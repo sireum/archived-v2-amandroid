@@ -394,63 +394,63 @@ ifeq ($(SDK_ONLY),true)
 # the second section defines all the Java ones (assuming javac is available.)
 
 subdirs := \
-	prebuilt \
-	build/libs/host \
-	build/tools/zipalign \
+#	prebuilt \
+#	build/libs/host \
+#	build/tools/zipalign \
 	dalvik/dexdump \
 	dalvik/libdex \
-	dalvik/tools/dmtracedump \
-	dalvik/tools/hprof-conv \
-	development/host \
-	development/tools/etc1tool \
-	development/tools/line_endings \
-	development/tools/emulator/opengl \
-	external/clang \
-	external/easymock \
-	external/expat \
-	external/libpng \
-	external/llvm \
-	external/qemu \
-	external/sqlite/dist \
-	external/zlib \
-	frameworks/base \
-	frameworks/compile \
-	sdk/avdlauncher \
-	sdk/emulator/mksdcard \
-	sdk/sdklauncher \
-	system/core/adb \
-	system/core/fastboot \
-	system/core/libcutils \
-	system/core/liblog \
-	system/core/libzipfile
+#	dalvik/tools/dmtracedump \
+#	dalvik/tools/hprof-conv \
+#	development/host \
+#	development/tools/etc1tool \
+#	development/tools/line_endings \
+#	development/tools/emulator/opengl \
+#	external/clang \
+#	external/easymock \
+#	external/expat \
+#	external/libpng \
+#	external/llvm \
+#	external/qemu \
+#	external/sqlite/dist \
+#	external/zlib \
+#	frameworks/base \
+#	frameworks/compile \
+#	sdk/avdlauncher \
+#	sdk/emulator/mksdcard \
+#	sdk/sdklauncher \
+#	system/core/adb \
+#	system/core/fastboot \
+#	system/core/libcutils \
+#	system/core/liblog \
+#	system/core/libzipfile
 
 # The following can only be built if "javac" is available.
 # This check is used when building parts of the SDK under Cygwin.
 ifneq (,$(shell which javac 2>/dev/null))
-subdirs += \
-	build/tools/signapk \
-	dalvik/dx \
-	libcore \
-	sdk/archquery \
-	sdk/androidprefs \
-	sdk/apkbuilder \
-	sdk/assetstudio \
-	sdk/common \
-	sdk/ddms \
-	sdk/hierarchyviewer2 \
-	sdk/ide_common \
-	sdk/jarutils \
-	sdk/layoutlib_api \
-	sdk/layoutopt \
-	sdk/ninepatch \
-	sdk/rule_api \
-	sdk/sdkstats \
-	sdk/sdkmanager \
-	sdk/swtmenubar \
-	sdk/traceview \
-	development/apps \
-	development/tools/mkstubs \
-	packages
+#subdirs += \
+#	build/tools/signapk \
+#	dalvik/dx \
+#	libcore \
+#	sdk/archquery \
+#	sdk/androidprefs \
+#	sdk/apkbuilder \
+#	sdk/assetstudio \
+#	sdk/common \
+#	sdk/ddms \
+#	sdk/hierarchyviewer2 \
+#	sdk/ide_common \
+#	sdk/jarutils \
+#	sdk/layoutlib_api \
+#	sdk/layoutopt \
+#	sdk/ninepatch \
+#	sdk/rule_api \
+#	sdk/sdkstats \
+#	sdk/sdkmanager \
+#	sdk/swtmenubar \
+#	sdk/traceview \
+#	development/apps \
+#	development/tools/mkstubs \
+#	packages
 else
 $(warning SDK_ONLY: javac not available.)
 endif
@@ -466,17 +466,17 @@ ifeq ($(BUILD_TINY_ANDROID), true)
 # TINY_ANDROID is a super-minimal build configuration, handy for board
 # bringup and very low level debugging
 
-subdirs := \
-	bionic \
-	system/core \
-	system/extras/ext4_utils \
-	system/extras/su \
-	build/libs \
-	build/target \
-	build/tools/acp \
-	external/mksh \
-	external/yaffs2 \
-	external/zlib
+#subdirs := \
+#	bionic \
+#	system/core \
+#	system/extras/ext4_utils \
+#	system/extras/su \
+#	build/libs \
+#	build/target \
+#	build/tools/acp \
+#	external/mksh \
+#	external/yaffs2 \
+#	external/zlib
 else	# !BUILD_TINY_ANDROID
 
 #
