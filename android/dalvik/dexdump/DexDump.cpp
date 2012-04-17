@@ -29,6 +29,7 @@
  * - no generic signatures on parameters, e.g. type="java.lang.Class&lt;?&gt;"
  * - class shows declared fields and methods; does not show inherited fields
  */
+/* modified to output pilar by -Kui Luo   email:kuiluo@ksu.edu*/
 
 #include "libdex/DexFile.h"
 #include "libdex/CmdUtils.h"
