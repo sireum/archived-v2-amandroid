@@ -30,6 +30,7 @@
  * - class shows declared fields and methods; does not show inherited fields
  */
 /* modified to output pilar by -Kui Luo   email:kuiluo@ksu.edu*/
+/* further modified by Sankardas Roy (email:sroy@ksu.edu) and Fengguo Wei */
 
 #include "libdex/DexFile.h"
 #include "libdex/CmdUtils.h"
@@ -41,6 +42,9 @@
 #include "libdex/InstrUtils.h"
 #include "libdex/SysUtil.h"
 
+#include "pilar.h" // sankar adds this header file
+#include "pStash.h" // sankar adds this which defines a container class
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -50,12 +54,20 @@
 #include <errno.h>
 #include <assert.h>
 
+
+// #include<map>
+ // using namespace std;
+
 static const char* gProgName = "dexdump";
 static char* packageName =NULL;
 enum OutputFormat {
     OUTPUT_PLAIN = 0,               /* default */
     OUTPUT_XML,                     /* fancy */
 };
+
+
+
+FILE* pFp; // represents the file which will have pilar output;
 
 /* command-line options */
 struct Options {
@@ -70,16 +82,7 @@ struct Options {
     bool exportsOnly;
     bool verbose;
 };
-//******************* kui's modification begins  *******************
-struct Op31t {
-    int insnIdx;
-    const DecodedInstruction* pDecInsn;
-    void init(int insnIdx,const DecodedInstruction* pDecInsn){
-      this->insnIdx=insnIdx;
-      this->pDecInsn=pDecInsn;
-    }
-};
-//******************* kui's modification ends  *******************
+
 struct Options gOptions;
 
 /* basic info about a field or method */
@@ -441,55 +444,127 @@ void dumpFileHeader(const DexFile* pDexFile)
 
     if (pOptHeader != NULL) {
         printf("Optimized DEX file header:\n");
+        // fprintf(pFp, "Optimized DEX file header:\n"); // sankar
 
         asciify(sanitized, pOptHeader->magic, sizeof(pOptHeader->magic));
         printf("magic               : '%s'\n", sanitized);
+        // fprintf(pFp, "magic               : '%s'\n", sanitized); // sankar
+
         printf("dex_offset          : %d (0x%06x)\n",
             pOptHeader->dexOffset, pOptHeader->dexOffset);
+        // fprintf(pFp, "dex_offset          : %d (0x%06x)\n",
+           // pOptHeader->dexOffset, pOptHeader->dexOffset);  // sankar
+
         printf("dex_length          : %d\n", pOptHeader->dexLength);
+        // fprintf(pFp, "dex_length          : %d\n", pOptHeader->dexLength); // sankar
+
         printf("deps_offset         : %d (0x%06x)\n",
             pOptHeader->depsOffset, pOptHeader->depsOffset);
+        // fprintf(pFp, "deps_offset         : %d (0x%06x)\n",
+           //  pOptHeader->depsOffset, pOptHeader->depsOffset); // sankar
+
         printf("deps_length         : %d\n", pOptHeader->depsLength);
+        // fprintf(pFp, "deps_length         : %d\n", pOptHeader->depsLength); // sankar
+
         printf("opt_offset          : %d (0x%06x)\n",
             pOptHeader->optOffset, pOptHeader->optOffset);
+        // fprintf(pFp, "opt_offset          : %d (0x%06x)\n",
+           // pOptHeader->optOffset, pOptHeader->optOffset); // sankar
+
         printf("opt_length          : %d\n", pOptHeader->optLength);
+        // fprintf(pFp, "opt_length          : %d\n", pOptHeader->optLength); // sankar
+
         printf("flags               : %08x\n", pOptHeader->flags);
+        // fprintf(pFp, "flags               : %08x\n", pOptHeader->flags); // sankar
+
         printf("checksum            : %08x\n", pOptHeader->checksum);
+        // fprintf(pFp, "checksum            : %08x\n", pOptHeader->checksum); // sankar
         printf("\n");
+        // fprintf(pFp, "\n"); // sankar
     }
 
     printf("DEX file header:\n");
+    // fprintf(pFp, "DEX file header:\n"); // sankar
+
     asciify(sanitized, pHeader->magic, sizeof(pHeader->magic));
     printf("magic               : '%s'\n", sanitized);
+    // fprintf(pFp, "magic               : '%s'\n", sanitized); // sankar
+
     printf("checksum            : %08x\n", pHeader->checksum);
+    // fprintf(pFp, "checksum            : %08x\n", pHeader->checksum); // sankar
+
     printf("signature           : %02x%02x...%02x%02x\n",
         pHeader->signature[0], pHeader->signature[1],
         pHeader->signature[kSHA1DigestLen-2],
         pHeader->signature[kSHA1DigestLen-1]);
+    // fprintf(pFp, "signature           : %02x%02x...%02x%02x\n",
+       // pHeader->signature[0], pHeader->signature[1],
+       // pHeader->signature[kSHA1DigestLen-2],
+       // pHeader->signature[kSHA1DigestLen-1]); // sankar
+
     printf("file_size           : %d\n", pHeader->fileSize);
+    // fprintf(pFp, "file_size           : %d\n", pHeader->fileSize); // sankar
+
     printf("header_size         : %d\n", pHeader->headerSize);
+    // fprintf(pFp, "header_size         : %d\n", pHeader->headerSize); // sankar
+
     printf("link_size           : %d\n", pHeader->linkSize);
+    // fprintf(pFp, "link_size           : %d\n", pHeader->linkSize); // sankar
+
     printf("link_off            : %d (0x%06x)\n",
         pHeader->linkOff, pHeader->linkOff);
+    // fprintf(pFp, "link_off            : %d (0x%06x)\n",
+       // pHeader->linkOff, pHeader->linkOff); // sankar
+
     printf("string_ids_size     : %d\n", pHeader->stringIdsSize);
+    // fprintf(pFp, "string_ids_size     : %d\n", pHeader->stringIdsSize); // sankar
+
     printf("string_ids_off      : %d (0x%06x)\n",
         pHeader->stringIdsOff, pHeader->stringIdsOff);
+    // fprintf(pFp, "string_ids_off      : %d (0x%06x)\n",
+       //  pHeader->stringIdsOff, pHeader->stringIdsOff); // sankar
+
     printf("type_ids_size       : %d\n", pHeader->typeIdsSize);
+    // fprintf(pFp, "type_ids_size       : %d\n", pHeader->typeIdsSize); // sankar
+
     printf("type_ids_off        : %d (0x%06x)\n",
         pHeader->typeIdsOff, pHeader->typeIdsOff);
+    // fprintf(pFp, "type_ids_off        : %d (0x%06x)\n",
+       // pHeader->typeIdsOff, pHeader->typeIdsOff); // sankar
+
     printf("field_ids_size      : %d\n", pHeader->fieldIdsSize);
+    // fprintf(pFp, "field_ids_size      : %d\n", pHeader->fieldIdsSize); // sankar
+
     printf("field_ids_off       : %d (0x%06x)\n",
         pHeader->fieldIdsOff, pHeader->fieldIdsOff);
+    // fprintf(pFp, "field_ids_off       : %d (0x%06x)\n",
+       // pHeader->fieldIdsOff, pHeader->fieldIdsOff); // sankar
+
     printf("method_ids_size     : %d\n", pHeader->methodIdsSize);
+    // fprintf(pFp, "method_ids_size     : %d\n", pHeader->methodIdsSize); // sankar
+
     printf("method_ids_off      : %d (0x%06x)\n",
         pHeader->methodIdsOff, pHeader->methodIdsOff);
+    // fprintf(pFp, "method_ids_off      : %d (0x%06x)\n",
+       // pHeader->methodIdsOff, pHeader->methodIdsOff); // sankar
+
     printf("class_defs_size     : %d\n", pHeader->classDefsSize);
+    // fprintf(pFp, "class_defs_size     : %d\n", pHeader->classDefsSize); // sankar
+
     printf("class_defs_off      : %d (0x%06x)\n",
         pHeader->classDefsOff, pHeader->classDefsOff);
+    // fprintf(pFp, "class_defs_off      : %d (0x%06x)\n",
+       // pHeader->classDefsOff, pHeader->classDefsOff); // sankar
+
     printf("data_size           : %d\n", pHeader->dataSize);
+    // fprintf(pFp, "data_size           : %d\n", pHeader->dataSize); // sankar
+
     printf("data_off            : %d (0x%06x)\n",
         pHeader->dataOff, pHeader->dataOff);
+    // fprintf(pFp, "data_off            : %d (0x%06x)\n",
+       // pHeader->dataOff, pHeader->dataOff);
     printf("\n");
+    //fprintf(pFp, "\n"); // sankar
 }
 
 /*
@@ -502,11 +577,13 @@ void dumpOptDirectory(const DexFile* pDexFile)
         return;
 
     printf("OPT section contents:\n");
+    // fprintf(pFp, "OPT section contents:\n"); // sankar
 
     const u4* pOpt = (const u4*) ((u1*) pOptHeader + pOptHeader->optOffset);
 
     if (*pOpt == 0) {
         printf("(1.0 format, only class lookup table is present)\n\n");
+       // fprintf(pFp, "(1.0 format, only class lookup table is present)\n\n");
         return;
     }
 
@@ -535,10 +612,15 @@ void dumpOptDirectory(const DexFile* pDexFile)
             *pOpt >> 24, (char)(*pOpt >> 16), (char)(*pOpt >> 8), (char)*pOpt,
             verboseStr, size);
 
+       // fprintf(pFp, "Chunk %08x (%c%c%c%c) - %s (%d bytes)\n", *pOpt,
+           // *pOpt >> 24, (char)(*pOpt >> 16), (char)(*pOpt >> 8), (char)*pOpt,
+           // verboseStr, size); // sankar
+
         size = (size + 8 + 7) & ~7;
         pOpt += size / sizeof(u4);
     }
     printf("\n");
+   // fprintf(pFp, "\n");
 }
 
 /*
@@ -560,24 +642,58 @@ void dumpClassDef(DexFile* pDexFile, int idx)
     }
 
     printf("Class #%d header:\n", idx);
+   // fprintf(pFp, "Class #%d header:\n", idx); // sankar
+
     printf("class_idx           : %d\n", pClassDef->classIdx);
+  //  fprintf(pFp, "class_idx           : %d\n", pClassDef->classIdx); // sankar
+
     printf("access_flags        : %d (0x%04x)\n",
         pClassDef->accessFlags, pClassDef->accessFlags);
+  //  fprintf(pFp, "access_flags        : %d (0x%04x)\n",
+    //    pClassDef->accessFlags, pClassDef->accessFlags); // sankar
+
     printf("superclass_idx      : %d\n", pClassDef->superclassIdx);
+  //  fprintf(pFp, "superclass_idx      : %d\n", pClassDef->superclassIdx); // sankar
+
     printf("interfaces_off      : %d (0x%06x)\n",
         pClassDef->interfacesOff, pClassDef->interfacesOff);
+  //  fprintf(pFp, "interfaces_off      : %d (0x%06x)\n",
+      //  pClassDef->interfacesOff, pClassDef->interfacesOff); // sankar
+
     printf("source_file_idx     : %d\n", pClassDef->sourceFileIdx);
+  //  fprintf(pFp, "source_file_idx     : %d\n", pClassDef->sourceFileIdx); // sankar
+
     printf("annotations_off     : %d (0x%06x)\n",
         pClassDef->annotationsOff, pClassDef->annotationsOff);
+  //  fprintf(pFp, "annotations_off     : %d (0x%06x)\n",
+    //    pClassDef->annotationsOff, pClassDef->annotationsOff); // sankar
+
     printf("class_data_off      : %d (0x%06x)\n",
         pClassDef->classDataOff, pClassDef->classDataOff);
+   // fprintf(pFp, "class_data_off      : %d (0x%06x)\n",
+     //   pClassDef->classDataOff, pClassDef->classDataOff); // sankar
+
     printf("static_fields_size  : %d\n", pClassData->header.staticFieldsSize);
+  //  fprintf(pFp, "static_fields_size  : %d\n", pClassData->header.staticFieldsSize); // sankar
+
     printf("instance_fields_size: %d\n",
             pClassData->header.instanceFieldsSize);
+  //  fprintf(pFp, "instance_fields_size: %d\n",
+    //        pClassData->header.instanceFieldsSize); // sankar
+
     printf("direct_methods_size : %d\n", pClassData->header.directMethodsSize);
+
+  //  fprintf(pFp, "direct_methods_size : %d\n", pClassData->header.directMethodsSize); // sankar
+
     printf("virtual_methods_size: %d\n",
             pClassData->header.virtualMethodsSize);
+
+  //  fprintf(pFp, "virtual_methods_size: %d\n",
+    //        pClassData->header.virtualMethodsSize); // sankar
+
     printf("\n");
+
+  //  fprintf(pFp, "\n"); // sankar
 
     free(pClassData);
 }
@@ -593,15 +709,28 @@ void dumpInterface(const DexFile* pDexFile, const DexTypeItem* pTypeItem,
     //******************* kui's modification begins  *******************
     if (gOptions.outputFormat == OUTPUT_PLAIN) {
       if(flag==1)
-        printf(", [|%s|]",descriptorToDot(interfaceName));
+        { 
+			printf(", [|%s|]",descriptorToDot(interfaceName));
+			fprintf(pFp, ", [|%s|]",descriptorToDot(interfaceName));
+			
+		}
       else if(flag==2)
-        printf(" [|%s|],",descriptorToDot(interfaceName));
+        { 
+			printf(" [|%s|],",descriptorToDot(interfaceName));
+			fprintf(pFp, " [|%s|],",descriptorToDot(interfaceName));
+			
+		}
       else if(flag==0)
-        printf(" [|%s|]",descriptorToDot(interfaceName));
+        { 
+			printf(" [|%s|]",descriptorToDot(interfaceName));
+			fprintf(pFp, " [|%s|]",descriptorToDot(interfaceName));
+			
+		}
         //******************* kui's modification ends  *******************
     } else {
         char* dotted = descriptorToDot(interfaceName);
         printf("<implements name=\"%s\">\n</implements>\n", dotted);
+        fprintf(pFp, "<implements name=\"%s\">\n</implements>\n", dotted);
         free(dotted);
     }
 }
@@ -614,11 +743,11 @@ void dumpCatches(DexFile* pDexFile, const DexCode* pCode)
     u4 triesSize = pCode->triesSize;
     //******************* kui's modification begins  *******************
     if (triesSize == 0) {
-        //printf("      @catches:(none)\n");
+        printf("      @catches:(none)\n"); // not in pilar
         return;
     }
 
-  //  printf("      catches       : %d\n", triesSize);
+    printf("      catches       : %d\n", triesSize); // not in pilar
 
     const DexTry* pTries = dexGetTries(pCode);
     u4 i;
@@ -629,7 +758,7 @@ void dumpCatches(DexFile* pDexFile, const DexCode* pCode)
         u4 end = start + pTry->insnCount;
         DexCatchIterator iterator;
 
-       // printf("        0x%04x - 0x%04x\n", start, end);
+        printf("        0x%04x - 0x%04x\n", start, end); // not in pilar
 
         dexCatchIteratorInit(&iterator, pCode, pTry->handlerOff);
 
@@ -643,7 +772,9 @@ void dumpCatches(DexFile* pDexFile, const DexCode* pCode)
             const u2* insns = pCode->insns;
             descriptor = (handler->typeIdx == kDexNoIndex) ? "any" :
                 descriptorToDot(dexStringByTypeIdx(pDexFile, handler->typeIdx));
-            printf("  catch  %s @[L%06x..L%06x] goto L%06x;\n", descriptor,((u1*)insns - pDexFile->baseAddr) +start*2,((u1*)insns - pDexFile->baseAddr) +end*2,((u1*)insns - pDexFile->baseAddr) +(handler->address)*2);
+            printf("  catch  %s @[L%06x..L%06x] goto L%06x;\n", descriptor,((u1*)insns - pDexFile->baseAddr) +start*2,((u1*)insns - pDexFile->baseAddr) +end*2,((u1*)insns - pDexFile->baseAddr) +(handler->address)*2); // need to change back
+
+            fprintf(pFp,"  catch  %s @[L%06x..L%06x] goto L%06x;\n", descriptor,((u1*)insns - pDexFile->baseAddr) +start*2,((u1*)insns - pDexFile->baseAddr) +end*2,((u1*)insns - pDexFile->baseAddr) +(handler->address)*2); // sankar
         }
     }
     //******************* kui's modification ends  *******************
@@ -651,7 +782,7 @@ void dumpCatches(DexFile* pDexFile, const DexCode* pCode)
 
 static int dumpPositionsCb(void *cnxt, u4 address, u4 lineNum)
 {
-    printf("        0x%04x line=%d\n", address, lineNum);
+    printf("        0x%04x line=%d\n", address, lineNum); // not in pilar
     return 0;
 }
 
@@ -662,7 +793,7 @@ void dumpPositions(DexFile* pDexFile, const DexCode* pCode,
         const DexMethod *pDexMethod)
 {
 
-    printf("      positions     : \n");
+    printf("      positions     : \n"); // not in pilar
     const DexMethodId *pMethodId
             = dexGetMethodId(pDexFile, pDexMethod->methodIdx);
     const char *classDescriptor
@@ -676,8 +807,13 @@ static void dumpLocalsCb(void *cnxt, u2 reg, u4 startAddress,
         u4 endAddress, const char *name, const char *descriptor,
         const char *signature)
 {
+
+   printf("        0x%04x - 0x%04x reg=%d %s %s %s\n",
+            startAddress, endAddress, reg, name, descriptor,
+			            signature);
+
   //******************* kui's modification begins  *******************
-	printf("        [|%s|] [|%s|] @reg %d @scope (L%04x,L%04x) ;\n",
+	fprintf(pFp, "        [|%s|] [|%s|] @reg %d @scope (L%04x,L%04x) ;\n",
       descriptorToDot(descriptor), name,reg, startAddress,  +endAddress );
     //******************* kui's modification ends  *******************
 }
@@ -690,7 +826,8 @@ void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
         const DexMethod *pDexMethod)
 {
 
-	printf("      local placehoder ;\n");
+	printf("      locals :\n");
+	fprintf(pFp,"      local placehoder ;\n"); // sankar
     const DexMethodId *pMethodId
             = dexGetMethodId(pDexFile, pDexMethod->methodIdx);
     const char *classDescriptor
@@ -698,7 +835,7 @@ void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
 
     dexDecodeDebugInfo(pDexFile, pCode, classDescriptor, pMethodId->protoIdx,
             pDexMethod->accessFlags, NULL, dumpLocalsCb, NULL);
-    printf("      \n");
+    fprintf(pFp, "      \n"); // sankar: not in dexdump
 }
 
 /*
@@ -777,9 +914,9 @@ static char* indexString(DexFile* pDexFile,
         width = 4;
         break;
     case kFmt31c:
-    case kFmt40sc:
-    case kFmt41c:
-    case kFmt5rc:
+    // case kFmt40sc:  // sankar: this case is no longer defined 
+    // case kFmt41c:   // sankar: this case is no longer defined
+    // case kFmt5rc:   // sankar: this case is no longer defined
         index = pDecInsn->vB;
         width = 8;
         break;
@@ -788,10 +925,11 @@ static char* indexString(DexFile* pDexFile,
         index = pDecInsn->vC;
         width = 4;
         break;
-    case kFmt52c:
+                       // sankar: the following case i.e. kFmt52c is no longer defined, so commenting out the following block.
+    /* case kFmt52c:
         index = pDecInsn->vC;
         width = 8;
-        break;
+        break; */    
     default:
         index = 0;
         width = 4;
@@ -823,7 +961,7 @@ static char* indexString(DexFile* pDexFile,
         break;
     case kIndexTypeRef:
         outSize = snprintf(buf, bufSize, "%s",
-            descriptorToDot(getClassDescriptor(pDexFile, index)));
+             descriptorToDot(getClassDescriptor(pDexFile, index)));
         break;
     case kIndexStringRef:
         outSize = snprintf(buf, bufSize, "\"%s\"",
@@ -911,49 +1049,123 @@ static char* indexString(DexFile* pDexFile,
     }
 }
 
-/*
+
+
+
+/* 
  * Dump a single instruction.
+ * Sankar copied this function from Android4.1.original.source.DexDump.cpp and then modified it to output pilar following some of Kui's previous modification
  */
 void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
-    int insnWidth, const DecodedInstruction* pDecInsn,struct Op31t list[],int &s31t,int &l31t)
+    int insnWidth, const DecodedInstruction* pDecInsn, PStash &list, int &s31t, int &l31t) 
+    // sankar adds 3 extra args (list,int &s31t,int &l31t) to process switch-data-table and fill-array-data-table  
 {
     char indexBufChars[200];
-    char stringBufChars[200];
     char *indexBuf = indexBufChars;
-    char *stringBuf=stringBufChars;
     const u2* insns = pCode->insns;
     int i;
-    //******************* kui's modification begins  *******************
-    //printf("        #L%04x ", insnIdx);
-      printf("        #L%06x  ", ((u1*)insns - pDexFile->baseAddr) + insnIdx*2);
+
+    printf("%06x:", ((u1*)insns - pDexFile->baseAddr) + insnIdx*2);
+    fprintf(pFp,"#L%06x.   ", ((u1*)insns - pDexFile->baseAddr) + insnIdx*2); // sankar adds "L" at the left
+ 
+   //***** sankar: the following block simply dumps the hex bytes of the whole instruction in dexdump but not in pilar ***** 
+
+    for (i = 0; i < 8; i++) {
+        if (i < insnWidth) {
+            if (i == 7) {
+                printf(" ... ");
+            } else {
+                // print 16-bit value in little-endian order 
+                const u1* bytePtr = (const u1*) &insns[insnIdx+i];
+                printf(" %02x%02x", bytePtr[0], bytePtr[1]);
+            }
+        } else {
+            fputs("     ", stdout);
+        }
+    }
+
+  // ****** sankar: the above block ends *******
+
     if (pDecInsn->opcode == OP_NOP) {
-            u2 instr = get2LE((const u1*) &insns[insnIdx]);
-            if (instr == kPackedSwitchSignature) {
-              printf("switch v%d\n", list[l31t].pDecInsn->vA);
+        u2 instr = get2LE((const u1*) &insns[insnIdx]);
+
+
+        if (instr == kPackedSwitchSignature) {
+
+           printf("|%04x: packed-switch-data (%d units)",   insnIdx, insnWidth); // not in pilar
+
+           // ******* sankar starts ********
+
+		     struct Op31t* temp = (struct Op31t*)list[l31t];
+		     assert(temp);
+
+             // extra check to test if the appearance of switch  statements was in the same sequence as the appearance of the corresponding data-tables in the code later
+          
+              assert(insnIdx == (temp->insnIdx + temp->vB)); // if passes, then it is in ok sequence
+               
+		       //  printf("\n test; currInsnIdx = %04x, l31t = %d, storedInsnIdx = %04x, stored->vA= %d, and stored->vB = %04x \n", insnIdx, l31t, list[l31t].insnIdx, list[l31t].vA, list[l31t].vB);
+
+		      // extra check ends
+
+              fprintf(pFp, "switch  v%d\n", temp->vA);
               const u1* bytePtr = (const u1*) &insns[insnIdx+2];
               int minValue=(bytePtr[0] & 0xFF) |((bytePtr[1] & 0xFF) << 8) |((bytePtr[2] & 0xFF) << 16) |(bytePtr[3] << 24);
               for (i = 4; i < insnWidth; i+=2,minValue++) {
                   const u1* bytePtr = (const u1*) &insns[insnIdx+i];
-                     printf("                 | %d => goto L%06x\n", minValue,
-                    		 ((u1*)insns - pDexFile->baseAddr) +(((bytePtr[0] & 0xFF) |((bytePtr[1] & 0xFF) << 8) |((bytePtr[2] & 0xFF) << 16) |(bytePtr[3] << 24))+list[l31t].insnIdx)*2);
-                                        }
-              printf("                 | => goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(list[l31t].insnIdx+3)*2);
+                     fprintf(pFp, "                 | %d => goto L%06x\n", minValue,
+                    		 ((u1*)insns - pDexFile->baseAddr) +(((bytePtr[0] & 0xFF) |((bytePtr[1] & 0xFF) << 8) |((bytePtr[2] & 0xFF) << 16) |(bytePtr[3] << 24))+ temp->insnIdx)*2);
+               }
+              fprintf(pFp, "                 | => goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(temp->insnIdx+3)*2);
               ++l31t;
-            } else if (instr == kSparseSwitchSignature) {
-              printf("switch v%d\n", list[l31t].pDecInsn->vA);
+           // ********* sankar ends *********
+
+        } else if (instr == kSparseSwitchSignature) {
+
+            printf("|%04x: sparse-switch-data (%d units)",  insnIdx, insnWidth); // not in pilar
+
+            // ******** sankar starts ********
+		     struct Op31t* temp = (struct Op31t*)list[l31t];
+		     assert(temp);
+
+             // extra check to test if the appearance of switch statements was in the same sequence as the appearance of the corresponding data-tables in the code later
+          
+              assert(insnIdx == (temp->insnIdx + temp->vB)); // if passes, then it is in ok sequence
+               
+		       //  printf("\n test; currInsnIdx = %04x, l31t = %d, storedInsnIdx = %04x, stored->vA= %d, and stored->vB = %04x \n", insnIdx, l31t, list[l31t].insnIdx, list[l31t].vA, list[l31t].vB);
+
+		      // extra check ends
+
+              fprintf(pFp, "switch v%d\n", temp->vA);
               const u1* bytePtr = (const u1*) &insns[insnIdx+1];
               int size=(bytePtr[0] & 0xFF) | ((bytePtr[1] & 0xFF) << 8);
               int counter=0;
               for (i = 2; counter < size; i+=2,++counter) {
                    const u1* bytePtr = (const u1*) &insns[insnIdx+i];
-                    printf("                 | %d => goto L%06x\n",
+                    fprintf(pFp, "                 | %d => goto L%06x\n",
                     (bytePtr[0] & 0xFF) |((bytePtr[1] & 0xFF) << 8) |((bytePtr[2] & 0xFF) << 16) |(bytePtr[3] << 24),
-                    ((u1*)insns - pDexFile->baseAddr) + (((bytePtr[size*4] & 0xFF) |((bytePtr[size*4+1] & 0xFF) << 8) |((bytePtr[size*4+2] & 0xFF) << 16) |(bytePtr[size*4+3] << 24))+list[l31t].insnIdx)*2);
-                                                      }
-                     printf("                 | => goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(list[l31t].insnIdx+3)*2);
+                    ((u1*)insns - pDexFile->baseAddr) + (((bytePtr[size*4] & 0xFF) |((bytePtr[size*4+1] & 0xFF) << 8) |((bytePtr[size*4+2] & 0xFF) << 16) |(bytePtr[size*4+3] << 24))+ temp->insnIdx)*2);
+              }
+                     fprintf(pFp, "                 | => goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(temp->insnIdx+3)*2);
                      ++l31t;
-            } else if (instr == kArrayDataSignature) {
-              printf("v%d:=`[", list[l31t].pDecInsn->vA);
+           // *********** sankar ends **************
+
+        } else if (instr == kArrayDataSignature) {
+
+          printf("|%04x: array-data (%d units)", insnIdx, insnWidth); // not in pilar
+
+          // ********** sankar starts ******************
+		     struct Op31t* temp = (struct Op31t*)list[l31t];
+		     assert(temp);
+
+             // extra check to test if the appearance of fill-array statements was in the same sequence as the appearance of the corresponding data-tables in the code later
+          
+              assert(insnIdx == (temp->insnIdx + temp->vB)); // if passes, then it is in ok sequence
+               
+		       //  printf("\n test; currInsnIdx = %04x, l31t = %d, storedInsnIdx = %04x, stored->vA= %d, and stored->vB = %04x \n", insnIdx, l31t, list[l31t].insnIdx, list[l31t].vA, list[l31t].vB);
+
+		      // extra check ends
+
+              fprintf(pFp, "v%d:=`[", temp->vA);
               const u1* bytePtr = (const u1*) &insns[insnIdx+1];
               int length=(bytePtr[0] & 0xFF) | ((bytePtr[1] & 0xFF) << 8);
               switch (length){
@@ -961,24 +1173,24 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
                 for (i = 4; i < insnWidth; i++) {
                  const u1* bytePtr = (const u1*) &insns[insnIdx+i];
                  if(i==insnWidth-1)
-                   printf("%d ",(bytePtr[0] & 0xFF) | ((bytePtr[1] & 0xFF) << 8));
+                   fprintf(pFp, "%d ",(bytePtr[0] & 0xFF) | ((bytePtr[1] & 0xFF) << 8));
                  else
-                 printf("%d, ",(bytePtr[0] & 0xFF) | ((bytePtr[1] & 0xFF) << 8));
+                 fprintf(pFp, "%d, ",(bytePtr[0] & 0xFF) | ((bytePtr[1] & 0xFF) << 8));
                     }
                 break;
               case 4:
                 for (i = 4; i < insnWidth; i+=2) {
                const u1* bytePtr = (const u1*) &insns[insnIdx+i];
                if(i>=insnWidth-2)
-               printf("%d ",(bytePtr[0] & 0xFF) |((bytePtr[1] & 0xFF) << 8) |((bytePtr[2] & 0xFF) << 16) |(bytePtr[3] << 24));
-               else printf("%d, ",(bytePtr[0] & 0xFF) |((bytePtr[1] & 0xFF) << 8) |((bytePtr[2] & 0xFF) << 16) |(bytePtr[3] << 24));
+               fprintf(pFp, "%d ",(bytePtr[0] & 0xFF) |((bytePtr[1] & 0xFF) << 8) |((bytePtr[2] & 0xFF) << 16) |(bytePtr[3] << 24));
+               else fprintf(pFp, "%d, ",(bytePtr[0] & 0xFF) |((bytePtr[1] & 0xFF) << 8) |((bytePtr[2] & 0xFF) << 16) |(bytePtr[3] << 24));
                   }
                 break;
                case 8:
                  for (i = 4; i < insnWidth; i+=4) {
                    const u1* bytePtr = (const u1*) &insns[insnIdx+i];
                    if(i>=insnWidth-4)
-                   printf("%lldL "  ,(bytePtr[0]   & 0xFFL) |
+                   fprintf(pFp, "%lldL "  ,(bytePtr[0]   & 0xFFL) |
                                    ((bytePtr[1] & 0xFFL) << 8) |
                                    ((bytePtr[2] & 0xFFL) << 16) |
                                    ((bytePtr[3]  & 0xFFL) << 24) |
@@ -987,7 +1199,7 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
                                    ((bytePtr[6] & 0xFFLL) << 48) |
                                    (((long long)bytePtr[7]) << 56));
                    else
-                      printf("%lldL, "  ,(bytePtr[0]   & 0xFFL) |
+                      fprintf(pFp, "%lldL, "  ,(bytePtr[0]   & 0xFFL) |
                        ((bytePtr[1] & 0xFFL) << 8) |
                        ((bytePtr[2] & 0xFFL) << 16) |
                        ((bytePtr[3]  & 0xFFL) << 24) |
@@ -998,522 +1210,1217 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
                  }
                  break;
                  default:
-                   printf("fill-array-data length error");
+                   fprintf(pFp, "fill-array-data length error");
                    break;
               }
-              printf("];\n");
-              printf("               goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(list[l31t].insnIdx+3)*2);
+              fprintf(pFp, "];\n");
+              fprintf(pFp, "               goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(temp->insnIdx+3)*2);
               ++l31t;
-            }
-        }else{
+           // ************* sankar ends ***********
+
+        } else {  // sankar will check if this little one-line "else block" is necessary
+            printf("|%04x: nop // spacer", insnIdx);
+            // fprintf(pFp, "|%04x: nop // spacer", insnIdx); // fengguo was getting error if not uncommented
+        }
+    } 
+	
+	else {   // sankar includes the remaining of this method (a LOT of lines) as part of this else block
+
+       printf("|%04x: %s", insnIdx, dexGetOpcodeName(pDecInsn->opcode)); // not in pilar
+    
 
     if (pDecInsn->indexType != kIndexNone) {
-            indexBuf = indexString(pDexFile, pDecInsn,
-                    indexBufChars, sizeof(indexBufChars));
-        }
+        indexBuf = indexString(pDexFile, pDecInsn,
+                indexBufChars, sizeof(indexBufChars));
+    }
 
-        switch(pDecInsn->opcode){
-        case 0x00:
+    switch (dexGetFormatFromOpcode(pDecInsn->opcode)) {
+    case kFmt10x:        // op
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+			
+             case 0x00: // NOP
+			   break;
+
+			 case 0x0e:
+			  outReturnVoid();
+			  break;
+
+             default:
+			  fprintf(pFp, " 10x????");
+			  break;
+			
+			}
+		/***** sankar ends ***/
+        break;
+    case kFmt12x:        // op vA, vB
+        printf(" v%d, v%d", pDecInsn->vA, pDecInsn->vB); // not in pilar
+
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+             case 0x01: // move
+			  outMove(pDecInsn->vA, pDecInsn->vB);
+              break;
+			 case 0x04: // move-wide
+              outMoveWide(pDecInsn->vA, pDecInsn->vB); 
+              break;
+			 case 0x07: // move-object
+			  outMoveObject(pDecInsn->vA, pDecInsn->vB); 
+              break;
+			 case 0x21: // array-length
+			  outArrayLen(pDecInsn->vA,pDecInsn->vB); 
+			  break;
+
+         //uninary opCodes follow
+             case 0x7b:
+               outUnopNegInt(pDecInsn->vA, pDecInsn->vB); 
+               break;
+             case 0x7c:
+              outUnopNotInt(pDecInsn->vA, pDecInsn->vB); 
+              break;
+             case 0x7d:
+              outUnopNegLong(pDecInsn->vA, pDecInsn->vB); 
+              break;
+             case 0x7e:
+              outUnopNotLong(pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=~v%d  @type long;", pDecInsn->vA, pDecInsn->vB);
+              break;
+             case 0x7f:
+              outUnopNegFloat(pDecInsn->vA, pDecInsn->vB); // printf("v%d:=-v%d  @type float;", pDecInsn->vA, pDecInsn->vB);
+              break;
+             case 0x80:
+              outUnopNegDouble(pDecInsn->vA, pDecInsn->vB); // printf("v%d:=-v%d  @type double;", pDecInsn->vA, pDecInsn->vB);
+              break;
+             case 0x81:
+              outUnopInt2Long(pDecInsn->vA, pDecInsn->vB); // printf("v%d:=(long)v%d  @type i2l;", pDecInsn->vA, pDecInsn->vB);
+              break;
+             case 0x82:
+              outUnopInt2Float(pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=(float)v%d  @type i2f;", pDecInsn->vA, pDecInsn->vB);
+              break;
+             case 0x83:
+              outUnopInt2Double(pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=(double)v%d  @type i2d;", pDecInsn->vA, pDecInsn->vB);
+              break;
+             case 0x84:
+              outUnopLong2Int(pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=(int)v%d  @type l2i;", pDecInsn->vA, pDecInsn->vB);
+              break;
+             case 0x85:
+              outUnopLong2Float(pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=(float)v%d  @type l2f;", pDecInsn->vA, pDecInsn->vB);
+              break;
+             case 0x86:
+              outUnopLong2Double(pDecInsn->vA, pDecInsn->vB); // printf("v%d:=(double)v%d  @type l2d;", pDecInsn->vA, pDecInsn->vB);
+              break;
+             case 0x87:
+              outUnopFloat2Int(pDecInsn->vA, pDecInsn->vB); // printf("v%d:=(int)v%d  @type f2i;", pDecInsn->vA, pDecInsn->vB);
+              break;
+             case 0x88:
+              outUnopFloat2Long(pDecInsn->vA, pDecInsn->vB); // printf("v%d:=(long)v%d  @type f2l;", pDecInsn->vA, pDecInsn->vB);
+              break;
+             case 0x89:
+              outUnopFloat2Double(pDecInsn->vA, pDecInsn->vB); // printf("v%d:=(double)v%d  @type f2d;", pDecInsn->vA, pDecInsn->vB);
+              break;
+            case 0x8a:
+              outUnopDouble2Int(pDecInsn->vA, pDecInsn->vB); // printf("v%d:=(int)v%d  @type d2i;", pDecInsn->vA, pDecInsn->vB);
+              break;
+            case 0x8b:
+             outUnopDouble2Long(pDecInsn->vA, pDecInsn->vB); // printf("v%d:=(long)v%d  @type d2l;", pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0x8c:
+             outUnopDouble2Float(pDecInsn->vA, pDecInsn->vB); // printf("v%d:=(float)v%d  @type d2f;", pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0x8d:
+             outUnopInt2Byte(pDecInsn->vA, pDecInsn->vB); // printf("v%d:=(byte)v%d  @type i2b;", pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0x8e:
+             outUnopInt2Char(pDecInsn->vA, pDecInsn->vB); // printf("v%d:=(char)v%d  @type i2c;", pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0x8f:
+             outUnopInt2short(pDecInsn->vA, pDecInsn->vB); // printf("v%d:=(short)v%d  @type i2s;", pDecInsn->vA, pDecInsn->vB);
+             break;
+
+        //binary /2addr opCodes follow
+            case 0xb0:
+             outAddInt2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); // printf("v%d:=v%d+v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xb1:
+             outSubInt2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d-v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xb2:
+             outMulInt2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d*v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xb3:
+             outDivInt2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d/v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xb4:
+             outRemInt2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d%%v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xb5:
+             outAndInt2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d^&v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xb6:
+             outOrInt2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d^|v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xb7:
+             outXorInt2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d^~v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xb8:
+             outShlInt2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d^<v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xb9:
+             outShrInt2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d^>v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xba:
+             outUshrInt2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d^>>v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xbb:
+             outAddLong2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d+v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xbc:
+             outSubLong2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); // printf("v%d:=v%d-v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xbd:
+             outMulLong2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d*v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xbe:
+             outDivLong2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d/v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xbf:
+             outRemLong2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d%%v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xc0:
+             outAndLong2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d^&v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xc1:
+             outOrLong2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d^|v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xc2:
+             outXorLong2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d^~v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xc3:
+             outShlLong2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d^<v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xc4:
+             outShrLong2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d^>v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xc5:
+             outUshrLong2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d^>>v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xc6:
+             outAddFloat2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d+v%d  @type float;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xc7:
+             outSubFloat2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d-v%d  @type float;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xc8:
+             outMulFloat2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d*v%d  @type float;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xc9:
+             outDivFloat2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d/v%d  @type float;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xca:
+             outRemFloat2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); // printf("v%d:=v%d%%v%d  @type float;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xcb:
+             outAddDouble2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d+v%d  @type double;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xcc:
+             outSubDouble2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d-v%d  @type double;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xcd:
+             outMulDouble2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d*v%d  @type double;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xce:
+             outDivDouble2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d/v%d  @type double;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+            case 0xcf:
+             outRemDouble2addr(pDecInsn->vA, pDecInsn->vA, pDecInsn->vB); //  printf("v%d:=v%d%%v%d  @type double;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
+             break;
+
+
+             default:
+			  fprintf(pFp, " 12x????");
+			  break;
+              }
+	    /**** sankar ends *****/
+
+        break;
+    case kFmt11n:        // op vA, #+B
+        printf(" v%d, #int %d // #%x",
+           pDecInsn->vA, (s4)pDecInsn->vB, (u1)pDecInsn->vB); // not in pilar
+
+
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+
+             case 0x12:
+              outConst4(pDecInsn->vA, (s4)pDecInsn->vB); // printf("v%d:=%d  @length 4;", pDecInsn->vA,(s4)pDecInsn->vB );
+              break;
+
+             default:
+			  fprintf(pFp," 11n????");
+			  break;
+              }
+	    /**** sankar ends *****/
+
+        break;
+    case kFmt11x:        // op vAA
+        printf(" v%d", pDecInsn->vA); // not in pilar
+
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+          case 0x0a:
+           outMoveResult(pDecInsn->vA); // printf("v%d:=temp;", pDecInsn->vA);
+           break;
+         case 0x0b:
+           outMoveResultWide(pDecInsn->vA); // printf("v%d:=temp  @type wide;", pDecInsn->vA);
+           break;
+         case 0x0c:
+           outMoveResultObject(pDecInsn->vA); // printf("v%d:=temp  @type object;", pDecInsn->vA);
+           break;
+         case 0x0d:
+          outMoveExc(pDecInsn->vA); // printf("v%d:=Exception  @type object;", pDecInsn->vA);
           break;
-          //move
-        case 0x01:
-        case 0x02:
-        case 0x03:
-          printf("v%d:=v%d;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x04:
-        case 0x05:
-        case 0x06:
-          printf("v%d:=v%d  @type wide;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x07:
-        case 0x08:
-        case 0x09:
-          printf("v%d:=v%d  @type object;", pDecInsn->vA, pDecInsn->vB);
-          break;
-          //move-result
-        case 0x0a:
-          printf("v%d:=temp;", pDecInsn->vA);
-          break;
-        case 0x0b:
-          printf("v%d:=temp  @type wide;", pDecInsn->vA);
-          break;
-        case 0x0c:
-          printf("v%d:=temp  @type object;", pDecInsn->vA);
-          break;
-        case 0x0d:
-        	printf("v%d:=Exception  @type object;", pDecInsn->vA);
-          break;
-          //return
-        case 0x0e:
-          printf("return @void ;");
-          break;
+
+
         case 0x0f:
-          printf("return v%d;", pDecInsn->vA );
+          outReturn(pDecInsn->vA); // printf("return v%d;", pDecInsn->vA );
           break;
         case 0x10:
-          printf("return v%d  @type wide;", pDecInsn->vA );
+          outReturnWide(pDecInsn->vA); // printf("return v%d  @type wide;", pDecInsn->vA );
           break;
         case 0x11:
-          printf("return v%d  @type object;", pDecInsn->vA );
-          break;
-          //const
-        case 0x12:
-          printf("v%d:=%d  @length 4;", pDecInsn->vA,(s4)pDecInsn->vB );
-          break;
-        case 0x13:
-          printf("v%d:=%d  @length 16;", pDecInsn->vA,(s4)pDecInsn->vB );
-          break;
-        case 0x14:
-        {/* this is often, but not always, a float */
-           union {
-              float f;
-              u4 i;
-                  } conv;
-           conv.i = pDecInsn->vB;
-           printf(" v%d:=%f;",pDecInsn->vA, conv.f);
-         }
-          break;
-        case 0x15:
-          {s4 value = pDecInsn->vB << 16;
-                      printf("v%d:=%d  @length high16;",pDecInsn->vA, value);
-          }
-          break;
-        case 0x16:
-           printf("v%d:=%d  @length wide16;", pDecInsn->vA,(s4)pDecInsn->vB );
-           break;
-        case 0x17:
-        {/* this is often, but not always, a float */
-         union {
-             float f;
-             u4 i;
-                } conv;
-             conv.i = pDecInsn->vB;
-           printf(" v%d:=%f  @length wide32;",pDecInsn->vA, conv.f);
-        }
+          outReturnObj(pDecInsn->vA); // printf("return v%d  @type object;", pDecInsn->vA );
           break;
 
-        case 0x18:
-        {/* this is often, but not always, a double */
-            union {
-              double d;
-              u8 j;
-                } conv2;
-          conv2.j = pDecInsn->vB_wide;
-          printf("v%d:=%fL  @length wide;",pDecInsn->vA, conv2.d);
-        }
-          break;
-        case 0x19:
-          {s8 value1 = ((s8) pDecInsn->vB) << 48;
-           printf("v%d:=%lldL  @length wide_high16;",pDecInsn->vA, value1);
-          }
-           break;
-        case 0x1a:
-        case 0x1b:
-        {
-          // find escape characters
-         const char *Str = dexStringById(pDexFile, pDecInsn->vB);
-         char newStr [(int)strlen(Str)+100];
-         int m=0,n=0;
 
-        while( m<=(int)strlen(Str)){
-        	if(Str[m]=='\n'||Str[m]=='\r') ++m;
-        	else if(Str[m]=='\\'||Str[m]=='"')
-        		 {
-        		 newStr[n++]='\\';
-        		 newStr[n++]=Str[m++];
-        		 }
-        	 else newStr[n++]=Str[m++];
-         }
-         //newStr[n]='\0';
-         printf("v%d:=\"%s\";", pDecInsn->vA,newStr);
-        }
-          break;
-        case 0x1c:
-          printf("v%d:=[|%s|];", pDecInsn->vA,descriptorToDot(getClassDescriptor(pDexFile, pDecInsn->vB)));
-          break;
-          //monitor
+        //next 2 opcodes are about monitor
         case 0x1d:
-          printf("(@monitorenter v%d)", pDecInsn->vA);
+          outMonitorEnter(pDecInsn->vA); // printf("(@monitorenter v%d)", pDecInsn->vA);
           break;
         case 0x1e:
-          printf("(@monitorexit v%d)", pDecInsn->vA);
+          outMonitorExit(pDecInsn->vA); // printf("(@monitorexit v%d)", pDecInsn->vA);
           break;
-          //check cast
-        case 0x1f:
-          printf("v%d:=([|%s|])v%d;", pDecInsn->vA,descriptorToDot(getClassDescriptor(pDexFile, pDecInsn->vB)), pDecInsn->vA);
-           break;
-           //instance of
-        case 0x20:
-          printf("v%d:=instanceof(v%d, [|%s|]);",pDecInsn->vA,pDecInsn->vB,descriptorToDot(indexBuf));
-          break;
-          //array lenth
-        case 0x21:
-          printf("v%d:=v%d.length;",pDecInsn->vA,pDecInsn->vB);
-           break;
-           // new
-        case 0x22:
-          printf("v%d:=new [|%s|];",pDecInsn->vA,indexBuf);
-          break;
-        case 0x23:
-        {
-          char newIndex[200];
-          int flag=0;
-          for(int m=0,n=0;n<(int)strlen(indexBuf);){
-            if(indexBuf[n]=='['&&indexBuf[n+1]==']'&&flag==0)
-            {
-              newIndex[m]=indexBuf[n];
-              m++;n++;
-              char buffer[5];
-              sprintf(buffer, "v%d",pDecInsn->vB);
-              for(int i=0;i<(int)strlen(buffer);i++,m++)
-                newIndex[m]=buffer[i];
-              flag=1;
-            }
-            else {
-              newIndex[m]=indexBuf[n];
-              m++;n++;
-            }
-            newIndex[m]='\0';
-          }
-          printf("v%d:=new %s ;",pDecInsn->vA,newIndex);
-        }
-          break;
-          //fill array
-        case 0x24:
-        {
-          printf("temp:=(%s)`[", indexBuf);
-          for (i = 0; i < (int) pDecInsn->vA; i++) {
-              if (i == 0)
-                printf("v%d", pDecInsn->arg[i]);
-              else
-                printf(", v%d", pDecInsn->arg[i]);
-                    }
-          printf("];");
-        }
-        break;
-        case 0x25:
-        {
-          printf("temp:=(%s)`[", indexBuf);
-          for (i = 0; i < (int) pDecInsn->vA; i++) {
-              if (i == 0)
-                printf("v%d", pDecInsn->vC + i);
-              else
-                printf(", v%d", pDecInsn->vC + i);
-                      }
-                printf("];");
-         }
-          break;
-        case 0x26:
-        { printf("goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(insnIdx + pDecInsn->vB)*2);
-          list[s31t].init(insnIdx,pDecInsn);
-         ++s31t;
-          }
-          break;
+
+
           //throw
         case 0x27:
-          printf("throw v%d;",pDecInsn->vA);
+          outThrow(pDecInsn->vA); //printf("throw v%d;",pDecInsn->vA);
           break;
-          // goto
-        case 0x28:
-        case 0x29:
-        case 0x2a:
+
+         default:
+		  fprintf(pFp, " 11x????");
+		  break;
+          }
+	    /**** sankar ends *****/
+
+        break;
+    case kFmt10t:        // op +AA
+
+         {
+             s4 targ = (s4) pDecInsn->vA;
+             printf(" %04x // %c%04x",
+	               insnIdx + targ,
+	                 (targ < 0) ? '-' : '+',
+	                (targ < 0) ? -targ : targ); // not in pilar
+
+
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+             case 0x28:
+              outGoto(((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2); // printf("goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
+              break;
+
+             default:
+			  fprintf(pFp, " 10t????");
+			  break;
+              }
+	    /**** sankar ends *****/
+
+	     }
+	     break;  
+
+
+
+    case kFmt20t:        // op +AAAA
+
         {
             s4 targ = (s4) pDecInsn->vA;
-            printf("goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
-        }
-          break;
-        case 0x2b:
-        case 0x2c:
-        { printf("goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(insnIdx + pDecInsn->vB)*2);
-        list[s31t].init(insnIdx,pDecInsn);
-          ++s31t;
-        }
-          break;
-          // cmp
-        case 0x2d:
-        case 0x2f:
-          printf("v%d:=cmpl(v%d,v%d);",pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);
-          break;
-        case 0x2e:
-        case 0x30:
-          printf("v%d:=cmpg(v%d,v%d);",pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);
-          break;
-        case 0x31:
-          printf("v%d:=cmp(v%d,v%d);",pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);
-          break;
-          // if
-        case 0x32:
-           {
-              s4 targ = (s4) pDecInsn->vC;
-              printf("if v%d==v%d then goto L%06x;", pDecInsn->vA, pDecInsn->vB,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
-           }
-          break;
-        case 0x33:
-           {
-              s4 targ = (s4) pDecInsn->vC;
-              printf("if v%d!=v%d then goto L%06x;", pDecInsn->vA, pDecInsn->vB,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
-           }
-           break;
-        case 0x34:
-        {
-                      s4 targ = (s4) pDecInsn->vC;
-                      printf("if v%d<v%d then goto L%06x;", pDecInsn->vA, pDecInsn->vB,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
-                   }
-                  break;
-        case 0x35:
-        {
-                      s4 targ = (s4) pDecInsn->vC;
-                      printf("if v%d>=v%d then goto L%06x;", pDecInsn->vA, pDecInsn->vB,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
-                   }
-                  break;
-        case 0x36:
-        {
-                      s4 targ = (s4) pDecInsn->vC;
-                      printf("if v%d>v%d then goto L%06x;", pDecInsn->vA, pDecInsn->vB,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
-                   }
-                  break;
-        case 0x37:
-        {
-                      s4 targ = (s4) pDecInsn->vC;
-                      printf("if v%d<=v%d then goto L%06x;", pDecInsn->vA, pDecInsn->vB,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
-                   }
-                  break;
-        case 0x38:
+            printf(" %04x // %c%04x",
+                insnIdx + targ,
+                (targ < 0) ? '-' : '+',
+                (targ < 0) ? -targ : targ);  // not in pilar
+	
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+             case 0x29:
+               outGoto(((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2); // printf("goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
+               break;
+
+             default:
+			  fprintf(pFp, " 20t????");
+			  break;
+              }
+	    /**** sankar ends *****/
+       }
+        break;
+    case kFmt22x:        // op vAA, vBBBB
+         printf(" v%d, v%d", pDecInsn->vA, pDecInsn->vB); // not in pilar
+
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+              case 0x02:
+               outMove(pDecInsn->vA, pDecInsn->vB); // printf("v%d:=v%d;", pDecInsn->vA, pDecInsn->vB);
+               break;
+
+              case 0x05:
+               outMoveWide(pDecInsn->vA, pDecInsn->vB); // printf("v%d:=v%d  @type wide;", pDecInsn->vA, pDecInsn->vB);
+               break;
+
+              case 0x08:
+               outMoveObject(pDecInsn->vA, pDecInsn->vB); // printf("v%d:=v%d  @type object;", pDecInsn->vA, pDecInsn->vB);
+               break;
+
+             default:
+			  fprintf(pFp, " 22x????");
+			  break;
+              }
+	    /**** sankar ends *****/
+
+        break;
+    case kFmt21t:        // op vAA, +BBBB
+ 
         {
             s4 targ = (s4) pDecInsn->vB;
-            printf("if v%d==0 then goto L%06x;", pDecInsn->vA,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
+            printf(" v%d, %04x // %c%04x", pDecInsn->vA,
+                insnIdx + targ,
+                (targ < 0) ? '-' : '+',
+                (targ < 0) ? -targ : targ); // not in pilar
+
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+              case 0x38:
+               outIfEqz(pDecInsn->vA,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2); // printf("if v%d==0 then goto L%06x;", pDecInsn->vA,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
+               break;
+              case 0x39:
+               outIfNez(pDecInsn->vA,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2); // printf("if v%d!=0 then goto L%06x;", pDecInsn->vA,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
+               break;
+              case 0x3a:
+               outIfLtz(pDecInsn->vA,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2); // printf("if v%d<0 then goto L%06x;", pDecInsn->vA,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
+               break;
+              case 0x3b:
+               outIfGez(pDecInsn->vA,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2); // printf("if v%d>=0 then goto L%06x;", pDecInsn->vA,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
+               break;
+              case 0x3c:
+               outIfGtz(pDecInsn->vA,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2); // printf("if v%d>0 then goto L%06x;", pDecInsn->vA,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
+               break;
+              case 0x3d:
+               outIfLez(pDecInsn->vA,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2); // printf("if v%d<=0 then goto L%06x;", pDecInsn->vA,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
+               break;
+         
+
+             default:
+			  fprintf(pFp, " 21t????");
+			  break;
+              }
+	    /**** sankar ends *****/
+       }
+        break;
+
+    case kFmt21s:        // op vAA, #+BBBB
+        printf(" v%d, #int %d // #%x",
+            pDecInsn->vA, (s4)pDecInsn->vB, (u2)pDecInsn->vB); // not in pilar
+
+
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+
+             case 0x13:
+              outConst16(pDecInsn->vA, (s4)pDecInsn->vB); // printf("v%d:=%d  @length 16;", pDecInsn->vA,(s4)pDecInsn->vB );
+              break;
+
+             case 0x16:
+              outConstWide16(pDecInsn->vA,(s4)pDecInsn->vB ); // printf("v%d:=%d  @length wide16;", pDecInsn->vA,(s4)pDecInsn->vB );
+              break;
+
+             default:
+			  fprintf(pFp, " 21s????");
+			  break;
+              }
+	    /**** sankar ends *****/
+
+        break;
+
+    case kFmt21h:        // op vAA, #+BBBB0000[00000000]
+      
+	  // The printed format varies a bit based on the actual opcode.
+        if (pDecInsn->opcode == OP_CONST_HIGH16) {
+            s4 value = pDecInsn->vB << 16;
+            printf(" v%d, #int %d // #%x",
+              pDecInsn->vA, value, (u2)pDecInsn->vB);  // not in pilar
+        } else {
+            s8 value = ((s8) pDecInsn->vB) << 48;
+            printf(" v%d, #long %lld // #%x",
+                pDecInsn->vA, value, (u2)pDecInsn->vB); // not in pilar
         }
-          break;
-        case 0x39:
-        {
-                    s4 targ = (s4) pDecInsn->vB;
-                    printf("if v%d!=0 then goto L%06x;", pDecInsn->vA,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
-                }
-                  break;
-        case 0x3a:
-        {
-                    s4 targ = (s4) pDecInsn->vB;
-                    printf("if v%d<0 then goto L%06x;", pDecInsn->vA,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
-                }
-                  break;
-        case 0x3b:
-        {
-                    s4 targ = (s4) pDecInsn->vB;
-                    printf("if v%d>=0 then goto L%06x;", pDecInsn->vA,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
-                }
-                  break;
-        case 0x3c:
-        {
-                    s4 targ = (s4) pDecInsn->vB;
-                    printf("if v%d>0 then goto L%06x;", pDecInsn->vA,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
-                }
-                  break;
-        case 0x3d:
-        {
-           s4 targ = (s4) pDecInsn->vB;
-            printf("if v%d<=0 then goto L%06x;", pDecInsn->vA,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
-         }
-           break;
-          //aput/aget
-        case 0x44:
-          printf("v%d:=v%d[v%d];",pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);
-          break;
-        case 0x45:
-          printf("v%d:=v%d[v%d]  @wide;",pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);
-          break;
-        case 0x46:
-          printf("v%d:=v%d[v%d]  @object;",pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);
-          break;
-        case 0x47:
-          printf("v%d:=v%d[v%d]  @boolean;",pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);
-          break;
-        case 0x48:
-          printf("v%d:=v%d[v%d]  @byte;",pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);
-          break;
-        case 0x49:
-          printf("v%d:=v%d[v%d]  @char;",pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);
-          break;
-        case 0x4a:
-          printf("v%d:=v%d[v%d]  @short;",pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);
-          break;
-        case 0x4b:
-          printf("v%d[v%d]:=v%d;",pDecInsn->vB,pDecInsn->vC,pDecInsn->vA);
-          break;
-        case 0x4c:
-          printf("v%d[v%d]:=v%d  @wide;",pDecInsn->vB,pDecInsn->vC,pDecInsn->vA);
-          break;
-        case 0x4d:
-          printf("v%d[v%d]:=v%d  @object;",pDecInsn->vB,pDecInsn->vC,pDecInsn->vA);
-          break;
-        case 0x4e:
-          printf("v%d[v%d]:=v%d  @boolean;",pDecInsn->vB,pDecInsn->vC,pDecInsn->vA);
-          break;
-        case 0x4f:
-          printf("v%d[v%d]:=v%d  @byte;",pDecInsn->vB,pDecInsn->vC,pDecInsn->vA);
-          break;
-        case 0x50:
-          printf("v%d[v%d]:=v%d  @char;",pDecInsn->vB,pDecInsn->vC,pDecInsn->vA);
-          break;
-        case 0x51:
-          printf("v%d[v%d]:=v%d  @short;",pDecInsn->vB,pDecInsn->vC,pDecInsn->vA);
-          break;
-          //iget
-        case 0x52:
-          printf("v%d:=v%d%s;", pDecInsn->vA, pDecInsn->vB, indexBuf);
-          break;
-        case 0x53:
-          printf("v%d:=v%d%s  @wide;", pDecInsn->vA, pDecInsn->vB, indexBuf);
-          break;
-        case 0x54:
-          printf("v%d:=v%d%s  @object;", pDecInsn->vA, pDecInsn->vB, indexBuf);
-          break;
-        case 0x55:
-          printf("v%d:=v%d%s  @boolean;", pDecInsn->vA, pDecInsn->vB, indexBuf);
-          break;
-        case 0x56:
-          printf("v%d:=v%d%s  @byte;", pDecInsn->vA, pDecInsn->vB, indexBuf);
-          break;
-        case 0x57:
-          printf("v%d:=v%d%s  @char;", pDecInsn->vA, pDecInsn->vB, indexBuf);
-          break;
-        case 0x58:
-          printf("v%d:=v%d%s  @short;", pDecInsn->vA, pDecInsn->vB, indexBuf);
-          break;
-          //iput
-        case 0x59:
-          printf("v%d%s :=v%d;", pDecInsn->vB,indexBuf,pDecInsn->vA);
-          break;
-        case 0x5a:
-          printf("v%d%s :=v%d @wide;", pDecInsn->vB,indexBuf,pDecInsn->vA);
-          break;
-        case 0x5b:
-          printf("v%d%s :=v%d @object;", pDecInsn->vB,indexBuf,pDecInsn->vA);
-          break;
-        case 0x5c:
-          printf("v%d%s :=v%d @boolean;", pDecInsn->vB,indexBuf,pDecInsn->vA);
-          break;
-        case 0x5d:
-          printf("v%d%s :=v%d @byte;", pDecInsn->vB,indexBuf,pDecInsn->vA);
-          break;
-        case 0x5e:
-          printf("v%d%s :=v%d @char;", pDecInsn->vB,indexBuf,pDecInsn->vA);
-          break;
-        case 0x5f:
-          printf("v%d%s :=v%d @short;", pDecInsn->vB,indexBuf,pDecInsn->vA);
-          break;
+
+
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+
+                case 0x15:
+                 {
+				    s4 value = pDecInsn->vB << 16;
+                    outConstHigh16(pDecInsn->vA, value);        // printf("v%d:=%d  @length high16;",pDecInsn->vA, value);
+                    break;
+				 }
+
+                case 0x19:           
+		         {
+					 s8 value1 = ((s8) pDecInsn->vB) << 48;
+                     outConstWideHigh16(pDecInsn->vA, value1); // printf("v%d:=%lldL  @length wide_high16;",pDecInsn->vA, value1);
+                     break;
+				 }
+
+                default:
+			     fprintf(pFp, " 21h????");
+			     break;
+              }
+	    /**** sankar ends *****/
+
+        break;
+
+    case kFmt21c:        // op vAA, thing@BBBB
+        printf(" v%d, %s", pDecInsn->vA, indexBuf); // not in pilar
+
+       /**** sankar starts ****/
+
+
+        switch(pDecInsn->opcode){
+             case 0x1a:
+
+             {
+               // find escape characters
+               const char *Str = dexStringById(pDexFile, pDecInsn->vB);
+               char newStr [(int)strlen(Str)+100];
+               int m=0,n=0;
+
+               while( m<=(int)strlen(Str)){
+        	     if(Str[m]=='\n'||Str[m]=='\r') ++m;
+        	     else if(Str[m]=='\\'||Str[m]=='"')
+        		  {
+        		    newStr[n++]='\\';
+        		    newStr[n++]=Str[m++];
+        		  }
+        	     else newStr[n++]=Str[m++];
+               }
+               //newStr[n]='\0';
+               outConstString(pDecInsn->vA, newStr); // printf("v%d:=\"%s\";", pDecInsn->vA,newStr);
+             }
+             break;
+
+             case 0x1c:
+              outConstClass(pDecInsn->vA,descriptorToDot(getClassDescriptor(pDexFile, pDecInsn->vB))); // printf("v%d:=[|%s|];", pDecInsn->vA,descriptorToDot(getClassDescriptor(pDexFile, pDecInsn->vB)));
+              break;
+
+             case 0x1f:
+              outCheckCast(pDecInsn->vA,descriptorToDot(getClassDescriptor(pDexFile, pDecInsn->vB)), pDecInsn->vA); // printf("v%d:=([|%s|])v%d;", pDecInsn->vA,descriptorToDot(getClassDescriptor(pDexFile, pDecInsn->vB)), pDecInsn->vA);
+              break;
+
+
+             case 0x22:
+              outNewIns(pDecInsn->vA, indexBuf); // printf("v%d:=new [|%s|];",pDecInsn->vA, indexBuf);
+              break;
+
           //sget
-        case 0x60:
-          printf("v%d:=%s;", pDecInsn->vA, indexBuf);
-          break;
-        case 0x61:
-          printf("v%d:=%s  @wide;", pDecInsn->vA, indexBuf);
-          break;
-        case 0x62:
-          printf("v%d:=%s  @object;", pDecInsn->vA, indexBuf);
-          break;
-        case 0x63:
-          printf("v%d:=%s  @boolean;", pDecInsn->vA, indexBuf);
-          break;
-        case 0x64:
-          printf("v%d:=%s  @byte;", pDecInsn->vA, indexBuf);
-          break;
-        case 0x65:
-          printf("v%d:=%s  @char;", pDecInsn->vA, indexBuf);
-          break;
-        case 0x66:
-          printf("v%d:=%s  @short;", pDecInsn->vA, indexBuf);
-          break;
-          //sput
-        case 0x67:
-          printf("%s:=v%d;", indexBuf, pDecInsn->vA);
-          break;
-        case 0x68:
-          printf("%s:=v%d  @wide;", indexBuf, pDecInsn->vA);
-          break;
-        case 0x69:
-          printf("%s:=v%d  @object;", indexBuf, pDecInsn->vA);
-          break;
-        case 0x6a:
-          printf("%s:=v%d  @boolean;", indexBuf, pDecInsn->vA);
-          break;
-        case 0x6b:
-          printf("%s:=v%d  @byte;", indexBuf, pDecInsn->vA);
-          break;
-        case 0x6c:
-          printf("%s:=v%d  @char;", indexBuf, pDecInsn->vA);
-          break;
-        case 0x6d:
-          printf("%s:=v%d  @short;", indexBuf, pDecInsn->vA);
-          break;
-          //invoke
-        case 0x6e:
-        {
-           FieldMethodInfo methInfo;
-           if (getMethodInfo(pDexFile, pDecInsn->vB, &methInfo)) {
-          printf("call temp:= %s(", indexBuf);
-            for (i = 0; i < (int) pDecInsn->vA; i++) {
-             if (i == 0)
-               printf("v%d", pDecInsn->arg[i]);
-            else
-               printf(", v%d", pDecInsn->arg[i]);
-                    }
-           printf(") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type virtual;",methInfo.classDescriptor, methInfo.name,
-                   methInfo.signature,descriptorToDot(methInfo.classDescriptor));
+             case 0x60:
+              outSget(pDecInsn->vA, indexBuf); // printf("v%d:=%s;", pDecInsn->vA, indexBuf);
+              break;
+             case 0x61:
+              outSgetWide(pDecInsn->vA, indexBuf); // printf("v%d:=%s  @wide;", pDecInsn->vA, indexBuf);
+              break;
+             case 0x62:
+              outSgetObject(pDecInsn->vA, indexBuf); // printf("v%d:=%s  @object;", pDecInsn->vA, indexBuf);
+              break;
+             case 0x63:
+              outSgetBool(pDecInsn->vA, indexBuf); // printf("v%d:=%s  @boolean;", pDecInsn->vA, indexBuf);
+              break;
+             case 0x64:
+              outSgetByte(pDecInsn->vA, indexBuf); //printf("v%d:=%s  @byte;", pDecInsn->vA, indexBuf);
+              break;
+             case 0x65:
+              outSgetChar(pDecInsn->vA, indexBuf); // printf("v%d:=%s  @char;", pDecInsn->vA, indexBuf);
+              break;
+             case 0x66:
+              outSgetShort(pDecInsn->vA, indexBuf); // printf("v%d:=%s  @short;", pDecInsn->vA, indexBuf);
+              break;
+         //sput
+             case 0x67:
+              outSput(indexBuf, pDecInsn->vA); // printf("%s:=v%d;", indexBuf, pDecInsn->vA);
+              break;
+             case 0x68:
+              outSputWide(indexBuf, pDecInsn->vA); //  printf("%s:=v%d  @wide;", indexBuf, pDecInsn->vA);
+              break;
+             case 0x69:
+              outSputObject(indexBuf, pDecInsn->vA); //  printf("%s:=v%d  @object;", indexBuf, pDecInsn->vA);
+              break;
+             case 0x6a:
+              outSputBool(indexBuf, pDecInsn->vA); //  printf("%s:=v%d  @boolean;", indexBuf, pDecInsn->vA);
+              break;
+             case 0x6b:
+              outSputByte(indexBuf, pDecInsn->vA); //  printf("%s:=v%d  @byte;", indexBuf, pDecInsn->vA);
+              break;
+             case 0x6c:
+              outSputChar(indexBuf, pDecInsn->vA); // printf("%s:=v%d  @char;", indexBuf, pDecInsn->vA);
+              break;
+             case 0x6d:
+              outSputShort(indexBuf, pDecInsn->vA); // printf("%s:=v%d  @short;", indexBuf, pDecInsn->vA);
+              break;
+
+             default:
+			  fprintf(pFp, " 21c????");
+			  break;
+          }
+	    /**** sankar ends *****/
+		break;
+
+
+
+    case kFmt31c:        // op vAA, thing@BBBBBBBB
+        printf(" v%d, %s", pDecInsn->vA, indexBuf);  // not in pilar
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+            case 0x1b:
+             {
+               // find escape characters
+              const char *Str = dexStringById(pDexFile, pDecInsn->vB);
+              char newStr [(int)strlen(Str)+100];
+              int m=0,n=0;
+
+              while( m<=(int)strlen(Str)){
+        	    if(Str[m]=='\n'||Str[m]=='\r') ++m;
+        	    else if(Str[m]=='\\'||Str[m]=='"')
+        	    	 {
+        		       newStr[n++]='\\';
+        		       newStr[n++]=Str[m++];
+        		     }
+        	    else newStr[n++]=Str[m++];
+               }
+               //newStr[n]='\0';
+               outConstString(pDecInsn->vA, newStr); // printf("v%d:=\"%s\";", pDecInsn->vA,newStr);
+             }
+             break;
+
+             default:
+			  fprintf(pFp, " 31c????");
+			  break;
          }
+	    /**** sankar ends *****/
+        break;
+
+    case kFmt23x:        // op vAA, vBB, vCC
+        printf(" v%d, v%d, v%d", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+          // cmp
+             case 0x2d:
+             case 0x2f:
+               outCmpl(pDecInsn->vA,pDecInsn->vB,pDecInsn->vC); // printf("v%d:=cmpl(v%d,v%d);",pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);
+               break;
+             case 0x2e:
+             case 0x30:
+               outCmpg(pDecInsn->vA,pDecInsn->vB,pDecInsn->vC); // printf("v%d:=cmpg(v%d,v%d);",pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);
+               break;
+             case 0x31:
+               outCmp(pDecInsn->vA,pDecInsn->vB,pDecInsn->vC); // printf("v%d:=cmp(v%d,v%d);",pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);
+               break;
+
+          //aput/aget
+             case 0x44:
+              outAget(pDecInsn->vA,pDecInsn->vB,pDecInsn->vC); // printf("v%d:=v%d[v%d];",pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);
+              break;
+             case 0x45:
+              outAgetWide(pDecInsn->vA,pDecInsn->vB,pDecInsn->vC); // printf("v%d:=v%d[v%d]  @wide;",pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);
+              break;
+             case 0x46:
+              outAgetObject(pDecInsn->vA,pDecInsn->vB,pDecInsn->vC); // printf("v%d:=v%d[v%d]  @object;",pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);
+              break;
+             case 0x47:
+              outAgetBool(pDecInsn->vA,pDecInsn->vB,pDecInsn->vC); // printf("v%d:=v%d[v%d]  @boolean;",pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);
+              break;
+             case 0x48:
+              outAgetByte(pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);  // printf("v%d:=v%d[v%d]  @byte;",pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);
+              break;
+             case 0x49:
+              outAgetChar(pDecInsn->vA,pDecInsn->vB,pDecInsn->vC); // printf("v%d:=v%d[v%d]  @char;",pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);
+              break;
+             case 0x4a:
+              outAgetShort(pDecInsn->vA,pDecInsn->vB,pDecInsn->vC); //  printf("v%d:=v%d[v%d]  @short;",pDecInsn->vA,pDecInsn->vB,pDecInsn->vC);
+              break;
+             case 0x4b:
+              outAput(pDecInsn->vB,pDecInsn->vC,pDecInsn->vA); // printf("v%d[v%d]:=v%d;",pDecInsn->vB,pDecInsn->vC,pDecInsn->vA);
+              break;
+             case 0x4c:
+              outAputWide(pDecInsn->vB,pDecInsn->vC,pDecInsn->vA); // printf("v%d[v%d]:=v%d  @wide;",pDecInsn->vB,pDecInsn->vC,pDecInsn->vA);
+              break;
+             case 0x4d:
+              outAputObject(pDecInsn->vB,pDecInsn->vC,pDecInsn->vA); // printf("v%d[v%d]:=v%d  @object;",pDecInsn->vB,pDecInsn->vC,pDecInsn->vA);
+              break;
+             case 0x4e:
+              outAputBool(pDecInsn->vB,pDecInsn->vC,pDecInsn->vA); // printf("v%d[v%d]:=v%d  @boolean;",pDecInsn->vB,pDecInsn->vC,pDecInsn->vA);
+              break;
+             case 0x4f:
+              outAputByte(pDecInsn->vB,pDecInsn->vC,pDecInsn->vA); // printf("v%d[v%d]:=v%d  @byte;",pDecInsn->vB,pDecInsn->vC,pDecInsn->vA);
+              break;
+             case 0x50:
+              outAputChar(pDecInsn->vB,pDecInsn->vC,pDecInsn->vA); // printf("v%d[v%d]:=v%d  @char;",pDecInsn->vB,pDecInsn->vC,pDecInsn->vA);
+              break;
+             case 0x51:
+              outAputShort(pDecInsn->vB,pDecInsn->vC,pDecInsn->vA); // printf("v%d[v%d]:=v%d  @short;",pDecInsn->vB,pDecInsn->vC,pDecInsn->vA);
+              break;
+        
+          //binop
+             case 0x90:
+              outAddInt(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); // printf("v%d:=v%d+v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0x91:
+              outSubInt(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); // printf("v%d:=v%d-v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0x92:
+              outMulInt(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); // printf("v%d:=v%d*v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0x93:
+              outDivInt(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); // printf("v%d:=v%d/v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0x94:
+              outRemInt(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); // printf("v%d:=v%d%%v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0x95:
+              outAndInt(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); // printf("v%d:=v%d^&v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0x96:
+              outOrInt(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); // printf("v%d:=v%d^|v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0x97:
+              outXorInt(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); // printf("v%d:=v%d^~v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0x98:
+              outShlInt(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); // printf("v%d:=v%d^<v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0x99:
+              outShrInt(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); // printf("v%d:=v%d^>v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0x9a:
+              outUshrInt(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); // printf("v%d:=v%d^>>v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0x9b:
+              outAddLong(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); // printf("v%d:=v%d+v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0x9c:
+              outSubLong(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); //  printf("v%d:=v%d-v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0x9d:
+              outMulLong(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); //  printf("v%d:=v%d*v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0x9e:
+              outDivLong(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); //  printf("v%d:=v%d/v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0x9f:
+              outRemLong(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); //  printf("v%d:=v%d%%v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0xa0:
+              outAndLong(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); //  printf("v%d:=v%d^&v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0xa1:
+              outOrLong(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); //  printf("v%d:=v%d^|v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0xa2:
+              outXorLong(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); //  printf("v%d:=v%d^~v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0xa3:
+              outShlLong(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); //  printf("v%d:=v%d^<v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0xa4:
+              outShrLong(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); //  printf("v%d:=v%d^>v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0xa5:
+              outUshrLong(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); //  printf("v%d:=v%d^>>v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0xa6:
+              outAddFloat(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); //  printf("v%d:=v%d+v%d  @type float;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0xa7:
+              outSubFloat(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); //   printf("v%d:=v%d-v%d  @type float;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0xa8:
+              outMulFloat(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); //   printf("v%d:=v%d*v%d  @type float;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0xa9:
+              outDivFloat(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); //   printf("v%d:=v%d/v%d  @type float;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0xaa:
+              outRemFloat(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); //   printf("v%d:=v%d%%v%d  @type float;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0xab:
+               outAddDouble(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); // printf("v%d:=v%d+v%d  @type double;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+               break;
+             case 0xac:
+              outSubDouble(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); // printf("v%d:=v%d-v%d  @type double;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0xad:
+              outMulDouble(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); // printf("v%d:=v%d*v%d  @type double;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0xae:
+              outDivDouble(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); // printf("v%d:=v%d/v%d  @type double;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+             case 0xaf:
+              outRemDouble(pDecInsn->vA, pDecInsn->vB, pDecInsn->vC); // printf("v%d:=v%d%%v%d  @type double;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
+              break;
+
+             default:
+			  fprintf(pFp, " 23x????");
+			  break;
+         }
+	    /**** sankar ends *****/
+        break;
+
+    case kFmt22b:        // op vAA, vBB, #+CC
+         printf(" v%d, v%d, #int %d // #%02x",
+            pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC, (u1)pDecInsn->vC); // not in pilar
+
+
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+
+          //binop/lit8
+                case 0xd8:
+                  outAddLit8(pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC); // printf("v%d:=v%d+%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
+                  break;
+                case 0xd9:
+                 outSubLit8(pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC); //  printf("v%d:=v%d-%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
+                  break;
+                case 0xda:
+                 outMulLit8(pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC); //  printf("v%d:=v%d*%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
+                  break;
+                case 0xdb:
+                 outDivLit8(pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC); //  printf("v%d:=v%d/%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
+                  break;
+                case 0xdc:
+                 outRemLit8(pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC); //  printf("v%d:=v%d%%%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
+                  break;
+                case 0xdd:
+                 outAndLit8(pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC); //  printf("v%d:=v%d^&%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
+                  break;
+                case 0xde:
+                 outOrLit8(pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC); //  printf("v%d:=v%d^|%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
+                  break;
+                case 0xdf:
+                 outXorLit8(pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC); //  printf("v%d:=v%d^~%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
+                  break;
+                case 0xe0:
+                 outShlLit8(pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC); //  printf("v%d:=v%d^<%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
+                  break;
+                case 0xe1:
+                 outShrLit8(pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC); //  printf("v%d:=v%d^>%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
+                  break;
+                case 0xe2:
+                 outUshrLit8(pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC); //  printf("v%d:=v%d^>>%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
+                  break;
+
+                default:
+			     fprintf(pFp, " 22b????");
+			     break;
+            }
+	    /**** sankar ends *****/
+
+        break;
+    case kFmt22t:        // op vA, vB, +CCCC
+
+        {
+            s4 targ = (s4) pDecInsn->vC;
+            printf(" v%d, v%d, %04x // %c%04x", pDecInsn->vA, pDecInsn->vB,
+                insnIdx + targ,
+                (targ < 0) ? '-' : '+',
+                   (targ < 0) ? -targ : targ); // not in pilar
+        
+
+
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+         // if
+            case 0x32:
+              outIfEq(pDecInsn->vA, pDecInsn->vB,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);   // printf("if v%d==v%d then goto L%06x;", pDecInsn->vA, pDecInsn->vB,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
+              break;
+            case 0x33:
+              outIfNq(pDecInsn->vA, pDecInsn->vB,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2); // printf("if v%d!=v%d then goto L%06x;", pDecInsn->vA, pDecInsn->vB,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
+              break;
+            case 0x34:
+              outIfLt(pDecInsn->vA, pDecInsn->vB,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2); // printf("if v%d<v%d then goto L%06x;", pDecInsn->vA, pDecInsn->vB,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
+              break;
+            case 0x35:
+              outIfGe(pDecInsn->vA, pDecInsn->vB,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2); // printf("if v%d>=v%d then goto L%06x;", pDecInsn->vA, pDecInsn->vB,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
+              break;
+            case 0x36:
+              outIfGt(pDecInsn->vA, pDecInsn->vB,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2); // printf("if v%d>v%d then goto L%06x;", pDecInsn->vA, pDecInsn->vB,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
+              break;
+            case 0x37:
+             outIfLe(pDecInsn->vA, pDecInsn->vB,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);  // printf("if v%d<=v%d then goto L%06x;", pDecInsn->vA, pDecInsn->vB,((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
+             break;
+       
+
+             default:
+			  fprintf(pFp, " 22t????");
+			  break;
+         }
+
+      }
+	    /**** sankar ends *****/
+
+        break;
+
+    case kFmt22s:        // op vA, vB, #+CCCC
+
+         printf(" v%d, v%d, #int %d // #%04x",
+             pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC, (u2)pDecInsn->vC); // not in pilar
+
+
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+         //binop/lit16
+           case 0xd0:
+            outAddLit16(pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC); // printf("v%d:=v%d+%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
+            break;
+           case 0xd1:
+            outSubLit16(pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC); // printf("v%d:=v%d-%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
+            break;
+           case 0xd2:
+            outMulLit16(pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC); // printf("v%d:=v%d*%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
+            break;
+           case 0xd3:
+            outDivLit16(pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC); // printf("v%d:=v%d/%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
+            break;
+           case 0xd4:
+            outRemLit16(pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC); // printf("v%d:=v%d%%%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
+            break;
+           case 0xd5:
+            outAndLit16(pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC); // printf("v%d:=v%d^&%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
+            break;
+           case 0xd6:
+            outOrLit16(pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC); // printf("v%d:=v%d^|%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
+            break;
+           case 0xd7:
+            outXorLit16(pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC); // printf("v%d:=v%d^~%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
+            break;
+      
+
+             default:
+			  fprintf(pFp, " 22s????");
+			  break;
         }
-           break;
-        case 0x6f:
-        {
-          FieldMethodInfo methInfo;
-                     if (getMethodInfo(pDexFile, pDecInsn->vB, &methInfo)) {
-                    printf("call temp:= %s(", indexBuf);
-                      for (i = 0; i < (int) pDecInsn->vA; i++) {
-                       if (i == 0)
-                         printf("v%d", pDecInsn->arg[i]);
-                      else
-                         printf(", v%d", pDecInsn->arg[i]);
-                              }
-                      printf(") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type super;",methInfo.classDescriptor, methInfo.name,
-                                         methInfo.signature,descriptorToDot(methInfo.classDescriptor));
-                   }
+	    /**** sankar ends *****/
+
+        break;
+
+    case kFmt22c:        // op vA, vB, thing@CCCC
+
+    	 printf(" v%d, v%d, %s", pDecInsn->vA, pDecInsn->vB, indexBuf); // not in pilar
+
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+
+             //instance of
+             case 0x20:
+              outInstanceOf(pDecInsn->vA,pDecInsn->vB,descriptorToDot(indexBuf)); // printf("v%d:=instanceof(v%d, [|%s|]);",pDecInsn->vA,pDecInsn->vB,descriptorToDot(indexBuf));
+              break;
+
+
+             case 0x23:
+              {
+               char newIndex[200];
+               int flag=0;
+               for(int m=0,n=0;n<(int)strlen(indexBuf);){
+                 if(indexBuf[n]=='['&&indexBuf[n+1]==']'&&flag==0)
+                  {
+                    newIndex[m]=indexBuf[n];
+                    m++;n++;
+                    char buffer[5];
+                    sprintf(buffer, "v%d",pDecInsn->vB);
+                    for(int i=0;i<(int)strlen(buffer);i++,m++)
+                      newIndex[m]=buffer[i];
+                      flag=1;
+                  }
+                 else {
+                   newIndex[m]=indexBuf[n];
+                   m++;n++;
+                 }
+                  newIndex[m]='\0';
+               }
+               outNewArray(pDecInsn->vA, newIndex); // printf("v%d:=new %s ;",pDecInsn->vA,newIndex);
+             }
+              break;
+
+         //iget
+             case 0x52:
+              outIget(pDecInsn->vA, pDecInsn->vB, indexBuf); //  printf("v%d:=v%d%s;", pDecInsn->vA, pDecInsn->vB, indexBuf);
+              break;
+             case 0x53:
+              outIgetWide(pDecInsn->vA, pDecInsn->vB, indexBuf); //  printf("v%d:=v%d%s  @wide;", pDecInsn->vA, pDecInsn->vB, indexBuf);
+              break;
+             case 0x54:
+              outIgetObject(pDecInsn->vA, pDecInsn->vB, indexBuf); //  printf("v%d:=v%d%s  @object;", pDecInsn->vA, pDecInsn->vB, indexBuf);
+              break;
+             case 0x55:
+              outIgetBool(pDecInsn->vA, pDecInsn->vB, indexBuf); //  printf("v%d:=v%d%s  @boolean;", pDecInsn->vA, pDecInsn->vB, indexBuf);
+              break;
+             case 0x56:
+               outIgetByte(pDecInsn->vA, pDecInsn->vB, indexBuf); //  printf("v%d:=v%d%s  @byte;", pDecInsn->vA, pDecInsn->vB, indexBuf);
+               break;
+             case 0x57:
+               outIgetChar(pDecInsn->vA, pDecInsn->vB, indexBuf); //  printf("v%d:=v%d%s  @char;", pDecInsn->vA, pDecInsn->vB, indexBuf);
+               break;
+             case 0x58:
+              outIgetShort(pDecInsn->vA, pDecInsn->vB, indexBuf); //  printf("v%d:=v%d%s  @short;", pDecInsn->vA, pDecInsn->vB, indexBuf);
+              break;
+		  
+           //iput
+              case 0x59:
+                outIput(pDecInsn->vB,indexBuf,pDecInsn->vA); // printf("v%d%s :=v%d;", pDecInsn->vB,indexBuf,pDecInsn->vA);
+                break;
+              case 0x5a:
+               outIputWide(pDecInsn->vB,indexBuf,pDecInsn->vA); // printf("v%d%s :=v%d @wide;", pDecInsn->vB,indexBuf,pDecInsn->vA);
+               break;
+              case 0x5b:
+              outIputObject(pDecInsn->vB,indexBuf,pDecInsn->vA); // printf("v%d%s :=v%d @object;", pDecInsn->vB,indexBuf,pDecInsn->vA);
+              break;
+              case 0x5c:
+                outIputBool(pDecInsn->vB,indexBuf,pDecInsn->vA); // printf("v%d%s :=v%d @boolean;", pDecInsn->vB,indexBuf,pDecInsn->vA);
+                break;
+              case 0x5d:
+               outIputByte(pDecInsn->vB,indexBuf,pDecInsn->vA); // printf("v%d%s :=v%d @byte;", pDecInsn->vB,indexBuf,pDecInsn->vA);
+               break;
+             case 0x5e:
+              outIputChar(pDecInsn->vB,indexBuf,pDecInsn->vA); // printf("v%d%s :=v%d @char;", pDecInsn->vB,indexBuf,pDecInsn->vA);
+              break;
+             case 0x5f:
+              outIputShort(pDecInsn->vB,indexBuf,pDecInsn->vA); // printf("v%d%s :=v%d @short;", pDecInsn->vB,indexBuf,pDecInsn->vA);
+              break;
+      
+
+             default:
+			  fprintf(pFp, " 22c????");
+			  break;
         }
-                   break;
-        case 0x70:
+	    /**** sankar ends *****/
+        break;
+
+
+
+    case kFmt22cs:       // [opt] op vA, vB, field offset CCCC
+         printf(" v%d, v%d, %s", pDecInsn->vA, pDecInsn->vB, indexBuf); // not in pilar
+	     /**** sankar starts ****/
+         {
+                /* now processing indexBuf which looks like "[obj+003b]" ; we want to convert z to "+|003b|+" */ 
+                 char* newStr = (char*)malloc(sizeof(indexBuf));
+                 int index1 = 0;
+                 int index2 = 0;
+                 assert(sizeof(newStr) > 10);
+                 strcpy(newStr,"+|");
+                 index1 = 2;
+                 index2 = 5;
+                 while(indexBuf[index2] != ']' && index1 < 8){
+                     newStr[index1] = indexBuf[index2];
+                     index1++;
+                     index2++;
+                     }
+                 newStr[index1]='\0';
+                 strcat(newStr, "|+");
+                 strcpy(indexBuf, newStr);
+				 free(newStr);
+               /* indexBuf processing ends; note the free(newStr) at the end */ 
+         }
+	     switch(pDecInsn->opcode){
+    
+           // ***** sankar starts *********
+
+            //iget
+             case 0xf2:
+              outIgetQuick(pDecInsn->vA, pDecInsn->vB, indexBuf); 
+              break;
+             case 0xf3:
+              outIgetWideQuick(pDecInsn->vA, pDecInsn->vB, indexBuf); 
+              break;
+             case 0xf4:
+              outIgetObjectQuick(pDecInsn->vA, pDecInsn->vB, indexBuf); 
+              break;
+
+            //iput
+              case 0xf5:
+                outIputQuick(pDecInsn->vB,indexBuf,pDecInsn->vA); 
+                break;
+              case 0xf6:
+               outIputWideQuick(pDecInsn->vB,indexBuf,pDecInsn->vA); 
+               break;
+              case 0xf7:
+               outIputObjectQuick(pDecInsn->vB,indexBuf,pDecInsn->vA); 
+               break;
+         
+             default:
+			  fprintf(pFp, " 22cs????");
+			  break;
+              }
+	    /**** sankar ends *****/
+        break;
+
+    case kFmt30t:
+        printf(" #%08x", pDecInsn->vA); // not in pilar
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+             case 0x2a:
+              {
+               s4 targ = (s4) pDecInsn->vA;
+               outGoto(((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2); // printf("goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(insnIdx + targ)*2);
+              }
+              break;
+   
+
+             default:
+			  fprintf(pFp, " 30t????");
+			  break;
+              }
+	    /**** sankar ends *****/
+        break;
+
+    case kFmt31i:        // op vAA, #+BBBBBBBB
+
         {
-          FieldMethodInfo methInfo;
-                     if (getMethodInfo(pDexFile, pDecInsn->vB, &methInfo)) {
-                    printf("call temp:= %s(", indexBuf);
-                      for (i = 0; i < (int) pDecInsn->vA; i++) {
-                       if (i == 0)
-                         printf("v%d", pDecInsn->arg[i]);
-                      else
-                         printf(", v%d", pDecInsn->arg[i]);
-                              }
-                      printf(") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type direct;",methInfo.classDescriptor, methInfo.name,
-                                         methInfo.signature,descriptorToDot(methInfo.classDescriptor));
-                   }
-                 }
-                   break;
-        case 0x71:
+            /* this is often, but not always, a float */
+            union {
+                float f;
+                u4 i;
+            } conv;
+            conv.i = pDecInsn->vB;
+
+            printf(" v%d, #float %f // #%08x",
+                pDecInsn->vA, conv.f, pDecInsn->vB); // not in pilar
+        
+
+
+	      /**** sankar starts ****/
+	     switch(pDecInsn->opcode){
+
+              case 0x14:
+               outConst32(pDecInsn->vA, conv.f); // printf(" v%d:=%f;",pDecInsn->vA, conv.f);
+               break;
+    
+
+             case 0x17:
+              outConstWide32(pDecInsn->vA, conv.f); // printf(" v%d:=%f  @length wide32;",pDecInsn->vA, conv.f);
+              break;
+
+             default:
+			  fprintf(pFp, " 31i????");
+			  break;
+          }
+
+	    /**** sankar ends *****/
+       }
+        break;
+
+    case kFmt31t:       // op vAA, offset +BBBBBBBB
+
+        printf(" v%d, %08x // +%08x",
+            pDecInsn->vA, insnIdx + pDecInsn->vB, pDecInsn->vB); // not in pilar
+
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+
+             case 0x26:
+              { 
+		        outFillArrData(((u1*)insns - pDexFile->baseAddr) +(insnIdx + pDecInsn->vB)*2); // printf("goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(insnIdx + pDecInsn->vB)*2);
+                void* temp = (void*) new struct Op31t(insnIdx, pDecInsn);   // ***** note that we ignore deleting this later; possible little leakage ******  
+		        list.add(temp); // ********** do we need to do something to address this extra code in a separte place? *******
+                ++s31t; // represents the number of elements in list which is same as list.count()
+              }
+               break;
+    
+              case 0x2b:
+              case 0x2c:
+               { 
+		    	outSwitch(((u1*)insns - pDexFile->baseAddr) +(insnIdx + pDecInsn->vB)*2); // printf("goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(insnIdx + pDecInsn->vB)*2);
+				// printf("at sw statment: ((u1*)insns - pDexFile->baseAddr) = %04x , insnIdx = %04x , pDecInsn->vB = %04x , ((u1*)insns - pDexFile->baseAddr) + (insnIdx + pDecInsn->vB)*2 = %04x", ((u1*)insns - pDexFile->baseAddr), insnIdx, pDecInsn->vB, ((u1*)insns - pDexFile->baseAddr) + (insnIdx + pDecInsn->vB)*2);
+                
+                void* temp = (void*) new struct Op31t(insnIdx, pDecInsn); // ***** note that we ignore deleting this later; possible little leakage ******  
+		        list.add(temp); // ********** do we need to do something to address this extra code in a separte place? *******
+                ++s31t; // represents the number of elements in list which is same as list.count()
+               }
+               break;
+      
+             default:
+			  fprintf(pFp, " 31t????");
+			  break;
+         }
+	    /**** sankar ends *****/
+        break;
+
+    case kFmt32x:        // op vAAAA, vBBBB
+
+        printf(" v%d, v%d", pDecInsn->vA, pDecInsn->vB); // not in pilar
+
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+
+             case 0x03:
+              outMove(pDecInsn->vA, pDecInsn->vB); // printf("v%d:=v%d;", pDecInsn->vA, pDecInsn->vB);
+              break;
+
+
+             case 0x06:
+               outMoveWide(pDecInsn->vA, pDecInsn->vB); // printf("v%d:=v%d  @type wide;", pDecInsn->vA, pDecInsn->vB);
+               break;
+
+             case 0x09:
+               outMoveObject(pDecInsn->vA, pDecInsn->vB); // printf("v%d:=v%d  @type object;", pDecInsn->vA, pDecInsn->vB);
+               break;
+
+             default:
+			  fprintf(pFp, " 32x????");
+			  break;
+         }
+	    /**** sankar ends *****/
+        break;
+
+    case kFmt35c:        // op {vC, vD, vE, vF, vG}, thing@BBBB
+
         {
-          FieldMethodInfo methInfo;
-                     if (getMethodInfo(pDexFile, pDecInsn->vB, &methInfo)) {
-                    printf("call temp:= %s(", indexBuf);
-                      for (i = 0; i < (int) pDecInsn->vA; i++) {
-                       if (i == 0)
-                         printf("v%d", pDecInsn->arg[i]);
-                      else
-                         printf(", v%d", pDecInsn->arg[i]);
-                              }
-                      printf(") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type static;",methInfo.classDescriptor, methInfo.name,
-                                         methInfo.signature,descriptorToDot(methInfo.classDescriptor));
-                   }
-                 }
-                   break;
-        case 0x72:
-        {
-          FieldMethodInfo methInfo;
+            fputs(" {", stdout);
+            for (i = 0; i < (int) pDecInsn->vA; i++) {
+                if (i == 0)
+                    printf("v%d", pDecInsn->arg[i]);
+                else
+                    printf(", v%d", pDecInsn->arg[i]);
+            }
+            printf("}, %s", indexBuf); // not in pilar
+        }
+
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+
+             case 0x24:
+		      outFilledNewArray(indexBuf, pDecInsn->vA, pDecInsn->arg); // this is a multi-line macro ****** double check for error
+              break;
+             case 0x6e:
+		      outInvokeVirtual(pDexFile, pDecInsn, indexBuf); 
+              break;
+            case 0x6f:
+		     outInvokeSuper(pDexFile, pDecInsn, indexBuf); 
+             break;
+            case 0x70:
+		     outInvokeDirect(pDexFile, pDecInsn, indexBuf); 
+             break;
+           case 0x71:
+		    outInvokeStatic(pDexFile, pDecInsn, indexBuf);
+            break;
+           case 0x72:
+            /*
+	        	{
+                    FieldMethodInfo methInfo;
                      if (getMethodInfo(pDexFile, pDecInsn->vB, &methInfo)) {
                     printf("call temp:= %s(", indexBuf);
                       for (i = 0; i < (int) pDecInsn->vA; i++) {
@@ -1525,541 +2432,70 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
                       printf(") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type interface;",methInfo.classDescriptor, methInfo.name,
                                          methInfo.signature,descriptorToDot(methInfo.classDescriptor));
                    }
-                 }
-                   break;
-        case 0x74:
-        {
-          FieldMethodInfo methInfo;
-          if (getMethodInfo(pDexFile, pDecInsn->vB, &methInfo)) {
+                } */
+	    	  outInvokeInterface(pDexFile, pDecInsn, indexBuf);
+              break;
 
-          printf("call temp:= %s(", indexBuf);
-        for (i = 0; i < (int) pDecInsn->vA; i++) {
-            if (i == 0)
-                printf("v%d", pDecInsn->vC + i);
-            else
-                printf(", v%d", pDecInsn->vC + i);
-        }
-        printf(") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type virtual;",methInfo.classDescriptor, methInfo.name,
-                           methInfo.signature,descriptorToDot(methInfo.classDescriptor));
-          }
-         }break;
-        case 0x75:
-        {
-          FieldMethodInfo methInfo;
-                    if (getMethodInfo(pDexFile, pDecInsn->vB, &methInfo)) {
+             case 0xf0:
+			  outInvokeObjectInitRange(pDexFile, pDecInsn, indexBuf); 
+              break;
 
-                    printf("call temp:= %s(", indexBuf);
-                  for (i = 0; i < (int) pDecInsn->vA; i++) {
-                      if (i == 0)
-                          printf("v%d", pDecInsn->vC + i);
-                      else
-                          printf(", v%d", pDecInsn->vC + i);
-                  }
-                  printf(") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type super;",methInfo.classDescriptor, methInfo.name,
-                                     methInfo.signature,descriptorToDot(methInfo.classDescriptor));
-                    }
-                 }break;
-        case 0x76:
-        {
-          FieldMethodInfo methInfo;
-                    if (getMethodInfo(pDexFile, pDecInsn->vB, &methInfo)) {
+             default:
+			  fprintf(pFp, " 35c????");
+			  break;
+              }
+	    /**** sankar ends *****/
+        break;
 
-                    printf("call temp:= %s(", indexBuf);
-                  for (i = 0; i < (int) pDecInsn->vA; i++) {
-                      if (i == 0)
-                          printf("v%d", pDecInsn->vC + i);
-                      else
-                          printf(", v%d", pDecInsn->vC + i);
-                  }
-                  printf(") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type direct;",methInfo.classDescriptor, methInfo.name,
-                                     methInfo.signature,descriptorToDot(methInfo.classDescriptor));
-                    }
-                 }break;
-        case 0x77:
-        {
-          FieldMethodInfo methInfo;
-                    if (getMethodInfo(pDexFile, pDecInsn->vB, &methInfo)) {
-
-                    printf("call temp:= %s(", indexBuf);
-                  for (i = 0; i < (int) pDecInsn->vA; i++) {
-                      if (i == 0)
-                          printf("v%d", pDecInsn->vC + i);
-                      else
-                          printf(", v%d", pDecInsn->vC + i);
-                  }
-                  printf(") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type static;",methInfo.classDescriptor, methInfo.name,
-                                     methInfo.signature,descriptorToDot(methInfo.classDescriptor));
-                    }
-                 }break;
-        case 0x78:
-        {
-          FieldMethodInfo methInfo;
-                    if (getMethodInfo(pDexFile, pDecInsn->vB, &methInfo)) {
-
-                    printf("call temp:= %s(", indexBuf);
-                  for (i = 0; i < (int) pDecInsn->vA; i++) {
-                      if (i == 0)
-                          printf("v%d", pDecInsn->vC + i);
-                      else
-                          printf(", v%d", pDecInsn->vC + i);
-                  }
-                  printf(") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type interface;",methInfo.classDescriptor, methInfo.name,
-                                     methInfo.signature,descriptorToDot(methInfo.classDescriptor));
-                    }
-                 }break;
-          //unop
-        case 0x7b:
-          printf("v%d:=-v%d  @type int;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x7c:
-          printf("v%d:=~v%d  @type int;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x7d:
-          printf("v%d:=-v%d  @type long;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x7e:
-          printf("v%d:=~v%d  @type long;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x7f:
-          printf("v%d:=-v%d  @type float;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x80:
-          printf("v%d:=-v%d  @type double;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x81:
-          printf("v%d:=(long)v%d  @type i2l;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x82:
-          printf("v%d:=(float)v%d  @type i2f;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x83:
-          printf("v%d:=(double)v%d  @type i2d;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x84:
-          printf("v%d:=(int)v%d  @type l2i;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x85:
-          printf("v%d:=(float)v%d  @type l2f;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x86:
-          printf("v%d:=(double)v%d  @type l2d;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x87:
-          printf("v%d:=(int)v%d  @type f2i;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x88:
-          printf("v%d:=(long)v%d  @type f2l;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x89:
-          printf("v%d:=(double)v%d  @type f2d;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x8a:
-          printf("v%d:=(int)v%d  @type d2i;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x8b:
-          printf("v%d:=(long)v%d  @type d2l;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x8c:
-          printf("v%d:=(float)v%d  @type d2f;", pDecInsn->vA, pDecInsn->vB);
-           break;
-        case 0x8d:
-          printf("v%d:=(byte)v%d  @type i2b;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x8e:
-          printf("v%d:=(char)v%d  @type i2c;", pDecInsn->vA, pDecInsn->vB);
-          break;
-        case 0x8f:
-          printf("v%d:=(short)v%d  @type i2s;", pDecInsn->vA, pDecInsn->vB);
-          break;
-          //binop
-        case 0x90:
-          printf("v%d:=v%d+v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-          break;
-        case 0x91:
-          printf("v%d:=v%d-v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-          break;
-        case 0x92:
-          printf("v%d:=v%d*v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-          break;
-        case 0x93:
-          printf("v%d:=v%d/v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-          break;
-        case 0x94:
-          printf("v%d:=v%d%%v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-          break;
-        case 0x95:
-          printf("v%d:=v%d^&v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-          break;
-        case 0x96:
-          printf("v%d:=v%d^|v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-          break;
-        case 0x97:
-          printf("v%d:=v%d^~v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-          break;
-        case 0x98:
-          printf("v%d:=v%d^<v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-          break;
-        case 0x99:
-          printf("v%d:=v%d^>v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-          break;
-        case 0x9a:
-          printf("v%d:=v%d^>>v%d  @type int;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-          break;
-                case 0x9b:
-                  printf("v%d:=v%d+v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                  break;
-                case 0x9c:
-                  printf("v%d:=v%d-v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                  break;
-                case 0x9d:
-                  printf("v%d:=v%d*v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                  break;
-                case 0x9e:
-                  printf("v%d:=v%d/v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                  break;
-                case 0x9f:
-                  printf("v%d:=v%d%%v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                  break;
-                case 0xa0:
-                  printf("v%d:=v%d^&v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                  break;
-                case 0xa1:
-                  printf("v%d:=v%d^|v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                  break;
-                case 0xa2:
-                  printf("v%d:=v%d^~v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                  break;
-                case 0xa3:
-                  printf("v%d:=v%d^<v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                  break;
-                case 0xa4:
-                  printf("v%d:=v%d^>v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                  break;
-                case 0xa5:
-                  printf("v%d:=v%d^>>v%d  @type long;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                  break;
-                  case 0xa6:
-                    printf("v%d:=v%d+v%d  @type float;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                    break;
-                  case 0xa7:
-                    printf("v%d:=v%d-v%d  @type float;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                    break;
-                  case 0xa8:
-                    printf("v%d:=v%d*v%d  @type float;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                    break;
-                  case 0xa9:
-                    printf("v%d:=v%d/v%d  @type float;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                    break;
-                  case 0xaa:
-                    printf("v%d:=v%d%%v%d  @type float;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                    break;
-                    case 0xab:
-                      printf("v%d:=v%d+v%d  @type double;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                      break;
-                    case 0xac:
-                      printf("v%d:=v%d-v%d  @type double;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                      break;
-                    case 0xad:
-                      printf("v%d:=v%d*v%d  @type double;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                      break;
-                    case 0xae:
-                      printf("v%d:=v%d/v%d  @type double;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                      break;
-                    case 0xaf:
-                      printf("v%d:=v%d%%v%d  @type double;", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-                      break;
-                  //binop/2addr
-                            case 0xb0:
-                              printf("v%d:=v%d+v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                              break;
-                            case 0xb1:
-                              printf("v%d:=v%d-v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                              break;
-                            case 0xb2:
-                              printf("v%d:=v%d*v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                              break;
-                            case 0xb3:
-                              printf("v%d:=v%d/v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                              break;
-                            case 0xb4:
-                              printf("v%d:=v%d%%v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                              break;
-                            case 0xb5:
-                              printf("v%d:=v%d^&v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                              break;
-                            case 0xb6:
-                              printf("v%d:=v%d^|v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                              break;
-                            case 0xb7:
-                              printf("v%d:=v%d^~v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                              break;
-                            case 0xb8:
-                              printf("v%d:=v%d^<v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                              break;
-                            case 0xb9:
-                              printf("v%d:=v%d^>v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                              break;
-                            case 0xba:
-                              printf("v%d:=v%d^>>v%d  @type int;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                              break;
-                                    case 0xbb:
-                                      printf("v%d:=v%d+v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                      break;
-                                    case 0xbc:
-                                      printf("v%d:=v%d-v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                      break;
-                                    case 0xbd:
-                                      printf("v%d:=v%d*v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                      break;
-                                    case 0xbe:
-                                      printf("v%d:=v%d/v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                      break;
-                                    case 0xbf:
-                                      printf("v%d:=v%d%%v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                      break;
-                                    case 0xc0:
-                                      printf("v%d:=v%d^&v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                      break;
-                                    case 0xc1:
-                                      printf("v%d:=v%d^|v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                      break;
-                                    case 0xc2:
-                                      printf("v%d:=v%d^~v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                      break;
-                                    case 0xc3:
-                                      printf("v%d:=v%d^<v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                      break;
-                                    case 0xc4:
-                                      printf("v%d:=v%d^>v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                      break;
-                                    case 0xc5:
-                                      printf("v%d:=v%d^>>v%d  @type long;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                      break;
-                                      case 0xc6:
-                                        printf("v%d:=v%d+v%d  @type float;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                        break;
-                                      case 0xc7:
-                                        printf("v%d:=v%d-v%d  @type float;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                        break;
-                                      case 0xc8:
-                                        printf("v%d:=v%d*v%d  @type float;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                        break;
-                                      case 0xc9:
-                                        printf("v%d:=v%d/v%d  @type float;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                        break;
-                                      case 0xca:
-                                        printf("v%d:=v%d%%v%d  @type float;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                        break;
-                                        case 0xcb:
-                                          printf("v%d:=v%d+v%d  @type double;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                          break;
-                                        case 0xcc:
-                                          printf("v%d:=v%d-v%d  @type double;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                          break;
-                                        case 0xcd:
-                                          printf("v%d:=v%d*v%d  @type double;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                          break;
-                                        case 0xce:
-                                          printf("v%d:=v%d/v%d  @type double;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                          break;
-                                        case 0xcf:
-                                          printf("v%d:=v%d%%v%d  @type double;", pDecInsn->vA, pDecInsn->vA, pDecInsn->vB);
-                                          break;
-         //binop/lit16
-        case 0xd0:
-          printf("v%d:=v%d+%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
-          break;
-        case 0xd1:
-          printf("v%d:=v%d-%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
-          break;
-        case 0xd2:
-          printf("v%d:=v%d*%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
-          break;
-        case 0xd3:
-          printf("v%d:=v%d/%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
-          break;
-        case 0xd4:
-          printf("v%d:=v%d%%%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
-          break;
-        case 0xd5:
-          printf("v%d:=v%d^&%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
-          break;
-        case 0xd6:
-          printf("v%d:=v%d^|%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
-          break;
-        case 0xd7:
-          printf("v%d:=v%d^~%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
-          break;
-          //binop/lit8
-                case 0xd8:
-                  printf("v%d:=v%d+%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
-                  break;
-                case 0xd9:
-                  printf("v%d:=v%d-%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
-                  break;
-                case 0xda:
-                  printf("v%d:=v%d*%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
-                  break;
-                case 0xdb:
-                  printf("v%d:=v%d/%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
-                  break;
-                case 0xdc:
-                  printf("v%d:=v%d%%%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
-                  break;
-                case 0xdd:
-                  printf("v%d:=v%d^&%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
-                  break;
-                case 0xde:
-                  printf("v%d:=v%d^|%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
-                  break;
-                case 0xdf:
-                  printf("v%d:=v%d^~%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
-                  break;
-                case 0xe0:
-                  printf("v%d:=v%d^<%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
-                  break;
-                case 0xe1:
-                  printf("v%d:=v%d^>%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
-                  break;
-                case 0xe2:
-                  printf("v%d:=v%d^>>%d;",pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC);
-                  break;
-        default:
-            printf(" ???");
-            break;
-        }
-
-   /* if (pDecInsn->opcode == OP_NOP) {
-        u2 instr = get2LE((const u1*) &insns[insnIdx]);
-        if (instr == kPackedSwitchSignature) {
-            printf("|%04x: packed-switch-data (%d units)",
-                insnIdx, insnWidth);
-        } else if (instr == kSparseSwitchSignature) {
-            printf("|%04x: sparse-switch-data (%d units)",
-                insnIdx, insnWidth);
-        } else if (instr == kArrayDataSignature) {
-            printf("|%04x: array-data (%d units)",
-                insnIdx, insnWidth);
-        } else {
-            printf("|%04x: nop // spacer", insnIdx);
-        }
-    } else {
-        printf("|%04x: %s", insnIdx, dexGetOpcodeName(pDecInsn->opcode));
-    }
-
-    if (pDecInsn->indexType != kIndexNone) {
-        indexBuf = indexString(pDexFile, pDecInsn,
-                indexBufChars, sizeof(indexBufChars));
-    }
-
-    switch (dexGetFormatFromOpcode(pDecInsn->opcode)) {
-    case kFmt10x:        // op
-        break;
-    case kFmt12x:        // op vA, vB
-        printf(" v%d, v%d", pDecInsn->vA, pDecInsn->vB);
-        break;
-    case kFmt11n:        // op vA, #+B
-        printf(" v%d, #int %d // #%x",
-            pDecInsn->vA, (s4)pDecInsn->vB, (u1)pDecInsn->vB);
-        break;
-    case kFmt11x:        // op vAA
-        printf(" v%d", pDecInsn->vA);
-        break;
-    case kFmt10t:        // op +AA
-    case kFmt20t:        // op +AAAA
-        {
-            s4 targ = (s4) pDecInsn->vA;
-            printf(" %04x // %c%04x",
-                insnIdx + targ,
-                (targ < 0) ? '-' : '+',
-                (targ < 0) ? -targ : targ);
-        }
-        break;
-    case kFmt22x:        // op vAA, vBBBB
-        printf(" v%d, v%d", pDecInsn->vA, pDecInsn->vB);
-        break;
-    case kFmt21t:        // op vAA, +BBBB
-        {
-            s4 targ = (s4) pDecInsn->vB;
-            printf(" v%d, %04x // %c%04x", pDecInsn->vA,
-                insnIdx + targ,
-                (targ < 0) ? '-' : '+',
-                (targ < 0) ? -targ : targ);
-        }
-        break;
-    case kFmt21s:        // op vAA, #+BBBB
-        printf(" v%d, #int %d // #%x",
-            pDecInsn->vA, (s4)pDecInsn->vB, (u2)pDecInsn->vB);
-        break;
-    case kFmt21h:        // op vAA, #+BBBB0000[00000000]
-        // The printed format varies a bit based on the actual opcode.
-        if (pDecInsn->opcode == OP_CONST_HIGH16) {
-            s4 value = pDecInsn->vB << 16;
-            printf(" v%d, #int %d // #%x",
-                pDecInsn->vA, value, (u2)pDecInsn->vB);
-        } else {
-            s8 value = ((s8) pDecInsn->vB) << 48;
-            printf(" v%d, #long %lld // #%x",
-                pDecInsn->vA, value, (u2)pDecInsn->vB);
-        }
-        break;
-    case kFmt21c:        // op vAA, thing@BBBB
-    case kFmt31c:        // op vAA, thing@BBBBBBBB
-    case kFmt41c:        // exop vAAAA, thing@BBBBBBBB
-        printf(" v%d, %s", pDecInsn->vA, indexBuf);
-        break;
-    case kFmt23x:        // op vAA, vBB, vCC
-    case kFmt33x:        // exop vAA, vBB, vCCCC
-        printf(" v%d, v%d, v%d", pDecInsn->vA, pDecInsn->vB, pDecInsn->vC);
-        break;
-    case kFmt22b:        // op vAA, vBB, #+CC
-        printf(" v%d, v%d, #int %d // #%02x",
-            pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC, (u1)pDecInsn->vC);
-        break;
-    case kFmt22t:        // op vA, vB, +CCCC
-        {
-            s4 targ = (s4) pDecInsn->vC;
-            printf(" v%d, v%d, %04x // %c%04x", pDecInsn->vA, pDecInsn->vB,
-                insnIdx + targ,
-                (targ < 0) ? '-' : '+',
-                (targ < 0) ? -targ : targ);
-        }
-        break;
-    case kFmt22s:        // op vA, vB, #+CCCC
-    case kFmt32s:        // exop vAA, vBB, #+CCCC
-        printf(" v%d, v%d, #int %d // #%04x",
-            pDecInsn->vA, pDecInsn->vB, (s4)pDecInsn->vC, (u2)pDecInsn->vC);
-        break;
-    case kFmt22c:        // op vA, vB, thing@CCCC
-    case kFmt22cs:       // [opt] op vA, vB, field offset CCCC
-    case kFmt52c:        // exop vAAAA, vBBBB, thing@CCCCCCCC
-        printf(" v%d, v%d, %s", pDecInsn->vA, pDecInsn->vB, indexBuf);
-        break;
-    case kFmt30t:
-        printf(" #%08x", pDecInsn->vA);
-        break;
-    case kFmt31i:        // op vAA, #+BBBBBBBB
-        { */
-            /* this is often, but not always, a float */
-          /*  union {
-                float f;
-                u4 i;
-            } conv;
-            conv.i = pDecInsn->vB;
-            printf(" v%d, #float %f // #%08x",
-                pDecInsn->vA, conv.f, pDecInsn->vB);
-        }
-        break;
-    case kFmt31t:       // op vAA, offset +BBBBBBBB
-        printf(" v%d, %08x // +%08x",
-            pDecInsn->vA, insnIdx + pDecInsn->vB, pDecInsn->vB);
-        break;
-    case kFmt32x:        // op vAAAA, vBBBB
-        printf(" v%d, v%d", pDecInsn->vA, pDecInsn->vB);
-        break;
-    case kFmt35c:        // op {vC, vD, vE, vF, vG}, thing@BBBB
     case kFmt35ms:       // [opt] invoke-virtual+super
+
+        {
+            fputs(" {", stdout);
+            for (i = 0; i < (int) pDecInsn->vA; i++) {
+                if (i == 0)
+                    printf("v%d", pDecInsn->arg[i]);
+                else
+                    printf(", v%d", pDecInsn->arg[i]);
+            }
+            printf("}, %s", indexBuf); // not in pilar
+        }
+
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+
+            case 0xf8: // invoke-virtual-quick
+            /*
+	        	{
+                    FieldMethodInfo methInfo;
+                     if (getMethodInfo(pDexFile, pDecInsn->vB, &methInfo)) {
+                    printf("call temp:= %s(", indexBuf);
+                      for (i = 0; i < (int) pDecInsn->vA; i++) {
+                       if (i == 0)
+                         printf("v%d", pDecInsn->arg[i]);
+                      else
+                         printf(", v%d", pDecInsn->arg[i]);
+                              }
+                      printf(") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type virtual-quick;",methInfo.classDescriptor, methInfo.name,
+                                         methInfo.signature,descriptorToDot(methInfo.classDescriptor));
+                   }
+                } */
+	    	  outInvokeVirtualQuick(pDexFile, pDecInsn, indexBuf);
+              break;
+
+            case 0xfa: // invoke-super-quick
+	    	  outInvokeSuperQuick(pDexFile, pDecInsn, indexBuf);
+              break;
+        
+
+             default:
+			  fprintf(pFp, " 35ms????");
+			  break;
+         }
+	    /**** sankar ends *****/
+        break;
+
     case kFmt35mi:       // [opt] inline invoke
+
         {
             fputs(" {", stdout);
             for (i = 0; i < (int) pDecInsn->vA; i++) {
@@ -2069,18 +2505,32 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
                     printf(", v%d", pDecInsn->arg[i]);
             }
             printf("}, %s", indexBuf);
-        }
+        }  // not in pilar
+
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+
+            // sankar starts
+
+             case 0xee: // execute-inline
+              outExecuteInline(pDexFile, pDecInsn, indexBuf);
+              break;
+
+
+             default:
+			  fprintf(pFp, " 35mi????");
+			  break;
+         }
+	    /**** sankar ends *****/
         break;
+
     case kFmt3rc:        // op {vCCCC .. v(CCCC+AA-1)}, thing@BBBB
-    case kFmt3rms:       // [opt] invoke-virtual+super/range
-    case kFmt3rmi:       // [opt] execute-inline/range
-    case kFmt5rc:        // exop {vCCCC .. v(CCCC+AAAA-1)}, meth@BBBBBBBB
-        { */
-            /*
-             * This doesn't match the "dx" output when some of the args are
-             * 64-bit values -- dx only shows the first register.
-             */
-     /*       fputs(" {", stdout);
+
+        {
+            // * This doesn't match the "dx" output when some of the args are
+            // * 64-bit values -- dx only shows the first register.
+
+            fputs(" {", stdout);
             for (i = 0; i < (int) pDecInsn->vA; i++) {
                 if (i == 0)
                     printf("v%d", pDecInsn->vC + i);
@@ -2088,37 +2538,203 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
                     printf(", v%d", pDecInsn->vC + i);
             }
             printf("}, %s", indexBuf);
-        }
+        }  // not in pilar
+
+
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+
+             case 0x25:
+     	    	/*
+                {
+                 printf("temp:=(%s)`[", indexBuf);
+                 for (i = 0; i < (int) pDecInsn->vA; i++) {
+                  if (i == 0)
+                   printf("v%d", pDecInsn->vC + i);
+                  else
+                   printf(", v%d", pDecInsn->vC + i);
+                      }
+                  printf("];");
+                 } */
+         
+		       outFilledNewArrRange(indexBuf, pDecInsn->vA, pDecInsn->vC); // this is a multi-line macro ****** double check for error
+               break;
+    
+
+
+             case 0x74:
+               /*
+	        	{
+                  FieldMethodInfo methInfo;
+                  if (getMethodInfo(pDexFile, pDecInsn->vB, &methInfo)) {
+
+                      printf("call temp:= %s(", indexBuf);
+                      for (i = 0; i < (int) pDecInsn->vA; i++) {
+                        if (i == 0)
+                          printf("v%d", pDecInsn->vC + i);
+                        else
+                          printf(", v%d", pDecInsn->vC + i);
+                      }
+                        printf(") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type virtual;",methInfo.classDescriptor, methInfo.name,
+                              methInfo.signature,descriptorToDot(methInfo.classDescriptor));
+                 }
+               }*/
+	          outInvokeVirtualRange(pDexFile, pDecInsn, indexBuf);	 
+		      break;
+             case 0x75:
+		      outInvokeSuperRange(pDexFile, pDecInsn, indexBuf);
+		      break;
+             case 0x76:
+		      outInvokeDirectRange(pDexFile, pDecInsn, indexBuf);
+	          break;
+             case 0x77:
+	      	  outInvokeStaticRange(pDexFile, pDecInsn, indexBuf);
+		      break;
+             case 0x78:
+		      outInvokeInterfaceRange(pDexFile, pDecInsn, indexBuf);
+		      break;
+
+             default:
+			  fprintf(pFp, " 3rc????");
+			  break;
+         }
+	    /**** sankar ends *****/
         break;
+
+    case kFmt3rms:       // [opt] invoke-virtual+super/range
+
+        {
+            
+             // * This doesn't match the "dx" output when some of the args are
+             // * 64-bit values -- dx only shows the first register.
+             
+            fputs(" {", stdout);
+            for (i = 0; i < (int) pDecInsn->vA; i++) {
+                if (i == 0)
+                    printf("v%d", pDecInsn->vC + i);
+                else
+                    printf(", v%d", pDecInsn->vC + i);
+            }
+            printf("}, %s", indexBuf);
+        }  // not in pilar
+
+
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+
+             // invoke-virtual-quick/range
+
+             case 0xf9:
+               /*
+	        	{
+                  FieldMethodInfo methInfo;
+                  if (getMethodInfo(pDexFile, pDecInsn->vB, &methInfo)) {
+
+                      printf("call temp:= %s(", indexBuf);
+                      for (i = 0; i < (int) pDecInsn->vA; i++) {
+                        if (i == 0)
+                          printf("v%d", pDecInsn->vC + i);
+                        else
+                          printf(", v%d", pDecInsn->vC + i);
+                      }
+                        printf(") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type virtual-quick;",methInfo.classDescriptor, methInfo.name,
+                              methInfo.signature,descriptorToDot(methInfo.classDescriptor));
+                 }
+               }*/
+	          outInvokeVirtualQuickRange(pDexFile, pDecInsn, indexBuf);	 
+		      break;
+              
+			 case 0xfb:
+	          outInvokeSuperQuickRange(pDexFile, pDecInsn, indexBuf);	 
+			  break;
+
+             default:
+			  fprintf(pFp, " 3rms????");
+			  break;
+          }
+	    /**** sankar ends *****/
+        break;
+
+    case kFmt3rmi:       // [opt] execute-inline/range
+	 
+        {
+            
+             // * This doesn't match the "dx" output when some of the args are
+             // * 64-bit values -- dx only shows the first register.
+             
+            fputs(" {", stdout);
+            for (i = 0; i < (int) pDecInsn->vA; i++) {
+                if (i == 0)
+                    printf("v%d", pDecInsn->vC + i);
+                else
+                    printf(", v%d", pDecInsn->vC + i);
+            }
+            printf("}, %s", indexBuf);
+        } // not in pilar
+
+
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+
+
+             case 0xef: // execute-inline-range
+              outExecuteInlineRange(pDexFile, pDecInsn, indexBuf);
+              break;
+             
+             default:
+			  fprintf(pFp, " 3rmi????");
+			  break;
+          }
+	    /**** sankar ends *****/
+        break;
+
     case kFmt51l:        // op vAA, #+BBBBBBBBBBBBBBBB
-        {  */
+
+        {
             /* this is often, but not always, a double */
-         /*   union {
+            union {
                 double d;
                 u8 j;
             } conv;
             conv.j = pDecInsn->vB_wide;
+
             printf(" v%d, #double %f // #%016llx",
-                pDecInsn->vA, conv.d, pDecInsn->vB_wide);
-        }
+                pDecInsn->vA, conv.d, pDecInsn->vB_wide); // not in pilar
+        
+	    /**** sankar starts ****/
+	    switch(pDecInsn->opcode){
+
+             case 0x18:
+              outConstWide(pDecInsn->vA, conv.d); // printf("v%d:=%fL  @length wide;",pDecInsn->vA, conv2.d);
+              break;
+       
+             default:
+			  fprintf(pFp, " 51l????");
+			  break;
+          }
+	    }
+	    /**** sankar ends *****/
         break;
+
     case kFmt00x:        // unknown op or breakpoint
         break;
+
     default:
         printf(" ???");
+        fprintf(pFp, " ???"); // sankar
         break;
-    } */
-        }
-    putchar('\n');
-
-    if (indexBuf != indexBufChars) {
-        free(indexBuf);
     }
-    if (stringBuf != stringBufChars) {
-            free(stringBuf);
-        };
-    //******************* kui's modification ends  *******************
+
+   }
+   putchar('\n');
+   fprintf(pFp, "\n"); // sankar
+
+   if (indexBuf != indexBufChars) {
+        free(indexBuf);
+   }
 }
+
+
 
 /*
  * Dump a bytecode disassembly.
@@ -2138,11 +2754,13 @@ void dumpBytecodes(DexFile* pDexFile, const DexMethod* pDexMethod)
     getMethodInfo(pDexFile, pDexMethod->methodIdx, &methInfo);
     startAddr = ((u1*)pCode - pDexFile->baseAddr);
     className = descriptorToDot(methInfo.classDescriptor);
+
+    printf("%06x:                                        |[%06x] %s.%s:%s\n",
+        startAddr, startAddr,
+        className, methInfo.name, methInfo.signature); // not in pilar
+
     //******************* kui's modification begins  *******************
-   // printf("%06x:                                        |[%06x] %s.%s:%s\n",
-    //    startAddr, startAddr,
-     //   className, methInfo.name, methInfo.signature);
-    struct Op31t list[20];
+    PStash list; // sankar adds this; // Kui did "struct Op31t list[20];"
     int s31t=0;
     int l31t=0;
     //******************* kui's modification ends  *******************
@@ -2182,7 +2800,7 @@ void dumpBytecodes(DexFile* pDexFile, const DexMethod* pDexMethod)
         }
         //******************* kui's modification begins  *******************
         dexDecodeInstruction(insns, &decInsn);
-        dumpInstruction(pDexFile, pCode, insnIdx, insnWidth, &decInsn,list,s31t,l31t);
+        dumpInstruction(pDexFile, pCode, insnIdx, insnWidth, &decInsn, list,s31t,l31t); // sankar adds 3 args 
         //******************* kui's modification ends  *******************
         insns += insnWidth;
         insnIdx += insnWidth;
@@ -2197,17 +2815,17 @@ void dumpBytecodes(DexFile* pDexFile, const DexMethod* pDexMethod)
 void dumpCode(DexFile* pDexFile, const DexMethod* pDexMethod)
 {
     const DexCode* pCode = dexGetCode(pDexFile, pDexMethod);
+    printf("      @registers     : %d\n", pCode->registersSize);
+    printf("      ins           : %d\n", pCode->insSize);
+    printf("      outs          : %d\n", pCode->outsSize);
+    printf("      insns size    : %d 16-bit code units\n", pCode->insnsSize);
     //******************* kui's modification begins  *******************
-   // printf("      @registers     : %d\n", pCode->registersSize);
-   // printf("      ins           : %d\n", pCode->insSize);
-  //  printf("      outs          : %d\n", pCode->outsSize);
-   // printf("      insns size    : %d 16-bit code units\n", pCode->insnsSize);
     dumpLocals(pDexFile, pCode, pDexMethod);
     if (gOptions.disassemble)
         dumpBytecodes(pDexFile, pDexMethod);
     dumpCatches(pDexFile, pCode);
     /* both of these are encoded in debug info */
-   // dumpPositions(pDexFile, pCode, pDexMethod);
+    dumpPositions(pDexFile, pCode, pDexMethod);
 
     //******************* kui's modification ends  *******************
 }
@@ -2238,14 +2856,14 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
     accessStr = createAccessFlagStr(pDexMethod->accessFlags,
                     kAccessForMethod);
 
-    //******************* kui's modification begins  *******************
     if (gOptions.outputFormat == OUTPUT_PLAIN) {
-       /* printf("    #%d              : (in %s)\n", i, backDescriptor);
+        printf("    #%d              : (in %s)\n", i, backDescriptor);
         printf("      name          : '%s'\n", name);
         printf("      type          : '%s'\n", typeDescriptor);
         printf("      access        : 0x%04x (%s)\n",
             pDexMethod->accessFlags, accessStr);
 
+    /******************* kui's modification begins  *******************
         if (pDexMethod->codeOff == 0) {
             printf("      code          : (none)\n");
         } else {
@@ -2255,6 +2873,7 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 
         if (gOptions.disassemble)
             putchar('\n'); */
+
             int startReg=0;
         if( pDexMethod->codeOff != 0)
         { const DexCode* pCode = dexGetCode(pDexFile, pDexMethod);
@@ -2323,27 +2942,29 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
                    }
               //if(strcmp(name,"<init>")==0)  printf("    procedure %s [|init|] (%s) @%s {\n", rtype,para,accessStr);
              // else if(strcmp(name,"<clinit>")==0)  printf("    procedure %s [|clinit|] (%s) @%s {\n", rtype,para,accessStr);
-              printf("    procedure [|%s|] [|%s|] ([|%s|]) @owner [|%s|] @signature [|%s.%s:%s|] @Access %s {\n",
-            		                 rtype, name,para,owner,backDescriptor,name,typeDescriptor,accessStr);
+              fprintf(pFp, "    procedure [|%s|] [|%s.%s|] ([|%s|]) @owner [|%s|] @signature [|%s.%s:%s|] @Access %s {\n",
+            		                 rtype,backDescriptor,name,para,owner,backDescriptor,name,typeDescriptor,accessStr); // not in dexdump
              free(rtype);
              free(para);
               //printf("      name          : '%s'\n", name);
             //  printf("      type          : '%s'\n", typeDescriptor);
 
               if (pDexMethod->codeOff == 0) {
-                 printf("      #");
+				  printf("      code          : (none)\n");
+                 fprintf(pFp, "      #"); 
               } else {
-                 // printf("      @code          -\n");
+                  printf("      code          -\n");
                   dumpCode(pDexFile, pDexMethod);
               }
 
               if (gOptions.disassemble)
-                  putchar('\n');
-              printf("   }\n");
+                  printf("\n");  
+                  fprintf(pFp, "\n"); // sankar  
+              fprintf(pFp, "   }\n"); // not in dexdump
 
 
               //******************* kui's modification ends  *******************
-    } else if (gOptions.outputFormat == OUTPUT_XML) {
+    } else if (gOptions.outputFormat == OUTPUT_XML) { // seems to be not supported for pilar 
         bool constructor = (name[0] == '<');
 
         if (constructor) {
@@ -2470,14 +3091,14 @@ void dumpSField(const DexFile* pDexFile, const DexField* pSField, int i,bool fla
     accessStr = createAccessFlagStr(pSField->accessFlags, kAccessForField);
     //******************* kui's modification begins  *******************
     if (gOptions.outputFormat == OUTPUT_PLAIN) {
-      /* printf("    #%d              : (in %s)\n", i, backDescriptor);
+              printf("    #%d              : (in %s)\n", i, backDescriptor);
               printf("      name          : '%s'\n", name);
               printf("      type          : '%s'\n", typeDescriptor);
               printf("      access        : 0x%04x (%s)\n",
-                  pSField->accessFlags, accessStr); */
-                    if(flag)printf("      global [|%s|] @@[|%s|]", descriptorToDot(typeDescriptor),name);
-                    else printf("      [|%s|] [|%s|]",descriptorToDot(typeDescriptor),name);
-                    printf("    @AccessFlag %s;\n",accessStr);
+                  pSField->accessFlags, accessStr); 
+                    if(flag)fprintf(pFp, "      global [|%s|] @@[|%s|]", descriptorToDot(typeDescriptor),name);
+                    else fprintf(pFp, "      [|%s|] [|%s|]",descriptorToDot(typeDescriptor),name);
+                    fprintf(pFp, "    @AccessFlag %s;\n",accessStr);
 
             //******************* kui's modification ends  *******************
     } else if (gOptions.outputFormat == OUTPUT_XML) {
@@ -2549,6 +3170,7 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
 
     if (pClassData == NULL) {
         printf("Trouble reading class data (#%d)\n", idx);
+        fprintf(pFp, "Trouble reading class data (#%d)\n", idx); // sankar
         goto bail;
     }
 
@@ -2590,8 +3212,13 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
         if (*pLastPackage == NULL || strcmp(mangle, *pLastPackage) != 0) {
             /* start of a new package */
             if (*pLastPackage != NULL)
-                printf("</package>\n");
+                { 
+					printf("</package>\n");
+					fprintf(pFp, "</package>\n"); // sankar
+
+				}
             printf("<package name=\"%s\"\n>\n", mangle);
+            fprintf(pFp, "<package name=\"%s\"\n>\n", mangle); // sankar
             free(*pLastPackage);
             *pLastPackage = mangle;
         } else {
@@ -2609,7 +3236,7 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
     }
     //******************* kui's modification begins  *******************
     if (gOptions.outputFormat == OUTPUT_PLAIN) {
-      /* printf("Class #%d            -\n", idx);
+              printf("Class #%d            -\n", idx);
               printf("  Class descriptor  : '%s'\n", classDescriptor);
               printf("  Access flags      : 0x%04x (%s)\n",
                   pClassDef->accessFlags, accessStr);
@@ -2617,20 +3244,20 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
               if (superclassDescriptor != NULL)
                   printf("  Superclass        : '%s'\n", superclassDescriptor);
 
-              printf("  Interfaces        -\n"); */
+              printf("  Interfaces        -\n"); // above 5 prints not in pilar
 
           if(packageName==NULL||strcmp(packageName,getPackageName(classDescriptor))!=0)
           {
-            printf("package [|%s|] ;\n", getPackageName(classDescriptor));
+            fprintf(pFp, "package [|%s|] ;\n", getPackageName(classDescriptor)); // not in dexdump
             packageName=getPackageName(classDescriptor);
           }
              pInterfaces = dexGetInterfacesList(pDexFile, pClassDef);
             if (superclassDescriptor != NULL && strcmp(superclassDescriptor,"Ljava/lang/Object;")!= 0)
               {
-              printf("record [|%s|] ", descriptorToDot(classDescriptor));
-              if(!((pClassDef->accessFlags)&ACC_INTERFACE)==0)  printf(" @type interface");
-              else printf(" @type class");
-              printf(" @AccessFlag %s  extends [|%s|]",accessStr,descriptorToDot(superclassDescriptor));
+              fprintf(pFp, "record [|%s|] ", descriptorToDot(classDescriptor)); // not in dexdump
+              if(!((pClassDef->accessFlags)&ACC_INTERFACE)==0)  fprintf(pFp, " @type interface");
+              else fprintf(pFp, " @type class"); // not in dexdump
+              fprintf(pFp, " @AccessFlag %s  extends [|%s|]",accessStr,descriptorToDot(superclassDescriptor)); // not in dexdump
               if (pInterfaces != NULL) {
                 for (i = 0; i < (int) pInterfaces->size; i++)
                 	dumpInterface(pDexFile, dexGetTypeItem(pInterfaces, i), i,1);
@@ -2638,69 +3265,80 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
                  }
               }
             else{
-              printf("record [|%s|] ", descriptorToDot(classDescriptor));
-              if(!((pClassDef->accessFlags)&ACC_INTERFACE)==0)  printf(" @type interface");
-                          else printf(" @type class");
-                          printf(" @AccessFlag %s ",accessStr);
+              fprintf(pFp, "record [|%s|] ", descriptorToDot(classDescriptor)); // not in dexdump
+              if(!((pClassDef->accessFlags)&ACC_INTERFACE)==0)  fprintf(pFp, " @type interface"); // not in dexdump
+                          else fprintf(pFp, " @type class"); // not in dexdump
+                          fprintf(pFp, " @AccessFlag %s ",accessStr); // not in dexdump
               if (pInterfaces != NULL) {
-            	  printf("extends ");
+            	  fprintf(pFp, "extends "); // not in dexdump
                   for (i = 0; i < (int) pInterfaces->size-1; i++)
                   dumpInterface(pDexFile, dexGetTypeItem(pInterfaces, i), i,2);
                   dumpInterface(pDexFile, dexGetTypeItem(pInterfaces, i), i,0);
              }
              }
 
-            printf(" {\n");
+            fprintf(pFp, " {\n"); // not in dexdump
             for (i = 0; i < (int) pClassData->header.instanceFieldsSize; i++) {
                 dumpIField(pDexFile, &pClassData->instanceFields[i], i);
             }
-            printf("   }\n");
+            fprintf(pFp, "   }\n"); // not in dexdump
                     //******************* kui's modification ends  *******************
     } else {
         char* tmp;
 
         tmp = descriptorClassToDot(classDescriptor);
         printf("<class name=\"%s\"\n", tmp);
+        fprintf(pFp, "<class name=\"%s\"\n", tmp); // sankar
         free(tmp);
 
         if (superclassDescriptor != NULL) {
             tmp = descriptorToDot(superclassDescriptor);
             printf(" extends=\"%s\"\n", tmp);
+            fprintf(pFp," extends=\"%s\"\n", tmp); // sankar
             free(tmp);
         }
         printf(" abstract=%s\n",
             quotedBool((pClassDef->accessFlags & ACC_ABSTRACT) != 0));
+        fprintf(pFp, " abstract=%s\n",
+            quotedBool((pClassDef->accessFlags & ACC_ABSTRACT) != 0));
         printf(" static=%s\n",
             quotedBool((pClassDef->accessFlags & ACC_STATIC) != 0));
+        fprintf(pFp, " static=%s\n",
+            quotedBool((pClassDef->accessFlags & ACC_STATIC) != 0));
         printf(" final=%s\n",
+            quotedBool((pClassDef->accessFlags & ACC_FINAL) != 0));
+        fprintf(pFp, " final=%s\n",
             quotedBool((pClassDef->accessFlags & ACC_FINAL) != 0));
         // "deprecated=" not knowable w/o parsing annotations
         printf(" visibility=%s\n",
             quotedVisibility(pClassDef->accessFlags));
+        fprintf(pFp, " visibility=%s\n",
+            quotedVisibility(pClassDef->accessFlags));
         printf(">\n");
+        fprintf(pFp, ">\n");
     }
 
 
     //******************* kui's modification begins  *******************
-       // if (gOptions.outputFormat == OUTPUT_PLAIN)
-         // if((int) pClassData->header.instanceFieldsSize!=0||(int) pClassData->header.staticFieldsSize!=0)
-           //   printf("  local\n");
+        if (gOptions.outputFormat == OUTPUT_PLAIN)
+          if((int) pClassData->header.instanceFieldsSize!=0||(int) pClassData->header.staticFieldsSize!=0)
+              printf("  local\n"); // not in pilar
         for (i = 0; i < (int) pClassData->header.staticFieldsSize; i++) {
             dumpSField(pDexFile, &pClassData->staticFields[i], i,true);
         }
 
-       // if (gOptions.outputFormat == OUTPUT_PLAIN)
-         //   printf("  Instance fields   -\n");
+        if (gOptions.outputFormat == OUTPUT_PLAIN)
+            printf("  Instance fields   -\n"); // not in pilar
 
 
-        //if (gOptions.outputFormat == OUTPUT_PLAIN)
-            //printf("  Direct methods    -\n");
+        if (gOptions.outputFormat == OUTPUT_PLAIN)
+            printf("  Direct methods    -\n"); // not in pilar
         for (i = 0; i < (int) pClassData->header.directMethodsSize; i++) {
             dumpMethod(pDexFile, &pClassData->directMethods[i], i,descriptorToDot(classDescriptor));
         }
 
-       // if (gOptions.outputFormat == OUTPUT_PLAIN)
-          //  printf("  Virtual methods   -\n");
+        if (gOptions.outputFormat == OUTPUT_PLAIN)
+            printf("  Virtual methods   -\n"); // not in pilar
         for (i = 0; i < (int) pClassData->header.virtualMethodsSize; i++) {
             dumpMethod(pDexFile, &pClassData->virtualMethods[i], i,descriptorToDot(classDescriptor));
         }
@@ -2715,12 +3353,13 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
 
     //******************* kui's modification begins  *******************
         if (gOptions.outputFormat == OUTPUT_PLAIN) {
-           // printf("  @source_file_idx:(%s)\n",fileName);
+            printf("  @source_file_idx:(%s)\n",fileName);
         }
         //******************* kui's modification ends  *******************
 
     if (gOptions.outputFormat == OUTPUT_XML) {
         printf("</class>\n");
+        fprintf(pFp, "</class>\n"); // sankar
     }
 
 bail:
@@ -2734,7 +3373,7 @@ bail:
  */
 static inline const u1* align32(const u1* ptr)
 {
-    return (u1*) (((int) ptr + 3) & ~0x03);
+    return (u1*) (((uintptr_t) ptr + 3) & ~0x03); // sankar : note that it was "(int)" casting instead of "(uintptr_t)" in version 4.0
 }
 
 
@@ -2770,6 +3409,9 @@ void dumpDifferentialCompressedMap(const u1** pData)
         origLen, compLen,
         (addrWidth + regWidth) * numEntries, compressedLen);
 
+    fprintf(pFp,"        (differential compression %d -> %d [%d -> %d])\n",
+        origLen, compLen,
+        (addrWidth + regWidth) * numEntries, compressedLen);
     /* skip past end of entry */
     data += compressedLen;
 
@@ -2793,6 +3435,7 @@ void dumpMethodMap(DexFile* pDexFile, const DexMethod* pDexMethod, int idx,
     pMethodId = dexGetMethodId(pDexFile, pDexMethod->methodIdx);
     name = dexStringById(pDexFile, pMethodId->nameIdx);
     printf("      #%d: 0x%08x %s\n", idx, offset, name);
+    fprintf(pFp, "      #%d: 0x%08x %s\n", idx, offset, name);
 
     u1 format;
     int addrWidth;
@@ -2801,6 +3444,7 @@ void dumpMethodMap(DexFile* pDexFile, const DexMethod* pDexMethod, int idx,
     if (format == 1) {              /* kRegMapFormatNone */
         /* no map */
         printf("        (no map)\n");
+        fprintf(pFp, "        (no map)\n");
         addrWidth = 0;
     } else if (format == 2) {       /* kRegMapFormatCompact8 */
         addrWidth = 1;
@@ -2811,6 +3455,7 @@ void dumpMethodMap(DexFile* pDexFile, const DexMethod* pDexMethod, int idx,
         goto bail;
     } else {
         printf("        (unknown format %d!)\n", format);
+        fprintf(pFp, "        (unknown format %d!)\n", format);
         /* don't know how to skip data; failure will cascade to end of class */
         goto bail;
     }
@@ -2830,10 +3475,13 @@ void dumpMethodMap(DexFile* pDexFile, const DexMethod* pDexMethod, int idx,
                 addr |= (*data++) << 8;
 
             printf("        %4x:", addr);
+            fprintf(pFp, "        %4x:", addr);
             for (byte = 0; byte < regWidth; byte++) {
                 printf(" %02x", *data++);
+                fprintf(pFp, " %02x", *data++);
             }
             printf("\n");
+            fprintf(pFp, "\n");
         }
     }
 
@@ -2862,6 +3510,7 @@ void dumpRegisterMaps(DexFile* pDexFile)
 
     if (pClassPool == NULL) {
         printf("No register maps found\n");
+        fprintf(pFp, "No register maps found\n");
         return;
     }
 
@@ -2871,7 +3520,9 @@ void dumpRegisterMaps(DexFile* pDexFile)
     classOffsets = (const u4*) ptr;
 
     printf("RMAP begins at offset 0x%07x\n", baseFileOffset);
+    fprintf(pFp, "RMAP begins at offset 0x%07x\n", baseFileOffset);
     printf("Maps for %d classes\n", numClasses);
+    fprintf(pFp, "Maps for %d classes\n", numClasses);
     for (idx = 0; idx < (int) numClasses; idx++) {
         const DexClassDef* pClassDef;
         const char* classDescriptor;
@@ -2880,6 +3531,8 @@ void dumpRegisterMaps(DexFile* pDexFile)
         classDescriptor = dexStringByTypeIdx(pDexFile, pClassDef->classIdx);
 
         printf("%4d: +%d (0x%08x) %s\n", idx, classOffsets[idx],
+            baseFileOffset + classOffsets[idx], classDescriptor);
+        fprintf(pFp, "%4d: +%d (0x%08x) %s\n", idx, classOffsets[idx],
             baseFileOffset + classOffsets[idx], classDescriptor);
 
         if (classOffsets[idx] == 0)
@@ -2911,16 +3564,23 @@ void dumpRegisterMaps(DexFile* pDexFile)
             printf("NOTE: method count discrepancy (%d != %d + %d)\n",
                 methodCount, pClassData->header.directMethodsSize,
                 pClassData->header.virtualMethodsSize);
+            fprintf(pFp, "NOTE: method count discrepancy (%d != %d + %d)\n",
+                methodCount, pClassData->header.directMethodsSize,
+                pClassData->header.virtualMethodsSize);
             /* this is bad, but keep going anyway */
         }
 
         printf("    direct methods: %d\n",
+            pClassData->header.directMethodsSize);
+        fprintf(pFp, "    direct methods: %d\n",
             pClassData->header.directMethodsSize);
         for (i = 0; i < (int) pClassData->header.directMethodsSize; i++) {
             dumpMethodMap(pDexFile, &pClassData->directMethods[i], i, &data);
         }
 
         printf("    virtual methods: %d\n",
+            pClassData->header.virtualMethodsSize);
+        fprintf(pFp, "    virtual methods: %d\n",
             pClassData->header.virtualMethodsSize);
         for (i = 0; i < (int) pClassData->header.virtualMethodsSize; i++) {
             dumpMethodMap(pDexFile, &pClassData->virtualMethods[i], i, &data);
@@ -2966,6 +3626,7 @@ void processDexFile(const char* fileName, DexFile* pDexFile)
     /* free the last one allocated */
     if (package != NULL) {
         printf("</package>\n");
+        fprintf(pFp, "</package>\n");
         free(package);
     }
 
@@ -3004,6 +3665,7 @@ int process(const char* fileName)
 
     if (gOptions.checksumOnly) {
         printf("Checksum verified\n");
+        fprintf(pFp, "Checksum verified\n");
     } else {
         processDexFile(fileName, pDexFile);
     }
@@ -3026,7 +3688,7 @@ void usage(void)
 {
     fprintf(stderr, "Copyright (C) 2007 The Android Open Source Project\n\n");
     fprintf(stderr,
-        "%s: [-c] [-d] [-f] [-h] [-i] [-l layout] [-m] [-t tempfile] dexfile...\n",
+        "%s: [-c] [-d] [-f] [-h] [-i] [-l layout] [-m] [-p] [-t tempfile] dexfile...\n",
         gProgName);
     fprintf(stderr, "\n");
     fprintf(stderr, " -c : verify checksum and exit\n");
@@ -3036,6 +3698,7 @@ void usage(void)
     fprintf(stderr, " -i : ignore checksum failures\n");
     fprintf(stderr, " -l : output layout, either 'plain' or 'xml'\n");
     fprintf(stderr, " -m : dump register maps (and nothing else)\n");
+    fprintf(stderr, " -p : also produce pilar output in a file, name.pilar \n");  // sankar adds
     fprintf(stderr, " -t : temp file name (defaults to /sdcard/dex-temp-*)\n");
 }
 
@@ -3049,11 +3712,15 @@ int main(int argc, char* const argv[])
     bool wantUsage = false;
     int ic;
 
+    char* filename; // given file name; // sankar adds
+	char* pilarFile; // this will hold the .pilar filename; // sankar adds
+	bool pilar = false; // become true if -p option is used; // sankar adds
+
     memset(&gOptions, 0, sizeof(gOptions));
     gOptions.verbose = true;
 
     while (1) {
-        ic = getopt(argc, argv, "cdfhil:mt:");
+        ic = getopt(argc, argv, "cdfhil:mpt:");  // sankar adds p
         if (ic < 0)
             break;
 
@@ -3087,6 +3754,9 @@ int main(int argc, char* const argv[])
         case 'm':       // dump register maps only
             gOptions.dumpRegisterMaps = true;
             break;
+        case 'p':       // sankar adds this case
+		    pilar = true;
+            break;
         case 't':       // temp file, used when opening compressed Jar
             gOptions.tempFileName = optarg;
             break;
@@ -3113,7 +3783,20 @@ int main(int argc, char* const argv[])
 
     int result = 0;
     while (optind < argc) {
+
+        if(pilar) {  // sankar adds this if clause
+           filename = strdup(argv[optind]); // is strdup safe? // sankar adds this line for pilar
+	       pilarFile = pilarExtName(filename); // get .pilar extension filename; // sankar adds this line;  
+		   pFp = fopen(pilarFile, "w");
+		   if(!pFp)
+			{
+			  fprintf(stderr, " \n could not open the pilar file \n");	   
+			}
+        }
+
         result |= process(argv[optind++]);
+
+        fclose(pFp); // sankar adds
     }
 
     return (result != 0);
