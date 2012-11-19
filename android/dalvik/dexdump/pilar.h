@@ -158,9 +158,9 @@ static char* pilarExtName(const char* str)
 #define  outIgetChar(x, y, z)      fprintf(pFp,"v%d:= v%d%s  @char;",x, y, z )
 #define  outIgetShort(x, y, z)     fprintf(pFp,"v%d:= v%d%s  @short;", x, y, z)
         
-#define  outIgetQuick(x, y, z)          fprintf(pFp,"v%d:= v%d.%s @iget-quick;", x, y, z)
-#define  outIgetWideQuick(x, y, z)      fprintf(pFp,"v%d:= v%d.%s  @iget-wide-quick;", x, y, z)
-#define  outIgetObjectQuick(x, y, z)    fprintf(pFp,"v%d:= v%d.%s  @iget-object-quick;",x, y, z )
+#define  outIgetQuick(x, y, z)          fprintf(pFp,"v%d:= v%d.%s @iget_quick;", x, y, z)
+#define  outIgetWideQuick(x, y, z)      fprintf(pFp,"v%d:= v%d.%s  @iget_wide_quick;", x, y, z)
+#define  outIgetObjectQuick(x, y, z)    fprintf(pFp,"v%d:= v%d.%s  @iget_object_quick;",x, y, z )
 		
 #define  outIput(x, y, z)          fprintf(pFp,"v%d%s := v%d;", x, y, z)
 #define  outIputWide(x, y, z)      fprintf(pFp,"v%d%s := v%d @wide;", x, y, z)
@@ -171,9 +171,9 @@ static char* pilarExtName(const char* str)
 #define  outIputShort(x, y, z)     fprintf(pFp,"v%d%s := v%d @short;", x, y, z)
  
 
-#define  outIputQuick(x, y, z)          fprintf(pFp,"v%d.%s := v%d @iput-quick;", x, y, z)
-#define  outIputWideQuick(x, y, z)      fprintf(pFp,"v%d.%s := v%d @iput-wide-quick;", x, y, z)
-#define  outIputObjectQuick(x, y, z)    fprintf(pFp,"v%d.%s := v%d @iput-object-quick;", x, y, z)
+#define  outIputQuick(x, y, z)          fprintf(pFp,"v%d.%s := v%d @iput_quick;", x, y, z)
+#define  outIputWideQuick(x, y, z)      fprintf(pFp,"v%d.%s := v%d @iput_wide_quick;", x, y, z)
+#define  outIputObjectQuick(x, y, z)    fprintf(pFp,"v%d.%s := v%d @iput_object_quick;", x, y, z)
 
 #define  outSget(x, y)    fprintf(pFp,"v%d:= %s;", x, y)
 #define  outSgetWide(x, y)  fprintf(pFp,"v%d:= %s  @wide;", x, y)
@@ -223,7 +223,7 @@ char* cut2Char(char* proc)
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type object-init;",methInfo.classDescriptor, methInfo.name,\
+               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type object_init;",methInfo.classDescriptor, methInfo.name,\
                    methInfo.signature,descriptorToDot(methInfo.classDescriptor));\
          }\
      }
@@ -275,7 +275,7 @@ char* cut2Char(char* proc)
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature [||] @classDescriptor [||] @type virtual-quick;");\
+               fprintf(pFp,") @signature [||] @classDescriptor [||] @type virtual_quick;");\
 				   free(newStr);    /**** this is to free the newStr ******/\
      }
 
@@ -323,7 +323,7 @@ char* cut2Char(char* proc)
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature [||] @classDescriptor [||] @type super-quick;");\
+               fprintf(pFp,") @signature [||] @classDescriptor [||] @type super_quick;");\
 				   free(newStr); /**** this is to free the newStr ******/\
 	}
 
@@ -425,7 +425,7 @@ char* cut2Char(char* proc)
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature [||] @classDescriptor [||] @type virtual-quick;"); \
+          fprintf(pFp,") @signature [||] @classDescriptor [||] @type virtual_quick;"); \
 						   free(newStr);\
   }
 
@@ -477,7 +477,7 @@ char* cut2Char(char* proc)
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature [||] @classDescriptor [||] @type super-quick;"); \
+          fprintf(pFp,") @signature [||] @classDescriptor [||] @type super_quick;"); \
 						   free(newStr);\
   }
 
@@ -560,9 +560,9 @@ char* cut2Char(char* proc)
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               /* fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type execute-inline;",methInfo.classDescriptor, methInfo.name,\
+               /* fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type execute_inline;",methInfo.classDescriptor, methInfo.name,\
                    methInfo.signature,descriptorToDot(methInfo.classDescriptor)); */\
-               fprintf(pFp,") @signature [||] @classDescriptor [||] @type execute-inline;");\
+               fprintf(pFp,") @signature [||] @classDescriptor [||] @type execute_inline;");\
 				   free(newStr);    /**** this is to free the newStr ******/\
      }
 
@@ -595,7 +595,7 @@ char* cut2Char(char* proc)
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature [||] @classDescriptor [||] @type execute-inline;"); \
+          fprintf(pFp,") @signature [||] @classDescriptor [||] @type execute_inline;"); \
 						   free(newStr);\
   }
 

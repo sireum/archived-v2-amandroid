@@ -2943,7 +2943,7 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
               //if(strcmp(name,"<init>")==0)  printf("    procedure %s [|init|] (%s) @%s {\n", rtype,para,accessStr);
              // else if(strcmp(name,"<clinit>")==0)  printf("    procedure %s [|clinit|] (%s) @%s {\n", rtype,para,accessStr);
               fprintf(pFp, "    procedure [|%s|] [|%s.%s|] ([|%s|]) @owner [|%s|] @signature [|%s.%s:%s|] @Access %s {\n",
-            		                 rtype,backDescriptor,name,para,owner,backDescriptor,name,typeDescriptor,accessStr); // not in dexdump
+            		                 rtype,owner,name,para,owner,backDescriptor,name,typeDescriptor,accessStr); // not in dexdump
              free(rtype);
              free(para);
               //printf("      name          : '%s'\n", name);
@@ -3248,7 +3248,7 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
 
           if(packageName==NULL||strcmp(packageName,getPackageName(classDescriptor))!=0)
           {
-            fprintf(pFp, "package [|%s|] ;\n", getPackageName(classDescriptor)); // not in dexdump
+            // fprintf(pFp, "package [|%s|] ;\n", getPackageName(classDescriptor)); // not in dexdump
             packageName=getPackageName(classDescriptor);
           }
              pInterfaces = dexGetInterfacesList(pDexFile, pClassDef);
