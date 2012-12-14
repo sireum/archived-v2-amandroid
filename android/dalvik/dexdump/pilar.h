@@ -6,6 +6,35 @@
 #include <string.h>
 
 
+
+struct locVarInfo {  // sankar adds this struct which can store one local variable info 
+	
+	char* descriptor;
+	char* name;
+	u2 reg;
+	u4 startAddress;
+	u4 endAddress;
+
+    locVarInfo(const char* desc, const char* nam, u2 r, u4 sa, u4 ea)
+	 { 
+	  descriptor = new char[strlen(desc) + 1];
+	  strcpy(descriptor, desc);
+	  name = new char[strlen(nam) + 1];
+	  strcpy(name, nam);
+	  reg = r;
+      startAddress = sa;
+	  endAddress = ea;
+	 }
+
+	~locVarInfo()
+    	{
+	    	delete descriptor;
+		    delete name;
+        } 
+
+	};
+
+
 //******************* kui's modification begins  *******************
 struct Op31t {
     int insnIdx;

@@ -66,6 +66,10 @@ enum OutputFormat {
 };
 
 
+int lastAddress = 0; // sankar adds : this would store the last address of the current method
+typedef struct locVarInfo locVarInf; // sankar adds
+
+PStash* locVarList = NULL; // sankar adds this list which holds local variables' info for the current method 
 
 FILE* pFp; // represents the file which will have pilar output;
 
@@ -774,7 +778,19 @@ void dumpCatches(DexFile* pDexFile, const DexCode* pCode)
                 descriptorToDot(dexStringByTypeIdx(pDexFile, handler->typeIdx));
             printf("  catch  %s @[L%06x..L%06x] goto L%06x;\n", descriptor,((u1*)insns - pDexFile->baseAddr) +start*2,((u1*)insns - pDexFile->baseAddr) +end*2,((u1*)insns - pDexFile->baseAddr) +(handler->address)*2); // need to change back
 
+           /*********** sankar starts ***********/
+            if(end > lastAddress)  
+			{
+				end = lastAddress; // casting ok?
+			}
+		   //  else
+		   //    printf("end = %d , lastAdd = %d  \n", end, lastAddress);
+          /********** sankar ends **********/
+
             fprintf(pFp,"  catch  %s @[L%06x..L%06x] goto L%06x;\n", descriptor,((u1*)insns - pDexFile->baseAddr) +start*2,((u1*)insns - pDexFile->baseAddr) +end*2,((u1*)insns - pDexFile->baseAddr) +(handler->address)*2); // sankar
+
+            
+			// printf("insns = %06x , pDexFile->baseAddr = %06x , start*2 =  %06x , end*2 = %06x \n", (u1*)insns , pDexFile->baseAddr , start*2 , end*2);
         }
     }
     //******************* kui's modification ends  *******************
@@ -803,20 +819,35 @@ void dumpPositions(DexFile* pDexFile, const DexCode* pCode,
             pDexMethod->accessFlags, dumpPositionsCb, NULL, NULL);
 }
 
+	
+
+
 static void dumpLocalsCb(void *cnxt, u2 reg, u4 startAddress,
         u4 endAddress, const char *name, const char *descriptor,
         const char *signature)
 {
 
+   locVarInf* temp; // sankar adds temp
+
    printf("        0x%04x - 0x%04x reg=%d %s %s %s\n",
             startAddress, endAddress, reg, name, descriptor,
 			            signature);
+  /************* sankar starts ************/
 
-  //******************* kui's modification begins  *******************
-	fprintf(pFp, "        [|%s|] [|%s|] @reg %d @scope (L%04x,L%04x) ;\n",
-      descriptorToDot(descriptor), name,reg, startAddress,  +endAddress );
+   temp = new locVarInf(descriptorToDot(descriptor), name, reg, startAddress, endAddress); 
+   //printf("***** %d \n", temp->reg);
+
+   assert(locVarList);
+   locVarList->add((void*)temp);
+  /****************** sankar ends ***********/
+
+  //******************* kui's modification begins : sankar moved the following to dumpLocals()  *******************
+	// fprintf(pFp, "        [|%s|] [|%s|] @reg %d @scope (L%04x,L%04x) ;\n",
+      // descriptorToDot(descriptor), name,reg, startAddress,  +endAddress );
     //******************* kui's modification ends  *******************
 }
+
+
 
 /*
  * Dump the locals list.
@@ -825,9 +856,13 @@ static void dumpLocalsCb(void *cnxt, u2 reg, u4 startAddress,
 void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
         const DexMethod *pDexMethod)
 {
+    if(locVarList) 
+		delete locVarList; // sankar adds: check some possible memory leak here
+
+    locVarList = new PStash; // sankar adds
 
 	printf("      locals :\n");
-	fprintf(pFp,"      local placehoder ;\n"); // sankar
+	fprintf(pFp,"      local placeholder ;\n"); // sankar
     const DexMethodId *pMethodId
             = dexGetMethodId(pDexFile, pDexMethod->methodIdx);
     const char *classDescriptor
@@ -835,7 +870,60 @@ void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
 
     dexDecodeDebugInfo(pDexFile, pCode, classDescriptor, pMethodId->protoIdx,
             pDexMethod->accessFlags, NULL, dumpLocalsCb, NULL);
-    fprintf(pFp, "      \n"); // sankar: not in dexdump
+
+   /*********** sankar starts ***********/
+
+   if(locVarList)
+       {
+		 for(int i=0; i < locVarList->count(); i++)
+		  {	 
+		    void* temp1 = (*locVarList)[i];
+		    if(temp1) 
+			   {
+				 locVarInf* t1 = (locVarInf*) temp1;
+                 if(t1->descriptor && t1->name)
+				    fprintf(pFp, "        [|%s|] [|%s|] @reg %d @scope (L%04x,L%04x);",
+				                     t1->descriptor, t1->name, t1->reg, t1->startAddress,  t1->endAddress );
+
+                 int conflictCount = 0;
+
+                 for(int j=i+1; j < locVarList->count(); j++)
+				 {
+				   void* temp2 = (*locVarList)[j];
+				   if(temp2)
+				   {
+				     locVarInf* t2 = (locVarInf*) temp2;
+					 if(t2->descriptor && t2->name && t1->name && !strcmp(t2->name, t1->name))
+					  { 
+						conflictCount++;
+
+			            // fprintf(pFp, ", @scope (L%04x,L%04x) ", t2->startAddress,  t2->endAddress);
+				        // delete t2; // is it safe?
+						// locVarList->remove(j); // possible memory leak?
+
+                        char* tName;
+						char extra[6]; //*******  assume that number of conflicts is less than 10^4 *******
+						snprintf(extra, 6, ".%d", conflictCount);
+						tName = new char[strlen(t2->name) + strlen(extra) + 2]; // i think even +1 would have been suffi
+						strcpy(tName, t2->name);
+						strcat(tName, extra);
+						free(t2->name);
+						t2->name= tName;
+                      }
+				   }
+				 }
+                 
+				 fprintf(pFp, "\n");
+				 delete t1; // is it safe?
+				 locVarList->remove(i); // possible memory leak?
+
+               }
+		  }
+	   }
+    /************* sankar ends *************/
+
+   // printf("num of local vars = %d \n", locVarList->count());
+   fprintf(pFp, "      \n"); // sankar: not in dexdump
 }
 
 /*
@@ -1051,7 +1139,6 @@ static char* indexString(DexFile* pDexFile,
 
 
 
-
 /* 
  * Dump a single instruction.
  * Sankar copied this function from Android4.1.original.source.DexDump.cpp and then modified it to output pilar following some of Kui's previous modification
@@ -1064,6 +1151,10 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
     char *indexBuf = indexBufChars;
     const u2* insns = pCode->insns;
     int i;
+
+    lastAddress = insnIdx; // sankar adds
+
+   // printf("insns = %06x , pDexFile->baseAddr = %06x , insnIdx*2 =  %06x \n", (u1*)insns , pDexFile->baseAddr , insnIdx*2 );
 
     printf("%06x:", ((u1*)insns - pDexFile->baseAddr) + insnIdx*2);
     fprintf(pFp,"#L%06x.   ", ((u1*)insns - pDexFile->baseAddr) + insnIdx*2); // sankar adds "L" at the left
@@ -2943,7 +3034,7 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
               //if(strcmp(name,"<init>")==0)  printf("    procedure %s [|init|] (%s) @%s {\n", rtype,para,accessStr);
              // else if(strcmp(name,"<clinit>")==0)  printf("    procedure %s [|clinit|] (%s) @%s {\n", rtype,para,accessStr);
               fprintf(pFp, "    procedure [|%s|] [|%s.%s|] ([|%s|]) @owner [|%s|] @signature [|%s.%s:%s|] @Access %s {\n",
-            		                 rtype,owner,name,para,owner,backDescriptor,name,typeDescriptor,accessStr); // not in dexdump
+			            rtype,owner,name,para,owner,backDescriptor,name,typeDescriptor,accessStr); // not in dexdump
              free(rtype);
              free(para);
               //printf("      name          : '%s'\n", name);
@@ -3069,7 +3160,7 @@ bail:
 /*
  * Dump a static (class) field.
  */
-void dumpSField(const DexFile* pDexFile, const DexField* pSField, int i,bool flag)
+void dumpSField(const DexFile* pDexFile, const DexField* pSField, int i,bool flag, char* className) // sankar adds the 5th argument
 {
     const DexFieldId* pFieldId;
     const char* backDescriptor;
@@ -3096,8 +3187,8 @@ void dumpSField(const DexFile* pDexFile, const DexField* pSField, int i,bool fla
               printf("      type          : '%s'\n", typeDescriptor);
               printf("      access        : 0x%04x (%s)\n",
                   pSField->accessFlags, accessStr); 
-                    if(flag)fprintf(pFp, "      global [|%s|] @@[|%s|]", descriptorToDot(typeDescriptor),name);
-                    else fprintf(pFp, "      [|%s|] [|%s|]",descriptorToDot(typeDescriptor),name);
+                    if(flag)fprintf(pFp, "      global [|%s|] @@[|%s.%s|]", descriptorToDot(typeDescriptor),className, name); // sankar adds className
+                    else fprintf(pFp, "      [|%s|] [|%s.%s|]",descriptorToDot(typeDescriptor),className, name); // sankar adds className
                     fprintf(pFp, "    @AccessFlag %s;\n",accessStr);
 
             //******************* kui's modification ends  *******************
@@ -3131,9 +3222,9 @@ void dumpSField(const DexFile* pDexFile, const DexField* pSField, int i,bool fla
 /*
  * Dump an instance field.
  */
-void dumpIField(const DexFile* pDexFile, const DexField* pIField, int i)
+void dumpIField(const DexFile* pDexFile, const DexField* pIField, int i, char* className) // sankar adds the 4th argument
 {
-    dumpSField(pDexFile, pIField, i,false);
+    dumpSField(pDexFile, pIField, i,false, className); // sankar adds the 5th argument
 }
 
 /*
@@ -3248,7 +3339,7 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
 
           if(packageName==NULL||strcmp(packageName,getPackageName(classDescriptor))!=0)
           {
-            // fprintf(pFp, "package [|%s|] ;\n", getPackageName(classDescriptor)); // not in dexdump
+           // fprintf(pFp, "package [|%s|] ;\n", getPackageName(classDescriptor)); // not in dexdump
             packageName=getPackageName(classDescriptor);
           }
              pInterfaces = dexGetInterfacesList(pDexFile, pClassDef);
@@ -3279,7 +3370,7 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
 
             fprintf(pFp, " {\n"); // not in dexdump
             for (i = 0; i < (int) pClassData->header.instanceFieldsSize; i++) {
-                dumpIField(pDexFile, &pClassData->instanceFields[i], i);
+                dumpIField(pDexFile, &pClassData->instanceFields[i], i, descriptorToDot(classDescriptor)); // sankar adds the 4th argument
             }
             fprintf(pFp, "   }\n"); // not in dexdump
                     //******************* kui's modification ends  *******************
@@ -3324,7 +3415,7 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
           if((int) pClassData->header.instanceFieldsSize!=0||(int) pClassData->header.staticFieldsSize!=0)
               printf("  local\n"); // not in pilar
         for (i = 0; i < (int) pClassData->header.staticFieldsSize; i++) {
-            dumpSField(pDexFile, &pClassData->staticFields[i], i,true);
+            dumpSField(pDexFile, &pClassData->staticFields[i], i,true, descriptorToDot(classDescriptor)); // sankar adds the 5th argument
         }
 
         if (gOptions.outputFormat == OUTPUT_PLAIN)
