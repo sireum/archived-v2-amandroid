@@ -3042,7 +3042,7 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 
               if (pDexMethod->codeOff == 0) {
 				  printf("      code          : (none)\n");
-                 fprintf(pFp, "      #"); 
+                 fprintf(pFp, "      # return;"); // sankar changed from "#" to "#return;" because some abstract interface method body was containing only {#} which was causing symbol resolution error 
               } else {
                   printf("      code          -\n");
                   dumpCode(pDexFile, pDexMethod);
