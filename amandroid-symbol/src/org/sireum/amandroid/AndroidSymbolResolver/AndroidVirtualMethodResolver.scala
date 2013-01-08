@@ -120,8 +120,8 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
         val procedureName = 
           if (!isConsOrStatic(pat))
             getInside(nameDefinition.name)
-          else ""
-        if (!procedureName.isEmpty()){
+          else null
+        if (procedureName != null && !procedureName.isEmpty()){
           buildVirtualMethodTable(procedureName,
                                       procedureName)
           val nameUser : NameUser =
