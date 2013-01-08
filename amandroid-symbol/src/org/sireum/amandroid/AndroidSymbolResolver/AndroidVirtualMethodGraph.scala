@@ -51,13 +51,13 @@ object AndroidVirtualMethodGraph {
       if(!recordName.equals(lastRN)){
         var labelsName = new ArrayList[String]
         val label = template.getInstanceOf("Label")
-        label.add("shortName", recordName.replaceAll(org.sireum.pilar.PILAR_PACKAGE_SEP, ""))
+        label.add("shortName", getShortName(recordName))
         label.add("name", recordName)
         labelsName.add(label.render())
         val proceduresName = recordProcedureTable.get(recordName)
         for(procedureName <- proceduresName){
           val label = template.getInstanceOf("Label")
-          label.add("shortName", procedureName.replaceAll(org.sireum.pilar.PILAR_PACKAGE_SEP, "").replace('.', '_'))
+          label.add("shortName", getShortName(procedureName))
           label.add("name", procedureName)
           labelsName.add(label.render())
         }
@@ -74,12 +74,12 @@ object AndroidVirtualMethodGraph {
       if(!recordName.equals(lastRecordName)){
         val rhsNode = template.getInstanceOf("EdgeNode")
         rhsNode.add("name", recordName)
-        rhsNode.add("shortName", recordName.replaceAll(org.sireum.pilar.PILAR_PACKAGE_SEP, ""))
+        rhsNode.add("shortName", getShortName(recordName))
         val parentsName = recordHierarchyTable.get(recordName)
         for(parentName <- parentsName){
           val lhsNode = template.getInstanceOf("EdgeNode")
           lhsNode.add("name", parentName)
-          lhsNode.add("shortName", parentName.replaceAll(org.sireum.pilar.PILAR_PACKAGE_SEP, ""))
+          lhsNode.add("shortName", getShortName(parentName))
           val edge = template.getInstanceOf("Edge")
           edge.add("from", lhsNode)
           edge.add("to", rhsNode)
@@ -93,13 +93,13 @@ object AndroidVirtualMethodGraph {
       if(!procedureName.equals(lastProcedureName)){
         val lhsNode = template.getInstanceOf("EdgeNode")
         lhsNode.add("name", getRecordName(procedureName))
-        lhsNode.add("shortName", procedureName.replaceAll(org.sireum.pilar.PILAR_PACKAGE_SEP, "").replace('.', '_'))
+        lhsNode.add("shortName", getShortName(procedureName))
         val overrideProceduresName = virtualMethodTable.get(procedureName)
         for(overrideProcedureName <- overrideProceduresName){
           if(!procedureName.equals(overrideProcedureName)){
             val rhsNode = template.getInstanceOf("EdgeNode")
             rhsNode.add("name", getRecordName(overrideProcedureName))
-            rhsNode.add("shortName", overrideProcedureName.replaceAll(org.sireum.pilar.PILAR_PACKAGE_SEP, "").replace('.', '_'))
+            rhsNode.add("shortName", getShortName(overrideProcedureName))
             val edge = template.getInstanceOf("Edge")
             edge.add("from", lhsNode)
             edge.add("to", rhsNode)
@@ -113,6 +113,10 @@ object AndroidVirtualMethodGraph {
     vmGraph.add("nodes", nodes)
     vmGraph.add("edges", edges)
     println(vmGraph.render())
+  }
+  
+  def getShortName(name : String) : String = {
+    name.replaceAll(org.sireum.pilar.PILAR_PACKAGE_SEP, "").replace('$', '0').replace('.', '_')
   }
         
   def getRecordName(procedureName : String) : String = {

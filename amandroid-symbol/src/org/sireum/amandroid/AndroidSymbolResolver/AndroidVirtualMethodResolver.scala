@@ -103,13 +103,17 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
         name
       case _ => null
     }
-    val access = nameUser.name
-    if(access.indexOf("CONSTRUCTOR") > 0)
-      true
-    else if(access.indexOf("STATIC") > 0)
-      true
-    else
+    if(nameUser != null){
+      val access = nameUser.name
+      if(access.indexOf("CONSTRUCTOR") > 0)
+        true
+      else if(access.indexOf("STATIC") > 0)
+        true
+      else
+        false
+    } else {
       false
+    }
   }
   
   def androidVMResolver(stp : SymbolTableProducer) : Unit =
@@ -120,8 +124,8 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
         val procedureName = 
           if (!isConsOrStatic(pat))
             getInside(nameDefinition.name)
-          else ""
-        if (!procedureName.isEmpty()){
+          else null
+        if (procedureName != null && !procedureName.isEmpty()){
           buildVirtualMethodTable(procedureName,
                                       procedureName)
           val nameUser : NameUser =
@@ -135,7 +139,7 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
           val parentsName = recordHierarchyTable.get(recordName)
           for (parentName <- parentsName){
             var success = androidAddRelation(parentName, recordName, procedureName)
-            while(!success){
+            if(!success){
               val suParentsName = recordHierarchyTable.get(parentName)
               for (suParentName <- suParentsName){
                 success = androidAddRelation(suParentName, recordName, procedureName)
