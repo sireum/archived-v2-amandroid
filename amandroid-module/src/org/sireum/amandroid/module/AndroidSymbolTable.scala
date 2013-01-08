@@ -3,6 +3,8 @@ package org.sireum.amandroid.module
 import org.sireum.pilar.ast._
 import org.sireum.util._
 import org.sireum.pilar.symbol._
+import com.google.common.collect.HashMultimap
+import org.sireum.amandroid.AndroidSymbolResolver._
 
 
 /**
@@ -59,7 +61,27 @@ object AndroidSymbolTable {
     
   }
 
+  def resolveVirtualMethod(stp : SymbolTableProducer) : AndroidVirtualMethodTables = {
+    val rht = HashMultimap.create[String, String]()
+    val vmt = HashMultimap.create[String, String]()
+    new Object with AndroidVirtualMethodResolver {
+      override def recordHierarchyTable = rht
+      override def virtualMethodTable = vmt
+    }.androidVirtualMethodResolver(stp)
+    val favmt = {_ : Unit => new AVMT}
+    AndroidVirtualMethodTables(rht, vmt, favmt)
+  }
   
+  class AVMT extends AndroidVirtualMethodTables with AndroidVirtualMethodTablesProducer {
+    avmt =>
+    
+    val tables = AndroidVirtualMethodTablesData()
+    
+    def recordHierarchyTable : HashMultimap[String, String] = tables.recordHierarchyTable
+    def virtualMethodTable : HashMultimap[String, String] = tables.virtualMethodTable
+    
+    def toAndroidVirtualMethodTables : AndroidVirtualMethodTables = this
+  }
 
   def resolvePackageElements(models : ISeq[Model], stp : SymbolTableProducer,
                              parallel : Boolean) : Unit = {
@@ -82,9 +104,10 @@ object AndroidSymbolTable {
                        stpConstructor : Unit => SymbolTableProducer,
                        parallel : Boolean) = {
     val stp = minePackageElements(models, stpConstructor, parallel)
-       resolvePackageElements(models, stp, parallel)
-       SymbolTable.buildProcedureSymbolTables(stp)
-    stp.toSymbolTable
+    val tables = resolveVirtualMethod(stp)
+    resolvePackageElements(models, stp, parallel)
+    SymbolTable.buildProcedureSymbolTables(stp)
+    (stp.toSymbolTable, tables)
   }
 
 

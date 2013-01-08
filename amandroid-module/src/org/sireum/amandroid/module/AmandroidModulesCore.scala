@@ -2,18 +2,18 @@ package org.sireum.amandroid.module
 
 import org.sireum.util._
 import org.sireum.pipeline._
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
 import org.sireum.pilar.ast.Model
 import org.sireum.pilar.symbol.SymbolTable
 import scala.collection.immutable.Seq
-import org.sireum.core.module.PilarParser
 import org.sireum.core.module.PilarParserModule
-
 
 object PilarAndroidSymbolResolverModule extends PipelineModule {
   def title = "Pilar Symbol Resolver for Android"
   def origin = classOf[PilarAndroidSymbolResolver]
 
   val globalParallelKey = "Global.parallel"
+  val globalAndroidVirtualMethodTablesKey = "Global.androidVirtualMethodTables"
   val globalModelsKey = "Global.models"
   val modelsKey = "PilarAndroidSymbolResolver.models"
   val globalSymbolTableKey = "Global.symbolTable"
@@ -51,33 +51,6 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
 
   def inputDefined (job : PipelineJob) : MBuffer[Tag] = {
     val tags = marrayEmpty[Tag]
-    var _parallel : scala.Option[AnyRef] = None
-    var _parallelKey : scala.Option[String] = None
-
-    val keylistparallel = List(PilarAndroidSymbolResolverModule.globalParallelKey)
-    keylistparallel.foreach(key => 
-      if(job ? key) { 
-        if(_parallel.isEmpty) {
-          _parallel = Some(job(key))
-          _parallelKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _parallel.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'parallel' keys '" + _parallelKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _parallel match{
-      case Some(x) =>
-        if(!x.isInstanceOf[scala.Boolean]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'parallel'.  Expecting 'scala.Boolean' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'parallel'")       
-    }
     var _models : scala.Option[AnyRef] = None
     var _modelsKey : scala.Option[String] = None
 
@@ -105,6 +78,33 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'models'")       
     }
+    var _parallel : scala.Option[AnyRef] = None
+    var _parallelKey : scala.Option[String] = None
+
+    val keylistparallel = List(PilarAndroidSymbolResolverModule.globalParallelKey)
+    keylistparallel.foreach(key => 
+      if(job ? key) { 
+        if(_parallel.isEmpty) {
+          _parallel = Some(job(key))
+          _parallelKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _parallel.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'parallel' keys '" + _parallelKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _parallel match{
+      case Some(x) =>
+        if(!x.isInstanceOf[scala.Boolean]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'parallel'.  Expecting 'scala.Boolean' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'parallel'")       
+    }
     return tags
   }
 
@@ -127,6 +127,17 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
         job(PilarAndroidSymbolResolverModule.globalModelsKey).getClass.toString + "'")
     } 
 
+    if(!(job ? PilarAndroidSymbolResolverModule.globalAndroidVirtualMethodTablesKey)) {
+      tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+        "Output error for '" + this.title + "': No entry found for 'androidVirtualMethodTables'. Expecting (PilarAndroidSymbolResolverModule.globalAndroidVirtualMethodTablesKey)") 
+    }
+
+    if(job ? PilarAndroidSymbolResolverModule.globalAndroidVirtualMethodTablesKey && !job(PilarAndroidSymbolResolverModule.globalAndroidVirtualMethodTablesKey).isInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables]) {
+      tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker, 
+        "Output error for '" + this.title + "': Wrong type found for PilarAndroidSymbolResolverModule.globalAndroidVirtualMethodTablesKey.  Expecting 'org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables' but found '" + 
+        job(PilarAndroidSymbolResolverModule.globalAndroidVirtualMethodTablesKey).getClass.toString + "'")
+    } 
+
     if(!(job ? PilarAndroidSymbolResolverModule.globalSymbolTableKey)) {
       tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
         "Output error for '" + this.title + "': No entry found for 'symbolTable'. Expecting (PilarAndroidSymbolResolverModule.globalSymbolTableKey)") 
@@ -138,21 +149,6 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
         job(PilarAndroidSymbolResolverModule.globalSymbolTableKey).getClass.toString + "'")
     } 
     return tags
-  }
-
-  def modGetParallel (options : scala.collection.Map[Property.Key, Any]) : scala.Boolean = {
-    if (options.contains(PilarAndroidSymbolResolverModule.globalParallelKey)) {
-       return options(PilarAndroidSymbolResolverModule.globalParallelKey).asInstanceOf[scala.Boolean]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setParallel (options : MMap[Property.Key, Any], parallel : scala.Boolean) : MMap[Property.Key, Any] = {
-
-    options(PilarAndroidSymbolResolverModule.globalParallelKey) = parallel
-
-    return options
   }
 
   def modGetModels (options : scala.collection.Map[Property.Key, Any]) : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model] = {
@@ -193,6 +189,36 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
     return options
   }
 
+  def modGetParallel (options : scala.collection.Map[Property.Key, Any]) : scala.Boolean = {
+    if (options.contains(PilarAndroidSymbolResolverModule.globalParallelKey)) {
+       return options(PilarAndroidSymbolResolverModule.globalParallelKey).asInstanceOf[scala.Boolean]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setParallel (options : MMap[Property.Key, Any], parallel : scala.Boolean) : MMap[Property.Key, Any] = {
+
+    options(PilarAndroidSymbolResolverModule.globalParallelKey) = parallel
+
+    return options
+  }
+
+  def getAndroidVirtualMethodTables (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = {
+    if (options.contains(PilarAndroidSymbolResolverModule.globalAndroidVirtualMethodTablesKey)) {
+       return options(PilarAndroidSymbolResolverModule.globalAndroidVirtualMethodTablesKey).asInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def modSetAndroidVirtualMethodTables (options : MMap[Property.Key, Any], androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables) : MMap[Property.Key, Any] = {
+
+    options(PilarAndroidSymbolResolverModule.globalAndroidVirtualMethodTablesKey) = androidVirtualMethodTables
+
+    return options
+  }
+
   def getSymbolTable (options : scala.collection.Map[Property.Key, Any]) : org.sireum.pilar.symbol.SymbolTable = {
     if (options.contains(PilarAndroidSymbolResolverModule.globalSymbolTableKey)) {
        return options(PilarAndroidSymbolResolverModule.globalSymbolTableKey).asInstanceOf[org.sireum.pilar.symbol.SymbolTable]
@@ -212,12 +238,15 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
 trait PilarAndroidSymbolResolverModule {
   def job : PipelineJob
 
-  def parallel : scala.Boolean = PilarAndroidSymbolResolverModule.modGetParallel(job.properties)
-
   def models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model] = PilarAndroidSymbolResolverModule.modGetModels(job.properties)
 
 
   def models_=(models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model]) { PilarAndroidSymbolResolverModule.modSetModels(job.properties, models) }
+
+  def parallel : scala.Boolean = PilarAndroidSymbolResolverModule.modGetParallel(job.properties)
+
+
+  def androidVirtualMethodTables_=(androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables) { PilarAndroidSymbolResolverModule.modSetAndroidVirtualMethodTables(job.properties, androidVirtualMethodTables) }
 
 
   def symbolTable_=(symbolTable : org.sireum.pilar.symbol.SymbolTable) { PilarAndroidSymbolResolverModule.modSetSymbolTable(job.properties, symbolTable) }

@@ -35,13 +35,15 @@ class PilarAndroidSymbolResolverDef (val job : PipelineJob, info : PipelineJobMo
   val result = AndroidSymbolTable(ms, fst, par)
     
 
-  val st = result.asInstanceOf[ST]
+  val st = result._1.asInstanceOf[ST]
   info.tags ++= st.tags
 
   if (st.hasErrors)
     info.hasError = true
 
-  this.symbolTable_=(result)
+  this.symbolTable_=(result._1)
+  
+  this.androidVirtualMethodTables_=(result._2)
 
   class ST extends SymbolTable with SymbolTableProducer {
     st =>

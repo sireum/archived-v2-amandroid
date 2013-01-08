@@ -7,6 +7,7 @@ import org.sireum.pilar.ast.Model
 import org.sireum.pilar.symbol.SymbolTable
 import org.sireum.option.PipelineMode
 import org.sireum.pipeline.gen.ModuleGenerator
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
 
 
 /*
@@ -37,6 +38,10 @@ case class PilarAndroidSymbolResolver(
   @Produce 
   models : ISeq[Model],
   
+// Fengguo Wei put this output: androidRecordProcedureDependencyTables
+  @Output
+  androidVirtualMethodTables : AndroidVirtualMethodTables,
+ 
   
   @Output
   symbolTable : SymbolTable)
