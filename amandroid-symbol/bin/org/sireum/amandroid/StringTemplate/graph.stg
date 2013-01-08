@@ -5,7 +5,7 @@ delimiters "$", "$"
 Graph(nodes, edges) ::= <<
 digraph G{
   graph [
-    rankdir = "TB"
+    rankdir = "LR"
   ];
   node [
     fontsize = "16"
