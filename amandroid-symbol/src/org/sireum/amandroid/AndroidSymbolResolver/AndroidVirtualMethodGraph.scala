@@ -112,7 +112,7 @@ object AndroidVirtualMethodGraph {
     val vmGraph = template.getInstanceOf("Graph")
     vmGraph.add("nodes", nodes)
     vmGraph.add("edges", edges)
-    println(vmGraph.render())
+   // println(vmGraph.render())
   }
   
   def getShortName(name : String) : String = {

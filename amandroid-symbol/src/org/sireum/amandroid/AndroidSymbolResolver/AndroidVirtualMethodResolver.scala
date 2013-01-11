@@ -105,9 +105,9 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
     }
     if(nameUser != null){
       val access = nameUser.name
-      if(access.indexOf("CONSTRUCTOR") > 0)
+      if(access.contains("CONSTRUCTOR"))
         true
-      else if(access.indexOf("STATIC") > 0)
+      else if(access.contains("STATIC"))
         true
       else
         false
