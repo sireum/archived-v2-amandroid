@@ -20,6 +20,8 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
 //  val procedureDependencyTable = HashMultimap.create[String, String]()
   val recordProcedureTable = HashMultimap.create[String, String]()
   
+  var interfaceTable = msetEmpty[String]
+  
   def buildRecordHierarchyTable(self : String, parent : String) : Unit = {
     recordHierarchyTable.put(self, parent)
   }
@@ -42,7 +44,13 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
   
   def androidRecordHierarchyResolver(stp : SymbolTableProducer) : Unit =
     if (!stp.tables.recordTable.isEmpty)
-      for (rd <- stp.tables.recordTable.values)
+      for (rd <- stp.tables.recordTable.values){
+        rd.getValueAnnotation("type") match {
+            case Some(exp : NameExp) =>
+              if(exp.name.name.equals("interface"))
+                interfaceTable += getInside(rd.name.name)
+            case _ => null
+          }
         rd.extendsClauses.foreach { ec =>
           import LineColumnLocation._
           val nameUser = ec.name
@@ -61,6 +69,7 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
 //              nameUser.line, nameUser.column,
 //              NOT_FOUND_EXTEND_RECORD.format(nameUser.name))
         }
+      }
 
   def resolveAndroidRecordHierarchy(stp : SymbolTableProducer,
                              self : NameDefinition,
@@ -105,15 +114,24 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
     }
     if(nameUser != null){
       val access = nameUser.name
-      if(access.indexOf("CONSTRUCTOR") > 0)
+      if(access.contains("CONSTRUCTOR"))
         true
-      else if(access.indexOf("STATIC") > 0)
+      else if(access.contains("STATIC"))
         true
       else
         false
     } else {
       false
     }
+  }
+  
+  def isInterface(recordName : String) : Boolean = {
+    if(interfaceTable.contains(recordName)) true
+    else false
+  }
+  
+  def getRecordName(procedureName : String) : String = {
+    procedureName.split("\\.")(0)
   }
   
   def androidVMResolver(stp : SymbolTableProducer) : Unit =
@@ -124,10 +142,12 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
         val procedureName = 
           if (!isConsOrStatic(pat))
             getInside(nameDefinition.name)
-          else null
-        if (procedureName != null && !procedureName.isEmpty()){
-          buildVirtualMethodTable(procedureName,
-                                      procedureName)
+          else ""
+        if (!procedureName.isEmpty()){
+          if(!isInterface(getRecordName(procedureName))){
+            buildVirtualMethodTable(procedureName,
+                                    procedureName)
+          }
           val nameUser : NameUser =
             pat.getValueAnnotation("owner") match {
               case Some(exp : NameExp) => 
@@ -138,13 +158,7 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
           val recordName = getInside(nameUser.name)
           val parentsName = recordHierarchyTable.get(recordName)
           for (parentName <- parentsName){
-            var success = androidAddRelation(parentName, recordName, procedureName)
-            if(!success){
-              val suParentsName = recordHierarchyTable.get(parentName)
-              for (suParentName <- suParentsName){
-                success = androidAddRelation(suParentName, recordName, procedureName)
-              }
-            }
+            val success = androidAddRelation(parentName, recordName, procedureName)
           }
         }
       }
@@ -161,6 +175,10 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
                                       procedureName)
         return true
       }
+    }
+    val suParentsName = recordHierarchyTable.get(parentName)
+    for(suParentName <- suParentsName){
+      androidAddRelation(suParentName, recordName, procedureName)
     }
     false
   }

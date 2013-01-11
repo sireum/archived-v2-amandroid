@@ -96,15 +96,15 @@ object AndroidVirtualMethodGraph {
         lhsNode.add("shortName", getShortName(procedureName))
         val overrideProceduresName = virtualMethodTable.get(procedureName)
         for(overrideProcedureName <- overrideProceduresName){
-          if(!procedureName.equals(overrideProcedureName)){
-            val rhsNode = template.getInstanceOf("EdgeNode")
-            rhsNode.add("name", getRecordName(overrideProcedureName))
-            rhsNode.add("shortName", getShortName(overrideProcedureName))
-            val edge = template.getInstanceOf("Edge")
-            edge.add("from", lhsNode)
-            edge.add("to", rhsNode)
-            edges.add(edge.render())
-          }
+
+          val rhsNode = template.getInstanceOf("EdgeNode")
+          rhsNode.add("name", getRecordName(overrideProcedureName))
+          rhsNode.add("shortName", getShortName(overrideProcedureName))
+          val edge = template.getInstanceOf("Edge")
+          edge.add("from", lhsNode)
+          edge.add("to", rhsNode)
+          edges.add(edge.render())
+
         }
       }
       lastProcedureName = procedureName
