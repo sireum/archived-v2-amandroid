@@ -52,33 +52,6 @@ object SystemCFGModule extends PipelineModule {
 
   def inputDefined (job : PipelineJob) : MBuffer[Tag] = {
     val tags = marrayEmpty[Tag]
-    var _result : scala.Option[AnyRef] = None
-    var _resultKey : scala.Option[String] = None
-
-    val keylistresult = List(SystemCFGModule.globalResultKey)
-    keylistresult.foreach(key => 
-      if(job ? key) { 
-        if(_result.isEmpty) {
-          _result = Some(job(key))
-          _resultKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _result.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'result' keys '" + _resultKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _result match{
-      case Some(x) =>
-        if(!x.isInstanceOf[scala.collection.mutable.Map[java.lang.String, org.sireum.core.module.AlirIntraProcedural.AlirIntraproceduralAnalysisResult]]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'result'.  Expecting 'scala.collection.mutable.Map[java.lang.String, org.sireum.core.module.AlirIntraProcedural.AlirIntraproceduralAnalysisResult]' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'result'")       
-    }
     var _parallel : scala.Option[AnyRef] = None
     var _parallelKey : scala.Option[String] = None
 
@@ -160,6 +133,33 @@ object SystemCFGModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'androidVirtualMethodTables'")       
     }
+    var _result : scala.Option[AnyRef] = None
+    var _resultKey : scala.Option[String] = None
+
+    val keylistresult = List(SystemCFGModule.globalResultKey)
+    keylistresult.foreach(key => 
+      if(job ? key) { 
+        if(_result.isEmpty) {
+          _result = Some(job(key))
+          _resultKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _result.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'result' keys '" + _resultKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _result match{
+      case Some(x) =>
+        if(!x.isInstanceOf[scala.collection.mutable.Map[java.lang.String, org.sireum.core.module.AlirIntraProcedural.AlirIntraproceduralAnalysisResult]]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'result'.  Expecting 'scala.collection.mutable.Map[java.lang.String, org.sireum.core.module.AlirIntraProcedural.AlirIntraproceduralAnalysisResult]' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'result'")       
+    }
     return tags
   }
 
@@ -176,21 +176,6 @@ object SystemCFGModule extends PipelineModule {
         job(SystemCFGModule.globalAndroidresultKey).getClass.toString + "'")
     } 
     return tags
-  }
-
-  def modGetResult (options : scala.collection.Map[Property.Key, Any]) : scala.collection.mutable.Map[java.lang.String, org.sireum.core.module.AlirIntraProcedural.AlirIntraproceduralAnalysisResult] = {
-    if (options.contains(SystemCFGModule.globalResultKey)) {
-       return options(SystemCFGModule.globalResultKey).asInstanceOf[scala.collection.mutable.Map[java.lang.String, org.sireum.core.module.AlirIntraProcedural.AlirIntraproceduralAnalysisResult]]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setResult (options : MMap[Property.Key, Any], result : scala.collection.mutable.Map[java.lang.String, org.sireum.core.module.AlirIntraProcedural.AlirIntraproceduralAnalysisResult]) : MMap[Property.Key, Any] = {
-
-    options(SystemCFGModule.globalResultKey) = result
-
-    return options
   }
 
   def modGetParallel (options : scala.collection.Map[Property.Key, Any]) : scala.Boolean = {
@@ -252,12 +237,25 @@ object SystemCFGModule extends PipelineModule {
 
     return options
   }
+
+  def modGetResult (options : scala.collection.Map[Property.Key, Any]) : scala.collection.mutable.Map[java.lang.String, org.sireum.core.module.AlirIntraProcedural.AlirIntraproceduralAnalysisResult] = {
+    if (options.contains(SystemCFGModule.globalResultKey)) {
+       return options(SystemCFGModule.globalResultKey).asInstanceOf[scala.collection.mutable.Map[java.lang.String, org.sireum.core.module.AlirIntraProcedural.AlirIntraproceduralAnalysisResult]]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setResult (options : MMap[Property.Key, Any], result : scala.collection.mutable.Map[java.lang.String, org.sireum.core.module.AlirIntraProcedural.AlirIntraproceduralAnalysisResult]) : MMap[Property.Key, Any] = {
+
+    options(SystemCFGModule.globalResultKey) = result
+
+    return options
+  }
 }
 
 trait SystemCFGModule {
   def job : PipelineJob
-
-  def result : scala.collection.mutable.Map[java.lang.String, org.sireum.core.module.AlirIntraProcedural.AlirIntraproceduralAnalysisResult] = SystemCFGModule.modGetResult(job.properties)
 
   def parallel : scala.Boolean = SystemCFGModule.modGetParallel(job.properties)
 
@@ -267,4 +265,6 @@ trait SystemCFGModule {
 
 
   def androidresult_=(androidresult : org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterProceduralAnalysisResult) { SystemCFGModule.modSetAndroidresult(job.properties, androidresult) }
+
+  def result : scala.collection.mutable.Map[java.lang.String, org.sireum.core.module.AlirIntraProcedural.AlirIntraproceduralAnalysisResult] = SystemCFGModule.modGetResult(job.properties)
 }
