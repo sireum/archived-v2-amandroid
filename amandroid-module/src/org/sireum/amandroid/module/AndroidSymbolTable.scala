@@ -64,12 +64,18 @@ object AndroidSymbolTable {
   def resolveVirtualMethod(stp : SymbolTableProducer) : AndroidVirtualMethodTables = {
     val rht = HashMultimap.create[String, String]()
     val vmt = HashMultimap.create[String, String]()
+    val rut = mmapEmpty[String, ResourceUri]
+    val put = mmapEmpty[String, ResourceUri]
+    val ptt = mmapEmpty[String, String]
     new Object with AndroidVirtualMethodResolver {
       override def recordHierarchyTable = rht
       override def virtualMethodTable = vmt
+      override protected def recordUriTable = rut
+      override protected def procedureUriTable = put
+      override protected def procedureTypeTable = ptt
     }.androidVirtualMethodResolver(stp)
     val favmt = {_ : Unit => new AVMT}
-    AndroidVirtualMethodTables(rht, vmt, favmt)
+    AndroidVirtualMethodTables(rht, vmt, rut, put, ptt, favmt)
   }
   
   class AVMT extends AndroidVirtualMethodTables with AndroidVirtualMethodTablesProducer {
@@ -77,8 +83,74 @@ object AndroidSymbolTable {
     
     val tables = AndroidVirtualMethodTablesData()
     
-    def recordHierarchyTable : HashMultimap[String, String] = tables.recordHierarchyTable
-    def virtualMethodTable : HashMultimap[String, String] = tables.virtualMethodTable
+    def recordHierarchyTable : HashMultimap[ResourceUri, ResourceUri] = tables.recordHierarchyTable
+    def virtualMethodTable : HashMultimap[ResourceUri, ResourceUri] = tables.virtualMethodTable
+    protected def recordUriTable : MMap[String, ResourceUri] = tables.recordUriTable
+    protected def procedureUriTable : MMap[String, ResourceUri] = tables.procedureUriTable
+    protected def procedureTypeTable : MMap[ResourceUri, String] = tables.procedureTypeTable
+    
+    def getRecordUri(recordName : String) : ResourceUri = {
+      if(recordUriTable.contains(recordName)){
+        recordUriTable(recordName)
+      }
+      else null
+    }
+    
+    def getProcedureUriBySignature(sig : String) : ResourceUri = {
+      if(procedureUriTable.contains(sig))
+        procedureUriTable(sig)
+      else null
+    }
+    
+    def getCalleeOptionsByUri(procedureUri : ResourceUri) : java.util.Set[ResourceUri] = {
+      if(procedureUri != null){
+        if(isConstructor(procedureUri) || isStaticMethod(procedureUri)){
+          val option : java.util.Set[ResourceUri] = null
+          option +(procedureUri)
+          option
+        }
+        else virtualMethodTable.get(procedureUri)
+      }
+      else null
+    }
+    
+    def getCalleeOptionsBySignature(sig : String) : java.util.Set[ResourceUri] = {
+      var procedureUri = getProcedureUriBySignature(sig)
+      getCalleeOptionsByUri(procedureUri)
+    }
+    
+    def isConstructor(procedureUri : ResourceUri) : Boolean = {
+      if(procedureTypeTable.contains(procedureUri)){
+        if(procedureTypeTable(procedureUri) != null && procedureTypeTable(procedureUri).contains("CONSTRUCTOR")) true
+        else false
+      }
+      else {
+        println("procedureTypeTable : cannot find " + procedureUri)
+        false
+      }
+    }
+    
+    def isStaticMethod(procedureUri : ResourceUri) : Boolean = {
+      if(procedureTypeTable.contains(procedureUri)){
+        if(procedureTypeTable(procedureUri) != null && procedureTypeTable(procedureUri).contains("STATIC")) true
+        else false
+      }
+      else {
+        println("procedureTypeTable : cannot find " + procedureUri)
+        false
+      }
+    }
+    
+    def isVirtualMethod(procedureUri : ResourceUri) : Boolean = {
+      if(procedureTypeTable.contains(procedureUri)){
+        if(procedureTypeTable(procedureUri) != null && !procedureTypeTable(procedureUri).contains("CONSTRUCTOR") && !procedureTypeTable(procedureUri).contains("STATIC")) true
+        else false
+      }
+      else {
+        println("procedureTypeTable : cannot find " + procedureUri)
+        false
+      }
+    }
     
     def toAndroidVirtualMethodTables : AndroidVirtualMethodTables = this
   }
