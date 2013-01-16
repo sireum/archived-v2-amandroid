@@ -15,54 +15,115 @@ import org.sireum.pilar.symbol._
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
+
+  val recordProcedureTable = HashMultimap.create[ResourceUri, ResourceUri]()
   
-//  val recordHierarchyTable = HashMultimap.create[String, String]()
-//  val procedureDependencyTable = HashMultimap.create[String, String]()
-  val recordProcedureTable = HashMultimap.create[String, String]()
+  var interfaceTable = msetEmpty[ResourceUri]
   
-  var interfaceTable = msetEmpty[String]
+  def buildRecordHierarchyTable(self : ResourceUri, parent : ResourceUri) : Unit = {
+    if(!recordHierarchyTable.get(self).contains(parent))
+      recordHierarchyTable.put(self, parent)
+  }
+  def buildVirtualMethodTable(from : ResourceUri, to : ResourceUri) : Unit = {
+    if(!virtualMethodTable.get(from).contains(to))
+      virtualMethodTable.put(from, to)
+  }
+  def buildRecordProcedureTable(recordName : ResourceUri, procedureName : ResourceUri) : Unit = {
+    if(!recordProcedureTable.get(recordName).contains(procedureName))
+      recordProcedureTable.put(recordName, procedureName)
+  }
   
-  def buildRecordHierarchyTable(self : String, parent : String) : Unit = {
-    recordHierarchyTable.put(self, parent)
-  }
-  def buildVirtualMethodTable(from : String, to : String) : Unit = {
-    virtualMethodTable.put(from, to)
-  }
-  def buildRecordProcedureTable(recordName : String, procedureName : String) : Unit = {
-    recordProcedureTable.put(recordName, procedureName)
-  }
+  def getRecordUri(recordName : String) : ResourceUri = {
+      if(recordUriTable.contains(recordName)){
+        recordUriTable(recordName)
+      }
+      else null
+    }
+    
+    def getProcedureUriBySignature(sig : String) : ResourceUri = {
+      if(procedureUriTable.contains(sig))
+        procedureUriTable(sig)
+      else null
+    }
+    
+    def getCalleeOptionsByUri(procedureUri : ResourceUri) : java.util.Set[ResourceUri] = {
+      if(procedureUri != null){
+        virtualMethodTable.get(procedureUri)
+      }
+      else null
+    }
+    
+    def getCalleeOptionsBySignature(sig : String) : java.util.Set[ResourceUri] = {
+      var procedureUri = getProcedureUriBySignature(sig)
+      getCalleeOptionsByUri(procedureUri)
+    }
+    
+    def isConstructor(sig : String) : Boolean = {
+      if(procedureTypeTable.contains(sig)){
+        if(procedureTypeTable(sig).contains("CONSTRUCTOR")) true
+        else false
+      }
+      else {
+        println("procedureTypeTable : cannot find " + sig)
+        false
+      }
+    }
+    
+    def isStaticMethod(sig : String) : Boolean = {
+      if(procedureTypeTable.contains(sig)){
+        if(procedureTypeTable(sig).contains("STATIC")) true
+        else false
+      }
+      else {
+        println("procedureTypeTable : cannot find " + sig)
+        false
+      }
+    }
+    
+    def isVirtualMethod(sig : String) : Boolean = {
+      if(procedureTypeTable.contains(sig)){
+        if(!procedureTypeTable(sig).contains("CONSTRUCTOR") && !procedureTypeTable(sig).contains("STATIC")) true
+        else false
+      }
+      else {
+        println("procedureTypeTable : cannot find " + sig)
+        false
+      }
+    }
   
   def androidVirtualMethodResolver(stp : SymbolTableProducer) : Unit = {
     androidRecordHierarchyResolver(stp)
     androidRecordProcedureResolver(stp)
     androidVMResolver(stp)
-    AndroidVirtualMethodGraph(stp,
-                              recordHierarchyTable,
-                              virtualMethodTable,
-                              recordProcedureTable)
+    println()
+//    AndroidVirtualMethodGraph(stp,
+//                              recordHierarchyTable,
+//                              virtualMethodTable,
+//                              recordProcedureTable)
   }
   
   def androidRecordHierarchyResolver(stp : SymbolTableProducer) : Unit =
     if (!stp.tables.recordTable.isEmpty)
-      for (rd <- stp.tables.recordTable.values){
-        rd.getValueAnnotation("type") match {
+      for (rd <- stp.tables.recordTable){
+        recordUriTable(rd._2.name.name) = rd._1
+        rd._2.getValueAnnotation("type") match {
             case Some(exp : NameExp) =>
               if(exp.name.name.equals("interface"))
-                interfaceTable += getInside(rd.name.name)
+                interfaceTable += getInside(rd._1)
             case _ => null
           }
-        rd.extendsClauses.foreach { ec =>
+        rd._2.extendsClauses.foreach { ec =>
           import LineColumnLocation._
           val nameUser = ec.name
           val recordName = nameUser.name
-          val self = rd.name
+          val self = rd._1
           val paths = ilist(recordName)
           val key = Resource.getResourceUri("pilar", H.RECORD_TYPE, paths, false)
-          var success = resolveAndroidRecordHierarchy(stp, self, nameUser, key, paths)
+          var success = resolveAndroidRecordHierarchy(stp, self, key)
           if (!success) {
-            val paths = ilist(H.packageName(rd.name), recordName)
+            val paths = ilist(H.packageName(rd._2.name), recordName)
             val key = Resource.getResourceUri("pilar", H.RECORD_TYPE, paths, false)
-            success = resolveAndroidRecordHierarchy(stp, self, nameUser, key, paths)
+            success = resolveAndroidRecordHierarchy(stp, self, key)
           }
 //          if (!success)
 //            stp.reportError(source,
@@ -72,48 +133,50 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
       }
 
   def resolveAndroidRecordHierarchy(stp : SymbolTableProducer,
-                             self : NameDefinition,
-                             recordR : SymbolUser,
-                             key : String,
-                             recordPaths : ISeq[String]) : Boolean =
+                             self : ResourceUri,
+                             key : ResourceUri) : Boolean =
     stp.tables.recordTable.get(key) match {
       case Some(rd) =>
-        buildRecordHierarchyTable(getInside(self.name), getInside(rd.name.name))
+        buildRecordHierarchyTable(self, key)
         true
       case _ =>
         false
     }
   
+  def getProcedureAccess(pd : ProcedureDecl) : String = {
+    pd.getValueAnnotation("Access") match {
+      case Some(exp : NameExp) =>
+        exp.name.name
+      case _ => null
+    }
+  }
+  
   def androidRecordProcedureResolver(stp : SymbolTableProducer) : Unit = 
     if (!stp.tables.procedureAbsTable.isEmpty)
-      for (pat <- stp.tables.procedureAbsTable.values){
-        val nameDefinition = pat.name
-        val procedureName : String = 
-          if (!isConsOrStatic(pat))
-            getInside(nameDefinition.name)
-          else ""
-        val nameUser : NameUser =
-          pat.getValueAnnotation("owner") match {
-            case Some(exp : NameExp) => 
-              val name = exp.name
-              name
-            case _ => null
-          }
-        val recordName = getInside(nameUser.name)
-        if(!procedureName.isEmpty() && !recordName.isEmpty())
-          buildRecordProcedureTable(recordName, procedureName)
+      for (pat <- stp.tables.procedureAbsTable){
+        procedureUriTable(getSig(pat._2)) = pat._1
+        procedureTypeTable(pat._1) = getProcedureAccess(pat._2)
+        val procedureUri = 
+          if(!isConsOrStatic(pat._2)) pat._1
+          else null
+        if(procedureUri != null){
+          val nameUser : NameUser =
+            pat._2.getValueAnnotation("owner") match {
+              case Some(exp : NameExp) => 
+                val name = exp.name
+                name
+              case _ => null
+            }
+          val recordName = getInside(nameUser.name)
+          val recordUri = getRecordUri(stp, recordName)
+          if(recordUri != null)
+            buildRecordProcedureTable(recordUri, procedureUri)
+        }
       }
   
   def isConsOrStatic(pd : ProcedureDecl) : Boolean = {
-    val nameUser = 
-      pd.getValueAnnotation("Access") match {
-      case Some(exp : NameExp) =>
-        val name = exp.name
-        name
-      case _ => null
-    }
-    if(nameUser != null){
-      val access = nameUser.name
+    val access = getProcedureAccess(pd)
+    if(access != null){
       if(access.contains("CONSTRUCTOR"))
         true
       else if(access.contains("STATIC"))
@@ -125,67 +188,84 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
     }
   }
   
-  def isInterface(recordName : String) : Boolean = {
-    if(interfaceTable.contains(recordName)) true
+  def isInterface(recordUri : ResourceUri) : Boolean = {
+    if(interfaceTable.contains(recordUri)) true
     else false
   }
   
-  def getRecordName(procedureName : String) : String = {
-    procedureName.split("\\.")(0)
+  def getRecordUri(stp : SymbolTableProducer, recordName : String) : ResourceUri = {
+    var recordUri : ResourceUri = null
+    stp.tables.recordTable.keys.foreach(
+              key => 
+                  if(key.contains(recordName)) recordUri = key
+          )
+    recordUri
   }
   
   def androidVMResolver(stp : SymbolTableProducer) : Unit =
-    if (!stp.tables.procedureAbsTable.isEmpty)
-      for (pat <- stp.tables.procedureAbsTable.values){
+    if (!stp.tables.recordTable.isEmpty)
+      for (rd <- stp.tables.recordTable){
         import LineColumnLocation._
-        val nameDefinition = pat.name
-        val procedureName = 
-          if (!isConsOrStatic(pat))
-            getInside(nameDefinition.name)
-          else ""
-        if (!procedureName.isEmpty()){
-          if(!isInterface(getRecordName(procedureName))){
-            buildVirtualMethodTable(procedureName,
-                                    procedureName)
-          }
-          val nameUser : NameUser =
-            pat.getValueAnnotation("owner") match {
-              case Some(exp : NameExp) => 
-                val name = exp.name
-                name
-              case _ => null
+        val recordUri = rd._1
+        if(recordUri != null){
+          val proceduresUri = recordProcedureTable.get(recordUri)
+          for(procedureUri <- proceduresUri){
+            if(!isConsOrStatic(stp.tables.procedureAbsTable(procedureUri))){
+              if(!isInterface(recordUri)){
+                buildVirtualMethodTable(procedureUri, procedureUri)
+              }
+              androidAddRelation(stp, recordUri, procedureUri)
             }
-          val recordName = getInside(nameUser.name)
-          val parentsName = recordHierarchyTable.get(recordName)
-          for (parentName <- parentsName){
-            val success = androidAddRelation(parentName, recordName, procedureName)
           }
         }
       }
   
-  def androidAddRelation(parentName : String,
-                           recordName : String,
-                           procedureName : String) : Boolean = {
-    val parentProceduresName = recordProcedureTable.get(parentName)
-    for (parentProcedureName <- parentProceduresName){
-      val ppn = procedureNameGetter(parentProcedureName, parentName)
-      val pn = procedureNameGetter(procedureName, recordName)
-      if(ppn.equals(pn)){
-        buildVirtualMethodTable(parentProcedureName,
-                                      procedureName)
-        return true
+  def androidAddRelation(stp : SymbolTableProducer,
+                         recordUri : ResourceUri,
+                         procedureUri : ResourceUri) : Boolean = {
+    val parentsUri = recordHierarchyTable.get(recordUri)
+    if(parentsUri.isEmpty()) true
+    else{
+      for(parentUri <- parentsUri){
+        val parentProceduresUri = recordProcedureTable.get(parentUri)
+        for (parentProcedureUri <- parentProceduresUri){
+          if(sigEqual(stp, procedureUri, parentProcedureUri)){
+            buildVirtualMethodTable(parentProcedureUri,
+                                    procedureUri)
+          }
+        }
+        androidAddRelation(stp, parentUri, procedureUri)
       }
+      false
     }
-    val suParentsName = recordHierarchyTable.get(parentName)
-    for(suParentName <- suParentsName){
-      androidAddRelation(suParentName, recordName, procedureName)
-    }
-    false
   }
   
-  def procedureNameGetter(procedureName : String, recordName : String) : String = {
-    val name = procedureName.substring(recordName.length()+1, procedureName.length())
-    name
+  def getPartSig(pd : ProcedureDecl) : String = {
+    pd.getValueAnnotation("signature") match {
+      case Some(exp : NameExp) =>
+        getInside(exp.name.name).split(";", 2)(1)
+      case _ => null
+    }
+  }
+  
+  def getSig(pd : ProcedureDecl) : String = {
+    pd.getValueAnnotation("signature") match {
+      case Some(exp : NameExp) =>
+        exp.name.name
+      case _ => null
+    }
+  }
+  
+  def sigEqual(stp : SymbolTableProducer, 
+               procedureUri : ResourceUri,
+               parentProcedureUri : ResourceUri) : Boolean = {
+    val pd = stp.tables.procedureAbsTable(procedureUri)
+    val sig = getPartSig(pd)
+    val pd1 = stp.tables.procedureAbsTable(parentProcedureUri)
+    val sig1 = getPartSig(pd1)
+    if(sig.equals(sig1)){
+      true
+    } else false
   }
   
   def getInside(name : String) : String = {

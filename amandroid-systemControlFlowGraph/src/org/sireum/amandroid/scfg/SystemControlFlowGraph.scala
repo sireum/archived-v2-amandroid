@@ -165,7 +165,7 @@ object SystemControlFlowGraph {
    
    // step 1 is done above
  
-    var calleeUri : ResourceUri = null // indicates the name/Uri of the callee procedure
+    var calleeSig : String = null // indicates the name/Uri of the callee procedure
     
     val extractCallee = Visitor.build({
       
@@ -173,11 +173,15 @@ object SystemControlFlowGraph {
       
       case t : CallJump => { 
         
-        // println("i am calling" + calleeUri) 
+//         println("i am calling" + calleeSig) 
         
-        calleeUri = t.callExp.exp.asInstanceOf[NameExp].name.name
-        false
+        calleeSig = t.getValueAnnotation("signature") match {
+          case Some(exp : NameExp) =>
+            exp.name.name
+          case _ => null
         }
+        false
+      }
       
       case _ => 
         false
@@ -205,21 +209,22 @@ object SystemControlFlowGraph {
         
         extractCallee(l)
         
-        if(calleeUri != null){  // so, the current locDecl is actually a caller node
+        if(calleeSig != null){  // so, the current locDecl is actually a caller node
          
           // testing vmTables
           
-          println("calleeUri = " + calleeUri)
+          println("calleeSig = " + calleeSig)
           
-          val vmtable = vmTables.virtualMethodTable
-          val calleeOptions = vmtable.get(calleeUri.substring(2, calleeUri.length() -2))
+          //modified by Fengguo Wei
+          
+          val calleeOptions = vmTables.getCalleeOptionsBySignature(calleeSig)
           
           println("calleeOptions = " + calleeOptions)
           
           // testing ends
           
           
-          val t = sCfg.getNodeBySubString(calleeUri)
+          val t = sCfg.getNodeBySubString(calleeSig)
           
          t match{ 
             case Some(node) => {  // so, the callee node is actually found in the sCfg pool
@@ -247,7 +252,7 @@ object SystemControlFlowGraph {
            
          }
         
-        calleeUri = null   // resetting this for the next locDecl exploration
+        calleeSig = null   // resetting this for the next locDecl exploration
         
         }
         
