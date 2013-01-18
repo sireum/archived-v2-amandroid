@@ -16,7 +16,7 @@ import org.sireum.amandroid.module.SystemCFGModule
 
 // sankar introduces the following framework which adds one stage on top of AmandroidParserTestFrameWork 
 
-trait AmandroidParserTestFrameWorkExtd extends TestFramework { 
+trait AmandroidTestFrameWorkExtd extends TestFramework { 
   
   //////////////////////////////////////////////////////////////////////////////
   // Implemented Public Methods
