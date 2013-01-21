@@ -4,6 +4,10 @@ import org.sireum.pilar.ast._
 import org.sireum.pilar.symbol._
 import org.sireum.util._
 import org.sireum.pipeline._
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTable
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTableProducer
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTableData
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidProcedureSymbolTableProducer
 
 
 
@@ -32,7 +36,13 @@ class PilarAndroidSymbolResolverDef (val job : PipelineJob, info : PipelineJobMo
   val par = this.parallel
   val fst = { _ : Unit => new ST }
 
-  val result = AndroidSymbolTable(ms, fst, par)
+  val result = 
+    if (this.hasExistingSymbolTable.isDefined) {
+      require(this.hasExistingSymbolTable.isDefined)
+      val est = this.hasExistingSymbolTable.get.asInstanceOf[ST]
+      AndroidSymbolTable(ms, fst, est, par)
+    }
+    else AndroidSymbolTable(ms, fst, par)
     
 
   val st = result._1.asInstanceOf[ST]
@@ -45,13 +55,13 @@ class PilarAndroidSymbolResolverDef (val job : PipelineJob, info : PipelineJobMo
   
   this.androidVirtualMethodTables_=(result._2)
 
-  class ST extends SymbolTable with SymbolTableProducer {
+  class ST extends SymbolTable with AndroidSymbolTableProducer {
     st =>
 
     import PilarAndroidSymbolResolverDef.ERROR_TAG_TYPE
     import PilarAndroidSymbolResolverDef.WARNING_TAG_TYPE
     
-    val tables = SymbolTableData()
+    val tables = AndroidSymbolTableData()
     val tags = marrayEmpty[LocationTag]
     var hasErrors = false
  
@@ -69,8 +79,8 @@ class PilarAndroidSymbolResolverDef (val job : PipelineJob, info : PipelineJobMo
 
     val pdMap = mmapEmpty[ResourceUri, PST]
 
-    def globalVars = tables.globalVarTable.keys
-    def globalVar(globalUri : ResourceUri) = tables.globalVarTable(globalUri)
+    def globalVars = null
+    def globalVar(globalUri : ResourceUri) = null
 
     def procedures = tables.procedureTable.keys
 
@@ -88,7 +98,7 @@ class PilarAndroidSymbolResolverDef (val job : PipelineJob, info : PipelineJobMo
     }
 
     class PST(val procedureUri : ResourceUri)
-        extends ProcedureSymbolTable with ProcedureSymbolTableProducer {
+        extends ProcedureSymbolTable with AndroidProcedureSymbolTableProducer {
       
       val tables = ProcedureSymbolTableData()
       var nextLocTable : CMap[ResourceUri, ResourceUri] = null
@@ -96,7 +106,7 @@ class PilarAndroidSymbolResolverDef (val job : PipelineJob, info : PipelineJobMo
       // println("pilarAndroidSymbolResDef :: AndroidSymbolTable :: class ST :: class PST :: OK3.2" + procedureUri) // sankar testing
       
       def symbolTable = st
-      def symbolTableProducer = st
+      def androidSymbolTableProducer = st
       def procedure = st.tables.procedureAbsTable(procedureUri)
       def typeVars : ISeq[ResourceUri] = tables.typeVarTable.keys.toList
       def params : ISeq[ResourceUri] = tables.params.toList

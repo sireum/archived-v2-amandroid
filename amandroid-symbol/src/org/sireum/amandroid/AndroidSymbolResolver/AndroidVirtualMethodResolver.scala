@@ -91,7 +91,7 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
       }
     }
   
-  def androidVirtualMethodResolver(stp : SymbolTableProducer) : Unit = {
+  def androidVirtualMethodResolver(stp : AndroidSymbolTableProducer) : Unit = {
     androidRecordHierarchyResolver(stp)
     androidRecordProcedureResolver(stp)
     androidVMResolver(stp)
@@ -102,7 +102,7 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
 //                              recordProcedureTable)
   }
   
-  def androidRecordHierarchyResolver(stp : SymbolTableProducer) : Unit =
+  def androidRecordHierarchyResolver(stp : AndroidSymbolTableProducer) : Unit =
     if (!stp.tables.recordTable.isEmpty)
       for (rd <- stp.tables.recordTable){
         recordUriTable(rd._2.name.name) = rd._1
@@ -132,7 +132,7 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
         }
       }
 
-  def resolveAndroidRecordHierarchy(stp : SymbolTableProducer,
+  def resolveAndroidRecordHierarchy(stp : AndroidSymbolTableProducer,
                              self : ResourceUri,
                              key : ResourceUri) : Boolean =
     stp.tables.recordTable.get(key) match {
@@ -151,7 +151,7 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
     }
   }
   
-  def androidRecordProcedureResolver(stp : SymbolTableProducer) : Unit = 
+  def androidRecordProcedureResolver(stp : AndroidSymbolTableProducer) : Unit = 
     if (!stp.tables.procedureAbsTable.isEmpty)
       for (pat <- stp.tables.procedureAbsTable){
         procedureUriTable(getSig(pat._2)) = pat._1
@@ -193,7 +193,7 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
     else false
   }
   
-  def getRecordUri(stp : SymbolTableProducer, recordName : String) : ResourceUri = {
+  def getRecordUri(stp : AndroidSymbolTableProducer, recordName : String) : ResourceUri = {
     var recordUri : ResourceUri = null
     stp.tables.recordTable.keys.foreach(
               key => 
@@ -202,7 +202,7 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
     recordUri
   }
   
-  def androidVMResolver(stp : SymbolTableProducer) : Unit =
+  def androidVMResolver(stp : AndroidSymbolTableProducer) : Unit =
     if (!stp.tables.recordTable.isEmpty)
       for (rd <- stp.tables.recordTable){
         import LineColumnLocation._
@@ -220,7 +220,7 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
         }
       }
   
-  def androidAddRelation(stp : SymbolTableProducer,
+  def androidAddRelation(stp : AndroidSymbolTableProducer,
                          recordUri : ResourceUri,
                          procedureUri : ResourceUri) : Boolean = {
     val parentsUri = recordHierarchyTable.get(recordUri)
@@ -256,7 +256,7 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
     }
   }
   
-  def sigEqual(stp : SymbolTableProducer, 
+  def sigEqual(stp : AndroidSymbolTableProducer, 
                procedureUri : ResourceUri,
                parentProcedureUri : ResourceUri) : Boolean = {
     val pd = stp.tables.procedureAbsTable(procedureUri)
