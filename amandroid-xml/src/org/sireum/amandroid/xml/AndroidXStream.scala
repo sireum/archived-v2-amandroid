@@ -2,7 +2,6 @@ package org.sireum.amandroid.xml
 
 import com.thoughtworks.xstream.XStream
 import com.thoughtworks.xstream.io.xml.Xpp3Driver
-import com.thoughtworks.xstream.converters.SingleValueConverter
 import com.google.common.collect.HashBiMap
 import org.sireum.util._
 import java.io._

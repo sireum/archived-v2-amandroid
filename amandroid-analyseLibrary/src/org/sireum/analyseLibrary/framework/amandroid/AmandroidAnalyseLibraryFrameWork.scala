@@ -97,8 +97,8 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         val xStream = AndroidXStream
         xStream.xstream.alias("SymbolTable", classOf[SymbolTable])
         xStream.xstream.alias("AndroidVirtualMethodTables", classOf[AndroidVirtualMethodTables])
-        val existingST = xStream.fromXml(stFile).asInstanceOf[SymbolTable]
-        val existingAVMT = xStream.fromXml(avmtFile).asInstanceOf[AndroidVirtualMethodTables]
+//        val existingST = xStream.fromXml(stFile).asInstanceOf[SymbolTable]
+//        val existingAVMT = xStream.fromXml(avmtFile).asInstanceOf[AndroidVirtualMethodTables]
         
         val job = PipelineJob()
         val options = job.properties
@@ -106,8 +106,8 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
 //        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d+dirName+"/classes.pilar"))))
         
         PilarAndroidSymbolResolverModule.setParallel(options, false)
-        PilarAndroidSymbolResolverModule.setHasExistingSymbolTable(options, Option(existingST))
-        PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, Option(existingAVMT))
+        PilarAndroidSymbolResolverModule.setHasExistingSymbolTable(options, None)
+        PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, None)
         
         AlirIntraProceduralModule.setShouldBuildCfg(options, true)
         AlirIntraProceduralModule.setShouldBuildCdg(options, false)

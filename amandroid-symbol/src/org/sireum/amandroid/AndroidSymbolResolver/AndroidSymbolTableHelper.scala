@@ -122,29 +122,6 @@ object H1 {
     val tables2 = stp2.tables
     val str = stp1
 
-//    H.combineMap(tables1.declaredSymbols, tables2.declaredSymbols)
-//
-//    H.combineTable(tables1.constTable, tables2.constTable)
-//
-//    H.combineTable(str, tables1.constElementTable, tables2.constElementTable,
-//      { x : ConstElement => x.name }, SymbolTableMessage.DUPLICATE_CONST_ELEMENT + SymbolTableMessage.OF_FILE)
-//
-//    H.combineTable(tables1.enumTable, tables2.enumTable)
-//
-//    H.combineTable(str, tables1.enumElementTable, tables2.enumElementTable,
-//      { x : EnumElement => x.name }, SymbolTableMessage.DUPLICATE_ENUM_ELEMENT + SymbolTableMessage.OF_FILE)
-//
-//    H.combineTable(tables1.extensionTable, tables2.extensionTable)
-//
-//    H.combineTable(str, tables1.extensionElementTable, tables2.extensionElementTable,
-//      { x : ExtElement => x.name }, SymbolTableMessage.DUPLICATE_EXTENSION_ELEMENT + SymbolTableMessage.OF_FILE)
-//
-//    H.combineTable(str, tables1.funTable, tables2.funTable,
-//      { x : FunDecl => x.name }, SymbolTableMessage.DUPLICATE_FUN + SymbolTableMessage.OF_FILE)
-//
-//    H.combineTable(str, tables1.globalVarTable, tables2.globalVarTable,
-//      { x : GlobalVarDecl => x.name }, SymbolTableMessage.DUPLICATE_GLOBAL_VAR + SymbolTableMessage.OF_FILE)
-
     H.combineTable(tables1.procedureTable, tables2.procedureTable)
 
     H.combineTable(str, tables1.procedureAbsTable, tables2.procedureAbsTable,
@@ -153,17 +130,11 @@ object H1 {
     H.combineTable(str, tables1.recordTable, tables2.recordTable,
       { x : RecordDecl => x.name }, SymbolTableMessage.DUPLICATE_RECORD + SymbolTableMessage.OF_FILE)
 
-//    H.combineTable(str, tables1.attributeTable, tables2.attributeTable,
-//      { x : AttributeDecl => x.name }, SymbolTableMessage.DUPLICATE_ATTRIBUTE + SymbolTableMessage.OF_FILE)
-//
-//    H.combineTable(str, tables1.typeVarTable, tables2.typeVarTable,
-//      { x : NameDefinition => x }, SymbolTableMessage.DUPLICATE_TYPE_VAR + SymbolTableMessage.OF_FILE)
-//
-//    H.combineTable(str, tables1.typeAliasTable, tables2.typeAliasTable,
-//      { x : TypeAliasDecl => x.name }, SymbolTableMessage.DUPLICATE_TYPE_ALIAS + SymbolTableMessage.OF_FILE)
-
-    //combineTable(str, tables1.vsetTable, tables2.vsetTable,
-      // { x : VSetDecl => x.name }, DUPLICATE_VSET + OF_FILE)
+//    tables2.procedureAbsTable.keys.foreach(
+//      key => 
+//        if(stp1.procedureSymbolTableProducer(key).tables.bodyTables)
+//        stp1.procedureSymbolTableProducer(key).tables.bodyTables = stp2.procedureSymbolTableProducer(key).tables.bodyTables
+//    )
 
     stp1
   }

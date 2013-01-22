@@ -8,7 +8,7 @@ import org.sireum.androidLibraryFile.amandroid.AmandroidAndroidLibraryFiles
 
 
 @RunWith(classOf[JUnitRunner])
-class AmandroidAnalyseLibraryExtd extends AmandroidAnalyseLibraryFrameWork{
+class AmandroidAnalyseLibrary extends AmandroidAnalyseLibraryFrameWork{
   AmandroidAndroidLibraryFiles.dexModelFiles.
   foreach{fileUri=>
 //    if(fileUri.indexOf("2d4865") > 0)

@@ -4,113 +4,74 @@
       <com.google.common.collect.HashMultimap>
         <default/>
         <int>2</int>
-        <int>0</int>
+        <int>4</int>
+        <string>pilar:/record/default/%5B%7Ccom::android::commands::content::Content$InsertCommand%7C%5D</string>
+        <int>1</int>
+        <string>pilar:/record/default/%5B%7Ccom::android::commands::content::Content$Command%7C%5D</string>
+        <string>pilar:/record/default/%5B%7Ccom::android::commands::content::Content$QueryCommand%7C%5D</string>
+        <int>1</int>
+        <string>pilar:/record/default/%5B%7Ccom::android::commands::content::Content$DeleteCommand%7C%5D</string>
+        <string>pilar:/record/default/%5B%7Ccom::android::commands::content::Content$DeleteCommand%7C%5D</string>
+        <int>1</int>
+        <string>pilar:/record/default/%5B%7Ccom::android::commands::content::Content$Command%7C%5D</string>
+        <string>pilar:/record/default/%5B%7Ccom::android::commands::content::Content$UpdateCommand%7C%5D</string>
+        <int>1</int>
+        <string>pilar:/record/default/%5B%7Ccom::android::commands::content::Content$InsertCommand%7C%5D</string>
       </com.google.common.collect.HashMultimap>
     </recordHierarchyTable>
     <virtualMethodTable id="4" serialization="custom">
       <com.google.common.collect.HashMultimap>
         <default/>
         <int>2</int>
-        <int>33</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.getInterval%7C%5D/1/23/ac59b8ae</string>
+        <int>14</int>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$DeleteCommand.onExecute%7C%5D/1/23/a3a2eb7c</string>
+        <int>2</int>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$DeleteCommand.onExecute%7C%5D/1/23/a3a2eb7c</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$QueryCommand.onExecute%7C%5D/1/23/3e9fa0f6</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$UpdateCommand.onExecute%7C%5D/1/23/ab5dfd1b</string>
         <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.getInterval%7C%5D/1/23/ac59b8ae</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.getQuality%7C%5D/1/22/e05f280c</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$UpdateCommand.onExecute%7C%5D/1/23/ab5dfd1b</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseCommand%7C%5D/1/67/899b06e5</string>
         <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.getQuality%7C%5D/1/22/e05f280c</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider$1.getFromLocationName%7C%5D/1/37/f07ea157</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseCommand%7C%5D/1/67/899b06e5</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Command.execute%7C%5D/1/23/9113b4e3</string>
         <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider$1.getFromLocationName%7C%5D/1/37/f07ea157</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.enable%7C%5D/1/23/570090d</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Command.execute%7C%5D/1/23/9113b4e3</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseDeleteCommand%7C%5D/1/73/44ccc0d1</string>
         <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.enable%7C%5D/1/23/570090d</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.dump%7C%5D/1/23/83bc2e81</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseDeleteCommand%7C%5D/1/73/44ccc0d1</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseUpdateCommand%7C%5D/1/73/25173d1</string>
         <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.dump%7C%5D/1/23/83bc2e81</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onGetStatusUpdateTime%7C%5D/1/23/99dff2c5</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseUpdateCommand%7C%5D/1/73/25173d1</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.argumentValueRequired%7C%5D/1/37/a41951dd</string>
         <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onGetStatusUpdateTime%7C%5D/1/23/99dff2c5</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderPropertiesUnbundled.getProviderProperties%7C%5D/1/71/efead273</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.argumentValueRequired%7C%5D/1/37/a41951dd</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseQueryCommand%7C%5D/1/72/6338b463</string>
         <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderPropertiesUnbundled.getProviderProperties%7C%5D/1/71/efead273</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.getBinder%7C%5D/1/39/452856dd</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseQueryCommand%7C%5D/1/72/6338b463</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$InsertCommand.onExecute%7C%5D/1/23/3c728489</string>
+        <int>2</int>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$UpdateCommand.onExecute%7C%5D/1/23/ab5dfd1b</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$InsertCommand.onExecute%7C%5D/1/23/3c728489</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseInsertCommand%7C%5D/1/73/d95d8bd1</string>
         <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.getBinder%7C%5D/1/39/452856dd</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onSetRequest%7C%5D/1/23/4d4fe324</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseInsertCommand%7C%5D/1/73/d95d8bd1</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Tokenizer.nextArg%7C%5D/1/37/71842b7d</string>
         <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onSetRequest%7C%5D/1/23/4d4fe324</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.setRequest%7C%5D/1/23/386a8460</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Tokenizer.nextArg%7C%5D/1/37/71842b7d</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$QueryCommand.onExecute%7C%5D/1/23/3e9fa0f6</string>
         <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.setRequest%7C%5D/1/23/386a8460</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.getFastestInterval%7C%5D/1/23/f730c180</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$QueryCommand.onExecute%7C%5D/1/23/3e9fa0f6</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Command.onExecute%7C%5D/1/23/c9781b17</string>
+        <int>5</int>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$UpdateCommand.onExecute%7C%5D/1/23/ab5dfd1b</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$DeleteCommand.onExecute%7C%5D/1/23/a3a2eb7c</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$QueryCommand.onExecute%7C%5D/1/23/3e9fa0f6</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$InsertCommand.onExecute%7C%5D/1/23/3c728489</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Command.onExecute%7C%5D/1/23/c9781b17</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseBindValue%7C%5D/1/23/612e2406</string>
         <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.getFastestInterval%7C%5D/1/23/f730c180</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderPropertiesUnbundled.toString%7C%5D/1/37/a29d076b</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderPropertiesUnbundled.toString%7C%5D/1/37/a29d076b</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderRequestUnbundled.getInterval%7C%5D/1/23/ac6c606a</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderRequestUnbundled.getInterval%7C%5D/1/23/ac6c606a</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.sendExtraCommand%7C%5D/1/26/a73485e0</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.sendExtraCommand%7C%5D/1/26/a73485e0</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderRequestUnbundled.getLocationRequests%7C%5D/1/35/6c7271d3</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderRequestUnbundled.getLocationRequests%7C%5D/1/35/6c7271d3</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.reportLocation%7C%5D/1/23/b73da0c4</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.reportLocation%7C%5D/1/23/b73da0c4</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider.onGetFromLocation%7C%5D/1/37/6094318d</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider.onGetFromLocation%7C%5D/1/37/6094318d</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onGetStatus%7C%5D/1/22/1683d09c</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onGetStatus%7C%5D/1/22/1683d09c</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider.getBinder%7C%5D/1/39/d88cff47</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider.getBinder%7C%5D/1/39/d88cff47</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onDump%7C%5D/1/23/7a49741c</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onDump%7C%5D/1/23/7a49741c</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onEnable%7C%5D/1/23/57d31377</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onEnable%7C%5D/1/23/57d31377</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.toString%7C%5D/1/37/43f617df</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.toString%7C%5D/1/37/43f617df</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onSendExtraCommand%7C%5D/1/26/162eaaef</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onSendExtraCommand%7C%5D/1/26/162eaaef</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.disable%7C%5D/1/23/73febe15</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.disable%7C%5D/1/23/73febe15</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.getStatusUpdateTime%7C%5D/1/23/a90ed94d</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.getStatusUpdateTime%7C%5D/1/23/a90ed94d</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.getStatus%7C%5D/1/22/7e1362fa</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.getStatus%7C%5D/1/22/7e1362fa</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.getSmallestDisplacement%7C%5D/1/24/9b369952</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.getSmallestDisplacement%7C%5D/1/24/9b369952</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderRequestUnbundled.getReportLocation%7C%5D/1/26/1b4bf250</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderRequestUnbundled.getReportLocation%7C%5D/1/26/1b4bf250</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider$1.getFromLocation%7C%5D/1/37/2f1fbfa8</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider$1.getFromLocation%7C%5D/1/37/2f1fbfa8</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onDisable%7C%5D/1/23/a5a9d2cd</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onDisable%7C%5D/1/23/a5a9d2cd</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.getProperties%7C%5D/1/71/af39b0c4</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.getProperties%7C%5D/1/71/af39b0c4</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderRequestUnbundled.toString%7C%5D/1/37/23a50aa3</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderRequestUnbundled.toString%7C%5D/1/37/23a50aa3</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider.onGetFromLocationName%7C%5D/1/37/d5f928db</string>
-        <int>1</int>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider.onGetFromLocationName%7C%5D/1/37/d5f928db</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseBindValue%7C%5D/1/23/612e2406</string>
       </com.google.common.collect.HashMultimap>
     </virtualMethodTable>
     <recordUriTable class="scala.collection.mutable.HashMap" id="5" serialization="custom">
@@ -121,22 +82,22 @@
         <int>8</int>
         <int>4</int>
         <boolean>false</boolean>
-        <string>[|com::android::location::provider::ProviderPropertiesUnbundled|]</string>
-        <string>pilar:/record/default/%5B%7Ccom::android::location::provider::ProviderPropertiesUnbundled%7C%5D</string>
-        <string>[|com::android::location::provider::LocationProviderBase$1|]</string>
-        <string>pilar:/record/default/%5B%7Ccom::android::location::provider::LocationProviderBase$1%7C%5D</string>
-        <string>[|com::android::location::provider::GeocodeProvider|]</string>
-        <string>pilar:/record/default/%5B%7Ccom::android::location::provider::GeocodeProvider%7C%5D</string>
-        <string>[|com::android::location::provider::LocationProviderBase$Service|]</string>
-        <string>pilar:/record/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service%7C%5D</string>
-        <string>[|com::android::location::provider::LocationRequestUnbundled|]</string>
-        <string>pilar:/record/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled%7C%5D</string>
-        <string>[|com::android::location::provider::ProviderRequestUnbundled|]</string>
-        <string>pilar:/record/default/%5B%7Ccom::android::location::provider::ProviderRequestUnbundled%7C%5D</string>
-        <string>[|com::android::location::provider::LocationProviderBase|]</string>
-        <string>pilar:/record/default/%5B%7Ccom::android::location::provider::LocationProviderBase%7C%5D</string>
-        <string>[|com::android::location::provider::GeocodeProvider$1|]</string>
-        <string>pilar:/record/default/%5B%7Ccom::android::location::provider::GeocodeProvider$1%7C%5D</string>
+        <string>[|com::android::commands::content::Content|]</string>
+        <string>pilar:/record/default/%5B%7Ccom::android::commands::content::Content%7C%5D</string>
+        <string>[|com::android::commands::content::Content$Command|]</string>
+        <string>pilar:/record/default/%5B%7Ccom::android::commands::content::Content$Command%7C%5D</string>
+        <string>[|com::android::commands::content::Content$UpdateCommand|]</string>
+        <string>pilar:/record/default/%5B%7Ccom::android::commands::content::Content$UpdateCommand%7C%5D</string>
+        <string>[|com::android::commands::content::Content$Tokenizer|]</string>
+        <string>pilar:/record/default/%5B%7Ccom::android::commands::content::Content$Tokenizer%7C%5D</string>
+        <string>[|com::android::commands::content::Content$Parser|]</string>
+        <string>pilar:/record/default/%5B%7Ccom::android::commands::content::Content$Parser%7C%5D</string>
+        <string>[|com::android::commands::content::Content$InsertCommand|]</string>
+        <string>pilar:/record/default/%5B%7Ccom::android::commands::content::Content$InsertCommand%7C%5D</string>
+        <string>[|com::android::commands::content::Content$DeleteCommand|]</string>
+        <string>pilar:/record/default/%5B%7Ccom::android::commands::content::Content$DeleteCommand%7C%5D</string>
+        <string>[|com::android::commands::content::Content$QueryCommand|]</string>
+        <string>pilar:/record/default/%5B%7Ccom::android::commands::content::Content$QueryCommand%7C%5D</string>
       </scala.collection.mutable.HashMap>
     </recordUriTable>
     <procedureUriTable class="scala.collection.mutable.HashMap" id="6" serialization="custom">
@@ -144,95 +105,57 @@
       <scala.collection.mutable.HashMap>
         <default/>
         <int>750</int>
-        <int>43</int>
+        <int>24</int>
         <int>4</int>
         <boolean>false</boolean>
-        <string>[|Lcom/android/location/provider/ProviderRequestUnbundled;.getReportLocation:()Z|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderRequestUnbundled.getReportLocation%7C%5D/1/26/1b4bf250</string>
-        <string>[|Lcom/android/location/provider/ProviderRequestUnbundled;.toString:()Ljava/lang/String;|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderRequestUnbundled.toString%7C%5D/1/37/23a50aa3</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase$Service;.getStatus:(Landroid/os/Bundle;)I|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.getStatus%7C%5D/1/22/7e1362fa</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase;.&lt;init&gt;:(Ljava/lang/String;Lcom/android/location/provider/ProviderPropertiesUnbundled;)V|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.%3Cinit%3E%7C%5D/1/23/2485664a</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase$Service;.sendExtraCommand:(Ljava/lang/String;Landroid/os/Bundle;)Z|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.sendExtraCommand%7C%5D/1/26/a73485e0</string>
-        <string>[|Lcom/android/location/provider/ProviderPropertiesUnbundled;.toString:()Ljava/lang/String;|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderPropertiesUnbundled.toString%7C%5D/1/37/a29d076b</string>
-        <string>[|Lcom/android/location/provider/ProviderPropertiesUnbundled;.getProviderProperties:()Lcom/android/internal/location/ProviderProperties;|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderPropertiesUnbundled.getProviderProperties%7C%5D/1/71/efead273</string>
-        <string>[|Lcom/android/location/provider/GeocodeProvider;.getBinder:()Landroid/os/IBinder;|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider.getBinder%7C%5D/1/39/d88cff47</string>
-        <string>[|Lcom/android/location/provider/ProviderPropertiesUnbundled;.&lt;init&gt;:(Lcom/android/internal/location/ProviderProperties;)V|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderPropertiesUnbundled.%3Cinit%3E%7C%5D/1/23/af890999</string>
-        <string>[|Lcom/android/location/provider/ProviderRequestUnbundled;.getInterval:()J|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderRequestUnbundled.getInterval%7C%5D/1/23/ac6c606a</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase$Service;.getStatusUpdateTime:()J|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.getStatusUpdateTime%7C%5D/1/23/a90ed94d</string>
-        <string>[|Lcom/android/location/provider/GeocodeProvider;.&lt;init&gt;:()V|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider.%3Cinit%3E%7C%5D/1/23/6a628ceb</string>
-        <string>[|Lcom/android/location/provider/GeocodeProvider;.onGetFromLocationName:(Ljava/lang/String;DDDDILandroid/location/GeocoderParams;Ljava/util/List;)Ljava/lang/String;|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider.onGetFromLocationName%7C%5D/1/37/d5f928db</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase;.reportLocation:(Landroid/location/Location;)V|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.reportLocation%7C%5D/1/23/b73da0c4</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase;.onGetStatusUpdateTime:()J|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onGetStatusUpdateTime%7C%5D/1/23/99dff2c5</string>
-        <string>[|Lcom/android/location/provider/LocationRequestUnbundled;.getSmallestDisplacement:()F|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.getSmallestDisplacement%7C%5D/1/24/9b369952</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase$Service;.&lt;init&gt;:(Lcom/android/location/provider/LocationProviderBase;)V|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.%3Cinit%3E%7C%5D/1/23/4fa2b268</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase;.onSetRequest:(Lcom/android/location/provider/ProviderRequestUnbundled;Landroid/os/WorkSource;)V|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onSetRequest%7C%5D/1/23/4d4fe324</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase;.access$000:(Lcom/android/location/provider/LocationProviderBase;)Lcom/android/internal/location/ProviderProperties;|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.access$000%7C%5D/1/71/4d8be834</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase;.getBinder:()Landroid/os/IBinder;|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.getBinder%7C%5D/1/39/452856dd</string>
-        <string>[|Lcom/android/location/provider/ProviderPropertiesUnbundled;.create:(ZZZZZZZII)Lcom/android/location/provider/ProviderPropertiesUnbundled;|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderPropertiesUnbundled.create%7C%5D/1/80/7fdcd31c</string>
-        <string>[|Lcom/android/location/provider/LocationRequestUnbundled;.toString:()Ljava/lang/String;|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.toString%7C%5D/1/37/43f617df</string>
-        <string>[|Lcom/android/location/provider/LocationRequestUnbundled;.&lt;init&gt;:(Landroid/location/LocationRequest;)V|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.%3Cinit%3E%7C%5D/1/23/e17cde29</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase$Service;.disable:()V|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.disable%7C%5D/1/23/73febe15</string>
-        <string>[|Lcom/android/location/provider/GeocodeProvider$1;.getFromLocationName:(Ljava/lang/String;DDDDILandroid/location/GeocoderParams;Ljava/util/List;)Ljava/lang/String;|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider$1.getFromLocationName%7C%5D/1/37/f07ea157</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase$Service;.setRequest:(Lcom/android/internal/location/ProviderRequest;Landroid/os/WorkSource;)V|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.setRequest%7C%5D/1/23/386a8460</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase$Service;.dump:(Ljava/io/FileDescriptor;[Ljava/lang/String;)V|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.dump%7C%5D/1/23/83bc2e81</string>
-        <string>[|Lcom/android/location/provider/LocationRequestUnbundled;.getFastestInterval:()J|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.getFastestInterval%7C%5D/1/23/f730c180</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase;.onEnable:()V|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onEnable%7C%5D/1/23/57d31377</string>
-        <string>[|Lcom/android/location/provider/GeocodeProvider$1;.&lt;init&gt;:(Lcom/android/location/provider/GeocodeProvider;)V|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider$1.%3Cinit%3E%7C%5D/1/23/9540483a</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase;.onGetStatus:(Landroid/os/Bundle;)I|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onGetStatus%7C%5D/1/22/1683d09c</string>
-        <string>[|Lcom/android/location/provider/ProviderRequestUnbundled;.getLocationRequests:()Ljava/util/List;|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderRequestUnbundled.getLocationRequests%7C%5D/1/35/6c7271d3</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase;.onDisable:()V|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onDisable%7C%5D/1/23/a5a9d2cd</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase;.onSendExtraCommand:(Ljava/lang/String;Landroid/os/Bundle;)Z|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onSendExtraCommand%7C%5D/1/26/162eaaef</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase$Service;.enable:()V|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.enable%7C%5D/1/23/570090d</string>
-        <string>[|Lcom/android/location/provider/GeocodeProvider;.onGetFromLocation:(DDILandroid/location/GeocoderParams;Ljava/util/List;)Ljava/lang/String;|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider.onGetFromLocation%7C%5D/1/37/6094318d</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase$Service;.&lt;init&gt;:(Lcom/android/location/provider/LocationProviderBase;Lcom/android/location/provider/LocationProviderBase$1;)V|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.%3Cinit%3E%7C%5D/1/23/6907401b</string>
-        <string>[|Lcom/android/location/provider/LocationRequestUnbundled;.getQuality:()I|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.getQuality%7C%5D/1/22/e05f280c</string>
-        <string>[|Lcom/android/location/provider/ProviderRequestUnbundled;.&lt;init&gt;:(Lcom/android/internal/location/ProviderRequest;)V|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderRequestUnbundled.%3Cinit%3E%7C%5D/1/23/ad4cef2b</string>
-        <string>[|Lcom/android/location/provider/GeocodeProvider$1;.getFromLocation:(DDILandroid/location/GeocoderParams;Ljava/util/List;)Ljava/lang/String;|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider$1.getFromLocation%7C%5D/1/37/2f1fbfa8</string>
-        <string>[|Lcom/android/location/provider/LocationRequestUnbundled;.getInterval:()J|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.getInterval%7C%5D/1/23/ac59b8ae</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase;.onDump:(Ljava/io/FileDescriptor;Ljava/io/PrintWriter;[Ljava/lang/String;)V|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onDump%7C%5D/1/23/7a49741c</string>
-        <string>[|Lcom/android/location/provider/LocationProviderBase$Service;.getProperties:()Lcom/android/internal/location/ProviderProperties;|]</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.getProperties%7C%5D/1/71/af39b0c4</string>
+        <string>[|Lcom/android/commands/content/Content$Tokenizer;.nextArg:()Ljava/lang/String;|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Tokenizer.nextArg%7C%5D/1/37/71842b7d</string>
+        <string>[|Lcom/android/commands/content/Content$Tokenizer;.access$000:(Lcom/android/commands/content/Content$Tokenizer;)Ljava/lang/String;|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Tokenizer.access$000%7C%5D/1/37/96aee384</string>
+        <string>[|Lcom/android/commands/content/Content$Parser;.parseInsertCommand:()Lcom/android/commands/content/Content$InsertCommand;|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseInsertCommand%7C%5D/1/73/d95d8bd1</string>
+        <string>[|Lcom/android/commands/content/Content$Command;.&lt;init&gt;:(Landroid/net/Uri;I)V|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Command.%3Cinit%3E%7C%5D/1/23/6726e929</string>
+        <string>[|Lcom/android/commands/content/Content;.main:([Ljava/lang/String;)V|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content.main%7C%5D/1/23/bc91f006</string>
+        <string>[|Lcom/android/commands/content/Content$Parser;.parseDeleteCommand:()Lcom/android/commands/content/Content$DeleteCommand;|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseDeleteCommand%7C%5D/1/73/44ccc0d1</string>
+        <string>[|Lcom/android/commands/content/Content$Parser;.parseQueryCommand:()Lcom/android/commands/content/Content$QueryCommand;|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseQueryCommand%7C%5D/1/72/6338b463</string>
+        <string>[|Lcom/android/commands/content/Content$Parser;.parseBindValue:(Landroid/content/ContentValues;)V|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseBindValue%7C%5D/1/23/612e2406</string>
+        <string>[|Lcom/android/commands/content/Content$DeleteCommand;.onExecute:(Landroid/content/IContentProvider;)V|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$DeleteCommand.onExecute%7C%5D/1/23/a3a2eb7c</string>
+        <string>[|Lcom/android/commands/content/Content$UpdateCommand;.onExecute:(Landroid/content/IContentProvider;)V|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$UpdateCommand.onExecute%7C%5D/1/23/ab5dfd1b</string>
+        <string>[|Lcom/android/commands/content/Content$QueryCommand;.onExecute:(Landroid/content/IContentProvider;)V|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$QueryCommand.onExecute%7C%5D/1/23/3e9fa0f6</string>
+        <string>[|Lcom/android/commands/content/Content$InsertCommand;.onExecute:(Landroid/content/IContentProvider;)V|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$InsertCommand.onExecute%7C%5D/1/23/3c728489</string>
+        <string>[|Lcom/android/commands/content/Content$Command;.execute:()V|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Command.execute%7C%5D/1/23/9113b4e3</string>
+        <string>[|Lcom/android/commands/content/Content$Parser;.parseUpdateCommand:()Lcom/android/commands/content/Content$UpdateCommand;|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseUpdateCommand%7C%5D/1/73/25173d1</string>
+        <string>[|Lcom/android/commands/content/Content$Tokenizer;.&lt;init&gt;:([Ljava/lang/String;)V|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Tokenizer.%3Cinit%3E%7C%5D/1/23/7d795656</string>
+        <string>[|Lcom/android/commands/content/Content$UpdateCommand;.&lt;init&gt;:(Landroid/net/Uri;ILandroid/content/ContentValues;Ljava/lang/String;)V|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$UpdateCommand.%3Cinit%3E%7C%5D/1/23/ee9f75e1</string>
+        <string>[|Lcom/android/commands/content/Content$Parser;.&lt;init&gt;:([Ljava/lang/String;)V|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.%3Cinit%3E%7C%5D/1/23/d0f61ccd</string>
+        <string>[|Lcom/android/commands/content/Content;.&lt;init&gt;:()V|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content.%3Cinit%3E%7C%5D/1/23/7a66b762</string>
+        <string>[|Lcom/android/commands/content/Content$Command;.onExecute:(Landroid/content/IContentProvider;)V|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Command.onExecute%7C%5D/1/23/c9781b17</string>
+        <string>[|Lcom/android/commands/content/Content$Parser;.argumentValueRequired:(Ljava/lang/String;)Ljava/lang/String;|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.argumentValueRequired%7C%5D/1/37/a41951dd</string>
+        <string>[|Lcom/android/commands/content/Content$DeleteCommand;.&lt;init&gt;:(Landroid/net/Uri;ILjava/lang/String;)V|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$DeleteCommand.%3Cinit%3E%7C%5D/1/23/4d2dbf1a</string>
+        <string>[|Lcom/android/commands/content/Content$Parser;.parseCommand:()Lcom/android/commands/content/Content$Command;|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseCommand%7C%5D/1/67/899b06e5</string>
+        <string>[|Lcom/android/commands/content/Content$InsertCommand;.&lt;init&gt;:(Landroid/net/Uri;ILandroid/content/ContentValues;)V|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$InsertCommand.%3Cinit%3E%7C%5D/1/23/56c64836</string>
+        <string>[|Lcom/android/commands/content/Content$QueryCommand;.&lt;init&gt;:(Landroid/net/Uri;I[Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V|]</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$QueryCommand.%3Cinit%3E%7C%5D/1/23/7901f195</string>
       </scala.collection.mutable.HashMap>
     </procedureUriTable>
     <procedureTypeTable class="scala.collection.mutable.HashMap" id="7" serialization="custom">
@@ -240,95 +163,57 @@
       <scala.collection.mutable.HashMap>
         <default/>
         <int>750</int>
-        <int>43</int>
+        <int>24</int>
         <int>4</int>
         <boolean>false</boolean>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.disable%7C%5D/1/23/73febe15</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content.%3Cinit%3E%7C%5D/1/23/7a66b762</string>
+        <string>PUBLIC_CONSTRUCTOR</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$DeleteCommand.onExecute%7C%5D/1/23/a3a2eb7c</string>
         <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.getInterval%7C%5D/1/23/ac59b8ae</string>
-        <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderRequestUnbundled.getReportLocation%7C%5D/1/26/1b4bf250</string>
-        <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.getQuality%7C%5D/1/22/e05f280c</string>
-        <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.dump%7C%5D/1/23/83bc2e81</string>
-        <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.enable%7C%5D/1/23/570090d</string>
-        <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.getSmallestDisplacement%7C%5D/1/24/9b369952</string>
-        <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onDump%7C%5D/1/23/7a49741c</string>
-        <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderPropertiesUnbundled.create%7C%5D/1/80/7fdcd31c</string>
-        <string>PUBLIC_STATIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.%3Cinit%3E%7C%5D/1/23/e17cde29</string>
-        <string>CONSTRUCTOR</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderRequestUnbundled.toString%7C%5D/1/37/23a50aa3</string>
-        <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.getStatus%7C%5D/1/22/7e1362fa</string>
-        <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onEnable%7C%5D/1/23/57d31377</string>
-        <string>PUBLIC_ABSTRACT</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.getStatusUpdateTime%7C%5D/1/23/a90ed94d</string>
-        <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider$1.getFromLocation%7C%5D/1/37/2f1fbfa8</string>
-        <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onGetStatus%7C%5D/1/22/1683d09c</string>
-        <string>PUBLIC_ABSTRACT</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.reportLocation%7C%5D/1/23/b73da0c4</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Command.execute%7C%5D/1/23/9113b4e3</string>
         <string>PUBLIC_FINAL</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.%3Cinit%3E%7C%5D/1/23/6907401b</string>
-        <string>SYNTHETIC_CONSTRUCTOR</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onGetStatusUpdateTime%7C%5D/1/23/99dff2c5</string>
-        <string>PUBLIC_ABSTRACT</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderPropertiesUnbundled.toString%7C%5D/1/37/a29d076b</string>
-        <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.%3Cinit%3E%7C%5D/1/23/4fa2b268</string>
-        <string>PRIVATE_CONSTRUCTOR</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider$1.getFromLocationName%7C%5D/1/37/f07ea157</string>
-        <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onDisable%7C%5D/1/23/a5a9d2cd</string>
-        <string>PUBLIC_ABSTRACT</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderPropertiesUnbundled.getProviderProperties%7C%5D/1/71/efead273</string>
-        <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.getFastestInterval%7C%5D/1/23/f730c180</string>
-        <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider.onGetFromLocation%7C%5D/1/37/6094318d</string>
-        <string>PUBLIC_ABSTRACT</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.getProperties%7C%5D/1/71/af39b0c4</string>
-        <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider.%3Cinit%3E%7C%5D/1/23/6a628ceb</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseBindValue%7C%5D/1/23/612e2406</string>
+        <string>PRIVATE</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Command.onExecute%7C%5D/1/23/c9781b17</string>
+        <string>PROTECTED_ABSTRACT</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.%3Cinit%3E%7C%5D/1/23/d0f61ccd</string>
         <string>PUBLIC_CONSTRUCTOR</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderRequestUnbundled.getLocationRequests%7C%5D/1/35/6c7271d3</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$DeleteCommand.%3Cinit%3E%7C%5D/1/23/4d2dbf1a</string>
+        <string>PUBLIC_CONSTRUCTOR</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$InsertCommand.%3Cinit%3E%7C%5D/1/23/56c64836</string>
+        <string>PUBLIC_CONSTRUCTOR</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Command.%3Cinit%3E%7C%5D/1/23/6726e929</string>
+        <string>PUBLIC_CONSTRUCTOR</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseQueryCommand%7C%5D/1/72/6338b463</string>
         <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationRequestUnbundled.toString%7C%5D/1/37/43f617df</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$UpdateCommand.%3Cinit%3E%7C%5D/1/23/ee9f75e1</string>
+        <string>PUBLIC_CONSTRUCTOR</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$InsertCommand.onExecute%7C%5D/1/23/3c728489</string>
         <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider$1.%3Cinit%3E%7C%5D/1/23/9540483a</string>
-        <string>CONSTRUCTOR</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderPropertiesUnbundled.%3Cinit%3E%7C%5D/1/23/af890999</string>
-        <string>PRIVATE_CONSTRUCTOR</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider.getBinder%7C%5D/1/39/d88cff47</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseInsertCommand%7C%5D/1/73/d95d8bd1</string>
+        <string>PRIVATE</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content.main%7C%5D/1/23/bc91f006</string>
+        <string>PUBLIC_STATIC</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$QueryCommand.%3Cinit%3E%7C%5D/1/23/7901f195</string>
+        <string>PUBLIC_CONSTRUCTOR</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseCommand%7C%5D/1/67/899b06e5</string>
         <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.getBinder%7C%5D/1/39/452856dd</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseUpdateCommand%7C%5D/1/73/25173d1</string>
+        <string>PRIVATE</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Tokenizer.nextArg%7C%5D/1/37/71842b7d</string>
+        <string>PRIVATE</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Tokenizer.%3Cinit%3E%7C%5D/1/23/7d795656</string>
+        <string>PUBLIC_CONSTRUCTOR</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$QueryCommand.onExecute%7C%5D/1/23/3e9fa0f6</string>
         <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onSetRequest%7C%5D/1/23/4d4fe324</string>
-        <string>PUBLIC_ABSTRACT</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::GeocodeProvider.onGetFromLocationName%7C%5D/1/37/d5f928db</string>
-        <string>PUBLIC_ABSTRACT</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.access$000%7C%5D/1/71/4d8be834</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.argumentValueRequired%7C%5D/1/37/a41951dd</string>
+        <string>PRIVATE</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$UpdateCommand.onExecute%7C%5D/1/23/ab5dfd1b</string>
+        <string>PUBLIC</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Tokenizer.access$000%7C%5D/1/37/96aee384</string>
         <string>STATIC_SYNTHETIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.%3Cinit%3E%7C%5D/1/23/2485664a</string>
-        <string>PUBLIC_CONSTRUCTOR</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.setRequest%7C%5D/1/23/386a8460</string>
-        <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderRequestUnbundled.%3Cinit%3E%7C%5D/1/23/ad4cef2b</string>
-        <string>PUBLIC_CONSTRUCTOR</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase$Service.sendExtraCommand%7C%5D/1/26/a73485e0</string>
-        <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::ProviderRequestUnbundled.getInterval%7C%5D/1/23/ac6c606a</string>
-        <string>PUBLIC</string>
-        <string>pilar:/procedure/default/%5B%7Ccom::android::location::provider::LocationProviderBase.onSendExtraCommand%7C%5D/1/26/162eaaef</string>
-        <string>PUBLIC</string>
+        <string>pilar:/procedure/default/%5B%7Ccom::android::commands::content::Content$Parser.parseDeleteCommand%7C%5D/1/73/44ccc0d1</string>
+        <string>PRIVATE</string>
       </scala.collection.mutable.HashMap>
     </procedureTypeTable>
   </tables>
