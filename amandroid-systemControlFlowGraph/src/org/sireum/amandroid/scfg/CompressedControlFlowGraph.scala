@@ -4,6 +4,7 @@ import org.sireum.alir._
 import org.sireum.pilar.ast._
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.util._
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidProcedureSymbolTableProducer
 
 trait CompressedControlFlowGraph[VirtualLabel] extends ControlFlowGraph[VirtualLabel] 
  with AlirIntraProceduralGraphExtra[CompressedControlFlowGraph.Node, VirtualLabel] {
@@ -91,6 +92,7 @@ object CompressedControlFlowGraph {
       
         
       if(deleteFlag){
+        
         
         val preds = copy.predecessors(myNode)
         

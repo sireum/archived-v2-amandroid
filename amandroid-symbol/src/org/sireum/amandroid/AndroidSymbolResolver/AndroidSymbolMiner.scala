@@ -5,6 +5,45 @@ import org.sireum.util._
 import org.sireum.pilar.ast._
 import org.sireum.pilar.symbol.SymbolTableMessage._
 
+trait AndroidGlobalVarMiner extends SymbolMiner {
+  self : AndroidSymbolTableProducer =>
+    
+  val globalVarMiner : VisitorFunction = {
+    case pd : PackageDecl =>
+      val packageSymDef = pd.name
+      pd.elements.foreach {
+        case gvd : GlobalVarDecl => globalVarSymbol(gvd, packageSymDef)
+        case _                   =>
+      }
+      false
+    case pe : PackageElement =>
+      false
+    case a : Annotation =>
+      false
+  }
+
+  def globalVarSymbol(globalVarDecl : GlobalVarDecl,
+                      packageSymDef : Option[SymbolDefinition]) = {
+    val nameDef = globalVarDecl.name
+    H.symbolInit(nameDef, H.GLOBAL_VAR_TYPE,
+      H.packagePath(packageSymDef, nameDef.name))
+
+    val key = nameDef.uri
+    val gvt = tables.globalVarTable
+    gvt.get(key) match {
+      case Some(other) =>
+        import LineColumnLocation._
+        import FileLocation._
+        reportError(nameDef.fileUriOpt, nameDef.line,
+          nameDef.column,
+          DUPLICATE_GLOBAL_VAR.format(H.symbolSimpleName(nameDef),
+            other.name.line, other.name.column))
+      case _ =>
+        tables.globalVarTable(key.intern) = globalVarDecl
+    }
+  }
+}
+
 trait AndroidProcedureMiner extends SymbolMiner {
   self : AndroidSymbolTableProducer =>
     

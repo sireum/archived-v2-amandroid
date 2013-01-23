@@ -83,7 +83,7 @@ class SystemCFGDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends
   
   // scfg building starts
   
-  val systemCfg = SystemControlFlowGraph[VirtualLabel](psts, vmTables, cCfgs)
+//  val systemCfg = SystemControlFlowGraph[VirtualLabel](psts, vmTables, cCfgs)
   
   
   // scfg building ends

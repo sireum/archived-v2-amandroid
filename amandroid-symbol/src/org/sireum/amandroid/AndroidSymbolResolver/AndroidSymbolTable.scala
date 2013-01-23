@@ -51,7 +51,7 @@ object AndroidSymbolTable {
 //        set ++= tables.extensionTable.keys
 //        set ++= tables.extensionElementTable.keys
 //        set ++= tables.funTable.keys
-//        set ++= tables.globalVarTable.keys
+        set ++= tables.globalVarTable.keys
         set ++= tables.procedureTable.keys
         set ++= tables.procedureAbsTable.keys
         set ++= tables.recordTable.keys
@@ -245,7 +245,7 @@ sealed case class AndroidSymbolTableData //
 // extensionTable : MMap[ResourceUri, MBuffer[ExtensionDecl]] = mmapEmpty,
 // extensionElementTable : MMap[ResourceUri, ExtElement] = mmapEmpty,
 // funTable : MMap[ResourceUri, FunDecl] = mmapEmpty,
-// globalVarTable : MMap[ResourceUri, GlobalVarDecl] = mmapEmpty,
+ globalVarTable : MMap[ResourceUri, GlobalVarDecl] = mmapEmpty,
  procedureTable : MMap[ResourceUri, MBuffer[ResourceUri]] = mmapEmpty,
  procedureAbsTable : MMap[ResourceUri, ProcedureDecl] = mmapEmpty,
  recordTable : MMap[ResourceUri, RecordDecl] = mmapEmpty,

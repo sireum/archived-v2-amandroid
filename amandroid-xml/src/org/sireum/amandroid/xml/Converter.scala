@@ -35,6 +35,8 @@ object Converter {
               import AndroidScalaCollectionType._
               val result =
                 m match {
+                  case m : MLinkedMap[_, _] =>
+                    new AndroidScalaCollection(MLinkMap, elements)
                   case m : MMap[_, _] =>
                     new AndroidScalaCollection(MMap, elements)
                 }
@@ -66,6 +68,16 @@ object Converter {
                 i += 1
               }
               result
+            case p : Product with PropertyProvider =>
+              val elementSize = p.productArity
+              val elements = new Array[Object](elementSize)
+              val result = new ScalaProductWithProperty(p.getClass,
+                elements, null)
+              seen(o) = result
+              for (i <- 0 until elementSize) {
+                elements(i) = javafy(p.productElement(i))
+              }
+              result
             case p : Product =>
               val elementSize = p.productArity
               val elements = new Array[Object](elementSize)
@@ -75,7 +87,7 @@ object Converter {
                 elements(i) = javafy(p.productElement(i))
               }
               result
-//            case a : Any => a
+            case a : Any => a
           }
         }
     }

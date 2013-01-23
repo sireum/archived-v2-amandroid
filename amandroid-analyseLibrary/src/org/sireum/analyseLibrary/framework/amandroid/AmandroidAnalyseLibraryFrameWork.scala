@@ -20,6 +20,11 @@ import org.sireum.amandroid.module.SystemCFGModule
 import org.sireum.pilar.symbol.SymbolTable
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
 import org.sireum.amandroid.xml.AndroidXStream
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTableProducer
+import org.sireum.pilar.symbol.ProcedureSymbolTable
+import org.sireum.pilar.symbol.ProcedureSymbolTableData
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTableData
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidCompressedSymbolTable
 
 trait AmandroidAnalyseLibraryFrameWork extends TestFramework { 
   
@@ -91,13 +96,15 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         }
         srcFiles += FileUtil.toUri(d + dirName + "/classes.dex")
         
-        val stFile = new File(resDir + "/LibrarySymbolTable.xml")
-        val avmtFile = new File(resDir + "/LibraryVirtualMethodTables.xml")
+        val stFile = new File(resDir + "/" + dirName + "SymbolTable.xml")
+        val avmtFile = new File(resDir + "/" + dirName + "VirtualMethodTables.xml")
         
         val xStream = AndroidXStream
         xStream.xstream.alias("SymbolTable", classOf[SymbolTable])
         xStream.xstream.alias("AndroidVirtualMethodTables", classOf[AndroidVirtualMethodTables])
-//        val existingST = xStream.fromXml(stFile).asInstanceOf[SymbolTable]
+//        val (stData, pstsData) = xStream.fromXml(stFile).asInstanceOf[(AndroidSymbolTableData, MMap[ResourceUri, ProcedureSymbolTableData])]
+//        val existingST : SymbolTable = null
+//        existingST.asInstanceOf[AndroidSymbolTableProducer].tables.declaredSymbols ++= stData.declaredSymbols
 //        val existingAVMT = xStream.fromXml(avmtFile).asInstanceOf[AndroidVirtualMethodTables]
         
         val job = PipelineJob()
@@ -128,7 +135,58 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         val wST = new OutputStreamWriter(outerST, "GBK")
         val st = PilarAndroidSymbolResolverModule.getSymbolTable(options)
 
-        xStream.toXml(st, wST)
+        
+        
+        
+        st.asInstanceOf[AndroidSymbolTableProducer].tables.procedureAbsTable.foreach(
+          item =>
+            {
+              
+              val pst = st.asInstanceOf[AndroidSymbolTableProducer].procedureSymbolTableProducer(item._1)
+              val locations = pst.asInstanceOf[ProcedureSymbolTable].locations.toSeq
+              
+              var deleteFlag = false 
+              val compression = Visitor.build({
+                
+                case j : JumpLocation => true
+                
+                case t : CallJump => { 
+                  deleteFlag = false
+                  false
+                  }
+                
+                case _ => {
+                  deleteFlag = true
+                  false
+                  }
+              })
+              
+              for(i <- 0 until locations.size){
+                val l = locations(i)
+                compression(l)
+                if(deleteFlag){
+                  pst.tables.bodyTables match {
+                    case Some(bt) => bt.locationTable(l.name match {
+                      case Some(name) => name.name
+                      case _ => null
+                    }) = null
+                    case _        => 
+                  }
+                }
+                deleteFlag = false
+              }
+              st.asInstanceOf[AndroidSymbolTableProducer].tables.procedureAbsTable(item._1) = item._2.withoutBody
+            }
+        )
+        val cST : AndroidCompressedSymbolTable = new AndroidCompressedSymbolTable()
+        cST.stData = st.asInstanceOf[AndroidSymbolTableProducer].tables
+        st.asInstanceOf[AndroidSymbolTableProducer].tables.procedureAbsTable.foreach(
+          item =>
+            {
+              cST.pstsData(item._1) = st.asInstanceOf[AndroidSymbolTableProducer].procedureSymbolTableProducer(item._1).tables
+            })
+        println("start convert xml!")
+        xStream.toXml(cST, wST)
         
         val outerAVMT = new FileOutputStream(avmtFile)
         val wAVMT = new OutputStreamWriter(outerAVMT, "GBK")

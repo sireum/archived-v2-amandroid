@@ -49,11 +49,11 @@ object H1 {
 
   class PackageElementMiner(stp : AndroidSymbolTableProducer)
       extends StpWrapper(stp)
-      with AndroidProcedureMiner with AndroidRecordMiner {
+      with AndroidGlobalVarMiner with AndroidProcedureMiner with AndroidRecordMiner {
 
     val packageElementMiner =
       Visitor.build(Visitor.map(
-        ilist(procedureMiner, recordMiner), false))
+        ilist(globalVarMiner, procedureMiner, recordMiner), false))
   }
 
   class ProcedureMinerResolver(pstp : AndroidProcedureSymbolTableProducer)

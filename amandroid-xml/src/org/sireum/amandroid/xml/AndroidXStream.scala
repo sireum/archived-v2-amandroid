@@ -39,7 +39,7 @@ object AndroidXStream {
     r
   }
 
-  def toXml(o : Any, w : Writer) = xstream.toXML(o, w)
+  def toXml(o : Any, w : Writer) = xstream.toXML(javafy(o), w)
 
   def fromXml(o : File) = xstream.fromXML(o)
 

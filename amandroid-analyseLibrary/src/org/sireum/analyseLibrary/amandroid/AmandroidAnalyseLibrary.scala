@@ -11,7 +11,7 @@ import org.sireum.androidLibraryFile.amandroid.AmandroidAndroidLibraryFiles
 class AmandroidAnalyseLibrary extends AmandroidAnalyseLibraryFrameWork{
   AmandroidAndroidLibraryFiles.dexModelFiles.
   foreach{fileUri=>
-//    if(fileUri.indexOf("2d4865") > 0)
+    if(fileUri.indexOf("location") > 0)
     Analyzing title fileUri file fileUri
   }
 }
