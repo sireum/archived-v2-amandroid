@@ -95,7 +95,6 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
     androidRecordHierarchyResolver(stp)
     androidRecordProcedureResolver(stp)
     androidVMResolver(stp)
-    println()
 //    AndroidVirtualMethodGraph(stp,
 //                              recordHierarchyTable,
 //                              virtualMethodTable,
@@ -125,10 +124,12 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
             val key = Resource.getResourceUri("pilar", H.RECORD_TYPE, paths, false)
             success = resolveAndroidRecordHierarchy(stp, self, key)
           }
-//          if (!success)
+          if (!success){
+            println("Cannot find: " + key)
 //            stp.reportError(source,
 //              nameUser.line, nameUser.column,
 //              NOT_FOUND_EXTEND_RECORD.format(nameUser.name))
+          }
         }
       }
 

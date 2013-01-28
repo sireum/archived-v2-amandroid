@@ -14,5 +14,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JGraphT"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-alir"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-systemControlFlowGraph"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-xml"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/XStream"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

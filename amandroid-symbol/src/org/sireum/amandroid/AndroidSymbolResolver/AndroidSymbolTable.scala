@@ -161,25 +161,12 @@ object AndroidSymbolTable {
     def toAndroidVirtualMethodTables : AndroidVirtualMethodTables = this
   }
 
-//  def resolvePackageElements(models : ISeq[Model], stp : SymbolTableProducer,
-//                             parallel : Boolean) : Unit = {
-//    if (models.isEmpty) return
-//
-//    val ms : GenSeq[Model] = if (parallel) models.par else models
-//
-//    val dependencies = ms.map { model =>
-//      val per = new H1.PackageElementResolver(stp)
-//      per.packageElementResolver(model)
-//      per.dependency
-//    }
-//    dependencies.foldLeft(stp.tables.dependency)(H.combineMap)
-//    
-//    // println("AndroidSymbolTable :: AndroidSymbolTable :: resolvePackageElements :: OK2.2") // sankar testing
-//  }
-
   def buildProcedureSymbolTables(stp : AndroidSymbolTableProducer, parallel : Boolean = true) : Unit = {
     val procedures = stp.tables.procedureAbsTable.keys.toSeq
     val col : GenSeq[ResourceUri] = if (parallel) procedures.par else procedures
+    
+    println("build pst start! pst number : " + col.size)
+    
     col.foreach { procedureUri =>
       val pstp = stp.procedureSymbolTableProducer(procedureUri)
       val pd = stp.tables.procedureAbsTable(procedureUri)
@@ -201,7 +188,7 @@ object AndroidSymbolTable {
     val stp = minePackageElements(models, stpConstructor, parallel)
     val tables = resolveVirtualMethod(stp)
     //resolvePackageElements(models, stp, parallel)
-    buildProcedureSymbolTables(stp)
+    buildProcedureSymbolTables(stp, parallel)
     (stp.toSymbolTable, tables)
   }
   

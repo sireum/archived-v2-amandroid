@@ -16,7 +16,6 @@ import java.io._
 import java.util.zip.ZipFile
 import org.sireum.core.module.ChunkingPilarParserModule
 import org.sireum.amandroid.module.PilarAndroidSymbolResolverModule
-import org.sireum.amandroid.module.SystemCFGModule
 import org.sireum.pilar.symbol.SymbolTable
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
 import org.sireum.amandroid.xml.AndroidXStream
@@ -25,6 +24,8 @@ import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.pilar.symbol.ProcedureSymbolTableData
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTableData
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidCompressedSymbolTable
+import org.sireum.amandroid.module.AndroidInterIntraProcedural
+import org.sireum.amandroid.module.AndroidInterIntraProceduralModule
 
 trait AmandroidAnalyseLibraryFrameWork extends TestFramework { 
   
@@ -64,40 +65,41 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
           dirName += nameArray(i)
         }
         val d = srcs.substring(srcs.indexOf("/"), srcs.lastIndexOf("/")+1)
-        val dirc = new File(d + dirName)
+//        val dirc = new File(d + dirName)
         val srcFiles = mlistEmpty[FileResourceUri]
         val resDir = new File(d+"result")
-        if(!dirc.exists()){
-          dirc.mkdir()
-        }
+//        if(!dirc.exists()){
+//          dirc.mkdir()
+//        }
         if(!resDir.exists()){
           resDir.mkdir()
         }
         //deal with jar file
-        val apkName = f.getName()
-        val apkFile = new ZipFile(f, ZipFile.OPEN_READ)
-        val entries = apkFile.entries()
-        while(entries.hasMoreElements()){
-          val ze = entries.nextElement()
-          if(ze.toString().endsWith(".dex")){
-            val loadFile = new File(d+ze.getName())
-            val ops = new FileOutputStream(d + dirName + "/classes.dex")
-            val ips = apkFile.getInputStream(ze)
-            var reading = true
-            while(reading){
-              ips.read() match {
-                case -1 => reading = false
-                case c => ops.write(c)
-              }
-            }
-            ops.flush()
-            ips.close()
-          }
-        }
-        srcFiles += FileUtil.toUri(d + dirName + "/classes.dex")
+//        val apkName = f.getName()
+//        val apkFile = new ZipFile(f, ZipFile.OPEN_READ)
+//        val entries = apkFile.entries()
+//        while(entries.hasMoreElements()){
+//          val ze = entries.nextElement()
+//          if(ze.toString().endsWith(".dex")){
+//            val loadFile = new File(d+ze.getName())
+//            val ops = new FileOutputStream(d + dirName + "/" + dirName + ".dex")
+//            val ips = apkFile.getInputStream(ze)
+//            var reading = true
+//            while(reading){
+//              ips.read() match {
+//                case -1 => reading = false
+//                case c => ops.write(c)
+//              }
+//            }
+//            ops.flush()
+//            ips.close()
+//          }
+//        }
+        srcFiles += FileUtil.toUri(d + dirName + "/" + dirName + ".dex")
         
         val stFile = new File(resDir + "/" + dirName + "SymbolTable.xml")
         val avmtFile = new File(resDir + "/" + dirName + "VirtualMethodTables.xml")
+        val graphFile = new File(resDir + "/" + dirName + "CCfgs.xml")
         
         val xStream = AndroidXStream
         xStream.xstream.alias("SymbolTable", classOf[SymbolTable])
@@ -109,34 +111,53 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         
         val job = PipelineJob()
         val options = job.properties
-        Dex2PilarWrapperModule.setSrcFiles(options, srcFiles)
-//        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d+dirName+"/classes.pilar"))))
+//        Dex2PilarWrapperModule.setSrcFiles(options, srcFiles)
+
+        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d+ "/" +f.getName()))))
         
-        PilarAndroidSymbolResolverModule.setParallel(options, false)
+        PilarAndroidSymbolResolverModule.setParallel(options, true)
         PilarAndroidSymbolResolverModule.setHasExistingSymbolTable(options, None)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, None)
         
-        AlirIntraProceduralModule.setShouldBuildCfg(options, true)
-        AlirIntraProceduralModule.setShouldBuildCdg(options, false)
-        AlirIntraProceduralModule.setShouldBuildRda(options, false)
-        AlirIntraProceduralModule.setShouldBuildDdg(options, false)
-        AlirIntraProceduralModule.setShouldBuildPdg(options, false)
-        AlirIntraProceduralModule.setShouldBuildDfg(options, false)
-        AlirIntraProceduralModule.setShouldBuildIdg(options, false)
-        AlirIntraProceduralModule.setProcedureAbsUriIterator(options, None)
+        AndroidInterIntraProceduralModule.setParallel(options, false)
+        AndroidInterIntraProceduralModule.setShouldBuildCfg(options, true)
+        AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
+        AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, false)
         pipeline.compute(job)
+
         if(job.hasError){
           println("Error present: " + job.hasError)
           job.tags.foreach(f => println(f))
           job.lastStageInfo.tags.foreach(f => println(f))
         }
 
+        val st = PilarAndroidSymbolResolverModule.getSymbolTable(options)
         val outerST = new FileOutputStream(stFile)
         val wST = new OutputStreamWriter(outerST, "GBK")
-        val st = PilarAndroidSymbolResolverModule.getSymbolTable(options)
-
         
         
+        println("pipeline done!")
+        
+        
+        val rfmFile = new File(resDir + "/recordFileMap.xml")
+        
+        // recordFileMap is a map from record name r to file name f
+        // where f.table stores compressedSymbolTable f.vmtable stores vmtables
+        // of r.
+        val recordFileMap : MMap[ResourceUri, FileResourceUri] = mmapEmpty
+        if(rfmFile.exists()){
+           recordFileMap ++= xStream.fromXml(rfmFile).asInstanceOf[MMap[ResourceUri, FileResourceUri]]
+        }
+        
+        st.asInstanceOf[AndroidSymbolTableProducer].tables.recordTable.keys.foreach(
+          recordUri =>
+            recordFileMap(recordUri) = FileUtil.toUri(d+ "/" +f.getName())
+        )
+        
+        val outerRfm = new FileOutputStream(rfmFile)
+        val wRfm = new OutputStreamWriter(outerRfm, "GBK")
+        
+        xStream.toXml(recordFileMap, wRfm)
         
         st.asInstanceOf[AndroidSymbolTableProducer].tables.procedureAbsTable.foreach(
           item =>
@@ -180,19 +201,27 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         )
         val cST : AndroidCompressedSymbolTable = new AndroidCompressedSymbolTable()
         cST.stData = st.asInstanceOf[AndroidSymbolTableProducer].tables
-        st.asInstanceOf[AndroidSymbolTableProducer].tables.procedureAbsTable.foreach(
-          item =>
-            {
-              cST.pstsData(item._1) = st.asInstanceOf[AndroidSymbolTableProducer].procedureSymbolTableProducer(item._1).tables
-            })
-        println("start convert xml!")
+//        st.asInstanceOf[AndroidSymbolTableProducer].tables.procedureAbsTable.foreach(
+//          item =>
+//            {
+//              cST.pstsData(item._1) = st.asInstanceOf[AndroidSymbolTableProducer].procedureSymbolTableProducer(item._1).tables
+//            })
+        
+        println("start convert ST to xml!")
         xStream.toXml(cST, wST)
         
         val outerAVMT = new FileOutputStream(avmtFile)
         val wAVMT = new OutputStreamWriter(outerAVMT, "GBK")
         val avmt = PilarAndroidSymbolResolverModule.getAndroidVirtualMethodTables(options)
-        
+        println("start convert AVMT to xml!")
         xStream.toXml(avmt, wAVMT)
+        
+        val outerGraph = new FileOutputStream(graphFile)
+        val wGraph = new OutputStreamWriter(outerGraph, "GBK")
+        val cCfgs = AndroidInterIntraProceduralModule.getIntraResult(options)
+        println("start convert graph to xml!")
+        xStream.xstream.toXML(cCfgs, wGraph)
+        
         println("###############################################")
     }
   }
@@ -212,11 +241,11 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
     PipelineConfiguration(
       "Library analyse pipeline",
       false,
-      PipelineStage(
-        "dex2pilar stage",
-        false,
-        Dex2PilarWrapperModule
-      ),
+//      PipelineStage(
+//        "dex2pilar stage",
+//        false,
+//        Dex2PilarWrapperModule
+//      )
       PipelineStage(
         "Chunking pilar parsing stage",
         false,
@@ -226,16 +255,13 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         "PilarAndroidSymbolResolverModule stage",
         false,
         PilarAndroidSymbolResolverModule
-      ),
+      )
+      ,
       PipelineStage(
-        "Alir IntraProcedural Analysis",
+        "Android InterIntraProcedural Analysis",
         false,
-        AlirIntraProceduralModule
-      ),
-      PipelineStage(
-        "compresses CFGs, and builds the SCFG for Android",
-        false,
-        SystemCFGModule
+        AndroidInterIntraProceduralModule
       )
     )
+    
 }

@@ -122,6 +122,11 @@ object Converter {
                 case MBuffer   => Buffer(es : _*)
                 case MSet => Set(es : _*)
                 case ISeq => scala.collection.immutable.Seq(es : _*)
+                case MLinkMap =>
+                  Map(es.map { o =>
+                    val sp = o.asInstanceOf[ScalaPair]
+                    (sp.first, sp.second)
+                  } : _*)
                 case MMap =>
                   Map(es.map { o =>
                     val sp = o.asInstanceOf[ScalaPair]
@@ -150,6 +155,7 @@ object Converter {
                 case _ =>
               }
               result
+            case a : Any => a
           }
     }
 }

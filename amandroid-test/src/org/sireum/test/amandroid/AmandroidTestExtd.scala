@@ -11,7 +11,7 @@ import org.sireum.test.framework.amandroid.AmandroidTestFrameWorkExtd
 class AmandroidTestExtd extends AmandroidTestFrameWorkExtd{
   AmandroidExamples.dexModelFiles.
   foreach{fileUri=>
-    if(fileUri.indexOf("2d4865") > 0)
+    if(fileUri.indexOf("0eb4b") > 0)
     Analyzing title fileUri file fileUri
   }
 }

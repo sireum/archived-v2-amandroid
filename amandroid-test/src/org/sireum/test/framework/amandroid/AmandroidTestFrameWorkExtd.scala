@@ -12,7 +12,7 @@ import java.io._
 import java.util.zip.ZipFile
 import org.sireum.core.module.ChunkingPilarParserModule
 import org.sireum.amandroid.module.PilarAndroidSymbolResolverModule
-import org.sireum.amandroid.module.SystemCFGModule
+import org.sireum.amandroid.module.AndroidInterIntraProceduralModule
 
 // sankar introduces the following framework which adds one stage on top of AmandroidParserTestFrameWork 
 
@@ -86,15 +86,13 @@ trait AmandroidTestFrameWorkExtd extends TestFramework {
 //        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d+dirName+"/classes.pilar"))))
         
         PilarAndroidSymbolResolverModule.setParallel(options, false)
+        PilarAndroidSymbolResolverModule.setHasExistingSymbolTable(options, None)
+        PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, None)
         
-        AlirIntraProceduralModule.setShouldBuildCfg(options, true)
-        AlirIntraProceduralModule.setShouldBuildCdg(options, false)
-        AlirIntraProceduralModule.setShouldBuildRda(options, false)
-        AlirIntraProceduralModule.setShouldBuildDdg(options, false)
-        AlirIntraProceduralModule.setShouldBuildPdg(options, false)
-        AlirIntraProceduralModule.setShouldBuildDfg(options, false)
-        AlirIntraProceduralModule.setShouldBuildIdg(options, false)
-        AlirIntraProceduralModule.setProcedureAbsUriIterator(options, None)
+        AndroidInterIntraProceduralModule.setParallel(options, true)
+        AndroidInterIntraProceduralModule.setShouldBuildCfg(options, true)
+        AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
+        AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, true)
         pipeline.compute(job)
         if(job.hasError){
           println("Error present: " + job.hasError)
@@ -168,31 +166,27 @@ trait AmandroidTestFrameWorkExtd extends TestFramework {
 
   protected val pipeline =
     PipelineConfiguration(
-          "dex2PilarAndParseAndProcedureLocationList test pipeline",
-          false,
-          PipelineStage(
-            "dex2pilar stage",
-            false,
-            Dex2PilarWrapperModule
-          ),
-          PipelineStage(
-            "Chunking pilar parsing stage",
-            false,
-            ChunkingPilarParserModule
-          ),
-          PipelineStage(
-            "PilarAndroidSymbolResolverModule stage",
-            false,
-            PilarAndroidSymbolResolverModule
-          ),
-         PipelineStage(
-        "Alir IntraProcedural Analysis",
+      "dex2PilarAndParseAndProcedureLocationList test pipeline",
+      false,
+      PipelineStage(
+        "dex2pilar stage",
         false,
-        AlirIntraProceduralModule
-        ),
-        PipelineStage(
-        "compresses CFGs, and builds the SCFG for Android",
+        Dex2PilarWrapperModule
+      ),
+      PipelineStage(
+        "Chunking pilar parsing stage",
         false,
-        SystemCFGModule)
-        )
+        ChunkingPilarParserModule
+      ),
+      PipelineStage(
+        "PilarAndroidSymbolResolverModule stage",
+        false,
+        PilarAndroidSymbolResolverModule
+      ),
+      PipelineStage(
+      "Android InterIntraProcedural Analysis",
+      false,
+      AndroidInterIntraProceduralModule
+      )
+    )
 }
