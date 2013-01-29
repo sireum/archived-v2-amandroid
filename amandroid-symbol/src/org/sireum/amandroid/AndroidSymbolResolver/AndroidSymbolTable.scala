@@ -336,9 +336,9 @@ object AndroidSymbolTable {
     val tables = resolveVirtualMethod(stp)
     //resolvePackageElements(models, stp, parallel)
     buildProcedureSymbolTables(stp)
-    
+    println("before merge : " + tables.cannotFindRecordTable)
     tables.mergeWith(existingAndroidVirtualMethodTables)
-    
+    println("after merge : " + tables.cannotFindRecordTable)
     (stp.toSymbolTable, tables)
   }
 
