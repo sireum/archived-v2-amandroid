@@ -17,7 +17,7 @@ class AmandroidAnalyseLibrary extends AmandroidAnalyseLibraryFrameWork{
 //  }
   AmandroidAndroidLibraryPilarFiles.dexModelFiles.foreach{
     fileUri =>
-//      if(fileUri.indexOf("policy") > 0)
+//      if(fileUri.indexOf("content") > 0)
         Analyzing title fileUri file fileUri
   }
 }

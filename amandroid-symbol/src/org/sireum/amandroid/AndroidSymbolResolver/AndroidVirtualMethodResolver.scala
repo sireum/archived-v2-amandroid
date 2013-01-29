@@ -157,9 +157,7 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
       for (pat <- stp.tables.procedureAbsTable){
         procedureUriTable(getSig(pat._2)) = pat._1
         procedureTypeTable(pat._1) = getProcedureAccess(pat._2)
-        val procedureUri = 
-          if(!isConsOrStatic(pat._2)) pat._1
-          else null
+        val procedureUri = pat._1
         if(procedureUri != null){
           val nameUser : NameUser =
             pat._2.getValueAnnotation("owner") match {
@@ -175,12 +173,16 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
         }
       }
   
-  def isConsOrStatic(pd : ProcedureDecl) : Boolean = {
+  def isConsStaticFinalOrProtected(pd : ProcedureDecl) : Boolean = {
     val access = getProcedureAccess(pd)
     if(access != null){
       if(access.contains("CONSTRUCTOR"))
         true
       else if(access.contains("STATIC"))
+        true
+      else if(access.contains("FINAL"))
+        true
+      else if(access.contains("PROTECTED"))
         true
       else
         false
@@ -211,11 +213,11 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
         if(recordUri != null){
           val proceduresUri = recordProcedureTable.get(recordUri)
           for(procedureUri <- proceduresUri){
-            if(!isConsOrStatic(stp.tables.procedureAbsTable(procedureUri))){
-              if(!isInterface(recordUri)){
-                buildVirtualMethodTable(procedureUri, procedureUri)
+            if(!isInterface(recordUri)){
+              buildVirtualMethodTable(procedureUri, procedureUri)
+              if(!isConsStaticFinalOrProtected(stp.tables.procedureAbsTable(procedureUri))){
+                androidAddRelation(stp, recordUri, procedureUri)
               }
-              androidAddRelation(stp, recordUri, procedureUri)
             }
           }
         }
@@ -276,43 +278,9 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
 
   
 // All merge methods happen below
-  def mergeWith(anotherVmTables : AndroidVirtualMethodTables) = {
-    mergeRecordHierarchyTable(anotherVmTables.recordHierarchyTable,
-                              anotherVmTables.cannotFindRecordTable,
-                              anotherVmTables.recordUriTable.values.toSeq)
-    
+  def mergeWith(anotherVmTables : AndroidVirtualMethodTables) = {    
   }
-  
-  def mergeRecordHierarchyTable(anotherRecordHierarchyTable : HashMultimap[ResourceUri, ResourceUri],
-                                anotherCannotFindRecordTable : HashMultimap[ResourceUri, ResourceUri],
-                                anotherRecordSets : Seq[ResourceUri]) = {
-    for(key <- cannotFindRecordTable.keys){
-      val notFoundRecords = cannotFindRecordTable.get(key)
-      notFoundRecords.foreach(
-        notFoundRecord =>
-          if(anotherRecordSets.contains(notFoundRecord)){
-            recordHierarchyTable.put(key, notFoundRecord)
-            notFoundRecords.remove(notFoundRecord)
-          }
-      )
-      cannotFindRecordTable.replaceValues(key, notFoundRecords)
-    }
-    
-    for(key <- anotherCannotFindRecordTable.keys){
-      val notFoundRecords = anotherCannotFindRecordTable.get(key)
-      notFoundRecords.foreach(
-        notFoundRecord =>
-          if(recordUriTable.values.contains(notFoundRecord)){
-            recordHierarchyTable.put(key, notFoundRecord)
-            notFoundRecords.remove(notFoundRecord)
-          }
-      )
-      anotherCannotFindRecordTable.replaceValues(key, notFoundRecords)
-    }
-    
-    cannotFindRecordTable.putAll(anotherCannotFindRecordTable)
-    recordHierarchyTable.putAll(anotherRecordHierarchyTable)
-  }
+
   
 ////////////////////////////////
 }

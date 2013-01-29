@@ -207,7 +207,7 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
 //              cST.pstsData(item._1) = st.asInstanceOf[AndroidSymbolTableProducer].procedureSymbolTableProducer(item._1).tables
 //            })
         
-        println("start convert ST to xml!")
+//        println("start convert ST to xml!")
 //        xStream.toXml(cST, wST)
         
         val outerAVMT = new FileOutputStream(avmtFile)

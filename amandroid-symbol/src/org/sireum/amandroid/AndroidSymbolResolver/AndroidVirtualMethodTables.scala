@@ -2,6 +2,7 @@ package org.sireum.amandroid.AndroidSymbolResolver
 
 import com.google.common.collect.HashMultimap
 import org.sireum.util._
+import com.google.common.collect.HashBiMap
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -11,8 +12,8 @@ trait AndroidVirtualMethodTables {
   def virtualMethodTable : HashMultimap[ResourceUri, ResourceUri]
   def recordProcedureTable : HashMultimap[ResourceUri, ResourceUri]
   def cannotFindRecordTable : HashMultimap[ResourceUri, ResourceUri]
-  def recordUriTable : MMap[String, ResourceUri]
-  def procedureUriTable : MMap[String, ResourceUri]
+  def recordUriTable : HashBiMap[String, ResourceUri]
+  def procedureUriTable : HashBiMap[String, ResourceUri]
   def procedureTypeTable : MMap[ResourceUri, String]
   def interfaceTable : MSet[ResourceUri]
   def getRecordUri(recordName : String) : ResourceUri
@@ -30,8 +31,8 @@ object AndroidVirtualMethodTables{
               vmt : HashMultimap[ResourceUri, ResourceUri],
               rpt : HashMultimap[ResourceUri, ResourceUri],
               cfrt : HashMultimap[ResourceUri, ResourceUri],
-              rut : MMap[String, ResourceUri],
-              put : MMap[String, ResourceUri],
+              rut : HashBiMap[String, ResourceUri],
+              put : HashBiMap[String, ResourceUri],
               ptt : MMap[String, String],
               it : MSet[ResourceUri],
               avmtConstructor : Unit => AndroidVirtualMethodTablesProducer) = {
@@ -42,8 +43,8 @@ object AndroidVirtualMethodTables{
                       vmt : HashMultimap[ResourceUri, ResourceUri],
                       rpt : HashMultimap[ResourceUri, ResourceUri],
                       cfrt : HashMultimap[ResourceUri, ResourceUri],
-                      rut : MMap[String, ResourceUri],
-                      put : MMap[String, ResourceUri],
+                      rut : HashBiMap[String, ResourceUri],
+                      put : HashBiMap[String, ResourceUri],
                       ptt : MMap[String, String],
                       it : MSet[ResourceUri],
                       avmtConstructor : Unit => AndroidVirtualMethodTablesProducer) = {
@@ -52,8 +53,8 @@ object AndroidVirtualMethodTables{
       avmt.tables.virtualMethodTable.putAll(vmt)
       avmt.tables.recordProcedureTable.putAll(rpt)
       avmt.tables.cannotFindRecordTable.putAll(cfrt)
-      avmt.tables.recordUriTable ++= rut
-      avmt.tables.procedureUriTable ++= put
+      avmt.tables.recordUriTable.putAll(rut)
+      avmt.tables.procedureUriTable.putAll(put)
       avmt.tables.procedureTypeTable ++= ptt
       avmt.tables.interfaceTable ++= it
       avmt.toAndroidVirtualMethodTables
@@ -71,8 +72,8 @@ sealed case class AndroidVirtualMethodTablesData
  virtualMethodTable : HashMultimap[ResourceUri, ResourceUri] = HashMultimap.create(),
  recordProcedureTable : HashMultimap[ResourceUri, ResourceUri] = HashMultimap.create(),
  cannotFindRecordTable : HashMultimap[ResourceUri, ResourceUri] = HashMultimap.create(),
- recordUriTable : MMap[String, ResourceUri] = mmapEmpty[String, ResourceUri],
- procedureUriTable : MMap[String, ResourceUri] = mmapEmpty[String, ResourceUri],
+ recordUriTable : HashBiMap[String, ResourceUri] = HashBiMap.create[String, ResourceUri](),
+ procedureUriTable : HashBiMap[String, ResourceUri] = HashBiMap.create[String, ResourceUri](),
  procedureTypeTable : MMap[ResourceUri, String] = mmapEmpty[ResourceUri, String],
  interfaceTable : MSet[ResourceUri] = msetEmpty
 )
