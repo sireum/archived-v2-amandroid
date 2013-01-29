@@ -97,9 +97,9 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
 //        }
         srcFiles += FileUtil.toUri(d + dirName + "/" + dirName + ".dex")
         
-        val stFile = new File(resDir + "/" + dirName + "SymbolTable.xml")
+//        val stFile = new File(resDir + "/" + dirName + "SymbolTable.xml")
         val avmtFile = new File(resDir + "/" + dirName + "VirtualMethodTables.xml")
-        val graphFile = new File(resDir + "/" + dirName + "CCfgs.xml")
+//        val graphFile = new File(resDir + "/" + dirName + "CCfgs.xml")
         
         val xStream = AndroidXStream
         xStream.xstream.alias("SymbolTable", classOf[SymbolTable])
@@ -132,8 +132,8 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         }
 
         val st = PilarAndroidSymbolResolverModule.getSymbolTable(options)
-        val outerST = new FileOutputStream(stFile)
-        val wST = new OutputStreamWriter(outerST, "GBK")
+//        val outerST = new FileOutputStream(stFile)
+//        val wST = new OutputStreamWriter(outerST, "GBK")
         
         
         println("pipeline done!")
@@ -208,7 +208,7 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
 //            })
         
         println("start convert ST to xml!")
-        xStream.toXml(cST, wST)
+//        xStream.toXml(cST, wST)
         
         val outerAVMT = new FileOutputStream(avmtFile)
         val wAVMT = new OutputStreamWriter(outerAVMT, "GBK")
@@ -216,11 +216,11 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         println("start convert AVMT to xml!")
         xStream.toXml(avmt, wAVMT)
         
-        val outerGraph = new FileOutputStream(graphFile)
-        val wGraph = new OutputStreamWriter(outerGraph, "GBK")
-        val cCfgs = AndroidInterIntraProceduralModule.getIntraResult(options)
-        println("start convert graph to xml!")
-        xStream.xstream.toXML(cCfgs, wGraph)
+//        val outerGraph = new FileOutputStream(graphFile)
+//        val wGraph = new OutputStreamWriter(outerGraph, "GBK")
+//        val cCfgs = AndroidInterIntraProceduralModule.getIntraResult(options)
+//        println("start convert graph to xml!")
+//        xStream.xstream.toXML(cCfgs, wGraph)
         
         println("###############################################")
     }

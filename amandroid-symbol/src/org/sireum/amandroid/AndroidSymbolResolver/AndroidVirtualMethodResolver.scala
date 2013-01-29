@@ -15,10 +15,6 @@ import org.sireum.pilar.symbol._
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
-
-  val recordProcedureTable = HashMultimap.create[ResourceUri, ResourceUri]()
-  
-  var interfaceTable = msetEmpty[ResourceUri]
   
   def buildRecordHierarchyTable(self : ResourceUri, parent : ResourceUri) : Unit = {
     if(!recordHierarchyTable.get(self).contains(parent))
@@ -31,6 +27,10 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
   def buildRecordProcedureTable(recordName : ResourceUri, procedureName : ResourceUri) : Unit = {
     if(!recordProcedureTable.get(recordName).contains(procedureName))
       recordProcedureTable.put(recordName, procedureName)
+  }
+  def buildCannotFindRecordTable(notFindParentName : ResourceUri, recordName : ResourceUri) : Unit = {
+    if(!recordProcedureTable.get(notFindParentName).contains(recordName))
+      cannotFindRecordTable.put(notFindParentName, recordName)
   }
   
   def getRecordUri(recordName : String) : ResourceUri = {
@@ -117,15 +117,15 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
           val recordName = nameUser.name
           val self = rd._1
           val paths = ilist(recordName)
-          val key = Resource.getResourceUri("pilar", H.RECORD_TYPE, paths, false)
+          var key = Resource.getResourceUri("pilar", H.RECORD_TYPE, paths, false)
           var success = resolveAndroidRecordHierarchy(stp, self, key)
           if (!success) {
             val paths = ilist(H.packageName(rd._2.name), recordName)
-            val key = Resource.getResourceUri("pilar", H.RECORD_TYPE, paths, false)
+            key = Resource.getResourceUri("pilar", H.RECORD_TYPE, paths, false)
             success = resolveAndroidRecordHierarchy(stp, self, key)
           }
           if (!success){
-            println("Cannot find: " + key)
+            buildCannotFindRecordTable(self, key)
 //            stp.reportError(source,
 //              nameUser.line, nameUser.column,
 //              NOT_FOUND_EXTEND_RECORD.format(nameUser.name))
@@ -273,4 +273,46 @@ trait AndroidVirtualMethodResolver extends AndroidVirtualMethodTables {
     val rName = name.substring(2, name.length()-2)
     rName
   }
+
+  
+// All merge methods happen below
+  def mergeWith(anotherVmTables : AndroidVirtualMethodTables) = {
+    mergeRecordHierarchyTable(anotherVmTables.recordHierarchyTable,
+                              anotherVmTables.cannotFindRecordTable,
+                              anotherVmTables.recordUriTable.values.toSeq)
+    
+  }
+  
+  def mergeRecordHierarchyTable(anotherRecordHierarchyTable : HashMultimap[ResourceUri, ResourceUri],
+                                anotherCannotFindRecordTable : HashMultimap[ResourceUri, ResourceUri],
+                                anotherRecordSets : Seq[ResourceUri]) = {
+    for(key <- cannotFindRecordTable.keys){
+      val notFoundRecords = cannotFindRecordTable.get(key)
+      notFoundRecords.foreach(
+        notFoundRecord =>
+          if(anotherRecordSets.contains(notFoundRecord)){
+            recordHierarchyTable.put(key, notFoundRecord)
+            notFoundRecords.remove(notFoundRecord)
+          }
+      )
+      cannotFindRecordTable.replaceValues(key, notFoundRecords)
+    }
+    
+    for(key <- anotherCannotFindRecordTable.keys){
+      val notFoundRecords = anotherCannotFindRecordTable.get(key)
+      notFoundRecords.foreach(
+        notFoundRecord =>
+          if(recordUriTable.values.contains(notFoundRecord)){
+            recordHierarchyTable.put(key, notFoundRecord)
+            notFoundRecords.remove(notFoundRecord)
+          }
+      )
+      anotherCannotFindRecordTable.replaceValues(key, notFoundRecords)
+    }
+    
+    cannotFindRecordTable.putAll(anotherCannotFindRecordTable)
+    recordHierarchyTable.putAll(anotherRecordHierarchyTable)
+  }
+  
+////////////////////////////////
 }

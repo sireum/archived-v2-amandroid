@@ -85,11 +85,11 @@ trait AmandroidTestFrameWorkExtd extends TestFramework {
         
 //        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d+dirName+"/classes.pilar"))))
         
-        PilarAndroidSymbolResolverModule.setParallel(options, false)
+        PilarAndroidSymbolResolverModule.setParallel(options, true)
         PilarAndroidSymbolResolverModule.setHasExistingSymbolTable(options, None)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, None)
         
-        AndroidInterIntraProceduralModule.setParallel(options, true)
+        AndroidInterIntraProceduralModule.setParallel(options, false)
         AndroidInterIntraProceduralModule.setShouldBuildCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, true)
