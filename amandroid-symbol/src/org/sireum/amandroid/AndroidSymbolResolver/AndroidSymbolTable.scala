@@ -28,9 +28,9 @@ object AndroidSymbolTable {
     
   def apply(models : ISeq[Model],
             stpConstructor : Unit => AndroidSymbolTableProducer,
-            existingST : SymbolTable,
+            existingAndroidVirtualMethodTables : AndroidVirtualMethodTables,
             parallel : Boolean) =
-    buildSymbolTable(models, stpConstructor, existingST, parallel)
+    buildSymbolTable(models, stpConstructor, existingAndroidVirtualMethodTables, parallel)
 
 
   def minePackageElements[P <: AndroidSymbolTableProducer] //
@@ -330,14 +330,15 @@ object AndroidSymbolTable {
   
   def buildSymbolTable(models : ISeq[Model],
                        stpConstructor : Unit => AndroidSymbolTableProducer,
-                       existingST : SymbolTable,
+                       existingAndroidVirtualMethodTables : AndroidVirtualMethodTables,
                        parallel : Boolean) = {
     val stp = minePackageElements(models, stpConstructor, parallel)
-    val stp2 = existingST.asInstanceOf[AndroidSymbolTableProducer]
-    H1.combine(stp, stp2)
     val tables = resolveVirtualMethod(stp)
     //resolvePackageElements(models, stp, parallel)
     buildProcedureSymbolTables(stp)
+    
+    tables.mergeWith(existingAndroidVirtualMethodTables)
+    
     (stp.toSymbolTable, tables)
   }
 

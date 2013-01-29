@@ -1,4 +1,4 @@
-package org.sireum.test.framework.amandroid
+package org.sireum.analyseApp.framework.amandroid
 
 
 import org.sireum.test.framework._
@@ -13,10 +13,12 @@ import java.util.zip.ZipFile
 import org.sireum.core.module.ChunkingPilarParserModule
 import org.sireum.amandroid.module.PilarAndroidSymbolResolverModule
 import org.sireum.amandroid.module.AndroidInterIntraProceduralModule
+import org.sireum.amandroid.xml.AndroidXStream
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
 
 // sankar introduces the following framework which adds one stage on top of AmandroidParserTestFrameWork 
 
-trait AmandroidTestFrameWorkExtd extends TestFramework { 
+trait AmandroidAnalyseAppFrameWork extends TestFramework { 
   
   //////////////////////////////////////////////////////////////////////////////
   // Implemented Public Methods
@@ -79,6 +81,16 @@ trait AmandroidTestFrameWorkExtd extends TestFramework {
           }
         }
         srcFiles += FileUtil.toUri(d + dirName + "/classes.dex")
+        
+        val xStream = AndroidXStream
+        xStream.xstream.alias("AndroidVirtualMethodTables", classOf[AndroidVirtualMethodTables])
+        
+        val libVmTablesFile = new File(d + "/pilar/result/result/libVmTables.xml")
+        var libVmTables : AndroidVirtualMethodTables = null
+        if(libVmTablesFile.exists()){
+          libVmTables = xStream.fromXml(libVmTablesFile).asInstanceOf[AndroidVirtualMethodTables]
+        }
+        
         val job = PipelineJob()
         val options = job.properties
         Dex2PilarWrapperModule.setSrcFiles(options, srcFiles)
@@ -87,7 +99,7 @@ trait AmandroidTestFrameWorkExtd extends TestFramework {
         
         PilarAndroidSymbolResolverModule.setParallel(options, true)
         PilarAndroidSymbolResolverModule.setHasExistingSymbolTable(options, None)
-        PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, None)
+        PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, Option(libVmTables))
         
         AndroidInterIntraProceduralModule.setParallel(options, false)
         AndroidInterIntraProceduralModule.setShouldBuildCfg(options, true)
@@ -99,7 +111,7 @@ trait AmandroidTestFrameWorkExtd extends TestFramework {
           job.tags.foreach(f => println(f))
           job.lastStageInfo.tags.foreach(f => println(f))
         }
-        val r = AlirIntraProceduralModule.getResult(options)
+        val r = AndroidInterIntraProceduralModule.getInterResult(options)
         
         //1. set graph file name
         //2. set output string
@@ -110,41 +122,7 @@ trait AmandroidTestFrameWorkExtd extends TestFramework {
         val cfgFile = new File(d + dirName + "/graphs/cfg.dot")
         val outer1 = new FileOutputStream(cfgFile)
         val w1 = new OutputStreamWriter(outer1, "GBK")
-        r.foreach { p =>
-          val (procedureUri, result) = p
-          
-          
-          
-          result.cfg.toDot(w1)
-          
-          
-          //2. get cdg
-//          val cdgFile = new File(d + dirName + "/graphs/cdg.dot")
-//          val outer2 = new FileOutputStream(cdgFile)
-//          val w2 = new OutputStreamWriter(outer2, "GBK")
-//          result.cdgOpt.get.toDot(w2)
-//          w2.flush()       
-//          val str2 = Array("dot", "-Tps", d + dirName + "/graphs/cdg.dot", "-o", d + dirName + "/graphs/cdg.ps")
-//          val proc2 = Runtime.getRuntime().exec(str2)
-          
-          //3. get dfg
-//          val dfgFile = new File(d + dirName + "/graphs/dfg.dot")
-//          val outer3 = new FileOutputStream(dfgFile)
-//          val w3 = new OutputStreamWriter(outer3, "GBK")
-//          result.dfgOpt.get.toDot(w3)
-//          w3.flush()
-//          val str3 = Array("dot", "-Tps", d + dirName + "/graphs/dfg.dot", "-o", d + dirName + "/graphs/dfg.ps")
-//          val proc3 = Runtime.getRuntime().exec(str3)
-          
-          //4. get idg
-//          val idgFile = new File(d + dirName + "/graphs/idg.dot")
-//          val outer4 = new FileOutputStream(idgFile)
-//          val w4 = new OutputStreamWriter(outer4, "GBK")
-//          result.idgOpt.get.toDot(w4)
-//          w4.flush()
-//          val str4 = Array("dot", "-Tps", d + dirName + "/graphs/idg.dot", "-o", d + dirName + "/graphs/idg.ps")
-//          val proc4 = Runtime.getRuntime().exec(str4)
-        }
+        
         
         w1.flush()
         val str1 = Array("dot", "-Tps2", d + dirName + "/graphs/cfg.dot", "-o", d + dirName + "/graphs/cfg.ps")

@@ -20,5 +20,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-pipeline"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-tools"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/XStream"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-xml"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

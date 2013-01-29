@@ -8,6 +8,7 @@ import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTable
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTableProducer
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTableData
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidProcedureSymbolTableProducer
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
 
 
 
@@ -37,10 +38,10 @@ class PilarAndroidSymbolResolverDef (val job : PipelineJob, info : PipelineJobMo
   val fst = { _ : Unit => new ST }
 
   val result = 
-    if (this.hasExistingSymbolTable.isDefined) {
-      require(this.hasExistingSymbolTable.isDefined)
-      val est = this.hasExistingSymbolTable.get.asInstanceOf[ST]
-      AndroidSymbolTable(ms, fst, est, par)
+    if (this.hasExistingAndroidVirtualMethodTables.isDefined) {
+      require(this.hasExistingAndroidVirtualMethodTables.isDefined)
+      val eavmt = this.hasExistingAndroidVirtualMethodTables.get.asInstanceOf[AndroidVirtualMethodTables]
+      AndroidSymbolTable(ms, fst, eavmt, par)
     }
     else AndroidSymbolTable(ms, fst, par)
     
