@@ -15,6 +15,8 @@ import org.sireum.amandroid.module.PilarAndroidSymbolResolverModule
 import org.sireum.amandroid.module.AndroidInterIntraProceduralModule
 import org.sireum.amandroid.xml.AndroidXStream
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
+import org.sireum.alir.AlirIntraProceduralGraph
+import org.sireum.amandroid.scfg.CompressedControlFlowGraph
 
 // sankar introduces the following framework which adds one stage on top of AmandroidParserTestFrameWork 
 
@@ -32,15 +34,19 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
     this
   }
 
-  def file(fileUri : FileResourceUri) =
-    AmandroidConfiguration(title, fileUri)
+  def file(fileUri : FileResourceUri,
+        libCoreFrameworkCCfgs : MMap[ResourceUri, (AlirIntraProceduralGraph.NodePool, Option[CompressedControlFlowGraph[VirtualLabel]])]) =
+    AmandroidConfiguration(title, fileUri, libCoreFrameworkCCfgs)
 
   //////////////////////////////////////////////////////////////////////////////
   // Public Case Classes
   //////////////////////////////////////////////////////////////////////////////
 
+  type VirtualLabel = String
+    
   case class AmandroidConfiguration //
-  (title : String, srcs : FileResourceUri) {
+  (title : String, srcs : FileResourceUri,
+   libCoreFrameworkCCfgs : MMap[ResourceUri, (AlirIntraProceduralGraph.NodePool, Option[CompressedControlFlowGraph[VirtualLabel]])]) {
 
     ////////////////////////////////////////////////////////////////////////////
     // Test Constructor
@@ -101,7 +107,10 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
         PilarAndroidSymbolResolverModule.setHasExistingSymbolTable(options, None)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, Option(libVmTables))
         
+        val libraryFilePath = d + "../../../../../../../amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/"
         AndroidInterIntraProceduralModule.setParallel(options, false)
+        AndroidInterIntraProceduralModule.setLibCoreFrameworkCCfgs(options, libCoreFrameworkCCfgs)
+        AndroidInterIntraProceduralModule.setLibraryFilePath(options, libraryFilePath)
         AndroidInterIntraProceduralModule.setShouldBuildCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, true)

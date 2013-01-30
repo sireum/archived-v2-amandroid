@@ -119,12 +119,7 @@ object AndroidSymbolTable {
     
     def getCalleeOptionsByUri(procedureUri : ResourceUri) : java.util.Set[ResourceUri] = {
       if(procedureUri != null){
-        if(isConstructor(procedureUri) || isStaticMethod(procedureUri)){
-          val option : java.util.Set[ResourceUri] = null
-          option +(procedureUri)
-          option
-        }
-        else virtualMethodTable.get(procedureUri)
+        virtualMethodTable.get(procedureUri)
       }
       else null
     }

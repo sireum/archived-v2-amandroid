@@ -29,13 +29,6 @@ object AndroidInterIntraProcedural {
   type CCFG = CompressedControlFlowGraph[VirtualLabel]
   type SCFG = SystemControlFlowGraph[VirtualLabel]
   
-
-  final case class AndroidIntraProceduralAnalysisResult(
-    pool : AlirIntraProceduralGraph.NodePool,
-//    cfg : AndroidInterIntraProcedural.CFG,
-    cCfgOpt : Option[AndroidInterIntraProcedural.CCFG]
-  )
-  
   type ShouldIncludeFlowFunction = (LocationDecl, Iterable[CatchClause]) => 
       (Iterable[CatchClause], java.lang.Boolean)
         
@@ -70,13 +63,19 @@ case class AndroidInterIntraProcedural(
   @Input
   shouldBuildSCfg : Boolean,
   
+  @Input
+  libraryFilePath : String,
+  
+  @Input
+  libCoreFrameworkCCfgs : MMap[ResourceUri, (AlirIntraProceduralGraph.NodePool, Option[CompressedControlFlowGraph[String]])],
+  
   @Input 
   shouldIncludeFlowFunction : AndroidInterIntraProcedural.ShouldIncludeFlowFunction =
     // ControlFlowGraph.defaultSiff,
     { (_, _) => (Array.empty[CatchClause], false) },
        
   @Output 
-  intraResult : MMap[ResourceUri, AndroidInterIntraProcedural.AndroidIntraProceduralAnalysisResult],
+  intraResult : MMap[ResourceUri, (AlirIntraProceduralGraph.NodePool, Option[AndroidInterIntraProcedural.CCFG])],
     
   @Output
   interResult : Option[SystemControlFlowGraph[String]]
@@ -121,6 +120,12 @@ case class cCfg(
 case class sCfg(
   title : String = "System Control Flow Graph Builder",
     
+  @Input
+  libraryFilePath : String,
+  
+  @Input
+  libCoreFrameworkCCfgs : MMap[ResourceUri, (AlirIntraProceduralGraph.NodePool, Option[CompressedControlFlowGraph[String]])],
+  
   @Input
   procedureSymbolTables : Seq[ProcedureSymbolTable],
   

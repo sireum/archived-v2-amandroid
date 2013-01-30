@@ -46,23 +46,17 @@ class AndroidInterIntraProceduralDef (val job : PipelineJob, info : PipelineJobM
     val pool = CfgModule.getPool(options)
     val cfg = CfgModule.getCfg(options)
     val cCfg = if (this.shouldBuildCCfg) Some(cCfgModule.getCCfg(options)) else None
-    (pst.procedureUri,
-      AndroidInterIntraProcedural.AndroidIntraProceduralAnalysisResult(
-        pool, cCfg
-    ))
+    (pst.procedureUri, (pool, cCfg))
   }
   
-  val intraResult : MMap[ResourceUri, AndroidInterIntraProcedural.AndroidIntraProceduralAnalysisResult] = mmapEmpty
+  val intraResult : MMap[ResourceUri, (AlirIntraProceduralGraph.NodePool, Option[CompressedControlFlowGraph[VirtualLabel]])] = mmapEmpty
 
   val col : GenSeq[ProcedureSymbolTable] = if (par) psts.par else psts
   println("ccfg building start! ccfg number = " + col.size)
-//  var i = 0
   (col.map { pst =>
-//    i+=1
-//    println(i)
     compute(pst)
   }).foreach { p =>
-    intraResult(first2(p)) = second2(p)
+    intraResult(p._1) = p._2
   }
   println("ccfg building complete!")
   this.intraResult_=(intraResult)
@@ -70,23 +64,27 @@ class AndroidInterIntraProceduralDef (val job : PipelineJob, info : PipelineJobM
   if(this.shouldBuildSCfg){
     val j = PipelineJob()
     val options = j.properties
+    val libraryFilePath = this.libraryFilePath
     val avmt = this.androidVirtualMethodTables
+    val libCoreFrameworkCCfgs = this.libCoreFrameworkCCfgs
     val cCfgs : MMap[ResourceUri, (AlirIntraProceduralGraph.NodePool, CompressedControlFlowGraph[VirtualLabel])] = mmapEmpty
     intraResult.foreach(
       item =>
       {
         var cCfg : CompressedControlFlowGraph[VirtualLabel] = null
-        item._2.cCfgOpt match {
+        item._2._2 match {
           case Some(x) => cCfg = x
           case _ =>
         }
-        cCfgs(item._1) = (item._2.pool, cCfg)
+        cCfgs(item._1) = (item._2._1, cCfg)
       }
     )
     
     sCfgModule.setAndroidVirtualMethodTables(options, avmt)
     sCfgModule.setCCfgs(options, cCfgs)
     sCfgModule.setProcedureSymbolTables(options, psts)
+    sCfgModule.setLibraryFilePath(options, libraryFilePath)
+    sCfgModule.setLibCoreFrameworkCCfgs(options, libCoreFrameworkCCfgs)
     interPipeline.compute(j)
     info.hasError = j.hasError
     if (info.hasError) {
@@ -115,7 +113,7 @@ class AndroidInterIntraProceduralDef (val job : PipelineJob, info : PipelineJobM
     val stages = marrayEmpty[PipelineStage]
     
     if (this.shouldBuildSCfg)
-      stages += PipelineStage("DFG Building", false, sCfgModule)
+      stages += PipelineStage("SCFG Building", false, sCfgModule)
       
     PipelineConfiguration("Android Interprocedural Analysis Pipeline",
       false, stages : _*)
@@ -140,5 +138,5 @@ class cCfgDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends cCfg
 }
 
 class sCfgDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends sCfgModule {
-  this.sCfg_=(SystemControlFlowGraph[String](this.procedureSymbolTables, this.androidVirtualMethodTables, this.cCfgs))
+  this.sCfg_=(SystemControlFlowGraph[String](this.procedureSymbolTables, this.androidVirtualMethodTables, this.cCfgs, this.libraryFilePath, this.libCoreFrameworkCCfgs))
 }
