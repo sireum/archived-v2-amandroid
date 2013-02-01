@@ -35,7 +35,7 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
   }
 
   def file(fileUri : FileResourceUri,
-        libCoreFrameworkCCfgs : MMap[ResourceUri, (AlirIntraProceduralGraph.NodePool, Option[CompressedControlFlowGraph[VirtualLabel]])]) =
+        libCoreFrameworkCCfgs : MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]]) =
     AmandroidConfiguration(title, fileUri, libCoreFrameworkCCfgs)
 
   //////////////////////////////////////////////////////////////////////////////
@@ -46,7 +46,7 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
     
   case class AmandroidConfiguration //
   (title : String, srcs : FileResourceUri,
-   libCoreFrameworkCCfgs : MMap[ResourceUri, (AlirIntraProceduralGraph.NodePool, Option[CompressedControlFlowGraph[VirtualLabel]])]) {
+   libCoreFrameworkCCfgs : MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]]) {
 
     ////////////////////////////////////////////////////////////////////////////
     // Test Constructor
@@ -109,9 +109,8 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
         
         val libraryFilePath = d + "../../../../../../../amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/"
         AndroidInterIntraProceduralModule.setParallel(options, false)
-        AndroidInterIntraProceduralModule.setLibCoreFrameworkCCfgs(options, libCoreFrameworkCCfgs)
-        AndroidInterIntraProceduralModule.setLibraryFilePath(options, libraryFilePath)
-        AndroidInterIntraProceduralModule.setShouldBuildCfg(options, true)
+        AndroidInterIntraProceduralModule.setLibCoreFrameworkCCfgs(options, Some(libCoreFrameworkCCfgs))
+        AndroidInterIntraProceduralModule.setLibraryFilePath(options, Some(libraryFilePath))
         AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, true)
         pipeline.compute(job)

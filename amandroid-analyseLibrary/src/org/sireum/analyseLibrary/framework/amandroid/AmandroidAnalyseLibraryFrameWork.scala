@@ -104,11 +104,7 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         val xStream = AndroidXStream
         xStream.xstream.alias("SymbolTable", classOf[SymbolTable])
         xStream.xstream.alias("AndroidVirtualMethodTables", classOf[AndroidVirtualMethodTables])
-//        val (stData, pstsData) = xStream.fromXml(stFile).asInstanceOf[(AndroidSymbolTableData, MMap[ResourceUri, ProcedureSymbolTableData])]
-//        val existingST : SymbolTable = null
-//        existingST.asInstanceOf[AndroidSymbolTableProducer].tables.declaredSymbols ++= stData.declaredSymbols
-//        val existingAVMT = xStream.fromXml(avmtFile).asInstanceOf[AndroidVirtualMethodTables]
-        
+    
         val job = PipelineJob()
         val options = job.properties
 //        Dex2PilarWrapperModule.setSrcFiles(options, srcFiles)
@@ -120,8 +116,8 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, None)
         
         AndroidInterIntraProceduralModule.setParallel(options, false)
-        AndroidInterIntraProceduralModule.setLibraryFilePath(options, "")
-        AndroidInterIntraProceduralModule.setShouldBuildCfg(options, true)
+        AndroidInterIntraProceduralModule.setLibraryFilePath(options, None)
+        AndroidInterIntraProceduralModule.setLibCoreFrameworkCCfgs(options, None)
         AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, false)
         pipeline.compute(job)
@@ -139,26 +135,40 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         
         println("pipeline done!")
         
-        
+        val rfmFile = new File(resDir + "/recordFileMap.xml")
         val pfmFile = new File(resDir + "/procedureFileMap.xml")
         
         // recordFileMap is a map from record name r to file name f
         // where f.table stores compressedSymbolTable f.vmtable stores vmtables
         // of r.
+        val recordFileMap : MMap[ResourceUri, FileResourceUri] = mmapEmpty
         val procedureFileMap : MMap[ResourceUri, FileResourceUri] = mmapEmpty
+        if(rfmFile.exists()){
+           recordFileMap ++= xStream.fromXml(rfmFile).asInstanceOf[MMap[ResourceUri, FileResourceUri]]
+        }
         if(pfmFile.exists()){
            procedureFileMap ++= xStream.fromXml(pfmFile).asInstanceOf[MMap[ResourceUri, FileResourceUri]]
         }
         
+        st.asInstanceOf[AndroidSymbolTableProducer].tables.recordTable.keys.foreach(
+          recordUri =>
+            recordFileMap(recordUri) = resDir + "/" +f.getName().substring(0, f.getName().length()-6)
+        )
         st.asInstanceOf[AndroidSymbolTableProducer].tables.procedureAbsTable.keys.foreach(
           procedureUri =>
             procedureFileMap(procedureUri) = resDir + "/" +f.getName().substring(0, f.getName().length()-6)
         )
         
-        val outerRfm = new FileOutputStream(pfmFile)
+        
+        val outerRfm = new FileOutputStream(rfmFile)
         val wRfm = new OutputStreamWriter(outerRfm, "GBK")
         
-        xStream.toXml(procedureFileMap, wRfm)
+        xStream.toXml(recordFileMap, wRfm)
+        
+        val outerPfm = new FileOutputStream(pfmFile)
+        val wPfm = new OutputStreamWriter(outerPfm, "GBK")
+        
+        xStream.toXml(procedureFileMap, wPfm)
         
 //        st.asInstanceOf[AndroidSymbolTableProducer].tables.procedureAbsTable.foreach(
 //          item =>

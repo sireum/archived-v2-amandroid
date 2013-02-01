@@ -58,9 +58,9 @@ object SystemControlFlowGraph {
   def build[VirtualLabel] //
   (psts : Seq[ProcedureSymbolTable],
    vmTables : AndroidVirtualMethodTables,
-   cCfgsPlusPool: MMap[ResourceUri, (AlirIntraProceduralGraph.NodePool, CompressedControlFlowGraph[VirtualLabel])],
+   cCfgsPlusPool: MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]],
    libraryFilePath : String,
-   libCoreFrameworkCCfgs : MMap[ResourceUri, (AlirIntraProceduralGraph.NodePool, Option[CompressedControlFlowGraph[VirtualLabel]])]
+   libCoreFrameworkCCfgs : MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]]
 //   shouldIncludeFlow : ShouldIncludeFlowFunction = defaultSiff
    )  
    : SystemControlFlowGraph[VirtualLabel] = {  
@@ -110,7 +110,7 @@ object SystemControlFlowGraph {
      cCfgsPlusPool.foreach{   
        item =>
          val pUri = item._1
-         val tempCfg = item._2._2
+         val tempCfg = item._2
          collectionCCfgToBaseGraph(pUri, tempCfg)
      }
    
@@ -150,7 +150,7 @@ object SystemControlFlowGraph {
         println("cCfg number " + n)
         var m = 0
         val pUri = item._1
-        val cCfg = item._2._2
+        val cCfg = item._2
         val pst = pstMap(pUri)
         println("nodes size : " + cCfg.nodes.size)
         cCfg.nodes.foreach(
@@ -181,21 +181,15 @@ object SystemControlFlowGraph {
 
                         val filePath = procedureFileMap(callee)
                         if(filePath.endsWith("core") || filePath.endsWith("framework1") || filePath.endsWith("framework2")){
-                          val calleeCCfg = libCoreFrameworkCCfgs(callee)._2 match {
-                            case Some(x) => x
-                            case None => null
-                          }
+                          val calleeCCfg = libCoreFrameworkCCfgs(callee)
                           collectionCCfgToBaseGraph(callee, calleeCCfg)
                         } else {
                           val ccfgFile = new File(filePath + "CCfgs.xml")
-                          val libCCfgs : MMap[ResourceUri, (AlirIntraProceduralGraph.NodePool, Option[CompressedControlFlowGraph[VirtualLabel]])] = mmapEmpty
+                          val libCCfgs : MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]] = mmapEmpty
                           if(ccfgFile.exists()){
-                            libCCfgs ++= xStream.fromXml(ccfgFile).asInstanceOf[MMap[ResourceUri, (AlirIntraProceduralGraph.NodePool, Option[CompressedControlFlowGraph[VirtualLabel]])]]
+                            libCCfgs ++= xStream.fromXml(ccfgFile).asInstanceOf[MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]]]
                           }
-                          val calleeCCfg = libCCfgs(callee)._2 match {
-                            case Some(x) => x
-                            case None => null
-                          }
+                          val calleeCCfg = libCCfgs(callee)
                           collectionCCfgToBaseGraph(callee, calleeCCfg)
                         }
                       }

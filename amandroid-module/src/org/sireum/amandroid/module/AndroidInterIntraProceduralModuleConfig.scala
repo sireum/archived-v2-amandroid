@@ -55,19 +55,16 @@ case class AndroidInterIntraProcedural(
   androidVirtualMethodTables : AndroidVirtualMethodTables,
   
   @Input
-  shouldBuildCfg : Boolean,
-  
-  @Input
   shouldBuildCCfg : Boolean,
   
   @Input
   shouldBuildSCfg : Boolean,
   
   @Input
-  libraryFilePath : String,
+  libraryFilePath : Option[String],
   
   @Input
-  libCoreFrameworkCCfgs : MMap[ResourceUri, (AlirIntraProceduralGraph.NodePool, Option[CompressedControlFlowGraph[String]])],
+  libCoreFrameworkCCfgs : Option[MMap[ResourceUri, AndroidInterIntraProcedural.CCFG]],
   
   @Input 
   shouldIncludeFlowFunction : AndroidInterIntraProcedural.ShouldIncludeFlowFunction =
@@ -75,7 +72,7 @@ case class AndroidInterIntraProcedural(
     { (_, _) => (Array.empty[CatchClause], false) },
        
   @Output 
-  intraResult : MMap[ResourceUri, (AlirIntraProceduralGraph.NodePool, Option[AndroidInterIntraProcedural.CCFG])],
+  intraResult : MMap[ResourceUri, AndroidInterIntraProcedural.CCFG],
     
   @Output
   interResult : Option[SystemControlFlowGraph[String]]
@@ -124,13 +121,13 @@ case class sCfg(
   libraryFilePath : String,
   
   @Input
-  libCoreFrameworkCCfgs : MMap[ResourceUri, (AlirIntraProceduralGraph.NodePool, Option[CompressedControlFlowGraph[String]])],
+  libCoreFrameworkCCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
   
   @Input
   procedureSymbolTables : Seq[ProcedureSymbolTable],
   
   @Input 
-  cCfgs : MMap[ResourceUri, (AlirIntraProceduralGraph.NodePool, CompressedControlFlowGraph[String])],
+  cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
 
   @Input
   androidVirtualMethodTables : AndroidVirtualMethodTables,
