@@ -6,8 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-pipeline"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-option"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-pilar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/sireum-util"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/sireum-module"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-tools"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-symbol"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Guava"/>
@@ -16,5 +14,10 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-systemControlFlowGraph"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-xml"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/XStream"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sireum-module"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sireum-util"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/ScalaLogging for SLF4J"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SLF4J"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sireum-cache"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

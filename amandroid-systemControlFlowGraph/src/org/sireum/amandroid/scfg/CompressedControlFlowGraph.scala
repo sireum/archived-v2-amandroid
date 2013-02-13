@@ -8,7 +8,7 @@ import org.sireum.amandroid.AndroidSymbolResolver.AndroidProcedureSymbolTablePro
 
 trait CompressedControlFlowGraph[VirtualLabel] extends ControlFlowGraph[VirtualLabel] 
  with AlirIntraProceduralGraphExtra[CompressedControlFlowGraph.Node, VirtualLabel] {
-
+ 
 }
 
 object CompressedControlFlowGraph {
@@ -28,42 +28,26 @@ object CompressedControlFlowGraph {
    ) // 
    : CompressedControlFlowGraph[VirtualLabel] = {
 
-    val locationDecls = pst.locations.toSeq
+   val locationDecls = pst.locations.toSeq
     
-    val size = locationDecls.size
+   val size = locationDecls.size
            
-   val copy = new compressedCfg[VirtualLabel](pool) 
-    
-   for (n <- origCfg.nodes) copy.addNode(n)
+   val cCfg = new compressedCfg[VirtualLabel](pool)
+   
+   for (n <- origCfg.nodes){
+     cCfg.addNode(n)
+   }
    
    var tempEdge : Edge = null
    
    for (e <- origCfg.edges) {
-     
-     tempEdge = copy.addEdge(e.source, e.target) 
-     
-     }
-   
-   //for (i <- 0 until size) {
-      //val l = locationDecls(i)
-      //val myNode = getNode(l)
-     // println("current node = "+ myNode)
-     // println("successors:" + result.successors(myNode))
-     // println("predecessors:" + result.predecessors(myNode))
-   // }
-   
-   // copy.entryNode = result.entryNode
-   // copy.exitNode = result.exitNode
-   
-    // copy.deleteEdge(tempEdge.source, tempEdge.target)
-    //copy.deleteEdge(tempEdge)
+     tempEdge = cCfg.addEdge(e.source, e.target) 
+   }
    
     var deleteFlag = false // indicates if the current node can be deleted for compressing the CFG copy
     
-    val compression = Visitor.build({
-      
+    val compression = Visitor.build({ 
       case j : JumpLocation => true
-      
       case t : CallJump => { 
         // println("call") 
         deleteFlag = false
@@ -76,61 +60,55 @@ object CompressedControlFlowGraph {
         }
     })
     
+    var calleeSig : String = null // indicates the signature (as known in dexdump) of the callee procedure
+     
+    val extractCallee = Visitor.build({
+       case j : JumpLocation => true
+       case t : CallJump => { 
+         calleeSig = t.getValueAnnotation("signature") match {
+           case Some(exp : NameExp) =>
+             exp.name.name
+           case _ => null
+         }
+         false
+       }
+       case _ => 
+         false 
+     })  
+    
     for (i <- 0 until size) {
-      
       val l = locationDecls(i)
-      //if (!l.name.isEmpty) println(l.name.get.uri)
-      
       compression(l)  
-      
-     // println(deleteFlag)
-      
-      val myNode = if (l.name.isEmpty)
-          copy.getNode(None, l.index)
+      var myNode = if (l.name.isEmpty)
+          cCfg.getNode(None, l.index)
         else
-          copy.getNode(Some(l.name.get.uri), l.index)
-      
-        
+          cCfg.getNode(Some(l.name.get.uri), l.index)
       if(deleteFlag){
-        
-        
-        val preds = copy.predecessors(myNode)
-        
-        
-        val succs = copy.successors(myNode)
-       
-        
+        val preds = cCfg.predecessors(myNode)
+        val succs = cCfg.successors(myNode)
+
         for(pred <- preds)
-        {
-          copy.deleteEdge(pred, myNode)    
-        }
+          cCfg.deleteEdge(pred, myNode)    
         
         for(succ <- succs)
-        {
-            copy.deleteEdge(myNode, succ)
-        }
+          cCfg.deleteEdge(myNode, succ)
         
-        for(pred <- preds)
-        {
-          
-          for(succ <- succs)
-          {
-                       
-            if (!copy.hasEdge(pred,succ))
-              copy.addEdge(pred, succ)
-            
+        for(pred <- preds){
+          for(succ <- succs){           
+            if (!cCfg.hasEdge(pred,succ))
+              cCfg.addEdge(pred, succ)
           }
         }
-        
+        cCfg.deleteNode(cCfg.getNode(l))
       }
-        
+      else {
+        extractCallee(l)
+        myNode = cCfg.getNode(l)
+        myNode.propertyMap("calleeSig") = calleeSig
+        calleeSig = null
+      } 
     }
-    
-    
-   // print("copy = " + copy)
-   
-   
-    copy
+    cCfg
   }
 
   private def putBranchOnEdge(trans : Int, branch : Int, e : Edge) = {
@@ -219,8 +197,8 @@ object CompressedControlFlowGraph {
       for (n <- nodes)
         for (m <- successors(n)) {
           for (e <- getEdges(n, m)) {
-            val branch = if (e ? ControlFlowGraph.BRANCH_PROPERTY_KEY)
-              e(ControlFlowGraph.BRANCH_PROPERTY_KEY).toString
+            val branch = if (e ? CompressedControlFlowGraph.BRANCH_PROPERTY_KEY)
+              e(CompressedControlFlowGraph.BRANCH_PROPERTY_KEY).toString
             else ""
             sb.append("%s -> %s %s\n".format(n, m, branch))
           }

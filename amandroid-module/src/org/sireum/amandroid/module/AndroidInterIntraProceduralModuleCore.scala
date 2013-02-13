@@ -6,6 +6,7 @@ import java.lang.String
 import org.sireum.alir.AlirIntraProceduralNode
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
+import org.sireum.amandroid.cache.AndroidCacheFile
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
 import org.sireum.amandroid.scfg.SystemControlFlowGraph
 import org.sireum.pilar.ast.LocationDecl
@@ -13,7 +14,6 @@ import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.pilar.symbol.SymbolTable
 import scala.Function2
 import scala.Option
-import scala.collection.Seq
 import scala.collection.mutable.Map
 
 object AndroidInterIntraProceduralModule extends PipelineModule {
@@ -22,13 +22,12 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
 
   val globalParallelKey = "Global.parallel"
   val globalShouldBuildCCfgKey = "Global.shouldBuildCCfg"
-  val globalLibraryFilePathKey = "Global.libraryFilePath"
   val globalInterResultKey = "Global.interResult"
   val globalAndroidVirtualMethodTablesKey = "Global.androidVirtualMethodTables"
+  val globalAndroidCacheKey = "Global.androidCache"
   val globalIntraResultKey = "Global.intraResult"
   val globalShouldIncludeFlowFunctionKey = "Global.shouldIncludeFlowFunction"
   val globalShouldBuildSCfgKey = "Global.shouldBuildSCfg"
-  val globalLibCoreFrameworkCCfgsKey = "Global.libCoreFrameworkCCfgs"
   val globalSymbolTableKey = "Global.symbolTable"
 
   def compute(job : PipelineJob, info : PipelineJobModuleInfo) : MBuffer[Tag] = {
@@ -48,7 +47,7 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
 
   override def initialize(job : PipelineJob) {
     if(!(job ? AndroidInterIntraProceduralModule.globalShouldIncludeFlowFunctionKey)) {
-      val shouldIncludeFlowFunction = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$9").invoke(null).asInstanceOf[scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]]]
+      val shouldIncludeFlowFunction = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$8").invoke(null).asInstanceOf[scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]]]
       setShouldIncludeFlowFunction(job.properties, shouldIncludeFlowFunction)
     }
   }
@@ -149,6 +148,33 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'androidVirtualMethodTables'")       
     }
+    var _androidCache : scala.Option[AnyRef] = None
+    var _androidCacheKey : scala.Option[String] = None
+
+    val keylistandroidCache = List(AndroidInterIntraProceduralModule.globalAndroidCacheKey)
+    keylistandroidCache.foreach(key => 
+      if(job ? key) { 
+        if(_androidCache.isEmpty) {
+          _androidCache = Some(job(key))
+          _androidCacheKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _androidCache.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'androidCache' keys '" + _androidCacheKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _androidCache match{
+      case Some(x) =>
+        if(!x.isInstanceOf[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'androidCache'.  Expecting 'org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'androidCache'")       
+    }
     var _shouldBuildCCfg : scala.Option[AnyRef] = None
     var _shouldBuildCCfgKey : scala.Option[String] = None
 
@@ -202,60 +228,6 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'shouldBuildSCfg'")       
-    }
-    var _libraryFilePath : scala.Option[AnyRef] = None
-    var _libraryFilePathKey : scala.Option[String] = None
-
-    val keylistlibraryFilePath = List(AndroidInterIntraProceduralModule.globalLibraryFilePathKey)
-    keylistlibraryFilePath.foreach(key => 
-      if(job ? key) { 
-        if(_libraryFilePath.isEmpty) {
-          _libraryFilePath = Some(job(key))
-          _libraryFilePathKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _libraryFilePath.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'libraryFilePath' keys '" + _libraryFilePathKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _libraryFilePath match{
-      case Some(x) =>
-        if(!x.isInstanceOf[scala.Option[java.lang.String]]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'libraryFilePath'.  Expecting 'scala.Option[java.lang.String]' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'libraryFilePath'")       
-    }
-    var _libCoreFrameworkCCfgs : scala.Option[AnyRef] = None
-    var _libCoreFrameworkCCfgsKey : scala.Option[String] = None
-
-    val keylistlibCoreFrameworkCCfgs = List(AndroidInterIntraProceduralModule.globalLibCoreFrameworkCCfgsKey)
-    keylistlibCoreFrameworkCCfgs.foreach(key => 
-      if(job ? key) { 
-        if(_libCoreFrameworkCCfgs.isEmpty) {
-          _libCoreFrameworkCCfgs = Some(job(key))
-          _libCoreFrameworkCCfgsKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _libCoreFrameworkCCfgs.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'libCoreFrameworkCCfgs' keys '" + _libCoreFrameworkCCfgsKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _libCoreFrameworkCCfgs match{
-      case Some(x) =>
-        if(!x.isInstanceOf[scala.Option[scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]]]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'libCoreFrameworkCCfgs'.  Expecting 'scala.Option[scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]]' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'libCoreFrameworkCCfgs'")       
     }
     var _shouldIncludeFlowFunction : scala.Option[AnyRef] = None
     var _shouldIncludeFlowFunctionKey : scala.Option[String] = None
@@ -358,6 +330,21 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
     return options
   }
 
+  def modGetAndroidCache (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String] = {
+    if (options.contains(AndroidInterIntraProceduralModule.globalAndroidCacheKey)) {
+       return options(AndroidInterIntraProceduralModule.globalAndroidCacheKey).asInstanceOf[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setAndroidCache (options : MMap[Property.Key, Any], androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]) : MMap[Property.Key, Any] = {
+
+    options(AndroidInterIntraProceduralModule.globalAndroidCacheKey) = androidCache
+
+    return options
+  }
+
   def modGetShouldBuildCCfg (options : scala.collection.Map[Property.Key, Any]) : scala.Boolean = {
     if (options.contains(AndroidInterIntraProceduralModule.globalShouldBuildCCfgKey)) {
        return options(AndroidInterIntraProceduralModule.globalShouldBuildCCfgKey).asInstanceOf[scala.Boolean]
@@ -384,36 +371,6 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
   def setShouldBuildSCfg (options : MMap[Property.Key, Any], shouldBuildSCfg : scala.Boolean) : MMap[Property.Key, Any] = {
 
     options(AndroidInterIntraProceduralModule.globalShouldBuildSCfgKey) = shouldBuildSCfg
-
-    return options
-  }
-
-  def modGetLibraryFilePath (options : scala.collection.Map[Property.Key, Any]) : scala.Option[java.lang.String] = {
-    if (options.contains(AndroidInterIntraProceduralModule.globalLibraryFilePathKey)) {
-       return options(AndroidInterIntraProceduralModule.globalLibraryFilePathKey).asInstanceOf[scala.Option[java.lang.String]]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setLibraryFilePath (options : MMap[Property.Key, Any], libraryFilePath : scala.Option[java.lang.String]) : MMap[Property.Key, Any] = {
-
-    options(AndroidInterIntraProceduralModule.globalLibraryFilePathKey) = libraryFilePath
-
-    return options
-  }
-
-  def modGetLibCoreFrameworkCCfgs (options : scala.collection.Map[Property.Key, Any]) : scala.Option[scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]] = {
-    if (options.contains(AndroidInterIntraProceduralModule.globalLibCoreFrameworkCCfgsKey)) {
-       return options(AndroidInterIntraProceduralModule.globalLibCoreFrameworkCCfgsKey).asInstanceOf[scala.Option[scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]]]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setLibCoreFrameworkCCfgs (options : MMap[Property.Key, Any], libCoreFrameworkCCfgs : scala.Option[scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]]) : MMap[Property.Key, Any] = {
-
-    options(AndroidInterIntraProceduralModule.globalLibCoreFrameworkCCfgsKey) = libCoreFrameworkCCfgs
 
     return options
   }
@@ -473,13 +430,11 @@ trait AndroidInterIntraProceduralModule {
 
   def androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = AndroidInterIntraProceduralModule.modGetAndroidVirtualMethodTables(job.properties)
 
+  def androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String] = AndroidInterIntraProceduralModule.modGetAndroidCache(job.properties)
+
   def shouldBuildCCfg : scala.Boolean = AndroidInterIntraProceduralModule.modGetShouldBuildCCfg(job.properties)
 
   def shouldBuildSCfg : scala.Boolean = AndroidInterIntraProceduralModule.modGetShouldBuildSCfg(job.properties)
-
-  def libraryFilePath : scala.Option[java.lang.String] = AndroidInterIntraProceduralModule.modGetLibraryFilePath(job.properties)
-
-  def libCoreFrameworkCCfgs : scala.Option[scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]] = AndroidInterIntraProceduralModule.modGetLibCoreFrameworkCCfgs(job.properties)
 
   def shouldIncludeFlowFunction : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]] = AndroidInterIntraProceduralModule.modGetShouldIncludeFlowFunction(job.properties)
 
@@ -494,8 +449,8 @@ object CfgModule extends PipelineModule {
   def title = "Control Flow Graph Builder"
   def origin = classOf[Cfg]
 
-  val globalProcedureSymbolTableKey = "Global.procedureSymbolTable"
   val poolKey = "Cfg.pool"
+  val globalProcedureSymbolTableKey = "Global.procedureSymbolTable"
   val globalPoolKey = "Global.pool"
   val cfgKey = "Cfg.cfg"
   val globalShouldIncludeFlowFunctionKey = "Global.shouldIncludeFlowFunction"
@@ -534,33 +489,6 @@ object CfgModule extends PipelineModule {
 
   def inputDefined (job : PipelineJob) : MBuffer[Tag] = {
     val tags = marrayEmpty[Tag]
-    var _shouldIncludeFlowFunction : scala.Option[AnyRef] = None
-    var _shouldIncludeFlowFunctionKey : scala.Option[String] = None
-
-    val keylistshouldIncludeFlowFunction = List(CfgModule.globalShouldIncludeFlowFunctionKey)
-    keylistshouldIncludeFlowFunction.foreach(key => 
-      if(job ? key) { 
-        if(_shouldIncludeFlowFunction.isEmpty) {
-          _shouldIncludeFlowFunction = Some(job(key))
-          _shouldIncludeFlowFunctionKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _shouldIncludeFlowFunction.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'shouldIncludeFlowFunction' keys '" + _shouldIncludeFlowFunctionKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _shouldIncludeFlowFunction match{
-      case Some(x) =>
-        if(!x.isInstanceOf[scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]]]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'shouldIncludeFlowFunction'.  Expecting 'scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]]' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'shouldIncludeFlowFunction'")       
-    }
     var _procedureSymbolTable : scala.Option[AnyRef] = None
     var _procedureSymbolTableKey : scala.Option[String] = None
 
@@ -587,6 +515,33 @@ object CfgModule extends PipelineModule {
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'procedureSymbolTable'")       
+    }
+    var _shouldIncludeFlowFunction : scala.Option[AnyRef] = None
+    var _shouldIncludeFlowFunctionKey : scala.Option[String] = None
+
+    val keylistshouldIncludeFlowFunction = List(CfgModule.globalShouldIncludeFlowFunctionKey)
+    keylistshouldIncludeFlowFunction.foreach(key => 
+      if(job ? key) { 
+        if(_shouldIncludeFlowFunction.isEmpty) {
+          _shouldIncludeFlowFunction = Some(job(key))
+          _shouldIncludeFlowFunctionKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _shouldIncludeFlowFunction.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'shouldIncludeFlowFunction' keys '" + _shouldIncludeFlowFunctionKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _shouldIncludeFlowFunction match{
+      case Some(x) =>
+        if(!x.isInstanceOf[scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]]]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'shouldIncludeFlowFunction'.  Expecting 'scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]]' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'shouldIncludeFlowFunction'")       
     }
     return tags
   }
@@ -629,17 +584,21 @@ object CfgModule extends PipelineModule {
     return tags
   }
 
-  def modGetShouldIncludeFlowFunction (options : scala.collection.Map[Property.Key, Any]) : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]] = {
-    if (options.contains(CfgModule.globalShouldIncludeFlowFunctionKey)) {
-       return options(CfgModule.globalShouldIncludeFlowFunctionKey).asInstanceOf[scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]]]
+  def getPool (options : scala.collection.Map[Property.Key, Any]) : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode] = {
+    if (options.contains(CfgModule.globalPoolKey)) {
+       return options(CfgModule.globalPoolKey).asInstanceOf[scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]]
+    }
+    if (options.contains(CfgModule.poolKey)) {
+       return options(CfgModule.poolKey).asInstanceOf[scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def setShouldIncludeFlowFunction (options : MMap[Property.Key, Any], shouldIncludeFlowFunction : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]]) : MMap[Property.Key, Any] = {
+  def modSetPool (options : MMap[Property.Key, Any], pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]) : MMap[Property.Key, Any] = {
 
-    options(CfgModule.globalShouldIncludeFlowFunctionKey) = shouldIncludeFlowFunction
+    options(CfgModule.globalPoolKey) = pool
+    options(CfgModule.poolKey) = pool
 
     return options
   }
@@ -659,21 +618,17 @@ object CfgModule extends PipelineModule {
     return options
   }
 
-  def getPool (options : scala.collection.Map[Property.Key, Any]) : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode] = {
-    if (options.contains(CfgModule.globalPoolKey)) {
-       return options(CfgModule.globalPoolKey).asInstanceOf[scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]]
-    }
-    if (options.contains(CfgModule.poolKey)) {
-       return options(CfgModule.poolKey).asInstanceOf[scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]]
+  def modGetShouldIncludeFlowFunction (options : scala.collection.Map[Property.Key, Any]) : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]] = {
+    if (options.contains(CfgModule.globalShouldIncludeFlowFunctionKey)) {
+       return options(CfgModule.globalShouldIncludeFlowFunctionKey).asInstanceOf[scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]]]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def modSetPool (options : MMap[Property.Key, Any], pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]) : MMap[Property.Key, Any] = {
+  def setShouldIncludeFlowFunction (options : MMap[Property.Key, Any], shouldIncludeFlowFunction : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]]) : MMap[Property.Key, Any] = {
 
-    options(CfgModule.globalPoolKey) = pool
-    options(CfgModule.poolKey) = pool
+    options(CfgModule.globalShouldIncludeFlowFunctionKey) = shouldIncludeFlowFunction
 
     return options
   }
@@ -701,12 +656,12 @@ object CfgModule extends PipelineModule {
 trait CfgModule {
   def job : PipelineJob
 
-  def shouldIncludeFlowFunction : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]] = CfgModule.modGetShouldIncludeFlowFunction(job.properties)
+
+  def pool_=(pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]) { CfgModule.modSetPool(job.properties, pool) }
 
   def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = CfgModule.modGetProcedureSymbolTable(job.properties)
 
-
-  def pool_=(pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]) { CfgModule.modSetPool(job.properties, pool) }
+  def shouldIncludeFlowFunction : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]] = CfgModule.modGetShouldIncludeFlowFunction(job.properties)
 
 
   def cfg_=(cfg : org.sireum.alir.ControlFlowGraph[java.lang.String]) { CfgModule.modSetCfg(job.properties, cfg) }
@@ -755,33 +710,6 @@ object cCfgModule extends PipelineModule {
 
   def inputDefined (job : PipelineJob) : MBuffer[Tag] = {
     val tags = marrayEmpty[Tag]
-    var _procedureSymbolTable : scala.Option[AnyRef] = None
-    var _procedureSymbolTableKey : scala.Option[String] = None
-
-    val keylistprocedureSymbolTable = List(cCfgModule.globalProcedureSymbolTableKey)
-    keylistprocedureSymbolTable.foreach(key => 
-      if(job ? key) { 
-        if(_procedureSymbolTable.isEmpty) {
-          _procedureSymbolTable = Some(job(key))
-          _procedureSymbolTableKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _procedureSymbolTable.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'procedureSymbolTable' keys '" + _procedureSymbolTableKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _procedureSymbolTable match{
-      case Some(x) =>
-        if(!x.isInstanceOf[org.sireum.pilar.symbol.ProcedureSymbolTable]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'procedureSymbolTable'.  Expecting 'org.sireum.pilar.symbol.ProcedureSymbolTable' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'procedureSymbolTable'")       
-    }
     var _pool : scala.Option[AnyRef] = None
     var _poolKey : scala.Option[String] = None
 
@@ -808,6 +736,33 @@ object cCfgModule extends PipelineModule {
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'pool'")       
+    }
+    var _procedureSymbolTable : scala.Option[AnyRef] = None
+    var _procedureSymbolTableKey : scala.Option[String] = None
+
+    val keylistprocedureSymbolTable = List(cCfgModule.globalProcedureSymbolTableKey)
+    keylistprocedureSymbolTable.foreach(key => 
+      if(job ? key) { 
+        if(_procedureSymbolTable.isEmpty) {
+          _procedureSymbolTable = Some(job(key))
+          _procedureSymbolTableKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _procedureSymbolTable.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'procedureSymbolTable' keys '" + _procedureSymbolTableKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _procedureSymbolTable match{
+      case Some(x) =>
+        if(!x.isInstanceOf[org.sireum.pilar.symbol.ProcedureSymbolTable]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'procedureSymbolTable'.  Expecting 'org.sireum.pilar.symbol.ProcedureSymbolTable' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'procedureSymbolTable'")       
     }
     var _cfg : scala.Option[AnyRef] = None
     var _cfgKey : scala.Option[String] = None
@@ -860,21 +815,6 @@ object cCfgModule extends PipelineModule {
     return tags
   }
 
-  def modGetProcedureSymbolTable (options : scala.collection.Map[Property.Key, Any]) : org.sireum.pilar.symbol.ProcedureSymbolTable = {
-    if (options.contains(cCfgModule.globalProcedureSymbolTableKey)) {
-       return options(cCfgModule.globalProcedureSymbolTableKey).asInstanceOf[org.sireum.pilar.symbol.ProcedureSymbolTable]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setProcedureSymbolTable (options : MMap[Property.Key, Any], procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable) : MMap[Property.Key, Any] = {
-
-    options(cCfgModule.globalProcedureSymbolTableKey) = procedureSymbolTable
-
-    return options
-  }
-
   def modGetPool (options : scala.collection.Map[Property.Key, Any]) : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode] = {
     if (options.contains(cCfgModule.globalPoolKey)) {
        return options(cCfgModule.globalPoolKey).asInstanceOf[scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]]
@@ -890,6 +830,21 @@ object cCfgModule extends PipelineModule {
 
     options(cCfgModule.globalPoolKey) = pool
     options(CfgModule.poolKey) = pool
+
+    return options
+  }
+
+  def modGetProcedureSymbolTable (options : scala.collection.Map[Property.Key, Any]) : org.sireum.pilar.symbol.ProcedureSymbolTable = {
+    if (options.contains(cCfgModule.globalProcedureSymbolTableKey)) {
+       return options(cCfgModule.globalProcedureSymbolTableKey).asInstanceOf[org.sireum.pilar.symbol.ProcedureSymbolTable]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setProcedureSymbolTable (options : MMap[Property.Key, Any], procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable) : MMap[Property.Key, Any] = {
+
+    options(cCfgModule.globalProcedureSymbolTableKey) = procedureSymbolTable
 
     return options
   }
@@ -936,9 +891,9 @@ object cCfgModule extends PipelineModule {
 trait cCfgModule {
   def job : PipelineJob
 
-  def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = cCfgModule.modGetProcedureSymbolTable(job.properties)
-
   def pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode] = cCfgModule.modGetPool(job.properties)
+
+  def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = cCfgModule.modGetProcedureSymbolTable(job.properties)
 
   def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = cCfgModule.modGetCfg(job.properties)
 
@@ -950,11 +905,9 @@ object sCfgModule extends PipelineModule {
   def title = "System Control Flow Graph Builder"
   def origin = classOf[sCfg]
 
-  val globalLibraryFilePathKey = "Global.libraryFilePath"
   val globalAndroidVirtualMethodTablesKey = "Global.androidVirtualMethodTables"
-  val globalProcedureSymbolTablesKey = "Global.procedureSymbolTables"
+  val globalAndroidCacheKey = "Global.androidCache"
   val globalSCfgKey = "Global.sCfg"
-  val globalLibCoreFrameworkCCfgsKey = "Global.libCoreFrameworkCCfgs"
   val sCfgKey = "sCfg.sCfg"
   val globalCCfgsKey = "Global.cCfgs"
 
@@ -1018,59 +971,32 @@ object sCfgModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'androidVirtualMethodTables'")       
     }
-    var _libraryFilePath : scala.Option[AnyRef] = None
-    var _libraryFilePathKey : scala.Option[String] = None
+    var _androidCache : scala.Option[AnyRef] = None
+    var _androidCacheKey : scala.Option[String] = None
 
-    val keylistlibraryFilePath = List(sCfgModule.globalLibraryFilePathKey)
-    keylistlibraryFilePath.foreach(key => 
+    val keylistandroidCache = List(sCfgModule.globalAndroidCacheKey)
+    keylistandroidCache.foreach(key => 
       if(job ? key) { 
-        if(_libraryFilePath.isEmpty) {
-          _libraryFilePath = Some(job(key))
-          _libraryFilePathKey = Some(key)
+        if(_androidCache.isEmpty) {
+          _androidCache = Some(job(key))
+          _androidCacheKey = Some(key)
         }
-        if(!(job(key).asInstanceOf[AnyRef] eq _libraryFilePath.get)) {
+        if(!(job(key).asInstanceOf[AnyRef] eq _androidCache.get)) {
           tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'libraryFilePath' keys '" + _libraryFilePathKey.get + " and '" + key + "' point to different objects.")
+            "Input error for '" + this.title + "': 'androidCache' keys '" + _androidCacheKey.get + " and '" + key + "' point to different objects.")
         }
       }
     )
 
-    _libraryFilePath match{
+    _androidCache match{
       case Some(x) =>
-        if(!x.isInstanceOf[java.lang.String]){
+        if(!x.isInstanceOf[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]){
           tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'libraryFilePath'.  Expecting 'java.lang.String' but found '" + x.getClass.toString + "'")
+            "Input error for '" + this.title + "': Wrong type found for 'androidCache'.  Expecting 'org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]' but found '" + x.getClass.toString + "'")
         }
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'libraryFilePath'")       
-    }
-    var _libCoreFrameworkCCfgs : scala.Option[AnyRef] = None
-    var _libCoreFrameworkCCfgsKey : scala.Option[String] = None
-
-    val keylistlibCoreFrameworkCCfgs = List(sCfgModule.globalLibCoreFrameworkCCfgsKey)
-    keylistlibCoreFrameworkCCfgs.foreach(key => 
-      if(job ? key) { 
-        if(_libCoreFrameworkCCfgs.isEmpty) {
-          _libCoreFrameworkCCfgs = Some(job(key))
-          _libCoreFrameworkCCfgsKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _libCoreFrameworkCCfgs.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'libCoreFrameworkCCfgs' keys '" + _libCoreFrameworkCCfgsKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _libCoreFrameworkCCfgs match{
-      case Some(x) =>
-        if(!x.isInstanceOf[scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'libCoreFrameworkCCfgs'.  Expecting 'scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'libCoreFrameworkCCfgs'")       
+          "Input error for '" + this.title + "': No value found for 'androidCache'")       
     }
     var _cCfgs : scala.Option[AnyRef] = None
     var _cCfgsKey : scala.Option[String] = None
@@ -1098,33 +1024,6 @@ object sCfgModule extends PipelineModule {
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'cCfgs'")       
-    }
-    var _procedureSymbolTables : scala.Option[AnyRef] = None
-    var _procedureSymbolTablesKey : scala.Option[String] = None
-
-    val keylistprocedureSymbolTables = List(sCfgModule.globalProcedureSymbolTablesKey)
-    keylistprocedureSymbolTables.foreach(key => 
-      if(job ? key) { 
-        if(_procedureSymbolTables.isEmpty) {
-          _procedureSymbolTables = Some(job(key))
-          _procedureSymbolTablesKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _procedureSymbolTables.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'procedureSymbolTables' keys '" + _procedureSymbolTablesKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _procedureSymbolTables match{
-      case Some(x) =>
-        if(!x.isInstanceOf[scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable]]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'procedureSymbolTables'.  Expecting 'scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable]' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'procedureSymbolTables'")       
     }
     return tags
   }
@@ -1165,32 +1064,17 @@ object sCfgModule extends PipelineModule {
     return options
   }
 
-  def modGetLibraryFilePath (options : scala.collection.Map[Property.Key, Any]) : java.lang.String = {
-    if (options.contains(sCfgModule.globalLibraryFilePathKey)) {
-       return options(sCfgModule.globalLibraryFilePathKey).asInstanceOf[java.lang.String]
+  def modGetAndroidCache (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String] = {
+    if (options.contains(sCfgModule.globalAndroidCacheKey)) {
+       return options(sCfgModule.globalAndroidCacheKey).asInstanceOf[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def setLibraryFilePath (options : MMap[Property.Key, Any], libraryFilePath : java.lang.String) : MMap[Property.Key, Any] = {
+  def setAndroidCache (options : MMap[Property.Key, Any], androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]) : MMap[Property.Key, Any] = {
 
-    options(sCfgModule.globalLibraryFilePathKey) = libraryFilePath
-
-    return options
-  }
-
-  def modGetLibCoreFrameworkCCfgs (options : scala.collection.Map[Property.Key, Any]) : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = {
-    if (options.contains(sCfgModule.globalLibCoreFrameworkCCfgsKey)) {
-       return options(sCfgModule.globalLibCoreFrameworkCCfgsKey).asInstanceOf[scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setLibCoreFrameworkCCfgs (options : MMap[Property.Key, Any], libCoreFrameworkCCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]) : MMap[Property.Key, Any] = {
-
-    options(sCfgModule.globalLibCoreFrameworkCCfgsKey) = libCoreFrameworkCCfgs
+    options(sCfgModule.globalAndroidCacheKey) = androidCache
 
     return options
   }
@@ -1228,21 +1112,6 @@ object sCfgModule extends PipelineModule {
 
     return options
   }
-
-  def modGetProcedureSymbolTables (options : scala.collection.Map[Property.Key, Any]) : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = {
-    if (options.contains(sCfgModule.globalProcedureSymbolTablesKey)) {
-       return options(sCfgModule.globalProcedureSymbolTablesKey).asInstanceOf[scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable]]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setProcedureSymbolTables (options : MMap[Property.Key, Any], procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable]) : MMap[Property.Key, Any] = {
-
-    options(sCfgModule.globalProcedureSymbolTablesKey) = procedureSymbolTables
-
-    return options
-  }
 }
 
 trait sCfgModule {
@@ -1250,14 +1119,10 @@ trait sCfgModule {
 
   def androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = sCfgModule.modGetAndroidVirtualMethodTables(job.properties)
 
-  def libraryFilePath : java.lang.String = sCfgModule.modGetLibraryFilePath(job.properties)
-
-  def libCoreFrameworkCCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = sCfgModule.modGetLibCoreFrameworkCCfgs(job.properties)
+  def androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String] = sCfgModule.modGetAndroidCache(job.properties)
 
   def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = sCfgModule.modGetCCfgs(job.properties)
 
 
   def sCfg_=(sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]) { sCfgModule.modSetSCfg(job.properties, sCfg) }
-
-  def procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = sCfgModule.modGetProcedureSymbolTables(job.properties)
 }

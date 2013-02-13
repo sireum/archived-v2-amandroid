@@ -13,6 +13,7 @@ import org.sireum.pilar.symbol.SymbolTable
 import org.sireum.amandroid.scfg.{CompressedControlFlowGraph, SystemControlFlowGraph}
 import org.sireum.pilar.ast.{LocationDecl, CatchClause}
 import org.sireum.pilar.symbol.ProcedureSymbolTable
+import org.sireum.amandroid.cache.AndroidCacheFile
 
 
 /*
@@ -55,16 +56,13 @@ case class AndroidInterIntraProcedural(
   androidVirtualMethodTables : AndroidVirtualMethodTables,
   
   @Input
+  androidCache : AndroidCacheFile[ResourceUri],
+  
+  @Input
   shouldBuildCCfg : Boolean,
   
   @Input
   shouldBuildSCfg : Boolean,
-  
-  @Input
-  libraryFilePath : Option[String],
-  
-  @Input
-  libCoreFrameworkCCfgs : Option[MMap[ResourceUri, AndroidInterIntraProcedural.CCFG]],
   
   @Input 
   shouldIncludeFlowFunction : AndroidInterIntraProcedural.ShouldIncludeFlowFunction =
@@ -116,15 +114,9 @@ case class cCfg(
   
 case class sCfg(
   title : String = "System Control Flow Graph Builder",
-    
+
   @Input
-  libraryFilePath : String,
-  
-  @Input
-  libCoreFrameworkCCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
-  
-  @Input
-  procedureSymbolTables : Seq[ProcedureSymbolTable],
+  androidCache : AndroidCacheFile[ResourceUri],
   
   @Input 
   cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],

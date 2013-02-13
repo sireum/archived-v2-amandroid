@@ -13,7 +13,8 @@ trait AlirIntraProceduralGraphExtra
     extends AlirIntraProceduralGraph[Node, VirtualLabel] {
   self =>
 
-  
+  def deleteNode(n : Node) = graph.removeVertex(n)
+    
   def deleteEdge(source : Node, target : Node) : Edge =
     graph.removeEdge(getNode(source), getNode(target))
 

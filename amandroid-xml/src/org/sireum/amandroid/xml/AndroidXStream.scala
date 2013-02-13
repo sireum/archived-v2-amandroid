@@ -34,14 +34,16 @@ object AndroidXStream {
     
     r.useAttributeFor(classOf[Class[_]])
 
-//    r.registerConverter(new SymbolTableConverter())
+//    r.registerConverter
 
     r
   }
 
-  def toXml(o : Any, w : Writer) = xstream.toXML(o, w)
+  def toXml(o : Any) = xstream.toXML(o)
+  def toXml(o : Any, w : OutputStream) = xstream.toXML(o, w)
 
   def fromXml(o : File) = xstream.fromXML(o)
+  def fromXml(o : InputStream) = xstream.fromXML(o)
 
   private def javafy(o : Any) = Converter.javafy(o)(idmapEmpty)
   private def scalafy(o : Object) = Converter.scalafy(o)(idmapEmpty)

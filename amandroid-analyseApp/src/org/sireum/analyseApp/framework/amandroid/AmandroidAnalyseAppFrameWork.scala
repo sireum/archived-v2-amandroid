@@ -17,6 +17,7 @@ import org.sireum.amandroid.xml.AndroidXStream
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
 import org.sireum.alir.AlirIntraProceduralGraph
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
+import org.sireum.amandroid.cache.AndroidCacheFile
 
 // sankar introduces the following framework which adds one stage on top of AmandroidParserTestFrameWork 
 
@@ -29,14 +30,12 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
   def Analyzing : this.type = this
 
   def title(s : String) : this.type = {
-    _title = "Case " + casePrefix + ": " + s
-    casePrefix = ""
+    _title = caseString + s
     this
   }
 
-  def file(fileUri : FileResourceUri,
-        libCoreFrameworkCCfgs : MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]]) =
-    AmandroidConfiguration(title, fileUri, libCoreFrameworkCCfgs)
+  def file(fileUri : FileResourceUri) =
+    AmandroidConfiguration(title, fileUri)
 
   //////////////////////////////////////////////////////////////////////////////
   // Public Case Classes
@@ -45,8 +44,7 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
   type VirtualLabel = String
     
   case class AmandroidConfiguration //
-  (title : String, srcs : FileResourceUri,
-   libCoreFrameworkCCfgs : MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]]) {
+  (title : String, srcs : FileResourceUri) {
 
     ////////////////////////////////////////////////////////////////////////////
     // Test Constructor
@@ -91,7 +89,7 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
         val xStream = AndroidXStream
         xStream.xstream.alias("AndroidVirtualMethodTables", classOf[AndroidVirtualMethodTables])
         
-        val libVmTablesFile = new File(d + "../../../../../../../amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/result/libVmTables.xml")
+        val libVmTablesFile = new File(d + "../../../../../../../amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/libVmTables/libVmTables.xml")
         var libVmTables : AndroidVirtualMethodTables = null
         if(libVmTablesFile.exists()){
           libVmTables = xStream.fromXml(libVmTablesFile).asInstanceOf[AndroidVirtualMethodTables]
@@ -107,10 +105,20 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
         PilarAndroidSymbolResolverModule.setHasExistingSymbolTable(options, None)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, Option(libVmTables))
         
-        val libraryFilePath = d + "../../../../../../../amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/"
+        val libraryFilePath = d + "../../../../../../../amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/ccfgs/"
+        val aCache = new AndroidCacheFile[ResourceUri]
+        val serializer : (Any, OutputStream) --> Unit = {
+          case (v, o) =>
+            xStream.toXml(v, o)
+        }
+        val unSerializer : InputStream --> Any = {
+          case o =>
+            xStream.fromXml(o)
+        }
+        aCache.setRootDirectory(libraryFilePath)
+        aCache.setValueSerializer(serializer, unSerializer)
         AndroidInterIntraProceduralModule.setParallel(options, false)
-        AndroidInterIntraProceduralModule.setLibCoreFrameworkCCfgs(options, Some(libCoreFrameworkCCfgs))
-        AndroidInterIntraProceduralModule.setLibraryFilePath(options, Some(libraryFilePath))
+        AndroidInterIntraProceduralModule.setAndroidCache(options, aCache)
         AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, true)
         pipeline.compute(job)
@@ -126,15 +134,18 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
         //3. get each file
         //4. run command
         
-        //1. get cfg
-        val cfgFile = new File(d + dirName + "/graphs/cfg.dot")
-        val outer1 = new FileOutputStream(cfgFile)
-        val w1 = new OutputStreamWriter(outer1, "GBK")
-        
-        
-        w1.flush()
-        val str1 = Array("dot", "-Tps2", d + dirName + "/graphs/cfg.dot", "-o", d + dirName + "/graphs/cfg.ps")
-        val proc1 = Runtime.getRuntime().exec(str1) 
+        //1. get sCfg
+//        val sCfgFile = new File(d + dirName + "/graphs/sCfg.dot")
+//        val outer = new FileOutputStream(sCfgFile)
+//        val w = new OutputStreamWriter(outer, "GBK")
+//        val sCfg = AndroidInterIntraProceduralModule.getInterResult(options) match {
+//          case Some(s) => s
+//          case None => null
+//        }
+//        sCfg.toDot(w)
+//        w.flush()
+//        val str = Array("dot", "-Tps2", d + dirName + "/graphs/sCfg.dot", "-o", d + dirName + "/graphs/sCfg.ps")
+//        val proc = Runtime.getRuntime().exec(str) 
         println("###############################################")
     }
   }

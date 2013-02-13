@@ -26,6 +26,8 @@ import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTableData
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidCompressedSymbolTable
 import org.sireum.amandroid.module.AndroidInterIntraProcedural
 import org.sireum.amandroid.module.AndroidInterIntraProceduralModule
+import org.sireum.amandroid.scfg.CompressedControlFlowGraph
+import org.sireum.amandroid.cache.AndroidCacheFile
 
 trait AmandroidAnalyseLibraryFrameWork extends TestFramework { 
   
@@ -36,8 +38,7 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
   def Analyzing : this.type = this
 
   def title(s : String) : this.type = {
-    _title = "Case " + casePrefix + ": " + s
-    casePrefix = ""
+    _title = caseString + s
     this
   }
 
@@ -68,11 +69,15 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
 //        val dirc = new File(d + dirName)
         val srcFiles = mlistEmpty[FileResourceUri]
         val resDir = new File(d+"result")
+        val ccfgDir = new File(d+"result/ccfgs")
 //        if(!dirc.exists()){
 //          dirc.mkdir()
 //        }
         if(!resDir.exists()){
           resDir.mkdir()
+        }
+        if(!ccfgDir.exists()){
+          ccfgDir.mkdir()
         }
         //deal with jar file
 //        val apkName = f.getName()
@@ -98,8 +103,7 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         srcFiles += FileUtil.toUri(d + dirName + "/" + dirName + ".dex")
         
 //        val stFile = new File(resDir + "/" + dirName + "SymbolTable.xml")
-//        val avmtFile = new File(resDir + "/" + dirName + "VirtualMethodTables.xml")
-        val graphFile = new File(resDir + "/" + dirName + "CCfgs.xml")
+        val avmtFile = new File(resDir + "/" + dirName + "VirtualMethodTables.xml")
         
         val xStream = AndroidXStream
         xStream.xstream.alias("SymbolTable", classOf[SymbolTable])
@@ -115,9 +119,15 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         PilarAndroidSymbolResolverModule.setHasExistingSymbolTable(options, None)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, None)
         
+        val aCache = new AndroidCacheFile[ResourceUri]
+        val serializer : (Any, OutputStream) --> Unit = {
+          case (v, o) =>
+            xStream.toXml(v, o)
+        }
+        aCache.setRootDirectory(ccfgDir + "/")
+        aCache.setValueSerializer(serializer, null)
         AndroidInterIntraProceduralModule.setParallel(options, false)
-        AndroidInterIntraProceduralModule.setLibraryFilePath(options, None)
-        AndroidInterIntraProceduralModule.setLibCoreFrameworkCCfgs(options, None)
+        AndroidInterIntraProceduralModule.setAndroidCache(options, aCache)
         AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, false)
         pipeline.compute(job)
@@ -127,111 +137,22 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
           job.tags.foreach(f => println(f))
           job.lastStageInfo.tags.foreach(f => println(f))
         }
-
-        val st = PilarAndroidSymbolResolverModule.getSymbolTable(options)
-//        val outerST = new FileOutputStream(stFile)
-//        val wST = new OutputStreamWriter(outerST, "GBK")
-        
         
         println("pipeline done!")
+          
+        val outerAVMT = new FileOutputStream(avmtFile)
+        val avmt = PilarAndroidSymbolResolverModule.getAndroidVirtualMethodTables(options)
+        println("start convert AVMT to xml!")
+        xStream.toXml(avmt, outerAVMT)
         
-        val rfmFile = new File(resDir + "/recordFileMap.xml")
-        val pfmFile = new File(resDir + "/procedureFileMap.xml")
-        
-        // recordFileMap is a map from record name r to file name f
-        // where f.table stores compressedSymbolTable f.vmtable stores vmtables
-        // of r.
-        val recordFileMap : MMap[ResourceUri, FileResourceUri] = mmapEmpty
-        val procedureFileMap : MMap[ResourceUri, FileResourceUri] = mmapEmpty
-        if(rfmFile.exists()){
-           recordFileMap ++= xStream.fromXml(rfmFile).asInstanceOf[MMap[ResourceUri, FileResourceUri]]
-        }
-        if(pfmFile.exists()){
-           procedureFileMap ++= xStream.fromXml(pfmFile).asInstanceOf[MMap[ResourceUri, FileResourceUri]]
-        }
-        
-        st.asInstanceOf[AndroidSymbolTableProducer].tables.recordTable.keys.foreach(
-          recordUri =>
-            recordFileMap(recordUri) = resDir + "/" +f.getName().substring(0, f.getName().length()-6)
-        )
-        st.asInstanceOf[AndroidSymbolTableProducer].tables.procedureAbsTable.keys.foreach(
-          procedureUri =>
-            procedureFileMap(procedureUri) = resDir + "/" +f.getName().substring(0, f.getName().length()-6)
-        )
-        
-        
-        val outerRfm = new FileOutputStream(rfmFile)
-        val wRfm = new OutputStreamWriter(outerRfm, "GBK")
-        
-        xStream.toXml(recordFileMap, wRfm)
-        
-        val outerPfm = new FileOutputStream(pfmFile)
-        val wPfm = new OutputStreamWriter(outerPfm, "GBK")
-        
-        xStream.toXml(procedureFileMap, wPfm)
-        
-//        st.asInstanceOf[AndroidSymbolTableProducer].tables.procedureAbsTable.foreach(
-//          item =>
-//            {
-//              
-//              val pst = st.asInstanceOf[AndroidSymbolTableProducer].procedureSymbolTableProducer(item._1)
-//              val locations = pst.asInstanceOf[ProcedureSymbolTable].locations.toSeq
-//              
-//              var deleteFlag = false 
-//              val compression = Visitor.build({
-//                
-//                case j : JumpLocation => true
-//                
-//                case t : CallJump => { 
-//                  deleteFlag = false
-//                  false
-//                  }
-//                
-//                case _ => {
-//                  deleteFlag = true
-//                  false
-//                  }
-//              })
-//              
-//              for(i <- 0 until locations.size){
-//                val l = locations(i)
-//                compression(l)
-//                if(deleteFlag){
-//                  pst.tables.bodyTables match {
-//                    case Some(bt) => bt.locationTable(l.name match {
-//                      case Some(name) => name.name
-//                      case _ => null
-//                    }) = null
-//                    case _        => 
-//                  }
-//                }
-//                deleteFlag = false
-//              }
-//              st.asInstanceOf[AndroidSymbolTableProducer].tables.procedureAbsTable(item._1) = item._2.withoutBody
-//            }
-//        )
-//        val cST : AndroidCompressedSymbolTable = new AndroidCompressedSymbolTable()
-//        cST.stData = st.asInstanceOf[AndroidSymbolTableProducer].tables
-//        st.asInstanceOf[AndroidSymbolTableProducer].tables.procedureAbsTable.foreach(
-//          item =>
-//            {
-//              cST.pstsData(item._1) = st.asInstanceOf[AndroidSymbolTableProducer].procedureSymbolTableProducer(item._1).tables
-//            })
-        
-//        println("start convert ST to xml!")
-//        xStream.toXml(cST, wST)
-        
-//        val outerAVMT = new FileOutputStream(avmtFile)
-//        val wAVMT = new OutputStreamWriter(outerAVMT, "GBK")
-//        val avmt = PilarAndroidSymbolResolverModule.getAndroidVirtualMethodTables(options)
-//        println("start convert AVMT to xml!")
-//        xStream.toXml(avmt, wAVMT)
-        
-        val outerGraph = new FileOutputStream(graphFile)
-        val wGraph = new OutputStreamWriter(outerGraph, "GBK")
-        val cCfgs = AndroidInterIntraProceduralModule.getIntraResult(options)
         println("start convert graph to xml!")
-        xStream.xstream.toXML(cCfgs, wGraph)
+        val cCfgs = AndroidInterIntraProceduralModule.getIntraResult(options)
+        cCfgs.foreach(
+          item =>
+          {
+            aCache.save[CompressedControlFlowGraph[String]](item._1, item._2)
+          }  
+        )
         
         println("###############################################")
     }

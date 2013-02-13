@@ -7,7 +7,10 @@ import org.sireum.analyseLibrary.framework.amandroid.AmandroidAnalyseLibraryFram
 import org.sireum.androidLibraryFile.amandroid.AmandroidAndroidLibraryFiles
 import org.sireum.androidLibraryFile.amandroid.AmandroidAndroidLibraryPilarFiles
 
-
+/*
+ * Fengguo Wei, Kansas State University. Implement this library analyse framework.
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>                           
+*/
 @RunWith(classOf[JUnitRunner])
 class AmandroidAnalyseLibrary extends AmandroidAnalyseLibraryFrameWork{
 //  AmandroidAndroidLibraryFiles.dexModelFiles.

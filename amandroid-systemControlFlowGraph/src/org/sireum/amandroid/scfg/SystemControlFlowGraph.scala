@@ -8,22 +8,25 @@ import org.sireum.pilar.ast._
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
 import java.io.File
 import org.sireum.amandroid.xml.AndroidXStream
+import org.sireum.amandroid.cache.AndroidCacheFile
 
 
 trait SystemControlFlowGraph[VirtualLabel] extends CompressedControlFlowGraph[VirtualLabel] {
-
+  
+  def procedureUriList : MList[ResourceUri]  //this contains those pUris whose cCfg is not yet completed in the sCfg
+  
    def addNode(procUri : ResourceUri, locUri : ResourceUri, locIndex : Int) : SystemControlFlowGraph.Node = {
-    val extdLocUri =     procUri + "." + locUri                    
-    val node = newNode(Option(extdLocUri), locIndex).asInstanceOf[SystemControlFlowGraph.Node]
-    val n =
+     val extdLocUri = procUri + "." + locUri                    
+     val node = newNode(Option(extdLocUri), locIndex).asInstanceOf[SystemControlFlowGraph.Node]
+     val n =
       if (pool.contains(node)) pool(node)
       else {
         pool(node) = node
         node
       }
-    graph.addVertex(n)
-    n
-  }
+     graph.addVertex(n)
+     n
+   }
 
    
    def getNode(procUri : ResourceUri, locUri : ResourceUri, locIndex : Int) : SystemControlFlowGraph.Node =
@@ -41,200 +44,127 @@ object SystemControlFlowGraph {
   type ShouldIncludeFlowFunction = (LocationDecl, Iterable[CatchClause]) => (Iterable[CatchClause], Boolean)
   // val defaultSiff : ShouldIncludeFlowFunction = { (_, _) => (Array.empty[CatchClause], false) }
 
-  def apply[VirtualLabel] = build[VirtualLabel] _
+  def apply[VirtualLabel]
+  (vmTables : AndroidVirtualMethodTables,
+   cCfgs: MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]],
+   aCache : AndroidCacheFile[ResourceUri]
+  ) = build[VirtualLabel](vmTables, cCfgs, aCache)
   
   /*********** notes for future optimization of build below /
-   * 
-   * 1. Maybe we can cut the pool from parameter cCfgsPlusPool
-   * 2. Currently we load core, framework1, framework2 cCfgs xml in memory which 
-   * takes 3GB. Can we make it better?
-   * Note that the cCfgs xml of the other part of library are selectively loaded
-   * only if they are used in the current app calls (lib API).
    * 
    * 3. In future we can load all library xml in the memory of a powerful machine.
    * 
    */
   
-  def build[VirtualLabel] //
-  (psts : Seq[ProcedureSymbolTable],
-   vmTables : AndroidVirtualMethodTables,
-   cCfgsPlusPool: MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]],
-   libraryFilePath : String,
-   libCoreFrameworkCCfgs : MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]]
-//   shouldIncludeFlow : ShouldIncludeFlowFunction = defaultSiff
-   )  
-   : SystemControlFlowGraph[VirtualLabel] = {  
-     val tPool: AlirIntraProceduralGraph.NodePool = mmapEmpty  // will represent total pool
-     val sCfg = new systemCfg[VirtualLabel](tPool)     
-   // build step 0: construct a map of type [procedureUri, procedureSysmbolTable] from the input psts Seq
-     val pstMap = mmapEmpty[ResourceUri, ProcedureSymbolTable]    
-     psts.foreach{
-       item => 
-       var pUri = item.procedureUri
-       pstMap(pUri) = item
-     }
-     
-    //below we def collection-ccfg-to-base-graph which is an inner function
-    def collectionCCfgToBaseGraph(pUri : ResourceUri, cCfg : CompressedControlFlowGraph[VirtualLabel]) = {
-      for (n <- cCfg.nodes) 
+  val xStream = AndroidXStream
+  
+  def addInterCCfgEdges[VirtualLabel](pUri : ResourceUri,
+                                      vmTables : AndroidVirtualMethodTables,
+                                      cCfg : CompressedControlFlowGraph[VirtualLabel],
+                                      cCfgs: MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]],
+                                      sCfg : SystemControlFlowGraph[VirtualLabel],
+                                      aCache : AndroidCacheFile[ResourceUri]
+                                      ) = {
+    cCfg.nodes.foreach(
+      node =>
       {
-        if(n.isInstanceOf[AlirVirtualNode[VirtualLabel]])
-          sCfg.addVirtualNode((pUri + "." + n.toString()).asInstanceOf[VirtualLabel]) 
-        else if(n.isInstanceOf[AlirLocationUriNode])
-          sCfg.addNode(pUri, n.asInstanceOf[AlirLocationUriNode].toString(), n.asInstanceOf[AlirLocationUriNode].locIndex)
-        // do we need to add another node type case here , i.e. AlirLocationIndexNode ????
+        node match 
+        {
+          case n : AlirLocationNode =>
+            val calleeSig = n.getProperty[String]("calleeSig")
+            if(calleeSig != null){  // so, the current locDecl is actually a caller node
+              val calleeOptions = vmTables.getCalleeOptionsBySignature(calleeSig)             
+              // getting caller node
+              var callerNode : Node = null  
+              if(n.isInstanceOf[AlirLocationUriNode])
+                 callerNode = sCfg.getNode(pUri, n.asInstanceOf[AlirLocationUriNode].toString(), n.asInstanceOf[AlirLocationUriNode].locIndex)
+                 
+              if(calleeOptions != null) {                    
+                import scala.collection.JavaConversions._  // we need this for the next for loop 
+                for (callee <- calleeOptions)
+                {                      
+                  // some of the callees may be inside this sCfg, some of them may be outside
+                  if(!sCfg.procedureUriList.contains(callee) && !cCfgs.contains(callee)){
+                    //i.e outside callee case starts
+                    sCfg.procedureUriList += callee
+                    println(callee)
+                    val calleeCCfg = aCache.load[CompressedControlFlowGraph[VirtualLabel]](callee)
+                    cCfgs(callee) = calleeCCfg
+                    collectionCCfgToBaseGraph[VirtualLabel](callee, calleeCCfg, sCfg.asInstanceOf[systemCfg[VirtualLabel]])
+                  }
+                  // outside app case extra work (collecting calleeCCfg) is done above
+                  // below is common work (i.e. merging with calleeCCfg) for outside app and inside app
+                  val calleeFuncStartNode = sCfg.getVirtualNode((callee + "." + "Entry").asInstanceOf[VirtualLabel])
+                  
+                  if(callerNode != null && calleeFuncStartNode != null)   
+                     sCfg.asInstanceOf[systemCfg[VirtualLabel]].addEdge(callerNode, calleeFuncStartNode) // this is adding an inter-cCfg edge in the sCfg
+                  else
+                     println("error:  not ok")
+                    
+                  val calleeFuncExitNode = sCfg.getVirtualNode((callee + "." + "Exit").asInstanceOf[VirtualLabel])
+                  val origSuccs = cCfg.successors(n) // these are the successors of original Caller in the cCfg
+                  var callerNodeSuccessor : Node = null
+                  
+                  origSuccs.foreach(   
+                      origCallerSuccessor =>
+                      {        
+                        if(origCallerSuccessor.isInstanceOf[AlirLocationUriNode])
+                          callerNodeSuccessor = sCfg.getNode(pUri, origCallerSuccessor.asInstanceOf[AlirLocationUriNode].toString(), origCallerSuccessor.asInstanceOf[AlirLocationUriNode].locIndex)
+                        else if(origCallerSuccessor.isInstanceOf[AlirVirtualNode[VirtualLabel]])
+                          callerNodeSuccessor = sCfg.getVirtualNode((pUri + "." + origCallerSuccessor.toString()).asInstanceOf[VirtualLabel])
+                        else
+                           println("errrorr: not ok")
+                           
+                        if(callerNodeSuccessor != null && calleeFuncExitNode != null){
+                           sCfg.asInstanceOf[systemCfg[VirtualLabel]].addEdge(calleeFuncExitNode, callerNodeSuccessor) // this is adding an inter-cCfg edge in the sCfg
+                           sCfg.deleteEdge(callerNode, callerNodeSuccessor)
+                           callerNodeSuccessor = null
+                        }
+                        else
+                           println("errror:  not ok \n when calleeFuncExitNode = " + calleeFuncExitNode + " \n and callerNodeSuccessor = " +  callerNodeSuccessor + " \n and callerNode = "+ callerNode)
+                      }
+                   )
+                }
+             }
+             // caller node was got
+          }
+          case x : AlirVirtualNode[VirtualLabel] => // do nothing; println(x.label) 
+       }
       }
-      var tempEdge : Edge = null
-      for (e <- cCfg.edges) {
-       var tempNode = e.source
-       var sNode : Node = null
-       if(tempNode.isInstanceOf[AlirVirtualNode[VirtualLabel]])
-         sNode = sCfg.getVirtualNode((pUri + "." + tempNode.toString()).asInstanceOf[VirtualLabel])
-       if(tempNode.isInstanceOf[AlirLocationUriNode])
-         sNode = sCfg.getNode(pUri, tempNode.asInstanceOf[AlirLocationUriNode].toString(), tempNode.asInstanceOf[AlirLocationUriNode].locIndex)
-       tempNode = e.target          
-       var tNode : Node = null
-       if(tempNode.isInstanceOf[AlirVirtualNode[VirtualLabel]])
-         tNode = sCfg.getVirtualNode((pUri + "." + tempNode.toString()).asInstanceOf[VirtualLabel])
-             
-       if(tempNode.isInstanceOf[AlirLocationUriNode])
-         tNode = sCfg.getNode(pUri, tempNode.asInstanceOf[AlirLocationUriNode].toString(), tempNode.asInstanceOf[AlirLocationUriNode].locIndex)  
-       tempEdge = sCfg.addEdge(sNode, tNode) 
-      }
-    }
-
+    )
+  }
+  
+  def build[VirtualLabel] //
+  (vmTables : AndroidVirtualMethodTables,
+   cCfgs: MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]],
+   aCache : AndroidCacheFile[ResourceUri]
+  )  
+  : SystemControlFlowGraph[VirtualLabel] = {  
+    val tPool: AlirIntraProceduralGraph.NodePool = mmapEmpty  // will represent total pool
+    val sCfg = new systemCfg[VirtualLabel](tPool)     
      
     // build step 1: make base pool (collection of all individual cCfg node-pools) 
      // and base graph (collection of all individual cCfgs). 
      // (then do we need to make subgraphs ? maybe, NOT)
-     cCfgsPlusPool.foreach{   
+     cCfgs.foreach{   
        item =>
          val pUri = item._1
          val tempCfg = item._2
-         collectionCCfgToBaseGraph(pUri, tempCfg)
+         collectionCCfgToBaseGraph[VirtualLabel](pUri, tempCfg, sCfg)
+         sCfg.procedureUriList += pUri
      }
    
    // step 1 is done above
      
- // a visitor func for extracting callee information from locationDecl
-     var calleeSig : String = null // indicates the signature (as known in dexdump) of the callee procedure
-     val extractCallee = Visitor.build({
-       case j : JumpLocation => true
-       case t : CallJump => { 
-         calleeSig = t.getValueAnnotation("signature") match {
-           case Some(exp : NameExp) =>
-             exp.name.name
-           case _ => null
-         }
-         false
-       }
-       case _ => 
-         false 
-     })  
-     
  // build step 2: add inter-cCfg edges in scfg
-    
-    // note cCfgsPlusPool is MMap[ResourceUri, (AlirIntraProceduralGraph.NodePool, CompressedControlFlowGraph[VirtualLabel])
-    val xStream = AndroidXStream
-    val procedureFileMapFile = new File(libraryFilePath + "procedureFileMap.xml")
-    val procedureFileMap : MMap[ResourceUri, FileResourceUri] = mmapEmpty
-    if(procedureFileMapFile.exists()){
-      procedureFileMap ++= xStream.fromXml(procedureFileMapFile).asInstanceOf[MMap[ResourceUri, ResourceUri]]
-    }
-    
-    println("cCfg size :" + cCfgsPlusPool.size)
-    var n = 0;
-    cCfgsPlusPool.foreach{   
-      item =>
-        n = n + 1
-        println("cCfg number " + n)
-        var m = 0
-        val pUri = item._1
-        val cCfg = item._2
-        val pst = pstMap(pUri)
-        println("nodes size : " + cCfg.nodes.size)
-        cCfg.nodes.foreach(
-          node =>
-          {
-            m = m + 1
-            println("node " + m)
-            node match 
-            {
-              case n : AlirLocationNode =>
-                val locationDecl = pst.location(n.locIndex)
-                extractCallee(locationDecl)
-                if(calleeSig != null){  // so, the current locDecl is actually a caller node
-                  val calleeOptions = vmTables.getCalleeOptionsBySignature(calleeSig)             
-                  // getting caller node
-                  var callerNode : Node = null  
-                  val origCaller = cCfg.getNode(locationDecl)  // this is the current corresponding node in the current cCfg
-                  if(origCaller.isInstanceOf[AlirLocationUriNode])
-                     callerNode = sCfg.getNode(pUri, origCaller.asInstanceOf[AlirLocationUriNode].toString(), origCaller.asInstanceOf[AlirLocationUriNode].locIndex)
-                     
-                  if(calleeOptions != null) {                    
-                    import scala.collection.JavaConversions._  // we need this for the next for loop 
-                    for (callee <- calleeOptions)
-                    {                      
-                      // some of the callees may be inside this app, some of them may be outside
-                      if(!pstMap.contains(callee)){
-                        //i.e outside app callee case starts
 
-                        val filePath = procedureFileMap(callee)
-                        if(filePath.endsWith("core") || filePath.endsWith("framework1") || filePath.endsWith("framework2")){
-                          val calleeCCfg = libCoreFrameworkCCfgs(callee)
-                          collectionCCfgToBaseGraph(callee, calleeCCfg)
-                        } else {
-                          val ccfgFile = new File(filePath + "CCfgs.xml")
-                          val libCCfgs : MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]] = mmapEmpty
-                          if(ccfgFile.exists()){
-                            libCCfgs ++= xStream.fromXml(ccfgFile).asInstanceOf[MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]]]
-                          }
-                          val calleeCCfg = libCCfgs(callee)
-                          collectionCCfgToBaseGraph(callee, calleeCCfg)
-                        }
-                      }
-                      // outside app case extra work (collecting calleeCCfg) is done above
-                      // below is common work (i.e. merging with calleeCCfg) for outside app and inside app
-                      val calleeFuncStartNode = sCfg.getVirtualNode((callee + "." + "Entry").asInstanceOf[VirtualLabel])
-                      
-                      if(callerNode != null && calleeFuncStartNode != null)   
-                         sCfg.addEdge(callerNode, calleeFuncStartNode) // this is adding an inter-cCfg edge in the sCfg
-                      else
-                         println("error:  not ok")
-                        
-                      val calleeFuncExitNode = sCfg.getVirtualNode((callee + "." + "Exit").asInstanceOf[VirtualLabel])
-                      val origSuccs = cCfg.successors(origCaller) // these are the successors of original Caller in the cCfg
-                      var callerNodeSuccessor : Node = null
-                      
-                      origSuccs.foreach(   
-                          origCallerSuccessor =>
-                          {        
-                            if(origCallerSuccessor.isInstanceOf[AlirLocationUriNode])
-                              callerNodeSuccessor = sCfg.getNode(pUri, origCallerSuccessor.asInstanceOf[AlirLocationUriNode].toString(), origCallerSuccessor.asInstanceOf[AlirLocationUriNode].locIndex)
-                            else if(origCallerSuccessor.isInstanceOf[AlirVirtualNode[VirtualLabel]])
-                              callerNodeSuccessor = sCfg.getVirtualNode((pUri + "." + origCallerSuccessor.toString()).asInstanceOf[VirtualLabel])
-                            else
-                               println("errrorr: not ok")
-                               
-                            if(callerNodeSuccessor != null && calleeFuncExitNode != null){
-                               sCfg.addEdge(calleeFuncExitNode, callerNodeSuccessor) // this is adding an inter-cCfg edge in the sCfg
-                               sCfg.deleteEdge(callerNode, callerNodeSuccessor)
-                               callerNodeSuccessor = null
-                            }
-                            else
-                               println("errror:  not ok \n when calleeFuncExitNode = " + calleeFuncExitNode + " \n and callerNodeSuccessor = " +  callerNodeSuccessor + " \n and callerNode = "+ callerNode)
-                          }
-                       )
-                    }
-                 }
-                 // caller node was got
-                 calleeSig = null  // reseting for the cCfg's next node of the outer for loop
-              }
-              case x : AlirVirtualNode[VirtualLabel] => // do nothing; println(x.label) 
-           }
-          }
-        )   
-   }   
+    while(sCfg.procedureUriList.size != 0){ 
+      println("cCfg size :" + cCfgs.size)
+      val pUri = sCfg.procedureUriList(0)
+      val cCfg = cCfgs(pUri)
+      addInterCCfgEdges(pUri, vmTables, cCfg, cCfgs, sCfg, aCache)
+      sCfg.procedureUriList -= pUri
+    }
     print("sCfg = " + sCfg)
     sCfg
   }
@@ -266,6 +196,35 @@ object SystemControlFlowGraph {
       }
     } else None
   }
+  
+  //below we def collection-ccfg-to-base-graph which is an inner function
+  def collectionCCfgToBaseGraph[VirtualLabel](pUri : ResourceUri, cCfg : CompressedControlFlowGraph[VirtualLabel], sCfg : systemCfg[VirtualLabel]) = {
+    for (n <- cCfg.nodes) 
+    {
+      if(n.isInstanceOf[AlirVirtualNode[VirtualLabel]])
+        sCfg.addVirtualNode((pUri + "." + n.toString()).asInstanceOf[VirtualLabel]) 
+      else if(n.isInstanceOf[AlirLocationUriNode])
+        sCfg.addNode(pUri, n.asInstanceOf[AlirLocationUriNode].toString(), n.asInstanceOf[AlirLocationUriNode].locIndex)
+      // do we need to add another node type case here , i.e. AlirLocationIndexNode ????
+    }
+    var tempEdge : Edge = null
+    for (e <- cCfg.edges) {
+     var tempNode = e.source
+     var sNode : Node = null
+     if(tempNode.isInstanceOf[AlirVirtualNode[VirtualLabel]])
+       sNode = sCfg.getVirtualNode((pUri + "." + tempNode.toString()).asInstanceOf[VirtualLabel])
+     if(tempNode.isInstanceOf[AlirLocationUriNode])
+       sNode = sCfg.getNode(pUri, tempNode.asInstanceOf[AlirLocationUriNode].toString(), tempNode.asInstanceOf[AlirLocationUriNode].locIndex)
+     tempNode = e.target          
+     var tNode : Node = null
+     if(tempNode.isInstanceOf[AlirVirtualNode[VirtualLabel]])
+       tNode = sCfg.getVirtualNode((pUri + "." + tempNode.toString()).asInstanceOf[VirtualLabel])
+           
+     if(tempNode.isInstanceOf[AlirLocationUriNode])
+       tNode = sCfg.getNode(pUri, tempNode.asInstanceOf[AlirLocationUriNode].toString(), tempNode.asInstanceOf[AlirLocationUriNode].locIndex)  
+     tempEdge = sCfg.addEdge(sNode, tNode) 
+    }
+  }
 
   private class systemCfg[VirtualLabel] //
   (val pool : AlirIntraProceduralGraph.NodePool)
@@ -274,7 +233,7 @@ object SystemControlFlowGraph {
 
     private var succBranchMap : MMap[(Node, Option[Branch]), Node] = null
     private var predBranchMap : MMap[(Node, Option[Branch]), Node] = null
-
+    val procedureUriList : MList[ResourceUri] = mlistEmpty
     var entryNode : Node = null
 
     var exitNode : Node = null
@@ -325,10 +284,10 @@ object SystemControlFlowGraph {
       for (n <- nodes)
         for (m <- successors(n)) {
           for (e <- getEdges(n, m)) {
-            val branch = if (e ? ControlFlowGraph.BRANCH_PROPERTY_KEY)
-              e(ControlFlowGraph.BRANCH_PROPERTY_KEY).toString
+            val branch = if (e ? SystemControlFlowGraph.BRANCH_PROPERTY_KEY)
+              e(SystemControlFlowGraph.BRANCH_PROPERTY_KEY).toString
             else ""
-            sb.append("%s -> %s %s\n".format(n, m, branch))
+              sb.append("%s -> %s %s\n".format(n, m, branch))
           }
         }
 

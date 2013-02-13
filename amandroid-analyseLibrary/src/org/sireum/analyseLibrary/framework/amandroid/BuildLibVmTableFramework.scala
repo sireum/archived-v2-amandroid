@@ -15,8 +15,7 @@ class BuildLibVmTableFramework extends TestFramework {
   def Analyzing : this.type = this
 
   def title(s : String) : this.type = {
-    _title = "Case " + casePrefix + ": " + s
-    casePrefix = ""
+    _title = caseString + s
     this
   }
 
@@ -45,7 +44,7 @@ class BuildLibVmTableFramework extends TestFramework {
         }
         val d = srcs.substring(srcs.indexOf("/"), srcs.lastIndexOf("/")+1)
         val srcFiles = mlistEmpty[FileResourceUri]
-        val resDir = new File(d+"result")
+        val resDir = new File(d+"libVmTables")
         if(!resDir.exists()){
           resDir.mkdir()
         }
@@ -71,10 +70,9 @@ class BuildLibVmTableFramework extends TestFramework {
         }
         
         val outerAVMT = new FileOutputStream(libVmTablesFile)
-        val wAVMT = new OutputStreamWriter(outerAVMT, "GBK")
         
         println("start convert AVMT to xml!")
-        xStream.toXml(libVmTables, wAVMT)
+        xStream.toXml(libVmTables, outerAVMT)
         
         println("###############################################")
     }
