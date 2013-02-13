@@ -15,8 +15,7 @@ class BuildLibVmTableFramework extends TestFramework {
   def Analyzing : this.type = this
 
   def title(s : String) : this.type = {
-    _title = "Case " + casePrefix + ": " + s
-    casePrefix = ""
+    _title = caseString + s
     this
   }
 

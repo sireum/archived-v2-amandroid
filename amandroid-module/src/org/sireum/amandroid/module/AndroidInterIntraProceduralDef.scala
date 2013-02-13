@@ -18,7 +18,7 @@ import org.sireum.pipeline.PipelineConfiguration
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 
-class AndroidInterIntraProceduralDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends AndroidInterIntraProceduralModule {
+class AndroidInterIntraProceduralDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends AndroidInterIntraProceduralModule with ImplicitLogging {
   // add implementation here
   type VirtualLabel = String
   val par = this.parallel
