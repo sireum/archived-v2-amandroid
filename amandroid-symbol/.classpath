@@ -5,9 +5,10 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Guava"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JGraphT"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/ANTLR v3"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-pilar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-util"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-alir"/>
-	<classpathentry kind="lib" path="/Users/fgwei/Downloads/ST-4.0.7.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/StringTemplate v4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
