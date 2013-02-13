@@ -165,7 +165,7 @@ object SystemControlFlowGraph {
       addInterCCfgEdges(pUri, vmTables, cCfg, cCfgs, sCfg, aCache)
       sCfg.procedureUriList -= pUri
     }
-    print("sCfg = " + sCfg)
+//    print("sCfg = " + sCfg)
     sCfg
   }
   
