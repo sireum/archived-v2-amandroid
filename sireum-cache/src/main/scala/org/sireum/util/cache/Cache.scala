@@ -2,6 +2,7 @@ package org.sireum.util.cache
 
 import org.sireum.util._
 import java.io._
+import java.util.zip._
 
 /**
  * Cache provider for save Object to predefined factory and load Object from
@@ -64,12 +65,11 @@ trait CacheProvider[K] {
   def setRemovePercent(p : Integer)
   
   /**
-   * When one of the item used in the cacheMap, first update the item cite number
-   * second sort the Map based on the cite number.
+   * When one of the item used in the cacheMap, first update the item used number.
    * 
    * @param key     key of the cacheMap.
    */
-  def cacheUpdateAndSort(key : K)
+  def cacheUpdate(key : K)
   
   /**
    * Based on percent number, remove items from cacheMap.
@@ -93,8 +93,8 @@ trait CacheProvider[K] {
  */
 trait FileCaseFactory[K] {
   var rootDirectory : FileResourceUri
-  var outer : FileOutputStream
-  var inner : FileInputStream
+  var outer : GZIPOutputStream
+  var inner : GZIPInputStream
   
   /**
    * Set the root directory of the factory.

@@ -87,7 +87,7 @@ object SystemControlFlowGraph {
                   if(!sCfg.procedureUriList.contains(callee) && !cCfgs.contains(callee)){
                     //i.e outside callee case starts
                     sCfg.procedureUriList += callee
-                    println(callee)
+//                    println(callee)
                     val calleeCCfg = aCache.load[CompressedControlFlowGraph[VirtualLabel]](callee)
                     cCfgs(callee) = calleeCCfg
                     collectionCCfgToBaseGraph[VirtualLabel](callee, calleeCCfg, sCfg.asInstanceOf[systemCfg[VirtualLabel]])
@@ -159,12 +159,12 @@ object SystemControlFlowGraph {
  // build step 2: add inter-cCfg edges in scfg
 
     while(sCfg.procedureUriList.size != 0){ 
-      println("cCfg size :" + cCfgs.size)
       val pUri = sCfg.procedureUriList(0)
       val cCfg = cCfgs(pUri)
       addInterCCfgEdges(pUri, vmTables, cCfg, cCfgs, sCfg, aCache)
       sCfg.procedureUriList -= pUri
     }
+    println("cCfg size :" + cCfgs.size)
 //    print("sCfg = " + sCfg)
     sCfg
   }
