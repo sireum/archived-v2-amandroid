@@ -34,8 +34,10 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
     this
   }
 
-  def file(fileUri : FileResourceUri) =
-    AmandroidConfiguration(title, fileUri)
+  def file(fileUri : FileResourceUri,
+           libVmTables : AndroidVirtualMethodTables,
+           aCache : AndroidCacheFile[ResourceUri]) =
+    AmandroidConfiguration(title, fileUri, libVmTables, aCache)
 
   //////////////////////////////////////////////////////////////////////////////
   // Public Case Classes
@@ -44,7 +46,10 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
   type VirtualLabel = String
     
   case class AmandroidConfiguration //
-  (title : String, srcs : FileResourceUri) {
+  (title : String,
+   srcs : FileResourceUri,
+   libVmTables : AndroidVirtualMethodTables,
+   aCache : AndroidCacheFile[ResourceUri]) {
 
     ////////////////////////////////////////////////////////////////////////////
     // Test Constructor
@@ -86,15 +91,6 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
         }
         srcFiles += FileUtil.toUri(d + dirName + "/classes.dex")
         
-        val xStream = AndroidXStream
-        xStream.xstream.alias("AndroidVirtualMethodTables", classOf[AndroidVirtualMethodTables])
-        
-        val libVmTablesFile = new File(d + "../../../../../../../amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/libVmTables/libVmTables.xml")
-        var libVmTables : AndroidVirtualMethodTables = null
-        if(libVmTablesFile.exists()){
-          libVmTables = xStream.fromXml(libVmTablesFile).asInstanceOf[AndroidVirtualMethodTables]
-        }
-        
         val job = PipelineJob()
         val options = job.properties
         Dex2PilarWrapperModule.setSrcFiles(options, srcFiles)
@@ -104,19 +100,6 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
         PilarAndroidSymbolResolverModule.setParallel(options, true)
         PilarAndroidSymbolResolverModule.setHasExistingSymbolTable(options, None)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, Option(libVmTables))
-        
-        val libraryFilePath = d + "../../../../../../../amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/ccfgs/"
-        val aCache = new AndroidCacheFile[ResourceUri]
-        val serializer : (Any, OutputStream) --> Unit = {
-          case (v, o) =>
-            xStream.toXml(v, o)
-        }
-        val unSerializer : InputStream --> Any = {
-          case o =>
-            xStream.fromXml(o)
-        }
-        aCache.setRootDirectory(libraryFilePath)
-        aCache.setValueSerializer(serializer, unSerializer)
         AndroidInterIntraProceduralModule.setParallel(options, false)
         AndroidInterIntraProceduralModule.setAndroidCache(options, aCache)
         AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
