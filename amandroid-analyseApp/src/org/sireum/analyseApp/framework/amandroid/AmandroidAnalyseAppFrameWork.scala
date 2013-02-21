@@ -44,7 +44,8 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
   //////////////////////////////////////////////////////////////////////////////
 
   type VirtualLabel = String
-    
+  
+  
   case class AmandroidConfiguration //
   (title : String,
    srcs : FileResourceUri,
@@ -97,7 +98,7 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
         
 //        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d+dirName+"/classes.pilar"))))
         
-        PilarAndroidSymbolResolverModule.setParallel(options, true)
+        PilarAndroidSymbolResolverModule.setParallel(options, false)
         PilarAndroidSymbolResolverModule.setHasExistingSymbolTable(options, None)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, Option(libVmTables))
         AndroidInterIntraProceduralModule.setParallel(options, false)

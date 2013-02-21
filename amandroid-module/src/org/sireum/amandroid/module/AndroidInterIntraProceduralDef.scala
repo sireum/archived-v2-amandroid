@@ -68,7 +68,6 @@ class AndroidInterIntraProceduralDef (val job : PipelineJob, info : PipelineJobM
     val j = PipelineJob()
     val options = j.properties
     val avmt = this.androidVirtualMethodTables
-    val cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]] = mmapEmpty
     
     sCfgModule.setAndroidCache(options, aCache)
     sCfgModule.setAndroidVirtualMethodTables(options, avmt)

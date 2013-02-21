@@ -51,7 +51,7 @@ class PilarAndroidSymbolResolverDef (val job : PipelineJob, info : PipelineJobMo
 
   if (st.hasErrors)
     info.hasError = true
-
+    
   this.symbolTable_=(result._1)
   
   this.androidVirtualMethodTables_=(result._2)

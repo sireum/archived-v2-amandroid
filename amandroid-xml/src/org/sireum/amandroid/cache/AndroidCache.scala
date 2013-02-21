@@ -33,6 +33,7 @@ final class AndroidCacheFile[K] extends CacheProvider[K] with FileCaseFactory[K]
     } else {
       setFileInputStream(key)
       val value = unSerializer(inner).asInstanceOf[T]
+      inner.close()
       if(size == 0){
         //do nothing
       } else if(cacheMap.size <= size){

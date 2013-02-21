@@ -12,6 +12,7 @@ import org.sireum.alir.AlirIntraProceduralGraph
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
 import org.sireum.amandroid.cache.AndroidCacheFile
+import java.util.zip.GZIPInputStream
 
 
 @RunWith(classOf[JUnitRunner])
@@ -21,8 +22,9 @@ class AmandroidAnalyseApp extends AmandroidAnalyseAppFrameWork{
   val xStream = AndroidXStream
   xStream.xstream.alias("AndroidVirtualMethodTables", classOf[AndroidVirtualMethodTables])
   
-  val libVmTablesFile = new File(d + "../../../../../../../amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/libVmTables/libVmTables.xml")
-  val libVmTables = xStream.fromXml(libVmTablesFile).asInstanceOf[AndroidVirtualMethodTables]
+  val libVmTablesFile = new File(d + "../../../../../../../amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/libVmTables/libVmTables.xml.zip")
+  val interAVMT = new GZIPInputStream(new FileInputStream(libVmTablesFile))
+  val libVmTables = xStream.fromXml(interAVMT).asInstanceOf[AndroidVirtualMethodTables]
   
   val libraryFilePath = d + "../../../../../../../amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/ccfgs/"
   val aCache = new AndroidCacheFile[ResourceUri]
@@ -41,7 +43,7 @@ class AmandroidAnalyseApp extends AmandroidAnalyseAppFrameWork{
   
   AmandroidFiles.apkModelFiles.
   foreach{fileUri=>
-    if(fileUri.indexOf("0eb") > 0)
+    if(fileUri.indexOf("0eb") > 0 || fileUri.indexOf("4bf") > 0)
       Analyzing title fileUri file(fileUri, libVmTables, aCache)
   }
 }
