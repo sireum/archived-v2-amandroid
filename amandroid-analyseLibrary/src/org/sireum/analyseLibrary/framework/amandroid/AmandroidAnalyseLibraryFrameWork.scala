@@ -113,7 +113,7 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
 
         ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d+ "/" +f.getName()))))
         
-        PilarAndroidSymbolResolverModule.setParallel(options, true)
+        PilarAndroidSymbolResolverModule.setParallel(options, false)
         PilarAndroidSymbolResolverModule.setHasExistingSymbolTable(options, None)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, None)
         
@@ -128,6 +128,8 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         AndroidInterIntraProceduralModule.setAndroidCache(options, aCache)
         AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, false)
+        AndroidInterIntraProceduralModule.setShouldBuildCSCfg(options, false)
+        AndroidInterIntraProceduralModule.setAPIpermOpt(options, None)
         pipeline.compute(job)
 
         if(job.hasError){
