@@ -4,7 +4,7 @@ import org.sireum.pipeline._
 import org.sireum.option.PipelineMode
 import org.sireum.pipeline.gen.ModuleGenerator
 import org.sireum.alir.ControlFlowGraph
-import org.sireum.util.MMap
+import org.sireum.util.{MMap, MList}
 import org.sireum.alir.AlirIntraProceduralGraph
 import org.sireum.util.ResourceUri
 import org.sireum.core.module.AlirIntraProcedural
@@ -17,7 +17,7 @@ import org.sireum.amandroid.cache.AndroidCacheFile
 
 
 /*
-Copyright (c) 2011-2012 Sankardas Roy & Fengguo Wei, Kansas State University.        
+Copyright (c) 2012-2013 Sankardas Roy & Fengguo Wei, Kansas State University.        
 All rights reserved. This program and the accompanying materials      
 are made available under the terms of the Eclipse Public License v1.0 
 which accompanies this distribution, and is available at              
@@ -29,6 +29,7 @@ object AndroidInterIntraProcedural {
   type CFG = ControlFlowGraph[VirtualLabel]
   type CCFG = CompressedControlFlowGraph[VirtualLabel]
   type SCFG = SystemControlFlowGraph[VirtualLabel]
+  // type CSCFG = SystemControlFlowGraph[VirtualLabel]
   
   type ShouldIncludeFlowFunction = (LocationDecl, Iterable[CatchClause]) => 
       (Iterable[CatchClause], java.lang.Boolean)
@@ -64,6 +65,12 @@ case class AndroidInterIntraProcedural(
   @Input
   shouldBuildSCfg : Boolean,
   
+  @Input
+  shouldBuildCSCfg : Boolean,
+  
+  @Input
+  APIpermOpt : Option[MMap[ResourceUri, MList[String]]],
+  
   @Input 
   shouldIncludeFlowFunction : AndroidInterIntraProcedural.ShouldIncludeFlowFunction =
     // ControlFlowGraph.defaultSiff,
@@ -73,7 +80,7 @@ case class AndroidInterIntraProcedural(
   intraResult : MMap[ResourceUri, AndroidInterIntraProcedural.CCFG],
     
   @Output
-  interResult : Option[SystemControlFlowGraph[String]]
+  interResult : Option[AndroidInterIntraProcedural.SCFG]  // actually it can be the compressed sCFG
 )
  
 case class Cfg(
@@ -128,8 +135,33 @@ case class sCfg(
   @Produce
   sCfg : SystemControlFlowGraph[String])
   
+  
+  case class csCfg(
+  title : String = "Compressed System Control Flow Graph Builder",
+
+  @Input
+  androidCache : AndroidCacheFile[ResourceUri],
+  
+  @Input 
+  cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
+
+  @Input
+  androidVirtualMethodTables : AndroidVirtualMethodTables,
+  
+  @Input
+  sCfg : SystemControlFlowGraph[String],
+  
+  @Input
+  APIperm : MMap[ResourceUri, MList[String]],  // MList will contain the list of permission strings for one API
+  
+  @Output
+  @Produce
+  csCfg : SystemControlFlowGraph[String])
+  
+  
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
   
 object AndroidInterIntraProceduralModuleBuild {
@@ -139,7 +171,8 @@ object AndroidInterIntraProceduralModuleBuild {
         AndroidInterIntraProcedural.getClass().getName().dropRight(1),
         Cfg.getClass().getName().dropRight(1),
         cCfg.getClass().getName().dropRight(1),
-        sCfg.getClass().getName().dropRight(1)
+        sCfg.getClass().getName().dropRight(1),
+        csCfg.getClass().getName().dropRight(1)
         )
     opt.dir = "./src/org/sireum/amandroid/module"
     opt.genClassName = "AndroidInterIntraProceduralModuleCore"

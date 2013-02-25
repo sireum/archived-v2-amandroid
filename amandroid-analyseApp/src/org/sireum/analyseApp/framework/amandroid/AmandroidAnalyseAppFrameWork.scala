@@ -101,7 +101,7 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
         
 //        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d+dirName+"/classes.pilar"))))
         
-        PilarAndroidSymbolResolverModule.setParallel(options, true)
+        PilarAndroidSymbolResolverModule.setParallel(options, false)
         PilarAndroidSymbolResolverModule.setHasExistingSymbolTable(options, None)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, Option(libVmTables))
         
@@ -121,6 +121,15 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
         AndroidInterIntraProceduralModule.setAndroidCache(options, aCache)
         AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, true)
+        AndroidInterIntraProceduralModule.setShouldBuildCSCfg(options, true)
+        
+        val apiPermission : MMap[ResourceUri, MList[String]] = mmapEmpty
+        val permList : MList[String] = mlistEmpty
+        permList+=("permission")   // put the permission strings e.g. "NETWORKS" here
+        val pUri : ResourceUri = "abc"  // replace "abc" by apiUri (e.g. pilar:/procedure/default/%5B%7Candroid::content::Context.startService%7C%5D/1/50/f9cb48df) later
+        apiPermission(pUri) = permList
+        AndroidInterIntraProceduralModule.setAPIpermOpt(options, Option(apiPermission)) 
+        
         pipeline.compute(job)
         if(job.hasError){
           println("Error present: " + job.hasError)
@@ -138,10 +147,10 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
 //        val sCfgFile = new File(d + dirName + "/graphs/sCfg.dot")
 //        val outer = new FileOutputStream(sCfgFile)
 //        val w = new OutputStreamWriter(outer, "GBK")
-//        val sCfg = AndroidInterIntraProceduralModule.getInterResult(options) match {
-//          case Some(s) => s
-//          case None => null
-//        }
+        val csCfg = AndroidInterIntraProceduralModule.getInterResult(options) match {
+          case Some(s) => s
+          case None => null
+        }
 //        sCfg.toDot(w)
 //        w.flush()
 //        val str = Array("dot", "-Tps2", d + dirName + "/graphs/sCfg.dot", "-o", d + dirName + "/graphs/sCfg.ps")

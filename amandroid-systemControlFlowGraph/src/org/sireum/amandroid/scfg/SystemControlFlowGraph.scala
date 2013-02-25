@@ -11,7 +11,7 @@ import org.sireum.amandroid.xml.AndroidXStream
 import org.sireum.amandroid.cache.AndroidCacheFile
 
 
-trait SystemControlFlowGraph[VirtualLabel] extends CompressedControlFlowGraph[VirtualLabel] {
+trait SystemControlFlowGraph[VirtualLabel] extends CompressedControlFlowGraph[VirtualLabel] with AlirEdgeAccesses[SystemControlFlowGraph.Node]{
   
   def procedureUriList : MList[ResourceUri]  //this contains those pUris whose cCfg is not yet completed in the sCfg
   
@@ -35,6 +35,109 @@ trait SystemControlFlowGraph[VirtualLabel] extends CompressedControlFlowGraph[Vi
      pool(newNode(Option(extdLocUri), locIndex).asInstanceOf[SystemControlFlowGraph.Node])
    }
 
+   
+   
+   // the following method compresses sCfg by retaining only those API-call-edges which are listed in the input APIperm
+   
+   def compress (cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]], 
+                     APIperm : MMap[ResourceUri, MList[String]]) = {
+     
+     // The algorithm is outlined below: 
+       // get a cCfg i from cCfgs; 
+           // check if i is to be deleted 
+                     //(e.g. if its pUri is not security sensitive or does not contain "de::mobinauten::smsspy::")
+           // if yes, traverse each inner node n in cCfg i 
+                  //and delete all the outgoing and incoming edges; and delete n
+                             //(this includes the call-edge (from n) and the incoming return edges (to n's succs))
+                      // get each caller cCfg j of i (use i's start node to find the callers;)
+                                                       // (note that each caller j has an edge to i.start). 
+                                    //delete the edges b/w j and i,  and add(restore) one edge inside j
+     
+            def delNodeAndRelatedEdges(n:SystemControlFlowGraph.Node) = {
+              
+              val prededges = predecessorEdges(n)
+                  
+                  while(prededges.size != 0){
+                     
+                     println("delete pe: " + prededges.toSeq(0))
+                     deleteEdge(prededges.toSeq(0))
+                  }
+                  
+                  val succedges = successorEdges(n)
+                  
+                  
+                  while(succedges.size != 0){
+                     
+                     println("delete se: " + succedges.toSeq(0))
+                     deleteEdge(succedges.toSeq(0))
+                  }
+                  
+                  println("after deleting node: " + n + " ; node count of scfg = " + ( nodes.size -1))
+                  deleteNode(n)  // deleting the node from sCfg
+              
+            }
+     
+     cCfgs.foreach{   
+       item =>
+         val pUri = item._1
+         val tempCfg = item._2
+         
+         if (!pUri.contains("de::mobinauten::smsspy")){
+           
+           tempCfg.nodes.foreach(
+            node =>
+            {
+              node match 
+              {
+                case n : AlirLocationNode =>
+                 
+                  var tNode : SystemControlFlowGraph.Node = null  
+                  if(n.isInstanceOf[AlirLocationUriNode])
+                    tNode = getNode(pUri, n.asInstanceOf[AlirLocationUriNode].toString(), n.asInstanceOf[AlirLocationUriNode].locIndex)
+                  else
+                    println("error: AlirLocationUriNode expected")
+                  
+                  delNodeAndRelatedEdges(tNode)
+                  
+                case x : AlirVirtualNode[VirtualLabel] => // do nothing; println(x.label) 
+              }
+            }
+          )
+          
+          val startNode = getVirtualNode((pUri + "." + "Entry").asInstanceOf[VirtualLabel])
+          val exitNode = getVirtualNode((pUri + "." + "Exit").asInstanceOf[VirtualLabel])
+                 
+          val callerNodes = predecessors(startNode) // assume each predecessor is the caller node of a caller cCfg
+        
+          val callerNodeSuccs = successors(exitNode) // assume each successor is a succ of the caller node of a caller cCfg
+         
+          callerNodes.foreach{
+             x =>
+             val callerNodeUri =  x.toString()
+             val callerUri = callerNodeUri.substring(0, callerNodeUri.lastIndexOf(".")) // assume each nodeUri = pUri.Index
+             
+             callerNodeSuccs.foreach{
+               y =>
+                 val callerNodeSuccUri =  y.toString()
+                 if (callerNodeSuccUri.startsWith(callerUri)){ // assume that prefix match implies equality
+                   addEdge(x,y)
+                   println("after adding an edge ; edge count of scfg = " +  edges.size)
+                   
+                 } 
+               
+             }
+           }
+           
+           delNodeAndRelatedEdges(startNode)
+           delNodeAndRelatedEdges(exitNode)
+           
+           
+         }
+     }
+     
+     this
+   }
+   
 }
 
 object SystemControlFlowGraph {
@@ -87,7 +190,7 @@ object SystemControlFlowGraph {
                   if(!sCfg.procedureUriList.contains(callee) && !cCfgs.contains(callee)){
                     //i.e outside callee case starts
                     sCfg.procedureUriList += callee
-                    println(callee)
+                    // println(callee)
                     val calleeCCfg = aCache.load[CompressedControlFlowGraph[VirtualLabel]](callee)
                     cCfgs(callee) = calleeCCfg
                     collectionCCfgToBaseGraph[VirtualLabel](callee, calleeCCfg, sCfg.asInstanceOf[systemCfg[VirtualLabel]])
@@ -159,11 +262,12 @@ object SystemControlFlowGraph {
  // build step 2: add inter-cCfg edges in scfg
 
     while(sCfg.procedureUriList.size != 0){ 
-      println("cCfg size :" + cCfgs.size)
+     // println("cCfg size :" + cCfgs.size)
       val pUri = sCfg.procedureUriList(0)
       val cCfg = cCfgs(pUri)
       addInterCCfgEdges(pUri, vmTables, cCfg, cCfgs, sCfg, aCache)
       sCfg.procedureUriList -= pUri
+      
     }
 //    print("sCfg = " + sCfg)
     sCfg
