@@ -6,6 +6,17 @@ import org.sireum.util._
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTableProducer
 import org.sireum.pilar.symbol.ProcedureSymbolTableData
 import org.sireum.pilar.symbol.SymbolTable
+import com.thoughtworks.xstream.mapper.Mapper
+import com.thoughtworks.xstream.converters.collections.AbstractCollectionConverter
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter
+import com.thoughtworks.xstream.converters.MarshallingContext
+import com.thoughtworks.xstream.io.HierarchicalStreamReader
+import com.thoughtworks.xstream.converters.UnmarshallingContext
+import scala.collection.mutable.HashMap
+import scala.collection.mutable.LinkedHashMap
+import scala.collection.immutable.List
+import org.jgrapht.util.ArrayUnenforcedSet
+import com.google.common.collect.HashBiMap
 
 object Converter {
   def javafy(o : Any)(
@@ -87,7 +98,7 @@ object Converter {
                 elements(i) = javafy(p.productElement(i))
               }
               result
-            case a : Any => a
+//            case _ => o
           }
         }
     }
@@ -155,7 +166,155 @@ object Converter {
                 case _ =>
               }
               result
-            case a : Any => a
           }
     }
+}
+
+class ArrayUnenforcedSetConverter( _mapper : Mapper )  extends AbstractCollectionConverter(_mapper) {
+  /** Helper method to use x.getClass
+   * 
+   */
+  def getAnyClass(x: Any) = x.asInstanceOf[AnyRef].getClass
+
+  def canConvert( clazz: Class[_]) = {       
+    classOf[ArrayUnenforcedSet[Any]] == clazz
+  }
+
+  def marshal( value: Any, writer: HierarchicalStreamWriter, context: MarshallingContext) = {
+    val set = value.asInstanceOf[ArrayUnenforcedSet[Any]]
+    val it = set.iterator()
+    while(it.hasNext())
+      writeItem(it.next(), context, writer)
+  }
+
+  def unmarshal( reader: HierarchicalStreamReader, context: UnmarshallingContext ) = {
+//    println(context.getRequiredType())
+    var set = createCollection(context.getRequiredType()).asInstanceOf[ArrayUnenforcedSet[Any]]
+    while (reader.hasMoreChildren()) {
+      reader.moveDown();
+      val item = readItem(reader, context, set);
+      set.add(item)
+      reader.moveUp();
+    }
+    set
+  }
+}
+
+class MMapConverter( _mapper : Mapper )  extends AbstractCollectionConverter(_mapper) {
+  /** Helper method to use x.getClass
+   * 
+   */
+  def getAnyClass(x: Any) = x.asInstanceOf[AnyRef].getClass
+
+  def canConvert( clazz: Class[_]) = {       
+    classOf[HashMap[Any, Any]] == clazz
+  }
+
+  def marshal( value: Any, writer: HierarchicalStreamWriter, context: MarshallingContext) = {
+    val mmap = value.asInstanceOf[HashMap[Any, Any]]
+    for ( (key, value) <- mmap ) {  
+      writer.startNode("item")
+      writeItem(key, context, writer)
+      writeItem(value, context, writer)
+      writer.endNode()
+    }
+  }
+
+  def unmarshal( reader: HierarchicalStreamReader, context: UnmarshallingContext ) = {
+//    println(context.getRequiredType())
+    val mmap : MMap[Any, Any] = mmapEmpty
+    while (reader.hasMoreChildren()) {
+      var key : Any = null
+      var value : Any = null
+      reader.moveDown()
+      reader.moveDown()
+      key = readItem(reader, context, key)
+      reader.moveUp()
+      reader.moveDown()
+      value = readItem(reader, context, value)
+      reader.moveUp()
+      reader.moveUp()
+      mmap(key) = value
+    }
+    mmap
+  }
+}
+
+class LinkedHashMapConverter( _mapper : Mapper )  extends AbstractCollectionConverter(_mapper) {
+  /** Helper method to use x.getClass
+   * 
+   */
+  def getAnyClass(x: Any) = x.asInstanceOf[AnyRef].getClass
+
+  def canConvert( clazz: Class[_]) = {       
+    classOf[LinkedHashMap[Any, Any]] == clazz
+  }
+
+  def marshal( value: Any, writer: HierarchicalStreamWriter, context: MarshallingContext) = {
+    val mmap = value.asInstanceOf[LinkedHashMap[Any, Any]]
+    for ( (key, value) <- mmap ) {  
+      writer.startNode("item")
+      writeItem(key, context, writer)
+      writeItem(value, context, writer)
+      writer.endNode()
+    }
+  }
+
+  def unmarshal( reader: HierarchicalStreamReader, context: UnmarshallingContext ) = {
+//    println(context.getRequiredType())
+    var lmap = mlinkedMapEmpty[Any, Any]
+    while (reader.hasMoreChildren()) {
+      var key : Any = null
+      var value : Any = null
+      reader.moveDown()
+      reader.moveDown()
+      key = readItem(reader, context, key)
+      reader.moveUp()
+      reader.moveDown()
+      value = readItem(reader, context, value)
+      reader.moveUp()
+      reader.moveUp()
+      lmap(key) = value
+    }
+    lmap
+  }
+}
+
+class HashBiMapConverter( _mapper : Mapper )  extends AbstractCollectionConverter(_mapper) {
+  /** Helper method to use x.getClass
+   * 
+   */
+  def getAnyClass(x: Any) = x.asInstanceOf[AnyRef].getClass
+
+  def canConvert( clazz: Class[_]) = {       
+    classOf[HashBiMap[Any, Any]] == clazz
+  }
+
+  def marshal( value: Any, writer: HierarchicalStreamWriter, context: MarshallingContext) = {
+    val hbm = value.asInstanceOf[HashBiMap[Any, Any]]
+    for ( (key, value) <- hbm ) {
+      writer.startNode("entry")
+      writeItem(key, context, writer)
+      writeItem(value, context, writer)
+      writer.endNode()
+    }
+  }
+
+  def unmarshal( reader: HierarchicalStreamReader, context: UnmarshallingContext ) = {
+    val hbm = HashBiMap.create[Any, Any]()
+    while (reader.hasMoreChildren()) {
+      var key : Any = null
+      var value : Any = null
+      reader.moveDown()
+      reader.moveDown()
+      key = readItem(reader, context, key)
+      reader.moveUp()
+      reader.moveDown()
+      value = readItem(reader, context, value)
+      reader.moveUp()
+      reader.moveUp()
+      hbm(key) = value
+    }
+    hbm
+  }
 }

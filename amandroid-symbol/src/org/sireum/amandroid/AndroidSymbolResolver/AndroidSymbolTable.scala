@@ -10,15 +10,19 @@ import org.sireum.amandroid.AndroidSymbolResolver._
 
 /**
  * @author <a href="mailto:robby@k-state.edu">Robby</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 
 trait AndroidSymbolTable extends SymbolTable
 
 
-
 /**
  * @author <a href="mailto:robby@k-state.edu">Robby</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
+
 
 object AndroidSymbolTable {
   def apply(models : ISeq[Model],
@@ -69,227 +73,9 @@ object AndroidSymbolTable {
   }
 
   def resolveVirtualMethod(stp : AndroidSymbolTableProducer) : AndroidVirtualMethodTables = {
-    val rht = HashMultimap.create[ResourceUri, ResourceUri]()
-    val vmt = HashMultimap.create[ResourceUri, ResourceUri]()
-    val rpt = HashMultimap.create[ResourceUri, ResourceUri]()
-    val cfrt = HashMultimap.create[ResourceUri, ResourceUri]()
-    val rut = HashBiMap.create[String, ResourceUri]()
-    val put = HashBiMap.create[String, ResourceUri]()
-    val ptt = mmapEmpty[String, String]
-    val it = msetEmpty[ResourceUri]
-    new Object with AndroidVirtualMethodResolver {
-      override def recordHierarchyTable = rht
-      override def virtualMethodTable = vmt
-      override def recordProcedureTable = rpt
-      override def cannotFindRecordTable = cfrt
-      override def recordUriTable = rut
-      override def procedureUriTable = put
-      override def procedureTypeTable = ptt
-      override def interfaceTable = it
-    }.androidVirtualMethodResolver(stp)
-    val favmt = {_ : Unit => new AVMT}
-    AndroidVirtualMethodTables(rht, vmt, rpt, cfrt, rut, put, ptt, it, favmt)
-  }
-  
-  class AVMT extends AndroidVirtualMethodTables with AndroidVirtualMethodTablesProducer {
-    avmt =>
-    
-    val tables = AndroidVirtualMethodTablesData()
-    
-    def recordHierarchyTable : HashMultimap[ResourceUri, ResourceUri] = tables.recordHierarchyTable
-    def virtualMethodTable : HashMultimap[ResourceUri, ResourceUri] = tables.virtualMethodTable
-    def recordProcedureTable : HashMultimap[ResourceUri, ResourceUri] = tables.recordProcedureTable
-    def cannotFindRecordTable : HashMultimap[ResourceUri, ResourceUri] = tables.cannotFindRecordTable
-    def recordUriTable : HashBiMap[String, ResourceUri] = tables.recordUriTable
-    def procedureUriTable : HashBiMap[String, ResourceUri] = tables.procedureUriTable
-    def procedureTypeTable : MMap[ResourceUri, String] = tables.procedureTypeTable
-    def interfaceTable : MSet[ResourceUri] = tables.interfaceTable
-    def getRecordUri(recordName : String) : ResourceUri = {
-      if(recordUriTable.contains(recordName)){
-        recordUriTable(recordName)
-      }
-      else null
-    }
-    
-    def getProcedureUriBySignature(sig : String) : ResourceUri = {
-      if(procedureUriTable.contains(sig))
-        procedureUriTable(sig)
-      else null
-    }
-    
-    def getCalleeOptionsByUri(procedureUri : ResourceUri) : java.util.Set[ResourceUri] = {
-      if(procedureUri != null){
-        virtualMethodTable.get(procedureUri)
-      }
-      else null
-    }
-    
-    def getCalleeOptionsBySignature(sig : String) : java.util.Set[ResourceUri] = {
-      var procedureUri = getProcedureUriBySignature(sig)
-      getCalleeOptionsByUri(procedureUri)
-    }
-    
-    def isConstructor(procedureUri : ResourceUri) : Boolean = {
-      if(procedureTypeTable.contains(procedureUri)){
-        if(procedureTypeTable(procedureUri) != null && procedureTypeTable(procedureUri).contains("CONSTRUCTOR")) true
-        else false
-      }
-      else {
-        println("procedureTypeTable : cannot find " + procedureUri)
-        false
-      }
-    }
-    
-    def isStaticMethod(procedureUri : ResourceUri) : Boolean = {
-      if(procedureTypeTable.contains(procedureUri)){
-        if(procedureTypeTable(procedureUri) != null && procedureTypeTable(procedureUri).contains("STATIC")) true
-        else false
-      }
-      else {
-        println("procedureTypeTable : cannot find " + procedureUri)
-        false
-      }
-    }
-    
-    def isVirtualMethod(procedureUri : ResourceUri) : Boolean = {
-      if(procedureTypeTable.contains(procedureUri)){
-        if(procedureTypeTable(procedureUri) != null && !procedureTypeTable(procedureUri).contains("CONSTRUCTOR") && !procedureTypeTable(procedureUri).contains("STATIC")) true
-        else false
-      }
-      else {
-        println("procedureTypeTable : cannot find " + procedureUri)
-        false
-      }
-    }
-    
-    def mergeWith(anotherVmTables : AndroidVirtualMethodTables) = {
-      combineTables(anotherVmTables)
-      mergeRecordHierarchyTableAndVirtualMethodTable()
-      
-    }
-    
-    def combineTables(anotherVmTables : AndroidVirtualMethodTables) = {
-      virtualMethodTable.putAll(anotherVmTables.virtualMethodTable)
-      recordProcedureTable.putAll(anotherVmTables.recordProcedureTable)
-      recordHierarchyTable.putAll(anotherVmTables.recordHierarchyTable)
-      cannotFindRecordTable.putAll(anotherVmTables.cannotFindRecordTable)
-      procedureTypeTable ++= anotherVmTables.procedureTypeTable
-      procedureUriTable ++= anotherVmTables.procedureUriTable
-      recordUriTable ++= anotherVmTables.recordUriTable
-      interfaceTable ++= anotherVmTables.interfaceTable
-    }
-    
-    def mergeRecordHierarchyTableAndVirtualMethodTable() = {
-      var tempNotFoundRecordsTable : HashMultimap[ResourceUri, ResourceUri] = HashMultimap.create()
-      val recordSets = recordUriTable.values.toSeq
-      var keys = cannotFindRecordTable.keySet
-      keys.map(
-        key=>
-        {
-          val notFoundRecords = cannotFindRecordTable.get(key)
-          notFoundRecords.map(
-            notFoundRecord =>
-              if(recordSets.contains(notFoundRecord)){
-                println("find: " + notFoundRecord)
-                recordHierarchyTable.put(key, notFoundRecord)
-                resolveVM(key)
-              } 
-              else {
-                tempNotFoundRecordsTable.put(key, notFoundRecord)
-              }
-          )
-        }
-      )
-      cannotFindRecordTable.clear()
-      cannotFindRecordTable.putAll(tempNotFoundRecordsTable)
-    }
-    
-    def isInterface(recordUri : ResourceUri) : Boolean = {
-      if(interfaceTable.contains(recordUri)) true
-      else false
-    }
-    
-    def isConsStaticFinalOrProtected(access : String) : Boolean = {
-      if(access != null){
-        if(access.contains("CONSTRUCTOR"))
-          true
-        else if(access.contains("STATIC"))
-          true
-        else if(access.contains("FINAL"))
-          true
-        else if(access.contains("PROTECTED"))
-          true
-        else
-          false
-      } else {
-        false
-      }
-    }
-    
-    def getInside(name : String) : String = {
-      val rName = name.substring(2, name.length()-2)
-      rName
-    }
-    
-    def getPartSig(sig : String) : String = {
-      getInside(sig).split(";", 2)(1)
-    }
-    
-    def sigEqual(procedureUri : ResourceUri, parentProcedureUri : ResourceUri) : Boolean = {
-      val sig1 = procedureUriTable.inverse.get(procedureUri)
-      val sig2 = procedureUriTable.inverse.get(parentProcedureUri)
-      if(sig1 != null && sig2 !=null && getPartSig(sig1).equals(getPartSig(sig2))){
-        true
-      } else {
-        false
-      }
-    }
-    
-    def buildVirtualMethodTable(from : ResourceUri, to : ResourceUri) : Unit = {
-      if(!virtualMethodTable.get(from).contains(to))
-        virtualMethodTable.put(from, to)
-    }
-    
-    def addRelation(recordUri : ResourceUri, procedureUri : ResourceUri) : Boolean = {
-      val parentsUri = recordHierarchyTable.get(recordUri)
-      if(parentsUri.isEmpty()) true
-      else{
-        for(parentUri <- parentsUri){
-          val parentProceduresUri = recordProcedureTable.get(parentUri)
-          for (parentProcedureUri <- parentProceduresUri){
-            if(sigEqual(procedureUri, parentProcedureUri)){
-              val vmPreceduresUri = virtualMethodTable.get(procedureUri)
-              println("procedures : " + vmPreceduresUri)
-              vmPreceduresUri.map(
-                pUri =>
-                {
-                  buildVirtualMethodTable(parentProcedureUri, pUri)
-                }
-              )
-              
-            }
-          }
-          addRelation(parentUri, procedureUri)
-        }
-        false
-      }
-    }
-    
-    def resolveVM(recordUri : ResourceUri) = {
-      if(!isInterface(recordUri)){
-        val proceduresUri = recordProcedureTable.get(recordUri)
-        proceduresUri.foreach(
-          procedureUri =>
-          {
-            if(!isConsStaticFinalOrProtected(procedureTypeTable(procedureUri))){
-              addRelation(recordUri, procedureUri)
-            }
-          }
-        )
-      }
-    }
-    
-    def toAndroidVirtualMethodTables : AndroidVirtualMethodTables = this
+    val avmr = new AndroidVirtualMethodResolver
+    avmr.resolveAndroidVirtualMethod(stp)
+    avmr.toAndroidVirtualMethodTables
   }
 
   def buildProcedureSymbolTables(stp : AndroidSymbolTableProducer, parallel : Boolean = true) : Unit = {
@@ -311,6 +97,8 @@ object AndroidSymbolTable {
       pmr.procMiner(pd)
       pmr.procResolver(pd)
     }
+    
+    println("build pst done! pst number : " + stp.toSymbolTable.procedureSymbolTables.size)
   }
   
   def buildSymbolTable(models : ISeq[Model],
@@ -330,10 +118,10 @@ object AndroidSymbolTable {
     val stp = minePackageElements(models, stpConstructor, parallel)
     val tables = resolveVirtualMethod(stp)
     //resolvePackageElements(models, stp, parallel)
-    buildProcedureSymbolTables(stp)
-    println("before merge : " + tables.cannotFindRecordTable)
+    buildProcedureSymbolTables(stp, parallel)
+    println("before merge : " + tables.asInstanceOf[AndroidVirtualMethodTablesProducer].tables.cannotFindRecordTable)
     tables.mergeWith(existingAndroidVirtualMethodTables)
-    println("after merge : " + tables.cannotFindRecordTable)
+    println("after merge : " + tables.asInstanceOf[AndroidVirtualMethodTablesProducer].tables.cannotFindRecordTable)
     (stp.toSymbolTable, tables)
   }
 

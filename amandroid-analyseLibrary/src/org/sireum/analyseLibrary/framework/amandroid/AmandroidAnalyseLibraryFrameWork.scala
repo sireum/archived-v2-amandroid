@@ -23,7 +23,6 @@ import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTableProducer
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.pilar.symbol.ProcedureSymbolTableData
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTableData
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidCompressedSymbolTable
 import org.sireum.amandroid.module.AndroidInterIntraProcedural
 import org.sireum.amandroid.module.AndroidInterIntraProceduralModule
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
@@ -103,7 +102,6 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         srcFiles += FileUtil.toUri(d + dirName + "/" + dirName + ".dex")
         
 //        val stFile = new File(resDir + "/" + dirName + "SymbolTable.xml")
-        val avmtFile = new File(resDir + "/" + dirName + "VirtualMethodTables.xml")
         
         val xStream = AndroidXStream
         xStream.xstream.alias("SymbolTable", classOf[SymbolTable])
@@ -140,6 +138,7 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         
         println("pipeline done!")
           
+        val avmtFile = new File(resDir + "/" + dirName + "VirtualMethodTables.xml")
         val outerAVMT = new FileOutputStream(avmtFile)
         val avmt = PilarAndroidSymbolResolverModule.getAndroidVirtualMethodTables(options)
         println("start convert AVMT to xml!")

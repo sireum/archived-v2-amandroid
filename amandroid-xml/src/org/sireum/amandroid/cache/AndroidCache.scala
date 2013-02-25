@@ -4,6 +4,8 @@ import org.sireum.util.cache.CacheProvider
 import org.sireum.util.cache.FileCaseFactory
 import org.sireum.util._
 import java.io._
+import java.util.zip.GZIPOutputStream
+import java.util.zip.GZIPInputStream
 
 final class AndroidCacheFile[K] extends CacheProvider[K] with FileCaseFactory[K]{
   
@@ -12,8 +14,8 @@ final class AndroidCacheFile[K] extends CacheProvider[K] with FileCaseFactory[K]
   var removePercent : Integer = 20
   var serializer : (Any, OutputStream) --> Unit = null
   var unSerializer : InputStream --> Any = null
-  var outer : FileOutputStream = null
-  var inner : FileInputStream = null
+  var outer : GZIPOutputStream = null
+  var inner : GZIPInputStream = null
   var rootDirectory : FileResourceUri = null
 
   def save[T](key : K, value : T) = {
@@ -26,11 +28,12 @@ final class AndroidCacheFile[K] extends CacheProvider[K] with FileCaseFactory[K]
   def load[T](key : K) : T = {
     require(!rootDirectory.equals(null))
     if(cacheMap.contains(key)){
-      cacheUpdateAndSort(key)
+      cacheUpdate(key)
       cacheMap(key)._1.asInstanceOf[T]
     } else {
       setFileInputStream(key)
       val value = unSerializer(inner).asInstanceOf[T]
+      inner.close()
       if(size == 0){
         //do nothing
       } else if(cacheMap.size <= size){
@@ -52,17 +55,13 @@ final class AndroidCacheFile[K] extends CacheProvider[K] with FileCaseFactory[K]
     removePercent = p
   }
   
-  def cacheUpdateAndSort(key : K) = {
+  def cacheUpdate(key : K) = {
     cacheMap(key) = (cacheMap(key)._1, cacheMap(key)._2 + 1)
-    cacheMap.toSeq.sortBy(_._2._2)
-    cacheMap.foreach(
-      item => println(item._2._1 + " " + item._2._2)  
-    )
   }
   
   def collectCacheMap() = {
     val i = (size * removePercent) / 100
-    cacheMap.dropRight(i)
+    cacheMap.toSeq.sortBy(_._2._2).dropRight(i)
   }
   
   def setValueSerializer(f : (Any, OutputStream) --> Unit, g : InputStream --> Any) = {
@@ -79,7 +78,7 @@ final class AndroidCacheFile[K] extends CacheProvider[K] with FileCaseFactory[K]
   }
   
   def fileNameBuilder(pUri : ResourceUri) : FileResourceUri = {
-    formatProcedureUri(pUri) + Integer.toHexString(pUri.hashCode) + ".xml"
+    formatProcedureUri(pUri) + Integer.toHexString(pUri.hashCode) + ".xml.zip"
   }
   
   def setFileInputStream(key : K) = {
@@ -89,7 +88,7 @@ final class AndroidCacheFile[K] extends CacheProvider[K] with FileCaseFactory[K]
         fileName = rootDirectory + fileNameBuilder(pUri)
       case _ =>
     }
-    inner = new FileInputStream(fileName)
+    inner = new GZIPInputStream(new FileInputStream(fileName))
   }
     
   def setFileOutputStream(key : K) = {
@@ -100,6 +99,6 @@ final class AndroidCacheFile[K] extends CacheProvider[K] with FileCaseFactory[K]
       case _ =>
     }
     val file = new File(fileName)
-    outer = new FileOutputStream(file)
+    outer = new GZIPOutputStream(new FileOutputStream(file))
   }
 }

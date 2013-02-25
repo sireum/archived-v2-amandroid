@@ -4,7 +4,10 @@ import org.sireum.test.framework.TestFramework
 import org.sireum.util._
 import java.io._
 import org.sireum.amandroid.xml.AndroidXStream
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
+import org.sireum.amandroid.AndroidSymbolResolver._
+import java.util.zip.GZIPOutputStream
+import java.util.zip.GZIPInputStream
+
 
 class BuildLibVmTableFramework extends TestFramework { 
   
@@ -52,10 +55,12 @@ class BuildLibVmTableFramework extends TestFramework {
         val xStream = AndroidXStream
         xStream.xstream.alias("AndroidVirtualMethodTables", classOf[AndroidVirtualMethodTables])
         
-        val libVmTablesFile = new File(resDir + "/" + "libVmTables.xml")
+        val libVmTablesFile = new File(resDir + "/" + "libVmTables.xml.zip")
         var libVmTables : AndroidVirtualMethodTables = null
         if(libVmTablesFile.exists()){
-          libVmTables = xStream.fromXml(libVmTablesFile).asInstanceOf[AndroidVirtualMethodTables]
+          val interAVMT = new GZIPInputStream(new FileInputStream(libVmTablesFile))
+          libVmTables = xStream.fromXml(interAVMT).asInstanceOf[AndroidVirtualMethodTables]
+          interAVMT.close()
         }
         
         val currentVmTables = xStream.fromXml(currentVmTablesFile).asInstanceOf[AndroidVirtualMethodTables]
@@ -63,17 +68,17 @@ class BuildLibVmTableFramework extends TestFramework {
         if(libVmTables == null){
           libVmTables = currentVmTables
         } else {
-          println("before merge: " + libVmTables.cannotFindRecordTable)
+          println("before merge: " + libVmTables.asInstanceOf[AndroidVirtualMethodTablesProducer].tables.cannotFindRecordTable)
           // if libVmTables already have something means we need to merge.
           libVmTables.mergeWith(currentVmTables)
-          println("after merge: " + libVmTables.cannotFindRecordTable)
+          println("after merge: " + libVmTables.asInstanceOf[AndroidVirtualMethodTablesProducer].tables.cannotFindRecordTable)
         }
         
-        val outerAVMT = new FileOutputStream(libVmTablesFile)
+        val outerAVMT = new GZIPOutputStream(new FileOutputStream(libVmTablesFile))
         
         println("start convert AVMT to xml!")
         xStream.toXml(libVmTables, outerAVMT)
-        
+        outerAVMT.close()
         println("###############################################")
     }
   }
