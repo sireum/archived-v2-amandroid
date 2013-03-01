@@ -12,7 +12,7 @@ import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
 
 
 
-object PilarAndroidSymbolResolverDef{
+object PilarAndroidSymbolResolverModuleDef{
     val ERROR_TAG_TYPE = MarkerType(
     "org.sireum.pilar.tag.error.symtab",
     None,
@@ -31,12 +31,10 @@ object PilarAndroidSymbolResolverDef{
 }
 
 
-class PilarAndroidSymbolResolverDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends PilarAndroidSymbolResolverModule {
-  
+class PilarAndroidSymbolResolverModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends PilarAndroidSymbolResolverModule {
   val ms = this.models
   val par = this.parallel
   val fst = { _ : Unit => new ST }
-
   val result = 
     if (this.hasExistingAndroidVirtualMethodTables.isDefined) {
       require(this.hasExistingAndroidVirtualMethodTables.isDefined)
@@ -59,8 +57,8 @@ class PilarAndroidSymbolResolverDef (val job : PipelineJob, info : PipelineJobMo
   class ST extends SymbolTable with AndroidSymbolTableProducer {
     st =>
 
-    import PilarAndroidSymbolResolverDef.ERROR_TAG_TYPE
-    import PilarAndroidSymbolResolverDef.WARNING_TAG_TYPE
+    import PilarAndroidSymbolResolverModuleDef.ERROR_TAG_TYPE
+    import PilarAndroidSymbolResolverModuleDef.WARNING_TAG_TYPE
     
     val tables = AndroidSymbolTableData()
     val tags = marrayEmpty[LocationTag]

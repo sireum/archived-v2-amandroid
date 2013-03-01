@@ -99,13 +99,11 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
 //        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d+dirName+"/classes.pilar"))))
         
         PilarAndroidSymbolResolverModule.setParallel(options, false)
-        PilarAndroidSymbolResolverModule.setHasExistingSymbolTable(options, None)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, Option(libVmTables))
-        AndroidInterIntraProceduralModule.setParallel(options, false)
         AndroidInterIntraProceduralModule.setAndroidCache(options, aCache)
         AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, true)
-        AndroidInterIntraProceduralModule.setShouldBuildCSCfg(options, true)
+        AndroidInterIntraProceduralModule.setShouldBuildCSCfg(options, false)
         
         val apiPermission : MMap[ResourceUri, MList[String]] = mmapEmpty
         val permList : MList[String] = mlistEmpty

@@ -32,8 +32,6 @@ case class PilarAndroidSymbolResolver(
   @Input
   parallel : Boolean,
 // Fengguo Wei put this three input as below.  
-  @Input
-  hasExistingSymbolTable : scala.Option[SymbolTable],
   
   @Input
   hasExistingAndroidVirtualMethodTables : scala.Option[AndroidVirtualMethodTables],

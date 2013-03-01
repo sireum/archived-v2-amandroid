@@ -114,7 +114,6 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d+ "/" +f.getName()))))
         
         PilarAndroidSymbolResolverModule.setParallel(options, false)
-        PilarAndroidSymbolResolverModule.setHasExistingSymbolTable(options, None)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, None)
         
         val aCache = new AndroidCacheFile[ResourceUri]

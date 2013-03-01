@@ -6,6 +6,7 @@ import org.sireum.util._
 import org.sireum.pilar.symbol._
 import com.google.common.collect.{HashMultimap, HashBiMap}
 import org.sireum.amandroid.AndroidSymbolResolver._
+import scala.collection.parallel._
 
 
 /**
@@ -67,9 +68,9 @@ object AndroidSymbolTable {
         tables.declaredSymbols(fileUri) = set
       }
       // println("AndroidSymbolTable :: AndroidSymbolTable :: minePackageElements :: OK2.1") // sankar testing
+      println("mine = " + stp.toSymbolTable.procedureSymbolTables.size)
       stp
     }.toIterable.reduce(H1.combine)
-    
   }
 
   def resolveVirtualMethod(stp : AndroidSymbolTableProducer) : AndroidVirtualMethodTables = {
@@ -82,9 +83,7 @@ object AndroidSymbolTable {
     val procedures = stp.tables.procedureAbsTable.keys.toSeq
     val col : GenSeq[ResourceUri] = if (parallel) procedures.par else procedures
     
-    println("build pst start! pst number : " + col.size)
-    
-    col.foreach { procedureUri =>
+    def work(procedureUri : ResourceUri) = {
       val pstp = stp.procedureSymbolTableProducer(procedureUri)
       val pd = stp.tables.procedureAbsTable(procedureUri)
       pd.body match {
@@ -96,7 +95,24 @@ object AndroidSymbolTable {
       val pmr = new H1.ProcedureMinerResolver(pstp)
       pmr.procMiner(pd)
       pmr.procResolver(pd)
+      sleep
     }
+    
+    def time(block: => Unit) : Long = {
+      val start = System.currentTimeMillis
+      block
+      val stop = System.currentTimeMillis
+      stop - start
+    }
+
+    // "lengthy" task for test
+    def sleep = {
+      Thread.sleep(100)
+    }
+    
+    println("build pst start! pst number : " + col.size)
+    
+    println(time(col.map{procUri=>work(procUri)}))
     
     println("build pst done! pst number : " + stp.toSymbolTable.procedureSymbolTables.size)
   }

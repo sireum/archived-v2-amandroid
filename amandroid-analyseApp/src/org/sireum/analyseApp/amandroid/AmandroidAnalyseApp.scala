@@ -25,7 +25,6 @@ class AmandroidAnalyseApp extends AmandroidAnalyseAppFrameWork{
   val libVmTablesFile = new File(d + "../../../../../../../amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/libVmTables/libVmTables.xml.zip")
   val interAVMT = new GZIPInputStream(new FileInputStream(libVmTablesFile))
   val libVmTables = xStream.fromXml(interAVMT).asInstanceOf[AndroidVirtualMethodTables]
-  
   val libraryFilePath = d + "../../../../../../../amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/ccfgs/"
   val aCache = new AndroidCacheFile[ResourceUri]
   val serializer : (Any, OutputStream) --> Unit = {
