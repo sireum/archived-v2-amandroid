@@ -19,5 +19,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-module"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-util"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-cache"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/bricsAutomata"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

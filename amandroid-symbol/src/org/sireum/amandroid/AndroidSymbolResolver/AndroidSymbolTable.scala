@@ -95,7 +95,7 @@ object AndroidSymbolTable {
       val pmr = new H1.ProcedureMinerResolver(pstp)
       pmr.procMiner(pd)
       pmr.procResolver(pd)
-      sleep
+     // sleep
     }
     
     def time(block: => Unit) : Long = {

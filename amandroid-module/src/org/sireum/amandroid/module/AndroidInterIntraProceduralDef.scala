@@ -155,6 +155,6 @@ class sCfgDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends sCfg
 
 class csCfgDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends csCfgModule {
  
-  this.csCfg_=(this.sCfg.compress(this.cCfgs, this.APIperm))
-  println("csCfg is built")
+  this.csCfg_=(this.sCfg.NOcompress(this.cCfgs, this.APIperm))
+  println("csCfg is built, which is same as the sCfg")
 }

@@ -13,5 +13,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-symbol"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-xml"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-cache"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/bricsAutomata"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

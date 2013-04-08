@@ -13,6 +13,10 @@ import org.sireum.amandroid.scfg.CompressedControlFlowGraph
 import org.sireum.alir.AlirLocationNode
 import java.util.zip.GZIPOutputStream
 
+
+// sankar comments: the main method takes a list of atomic security APIs S as input, and it finds the set of procedures which 
+// can reach (i.e. there is an control flow in between) an API in S.
+
 object Step3_IdentifySecurityRelatedAPIs {
   
   def time(block: => Unit) = {
@@ -55,7 +59,16 @@ object Step3_IdentifySecurityRelatedAPIs {
     val tempList : MList[ResourceUri] = mlistEmpty
     val procedures = libVmTables.asInstanceOf[AndroidVirtualMethodTablesProducer].tables.procedureUriTable
     println("total method number = " + procedures.size())
-    tempList += "pilar:/procedure/default/%5B%7Candroid::location::Location.getLatitude%7C%5D/1/25/7340288d"
+    tempList +="pilar:/procedure/default/%5B%7Candroid::location::LocationManager.requestLocationUpdates%7C%5D/1/23/100d0973"
+    tempList += "pilar:/procedure/default/%5B%7Candroid::location::LocationManager.requestLocationUpdates%7C%5D/1/23/5ab1845"
+    tempList += "pilar:/procedure/default/%5B%7Candroid::location::LocationManager.requestLocationUpdates%7C%5D/1/23/a14cd0d2"
+    tempList += "pilar:/procedure/default/%5B%7Candroid::location::LocationManager.requestLocationUpdates%7C%5D/1/23/6a9426cb"
+    tempList += "pilar:/procedure/default/%5B%7Candroid::location::LocationManager.requestLocationUpdates%7C%5D/1/23/dd6d2b6f"
+    tempList += "pilar:/procedure/default/%5B%7Candroid::location::LocationManager.requestLocationUpdates%7C%5D/1/23/9b52afde"
+    tempList += "pilar:/procedure/default/%5B%7Candroid::location::LocationManager.requestLocationUpdates%7C%5D/1/23/53535e43"
+    tempList += "pilar:/procedure/default/%5B%7Candroid::location::LocationManager.requestLocationUpdates%7C%5D/1/23/20986b88"
+      
+    // tempList += "pilar:/procedure/default/%5B%7Candroid::location::Location.getLatitude%7C%5D/1/25/7340288d"
     tempList += "pilar:/procedure/default/%5B%7Candroid::telephony::SmsManager.sendTextMessage%7C%5D/1/23/b3fa9950"
 
     val atomicSecAPIs = tempList.toSeq
@@ -67,7 +80,7 @@ object Step3_IdentifySecurityRelatedAPIs {
           val bitset : MBitSet = mbitsetEmpty(atomicSecAPIs.size)
           bitset(atomicSecAPIs.indexOf(procUri)) = true
           pUriToBitsetMap(procUri) = (bitset,(mmapEmpty))
-          println(procUri + "bitset = " + bitset(0) + bitset(1))
+          println(procUri + " 's bitset = " + bitset.toString())
         }
     )
     type VirtualLabel = String

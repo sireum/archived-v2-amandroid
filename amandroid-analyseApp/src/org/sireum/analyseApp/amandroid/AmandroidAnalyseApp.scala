@@ -42,7 +42,7 @@ class AmandroidAnalyseApp extends AmandroidAnalyseAppFrameWork{
   
   AmandroidFiles.apkModelFiles.
   foreach{fileUri=>
-    if(fileUri.indexOf("0eb") > 0)
+     if(fileUri.indexOf("0eb") > 0)
       Analyzing title fileUri file(fileUri, libVmTables, aCache)
   }
 }

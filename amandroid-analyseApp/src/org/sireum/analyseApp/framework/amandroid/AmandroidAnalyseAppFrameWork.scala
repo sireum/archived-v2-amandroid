@@ -103,7 +103,9 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
         AndroidInterIntraProceduralModule.setAndroidCache(options, aCache)
         AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, true)
-        AndroidInterIntraProceduralModule.setShouldBuildCSCfg(options, false)
+        AndroidInterIntraProceduralModule.setShouldBuildCSCfg(options, true) // CSCFG = compressed system-wide control flow graph of an app X
+  
+        // experimental code starts which does not have any significant role now; later we will delete it after some related cleaning 
         
         val apiPermission : MMap[ResourceUri, MList[String]] = mmapEmpty
         val permList : MList[String] = mlistEmpty
@@ -111,6 +113,8 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
         val pUri : ResourceUri = "abc"  // replace "abc" by apiUri (e.g. pilar:/procedure/default/%5B%7Candroid::content::Context.startService%7C%5D/1/50/f9cb48df) later
         apiPermission(pUri) = permList
         AndroidInterIntraProceduralModule.setAPIpermOpt(options, Option(apiPermission)) 
+        
+        // experimental code ends
         
         pipeline.compute(job)
         if(job.hasError){
@@ -120,15 +124,14 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
         }
 //        val r = AndroidInterIntraProceduralModule.getInterResult(options)
         
-        //1. set graph file name
-        //2. set output string
-        //3. get each file
-        //4. run command
+ 
         
         //1. get sCfg
-//        val sCfgFile = new File(d + dirName + "/graphs/sCfg.dot")
-//        val outer = new FileOutputStream(sCfgFile)
-//        val w = new OutputStreamWriter(outer, "GBK")
+      //  val sCfgFile = new File(d + dirName + "/graphs/sCfg.graph")
+      //  val outer = new FileOutputStream(sCfgFile)
+      //  val w = new OutputStreamWriter(outer, "GBK")
+        
+        
         val csCfg = AndroidInterIntraProceduralModule.getInterResult(options) match {
           case Some(s) => s
           case None => null
@@ -137,7 +140,16 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
 //        w.flush()
 //        val str = Array("dot", "-Tps2", d + dirName + "/graphs/sCfg.dot", "-o", d + dirName + "/graphs/sCfg.ps")
 //        val proc = Runtime.getRuntime().exec(str) 
+        
         println("###############################################")
+        
+        //get csCfg
+        val csCfgFile = new File(d + dirName + "/graphs/csCfg.graph")
+        val outer = new FileOutputStream(csCfgFile)
+        val w = new OutputStreamWriter(outer, "GBK")
+        w.write(csCfg.toString())
+// //       println(csCfg.toString())
+        println(" csCfg saving is done which is same as sCfg now because no compression was made")
     }
   }
 
