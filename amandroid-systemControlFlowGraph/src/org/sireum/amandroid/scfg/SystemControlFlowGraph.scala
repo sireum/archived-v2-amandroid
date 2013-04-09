@@ -337,7 +337,7 @@ object SystemControlFlowGraph {
 	         
 	                       if(!bitset.isEmpty) {
 	                       
-	                         // addFlag = true     // ********** uncomment this line later; commented it just to make the sCfg small for a test
+	                          addFlag = true     // ********** uncomment this line later; commented it just to make the sCfg small for a test
 	                       }
 	                     
 	                     }
@@ -449,7 +449,7 @@ object SystemControlFlowGraph {
     
   // build step 1.1 : loading marking repository (which has info about procedures transitively calling interesting APIs) which has been saved in an earlier stage
   
-    
+  // ************ need to AVOID the following hard-coded file path  *********************  
     
   val markingRepoFile = new File("/Users/sankar/Desktop/amandroidWorkSpace/amandroid/amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/libBitSet/libBitSet.xml.zip")
   var markingRepo : MMap[ResourceUri, (MBitSet,MMap[ResourceUri, Integer])] = null
@@ -519,6 +519,7 @@ object SystemControlFlowGraph {
       println("in sCfg the current num of cCfgs is :" + cCfgs.size + " and procedure-to-be-precessed count is " + sCfg.procedureUriList.size)
       val pUri = sCfg.procedureUriList(0)
       val cCfg = cCfgs(pUri)
+      //connectToAtomicAPIsOrCompress(pUri, vmTables, markingRepo, cCfg, cCfgs, sCfg, aCache) 
       addInterCCfgEdgesOrCompress(pUri, vmTables, markingRepo, cCfg, cCfgs, sCfg, aCache) 
       sCfg.procedureUriList -= pUri
       
@@ -526,8 +527,66 @@ object SystemControlFlowGraph {
     
     println("cCfg size :" + cCfgs.size)
     println("sCfg node count = " + sCfg.nodes.size + " and edge count is " + sCfg.edges.size)
+  
     
-    sCfg.buildAutomata()
+//    // now 2nd type of compression (only keeping info-collection and info-send and entry-point procedures) starts
+//
+//    val tempList : MList[ResourceUri] = mlistEmpty
+//    
+//    tempList +="pilar:/procedure/default/%5B%7Candroid::location::LocationManager.requestLocationUpdates%7C%5D/1/23/100d0973"
+//    tempList += "pilar:/procedure/default/%5B%7Candroid::location::LocationManager.requestLocationUpdates%7C%5D/1/23/5ab1845"
+//    tempList += "pilar:/procedure/default/%5B%7Candroid::location::LocationManager.requestLocationUpdates%7C%5D/1/23/a14cd0d2"
+//    tempList += "pilar:/procedure/default/%5B%7Candroid::location::LocationManager.requestLocationUpdates%7C%5D/1/23/6a9426cb"
+//    tempList += "pilar:/procedure/default/%5B%7Candroid::location::LocationManager.requestLocationUpdates%7C%5D/1/23/dd6d2b6f"
+//    tempList += "pilar:/procedure/default/%5B%7Candroid::location::LocationManager.requestLocationUpdates%7C%5D/1/23/9b52afde"
+//    tempList += "pilar:/procedure/default/%5B%7Candroid::location::LocationManager.requestLocationUpdates%7C%5D/1/23/53535e43"
+//    tempList += "pilar:/procedure/default/%5B%7Candroid::location::LocationManager.requestLocationUpdates%7C%5D/1/23/20986b88"
+//      
+//    // tempList += "pilar:/procedure/default/%5B%7Candroid::location::Location.getLatitude%7C%5D/1/25/7340288d"
+//    tempList += "pilar:/procedure/default/%5B%7Candroid::telephony::SmsManager.sendTextMessage%7C%5D/1/23/b3fa9950"
+//
+//    var done = false
+//      
+//    while(!done) {
+//      
+//      done = true
+//      
+//      var i = 0
+//      
+//      while(i < (sCfg.nodes.size -1)) {
+//      
+//	      val n = sCfg.nodes.toSeq(i)  // is this for-loop-while-loop logic/construction OK ???
+//	      
+//	      val label = n.toString()
+//	      
+//	      println("current to-delete node is " + label + " while i = " + i + " and total node count in current sCfg is " + sCfg.nodes.size)
+//	      
+//	      if(!label.contains("pilar:/procedure/default/%5B%7Cde::mobinauten::smsspy::EmergencyTask.onLocationChanged%7C%5D/1/23/51eae215.Entry")) {
+//	        
+//	        sCfg.compressByDelNode(n) // note that this call does not obey the assumptions of compressByDelNode as noted on top of the definition
+//	        
+//	        done = false
+//	        
+//	      }
+//	      
+//	      else {
+//	        
+//	         i = i + 1
+//	        
+//	      }
+//	        
+//	     
+//      }
+//           
+//    }
+//    
+//   
+//    println("after 2nd compression the sCfg's node count = " + sCfg.nodes.size + " and edge count is " + sCfg.edges.size)
+//    
+//    // the above type of compression ends
+//    
+    
+    val automata = sCfg.buildAutomata()
     
     sCfg
   }
