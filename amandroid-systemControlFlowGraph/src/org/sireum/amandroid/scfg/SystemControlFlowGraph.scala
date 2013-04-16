@@ -427,7 +427,7 @@ object SystemControlFlowGraph {
 		                for (callee <- calleeOptions)
 		                {
 		                  //if callee is in the app, then we are interested in adding edges to callee
-		                  //if callee is marked in mRepo with bits x, then only we are interested in adding edges to each such ATOMIC API (corresponding to x)ß
+		                  //if callee is marked in mRepo with bits x, then only we are interested in adding edges to each such ATOMIC API (corresponding to x)
 		                  if (sCfg.intraAppProcUriList.contains(callee)) {
 		                      delFlag = false
 		                  } else {
@@ -514,7 +514,7 @@ object SystemControlFlowGraph {
 		                for (callee <- calleeOptions)
 		                {
 		                  //if callee is in the app, then we are interested in adding edges to callee
-		                  //if callee is marked in mRepo with bits x, then only we are interested in adding edges to each such ATOMIC API (corresponding to x)ß
+		                  //if callee is marked in mRepo with bits x, then only we are interested in adding edges to each such ATOMIC API (corresponding to x)
 		                  
 	                     if(!mRepo.contains(callee)){
 	                       println("error: this is an unexpected situation: mRepo does not have the callee.")
