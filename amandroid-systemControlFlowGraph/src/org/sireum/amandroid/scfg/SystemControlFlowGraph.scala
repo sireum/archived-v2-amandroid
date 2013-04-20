@@ -19,6 +19,8 @@ import java.io.OutputStreamWriter
 import java.io.Writer
 import org.jgrapht.ext.DOTExporter
 import org.jgrapht.ext.VertexNameProvider
+import org.sireum.amandroid.callGraph.CallGraphMark
+import dk.brics.automaton.RegExp
 
 
 trait SystemControlFlowGraph[VirtualLabel] extends CompressedControlFlowGraph[VirtualLabel] with AlirEdgeAccesses[SystemControlFlowGraph.Node]{
@@ -278,39 +280,41 @@ trait SystemControlFlowGraph[VirtualLabel] extends CompressedControlFlowGraph[Vi
         }
     )
     
-    nodes.foreach(
+//    calleeIndex = 0 // resetting it for tracking other nodes
+//    
+//    nodes.foreach(
+//    
+//        gNode => { // ******* below check the hard-coded path for testing ***********
+//          
+//          if(!gNode.toString().contains("pilar:/procedure/default/%5B%7Cde::mobinauten") && gNode.toString().endsWith(".Exit"))
+//          {
+//            
+//            calleeMap(gNode) = ('a' + calleeIndex).toChar
+//            println("in calleeMap: node " + gNode.toString() + "  has label = " + calleeMap(gNode))
+//            
+//            calleeIndex = calleeIndex + 1
+//          }
+//          
+//        }
+//    )
     
-        gNode => { // ******* below check the hard-coded path for testing ***********
-          
-          if(!gNode.toString().contains("pilar:/procedure/default/%5B%7Cde::mobinauten") && !gNode.toString().endsWith(".Entry"))
-          {
-            
-            calleeMap(gNode) = ('A' + calleeIndex).toChar
-            println("in calleeMap: node " + gNode.toString() + "  has label = " + calleeMap(gNode))
-            
-            calleeIndex = calleeIndex + 1
-          }
-          
-        }
-    )
+    //calleeIndex = 0 // resetting it for tracking other nodes
     
-    calleeIndex = 0 // resetting it for tracking other nodes
-    
-    nodes.foreach(
-    
-        gNode => { // ******* below check the hard-coded path for testing ***********
-          
-          if(gNode.toString().contains("pilar:/procedure/default/%5B%7Cde::mobinauten"))
-          {
-            
-            calleeMap(gNode) = ('a' + calleeIndex).toChar
-            println("in calleeMap: node " + gNode.toString() + "  has label = " + calleeMap(gNode))
-            
-            calleeIndex = calleeIndex + 1
-          }
-          
-        }
-    )
+//    nodes.foreach(
+//    
+//        gNode => { // ******* below check the hard-coded path for testing ***********
+//          
+//          if(gNode.toString().contains("pilar:/procedure/default/%5B%7Cde::mobinauten") && gNode.toString().endsWith(".Exit"))
+//          {
+//            
+//            calleeMap(gNode) = ('y').toChar
+//            println("in calleeMap: node " + gNode.toString() + "  has label = " + calleeMap(gNode))
+//            
+////            calleeIndex = calleeIndex + 1
+//          }
+//          
+//        }
+//    )
     
     
     // build the automata from the sCfg
@@ -330,11 +334,7 @@ trait SystemControlFlowGraph[VirtualLabel] extends CompressedControlFlowGraph[Vi
                 
                 val automataSucc = nodeMap(gSucc)
                 
-                // ******* below check the hard-coded path for testing ***********
-                
-                if(gSucc.toString().contains("android::telephony::SmsManager"))  // testing : this if-block is for debugging
-                  println("there is an edge (in sCfg) start node = " + gNode + " and the end node = " + gSucc)
-                
+               
                 if(calleeMap.contains(gSucc))
                   label = calleeMap(gSucc)
                 
@@ -368,8 +368,7 @@ trait SystemControlFlowGraph[VirtualLabel] extends CompressedControlFlowGraph[Vi
     )
    
    automata
-  }
-   
+  }  
    
 }
 
@@ -428,7 +427,7 @@ object SystemControlFlowGraph {
 		                for (callee <- calleeOptions)
 		                {
 		                  //if callee is in the app, then we are interested in adding edges to callee
-		                  //if callee is marked in mRepo with bits x, then only we are interested in adding edges to each such ATOMIC API (corresponding to x)ß
+		                  //if callee is marked in mRepo with bits x, then only we are interested in adding edges to each such ATOMIC API (corresponding to x)
 		                  if (sCfg.intraAppProcUriList.contains(callee)) {
 		                      delFlag = false
 		                  } else {
@@ -481,6 +480,90 @@ object SystemControlFlowGraph {
     
   }
   
+  
+  // note the difference of extraCompressCCfgAndCollect and CompressCCfgAndCollect. 
+  // extraCompressCCfgAndCollect also compresses intra-app calls if they are not transitively interesting.
+  
+  def extraCompressCCfgAndCollect[VirtualLabel](
+                                      vmTables : AndroidVirtualMethodTables,
+                                      atomicSecAPIs : Seq[ResourceUri],
+                                      mRepo : MMap[ResourceUri, (MBitSet,MMap[ResourceUri, Integer])], // marking-repo which remains constant inside this procedure
+                                      cCfgs: MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]], // cCfgs does not grow within this procedure. For each atomic proc we add one pair of Entry and Exit nodes to SCfg.
+                                      sCfg: SystemControlFlowGraph[VirtualLabel],
+                                      aCache : AndroidCacheFile[ResourceUri]) = {
+    val cCfgsSeq = cCfgs.toSeq
+    for(i<-0 to cCfgs.size - 1){
+        val cCfg = cCfgsSeq(i)
+        cCfg._2.nodes.foreach(
+            node =>{
+	        	node match 
+		        {
+		          case n : AlirLocationNode =>
+		            val calleeSig = n.getProperty[String]("calleeSig")
+		            if(calleeSig != null){  // so, the current locDecl is actually a caller node
+		              val calleeOptions = vmTables.getCalleeOptionsBySignature(calleeSig)             
+		              // getting caller node
+		              var callerNode : Node = null  
+		              if(n.isInstanceOf[AlirLocationUriNode])
+		            	  callerNode = sCfg.getNode(cCfg._1, n.asInstanceOf[AlirLocationUriNode].toString(), n.asInstanceOf[AlirLocationUriNode].locIndex)
+		              else
+		            	  println("unexpected error: caller node is not available")
+		              var delFlag = true // if the delFlag remains true below after all callee options are processed, then we delete the caller node from the sCfg.
+		              if(calleeOptions != null) {                    
+		                import scala.collection.JavaConversions._  // we need this for the next for-loop 
+		                for (callee <- calleeOptions)
+		                {
+		                  //if callee is in the app, then we are interested in adding edges to callee
+		                  //if callee is marked in mRepo with bits x, then only we are interested in adding edges to each such ATOMIC API (corresponding to x)
+		                  
+	                     if(!mRepo.contains(callee)){
+	                       println("error: this is an unexpected situation: mRepo does not have the callee.")
+	                     } else {
+	                       val bitset = mRepo(callee)._1
+	                       if(!bitset.isEmpty) {
+			                  delFlag = false
+			                  val relAtomicAPIs : MList[ResourceUri] = mlistEmpty
+		                      atomicSecAPIs.foreach(
+							      procUri =>
+							        {
+							        	if(bitset(atomicSecAPIs.indexOf(procUri))){
+							              relAtomicAPIs += procUri
+							        	}
+							        }
+							  )
+							  println("relAtomic----->" + relAtomicAPIs)
+							  relAtomicAPIs.foreach(
+								relAtomicAPI =>{
+								  if(!sCfg.procedureUriList.contains(relAtomicAPI) && !cCfgs.contains(relAtomicAPI)){
+				                    //i.e outside callee case starts
+				                    sCfg.procedureUriList += relAtomicAPI
+				                    // println(relAtomicAPI)
+				                    val calleeCCfg = aCache.load[CompressedControlFlowGraph[VirtualLabel]](relAtomicAPI)
+//					                    cCfgs(relAtomicAPI) = calleeCCfg
+				                    collectAtomicCCfgToBaseGraph[VirtualLabel](relAtomicAPI, sCfg.asInstanceOf[systemCfg[VirtualLabel]])
+				                  }
+								}
+							  )
+	                       }
+	                     } 
+		                }
+		             }
+		             // the current caller node has been processed
+		              
+		             if(delFlag){
+		               // println("callerNode = " + callerNode)
+		               // delete the caller node (as it does not involve an interesting call option neither it is within the app) using the regular cfg compression algorithm
+		               sCfg.compressByDelNode(callerNode)
+		             } 
+		          }
+		          case x : AlirVirtualNode[VirtualLabel] => // do nothing; println(x.label) 
+		       }
+	      }
+        )
+     }
+    
+  }
+  
   def connectCCfgs[VirtualLabel](vmTables : AndroidVirtualMethodTables,
                                       atomicSecAPIs : Seq[ResourceUri],
                                       mRepo : MMap[ResourceUri, (MBitSet,MMap[ResourceUri, Integer])],
@@ -509,38 +592,38 @@ object SystemControlFlowGraph {
 	                  //if callee is marked in mRepo with bits x, then only we are interested in adding edges to each such ATOMIC API (corresponding to x)
 	                  
 	                  
-	                  if (sCfg.intraAppProcUriList.contains(callee)) {
-	                      addFlag = true
-	                      val calleeFuncStartNode = sCfg.getVirtualNode((callee + "." + "Entry").asInstanceOf[VirtualLabel])
-		                  if(callerNode != null && calleeFuncStartNode != null)
-		                  {
-		                     if (!sCfg.hasEdge(callerNode, calleeFuncStartNode))
-		                        sCfg.addEdge(callerNode, calleeFuncStartNode) // this is adding an inter-cCfg edge in the sCfg
-		                  }
-		                  else
-		                     println("error:  not ok")
-		                    
-		                  val calleeFuncExitNode = sCfg.getVirtualNode((callee + "." + "Exit").asInstanceOf[VirtualLabel])
-		                  
-		                  
-		                 // note that  callerNodeSuccessors list is determined before the for-loop-of-calleeOptions so that this for-loop does not have an impact on this list
-		                  // also, note that using "callerNodeSuccessors.foreach" is OK below as the following inner loop does not change callerNodeSuccessors list ????
-		                  
-		                  callerNodeSuccessors.foreach(
-		                  
-		                      callerNodeSuccessor => {
-		                        
-		                        if(calleeFuncExitNode != null){
-		                           if(!sCfg.hasEdge(calleeFuncExitNode, callerNodeSuccessor))
-		                             sCfg.addEdge(calleeFuncExitNode, callerNodeSuccessor) // this is adding an inter-cCfg edge in the sCfg
-		                           sCfg.deleteEdge(callerNode, callerNodeSuccessor)
-	
-		                        }
-		                        		                        
-		                      }
-		                  )
-	                  } 
-	                  else {
+//	                  if (sCfg.intraAppProcUriList.contains(callee)) {
+//	                      addFlag = true
+//	                      val calleeFuncStartNode = sCfg.getVirtualNode((callee + "." + "Entry").asInstanceOf[VirtualLabel])
+//		                  if(callerNode != null && calleeFuncStartNode != null)
+//		                  {
+//		                     if (!sCfg.hasEdge(callerNode, calleeFuncStartNode))
+//		                        sCfg.addEdge(callerNode, calleeFuncStartNode) // this is adding an inter-cCfg edge in the sCfg
+//		                  }
+//		                  else
+//		                     println("error:  not ok")
+//		                    
+//		                  val calleeFuncExitNode = sCfg.getVirtualNode((callee + "." + "Exit").asInstanceOf[VirtualLabel])
+//		                  
+//		                  
+//		                 // note that  callerNodeSuccessors list is determined before the for-loop-of-calleeOptions so that this for-loop does not have an impact on this list
+//		                  // also, note that using "callerNodeSuccessors.foreach" is OK below as the following inner loop does not change callerNodeSuccessors list ????
+//		                  
+//		                  callerNodeSuccessors.foreach(
+//		                  
+//		                      callerNodeSuccessor => {
+//		                        
+//		                        if(calleeFuncExitNode != null){
+//		                           if(!sCfg.hasEdge(calleeFuncExitNode, callerNodeSuccessor))
+//		                             sCfg.addEdge(calleeFuncExitNode, callerNodeSuccessor) // this is adding an inter-cCfg edge in the sCfg
+//		                           sCfg.deleteEdge(callerNode, callerNodeSuccessor)
+//	
+//		                        }
+//		                        		                        
+//		                      }
+//		                  )
+//	                  } 
+//	                  else {
 	                     if(!mRepo.contains(callee))
 	                       println("error: this is an unexpected situation")
 	                     else
@@ -602,7 +685,7 @@ object SystemControlFlowGraph {
 	                       }
 	                     
 	                     }
-	                  }
+//	                  }
                 }
              }
              // the current caller node has been processed
@@ -989,7 +1072,20 @@ object SystemControlFlowGraph {
     )
   }
   
-  
+  def matchSignature(reg : String,
+		  			 automata : Automaton) = {
+     val r1 = new RegExp(reg)
+	 val a = r1.toAutomaton()
+	 val result = automata.intersection(a)
+	 println(result.toDot())
+	 if(!result.isEmpty()){
+	   println("fs = " + result.getFiniteStrings())
+	   println( "singleton" + result.getSingleton())
+	   true
+	 } else {
+	   false
+	 }
+  }
 
   
   def build[VirtualLabel] //
@@ -1067,7 +1163,13 @@ object SystemControlFlowGraph {
 	                  
 	println("marked procedure count in the whole library is " + markedProcNum)                  
 
-   // build step 1.2: make base pool (collection of all individual cCfg node-pools) 
+	// build step 1.2: update marking repo with intra-app calls.
+	val cgm = new CallGraphMark
+	cgm.initiatePUriToBitsetMap[VirtualLabel](cCfgs, markingRepo, atomicSecAPIs.size)
+	cgm.callGraphMark[VirtualLabel](cCfgs, markingRepo, vmTables)
+	
+//	println("onlocationchanged -------> " + markingRepo("pilar:/procedure/default/%5B%7Cde::mobinauten::smsspy::EmergencyTask.onLocationChanged%7C%5D/1/23/51eae215"))
+   // build step 1.3: make base pool (collection of all individual cCfg node-pools) 
    // and base graph (collection of all individual cCfgs) of the particular input app. 
    
 	
@@ -1092,7 +1194,6 @@ object SystemControlFlowGraph {
      }
    
    
-   
    // step 1.2 is done above
     
   
@@ -1114,7 +1215,8 @@ object SystemControlFlowGraph {
 //      
 //    }
     
-    compressCCfgAndCollect(vmTables, atomicSecAPIs, markingRepo, cCfgs, sCfg, aCache)
+//    compressCCfgAndCollect(vmTables, atomicSecAPIs, markingRepo, cCfgs, sCfg, aCache)
+    extraCompressCCfgAndCollect(vmTables, atomicSecAPIs, markingRepo, cCfgs, sCfg, aCache)
     connectCCfgs(vmTables, atomicSecAPIs, markingRepo, sCfg)
 //    println("cCfg size :" + cCfgs.size)
     println("sCfg node count = " + sCfg.nodes.size + " and edge count is " + sCfg.edges.size)
@@ -1186,7 +1288,8 @@ object SystemControlFlowGraph {
 //    
     
     val automata = sCfg.buildAutomata()
-    
+    val reg : String = "x*(A|B|C|E|F|G|H|I)x*Dx*"
+    println("match?------> " + matchSignature(reg, automata))
     sCfg
   }
   

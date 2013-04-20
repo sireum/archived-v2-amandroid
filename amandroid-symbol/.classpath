@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Guava"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JGraphT"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/ANTLR v3"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry combineaccessrules="false" kind="src" path="/sireum-lib"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-pilar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-util"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-alir"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/StringTemplate v4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
