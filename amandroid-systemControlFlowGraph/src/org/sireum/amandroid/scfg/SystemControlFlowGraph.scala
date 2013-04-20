@@ -1007,7 +1007,7 @@ object SystemControlFlowGraph {
   
   // ************ need to AVOID the following hard-coded file path  *********************  
     
-  val markingRepoFile = new File("/Users/sankar/Desktop/amandroidWorkSpace/amandroid/amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/libBitSet/libBitSet.xml.zip")
+  val markingRepoFile = new File("../../../../../../../amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/libVmTables/libVmTables.xml.zip")
   var markingRepo : MMap[ResourceUri, (MBitSet,MMap[ResourceUri, Integer])] = null
     if(markingRepoFile.exists()){
       val repoStream = new GZIPInputStream(new FileInputStream(markingRepoFile))

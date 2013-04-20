@@ -1,9 +1,4 @@
-package org.sireum.analyseLibrary.framework.amandroid
-
-/*
- * Fengguo Wei, Kansas State University. Implement this library analyse framework.
- * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>                           
-*/
+package org.sireum.analyseApp.framework.amandroid
 
 import org.sireum.test.framework._
 import org.sireum.pilar.ast._
@@ -16,19 +11,16 @@ import java.io._
 import java.util.zip.ZipFile
 import org.sireum.core.module.ChunkingPilarParserModule
 import org.sireum.amandroid.module.PilarAndroidSymbolResolverModule
-import org.sireum.pilar.symbol.SymbolTable
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
-import org.sireum.amandroid.xml.AndroidXStream
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTableProducer
-import org.sireum.pilar.symbol.ProcedureSymbolTable
-import org.sireum.pilar.symbol.ProcedureSymbolTableData
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTableData
-import org.sireum.amandroid.module.AndroidInterIntraProcedural
 import org.sireum.amandroid.module.AndroidInterIntraProceduralModule
+import org.sireum.amandroid.xml.AndroidXStream
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
+import org.sireum.alir.AlirIntraProceduralGraph
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
 import org.sireum.amandroid.cache.AndroidCacheFile
 
-trait AmandroidAnalyseLibraryFrameWork extends TestFramework { 
+// sankar introduces the following framework which adds one stage on top of AmandroidParserTestFrameWork 
+
+trait AmandroidOFAAppFrameWork extends TestFramework { 
   
   //////////////////////////////////////////////////////////////////////////////
   // Implemented Public Methods
@@ -41,15 +33,23 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
     this
   }
 
-  def file(fileUri : FileResourceUri) =
-    AmandroidConfiguration(title, fileUri)
+  def file(fileUri : FileResourceUri,
+           libVmTables : AndroidVirtualMethodTables,
+           aCache : AndroidCacheFile[ResourceUri]) =
+    AmandroidConfiguration(title, fileUri, libVmTables, aCache)
 
   //////////////////////////////////////////////////////////////////////////////
   // Public Case Classes
   //////////////////////////////////////////////////////////////////////////////
 
+  type VirtualLabel = String
+  
+  
   case class AmandroidConfiguration //
-  (title : String, srcs : FileResourceUri) {
+  (title : String,
+   srcs : FileResourceUri,
+   libVmTables : AndroidVirtualMethodTables,
+   aCache : AndroidCacheFile[ResourceUri]) {
 
     ////////////////////////////////////////////////////////////////////////////
     // Test Constructor
@@ -59,26 +59,16 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
       println("####" + title + "#####")
         val f = new File(srcs.toString().substring(5))
         //create directory
-        val nameArray = f.getName().split("\\.")
-        var dirName : String = ""
-        for(i <- 0 until nameArray.length-1){
-          dirName += nameArray(i)
-        }
+        val dirName = f.getName().split("\\.")(0)
         val d = srcs.substring(srcs.indexOf("/"), srcs.lastIndexOf("/")+1)
-//        val dirc = new File(d + dirName)
+        val dirc = new File(d + dirName)
         val srcFiles = mlistEmpty[FileResourceUri]
-        val resDir = new File(d+"result")
-        val ccfgDir = new File(d+"result/ccfgs")
-//        if(!dirc.exists()){
-//          dirc.mkdir()
-//        }
-        if(!resDir.exists()){
-          resDir.mkdir()
+        val graDir = new File(d+dirName+"/graphs")
+        if(!dirc.exists()){
+          dirc.mkdir()
+          graDir.mkdir()
         }
-        if(!ccfgDir.exists()){
-          ccfgDir.mkdir()
-        }
-        //deal with jar file
+        //deal with apk file
 //        val apkName = f.getName()
 //        val apkFile = new ZipFile(f, ZipFile.OPEN_READ)
 //        val entries = apkFile.entries()
@@ -86,7 +76,7 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
 //          val ze = entries.nextElement()
 //          if(ze.toString().endsWith(".dex")){
 //            val loadFile = new File(d+ze.getName())
-//            val ops = new FileOutputStream(d + dirName + "/" + dirName + ".dex")
+//            val ops = new FileOutputStream(d + dirName + "/classes.dex")
 //            val ips = apkFile.getInputStream(ze)
 //            var reading = true
 //            while(reading){
@@ -99,62 +89,68 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
 //            ips.close()
 //          }
 //        }
-        srcFiles += FileUtil.toUri(d + dirName + "/" + dirName + ".dex")
+      
+        srcFiles += FileUtil.toUri(d + "/" + dirName + ".pilar")
         
-//        val stFile = new File(resDir + "/" + dirName + "SymbolTable.xml")
-        
-        val xStream = AndroidXStream
-        xStream.xstream.alias("SymbolTable", classOf[SymbolTable])
-        xStream.xstream.alias("AndroidVirtualMethodTables", classOf[AndroidVirtualMethodTables])
-    
         val job = PipelineJob()
         val options = job.properties
 //        Dex2PilarWrapperModule.setSrcFiles(options, srcFiles)
-
-        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d+ "/" +f.getName()))))
+        
+        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d + "/" + dirName + ".pilar"))))
         
         PilarAndroidSymbolResolverModule.setParallel(options, false)
-        PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, None)
-        
-        val aCache = new AndroidCacheFile[ResourceUri]
-        val serializer : (Any, OutputStream) --> Unit = {
-          case (v, o) =>
-            xStream.toXml(v, o)
-        }
-        aCache.setRootDirectory(ccfgDir + "/")
-        aCache.setValueSerializer(serializer, null)
-        AndroidInterIntraProceduralModule.setParallel(options, false)
+        PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, Option(libVmTables))
         AndroidInterIntraProceduralModule.setAndroidCache(options, aCache)
-        AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
+        AndroidInterIntraProceduralModule.setShouldBuildOFAsCfg(options, false)
+        AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, false)
         AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, false)
-        AndroidInterIntraProceduralModule.setShouldBuildCSCfg(options, false)
-        AndroidInterIntraProceduralModule.setAPIpermOpt(options, None)
+        AndroidInterIntraProceduralModule.setShouldBuildCSCfg(options, false) // CSCFG = compressed system-wide control flow graph of an app X
+  
+        // experimental code starts which does not have any significant role now; later we will delete it after some related cleaning 
+        
+        val apiPermission : MMap[ResourceUri, MList[String]] = mmapEmpty
+        val permList : MList[String] = mlistEmpty
+        permList+=("permission")   // put the permission strings e.g. "NETWORKS" here
+        val pUri : ResourceUri = "abc"  // replace "abc" by apiUri (e.g. pilar:/procedure/default/%5B%7Candroid::content::Context.startService%7C%5D/1/50/f9cb48df) later
+        apiPermission(pUri) = permList
+        AndroidInterIntraProceduralModule.setAPIpermOpt(options, Option(apiPermission)) 
+        
+        // experimental code ends
+        
         pipeline.compute(job)
-
         if(job.hasError){
           println("Error present: " + job.hasError)
           job.tags.foreach(f => println(f))
           job.lastStageInfo.tags.foreach(f => println(f))
         }
+//        val r = AndroidInterIntraProceduralModule.getInterResult(options)
         
-        println("pipeline done!")
-          
-        val avmtFile = new File(resDir + "/" + dirName + "VirtualMethodTables.xml")
-        val outerAVMT = new FileOutputStream(avmtFile)
-        val avmt = PilarAndroidSymbolResolverModule.getAndroidVirtualMethodTables(options)
-        println("start convert AVMT to xml!")
-        xStream.toXml(avmt, outerAVMT)
+ 
         
-        println("start convert graph to xml!")
-        val cCfgs = AndroidInterIntraProceduralModule.getIntraResult(options)
-        cCfgs.foreach(
-          item =>
-          {
-//            aCache.save[CompressedControlFlowGraph[String]](item._1, item._2)
-          }  
-        )
+        //1. get sCfg
+      //  val sCfgFile = new File(d + dirName + "/graphs/sCfg.graph")
+      //  val outer = new FileOutputStream(sCfgFile)
+      //  val w = new OutputStreamWriter(outer, "GBK")
+        
+        
+//        val csCfg = AndroidInterIntraProceduralModule.getInterResult(options) match {
+//          case Some(s) => s
+//          case None => null
+//        }
+//        sCfg.toDot(w)
+//        w.flush()
+//        val str = Array("dot", "-Tps2", d + dirName + "/graphs/sCfg.dot", "-o", d + dirName + "/graphs/sCfg.ps")
+//        val proc = Runtime.getRuntime().exec(str) 
         
         println("###############################################")
+        
+        //get csCfg
+//        val csCfgFile = new File(d + dirName + "/graphs/csCfg.graph")
+//        val outer = new FileOutputStream(csCfgFile)
+//        val w = new OutputStreamWriter(outer, "GBK")
+//        w.write(csCfg.toString())
+// //       println(csCfg.toString())
+        println(" csCfg saving is done which is same as sCfg now because no compression was made")
     }
   }
 
@@ -171,13 +167,13 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
 
   protected val pipeline =
     PipelineConfiguration(
-      "Library analyse pipeline",
+      "dex2PilarAndParseAndProcedureLocationList test pipeline",
       false,
 //      PipelineStage(
 //        "dex2pilar stage",
 //        false,
 //        Dex2PilarWrapperModule
-//      )
+//      ),
       PipelineStage(
         "Chunking pilar parsing stage",
         false,
@@ -190,10 +186,9 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
       )
       ,
       PipelineStage(
-        "Android InterIntraProcedural Analysis",
-        false,
-        AndroidInterIntraProceduralModule
+      "Android InterIntraProcedural Analysis",
+      false,
+      AndroidInterIntraProceduralModule
       )
     )
-    
 }

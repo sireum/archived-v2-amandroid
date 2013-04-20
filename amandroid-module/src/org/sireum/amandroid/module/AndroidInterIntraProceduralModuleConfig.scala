@@ -28,6 +28,7 @@ object AndroidInterIntraProcedural {
   type VirtualLabel = String
   type CFG = ControlFlowGraph[VirtualLabel]
   type CCFG = CompressedControlFlowGraph[VirtualLabel]
+  type OFAsCfg = SystemControlFlowGraph[VirtualLabel]
   type SCFG = SystemControlFlowGraph[VirtualLabel]
   // type CSCFG = SystemControlFlowGraph[VirtualLabel]
   
@@ -63,6 +64,9 @@ case class AndroidInterIntraProcedural(
   shouldBuildCCfg : Boolean,
   
   @Input
+  shouldBuildOFAsCfg : Boolean,
+  
+  @Input
   shouldBuildSCfg : Boolean,
   
   @Input
@@ -77,10 +81,10 @@ case class AndroidInterIntraProcedural(
     { (_, _) => (Array.empty[CatchClause], false) },
        
   @Output 
-  intraResult : MMap[ResourceUri, AndroidInterIntraProcedural.CCFG],
+  intraResult : MMap[ResourceUri, AndroidInterIntraProcedural.CFG],
     
   @Output
-  interResult : Option[AndroidInterIntraProcedural.SCFG]  // actually it can be the compressed sCFG
+  interResult : Option[AndroidInterIntraProcedural.OFAsCfg]  // actually it can be the compressed sCFG
 )
  
 case class Cfg(
@@ -118,6 +122,22 @@ case class cCfg(
   @Output
   @Produce
   cCfg : CompressedControlFlowGraph[String])
+  
+case class OFAsCfg(
+  title : String = "System Control Flow Graph with OFA Builder",
+
+  @Input
+  androidCache : AndroidCacheFile[ResourceUri],
+  
+  @Input 
+  cfgs : MMap[ResourceUri, ControlFlowGraph[String]],
+
+  @Input
+  androidVirtualMethodTables : AndroidVirtualMethodTables,
+  
+  @Output
+  @Produce
+  OFAsCfg : SystemControlFlowGraph[String])
   
 case class sCfg(
   title : String = "System Control Flow Graph Builder",
@@ -171,6 +191,7 @@ object AndroidInterIntraProceduralModuleBuild {
         AndroidInterIntraProcedural.getClass().getName().dropRight(1),
         Cfg.getClass().getName().dropRight(1),
         cCfg.getClass().getName().dropRight(1),
+        OFAsCfg.getClass().getName().dropRight(1),
         sCfg.getClass().getName().dropRight(1),
         csCfg.getClass().getName().dropRight(1)
         )
