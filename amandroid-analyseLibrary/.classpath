@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JUnit"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/ScalaTest"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sireum-lib"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-module"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-symbol"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-systemControlFlowGraph"/>
@@ -12,17 +11,11 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-core-test"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-module"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-util"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Apfloat"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Guava"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JGraphT"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-option"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-pilar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-pipeline"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-tools"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/XStream"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-xml"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-cache"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/ScalaLogging for SLF4J"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SLF4J"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

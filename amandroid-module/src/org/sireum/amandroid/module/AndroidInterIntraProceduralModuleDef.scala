@@ -8,12 +8,12 @@ import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.alir.AlirIntraProceduralGraph
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
 import org.sireum.amandroid.scfg.SystemControlFlowGraph
-
 import java.io._
 import org.sireum.amandroid.xml.AndroidXStream
 import org.sireum.pipeline.ErrorneousModulesThrowable
 import org.sireum.pipeline.PipelineStage
 import org.sireum.pipeline.PipelineConfiguration
+import org.sireum.amandroid.objectflowanalysis.ObjectFlowGraphBuilder
 
 
 /**
@@ -21,7 +21,7 @@ import org.sireum.pipeline.PipelineConfiguration
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
 
-class AndroidInterIntraProceduralDef (val job : PipelineJob, info : PipelineJobModuleInfo) 
+class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) 
   extends AndroidInterIntraProceduralModule with ImplicitLogging{
   // add implementation here
   type VirtualLabel = String
@@ -39,9 +39,9 @@ class AndroidInterIntraProceduralDef (val job : PipelineJob, info : PipelineJobM
     val options = j.properties
     CfgModule.setProcedureSymbolTable(options, pst)
     CfgModule.setShouldIncludeFlowFunction(options, siff)
-    if(this.shouldBuildCCfg){
+//    if(this.shouldBuildCCfg){
       cCfgModule.setProcedureSymbolTable(options, pst)
-    }
+//    }
     intraPipeline.compute(j)
     info.hasError = j.hasError
     if (info.hasError) {
@@ -51,20 +51,23 @@ class AndroidInterIntraProceduralDef (val job : PipelineJob, info : PipelineJobM
     val pool = CfgModule.getPool(options)
     val cfg = CfgModule.getCfg(options)
     val cCfg = cCfgModule.getCCfg(options)
-    (pst.procedureUri, cCfg)
+    (pst.procedureUri, cfg, cCfg)
   }
   
-  val intraResult : MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]] = mmapEmpty
+  val intraResultTmp_Cfg : MMap[ResourceUri, (ControlFlowGraph[VirtualLabel])] = mmapEmpty
+  val intraResultTmp_cCfg : MMap[ResourceUri, (CompressedControlFlowGraph[VirtualLabel])] = mmapEmpty
 
   val col : GenSeq[ProcedureSymbolTable] = if (par) psts.par else psts
   println("ccfg building start! ccfg number = " + col.size)
   (col.map { pst =>
     compute(pst)
   }).foreach { p =>
-    intraResult(p._1) = p._2
+    intraResultTmp_Cfg(p._1) = p._2
+    intraResultTmp_cCfg(p._1) = p._3
   }
   println("ccfg building complete!")
-  this.intraResult_=(intraResult)
+  this.intraResult_Cfg_=(intraResultTmp_Cfg)
+  this.intraResult_cCfg_=(intraResultTmp_cCfg)
   
   if(this.shouldBuildSCfg || this.shouldBuildCSCfg){  // SCfg=system(wide)-control-flow-graph, CSCfg=compressedSCfg
     val j = PipelineJob()
@@ -73,7 +76,7 @@ class AndroidInterIntraProceduralDef (val job : PipelineJob, info : PipelineJobM
     
     sCfgModule.setAndroidCache(options, aCache)
     sCfgModule.setAndroidVirtualMethodTables(options, avmt)
-    sCfgModule.setCCfgs(options, intraResult)
+    sCfgModule.setCCfgs(options, intraResult_cCfg)
     
     if(this.shouldBuildCSCfg){
       
@@ -86,7 +89,7 @@ class AndroidInterIntraProceduralDef (val job : PipelineJob, info : PipelineJobM
       
       csCfgModule.setAndroidCache(options, aCache)
       csCfgModule.setAndroidVirtualMethodTables(options, avmt)
-      csCfgModule.setCCfgs(options, intraResult)
+      csCfgModule.setCCfgs(options, intraResult_cCfg)
       csCfgModule.setAPIperm(options, APIperm)
         
     }
@@ -103,10 +106,32 @@ class AndroidInterIntraProceduralDef (val job : PipelineJob, info : PipelineJobM
     this.interResult_=(None)
   }
   
+  if(this.shouldBuildOFAsCfg) {
+    val j = PipelineJob()
+    val options = j.properties
+    val avmt = this.androidVirtualMethodTables
+    
+    OFAsCfgModule.setAndroidCache(options, aCache)
+    OFAsCfgModule.setAndroidVirtualMethodTables(options, avmt)
+    OFAsCfgModule.setCfgs(options, intraResult_Cfg)
+    OFAsCfgModule.setProcedureSymbolTables(options, psts)
+    
+    interPipeline.compute(j)
+    info.hasError = j.hasError
+    if (info.hasError) {
+      info.exception = Some(ErrorneousModulesThrowable(
+        j.lastStageInfo.info.filter { i => i.hasError }))
+    }
+//    this.interResult_=(Option(OFAsCfgModule.getOFAsCfg(options)))
+    this.interResult_=(None)
+  } else {
+    this.interResult_=(None)
+  }
+  
   def buildIntraPipeline(job : PipelineJob) = {
     val stages = marrayEmpty[PipelineStage]
 
-    if (this.shouldBuildCCfg || this.shouldBuildSCfg || this.shouldBuildCSCfg){
+    if (this.shouldBuildCCfg || this.shouldBuildOFAsCfg || this.shouldBuildSCfg || this.shouldBuildCSCfg){
       stages += PipelineStage("CFG Building", false, CfgModule)
       stages += PipelineStage("CCFG Building", false, cCfgModule)
     }
@@ -117,6 +142,9 @@ class AndroidInterIntraProceduralDef (val job : PipelineJob, info : PipelineJobM
   
   def buildInterPipeline(job : PipelineJob) = {
     val stages = marrayEmpty[PipelineStage]
+    
+    if (this.shouldBuildOFAsCfg) 
+      stages += PipelineStage("OFASCFG Building", false, OFAsCfgModule)
     
     if (this.shouldBuildSCfg || this.shouldBuildCSCfg)
       stages += PipelineStage("SCFG Building", false, sCfgModule)
@@ -131,7 +159,7 @@ class AndroidInterIntraProceduralDef (val job : PipelineJob, info : PipelineJobM
 }
 
 
-class CfgDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends CfgModule {
+class CfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends CfgModule {
   val ENTRY_NODE_LABEL = "Entry"
   val EXIT_NODE_LABEL = "Exit"
   val pl : AlirIntraProceduralGraph.NodePool = mmapEmpty
@@ -142,19 +170,28 @@ class CfgDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends CfgMo
   this.cfg_=(result)
 }
 
-class cCfgDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends cCfgModule {
+class cCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends cCfgModule {
   this.cCfg_=(CompressedControlFlowGraph[String](this.procedureSymbolTable, this.pool, this.cfg))
   
 }
 
-class sCfgDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends sCfgModule {
+class sCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends sCfgModule {
   this.sCfg_=(SystemControlFlowGraph[String](this.androidVirtualMethodTables, this.cCfgs, this.androidCache))
   println("sCfg is built")
 }
 
 
-class csCfgDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends csCfgModule {
+class csCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends csCfgModule {
  
   this.csCfg_=(this.sCfg.NOcompress(this.cCfgs, this.APIperm))
   println("csCfg is built, which is same as the sCfg")
+}
+
+/** The following class will be called reflectively.  Create the file 
+  * OFAsCfgModuleDef.scala in the directory corresponding to org.sireum.amandroid.module
+  * and paste the code into it
+  */
+
+class OFAsCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends OFAsCfgModule {
+  this.OFAsCfg_=(ObjectFlowGraphBuilder(this.procedureSymbolTables))
 }

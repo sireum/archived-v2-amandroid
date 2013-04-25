@@ -427,7 +427,7 @@ object SystemControlFlowGraph {
 		                for (callee <- calleeOptions)
 		                {
 		                  //if callee is in the app, then we are interested in adding edges to callee
-		                  //if callee is marked in mRepo with bits x, then only we are interested in adding edges to each such ATOMIC API (corresponding to x)ß
+		                  //if callee is marked in mRepo with bits x, then only we are interested in adding edges to each such ATOMIC API (corresponding to x)
 		                  if (sCfg.intraAppProcUriList.contains(callee)) {
 		                      delFlag = false
 		                  } else {
@@ -514,7 +514,7 @@ object SystemControlFlowGraph {
 		                for (callee <- calleeOptions)
 		                {
 		                  //if callee is in the app, then we are interested in adding edges to callee
-		                  //if callee is marked in mRepo with bits x, then only we are interested in adding edges to each such ATOMIC API (corresponding to x)ß
+		                  //if callee is marked in mRepo with bits x, then only we are interested in adding edges to each such ATOMIC API (corresponding to x)
 		                  
 	                     if(!mRepo.contains(callee)){
 	                       println("error: this is an unexpected situation: mRepo does not have the callee.")
@@ -1103,7 +1103,7 @@ object SystemControlFlowGraph {
   
   // ************ need to AVOID the following hard-coded file path  *********************  
     
-  val markingRepoFile = new File("/Users/sankar/Desktop/amandroidWorkSpace/amandroid/amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/libBitSet/libBitSet.xml.zip")
+  val markingRepoFile = new File("/Users/fgwei/Developer/git-repo/amandroid/amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/libBitSet/libBitSet.xml.zip")
   var markingRepo : MMap[ResourceUri, (MBitSet,MMap[ResourceUri, Integer])] = null
     if(markingRepoFile.exists()){
       val repoStream = new GZIPInputStream(new FileInputStream(markingRepoFile))
@@ -1223,7 +1223,7 @@ object SystemControlFlowGraph {
     
    // println(sCfg.toString)
     
-    val sCfgFile = new File("/Users/sankar/Desktop/sCfg.dot")
+    val sCfgFile = new File("/Users/fgwei/Desktop/sCfg.dot")
     val outer2 = new FileOutputStream(sCfgFile)
     val w2 = new OutputStreamWriter(outer2, "GBK")
     
