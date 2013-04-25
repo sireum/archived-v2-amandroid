@@ -1165,8 +1165,8 @@ object SystemControlFlowGraph {
 
 	// build step 1.2: update marking repo with intra-app calls.
 	val cgm = new CallGraphMark
-	cgm.initiatePUriToBitsetMap[VirtualLabel](cCfgs, markingRepo, atomicSecAPIs.size)
-	cgm.callGraphMark[VirtualLabel](cCfgs, markingRepo, vmTables)
+	cgm.initiatePUriToBitsetMap[VirtualLabel](cCfgs, markingRepo, atomicSecAPIs.size)  // initialization of bitset of each pUri of the app
+	cgm.callGraphMark[VirtualLabel](cCfgs, markingRepo, vmTables) // update the marking repo with info from app
 	
 //	println("onlocationchanged -------> " + markingRepo("pilar:/procedure/default/%5B%7Cde::mobinauten::smsspy::EmergencyTask.onLocationChanged%7C%5D/1/23/51eae215"))
    // build step 1.3: make base pool (collection of all individual cCfg node-pools) 
@@ -1216,7 +1216,7 @@ object SystemControlFlowGraph {
 //    }
     
 //    compressCCfgAndCollect(vmTables, atomicSecAPIs, markingRepo, cCfgs, sCfg, aCache)
-    extraCompressCCfgAndCollect(vmTables, atomicSecAPIs, markingRepo, cCfgs, sCfg, aCache)
+    extraCompressCCfgAndCollect(vmTables, atomicSecAPIs, markingRepo, cCfgs, sCfg, aCache) // note its diff with compressCCfgAndCollect
     connectCCfgs(vmTables, atomicSecAPIs, markingRepo, sCfg)
 //    println("cCfg size :" + cCfgs.size)
     println("sCfg node count = " + sCfg.nodes.size + " and edge count is " + sCfg.edges.size)
