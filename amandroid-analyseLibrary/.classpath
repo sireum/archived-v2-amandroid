@@ -2,7 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-  <classpathentry combineaccessrules="false" kind="src" path="/sireum-lib"/>
+	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sireum-lib"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-module"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-symbol"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-systemControlFlowGraph"/>

@@ -14,6 +14,8 @@ import org.sireum.amandroid.scfg.{CompressedControlFlowGraph, SystemControlFlowG
 import org.sireum.pilar.ast.{LocationDecl, CatchClause}
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.amandroid.cache.AndroidCacheFile
+import org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph
+import org.sireum.amandroid.objectflowanalysis.OfaNode
 
 
 /*
@@ -81,7 +83,10 @@ case class AndroidInterIntraProcedural(
     { (_, _) => (Array.empty[CatchClause], false) },
        
   @Output 
-  intraResult : MMap[ResourceUri, AndroidInterIntraProcedural.CFG],
+  intraResult_Cfg : MMap[ResourceUri, AndroidInterIntraProcedural.CFG],
+  
+  @Output 
+  intraResult_cCfg : MMap[ResourceUri, AndroidInterIntraProcedural.CCFG],
     
   @Output
   interResult : Option[AndroidInterIntraProcedural.OFAsCfg]  // actually it can be the compressed sCFG
@@ -131,13 +136,17 @@ case class OFAsCfg(
   
   @Input 
   cfgs : MMap[ResourceUri, ControlFlowGraph[String]],
+  
+  @Input
+  procedureSymbolTables : Seq[ProcedureSymbolTable],
 
   @Input
   androidVirtualMethodTables : AndroidVirtualMethodTables,
   
+  // for test now. Later will change it.
   @Output
   @Produce
-  OFAsCfg : SystemControlFlowGraph[String])
+  OFAsCfg : ObjectFlowGraph[OfaNode])
   
 case class sCfg(
   title : String = "System Control Flow Graph Builder",

@@ -26,7 +26,8 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
   val globalAndroidVirtualMethodTablesKey = "Global.androidVirtualMethodTables"
   val globalAPIpermOptKey = "Global.APIpermOpt"
   val globalAndroidCacheKey = "Global.androidCache"
-  val globalIntraResultKey = "Global.intraResult"
+  val globalIntraResult_cCfgKey = "Global.intraResult_cCfg"
+  val globalIntraResult_CfgKey = "Global.intraResult_Cfg"
   val globalShouldIncludeFlowFunctionKey = "Global.shouldIncludeFlowFunction"
   val globalShouldBuildSCfgKey = "Global.shouldBuildSCfg"
   val globalSymbolTableKey = "Global.symbolTable"
@@ -343,15 +344,26 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
 
   def outputDefined (job : PipelineJob) : MBuffer[Tag] = {
     val tags = marrayEmpty[Tag]
-    if(!(job ? AndroidInterIntraProceduralModule.globalIntraResultKey)) {
+    if(!(job ? AndroidInterIntraProceduralModule.globalIntraResult_CfgKey)) {
       tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-        "Output error for '" + this.title + "': No entry found for 'intraResult'. Expecting (AndroidInterIntraProceduralModule.globalIntraResultKey)") 
+        "Output error for '" + this.title + "': No entry found for 'intraResult_Cfg'. Expecting (AndroidInterIntraProceduralModule.globalIntraResult_CfgKey)") 
     }
 
-    if(job ? AndroidInterIntraProceduralModule.globalIntraResultKey && !job(AndroidInterIntraProceduralModule.globalIntraResultKey).isInstanceOf[scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]]]) {
+    if(job ? AndroidInterIntraProceduralModule.globalIntraResult_CfgKey && !job(AndroidInterIntraProceduralModule.globalIntraResult_CfgKey).isInstanceOf[scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]]]) {
       tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker, 
-        "Output error for '" + this.title + "': Wrong type found for AndroidInterIntraProceduralModule.globalIntraResultKey.  Expecting 'scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]]' but found '" + 
-        job(AndroidInterIntraProceduralModule.globalIntraResultKey).getClass.toString + "'")
+        "Output error for '" + this.title + "': Wrong type found for AndroidInterIntraProceduralModule.globalIntraResult_CfgKey.  Expecting 'scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]]' but found '" + 
+        job(AndroidInterIntraProceduralModule.globalIntraResult_CfgKey).getClass.toString + "'")
+    } 
+
+    if(!(job ? AndroidInterIntraProceduralModule.globalIntraResult_cCfgKey)) {
+      tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+        "Output error for '" + this.title + "': No entry found for 'intraResult_cCfg'. Expecting (AndroidInterIntraProceduralModule.globalIntraResult_cCfgKey)") 
+    }
+
+    if(job ? AndroidInterIntraProceduralModule.globalIntraResult_cCfgKey && !job(AndroidInterIntraProceduralModule.globalIntraResult_cCfgKey).isInstanceOf[scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]]) {
+      tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker, 
+        "Output error for '" + this.title + "': Wrong type found for AndroidInterIntraProceduralModule.globalIntraResult_cCfgKey.  Expecting 'scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]' but found '" + 
+        job(AndroidInterIntraProceduralModule.globalIntraResult_cCfgKey).getClass.toString + "'")
     } 
 
     if(!(job ? AndroidInterIntraProceduralModule.globalInterResultKey)) {
@@ -517,17 +529,32 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
     return options
   }
 
-  def getIntraResult (options : scala.collection.Map[Property.Key, Any]) : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]] = {
-    if (options.contains(AndroidInterIntraProceduralModule.globalIntraResultKey)) {
-       return options(AndroidInterIntraProceduralModule.globalIntraResultKey).asInstanceOf[scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]]]
+  def getIntraResult_Cfg (options : scala.collection.Map[Property.Key, Any]) : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]] = {
+    if (options.contains(AndroidInterIntraProceduralModule.globalIntraResult_CfgKey)) {
+       return options(AndroidInterIntraProceduralModule.globalIntraResult_CfgKey).asInstanceOf[scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]]]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def setIntraResult (options : MMap[Property.Key, Any], intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]]) : MMap[Property.Key, Any] = {
+  def setIntraResult_Cfg (options : MMap[Property.Key, Any], intraResult_Cfg : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]]) : MMap[Property.Key, Any] = {
 
-    options(AndroidInterIntraProceduralModule.globalIntraResultKey) = intraResult
+    options(AndroidInterIntraProceduralModule.globalIntraResult_CfgKey) = intraResult_Cfg
+
+    return options
+  }
+
+  def getIntraResult_cCfg (options : scala.collection.Map[Property.Key, Any]) : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = {
+    if (options.contains(AndroidInterIntraProceduralModule.globalIntraResult_cCfgKey)) {
+       return options(AndroidInterIntraProceduralModule.globalIntraResult_cCfgKey).asInstanceOf[scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setIntraResult_cCfg (options : MMap[Property.Key, Any], intraResult_cCfg : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]) : MMap[Property.Key, Any] = {
+
+    options(AndroidInterIntraProceduralModule.globalIntraResult_cCfgKey) = intraResult_cCfg
 
     return options
   }
@@ -559,7 +586,8 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
       def shouldBuildCSCfg : scala.Boolean = AndroidInterIntraProceduralModule.getShouldBuildCSCfg(job.propertyMap)
       def APIpermOpt : scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]] = AndroidInterIntraProceduralModule.getAPIpermOpt(job.propertyMap)
       def shouldIncludeFlowFunction : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]] = AndroidInterIntraProceduralModule.getShouldIncludeFlowFunction(job.propertyMap)
-      def intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]] = AndroidInterIntraProceduralModule.getIntraResult(job.propertyMap)
+      def intraResult_Cfg : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]] = AndroidInterIntraProceduralModule.getIntraResult_Cfg(job.propertyMap)
+      def intraResult_cCfg : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = AndroidInterIntraProceduralModule.getIntraResult_cCfg(job.propertyMap)
       def interResult : scala.Option[org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]] = AndroidInterIntraProceduralModule.getInterResult(job.propertyMap)
     }
   }
@@ -597,8 +625,11 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
       def shouldIncludeFlowFunction_=(shouldIncludeFlowFunction : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]]) { AndroidInterIntraProceduralModule.setShouldIncludeFlowFunction(job.propertyMap, shouldIncludeFlowFunction) }
       def shouldIncludeFlowFunction : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]] = AndroidInterIntraProceduralModule.getShouldIncludeFlowFunction(job.propertyMap)
 
-      def intraResult_=(intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]]) { AndroidInterIntraProceduralModule.setIntraResult(job.propertyMap, intraResult) }
-      def intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]] = AndroidInterIntraProceduralModule.getIntraResult(job.propertyMap)
+      def intraResult_Cfg_=(intraResult_Cfg : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]]) { AndroidInterIntraProceduralModule.setIntraResult_Cfg(job.propertyMap, intraResult_Cfg) }
+      def intraResult_Cfg : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]] = AndroidInterIntraProceduralModule.getIntraResult_Cfg(job.propertyMap)
+
+      def intraResult_cCfg_=(intraResult_cCfg : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]) { AndroidInterIntraProceduralModule.setIntraResult_cCfg(job.propertyMap, intraResult_cCfg) }
+      def intraResult_cCfg : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = AndroidInterIntraProceduralModule.getIntraResult_cCfg(job.propertyMap)
 
       def interResult_=(interResult : scala.Option[org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]) { AndroidInterIntraProceduralModule.setInterResult(job.propertyMap, interResult) }
       def interResult : scala.Option[org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]] = AndroidInterIntraProceduralModule.getInterResult(job.propertyMap)
@@ -630,8 +661,12 @@ trait AndroidInterIntraProceduralModule {
   def shouldIncludeFlowFunction : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]] = AndroidInterIntraProceduralModule.getShouldIncludeFlowFunction(job.propertyMap)
 
 
-  def intraResult_=(intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]]) { AndroidInterIntraProceduralModule.setIntraResult(job.propertyMap, intraResult) }
-  def intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]] = AndroidInterIntraProceduralModule.getIntraResult(job.propertyMap)
+  def intraResult_Cfg_=(intraResult_Cfg : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]]) { AndroidInterIntraProceduralModule.setIntraResult_Cfg(job.propertyMap, intraResult_Cfg) }
+  def intraResult_Cfg : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]] = AndroidInterIntraProceduralModule.getIntraResult_Cfg(job.propertyMap)
+
+
+  def intraResult_cCfg_=(intraResult_cCfg : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]) { AndroidInterIntraProceduralModule.setIntraResult_cCfg(job.propertyMap, intraResult_cCfg) }
+  def intraResult_cCfg : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = AndroidInterIntraProceduralModule.getIntraResult_cCfg(job.propertyMap)
 
 
   def interResult_=(interResult : scala.Option[org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]) { AndroidInterIntraProceduralModule.setInterResult(job.propertyMap, interResult) }

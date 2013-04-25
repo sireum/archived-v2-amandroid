@@ -101,7 +101,7 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
         PilarAndroidSymbolResolverModule.setParallel(options, false)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, Option(libVmTables))
         AndroidInterIntraProceduralModule.setAndroidCache(options, aCache)
-        AndroidInterIntraProceduralModule.setShouldBuildOFAsCfg(options, false)
+        AndroidInterIntraProceduralModule.setShouldBuildOFAsCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, false)
         AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, false)
         AndroidInterIntraProceduralModule.setShouldBuildCSCfg(options, false) // CSCFG = compressed system-wide control flow graph of an app X
@@ -150,7 +150,7 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
 //        val w = new OutputStreamWriter(outer, "GBK")
 //        w.write(csCfg.toString())
 // //       println(csCfg.toString())
-        println(" csCfg saving is done which is same as sCfg now because no compression was made")
+//        println(" csCfg saving is done which is same as sCfg now because no compression was made")
     }
   }
 

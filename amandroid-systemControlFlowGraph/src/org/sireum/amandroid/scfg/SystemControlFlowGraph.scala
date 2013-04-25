@@ -1103,7 +1103,7 @@ object SystemControlFlowGraph {
   
   // ************ need to AVOID the following hard-coded file path  *********************  
     
-  val markingRepoFile = new File("../../../../../../../amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/libVmTables/libVmTables.xml.zip")
+  val markingRepoFile = new File("/Users/fgwei/Developer/git-repo/amandroid/amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/libBitSet/libBitSet.xml.zip")
   var markingRepo : MMap[ResourceUri, (MBitSet,MMap[ResourceUri, Integer])] = null
     if(markingRepoFile.exists()){
       val repoStream = new GZIPInputStream(new FileInputStream(markingRepoFile))
@@ -1223,7 +1223,7 @@ object SystemControlFlowGraph {
     
    // println(sCfg.toString)
     
-    val sCfgFile = new File("/Users/sankar/Desktop/sCfg.dot")
+    val sCfgFile = new File("/Users/fgwei/Desktop/sCfg.dot")
     val outer2 = new FileOutputStream(sCfgFile)
     val w2 = new OutputStreamWriter(outer2, "GBK")
     

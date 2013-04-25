@@ -10,6 +10,8 @@ import org.sireum.alir.AlirIntraProceduralNode
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
 import org.sireum.amandroid.cache.AndroidCacheFile
+import org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph
+import org.sireum.amandroid.objectflowanalysis.OfaNode
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
 import org.sireum.amandroid.scfg.SystemControlFlowGraph
 import org.sireum.pilar.ast.LocationDecl
@@ -17,6 +19,7 @@ import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.pilar.symbol.SymbolTable
 import scala.Function2
 import scala.Option
+import scala.collection.Seq
 import scala.collection.mutable.Map
 
 object csCfgModule extends PipelineModule {
@@ -118,33 +121,6 @@ object csCfgModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'androidCache'")       
     }
-    var _sCfg : scala.Option[AnyRef] = None
-    var _sCfgKey : scala.Option[String] = None
-
-    val keylistsCfg = List(csCfgModule.globalSCfgKey)
-    keylistsCfg.foreach(key => 
-      if(job ? key) { 
-        if(_sCfg.isEmpty) {
-          _sCfg = Some(job(key))
-          _sCfgKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _sCfg.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'sCfg' keys '" + _sCfgKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _sCfg match{
-      case Some(x) =>
-        if(!x.isInstanceOf[org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'sCfg'.  Expecting 'org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'sCfg'")       
-    }
     var _cCfgs : scala.Option[AnyRef] = None
     var _cCfgsKey : scala.Option[String] = None
 
@@ -171,6 +147,33 @@ object csCfgModule extends PipelineModule {
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'cCfgs'")       
+    }
+    var _sCfg : scala.Option[AnyRef] = None
+    var _sCfgKey : scala.Option[String] = None
+
+    val keylistsCfg = List(csCfgModule.globalSCfgKey)
+    keylistsCfg.foreach(key => 
+      if(job ? key) { 
+        if(_sCfg.isEmpty) {
+          _sCfg = Some(job(key))
+          _sCfgKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _sCfg.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'sCfg' keys '" + _sCfgKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _sCfg match{
+      case Some(x) =>
+        if(!x.isInstanceOf[org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'sCfg'.  Expecting 'org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'sCfg'")       
     }
     var _APIperm : scala.Option[AnyRef] = None
     var _APIpermKey : scala.Option[String] = None
@@ -253,17 +256,21 @@ object csCfgModule extends PipelineModule {
     return options
   }
 
-  def getSCfg (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = {
-    if (options.contains(csCfgModule.globalSCfgKey)) {
-       return options(csCfgModule.globalSCfgKey).asInstanceOf[org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]
+  def getCsCfg (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = {
+    if (options.contains(csCfgModule.globalCsCfgKey)) {
+       return options(csCfgModule.globalCsCfgKey).asInstanceOf[org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]
+    }
+    if (options.contains(csCfgModule.csCfgKey)) {
+       return options(csCfgModule.csCfgKey).asInstanceOf[org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def setSCfg (options : MMap[Property.Key, Any], sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]) : MMap[Property.Key, Any] = {
+  def setCsCfg (options : MMap[Property.Key, Any], csCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]) : MMap[Property.Key, Any] = {
 
-    options(csCfgModule.globalSCfgKey) = sCfg
+    options(csCfgModule.globalCsCfgKey) = csCfg
+    options(csCfgKey) = csCfg
 
     return options
   }
@@ -283,21 +290,17 @@ object csCfgModule extends PipelineModule {
     return options
   }
 
-  def getCsCfg (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = {
-    if (options.contains(csCfgModule.globalCsCfgKey)) {
-       return options(csCfgModule.globalCsCfgKey).asInstanceOf[org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]
-    }
-    if (options.contains(csCfgModule.csCfgKey)) {
-       return options(csCfgModule.csCfgKey).asInstanceOf[org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]
+  def getSCfg (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = {
+    if (options.contains(csCfgModule.globalSCfgKey)) {
+       return options(csCfgModule.globalSCfgKey).asInstanceOf[org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def setCsCfg (options : MMap[Property.Key, Any], csCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]) : MMap[Property.Key, Any] = {
+  def setSCfg (options : MMap[Property.Key, Any], sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]) : MMap[Property.Key, Any] = {
 
-    options(csCfgModule.globalCsCfgKey) = csCfg
-    options(csCfgKey) = csCfg
+    options(csCfgModule.globalSCfgKey) = sCfg
 
     return options
   }
@@ -321,9 +324,9 @@ object csCfgModule extends PipelineModule {
     implicit class csCfgModuleConsumerView (val job : PropertyProvider) extends AnyVal {
       def androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = csCfgModule.getAndroidVirtualMethodTables(job.propertyMap)
       def androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String] = csCfgModule.getAndroidCache(job.propertyMap)
-      def sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = csCfgModule.getSCfg(job.propertyMap)
-      def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = csCfgModule.getCCfgs(job.propertyMap)
       def csCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = csCfgModule.getCsCfg(job.propertyMap)
+      def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = csCfgModule.getCCfgs(job.propertyMap)
+      def sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = csCfgModule.getSCfg(job.propertyMap)
       def APIperm : scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]] = csCfgModule.getAPIperm(job.propertyMap)
     }
   }
@@ -337,14 +340,14 @@ object csCfgModule extends PipelineModule {
       def androidCache_=(androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]) { csCfgModule.setAndroidCache(job.propertyMap, androidCache) }
       def androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String] = csCfgModule.getAndroidCache(job.propertyMap)
 
-      def sCfg_=(sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]) { csCfgModule.setSCfg(job.propertyMap, sCfg) }
-      def sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = csCfgModule.getSCfg(job.propertyMap)
+      def csCfg_=(csCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]) { csCfgModule.setCsCfg(job.propertyMap, csCfg) }
+      def csCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = csCfgModule.getCsCfg(job.propertyMap)
 
       def cCfgs_=(cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]) { csCfgModule.setCCfgs(job.propertyMap, cCfgs) }
       def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = csCfgModule.getCCfgs(job.propertyMap)
 
-      def csCfg_=(csCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]) { csCfgModule.setCsCfg(job.propertyMap, csCfg) }
-      def csCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = csCfgModule.getCsCfg(job.propertyMap)
+      def sCfg_=(sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]) { csCfgModule.setSCfg(job.propertyMap, sCfg) }
+      def sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = csCfgModule.getSCfg(job.propertyMap)
 
       def APIperm_=(APIperm : scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]) { csCfgModule.setAPIperm(job.propertyMap, APIperm) }
       def APIperm : scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]] = csCfgModule.getAPIperm(job.propertyMap)
@@ -359,13 +362,13 @@ trait csCfgModule {
 
   def androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String] = csCfgModule.getAndroidCache(job.propertyMap)
 
-  def sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = csCfgModule.getSCfg(job.propertyMap)
-
-  def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = csCfgModule.getCCfgs(job.propertyMap)
-
 
   def csCfg_=(csCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]) { csCfgModule.setCsCfg(job.propertyMap, csCfg) }
   def csCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = csCfgModule.getCsCfg(job.propertyMap)
+
+  def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = csCfgModule.getCCfgs(job.propertyMap)
+
+  def sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = csCfgModule.getSCfg(job.propertyMap)
 
   def APIperm : scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]] = csCfgModule.getAPIperm(job.propertyMap)
 }

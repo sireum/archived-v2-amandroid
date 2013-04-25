@@ -146,7 +146,7 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         xStream.toXml(avmt, outerAVMT)
         
         println("start convert graph to xml!")
-        val cCfgs = AndroidInterIntraProceduralModule.getIntraResult(options)
+        val cCfgs = AndroidInterIntraProceduralModule.getIntraResult_cCfg(options)
         cCfgs.foreach(
           item =>
           {
