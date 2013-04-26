@@ -66,7 +66,7 @@ enum OutputFormat {
 };
 
 
-int lastAddress = 0; // sankar adds : this would store the last address of the current method
+u4 lastAddress = 0; // sankar adds : this would store the last address of the current method
 typedef struct locVarInfo locVarInf; // sankar adds
 
 PStash* locVarList = NULL; // sankar adds this list which holds local variables' info for the current method 
@@ -856,13 +856,19 @@ static void dumpLocalsCb(void *cnxt, u2 reg, u4 startAddress,
 void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
         const DexMethod *pDexMethod)
 {
+	/**** moved the following two blocks to dumpMethod() ***
+
     if(locVarList) 
 		delete locVarList; // sankar adds: check some possible memory leak here
 
     locVarList = new PStash; // sankar adds
 
+    ****/
+
 	printf("      locals :\n");
 	fprintf(pFp,"      local placeholder ;\n"); // sankar
+
+	/******
     const DexMethodId *pMethodId
             = dexGetMethodId(pDexFile, pDexMethod->methodIdx);
     const char *classDescriptor
@@ -870,6 +876,7 @@ void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
 
     dexDecodeDebugInfo(pDexFile, pCode, classDescriptor, pMethodId->protoIdx,
             pDexMethod->accessFlags, NULL, dumpLocalsCb, NULL);
+    ****/
 
    /*********** sankar starts ***********/
 
@@ -2954,6 +2961,23 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
         printf("      access        : 0x%04x (%s)\n",
             pDexMethod->accessFlags, accessStr);
 
+
+   /********** sankar starts : moving the following block of code from the previous dumpLocals() function; this block just populates locVarList but does not print ***/
+                const DexCode* pCode = dexGetCode(pDexFile, pDexMethod);
+                if(locVarList) 
+	            	delete locVarList; // sankar adds: check some possible memory leak here
+
+                locVarList = new PStash; // sankar adds
+
+                const DexMethodId *pMethodId
+                      = dexGetMethodId(pDexFile, pDexMethod->methodIdx);
+                const char *classDescriptor
+                      = dexStringByTypeIdx(pDexFile, pMethodId->classIdx);
+
+                dexDecodeDebugInfo(pDexFile, pCode, classDescriptor, pMethodId->protoIdx,
+                        pDexMethod->accessFlags, NULL, dumpLocalsCb, NULL);
+  /************* sankar ends *******/
+
     /******************* kui's modification begins  *******************
         if (pDexMethod->codeOff == 0) {
             printf("      code          : (none)\n");
@@ -2989,22 +3013,52 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
                    char tmpBuf[strlen(typeDescriptor)+1];      /* more than big enough */
                    const char* base = typeDescriptor+1;
                    const char* preTraverse = typeDescriptor+1;
-                   char* para=(char*)malloc(sizeof(char)*1000);
+                   char* para=(char*)malloc(sizeof(char)*5000);  // sankar increased the size from 1000 to 5000
                    strcpy(para,"");
                    // print the parameters with index
 
+                   // sankar adds: print "this" register as the first param for non-static method
+                   if(locVarList)
+                     {
+		                for(int i=0; i < locVarList->count(); i++)
+		                   {	 
+		                      void* temp1 = (*locVarList)[i];
+		                      if(temp1) 
+			                   {
+			                     	locVarInf* t1 = (locVarInf*) temp1;
+                                    if(t1->descriptor && t1->name && !strcmp(t1->name, "this"))
+									{
+				                       // fprintf(pFp, "        [|%s|] [|%s|] [|v%d|] @scope (L%04x,L%04x);",
+				                          // t1->descriptor, t1->name, t1->reg, t1->startAddress,  t1->endAddress );
+                                       strcat(para, "[|");
+									   strcat(para, t1->descriptor);
+									   strcat(para, "|]");
+									   char regNamebuff[20];
+									   sprintf(regNamebuff, " [|v%d|]", t1->reg);
+									   strcat(para, regNamebuff);
+									   strcat(para, " @type this,");
+									}
+							   }
+						   }
+					 }
+
+                   // now print other params 
+
                    while (*base != ')') {
-                     char* cp = tmpBuf;
+                     char* cp = tmpBuf;    
                      int flag=0;
+					 int objectParamFlag = 0; // sankar introduces this flag to add annotation "@ type object" for each object parameter
                      while (*base == '[')
                        *cp++ = *base++;
 
                      if (*base == 'L') {
+
+					   objectParamFlag = 1; // the current parameter is an object 	 
                       /* copy through ';' */
                       do {
                         *cp = *base++;
                         } while (*cp++ != ';');
-                                    }
+                     }
                      else {
                            /* primitive char, copy it */
                             if (strchr("ZBCSIFJD", *base) == NULL) {
@@ -3014,26 +3068,33 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
                              if(*base=='D'||*base=='J')
                                flag=1;
                              *cp++ = *base++;
-                             }
-                            /* null terminate and display */
-                           *cp++ = '\0';
+                          }
+                     /* null terminate and display */
+                     *cp++ = '\0';
 
-                             char* tmp = descriptorToDot(tmpBuf);
-                           // printf("<parameter name=\"arg%d\" type=\"%s\">\n</parameter>\n",
-                            // argNum++, tmp);
-                             {
-                              strcat(para,tmp);
-                               char buffer[5];
-                               sprintf(buffer, " v%d",startReg++);
-                               strcat(para,buffer);
-                               if(*base !=')') strcat(para,",");
-                             }
-                             if(flag==1)startReg++;
-                              free(tmp);
-                   }
+                     char* tmp = descriptorToDot(tmpBuf);
+                     // printf("<parameter name=\"arg%d\" type=\"%s\">\n</parameter>\n",
+                     // argNum++, tmp);
+                     {
+						strcat(para, "[|"); // sankar added 
+                        strcat(para,tmp);
+						strcat(para, "|]"); // sankar added
+                        char buffer[20];  // sankar increased the size 
+                        sprintf(buffer, " [|v%d|]",startReg++);
+                        strcat(para,buffer);
+                        if(objectParamFlag==1)
+							strcat(para, "@type object");
+
+                        if(*base !=')') strcat(para,",");
+                     }
+                     if(flag==1)
+						 startReg++;
+                     free(tmp);
+                 }
+
               //if(strcmp(name,"<init>")==0)  printf("    procedure %s [|init|] (%s) @%s {\n", rtype,para,accessStr);
              // else if(strcmp(name,"<clinit>")==0)  printf("    procedure %s [|clinit|] (%s) @%s {\n", rtype,para,accessStr);
-              fprintf(pFp, "    procedure [|%s|] [|%s.%s|] ([|%s|]) @owner [|%s|] @signature [|%s.%s:%s|] @Access %s {\n",
+              fprintf(pFp, "    procedure [|%s|] [|%s.%s|] (%s) @owner [|%s|] @signature [|%s.%s:%s|] @Access %s {\n",
 			            rtype,owner,name,para,owner,backDescriptor,name,typeDescriptor,accessStr); // not in dexdump
              free(rtype);
              free(para);
@@ -3224,7 +3285,7 @@ void dumpSField(const DexFile* pDexFile, const DexField* pSField, int i,bool fla
  */
 void dumpIField(const DexFile* pDexFile, const DexField* pIField, int i, char* className) // sankar adds the 4th argument
 {
-    dumpSField(pDexFile, pIField, i,false, className); // sankar adds the 5th argument
+    dumpSField(pDexFile, pIField, i,false, className); // sankar adds the 5th argument "className"
 }
 
 /*
