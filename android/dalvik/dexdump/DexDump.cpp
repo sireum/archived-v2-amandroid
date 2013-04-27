@@ -3052,6 +3052,7 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 									   strcat(paraThis, regNamebuff);
 									   strcat(paraThis, " @type (this)");
 									   thisFlag = 1;
+									   break;  // to come out of the for-loop once a "this" is obtained; note there can be more than one "this" in locVarList 
 									}
 							   }
 						   }
