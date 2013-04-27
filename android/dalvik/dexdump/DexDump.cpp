@@ -2963,19 +2963,25 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 
 
    /********** sankar starts : moving the following block of code from the previous dumpLocals() function; this block just populates locVarList but does not print ***/
-                const DexCode* pCode = dexGetCode(pDexFile, pDexMethod);
+
                 if(locVarList) 
 	            	delete locVarList; // sankar adds: check some possible memory leak here
 
                 locVarList = new PStash; // sankar adds
 
-                const DexMethodId *pMethodId
-                      = dexGetMethodId(pDexFile, pDexMethod->methodIdx);
-                const char *classDescriptor
-                      = dexStringByTypeIdx(pDexFile, pMethodId->classIdx);
+                if( pDexMethod->codeOff != 0)
+                { 
+					const DexCode* pCode = dexGetCode(pDexFile, pDexMethod);
 
-                dexDecodeDebugInfo(pDexFile, pCode, classDescriptor, pMethodId->protoIdx,
+
+                    const DexMethodId *pMethodId
+                        = dexGetMethodId(pDexFile, pDexMethod->methodIdx);
+                    const char *classDescriptor
+                        = dexStringByTypeIdx(pDexFile, pMethodId->classIdx);
+
+                    dexDecodeDebugInfo(pDexFile, pCode, classDescriptor, pMethodId->protoIdx,
                         pDexMethod->accessFlags, NULL, dumpLocalsCb, NULL);
+				}
   /************* sankar ends *******/
 
     /******************* kui's modification begins  *******************
@@ -2989,32 +2995,40 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
         if (gOptions.disassemble)
             putchar('\n'); */
 
-            int startReg=0;
-        if( pDexMethod->codeOff != 0)
-        { const DexCode* pCode = dexGetCode(pDexFile, pDexMethod);
-         startReg =pCode->registersSize-pCode->insSize;
-         if((pDexMethod->accessFlags & ACC_STATIC) ==0)startReg++;
-        }
-            // find return type
-            const char* returnType = strrchr(typeDescriptor, ')');
-                   if (returnType == NULL) {
+                 int startReg=0;
+                 if( pDexMethod->codeOff != 0)
+                  { const DexCode* pCode = dexGetCode(pDexFile, pDexMethod);
+                    startReg =pCode->registersSize-pCode->insSize;
+                    if((pDexMethod->accessFlags & ACC_STATIC) ==0)startReg++;
+                  }
+                  // find return type
+                  const char* returnType = strrchr(typeDescriptor, ')');
+                  if (returnType == NULL) {
                      fprintf(stderr, "bad method type descriptor '%s'\n",typeDescriptor);
                             goto bail;
-                        }
-                     char* rtype = descriptorToDot(returnType+1);
+                  }
+                  char* rtype = descriptorToDot(returnType+1);
                         /*
                          * Parameters.
                          */
-                     if (typeDescriptor[0] != '(') {
+                  if (typeDescriptor[0] != '(') {
                       fprintf(stderr, "ERROR: bad descriptor '%s'\n", typeDescriptor);
                          goto bail;
-                       }
+                   }
 
                    char tmpBuf[strlen(typeDescriptor)+1];      /* more than big enough */
                    const char* base = typeDescriptor+1;
                    const char* preTraverse = typeDescriptor+1;
                    char* para=(char*)malloc(sizeof(char)*5000);  // sankar increased the size from 1000 to 5000
+                   char* paraThis=(char*)malloc(sizeof(char)*1000);  // sankar adds
+                   char* paraTotal=(char*)malloc(sizeof(char)*6000);  // sankar adds
                    strcpy(para,"");
+				   strcpy(paraThis,"");
+				   strcpy(paraTotal,"");
+
+				   int thisFlag = 0; // if 1 then this method has "this" as the first param as well as a local variable
+				   int paramCount = 0; // this count does not include "this"
+
                    // print the parameters with index
 
                    // sankar adds: print "this" register as the first param for non-static method
@@ -3030,13 +3044,14 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 									{
 				                       // fprintf(pFp, "        [|%s|] [|%s|] [|v%d|] @scope (L%04x,L%04x);",
 				                          // t1->descriptor, t1->name, t1->reg, t1->startAddress,  t1->endAddress );
-                                       strcat(para, "[|");
-									   strcat(para, t1->descriptor);
-									   strcat(para, "|]");
+                                       strcat(paraThis, "[|");
+									   strcat(paraThis, t1->descriptor);
+									   strcat(paraThis, "|]");
 									   char regNamebuff[20];
 									   sprintf(regNamebuff, " [|v%d|]", t1->reg);
-									   strcat(para, regNamebuff);
-									   strcat(para, " @type this,");
+									   strcat(paraThis, regNamebuff);
+									   strcat(paraThis, " @type (this)");
+									   thisFlag = 1;
 									}
 							   }
 						   }
@@ -3075,7 +3090,8 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
                      char* tmp = descriptorToDot(tmpBuf);
                      // printf("<parameter name=\"arg%d\" type=\"%s\">\n</parameter>\n",
                      // argNum++, tmp);
-                     {
+                     {  
+						paramCount++; 
 						strcat(para, "[|"); // sankar added 
                         strcat(para,tmp);
 						strcat(para, "|]"); // sankar added
@@ -3083,9 +3099,9 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
                         sprintf(buffer, " [|v%d|]",startReg++);
                         strcat(para,buffer);
                         if(objectParamFlag==1)
-							strcat(para, "@type object");
+							strcat(para, "@type (object)");
 
-                        if(*base !=')') strcat(para,",");
+                        if(*base !=')') strcat(para,", ");
                      }
                      if(flag==1)
 						 startReg++;
@@ -3094,10 +3110,21 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 
               //if(strcmp(name,"<init>")==0)  printf("    procedure %s [|init|] (%s) @%s {\n", rtype,para,accessStr);
              // else if(strcmp(name,"<clinit>")==0)  printf("    procedure %s [|clinit|] (%s) @%s {\n", rtype,para,accessStr);
+
+             if(thisFlag == 1 && paramCount > 0)
+			 {
+			   	 strcat(paraThis, ", ");
+		     }
+
+			 strcat(paraTotal, paraThis);
+			 strcat(paraTotal, para);
+
               fprintf(pFp, "    procedure [|%s|] [|%s.%s|] (%s) @owner [|%s|] @signature [|%s.%s:%s|] @Access %s {\n",
-			            rtype,owner,name,para,owner,backDescriptor,name,typeDescriptor,accessStr); // not in dexdump
+			            rtype,owner,name,paraTotal,owner,backDescriptor,name,typeDescriptor,accessStr); // not in dexdump
              free(rtype);
              free(para);
+			 free(paraThis);
+			 free(paraTotal);
               //printf("      name          : '%s'\n", name);
             //  printf("      type          : '%s'\n", typeDescriptor);
 
