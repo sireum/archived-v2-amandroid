@@ -14,6 +14,7 @@ struct locVarInfo {  // sankar adds this struct which can store one local variab
 	u2 reg;
 	u4 startAddress;
 	u4 endAddress;
+    bool paramFlag; // if true then it indicates that this local variable is also a parameter of the procedure
 
     locVarInfo(const char* desc, const char* nam, u2 r, u4 sa, u4 ea)
 	 { 
@@ -24,6 +25,7 @@ struct locVarInfo {  // sankar adds this struct which can store one local variab
 	  reg = r;
       startAddress = sa;
 	  endAddress = ea;
+	  paramFlag = false;  // if param, then this flag will be set in dumpMethod() function of DexDump.cpp
 	 }
 
 	~locVarInfo()

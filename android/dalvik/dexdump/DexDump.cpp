@@ -178,8 +178,8 @@ static char* descriptorToDot(const char* str)
                      char ch = str[offset + i];
                      if (ch == '/') {
                        newStr[i+counter]=':';
-                       counter++;
-                       newStr[i+counter]=':';
+                       //counter++;
+                       //newStr[i+counter]=':';
                      }
                      else newStr[i+counter]=ch;
                  }
@@ -856,7 +856,7 @@ static void dumpLocalsCb(void *cnxt, u2 reg, u4 startAddress,
 void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
         const DexMethod *pDexMethod)
 {
-	/**** moved the following two blocks to dumpMethod() ***
+	/**** moved the following block to dumpMethod() ***
 
     if(locVarList) 
 		delete locVarList; // sankar adds: check some possible memory leak here
@@ -866,9 +866,9 @@ void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
     ****/
 
 	printf("      locals :\n");
-	fprintf(pFp,"      local placeholder ;\n"); // sankar
+	fprintf(pFp,"      local temp ;\n"); // sankar adds: previously it was "placeholder" instead of "temp"
 
-	/******
+	/****** moved the following block to dumpMethod() ****
     const DexMethodId *pMethodId
             = dexGetMethodId(pDexFile, pDexMethod->methodIdx);
     const char *classDescriptor
@@ -888,39 +888,43 @@ void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
 		    if(temp1) 
 			   {
 				 locVarInf* t1 = (locVarInf*) temp1;
-                 if(t1->descriptor && t1->name)
-				    fprintf(pFp, "        [|%s|] [|%s|] @reg %d @scope (L%04x,L%04x);",
-				                     t1->descriptor, t1->name, t1->reg, t1->startAddress,  t1->endAddress );
-
-                 int conflictCount = 0;
-
-                 for(int j=i+1; j < locVarList->count(); j++)
+                 if(t1->descriptor && t1->name && !t1->paramFlag)
 				 {
-				   void* temp2 = (*locVarList)[j];
-				   if(temp2)
-				   {
-				     locVarInf* t2 = (locVarInf*) temp2;
-					 if(t2->descriptor && t2->name && t1->name && !strcmp(t2->name, t1->name))
-					  { 
-						conflictCount++;
+				    fprintf(pFp, "        [|%s|] v%d @varname %s @scope ((L%04x,L%04x)",
+				                     t1->descriptor, t1->reg, t1->name, t1->startAddress,  t1->endAddress );
 
-			            // fprintf(pFp, ", @scope (L%04x,L%04x) ", t2->startAddress,  t2->endAddress);
-				        // delete t2; // is it safe?
-						// locVarList->remove(j); // possible memory leak?
+                    int conflictCount = 0;
 
-                        char* tName;
-						char extra[6]; //*******  assume that number of conflicts is less than 10^4 *******
-						snprintf(extra, 6, ".%d", conflictCount);
-						tName = new char[strlen(t2->name) + strlen(extra) + 2]; // i think even +1 would have been suffi
-						strcpy(tName, t2->name);
-						strcat(tName, extra);
-						free(t2->name);
-						t2->name= tName;
-                      }
-				   }
-				 }
+                    for(int j=i+1; j < locVarList->count(); j++)
+				      {
+				        void* temp2 = (*locVarList)[j];
+				        if(temp2)
+				          {
+				            locVarInf* t2 = (locVarInf*) temp2;
+					        if(t2->descriptor && t2->name && !t2->paramFlag  && t1->name && !strcmp(t2->name, t1->name))
+					          { 
+						        conflictCount++;
+
+			                    fprintf(pFp, ", (L%04x,L%04x)", t2->startAddress,  t2->endAddress);
+				                delete t2; // is it safe?
+						        locVarList->remove(j); // possible memory leak?
+
+                                // char* tName;
+					        	// char extra[6]; //*******  assume that number of conflicts is less than 10^4 *******
+					        	// snprintf(extra, 6, ".%d", conflictCount);
+					        	// tName = new char[strlen(t2->name) + strlen(extra) + 2]; // i think even +1 would have been suffi
+						        // strcpy(tName, t2->name);
+						        // strcat(tName, extra);
+						        // free(t2->name);
+					        	// t2->name= tName;
+                             }
+				          }
+				      }
                  
-				 fprintf(pFp, "\n");
+				    fprintf(pFp, ") "); // note that ")" closes the scopes which have been already listed for the current local variable
+                  }
+                 
+				 fprintf(pFp, "\n"); 
 				 delete t1; // is it safe?
 				 locVarList->remove(i); // possible memory leak?
 
@@ -3023,7 +3027,6 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
                    char* paraThis=(char*)malloc(sizeof(char)*1000);  // sankar adds
                    char* paraTotal=(char*)malloc(sizeof(char)*6000);  // sankar adds
                    strcpy(para,"");
-				   strcpy(paraThis,"");
 				   strcpy(paraTotal,"");
 
 				   int thisFlag = 0; // if 1 then this method has "this" as the first param as well as a local variable
@@ -3044,19 +3047,23 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 									{
 				                       // fprintf(pFp, "        [|%s|] [|%s|] [|v%d|] @scope (L%04x,L%04x);",
 				                          // t1->descriptor, t1->name, t1->reg, t1->startAddress,  t1->endAddress );
+
+				                       strcpy(paraThis,""); // initializing with null string
                                        strcat(paraThis, "[|");
 									   strcat(paraThis, t1->descriptor);
 									   strcat(paraThis, "|]");
 									   char regNamebuff[20];
-									   sprintf(regNamebuff, " [|v%d|]", t1->reg);
+									   sprintf(regNamebuff, " v%d", t1->reg);
 									   strcat(paraThis, regNamebuff);
 									   strcat(paraThis, " @type (this)");
 									   thisFlag = 1;
-									   break;  // to come out of the for-loop once a "this" is obtained; note there can be more than one "this" in locVarList 
+									   t1->paramFlag = true; // the corresponding element of locVarList is set as a parameter so that we can identify it in dumpLocals() 
+									   // note there can be more than one "this" in locVarList 
 									}
 							   }
 						   }
 					 }
+
 
                    // now print other params 
 
@@ -3089,15 +3096,41 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
                      *cp++ = '\0';
 
                      char* tmp = descriptorToDot(tmpBuf);
+
                      // printf("<parameter name=\"arg%d\" type=\"%s\">\n</parameter>\n",
                      // argNum++, tmp);
+
+                   // identifying the local variables which are also parameters
+
+                   if(locVarList)
+                     {
+		                for(int i=0; i < locVarList->count(); i++)
+		                   {	 
+		                      void* temp1 = (*locVarList)[i];
+		                      if(temp1) 
+			                   {
+			                     	locVarInf* t1 = (locVarInf*) temp1;
+
+                                    if(t1->descriptor && (t1->reg == startReg)) // startReg is the current variable's register's index
+									{
+				                        // fprintf(pFp, "        [|%s|] [|%s|] [|v%d|] @scope (L%04x,L%04x); tmp=%s ",
+				                            // t1->descriptor, t1->name, t1->reg, t1->startAddress,  t1->endAddress, tmp );
+
+									   t1->paramFlag = true; // the corresponding element of locVarList is set as a parameter so that we can identify it in dumpLocals()
+									}
+							   }
+						   }
+					 }
+
+			     // param identification done
+
                      {  
 						paramCount++; 
 						strcat(para, "[|"); // sankar added 
                         strcat(para,tmp);
 						strcat(para, "|]"); // sankar added
                         char buffer[20];  // sankar increased the size 
-                        sprintf(buffer, " [|v%d|]",startReg++);
+                        sprintf(buffer, " v%d", startReg++);
                         strcat(para,buffer);
                         if(objectParamFlag==1)
 							strcat(para, "@type (object)");
