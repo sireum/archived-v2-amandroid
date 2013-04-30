@@ -149,7 +149,16 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
 
         if(job.hasError){
           println("Error present: " + job.hasError)
-          job.tags.foreach(f => println(f))
+          job.tags.foreach{f =>
+            f match{
+              case t:LocationTag =>
+                t.location match {
+                  case lcl : LineColumnLocation => println("line --->" + lcl.line + " col --->" + lcl.column)
+                  case _ =>
+                }
+              case _ =>
+            }
+            println(f)}
           job.lastStageInfo.tags.foreach(f => println(f))
         }
         
