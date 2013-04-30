@@ -150,6 +150,7 @@ class PointsCollector {
               exps(0) match {
                 case ne : NameExp =>
                   pi.recv = new PointRecv(ne.name.name, loc, locIndex)
+                  pi.recv.container = pi
                 case _ =>
               }
               for(i <- 1 to (exps.size-1)) {
@@ -157,6 +158,7 @@ class PointsCollector {
                   case ne : NameExp =>
                     val arg = new PointArg(ne.name.name, loc, locIndex)
                     pi.args(i-1) = arg 
+                    pi.args(i-1).container = pi
                   case _ =>
                 }
               }
@@ -223,7 +225,8 @@ final class PointAsmt(uri : ResourceUri, loc : ResourceUri, locIndex : Int) exte
  * Set of program points corresponding to method recv variable.
  * pi represents an element in this set.
  */
-final class PointRecv(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
+final class PointRecv(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){
+  var container : PointI = null
   override def toString = "recv:" + uri + "@" + loc
 }
 
@@ -232,6 +235,7 @@ final class PointRecv(uri : ResourceUri, loc : ResourceUri, locIndex : Int) exte
  * pi represents an element in this set.
  */
 final class PointArg(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
+  var container : PointI = null
   override def toString = "arg:" + uri + "@" + loc
 }
 
@@ -311,6 +315,7 @@ class PointRNoIndex(uri : ResourceUri, loc : ResourceUri) extends Point{
  * Set of program points corresponding to params. 
  */
 class PointProc(loc : ResourceUri) extends Point{
+  val pUri = loc
   var thisParamOpt : Option[PointThis] = None
   val params : MMap[Int, PointRNoIndex] = mmapEmpty
   var retParam : PointRNoIndex = null

@@ -12,6 +12,8 @@ import java.util.HashSet
 trait AndroidVirtualMethodTables {
   def getRecordUri(recordName : String) : ResourceUri
   def getProcedureUriBySignature(sig : String) : ResourceUri
+  def getProcedureUrisByRecordUri(recordUri : ResourceUri) : java.util.Set[ResourceUri]
+  def getProcedureSigsByRecordUri(recordUri : ResourceUri) : MSet[ResourceUri]
   def getCalleeOptionsByUri(procedureUri : ResourceUri) : java.util.Set[ResourceUri]
   def getCalleeOptionsBySignature(sig : String) : java.util.Set[ResourceUri]
   def isConstructor(sig : String) : Boolean

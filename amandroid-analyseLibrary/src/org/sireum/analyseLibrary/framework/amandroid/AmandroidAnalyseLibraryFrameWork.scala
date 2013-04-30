@@ -67,22 +67,12 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         val d = srcs.substring(srcs.indexOf("/"), srcs.lastIndexOf("/")+1)
         val srcFiles = mlistEmpty[FileResourceUri]
         /*for start analysis from jar file*/
-        val pilarDir = new File(d + "pilar")
-        val resDir = new File(pilarDir+"/result")
-        val ccfgDir = new File(resDir+"/ccfgs")
-        if(!pilarDir.exists()){
-          resDir.mkdir()
-        }
-        if(!resDir.exists()){
-          resDir.mkdir()
-        }
-        if(!ccfgDir.exists()){
-          ccfgDir.mkdir()
-        }
-        /*end here*/
-        /*for start analysis from pilar file*/
-//        val resDir = new File(d+"result")
-//        val ccfgDir = new File(d+"result/ccfgs")
+//        val pilarDir = new File(d + "pilar")
+//        val resDir = new File(pilarDir+"/result")
+//        val ccfgDir = new File(resDir+"/ccfgs")
+//        if(!pilarDir.exists()){
+//          resDir.mkdir()
+//        }
 //        if(!resDir.exists()){
 //          resDir.mkdir()
 //        }
@@ -90,29 +80,39 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
 //          ccfgDir.mkdir()
 //        }
         /*end here*/
+        /*for start analysis from pilar file*/
+        val resDir = new File(d+"result")
+        val ccfgDir = new File(d+"result/ccfgs")
+        if(!resDir.exists()){
+          resDir.mkdir()
+        }
+        if(!ccfgDir.exists()){
+          ccfgDir.mkdir()
+        }
+        /*end here*/
         
         //deal with jar file
-        val apkName = f.getName()
-        val apkFile = new ZipFile(f, ZipFile.OPEN_READ)
-        val entries = apkFile.entries()
-        while(entries.hasMoreElements()){
-          val ze = entries.nextElement()
-          if(ze.toString().endsWith(".dex")){
-            val loadFile = new File(d+ze.getName())
-            val ops = new FileOutputStream(d + "pilar/" + dirName + ".dex")
-            val ips = apkFile.getInputStream(ze)
-            var reading = true
-            while(reading){
-              ips.read() match {
-                case -1 => reading = false
-                case c => ops.write(c)
-              }
-            }
-            ops.flush()
-            ips.close()
-          }
-        }
-        srcFiles += FileUtil.toUri(d + "pilar/" + dirName + ".dex")
+//        val apkName = f.getName()
+//        val apkFile = new ZipFile(f, ZipFile.OPEN_READ)
+//        val entries = apkFile.entries()
+//        while(entries.hasMoreElements()){
+//          val ze = entries.nextElement()
+//          if(ze.toString().endsWith(".dex")){
+//            val loadFile = new File(d+ze.getName())
+//            val ops = new FileOutputStream(d + "pilar/" + dirName + ".dex")
+//            val ips = apkFile.getInputStream(ze)
+//            var reading = true
+//            while(reading){
+//              ips.read() match {
+//                case -1 => reading = false
+//                case c => ops.write(c)
+//              }
+//            }
+//            ops.flush()
+//            ips.close()
+//          }
+//        }
+//        srcFiles += FileUtil.toUri(d + "pilar/" + dirName + ".dex")
         
 //        val stFile = new File(resDir + "/" + dirName + "SymbolTable.xml")
         
@@ -122,9 +122,9 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
     
         val job = PipelineJob()
         val options = job.properties
-        Dex2PilarWrapperModule.setSrcFiles(options, srcFiles)
+//        Dex2PilarWrapperModule.setSrcFiles(options, srcFiles)
 
-//        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d+ "/" +f.getName()))))
+        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d+ "/" +f.getName()))))
         
         PilarAndroidSymbolResolverModule.setParallel(options, false)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, None)
@@ -198,11 +198,11 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
     PipelineConfiguration(
       "Library analyse pipeline",
       false,
-      PipelineStage(
-        "dex2pilar stage",
-        false,
-        Dex2PilarWrapperModule
-      ),
+//      PipelineStage(
+//        "dex2pilar stage",
+//        false,
+//        Dex2PilarWrapperModule
+//      ),
       PipelineStage(
         "Chunking pilar parsing stage",
         false,

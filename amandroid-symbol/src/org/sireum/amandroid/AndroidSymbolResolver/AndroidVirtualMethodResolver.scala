@@ -230,6 +230,19 @@ class AndroidVirtualMethodResolver
       getCalleeOptionsByUri(procedureUri)
     }
     
+    def getProcedureUrisByRecordUri(recordUri : ResourceUri) : java.util.Set[ResourceUri] = {
+      tables.recordProcedureTable.get(recordUri)
+    }
+    
+    def getProcedureSigsByRecordUri(recordUri : ResourceUri) : MSet[ResourceUri] = {
+      val pUris = tables.recordProcedureTable.get(recordUri)
+      val sigs : MSet[ResourceUri] = msetEmpty
+      pUris.foreach(
+        pUri => sigs += tables.procedureUriTable.inverse().get(pUri)  
+      )
+      sigs
+    }
+    
     def isConstructor(procedureUri : ResourceUri) : Boolean = {
       if(tables.procedureTypeTable.contains(procedureUri)){
         if(tables.procedureTypeTable.get(procedureUri) != null && tables.procedureTypeTable.get(procedureUri).contains("CONSTRUCTOR")) true

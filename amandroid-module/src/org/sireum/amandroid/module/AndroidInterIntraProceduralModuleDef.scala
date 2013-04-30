@@ -237,6 +237,6 @@ class csCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) exten
   */
 
 class OFAsCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends OFAsCfgModule {
-  val ofg = ObjectFlowGraphBuilder(this.procedureSymbolTables, this.cfgs, this.rdas)
+  val ofg = ObjectFlowGraphBuilder(this.procedureSymbolTables, this.cfgs, this.rdas, this.androidVirtualMethodTables, this.androidCache)
   this.OFAsCfg_=(SystemControlFlowGraph[String]())
 }

@@ -99,7 +99,6 @@ trait ConstraintModel {
             } else {
               defDesc match {
                 case ldd : LocDefDesc => 
-                  
                   ldd.locUri match {
                     case Some(locU) => ps += getPoint(p.varName, locU, ldd.locIndex)
                     case _ =>
@@ -144,7 +143,7 @@ trait ConstraintModel {
         p match {
           case pp : PointProc =>
             pp.thisParamOpt match {
-              case Some(thisP) => 
+              case Some(thisP) =>
                 if(thisP.varName.equals(uri)){
                   point = thisP
                 }
@@ -163,5 +162,41 @@ trait ConstraintModel {
     )
     require(point != null)
     point
+  }
+  
+  def getProcPointOrElse(uri : ResourceUri) : PointProc = {
+    var point : PointProc = null
+    points.foreach(
+      p => {
+        p match {
+          case pp : PointProc =>
+            if(pp.pUri.equals(uri))
+              point
+          case _ =>
+        }
+      }  
+    )
+    require(point != null)
+    point
+  }
+  
+  def getRecvPoint(uri : ResourceUri, loc : ResourceUri) : Option[PointRecv] = {
+    var pointOpt : Option[PointRecv] = null
+    points.foreach(
+      p => {
+        p match {
+          case pp : PointAsmt =>
+            pp.rhs match {
+              case pi : PointI =>
+                pointOpt = Some(pi.recv)
+              case _ =>
+                pointOpt = None
+            }
+          case _ =>
+            pointOpt = None
+        }
+      }  
+    )
+    pointOpt
   }
 }
