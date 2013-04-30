@@ -54,13 +54,13 @@ class PilarAndroidSymbolResolverModuleDef (val job : PipelineJob, info : Pipelin
   
   this.androidVirtualMethodTables_=(result._2)
 
-  class ST extends SymbolTable with AndroidSymbolTableProducer {
+  class ST extends SymbolTable with SymbolTableProducer {
     st =>
 
     import PilarAndroidSymbolResolverModuleDef.ERROR_TAG_TYPE
     import PilarAndroidSymbolResolverModuleDef.WARNING_TAG_TYPE
     
-    val tables = AndroidSymbolTableData()
+    val tables = SymbolTableData()
     val tags = marrayEmpty[LocationTag]
     var hasErrors = false
  
@@ -96,16 +96,49 @@ class PilarAndroidSymbolResolverModuleDef (val job : PipelineJob, info : Pipelin
       pdMap.getOrElseUpdate(procedureAbsUri, new PST(procedureAbsUri))
     }
 
-    class PST(val procedureUri : ResourceUri)
-        extends ProcedureSymbolTable with AndroidProcedureSymbolTableProducer {
-      
+//    class PST(val procedureUri : ResourceUri)
+//        extends ProcedureSymbolTable with ProcedureSymbolTableProducer {
+//      
+//      val tables = ProcedureSymbolTableData()
+//      var nextLocTable : CMap[ResourceUri, ResourceUri] = null
+//      
+//      // println("pilarAndroidSymbolResDef :: AndroidSymbolTable :: class ST :: class PST :: OK3.2" + procedureUri) // sankar testing
+//      
+//      def symbolTable = st
+//      def androidSymbolTableProducer = st
+//      def procedure = st.tables.procedureAbsTable(procedureUri)
+//      def typeVars : ISeq[ResourceUri] = tables.typeVarTable.keys.toList
+//      def params : ISeq[ResourceUri] = tables.params.toList
+//      def isParam(localUri : ResourceUri) = tables.params.contains(localUri)
+//      def locals : Iterable[ResourceUri] = tables.localVarTable.keys
+//      def nonParamLocals : Iterable[ResourceUri] = tables.localVarTable.keys.filterNot(isParam)
+//      def locations =
+//        tables.bodyTables match {
+//          case Some(bt) => procedure.body.asInstanceOf[ImplementedBody].locations
+//          case _        => ilistEmpty
+//        }
+//      def typeVar(typeVarUri : ResourceUri) : NameDefinition =
+//        tables.typeVarTable(typeVarUri)
+//      def param(paramUri : ResourceUri) : ParamDecl =
+//        tables.localVarTable(paramUri).asInstanceOf[ParamDecl]
+//      def local(localUri : ResourceUri) : LocalVarDecl =
+//        tables.localVarTable(localUri).asInstanceOf[LocalVarDecl]
+//      def location(locationIndex : Int) = locations(locationIndex)
+//      def location(locationUri : ResourceUri) =
+//        tables.bodyTables.get.locationTable(locationUri)
+//      def catchClauses(locationIndex : Int) : Iterable[CatchClause] =
+//        tables.bodyTables.get.catchTable.getOrElse(locationIndex,
+//          Array.empty[CatchClause] : Iterable[CatchClause])
+//    }
+//
+//    def toSymbolTable : SymbolTable = this
+//  }
+  class PST(val procedureUri : ResourceUri)
+        extends ProcedureSymbolTable with ProcedureSymbolTableProducer {
       val tables = ProcedureSymbolTableData()
       var nextLocTable : CMap[ResourceUri, ResourceUri] = null
-      
-      // println("pilarAndroidSymbolResDef :: AndroidSymbolTable :: class ST :: class PST :: OK3.2" + procedureUri) // sankar testing
-      
       def symbolTable = st
-      def androidSymbolTableProducer = st
+      def symbolTableProducer = st
       def procedure = st.tables.procedureAbsTable(procedureUri)
       def typeVars : ISeq[ResourceUri] = tables.typeVarTable.keys.toList
       def params : ISeq[ResourceUri] = tables.params.toList
@@ -115,7 +148,7 @@ class PilarAndroidSymbolResolverModuleDef (val job : PipelineJob, info : Pipelin
       def locations =
         tables.bodyTables match {
           case Some(bt) => procedure.body.asInstanceOf[ImplementedBody].locations
-          case _        => ilistEmpty
+          case _        => ivectorEmpty
         }
       def typeVar(typeVarUri : ResourceUri) : NameDefinition =
         tables.typeVarTable(typeVarUri)
@@ -133,6 +166,5 @@ class PilarAndroidSymbolResolverModuleDef (val job : PipelineJob, info : Pipelin
 
     def toSymbolTable : SymbolTable = this
   }
-  
   
 }

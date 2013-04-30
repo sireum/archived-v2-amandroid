@@ -27,88 +27,63 @@ trait AndroidSymbolTable extends SymbolTable
 
 object AndroidSymbolTable {
   def apply(models : ISeq[Model],
-            stpConstructor : Unit => SymbolTableProducer,
+            stpConstructor : Unit => AndroidSymbolTableProducer,
             parallel : Boolean) =
     buildSymbolTable(models, stpConstructor, parallel)
     
   def apply(models : ISeq[Model],
-            stpConstructor : Unit => SymbolTableProducer,
+            stpConstructor : Unit => AndroidSymbolTableProducer,
             existingAndroidVirtualMethodTables : AndroidVirtualMethodTables,
             parallel : Boolean) =
     buildSymbolTable(models, stpConstructor, existingAndroidVirtualMethodTables, parallel)
 
 
-  def minePackageElements[P <: SymbolTableProducer] //
+  def minePackageElements[P <: AndroidSymbolTableProducer] //
   (models : ISeq[Model], stpConstructor : Unit => P,
-   parallel : Boolean) : SymbolTableProducer = {
+   parallel : Boolean) : AndroidSymbolTableProducer = {
     if (models.isEmpty) return stpConstructor()
 
     val ms : GenSeq[Model] = if (parallel) models.par else models
     ms.map { model =>
       val stp = stpConstructor()
-      new H.PackageElementMiner(stp).packageElementMiner(model)
+      new H1.PackageElementMiner(stp).packageElementMiner(model)
       val tables = stp.tables
       model.sourceURI.foreach { fileUri =>
         val set = msetEmpty[ResourceUri]
-        set ++= tables.constTable.keys
-        set ++= tables.constElementTable.keys
-        set ++= tables.enumTable.keys
-        set ++= tables.enumElementTable.keys
-        set ++= tables.extensionTable.keys
-        set ++= tables.extensionElementTable.keys
-        set ++= tables.funTable.keys
+//        set ++= tables.constTable.keys
+//        set ++= tables.constElementTable.keys
+//        set ++= tables.enumTable.keys
+//        set ++= tables.enumElementTable.keys
+//        set ++= tables.extensionTable.keys
+//        set ++= tables.extensionElementTable.keys
+//        set ++= tables.funTable.keys
         set ++= tables.globalVarTable.keys
         set ++= tables.procedureTable.keys
         set ++= tables.procedureAbsTable.keys
         set ++= tables.recordTable.keys
-        set ++= tables.attributeTable.keys
-        set ++= tables.typeVarTable.keys
-        set ++= tables.typeAliasTable.keys
-         set ++= tables.vsetTable.keys
+//        set ++= tables.attributeTable.keys
+//        set ++= tables.typeVarTable.keys
+//        set ++= tables.typeAliasTable.keys
+        // set ++= tables.vsetTable.keys
         tables.declaredSymbols(fileUri) = set
       }
       // println("AndroidSymbolTable :: AndroidSymbolTable :: minePackageElements :: OK2.1") // sankar testing
-//      println("mine = " + stp.toSymbolTable.procedureSymbolTables.size)
+      println("mine = " + stp.toSymbolTable.procedureSymbolTables.size)
       stp
-    }.toIterable.reduce(H.combine)
+    }.toIterable.reduce(H1.combine)
   }
 
-  def resolveVirtualMethod(stp : SymbolTableProducer) : AndroidVirtualMethodTables = {
+  def resolveVirtualMethod(stp : AndroidSymbolTableProducer) : AndroidVirtualMethodTables = {
     val avmr = new AndroidVirtualMethodResolver
     avmr.resolveAndroidVirtualMethod(stp)
     avmr.toAndroidVirtualMethodTables
   }
 
-//  def buildProcedureSymbolTables(stp : AndroidSymbolTableProducer, parallel : Boolean = true) : Unit = {
-//    val procedures = stp.tables.procedureAbsTable.keys.toSeq
-//    val col : GenSeq[ResourceUri] = if (parallel) procedures.par else procedures
-//    
-//    def work(procedureUri : ResourceUri) = {
-//      val pstp = stp.procedureSymbolTableProducer(procedureUri)
-//      val pd = stp.tables.procedureAbsTable(procedureUri)
-//      pd.body match {
-//        case body : ImplementedBody =>
-//          pstp.tables.bodyTables =
-//            Some(BodySymbolTableData())
-//        case body : EmptyBody =>
-//      }
-//      val pmr = new H1.ProcedureMinerResolver(pstp)
-//      pmr.procMiner(pd)
-//      pmr.procResolver(pd)
-//     // sleep
-//    }
-//    
-//    println("build pst start! pst number : " + col.size)
-//    
-//    println(time(col.map{procUri=>work(procUri)}))
-//    
-//    println("build pst done! pst number : " + stp.toSymbolTable.procedureSymbolTables.size)
-//  }
-  
-  def buildProcedureSymbolTables(stp : SymbolTableProducer, parallel : Boolean = true) : Unit = {
+  def buildProcedureSymbolTables(stp : AndroidSymbolTableProducer, parallel : Boolean = true) : Unit = {
     val procedures = stp.tables.procedureAbsTable.keys.toSeq
     val col : GenSeq[ResourceUri] = if (parallel) procedures.par else procedures
-    col.foreach { procedureUri =>
+    
+    def work(procedureUri : ResourceUri) = {
       val pstp = stp.procedureSymbolTableProducer(procedureUri)
       val pd = stp.tables.procedureAbsTable(procedureUri)
       pd.body match {
@@ -117,43 +92,48 @@ object AndroidSymbolTable {
             Some(BodySymbolTableData())
         case body : EmptyBody =>
       }
-      val pmr = new H.ProcedureMinerResolver(pstp)
+      val pmr = new H1.ProcedureMinerResolver(pstp)
       pmr.procMiner(pd)
       pmr.procResolver(pd)
+     // sleep
     }
+    
+    def time(block: => Unit) : Long = {
+      val start = System.currentTimeMillis
+      block
+      val stop = System.currentTimeMillis
+      stop - start
+    }
+
+    // "lengthy" task for test
+    def sleep = {
+      Thread.sleep(100)
+    }
+    
+    println("build pst start! pst number : " + col.size)
+    
+    println(time(col.map{procUri=>work(procUri)}))
+    
+    println("build pst done! pst number : " + stp.toSymbolTable.procedureSymbolTables.size)
   }
   
   def buildSymbolTable(models : ISeq[Model],
-                       stpConstructor : Unit => SymbolTableProducer,
+                       stpConstructor : Unit => AndroidSymbolTableProducer,
                        parallel : Boolean) = {
     val stp = minePackageElements(models, stpConstructor, parallel)
     val tables = resolveVirtualMethod(stp)
-    resolvePackageElements(models, stp, parallel)
+    //resolvePackageElements(models, stp, parallel)
     buildProcedureSymbolTables(stp, parallel)
     (stp.toSymbolTable, tables)
   }
   
-  def resolvePackageElements(models : ISeq[Model], stp : SymbolTableProducer,
-                             parallel : Boolean) : Unit = {
-    if (models.isEmpty) return
-
-    val ms : GenSeq[Model] = if (parallel) models.par else models
-
-    val dependencies = ms.map { model =>
-      val per = new H.PackageElementResolver(stp)
-      per.packageElementResolver(model)
-      per.dependency
-    }
-    dependencies.foldLeft(stp.tables.dependency)(H.combineMap)
-  }
-  
   def buildSymbolTable(models : ISeq[Model],
-                       stpConstructor : Unit => SymbolTableProducer,
+                       stpConstructor : Unit => AndroidSymbolTableProducer,
                        existingAndroidVirtualMethodTables : AndroidVirtualMethodTables,
                        parallel : Boolean) = {
     val stp = minePackageElements(models, stpConstructor, parallel)
     val tables = resolveVirtualMethod(stp)
-    resolvePackageElements(models, stp, parallel)
+    //resolvePackageElements(models, stp, parallel)
     buildProcedureSymbolTables(stp, parallel)
     println("before merge : " + tables.asInstanceOf[AndroidVirtualMethodTablesProducer].tables.cannotFindRecordTable)
     tables.mergeWith(existingAndroidVirtualMethodTables)

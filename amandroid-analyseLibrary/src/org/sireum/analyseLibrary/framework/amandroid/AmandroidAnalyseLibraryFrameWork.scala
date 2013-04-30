@@ -65,41 +65,54 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
           dirName += nameArray(i)
         }
         val d = srcs.substring(srcs.indexOf("/"), srcs.lastIndexOf("/")+1)
-//        val dirc = new File(d + dirName)
         val srcFiles = mlistEmpty[FileResourceUri]
-        val resDir = new File(d+"result")
-        val ccfgDir = new File(d+"result/ccfgs")
-//        if(!dirc.exists()){
-//          dirc.mkdir()
-//        }
+        /*for start analysis from jar file*/
+        val pilarDir = new File(d + "pilar")
+        val resDir = new File(pilarDir+"/result")
+        val ccfgDir = new File(resDir+"/ccfgs")
+        if(!pilarDir.exists()){
+          resDir.mkdir()
+        }
         if(!resDir.exists()){
           resDir.mkdir()
         }
         if(!ccfgDir.exists()){
           ccfgDir.mkdir()
         }
-        //deal with jar file
-//        val apkName = f.getName()
-//        val apkFile = new ZipFile(f, ZipFile.OPEN_READ)
-//        val entries = apkFile.entries()
-//        while(entries.hasMoreElements()){
-//          val ze = entries.nextElement()
-//          if(ze.toString().endsWith(".dex")){
-//            val loadFile = new File(d+ze.getName())
-//            val ops = new FileOutputStream(d + dirName + "/" + dirName + ".dex")
-//            val ips = apkFile.getInputStream(ze)
-//            var reading = true
-//            while(reading){
-//              ips.read() match {
-//                case -1 => reading = false
-//                case c => ops.write(c)
-//              }
-//            }
-//            ops.flush()
-//            ips.close()
-//          }
+        /*end here*/
+        /*for start analysis from pilar file*/
+//        val resDir = new File(d+"result")
+//        val ccfgDir = new File(d+"result/ccfgs")
+//        if(!resDir.exists()){
+//          resDir.mkdir()
 //        }
-        srcFiles += FileUtil.toUri(d + dirName + "/" + dirName + ".dex")
+//        if(!ccfgDir.exists()){
+//          ccfgDir.mkdir()
+//        }
+        /*end here*/
+        
+        //deal with jar file
+        val apkName = f.getName()
+        val apkFile = new ZipFile(f, ZipFile.OPEN_READ)
+        val entries = apkFile.entries()
+        while(entries.hasMoreElements()){
+          val ze = entries.nextElement()
+          if(ze.toString().endsWith(".dex")){
+            val loadFile = new File(d+ze.getName())
+            val ops = new FileOutputStream(d + "pilar/" + dirName + ".dex")
+            val ips = apkFile.getInputStream(ze)
+            var reading = true
+            while(reading){
+              ips.read() match {
+                case -1 => reading = false
+                case c => ops.write(c)
+              }
+            }
+            ops.flush()
+            ips.close()
+          }
+        }
+        srcFiles += FileUtil.toUri(d + "pilar/" + dirName + ".dex")
         
 //        val stFile = new File(resDir + "/" + dirName + "SymbolTable.xml")
         
@@ -109,9 +122,9 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
     
         val job = PipelineJob()
         val options = job.properties
-//        Dex2PilarWrapperModule.setSrcFiles(options, srcFiles)
+        Dex2PilarWrapperModule.setSrcFiles(options, srcFiles)
 
-        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d+ "/" +f.getName()))))
+//        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d+ "/" +f.getName()))))
         
         PilarAndroidSymbolResolverModule.setParallel(options, false)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, None)
@@ -128,6 +141,7 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, false)
         AndroidInterIntraProceduralModule.setShouldBuildCSCfg(options, false)
+        AndroidInterIntraProceduralModule.setShouldBuildOFAsCfg(options, false)
         AndroidInterIntraProceduralModule.setAPIpermOpt(options, None)
         pipeline.compute(job)
 
@@ -145,14 +159,14 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         println("start convert AVMT to xml!")
         xStream.toXml(avmt, outerAVMT)
         
-        println("start convert graph to xml!")
-        val cCfgs = AndroidInterIntraProceduralModule.getIntraResult_cCfg(options)
-        cCfgs.foreach(
-          item =>
-          {
-//            aCache.save[CompressedControlFlowGraph[String]](item._1, item._2)
-          }  
-        )
+//        println("start convert graph to xml!")
+//        val cCfgs = AndroidInterIntraProceduralModule.getIntraResult_cCfg(options)
+//        cCfgs.foreach(
+//          item =>
+//          {
+////            aCache.save[CompressedControlFlowGraph[String]](item._1, item._2)
+//          }  
+//        )
         
         println("###############################################")
     }
@@ -173,11 +187,11 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
     PipelineConfiguration(
       "Library analyse pipeline",
       false,
-//      PipelineStage(
-//        "dex2pilar stage",
-//        false,
-//        Dex2PilarWrapperModule
-//      )
+      PipelineStage(
+        "dex2pilar stage",
+        false,
+        Dex2PilarWrapperModule
+      ),
       PipelineStage(
         "Chunking pilar parsing stage",
         false,

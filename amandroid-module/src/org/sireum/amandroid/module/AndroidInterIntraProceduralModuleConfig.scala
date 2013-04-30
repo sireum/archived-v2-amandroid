@@ -3,19 +3,16 @@ package org.sireum.amandroid.module
 import org.sireum.pipeline._
 import org.sireum.option.PipelineMode
 import org.sireum.pipeline.gen.ModuleGenerator
-import org.sireum.alir.ControlFlowGraph
-import org.sireum.util.{MMap, MList}
-import org.sireum.alir.AlirIntraProceduralGraph
-import org.sireum.util.ResourceUri
+import org.sireum.util._
 import org.sireum.core.module.AlirIntraProcedural
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
-import org.sireum.pilar.symbol.SymbolTable
 import org.sireum.amandroid.scfg.{CompressedControlFlowGraph, SystemControlFlowGraph}
 import org.sireum.pilar.ast.{LocationDecl, CatchClause}
-import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.amandroid.cache.AndroidCacheFile
 import org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph
 import org.sireum.amandroid.objectflowanalysis.OfaNode
+import org.sireum.alir._
+import org.sireum.pilar.symbol._
 
 
 /*
@@ -29,16 +26,27 @@ http://www.eclipse.org/legal/epl-v10.html
 object AndroidInterIntraProcedural {
   type VirtualLabel = String
   type CFG = ControlFlowGraph[VirtualLabel]
+  
+  type RDA = ReachingDefinitionAnalysis.Result  //adding for rda building
+  
   type CCFG = CompressedControlFlowGraph[VirtualLabel]
   type OFAsCfg = SystemControlFlowGraph[VirtualLabel]
   type SCFG = SystemControlFlowGraph[VirtualLabel]
   // type CSCFG = SystemControlFlowGraph[VirtualLabel]
   
+  final case class AndroidIntraAnalysisResult(
+    pool : AlirIntraProceduralGraph.NodePool,
+    cfg : AndroidInterIntraProcedural.CFG,
+    rdaOpt : Option[AndroidInterIntraProcedural.RDA],
+    cCfgOpt : Option[AndroidInterIntraProcedural.CCFG])
+    
+  final case class AndroidInterAnalysisResult(
+    ofaScfgOpt : Option[AndroidInterIntraProcedural.OFAsCfg])
+  
   type ShouldIncludeFlowFunction = (LocationDecl, Iterable[CatchClause]) => 
       (Iterable[CatchClause], java.lang.Boolean)
         
 }
-
 
 
 /**
@@ -63,6 +71,12 @@ case class AndroidInterIntraProcedural(
   androidCache : AndroidCacheFile[ResourceUri],
   
   @Input
+  shouldBuildCfg : Boolean,
+
+  @Input 
+  shouldBuildRda : Boolean,
+  
+  @Input
   shouldBuildCCfg : Boolean,
   
   @Input
@@ -81,15 +95,25 @@ case class AndroidInterIntraProcedural(
   shouldIncludeFlowFunction : AndroidInterIntraProcedural.ShouldIncludeFlowFunction =
     // ControlFlowGraph.defaultSiff,
     { (_, _) => (Array.empty[CatchClause], false) },
-       
-  @Output 
-  intraResult_Cfg : MMap[ResourceUri, AndroidInterIntraProcedural.CFG],
-  
-  @Output 
-  intraResult_cCfg : MMap[ResourceUri, AndroidInterIntraProcedural.CCFG],
     
-  @Output
-  interResult : Option[AndroidInterIntraProcedural.OFAsCfg]  // actually it can be the compressed sCFG
+//modified for building RDA       
+  @Input defRef : SymbolTable => DefRef = { st => new org.sireum.alir.BasicVarDefRef(st, new org.sireum.alir.BasicVarAccesses(st)) },
+
+  @Input isInputOutputParamPredicate : ProcedureSymbolTable => (ResourceUri => java.lang.Boolean, ResourceUri => java.lang.Boolean) = { pst =>
+    val params = pst.params.toSet[ResourceUri]
+    ({ localUri => params.contains(localUri) },
+      { s => falsePredicate1[ResourceUri](s) })
+  },
+
+  @Input switchAsOrderedMatch : Boolean = true,
+
+  @Input procedureAbsUriIterator : scala.Option[Iterator[ResourceUri]] = None,
+//////////////////end here
+  
+  @Output intraResult : MMap[ResourceUri, AndroidInterIntraProcedural.AndroidIntraAnalysisResult],
+  
+  @Output interResult : AndroidInterIntraProcedural.AndroidInterAnalysisResult
+  
 )
  
 case class Cfg(
@@ -108,7 +132,25 @@ case class Cfg(
   @Output
   @Produce
   cfg : ControlFlowGraph[String]) 
-  
+
+/**
+ * @author <a href="mailto:belt@k-state.edu">Jason Belt</a>
+ * @author <a href="mailto:robby@k-state.edu">Robby</a>
+ */
+case class Rda(
+  title : String = "Reaching Definition Analysis Builder",
+
+  @Input procedureSymbolTable : ProcedureSymbolTable,
+
+  @Input @Consume(Array(classOf[Cfg])) cfg : ControlFlowGraph[String],
+
+  @Input defRef : SymbolTable => DefRef = { st => new org.sireum.alir.BasicVarDefRef(st, new org.sireum.alir.BasicVarAccesses(st)) },
+
+  @Input isInputOutputParamPredicate : ProcedureSymbolTable => (ResourceUri => java.lang.Boolean, ResourceUri => java.lang.Boolean),
+
+  @Input switchAsOrderedMatch : Boolean = false,
+
+  @Output @Produce rda : ReachingDefinitionAnalysis.Result)
 
 case class cCfg(
   title : String = "Compressed Control Flow Graph Builder",
@@ -137,6 +179,9 @@ case class OFAsCfg(
   @Input 
   cfgs : MMap[ResourceUri, ControlFlowGraph[String]],
   
+  @Input 
+  rdas : MMap[ResourceUri, ReachingDefinitionAnalysis.Result],
+  
   @Input
   procedureSymbolTables : Seq[ProcedureSymbolTable],
 
@@ -146,7 +191,7 @@ case class OFAsCfg(
   // for test now. Later will change it.
   @Output
   @Produce
-  OFAsCfg : ObjectFlowGraph[OfaNode])
+  OFAsCfg : SystemControlFlowGraph[String])
   
 case class sCfg(
   title : String = "System Control Flow Graph Builder",
@@ -199,6 +244,7 @@ object AndroidInterIntraProceduralModuleBuild {
     opt.classNames = Array(      
         AndroidInterIntraProcedural.getClass().getName().dropRight(1),
         Cfg.getClass().getName().dropRight(1),
+        Rda.getClass().getName().dropRight(1),
         cCfg.getClass().getName().dropRight(1),
         OFAsCfg.getClass().getName().dropRight(1),
         sCfg.getClass().getName().dropRight(1),
