@@ -787,7 +787,7 @@ void dumpCatches(DexFile* pDexFile, const DexCode* pCode)
 		   //    printf("end = %d , lastAdd = %d  \n", end, lastAddress);
           /********** sankar ends **********/
 
-            fprintf(pFp,"  catch  %s @[L%06x..L%06x] goto L%06x;\n", descriptor,((u1*)insns - pDexFile->baseAddr) +start*2,((u1*)insns - pDexFile->baseAddr) +end*2,((u1*)insns - pDexFile->baseAddr) +(handler->address)*2); // sankar
+            fprintf(pFp,"  catch  [|%s|] @[L%06x..L%06x] goto L%06x;\n", descriptor,((u1*)insns - pDexFile->baseAddr) +start*2,((u1*)insns - pDexFile->baseAddr) +end*2,((u1*)insns - pDexFile->baseAddr) +(handler->address)*2); // sankar
 
             
 			// printf("insns = %06x , pDexFile->baseAddr = %06x , start*2 =  %06x , end*2 = %06x \n", (u1*)insns , pDexFile->baseAddr , start*2 , end*2);
@@ -890,7 +890,7 @@ void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
 				 locVarInf* t1 = (locVarInf*) temp1;
                  if(t1->descriptor && t1->name && !t1->paramFlag)
 				 {
-				    fprintf(pFp, "        [|%s|] v%d @varname %s @scope ((L%04x,L%04x)",
+				    fprintf(pFp, "        [|%s|] v%d @varname [|%s|] @scope ((L%04x,L%04x)",
 				                     t1->descriptor, t1->reg, t1->name, t1->startAddress,  t1->endAddress );
 
                     int conflictCount = 0;
@@ -2254,7 +2254,7 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
                  }
                   newIndex[m]='\0';
                }
-               outNewArray(pDecInsn->vA, newIndex); // printf("v%d:=new %s ;",pDecInsn->vA,newIndex);
+               outNewArray(pDecInsn->vA, newIndex); // printf("v%d:=new [|%s|] ;",pDecInsn->vA,newIndex);
              }
               break;
 
@@ -3027,6 +3027,7 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
                    char* paraThis=(char*)malloc(sizeof(char)*1000);  // sankar adds
                    char* paraTotal=(char*)malloc(sizeof(char)*6000);  // sankar adds
                    strcpy(para,"");
+				   strcpy(paraThis,""); // initializing with null string
 				   strcpy(paraTotal,"");
 
 				   int thisFlag = 0; // if 1 then this method has "this" as the first param as well as a local variable

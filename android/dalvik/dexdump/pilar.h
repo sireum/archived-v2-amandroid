@@ -114,7 +114,7 @@ static char* pilarExtName(const char* str)
  #define  outInstanceOf(x, y, z)   fprintf(pFp,"v%d:= instanceof(v%d, [|%s|]);", x, y, z)
  #define  outArrayLen(x, y)        fprintf(pFp,"v%d:= v%d.length;", x, y)
  #define  outNewIns(x, y)          fprintf(pFp,"v%d:= new [|%s|];", x, y)
- #define  outNewArray(x, y)        fprintf(pFp,"v%d:= new %s ;", x, y)
+ #define  outNewArray(x, y)        fprintf(pFp,"v%d:= new [|%s|];", x, y)
 
 
  #define  outFilledNewArray(x, y, z)  {\
