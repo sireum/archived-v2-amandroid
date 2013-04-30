@@ -132,10 +132,10 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
       //  val w = new OutputStreamWriter(outer, "GBK")
         
         
-        val csCfg = AndroidInterIntraProceduralModule.getInterResult(options) match {
-          case Some(s) => s
-          case None => null
-        }
+//        val csCfg = AndroidInterIntraProceduralModule.getInterResult(options) match {
+//          case Some(s) => s
+//          case None => null
+//        }
 //        sCfg.toDot(w)
 //        w.flush()
 //        val str = Array("dot", "-Tps2", d + dirName + "/graphs/sCfg.dot", "-o", d + dirName + "/graphs/sCfg.ps")
@@ -144,12 +144,12 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
         println("###############################################")
         
         //get csCfg
-        val csCfgFile = new File(d + dirName + "/graphs/csCfg.graph")
-        val outer = new FileOutputStream(csCfgFile)
-        val w = new OutputStreamWriter(outer, "GBK")
-        w.write(csCfg.toString())
+//        val csCfgFile = new File(d + dirName + "/graphs/csCfg.graph")
+//        val outer = new FileOutputStream(csCfgFile)
+//        val w = new OutputStreamWriter(outer, "GBK")
+//        w.write(csCfg.toString())
 // //       println(csCfg.toString())
-        println(" csCfg saving is done which is same as sCfg now because no compression was made")
+//        println(" csCfg saving is done which is same as sCfg now because no compression was made")
     }
   }
 

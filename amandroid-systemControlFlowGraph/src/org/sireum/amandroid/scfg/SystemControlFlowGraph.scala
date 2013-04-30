@@ -385,7 +385,13 @@ object SystemControlFlowGraph {
    aCache : AndroidCacheFile[ResourceUri]
   ) = build[VirtualLabel](vmTables, cCfgs, aCache)
   
+  def apply[VirtualLabel]() = buildEmptyGraph[VirtualLabel]()
   
+  def buildEmptyGraph[VirtualLabel]() : SystemControlFlowGraph[VirtualLabel] = {
+    val tPool: AlirIntraProceduralGraph.NodePool = mmapEmpty  // will represent total pool
+    val sCfg = new systemCfg[VirtualLabel](tPool)     
+    sCfg
+  }
   
   val xStream = AndroidXStream
   
@@ -1104,7 +1110,7 @@ object SystemControlFlowGraph {
   // ************ need to AVOID the following hard-coded file path  *********************  
     
   val markingRepoFile = new File("/Users/fgwei/Developer/git-repo/amandroid/amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/libBitSet/libBitSet.xml.zip")
-  var markingRepo : MMap[ResourceUri, (MBitSet,MMap[ResourceUri, Integer])] = null
+  var markingRepo : MMap[ResourceUri, (MBitSet,MMap[ResourceUri, Integer])] = mmapEmpty
     if(markingRepoFile.exists()){
       val repoStream = new GZIPInputStream(new FileInputStream(markingRepoFile))
       markingRepo = xStream.fromXml(repoStream).asInstanceOf[MMap[ResourceUri, (MBitSet,MMap[ResourceUri, Integer])]]
@@ -1137,7 +1143,7 @@ object SystemControlFlowGraph {
     
    // step 1.1 is done above
      
-   println("repo size = "  + markingRepo.size)  
+//   println("repo size = "  + markingRepo.size)  
     
    // below we count the num of marked proc in the library; this is only for getting some info but it is NOT necessary for sCfg building 
    

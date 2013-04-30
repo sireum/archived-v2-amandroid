@@ -8,15 +8,18 @@ import org.sireum.pipeline._
 import java.lang.String
 import org.sireum.alir.AlirIntraProceduralNode
 import org.sireum.alir.ControlFlowGraph
+import org.sireum.alir.DefRef
+import org.sireum.alir.MonotoneDataFlowAnalysisResult
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
 import org.sireum.amandroid.cache.AndroidCacheFile
-import org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph
-import org.sireum.amandroid.objectflowanalysis.OfaNode
+import org.sireum.amandroid.module.AndroidInterIntraProcedural.AndroidInterAnalysisResult
+import org.sireum.amandroid.module.AndroidInterIntraProcedural.AndroidIntraAnalysisResult
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
 import org.sireum.amandroid.scfg.SystemControlFlowGraph
 import org.sireum.pilar.ast.LocationDecl
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.pilar.symbol.SymbolTable
+import scala.Function1
 import scala.Function2
 import scala.Option
 import scala.collection.Seq
@@ -200,21 +203,6 @@ object sCfgModule extends PipelineModule {
     return options
   }
 
-  def getCCfgs (options : scala.collection.Map[Property.Key, Any]) : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = {
-    if (options.contains(sCfgModule.globalCCfgsKey)) {
-       return options(sCfgModule.globalCCfgsKey).asInstanceOf[scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setCCfgs (options : MMap[Property.Key, Any], cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]) : MMap[Property.Key, Any] = {
-
-    options(sCfgModule.globalCCfgsKey) = cCfgs
-
-    return options
-  }
-
   def getSCfg (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = {
     if (options.contains(sCfgModule.globalSCfgKey)) {
        return options(sCfgModule.globalSCfgKey).asInstanceOf[org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]
@@ -234,12 +222,27 @@ object sCfgModule extends PipelineModule {
     return options
   }
 
+  def getCCfgs (options : scala.collection.Map[Property.Key, Any]) : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = {
+    if (options.contains(sCfgModule.globalCCfgsKey)) {
+       return options(sCfgModule.globalCCfgsKey).asInstanceOf[scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setCCfgs (options : MMap[Property.Key, Any], cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]) : MMap[Property.Key, Any] = {
+
+    options(sCfgModule.globalCCfgsKey) = cCfgs
+
+    return options
+  }
+
   object ConsumerView {
     implicit class sCfgModuleConsumerView (val job : PropertyProvider) extends AnyVal {
       def androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = sCfgModule.getAndroidVirtualMethodTables(job.propertyMap)
       def androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String] = sCfgModule.getAndroidCache(job.propertyMap)
-      def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = sCfgModule.getCCfgs(job.propertyMap)
       def sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = sCfgModule.getSCfg(job.propertyMap)
+      def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = sCfgModule.getCCfgs(job.propertyMap)
     }
   }
 
@@ -252,11 +255,11 @@ object sCfgModule extends PipelineModule {
       def androidCache_=(androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]) { sCfgModule.setAndroidCache(job.propertyMap, androidCache) }
       def androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String] = sCfgModule.getAndroidCache(job.propertyMap)
 
-      def cCfgs_=(cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]) { sCfgModule.setCCfgs(job.propertyMap, cCfgs) }
-      def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = sCfgModule.getCCfgs(job.propertyMap)
-
       def sCfg_=(sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]) { sCfgModule.setSCfg(job.propertyMap, sCfg) }
       def sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = sCfgModule.getSCfg(job.propertyMap)
+
+      def cCfgs_=(cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]) { sCfgModule.setCCfgs(job.propertyMap, cCfgs) }
+      def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = sCfgModule.getCCfgs(job.propertyMap)
     }
   }
 }
@@ -268,9 +271,9 @@ trait sCfgModule {
 
   def androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String] = sCfgModule.getAndroidCache(job.propertyMap)
 
-  def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = sCfgModule.getCCfgs(job.propertyMap)
-
 
   def sCfg_=(sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]) { sCfgModule.setSCfg(job.propertyMap, sCfg) }
   def sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = sCfgModule.getSCfg(job.propertyMap)
+
+  def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = sCfgModule.getCCfgs(job.propertyMap)
 }

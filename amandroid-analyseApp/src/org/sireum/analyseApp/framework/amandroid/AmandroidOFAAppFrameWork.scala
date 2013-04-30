@@ -99,8 +99,10 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
         ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d + "/" + dirName + ".pilar"))))
         
         PilarAndroidSymbolResolverModule.setParallel(options, false)
-        PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, None)
-        AndroidInterIntraProceduralModule.setAndroidCache(options, null)
+        PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, Option(libVmTables))
+        AndroidInterIntraProceduralModule.setAndroidCache(options, aCache)
+        AndroidInterIntraProceduralModule.setShouldBuildCfg(options, true)
+        AndroidInterIntraProceduralModule.setShouldBuildRda(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildOFAsCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, false)
         AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, false)

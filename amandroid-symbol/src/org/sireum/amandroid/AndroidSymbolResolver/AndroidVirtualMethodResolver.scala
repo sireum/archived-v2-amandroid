@@ -37,7 +37,7 @@ class AndroidVirtualMethodResolver
       tables.cannotFindRecordTable.put(notFindParentName, recordName)
   }
   
-  def resolveAndroidVirtualMethod(stp : AndroidSymbolTableProducer) : Unit = {
+  def resolveAndroidVirtualMethod(stp : SymbolTableProducer) : Unit = {
     androidRecordHierarchyResolver(stp)
     androidRecordProcedureResolver(stp)
     androidVMResolver()
@@ -47,7 +47,7 @@ class AndroidVirtualMethodResolver
 //                              recordProcedureTable)
   }
   
-  def androidRecordHierarchyResolver(stp : AndroidSymbolTableProducer) : Unit =
+  def androidRecordHierarchyResolver(stp : SymbolTableProducer) : Unit =
     if (!stp.tables.recordTable.isEmpty)
       for (rd <- stp.tables.recordTable){
         tables.recordUriTable.put(rd._2.name.name, rd._1)
@@ -79,7 +79,7 @@ class AndroidVirtualMethodResolver
         }
       }
 
-  def resolveAndroidRecordHierarchy(stp : AndroidSymbolTableProducer,
+  def resolveAndroidRecordHierarchy(stp : SymbolTableProducer,
                              self : ResourceUri,
                              key : ResourceUri) : Boolean =
     stp.tables.recordTable.get(key) match {
@@ -98,7 +98,7 @@ class AndroidVirtualMethodResolver
     }
   }
   
-  def androidRecordProcedureResolver(stp : AndroidSymbolTableProducer) : Unit = 
+  def androidRecordProcedureResolver(stp : SymbolTableProducer) : Unit = 
     if (!stp.tables.procedureAbsTable.isEmpty)
       for (pat <- stp.tables.procedureAbsTable){
         tables.procedureUriTable.put(getSigByPd(pat._2), pat._1)

@@ -66,20 +66,31 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         }
         val d = srcs.substring(srcs.indexOf("/"), srcs.lastIndexOf("/")+1)
         val srcFiles = mlistEmpty[FileResourceUri]
-        val resDir = new File(d+"result")
-        val ccfgDir = new File(d+"result/ccfgs")
-        /*Note that below is to create directory for each library jar file.*/
-        val dirc = new File(d + dirName)
-        if(!dirc.exists()){
-          dirc.mkdir()
+        /*for start analysis from jar file*/
+        val pilarDir = new File(d + "pilar")
+        val resDir = new File(pilarDir+"/result")
+        val ccfgDir = new File(resDir+"/ccfgs")
+        if(!pilarDir.exists()){
+          resDir.mkdir()
         }
-        /*end here*/
         if(!resDir.exists()){
           resDir.mkdir()
         }
         if(!ccfgDir.exists()){
           ccfgDir.mkdir()
         }
+        /*end here*/
+        /*for start analysis from pilar file*/
+//        val resDir = new File(d+"result")
+//        val ccfgDir = new File(d+"result/ccfgs")
+//        if(!resDir.exists()){
+//          resDir.mkdir()
+//        }
+//        if(!ccfgDir.exists()){
+//          ccfgDir.mkdir()
+//        }
+        /*end here*/
+        
         //deal with jar file
         val apkName = f.getName()
         val apkFile = new ZipFile(f, ZipFile.OPEN_READ)
@@ -88,7 +99,7 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
           val ze = entries.nextElement()
           if(ze.toString().endsWith(".dex")){
             val loadFile = new File(d+ze.getName())
-            val ops = new FileOutputStream(d + dirName + "/" + dirName + ".dex")
+            val ops = new FileOutputStream(d + "pilar/" + dirName + ".dex")
             val ips = apkFile.getInputStream(ze)
             var reading = true
             while(reading){
@@ -101,7 +112,7 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
             ips.close()
           }
         }
-        srcFiles += FileUtil.toUri(d + dirName + "/" + dirName + ".dex")
+        srcFiles += FileUtil.toUri(d + "pilar/" + dirName + ".dex")
         
 //        val stFile = new File(resDir + "/" + dirName + "SymbolTable.xml")
         
@@ -127,7 +138,7 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         aCache.setValueSerializer(serializer, null)
         AndroidInterIntraProceduralModule.setParallel(options, false)
         AndroidInterIntraProceduralModule.setAndroidCache(options, aCache)
-        AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, false)
+        AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, false)
         AndroidInterIntraProceduralModule.setShouldBuildCSCfg(options, false)
         AndroidInterIntraProceduralModule.setShouldBuildOFAsCfg(options, false)
