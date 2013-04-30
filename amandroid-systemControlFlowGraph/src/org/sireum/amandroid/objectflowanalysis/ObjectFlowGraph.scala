@@ -35,14 +35,16 @@ class ObjectFlowGraph[Node <: OfaNode]
   
   protected def pool : MMap[OfaNode, Node] = pl
   
+  final val worklist : MList[Node] = mlistEmpty
+  
   /**
    * create the nodes and edges to reflect the constraints corresponding 
    * to the given program point. If a value is added to a node, then that 
    * node is added to the worklist.
    */
-  def constructGraph(p : Point, ps : MList[Point], cfg : ControlFlowGraph[String], rda : ReachingDefinitionAnalysis.Result) = {
+  def constructGraph(p : Point, cfg : ControlFlowGraph[String], rda : ReachingDefinitionAnalysis.Result) = {
     collectNodes(p)
-    val constraintMap = applyConstraint(p, ps, cfg, rda)
+    val constraintMap = applyConstraint(p, cfg, rda)
     buildingEdges(constraintMap)
   }
   
@@ -57,6 +59,7 @@ class ObjectFlowGraph[Node <: OfaNode]
         rhs match {
           case po : PointO =>
             rhsNode.propertyMap(PROP_KEY).asInstanceOf[MSet[ResourceUri]] += po.typ
+            worklist += rhsNode
           case pi : PointI =>
             val recv = pi.recv
             val args = pi.args

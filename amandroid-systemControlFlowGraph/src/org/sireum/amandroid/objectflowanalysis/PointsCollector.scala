@@ -15,7 +15,7 @@ class PointsCollector {
       param => {
         var i = 0
         if(is("this", param.annotations)){
-          val thisP = new PointRNoIndex("this", pUri)
+          val thisP = new PointThis(param.name.name, pUri)
           pProc.thisParamOpt = Option(thisP)
           i-=1
         } else if(is("object", param.annotations)){
@@ -149,13 +149,13 @@ class PointsCollector {
             if(exps.size > 0){
               exps(0) match {
                 case ne : NameExp =>
-                  pi.recv = new PointR(ne.name.name, loc, locIndex)
+                  pi.recv = new PointRecv(ne.name.name, loc, locIndex)
                 case _ =>
               }
               for(i <- 1 to (exps.size-1)) {
                 exps(i) match {
                   case ne : NameExp =>
-                    val arg = new PointR(ne.name.name, loc, locIndex)
+                    val arg = new PointArg(ne.name.name, loc, locIndex)
                     pi.args(i-1) = arg 
                   case _ =>
                 }
@@ -220,12 +220,28 @@ final class PointAsmt(uri : ResourceUri, loc : ResourceUri, locIndex : Int) exte
 }
 
 /**
+ * Set of program points corresponding to method recv variable.
+ * pi represents an element in this set.
+ */
+final class PointRecv(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
+  override def toString = "recv:" + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to method recv variable.
+ * pi represents an element in this set.
+ */
+final class PointArg(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
+  override def toString = "arg:" + uri + "@" + loc
+}
+
+/**
  * Set of program points corresponding to method invocation expressions.
  * pi represents an element in this set.
  */
 final class PointI(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
-  var recv : PointR = null
-  val args : MMap[Int, PointR] = mmapEmpty
+  var recv : PointRecv = null
+  val args : MMap[Int, PointArg] = mmapEmpty
   override def toString = uri + "@" + loc
 }
 
@@ -265,13 +281,13 @@ class PointR(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends Point
   override def toString = uri + "@" + loc
 }
 
-///**
-// * Set of program points corresponding to this variable.
-// */
-//final class PointThis(uri : ResourceUri, loc : ResourceUri) extends PointR(uri, loc){ 
-//  override def toString = uri + "@" + loc
-//}
-//
+/**
+ * Set of program points corresponding to this variable.
+ */
+final class PointThis(uri : ResourceUri, loc : ResourceUri) extends PointRNoIndex(uri, loc){ 
+  override def toString = "this:" + uri + "@" + loc
+}
+
 /**
  * Set of program points corresponding to return variable.
  */
@@ -295,7 +311,7 @@ class PointRNoIndex(uri : ResourceUri, loc : ResourceUri) extends Point{
  * Set of program points corresponding to params. 
  */
 class PointProc(loc : ResourceUri) extends Point{
-  var thisParamOpt : Option[PointRNoIndex] = None
+  var thisParamOpt : Option[PointThis] = None
   val params : MMap[Int, PointRNoIndex] = mmapEmpty
   var retParam : PointRNoIndex = null
   override def toString = loc

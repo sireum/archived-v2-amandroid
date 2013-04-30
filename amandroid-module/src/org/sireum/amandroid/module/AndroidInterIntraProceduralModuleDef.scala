@@ -144,7 +144,11 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
       this.interResult_=(AndroidInterIntraProcedural.AndroidInterAnalysisResult(
           ofaScfg
         ))
-    } 
+    }  else {
+      this.interResult_=(AndroidInterIntraProcedural.AndroidInterAnalysisResult(
+          None
+        ))
+    }
   }
   
   println("inter analysis start! procudure number = " + col.size)

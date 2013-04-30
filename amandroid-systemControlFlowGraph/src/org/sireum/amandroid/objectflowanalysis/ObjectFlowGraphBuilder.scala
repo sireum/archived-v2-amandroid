@@ -38,16 +38,35 @@ object ObjectFlowGraphBuilder {
             cfg : ControlFlowGraph[String],
             rda : ReachingDefinitionAnalysis.Result,
             ofg : ObjectFlowGraph[Node]) = {
-    val points = new PointsCollector().points(pst)
     val ofg = new ObjectFlowGraph[Node]
-    points.foreach(
-      point => ofg.constructGraph(point, points, cfg, rda)
+    ofg.points ++= new PointsCollector().points(pst)
+    ofg.points.foreach(
+      point => ofg.constructGraph(point, cfg, rda)
     )
+    fix(ofg)
     val w = new java.io.PrintWriter(System.out, true)
-    println("ofg: ")
-    ofg.toDot(w)
+//    ofg.toDot(w)
   }
-
   
+  def fix(ofg : ObjectFlowGraph[Node]) : Unit = {
+    val workList = ofg.worklist
+    while (!workList.isEmpty) {
+      val n = workList.remove(0)
+      ofg.successors(n).foreach(
+        succ => {
+          val vsN = n.propertyMap(ofg.PROP_KEY).asInstanceOf[MSet[ResourceUri]]
+          val vsSucc = succ.propertyMap(ofg.PROP_KEY).asInstanceOf[MSet[ResourceUri]]
+          val d = vsN -- vsSucc
+          if(!d.isEmpty){
+            vsSucc ++= d
+            println(vsSucc)
+            workList += succ
+          }
+        }  
+      )
+    }
+  }
   
+//  def recv()
+ 
 }

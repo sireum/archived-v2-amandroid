@@ -4,8 +4,10 @@ import org.sireum.util._
 import org.sireum.alir._
 
 trait ConstraintModel {
+  
+  val points : MList[Point] = mlistEmpty
+  
   def applyConstraint(p : Point,
-                      ps : MList[Point],
                       cfg : ControlFlowGraph[String],
                       rda : ReachingDefinitionAnalysis.Result) 
                       : MMap[Point, MSet[Point]] = {
@@ -21,8 +23,29 @@ trait ConstraintModel {
         rhs match {
           case po : PointO =>
           case pi : PointI =>
+            val recvP = pi.recv
+            udChain(recvP, cfg, rda).foreach(
+              point => {
+                if(!flowMap.contains(point)){
+                    flowMap(point) = msetEmpty
+                }
+                flowMap(point) += recvP
+              }
+            )
+            pi.args.keys.foreach(
+              i => {
+                udChain(pi.args(i), cfg, rda).foreach(
+                  point => {
+                    if(!flowMap.contains(point)){
+                        flowMap(point) = msetEmpty
+                    }
+                    flowMap(point) += pi.args(i)
+                  }
+                )
+              }  
+            )
           case pr : PointR =>
-            udChain(pr, ps, cfg, rda).foreach(
+            udChain(pr, cfg, rda).foreach(
               point => {
                 if(!flowMap.contains(point)){
                     flowMap(point) = msetEmpty
@@ -44,7 +67,7 @@ trait ConstraintModel {
             flowMap(retP) = msetEmpty
         }
         flowMap(retP) += retP.procPoint.retParam
-        udChain(retP, ps, cfg, rda).foreach(
+        udChain(retP, cfg, rda).foreach(
           point => {
             if(!flowMap.contains(point)){
                 flowMap(point) = msetEmpty
@@ -55,17 +78,16 @@ trait ConstraintModel {
       case _ =>
     }
     p match {
-      case pw : PointWithIndex => udChain(pw, ps, cfg, rda)
+      case pw : PointWithIndex => udChain(pw, cfg, rda)
       case _ =>
     }
     flowMap
   }
   
   def udChain(p : PointWithIndex,
-              ps : MList[Point],
               cfg : ControlFlowGraph[String],
               rda : ReachingDefinitionAnalysis.Result) : MSet[Point] = {
-    val points : MSet[Point] = msetEmpty
+    val ps : MSet[Point] = msetEmpty
     val slots = rda.entrySet(cfg.getNode(Some(p.locationUri), p.locationIndex))
     slots.foreach(
       item => {
@@ -73,12 +95,13 @@ trait ConstraintModel {
           val (slot, defDesc) = item.asInstanceOf[(Slot, DefDesc)]
           if(p.varName.equals(slot.toString())){
             if(defDesc.toString().equals("*")){
-              points += getPoint(p.varName, ps)
+              ps += getPoint(p.varName)
             } else {
               defDesc match {
                 case ldd : LocDefDesc => 
+                  
                   ldd.locUri match {
-                    case Some(locU) => points += getPoint(locU, ldd.locIndex, ps)
+                    case Some(locU) => ps += getPoint(p.varName, locU, ldd.locIndex)
                     case _ =>
                   }
                 case _ =>
@@ -88,31 +111,45 @@ trait ConstraintModel {
         }
       }
     )
-    println("points ------>" + p + "   slots------> " + slots)
-    points
+    ps
   }
   
-  def getPoint(locUri : ResourceUri, locIndex : Int, ps : MList[Point]) : Point = {
+  def getPoint(uri : ResourceUri, locUri : ResourceUri, locIndex : Int) : Point = {
     var point : Point = null
-    ps.foreach(
+    points.foreach(
       p => {
-        require(p.isInstanceOf[PointWithIndex])
-        val uri = p.asInstanceOf[PointWithIndex].locationUri
-        val index = p.asInstanceOf[PointWithIndex].locationIndex
-        if(locUri.equals(uri) && locIndex == index)
-          point = p
-      }  
+        p match {
+          case asmtP : PointAsmt =>
+            val lhs = asmtP.lhs
+            if(lhs.isInstanceOf[PointWithIndex]){
+              val locationUri = lhs.asInstanceOf[PointWithIndex].locationUri
+              val locationIndex = lhs.asInstanceOf[PointWithIndex].locationIndex
+              if(lhs.varName.equals(uri) && locUri.equals(locationUri) && locIndex == locationIndex)
+                point = lhs
+            }
+          case _ =>
+        }
+        
+      }
+      
     )
     require(point != null)
     point
   }
   
-  def getPoint(uri : ResourceUri, ps : MList[Point]) : Point = {
+  def getPoint(uri : ResourceUri) : Point = {
     var point : Point = null
-    ps.foreach(
+    points.foreach(
       p => {
         p match {
           case pp : PointProc =>
+            pp.thisParamOpt match {
+              case Some(thisP) => 
+                if(thisP.varName.equals(uri)){
+                  point = thisP
+                }
+              case None =>
+            }
             pp.params.foreach(
               pa => {
                 if(pa._2.varName.equals(uri)){
