@@ -921,7 +921,7 @@ void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
 				          }
 				      }
                  
-				    fprintf(pFp, ") "); // note that ")" closes the scopes which have been already listed for the current local variable
+				    fprintf(pFp, ");"); // note that ")" closes the scopes which have been already listed for the current local variable
                   }
                  
 				 fprintf(pFp, "\n"); 
