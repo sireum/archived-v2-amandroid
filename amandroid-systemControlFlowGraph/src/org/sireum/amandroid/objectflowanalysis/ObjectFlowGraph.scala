@@ -101,23 +101,41 @@ class ObjectFlowGraph[Node <: OfaNode]
         map(sp).foreach(
             tp => {
               val targetNode = getNode(tp)
-              addEdge(srcNode, targetNode)
+              if(!graph.containsEdge(srcNode, targetNode))
+                addEdge(srcNode, targetNode)
             }
         )
       }  
     )
   }
   
+  def extendGraph(met : PointProc, pi : PointI) = {
+    met.params.keys.foreach(
+      i => {
+        val srcNode = getNode(pi.args(i))
+        val targetNode = getNode(met.params(i))
+        worklist += targetNode
+        addEdge(srcNode, targetNode)
+      }  
+    )
+    met.thisParamOpt match {
+      case Some(thisParam) =>
+        val srcNode = getNode(pi.recv)
+        val targetNode = getNode(thisParam)
+        worklist += targetNode
+        addEdge(srcNode, targetNode)
+      case None =>
+    }
+    val targetNode = getNode(pi)
+    val srcNode = getNode(met.retParam)
+    worklist += srcNode
+    addEdge(srcNode, targetNode)
+  }
+  
   def recvInverse(n : Node) : Option[PointI] = {
     if(n.isInstanceOf[OfaPointNode]){
-      val pointOpt = getRecvPoint(n.asInstanceOf[OfaPointNode].uri, n.asInstanceOf[OfaPointNode].loc)
-      pointOpt match {
-        case Some(point) => Some(point.asInstanceOf[PointRecv].container)
-        case None => None
-      }
-    } else {
-      None
-    }
+      getRecvPoint(n.asInstanceOf[OfaPointNode].uri, n.asInstanceOf[OfaPointNode].loc)
+    } else {None}
   }
   
   /**
@@ -125,8 +143,8 @@ class ObjectFlowGraph[Node <: OfaNode]
    */ 
   def calleeSet(diffSet : MSet[ResourceUri],
                 pi : PointI,
-                androidVirtualMethodTables : AndroidVirtualMethodTables) : MSet[PointProc] = {
-    val calleeSet : MSet[PointProc] = msetEmpty
+                androidVirtualMethodTables : AndroidVirtualMethodTables) : MSet[ResourceUri] = {
+    val calleeSet : MSet[ResourceUri] = msetEmpty
     diffSet.foreach(
       d => {
         val recordUri = androidVirtualMethodTables.getRecordUri(d)
@@ -134,19 +152,30 @@ class ObjectFlowGraph[Node <: OfaNode]
         val str = pi.varName.substring(pi.varName.indexOf(";."))
         procSigs.foreach(
           sig => {
-//            if(sig.contains(str)){
-//              calleeSet += getSigPoint(sig)
-//            }
+            if(sig.contains(str)){
+              calleeSet += androidVirtualMethodTables.getProcedureUriBySignature(sig)
+            }
           }  
         )
-        println(pi.varName + " " + procSigs)
       }  
     )
-    msetEmpty
+    calleeSet
   }
   
   def getNodeOrElse(p : Point) : Node = {
     p match {
+      case pr : PointRecv =>
+        if(!nodeExists("recv:" + pr.varName, pr.locationUri)){
+          val node = addNode("recv:" + pr.varName, pr.locationUri)
+          node.setProperty(PROP_KEY, msetEmpty[ResourceUri])
+          node
+        } else getNode("recv:" + pr.varName, pr.locationUri)
+      case pa : PointArg =>
+        if(!nodeExists("arg:" + pa.varName, pa.locationUri)){
+          val node = addNode("arg:" + pa.varName, pa.locationUri)
+          node.setProperty(PROP_KEY, msetEmpty[ResourceUri])
+          node
+        } else getNode("arg:" + pa.varName, pa.locationUri)
       case pwi : PointWithIndex =>
         if(!nodeExists(pwi.varName, pwi.locationUri)){
           val node = addNode(pwi.varName, pwi.locationUri)
@@ -217,10 +246,14 @@ class ObjectFlowGraph[Node <: OfaNode]
     
   def getNode(p : Point) : Node = {
     p match {
+      case pr : PointRecv =>
+        getNode("recv:" + pr.varName, pr.locationUri)
+      case pa : PointArg =>
+        getNode("arg:" + pa.varName, pa.locationUri)
       case pwi : PointWithIndex =>
         getNode(pwi.varName, pwi.locationUri)
-      case pr : PointRNoIndex =>
-        getNode(pr.varName, pr.identifier)
+      case pri : PointRNoIndex =>
+        getNode(pri.varName, pri.identifier)
       case pp : PointProc =>
         getNode(pp.pUri)
     }

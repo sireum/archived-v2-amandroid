@@ -180,20 +180,21 @@ trait ConstraintModel {
     point
   }
   
-  def getRecvPoint(uri : ResourceUri, loc : ResourceUri) : Option[PointRecv] = {
-    var pointOpt : Option[PointRecv] = null
+  def getRecvPoint(uri : ResourceUri, loc : ResourceUri) : Option[PointI] = {
+    var pointOpt : Option[PointI] = None
     points.foreach(
       p => {
         p match {
           case pp : PointAsmt =>
             pp.rhs match {
               case pi : PointI =>
-                pointOpt = Some(pi.recv)
+                if(("recv:" +pi.recv.varName).equals(uri) && pi.recv.locationUri.equals(loc)){
+                  println(pi)
+                  pointOpt = Some(pi)
+                }
               case _ =>
-                pointOpt = None
             }
           case _ =>
-            pointOpt = None
         }
       }  
     )

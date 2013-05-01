@@ -199,7 +199,7 @@ class PointsCollector {
       val l = locationDecls(i)
       visitor(l)
     }
-    println("points---> " + points)
+//    println("points---> " + points)
     points
   }
 }
@@ -231,7 +231,7 @@ final class PointRecv(uri : ResourceUri, loc : ResourceUri, locIndex : Int) exte
 }
 
 /**
- * Set of program points corresponding to method recv variable.
+ * Set of program points corresponding to method arg variable.
  * pi represents an element in this set.
  */
 final class PointArg(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
