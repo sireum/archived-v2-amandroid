@@ -9,5 +9,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-symbol"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-xml"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-cache"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-util"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

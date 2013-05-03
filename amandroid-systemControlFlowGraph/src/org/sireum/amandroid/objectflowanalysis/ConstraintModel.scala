@@ -11,6 +11,7 @@ trait ConstraintModel {
                       cfg : ControlFlowGraph[String],
                       rda : ReachingDefinitionAnalysis.Result) 
                       : MMap[Point, MSet[Point]] = {
+    //contains the edge list related to point p
     val flowMap : MMap[Point, MSet[Point]] = mmapEmpty
     p match {
       case asmtP : PointAsmt =>
@@ -20,7 +21,28 @@ trait ConstraintModel {
             flowMap(rhs) = msetEmpty
         }
         flowMap(rhs) += lhs
+        lhs match {
+          case pfl : PointFieldL =>
+            udChain(pfl.basePoint, cfg, rda).foreach(
+              point => {
+                if(!flowMap.contains(point)){
+                    flowMap(point) = msetEmpty
+                }
+                flowMap(point) += pfl.basePoint
+              }
+            )
+          case _ =>
+        }
         rhs match {
+          case pfr : PointFieldR =>
+            udChain(pfr.basePoint, cfg, rda).foreach(
+              point => {
+                if(!flowMap.contains(point)){
+                    flowMap(point) = msetEmpty
+                }
+                flowMap(point) += pfr.basePoint
+              }
+            )
           case po : PointO =>
           case pi : PointI =>
             val recvP = pi.recv
@@ -56,7 +78,7 @@ trait ConstraintModel {
         }
       case procP : PointProc =>
         val params = procP.params
-        val retPa = procP.retParam
+        val retPa = procP.retVar
         params.keys.foreach(
           i => {
             val pa = params(i)
@@ -66,7 +88,7 @@ trait ConstraintModel {
         if(!flowMap.contains(retP)){
             flowMap(retP) = msetEmpty
         }
-        flowMap(retP) += retP.procPoint.retParam
+        flowMap(retP) += retP.procPoint.retVar
         udChain(retP, cfg, rda).foreach(
           point => {
             if(!flowMap.contains(point)){
@@ -100,7 +122,9 @@ trait ConstraintModel {
               defDesc match {
                 case ldd : LocDefDesc => 
                   ldd.locUri match {
-                    case Some(locU) => ps += getPoint(p.varName, locU, ldd.locIndex)
+                    case Some(locU) => 
+                      println(p.varName + " " + locU + " " + ldd.locIndex)
+                      ps += getPoint(p.varName, locU, ldd.locIndex)
                     case _ =>
                   }
                 case _ =>
@@ -180,7 +204,7 @@ trait ConstraintModel {
     point
   }
   
-  def getRecvPoint(uri : ResourceUri, loc : ResourceUri) : Option[PointI] = {
+  def getInvocationPoint(uri : ResourceUri, loc : ResourceUri) : Option[PointI] = {
     var pointOpt : Option[PointI] = None
     points.foreach(
       p => {
@@ -189,7 +213,6 @@ trait ConstraintModel {
             pp.rhs match {
               case pi : PointI =>
                 if(("recv:" +pi.recv.varName).equals(uri) && pi.recv.locationUri.equals(loc)){
-                  println(pi)
                   pointOpt = Some(pi)
                 }
               case _ =>

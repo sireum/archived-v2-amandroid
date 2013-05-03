@@ -3,6 +3,7 @@ package org.sireum.amandroid.objectflowanalysis
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.util._
 import org.sireum.pilar.ast._
+import org.sireum.amandroid.util.SignatureParser
 
 class PointsCollector {
   
@@ -10,7 +11,7 @@ class PointsCollector {
     val pUri = pst.procedureUri
     val pProc : PointProc = new PointProc(pUri)
     val retP = new PointRNoIndex("ret", pUri)
-    pProc.retParam = retP
+    pProc.retVar = retP
     pst.procedure.params.foreach(
       param => {
         var i = 0
@@ -57,7 +58,7 @@ class PointsCollector {
       return false
     }
   
-  def points(pst : ProcedureSymbolTable) : MList[Point] = {
+  def points(pst : ProcedureSymbolTable, ofg : ObjectFlowGraph[OfaNode]) : MList[Point] = {
     val points : MList[Point] = mlistEmpty
     var loc : ResourceUri = ""
     var locIndex = 0
@@ -87,7 +88,12 @@ class PointsCollector {
               case n : NameExp => 
                 pl = new PointL(n.name.name, loc, locIndex)
               case a : AccessExp =>
-                pl = new PointL(a.attributeName.name, loc, locIndex)
+                val baseName = a.exp match {
+                  case ne : NameExp => ne.name.name
+                  case _ => ""
+                }
+                val pBase = new PointBase(baseName, loc, locIndex)
+                pl = new PointFieldL(pBase, a.attributeName.name, loc, locIndex)
               case _ => 
             }
             var name : ResourceUri = ""
@@ -96,27 +102,43 @@ class PointsCollector {
               case _ =>
             }
             pr = new PointO(name, loc, locIndex)
+            ofg.iFieldDefRepo(pr.toString) = mmapEmpty
           case n : NameExp =>
             if(is("object", as.annotations)){
                 as.lhs match {
                   case n : NameExp => 
                     pl = new PointL(n.name.name, loc, locIndex)
                   case a : AccessExp =>
-                    pl = new PointL(a.attributeName.name, loc, locIndex)
+                    val baseName = a.exp match {
+                      case ne : NameExp => ne.name.name
+                      case _ => ""
+                    }
+                    val pBase = new PointBase(baseName, loc, locIndex)
+                    pl = new PointFieldL(pBase, a.attributeName.name, loc, locIndex)
                   case _ => 
                 }
                 pr = new PointR(n.name.name, loc, locIndex)
             }
-          case a : AccessExp =>{
+          case ae : AccessExp =>{
             if(is("object", as.annotations)){
                 as.lhs match {
                   case n : NameExp => 
                     pl = new PointL(n.name.name, loc, locIndex)
                   case a : AccessExp =>
-                    pl = new PointL(a.attributeName.name, loc, locIndex)
+                    val baseName = a.exp match {
+                      case ne : NameExp => ne.name.name
+                      case _ => ""
+                    }
+                    val pBase = new PointBase(baseName, loc, locIndex)
+                    pl = new PointFieldL(pBase, a.attributeName.name, loc, locIndex)
                   case _ => 
                 }
-                pr = new PointR(a.attributeName.name, loc, locIndex)
+                val baseName = ae.exp match {
+                  case ne : NameExp => ne.name.name
+                  case _ => ""
+                }
+                val pBase = new PointBase(baseName, loc, locIndex)
+                pr = new PointFieldR(pBase, ae.attributeName.name, loc, locIndex)
             }
           }
           case _ =>
@@ -137,7 +159,16 @@ class PointsCollector {
           }
           case None => ""
         }
+        val typ = t.getValueAnnotation("type") match {
+          case Some(s) => s match {
+            case ne : NameExp => ne.name.name
+            case _ => ""
+          }
+          case None => ""
+        }
+        val types = new SignatureParser(sig).getParamSig.getParameters
         val pi : PointI = new PointI(sig, loc, locIndex)
+        pi.typ = typ
         t.lhs match {
           case Some(nameExp) =>
             pl = new PointL(nameExp.name.name, loc, locIndex)
@@ -146,20 +177,38 @@ class PointsCollector {
         t.callExp.arg match {
           case te : TupleExp =>{
             val exps = te.exps
-            if(exps.size > 0){
-              exps(0) match {
-                case ne : NameExp =>
-                  pi.recv = new PointRecv(ne.name.name, loc, locIndex)
-                  pi.recv.container = pi
-                case _ =>
-              }
-              for(i <- 1 to (exps.size-1)) {
+            if(pi.typ.equals("static")){
+              for(i <- 0 to (exps.size-1)) {
                 exps(i) match {
                   case ne : NameExp =>
-                    val arg = new PointArg(ne.name.name, loc, locIndex)
-                    pi.args(i-1) = arg 
-                    pi.args(i-1).container = pi
+                    val typ = types(i)
+                    if(typ.startsWith("L")){
+                      val arg = new PointArg(ne.name.name, loc, locIndex)
+                      pi.args(i) = arg 
+                      pi.args(i).container = pi
+                    }
                   case _ =>
+                }
+              }
+            } else {
+              if(exps.size > 0){
+                exps(0) match {
+                  case ne : NameExp =>
+                    pi.recv = new PointRecv(ne.name.name, loc, locIndex)
+                    pi.recv.container = pi
+                  case _ =>
+                }
+                for(i <- 1 to (exps.size-1)) {
+                  exps(i) match {
+                    case ne : NameExp =>
+                      val typ = types(i-1)
+                      if(typ.startsWith("L")){
+                        val arg = new PointArg(ne.name.name, loc, locIndex)
+                        pi.args(i-1) = arg 
+                        pi.args(i-1).container = pi
+                      }
+                    case _ =>
+                  }
                 }
               }
             }
@@ -246,7 +295,8 @@ final class PointArg(uri : ResourceUri, loc : ResourceUri, locIndex : Int) exten
 final class PointI(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
   var recv : PointRecv = null
   val args : MMap[Int, PointArg] = mmapEmpty
-  override def toString = uri + "@" + loc
+  var typ : String = null
+  override def toString = typ + ":" + uri + "@" + loc
 }
 
 /**
@@ -256,7 +306,7 @@ final class PointI(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends
  */
 final class PointO(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
   val typ = uri
-  override def toString = "new " + uri + "@" + loc
+  override def toString = "new:" + uri + "@" + loc
 }
 
 /**
@@ -272,7 +322,7 @@ final class PointV(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends
  * Set of program points corresponding to l-value expressions. 
  * pl represents an element in this set.
  */
-final class PointL(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointWithIndex(uri, loc, locIndex){ 
+class PointL(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointWithIndex(uri, loc, locIndex){ 
   override def toString = uri + "@" + loc
 }
 
@@ -283,6 +333,29 @@ final class PointL(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends
  */
 class PointR(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointWithIndex(uri, loc, locIndex){ 
   override def toString = uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to l-value field access expressions. 
+ */
+final class PointFieldL(base : PointBase, uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointL(uri, loc, locIndex){ 
+  val basePoint = base
+  override def toString = basePoint.varName + "." + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to R-value field access expressions. 
+ */
+final class PointFieldR(base : PointBase, uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
+  val basePoint = base
+  override def toString = basePoint.varName + "." + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to base part of field access expressions. 
+ */
+final class PointBase(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
+  override def toString = "base:" + uri + "@" + loc
 }
 
 /**
@@ -318,6 +391,6 @@ class PointProc(loc : ResourceUri) extends Point{
   val pUri = loc
   var thisParamOpt : Option[PointThis] = None
   val params : MMap[Int, PointRNoIndex] = mmapEmpty
-  var retParam : PointRNoIndex = null
+  var retVar : PointRNoIndex = null
   override def toString = loc
 }
