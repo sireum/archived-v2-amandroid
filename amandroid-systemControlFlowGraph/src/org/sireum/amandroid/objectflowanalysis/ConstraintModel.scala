@@ -45,15 +45,17 @@ trait ConstraintModel {
             )
           case po : PointO =>
           case pi : PointI =>
-            val recvP = pi.recv
-            udChain(recvP, cfg, rda).foreach(
-              point => {
-                if(!flowMap.contains(point)){
-                    flowMap(point) = msetEmpty
+            if(!pi.typ.equals("static")){
+              val recvP = pi.recv
+              udChain(recvP, cfg, rda).foreach(
+                point => {
+                  if(!flowMap.contains(point)){
+                      flowMap(point) = msetEmpty
+                  }
+                  flowMap(point) += recvP
                 }
-                flowMap(point) += recvP
-              }
-            )
+              )
+            }
             pi.args.keys.foreach(
               i => {
                 udChain(pi.args(i), cfg, rda).foreach(

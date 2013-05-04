@@ -90,21 +90,24 @@ object ObjectFlowGraphBuilder {
       val n = ofg.worklist.remove(0)
       ofg.successors(n).foreach(
         succ => {
-          val vsN = n.propertyMap(ofg.PROP_KEY).asInstanceOf[MMap[ResourceUri, ResourceUri]]
-          val vsSucc = succ.propertyMap(ofg.PROP_KEY).asInstanceOf[MMap[ResourceUri, ResourceUri]]
+          n match {
+            case ofn : OfaFieldNode =>
+                ofg.updateFieldValueSet(ofn)
+            case _ =>
+          }
+          val vsN = n.propertyMap(ofg.VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
+          val vsSucc = succ.propertyMap(ofg.VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
           val d = mmapEmpty[ResourceUri, ResourceUri]
           vsN.keys.map{ case k => if(vsSucc.contains(k)){if(!vsN(k).equals(vsSucc(k))){d(k) = vsN(k)}}else{d(k) = vsN(k)} }
           if(!d.isEmpty){
             vsSucc ++= d
             ofg.worklist += succ
-            println("worklist--->" + ofg.worklist)
             //check whether it's a base node of field access, if yes, then populate/use iFieldDefRepo.
             succ match {
               case ofbn : OfaFieldBaseNode =>
                 val fieldNode = ofbn.fieldNode
                 ofg.updateFieldValueSet(d, fieldNode)
               case ofn : OfaFieldNode =>
-                println("field node-->" + ofn)
                 ofg.populateIFieldRepo(d, ofn)
               case _ =>
             }

@@ -141,7 +141,6 @@ class AndroidVirtualMethodResolver
                       }
                     }
                     if(flag == true){
-                      println("key--->" + key + " parentPUri---->" + parentPUri)
                       buildRecordProcedureTable(key, parentPUri)
                     }
                   }

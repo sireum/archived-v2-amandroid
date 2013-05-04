@@ -12,9 +12,9 @@ class PointsCollector {
     val pProc : PointProc = new PointProc(pUri)
     val retP = new PointRNoIndex("ret", pUri)
     pProc.retVar = retP
+    var i = 0
     pst.procedure.params.foreach(
       param => {
-        var i = 0
         if(is("this", param.annotations)){
           val thisP = new PointThis(param.name.name, pUri)
           pProc.thisParamOpt = Option(thisP)

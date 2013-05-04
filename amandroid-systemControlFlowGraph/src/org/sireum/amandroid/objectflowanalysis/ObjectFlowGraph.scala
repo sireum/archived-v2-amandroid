@@ -29,7 +29,7 @@ class ObjectFlowGraph[Node <: OfaNode]
         new AlirEdge(self, source, target)
     })
 
-  final val PROP_KEY = "ValueSet"
+  final val VALUE_SET = "ValueSet"
   final val PARAM_NUM = "param.number"
   
   protected val pl : MMap[OfaNode, Node] = mmapEmpty
@@ -44,7 +44,7 @@ class ObjectFlowGraph[Node <: OfaNode]
   /**
    * tracking a class's instance field definitions
    */ 
-  final val iFieldDefRepo : MMap[ResourceUri, MMap[ResourceUri, MMap[ResourceUri, ResourceUri]]] = mmapEmpty
+  final val iFieldDefRepo : MMap[ResourceUri, MMap[ResourceUri, (MSet[OfaFieldNode], MMap[ResourceUri, ResourceUri])]] = mmapEmpty
   
   /**
    * create the nodes and edges to reflect the constraints corresponding 
@@ -79,7 +79,7 @@ class ObjectFlowGraph[Node <: OfaNode]
             baseNode.fieldNode = fieldNode
             fieldNode.baseNode = baseNode
           case po : PointO =>
-            rhsNode.propertyMap(PROP_KEY).asInstanceOf[MMap[ResourceUri, ResourceUri]](po.toString) = po.typ
+            rhsNode.propertyMap(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]](po.toString) = po.typ
             worklist += rhsNode
           case pi : PointI =>
             if(pi.typ.equals("static")){
@@ -161,6 +161,18 @@ class ObjectFlowGraph[Node <: OfaNode]
       addEdge(srcNode, targetNode)
   }
   
+  def updateFieldValueSet(fieldNode : OfaFieldNode) = {
+    val baseNode = fieldNode.baseNode
+    val baseValueSet = baseNode.getProperty(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
+    baseValueSet.keys.foreach(
+      ins => {
+        val fieldMap = iFieldDefRepo(ins)
+        val valueSet = fieldNode.getProperty(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
+        valueSet ++= fieldMap(fieldNode.fieldName)._2
+      }  
+    )
+  }
+  
   /**
    * @param: d is a map from instance name to type
    */ 
@@ -170,13 +182,13 @@ class ObjectFlowGraph[Node <: OfaNode]
       ins => {
         val fieldMap = iFieldDefRepo(ins)
         if(!fieldMap.contains(fieldNode.fieldName)){
-          fieldMap(fieldNode.fieldName) = mmapEmpty
+          fieldMap(fieldNode.fieldName) = (msetEmpty, mmapEmpty)
         }
-        tempVs ++= fieldMap(fieldNode.fieldName)
+        fieldMap(fieldNode.fieldName)._1 += fieldNode
+        tempVs ++= fieldMap(fieldNode.fieldName)._2
       }  
     )
-    val valueSet = fieldNode.getProperty(PROP_KEY).asInstanceOf[MMap[ResourceUri, ResourceUri]]
-    println("iFieldDefRepo------->" + iFieldDefRepo)
+    val valueSet = fieldNode.getProperty(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
     if(!tempVs.isEmpty){
       valueSet ++= tempVs
       worklist += fieldNode.asInstanceOf[Node]
@@ -188,17 +200,15 @@ class ObjectFlowGraph[Node <: OfaNode]
    */ 
   def populateIFieldRepo(d : MMap[ResourceUri, ResourceUri], fieldNode : OfaFieldNode) = {
     val baseNode = fieldNode.baseNode
-    val valueSet = baseNode.getProperty(PROP_KEY).asInstanceOf[MMap[ResourceUri, ResourceUri]]
-    println("base valueset----->" + valueSet)
+    val valueSet = baseNode.getProperty(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
     valueSet.keys.foreach(
       ins => {
         val fieldMap = iFieldDefRepo(ins)
         if(!fieldMap.contains(fieldNode.fieldName)){
-          fieldMap(fieldNode.fieldName) = mmapEmpty
+          fieldMap(fieldNode.fieldName) = (msetEmpty, mmapEmpty)
         }
-        println("diff---->" + d)
-        fieldMap(fieldNode.fieldName) ++= d
-        println("ifdr----->" + iFieldDefRepo)
+        fieldMap(fieldNode.fieldName)._2 ++= d
+        worklist ++= fieldMap(fieldNode.fieldName)._1.asInstanceOf[MSet[Node]]
       }  
     )
   }
@@ -228,7 +238,6 @@ class ObjectFlowGraph[Node <: OfaNode]
       d => {
         val recordUri = androidVirtualMethodTables.getRecordUri(d)
         val procSigs = androidVirtualMethodTables.getProcedureSigsByRecordUri(recordUri)
-        println("procSigs--->" + procSigs)
         val str = pi.varName.substring(pi.varName.indexOf(";."))
         procSigs.foreach(
           sig => {
@@ -247,55 +256,55 @@ class ObjectFlowGraph[Node <: OfaNode]
       case pb : PointBase =>
         if(!fieldBaseNodeExists(pb.varName, pb.locationUri)){
           val node = addFieldBaseNode(pb.varName, pb.locationUri)
-          node.setProperty(PROP_KEY, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
           node
         } else getFieldBaseNode(pb.varName, pb.locationUri)
       case pfl : PointFieldL =>
         if(!fieldNodeExists(pfl.basePoint.varName, pfl.varName, pfl.locationUri)){
           val node = addFieldNode(pfl.basePoint.varName, pfl.varName, pfl.locationUri)
-          node.setProperty(PROP_KEY, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
           node
         } else getFieldNode(pfl.basePoint.varName, pfl.varName, pfl.locationUri)
       case pfr : PointFieldR =>
         if(!fieldNodeExists(pfr.basePoint.varName, pfr.varName, pfr.locationUri)){
           val node = addFieldNode(pfr.basePoint.varName, pfr.varName, pfr.locationUri)
-          node.setProperty(PROP_KEY, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
           node
         } else getFieldNode(pfr.basePoint.varName, pfr.varName, pfr.locationUri)
       case pr : PointRecv =>
         if(!nodeExists("recv:" + pr.varName, pr.locationUri)){
           val node = addNode("recv:" + pr.varName, pr.locationUri)
-          node.setProperty(PROP_KEY, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
           node
         } else getNode("recv:" + pr.varName, pr.locationUri)
       case pa : PointArg =>
         if(!nodeExists("arg:" + pa.varName, pa.locationUri)){
           val node = addNode("arg:" + pa.varName, pa.locationUri)
-          node.setProperty(PROP_KEY, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
           node
         } else getNode("arg:" + pa.varName, pa.locationUri)
       case po : PointO =>
         if(!nodeExists("new:" + po.varName, po.locationUri)){
           val node = addNode("new:" + po.varName, po.locationUri)
-          node.setProperty(PROP_KEY, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
           node
         } else getNode("new:" + po.varName, po.locationUri)
       case pwi : PointWithIndex =>
         if(!nodeExists(pwi.varName, pwi.locationUri)){
           val node = addNode(pwi.varName, pwi.locationUri)
-          node.setProperty(PROP_KEY, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
           node
         } else getNode(pwi.varName, pwi.locationUri)
       case pr : PointRNoIndex =>
         if(!nodeExists(pr.varName, pr.identifier)){
           val node = addNode(pr.varName, pr.identifier)
-          node.setProperty(PROP_KEY, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
           node
         } else getNode(pr.varName, pr.identifier)
       case pp : PointProc =>
         if(!nodeExists(pp.pUri)){
           val node = addNode(pp.pUri)
-          node.setProperty(PROP_KEY, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
           node
         } else getNode(pp.pUri)
     }
@@ -448,12 +457,10 @@ class ObjectFlowGraph[Node <: OfaNode]
           n.toString().replaceAll("pilar:/procedure/[a-zA-Z0-9]*/%5B%7C", "")
                 .replaceAll("%7C%5D/[0-9]*/[0-9]*/", "_")
                 .replaceAll("[:./;\\ ]", "_")
-                .replaceAll("\\|", "")
                 .replaceAll("@", "_AT_")
                 .replaceAll("=", "_EQ_")
                 .replaceAll("%3[CE]", "")
-                .replaceAll("[<>]", "")
-                .replaceAll("[\\[\\]()]", "")
+                .replaceAll("[\\[\\]()<>\"\\|]", "")
         }
       }
     }
