@@ -136,15 +136,15 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         }
         aCache.setRootDirectory(ccfgDir + "/")
         aCache.setValueSerializer(serializer, null)
-        AndroidInterIntraProceduralModule.setParallel(options, false)
-        AndroidInterIntraProceduralModule.setAndroidCache(options, aCache)
-        AndroidInterIntraProceduralModule.setShouldBuildCfg(options, true)
-        AndroidInterIntraProceduralModule.setShouldBuildRda(options, false)
-        AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, false)
-        AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, false)
-        AndroidInterIntraProceduralModule.setShouldBuildCSCfg(options, false)
-        AndroidInterIntraProceduralModule.setShouldBuildOFAsCfg(options, false)
-        AndroidInterIntraProceduralModule.setAPIpermOpt(options, None)
+//        AndroidInterIntraProceduralModule.setParallel(options, false)
+//        AndroidInterIntraProceduralModule.setAndroidCache(options, aCache)
+//        AndroidInterIntraProceduralModule.setShouldBuildCfg(options, true)
+//        AndroidInterIntraProceduralModule.setShouldBuildRda(options, false)
+//        AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, false)
+//        AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, false)
+//        AndroidInterIntraProceduralModule.setShouldBuildCSCfg(options, false)
+//        AndroidInterIntraProceduralModule.setShouldBuildOFAsCfg(options, false)
+//        AndroidInterIntraProceduralModule.setAPIpermOpt(options, None)
         pipeline.compute(job)
 
         if(job.hasError){
@@ -213,12 +213,12 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         false,
         PilarAndroidSymbolResolverModule
       )
-      ,
-      PipelineStage(
-        "Android InterIntraProcedural Analysis",
-        false,
-        AndroidInterIntraProceduralModule
-      )
+//      ,
+//      PipelineStage(
+//        "Android InterIntraProcedural Analysis",
+//        false,
+//        AndroidInterIntraProceduralModule
+//      )
     )
     
 }

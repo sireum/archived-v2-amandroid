@@ -169,10 +169,14 @@ class ObjectFlowGraph[Node <: OfaNode]
     d.keys.foreach(
       ins => {
         val fieldMap = iFieldDefRepo(ins)
-        tempVs ++= fieldMap.getOrElseUpdate(fieldNode.fieldName, mmapEmpty)
+        if(!fieldMap.contains(fieldNode.fieldName)){
+          fieldMap(fieldNode.fieldName) = mmapEmpty
+        }
+        tempVs ++= fieldMap(fieldNode.fieldName)
       }  
     )
     val valueSet = fieldNode.getProperty(PROP_KEY).asInstanceOf[MMap[ResourceUri, ResourceUri]]
+    println("iFieldDefRepo------->" + iFieldDefRepo)
     if(!tempVs.isEmpty){
       valueSet ++= tempVs
       worklist += fieldNode.asInstanceOf[Node]
@@ -185,13 +189,16 @@ class ObjectFlowGraph[Node <: OfaNode]
   def populateIFieldRepo(d : MMap[ResourceUri, ResourceUri], fieldNode : OfaFieldNode) = {
     val baseNode = fieldNode.baseNode
     val valueSet = baseNode.getProperty(PROP_KEY).asInstanceOf[MMap[ResourceUri, ResourceUri]]
+    println("base valueset----->" + valueSet)
     valueSet.keys.foreach(
       ins => {
         val fieldMap = iFieldDefRepo(ins)
         if(!fieldMap.contains(fieldNode.fieldName)){
           fieldMap(fieldNode.fieldName) = mmapEmpty
         }
+        println("diff---->" + d)
         fieldMap(fieldNode.fieldName) ++= d
+        println("ifdr----->" + iFieldDefRepo)
       }  
     )
   }

@@ -123,7 +123,6 @@ trait ConstraintModel {
                 case ldd : LocDefDesc => 
                   ldd.locUri match {
                     case Some(locU) => 
-                      println(p.varName + " " + locU + " " + ldd.locIndex)
                       ps += getPoint(p.varName, locU, ldd.locIndex)
                     case _ =>
                   }

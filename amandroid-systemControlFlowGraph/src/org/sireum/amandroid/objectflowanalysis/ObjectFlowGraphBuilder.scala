@@ -97,12 +97,14 @@ object ObjectFlowGraphBuilder {
           if(!d.isEmpty){
             vsSucc ++= d
             ofg.worklist += succ
+            println("worklist--->" + ofg.worklist)
             //check whether it's a base node of field access, if yes, then populate/use iFieldDefRepo.
             succ match {
               case ofbn : OfaFieldBaseNode =>
                 val fieldNode = ofbn.fieldNode
                 ofg.updateFieldValueSet(d, fieldNode)
               case ofn : OfaFieldNode =>
+                println("field node-->" + ofn)
                 ofg.populateIFieldRepo(d, ofn)
               case _ =>
             }

@@ -99,7 +99,7 @@ class AndroidVirtualMethodResolver
   }
   
   def androidRecordProcedureResolver(stp : SymbolTableProducer) : Unit = 
-    if (!stp.tables.procedureAbsTable.isEmpty)
+    if (!stp.tables.procedureAbsTable.isEmpty){
       for (pat <- stp.tables.procedureAbsTable){
         tables.procedureUriTable.put(getSigByPd(pat._2), pat._1)
         tables.procedureTypeTable.put(pat._1, getProcedureAccess(pat._2))
@@ -118,6 +118,40 @@ class AndroidVirtualMethodResolver
             buildRecordProcedureTable(recordUri, procedureUri)
         }
       }
+      val keys : MSet[ResourceUri] = msetEmpty
+      keys ++= tables.recordProcedureTable.keys
+      keys.foreach(
+        key => {
+          val worklist : MList[ResourceUri] = mlistEmpty
+          worklist += key
+          val pUris = tables.recordProcedureTable.get(key).clone()
+          while(!worklist.isEmpty){
+            val rUri = worklist.remove(0)
+            if(tables.recordHierarchyTable.containsKey(rUri)){
+              val parents = tables.recordHierarchyTable.get(rUri)
+              worklist ++= parents
+              for(parent <- parents){
+                val parentPUris = tables.recordProcedureTable.get(parent).clone()
+                for(parentPUri <- parentPUris){
+                  if(!isConstructor(parentPUri)){
+                    var flag = true
+                    for(pUri <- pUris){
+                      if(sigEqual(pUri, parentPUri)){
+                        flag = false
+                      }
+                    }
+                    if(flag == true){
+                      println("key--->" + key + " parentPUri---->" + parentPUri)
+                      buildRecordProcedureTable(key, parentPUri)
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }  
+      )
+    }
   
   def isInterface(recordUri : ResourceUri) : Boolean = {
     if(tables.interfaceTable.contains(recordUri)) true
@@ -226,7 +260,7 @@ class AndroidVirtualMethodResolver
     }
     
     def getCalleeOptionsBySignature(sig : String) : java.util.Set[ResourceUri] = {
-      var procedureUri = getProcedureUriBySignature(sig)
+      val procedureUri = getProcedureUriBySignature(sig)
       getCalleeOptionsByUri(procedureUri)
     }
     
