@@ -880,6 +880,8 @@ void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
 
    /*********** sankar starts ***********/
 
+
+
    if(locVarList)
        {
 		 for(int i=0; i < locVarList->count(); i++)
@@ -925,16 +927,73 @@ void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
                   }
                  
 				 fprintf(pFp, "\n"); 
-				 delete t1; // is it safe?
-				 locVarList->remove(i); // possible memory leak?
+				 // delete t1; // do it later
+				 // locVarList->remove(i); // do it later
 
                }
 		  }
 	   }
-    /************* sankar ends *************/
 
-   // printf("num of local vars = %d \n", locVarList->count());
+   int numOfRegForLocals = pCode->registersSize - pCode->insSize;
+
+
+   for(int j=0; j < numOfRegForLocals; j++)
+   {
+
+	 bool presenseFlag = false;  
+
+     if(locVarList)
+        {
+		   for(int i=0; i < locVarList->count(); i++)
+		     {	 
+		        void* temp1 = (*locVarList)[i];
+		        if(temp1) 
+			      {
+				    locVarInf* t1 = (locVarInf*) temp1;
+                    if(t1 && t1->reg == j)
+				      {
+                         presenseFlag = true;
+
+                      }
+
+                  }
+	    	  }
+	     }
+
+	   if(!presenseFlag)	 
+	   {
+		   fprintf(pFp, "        v%d;", j); // sankar: not in dexdump; in pilar printing an extra register used as a local but which does not have any var name
+
+           fprintf(pFp, "\n"); // sankar: not in dexdump. NOTE that there is possible error in above print; some registers can be already part of a long local
+                 
+	   }
+   }
+
+// deleting locVarList
+
+     if(locVarList)
+        {
+		   for(int i=0; i < locVarList->count(); i++)
+		     {	 
+		        void* temp1 = (*locVarList)[i];
+		        if(temp1) 
+			      {
+				    locVarInf* t1 = (locVarInf*) temp1;
+                    if(t1)
+				      {
+                 
+			    	     delete t1; // is it safe?
+				         locVarList->remove(i); // possible memory leak?
+					  }
+
+                  }
+	    	  }
+	     }
+
+   /************* sankar ends *************/
+
    fprintf(pFp, "      \n"); // sankar: not in dexdump
+   
 }
 
 /*
@@ -1099,13 +1158,13 @@ static char* indexString(DexFile* pDexFile,
               case 0x6b:
               case 0x6c:
               case 0x6d:
-                outSize = snprintf(buf, bufSize, "[|%s|].[|%s|] ",
+                outSize = snprintf(buf, bufSize, "@@[|%s.%s|] ",                   // @@ identifies global/static variables in pilar
                     descriptorToDot(fieldInfo.classDescriptor), fieldInfo.name);
                                         //descriptorToDot(fieldInfo.signature));
                 break;
               default:
-                outSize = snprintf(buf, bufSize, ".[|%s|] @type [|%s|] ",
-                    fieldInfo.name,descriptorToDot( fieldInfo.classDescriptor));
+                outSize = snprintf(buf, bufSize, ".[|%s.%s|] ",
+                    descriptorToDot( fieldInfo.classDescriptor), fieldInfo.name);
                         //descriptorToDot(fieldInfo.signature));
               }
             } else {
@@ -3310,8 +3369,8 @@ void dumpSField(const DexFile* pDexFile, const DexField* pSField, int i,bool fla
               printf("      type          : '%s'\n", typeDescriptor);
               printf("      access        : 0x%04x (%s)\n",
                   pSField->accessFlags, accessStr); 
-                    if(flag)fprintf(pFp, "      global [|%s|] @@[|%s.%s|]", descriptorToDot(typeDescriptor),className, name); // sankar adds className
-                    else fprintf(pFp, "      [|%s|] [|%s.%s|]",descriptorToDot(typeDescriptor),className, name); // sankar adds className
+                    if(flag)fprintf(pFp, "      global [|%s|] @@[|%s.%s|]", descriptorToDot(typeDescriptor), className, name); // sankar adds className
+                    else fprintf(pFp, "      [|%s|] [|%s.%s|]",descriptorToDot(typeDescriptor), className, name); // sankar adds className
                     fprintf(pFp, "    @AccessFlag %s;\n",accessStr);
 
             //******************* kui's modification ends  *******************
