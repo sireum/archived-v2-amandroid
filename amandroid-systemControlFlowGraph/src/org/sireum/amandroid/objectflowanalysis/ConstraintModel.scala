@@ -213,7 +213,7 @@ trait ConstraintModel {
           case pp : PointAsmt =>
             pp.rhs match {
               case pi : PointI =>
-                if(("recv:" +pi.recv.varName).equals(uri) && pi.recv.locationUri.equals(loc)){
+                if(!pi.typ.equals("static") && ("recv:" +pi.recv.varName).equals(uri) && pi.recv.locationUri.equals(loc)){
                   pointOpt = Some(pi)
                 }
               case _ =>

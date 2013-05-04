@@ -80,12 +80,11 @@ object ObjectFlowGraphBuilder {
           androidCache : AndroidCacheFile[String]) : Unit = {
     while (!ofg.worklist.isEmpty) {
       //for construct and extend graph for static method invocation 
-      ofg.staticMethodList.foreach(
-        pi => {
-          val callee = ofg.getDirectCallee(pi, androidVirtualMethodTables)
-          extendGraphWithConstructGraph(callee, pi, ofg)
-        }  
-      )
+      while(!ofg.staticMethodList.isEmpty) {
+        val pi = ofg.staticMethodList.remove(0)
+        val callee = ofg.getDirectCallee(pi, androidVirtualMethodTables)
+        extendGraphWithConstructGraph(callee, pi, ofg)
+      }
       //end
       val n = ofg.worklist.remove(0)
       ofg.successors(n).foreach(
