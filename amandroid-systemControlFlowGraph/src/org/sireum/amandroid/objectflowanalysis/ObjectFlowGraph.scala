@@ -47,6 +47,11 @@ class ObjectFlowGraph[Node <: OfaNode]
   final val iFieldDefRepo : MMap[ResourceUri, MMap[ResourceUri, (MSet[OfaFieldNode], MMap[ResourceUri, ResourceUri])]] = mmapEmpty
   
   /**
+   * tracking global variables 
+   */ 
+  final val globalDefRepo : MMap[ResourceUri, (MSet[OfaGlobalVarNode], MMap[ResourceUri, ResourceUri])] = mmapEmpty
+  
+  /**
    * create the nodes and edges to reflect the constraints corresponding 
    * to the given program point. If a value is added to a node, then that 
    * node is added to the worklist.
@@ -73,6 +78,9 @@ class ObjectFlowGraph[Node <: OfaNode]
           case _ =>
         }
         rhs match {
+          case pgr : PointGlobalR =>
+            val globalVarNode = getNodeOrElse(pgr).asInstanceOf[OfaGlobalVarNode]
+            setGlobalDefRepo(globalVarNode)
           case pfr : PointFieldR =>
             val fieldNode = getNodeOrElse(pfr).asInstanceOf[OfaFieldNode]
             val baseNode = getNodeOrElse(pfr.basePoint).asInstanceOf[OfaFieldBaseNode]
@@ -214,6 +222,29 @@ class ObjectFlowGraph[Node <: OfaNode]
   }
   
   /**
+   * When a global variable is assigned then we populate the globalDefRepo
+   */ 
+  def populateGlobalDefRepo(d : MMap[ResourceUri, ResourceUri], globalVarNode : OfaGlobalVarNode) = {
+    val (usages, valueSet) = globalDefRepo.getOrElseUpdate(globalVarNode.uri, (msetEmpty, mmapEmpty))
+    valueSet ++= d
+    usages.foreach(
+      usage => {
+        val vs = usage.getProperty(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
+        vs ++= valueSet
+      }  
+    )
+    worklist ++= usages.asInstanceOf[MSet[Node]]
+  }
+  
+  /**
+   * When a global variable happen in right hand side then we set the globalDefRepo
+   */ 
+  def setGlobalDefRepo(globalVarNode : OfaGlobalVarNode) = {
+    val (usages, valueSet) = globalDefRepo.getOrElseUpdate(globalVarNode.uri, (msetEmpty, mmapEmpty))
+    usages += globalVarNode
+  }
+  
+  /**
    * This is the recv bar method in original algo
    */
   def recvInverse(n : Node) : Option[PointI] = {
@@ -253,6 +284,18 @@ class ObjectFlowGraph[Node <: OfaNode]
   
   def getNodeOrElse(p : Point) : Node = {
     p match {
+      case pgl : PointGlobalL =>
+        if(!globalVarNodeExists(pgl.varName, pgl.locationUri)){
+          val node = addGlobalVarNode(pgl.varName, pgl.locationUri)
+          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
+          node
+        } else getGlobalVarNode(pgl.varName, pgl.locationUri)
+      case pgr : PointGlobalR =>
+        if(!globalVarNodeExists(pgr.varName, pgr.locationUri)){
+          val node = addGlobalVarNode(pgr.varName, pgr.locationUri)
+          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
+          node
+        } else getGlobalVarNode(pgr.varName, pgr.locationUri)
       case pb : PointBase =>
         if(!fieldBaseNodeExists(pb.varName, pb.locationUri)){
           val node = addFieldBaseNode(pb.varName, pb.locationUri)
@@ -310,6 +353,10 @@ class ObjectFlowGraph[Node <: OfaNode]
     }
   }
   
+  def globalVarNodeExists(uri : ResourceUri, loc : ResourceUri) : Boolean = {
+    graph.containsVertex(newFieldBaseNode(uri, loc).asInstanceOf[Node])
+  }
+  
   def fieldBaseNodeExists(uri : ResourceUri, loc : ResourceUri) : Boolean = {
     graph.containsVertex(newFieldBaseNode(uri, loc).asInstanceOf[Node])
   }
@@ -330,6 +377,18 @@ class ObjectFlowGraph[Node <: OfaNode]
     require(pool(node) eq node)
     graph.addVertex(node)
     node
+  }
+  
+  def addGlobalVarNode(uri : ResourceUri, loc : ResourceUri) : Node = {
+    val node = newGlobalVarNode(uri, loc).asInstanceOf[Node]
+    val n =
+      if (pool.contains(node)) pool(node)
+      else {
+        pool(node) = node
+        node
+      }
+    graph.addVertex(n)
+    n
   }
   
   def addFieldBaseNode(uri : ResourceUri, loc : ResourceUri) : Node = {
@@ -383,6 +442,9 @@ class ObjectFlowGraph[Node <: OfaNode]
   def getNode(n : Node) : Node =
     pool(n)
     
+  def getGlobalVarNode(uri : ResourceUri, loc : ResourceUri) : Node =
+    pool(newGlobalVarNode(uri, loc))
+    
   def getFieldBaseNode(uri : ResourceUri, loc : ResourceUri) : Node =
     pool(newFieldBaseNode(uri, loc))
     
@@ -397,6 +459,10 @@ class ObjectFlowGraph[Node <: OfaNode]
     
   def getNode(p : Point) : Node = {
     p match {
+      case pgl : PointGlobalL =>
+        getGlobalVarNode(pgl.varName, pgl.locationUri)
+      case pgr : PointGlobalR =>
+        getGlobalVarNode(pgr.varName, pgr.locationUri)
       case pb : PointBase =>
         getFieldBaseNode(pb.varName, pb.locationUri)
       case pfl : PointFieldL =>
@@ -417,6 +483,9 @@ class ObjectFlowGraph[Node <: OfaNode]
         getNode(pp.pUri)
     }
   }
+  
+  protected def newGlobalVarNode(uri : ResourceUri, loc : ResourceUri) =
+    OfaGlobalVarNode(uri, loc)
   
   protected def newFieldNode(baseName : ResourceUri, fieldName : ResourceUri, loc : ResourceUri) =
     OfaFieldNode(baseName, fieldName, loc)
@@ -478,6 +547,13 @@ final case class OfaProcNode(uri : ResourceUri) extends OfaNode {
 
 final case class OfaPointNode(uri : ResourceUri, loc : ResourceUri) extends OfaNode {
   override def toString = uri + "@" + loc
+}
+
+/**
+ * Node type for global variable.
+ */
+final case class OfaGlobalVarNode(uri : ResourceUri, loc : ResourceUri) extends OfaNode {
+  override def toString = "global:" + uri.replaceAll("@@", "") + "@" + loc
 }
 
 /**

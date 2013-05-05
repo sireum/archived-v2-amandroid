@@ -119,7 +119,8 @@ trait ConstraintModel {
           val (slot, defDesc) = item.asInstanceOf[(Slot, DefDesc)]
           if(p.varName.equals(slot.toString())){
             if(defDesc.toString().equals("*")){
-              ps += getPoint(p.varName)
+              if(!p.varName.startsWith("@@"))
+                ps += getPoint(p.varName)
             } else {
               defDesc match {
                 case ldd : LocDefDesc => 

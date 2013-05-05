@@ -71,6 +71,10 @@ class PointsCollector {
           ""
         else
           l.name.get.uri
+          
+    def isGlobal(name : String) : Boolean = {
+          if(name.startsWith("@@")){true} else {false}
+        }
       
     val visitor = Visitor.build({
       case ld : LocationDecl => 
@@ -86,7 +90,11 @@ class PointsCollector {
           case n : NewExp =>
             as.lhs match {
               case n : NameExp => 
-                pl = new PointL(n.name.name, loc, locIndex)
+                if(isGlobal(n.name.name)){
+                  pl = new PointGlobalL(n.name.name, loc, locIndex)
+                } else {
+                  pl = new PointL(n.name.name, loc, locIndex)
+                }
               case a : AccessExp =>
                 val baseName = a.exp match {
                   case ne : NameExp => ne.name.name
@@ -107,7 +115,11 @@ class PointsCollector {
             if(is("object", as.annotations)){
                 as.lhs match {
                   case n : NameExp => 
-                    pl = new PointL(n.name.name, loc, locIndex)
+                    if(isGlobal(n.name.name)){
+                      pl = new PointGlobalL(n.name.name, loc, locIndex)
+                    } else {
+                      pl = new PointL(n.name.name, loc, locIndex)
+                    }
                   case a : AccessExp =>
                     val baseName = a.exp match {
                       case ne : NameExp => ne.name.name
@@ -117,13 +129,21 @@ class PointsCollector {
                     pl = new PointFieldL(pBase, a.attributeName.name, loc, locIndex)
                   case _ => 
                 }
-                pr = new PointR(n.name.name, loc, locIndex)
+                if(isGlobal(n.name.name)){
+                  pr = new PointGlobalR(n.name.name, loc, locIndex)
+                } else {
+                  pr = new PointR(n.name.name, loc, locIndex)
+                }
             }
           case ae : AccessExp =>{
             if(is("object", as.annotations)){
                 as.lhs match {
                   case n : NameExp => 
-                    pl = new PointL(n.name.name, loc, locIndex)
+                    if(isGlobal(n.name.name)){
+                      pl = new PointGlobalL(n.name.name, loc, locIndex)
+                    } else {
+                      pl = new PointL(n.name.name, loc, locIndex)
+                    }
                   case a : AccessExp =>
                     val baseName = a.exp match {
                       case ne : NameExp => ne.name.name
@@ -349,6 +369,20 @@ final class PointFieldL(base : PointBase, uri : ResourceUri, loc : ResourceUri, 
 final class PointFieldR(base : PointBase, uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
   val basePoint = base
   override def toString = basePoint.varName + "." + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to l-value global variable. 
+ */
+final class PointGlobalL(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointL(uri, loc, locIndex){ 
+  override def toString = "global:" + uri.replaceAll("@@", "") + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to R-value global variable. 
+ */
+final class PointGlobalR(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
+  override def toString = "global:" + uri.replaceAll("@@", "") + "@" + loc
 }
 
 /**

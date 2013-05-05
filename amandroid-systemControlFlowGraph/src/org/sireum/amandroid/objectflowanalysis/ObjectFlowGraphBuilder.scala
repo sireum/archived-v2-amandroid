@@ -101,8 +101,11 @@ object ObjectFlowGraphBuilder {
           if(!d.isEmpty){
             vsSucc ++= d
             ofg.worklist += succ
+            //check whether it's a global variable node, if yes, then populate globalDefRepo
             //check whether it's a base node of field access, if yes, then populate/use iFieldDefRepo.
             succ match {
+              case ogvn : OfaGlobalVarNode =>
+                ofg.populateGlobalDefRepo(d, ogvn)
               case ofbn : OfaFieldBaseNode =>
                 val fieldNode = ofbn.fieldNode
                 ofg.updateFieldValueSet(d, fieldNode)
