@@ -73,8 +73,65 @@ class PointsCollector {
           l.name.get.uri
           
     def isGlobal(name : String) : Boolean = {
-          if(name.startsWith("@@")){true} else {false}
-        }
+      if(name.startsWith("@@")){true} else {false}
+    }
+    
+    def initExpPointL(e : Exp) : PointL = {
+      e match {
+        case n : NameExp =>
+          if(isGlobal(n.name.name)){
+            new PointGlobalL(n.name.name, loc, locIndex)
+          } else {
+            new PointL(n.name.name, loc, locIndex)
+          }
+        case ie : IndexingExp =>
+          ie.exp match {
+            case n : NameExp =>
+              if(isGlobal(n.name.name)){
+                new PointGlobalArrayL(n.name.name, loc, locIndex)
+              } else {
+                new PointArrayL(n.name.name, loc, locIndex)
+              }
+            case _ => null
+          }
+        case _ => null
+      }
+    }
+    
+    def initExpPointR(e : Exp) : PointR = {
+      e match {
+        case n : NameExp =>
+          if(isGlobal(n.name.name)){
+            new PointGlobalR(n.name.name, loc, locIndex)
+          } else {
+            new PointR(n.name.name, loc, locIndex)
+          }
+        case ie : IndexingExp =>
+          ie.exp match {
+            case n : NameExp =>
+              new PointArrayR(n.name.name, loc, locIndex)
+            case _ => null
+          }
+        case _ => null
+      }
+    }
+    
+    def processLHS(lhs : Exp) : PointL = {
+      lhs match {
+        case n : NameExp => 
+          initExpPointL(n)
+        case ie : IndexingExp =>
+          initExpPointL(ie)
+        case a : AccessExp =>
+          val baseName = a.exp match {
+            case ne : NameExp => ne.name.name
+            case _ => ""
+          }
+          val pBase = new PointBase(baseName, loc, locIndex)
+          new PointFieldL(pBase, a.attributeName.name, loc, locIndex)
+        case _ => null
+      }
+    }
       
     val visitor = Visitor.build({
       case ld : LocationDecl => 
@@ -88,79 +145,45 @@ class PointsCollector {
         var pr : PointR = null
         as.rhs match {
           case n : NewExp =>
-            as.lhs match {
-              case n : NameExp => 
-                if(isGlobal(n.name.name)){
-                  pl = new PointGlobalL(n.name.name, loc, locIndex)
-                } else {
-                  pl = new PointL(n.name.name, loc, locIndex)
-                }
-              case a : AccessExp =>
-                val baseName = a.exp match {
-                  case ne : NameExp => ne.name.name
-                  case _ => ""
-                }
-                val pBase = new PointBase(baseName, loc, locIndex)
-                pl = new PointFieldL(pBase, a.attributeName.name, loc, locIndex)
-              case _ => 
-            }
+            pl = processLHS(as.lhs)
             var name : ResourceUri = ""
+            var instanceFlag = false
             n.typeSpec match {
-              case nt : NamedTypeSpec => name = nt.name.name
+              case nt : NamedTypeSpec => 
+                if(n.dims.isEmpty){instanceFlag = true}
+                name = nt.name.name
               case _ =>
             }
-            pr = new PointO(name, loc, locIndex)
-            ofg.iFieldDefRepo(pr.toString) = mmapEmpty
+            if(instanceFlag){
+              pr = new PointO(name, loc, locIndex)
+              ofg.iFieldDefRepo(pr.toString) = mmapEmpty
+            } else {
+              pr = new PointR("new_array:" + name, loc, locIndex)
+            }
           case n : NameExp =>
             if(is("object", as.annotations)){
-                as.lhs match {
-                  case n : NameExp => 
-                    if(isGlobal(n.name.name)){
-                      pl = new PointGlobalL(n.name.name, loc, locIndex)
-                    } else {
-                      pl = new PointL(n.name.name, loc, locIndex)
-                    }
-                  case a : AccessExp =>
-                    val baseName = a.exp match {
-                      case ne : NameExp => ne.name.name
-                      case _ => ""
-                    }
-                    val pBase = new PointBase(baseName, loc, locIndex)
-                    pl = new PointFieldL(pBase, a.attributeName.name, loc, locIndex)
-                  case _ => 
-                }
-                if(isGlobal(n.name.name)){
-                  pr = new PointGlobalR(n.name.name, loc, locIndex)
-                } else {
-                  pr = new PointR(n.name.name, loc, locIndex)
-                }
+              pl = processLHS(as.lhs)
+              if(is("array", as.annotations) && isGlobal(n.name.name)){
+                pr = new PointGlobalArrayR(n.name.name, loc, locIndex)
+              } else {
+                pr = initExpPointR(n)
+              }
             }
-          case ae : AccessExp =>{
+          case ae : AccessExp =>
             if(is("object", as.annotations)){
-                as.lhs match {
-                  case n : NameExp => 
-                    if(isGlobal(n.name.name)){
-                      pl = new PointGlobalL(n.name.name, loc, locIndex)
-                    } else {
-                      pl = new PointL(n.name.name, loc, locIndex)
-                    }
-                  case a : AccessExp =>
-                    val baseName = a.exp match {
-                      case ne : NameExp => ne.name.name
-                      case _ => ""
-                    }
-                    val pBase = new PointBase(baseName, loc, locIndex)
-                    pl = new PointFieldL(pBase, a.attributeName.name, loc, locIndex)
-                  case _ => 
-                }
-                val baseName = ae.exp match {
-                  case ne : NameExp => ne.name.name
-                  case _ => ""
-                }
-                val pBase = new PointBase(baseName, loc, locIndex)
-                pr = new PointFieldR(pBase, ae.attributeName.name, loc, locIndex)
+              pl = processLHS(as.lhs)
+              val baseName = ae.exp match {
+                case ne : NameExp => ne.name.name
+                case _ => ""
+              }
+              val pBase = new PointBase(baseName, loc, locIndex)
+              pr = new PointFieldR(pBase, ae.attributeName.name, loc, locIndex)
             }
-          }
+          case ie : IndexingExp =>
+            if(is("object", as.annotations)){
+              pl = processLHS(as.lhs)
+              pr = initExpPointR(ie)
+            }
           case _ =>
         }
         if(pl != null && pr != null){
@@ -241,8 +264,6 @@ class PointsCollector {
         assignmentPoint.rhs = pi
         points += assignmentPoint
         false
-      case gj : GotoJump =>
-        false
       case rj : ReturnJump =>
         if(is("object", rj.annotations)){
           rj.exp match {
@@ -255,10 +276,6 @@ class PointsCollector {
             case None =>
           }
         }
-        false
-      case ifj : IfJump =>
-        false
-      case sj : SwitchJump =>
         false
     }) 
     
@@ -358,7 +375,7 @@ class PointR(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends Point
 /**
  * Set of program points corresponding to l-value field access expressions. 
  */
-final class PointFieldL(base : PointBase, uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointL(uri, loc, locIndex){ 
+class PointFieldL(base : PointBase, uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointL(uri, loc, locIndex){ 
   val basePoint = base
   override def toString = basePoint.varName + "." + uri + "@" + loc
 }
@@ -366,22 +383,64 @@ final class PointFieldL(base : PointBase, uri : ResourceUri, loc : ResourceUri, 
 /**
  * Set of program points corresponding to R-value field access expressions. 
  */
-final class PointFieldR(base : PointBase, uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
+class PointFieldR(base : PointBase, uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
   val basePoint = base
   override def toString = basePoint.varName + "." + uri + "@" + loc
 }
 
 /**
+ * Set of program points corresponding to l-value array variable. 
+ */
+final class PointArrayL(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointL(uri, loc, locIndex){ 
+  override def toString = "array:" + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to R-value array variable. 
+ */
+final class PointArrayR(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
+  override def toString = "array:" + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to l-value global array variable. 
+ */
+final class PointGlobalArrayL(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointGlobalL(uri, loc, locIndex){ 
+  override def toString = "global_array:" + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to R-value global array variable. 
+ */
+final class PointGlobalArrayR(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointGlobalR(uri, loc, locIndex){ 
+  override def toString = "global_array:" + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to l-value field array variable. 
+ */
+final class PointFieldArrayL(base : PointBase, uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointFieldL(base, uri, loc, locIndex){ 
+  override def toString = "field_array:" + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to R-value field array variable. 
+ */
+final class PointFieldArrayR(base : PointBase, uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointFieldR(base, uri, loc, locIndex){ 
+  override def toString = "field_array:" + uri + "@" + loc
+}
+
+/**
  * Set of program points corresponding to l-value global variable. 
  */
-final class PointGlobalL(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointL(uri, loc, locIndex){ 
+class PointGlobalL(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointL(uri, loc, locIndex){ 
   override def toString = "global:" + uri.replaceAll("@@", "") + "@" + loc
 }
 
 /**
  * Set of program points corresponding to R-value global variable. 
  */
-final class PointGlobalR(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
+class PointGlobalR(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
   override def toString = "global:" + uri.replaceAll("@@", "") + "@" + loc
 }
 

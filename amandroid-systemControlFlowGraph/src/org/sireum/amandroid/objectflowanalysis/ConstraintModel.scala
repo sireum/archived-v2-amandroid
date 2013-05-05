@@ -26,14 +26,29 @@ trait ConstraintModel {
             udChain(pfl.basePoint, cfg, rda).foreach(
               point => {
                 if(!flowMap.contains(point)){
-                    flowMap(point) = msetEmpty
+                  flowMap(point) = msetEmpty
                 }
                 flowMap(point) += pfl.basePoint
+              }
+            )
+          //if an array point in lhs, then have flow from this array point to most recent array var shadowing place
+          case pal : PointArrayL =>
+            udChain(pal, cfg, rda).foreach(
+              point => {
+                if(!flowMap.contains(pal)){
+                  flowMap(pal) = msetEmpty
+                }
+                flowMap(pal) += point
               }
             )
           case _ =>
         }
         rhs match {
+          case pgar : PointGlobalArrayR =>
+            if(!flowMap.contains(lhs)){
+                flowMap(lhs) = msetEmpty
+            }
+            flowMap(lhs) += pgar
           case pfr : PointFieldR =>
             udChain(pfr.basePoint, cfg, rda).foreach(
               point => {
@@ -43,6 +58,16 @@ trait ConstraintModel {
                 flowMap(point) += pfr.basePoint
               }
             )
+          case par : PointArrayR =>
+            udChain(par, cfg, rda).foreach(
+              point => {
+                if(!flowMap.contains(par)){
+                  flowMap(par) = msetEmpty
+                }
+                flowMap(par) += point
+              }
+            )
+            flowMap(lhs) += par
           case po : PointO =>
           case pi : PointI =>
             if(!pi.typ.equals("static")){

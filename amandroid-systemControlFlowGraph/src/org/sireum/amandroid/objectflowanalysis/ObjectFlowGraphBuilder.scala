@@ -44,12 +44,20 @@ object ObjectFlowGraphBuilder {
     )
     this.cfgs = cfgs
     this.rdas = rdas
-    if(pstMap.contains("pilar:/procedure/default/%5B%7CFamily.main%7C%5D/1/23/9f7765dd")){
-      val pUri : ResourceUri = "pilar:/procedure/default/%5B%7CFamily.main%7C%5D/1/23/9f7765dd"
+    if(pstMap.contains("pilar:/procedure/default/%5B%7CFamily.main%7C%5D/1/23/aea1127c")){
+      val pUri : ResourceUri = "pilar:/procedure/default/%5B%7CFamily.main%7C%5D/1/23/aea1127c"
       val cfg = cfgs(pUri)
       val rda = rdas(pUri)
       doOFA(result, pstMap(pUri), cfg, rda, result, androidVirtualMethodTables, androidCache)
     }
+    result.nodes.foreach(
+      node => {
+        val name = node.toString()
+        val valueSet = node.getProperty(result.VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
+        println("node:" + name + "\nvalueSet:" + valueSet)
+      }
+    )
+    println("globalrepo------>" + result.globalDefRepo)
     val w = new java.io.PrintWriter(System.out, true)
     result.toDot(w)
     result

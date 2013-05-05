@@ -284,6 +284,18 @@ class ObjectFlowGraph[Node <: OfaNode]
   
   def getNodeOrElse(p : Point) : Node = {
     p match {
+      case pal : PointArrayL =>
+        if(!arrayNodeExists(pal.varName, pal.locationUri)){
+          val node = addArrayNode(pal.varName, pal.locationUri)
+          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
+          node
+        } else getArrayNode(pal.varName, pal.locationUri)
+      case par : PointArrayR =>
+        if(!arrayNodeExists(par.varName, par.locationUri)){
+          val node = addArrayNode(par.varName, par.locationUri)
+          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
+          node
+        } else getArrayNode(par.varName, par.locationUri)
       case pgl : PointGlobalL =>
         if(!globalVarNodeExists(pgl.varName, pgl.locationUri)){
           val node = addGlobalVarNode(pgl.varName, pgl.locationUri)
@@ -353,8 +365,12 @@ class ObjectFlowGraph[Node <: OfaNode]
     }
   }
   
+  def arrayNodeExists(uri : ResourceUri, loc : ResourceUri) : Boolean = {
+    graph.containsVertex(newArrayNode(uri, loc).asInstanceOf[Node])
+  }
+  
   def globalVarNodeExists(uri : ResourceUri, loc : ResourceUri) : Boolean = {
-    graph.containsVertex(newFieldBaseNode(uri, loc).asInstanceOf[Node])
+    graph.containsVertex(newGlobalVarNode(uri, loc).asInstanceOf[Node])
   }
   
   def fieldBaseNodeExists(uri : ResourceUri, loc : ResourceUri) : Boolean = {
@@ -377,6 +393,18 @@ class ObjectFlowGraph[Node <: OfaNode]
     require(pool(node) eq node)
     graph.addVertex(node)
     node
+  }
+  
+  def addArrayNode(uri : ResourceUri, loc : ResourceUri) : Node = {
+    val node = newArrayNode(uri, loc).asInstanceOf[Node]
+    val n =
+      if (pool.contains(node)) pool(node)
+      else {
+        pool(node) = node
+        node
+      }
+    graph.addVertex(n)
+    n
   }
   
   def addGlobalVarNode(uri : ResourceUri, loc : ResourceUri) : Node = {
@@ -442,6 +470,9 @@ class ObjectFlowGraph[Node <: OfaNode]
   def getNode(n : Node) : Node =
     pool(n)
     
+  def getArrayNode(uri : ResourceUri, loc : ResourceUri) : Node =
+    pool(newArrayNode(uri, loc))
+    
   def getGlobalVarNode(uri : ResourceUri, loc : ResourceUri) : Node =
     pool(newGlobalVarNode(uri, loc))
     
@@ -459,6 +490,10 @@ class ObjectFlowGraph[Node <: OfaNode]
     
   def getNode(p : Point) : Node = {
     p match {
+      case pal : PointArrayL =>
+        getArrayNode(pal.varName, pal.locationUri)
+      case par : PointArrayR =>
+        getArrayNode(par.varName, par.locationUri)
       case pgl : PointGlobalL =>
         getGlobalVarNode(pgl.varName, pgl.locationUri)
       case pgr : PointGlobalR =>
@@ -483,6 +518,9 @@ class ObjectFlowGraph[Node <: OfaNode]
         getNode(pp.pUri)
     }
   }
+  
+  protected def newArrayNode(uri : ResourceUri, loc : ResourceUri) =
+    OfaArrayNode(uri, loc)
   
   protected def newGlobalVarNode(uri : ResourceUri, loc : ResourceUri) =
     OfaGlobalVarNode(uri, loc)
@@ -570,4 +608,12 @@ final case class OfaFieldBaseNode(uri : ResourceUri, loc : ResourceUri) extends 
 final case class OfaFieldNode(baseName : ResourceUri, fieldName : ResourceUri, loc : ResourceUri) extends OfaNode {
   var baseNode : OfaFieldBaseNode = null
   override def toString = "field:" + baseName + "." + fieldName + "@" + loc
+}
+
+/**
+ * Node type for array variable.
+ */
+final case class OfaArrayNode(uri : ResourceUri, loc : ResourceUri) extends OfaNode {
+  var baseNode : OfaFieldBaseNode = null
+  override def toString = "array:" + uri + "@" + loc
 }
