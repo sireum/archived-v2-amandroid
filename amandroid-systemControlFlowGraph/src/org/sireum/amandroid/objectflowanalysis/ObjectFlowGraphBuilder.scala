@@ -36,31 +36,44 @@ object ObjectFlowGraphBuilder {
             androidVirtualMethodTables : AndroidVirtualMethodTables,
             androidCache : AndroidCacheFile[String])
    : ObjectFlowGraph[Node] = {
-    val result = new ObjectFlowGraph[Node]
+    val results : MSet[ObjectFlowGraph[Node]] = msetEmpty
+    val entryPoints : MSet[ResourceUri] = msetEmpty
     psts.foreach(
       pst =>{
+        if(pst.procedureUri.contains(".main")) entryPoints += pst.procedureUri
         pstMap(pst.procedureUri) = pst
       }  
     )
     this.cfgs = cfgs
     this.rdas = rdas
-    if(pstMap.contains("pilar:/procedure/default/%5B%7CFamily.main%7C%5D/1/23/aea1127c")){
-      val pUri : ResourceUri = "pilar:/procedure/default/%5B%7CFamily.main%7C%5D/1/23/aea1127c"
-      val cfg = cfgs(pUri)
-      val rda = rdas(pUri)
-      doOFA(result, pstMap(pUri), cfg, rda, result, androidVirtualMethodTables, androidCache)
-    }
-    result.nodes.foreach(
-      node => {
-        val name = node.toString()
-        val valueSet = node.getProperty(result.VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
-        println("node:" + name + "\nvalueSet:" + valueSet)
+    entryPoints.foreach(
+        ep => {
+          val result = new ObjectFlowGraph[Node]
+          val cfg = cfgs(ep)
+          val rda = rdas(ep)
+          doOFA(result, pstMap(ep), cfg, rda, result, androidVirtualMethodTables, androidCache)
+          results += result
+        }
+    )
+    results.foreach(
+      result=> {
+        result.nodes.foreach(
+          node => {
+            val name = node.toString()
+            val valueSet = node.getProperty(result.VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
+            println("node:" + name + "\nvalueSet:" + valueSet)
+          }
+        )
+        println("arrayrepo------>" + result.arrayRepo)
+        println("globalrepo------>" + result.globalDefRepo)
+        val w = new java.io.PrintWriter(System.out, true)
+        result.toDot(w)
+        result
       }
     )
-    println("globalrepo------>" + result.globalDefRepo)
-    val w = new java.io.PrintWriter(System.out, true)
-    result.toDot(w)
-    result
+    pstMap.clear
+    processed.clear
+    new ObjectFlowGraph[Node]
   }
   
   def doOFA(ofa : ObjectFlowGraph[Node],
@@ -72,6 +85,7 @@ object ObjectFlowGraphBuilder {
             androidCache : AndroidCacheFile[String]) = {
     val points = new PointsCollector().points(pst, ofg)
     ofg.points ++= points
+    ofg.fixArrayVar(points, cfg, rda)
     points.foreach(
       point => {
         if(point.isInstanceOf[PointProc]){
@@ -145,17 +159,20 @@ object ObjectFlowGraphBuilder {
   }
   
   def extendGraphWithConstructGraph(callee : ResourceUri, pi : PointI, ofg : ObjectFlowGraph[Node]) = {
-    val points : MList[Point] = mlistEmpty 
+    val points : MList[Point] = mlistEmpty
     if(!processed.contains(callee)){
       if(pstMap.contains(callee)){
+        val cfg = cfgs(callee)
+        val rda = rdas(callee)
         points ++= new PointsCollector().points(pstMap(callee), ofg)
         ofg.points ++= points
+        ofg.fixArrayVar(points, cfg, rda)
         points.foreach(
           point => {
             if(point.isInstanceOf[PointProc]){
               processed(callee) = point.asInstanceOf[PointProc]
             }
-            ofg.constructGraph(point, cfgs(callee), rdas(callee))
+            ofg.constructGraph(point, cfg, rda)
           }
         )
       } else {

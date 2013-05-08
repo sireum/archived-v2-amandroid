@@ -58,8 +58,122 @@ class ObjectFlowGraph[Node <: OfaNode]
    */
   def constructGraph(p : Point, cfg : ControlFlowGraph[String], rda : ReachingDefinitionAnalysis.Result) = {
     collectNodes(p)
-    val constraintMap = applyConstraint(p, cfg, rda)
+    val constraintMap = applyConstraint(p, points, cfg, rda)
     buildingEdges(constraintMap)
+  }
+  
+  /**
+   * collect all array variables inside one procedure
+   */ 
+  def fixArrayVar(ps : MList[Point],
+                  cfg : ControlFlowGraph[String],
+                  rda : ReachingDefinitionAnalysis.Result) = {
+    var flag = true
+    while(flag){
+      flag = false
+      ps.foreach(
+        p =>
+          p match {
+            case asmtP : PointAsmt =>
+              val lhs = asmtP.lhs
+              val rhs = asmtP.rhs
+              if(!arrayRepo.contains(lhs.toString)){
+                lhs match {
+                  case pfl : PointFieldL =>
+                  case pal : PointArrayL =>
+                    udChain(pal, ps, cfg, rda).foreach(
+                      point => {
+                        if(arrayRepo.contains(point.toString())){
+                          val dimensions = arrayRepo(point.toString())
+                          if(dimensions - pal.dimensions > 0){
+                            arrayRepo(pal.toString) = dimensions - pal.dimensions
+                            if(!arrayRepo.contains(rhs.toString)){
+                              arrayRepo(rhs.toString) = dimensions - pal.dimensions
+                              flag = true
+                            }
+                          }
+                        }
+                      }
+                    )
+                  case _ =>
+                }
+              } else if(!rhs.isInstanceOf[PointI] && !rhs.isInstanceOf[PointArrayO] && !arrayRepo.contains(rhs.toString)){
+                arrayRepo(rhs.toString) = arrayRepo(lhs.toString)
+              }
+              if(!arrayRepo.contains(rhs.toString)){
+                rhs match {
+                  case pgar : PointGlobalArrayR =>
+                  case pfr : PointFieldR =>
+                    udChain(pfr.basePoint, ps, cfg, rda).foreach(
+                      point => {
+                      }
+                    )
+                  case par : PointArrayR =>
+                    udChain(par, ps, cfg, rda).foreach(
+                      point => {
+                        if(arrayRepo.contains(point.toString())){
+                          val dimensions = arrayRepo(point.toString())
+                          if(dimensions - par.dimensions > 0){
+                            arrayRepo(par.toString) = dimensions - par.dimensions
+                            if(!arrayRepo.contains(lhs.toString)){
+                              arrayRepo(lhs.toString) = dimensions - par.dimensions
+                              flag = true
+                            }
+                          }
+                        }
+                      }
+                    )
+                  case po : PointO =>
+                  case pi : PointI =>
+                  case pr : PointR =>
+                    udChain(pr, ps, cfg, rda).foreach(
+                      point => {
+                        if(arrayRepo.contains(point.toString())){
+                          arrayRepo(pr.toString) = arrayRepo(point.toString())
+                          arrayRepo.getOrElseUpdate(lhs.toString, arrayRepo(point.toString()))
+                          flag = true
+                        }
+                      }
+                    )
+                }
+              } else if(!arrayRepo.contains(lhs.toString)){
+                arrayRepo(lhs.toString) = arrayRepo(rhs.toString)
+                flag = true
+              }
+            case pi : PointI =>
+                  pi.args.keys.foreach(
+                    i => {
+                      udChain(pi.args(i), ps, cfg, rda).foreach(
+                        point => {
+                          if(arrayRepo.contains(point.toString())){
+                            if(!arrayRepo.contains(pi.args(i).toString)){
+                              arrayRepo(pi.args(i).toString) = arrayRepo(point.toString())
+                            }
+                          }
+                        }
+                      )
+                    }  
+                  )
+            case procP : PointProc =>
+            case retP : PointRet =>
+              retP.procPoint.retVar match{
+                case Some(rev) =>
+                  udChain(retP, ps, cfg, rda).foreach(
+                    point => {
+                      if(arrayRepo.contains(point.toString())){
+                        if(!arrayRepo.contains(retP.toString)){
+                          arrayRepo(retP.toString) = arrayRepo(point.toString())
+                        }
+                      }
+                    }
+                  )
+                case None =>
+              }
+              
+            case _ =>
+          }
+      )
+    }
   }
   
   def collectNodes(p : Point) = {
@@ -89,32 +203,36 @@ class ObjectFlowGraph[Node <: OfaNode]
           case po : PointO =>
             rhsNode.propertyMap(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]](po.toString) = po.typ
             worklist += rhsNode
-          case pi : PointI =>
-            if(pi.typ.equals("static")){
-              staticMethodList += pi
-            } else {
-              val recv = pi.recv
-              val recvNode = getNodeOrElse(recv)
-            }
-            val args = pi.args
-            
-            args.keys.foreach(
-              i => {
-                val pa = args(i)
-                val argNode = getNodeOrElse(pa)
-                argNode.setProperty(PARAM_NUM, i)
-              }  
-            )
           case pr : PointR =>
         }
+      case pi : PointI =>
+        if(pi.typ.equals("static")){
+          staticMethodList += pi
+        } else {
+          val recv = pi.recv
+          val recvNode = getNodeOrElse(recv)
+        }
+        val args = pi.args
+        
+        args.keys.foreach(
+          i => {
+            val pa = args(i)
+            val argNode = getNodeOrElse(pa)
+            argNode.setProperty(PARAM_NUM, i)
+          }  
+        )
       case procP : PointProc =>
         val thisP = procP.thisParamOpt match {
           case Some(thisP) => getNodeOrElse(thisP)
           case None => null
         }
         val params = procP.params
-        val retPa = procP.retVar
-        val retNode = getNodeOrElse(retPa)
+        procP.retVar match {
+          case Some(rev) =>
+            getNodeOrElse(rev)
+          case None =>
+        }
+        
         params.keys.foreach(
           i => {
             val pa = params(i)
@@ -149,6 +267,10 @@ class ObjectFlowGraph[Node <: OfaNode]
         val srcNode = getNode(pi.args(i))
         val targetNode = getNode(met.params(i))
         worklist += targetNode
+        if(arrayRepo.contains(pi.args(i).toString)){
+          if(!graph.containsEdge(srcNode, targetNode))
+            addEdge(targetNode, srcNode)
+        }
         if(!graph.containsEdge(srcNode, targetNode))
           addEdge(srcNode, targetNode)
       }  
@@ -162,11 +284,16 @@ class ObjectFlowGraph[Node <: OfaNode]
           addEdge(srcNode, targetNode)
       case None =>
     }
-    val targetNode = getNode(pi)
-    val srcNode = getNode(met.retVar)
-    worklist += srcNode
-    if(!graph.containsEdge(srcNode, targetNode))
-      addEdge(srcNode, targetNode)
+    met.retVar match {
+      case Some(retv) =>
+        val targetNode = getNode(pi)
+        val srcNode = getNode(retv)
+        worklist += srcNode
+        if(!graph.containsEdge(srcNode, targetNode))
+          addEdge(srcNode, targetNode)
+      case None =>
+    }
+    
   }
   
   def updateFieldValueSet(fieldNode : OfaFieldNode) = {

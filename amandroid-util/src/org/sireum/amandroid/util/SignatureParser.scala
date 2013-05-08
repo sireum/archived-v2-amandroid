@@ -46,6 +46,18 @@ class SignatureParser(sig : String) {
         }
     }
   
+    /**
+     * Get the method return type signature.
+     * 
+     * @return the method return type signature
+     */
+    def getReturnTypeSignature() : String = {
+      val endOfParams = signature.lastIndexOf(')')
+      if (endOfParams < 0)
+        throw new IllegalArgumentException("Bad method signature: " + signature);
+      return signature.substring(endOfParams + 1);
+    }
+  
     def getParameters() : MList[String] = {
         var count = 0;
         val params : MList[String] = mlistEmpty
