@@ -7,12 +7,30 @@ import org.sireum.amandroid.util.SignatureParser
 
 class PointsCollector {
   
-  def collectProcPoint(pst : ProcedureSymbolTable) : PointProc = {
+  def collectProcPoint(pst : ProcedureSymbolTable, ofg : ObjectFlowGraph[OfaNode]) : PointProc = {
     val pUri = pst.procedureUri
     val pProc : PointProc = new PointProc(pUri)
-    val retP = new PointRNoIndex("ret", pUri)
-    pProc.retVar = retP
+    val sig = pst.procedure.getValueAnnotation("signature") match {
+      case Some(s) =>
+        s match {
+          case ne : NameExp =>
+            ne.name.name
+          case _ => ""
+        }
+      case None => ""
+    }
+    val retTyp = new SignatureParser(sig).getParamSig.getReturnTypeSignature
+    if(retTyp.startsWith("L")){
+      val retP = new PointRNoIndex("ret", pUri)
+      pProc.retVar = Some(retP)
+    } else if(retTyp.startsWith("[") && retTyp.charAt(retTyp.lastIndexOf('[')+1) == 'L'){
+      val retP = new PointRNoIndex("ret", pUri)
+      pProc.retVar = Some(retP)
+      val dimensions = retTyp.lastIndexOf('[') - retTyp.indexOf('[') + 1
+      ofg.arrayRepo(retP.toString) = dimensions
+    }
     var i = 0
+    val types = new SignatureParser(sig).getParamSig.getParameters
     pst.procedure.params.foreach(
       param => {
         if(is("this", param.annotations)){
@@ -20,8 +38,15 @@ class PointsCollector {
           pProc.thisParamOpt = Option(thisP)
           i-=1
         } else if(is("object", param.annotations)){
-          val pPoint = new PointRNoIndex(param.name.name, pUri)
-          pProc.params(i) = pPoint
+          if(types(i).startsWith("[") && types(i).charAt(types(i).lastIndexOf('[')+1) == 'L'){
+            val pPoint = new PointRNoIndex(param.name.name, pUri)
+            pProc.params(i) = pPoint
+            val dimensions = types(i).lastIndexOf('[') - types(i).indexOf('[') + 1
+            ofg.arrayRepo(pPoint.toString) = dimensions
+          } else if(types(i).startsWith("L")){
+            val pPoint = new PointRNoIndex(param.name.name, pUri)
+            pProc.params(i) = pPoint
+          }
         }
         i+=1
       }  
@@ -63,7 +88,7 @@ class PointsCollector {
     var loc : ResourceUri = ""
     var locIndex = 0
     val pUri : ResourceUri = pst.procedureUri
-    val procPoint = collectProcPoint(pst)
+    val procPoint = collectProcPoint(pst, ofg)
     points += procPoint
     
     def getLocUri(l : LocationDecl) =
@@ -90,7 +115,9 @@ class PointsCollector {
               if(isGlobal(n.name.name)){
                 new PointGlobalArrayL(n.name.name, loc, locIndex)
               } else {
-                new PointArrayL(n.name.name, loc, locIndex)
+                val pal = new PointArrayL(n.name.name, loc, locIndex)
+                pal.dimensions = ie.indices.size
+                pal
               }
             case _ => null
           }
@@ -109,7 +136,9 @@ class PointsCollector {
         case ie : IndexingExp =>
           ie.exp match {
             case n : NameExp =>
-              new PointArrayR(n.name.name, loc, locIndex)
+              val par = new PointArrayR(n.name.name, loc, locIndex)
+              par.dimensions = ie.indices.size
+              par
             case _ => null
           }
         case _ => null
@@ -147,18 +176,20 @@ class PointsCollector {
           case n : NewExp =>
             pl = processLHS(as.lhs)
             var name : ResourceUri = ""
-            var instanceFlag = false
+            var dimensions = 0
             n.typeSpec match {
               case nt : NamedTypeSpec => 
-                if(n.dims.isEmpty){instanceFlag = true}
+                if(!n.dims.isEmpty){dimensions = n.dims.size + n.typeFragments.size}
                 name = nt.name.name
               case _ =>
             }
-            if(instanceFlag){
+            if(dimensions == 0){
               pr = new PointO(name, loc, locIndex)
               ofg.iFieldDefRepo(pr.toString) = mmapEmpty
             } else {
-              pr = new PointR("new_array:" + name, loc, locIndex)
+              pr = new PointArrayO(name, loc, locIndex)
+              pr.asInstanceOf[PointArrayO].dimensions = dimensions
+              ofg.arrayRepo(pl.toString) = dimensions
             }
           case n : NameExp =>
             if(is("object", as.annotations)){
@@ -212,11 +243,8 @@ class PointsCollector {
         val types = new SignatureParser(sig).getParamSig.getParameters
         val pi : PointI = new PointI(sig, loc, locIndex)
         pi.typ = typ
-        t.lhs match {
-          case Some(nameExp) =>
-            pl = new PointL(nameExp.name.name, loc, locIndex)
-          case None =>
-        }
+        pi.retTyp = new SignatureParser(sig).getParamSig.getReturnTypeSignature
+        
         t.callExp.arg match {
           case te : TupleExp =>{
             val exps = te.exps
@@ -229,6 +257,12 @@ class PointsCollector {
                       val arg = new PointArg(ne.name.name, loc, locIndex)
                       pi.args(i) = arg 
                       pi.args(i).container = pi
+                    } else if(typ.startsWith("[") && typ.charAt(pi.retTyp.lastIndexOf('[')+1) == 'L'){
+                      val arg = new PointArg(ne.name.name, loc, locIndex)
+                      pi.args(i) = arg 
+                      pi.args(i).container = pi
+                      val dimensions = typ.lastIndexOf('[') - typ.indexOf('[') + 1
+                      ofg.arrayRepo(pi.args(i).toString) = dimensions
                     }
                   case _ =>
                 }
@@ -249,6 +283,12 @@ class PointsCollector {
                         val arg = new PointArg(ne.name.name, loc, locIndex)
                         pi.args(i-1) = arg 
                         pi.args(i-1).container = pi
+                      } else if(typ.startsWith("[") && typ.charAt(pi.retTyp.lastIndexOf('[')+1) == 'L'){
+                        val arg = new PointArg(ne.name.name, loc, locIndex)
+                        pi.args(i-1) = arg 
+                        pi.args(i-1).container = pi
+                        val dimensions = typ.lastIndexOf('[') - typ.indexOf('[') + 1
+                        ofg.arrayRepo(pi.args(i-1).toString) = dimensions                        
                       }
                     case _ =>
                   }
@@ -258,11 +298,33 @@ class PointsCollector {
           }
           case _ =>
         }
-        //Note that we are considering "call temp = invoke" as an assignment
-        val assignmentPoint : PointAsmt = new PointAsmt("[" + pl + "=" + pi + "]", loc, locIndex)
-        assignmentPoint.lhs = pl
-        assignmentPoint.rhs = pi
-        points += assignmentPoint
+        points += pi
+        if(pi.retTyp.startsWith("L")){
+          t.lhs match {
+            case Some(nameExp) =>
+              pl = new PointL(nameExp.name.name, loc, locIndex)
+            case None =>
+          }
+          //Note that we are considering "call temp = invoke" as an assignment
+          val assignmentPoint : PointAsmt = new PointAsmt("[" + pl + "=" + pi + "]", loc, locIndex)
+          assignmentPoint.lhs = pl
+          assignmentPoint.rhs = pi
+          points += assignmentPoint
+        } else if(pi.retTyp.startsWith("[")){
+          if(pi.retTyp.charAt(pi.retTyp.lastIndexOf('[')+1) == 'L'){
+            t.lhs match {
+              case Some(nameExp) =>
+                pl = new PointL(nameExp.name.name, loc, locIndex)
+              case None =>
+            }
+            val dimensions = pi.retTyp.lastIndexOf('[') - pi.retTyp.indexOf('[') + 1
+            ofg.arrayRepo(pl.toString) = dimensions
+            val assignmentPoint : PointAsmt = new PointAsmt("[" + pl + "=" + pi + "]", loc, locIndex)
+            assignmentPoint.lhs = pl
+            assignmentPoint.rhs = pi
+            points += assignmentPoint
+          }
+        }
         false
       case rj : ReturnJump =>
         if(is("object", rj.annotations)){
@@ -320,9 +382,17 @@ final class PointRecv(uri : ResourceUri, loc : ResourceUri, locIndex : Int) exte
  * Set of program points corresponding to method arg variable.
  * pi represents an element in this set.
  */
-final class PointArg(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
+class PointArg(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
   var container : PointI = null
   override def toString = "arg:" + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to method array arg variable.
+ * pi represents an element in this set.
+ */
+final class PointArrayArg(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointArg(uri, loc, locIndex){ 
+  override def toString = "array_arg:" + uri + "@" + loc
 }
 
 /**
@@ -333,6 +403,7 @@ final class PointI(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends
   var recv : PointRecv = null
   val args : MMap[Int, PointArg] = mmapEmpty
   var typ : String = null
+  var retTyp : String = null
   override def toString = typ + ":" + uri + "@" + loc
 }
 
@@ -342,8 +413,19 @@ final class PointI(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends
  * at that particular program point.
  */
 final class PointO(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
-  val typ = uri
+  def typ = uri
   override def toString = "new:" + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to object creating expressions. 
+ * An object creating program point abstracts all the objects created
+ * at that particular program point.
+ */
+final class PointArrayO(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
+  def typ = uri
+  var dimensions : Int = 0
+  override def toString = "new_array:" + uri + "@" + loc
 }
 
 /**
@@ -392,14 +474,16 @@ class PointFieldR(base : PointBase, uri : ResourceUri, loc : ResourceUri, locInd
  * Set of program points corresponding to l-value array variable. 
  */
 final class PointArrayL(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointL(uri, loc, locIndex){ 
-  override def toString = "array:" + uri + "@" + loc
+  var dimensions : Int = 0
+  override def toString = "array_indexing:" + uri + "@" + loc
 }
 
 /**
  * Set of program points corresponding to R-value array variable. 
  */
 final class PointArrayR(uri : ResourceUri, loc : ResourceUri, locIndex : Int) extends PointR(uri, loc, locIndex){ 
-  override def toString = "array:" + uri + "@" + loc
+  var dimensions : Int = 0
+  override def toString = "array_indexing:" + uri + "@" + loc
 }
 
 /**
@@ -484,6 +568,6 @@ class PointProc(loc : ResourceUri) extends Point{
   val pUri = loc
   var thisParamOpt : Option[PointThis] = None
   val params : MMap[Int, PointRNoIndex] = mmapEmpty
-  var retVar : PointRNoIndex = null
+  var retVar : Option[PointRNoIndex] = None
   override def toString = loc
 }

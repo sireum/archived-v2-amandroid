@@ -114,6 +114,18 @@ object H1 {
     }
   }
 
+  def mapCalls[T](st : SymbolTable,
+                  j : CallJump,
+                  filterFunction : CallJump => (ResourceUri => Boolean),
+                  mapFunction : ProcedureSymbolTable => T) = 
+    (j.callExp.exp : @unchecked) match {
+      case ne : NameExp => 
+        if(ne.name.hasResourceInfo){
+          st.procedures(ne.name.uri). //
+            filter(filterFunction(j)).
+            map { st.procedureSymbolTable(_) }.map { mapFunction(_) }
+        } else isetEmpty
+  }
   
   
   def combine(stp1 : AndroidSymbolTableProducer,

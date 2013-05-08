@@ -97,7 +97,7 @@ case class AndroidInterIntraProcedural(
     { (_, _) => (Array.empty[CatchClause], false) },
     
 //modified for building RDA       
-  @Input defRef : SymbolTable => DefRef = { st => new org.sireum.alir.BasicVarDefRef(st, new org.sireum.alir.BasicVarAccesses(st)) },
+  @Input defRef : SymbolTable => DefRef = { st => new org.sireum.amandroid.objectflowanalysis.AndroidDefRef(st, new org.sireum.amandroid.objectflowanalysis.AndroidVarAccesses(st)) },
 
   @Input isInputOutputParamPredicate : ProcedureSymbolTable => (ResourceUri => java.lang.Boolean, ResourceUri => java.lang.Boolean) = { pst =>
     val params = pst.params.toSet[ResourceUri]
@@ -144,7 +144,7 @@ case class Rda(
 
   @Input @Consume(Array(classOf[Cfg])) cfg : ControlFlowGraph[String],
 
-  @Input defRef : SymbolTable => DefRef = { st => new org.sireum.alir.BasicVarDefRef(st, new org.sireum.alir.BasicVarAccesses(st)) },
+  @Input defRef : SymbolTable => DefRef = { st => new org.sireum.amandroid.objectflowanalysis.AndroidDefRef(st, new org.sireum.amandroid.objectflowanalysis.AndroidVarAccesses(st)) },
 
   @Input isInputOutputParamPredicate : ProcedureSymbolTable => (ResourceUri => java.lang.Boolean, ResourceUri => java.lang.Boolean),
 
