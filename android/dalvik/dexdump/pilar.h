@@ -106,7 +106,7 @@ static char* pilarExtName(const char* str)
  #define  outConstWide32(x, y)     fprintf(pFp," v%d:= %f  @length wide32;", x, y)
  #define  outConstWide(x, y)       fprintf(pFp,"v%d:= %fL  @length wide;", x, y)
  #define  outConstWideHigh16(x, y) fprintf(pFp,"v%d:= %lldL  @length wide_high16;", x, y)
- #define  outConstString(x, y)     fprintf(pFp,"v%d:= new \"%s\"; @type object @sType string", x, y)  // adding annotation in pilar for const string to treat it as object
+ #define  outConstString(x, y)     fprintf(pFp,"v%d:= new \"%s\"; @type (object, string)", x, y)  // adding annotation in pilar for const string to treat it as object
  #define  outConstClass(x, y)      fprintf(pFp,"v%d:= [|%s|];", x, y)
  #define  outMonitorEnter(x)       fprintf(pFp,"(@monitorenter v%d)", x)
  #define  outMonitorExit(x)        fprintf(pFp,"(@monitorexit v%d)", x)
@@ -164,7 +164,7 @@ static char* pilarExtName(const char* str)
 
 #define  outAget(x, y, z)          fprintf(pFp,"v%d:= v%d[v%d];", x, y, z)
 #define  outAgetWide(x, y, z)      fprintf(pFp,"v%d:= v%d[v%d]  @wide;", x, y, z)
-#define  outAgetObject(x, y, z)    fprintf(pFp,"v%d:= v%d[v%d]  @object;", x, y, z)
+#define  outAgetObject(x, y, z)    fprintf(pFp,"v%d:= v%d[v%d]  @type object;", x, y, z)
 #define  outAgetBool(x, y, z)      fprintf(pFp,"v%d:= v%d[v%d]  @boolean;", x, y, z)
 #define  outAgetByte(x, y, z)      fprintf(pFp,"v%d:= v%d[v%d]  @byte;", x, y, z)
 #define  outAgetChar(x, y, z)      fprintf(pFp,"v%d:= v%d[v%d]  @char;", x, y, z)
@@ -173,7 +173,7 @@ static char* pilarExtName(const char* str)
 
 #define  outAput(x, y, z)          fprintf(pFp,"v%d[v%d]:= v%d;",pDecInsn->vB,pDecInsn->vC,pDecInsn->vA)
 #define  outAputWide(x, y, z)      fprintf(pFp,"v%d[v%d]:= v%d  @wide;", x, y, z)
-#define  outAputObject(x, y, z)    fprintf(pFp,"v%d[v%d]:= v%d  @object;", x, y, z)
+#define  outAputObject(x, y, z)    fprintf(pFp,"v%d[v%d]:= v%d  @type object;", x, y, z)
 #define  outAputBool(x, y, z)      fprintf(pFp,"v%d[v%d]:= v%d  @boolean;",x, y, z)
 #define  outAputByte(x, y, z)      fprintf(pFp,"v%d[v%d]:= v%d  @byte;",x, y, z)
 #define  outAputChar(x, y, z)      fprintf(pFp,"v%d[v%d]:= v%d  @char;", x, y, z)
@@ -183,7 +183,7 @@ static char* pilarExtName(const char* str)
 		 
 #define  outIget(x, y, z)          fprintf(pFp,"v%d:= v%d%s;", x, y, z)
 #define  outIgetWide(x, y, z)      fprintf(pFp,"v%d:= v%d%s  @wide;", x, y, z)
-#define  outIgetObject(x, y, z)    fprintf(pFp,"v%d:= v%d%s  @object;",x, y, z )
+#define  outIgetObject(x, y, z)    fprintf(pFp,"v%d:= v%d%s  @type object;",x, y, z )
 #define  outIgetBool(x, y, z)      fprintf(pFp,"v%d:= v%d%s  @boolean;",x, y, z )
 #define  outIgetByte(x, y, z)      fprintf(pFp,"v%d:= v%d%s  @byte;",x, y, z )
 #define  outIgetChar(x, y, z)      fprintf(pFp,"v%d:= v%d%s  @char;",x, y, z )
@@ -191,11 +191,11 @@ static char* pilarExtName(const char* str)
         
 #define  outIgetQuick(x, y, z)          fprintf(pFp,"v%d:= v%d.%s @iget_quick;", x, y, z)
 #define  outIgetWideQuick(x, y, z)      fprintf(pFp,"v%d:= v%d.%s  @iget_wide_quick;", x, y, z)
-#define  outIgetObjectQuick(x, y, z)    fprintf(pFp,"v%d:= v%d.%s  @iget_object_quick;",x, y, z )
+#define  outIgetObjectQuick(x, y, z)    fprintf(pFp,"v%d:= v%d.%s  @type (object, iget_object_quick)",x, y, z )
 		
 #define  outIput(x, y, z)          fprintf(pFp,"v%d%s := v%d;", x, y, z)
 #define  outIputWide(x, y, z)      fprintf(pFp,"v%d%s := v%d @wide;", x, y, z)
-#define  outIputObject(x, y, z)    fprintf(pFp,"v%d%s := v%d @object;", x, y, z)
+#define  outIputObject(x, y, z)    fprintf(pFp,"v%d%s := v%d @type object;", x, y, z)
 #define  outIputBool(x, y, z)      fprintf(pFp,"v%d%s := v%d @boolean;", x, y, z)
 #define  outIputByte(x, y, z)      fprintf(pFp,"v%d%s := v%d @byte;", x, y, z)
 #define  outIputChar(x, y, z)      fprintf(pFp,"v%d%s := v%d @char;", x, y, z)
@@ -204,11 +204,11 @@ static char* pilarExtName(const char* str)
 
 #define  outIputQuick(x, y, z)          fprintf(pFp,"v%d.%s := v%d @iput_quick;", x, y, z)
 #define  outIputWideQuick(x, y, z)      fprintf(pFp,"v%d.%s := v%d @iput_wide_quick;", x, y, z)
-#define  outIputObjectQuick(x, y, z)    fprintf(pFp,"v%d.%s := v%d @iput_object_quick;", x, y, z)
+#define  outIputObjectQuick(x, y, z)    fprintf(pFp,"v%d.%s := v%d @type (object, iput_object_quick)", x, y, z)
 
 #define  outSget(x, y)    fprintf(pFp,"v%d:= %s;", x, y)
 #define  outSgetWide(x, y)  fprintf(pFp,"v%d:= %s  @wide;", x, y)
-#define  outSgetObject(x, y)  fprintf(pFp,"v%d:= %s  @object;", x, y)
+#define  outSgetObject(x, y)  fprintf(pFp,"v%d:= %s  @type object;", x, y)
 #define  outSgetBool(x, y)  fprintf(pFp,"v%d:= %s  @boolean;", x, y)
 #define  outSgetByte(x, y)  fprintf(pFp,"v%d:= %s  @byte;", x, y)
 #define  outSgetChar(x, y)  fprintf(pFp,"v%d:= %s  @char;", x, y)
@@ -216,7 +216,7 @@ static char* pilarExtName(const char* str)
           
 #define  outSput(x, y)            fprintf(pFp,"%s:= v%d;", x, y)
 #define  outSputWide(x, y)        fprintf(pFp,"%s:= v%d  @wide;", x, y)
-#define  outSputObject(x, y)      fprintf(pFp,"%s:= v%d  @object;", x, y)
+#define  outSputObject(x, y)      fprintf(pFp,"%s:= v%d  @type object;", x, y)
 #define  outSputBool(x, y)        fprintf(pFp,"%s:= v%d  @boolean;", x, y)
 #define  outSputByte(x, y)        fprintf(pFp,"%s:= v%d  @byte;", x, y)
 #define  outSputChar(x, y)        fprintf(pFp,"%s:= v%d  @char;", x, y)
@@ -254,7 +254,7 @@ char* cut2Char(char* proc)
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type object_init;",methInfo.classDescriptor, methInfo.name,\
+               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type (object, object_init);",methInfo.classDescriptor, methInfo.name,\
                    methInfo.signature,descriptorToDot(methInfo.classDescriptor));\
          }\
      }
