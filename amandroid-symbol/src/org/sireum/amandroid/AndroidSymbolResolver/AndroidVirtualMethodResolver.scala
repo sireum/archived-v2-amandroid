@@ -32,6 +32,14 @@ class AndroidVirtualMethodResolver
     if(!tables.recordProcedureTable.get(recordName).contains(procedureName))
       tables.recordProcedureTable.put(recordName, procedureName)
   }
+  def buildRecordFieldVarTable(rUri : ResourceUri, fName : ResourceUri, data : AndroidFieldData) : Unit = {
+    if(!tables.recordFieldVarTable.getOrElseUpdate(rUri, mmapEmpty).contains(fName))
+      tables.recordFieldVarTable(rUri)(fName) = data
+  }
+  def buildGlobalVarTable(uri : ResourceUri, data : AndroidFieldData) : Unit = {
+    if(!tables.globalVarTable.contains(uri))
+      tables.globalVarTable(uri) = data
+  }
   def buildCannotFindRecordTable(notFindParentName : ResourceUri, recordName : ResourceUri) : Unit = {
     if(!tables.recordProcedureTable.get(notFindParentName).contains(recordName))
       tables.cannotFindRecordTable.put(notFindParentName, recordName)
@@ -40,6 +48,7 @@ class AndroidVirtualMethodResolver
   def resolveAndroidVirtualMethod(stp : SymbolTableProducer) : Unit = {
     androidRecordHierarchyResolver(stp)
     androidRecordProcedureResolver(stp)
+    androidRecordFieldResolver(stp)
     androidVMResolver()
 //    AndroidVirtualMethodGraph(stp,
 //                              recordHierarchyTable,
@@ -155,6 +164,47 @@ class AndroidVirtualMethodResolver
   def isInterface(recordUri : ResourceUri) : Boolean = {
     if(tables.interfaceTable.contains(recordUri)) true
     else false
+  }
+  
+  def getTypeDimensionFromTypeSpec(typeSpec : Option[TypeSpec], i : Int) : (ResourceUri, Option[Int]) = {
+    typeSpec match {
+      case Some(typSpe) =>
+        typSpe match {
+          case lts : ListTypeSpec =>
+            getTypeDimensionFromTypeSpec(Some(lts.elementType), i+1)
+          case nts : NamedTypeSpec =>
+            if(i!=0)
+              (nts.name.name, Some(i))
+            else
+              (nts.name.name, None)
+          case _ => ("", None)
+        }
+      case None => ("", None)
+    }
+  }
+  
+  def androidRecordFieldResolver(stp : SymbolTableProducer) = {
+    if (!stp.tables.recordTable.isEmpty){
+      for (rt <- stp.tables.recordTable){
+        val rUri = rt._1
+        val attributes = rt._2.attributes
+        attributes.foreach(
+          att => {
+            val attName = att.name.name
+            val (attType, attDimensionsOpt) = getTypeDimensionFromTypeSpec(att.typeSpec, 0)
+            buildRecordFieldVarTable(rUri, attName, new AndroidFieldData(attType, attDimensionsOpt))
+          }  
+        )
+      }
+    }
+    val gvt = stp.tables.globalVarTable
+    gvt.keys.foreach(
+      key => {
+        val gvName = gvt(key).name.name
+        val (gvType, gvDimensionsOpt) = getTypeDimensionFromTypeSpec(gvt(key).typeSpec, 0)
+        buildGlobalVarTable(gvName, new AndroidFieldData(gvType, gvDimensionsOpt))
+      }
+    )
   }
   
   def androidVMResolver() : Unit =
@@ -326,6 +376,8 @@ class AndroidVirtualMethodResolver
       tables.procedureTypeTable.putAll(anotherVmTables.asInstanceOf[AndroidVirtualMethodTablesProducer].tables.procedureTypeTable)
       tables.procedureUriTable.putAll(anotherVmTables.asInstanceOf[AndroidVirtualMethodTablesProducer].tables.procedureUriTable)
       tables.recordUriTable.putAll(anotherVmTables.asInstanceOf[AndroidVirtualMethodTablesProducer].tables.recordUriTable)
+      tables.recordFieldVarTable ++= anotherVmTables.asInstanceOf[AndroidVirtualMethodTablesProducer].tables.recordFieldVarTable
+      tables.globalVarTable ++= anotherVmTables.asInstanceOf[AndroidVirtualMethodTablesProducer].tables.globalVarTable
       tables.interfaceTable.addAll(anotherVmTables.asInstanceOf[AndroidVirtualMethodTablesProducer].tables.interfaceTable)
     }
     

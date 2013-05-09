@@ -8,7 +8,6 @@ import org.sireum.pipeline._
 import java.lang.String
 import org.sireum.alir.DefRef
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
-import org.sireum.amandroid.cache.AndroidCacheFile
 import org.sireum.amandroid.module.AndroidInterIntraProcedural.AndroidInterAnalysisResult
 import org.sireum.amandroid.module.AndroidInterIntraProcedural.AndroidIntraAnalysisResult
 import org.sireum.pilar.ast.LocationDecl
@@ -41,6 +40,7 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
   val globalIntraResultKey = "Global.intraResult"
   val globalSwitchAsOrderedMatchKey = "Global.switchAsOrderedMatch"
   val globalDefRefKey = "Global.defRef"
+  val globalShouldPreprocessOfgKey = "Global.shouldPreprocessOfg"
 
   def compute(job : PipelineJob, info : PipelineJobModuleInfo) : MBuffer[Tag] = {
     val tags = marrayEmpty[Tag]
@@ -58,28 +58,73 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
   }
 
   override def initialize(job : PipelineJob) {
+    if(!(job ? AndroidInterIntraProceduralModule.globalAndroidCacheKey)) {
+      val androidCache = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$5").invoke(null).asInstanceOf[scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]]
+      setAndroidCache(job.propertyMap, androidCache)
+    }
+
+    if(!(job ? AndroidInterIntraProceduralModule.globalShouldBuildCfgKey)) {
+      val shouldBuildCfg = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$6").invoke(null).asInstanceOf[scala.Boolean]
+      setShouldBuildCfg(job.propertyMap, shouldBuildCfg)
+    }
+
+    if(!(job ? AndroidInterIntraProceduralModule.globalShouldBuildRdaKey)) {
+      val shouldBuildRda = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$7").invoke(null).asInstanceOf[scala.Boolean]
+      setShouldBuildRda(job.propertyMap, shouldBuildRda)
+    }
+
+    if(!(job ? AndroidInterIntraProceduralModule.globalShouldPreprocessOfgKey)) {
+      val shouldPreprocessOfg = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$8").invoke(null).asInstanceOf[scala.Boolean]
+      setShouldPreprocessOfg(job.propertyMap, shouldPreprocessOfg)
+    }
+
+    if(!(job ? AndroidInterIntraProceduralModule.globalShouldBuildCCfgKey)) {
+      val shouldBuildCCfg = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$9").invoke(null).asInstanceOf[scala.Boolean]
+      setShouldBuildCCfg(job.propertyMap, shouldBuildCCfg)
+    }
+
+    if(!(job ? AndroidInterIntraProceduralModule.globalShouldBuildOFAsCfgKey)) {
+      val shouldBuildOFAsCfg = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$10").invoke(null).asInstanceOf[scala.Boolean]
+      setShouldBuildOFAsCfg(job.propertyMap, shouldBuildOFAsCfg)
+    }
+
+    if(!(job ? AndroidInterIntraProceduralModule.globalShouldBuildSCfgKey)) {
+      val shouldBuildSCfg = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$11").invoke(null).asInstanceOf[scala.Boolean]
+      setShouldBuildSCfg(job.propertyMap, shouldBuildSCfg)
+    }
+
+    if(!(job ? AndroidInterIntraProceduralModule.globalShouldBuildCSCfgKey)) {
+      val shouldBuildCSCfg = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$12").invoke(null).asInstanceOf[scala.Boolean]
+      setShouldBuildCSCfg(job.propertyMap, shouldBuildCSCfg)
+    }
+
+    if(!(job ? AndroidInterIntraProceduralModule.globalAPIpermOptKey)) {
+      val APIpermOpt = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$13").invoke(null).asInstanceOf[scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]]]
+      setAPIpermOpt(job.propertyMap, APIpermOpt)
+    }
+
     if(!(job ? AndroidInterIntraProceduralModule.globalShouldIncludeFlowFunctionKey)) {
-      val shouldIncludeFlowFunction = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$13").invoke(null).asInstanceOf[scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]]]
+      val shouldIncludeFlowFunction = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$14").invoke(null).asInstanceOf[scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]]]
       setShouldIncludeFlowFunction(job.propertyMap, shouldIncludeFlowFunction)
     }
 
     if(!(job ? AndroidInterIntraProceduralModule.globalDefRefKey)) {
-      val defRef = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$14").invoke(null).asInstanceOf[scala.Function1[org.sireum.pilar.symbol.SymbolTable, org.sireum.alir.DefRef]]
+      val defRef = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$15").invoke(null).asInstanceOf[scala.Function1[org.sireum.pilar.symbol.SymbolTable, org.sireum.alir.DefRef]]
       setDefRef(job.propertyMap, defRef)
     }
 
     if(!(job ? AndroidInterIntraProceduralModule.globalIsInputOutputParamPredicateKey)) {
-      val isInputOutputParamPredicate = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$15").invoke(null).asInstanceOf[scala.Function1[org.sireum.pilar.symbol.ProcedureSymbolTable, scala.Tuple2[scala.Function1[java.lang.String, scala.Boolean], scala.Function1[java.lang.String, scala.Boolean]]]]
+      val isInputOutputParamPredicate = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$16").invoke(null).asInstanceOf[scala.Function1[org.sireum.pilar.symbol.ProcedureSymbolTable, scala.Tuple2[scala.Function1[java.lang.String, scala.Boolean], scala.Function1[java.lang.String, scala.Boolean]]]]
       setIsInputOutputParamPredicate(job.propertyMap, isInputOutputParamPredicate)
     }
 
     if(!(job ? AndroidInterIntraProceduralModule.globalSwitchAsOrderedMatchKey)) {
-      val switchAsOrderedMatch = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$16").invoke(null).asInstanceOf[scala.Boolean]
+      val switchAsOrderedMatch = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$17").invoke(null).asInstanceOf[scala.Boolean]
       setSwitchAsOrderedMatch(job.propertyMap, switchAsOrderedMatch)
     }
 
     if(!(job ? AndroidInterIntraProceduralModule.globalProcedureAbsUriIteratorKey)) {
-      val procedureAbsUriIterator = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$17").invoke(null).asInstanceOf[scala.Option[scala.collection.Iterator[java.lang.String]]]
+      val procedureAbsUriIterator = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$18").invoke(null).asInstanceOf[scala.Option[scala.collection.Iterator[java.lang.String]]]
       setProcedureAbsUriIterator(job.propertyMap, procedureAbsUriIterator)
     }
   }
@@ -199,9 +244,9 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
 
     _androidCache match{
       case Some(x) =>
-        if(!x.isInstanceOf[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]){
+        if(!x.isInstanceOf[scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]]){
           tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'androidCache'.  Expecting 'org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]' but found '" + x.getClass.toString + "'")
+            "Input error for '" + this.title + "': Wrong type found for 'androidCache'.  Expecting 'scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]' but found '" + x.getClass.toString + "'")
         }
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
@@ -260,6 +305,33 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'shouldBuildRda'")       
+    }
+    var _shouldPreprocessOfg : scala.Option[AnyRef] = None
+    var _shouldPreprocessOfgKey : scala.Option[String] = None
+
+    val keylistshouldPreprocessOfg = List(AndroidInterIntraProceduralModule.globalShouldPreprocessOfgKey)
+    keylistshouldPreprocessOfg.foreach(key => 
+      if(job ? key) { 
+        if(_shouldPreprocessOfg.isEmpty) {
+          _shouldPreprocessOfg = Some(job(key))
+          _shouldPreprocessOfgKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _shouldPreprocessOfg.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'shouldPreprocessOfg' keys '" + _shouldPreprocessOfgKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _shouldPreprocessOfg match{
+      case Some(x) =>
+        if(!x.isInstanceOf[scala.Boolean]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'shouldPreprocessOfg'.  Expecting 'scala.Boolean' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'shouldPreprocessOfg'")       
     }
     var _shouldBuildCCfg : scala.Option[AnyRef] = None
     var _shouldBuildCCfgKey : scala.Option[String] = None
@@ -605,15 +677,15 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
     return options
   }
 
-  def getAndroidCache (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String] = {
+  def getAndroidCache (options : scala.collection.Map[Property.Key, Any]) : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = {
     if (options.contains(AndroidInterIntraProceduralModule.globalAndroidCacheKey)) {
-       return options(AndroidInterIntraProceduralModule.globalAndroidCacheKey).asInstanceOf[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]
+       return options(AndroidInterIntraProceduralModule.globalAndroidCacheKey).asInstanceOf[scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def setAndroidCache (options : MMap[Property.Key, Any], androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]) : MMap[Property.Key, Any] = {
+  def setAndroidCache (options : MMap[Property.Key, Any], androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]) : MMap[Property.Key, Any] = {
 
     options(AndroidInterIntraProceduralModule.globalAndroidCacheKey) = androidCache
 
@@ -646,6 +718,21 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
   def setShouldBuildRda (options : MMap[Property.Key, Any], shouldBuildRda : scala.Boolean) : MMap[Property.Key, Any] = {
 
     options(AndroidInterIntraProceduralModule.globalShouldBuildRdaKey) = shouldBuildRda
+
+    return options
+  }
+
+  def getShouldPreprocessOfg (options : scala.collection.Map[Property.Key, Any]) : scala.Boolean = {
+    if (options.contains(AndroidInterIntraProceduralModule.globalShouldPreprocessOfgKey)) {
+       return options(AndroidInterIntraProceduralModule.globalShouldPreprocessOfgKey).asInstanceOf[scala.Boolean]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setShouldPreprocessOfg (options : MMap[Property.Key, Any], shouldPreprocessOfg : scala.Boolean) : MMap[Property.Key, Any] = {
+
+    options(AndroidInterIntraProceduralModule.globalShouldPreprocessOfgKey) = shouldPreprocessOfg
 
     return options
   }
@@ -835,9 +922,10 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
       def parallel : scala.Boolean = AndroidInterIntraProceduralModule.getParallel(job.propertyMap)
       def symbolTable : org.sireum.pilar.symbol.SymbolTable = AndroidInterIntraProceduralModule.getSymbolTable(job.propertyMap)
       def androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = AndroidInterIntraProceduralModule.getAndroidVirtualMethodTables(job.propertyMap)
-      def androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String] = AndroidInterIntraProceduralModule.getAndroidCache(job.propertyMap)
+      def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = AndroidInterIntraProceduralModule.getAndroidCache(job.propertyMap)
       def shouldBuildCfg : scala.Boolean = AndroidInterIntraProceduralModule.getShouldBuildCfg(job.propertyMap)
       def shouldBuildRda : scala.Boolean = AndroidInterIntraProceduralModule.getShouldBuildRda(job.propertyMap)
+      def shouldPreprocessOfg : scala.Boolean = AndroidInterIntraProceduralModule.getShouldPreprocessOfg(job.propertyMap)
       def shouldBuildCCfg : scala.Boolean = AndroidInterIntraProceduralModule.getShouldBuildCCfg(job.propertyMap)
       def shouldBuildOFAsCfg : scala.Boolean = AndroidInterIntraProceduralModule.getShouldBuildOFAsCfg(job.propertyMap)
       def shouldBuildSCfg : scala.Boolean = AndroidInterIntraProceduralModule.getShouldBuildSCfg(job.propertyMap)
@@ -865,14 +953,17 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
       def androidVirtualMethodTables_=(androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables) { AndroidInterIntraProceduralModule.setAndroidVirtualMethodTables(job.propertyMap, androidVirtualMethodTables) }
       def androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = AndroidInterIntraProceduralModule.getAndroidVirtualMethodTables(job.propertyMap)
 
-      def androidCache_=(androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]) { AndroidInterIntraProceduralModule.setAndroidCache(job.propertyMap, androidCache) }
-      def androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String] = AndroidInterIntraProceduralModule.getAndroidCache(job.propertyMap)
+      def androidCache_=(androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]) { AndroidInterIntraProceduralModule.setAndroidCache(job.propertyMap, androidCache) }
+      def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = AndroidInterIntraProceduralModule.getAndroidCache(job.propertyMap)
 
       def shouldBuildCfg_=(shouldBuildCfg : scala.Boolean) { AndroidInterIntraProceduralModule.setShouldBuildCfg(job.propertyMap, shouldBuildCfg) }
       def shouldBuildCfg : scala.Boolean = AndroidInterIntraProceduralModule.getShouldBuildCfg(job.propertyMap)
 
       def shouldBuildRda_=(shouldBuildRda : scala.Boolean) { AndroidInterIntraProceduralModule.setShouldBuildRda(job.propertyMap, shouldBuildRda) }
       def shouldBuildRda : scala.Boolean = AndroidInterIntraProceduralModule.getShouldBuildRda(job.propertyMap)
+
+      def shouldPreprocessOfg_=(shouldPreprocessOfg : scala.Boolean) { AndroidInterIntraProceduralModule.setShouldPreprocessOfg(job.propertyMap, shouldPreprocessOfg) }
+      def shouldPreprocessOfg : scala.Boolean = AndroidInterIntraProceduralModule.getShouldPreprocessOfg(job.propertyMap)
 
       def shouldBuildCCfg_=(shouldBuildCCfg : scala.Boolean) { AndroidInterIntraProceduralModule.setShouldBuildCCfg(job.propertyMap, shouldBuildCCfg) }
       def shouldBuildCCfg : scala.Boolean = AndroidInterIntraProceduralModule.getShouldBuildCCfg(job.propertyMap)
@@ -922,11 +1013,13 @@ trait AndroidInterIntraProceduralModule {
 
   def androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = AndroidInterIntraProceduralModule.getAndroidVirtualMethodTables(job.propertyMap)
 
-  def androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String] = AndroidInterIntraProceduralModule.getAndroidCache(job.propertyMap)
+  def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = AndroidInterIntraProceduralModule.getAndroidCache(job.propertyMap)
 
   def shouldBuildCfg : scala.Boolean = AndroidInterIntraProceduralModule.getShouldBuildCfg(job.propertyMap)
 
   def shouldBuildRda : scala.Boolean = AndroidInterIntraProceduralModule.getShouldBuildRda(job.propertyMap)
+
+  def shouldPreprocessOfg : scala.Boolean = AndroidInterIntraProceduralModule.getShouldPreprocessOfg(job.propertyMap)
 
   def shouldBuildCCfg : scala.Boolean = AndroidInterIntraProceduralModule.getShouldBuildCCfg(job.propertyMap)
 

@@ -20,9 +20,9 @@ import java.util.zip._
  * @author Fengguo Wei
  */
 trait CacheProvider[K] {
-  def cacheMap : MMap[K, (Any, Integer)]
-  var size : Integer
-  var removePercent : Integer
+  def cacheMap : MMap[K, (Any, Int)]
+  var size : Int
+  var removePercent : Int
   var serializer : (Any, OutputStream) --> Unit
   var unSerializer : InputStream --> Any
   
@@ -52,9 +52,9 @@ trait CacheProvider[K] {
   /**
    * Define the size of cacheMap.
    * 
-   * @param size     It's an Integer number which defines size of the cacheMap.
+   * @param size     It's an Int number which defines size of the cacheMap.
    */
-  def setCacheSize(size : Integer)
+  def setCacheSize(size : Int)
   
   /**
    * If the cacheMap is full, based on the percent defined here to remove proper
@@ -62,7 +62,7 @@ trait CacheProvider[K] {
    * 
    * @param p     Percent of items need to remove. 
    */
-  def setRemovePercent(p : Integer)
+  def setRemovePercent(p : Int)
   
   /**
    * When one of the item used in the cacheMap, first update the item used number.

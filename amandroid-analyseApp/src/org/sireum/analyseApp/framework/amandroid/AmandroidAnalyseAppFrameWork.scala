@@ -100,7 +100,7 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
         
         PilarAndroidSymbolResolverModule.setParallel(options, false)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, Option(libVmTables))
-        AndroidInterIntraProceduralModule.setAndroidCache(options, aCache)
+        AndroidInterIntraProceduralModule.setAndroidCache(options, Some(aCache))
         AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildCSCfg(options, true) // CSCFG = compressed system-wide control flow graph of an app X

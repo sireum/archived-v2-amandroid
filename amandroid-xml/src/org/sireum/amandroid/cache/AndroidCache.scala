@@ -9,9 +9,9 @@ import java.util.zip.GZIPInputStream
 
 final class AndroidCacheFile[K] extends CacheProvider[K] with FileCaseFactory[K]{
   
-  val cacheMap : MMap[K, (Any, Integer)] = mmapEmpty
-  var size : Integer = 0
-  var removePercent : Integer = 20
+  val cacheMap : MMap[K, (Any, Int)] = mmapEmpty
+  var size : Int = 0
+  var removePercent : Int = 20
   var serializer : (Any, OutputStream) --> Unit = null
   var unSerializer : InputStream --> Any = null
   var outer : GZIPOutputStream = null
@@ -21,6 +21,13 @@ final class AndroidCacheFile[K] extends CacheProvider[K] with FileCaseFactory[K]
   def save[T](key : K, value : T) = {
     require(!rootDirectory.equals(null))
     setFileOutputStream(key)
+    serializer((value, outer))
+    outer.close()
+  }
+  
+  def save[T](key : K, fileName : String, value : T) = {
+    require(!rootDirectory.equals(null))
+    setFileOutputStream(key, fileName)
     serializer((value, outer))
     outer.close()
   }
@@ -46,11 +53,11 @@ final class AndroidCacheFile[K] extends CacheProvider[K] with FileCaseFactory[K]
     }
   }
   
-  def setCacheSize(s : Integer) = {
+  def setCacheSize(s : Int) = {
     size = s
   }
   
-  def setRemovePercent(p : Integer) {
+  def setRemovePercent(p : Int) {
     assert(p != 0)
     removePercent = p
   }
@@ -74,11 +81,21 @@ final class AndroidCacheFile[K] extends CacheProvider[K] with FileCaseFactory[K]
   }
   
   def formatProcedureUri(pUri : ResourceUri) : String = {
-    pUri.split("%5B%7C")(1).split("%7C%5D")(0).replaceAll("::", ".").replaceAll("%3", ".").replace('$', '.')
+    pUri.replaceAll("pilar:/procedure/[a-zA-Z0-9]*/%5B%7C", "")
+        .replaceAll("%7C%5D/[0-9]*/[0-9]*/", "")
+        .replaceAll("[:./;\\ ]", "")
+        .replaceAll("@", "_AT_")
+        .replaceAll("=", "_EQ_")
+        .replaceAll("%3[CE]", "")
+        .replaceAll("[\\[\\]()<>\"\\|]", "")
   }
   
   def fileNameBuilder(pUri : ResourceUri) : FileResourceUri = {
-    formatProcedureUri(pUri) + Integer.toHexString(pUri.hashCode) + ".xml.zip"
+    formatProcedureUri(pUri) + ".xml.zip"
+  }
+  
+  def fileNameBuilder(pUri : ResourceUri, name : String) : FileResourceUri = {
+    formatProcedureUri(pUri) + "/" + name + ".xml.zip"
   }
   
   def setFileInputStream(key : K) = {
@@ -96,6 +113,31 @@ final class AndroidCacheFile[K] extends CacheProvider[K] with FileCaseFactory[K]
     key match {
       case pUri : ResourceUri =>
         fileName = rootDirectory + fileNameBuilder(pUri)
+      case _ =>
+    }
+    val file = new File(fileName)
+    outer = new GZIPOutputStream(new FileOutputStream(file))
+  }
+  
+  def setFileInputStream(key : K, name : String) = {
+    var fileName : String = null
+    key match {
+      case pUri : ResourceUri =>
+        val fileDir = new File(rootDirectory + pUri)
+        if(!fileDir.exists()) fileDir.mkdir()
+        fileName = rootDirectory + fileNameBuilder(pUri, name)
+      case _ =>
+    }
+    inner = new GZIPInputStream(new FileInputStream(fileName))
+  }
+    
+  def setFileOutputStream(key : K, name : String) = {
+    var fileName : String = null
+    key match {
+      case pUri : ResourceUri =>
+        val fileDir = new File(rootDirectory + formatProcedureUri(pUri))
+        if(!fileDir.exists()) fileDir.mkdir()
+        fileName = rootDirectory + fileNameBuilder(pUri, name)
       case _ =>
     }
     val file = new File(fileName)

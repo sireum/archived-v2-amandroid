@@ -15,12 +15,12 @@ import org.sireum.androidLibraryFile.amandroid.AmandroidAndroidLibraryPilarFiles
 class AmandroidAnalyseLibrary extends AmandroidAnalyseLibraryFrameWork{
 //  AmandroidAndroidLibraryFiles.dexModelFiles.
 //  foreach{fileUri=>
-////     if(fileUri.indexOf("framework") > 0)
+//     if(fileUri.indexOf("settings.jar") > 0)
 //    Analyzing title fileUri file fileUri
 //  }
   AmandroidAndroidLibraryPilarFiles.dexModelFiles.foreach{
     fileUri =>
-//      if(fileUri.indexOf("content") > 0)
+      if(fileUri.indexOf("settings.pilar") > 0)
         Analyzing title fileUri file fileUri
   }
 }

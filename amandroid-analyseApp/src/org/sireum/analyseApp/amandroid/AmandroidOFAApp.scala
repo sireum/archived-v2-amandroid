@@ -41,7 +41,7 @@ class AmandroidOFAApp extends AmandroidOFAAppFrameWork{
   
   AmandroidFiles.pilarModelFiles.
   foreach{fileUri=>
-     if(fileUri.indexOf("testFieldArray.pilar") > 0)
+     if(fileUri.indexOf("testGlobalArray.pilar") > 0)
       Analyzing title fileUri file(fileUri, libVmTables, aCache)
   }
 }

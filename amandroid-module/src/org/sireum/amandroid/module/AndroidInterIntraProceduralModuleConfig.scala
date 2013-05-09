@@ -30,6 +30,7 @@ object AndroidInterIntraProcedural {
   type RDA = ReachingDefinitionAnalysis.Result  //adding for rda building
   
   type CCFG = CompressedControlFlowGraph[VirtualLabel]
+  type OFG = ObjectFlowGraph[OfaNode]
   type OFAsCfg = SystemControlFlowGraph[VirtualLabel]
   type SCFG = SystemControlFlowGraph[VirtualLabel]
   // type CSCFG = SystemControlFlowGraph[VirtualLabel]
@@ -38,6 +39,7 @@ object AndroidInterIntraProcedural {
     pool : AlirIntraProceduralGraph.NodePool,
     cfg : AndroidInterIntraProcedural.CFG,
     rdaOpt : Option[AndroidInterIntraProcedural.RDA],
+    ofgOpt : Option[AndroidInterIntraProcedural.OFG],
     cCfgOpt : Option[AndroidInterIntraProcedural.CCFG])
     
   final case class AndroidInterAnalysisResult(
@@ -68,28 +70,31 @@ case class AndroidInterIntraProcedural(
   androidVirtualMethodTables : AndroidVirtualMethodTables,
   
   @Input
-  androidCache : AndroidCacheFile[ResourceUri],
+  androidCache : scala.Option[AndroidCacheFile[ResourceUri]] = None,
   
   @Input
-  shouldBuildCfg : Boolean,
+  shouldBuildCfg : Boolean = true,
 
   @Input 
-  shouldBuildRda : Boolean,
+  shouldBuildRda : Boolean = false,
   
   @Input
-  shouldBuildCCfg : Boolean,
+  shouldPreprocessOfg : Boolean = false,
   
   @Input
-  shouldBuildOFAsCfg : Boolean,
+  shouldBuildCCfg : Boolean = false,
   
   @Input
-  shouldBuildSCfg : Boolean,
+  shouldBuildOFAsCfg : Boolean = false,
   
   @Input
-  shouldBuildCSCfg : Boolean,
+  shouldBuildSCfg : Boolean = false,
   
   @Input
-  APIpermOpt : Option[MMap[ResourceUri, MList[String]]],
+  shouldBuildCSCfg : Boolean = false,
+  
+  @Input
+  APIpermOpt : scala.Option[MMap[ResourceUri, MList[String]]] = None,
   
   @Input 
   shouldIncludeFlowFunction : AndroidInterIntraProcedural.ShouldIncludeFlowFunction =
@@ -169,12 +174,34 @@ case class cCfg(
   @Output
   @Produce
   cCfg : CompressedControlFlowGraph[String])
+
+case class OFAPreprocess(
+  title : String = "intra object flow graph Build",
+  
+  @Input 
+  @Consume(Array(classOf[Cfg]))  
+  cfg : ControlFlowGraph[String],
+  
+  @Input
+  @Consume(Array(classOf[Rda]))
+  rda : ReachingDefinitionAnalysis.Result,
+  
+  @Input
+  procedureSymbolTable : ProcedureSymbolTable,
+
+  @Input
+  androidVirtualMethodTables : AndroidVirtualMethodTables,
+  
+  // for test now. Later will change it.
+  @Output
+  @Produce
+  OFG : AndroidInterIntraProcedural.OFG)
   
 case class OFAsCfg(
   title : String = "System Control Flow Graph with OFA Builder",
 
   @Input
-  androidCache : AndroidCacheFile[ResourceUri],
+  androidCache : scala.Option[AndroidCacheFile[ResourceUri]],
   
   @Input 
   cfgs : MMap[ResourceUri, ControlFlowGraph[String]],
@@ -197,7 +224,7 @@ case class sCfg(
   title : String = "System Control Flow Graph Builder",
 
   @Input
-  androidCache : AndroidCacheFile[ResourceUri],
+  androidCache : scala.Option[AndroidCacheFile[ResourceUri]] = None,
   
   @Input 
   cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
@@ -214,7 +241,7 @@ case class sCfg(
   title : String = "Compressed System Control Flow Graph Builder",
 
   @Input
-  androidCache : AndroidCacheFile[ResourceUri],
+  androidCache : scala.Option[AndroidCacheFile[ResourceUri]] = None,
   
   @Input 
   cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
@@ -245,6 +272,7 @@ object AndroidInterIntraProceduralModuleBuild {
         AndroidInterIntraProcedural.getClass().getName().dropRight(1),
         Cfg.getClass().getName().dropRight(1),
         Rda.getClass().getName().dropRight(1),
+        OFAPreprocess.getClass().getName().dropRight(1),
         cCfg.getClass().getName().dropRight(1),
         OFAsCfg.getClass().getName().dropRight(1),
         sCfg.getClass().getName().dropRight(1),
