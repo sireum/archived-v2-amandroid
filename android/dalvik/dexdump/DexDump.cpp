@@ -54,6 +54,7 @@
 #include <errno.h>
 #include <assert.h>
 
+static char* toPilar(const char* str); // sankar adds
 
 // #include<map>
  // using namespace std;
@@ -193,10 +194,101 @@ static char* descriptorToDot(const char* str)
     }
     newStr[i+counter] = '\0';
     assert(i == targetLen + arrayDepth * 2);
+    // printf("class descriptor is \n %s \n while pilar format is \n %s \n", newStr, toPilar(newStr)); // *********** this print is only for testing
     //******************* kui's modification ends  *******************
     return newStr;
 }
 
+
+
+/* sankar adds toPilar: This func reformats a class descritptor to the pilar format.  For
+ * example, "int[]" becomes "[|int|][]".
+ */
+static char* toPilar(const char* str)
+{
+    int targetLen = strlen(str) + 4; // [| |] are extra 4 chars
+    int offset = strlen(str) - 1;
+    int arrayDepth = 0;
+    char* newStr = (char*)malloc(targetLen + 1);
+
+    /* strip trailing []s; this will again be added to end */
+    while (offset > 1) {
+		if(str[offset] == ']' && str[offset - 1] == '[')
+         { 
+			 offset = offset - 2;
+			 arrayDepth++;
+		 }
+
+		 else
+			 break;
+        
+    }
+    
+
+
+    /* brace with [| |] i.e. copy class name in the middle */
+
+    int i = 0;
+    newStr[0] = '[';
+	newStr[1] = '|';
+	i = 2;
+    for (int j = 0; j <= offset; j++) {
+         char ch = str[j];
+         newStr[j+2]=ch;
+		 i++;
+    }
+
+    newStr[i++] = '|';
+	newStr[i++] = ']';
+
+    for(int j = 0; j<arrayDepth; j++) {
+	
+	     newStr[i] = '[';
+		 newStr[i+1] = ']';
+		 i = i + 2;
+		
+    }
+
+    newStr[i] = '\0';
+    assert(i == targetLen);
+    return newStr;
+}
+
+
+
+/* sankar adds arraySym: This func checks the array depth of a descriptor and returns correct number of the array symbols.  For
+ * "example, if descriptor starts with [I" then it returns "[]".
+ */
+static char* arraySym(const char* str)
+{
+    int targetLen = strlen(str);
+    int offset = 0;
+    int arrayDepth = 0;
+    char* newStr;
+
+    /* strip leading [s;*/
+    while (targetLen > 1 && str[offset] == '[') {
+        offset++;
+        targetLen--;
+    }
+    arrayDepth = offset;
+
+    newStr = (char*)malloc(2*arrayDepth + 1);
+
+    int i = 0;
+
+    /* add the appropriate number of brackets for arrays */
+    while (arrayDepth-- > 0) {
+        newStr[i] = '[';
+        i++;
+        newStr[i] = ']';
+        i++;
+    }
+   
+    newStr[i] = '\0';
+    assert(i == 2*arrayDepth);
+    return newStr;
+}
 //get only the package name
 static char* getPackageName(const char* str)
 {
@@ -714,20 +806,20 @@ void dumpInterface(const DexFile* pDexFile, const DexTypeItem* pTypeItem,
     if (gOptions.outputFormat == OUTPUT_PLAIN) {
       if(flag==1)
         { 
-			printf(", [|%s|]",descriptorToDot(interfaceName));
-			fprintf(pFp, ", [|%s|]",descriptorToDot(interfaceName));
+			printf(", %s",descriptorToDot(interfaceName));
+			fprintf(pFp, ", %s", toPilar(descriptorToDot(interfaceName)));
 			
 		}
       else if(flag==2)
         { 
-			printf(" [|%s|],",descriptorToDot(interfaceName));
-			fprintf(pFp, " [|%s|],",descriptorToDot(interfaceName));
+			printf(" %s,",descriptorToDot(interfaceName));
+			fprintf(pFp, " %s,",toPilar(descriptorToDot(interfaceName)));
 			
 		}
       else if(flag==0)
         { 
-			printf(" [|%s|]",descriptorToDot(interfaceName));
-			fprintf(pFp, " [|%s|]",descriptorToDot(interfaceName));
+			printf(" %s",descriptorToDot(interfaceName));
+			fprintf(pFp, " %s",toPilar(descriptorToDot(interfaceName)));
 			
 		}
         //******************* kui's modification ends  *******************
@@ -787,7 +879,7 @@ void dumpCatches(DexFile* pDexFile, const DexCode* pCode)
 		   //    printf("end = %d , lastAdd = %d  \n", end, lastAddress);
           /********** sankar ends **********/
 
-            fprintf(pFp,"  catch  [|%s|] @[L%06x..L%06x] goto L%06x;\n", descriptor,((u1*)insns - pDexFile->baseAddr) +start*2,((u1*)insns - pDexFile->baseAddr) +end*2,((u1*)insns - pDexFile->baseAddr) +(handler->address)*2); // sankar
+            fprintf(pFp,"  catch  %s @[L%06x..L%06x] goto L%06x;\n", toPilar(descriptor),((u1*)insns - pDexFile->baseAddr) +start*2,((u1*)insns - pDexFile->baseAddr) +end*2,((u1*)insns - pDexFile->baseAddr) +(handler->address)*2); // sankar
 
             
 			// printf("insns = %06x , pDexFile->baseAddr = %06x , start*2 =  %06x , end*2 = %06x \n", (u1*)insns , pDexFile->baseAddr , start*2 , end*2);
@@ -892,8 +984,8 @@ void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
 				 locVarInf* t1 = (locVarInf*) temp1;
                  if(t1->descriptor && t1->name && !t1->paramFlag)
 				 {
-				    fprintf(pFp, "        [|%s|] v%d @varname [|%s|] @scope ((L%04x,L%04x)",
-				                     t1->descriptor, t1->reg, t1->name, t1->startAddress,  t1->endAddress );
+				    fprintf(pFp, "        %s v%d @varname %s @scope ((L%04x,L%04x)",
+				                     toPilar(t1->descriptor), t1->reg, toPilar(t1->name), t1->startAddress,  t1->endAddress );
 
                     int conflictCount = 0;
 
@@ -1130,7 +1222,7 @@ static char* indexString(DexFile* pDexFile,
             FieldMethodInfo methInfo;
             if (getMethodInfo(pDexFile, index, &methInfo)) {
               {
-                outSize = snprintf(buf, bufSize, "[|%s|]", methInfo.name);
+                outSize = snprintf(buf, bufSize, "%s", toPilar(methInfo.name));
               }
                     //,descriptorToDot(methInfo.classDescriptor));
             } else {
@@ -3109,9 +3201,9 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 				                          // t1->descriptor, t1->name, t1->reg, t1->startAddress,  t1->endAddress );
 
 				                       strcpy(paraThis,""); // initializing with null string
-                                       strcat(paraThis, "[|");
-									   strcat(paraThis, t1->descriptor);
-									   strcat(paraThis, "|]");
+                                       // strcat(paraThis, "[|");
+									   strcat(paraThis, toPilar(t1->descriptor));
+									   // strcat(paraThis, "|]");
 									   char regNamebuff[20];
 									   sprintf(regNamebuff, " v%d", t1->reg);
 									   strcat(paraThis, regNamebuff);
@@ -3186,14 +3278,14 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 
                      {  
 						paramCount++; 
-						strcat(para, "[|"); // sankar added 
-                        strcat(para,tmp);
-						strcat(para, "|]"); // sankar added
+						// strcat(para, "[|"); // sankar added 
+                        strcat(para,toPilar(tmp));
+						// strcat(para, "|]"); // sankar added
                         char buffer[20];  // sankar increased the size 
                         sprintf(buffer, " v%d", startReg++);
                         strcat(para,buffer);
                         if(objectParamFlag==1)
-							strcat(para, "@type (object)");
+							strcat(para, " @type (object)");
 
                         if(*base !=')') strcat(para,", ");
                      }
@@ -3213,8 +3305,8 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 			 strcat(paraTotal, paraThis);
 			 strcat(paraTotal, para);
 
-              fprintf(pFp, "    procedure [|%s|] [|%s.%s|] (%s) @owner [|%s|] @signature [|%s.%s:%s|] @Access %s {\n",
-			            rtype,owner,name,paraTotal,owner,backDescriptor,name,typeDescriptor,accessStr); // not in dexdump
+              fprintf(pFp, "    procedure %s [|%s.%s|] (%s) @owner %s @signature [|%s.%s:%s|] @Access %s {\n",
+			            toPilar(rtype), owner, name, paraTotal, toPilar(owner), backDescriptor, name, typeDescriptor, accessStr); // not in dexdump
              free(rtype);
              free(para);
 			 free(paraThis);
@@ -3369,8 +3461,8 @@ void dumpSField(const DexFile* pDexFile, const DexField* pSField, int i,bool fla
               printf("      type          : '%s'\n", typeDescriptor);
               printf("      access        : 0x%04x (%s)\n",
                   pSField->accessFlags, accessStr); 
-                    if(flag)fprintf(pFp, "      global [|%s|] @@[|%s.%s|]", descriptorToDot(typeDescriptor), className, name); // sankar adds className
-                    else fprintf(pFp, "      [|%s|] [|%s.%s|]",descriptorToDot(typeDescriptor), className, name); // sankar adds className
+                    if(flag)fprintf(pFp, "      global %s @@[|%s.%s|]", toPilar(descriptorToDot(typeDescriptor)), className, name); // sankar adds className
+                    else fprintf(pFp, "      %s [|%s.%s|]",toPilar(descriptorToDot(typeDescriptor)), className, name); // sankar adds className
                     fprintf(pFp, "    @AccessFlag %s;\n",accessStr);
 
             //******************* kui's modification ends  *******************
@@ -3527,10 +3619,10 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
              pInterfaces = dexGetInterfacesList(pDexFile, pClassDef);
             if (superclassDescriptor != NULL && strcmp(superclassDescriptor,"Ljava/lang/Object;")!= 0)
               {
-              fprintf(pFp, "record [|%s|] ", descriptorToDot(classDescriptor)); // not in dexdump
+              fprintf(pFp, "record %s ", toPilar(descriptorToDot(classDescriptor))); // not in dexdump
               if(!((pClassDef->accessFlags)&ACC_INTERFACE)==0)  fprintf(pFp, " @type interface");
               else fprintf(pFp, " @type class"); // not in dexdump
-              fprintf(pFp, " @AccessFlag %s  extends [|%s|]",accessStr,descriptorToDot(superclassDescriptor)); // not in dexdump
+              fprintf(pFp, " @AccessFlag %s  extends %s",accessStr,toPilar(descriptorToDot(superclassDescriptor))); // not in dexdump
               if (pInterfaces != NULL) {
                 for (i = 0; i < (int) pInterfaces->size; i++)
                 	dumpInterface(pDexFile, dexGetTypeItem(pInterfaces, i), i,1);
@@ -3538,7 +3630,7 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
                  }
               }
             else{
-              fprintf(pFp, "record [|%s|] ", descriptorToDot(classDescriptor)); // not in dexdump
+              fprintf(pFp, "record %s ", toPilar(descriptorToDot(classDescriptor))); // not in dexdump
               if(!((pClassDef->accessFlags)&ACC_INTERFACE)==0)  fprintf(pFp, " @type interface"); // not in dexdump
                           else fprintf(pFp, " @type class"); // not in dexdump
                           fprintf(pFp, " @AccessFlag %s ",accessStr); // not in dexdump
