@@ -215,7 +215,7 @@ static char* pilarExtName(const char* str)
  #define  outConstWide(x, y)       fprintf(pFp,"v%d:= %fL  @length wide;", x, y)
  #define  outConstWideHigh16(x, y) fprintf(pFp,"v%d:= %lldL  @length wide_high16;", x, y)
  #define  outConstString(x, y)     fprintf(pFp,"v%d:= \"%s\" @type (object, string);", x, y)  // adding annotation in pilar for const string to treat it as object
- #define  outConstClass(x, y)      fprintf(pFp,"v%d:= %s;", x, toPilar(y))
+ #define  outConstClass(x, y)      fprintf(pFp,"v%d:= new %s;", x, toPilarS(y))
  #define  outMonitorEnter(x)       fprintf(pFp,"(@monitorenter v%d)", x)
  #define  outMonitorExit(x)        fprintf(pFp,"(@monitorexit v%d)", x)
  #define  outCheckCast(x, y, z)    fprintf(pFp,"v%d:= (%s)v%d;", x, toPilar(y), z)
