@@ -7,6 +7,114 @@
 
 
 
+
+/* sankar adds toPilar: This func reformats a class descritptor to the pilar format.  For
+ * example, "int[]" becomes "[|int|][]".
+ */
+static char* toPilar(const char* str)
+{
+    int targetLen = strlen(str) + 4; // [| |] are extra 4 chars
+    int offset = strlen(str) - 1;
+    int arrayDepth = 0;
+    char* newStr = (char*)malloc(targetLen + 1);
+
+    /* strip trailing []s; this will again be added to end */
+    while (offset > 1) {
+		if(str[offset] == ']' && str[offset - 1] == '[')
+         { 
+			 offset = offset - 2;
+			 arrayDepth++;
+		 }
+
+		 else
+			 break;
+        
+    }
+    
+
+
+    /* brace with [| |] i.e. copy class name in the middle */
+
+    int i = 0;
+    newStr[0] = '[';
+	newStr[1] = '|';
+	i = 2;
+    for (int j = 0; j <= offset; j++) {
+         char ch = str[j];
+         newStr[j+2]=ch;
+		 i++;
+    }
+
+    newStr[i++] = '|';
+	newStr[i++] = ']';
+
+    for(int j = 0; j<arrayDepth; j++) {
+	
+	     newStr[i] = '[';
+		 newStr[i+1] = ']';
+		 i = i + 2;
+		
+    }
+
+    newStr[i] = '\0';
+    assert(i == targetLen);
+    return newStr;
+}
+
+
+
+
+/* sankar adds toPilarS: This func reformats a class descritptor to the pilar format.  S stands for special reformat. For
+ * example, "byte[v3]" becomes "[|byte|][v3]".
+ */
+static char* toPilarS(const char* str)
+{
+    int targetLen = strlen(str) + 4; // [| |] are extra 4 chars
+    int offset = 0;
+    int leng = strlen(str);
+    char* newStr = (char*)malloc(targetLen + 1);
+    bool arrayFlag = false;
+
+    /* move the offset to the first [ of trailing []s or [v1]s */
+    while(offset < leng){
+
+       if(str[offset] == '['){
+		 arrayFlag = true;
+		 break;
+	   }
+
+	   offset++;
+	}
+
+
+
+    /* brace with [| |] i.e. copy class name in the middle */
+
+    int i = 0;
+    newStr[0] = '[';
+	newStr[1] = '|';
+	i = 2;
+    for (int j = 0; j < offset; j++) {
+         char ch = str[j];
+         newStr[j+2]=ch;
+		 i++;
+    }
+
+    newStr[i++] = '|';
+	newStr[i++] = ']';
+
+    for(int j = offset; j < leng; j++) {
+	     char ch = str[j];
+	     newStr[i] = ch;
+		 i++;
+		
+    }
+
+    newStr[i] = '\0';
+    assert(i == targetLen);
+    return newStr;
+}
+
 struct locVarInfo {  // sankar adds this struct which can store one local variable info 
 	
 	char* descriptor;
@@ -114,7 +222,7 @@ static char* pilarExtName(const char* str)
  #define  outInstanceOf(x, y, z)   fprintf(pFp,"v%d:= instanceof @varname v%d @type [|%s|];", x, y, z)
  #define  outArrayLen(x, y)        fprintf(pFp,"v%d:= v%d.length;", x, y)
  #define  outNewIns(x, y)          fprintf(pFp,"v%d:= new %s;", x, toPilar(y))
- #define  outNewArray(x, y)        fprintf(pFp,"v%d:= new %s;", x, toPilar(y))
+ #define  outNewArray(x, y)        fprintf(pFp,"v%d:= new %s;", x, toPilarS(y))
 
 
  #define  outFilledNewArray(x, y, z)  {\
