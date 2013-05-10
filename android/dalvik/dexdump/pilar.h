@@ -111,7 +111,7 @@ static char* pilarExtName(const char* str)
  #define  outMonitorEnter(x)       fprintf(pFp,"(@monitorenter v%d)", x)
  #define  outMonitorExit(x)        fprintf(pFp,"(@monitorexit v%d)", x)
  #define  outCheckCast(x, y, z)    fprintf(pFp,"v%d:= (%s)v%d;", x, toPilar(y), z)
- #define  outInstanceOf(x, y, z)   fprintf(pFp,"v%d:= instanceof(v%d, %s);", x, y, toPilar(z))
+ #define  outInstanceOf(x, y, z)   fprintf(pFp,"v%d:= instanceof @varname v%d @type %s;", x, y, z)
  #define  outArrayLen(x, y)        fprintf(pFp,"v%d:= v%d.length;", x, y)
  #define  outNewIns(x, y)          fprintf(pFp,"v%d:= new %s;", x, toPilar(y))
  #define  outNewArray(x, y)        fprintf(pFp,"v%d:= new %s;", x, toPilar(y))
@@ -254,8 +254,8 @@ char* cut2Char(char* proc)
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type (object, object_init);",methInfo.classDescriptor, methInfo.name,\
-                   methInfo.signature,descriptorToDot(methInfo.classDescriptor));\
+               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor %s @type (object, object_init);",methInfo.classDescriptor, methInfo.name,\
+                   methInfo.signature, toPilar(descriptorToDot(methInfo.classDescriptor)));\
          }\
      }
 
@@ -271,8 +271,8 @@ char* cut2Char(char* proc)
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type virtual;",methInfo.classDescriptor, methInfo.name,\
-                   methInfo.signature,descriptorToDot(methInfo.classDescriptor));\
+               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor %s @type virtual;",methInfo.classDescriptor, methInfo.name,\
+                   methInfo.signature, toPilar(descriptorToDot(methInfo.classDescriptor)));\
          }\
      }
 
@@ -321,8 +321,8 @@ char* cut2Char(char* proc)
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type super;",methInfo.classDescriptor, methInfo.name,\
-                   methInfo.signature,descriptorToDot(methInfo.classDescriptor));\
+               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor %s @type super;",methInfo.classDescriptor, methInfo.name,\
+                   methInfo.signature, toPilar(descriptorToDot(methInfo.classDescriptor)));\
          }\
 	}
 
@@ -370,8 +370,8 @@ char* cut2Char(char* proc)
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type direct;",methInfo.classDescriptor, methInfo.name,\
-                   methInfo.signature,descriptorToDot(methInfo.classDescriptor));\
+               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor %s @type direct;",methInfo.classDescriptor, methInfo.name,\
+                   methInfo.signature, toPilar(descriptorToDot(methInfo.classDescriptor)));\
          }\
 	}
 
@@ -387,8 +387,8 @@ char* cut2Char(char* proc)
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type static;",methInfo.classDescriptor, methInfo.name,\
-                   methInfo.signature,descriptorToDot(methInfo.classDescriptor));\
+               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor %s @type static;",methInfo.classDescriptor, methInfo.name,\
+                   methInfo.signature, toPilar(descriptorToDot(methInfo.classDescriptor)));\
          }\
 	}
 	
@@ -405,8 +405,8 @@ char* cut2Char(char* proc)
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type interface;",methInfo.classDescriptor, methInfo.name,\
-                   methInfo.signature,descriptorToDot(methInfo.classDescriptor));\
+               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor %s @type interface;",methInfo.classDescriptor, methInfo.name,\
+                   methInfo.signature, toPilar(descriptorToDot(methInfo.classDescriptor)));\
          }\
 	}
 
@@ -421,8 +421,8 @@ char* cut2Char(char* proc)
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type virtual;",methInfo.classDescriptor, methInfo.name, \
-                           methInfo.signature,descriptorToDot(methInfo.classDescriptor)); \
+          fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor %s @type virtual;",methInfo.classDescriptor, methInfo.name, \
+                           methInfo.signature, toPilar(descriptorToDot(methInfo.classDescriptor))); \
           } \
   }
 
@@ -473,8 +473,8 @@ char* cut2Char(char* proc)
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type super;",methInfo.classDescriptor, methInfo.name, \
-                           methInfo.signature,descriptorToDot(methInfo.classDescriptor)); \
+          fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor %s @type super;",methInfo.classDescriptor, methInfo.name, \
+                           methInfo.signature, toPilar(descriptorToDot(methInfo.classDescriptor))); \
           } \
   }
 
@@ -523,8 +523,8 @@ char* cut2Char(char* proc)
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type direct;",methInfo.classDescriptor, methInfo.name, \
-                           methInfo.signature,descriptorToDot(methInfo.classDescriptor)); \
+          fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor %s @type direct;",methInfo.classDescriptor, methInfo.name, \
+                           methInfo.signature, toPilar(descriptorToDot(methInfo.classDescriptor))); \
           } \
   }
 
@@ -540,8 +540,8 @@ char* cut2Char(char* proc)
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type static;",methInfo.classDescriptor, methInfo.name, \
-                           methInfo.signature,descriptorToDot(methInfo.classDescriptor)); \
+          fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor %s @type static;",methInfo.classDescriptor, methInfo.name, \
+                           methInfo.signature, toPilar(descriptorToDot(methInfo.classDescriptor))); \
           } \
   }
 
@@ -556,8 +556,8 @@ char* cut2Char(char* proc)
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type interface;",methInfo.classDescriptor, methInfo.name, \
-                           methInfo.signature,descriptorToDot(methInfo.classDescriptor)); \
+          fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor %s @type interface;",methInfo.classDescriptor, methInfo.name, \
+                           methInfo.signature, toPilar(descriptorToDot(methInfo.classDescriptor))); \
           } \
   }
 
