@@ -90,7 +90,8 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
 
         /*end here*/
         
-        val libInfoDir = new File(d+"result/libInfoDataBase")
+//        val libInfoDir = new File(d+"result/libInfoDataBase")
+        val libInfoDir = new File(d+"pilar/result/libInfoDataBase")
         if(!libInfoDir.exists()){
           libInfoDir.mkdir()
         }
@@ -138,8 +139,12 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
           case (v, o) =>
             xStream.toXml(v, o)
         }
+        val unSerializer : InputStream --> Any = {
+          case (v) =>
+            xStream.fromXml(v)
+        }
         aCache.setRootDirectory(libInfoDir + "/")
-        aCache.setValueSerializer(serializer, null)
+        aCache.setValueSerializer(serializer, unSerializer)
         AndroidInterIntraProceduralModule.setParallel(options, false)
         AndroidInterIntraProceduralModule.setAndroidCache(options, Some(aCache))
         AndroidInterIntraProceduralModule.setShouldBuildCfg(options, true)
@@ -171,29 +176,41 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         println("start convert AVMT to xml!")
         xStream.toXml(avmt, outerAVMT)
         
-//        println("start convert cfgs, rdas, ofgs to xml!")
-//        val intraResult = AndroidInterIntraProceduralModule.getIntraResult(options)
-//        intraResult.keys.foreach(
-//          key =>
-//          {
-//            aCache.save[AndroidInterIntraProcedural.CFG](key, "cfg", intraResult(key).cfg)
-//            intraResult(key).rdaOpt match {
-//              case Some(rda) =>
-//                aCache.save[AndroidInterIntraProcedural.RDA](key, "rda", rda)
-//              case None =>
-//            }
-//            intraResult(key).ofgOpt match {
-//              case Some(ofg) =>
-//                aCache.save[AndroidInterIntraProcedural.OFG](key, "ofg", ofg)
-//              case None =>
-//            }
-//            intraResult(key).cCfgOpt match {
-//              case Some(cCfg) =>
-//                aCache.save[AndroidInterIntraProcedural.CCFG](key, "cCfg", cCfg)
-//              case None =>
-//            }
-//          }  
-//        )
+        println("start convert cfgs, rdas, ofgs to xml!")
+        val intraResult = AndroidInterIntraProceduralModule.getIntraResult(options)
+        intraResult.keys.foreach(
+          key =>
+          {
+//            val ofg = aCache.load[AndroidInterIntraProcedural.OFG](key, "ofg")
+//            val w = new java.io.PrintWriter(System.out, true)
+//            ofg.toDot(w)
+            
+            aCache.save[AndroidInterIntraProcedural.CFG](key, "cfg", intraResult(key).cfg)
+            intraResult(key).rdaOpt match {
+              case Some(rda) =>
+                val cfg = intraResult(key).cfg
+                val es : MMap[org.sireum.alir.ControlFlowGraph.Node, ISet[(org.sireum.alir.Slot, org.sireum.alir.DefDesc)]] = mmapEmpty
+                cfg.nodes.foreach(
+                  node => {
+                    es(node) = rda.entrySet(node)
+                  }  
+                )
+                aCache.save[MMap[org.sireum.alir.ControlFlowGraph.Node, ISet[(org.sireum.alir.Slot, org.sireum.alir.DefDesc)]]](key, "rda", es)
+              case None =>
+            }
+            intraResult(key).ofgOpt match {
+              case Some(ofg) =>
+//                ofg.toDot(w)
+                aCache.save[AndroidInterIntraProcedural.OFG](key, "ofg", ofg)
+              case None =>
+            }
+            intraResult(key).cCfgOpt match {
+              case Some(cCfg) =>
+                aCache.save[AndroidInterIntraProcedural.CCFG](key, "cCfg", cCfg)
+              case None =>
+            }
+          }  
+        )
         
         println("###############################################")
     }
@@ -229,12 +246,12 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         false,
         PilarAndroidSymbolResolverModule
       )
-//      ,
-//      PipelineStage(
-//        "Android InterIntraProcedural Analysis",
-//        false,
-//        AndroidInterIntraProceduralModule
-//      )
+      ,
+      PipelineStage(
+        "Android InterIntraProcedural Analysis",
+        false,
+        AndroidInterIntraProceduralModule
+      )
     )
     
 }

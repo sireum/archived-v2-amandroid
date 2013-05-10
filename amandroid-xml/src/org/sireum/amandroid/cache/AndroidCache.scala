@@ -25,7 +25,7 @@ final class AndroidCacheFile[K] extends CacheProvider[K] with FileCaseFactory[K]
     outer.close()
   }
   
-  def save[T](key : K, fileName : String, value : T) = {
+  def save[T](key : K, fileName : K, value : T) = {
     require(!rootDirectory.equals(null))
     setFileOutputStream(key, fileName)
     serializer((value, outer))
@@ -39,6 +39,27 @@ final class AndroidCacheFile[K] extends CacheProvider[K] with FileCaseFactory[K]
       cacheMap(key)._1.asInstanceOf[T]
     } else {
       setFileInputStream(key)
+      val value = unSerializer(inner).asInstanceOf[T]
+      inner.close()
+      if(size == 0){
+        //do nothing
+      } else if(cacheMap.size <= size){
+        cacheMap(key) = (value, 1)
+      } else {
+        collectCacheMap()
+        cacheMap(key) = (value, 1)
+      }
+      value
+    }
+  }
+  
+  def load[T](key : K, fileName : K) : T = {
+    require(!rootDirectory.equals(null))
+    if(cacheMap.contains(key)){
+      cacheUpdate(key)
+      cacheMap(key)._1.asInstanceOf[T]
+    } else {
+      setFileInputStream(key, fileName)
       val value = unSerializer(inner).asInstanceOf[T]
       inner.close()
       if(size == 0){
@@ -94,7 +115,7 @@ final class AndroidCacheFile[K] extends CacheProvider[K] with FileCaseFactory[K]
     formatProcedureUri(pUri) + ".xml.zip"
   }
   
-  def fileNameBuilder(pUri : ResourceUri, name : String) : FileResourceUri = {
+  def fileNameBuilder(pUri : ResourceUri, name : ResourceUri) : FileResourceUri = {
     formatProcedureUri(pUri) + "/" + name + ".xml.zip"
   }
   
@@ -119,25 +140,25 @@ final class AndroidCacheFile[K] extends CacheProvider[K] with FileCaseFactory[K]
     outer = new GZIPOutputStream(new FileOutputStream(file))
   }
   
-  def setFileInputStream(key : K, name : String) = {
+  def setFileInputStream(key : K, name : K) = {
     var fileName : String = null
     key match {
       case pUri : ResourceUri =>
-        val fileDir = new File(rootDirectory + pUri)
+        val fileDir = new File(rootDirectory + formatProcedureUri(pUri) + "/")
         if(!fileDir.exists()) fileDir.mkdir()
-        fileName = rootDirectory + fileNameBuilder(pUri, name)
+        fileName = rootDirectory + fileNameBuilder(pUri, name.asInstanceOf[ResourceUri])
       case _ =>
     }
     inner = new GZIPInputStream(new FileInputStream(fileName))
   }
     
-  def setFileOutputStream(key : K, name : String) = {
+  def setFileOutputStream(key : K, name : K) = {
     var fileName : String = null
     key match {
       case pUri : ResourceUri =>
-        val fileDir = new File(rootDirectory + formatProcedureUri(pUri))
-        if(!fileDir.exists()) fileDir.mkdir()
-        fileName = rootDirectory + fileNameBuilder(pUri, name)
+        val fileDir = new File(rootDirectory + formatProcedureUri(pUri) + "/")
+        if(!fileDir.exists()){fileDir.mkdir()}
+        fileName = rootDirectory + fileNameBuilder(pUri, name.asInstanceOf[ResourceUri])
       case _ =>
     }
     val file = new File(fileName)

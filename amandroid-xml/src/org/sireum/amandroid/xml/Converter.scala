@@ -318,3 +318,40 @@ class HashBiMapConverter( _mapper : Mapper )  extends AbstractCollectionConverte
     hbm
   }
 }
+
+//class RDAConverter( _mapper : Mapper )  extends AbstractCollectionConverter(_mapper) {
+//  /** Helper method to use x.getClass
+//   * 
+//   */
+//  def getAnyClass(x: Any) = x.asInstanceOf[AnyRef].getClass
+//
+//  def canConvert( clazz: Class[_]) = {       
+//    classOf[ReachingDefinitionAnalysis.Result] == clazz
+//  }
+//
+//  def marshal( value: Any, writer: HierarchicalStreamWriter, context: MarshallingContext) = {
+//    val rda = value.asInstanceOf[ReachingDefinitionAnalysis.Result]
+//    writer.startNode("entrySet")
+//    writeItem(rda.entrySet, context, writer)
+//    writer.endNode()
+//  }
+//
+//  def unmarshal( reader: HierarchicalStreamReader, context: UnmarshallingContext ) = {
+////    println(context.getRequiredType())
+//    val rda : ReachingDefinitionAnalysis.Result = new ReachingDefinitionAnalysis.Result
+//    while (reader.hasMoreChildren()) {
+//      var key : Any = null
+//      var value : Any = null
+//      reader.moveDown()
+//      reader.moveDown()
+//      key = readItem(reader, context, key)
+//      reader.moveUp()
+//      reader.moveDown()
+//      value = readItem(reader, context, value)
+//      reader.moveUp()
+//      reader.moveUp()
+//      mmap(key) = value
+//    }
+//    mmap
+//  }
+//}

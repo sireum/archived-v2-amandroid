@@ -56,10 +56,19 @@ class ObjectFlowGraph[Node <: OfaNode]
    * to the given program point. If a value is added to a node, then that 
    * node is added to the worklist.
    */
-  def constructGraph(p : Point, cfg : ControlFlowGraph[String], rda : ReachingDefinitionAnalysis.Result) = {
-    collectNodes(p)
-    val constraintMap = applyConstraint(p, points, cfg, rda)
-    buildingEdges(constraintMap)
+  def constructGraph(ps : MList[Point], cfg : ControlFlowGraph[String], rda : ReachingDefinitionAnalysis.Result) = {
+    fixArrayVar(ps, cfg, rda)
+    ps.foreach(
+      p=>{
+        collectNodes(p)
+      }  
+    )
+    ps.foreach(
+      p=>{
+        val constraintMap = applyConstraint(p, points, cfg, rda)
+        buildingEdges(constraintMap)
+      }  
+    )
   }
   
   /**
@@ -128,7 +137,7 @@ class ObjectFlowGraph[Node <: OfaNode]
                 rhs match {
                   case pgar : PointGlobalArrayR =>
                   case pfr : PointFieldR =>
-                    udChain(pfr.basePoint, ps, cfg, rda).foreach(
+                    udChain(pfr.basePoint, ps, cfg, rda, true).foreach(
                       point => {
                       }
                     )
@@ -150,7 +159,7 @@ class ObjectFlowGraph[Node <: OfaNode]
                   case po : PointO =>
                   case pi : PointI =>
                   case pr : PointR =>
-                    udChain(pr, ps, cfg, rda).foreach(
+                    udChain(pr, ps, cfg, rda, true).foreach(
                       point => {
                         if(arrayRepo.contains(point.toString())){
                           arrayRepo(pr.toString) = arrayRepo(point.toString())
@@ -167,7 +176,7 @@ class ObjectFlowGraph[Node <: OfaNode]
             case pi : PointI =>
                   pi.args.keys.foreach(
                     i => {
-                      udChain(pi.args(i), ps, cfg, rda).foreach(
+                      udChain(pi.args(i), ps, cfg, rda, true).foreach(
                         point => {
                           if(arrayRepo.contains(point.toString())){
                             if(!arrayRepo.contains(pi.args(i).toString)){
@@ -182,7 +191,7 @@ class ObjectFlowGraph[Node <: OfaNode]
             case retP : PointRet =>
               retP.procPoint.retVar match{
                 case Some(rev) =>
-                  udChain(retP, ps, cfg, rda).foreach(
+                  udChain(retP, ps, cfg, rda, true).foreach(
                     point => {
                       if(arrayRepo.contains(point.toString())){
                         if(!arrayRepo.contains(retP.toString)){
@@ -714,11 +723,12 @@ class ObjectFlowGraph[Node <: OfaNode]
         case n : OfaNode => {
           n.toString().replaceAll("pilar:/procedure/[a-zA-Z0-9]*/%5B%7C", "")
                 .replaceAll("%7C%5D/[0-9]*/[0-9]*/", "_")
-                .replaceAll("[:./;\\ ]", "_")
+                .replaceAll("[-:./;\\ ]", "_")
                 .replaceAll("@", "_AT_")
                 .replaceAll("=", "_EQ_")
+                .replaceAll("\\$", "_DOLLAR_")
                 .replaceAll("%3[CE]", "")
-                .replaceAll("[\\[\\]()<>\"\\|]", "")
+                .replaceAll("[\\[\\]()<>\"\\|\\']", "")
         }
       }
     }
