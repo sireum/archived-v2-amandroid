@@ -61,7 +61,7 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
       info.exception = Some(ErrorneousModulesThrowable(
         j.lastStageInfo.info.filter { i => i.hasError }))
     }
-    println(Tag.collateAsString(j.lastStageInfo.tags))
+//    println(Tag.collateAsString(j.lastStageInfo.tags))
     val pool = CfgModule.getPool(options)
     val cfg = CfgModule.getCfg(options)
     val rdaOpt = if (this.shouldBuildRda) Some(RdaModule.getRda(options)) else None
@@ -83,7 +83,10 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
 
   val col : GenSeq[ProcedureSymbolTable] = if (par) psts.par else psts
   println("intra analysis start! procudure number = " + col.size)
+  var i =0;
   (col.map { pst =>
+    i+=1
+    println(i)
     compute(pst)
   }).foreach { p =>
     intraResults(first2(p)) = second2(p)
@@ -124,7 +127,7 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
         info.exception = Some(ErrorneousModulesThrowable(
           j.lastStageInfo.info.filter { i => i.hasError }))
       }
-      println(Tag.collateAsString(j.lastStageInfo.tags))
+//      println(Tag.collateAsString(j.lastStageInfo.tags))
       val sCfg = if (this.shouldBuildSCfg) Some(sCfgModule.getSCfg(options)) else None
       this.interResult_=(AndroidInterIntraProcedural.AndroidInterAnalysisResult(
           sCfg
@@ -142,7 +145,7 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
         info.exception = Some(ErrorneousModulesThrowable(
           j.lastStageInfo.info.filter { i => i.hasError }))
       }
-      println(Tag.collateAsString(j.lastStageInfo.tags))
+//      println(Tag.collateAsString(j.lastStageInfo.tags))
       val ofaScfg = if (this.shouldBuildOFAsCfg) Some(OFAsCfgModule.getOFAsCfg(options)) else None
       this.interResult_=(AndroidInterIntraProcedural.AndroidInterAnalysisResult(
           ofaScfg

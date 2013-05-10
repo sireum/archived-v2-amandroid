@@ -84,15 +84,14 @@ object ObjectFlowGraphBuilder {
             androidCache : AndroidCacheFile[String]) = {
     val points = new PointsCollector().points(pst, ofg)
     ofg.points ++= points
-    ofg.fixArrayVar(points, cfg, rda)
     points.foreach(
       point => {
         if(point.isInstanceOf[PointProc]){
           processed(pst.procedureUri) = point.asInstanceOf[PointProc]
         }
-        ofg.constructGraph(point, cfg, rda)
       }
     )
+    ofg.constructGraph(points, cfg, rda)
     fix(ofg, androidVirtualMethodTables, androidCache)
   }
   
@@ -165,15 +164,14 @@ object ObjectFlowGraphBuilder {
         val rda = rdas(callee)
         points ++= new PointsCollector().points(pstMap(callee), ofg)
         ofg.points ++= points
-        ofg.fixArrayVar(points, cfg, rda)
         points.foreach(
           point => {
             if(point.isInstanceOf[PointProc]){
               processed(callee) = point.asInstanceOf[PointProc]
             }
-            ofg.constructGraph(point, cfg, rda)
           }
         )
+        ofg.constructGraph(points, cfg, rda)
       } else {
         //need to extend
       }

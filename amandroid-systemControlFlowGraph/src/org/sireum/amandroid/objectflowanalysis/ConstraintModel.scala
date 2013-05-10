@@ -79,7 +79,7 @@ trait ConstraintModel {
                 }
               )
             } else {
-              udChain(pr, ps, cfg, rda).foreach(
+              udChain(pr, ps, cfg, rda, true).foreach(
                 point => {
                   flowMap.getOrElseUpdate(point, msetEmpty) += pr
                 }
@@ -89,7 +89,7 @@ trait ConstraintModel {
       case pi : PointI =>
             if(!pi.typ.equals("static")){
               val recvP = pi.recv
-              udChain(recvP, ps, cfg, rda).foreach(
+              udChain(recvP, ps, cfg, rda, true).foreach(
                 point => {
                   flowMap.getOrElseUpdate(point, msetEmpty) += recvP
                 }
@@ -98,14 +98,14 @@ trait ConstraintModel {
             pi.args.keys.foreach(
               i => {
                 if(arrayRepo.contains(pi.args(i).toString)){
-                  udChain(pi.args(i), ps, cfg, rda).foreach(
+                  udChain(pi.args(i), ps, cfg, rda, true).foreach(
                     point => {
                       flowMap.getOrElseUpdate(point, msetEmpty) += pi.args(i)
                       flowMap.getOrElseUpdate(pi.args(i), msetEmpty) += point
                     }
                   )
                 } else {
-                  udChain(pi.args(i), ps, cfg, rda).foreach(
+                  udChain(pi.args(i), ps, cfg, rda, true).foreach(
                     point => {
                       flowMap.getOrElseUpdate(point, msetEmpty) += pi.args(i)
                     }
@@ -119,7 +119,7 @@ trait ConstraintModel {
         retP.procPoint.retVar match{
           case Some(rev) =>
             flowMap.getOrElseUpdate(retP, msetEmpty) += rev
-            udChain(retP, ps, cfg, rda).foreach(
+            udChain(retP, ps, cfg, rda, true).foreach(
               point => {
                 flowMap.getOrElseUpdate(point, msetEmpty) += retP
               }
@@ -135,7 +135,8 @@ trait ConstraintModel {
   def udChain(p : PointWithIndex,
               points : MList[Point],
               cfg : ControlFlowGraph[String],
-              rda : ReachingDefinitionAnalysis.Result) : MSet[Point] = {
+              rda : ReachingDefinitionAnalysis.Result,
+              avoidMode : Boolean = true) : MSet[Point] = {
     val ps : MSet[Point] = msetEmpty
     val slots = rda.entrySet(cfg.getNode(Some(p.locationUri), p.locationIndex))
     slots.foreach(
@@ -144,14 +145,19 @@ trait ConstraintModel {
           val (slot, defDesc) = item.asInstanceOf[(Slot, DefDesc)]
           if(p.varName.equals(slot.toString())){
             if(defDesc.toString().equals("*")){
-              if(!p.varName.startsWith("@@"))
-                ps += getPoint(p.varName, points)
+              if(!p.varName.startsWith("@@")){
+                val tp = getPoint(p.varName, points, avoidMode)
+                if(tp!=null)
+                        ps += tp
+              }
             } else {
               defDesc match {
                 case ldd : LocDefDesc => 
                   ldd.locUri match {
-                    case Some(locU) => 
-                      ps += getPoint(p.varName, locU, ldd.locIndex, points)
+                    case Some(locU) =>
+                      val tp = getPoint(p.varName, locU, ldd.locIndex, points, avoidMode)
+                      if(tp!=null)
+                        ps += tp
                     case _ =>
                   }
                 case _ =>
@@ -164,7 +170,7 @@ trait ConstraintModel {
     ps
   }
   
-  def getPoint(uri : ResourceUri, locUri : ResourceUri, locIndex : Int, ps : MList[Point]) : Point = {
+  def getPoint(uri : ResourceUri, locUri : ResourceUri, locIndex : Int, ps : MList[Point], avoidMode : Boolean) : Point = {
     var point : Point = null
     ps.foreach(
       p => {
@@ -183,11 +189,12 @@ trait ConstraintModel {
       }
       
     )
-    require(point != null)
+    if(!avoidMode)
+      require(point != null)
     point
   }
   
-  def getPoint(uri : ResourceUri, ps : MList[Point]) : Point = {
+  def getPoint(uri : ResourceUri, ps : MList[Point], avoidMode : Boolean) : Point = {
     var point : Point = null
     ps.foreach(
       p => {
@@ -202,7 +209,6 @@ trait ConstraintModel {
             }
             pp.params.foreach(
               pa => {
-                println("param-->" + pa)
                 if(pa._2.varName.equals(uri)){
                   point = pa._2
                 }
@@ -212,7 +218,8 @@ trait ConstraintModel {
         }
       }  
     )
-    require(point != null)
+    if(!avoidMode)
+      require(point != null)
     point
   }
   

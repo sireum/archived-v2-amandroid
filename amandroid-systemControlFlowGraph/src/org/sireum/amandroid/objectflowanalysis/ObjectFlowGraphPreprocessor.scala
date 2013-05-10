@@ -24,6 +24,7 @@ object ObjectFlowGraphPreprocessor {
             rda : ReachingDefinitionAnalysis.Result,
             androidVirtualMethodTables : AndroidVirtualMethodTables) : ObjectFlowGraph[Node] = {
     val result = new ObjectFlowGraph[Node]
+    doOFA(pst, cfg,rda, result, androidVirtualMethodTables)
     result
   }
   
@@ -34,11 +35,6 @@ object ObjectFlowGraphPreprocessor {
             androidVirtualMethodTables : AndroidVirtualMethodTables) = {
     val points = new PointsCollector().points(pst, ofg)
     ofg.points ++= points
-    ofg.fixArrayVar(points, cfg, rda)
-    points.foreach(
-      point => {
-        ofg.constructGraph(point, cfg, rda)
-      }
-    )
+    ofg.constructGraph(points, cfg, rda)
   }
 }
