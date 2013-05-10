@@ -27,6 +27,8 @@ import org.sireum.amandroid.module.AndroidInterIntraProcedural
 import org.sireum.amandroid.module.AndroidInterIntraProceduralModule
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
 import org.sireum.amandroid.cache.AndroidCacheFile
+import org.sireum.alir.ControlFlowGraph
+import org.sireum.amandroid.module.AndroidInterIntraProcedural
 
 trait AmandroidAnalyseLibraryFrameWork extends TestFramework { 
   
@@ -82,14 +84,16 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         /*end here*/
         /*for start analysis from pilar file*/
         val resDir = new File(d+"result")
-        val ccfgDir = new File(d+"result/ccfgs")
         if(!resDir.exists()){
           resDir.mkdir()
         }
-        if(!ccfgDir.exists()){
-          ccfgDir.mkdir()
-        }
+
         /*end here*/
+        
+        val libInfoDir = new File(d+"result/libInfoDataBase")
+        if(!libInfoDir.exists()){
+          libInfoDir.mkdir()
+        }
         
         //deal with jar file
 //        val apkName = f.getName()
@@ -134,17 +138,14 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
           case (v, o) =>
             xStream.toXml(v, o)
         }
-        aCache.setRootDirectory(ccfgDir + "/")
+        aCache.setRootDirectory(libInfoDir + "/")
         aCache.setValueSerializer(serializer, null)
-//        AndroidInterIntraProceduralModule.setParallel(options, false)
-//        AndroidInterIntraProceduralModule.setAndroidCache(options, aCache)
-//        AndroidInterIntraProceduralModule.setShouldBuildCfg(options, true)
-//        AndroidInterIntraProceduralModule.setShouldBuildRda(options, false)
-//        AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, false)
-//        AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, false)
-//        AndroidInterIntraProceduralModule.setShouldBuildCSCfg(options, false)
-//        AndroidInterIntraProceduralModule.setShouldBuildOFAsCfg(options, false)
-//        AndroidInterIntraProceduralModule.setAPIpermOpt(options, None)
+        AndroidInterIntraProceduralModule.setParallel(options, false)
+        AndroidInterIntraProceduralModule.setAndroidCache(options, Some(aCache))
+        AndroidInterIntraProceduralModule.setShouldBuildCfg(options, true)
+        AndroidInterIntraProceduralModule.setShouldBuildRda(options, true)
+        AndroidInterIntraProceduralModule.setShouldPreprocessOfg(options, true)
+        AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
         pipeline.compute(job)
 
         if(job.hasError){
@@ -170,14 +171,29 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         println("start convert AVMT to xml!")
         xStream.toXml(avmt, outerAVMT)
         
-//        println("start convert graph to xml!")
-//        val cCfgs = AndroidInterIntraProceduralModule.getIntraResult_cCfg(options)
-//        cCfgs.foreach(
-//          item =>
-//          {
-////            aCache.save[CompressedControlFlowGraph[String]](item._1, item._2)
-//          }  
-//        )
+        println("start convert cfgs, rdas, ofgs to xml!")
+        val intraResult = AndroidInterIntraProceduralModule.getIntraResult(options)
+        intraResult.keys.foreach(
+          key =>
+          {
+            aCache.save[AndroidInterIntraProcedural.CFG](key, "cfg", intraResult(key).cfg)
+//            intraResult(key).rdaOpt match {
+//              case Some(rda) =>
+//                aCache.save[AndroidInterIntraProcedural.RDA](key, "rda", rda)
+//              case None =>
+//            }
+            intraResult(key).ofgOpt match {
+              case Some(ofg) =>
+                aCache.save[AndroidInterIntraProcedural.OFG](key, "ofg", ofg)
+              case None =>
+            }
+            intraResult(key).cCfgOpt match {
+              case Some(cCfg) =>
+                aCache.save[AndroidInterIntraProcedural.CCFG](key, "cCfg", cCfg)
+              case None =>
+            }
+          }  
+        )
         
         println("###############################################")
     }
@@ -213,12 +229,12 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         false,
         PilarAndroidSymbolResolverModule
       )
-//      ,
-//      PipelineStage(
-//        "Android InterIntraProcedural Analysis",
-//        false,
-//        AndroidInterIntraProceduralModule
-//      )
+      ,
+      PipelineStage(
+        "Android InterIntraProcedural Analysis",
+        false,
+        AndroidInterIntraProceduralModule
+      )
     )
     
 }

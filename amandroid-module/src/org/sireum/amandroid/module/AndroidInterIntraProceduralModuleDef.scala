@@ -15,6 +15,7 @@ import org.sireum.pipeline.PipelineStage
 import org.sireum.pipeline.PipelineConfiguration
 import org.sireum.amandroid.objectflowanalysis.ObjectFlowGraphBuilder
 import org.sireum.alir.ReachingDefinitionAnalysis
+import org.sireum.amandroid.objectflowanalysis.ObjectFlowGraphPreprocessor
 
 
 /**
@@ -28,6 +29,7 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
   type VirtualLabel = String
   val par = this.parallel
   val aCache = this.androidCache
+  val avmt = this.androidVirtualMethodTables
   val st = this.symbolTable
   val psts = st.procedureSymbolTables.toSeq
   val siff = this.shouldIncludeFlowFunction
@@ -52,6 +54,7 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
     AndroidInterIntraProceduralModule.setDefRef(options, dr)
     AndroidInterIntraProceduralModule.setIsInputOutputParamPredicate(options, iopp)
     AndroidInterIntraProceduralModule.setSwitchAsOrderedMatch(options, saom)
+    if(this.shouldPreprocessOfg) OFAPreprocessModule.setAndroidVirtualMethodTables(options, avmt)
     intraPipeline.compute(j)
     info.hasError = j.hasError
     if (info.hasError) {
@@ -62,6 +65,7 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
     val pool = CfgModule.getPool(options)
     val cfg = CfgModule.getCfg(options)
     val rdaOpt = if (this.shouldBuildRda) Some(RdaModule.getRda(options)) else None
+    val ofgOpt = if (this.shouldPreprocessOfg) Some(OFAPreprocessModule.getOFG(options)) else None
     val cCfgOpt = if (this.shouldBuildCCfg) Some(cCfgModule.getCCfg(options)) else None
     cfgs(pst.procedureUri) = cfg
     if(this.shouldBuildOFAsCfg) rdas(pst.procedureUri) = RdaModule.getRda(options)
@@ -71,7 +75,7 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
     }
     (pst.procedureUri,
       AndroidInterIntraProcedural.AndroidIntraAnalysisResult(
-        pool, cfg, rdaOpt, cCfgOpt
+        pool, cfg, rdaOpt, ofgOpt, cCfgOpt
       ))
   }
   
@@ -97,7 +101,6 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
   def compute() = {
     val j = PipelineJob()
     val options = j.properties
-    val avmt = this.androidVirtualMethodTables
     if(this.shouldBuildSCfg || this.shouldBuildCSCfg){  // SCfg=system(wide)-control-flow-graph, CSCfg=compressedSCfg
       sCfgModule.setAndroidCache(options, aCache)
       sCfgModule.setAndroidVirtualMethodTables(options, avmt)
@@ -158,12 +161,16 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
   def buildIntraPipeline(job : PipelineJob) = {
     val stages = marrayEmpty[PipelineStage]
 
-    if (this.shouldBuildCfg || this.shouldBuildRda || this.shouldBuildCCfg || this.shouldBuildOFAsCfg || this.shouldBuildSCfg || this.shouldBuildCSCfg){
+    if (this.shouldBuildCfg || this.shouldBuildRda || this.shouldPreprocessOfg || this.shouldBuildCCfg || this.shouldBuildOFAsCfg || this.shouldBuildSCfg || this.shouldBuildCSCfg){
       stages += PipelineStage("CFG Building", false, CfgModule)
     }
     
-    if (this.shouldBuildRda || this.shouldBuildOFAsCfg){
+    if (this.shouldBuildRda || this.shouldPreprocessOfg || this.shouldBuildOFAsCfg){
       stages += PipelineStage("RDA Building", false, RdaModule)
+    }
+    
+    if (this.shouldPreprocessOfg){
+      stages += PipelineStage("OFA Preprocess", false, OFAPreprocessModule)
     }
     
     if (this.shouldBuildCCfg || this.shouldBuildOFAsCfg || this.shouldBuildSCfg || this.shouldBuildCSCfg){
@@ -220,8 +227,14 @@ class cCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extend
 }
 
 class sCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends sCfgModule {
-  this.sCfg_=(SystemControlFlowGraph[String](this.androidVirtualMethodTables, this.cCfgs, this.androidCache))
-  println("sCfg is built")
+  this.androidCache match{
+    case Some(ac) =>
+      this.sCfg_=(SystemControlFlowGraph[String](this.androidVirtualMethodTables, this.cCfgs, ac))
+      println("sCfg is built")
+    case None =>
+      this.sCfg_=(SystemControlFlowGraph[String]())
+      println("Please setup AndroidCache!")
+  }
 }
 
 
@@ -231,12 +244,15 @@ class csCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) exten
   println("csCfg is built, which is same as the sCfg")
 }
 
-/** The following class will be called reflectively.  Create the file 
-  * OFAsCfgModuleDef.scala in the directory corresponding to org.sireum.amandroid.module
-  * and paste the code into it
-  */
+class OFAPreprocessModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends OFAPreprocessModule {
+  this.OFG_=(ObjectFlowGraphPreprocessor(this.procedureSymbolTable, this.cfg, this.rda, this.androidVirtualMethodTables))
+}
 
 class OFAsCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends OFAsCfgModule {
-  val ofg = ObjectFlowGraphBuilder(this.procedureSymbolTables, this.cfgs, this.rdas, this.androidVirtualMethodTables, this.androidCache)
+  this.androidCache match{
+    case Some(ac) =>
+      val ofg = ObjectFlowGraphBuilder(this.procedureSymbolTables, this.cfgs, this.rdas, this.androidVirtualMethodTables, ac)
+    case None =>
+  }
   this.OFAsCfg_=(SystemControlFlowGraph[String]())
 }

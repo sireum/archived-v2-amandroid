@@ -51,7 +51,7 @@ object ObjectFlowGraphBuilder {
           val result = new ObjectFlowGraph[Node]
           val cfg = cfgs(ep)
           val rda = rdas(ep)
-          doOFA(result, pstMap(ep), cfg, rda, result, androidVirtualMethodTables, androidCache)
+          doOFA(pstMap(ep), cfg, rda, result, androidVirtualMethodTables, androidCache)
           results += result
         }
     )
@@ -76,8 +76,7 @@ object ObjectFlowGraphBuilder {
     new ObjectFlowGraph[Node]
   }
   
-  def doOFA(ofa : ObjectFlowGraph[Node],
-            pst : ProcedureSymbolTable,
+  def doOFA(pst : ProcedureSymbolTable,
             cfg : ControlFlowGraph[String],
             rda : ReachingDefinitionAnalysis.Result,
             ofg : ObjectFlowGraph[Node],

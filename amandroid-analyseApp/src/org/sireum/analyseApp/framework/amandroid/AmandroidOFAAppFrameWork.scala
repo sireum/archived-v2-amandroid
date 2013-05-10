@@ -100,7 +100,7 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
         
         PilarAndroidSymbolResolverModule.setParallel(options, false)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, Option(libVmTables))
-        AndroidInterIntraProceduralModule.setAndroidCache(options, aCache)
+        AndroidInterIntraProceduralModule.setAndroidCache(options, Some(aCache))
         AndroidInterIntraProceduralModule.setShouldBuildCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildRda(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildOFAsCfg(options, true)

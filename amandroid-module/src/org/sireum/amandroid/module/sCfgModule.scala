@@ -11,9 +11,10 @@ import org.sireum.alir.ControlFlowGraph
 import org.sireum.alir.DefRef
 import org.sireum.alir.MonotoneDataFlowAnalysisResult
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
-import org.sireum.amandroid.cache.AndroidCacheFile
 import org.sireum.amandroid.module.AndroidInterIntraProcedural.AndroidInterAnalysisResult
 import org.sireum.amandroid.module.AndroidInterIntraProcedural.AndroidIntraAnalysisResult
+import org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph
+import org.sireum.amandroid.objectflowanalysis.OfaNode
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
 import org.sireum.amandroid.scfg.SystemControlFlowGraph
 import org.sireum.pilar.ast.LocationDecl
@@ -51,6 +52,10 @@ object sCfgModule extends PipelineModule {
   }
 
   override def initialize(job : PipelineJob) {
+    if(!(job ? sCfgModule.globalAndroidCacheKey)) {
+      val androidCache = Class.forName("org.sireum.amandroid.module.sCfg").getDeclaredMethod("$lessinit$greater$default$2").invoke(null).asInstanceOf[scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]]
+      setAndroidCache(job.propertyMap, androidCache)
+    }
   }
 
   override def validPipeline(stage : PipelineStage, job : PipelineJob) : MBuffer[Tag] = {
@@ -68,33 +73,6 @@ object sCfgModule extends PipelineModule {
 
   def inputDefined (job : PipelineJob) : MBuffer[Tag] = {
     val tags = marrayEmpty[Tag]
-    var _cCfgs : scala.Option[AnyRef] = None
-    var _cCfgsKey : scala.Option[String] = None
-
-    val keylistcCfgs = List(sCfgModule.globalCCfgsKey)
-    keylistcCfgs.foreach(key => 
-      if(job ? key) { 
-        if(_cCfgs.isEmpty) {
-          _cCfgs = Some(job(key))
-          _cCfgsKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _cCfgs.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'cCfgs' keys '" + _cCfgsKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _cCfgs match{
-      case Some(x) =>
-        if(!x.isInstanceOf[scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'cCfgs'.  Expecting 'scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'cCfgs'")       
-    }
     var _androidVirtualMethodTables : scala.Option[AnyRef] = None
     var _androidVirtualMethodTablesKey : scala.Option[String] = None
 
@@ -141,13 +119,40 @@ object sCfgModule extends PipelineModule {
 
     _androidCache match{
       case Some(x) =>
-        if(!x.isInstanceOf[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]){
+        if(!x.isInstanceOf[scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]]){
           tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'androidCache'.  Expecting 'org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]' but found '" + x.getClass.toString + "'")
+            "Input error for '" + this.title + "': Wrong type found for 'androidCache'.  Expecting 'scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]' but found '" + x.getClass.toString + "'")
         }
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'androidCache'")       
+    }
+    var _cCfgs : scala.Option[AnyRef] = None
+    var _cCfgsKey : scala.Option[String] = None
+
+    val keylistcCfgs = List(sCfgModule.globalCCfgsKey)
+    keylistcCfgs.foreach(key => 
+      if(job ? key) { 
+        if(_cCfgs.isEmpty) {
+          _cCfgs = Some(job(key))
+          _cCfgsKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _cCfgs.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'cCfgs' keys '" + _cCfgsKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _cCfgs match{
+      case Some(x) =>
+        if(!x.isInstanceOf[scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'cCfgs'.  Expecting 'scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'cCfgs'")       
     }
     return tags
   }
@@ -171,6 +176,36 @@ object sCfgModule extends PipelineModule {
         job(sCfgModule.globalSCfgKey).getClass.toString + "'")
     } 
     return tags
+  }
+
+  def getAndroidVirtualMethodTables (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = {
+    if (options.contains(sCfgModule.globalAndroidVirtualMethodTablesKey)) {
+       return options(sCfgModule.globalAndroidVirtualMethodTablesKey).asInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setAndroidVirtualMethodTables (options : MMap[Property.Key, Any], androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables) : MMap[Property.Key, Any] = {
+
+    options(sCfgModule.globalAndroidVirtualMethodTablesKey) = androidVirtualMethodTables
+
+    return options
+  }
+
+  def getAndroidCache (options : scala.collection.Map[Property.Key, Any]) : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = {
+    if (options.contains(sCfgModule.globalAndroidCacheKey)) {
+       return options(sCfgModule.globalAndroidCacheKey).asInstanceOf[scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setAndroidCache (options : MMap[Property.Key, Any], androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]) : MMap[Property.Key, Any] = {
+
+    options(sCfgModule.globalAndroidCacheKey) = androidCache
+
+    return options
   }
 
   def getSCfg (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = {
@@ -207,59 +242,29 @@ object sCfgModule extends PipelineModule {
     return options
   }
 
-  def getAndroidVirtualMethodTables (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = {
-    if (options.contains(sCfgModule.globalAndroidVirtualMethodTablesKey)) {
-       return options(sCfgModule.globalAndroidVirtualMethodTablesKey).asInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setAndroidVirtualMethodTables (options : MMap[Property.Key, Any], androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables) : MMap[Property.Key, Any] = {
-
-    options(sCfgModule.globalAndroidVirtualMethodTablesKey) = androidVirtualMethodTables
-
-    return options
-  }
-
-  def getAndroidCache (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String] = {
-    if (options.contains(sCfgModule.globalAndroidCacheKey)) {
-       return options(sCfgModule.globalAndroidCacheKey).asInstanceOf[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setAndroidCache (options : MMap[Property.Key, Any], androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]) : MMap[Property.Key, Any] = {
-
-    options(sCfgModule.globalAndroidCacheKey) = androidCache
-
-    return options
-  }
-
   object ConsumerView {
     implicit class sCfgModuleConsumerView (val job : PropertyProvider) extends AnyVal {
+      def androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = sCfgModule.getAndroidVirtualMethodTables(job.propertyMap)
+      def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = sCfgModule.getAndroidCache(job.propertyMap)
       def sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = sCfgModule.getSCfg(job.propertyMap)
       def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = sCfgModule.getCCfgs(job.propertyMap)
-      def androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = sCfgModule.getAndroidVirtualMethodTables(job.propertyMap)
-      def androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String] = sCfgModule.getAndroidCache(job.propertyMap)
     }
   }
 
   object ProducerView {
     implicit class sCfgModuleProducerView (val job : PropertyProvider) extends AnyVal {
 
+      def androidVirtualMethodTables_=(androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables) { sCfgModule.setAndroidVirtualMethodTables(job.propertyMap, androidVirtualMethodTables) }
+      def androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = sCfgModule.getAndroidVirtualMethodTables(job.propertyMap)
+
+      def androidCache_=(androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]) { sCfgModule.setAndroidCache(job.propertyMap, androidCache) }
+      def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = sCfgModule.getAndroidCache(job.propertyMap)
+
       def sCfg_=(sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]) { sCfgModule.setSCfg(job.propertyMap, sCfg) }
       def sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = sCfgModule.getSCfg(job.propertyMap)
 
       def cCfgs_=(cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]) { sCfgModule.setCCfgs(job.propertyMap, cCfgs) }
       def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = sCfgModule.getCCfgs(job.propertyMap)
-
-      def androidVirtualMethodTables_=(androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables) { sCfgModule.setAndroidVirtualMethodTables(job.propertyMap, androidVirtualMethodTables) }
-      def androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = sCfgModule.getAndroidVirtualMethodTables(job.propertyMap)
-
-      def androidCache_=(androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]) { sCfgModule.setAndroidCache(job.propertyMap, androidCache) }
-      def androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String] = sCfgModule.getAndroidCache(job.propertyMap)
     }
   }
 }
@@ -267,13 +272,13 @@ object sCfgModule extends PipelineModule {
 trait sCfgModule {
   def job : PipelineJob
 
+  def androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = sCfgModule.getAndroidVirtualMethodTables(job.propertyMap)
+
+  def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = sCfgModule.getAndroidCache(job.propertyMap)
+
 
   def sCfg_=(sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]) { sCfgModule.setSCfg(job.propertyMap, sCfg) }
   def sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = sCfgModule.getSCfg(job.propertyMap)
 
   def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = sCfgModule.getCCfgs(job.propertyMap)
-
-  def androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = sCfgModule.getAndroidVirtualMethodTables(job.propertyMap)
-
-  def androidCache : org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String] = sCfgModule.getAndroidCache(job.propertyMap)
 }

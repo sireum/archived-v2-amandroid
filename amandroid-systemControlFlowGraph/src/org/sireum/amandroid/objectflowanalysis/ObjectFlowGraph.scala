@@ -63,6 +63,30 @@ class ObjectFlowGraph[Node <: OfaNode]
   }
   
   /**
+   * combine two ofgs into one, and combine all repos inside two ofgs.
+   */ 
+  def combineOfgs(ofg2 : ObjectFlowGraph[Node]) = {
+    pool ++= ofg2.pool
+    ofg2.nodes.foreach(
+      node=>{
+        addNode(node)
+      }
+    )
+    ofg2.edges.foreach(
+      edge=>{
+        addEdge(edge)
+      }  
+    )
+    iFieldDefRepo ++= ofg2.iFieldDefRepo
+    globalDefRepo ++= ofg2.globalDefRepo
+    worklist ++= ofg2.worklist
+    staticMethodList ++= ofg2.staticMethodList
+    arrayRepo ++= ofg2.arrayRepo
+    points ++= ofg2.points
+  }
+  
+  
+  /**
    * collect all array variables inside one procedure
    */ 
   def fixArrayVar(ps : MList[Point],

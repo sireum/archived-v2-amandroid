@@ -36,5 +36,9 @@ sealed case class AndroidVirtualMethodTablesData
  recordUriTable : HashBiMap[String, ResourceUri] = HashBiMap.create(),
  procedureUriTable : HashBiMap[String, ResourceUri] = HashBiMap.create(),
  procedureTypeTable : HashMap[ResourceUri, String] = new HashMap[ResourceUri, String],
+ recordFieldVarTable : MMap[ResourceUri, MMap[ResourceUri, AndroidFieldData]] = mmapEmpty,
+ globalVarTable : MMap[ResourceUri, AndroidFieldData] = mmapEmpty,
  interfaceTable : HashSet[ResourceUri] = new HashSet[ResourceUri]
 )
+
+sealed case class AndroidFieldData(typ : ResourceUri, dimensionsOpt : Option[Int])
