@@ -107,8 +107,10 @@ object AndroidSymbolTable {
   
   def buildProcedureSymbolTables(stp : SymbolTableProducer, parallel : Boolean = true) : Unit = {
     val procedures = stp.tables.procedureAbsTable.keys.toSeq
+    println("parallel=" + parallel)
     val col : GenSeq[ResourceUri] = if (parallel) procedures.par else procedures
-    col.foreach { procedureUri =>
+    println("col size=" + col.size)
+    col.map { procedureUri =>
       val pstp = stp.procedureSymbolTableProducer(procedureUri)
       val pd = stp.tables.procedureAbsTable(procedureUri)
       pd.body match {

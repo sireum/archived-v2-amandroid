@@ -67,34 +67,41 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
     val rdaOpt = if (this.shouldBuildRda) Some(RdaModule.getRda(options)) else None
     val ofgOpt = if (this.shouldPreprocessOfg) Some(OFAPreprocessModule.getOFG(options)) else None
     val cCfgOpt = if (this.shouldBuildCCfg) Some(cCfgModule.getCCfg(options)) else None
-    cfgs(pst.procedureUri) = cfg
-    if(this.shouldBuildOFAsCfg) rdas(pst.procedureUri) = RdaModule.getRda(options)
-    cCfgOpt match {
-      case Some(item) => cCfgs(pst.procedureUri) = item
-      case None =>
-    }
-    (pst.procedureUri,
+//    cfgs(pst.procedureUri) = cfg
+//    if(this.shouldBuildOFAsCfg) rdas(pst.procedureUri) = RdaModule.getRda(options)
+//    cCfgOpt match {
+//      case Some(item) => cCfgs(pst.procedureUri) = item
+//      case None =>
+//    }
+    Map(pst.procedureUri ->
       AndroidInterIntraProcedural.AndroidIntraAnalysisResult(
         pool, cfg, rdaOpt, ofgOpt, cCfgOpt
       ))
   }
   
   val intraResults : MMap[ResourceUri, AndroidInterIntraProcedural.AndroidIntraAnalysisResult] = mmapEmpty
-
+  println("par=" + par)
   val col : GenSeq[ProcedureSymbolTable] = if (par) psts.par else psts
   println("intra analysis start! procudure number = " + col.size)
-  var i =0;
-  (col.map { pst =>
-    i+=1
-    println(i)
-    compute(pst)
-  }).foreach { p =>
-    intraResults(first2(p)) = second2(p)
+  val starttime = System.currentTimeMillis();
+  
+  def combine(tp1 : IMap[ResourceUri, AndroidInterIntraProcedural.AndroidIntraAnalysisResult],
+      tp2 : IMap[ResourceUri, AndroidInterIntraProcedural.AndroidIntraAnalysisResult])
+      : IMap[ResourceUri, AndroidInterIntraProcedural.AndroidIntraAnalysisResult] = {
+    tp1 ++ tp2
   }
+  
+  intraResults ++= 
+    (col.map { pst =>
+//      println(pst.procedureUri)
+      compute(pst)
+    }).reduce(combine)
+
   this.intraResult_=(intraResults)
   println("intra building complete!")
   
-  
+  val endtime = System.currentTimeMillis();
+  logger.info(s"End computing: Time: ${(endtime - starttime) / 1000d} s")
   
   
   

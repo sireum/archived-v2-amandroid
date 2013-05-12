@@ -145,7 +145,7 @@ trait AmandroidAnalyseLibraryFrameWork extends TestFramework {
         }
         aCache.setRootDirectory(libInfoDir + "/")
         aCache.setValueSerializer(serializer, unSerializer)
-        AndroidInterIntraProceduralModule.setParallel(options, false)
+        AndroidInterIntraProceduralModule.setParallel(options, true)
         AndroidInterIntraProceduralModule.setAndroidCache(options, Some(aCache))
         AndroidInterIntraProceduralModule.setShouldBuildCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildRda(options, true)
