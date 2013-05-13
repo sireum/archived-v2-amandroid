@@ -5,7 +5,7 @@ import org.sireum.alir._
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.util._
 import org.sireum.pilar.ast._
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import java.io.File
 import org.sireum.amandroid.xml.AndroidXStream
 import org.sireum.amandroid.cache.AndroidCacheFile
@@ -380,7 +380,7 @@ object SystemControlFlowGraph {
   // val defaultSiff : ShouldIncludeFlowFunction = { (_, _) => (Array.empty[CatchClause], false) }
 
   def apply[VirtualLabel]
-  (vmTables : AndroidVirtualMethodTables,
+  (vmTables : AndroidLibInfoTables,
    cCfgs: MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]],
    aCache : AndroidCacheFile[ResourceUri]
   ) = build[VirtualLabel](vmTables, cCfgs, aCache)
@@ -404,7 +404,7 @@ object SystemControlFlowGraph {
   // cCfgs does not grow within this procedure. For each atomic proc we add one pair of Entry and Exit nodes to SCfg.
   
   def compressCCfgAndCollect[VirtualLabel](
-                                      vmTables : AndroidVirtualMethodTables,
+                                      vmTables : AndroidLibInfoTables,
                                       atomicSecAPIs : Seq[ResourceUri],
                                       mRepo : MMap[ResourceUri, (MBitSet,MMap[ResourceUri, Integer])], // marking-repo which remains constant inside this procedure
                                       cCfgs: MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]], // cCfgs does not grow within this procedure. For each atomic proc we add one pair of Entry and Exit nodes to SCfg.
@@ -491,7 +491,7 @@ object SystemControlFlowGraph {
   // extraCompressCCfgAndCollect also compresses intra-app calls if they are not transitively interesting.
   
   def extraCompressCCfgAndCollect[VirtualLabel](
-                                      vmTables : AndroidVirtualMethodTables,
+                                      vmTables : AndroidLibInfoTables,
                                       atomicSecAPIs : Seq[ResourceUri],
                                       mRepo : MMap[ResourceUri, (MBitSet,MMap[ResourceUri, Integer])], // marking-repo which remains constant inside this procedure
                                       cCfgs: MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]], // cCfgs does not grow within this procedure. For each atomic proc we add one pair of Entry and Exit nodes to SCfg.
@@ -570,7 +570,7 @@ object SystemControlFlowGraph {
     
   }
   
-  def connectCCfgs[VirtualLabel](vmTables : AndroidVirtualMethodTables,
+  def connectCCfgs[VirtualLabel](vmTables : AndroidLibInfoTables,
                                       atomicSecAPIs : Seq[ResourceUri],
                                       mRepo : MMap[ResourceUri, (MBitSet,MMap[ResourceUri, Integer])],
                                       sCfg : SystemControlFlowGraph[VirtualLabel]) = {
@@ -712,7 +712,7 @@ object SystemControlFlowGraph {
   // new comprssd-control-flow-graphs and inter-proc edges can be added in the sCfg; also, some caller nodes inside the cCfg can be deleted
   
   def connectToAtomicAPIsOrCompress[VirtualLabel](pUri : ResourceUri,
-                                      vmTables : AndroidVirtualMethodTables,
+                                      vmTables : AndroidLibInfoTables,
                                       atomicSecAPIs : Seq[ResourceUri],
                                       mRepo : MMap[ResourceUri, (MBitSet,MMap[ResourceUri, Integer])], // marking-repo which remains constant inside this procedure
                                       cCfg : CompressedControlFlowGraph[VirtualLabel],
@@ -924,7 +924,7 @@ object SystemControlFlowGraph {
   // new comprssd-control-flow-graphs and inter-proc edges can be added in the sCfg; also, some caller nodes inside the cCfg can be deleted
   
   def addInterCCfgEdgesOrCompress[VirtualLabel](pUri : ResourceUri,
-                                      vmTables : AndroidVirtualMethodTables,
+                                      vmTables : AndroidLibInfoTables,
                                       mRepo : MMap[ResourceUri, (MBitSet,MMap[ResourceUri, Integer])], // marking-repo which remains constant inside this procedure
                                       cCfg : CompressedControlFlowGraph[VirtualLabel],
                                       cCfgs: MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]], // this list can grow inside this procedure
@@ -1095,7 +1095,7 @@ object SystemControlFlowGraph {
 
   
   def build[VirtualLabel] //
-  (vmTables : AndroidVirtualMethodTables,
+  (vmTables : AndroidLibInfoTables,
    cCfgs: MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]], // represents the collection of the particular app's all procedures' cCfgs
    aCache : AndroidCacheFile[ResourceUri]
   )  

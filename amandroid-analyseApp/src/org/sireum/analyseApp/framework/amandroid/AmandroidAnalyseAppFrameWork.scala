@@ -14,7 +14,7 @@ import org.sireum.core.module.ChunkingPilarParserModule
 import org.sireum.amandroid.module.PilarAndroidSymbolResolverModule
 import org.sireum.amandroid.module.AndroidInterIntraProceduralModule
 import org.sireum.amandroid.xml.AndroidXStream
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.alir.AlirIntraProceduralGraph
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
 import org.sireum.amandroid.cache.AndroidCacheFile
@@ -35,9 +35,9 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
   }
 
   def file(fileUri : FileResourceUri,
-           libVmTables : AndroidVirtualMethodTables,
+           libInfoTables : AndroidLibInfoTables,
            aCache : AndroidCacheFile[ResourceUri]) =
-    AmandroidConfiguration(title, fileUri, libVmTables, aCache)
+    AmandroidConfiguration(title, fileUri, libInfoTables, aCache)
 
   //////////////////////////////////////////////////////////////////////////////
   // Public Case Classes
@@ -49,7 +49,7 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
   case class AmandroidConfiguration //
   (title : String,
    srcs : FileResourceUri,
-   libVmTables : AndroidVirtualMethodTables,
+   libInfoTables : AndroidLibInfoTables,
    aCache : AndroidCacheFile[ResourceUri]) {
 
     ////////////////////////////////////////////////////////////////////////////
@@ -99,7 +99,7 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
 //        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d+dirName+"/classes.pilar"))))
         
         PilarAndroidSymbolResolverModule.setParallel(options, false)
-        PilarAndroidSymbolResolverModule.setHasExistingAndroidVirtualMethodTables(options, Option(libVmTables))
+        PilarAndroidSymbolResolverModule.setHasExistingAndroidLibInfoTables(options, Option(libInfoTables))
         AndroidInterIntraProceduralModule.setAndroidCache(options, Some(aCache))
         AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, true)

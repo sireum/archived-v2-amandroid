@@ -6,7 +6,7 @@ import org.sireum.util._
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.pilar.ast._
 import org.sireum.alir.ReachingDefinitionAnalysis
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.cache.AndroidCacheFile
 
 object ObjectFlowGraphBuilder {
@@ -22,18 +22,18 @@ object ObjectFlowGraphBuilder {
   def apply(psts : Seq[ProcedureSymbolTable],
             cfgs : MMap[ResourceUri, ControlFlowGraph[String]],
             rdas : MMap[ResourceUri, ReachingDefinitionAnalysis.Result],
-            androidVirtualMethodTables : AndroidVirtualMethodTables,
+            androidLibInfoTables : AndroidLibInfoTables,
             androidCache : AndroidCacheFile[String]) 
             = build(psts : Seq[ProcedureSymbolTable],
                     cfgs : MMap[ResourceUri, ControlFlowGraph[String]],
                     rdas : MMap[ResourceUri, ReachingDefinitionAnalysis.Result],
-                    androidVirtualMethodTables : AndroidVirtualMethodTables,
+                    androidLibInfoTables : AndroidLibInfoTables,
                     androidCache : AndroidCacheFile[String])
 
   def build(psts : Seq[ProcedureSymbolTable],
             cfgs : MMap[ResourceUri, ControlFlowGraph[String]],
             rdas : MMap[ResourceUri, ReachingDefinitionAnalysis.Result],
-            androidVirtualMethodTables : AndroidVirtualMethodTables,
+            androidLibInfoTables : AndroidLibInfoTables,
             androidCache : AndroidCacheFile[String])
    : ObjectFlowGraph[Node] = {
     val results : MSet[ObjectFlowGraph[Node]] = msetEmpty
@@ -51,7 +51,7 @@ object ObjectFlowGraphBuilder {
           val result = new ObjectFlowGraph[Node]
           val cfg = cfgs(ep)
           val rda = rdas(ep)
-          doOFA(pstMap(ep), cfg, rda, result, androidVirtualMethodTables, androidCache)
+          doOFA(pstMap(ep), cfg, rda, result, androidLibInfoTables, androidCache)
           results += result
         }
     )
@@ -80,7 +80,7 @@ object ObjectFlowGraphBuilder {
             cfg : ControlFlowGraph[String],
             rda : ReachingDefinitionAnalysis.Result,
             ofg : ObjectFlowGraph[Node],
-            androidVirtualMethodTables : AndroidVirtualMethodTables,
+            androidLibInfoTables : AndroidLibInfoTables,
             androidCache : AndroidCacheFile[String]) = {
     val points = new PointsCollector().points(pst, ofg)
     ofg.points ++= points
@@ -92,17 +92,17 @@ object ObjectFlowGraphBuilder {
       }
     )
     ofg.constructGraph(points, cfg, rda)
-    fix(ofg, androidVirtualMethodTables, androidCache)
+    fix(ofg, androidLibInfoTables, androidCache)
   }
   
   def fix(ofg : ObjectFlowGraph[Node],
-          androidVirtualMethodTables : AndroidVirtualMethodTables,
+          androidLibInfoTables : AndroidLibInfoTables,
           androidCache : AndroidCacheFile[String]) : Unit = {
     while (!ofg.worklist.isEmpty) {
       //for construct and extend graph for static method invocation 
       while(!ofg.staticMethodList.isEmpty) {
         val pi = ofg.staticMethodList.remove(0)
-        val callee = ofg.getDirectCallee(pi, androidVirtualMethodTables)
+        val callee = ofg.getDirectCallee(pi, androidLibInfoTables)
         extendGraphWithConstructGraph(callee, pi, ofg)
       }
       //end
@@ -139,9 +139,9 @@ object ObjectFlowGraphBuilder {
               case Some(pi) =>
                 val calleeSet : MSet[ResourceUri] = msetEmpty
                 if(pi.typ.equals("direct")){
-                  calleeSet += ofg.getDirectCallee(pi, androidVirtualMethodTables)
+                  calleeSet += ofg.getDirectCallee(pi, androidLibInfoTables)
                 } else {
-                  calleeSet ++= ofg.getCalleeSet(d, pi, androidVirtualMethodTables)
+                  calleeSet ++= ofg.getCalleeSet(d, pi, androidLibInfoTables)
                 }
                 calleeSet.foreach(
                   callee => {

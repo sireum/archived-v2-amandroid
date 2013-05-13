@@ -10,7 +10,7 @@ import org.sireum.alir.AlirIntraProceduralNode
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.alir.DefRef
 import org.sireum.alir.MonotoneDataFlowAnalysisResult
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.module.AndroidInterIntraProcedural.AndroidInterAnalysisResult
 import org.sireum.amandroid.module.AndroidInterIntraProcedural.AndroidIntraAnalysisResult
 import org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph
@@ -30,7 +30,7 @@ object OFAPreprocessModule extends PipelineModule {
   val globalProcedureSymbolTableKey = "Global.procedureSymbolTable"
   val cfgKey = "OFAPreprocess.cfg"
   val globalRdaKey = "Global.rda"
-  val globalAndroidVirtualMethodTablesKey = "Global.androidVirtualMethodTables"
+  val globalAndroidLibInfoTablesKey = "Global.androidLibInfoTables"
   val globalOFGKey = "Global.OFG"
   val globalCfgKey = "Global.cfg"
   val rdaKey = "OFAPreprocess.rda"
@@ -69,33 +69,6 @@ object OFAPreprocessModule extends PipelineModule {
 
   def inputDefined (job : PipelineJob) : MBuffer[Tag] = {
     val tags = marrayEmpty[Tag]
-    var _procedureSymbolTable : scala.Option[AnyRef] = None
-    var _procedureSymbolTableKey : scala.Option[String] = None
-
-    val keylistprocedureSymbolTable = List(OFAPreprocessModule.globalProcedureSymbolTableKey)
-    keylistprocedureSymbolTable.foreach(key => 
-      if(job ? key) { 
-        if(_procedureSymbolTable.isEmpty) {
-          _procedureSymbolTable = Some(job(key))
-          _procedureSymbolTableKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _procedureSymbolTable.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'procedureSymbolTable' keys '" + _procedureSymbolTableKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _procedureSymbolTable match{
-      case Some(x) =>
-        if(!x.isInstanceOf[org.sireum.pilar.symbol.ProcedureSymbolTable]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'procedureSymbolTable'.  Expecting 'org.sireum.pilar.symbol.ProcedureSymbolTable' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'procedureSymbolTable'")       
-    }
     var _cfg : scala.Option[AnyRef] = None
     var _cfgKey : scala.Option[String] = None
 
@@ -123,32 +96,59 @@ object OFAPreprocessModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'cfg'")       
     }
-    var _androidVirtualMethodTables : scala.Option[AnyRef] = None
-    var _androidVirtualMethodTablesKey : scala.Option[String] = None
+    var _androidLibInfoTables : scala.Option[AnyRef] = None
+    var _androidLibInfoTablesKey : scala.Option[String] = None
 
-    val keylistandroidVirtualMethodTables = List(OFAPreprocessModule.globalAndroidVirtualMethodTablesKey)
-    keylistandroidVirtualMethodTables.foreach(key => 
+    val keylistandroidLibInfoTables = List(OFAPreprocessModule.globalAndroidLibInfoTablesKey)
+    keylistandroidLibInfoTables.foreach(key => 
       if(job ? key) { 
-        if(_androidVirtualMethodTables.isEmpty) {
-          _androidVirtualMethodTables = Some(job(key))
-          _androidVirtualMethodTablesKey = Some(key)
+        if(_androidLibInfoTables.isEmpty) {
+          _androidLibInfoTables = Some(job(key))
+          _androidLibInfoTablesKey = Some(key)
         }
-        if(!(job(key).asInstanceOf[AnyRef] eq _androidVirtualMethodTables.get)) {
+        if(!(job(key).asInstanceOf[AnyRef] eq _androidLibInfoTables.get)) {
           tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'androidVirtualMethodTables' keys '" + _androidVirtualMethodTablesKey.get + " and '" + key + "' point to different objects.")
+            "Input error for '" + this.title + "': 'androidLibInfoTables' keys '" + _androidLibInfoTablesKey.get + " and '" + key + "' point to different objects.")
         }
       }
     )
 
-    _androidVirtualMethodTables match{
+    _androidLibInfoTables match{
       case Some(x) =>
-        if(!x.isInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables]){
+        if(!x.isInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]){
           tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'androidVirtualMethodTables'.  Expecting 'org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables' but found '" + x.getClass.toString + "'")
+            "Input error for '" + this.title + "': Wrong type found for 'androidLibInfoTables'.  Expecting 'org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables' but found '" + x.getClass.toString + "'")
         }
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'androidVirtualMethodTables'")       
+          "Input error for '" + this.title + "': No value found for 'androidLibInfoTables'")       
+    }
+    var _procedureSymbolTable : scala.Option[AnyRef] = None
+    var _procedureSymbolTableKey : scala.Option[String] = None
+
+    val keylistprocedureSymbolTable = List(OFAPreprocessModule.globalProcedureSymbolTableKey)
+    keylistprocedureSymbolTable.foreach(key => 
+      if(job ? key) { 
+        if(_procedureSymbolTable.isEmpty) {
+          _procedureSymbolTable = Some(job(key))
+          _procedureSymbolTableKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _procedureSymbolTable.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'procedureSymbolTable' keys '" + _procedureSymbolTableKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _procedureSymbolTable match{
+      case Some(x) =>
+        if(!x.isInstanceOf[org.sireum.pilar.symbol.ProcedureSymbolTable]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'procedureSymbolTable'.  Expecting 'org.sireum.pilar.symbol.ProcedureSymbolTable' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'procedureSymbolTable'")       
     }
     var _rda : scala.Option[AnyRef] = None
     var _rdaKey : scala.Option[String] = None
@@ -201,21 +201,6 @@ object OFAPreprocessModule extends PipelineModule {
     return tags
   }
 
-  def getProcedureSymbolTable (options : scala.collection.Map[Property.Key, Any]) : org.sireum.pilar.symbol.ProcedureSymbolTable = {
-    if (options.contains(OFAPreprocessModule.globalProcedureSymbolTableKey)) {
-       return options(OFAPreprocessModule.globalProcedureSymbolTableKey).asInstanceOf[org.sireum.pilar.symbol.ProcedureSymbolTable]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setProcedureSymbolTable (options : MMap[Property.Key, Any], procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable) : MMap[Property.Key, Any] = {
-
-    options(OFAPreprocessModule.globalProcedureSymbolTableKey) = procedureSymbolTable
-
-    return options
-  }
-
   def getCfg (options : scala.collection.Map[Property.Key, Any]) : org.sireum.alir.ControlFlowGraph[java.lang.String] = {
     if (options.contains(OFAPreprocessModule.globalCfgKey)) {
        return options(OFAPreprocessModule.globalCfgKey).asInstanceOf[org.sireum.alir.ControlFlowGraph[java.lang.String]]
@@ -238,17 +223,32 @@ object OFAPreprocessModule extends PipelineModule {
     return options
   }
 
-  def getAndroidVirtualMethodTables (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = {
-    if (options.contains(OFAPreprocessModule.globalAndroidVirtualMethodTablesKey)) {
-       return options(OFAPreprocessModule.globalAndroidVirtualMethodTablesKey).asInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables]
+  def getAndroidLibInfoTables (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = {
+    if (options.contains(OFAPreprocessModule.globalAndroidLibInfoTablesKey)) {
+       return options(OFAPreprocessModule.globalAndroidLibInfoTablesKey).asInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def setAndroidVirtualMethodTables (options : MMap[Property.Key, Any], androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables) : MMap[Property.Key, Any] = {
+  def setAndroidLibInfoTables (options : MMap[Property.Key, Any], androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables) : MMap[Property.Key, Any] = {
 
-    options(OFAPreprocessModule.globalAndroidVirtualMethodTablesKey) = androidVirtualMethodTables
+    options(OFAPreprocessModule.globalAndroidLibInfoTablesKey) = androidLibInfoTables
+
+    return options
+  }
+
+  def getProcedureSymbolTable (options : scala.collection.Map[Property.Key, Any]) : org.sireum.pilar.symbol.ProcedureSymbolTable = {
+    if (options.contains(OFAPreprocessModule.globalProcedureSymbolTableKey)) {
+       return options(OFAPreprocessModule.globalProcedureSymbolTableKey).asInstanceOf[org.sireum.pilar.symbol.ProcedureSymbolTable]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setProcedureSymbolTable (options : MMap[Property.Key, Any], procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable) : MMap[Property.Key, Any] = {
+
+    options(OFAPreprocessModule.globalProcedureSymbolTableKey) = procedureSymbolTable
 
     return options
   }
@@ -296,9 +296,9 @@ object OFAPreprocessModule extends PipelineModule {
 
   object ConsumerView {
     implicit class OFAPreprocessModuleConsumerView (val job : PropertyProvider) extends AnyVal {
-      def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = OFAPreprocessModule.getProcedureSymbolTable(job.propertyMap)
       def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = OFAPreprocessModule.getCfg(job.propertyMap)
-      def androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = OFAPreprocessModule.getAndroidVirtualMethodTables(job.propertyMap)
+      def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = OFAPreprocessModule.getAndroidLibInfoTables(job.propertyMap)
+      def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = OFAPreprocessModule.getProcedureSymbolTable(job.propertyMap)
       def rda : org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]] = OFAPreprocessModule.getRda(job.propertyMap)
       def OFG : org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode] = OFAPreprocessModule.getOFG(job.propertyMap)
     }
@@ -307,14 +307,14 @@ object OFAPreprocessModule extends PipelineModule {
   object ProducerView {
     implicit class OFAPreprocessModuleProducerView (val job : PropertyProvider) extends AnyVal {
 
-      def procedureSymbolTable_=(procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable) { OFAPreprocessModule.setProcedureSymbolTable(job.propertyMap, procedureSymbolTable) }
-      def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = OFAPreprocessModule.getProcedureSymbolTable(job.propertyMap)
-
       def cfg_=(cfg : org.sireum.alir.ControlFlowGraph[java.lang.String]) { OFAPreprocessModule.setCfg(job.propertyMap, cfg) }
       def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = OFAPreprocessModule.getCfg(job.propertyMap)
 
-      def androidVirtualMethodTables_=(androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables) { OFAPreprocessModule.setAndroidVirtualMethodTables(job.propertyMap, androidVirtualMethodTables) }
-      def androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = OFAPreprocessModule.getAndroidVirtualMethodTables(job.propertyMap)
+      def androidLibInfoTables_=(androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables) { OFAPreprocessModule.setAndroidLibInfoTables(job.propertyMap, androidLibInfoTables) }
+      def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = OFAPreprocessModule.getAndroidLibInfoTables(job.propertyMap)
+
+      def procedureSymbolTable_=(procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable) { OFAPreprocessModule.setProcedureSymbolTable(job.propertyMap, procedureSymbolTable) }
+      def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = OFAPreprocessModule.getProcedureSymbolTable(job.propertyMap)
 
       def rda_=(rda : org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]) { OFAPreprocessModule.setRda(job.propertyMap, rda) }
       def rda : org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]] = OFAPreprocessModule.getRda(job.propertyMap)
@@ -328,11 +328,11 @@ object OFAPreprocessModule extends PipelineModule {
 trait OFAPreprocessModule {
   def job : PipelineJob
 
-  def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = OFAPreprocessModule.getProcedureSymbolTable(job.propertyMap)
-
   def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = OFAPreprocessModule.getCfg(job.propertyMap)
 
-  def androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = OFAPreprocessModule.getAndroidVirtualMethodTables(job.propertyMap)
+  def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = OFAPreprocessModule.getAndroidLibInfoTables(job.propertyMap)
+
+  def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = OFAPreprocessModule.getProcedureSymbolTable(job.propertyMap)
 
   def rda : org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]] = OFAPreprocessModule.getRda(job.propertyMap)
 

@@ -10,7 +10,7 @@ import org.sireum.alir.AlirIntraProceduralNode
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.alir.DefRef
 import org.sireum.alir.MonotoneDataFlowAnalysisResult
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.module.AndroidInterIntraProcedural.AndroidInterAnalysisResult
 import org.sireum.amandroid.module.AndroidInterIntraProcedural.AndroidIntraAnalysisResult
 import org.sireum.pilar.ast.LocationDecl
@@ -29,6 +29,7 @@ object RdaModule extends PipelineModule {
   val globalRdaKey = "Global.rda"
   val cfgKey = "Rda.cfg"
   val globalIsInputOutputParamPredicateKey = "Global.isInputOutputParamPredicate"
+  val globalAndroidLibInfoTablesKey = "Global.androidLibInfoTables"
   val globalSwitchAsOrderedMatchKey = "Global.switchAsOrderedMatch"
   val rdaKey = "Rda.rda"
   val globalCfgKey = "Global.cfg"
@@ -51,12 +52,12 @@ object RdaModule extends PipelineModule {
 
   override def initialize(job : PipelineJob) {
     if(!(job ? RdaModule.globalDefRefKey)) {
-      val defRef = Class.forName("org.sireum.amandroid.module.Rda").getDeclaredMethod("$lessinit$greater$default$4").invoke(null).asInstanceOf[scala.Function1[org.sireum.pilar.symbol.SymbolTable, org.sireum.alir.DefRef]]
+      val defRef = Class.forName("org.sireum.amandroid.module.Rda").getDeclaredMethod("$lessinit$greater$default$5").invoke(null).asInstanceOf[scala.Function2[org.sireum.pilar.symbol.SymbolTable, org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables, org.sireum.alir.DefRef]]
       setDefRef(job.propertyMap, defRef)
     }
 
     if(!(job ? RdaModule.globalSwitchAsOrderedMatchKey)) {
-      val switchAsOrderedMatch = Class.forName("org.sireum.amandroid.module.Rda").getDeclaredMethod("$lessinit$greater$default$6").invoke(null).asInstanceOf[scala.Boolean]
+      val switchAsOrderedMatch = Class.forName("org.sireum.amandroid.module.Rda").getDeclaredMethod("$lessinit$greater$default$7").invoke(null).asInstanceOf[scala.Boolean]
       setSwitchAsOrderedMatch(job.propertyMap, switchAsOrderedMatch)
     }
   }
@@ -76,33 +77,6 @@ object RdaModule extends PipelineModule {
 
   def inputDefined (job : PipelineJob) : MBuffer[Tag] = {
     val tags = marrayEmpty[Tag]
-    var _procedureSymbolTable : scala.Option[AnyRef] = None
-    var _procedureSymbolTableKey : scala.Option[String] = None
-
-    val keylistprocedureSymbolTable = List(RdaModule.globalProcedureSymbolTableKey)
-    keylistprocedureSymbolTable.foreach(key => 
-      if(job ? key) { 
-        if(_procedureSymbolTable.isEmpty) {
-          _procedureSymbolTable = Some(job(key))
-          _procedureSymbolTableKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _procedureSymbolTable.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'procedureSymbolTable' keys '" + _procedureSymbolTableKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _procedureSymbolTable match{
-      case Some(x) =>
-        if(!x.isInstanceOf[org.sireum.pilar.symbol.ProcedureSymbolTable]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'procedureSymbolTable'.  Expecting 'org.sireum.pilar.symbol.ProcedureSymbolTable' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'procedureSymbolTable'")       
-    }
     var _cfg : scala.Option[AnyRef] = None
     var _cfgKey : scala.Option[String] = None
 
@@ -130,6 +104,33 @@ object RdaModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'cfg'")       
     }
+    var _androidLibInfoTables : scala.Option[AnyRef] = None
+    var _androidLibInfoTablesKey : scala.Option[String] = None
+
+    val keylistandroidLibInfoTables = List(RdaModule.globalAndroidLibInfoTablesKey)
+    keylistandroidLibInfoTables.foreach(key => 
+      if(job ? key) { 
+        if(_androidLibInfoTables.isEmpty) {
+          _androidLibInfoTables = Some(job(key))
+          _androidLibInfoTablesKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _androidLibInfoTables.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'androidLibInfoTables' keys '" + _androidLibInfoTablesKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _androidLibInfoTables match{
+      case Some(x) =>
+        if(!x.isInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'androidLibInfoTables'.  Expecting 'org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'androidLibInfoTables'")       
+    }
     var _defRef : scala.Option[AnyRef] = None
     var _defRefKey : scala.Option[String] = None
 
@@ -149,9 +150,9 @@ object RdaModule extends PipelineModule {
 
     _defRef match{
       case Some(x) =>
-        if(!x.isInstanceOf[scala.Function1[org.sireum.pilar.symbol.SymbolTable, org.sireum.alir.DefRef]]){
+        if(!x.isInstanceOf[scala.Function2[org.sireum.pilar.symbol.SymbolTable, org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables, org.sireum.alir.DefRef]]){
           tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'defRef'.  Expecting 'scala.Function1[org.sireum.pilar.symbol.SymbolTable, org.sireum.alir.DefRef]' but found '" + x.getClass.toString + "'")
+            "Input error for '" + this.title + "': Wrong type found for 'defRef'.  Expecting 'scala.Function2[org.sireum.pilar.symbol.SymbolTable, org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables, org.sireum.alir.DefRef]' but found '" + x.getClass.toString + "'")
         }
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
@@ -211,6 +212,33 @@ object RdaModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'switchAsOrderedMatch'")       
     }
+    var _procedureSymbolTable : scala.Option[AnyRef] = None
+    var _procedureSymbolTableKey : scala.Option[String] = None
+
+    val keylistprocedureSymbolTable = List(RdaModule.globalProcedureSymbolTableKey)
+    keylistprocedureSymbolTable.foreach(key => 
+      if(job ? key) { 
+        if(_procedureSymbolTable.isEmpty) {
+          _procedureSymbolTable = Some(job(key))
+          _procedureSymbolTableKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _procedureSymbolTable.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'procedureSymbolTable' keys '" + _procedureSymbolTableKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _procedureSymbolTable match{
+      case Some(x) =>
+        if(!x.isInstanceOf[org.sireum.pilar.symbol.ProcedureSymbolTable]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'procedureSymbolTable'.  Expecting 'org.sireum.pilar.symbol.ProcedureSymbolTable' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'procedureSymbolTable'")       
+    }
     return tags
   }
 
@@ -235,21 +263,6 @@ object RdaModule extends PipelineModule {
     return tags
   }
 
-  def getProcedureSymbolTable (options : scala.collection.Map[Property.Key, Any]) : org.sireum.pilar.symbol.ProcedureSymbolTable = {
-    if (options.contains(RdaModule.globalProcedureSymbolTableKey)) {
-       return options(RdaModule.globalProcedureSymbolTableKey).asInstanceOf[org.sireum.pilar.symbol.ProcedureSymbolTable]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setProcedureSymbolTable (options : MMap[Property.Key, Any], procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable) : MMap[Property.Key, Any] = {
-
-    options(RdaModule.globalProcedureSymbolTableKey) = procedureSymbolTable
-
-    return options
-  }
-
   def getCfg (options : scala.collection.Map[Property.Key, Any]) : org.sireum.alir.ControlFlowGraph[java.lang.String] = {
     if (options.contains(RdaModule.globalCfgKey)) {
        return options(RdaModule.globalCfgKey).asInstanceOf[org.sireum.alir.ControlFlowGraph[java.lang.String]]
@@ -272,15 +285,30 @@ object RdaModule extends PipelineModule {
     return options
   }
 
-  def getDefRef (options : scala.collection.Map[Property.Key, Any]) : scala.Function1[org.sireum.pilar.symbol.SymbolTable, org.sireum.alir.DefRef] = {
-    if (options.contains(RdaModule.globalDefRefKey)) {
-       return options(RdaModule.globalDefRefKey).asInstanceOf[scala.Function1[org.sireum.pilar.symbol.SymbolTable, org.sireum.alir.DefRef]]
+  def getAndroidLibInfoTables (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = {
+    if (options.contains(RdaModule.globalAndroidLibInfoTablesKey)) {
+       return options(RdaModule.globalAndroidLibInfoTablesKey).asInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def setDefRef (options : MMap[Property.Key, Any], defRef : scala.Function1[org.sireum.pilar.symbol.SymbolTable, org.sireum.alir.DefRef]) : MMap[Property.Key, Any] = {
+  def setAndroidLibInfoTables (options : MMap[Property.Key, Any], androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables) : MMap[Property.Key, Any] = {
+
+    options(RdaModule.globalAndroidLibInfoTablesKey) = androidLibInfoTables
+
+    return options
+  }
+
+  def getDefRef (options : scala.collection.Map[Property.Key, Any]) : scala.Function2[org.sireum.pilar.symbol.SymbolTable, org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables, org.sireum.alir.DefRef] = {
+    if (options.contains(RdaModule.globalDefRefKey)) {
+       return options(RdaModule.globalDefRefKey).asInstanceOf[scala.Function2[org.sireum.pilar.symbol.SymbolTable, org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables, org.sireum.alir.DefRef]]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setDefRef (options : MMap[Property.Key, Any], defRef : scala.Function2[org.sireum.pilar.symbol.SymbolTable, org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables, org.sireum.alir.DefRef]) : MMap[Property.Key, Any] = {
 
     options(RdaModule.globalDefRefKey) = defRef
 
@@ -317,6 +345,21 @@ object RdaModule extends PipelineModule {
     return options
   }
 
+  def getProcedureSymbolTable (options : scala.collection.Map[Property.Key, Any]) : org.sireum.pilar.symbol.ProcedureSymbolTable = {
+    if (options.contains(RdaModule.globalProcedureSymbolTableKey)) {
+       return options(RdaModule.globalProcedureSymbolTableKey).asInstanceOf[org.sireum.pilar.symbol.ProcedureSymbolTable]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setProcedureSymbolTable (options : MMap[Property.Key, Any], procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable) : MMap[Property.Key, Any] = {
+
+    options(RdaModule.globalProcedureSymbolTableKey) = procedureSymbolTable
+
+    return options
+  }
+
   def getRda (options : scala.collection.Map[Property.Key, Any]) : org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]] = {
     if (options.contains(RdaModule.globalRdaKey)) {
        return options(RdaModule.globalRdaKey).asInstanceOf[org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]]
@@ -338,11 +381,12 @@ object RdaModule extends PipelineModule {
 
   object ConsumerView {
     implicit class RdaModuleConsumerView (val job : PropertyProvider) extends AnyVal {
-      def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = RdaModule.getProcedureSymbolTable(job.propertyMap)
       def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = RdaModule.getCfg(job.propertyMap)
-      def defRef : scala.Function1[org.sireum.pilar.symbol.SymbolTable, org.sireum.alir.DefRef] = RdaModule.getDefRef(job.propertyMap)
+      def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = RdaModule.getAndroidLibInfoTables(job.propertyMap)
+      def defRef : scala.Function2[org.sireum.pilar.symbol.SymbolTable, org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables, org.sireum.alir.DefRef] = RdaModule.getDefRef(job.propertyMap)
       def isInputOutputParamPredicate : scala.Function1[org.sireum.pilar.symbol.ProcedureSymbolTable, scala.Tuple2[scala.Function1[java.lang.String, scala.Boolean], scala.Function1[java.lang.String, scala.Boolean]]] = RdaModule.getIsInputOutputParamPredicate(job.propertyMap)
       def switchAsOrderedMatch : scala.Boolean = RdaModule.getSwitchAsOrderedMatch(job.propertyMap)
+      def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = RdaModule.getProcedureSymbolTable(job.propertyMap)
       def rda : org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]] = RdaModule.getRda(job.propertyMap)
     }
   }
@@ -350,20 +394,23 @@ object RdaModule extends PipelineModule {
   object ProducerView {
     implicit class RdaModuleProducerView (val job : PropertyProvider) extends AnyVal {
 
-      def procedureSymbolTable_=(procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable) { RdaModule.setProcedureSymbolTable(job.propertyMap, procedureSymbolTable) }
-      def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = RdaModule.getProcedureSymbolTable(job.propertyMap)
-
       def cfg_=(cfg : org.sireum.alir.ControlFlowGraph[java.lang.String]) { RdaModule.setCfg(job.propertyMap, cfg) }
       def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = RdaModule.getCfg(job.propertyMap)
 
-      def defRef_=(defRef : scala.Function1[org.sireum.pilar.symbol.SymbolTable, org.sireum.alir.DefRef]) { RdaModule.setDefRef(job.propertyMap, defRef) }
-      def defRef : scala.Function1[org.sireum.pilar.symbol.SymbolTable, org.sireum.alir.DefRef] = RdaModule.getDefRef(job.propertyMap)
+      def androidLibInfoTables_=(androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables) { RdaModule.setAndroidLibInfoTables(job.propertyMap, androidLibInfoTables) }
+      def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = RdaModule.getAndroidLibInfoTables(job.propertyMap)
+
+      def defRef_=(defRef : scala.Function2[org.sireum.pilar.symbol.SymbolTable, org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables, org.sireum.alir.DefRef]) { RdaModule.setDefRef(job.propertyMap, defRef) }
+      def defRef : scala.Function2[org.sireum.pilar.symbol.SymbolTable, org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables, org.sireum.alir.DefRef] = RdaModule.getDefRef(job.propertyMap)
 
       def isInputOutputParamPredicate_=(isInputOutputParamPredicate : scala.Function1[org.sireum.pilar.symbol.ProcedureSymbolTable, scala.Tuple2[scala.Function1[java.lang.String, scala.Boolean], scala.Function1[java.lang.String, scala.Boolean]]]) { RdaModule.setIsInputOutputParamPredicate(job.propertyMap, isInputOutputParamPredicate) }
       def isInputOutputParamPredicate : scala.Function1[org.sireum.pilar.symbol.ProcedureSymbolTable, scala.Tuple2[scala.Function1[java.lang.String, scala.Boolean], scala.Function1[java.lang.String, scala.Boolean]]] = RdaModule.getIsInputOutputParamPredicate(job.propertyMap)
 
       def switchAsOrderedMatch_=(switchAsOrderedMatch : scala.Boolean) { RdaModule.setSwitchAsOrderedMatch(job.propertyMap, switchAsOrderedMatch) }
       def switchAsOrderedMatch : scala.Boolean = RdaModule.getSwitchAsOrderedMatch(job.propertyMap)
+
+      def procedureSymbolTable_=(procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable) { RdaModule.setProcedureSymbolTable(job.propertyMap, procedureSymbolTable) }
+      def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = RdaModule.getProcedureSymbolTable(job.propertyMap)
 
       def rda_=(rda : org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]) { RdaModule.setRda(job.propertyMap, rda) }
       def rda : org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]] = RdaModule.getRda(job.propertyMap)
@@ -374,15 +421,17 @@ object RdaModule extends PipelineModule {
 trait RdaModule {
   def job : PipelineJob
 
-  def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = RdaModule.getProcedureSymbolTable(job.propertyMap)
-
   def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = RdaModule.getCfg(job.propertyMap)
 
-  def defRef : scala.Function1[org.sireum.pilar.symbol.SymbolTable, org.sireum.alir.DefRef] = RdaModule.getDefRef(job.propertyMap)
+  def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = RdaModule.getAndroidLibInfoTables(job.propertyMap)
+
+  def defRef : scala.Function2[org.sireum.pilar.symbol.SymbolTable, org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables, org.sireum.alir.DefRef] = RdaModule.getDefRef(job.propertyMap)
 
   def isInputOutputParamPredicate : scala.Function1[org.sireum.pilar.symbol.ProcedureSymbolTable, scala.Tuple2[scala.Function1[java.lang.String, scala.Boolean], scala.Function1[java.lang.String, scala.Boolean]]] = RdaModule.getIsInputOutputParamPredicate(job.propertyMap)
 
   def switchAsOrderedMatch : scala.Boolean = RdaModule.getSwitchAsOrderedMatch(job.propertyMap)
+
+  def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = RdaModule.getProcedureSymbolTable(job.propertyMap)
 
 
   def rda_=(rda : org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]) { RdaModule.setRda(job.propertyMap, rda) }

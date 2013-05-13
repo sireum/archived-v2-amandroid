@@ -1,0 +1,526 @@
+record [|com:android:commands:ime:Ime|]  @type class @AccessFlag PUBLIC_FINAL  {
+      [|java:lang:String|][] [|com:android:commands:ime:Ime.mArgs|]    @AccessFlag PRIVATE;
+      [|java:lang:String|] [|com:android:commands:ime:Ime.mCurArgData|]    @AccessFlag PRIVATE;
+      [|com:android:internal:view:IInputMethodManager|] [|com:android:commands:ime:Ime.mImm|]    @AccessFlag ;
+      [|int|] [|com:android:commands:ime:Ime.mNextArg|]    @AccessFlag PRIVATE;
+   }
+      global [|java:lang:String|] @@[|com:android:commands:ime:Ime.IMM_NOT_RUNNING_ERR|]    @AccessFlag PRIVATE_STATIC_FINAL;
+    procedure [|void|] [|com:android:commands:ime:Ime.<init>|] ([|com:android:commands:ime:Ime|] v0 @type (this)) @owner [|com:android:commands:ime:Ime|] @signature [|Lcom/android/commands/ime/Ime;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
+      local temp ;
+
+      
+#L00050c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
+#L000512.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:ime:Ime.main|] ([|java:lang:String|][] v1 @type (object)) @owner [|com:android:commands:ime:Ime|] @signature [|Lcom/android/commands/ime/Ime;.main:([Ljava/lang/String;)V|] @Access PUBLIC_STATIC {
+      local temp ;
+
+        v0;
+      
+#L000524.   v0:= new [|com:android:commands:ime:Ime|];
+#L000528.   call temp:=  [|com:android:commands:ime:Ime.<init>|](v0) @signature [|Lcom/android/commands/ime/Ime;.<init>:()V|] @classDescriptor [|com:android:commands:ime:Ime|] @type direct;
+#L00052e.   call temp:=  [|com:android:commands:ime:Ime.run|](v0, v1) @signature [|Lcom/android/commands/ime/Ime;.run:([Ljava/lang/String;)V|] @classDescriptor [|com:android:commands:ime:Ime|] @type virtual;
+#L000534.   return @void ;
+
+   }
+    procedure [|java:lang:String|] [|com:android:commands:ime:Ime.nextArg|] ([|com:android:commands:ime:Ime|] v3 @type (this)) @owner [|com:android:commands:ime:Ime|] @signature [|Lcom/android/commands/ime/Ime;.nextArg:()Ljava/lang/String;|] @Access PRIVATE {
+      local temp ;
+        [|java:lang:String|] v0 @varname [|arg|] @scope ((L000f,L0016));
+
+        v1;
+        v2;
+      
+#L000548.   v1:= v3.[|com:android:commands:ime:Ime.mNextArg|] ;
+#L00054c.   v2:= v3.[|com:android:commands:ime:Ime.mArgs|]   @type object;
+#L000550.   v2:= v2.length;
+#L000552.   if v1 < v2 then goto L00055a;
+#L000556.   v0:= 0  @length 4;
+#L000558.   return v0  @type object;
+#L00055a.   v1:= v3.[|com:android:commands:ime:Ime.mArgs|]   @type object;
+#L00055e.   v2:= v3.[|com:android:commands:ime:Ime.mNextArg|] ;
+#L000562.   v0:= v1[v2]  @type object;
+#L000566.   v1:= v3.[|com:android:commands:ime:Ime.mNextArg|] ;
+#L00056a.   v1:= v1 + 1;
+#L00056e.   v3.[|com:android:commands:ime:Ime.mNextArg|]  := v1;
+#L000572.   goto L000558;
+
+   }
+    procedure [|java:lang:String|] [|com:android:commands:ime:Ime.nextOption|] ([|com:android:commands:ime:Ime|] v6 @type (this)) @owner [|com:android:commands:ime:Ime|] @signature [|Lcom/android/commands/ime/Ime;.nextOption:()Ljava/lang/String;|] @Access PRIVATE {
+      local temp ;
+        [|java:lang:String|] v0 @varname [|arg|] @scope ((L0012,L0052));
+
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+      
+#L000584.   v5:= 1  @length 4;
+#L000586.   v4:= 2  @length 4;
+#L000588.   v1:= 0  @length 4;
+#L00058a.   v2:= v6.[|com:android:commands:ime:Ime.mNextArg|] ;
+#L00058e.   v3:= v6.[|com:android:commands:ime:Ime.mArgs|]   @type object;
+#L000592.   v3:= v3.length;
+#L000594.   if v2 < v3 then goto L00059c;
+#L000598.   v0:= v1  @type object;
+#L00059a.   return v0  @type object;
+#L00059c.   v2:= v6.[|com:android:commands:ime:Ime.mArgs|]   @type object;
+#L0005a0.   v3:= v6.[|com:android:commands:ime:Ime.mNextArg|] ;
+#L0005a4.   v0:= v2[v3]  @type object;
+#L0005a8.   v2:= "-" @type (object, string);
+#L0005ac.   call temp:=  [|java:lang:String.startsWith|](v0, v2) @signature [|Ljava/lang/String;.startsWith:(Ljava/lang/String;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L0005b2.   v2:= temp;
+#L0005b4.   if v2 != 0 then goto L0005bc;
+#L0005b8.   v0:= v1  @type object;
+#L0005ba.   goto L00059a;
+#L0005bc.   v2:= v6.[|com:android:commands:ime:Ime.mNextArg|] ;
+#L0005c0.   v2:= v2 + 1;
+#L0005c4.   v6.[|com:android:commands:ime:Ime.mNextArg|]  := v2;
+#L0005c8.   v2:= "--" @type (object, string);
+#L0005cc.   call temp:=  [|java:lang:String.equals|](v0, v2) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L0005d2.   v2:= temp;
+#L0005d4.   if v2 == 0 then goto L0005dc;
+#L0005d8.   v0:= v1  @type object;
+#L0005da.   goto L00059a;
+#L0005dc.   call temp:=  [|java:lang:String.length|](v0) @signature [|Ljava/lang/String;.length:()I|] @classDescriptor [|java:lang:String|] @type virtual;
+#L0005e2.   v2:= temp;
+#L0005e4.   if v2 <= v5 then goto L000622;
+#L0005e8.   call temp:=  [|java:lang:String.charAt|](v0, v5) @signature [|Ljava/lang/String;.charAt:(I)C|] @classDescriptor [|java:lang:String|] @type virtual;
+#L0005ee.   v2:= temp;
+#L0005f0.   v3:= 45  @length 16;
+#L0005f4.   if v2 == v3 then goto L000622;
+#L0005f8.   call temp:=  [|java:lang:String.length|](v0) @signature [|Ljava/lang/String;.length:()I|] @classDescriptor [|java:lang:String|] @type virtual;
+#L0005fe.   v2:= temp;
+#L000600.   if v2 <= v4 then goto L00061c;
+#L000604.   call temp:=  [|java:lang:String.substring|](v0, v4) @signature [|Ljava/lang/String;.substring:(I)Ljava/lang/String;|] @classDescriptor [|java:lang:String|] @type virtual;
+#L00060a.   v1:= temp  @type object;
+#L00060c.   v6.[|com:android:commands:ime:Ime.mCurArgData|]  := v1 @type object;
+#L000610.   v1:= 0  @length 4;
+#L000612.   call temp:=  [|java:lang:String.substring|](v0, v1, v4) @signature [|Ljava/lang/String;.substring:(II)Ljava/lang/String;|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000618.   v0:= temp  @type object;
+#L00061a.   goto L00059a;
+#L00061c.   v6.[|com:android:commands:ime:Ime.mCurArgData|]  := v1 @type object;
+#L000620.   goto L00059a;
+#L000622.   v6.[|com:android:commands:ime:Ime.mCurArgData|]  := v1 @type object;
+#L000626.   goto L00059a;
+
+   }
+    procedure [|java:lang:String|] [|com:android:commands:ime:Ime.nextOptionData|] ([|com:android:commands:ime:Ime|] v3 @type (this)) @owner [|com:android:commands:ime:Ime|] @signature [|Lcom/android/commands/ime/Ime;.nextOptionData:()Ljava/lang/String;|] @Access PRIVATE {
+      local temp ;
+        [|java:lang:String|] v0 @varname [|data|] @scope ((L0016,L001d));
+
+        v1;
+        v2;
+      
+#L000638.   v1:= v3.[|com:android:commands:ime:Ime.mCurArgData|]   @type object;
+#L00063c.   if v1 == 0 then goto L000646;
+#L000640.   v0:= v3.[|com:android:commands:ime:Ime.mCurArgData|]   @type object;
+#L000644.   return v0  @type object;
+#L000646.   v1:= v3.[|com:android:commands:ime:Ime.mNextArg|] ;
+#L00064a.   v2:= v3.[|com:android:commands:ime:Ime.mArgs|]   @type object;
+#L00064e.   v2:= v2.length;
+#L000650.   if v1 < v2 then goto L000658;
+#L000654.   v0:= 0  @length 4;
+#L000656.   goto L000644;
+#L000658.   v1:= v3.[|com:android:commands:ime:Ime.mArgs|]   @type object;
+#L00065c.   v2:= v3.[|com:android:commands:ime:Ime.mNextArg|] ;
+#L000660.   v0:= v1[v2]  @type object;
+#L000664.   v1:= v3.[|com:android:commands:ime:Ime.mNextArg|] ;
+#L000668.   v1:= v1 + 1;
+#L00066c.   v3.[|com:android:commands:ime:Ime.mNextArg|]  := v1;
+#L000670.   goto L000644;
+
+   }
+    procedure [|void|] [|com:android:commands:ime:Ime.runList|] ([|com:android:commands:ime:Ime|] v11 @type (this)) @owner [|com:android:commands:ime:Ime|] @signature [|Lcom/android/commands/ime/Ime;.runList:()V|] @Access PRIVATE {
+      local temp ;
+        [|int|] v3 @varname [|i|] @scope ((L004a,L0064), (L008f,L00b1));
+        [|android:view:inputmethod:InputMethodInfo|] v4 @varname [|imi|] @scope ((L0056,L0064), (L008f,L00b1));
+        [|java:util:List|] v5 @varname [|methods|] @scope ((L0040,L0064), (L007c,L007d), (L008f,L00b1));
+        [|android:util:Printer|] v7 @varname [|pr|] @scope ((L0049,L0064), (L008f,L00b1));
+        [|android:os:RemoteException|] v2 @varname [|e|] @scope ((L0065,L0076), (L007e,L008f));
+        [|boolean|] v0 @varname [|all|] @scope ((L0001,L00b1));
+        [|boolean|] v1 @varname [|brief|] @scope ((L0002,L00b1));
+        [|java:lang:String|] v6 @varname [|opt|] @scope ((L0006,L00b1));
+
+        v8;
+        v9;
+        v10;
+      
+#L000684.   v0:= 0  @length 4;
+#L000686.   v1:= 0  @length 4;
+#L000688.   call temp:=  [|com:android:commands:ime:Ime.nextOption|](v11) @signature [|Lcom/android/commands/ime/Ime;.nextOption:()Ljava/lang/String;|] @classDescriptor [|com:android:commands:ime:Ime|] @type direct;
+#L00068e.   v6:= temp  @type object;
+#L000690.   if v6 == 0 then goto L0006f4;
+#L000694.   v8:= "-a" @type (object, string);
+#L000698.   call temp:=  [|java:lang:String.equals|](v6, v8) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L00069e.   v8:= temp;
+#L0006a0.   if v8 == 0 then goto L0006a8;
+#L0006a4.   v0:= 1  @length 4;
+#L0006a6.   goto L000688;
+#L0006a8.   v8:= "-s" @type (object, string);
+#L0006ac.   call temp:=  [|java:lang:String.equals|](v6, v8) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L0006b2.   v8:= temp;
+#L0006b4.   if v8 == 0 then goto L0006bc;
+#L0006b8.   v1:= 1  @length 4;
+#L0006ba.   goto L000688;
+#L0006bc.   v8:= @@[|java:lang:System.err|]   @type object;
+#L0006c0.   v9:= new [|java:lang:StringBuilder|];
+#L0006c4.   call temp:=  [|java:lang:StringBuilder.<init>|](v9) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L0006ca.   v10:= "Error: Unknown option: " @type (object, string);
+#L0006ce.   call temp:=  [|java:lang:StringBuilder.append|](v9, v10) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0006d4.   v9:= temp  @type object;
+#L0006d6.   call temp:=  [|java:lang:StringBuilder.append|](v9, v6) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0006dc.   v9:= temp  @type object;
+#L0006de.   call temp:=  [|java:lang:StringBuilder.toString|](v9) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0006e4.   v9:= temp  @type object;
+#L0006e6.   call temp:=  [|java:io:PrintStream.println|](v8, v9) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0006ec.   call temp:=  [|com:android:commands:ime:Ime.showUsage|]() @signature [|Lcom/android/commands/ime/Ime;.showUsage:()V|] @classDescriptor [|com:android:commands:ime:Ime|] @type static;
+#L0006f2.   return @void ;
+#L0006f4.   if v0 != 0 then goto L000770;
+#L0006f8.   v8:= v11.[|com:android:commands:ime:Ime.mImm|]   @type object;
+#L0006fc.   call temp:=  [|com:android:internal:view:IInputMethodManager.getEnabledInputMethodList|](v8) @signature [|Lcom/android/internal/view/IInputMethodManager;.getEnabledInputMethodList:()Ljava/util/List;|] @classDescriptor [|com:android:internal:view:IInputMethodManager|] @type interface;
+#L000702.   v5:= temp  @type object;
+#L000704.   if v5 == 0 then goto L0006f2;
+#L000708.   v7:= new [|android:util:PrintStreamPrinter|];
+#L00070c.   v8:= @@[|java:lang:System.out|]   @type object;
+#L000710.   call temp:=  [|android:util:PrintStreamPrinter.<init>|](v7, v8) @signature [|Landroid/util/PrintStreamPrinter;.<init>:(Ljava/io/PrintStream;)V|] @classDescriptor [|android:util:PrintStreamPrinter|] @type direct;
+#L000716.   v3:= 0  @length 4;
+#L000718.   call temp:=  [|java:util:List.size|](v5) @signature [|Ljava/util/List;.size:()I|] @classDescriptor [|java:util:List|] @type interface;
+#L00071e.   v8:= temp;
+#L000720.   if v3 >= v8 then goto L0006f2;
+#L000724.   call temp:=  [|java:util:List.get|](v5, v3) @signature [|Ljava/util/List;.get:(I)Ljava/lang/Object;|] @classDescriptor [|java:util:List|] @type interface;
+#L00072a.   v4:= temp  @type object;
+#L00072c.   v4:= ([|android:view:inputmethod:InputMethodInfo|])v4;
+#L000730.   if v1 == 0 then goto L0007a2;
+#L000734.   v8:= @@[|java:lang:System.out|]   @type object;
+#L000738.   call temp:=  [|android:view:inputmethod:InputMethodInfo.getId|](v4) @signature [|Landroid/view/inputmethod/InputMethodInfo;.getId:()Ljava/lang/String;|] @classDescriptor [|android:view:inputmethod:InputMethodInfo|] @type virtual;
+#L00073e.   v9:= temp  @type object;
+#L000740.   call temp:=  [|java:io:PrintStream.println|](v8, v9) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000746.   v3:= v3 + 1;
+#L00074a.   goto L000718;
+#L00074c.   v2:= Exception  @type object;
+#L00074e.   v8:= @@[|java:lang:System.err|]   @type object;
+#L000752.   call temp:=  [|android:os:RemoteException.toString|](v2) @signature [|Landroid/os/RemoteException;.toString:()Ljava/lang/String;|] @classDescriptor [|android:os:RemoteException|] @type virtual;
+#L000758.   v9:= temp  @type object;
+#L00075a.   call temp:=  [|java:io:PrintStream.println|](v8, v9) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000760.   v8:= @@[|java:lang:System.err|]   @type object;
+#L000764.   v9:= "Error: Could not access the Input Method Manager.  Is the system running?" @type (object, string);
+#L000768.   call temp:=  [|java:io:PrintStream.println|](v8, v9) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00076e.   goto L0006f2;
+#L000770.   v8:= v11.[|com:android:commands:ime:Ime.mImm|]   @type object;
+#L000774.   call temp:=  [|com:android:internal:view:IInputMethodManager.getInputMethodList|](v8) @signature [|Lcom/android/internal/view/IInputMethodManager;.getInputMethodList:()Ljava/util/List;|] @classDescriptor [|com:android:internal:view:IInputMethodManager|] @type interface;
+#L00077a.   v5:= temp  @type object;
+#L00077c.   goto L000704;
+#L00077e.   v2:= Exception  @type object;
+#L000780.   v8:= @@[|java:lang:System.err|]   @type object;
+#L000784.   call temp:=  [|android:os:RemoteException.toString|](v2) @signature [|Landroid/os/RemoteException;.toString:()Ljava/lang/String;|] @classDescriptor [|android:os:RemoteException|] @type virtual;
+#L00078a.   v9:= temp  @type object;
+#L00078c.   call temp:=  [|java:io:PrintStream.println|](v8, v9) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000792.   v8:= @@[|java:lang:System.err|]   @type object;
+#L000796.   v9:= "Error: Could not access the Input Method Manager.  Is the system running?" @type (object, string);
+#L00079a.   call temp:=  [|java:io:PrintStream.println|](v8, v9) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0007a0.   goto L0006f2;
+#L0007a2.   v8:= @@[|java:lang:System.out|]   @type object;
+#L0007a6.   v9:= new [|java:lang:StringBuilder|];
+#L0007aa.   call temp:=  [|java:lang:StringBuilder.<init>|](v9) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L0007b0.   call temp:=  [|android:view:inputmethod:InputMethodInfo.getId|](v4) @signature [|Landroid/view/inputmethod/InputMethodInfo;.getId:()Ljava/lang/String;|] @classDescriptor [|android:view:inputmethod:InputMethodInfo|] @type virtual;
+#L0007b6.   v10:= temp  @type object;
+#L0007b8.   call temp:=  [|java:lang:StringBuilder.append|](v9, v10) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0007be.   v9:= temp  @type object;
+#L0007c0.   v10:= ":" @type (object, string);
+#L0007c4.   call temp:=  [|java:lang:StringBuilder.append|](v9, v10) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0007ca.   v9:= temp  @type object;
+#L0007cc.   call temp:=  [|java:lang:StringBuilder.toString|](v9) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0007d2.   v9:= temp  @type object;
+#L0007d4.   call temp:=  [|java:io:PrintStream.println|](v8, v9) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0007da.   v8:= "  " @type (object, string);
+#L0007de.   call temp:=  [|android:view:inputmethod:InputMethodInfo.dump|](v4, v7, v8) @signature [|Landroid/view/inputmethod/InputMethodInfo;.dump:(Landroid/util/Printer;Ljava/lang/String;)V|] @classDescriptor [|android:view:inputmethod:InputMethodInfo|] @type virtual;
+#L0007e4.   goto L000746;
+  catch  [|android:os:RemoteException|] @[L0006f8..L000702] goto L00074c;
+  catch  [|android:os:RemoteException|] @[L000770..L00077a] goto L00077e;
+
+   }
+    procedure [|void|] [|com:android:commands:ime:Ime.runSet|] ([|com:android:commands:ime:Ime|] v5 @type (this)) @owner [|com:android:commands:ime:Ime|] @signature [|Lcom/android/commands/ime/Ime;.runSet:()V|] @Access PRIVATE {
+      local temp ;
+        [|java:lang:IllegalArgumentException|] v0 @varname [|e|] @scope ((L0037,L0054), (L0055,L0066));
+        [|java:lang:String|] v1 @varname [|id|] @scope ((L0004,L0066));
+
+        v2;
+        v3;
+        v4;
+      
+#L000810.   call temp:=  [|com:android:commands:ime:Ime.nextArg|](v5) @signature [|Lcom/android/commands/ime/Ime;.nextArg:()Ljava/lang/String;|] @classDescriptor [|com:android:commands:ime:Ime|] @type direct;
+#L000816.   v1:= temp  @type object;
+#L000818.   if v1 != 0 then goto L000832;
+#L00081c.   v2:= @@[|java:lang:System.err|]   @type object;
+#L000820.   v3:= "Error: no input method ID specified" @type (object, string);
+#L000824.   call temp:=  [|java:io:PrintStream.println|](v2, v3) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00082a.   call temp:=  [|com:android:commands:ime:Ime.showUsage|]() @signature [|Lcom/android/commands/ime/Ime;.showUsage:()V|] @classDescriptor [|com:android:commands:ime:Ime|] @type static;
+#L000830.   return @void ;
+#L000832.   v2:= v5.[|com:android:commands:ime:Ime.mImm|]   @type object;
+#L000836.   v3:= 0  @length 4;
+#L000838.   call temp:=  [|com:android:internal:view:IInputMethodManager.setInputMethod|](v2, v3, v1) @signature [|Lcom/android/internal/view/IInputMethodManager;.setInputMethod:(Landroid/os/IBinder;Ljava/lang/String;)V|] @classDescriptor [|com:android:internal:view:IInputMethodManager|] @type interface;
+#L00083e.   v2:= @@[|java:lang:System.out|]   @type object;
+#L000842.   v3:= new [|java:lang:StringBuilder|];
+#L000846.   call temp:=  [|java:lang:StringBuilder.<init>|](v3) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L00084c.   v4:= "Input method " @type (object, string);
+#L000850.   call temp:=  [|java:lang:StringBuilder.append|](v3, v4) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000856.   v3:= temp  @type object;
+#L000858.   call temp:=  [|java:lang:StringBuilder.append|](v3, v1) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L00085e.   v3:= temp  @type object;
+#L000860.   v4:= " selected" @type (object, string);
+#L000864.   call temp:=  [|java:lang:StringBuilder.append|](v3, v4) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L00086a.   v3:= temp  @type object;
+#L00086c.   call temp:=  [|java:lang:StringBuilder.toString|](v3) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000872.   v3:= temp  @type object;
+#L000874.   call temp:=  [|java:io:PrintStream.println|](v2, v3) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00087a.   goto L000830;
+#L00087c.   v0:= Exception  @type object;
+#L00087e.   v2:= @@[|java:lang:System.err|]   @type object;
+#L000882.   v3:= new [|java:lang:StringBuilder|];
+#L000886.   call temp:=  [|java:lang:StringBuilder.<init>|](v3) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L00088c.   v4:= "Error: " @type (object, string);
+#L000890.   call temp:=  [|java:lang:StringBuilder.append|](v3, v4) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000896.   v3:= temp  @type object;
+#L000898.   call temp:=  [|java:lang:IllegalArgumentException.getMessage|](v0) @signature [|Ljava/lang/IllegalArgumentException;.getMessage:()Ljava/lang/String;|] @classDescriptor [|java:lang:IllegalArgumentException|] @type virtual;
+#L00089e.   v4:= temp  @type object;
+#L0008a0.   call temp:=  [|java:lang:StringBuilder.append|](v3, v4) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0008a6.   v3:= temp  @type object;
+#L0008a8.   call temp:=  [|java:lang:StringBuilder.toString|](v3) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0008ae.   v3:= temp  @type object;
+#L0008b0.   call temp:=  [|java:io:PrintStream.println|](v2, v3) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0008b6.   goto L000830;
+#L0008b8.   v0:= Exception  @type object;
+#L0008ba.   v2:= @@[|java:lang:System.err|]   @type object;
+#L0008be.   call temp:=  [|android:os:RemoteException.toString|](v0) @signature [|Landroid/os/RemoteException;.toString:()Ljava/lang/String;|] @classDescriptor [|android:os:RemoteException|] @type virtual;
+#L0008c4.   v3:= temp  @type object;
+#L0008c6.   call temp:=  [|java:io:PrintStream.println|](v2, v3) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0008cc.   v2:= @@[|java:lang:System.err|]   @type object;
+#L0008d0.   v3:= "Error: Could not access the Input Method Manager.  Is the system running?" @type (object, string);
+#L0008d4.   call temp:=  [|java:io:PrintStream.println|](v2, v3) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0008da.   goto L000830;
+  catch  [|java:lang:IllegalArgumentException|] @[L000832..L00087a] goto L00087c;
+  catch  [|android:os:RemoteException|] @[L000832..L00087a] goto L0008b8;
+
+   }
+    procedure [|void|] [|com:android:commands:ime:Ime.runSetEnabled|] ([|com:android:commands:ime:Ime|] v6 @type (this), [|boolean|] v7) @owner [|com:android:commands:ime:Ime|] @signature [|Lcom/android/commands/ime/Ime;.runSetEnabled:(Z)V|] @Access PRIVATE {
+      local temp ;
+        [|boolean|] v2 @varname [|res|] @scope ((L0017,L0040), (L005e,L0088), (L009b,L009e));
+        [|java:lang:IllegalArgumentException|] v0 @varname [|e|] @scope ((L0041,L005e), (L0089,L009b));
+        [|java:lang:String|] v1 @varname [|id|] @scope ((L0004,L009e));
+
+
+        v3;
+        v4;
+        v5;
+      
+#L0008fc.   call temp:=  [|com:android:commands:ime:Ime.nextArg|](v6) @signature [|Lcom/android/commands/ime/Ime;.nextArg:()Ljava/lang/String;|] @classDescriptor [|com:android:commands:ime:Ime|] @type direct;
+#L000902.   v1:= temp  @type object;
+#L000904.   if v1 != 0 then goto L00091e;
+#L000908.   v3:= @@[|java:lang:System.err|]   @type object;
+#L00090c.   v4:= "Error: no input method ID specified" @type (object, string);
+#L000910.   call temp:=  [|java:io:PrintStream.println|](v3, v4) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000916.   call temp:=  [|com:android:commands:ime:Ime.showUsage|]() @signature [|Lcom/android/commands/ime/Ime;.showUsage:()V|] @classDescriptor [|com:android:commands:ime:Ime|] @type static;
+#L00091c.   return @void ;
+#L00091e.   v3:= v6.[|com:android:commands:ime:Ime.mImm|]   @type object;
+#L000922.   call temp:=  [|com:android:internal:view:IInputMethodManager.setInputMethodEnabled|](v3, v1, v7) @signature [|Lcom/android/internal/view/IInputMethodManager;.setInputMethodEnabled:(Ljava/lang/String;Z)Z|] @classDescriptor [|com:android:internal:view:IInputMethodManager|] @type interface;
+#L000928.   v2:= temp;
+#L00092a.   if v7 == 0 then goto L0009be;
+#L00092e.   v4:= @@[|java:lang:System.out|]   @type object;
+#L000932.   v3:= new [|java:lang:StringBuilder|];
+#L000936.   call temp:=  [|java:lang:StringBuilder.<init>|](v3) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L00093c.   v5:= "Input method " @type (object, string);
+#L000940.   call temp:=  [|java:lang:StringBuilder.append|](v3, v5) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000946.   v3:= temp  @type object;
+#L000948.   call temp:=  [|java:lang:StringBuilder.append|](v3, v1) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L00094e.   v3:= temp  @type object;
+#L000950.   v5:= ": " @type (object, string);
+#L000954.   call temp:=  [|java:lang:StringBuilder.append|](v3, v5) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L00095a.   v5:= temp  @type object;
+#L00095c.   if v2 == 0 then goto L0009b8;
+#L000960.   v3:= "already enabled" @type (object, string);
+#L000964.   call temp:=  [|java:lang:StringBuilder.append|](v5, v3) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L00096a.   v3:= temp  @type object;
+#L00096c.   call temp:=  [|java:lang:StringBuilder.toString|](v3) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000972.   v3:= temp  @type object;
+#L000974.   call temp:=  [|java:io:PrintStream.println|](v4, v3) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00097a.   goto L00091c;
+#L00097c.   v0:= Exception  @type object;
+#L00097e.   v3:= @@[|java:lang:System.err|]   @type object;
+#L000982.   v4:= new [|java:lang:StringBuilder|];
+#L000986.   call temp:=  [|java:lang:StringBuilder.<init>|](v4) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L00098c.   v5:= "Error: " @type (object, string);
+#L000990.   call temp:=  [|java:lang:StringBuilder.append|](v4, v5) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000996.   v4:= temp  @type object;
+#L000998.   call temp:=  [|java:lang:IllegalArgumentException.getMessage|](v0) @signature [|Ljava/lang/IllegalArgumentException;.getMessage:()Ljava/lang/String;|] @classDescriptor [|java:lang:IllegalArgumentException|] @type virtual;
+#L00099e.   v5:= temp  @type object;
+#L0009a0.   call temp:=  [|java:lang:StringBuilder.append|](v4, v5) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0009a6.   v4:= temp  @type object;
+#L0009a8.   call temp:=  [|java:lang:StringBuilder.toString|](v4) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0009ae.   v4:= temp  @type object;
+#L0009b0.   call temp:=  [|java:io:PrintStream.println|](v3, v4) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0009b6.   goto L00091c;
+#L0009b8.   v3:= "now enabled" @type (object, string);
+#L0009bc.   goto L000964;
+#L0009be.   v4:= @@[|java:lang:System.out|]   @type object;
+#L0009c2.   v3:= new [|java:lang:StringBuilder|];
+#L0009c6.   call temp:=  [|java:lang:StringBuilder.<init>|](v3) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L0009cc.   v5:= "Input method " @type (object, string);
+#L0009d0.   call temp:=  [|java:lang:StringBuilder.append|](v3, v5) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0009d6.   v3:= temp  @type object;
+#L0009d8.   call temp:=  [|java:lang:StringBuilder.append|](v3, v1) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0009de.   v3:= temp  @type object;
+#L0009e0.   v5:= ": " @type (object, string);
+#L0009e4.   call temp:=  [|java:lang:StringBuilder.append|](v3, v5) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0009ea.   v5:= temp  @type object;
+#L0009ec.   if v2 == 0 then goto L000a32;
+#L0009f0.   v3:= "now disabled" @type (object, string);
+#L0009f4.   call temp:=  [|java:lang:StringBuilder.append|](v5, v3) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0009fa.   v3:= temp  @type object;
+#L0009fc.   call temp:=  [|java:lang:StringBuilder.toString|](v3) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000a02.   v3:= temp  @type object;
+#L000a04.   call temp:=  [|java:io:PrintStream.println|](v4, v3) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000a0a.   goto L00091c;
+#L000a0c.   v0:= Exception  @type object;
+#L000a0e.   v3:= @@[|java:lang:System.err|]   @type object;
+#L000a12.   call temp:=  [|android:os:RemoteException.toString|](v0) @signature [|Landroid/os/RemoteException;.toString:()Ljava/lang/String;|] @classDescriptor [|android:os:RemoteException|] @type virtual;
+#L000a18.   v4:= temp  @type object;
+#L000a1a.   call temp:=  [|java:io:PrintStream.println|](v3, v4) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000a20.   v3:= @@[|java:lang:System.err|]   @type object;
+#L000a24.   v4:= "Error: Could not access the Input Method Manager.  Is the system running?" @type (object, string);
+#L000a28.   call temp:=  [|java:io:PrintStream.println|](v3, v4) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000a2e.   goto L00091c;
+#L000a32.   v3:= "already disabled" @type (object, string);
+#L000a36.   goto L0009f4;
+  catch  [|java:lang:IllegalArgumentException|] @[L00091e..L00097a] goto L00097c;
+  catch  [|android:os:RemoteException|] @[L00091e..L00097a] goto L000a0c;
+  catch  [|java:lang:IllegalArgumentException|] @[L0009b8..L000a0a] goto L00097c;
+  catch  [|android:os:RemoteException|] @[L0009b8..L000a0a] goto L000a0c;
+  catch  [|java:lang:IllegalArgumentException|] @[L000a32..L000a36] goto L00097c;
+  catch  [|android:os:RemoteException|] @[L000a32..L000a36] goto L000a0c;
+
+   }
+    procedure [|void|] [|com:android:commands:ime:Ime.showUsage|] () @owner [|com:android:commands:ime:Ime|] @signature [|Lcom/android/commands/ime/Ime;.showUsage:()V|] @Access PRIVATE_STATIC {
+      local temp ;
+        v0;
+        v1;
+      
+#L000a68.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000a6c.   v1:= "usage: ime list [-a] [-s]" @type (object, string);
+#L000a70.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000a76.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000a7a.   v1:= "       ime enable ID" @type (object, string);
+#L000a7e.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000a84.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000a88.   v1:= "       ime disable ID" @type (object, string);
+#L000a8c.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000a92.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000a96.   v1:= "       ime set ID" @type (object, string);
+#L000a9a.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000aa0.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000aa4.   v1:= "" @type (object, string);
+#L000aa8.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000aae.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000ab2.   v1:= "The list command prints all enabled input methods.  Use" @type (object, string);
+#L000ab6.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000abc.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000ac0.   v1:= "the -a option to see all input methods.  Use" @type (object, string);
+#L000ac4.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000aca.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000ace.   v1:= "the -s option to see only a single summary line of each." @type (object, string);
+#L000ad2.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000ad8.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000adc.   v1:= "" @type (object, string);
+#L000ae0.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000ae6.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000aea.   v1:= "The enable command allows the given input method ID to be used." @type (object, string);
+#L000aee.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000af4.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000af8.   v1:= "" @type (object, string);
+#L000afc.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000b02.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000b06.   v1:= "The disable command disallows the given input method ID from use." @type (object, string);
+#L000b0a.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000b10.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000b14.   v1:= "" @type (object, string);
+#L000b18.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000b1e.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000b22.   v1:= "The set command switches to the given input method ID." @type (object, string);
+#L000b26.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000b2c.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:ime:Ime.run|] ([|com:android:commands:ime:Ime|] v4 @type (this), [|java:lang:String|][] v5 @type (object)) @owner [|com:android:commands:ime:Ime|] @signature [|Lcom/android/commands/ime/Ime;.run:([Ljava/lang/String;)V|] @Access PUBLIC {
+      local temp ;
+        [|java:lang:String|] v0 @varname [|op|] @scope ((L0025,L007b));
+
+
+        v1;
+        v2;
+        v3;
+      
+#L000b40.   v3:= 0  @length 4;
+#L000b42.   v2:= 1  @length 4;
+#L000b44.   v1:= v5.length;
+#L000b46.   if v1 >= v2 then goto L000b52;
+#L000b4a.   call temp:=  [|com:android:commands:ime:Ime.showUsage|]() @signature [|Lcom/android/commands/ime/Ime;.showUsage:()V|] @classDescriptor [|com:android:commands:ime:Ime|] @type static;
+#L000b50.   return @void ;
+#L000b52.   v1:= "input_method" @type (object, string);
+#L000b56.   call temp:=  [|android:os:ServiceManager.getService|](v1) @signature [|Landroid/os/ServiceManager;.getService:(Ljava/lang/String;)Landroid/os/IBinder;|] @classDescriptor [|android:os:ServiceManager|] @type static;
+#L000b5c.   v1:= temp  @type object;
+#L000b5e.   call temp:=  [|com:android:internal:view:IInputMethodManager$Stub.asInterface|](v1) @signature [|Lcom/android/internal/view/IInputMethodManager$Stub;.asInterface:(Landroid/os/IBinder;)Lcom/android/internal/view/IInputMethodManager;|] @classDescriptor [|com:android:internal:view:IInputMethodManager$Stub|] @type static;
+#L000b64.   v1:= temp  @type object;
+#L000b66.   v4.[|com:android:commands:ime:Ime.mImm|]  := v1 @type object;
+#L000b6a.   v1:= v4.[|com:android:commands:ime:Ime.mImm|]   @type object;
+#L000b6e.   if v1 != 0 then goto L000b82;
+#L000b72.   v1:= @@[|java:lang:System.err|]   @type object;
+#L000b76.   v2:= "Error: Could not access the Input Method Manager.  Is the system running?" @type (object, string);
+#L000b7a.   call temp:=  [|java:io:PrintStream.println|](v1, v2) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000b80.   goto L000b50;
+#L000b82.   v4.[|com:android:commands:ime:Ime.mArgs|]  := v5 @type object;
+#L000b86.   v0:= v5[v3]  @type object;
+#L000b8a.   v4.[|com:android:commands:ime:Ime.mNextArg|]  := v2;
+#L000b8e.   v1:= "list" @type (object, string);
+#L000b92.   call temp:=  [|java:lang:String.equals|](v1, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000b98.   v1:= temp;
+#L000b9a.   if v1 == 0 then goto L000ba6;
+#L000b9e.   call temp:=  [|com:android:commands:ime:Ime.runList|](v4) @signature [|Lcom/android/commands/ime/Ime;.runList:()V|] @classDescriptor [|com:android:commands:ime:Ime|] @type direct;
+#L000ba4.   goto L000b50;
+#L000ba6.   v1:= "enable" @type (object, string);
+#L000baa.   call temp:=  [|java:lang:String.equals|](v1, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000bb0.   v1:= temp;
+#L000bb2.   if v1 == 0 then goto L000bbe;
+#L000bb6.   call temp:=  [|com:android:commands:ime:Ime.runSetEnabled|](v4, v2) @signature [|Lcom/android/commands/ime/Ime;.runSetEnabled:(Z)V|] @classDescriptor [|com:android:commands:ime:Ime|] @type direct;
+#L000bbc.   goto L000b50;
+#L000bbe.   v1:= "disable" @type (object, string);
+#L000bc2.   call temp:=  [|java:lang:String.equals|](v1, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000bc8.   v1:= temp;
+#L000bca.   if v1 == 0 then goto L000bd6;
+#L000bce.   call temp:=  [|com:android:commands:ime:Ime.runSetEnabled|](v4, v3) @signature [|Lcom/android/commands/ime/Ime;.runSetEnabled:(Z)V|] @classDescriptor [|com:android:commands:ime:Ime|] @type direct;
+#L000bd4.   goto L000b50;
+#L000bd6.   v1:= "set" @type (object, string);
+#L000bda.   call temp:=  [|java:lang:String.equals|](v1, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000be0.   v1:= temp;
+#L000be2.   if v1 == 0 then goto L000bee;
+#L000be6.   call temp:=  [|com:android:commands:ime:Ime.runSet|](v4) @signature [|Lcom/android/commands/ime/Ime;.runSet:()V|] @classDescriptor [|com:android:commands:ime:Ime|] @type direct;
+#L000bec.   goto L000b50;
+#L000bee.   if v0 == 0 then goto L000c2e;
+#L000bf2.   v1:= @@[|java:lang:System.err|]   @type object;
+#L000bf6.   v2:= new [|java:lang:StringBuilder|];
+#L000bfa.   call temp:=  [|java:lang:StringBuilder.<init>|](v2) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L000c00.   v3:= "Error: unknown command '" @type (object, string);
+#L000c04.   call temp:=  [|java:lang:StringBuilder.append|](v2, v3) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000c0a.   v2:= temp  @type object;
+#L000c0c.   call temp:=  [|java:lang:StringBuilder.append|](v2, v0) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000c12.   v2:= temp  @type object;
+#L000c14.   v3:= "'" @type (object, string);
+#L000c18.   call temp:=  [|java:lang:StringBuilder.append|](v2, v3) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000c1e.   v2:= temp  @type object;
+#L000c20.   call temp:=  [|java:lang:StringBuilder.toString|](v2) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000c26.   v2:= temp  @type object;
+#L000c28.   call temp:=  [|java:io:PrintStream.println|](v1, v2) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000c2e.   call temp:=  [|com:android:commands:ime:Ime.showUsage|]() @signature [|Lcom/android/commands/ime/Ime;.showUsage:()V|] @classDescriptor [|com:android:commands:ime:Ime|] @type static;
+#L000c34.   goto L000b50;
+
+   }

@@ -1,0 +1,966 @@
+record [|com:android:commands:content:Content$Command|]  @type class @AccessFlag ABSTRACT  {
+      [|android:net:Uri|] [|com:android:commands:content:Content$Command.mUri|]    @AccessFlag FINAL;
+      [|int|] [|com:android:commands:content:Content$Command.mUserId|]    @AccessFlag FINAL;
+   }
+    procedure [|void|] [|com:android:commands:content:Content$Command.<init>|] ([|com:android:commands:content:Content$Command|] v0 @type (this), [|android:net:Uri|] v1 @type (object), [|int|] v2) @owner [|com:android:commands:content:Content$Command|] @signature [|Lcom/android/commands/content/Content$Command;.<init>:(Landroid/net/Uri;I)V|] @Access PUBLIC_CONSTRUCTOR {
+      local temp ;
+
+
+
+      
+#L000c48.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
+#L000c4e.   v0.[|com:android:commands:content:Content$Command.mUri|]  := v1 @type object;
+#L000c52.   v0.[|com:android:commands:content:Content$Command.mUserId|]  := v2;
+#L000c56.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:content:Content$Command.execute|] ([|com:android:commands:content:Content$Command|] v9 @type (this)) @owner [|com:android:commands:content:Content$Command|] @signature [|Lcom/android/commands/content/Content$Command;.execute:()V|] @Access PUBLIC_FINAL {
+      local temp ;
+        [|android:app:IActivityManager$ContentProviderHolder|] v2 @varname [|holder|] @scope ((L0016,L0031), (L0055,L0060));
+        [|android:app:IActivityManager|] v0 @varname [|activityManager|] @scope ((L000a,L0038), (L0055,L0060));
+        [|android:content:IContentProvider|] v3 @varname [|provider|] @scope ((L000b,L0038), (L0055,L0060));
+        [|android:os:IBinder|] v5 @varname [|token|] @scope ((L0010,L0038), (L0055,L0060));
+        [|java:lang:Exception|] v1 @varname [|e|] @scope ((L0039,L0054));
+        [|java:lang:String|] v4 @varname [|providerName|] @scope ((L0006,L0060));
+
+        v6;
+        v7;
+        v8;
+      
+#L000c68.   v6:= v9.[|com:android:commands:content:Content$Command.mUri|]   @type object;
+#L000c6c.   call temp:=  [|android:net:Uri.getAuthority|](v6) @signature [|Landroid/net/Uri;.getAuthority:()Ljava/lang/String;|] @classDescriptor [|android:net:Uri|] @type virtual;
+#L000c72.   v4:= temp  @type object;
+#L000c74.   call temp:=  [|android:app:ActivityManagerNative.getDefault|]() @signature [|Landroid/app/ActivityManagerNative;.getDefault:()Landroid/app/IActivityManager;|] @classDescriptor [|android:app:ActivityManagerNative|] @type static;
+#L000c7a.   v0:= temp  @type object;
+#L000c7c.   v3:= 0  @length 4;
+#L000c7e.   v5:= new [|android:os:Binder|];
+#L000c82.   call temp:=  [|android:os:Binder.<init>|](v5) @signature [|Landroid/os/Binder;.<init>:()V|] @classDescriptor [|android:os:Binder|] @type direct;
+#L000c88.   v6:= v9.[|com:android:commands:content:Content$Command.mUserId|] ;
+#L000c8c.   call temp:=  [|android:app:IActivityManager.getContentProviderExternal|](v0, v4, v6, v5) @signature [|Landroid/app/IActivityManager;.getContentProviderExternal:(Ljava/lang/String;ILandroid/os/IBinder;)Landroid/app/IActivityManager$ContentProviderHolder;|] @classDescriptor [|android:app:IActivityManager|] @type interface;
+#L000c92.   v2:= temp  @type object;
+#L000c94.   if v2 != 0 then goto L000d12;
+#L000c98.   v6:= new [|java:lang:IllegalStateException|];
+#L000c9c.   v7:= new [|java:lang:StringBuilder|];
+#L000ca0.   call temp:=  [|java:lang:StringBuilder.<init>|](v7) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L000ca6.   v8:= "Could not find provider: " @type (object, string);
+#L000caa.   call temp:=  [|java:lang:StringBuilder.append|](v7, v8) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000cb0.   v7:= temp  @type object;
+#L000cb2.   call temp:=  [|java:lang:StringBuilder.append|](v7, v4) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000cb8.   v7:= temp  @type object;
+#L000cba.   call temp:=  [|java:lang:StringBuilder.toString|](v7) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000cc0.   v7:= temp  @type object;
+#L000cc2.   call temp:=  [|java:lang:IllegalStateException.<init>|](v6, v7) @signature [|Ljava/lang/IllegalStateException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:IllegalStateException|] @type direct;
+#L000cc8.   throw v6;
+#L000cca.   v6:= Exception  @type object;
+#L000ccc.   if v3 == 0 then goto L000cd6;
+#L000cd0.   call temp:=  [|android:app:IActivityManager.removeContentProviderExternal|](v0, v4, v5) @signature [|Landroid/app/IActivityManager;.removeContentProviderExternal:(Ljava/lang/String;Landroid/os/IBinder;)V|] @classDescriptor [|android:app:IActivityManager|] @type interface;
+#L000cd6.   throw v6;
+#L000cd8.   v1:= Exception  @type object;
+#L000cda.   v6:= @@[|java:lang:System.err|]   @type object;
+#L000cde.   v7:= new [|java:lang:StringBuilder|];
+#L000ce2.   call temp:=  [|java:lang:StringBuilder.<init>|](v7) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L000ce8.   v8:= "Error while accessing provider:" @type (object, string);
+#L000cec.   call temp:=  [|java:lang:StringBuilder.append|](v7, v8) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000cf2.   v7:= temp  @type object;
+#L000cf4.   call temp:=  [|java:lang:StringBuilder.append|](v7, v4) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000cfa.   v7:= temp  @type object;
+#L000cfc.   call temp:=  [|java:lang:StringBuilder.toString|](v7) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000d02.   v7:= temp  @type object;
+#L000d04.   call temp:=  [|java:io:PrintStream.println|](v6, v7) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000d0a.   call temp:=  [|java:lang:Exception.printStackTrace|](v1) @signature [|Ljava/lang/Exception;.printStackTrace:()V|] @classDescriptor [|java:lang:Exception|] @type virtual;
+#L000d10.   return @void ;
+#L000d12.   v3:= v2.[|android:app:IActivityManager$ContentProviderHolder.provider|]   @type object;
+#L000d16.   call temp:=  [|com:android:commands:content:Content$Command.onExecute|](v9, v3) @signature [|Lcom/android/commands/content/Content$Command;.onExecute:(Landroid/content/IContentProvider;)V|] @classDescriptor [|com:android:commands:content:Content$Command|] @type virtual;
+#L000d1c.   if v3 == 0 then goto L000d10;
+#L000d20.   call temp:=  [|android:app:IActivityManager.removeContentProviderExternal|](v0, v4, v5) @signature [|Landroid/app/IActivityManager;.removeContentProviderExternal:(Ljava/lang/String;Landroid/os/IBinder;)V|] @classDescriptor [|android:app:IActivityManager|] @type interface;
+#L000d26.   goto L000d10;
+  catch  [|java:lang:Exception|] @[L000c74..L000c88] goto L000cd8;
+  catch  [|any|] @[L000c88..L000cca] goto L000cca;
+  catch  [|java:lang:Exception|] @[L000cd0..L000cd8] goto L000cd8;
+  catch  [|any|] @[L000d12..L000d1c] goto L000cca;
+  catch  [|java:lang:Exception|] @[L000d20..L000d26] goto L000cd8;
+
+   }
+    procedure [|void|] [|com:android:commands:content:Content$Command.onExecute|] ([|android:content:IContentProvider|] v0 @type (object)) @owner [|com:android:commands:content:Content$Command|] @signature [|Lcom/android/commands/content/Content$Command;.onExecute:(Landroid/content/IContentProvider;)V|] @Access PROTECTED_ABSTRACT {
+      # return;
+   }
+record [|com:android:commands:content:Content$DeleteCommand|]  @type class @AccessFlag   extends [|com:android:commands:content:Content$Command|] {
+      [|java:lang:String|] [|com:android:commands:content:Content$DeleteCommand.mWhere|]    @AccessFlag FINAL;
+   }
+    procedure [|void|] [|com:android:commands:content:Content$DeleteCommand.<init>|] ([|com:android:commands:content:Content$DeleteCommand|] v0 @type (this), [|android:net:Uri|] v1 @type (object), [|int|] v2, [|java:lang:String|] v3 @type (object)) @owner [|com:android:commands:content:Content$DeleteCommand|] @signature [|Lcom/android/commands/content/Content$DeleteCommand;.<init>:(Landroid/net/Uri;ILjava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
+      local temp ;
+
+
+
+
+      
+#L000d68.   call temp:=  [|com:android:commands:content:Content$Command.<init>|](v0, v1, v2) @signature [|Lcom/android/commands/content/Content$Command;.<init>:(Landroid/net/Uri;I)V|] @classDescriptor [|com:android:commands:content:Content$Command|] @type direct;
+#L000d6e.   v0.[|com:android:commands:content:Content$DeleteCommand.mWhere|]  := v3 @type object;
+#L000d72.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:content:Content$DeleteCommand.onExecute|] ([|com:android:commands:content:Content$DeleteCommand|] v3 @type (this), [|android:content:IContentProvider|] v4 @type (object)) @owner [|com:android:commands:content:Content$DeleteCommand|] @signature [|Lcom/android/commands/content/Content$DeleteCommand;.onExecute:(Landroid/content/IContentProvider;)V|] @Access PUBLIC {
+      local temp ;
+
+
+        v0;
+        v1;
+        v2;
+      
+#L000d84.   v0:= v3.[|com:android:commands:content:Content$DeleteCommand.mUri|]   @type object;
+#L000d88.   v1:= v3.[|com:android:commands:content:Content$DeleteCommand.mWhere|]   @type object;
+#L000d8c.   v2:= 0  @length 4;
+#L000d8e.   call temp:=  [|android:content:IContentProvider.delete|](v4, v0, v1, v2) @signature [|Landroid/content/IContentProvider;.delete:(Landroid/net/Uri;Ljava/lang/String;[Ljava/lang/String;)I|] @classDescriptor [|android:content:IContentProvider|] @type interface;
+#L000d94.   return @void ;
+
+   }
+record [|com:android:commands:content:Content$InsertCommand|]  @type class @AccessFlag   extends [|com:android:commands:content:Content$Command|] {
+      [|android:content:ContentValues|] [|com:android:commands:content:Content$InsertCommand.mContentValues|]    @AccessFlag FINAL;
+   }
+    procedure [|void|] [|com:android:commands:content:Content$InsertCommand.<init>|] ([|com:android:commands:content:Content$InsertCommand|] v0 @type (this), [|android:net:Uri|] v1 @type (object), [|int|] v2, [|android:content:ContentValues|] v3 @type (object)) @owner [|com:android:commands:content:Content$InsertCommand|] @signature [|Lcom/android/commands/content/Content$InsertCommand;.<init>:(Landroid/net/Uri;ILandroid/content/ContentValues;)V|] @Access PUBLIC_CONSTRUCTOR {
+      local temp ;
+
+
+
+
+      
+#L000da8.   call temp:=  [|com:android:commands:content:Content$Command.<init>|](v0, v1, v2) @signature [|Lcom/android/commands/content/Content$Command;.<init>:(Landroid/net/Uri;I)V|] @classDescriptor [|com:android:commands:content:Content$Command|] @type direct;
+#L000dae.   v0.[|com:android:commands:content:Content$InsertCommand.mContentValues|]  := v3 @type object;
+#L000db2.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:content:Content$InsertCommand.onExecute|] ([|com:android:commands:content:Content$InsertCommand|] v2 @type (this), [|android:content:IContentProvider|] v3 @type (object)) @owner [|com:android:commands:content:Content$InsertCommand|] @signature [|Lcom/android/commands/content/Content$InsertCommand;.onExecute:(Landroid/content/IContentProvider;)V|] @Access PUBLIC {
+      local temp ;
+
+
+        v0;
+        v1;
+      
+#L000dc4.   v0:= v2.[|com:android:commands:content:Content$InsertCommand.mUri|]   @type object;
+#L000dc8.   v1:= v2.[|com:android:commands:content:Content$InsertCommand.mContentValues|]   @type object;
+#L000dcc.   call temp:=  [|android:content:IContentProvider.insert|](v3, v0, v1) @signature [|Landroid/content/IContentProvider;.insert:(Landroid/net/Uri;Landroid/content/ContentValues;)Landroid/net/Uri;|] @classDescriptor [|android:content:IContentProvider|] @type interface;
+#L000dd2.   return @void ;
+
+   }
+record [|com:android:commands:content:Content$Parser|]  @type class @AccessFlag   {
+      [|com:android:commands:content:Content$Tokenizer|] [|com:android:commands:content:Content$Parser.mTokenizer|]    @AccessFlag PRIVATE_FINAL;
+   }
+      global [|java:lang:String|] @@[|com:android:commands:content:Content$Parser.ARGUMENT_BIND|]    @AccessFlag PRIVATE_STATIC_FINAL;
+      global [|java:lang:String|] @@[|com:android:commands:content:Content$Parser.ARGUMENT_DELETE|]    @AccessFlag PRIVATE_STATIC_FINAL;
+      global [|java:lang:String|] @@[|com:android:commands:content:Content$Parser.ARGUMENT_INSERT|]    @AccessFlag PRIVATE_STATIC_FINAL;
+      global [|java:lang:String|] @@[|com:android:commands:content:Content$Parser.ARGUMENT_PREFIX|]    @AccessFlag PRIVATE_STATIC_FINAL;
+      global [|java:lang:String|] @@[|com:android:commands:content:Content$Parser.ARGUMENT_PROJECTION|]    @AccessFlag PRIVATE_STATIC_FINAL;
+      global [|java:lang:String|] @@[|com:android:commands:content:Content$Parser.ARGUMENT_QUERY|]    @AccessFlag PRIVATE_STATIC_FINAL;
+      global [|java:lang:String|] @@[|com:android:commands:content:Content$Parser.ARGUMENT_SORT|]    @AccessFlag PRIVATE_STATIC_FINAL;
+      global [|java:lang:String|] @@[|com:android:commands:content:Content$Parser.ARGUMENT_UPDATE|]    @AccessFlag PRIVATE_STATIC_FINAL;
+      global [|java:lang:String|] @@[|com:android:commands:content:Content$Parser.ARGUMENT_URI|]    @AccessFlag PRIVATE_STATIC_FINAL;
+      global [|java:lang:String|] @@[|com:android:commands:content:Content$Parser.ARGUMENT_USER|]    @AccessFlag PRIVATE_STATIC_FINAL;
+      global [|java:lang:String|] @@[|com:android:commands:content:Content$Parser.ARGUMENT_WHERE|]    @AccessFlag PRIVATE_STATIC_FINAL;
+      global [|java:lang:String|] @@[|com:android:commands:content:Content$Parser.COLON|]    @AccessFlag PRIVATE_STATIC_FINAL;
+      global [|java:lang:String|] @@[|com:android:commands:content:Content$Parser.TYPE_BOOLEAN|]    @AccessFlag PRIVATE_STATIC_FINAL;
+      global [|java:lang:String|] @@[|com:android:commands:content:Content$Parser.TYPE_DOUBLE|]    @AccessFlag PRIVATE_STATIC_FINAL;
+      global [|java:lang:String|] @@[|com:android:commands:content:Content$Parser.TYPE_FLOAT|]    @AccessFlag PRIVATE_STATIC_FINAL;
+      global [|java:lang:String|] @@[|com:android:commands:content:Content$Parser.TYPE_INTEGER|]    @AccessFlag PRIVATE_STATIC_FINAL;
+      global [|java:lang:String|] @@[|com:android:commands:content:Content$Parser.TYPE_LONG|]    @AccessFlag PRIVATE_STATIC_FINAL;
+      global [|java:lang:String|] @@[|com:android:commands:content:Content$Parser.TYPE_STRING|]    @AccessFlag PRIVATE_STATIC_FINAL;
+    procedure [|void|] [|com:android:commands:content:Content$Parser.<init>|] ([|com:android:commands:content:Content$Parser|] v1 @type (this), [|java:lang:String|][] v2 @type (object)) @owner [|com:android:commands:content:Content$Parser|] @signature [|Lcom/android/commands/content/Content$Parser;.<init>:([Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
+      local temp ;
+
+
+        v0;
+      
+#L000de4.   call temp:=  [|java:lang:Object.<init>|](v1) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
+#L000dea.   v0:= new [|com:android:commands:content:Content$Tokenizer|];
+#L000dee.   call temp:=  [|com:android:commands:content:Content$Tokenizer.<init>|](v0, v2) @signature [|Lcom/android/commands/content/Content$Tokenizer;.<init>:([Ljava/lang/String;)V|] @classDescriptor [|com:android:commands:content:Content$Tokenizer|] @type direct;
+#L000df4.   v1.[|com:android:commands:content:Content$Parser.mTokenizer|]  := v0 @type object;
+#L000df8.   return @void ;
+
+   }
+    procedure [|java:lang:String|] [|com:android:commands:content:Content$Parser.argumentValueRequired|] ([|com:android:commands:content:Content$Parser|] v4 @type (this), [|java:lang:String|] v5 @type (object)) @owner [|com:android:commands:content:Content$Parser|] @signature [|Lcom/android/commands/content/Content$Parser;.argumentValueRequired:(Ljava/lang/String;)Ljava/lang/String;|] @Access PRIVATE {
+      local temp ;
+        [|java:lang:String|] v0 @varname [|value|] @scope ((L0006,L002e));
+
+
+        v1;
+        v2;
+        v3;
+      
+#L000e0c.   v1:= v4.[|com:android:commands:content:Content$Parser.mTokenizer|]   @type object;
+#L000e10.   call temp:=  [|com:android:commands:content:Content$Tokenizer.access$000|](v1) @signature [|Lcom/android/commands/content/Content$Tokenizer;.access$000:(Lcom/android/commands/content/Content$Tokenizer;)Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Tokenizer|] @type static;
+#L000e16.   v0:= temp  @type object;
+#L000e18.   call temp:=  [|android:text:TextUtils.isEmpty|](v0) @signature [|Landroid/text/TextUtils;.isEmpty:(Ljava/lang/CharSequence;)Z|] @classDescriptor [|android:text:TextUtils|] @type static;
+#L000e1e.   v1:= temp;
+#L000e20.   if v1 != 0 then goto L000e34;
+#L000e24.   v1:= "--" @type (object, string);
+#L000e28.   call temp:=  [|java:lang:String.startsWith|](v0, v1) @signature [|Ljava/lang/String;.startsWith:(Ljava/lang/String;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000e2e.   v1:= temp;
+#L000e30.   if v1 == 0 then goto L000e66;
+#L000e34.   v1:= new [|java:lang:IllegalArgumentException|];
+#L000e38.   v2:= new [|java:lang:StringBuilder|];
+#L000e3c.   call temp:=  [|java:lang:StringBuilder.<init>|](v2) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L000e42.   v3:= "No value for argument: " @type (object, string);
+#L000e46.   call temp:=  [|java:lang:StringBuilder.append|](v2, v3) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000e4c.   v2:= temp  @type object;
+#L000e4e.   call temp:=  [|java:lang:StringBuilder.append|](v2, v5) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000e54.   v2:= temp  @type object;
+#L000e56.   call temp:=  [|java:lang:StringBuilder.toString|](v2) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000e5c.   v2:= temp  @type object;
+#L000e5e.   call temp:=  [|java:lang:IllegalArgumentException.<init>|](v1, v2) @signature [|Ljava/lang/IllegalArgumentException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:IllegalArgumentException|] @type direct;
+#L000e64.   throw v1;
+#L000e66.   return v0  @type object;
+
+   }
+    procedure [|void|] [|com:android:commands:content:Content$Parser.parseBindValue|] ([|com:android:commands:content:Content$Parser|] v9 @type (this), [|android:content:ContentValues|] v10 @type (object)) @owner [|com:android:commands:content:Content$Parser|] @signature [|Lcom/android/commands/content/Content$Parser;.parseBindValue:(Landroid/content/ContentValues;)V|] @Access PRIVATE {
+      local temp ;
+        [|java:lang:String|] v0 @varname [|argument|] @scope ((L0006,L00eb));
+        [|java:lang:String|] v1 @varname [|column|] @scope ((L006e,L00eb));
+        [|int|] v2 @varname [|firstColonIndex|] @scope ((L002b,L00eb));
+        [|int|] v3 @varname [|secondColonIndex|] @scope ((L004e,L00eb));
+        [|java:lang:String|] v4 @varname [|type|] @scope ((L0074,L00eb));
+        [|java:lang:String|] v5 @varname [|value|] @scope ((L007a,L00eb));
+
+
+        v6;
+        v7;
+        v8;
+      
+#L000e78.   v6:= v9.[|com:android:commands:content:Content$Parser.mTokenizer|]   @type object;
+#L000e7c.   call temp:=  [|com:android:commands:content:Content$Tokenizer.access$000|](v6) @signature [|Lcom/android/commands/content/Content$Tokenizer;.access$000:(Lcom/android/commands/content/Content$Tokenizer;)Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Tokenizer|] @type static;
+#L000e82.   v0:= temp  @type object;
+#L000e84.   call temp:=  [|android:text:TextUtils.isEmpty|](v0) @signature [|Landroid/text/TextUtils;.isEmpty:(Ljava/lang/CharSequence;)Z|] @classDescriptor [|android:text:TextUtils|] @type static;
+#L000e8a.   v6:= temp;
+#L000e8c.   if v6 == 0 then goto L000ec2;
+#L000e90.   v6:= new [|java:lang:IllegalArgumentException|];
+#L000e94.   v7:= new [|java:lang:StringBuilder|];
+#L000e98.   call temp:=  [|java:lang:StringBuilder.<init>|](v7) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L000e9e.   v8:= "Binding not well formed: " @type (object, string);
+#L000ea2.   call temp:=  [|java:lang:StringBuilder.append|](v7, v8) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000ea8.   v7:= temp  @type object;
+#L000eaa.   call temp:=  [|java:lang:StringBuilder.append|](v7, v0) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000eb0.   v7:= temp  @type object;
+#L000eb2.   call temp:=  [|java:lang:StringBuilder.toString|](v7) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000eb8.   v7:= temp  @type object;
+#L000eba.   call temp:=  [|java:lang:IllegalArgumentException.<init>|](v6, v7) @signature [|Ljava/lang/IllegalArgumentException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:IllegalArgumentException|] @type direct;
+#L000ec0.   throw v6;
+#L000ec2.   v6:= ":" @type (object, string);
+#L000ec6.   call temp:=  [|java:lang:String.indexOf|](v0, v6) @signature [|Ljava/lang/String;.indexOf:(Ljava/lang/String;)I|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000ecc.   v2:= temp;
+#L000ece.   if v2 >= 0 then goto L000f04;
+#L000ed2.   v6:= new [|java:lang:IllegalArgumentException|];
+#L000ed6.   v7:= new [|java:lang:StringBuilder|];
+#L000eda.   call temp:=  [|java:lang:StringBuilder.<init>|](v7) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L000ee0.   v8:= "Binding not well formed: " @type (object, string);
+#L000ee4.   call temp:=  [|java:lang:StringBuilder.append|](v7, v8) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000eea.   v7:= temp  @type object;
+#L000eec.   call temp:=  [|java:lang:StringBuilder.append|](v7, v0) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000ef2.   v7:= temp  @type object;
+#L000ef4.   call temp:=  [|java:lang:StringBuilder.toString|](v7) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000efa.   v7:= temp  @type object;
+#L000efc.   call temp:=  [|java:lang:IllegalArgumentException.<init>|](v6, v7) @signature [|Ljava/lang/IllegalArgumentException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:IllegalArgumentException|] @type direct;
+#L000f02.   throw v6;
+#L000f04.   v6:= ":" @type (object, string);
+#L000f08.   v7:= v2 + 1;
+#L000f0c.   call temp:=  [|java:lang:String.indexOf|](v0, v6, v7) @signature [|Ljava/lang/String;.indexOf:(Ljava/lang/String;I)I|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000f12.   v3:= temp;
+#L000f14.   if v3 >= 0 then goto L000f4a;
+#L000f18.   v6:= new [|java:lang:IllegalArgumentException|];
+#L000f1c.   v7:= new [|java:lang:StringBuilder|];
+#L000f20.   call temp:=  [|java:lang:StringBuilder.<init>|](v7) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L000f26.   v8:= "Binding not well formed: " @type (object, string);
+#L000f2a.   call temp:=  [|java:lang:StringBuilder.append|](v7, v8) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000f30.   v7:= temp  @type object;
+#L000f32.   call temp:=  [|java:lang:StringBuilder.append|](v7, v0) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000f38.   v7:= temp  @type object;
+#L000f3a.   call temp:=  [|java:lang:StringBuilder.toString|](v7) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000f40.   v7:= temp  @type object;
+#L000f42.   call temp:=  [|java:lang:IllegalArgumentException.<init>|](v6, v7) @signature [|Ljava/lang/IllegalArgumentException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:IllegalArgumentException|] @type direct;
+#L000f48.   throw v6;
+#L000f4a.   v6:= 0  @length 4;
+#L000f4c.   call temp:=  [|java:lang:String.substring|](v0, v6, v2) @signature [|Ljava/lang/String;.substring:(II)Ljava/lang/String;|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000f52.   v1:= temp  @type object;
+#L000f54.   v6:= v2 + 1;
+#L000f58.   call temp:=  [|java:lang:String.substring|](v0, v6, v3) @signature [|Ljava/lang/String;.substring:(II)Ljava/lang/String;|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000f5e.   v4:= temp  @type object;
+#L000f60.   v6:= v3 + 1;
+#L000f64.   call temp:=  [|java:lang:String.substring|](v0, v6) @signature [|Ljava/lang/String;.substring:(I)Ljava/lang/String;|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000f6a.   v5:= temp  @type object;
+#L000f6c.   v6:= "s" @type (object, string);
+#L000f70.   call temp:=  [|java:lang:String.equals|](v6, v4) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000f76.   v6:= temp;
+#L000f78.   if v6 == 0 then goto L000f84;
+#L000f7c.   call temp:=  [|android:content:ContentValues.put|](v10, v1, v5) @signature [|Landroid/content/ContentValues;.put:(Ljava/lang/String;Ljava/lang/String;)V|] @classDescriptor [|android:content:ContentValues|] @type virtual;
+#L000f82.   return @void ;
+#L000f84.   v6:= "b" @type (object, string);
+#L000f88.   call temp:=  [|java:lang:String.equalsIgnoreCase|](v6, v4) @signature [|Ljava/lang/String;.equalsIgnoreCase:(Ljava/lang/String;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000f8e.   v6:= temp;
+#L000f90.   if v6 == 0 then goto L000fac;
+#L000f94.   call temp:=  [|java:lang:Boolean.parseBoolean|](v5) @signature [|Ljava/lang/Boolean;.parseBoolean:(Ljava/lang/String;)Z|] @classDescriptor [|java:lang:Boolean|] @type static;
+#L000f9a.   v6:= temp;
+#L000f9c.   call temp:=  [|java:lang:Boolean.valueOf|](v6) @signature [|Ljava/lang/Boolean;.valueOf:(Z)Ljava/lang/Boolean;|] @classDescriptor [|java:lang:Boolean|] @type static;
+#L000fa2.   v6:= temp  @type object;
+#L000fa4.   call temp:=  [|android:content:ContentValues.put|](v10, v1, v6) @signature [|Landroid/content/ContentValues;.put:(Ljava/lang/String;Ljava/lang/Boolean;)V|] @classDescriptor [|android:content:ContentValues|] @type virtual;
+#L000faa.   goto L000f82;
+#L000fac.   v6:= "i" @type (object, string);
+#L000fb0.   call temp:=  [|java:lang:String.equalsIgnoreCase|](v6, v4) @signature [|Ljava/lang/String;.equalsIgnoreCase:(Ljava/lang/String;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000fb6.   v6:= temp;
+#L000fb8.   if v6 != 0 then goto L000fcc;
+#L000fbc.   v6:= "l" @type (object, string);
+#L000fc0.   call temp:=  [|java:lang:String.equalsIgnoreCase|](v6, v4) @signature [|Ljava/lang/String;.equalsIgnoreCase:(Ljava/lang/String;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000fc6.   v6:= temp;
+#L000fc8.   if v6 == 0 then goto L000fe4;
+#L000fcc.   call temp:=  [|java:lang:Long.parseLong|](v5) @signature [|Ljava/lang/Long;.parseLong:(Ljava/lang/String;)J|] @classDescriptor [|java:lang:Long|] @type static;
+#L000fd2.   v6:= temp  @type wide;
+#L000fd4.   call temp:=  [|java:lang:Long.valueOf|](v6, v7) @signature [|Ljava/lang/Long;.valueOf:(J)Ljava/lang/Long;|] @classDescriptor [|java:lang:Long|] @type static;
+#L000fda.   v6:= temp  @type object;
+#L000fdc.   call temp:=  [|android:content:ContentValues.put|](v10, v1, v6) @signature [|Landroid/content/ContentValues;.put:(Ljava/lang/String;Ljava/lang/Long;)V|] @classDescriptor [|android:content:ContentValues|] @type virtual;
+#L000fe2.   goto L000f82;
+#L000fe4.   v6:= "f" @type (object, string);
+#L000fe8.   call temp:=  [|java:lang:String.equalsIgnoreCase|](v6, v4) @signature [|Ljava/lang/String;.equalsIgnoreCase:(Ljava/lang/String;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000fee.   v6:= temp;
+#L000ff0.   if v6 != 0 then goto L001004;
+#L000ff4.   v6:= "d" @type (object, string);
+#L000ff8.   call temp:=  [|java:lang:String.equalsIgnoreCase|](v6, v4) @signature [|Ljava/lang/String;.equalsIgnoreCase:(Ljava/lang/String;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000ffe.   v6:= temp;
+#L001000.   if v6 == 0 then goto L00101c;
+#L001004.   call temp:=  [|java:lang:Double.parseDouble|](v5) @signature [|Ljava/lang/Double;.parseDouble:(Ljava/lang/String;)D|] @classDescriptor [|java:lang:Double|] @type static;
+#L00100a.   v6:= temp  @type wide;
+#L00100c.   call temp:=  [|java:lang:Double.valueOf|](v6, v7) @signature [|Ljava/lang/Double;.valueOf:(D)Ljava/lang/Double;|] @classDescriptor [|java:lang:Double|] @type static;
+#L001012.   v6:= temp  @type object;
+#L001014.   call temp:=  [|android:content:ContentValues.put|](v10, v1, v6) @signature [|Landroid/content/ContentValues;.put:(Ljava/lang/String;Ljava/lang/Double;)V|] @classDescriptor [|android:content:ContentValues|] @type virtual;
+#L00101a.   goto L000f82;
+#L00101c.   v6:= new [|java:lang:IllegalArgumentException|];
+#L001020.   v7:= new [|java:lang:StringBuilder|];
+#L001024.   call temp:=  [|java:lang:StringBuilder.<init>|](v7) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L00102a.   v8:= "Unsupported type: " @type (object, string);
+#L00102e.   call temp:=  [|java:lang:StringBuilder.append|](v7, v8) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L001034.   v7:= temp  @type object;
+#L001036.   call temp:=  [|java:lang:StringBuilder.append|](v7, v4) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L00103c.   v7:= temp  @type object;
+#L00103e.   call temp:=  [|java:lang:StringBuilder.toString|](v7) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L001044.   v7:= temp  @type object;
+#L001046.   call temp:=  [|java:lang:IllegalArgumentException.<init>|](v6, v7) @signature [|Ljava/lang/IllegalArgumentException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:IllegalArgumentException|] @type direct;
+#L00104c.   throw v6;
+
+   }
+    procedure [|com:android:commands:content:Content$DeleteCommand|] [|com:android:commands:content:Content$Parser.parseDeleteCommand|] ([|com:android:commands:content:Content$Parser|] v7 @type (this)) @owner [|com:android:commands:content:Content$Parser|] @signature [|Lcom/android/commands/content/Content$Parser;.parseDeleteCommand:()Lcom/android/commands/content/Content$DeleteCommand;|] @Access PRIVATE {
+      local temp ;
+        [|java:lang:String|] v0 @varname [|argument|] @scope ((L0009,L0063));
+        [|android:net:Uri|] v1 @varname [|uri|] @scope ((L0001,L0063));
+        [|int|] v2 @varname [|userId|] @scope ((L0002,L0063));
+        [|java:lang:String|] v3 @varname [|where|] @scope ((L0003,L0063));
+
+        v4;
+        v5;
+        v6;
+      
+#L001060.   v1:= 0  @length 4;
+#L001062.   v2:= 0  @length 4;
+#L001064.   v3:= 0  @length 4;
+#L001066.   v4:= v7.[|com:android:commands:content:Content$Parser.mTokenizer|]   @type object;
+#L00106a.   call temp:=  [|com:android:commands:content:Content$Tokenizer.access$000|](v4) @signature [|Lcom/android/commands/content/Content$Tokenizer;.access$000:(Lcom/android/commands/content/Content$Tokenizer;)Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Tokenizer|] @type static;
+#L001070.   v0:= temp  @type object;
+#L001072.   if v0 == 0 then goto L001106;
+#L001076.   v4:= "--uri" @type (object, string);
+#L00107a.   call temp:=  [|java:lang:String.equals|](v4, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L001080.   v4:= temp;
+#L001082.   if v4 == 0 then goto L001098;
+#L001086.   call temp:=  [|com:android:commands:content:Content$Parser.argumentValueRequired|](v7, v0) @signature [|Lcom/android/commands/content/Content$Parser;.argumentValueRequired:(Ljava/lang/String;)Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type direct;
+#L00108c.   v4:= temp  @type object;
+#L00108e.   call temp:=  [|android:net:Uri.parse|](v4) @signature [|Landroid/net/Uri;.parse:(Ljava/lang/String;)Landroid/net/Uri;|] @classDescriptor [|android:net:Uri|] @type static;
+#L001094.   v1:= temp  @type object;
+#L001096.   goto L001066;
+#L001098.   v4:= "--user" @type (object, string);
+#L00109c.   call temp:=  [|java:lang:String.equals|](v4, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L0010a2.   v4:= temp;
+#L0010a4.   if v4 == 0 then goto L0010ba;
+#L0010a8.   call temp:=  [|com:android:commands:content:Content$Parser.argumentValueRequired|](v7, v0) @signature [|Lcom/android/commands/content/Content$Parser;.argumentValueRequired:(Ljava/lang/String;)Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type direct;
+#L0010ae.   v4:= temp  @type object;
+#L0010b0.   call temp:=  [|java:lang:Integer.parseInt|](v4) @signature [|Ljava/lang/Integer;.parseInt:(Ljava/lang/String;)I|] @classDescriptor [|java:lang:Integer|] @type static;
+#L0010b6.   v2:= temp;
+#L0010b8.   goto L001066;
+#L0010ba.   v4:= "--where" @type (object, string);
+#L0010be.   call temp:=  [|java:lang:String.equals|](v4, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L0010c4.   v4:= temp;
+#L0010c6.   if v4 == 0 then goto L0010d4;
+#L0010ca.   call temp:=  [|com:android:commands:content:Content$Parser.argumentValueRequired|](v7, v0) @signature [|Lcom/android/commands/content/Content$Parser;.argumentValueRequired:(Ljava/lang/String;)Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type direct;
+#L0010d0.   v3:= temp  @type object;
+#L0010d2.   goto L001066;
+#L0010d4.   v4:= new [|java:lang:IllegalArgumentException|];
+#L0010d8.   v5:= new [|java:lang:StringBuilder|];
+#L0010dc.   call temp:=  [|java:lang:StringBuilder.<init>|](v5) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L0010e2.   v6:= "Unsupported argument: " @type (object, string);
+#L0010e6.   call temp:=  [|java:lang:StringBuilder.append|](v5, v6) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0010ec.   v5:= temp  @type object;
+#L0010ee.   call temp:=  [|java:lang:StringBuilder.append|](v5, v0) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0010f4.   v5:= temp  @type object;
+#L0010f6.   call temp:=  [|java:lang:StringBuilder.toString|](v5) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0010fc.   v5:= temp  @type object;
+#L0010fe.   call temp:=  [|java:lang:IllegalArgumentException.<init>|](v4, v5) @signature [|Ljava/lang/IllegalArgumentException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:IllegalArgumentException|] @type direct;
+#L001104.   throw v4;
+#L001106.   if v1 != 0 then goto L00111a;
+#L00110a.   v4:= new [|java:lang:IllegalArgumentException|];
+#L00110e.   v5:= "Content provider URI not specified. Did you specify --uri argument?" @type (object, string);
+#L001112.   call temp:=  [|java:lang:IllegalArgumentException.<init>|](v4, v5) @signature [|Ljava/lang/IllegalArgumentException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:IllegalArgumentException|] @type direct;
+#L001118.   throw v4;
+#L00111a.   v4:= new [|com:android:commands:content:Content$DeleteCommand|];
+#L00111e.   call temp:=  [|com:android:commands:content:Content$DeleteCommand.<init>|](v4, v1, v2, v3) @signature [|Lcom/android/commands/content/Content$DeleteCommand;.<init>:(Landroid/net/Uri;ILjava/lang/String;)V|] @classDescriptor [|com:android:commands:content:Content$DeleteCommand|] @type direct;
+#L001124.   return v4  @type object;
+
+   }
+    procedure [|com:android:commands:content:Content$InsertCommand|] [|com:android:commands:content:Content$Parser.parseInsertCommand|] ([|com:android:commands:content:Content$Parser|] v7 @type (this)) @owner [|com:android:commands:content:Content$Parser|] @signature [|Lcom/android/commands/content/Content$Parser;.parseInsertCommand:()Lcom/android/commands/content/Content$InsertCommand;|] @Access PRIVATE {
+      local temp ;
+        [|java:lang:String|] v0 @varname [|argument|] @scope ((L000d,L0074));
+        [|android:net:Uri|] v1 @varname [|uri|] @scope ((L0001,L0074));
+        [|int|] v2 @varname [|userId|] @scope ((L0002,L0074));
+        [|android:content:ContentValues|] v3 @varname [|values|] @scope ((L0007,L0074));
+
+        v4;
+        v5;
+        v6;
+      
+#L001138.   v1:= 0  @length 4;
+#L00113a.   v2:= 0  @length 4;
+#L00113c.   v3:= new [|android:content:ContentValues|];
+#L001140.   call temp:=  [|android:content:ContentValues.<init>|](v3) @signature [|Landroid/content/ContentValues;.<init>:()V|] @classDescriptor [|android:content:ContentValues|] @type direct;
+#L001146.   v4:= v7.[|com:android:commands:content:Content$Parser.mTokenizer|]   @type object;
+#L00114a.   call temp:=  [|com:android:commands:content:Content$Tokenizer.access$000|](v4) @signature [|Lcom/android/commands/content/Content$Tokenizer;.access$000:(Lcom/android/commands/content/Content$Tokenizer;)Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Tokenizer|] @type static;
+#L001150.   v0:= temp  @type object;
+#L001152.   if v0 == 0 then goto L0011e4;
+#L001156.   v4:= "--uri" @type (object, string);
+#L00115a.   call temp:=  [|java:lang:String.equals|](v4, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L001160.   v4:= temp;
+#L001162.   if v4 == 0 then goto L001178;
+#L001166.   call temp:=  [|com:android:commands:content:Content$Parser.argumentValueRequired|](v7, v0) @signature [|Lcom/android/commands/content/Content$Parser;.argumentValueRequired:(Ljava/lang/String;)Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type direct;
+#L00116c.   v4:= temp  @type object;
+#L00116e.   call temp:=  [|android:net:Uri.parse|](v4) @signature [|Landroid/net/Uri;.parse:(Ljava/lang/String;)Landroid/net/Uri;|] @classDescriptor [|android:net:Uri|] @type static;
+#L001174.   v1:= temp  @type object;
+#L001176.   goto L001146;
+#L001178.   v4:= "--user" @type (object, string);
+#L00117c.   call temp:=  [|java:lang:String.equals|](v4, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L001182.   v4:= temp;
+#L001184.   if v4 == 0 then goto L00119a;
+#L001188.   call temp:=  [|com:android:commands:content:Content$Parser.argumentValueRequired|](v7, v0) @signature [|Lcom/android/commands/content/Content$Parser;.argumentValueRequired:(Ljava/lang/String;)Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type direct;
+#L00118e.   v4:= temp  @type object;
+#L001190.   call temp:=  [|java:lang:Integer.parseInt|](v4) @signature [|Ljava/lang/Integer;.parseInt:(Ljava/lang/String;)I|] @classDescriptor [|java:lang:Integer|] @type static;
+#L001196.   v2:= temp;
+#L001198.   goto L001146;
+#L00119a.   v4:= "--bind" @type (object, string);
+#L00119e.   call temp:=  [|java:lang:String.equals|](v4, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L0011a4.   v4:= temp;
+#L0011a6.   if v4 == 0 then goto L0011b2;
+#L0011aa.   call temp:=  [|com:android:commands:content:Content$Parser.parseBindValue|](v7, v3) @signature [|Lcom/android/commands/content/Content$Parser;.parseBindValue:(Landroid/content/ContentValues;)V|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type direct;
+#L0011b0.   goto L001146;
+#L0011b2.   v4:= new [|java:lang:IllegalArgumentException|];
+#L0011b6.   v5:= new [|java:lang:StringBuilder|];
+#L0011ba.   call temp:=  [|java:lang:StringBuilder.<init>|](v5) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L0011c0.   v6:= "Unsupported argument: " @type (object, string);
+#L0011c4.   call temp:=  [|java:lang:StringBuilder.append|](v5, v6) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0011ca.   v5:= temp  @type object;
+#L0011cc.   call temp:=  [|java:lang:StringBuilder.append|](v5, v0) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0011d2.   v5:= temp  @type object;
+#L0011d4.   call temp:=  [|java:lang:StringBuilder.toString|](v5) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0011da.   v5:= temp  @type object;
+#L0011dc.   call temp:=  [|java:lang:IllegalArgumentException.<init>|](v4, v5) @signature [|Ljava/lang/IllegalArgumentException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:IllegalArgumentException|] @type direct;
+#L0011e2.   throw v4;
+#L0011e4.   if v1 != 0 then goto L0011f8;
+#L0011e8.   v4:= new [|java:lang:IllegalArgumentException|];
+#L0011ec.   v5:= "Content provider URI not specified. Did you specify --uri argument?" @type (object, string);
+#L0011f0.   call temp:=  [|java:lang:IllegalArgumentException.<init>|](v4, v5) @signature [|Ljava/lang/IllegalArgumentException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:IllegalArgumentException|] @type direct;
+#L0011f6.   throw v4;
+#L0011f8.   call temp:=  [|android:content:ContentValues.size|](v3) @signature [|Landroid/content/ContentValues;.size:()I|] @classDescriptor [|android:content:ContentValues|] @type virtual;
+#L0011fe.   v4:= temp;
+#L001200.   if v4 != 0 then goto L001214;
+#L001204.   v4:= new [|java:lang:IllegalArgumentException|];
+#L001208.   v5:= "Bindings not specified. Did you specify --bind argument(s)?" @type (object, string);
+#L00120c.   call temp:=  [|java:lang:IllegalArgumentException.<init>|](v4, v5) @signature [|Ljava/lang/IllegalArgumentException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:IllegalArgumentException|] @type direct;
+#L001212.   throw v4;
+#L001214.   v4:= new [|com:android:commands:content:Content$InsertCommand|];
+#L001218.   call temp:=  [|com:android:commands:content:Content$InsertCommand.<init>|](v4, v1, v2, v3) @signature [|Lcom/android/commands/content/Content$InsertCommand;.<init>:(Landroid/net/Uri;ILandroid/content/ContentValues;)V|] @classDescriptor [|com:android:commands:content:Content$InsertCommand|] @type direct;
+#L00121e.   return v4  @type object;
+
+   }
+    procedure [|com:android:commands:content:Content$UpdateCommand|] [|com:android:commands:content:Content$Parser.parseUpdateCommand|] ([|com:android:commands:content:Content$Parser|] v8 @type (this)) @owner [|com:android:commands:content:Content$Parser|] @signature [|Lcom/android/commands/content/Content$Parser;.parseUpdateCommand:()Lcom/android/commands/content/Content$UpdateCommand;|] @Access PRIVATE {
+      local temp ;
+        [|java:lang:String|] v0 @varname [|argument|] @scope ((L000e,L0082));
+        [|android:net:Uri|] v1 @varname [|uri|] @scope ((L0001,L0082));
+        [|int|] v2 @varname [|userId|] @scope ((L0002,L0082));
+        [|android:content:ContentValues|] v3 @varname [|values|] @scope ((L0008,L0082));
+        [|java:lang:String|] v4 @varname [|where|] @scope ((L0003,L0082));
+
+        v5;
+        v6;
+        v7;
+      
+#L001230.   v1:= 0  @length 4;
+#L001232.   v2:= 0  @length 4;
+#L001234.   v4:= 0  @length 4;
+#L001236.   v3:= new [|android:content:ContentValues|];
+#L00123a.   call temp:=  [|android:content:ContentValues.<init>|](v3) @signature [|Landroid/content/ContentValues;.<init>:()V|] @classDescriptor [|android:content:ContentValues|] @type direct;
+#L001240.   v5:= v8.[|com:android:commands:content:Content$Parser.mTokenizer|]   @type object;
+#L001244.   call temp:=  [|com:android:commands:content:Content$Tokenizer.access$000|](v5) @signature [|Lcom/android/commands/content/Content$Tokenizer;.access$000:(Lcom/android/commands/content/Content$Tokenizer;)Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Tokenizer|] @type static;
+#L00124a.   v0:= temp  @type object;
+#L00124c.   if v0 == 0 then goto L0012f8;
+#L001250.   v5:= "--uri" @type (object, string);
+#L001254.   call temp:=  [|java:lang:String.equals|](v5, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L00125a.   v5:= temp;
+#L00125c.   if v5 == 0 then goto L001272;
+#L001260.   call temp:=  [|com:android:commands:content:Content$Parser.argumentValueRequired|](v8, v0) @signature [|Lcom/android/commands/content/Content$Parser;.argumentValueRequired:(Ljava/lang/String;)Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type direct;
+#L001266.   v5:= temp  @type object;
+#L001268.   call temp:=  [|android:net:Uri.parse|](v5) @signature [|Landroid/net/Uri;.parse:(Ljava/lang/String;)Landroid/net/Uri;|] @classDescriptor [|android:net:Uri|] @type static;
+#L00126e.   v1:= temp  @type object;
+#L001270.   goto L001240;
+#L001272.   v5:= "--user" @type (object, string);
+#L001276.   call temp:=  [|java:lang:String.equals|](v5, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L00127c.   v5:= temp;
+#L00127e.   if v5 == 0 then goto L001294;
+#L001282.   call temp:=  [|com:android:commands:content:Content$Parser.argumentValueRequired|](v8, v0) @signature [|Lcom/android/commands/content/Content$Parser;.argumentValueRequired:(Ljava/lang/String;)Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type direct;
+#L001288.   v5:= temp  @type object;
+#L00128a.   call temp:=  [|java:lang:Integer.parseInt|](v5) @signature [|Ljava/lang/Integer;.parseInt:(Ljava/lang/String;)I|] @classDescriptor [|java:lang:Integer|] @type static;
+#L001290.   v2:= temp;
+#L001292.   goto L001240;
+#L001294.   v5:= "--where" @type (object, string);
+#L001298.   call temp:=  [|java:lang:String.equals|](v5, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L00129e.   v5:= temp;
+#L0012a0.   if v5 == 0 then goto L0012ae;
+#L0012a4.   call temp:=  [|com:android:commands:content:Content$Parser.argumentValueRequired|](v8, v0) @signature [|Lcom/android/commands/content/Content$Parser;.argumentValueRequired:(Ljava/lang/String;)Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type direct;
+#L0012aa.   v4:= temp  @type object;
+#L0012ac.   goto L001240;
+#L0012ae.   v5:= "--bind" @type (object, string);
+#L0012b2.   call temp:=  [|java:lang:String.equals|](v5, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L0012b8.   v5:= temp;
+#L0012ba.   if v5 == 0 then goto L0012c6;
+#L0012be.   call temp:=  [|com:android:commands:content:Content$Parser.parseBindValue|](v8, v3) @signature [|Lcom/android/commands/content/Content$Parser;.parseBindValue:(Landroid/content/ContentValues;)V|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type direct;
+#L0012c4.   goto L001240;
+#L0012c6.   v5:= new [|java:lang:IllegalArgumentException|];
+#L0012ca.   v6:= new [|java:lang:StringBuilder|];
+#L0012ce.   call temp:=  [|java:lang:StringBuilder.<init>|](v6) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L0012d4.   v7:= "Unsupported argument: " @type (object, string);
+#L0012d8.   call temp:=  [|java:lang:StringBuilder.append|](v6, v7) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0012de.   v6:= temp  @type object;
+#L0012e0.   call temp:=  [|java:lang:StringBuilder.append|](v6, v0) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0012e6.   v6:= temp  @type object;
+#L0012e8.   call temp:=  [|java:lang:StringBuilder.toString|](v6) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0012ee.   v6:= temp  @type object;
+#L0012f0.   call temp:=  [|java:lang:IllegalArgumentException.<init>|](v5, v6) @signature [|Ljava/lang/IllegalArgumentException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:IllegalArgumentException|] @type direct;
+#L0012f6.   throw v5;
+#L0012f8.   if v1 != 0 then goto L00130c;
+#L0012fc.   v5:= new [|java:lang:IllegalArgumentException|];
+#L001300.   v6:= "Content provider URI not specified. Did you specify --uri argument?" @type (object, string);
+#L001304.   call temp:=  [|java:lang:IllegalArgumentException.<init>|](v5, v6) @signature [|Ljava/lang/IllegalArgumentException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:IllegalArgumentException|] @type direct;
+#L00130a.   throw v5;
+#L00130c.   call temp:=  [|android:content:ContentValues.size|](v3) @signature [|Landroid/content/ContentValues;.size:()I|] @classDescriptor [|android:content:ContentValues|] @type virtual;
+#L001312.   v5:= temp;
+#L001314.   if v5 != 0 then goto L001328;
+#L001318.   v5:= new [|java:lang:IllegalArgumentException|];
+#L00131c.   v6:= "Bindings not specified. Did you specify --bind argument(s)?" @type (object, string);
+#L001320.   call temp:=  [|java:lang:IllegalArgumentException.<init>|](v5, v6) @signature [|Ljava/lang/IllegalArgumentException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:IllegalArgumentException|] @type direct;
+#L001326.   throw v5;
+#L001328.   v5:= new [|com:android:commands:content:Content$UpdateCommand|];
+#L00132c.   call temp:=  [|com:android:commands:content:Content$UpdateCommand.<init>|](v5, v1, v2, v3, v4) @signature [|Lcom/android/commands/content/Content$UpdateCommand;.<init>:(Landroid/net/Uri;ILandroid/content/ContentValues;Ljava/lang/String;)V|] @classDescriptor [|com:android:commands:content:Content$UpdateCommand|] @type direct;
+#L001332.   return v5  @type object;
+
+   }
+    procedure [|com:android:commands:content:Content$Command|] [|com:android:commands:content:Content$Parser.parseCommand|] ([|com:android:commands:content:Content$Parser|] v5 @type (this)) @owner [|com:android:commands:content:Content$Parser|] @signature [|Lcom/android/commands/content/Content$Parser;.parseCommand:()Lcom/android/commands/content/Content$Command;|] @Access PUBLIC {
+      local temp ;
+        [|java:lang:String|] v1 @varname [|operation|] @scope ((L0006,L0012), (L0013,L0053));
+        [|java:lang:IllegalArgumentException|] v0 @varname [|iae|] @scope ((L0054,L0079));
+
+        v2;
+        v3;
+        v4;
+      
+#L001344.   v2:= v5.[|com:android:commands:content:Content$Parser.mTokenizer|]   @type object;
+#L001348.   call temp:=  [|com:android:commands:content:Content$Tokenizer.access$000|](v2) @signature [|Lcom/android/commands/content/Content$Tokenizer;.access$000:(Lcom/android/commands/content/Content$Tokenizer;)Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Tokenizer|] @type static;
+#L00134e.   v1:= temp  @type object;
+#L001350.   v2:= "insert" @type (object, string);
+#L001354.   call temp:=  [|java:lang:String.equals|](v2, v1) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L00135a.   v2:= temp;
+#L00135c.   if v2 == 0 then goto L00136a;
+#L001360.   call temp:=  [|com:android:commands:content:Content$Parser.parseInsertCommand|](v5) @signature [|Lcom/android/commands/content/Content$Parser;.parseInsertCommand:()Lcom/android/commands/content/Content$InsertCommand;|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type direct;
+#L001366.   v2:= temp  @type object;
+#L001368.   return v2  @type object;
+#L00136a.   v2:= "delete" @type (object, string);
+#L00136e.   call temp:=  [|java:lang:String.equals|](v2, v1) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L001374.   v2:= temp;
+#L001376.   if v2 == 0 then goto L001384;
+#L00137a.   call temp:=  [|com:android:commands:content:Content$Parser.parseDeleteCommand|](v5) @signature [|Lcom/android/commands/content/Content$Parser;.parseDeleteCommand:()Lcom/android/commands/content/Content$DeleteCommand;|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type direct;
+#L001380.   v2:= temp  @type object;
+#L001382.   goto L001368;
+#L001384.   v2:= "update" @type (object, string);
+#L001388.   call temp:=  [|java:lang:String.equals|](v2, v1) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L00138e.   v2:= temp;
+#L001390.   if v2 == 0 then goto L00139e;
+#L001394.   call temp:=  [|com:android:commands:content:Content$Parser.parseUpdateCommand|](v5) @signature [|Lcom/android/commands/content/Content$Parser;.parseUpdateCommand:()Lcom/android/commands/content/Content$UpdateCommand;|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type direct;
+#L00139a.   v2:= temp  @type object;
+#L00139c.   goto L001368;
+#L00139e.   v2:= "query" @type (object, string);
+#L0013a2.   call temp:=  [|java:lang:String.equals|](v2, v1) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L0013a8.   v2:= temp;
+#L0013aa.   if v2 == 0 then goto L0013b8;
+#L0013ae.   call temp:=  [|com:android:commands:content:Content$Parser.parseQueryCommand|](v5) @signature [|Lcom/android/commands/content/Content$Parser;.parseQueryCommand:()Lcom/android/commands/content/Content$QueryCommand;|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type virtual;
+#L0013b4.   v2:= temp  @type object;
+#L0013b6.   goto L001368;
+#L0013b8.   v2:= new [|java:lang:IllegalArgumentException|];
+#L0013bc.   v3:= new [|java:lang:StringBuilder|];
+#L0013c0.   call temp:=  [|java:lang:StringBuilder.<init>|](v3) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L0013c6.   v4:= "Unsupported operation: " @type (object, string);
+#L0013ca.   call temp:=  [|java:lang:StringBuilder.append|](v3, v4) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0013d0.   v3:= temp  @type object;
+#L0013d2.   call temp:=  [|java:lang:StringBuilder.append|](v3, v1) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0013d8.   v3:= temp  @type object;
+#L0013da.   call temp:=  [|java:lang:StringBuilder.toString|](v3) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0013e0.   v3:= temp  @type object;
+#L0013e2.   call temp:=  [|java:lang:IllegalArgumentException.<init>|](v2, v3) @signature [|Ljava/lang/IllegalArgumentException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:IllegalArgumentException|] @type direct;
+#L0013e8.   throw v2;
+#L0013ea.   v0:= Exception  @type object;
+#L0013ec.   v2:= @@[|java:lang:System.out|]   @type object;
+#L0013f0.   v3:= "usage: adb shell content [subcommand] [options]usage: adb shell content insert --uri <URI> [--user <USER_ID>] --bind <BINDING> [--bind <BINDING>...]  <URI> a content provider URI.  <BINDING> binds a typed value to a column and is formatted:  <COLUMN_NAME>:<TYPE>:<COLUMN_VALUE> where:  <TYPE> specifies data type such as:  b - boolean, s - string, i - integer, l - long, f - float, d - double  Note: Omit the value for passing an empty string, e.g column:s:  Example:  # Add \"new_setting\" secure setting with value \"new_value\".  adb shell content insert --uri content://settings/secure --bind name:s:new_setting --bind value:s:new_valueusage: adb shell content update --uri <URI> [--user <USER_ID>] [--where <WHERE>]  <WHERE> is a SQL style where clause in quotes (You have to escape single quotes - see example below).  Example:  # Change \"new_setting\" secure setting to \"newer_value\".  adb shell content update --uri content://settings/secure --bind value:s:newer_value --where \"name=\\'new_setting\\'\"usage: adb shell content delete --uri <URI> [--user <USER_ID>] --bind <BINDING> [--bind <BINDING>...] [--where <WHERE>]  Example:  # Remove \"new_setting\" secure setting.  adb shell content delete --uri content://settings/secure --where \"name=\\'new_setting\\'\"usage: adb shell content query --uri <URI> [--user <USER_ID>] [--projection <PROJECTION>] [--where <WHERE>] [--sort <SORT_ORDER>]  <PROJECTION> is a list of colon separated column names and is formatted:  <COLUMN_NAME>[:<COLUMN_NAME>...]  <SORT_OREDER> is the order in which rows in the result should be sorted.  Example:  # Select \"name\" and \"value\" columns from secure settings where \"name\" is equal to \"new_setting\" and sort the result by name in ascending order.  adb shell content query --uri content://settings/secure --projection name:value --where \"name=\\'new_setting\\'\" --sort \"name ASC\"" @type (object, string);
+#L0013f4.   call temp:=  [|java:io:PrintStream.println|](v2, v3) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0013fa.   v2:= @@[|java:lang:System.out|]   @type object;
+#L0013fe.   v3:= new [|java:lang:StringBuilder|];
+#L001402.   call temp:=  [|java:lang:StringBuilder.<init>|](v3) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L001408.   v4:= "[ERROR] " @type (object, string);
+#L00140c.   call temp:=  [|java:lang:StringBuilder.append|](v3, v4) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L001412.   v3:= temp  @type object;
+#L001414.   call temp:=  [|java:lang:IllegalArgumentException.getMessage|](v0) @signature [|Ljava/lang/IllegalArgumentException;.getMessage:()Ljava/lang/String;|] @classDescriptor [|java:lang:IllegalArgumentException|] @type virtual;
+#L00141a.   v4:= temp  @type object;
+#L00141c.   call temp:=  [|java:lang:StringBuilder.append|](v3, v4) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L001422.   v3:= temp  @type object;
+#L001424.   call temp:=  [|java:lang:StringBuilder.toString|](v3) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L00142a.   v3:= temp  @type object;
+#L00142c.   call temp:=  [|java:io:PrintStream.println|](v2, v3) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001432.   v2:= 0  @length 4;
+#L001434.   goto L001368;
+  catch  [|java:lang:IllegalArgumentException|] @[L001344..L0013ea] goto L0013ea;
+
+   }
+    procedure [|com:android:commands:content:Content$QueryCommand|] [|com:android:commands:content:Content$Parser.parseQueryCommand|] ([|com:android:commands:content:Content$Parser|] v9 @type (this)) @owner [|com:android:commands:content:Content$Parser|] @signature [|Lcom/android/commands/content/Content$Parser;.parseQueryCommand:()Lcom/android/commands/content/Content$QueryCommand;|] @Access PUBLIC {
+      local temp ;
+        [|android:net:Uri|] v1 @varname [|uri|] @scope ((L0001,L0085));
+        [|int|] v2 @varname [|userId|] @scope ((L0002,L0085));
+        [|java:lang:String|][] v3 @varname [|projection|] @scope ((L0003,L0085));
+        [|java:lang:String|] v4 @varname [|where|] @scope ((L0005,L0085));
+        [|java:lang:String|] v5 @varname [|sort|] @scope ((L0004,L0085));
+        [|java:lang:String|] v6 @varname [|argument|] @scope ((L000b,L0085));
+
+        v0;
+        v7;
+        v8;
+      
+#L001454.   v1:= 0  @length 4;
+#L001456.   v2:= 0  @length 4;
+#L001458.   v3:= 0  @length 4;
+#L00145a.   v5:= 0  @length 4;
+#L00145c.   v4:= 0  @length 4;
+#L00145e.   v0:= v9.[|com:android:commands:content:Content$Parser.mTokenizer|]   @type object;
+#L001462.   call temp:=  [|com:android:commands:content:Content$Tokenizer.access$000|](v0) @signature [|Lcom/android/commands/content/Content$Tokenizer;.access$000:(Lcom/android/commands/content/Content$Tokenizer;)Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Tokenizer|] @type static;
+#L001468.   v6:= temp  @type object;
+#L00146a.   if v6 == 0 then goto L00153e;
+#L00146e.   v0:= "--uri" @type (object, string);
+#L001472.   call temp:=  [|java:lang:String.equals|](v0, v6) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L001478.   v0:= temp;
+#L00147a.   if v0 == 0 then goto L001490;
+#L00147e.   call temp:=  [|com:android:commands:content:Content$Parser.argumentValueRequired|](v9, v6) @signature [|Lcom/android/commands/content/Content$Parser;.argumentValueRequired:(Ljava/lang/String;)Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type direct;
+#L001484.   v0:= temp  @type object;
+#L001486.   call temp:=  [|android:net:Uri.parse|](v0) @signature [|Landroid/net/Uri;.parse:(Ljava/lang/String;)Landroid/net/Uri;|] @classDescriptor [|android:net:Uri|] @type static;
+#L00148c.   v1:= temp  @type object;
+#L00148e.   goto L00145e;
+#L001490.   v0:= "--user" @type (object, string);
+#L001494.   call temp:=  [|java:lang:String.equals|](v0, v6) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L00149a.   v0:= temp;
+#L00149c.   if v0 == 0 then goto L0014b2;
+#L0014a0.   call temp:=  [|com:android:commands:content:Content$Parser.argumentValueRequired|](v9, v6) @signature [|Lcom/android/commands/content/Content$Parser;.argumentValueRequired:(Ljava/lang/String;)Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type direct;
+#L0014a6.   v0:= temp  @type object;
+#L0014a8.   call temp:=  [|java:lang:Integer.parseInt|](v0) @signature [|Ljava/lang/Integer;.parseInt:(Ljava/lang/String;)I|] @classDescriptor [|java:lang:Integer|] @type static;
+#L0014ae.   v2:= temp;
+#L0014b0.   goto L00145e;
+#L0014b2.   v0:= "--where" @type (object, string);
+#L0014b6.   call temp:=  [|java:lang:String.equals|](v0, v6) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L0014bc.   v0:= temp;
+#L0014be.   if v0 == 0 then goto L0014cc;
+#L0014c2.   call temp:=  [|com:android:commands:content:Content$Parser.argumentValueRequired|](v9, v6) @signature [|Lcom/android/commands/content/Content$Parser;.argumentValueRequired:(Ljava/lang/String;)Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type direct;
+#L0014c8.   v4:= temp  @type object;
+#L0014ca.   goto L00145e;
+#L0014cc.   v0:= "--sort" @type (object, string);
+#L0014d0.   call temp:=  [|java:lang:String.equals|](v0, v6) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L0014d6.   v0:= temp;
+#L0014d8.   if v0 == 0 then goto L0014e6;
+#L0014dc.   call temp:=  [|com:android:commands:content:Content$Parser.argumentValueRequired|](v9, v6) @signature [|Lcom/android/commands/content/Content$Parser;.argumentValueRequired:(Ljava/lang/String;)Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type direct;
+#L0014e2.   v5:= temp  @type object;
+#L0014e4.   goto L00145e;
+#L0014e6.   v0:= "--projection" @type (object, string);
+#L0014ea.   call temp:=  [|java:lang:String.equals|](v0, v6) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L0014f0.   v0:= temp;
+#L0014f2.   if v0 == 0 then goto L00150c;
+#L0014f6.   call temp:=  [|com:android:commands:content:Content$Parser.argumentValueRequired|](v9, v6) @signature [|Lcom/android/commands/content/Content$Parser;.argumentValueRequired:(Ljava/lang/String;)Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type direct;
+#L0014fc.   v0:= temp  @type object;
+#L0014fe.   v7:= "[\\s]*:[\\s]*" @type (object, string);
+#L001502.   call temp:=  [|java:lang:String.split|](v0, v7) @signature [|Ljava/lang/String;.split:(Ljava/lang/String;)[Ljava/lang/String;|] @classDescriptor [|java:lang:String|] @type virtual;
+#L001508.   v3:= temp  @type object;
+#L00150a.   goto L00145e;
+#L00150c.   v0:= new [|java:lang:IllegalArgumentException|];
+#L001510.   v7:= new [|java:lang:StringBuilder|];
+#L001514.   call temp:=  [|java:lang:StringBuilder.<init>|](v7) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L00151a.   v8:= "Unsupported argument: " @type (object, string);
+#L00151e.   call temp:=  [|java:lang:StringBuilder.append|](v7, v8) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L001524.   v7:= temp  @type object;
+#L001526.   call temp:=  [|java:lang:StringBuilder.append|](v7, v6) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L00152c.   v7:= temp  @type object;
+#L00152e.   call temp:=  [|java:lang:StringBuilder.toString|](v7) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L001534.   v7:= temp  @type object;
+#L001536.   call temp:=  [|java:lang:IllegalArgumentException.<init>|](v0, v7) @signature [|Ljava/lang/IllegalArgumentException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:IllegalArgumentException|] @type direct;
+#L00153c.   throw v0;
+#L00153e.   if v1 != 0 then goto L001552;
+#L001542.   v0:= new [|java:lang:IllegalArgumentException|];
+#L001546.   v7:= "Content provider URI not specified. Did you specify --uri argument?" @type (object, string);
+#L00154a.   call temp:=  [|java:lang:IllegalArgumentException.<init>|](v0, v7) @signature [|Ljava/lang/IllegalArgumentException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:IllegalArgumentException|] @type direct;
+#L001550.   throw v0;
+#L001552.   v0:= new [|com:android:commands:content:Content$QueryCommand|];
+#L001556.   call temp:=  [|com:android:commands:content:Content$QueryCommand.<init>|](v0, v1, v2, v3, v4, v5) @signature [|Lcom/android/commands/content/Content$QueryCommand;.<init>:(Landroid/net/Uri;I[Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V|] @classDescriptor [|com:android:commands:content:Content$QueryCommand|] @type direct;
+#L00155c.   return v0  @type object;
+
+   }
+record [|com:android:commands:content:Content$QueryCommand|]  @type class @AccessFlag   extends [|com:android:commands:content:Content$DeleteCommand|] {
+      [|java:lang:String|][] [|com:android:commands:content:Content$QueryCommand.mProjection|]    @AccessFlag FINAL;
+      [|java:lang:String|] [|com:android:commands:content:Content$QueryCommand.mSortOrder|]    @AccessFlag FINAL;
+   }
+    procedure [|void|] [|com:android:commands:content:Content$QueryCommand.<init>|] ([|com:android:commands:content:Content$QueryCommand|] v0 @type (this), [|android:net:Uri|] v1 @type (object), [|int|] v2, [|java:lang:String|][] v3 @type (object), [|java:lang:String|] v4 @type (object), [|java:lang:String|] v5 @type (object)) @owner [|com:android:commands:content:Content$QueryCommand|] @signature [|Lcom/android/commands/content/Content$QueryCommand;.<init>:(Landroid/net/Uri;I[Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
+      local temp ;
+
+
+
+
+
+
+      
+#L001570.   call temp:=  [|com:android:commands:content:Content$DeleteCommand.<init>|](v0, v1, v2, v4) @signature [|Lcom/android/commands/content/Content$DeleteCommand;.<init>:(Landroid/net/Uri;ILjava/lang/String;)V|] @classDescriptor [|com:android:commands:content:Content$DeleteCommand|] @type direct;
+#L001576.   v0.[|com:android:commands:content:Content$QueryCommand.mProjection|]  := v3 @type object;
+#L00157a.   v0.[|com:android:commands:content:Content$QueryCommand.mSortOrder|]  := v5 @type object;
+#L00157e.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:content:Content$QueryCommand.onExecute|] ([|com:android:commands:content:Content$QueryCommand|] v17 @type (this), [|android:content:IContentProvider|] v18 @type (object)) @owner [|com:android:commands:content:Content$QueryCommand|] @signature [|Lcom/android/commands/content/Content$QueryCommand;.onExecute:(Landroid/content/IContentProvider;)V|] @Access PUBLIC {
+      local temp ;
+        [|int|] v10 @varname [|columnIndex|] @scope ((L005a,L008e));
+        [|java:lang:String|] v11 @varname [|columnName|] @scope ((L0055,L008e));
+        [|java:lang:String|] v12 @varname [|columnValue|] @scope ((L0056,L008e));
+        [|int|] v16 @varname [|type|] @scope ((L005e,L008e));
+        [|java:lang:StringBuilder|] v8 @varname [|builder|] @scope ((L002e,L0099));
+        [|int|] v9 @varname [|columnCount|] @scope ((L0047,L0099));
+        [|int|] v14 @varname [|i|] @scope ((L0048,L0099));
+        [|int|] v15 @varname [|rowIndex|] @scope ((L0029,L0099));
+        [|android:database:Cursor|] v13 @varname [|cursor|] @scope ((L0018,L00b8));
+
+
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
+      
+#L001590.   v0:= v17  @type object;
+#L001594.   v2:= v0.[|com:android:commands:content:Content$QueryCommand.mUri|]   @type object;
+#L001598.   v0:= v17  @type object;
+#L00159c.   v3:= v0.[|com:android:commands:content:Content$QueryCommand.mProjection|]   @type object;
+#L0015a0.   v0:= v17  @type object;
+#L0015a4.   v4:= v0.[|com:android:commands:content:Content$QueryCommand.mWhere|]   @type object;
+#L0015a8.   v5:= 0  @length 4;
+#L0015aa.   v0:= v17  @type object;
+#L0015ae.   v6:= v0.[|com:android:commands:content:Content$QueryCommand.mSortOrder|]   @type object;
+#L0015b2.   v7:= 0  @length 4;
+#L0015b4.   v1:= v18  @type object;
+#L0015b8.   call temp:=  [|android:content:IContentProvider.query|](v1, v2, v3, v4, v5, v6, v7) @signature [|Landroid/content/IContentProvider;.query:(Landroid/net/Uri;[Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;Landroid/os/ICancellationSignal;)Landroid/database/Cursor;|] @classDescriptor [|android:content:IContentProvider|] @type interface;
+#L0015be.   v13:= temp  @type object;
+#L0015c0.   if v13 != 0 then goto L0015d4;
+#L0015c4.   v1:= @@[|java:lang:System.out|]   @type object;
+#L0015c8.   v2:= "No result found." @type (object, string);
+#L0015cc.   call temp:=  [|java:io:PrintStream.println|](v1, v2) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0015d2.   return @void ;
+#L0015d4.   call temp:=  [|android:database:Cursor.moveToFirst|](v13) @signature [|Landroid/database/Cursor;.moveToFirst:()Z|] @classDescriptor [|android:database:Cursor|] @type interface;
+#L0015da.   v1:= temp;
+#L0015dc.   if v1 == 0 then goto L0016ca;
+#L0015e0.   v15:= 0  @length 4;
+#L0015e2.   v8:= new [|java:lang:StringBuilder|];
+#L0015e6.   call temp:=  [|java:lang:StringBuilder.<init>|](v8) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L0015ec.   v1:= 0  @length 4;
+#L0015ee.   call temp:=  [|java:lang:StringBuilder.setLength|](v8, v1) @signature [|Ljava/lang/StringBuilder;.setLength:(I)V|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0015f4.   v1:= "Row: " @type (object, string);
+#L0015f8.   call temp:=  [|java:lang:StringBuilder.append|](v8, v1) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0015fe.   v1:= temp  @type object;
+#L001600.   call temp:=  [|java:lang:StringBuilder.append|](v1, v15) @signature [|Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L001606.   v1:= temp  @type object;
+#L001608.   v2:= " " @type (object, string);
+#L00160c.   call temp:=  [|java:lang:StringBuilder.append|](v1, v2) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L001612.   v15:= v15 + 1;
+#L001616.   call temp:=  [|android:database:Cursor.getColumnCount|](v13) @signature [|Landroid/database/Cursor;.getColumnCount:()I|] @classDescriptor [|android:database:Cursor|] @type interface;
+#L00161c.   v9:= temp;
+#L00161e.   v14:= 0  @length 4;
+#L001620.   if v14 >= v9 then goto L0016ac;
+#L001624.   if v14 <= 0 then goto L001632;
+#L001628.   v1:= ", " @type (object, string);
+#L00162c.   call temp:=  [|java:lang:StringBuilder.append|](v8, v1) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L001632.   call temp:=  [|android:database:Cursor.getColumnName|](v13, v14) @signature [|Landroid/database/Cursor;.getColumnName:(I)Ljava/lang/String;|] @classDescriptor [|android:database:Cursor|] @type interface;
+#L001638.   v11:= temp  @type object;
+#L00163a.   v12:= 0  @length 4;
+#L00163c.   call temp:=  [|android:database:Cursor.getColumnIndex|](v13, v11) @signature [|Landroid/database/Cursor;.getColumnIndex:(Ljava/lang/String;)I|] @classDescriptor [|android:database:Cursor|] @type interface;
+#L001642.   v10:= temp;
+#L001644.   call temp:=  [|android:database:Cursor.getType|](v13, v10) @signature [|Landroid/database/Cursor;.getType:(I)I|] @classDescriptor [|android:database:Cursor|] @type interface;
+#L00164a.   v16:= temp;
+#L00164c.   goto L0016e4;
+#L001652.   call temp:=  [|java:lang:StringBuilder.append|](v8, v11) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L001658.   v1:= temp  @type object;
+#L00165a.   v2:= "=" @type (object, string);
+#L00165e.   call temp:=  [|java:lang:StringBuilder.append|](v1, v2) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L001664.   v1:= temp  @type object;
+#L001666.   call temp:=  [|java:lang:StringBuilder.append|](v1, v12) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L00166c.   v14:= v14 + 1;
+#L001670.   goto L001620;
+#L001672.   call temp:=  [|android:database:Cursor.getFloat|](v13, v10) @signature [|Landroid/database/Cursor;.getFloat:(I)F|] @classDescriptor [|android:database:Cursor|] @type interface;
+#L001678.   v1:= temp;
+#L00167a.   call temp:=  [|java:lang:String.valueOf|](v1) @signature [|Ljava/lang/String;.valueOf:(F)Ljava/lang/String;|] @classDescriptor [|java:lang:String|] @type static;
+#L001680.   v12:= temp  @type object;
+#L001682.   goto L001652;
+#L001684.   call temp:=  [|android:database:Cursor.getInt|](v13, v10) @signature [|Landroid/database/Cursor;.getInt:(I)I|] @classDescriptor [|android:database:Cursor|] @type interface;
+#L00168a.   v1:= temp;
+#L00168c.   call temp:=  [|java:lang:String.valueOf|](v1) @signature [|Ljava/lang/String;.valueOf:(I)Ljava/lang/String;|] @classDescriptor [|java:lang:String|] @type static;
+#L001692.   v12:= temp  @type object;
+#L001694.   goto L001652;
+#L001696.   call temp:=  [|android:database:Cursor.getString|](v13, v10) @signature [|Landroid/database/Cursor;.getString:(I)Ljava/lang/String;|] @classDescriptor [|android:database:Cursor|] @type interface;
+#L00169c.   v12:= temp  @type object;
+#L00169e.   goto L001652;
+#L0016a0.   v12:= "BLOB" @type (object, string);
+#L0016a4.   goto L001652;
+#L0016a6.   v12:= "NULL" @type (object, string);
+#L0016aa.   goto L001652;
+#L0016ac.   v1:= @@[|java:lang:System.out|]   @type object;
+#L0016b0.   call temp:=  [|java:io:PrintStream.println|](v1, v8) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/Object;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0016b6.   call temp:=  [|android:database:Cursor.moveToNext|](v13) @signature [|Landroid/database/Cursor;.moveToNext:()Z|] @classDescriptor [|android:database:Cursor|] @type interface;
+#L0016bc.   v1:= temp;
+#L0016be.   if v1 != 0 then goto L0015ec;
+#L0016c2.   call temp:=  [|android:database:Cursor.close|](v13) @signature [|Landroid/database/Cursor;.close:()V|] @classDescriptor [|android:database:Cursor|] @type interface;
+#L0016c8.   goto L0015d2;
+#L0016ca.   v1:= @@[|java:lang:System.out|]   @type object;
+#L0016ce.   v2:= "No reuslt found." @type (object, string);
+#L0016d2.   call temp:=  [|java:io:PrintStream.println|](v1, v2) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0016d8.   goto L0016c2;
+#L0016da.   v1:= Exception  @type object;
+#L0016dc.   call temp:=  [|android:database:Cursor.close|](v13) @signature [|Landroid/database/Cursor;.close:()V|] @classDescriptor [|android:database:Cursor|] @type interface;
+#L0016e2.   throw v1;
+#L0016e4.   switch  v16
+                 | 0 => goto L0016a6
+                 | 1 => goto L001684
+                 | 2 => goto L001672
+                 | 3 => goto L001696
+                 | 4 => goto L0016a0
+                 | => goto L001652;
+  catch  [|any|] @[L0015d4..L0016bc] goto L0016da;
+  catch  [|any|] @[L0016ca..L0016d8] goto L0016da;
+
+   }
+record [|com:android:commands:content:Content$Tokenizer|]  @type class @AccessFlag   {
+      [|java:lang:String|][] [|com:android:commands:content:Content$Tokenizer.mArgs|]    @AccessFlag PRIVATE_FINAL;
+      [|int|] [|com:android:commands:content:Content$Tokenizer.mNextArg|]    @AccessFlag PRIVATE;
+   }
+    procedure [|void|] [|com:android:commands:content:Content$Tokenizer.<init>|] ([|com:android:commands:content:Content$Tokenizer|] v0 @type (this), [|java:lang:String|][] v1 @type (object)) @owner [|com:android:commands:content:Content$Tokenizer|] @signature [|Lcom/android/commands/content/Content$Tokenizer;.<init>:([Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
+      local temp ;
+
+
+      
+#L001724.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
+#L00172a.   v0.[|com:android:commands:content:Content$Tokenizer.mArgs|]  := v1 @type object;
+#L00172e.   return @void ;
+
+   }
+    procedure [|java:lang:String|] [|com:android:commands:content:Content$Tokenizer.access$000|] ([|com:android:commands:content:Content$Tokenizer|] v1 @type (object)) @owner [|com:android:commands:content:Content$Tokenizer|] @signature [|Lcom/android/commands/content/Content$Tokenizer;.access$000:(Lcom/android/commands/content/Content$Tokenizer;)Ljava/lang/String;|] @Access STATIC_SYNTHETIC {
+      local temp ;
+
+        v0;
+      
+#L001740.   call temp:=  [|com:android:commands:content:Content$Tokenizer.nextArg|](v1) @signature [|Lcom/android/commands/content/Content$Tokenizer;.nextArg:()Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Tokenizer|] @type direct;
+#L001746.   v0:= temp  @type object;
+#L001748.   return v0  @type object;
+
+   }
+    procedure [|java:lang:String|] [|com:android:commands:content:Content$Tokenizer.nextArg|] ([|com:android:commands:content:Content$Tokenizer|] v3 @type (this)) @owner [|com:android:commands:content:Content$Tokenizer|] @signature [|Lcom/android/commands/content/Content$Tokenizer;.nextArg:()Ljava/lang/String;|] @Access PRIVATE {
+      local temp ;
+
+        v0;
+        v1;
+        v2;
+      
+#L00175c.   v0:= v3.[|com:android:commands:content:Content$Tokenizer.mNextArg|] ;
+#L001760.   v1:= v3.[|com:android:commands:content:Content$Tokenizer.mArgs|]   @type object;
+#L001764.   v1:= v1.length;
+#L001766.   if v0 >= v1 then goto L001780;
+#L00176a.   v0:= v3.[|com:android:commands:content:Content$Tokenizer.mArgs|]   @type object;
+#L00176e.   v1:= v3.[|com:android:commands:content:Content$Tokenizer.mNextArg|] ;
+#L001772.   v2:= v1 + 1;
+#L001776.   v3.[|com:android:commands:content:Content$Tokenizer.mNextArg|]  := v2;
+#L00177a.   v0:= v0[v1]  @type object;
+#L00177e.   return v0  @type object;
+#L001780.   v0:= 0  @length 4;
+#L001782.   goto L00177e;
+
+   }
+record [|com:android:commands:content:Content$UpdateCommand|]  @type class @AccessFlag   extends [|com:android:commands:content:Content$InsertCommand|] {
+      [|java:lang:String|] [|com:android:commands:content:Content$UpdateCommand.mWhere|]    @AccessFlag FINAL;
+   }
+    procedure [|void|] [|com:android:commands:content:Content$UpdateCommand.<init>|] ([|com:android:commands:content:Content$UpdateCommand|] v0 @type (this), [|android:net:Uri|] v1 @type (object), [|int|] v2, [|android:content:ContentValues|] v3 @type (object), [|java:lang:String|] v4 @type (object)) @owner [|com:android:commands:content:Content$UpdateCommand|] @signature [|Lcom/android/commands/content/Content$UpdateCommand;.<init>:(Landroid/net/Uri;ILandroid/content/ContentValues;Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
+      local temp ;
+
+
+
+
+
+      
+#L001794.   call temp:=  [|com:android:commands:content:Content$InsertCommand.<init>|](v0, v1, v2, v3) @signature [|Lcom/android/commands/content/Content$InsertCommand;.<init>:(Landroid/net/Uri;ILandroid/content/ContentValues;)V|] @classDescriptor [|com:android:commands:content:Content$InsertCommand|] @type direct;
+#L00179a.   v0.[|com:android:commands:content:Content$UpdateCommand.mWhere|]  := v4 @type object;
+#L00179e.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:content:Content$UpdateCommand.onExecute|] ([|com:android:commands:content:Content$UpdateCommand|] v4 @type (this), [|android:content:IContentProvider|] v5 @type (object)) @owner [|com:android:commands:content:Content$UpdateCommand|] @signature [|Lcom/android/commands/content/Content$UpdateCommand;.onExecute:(Landroid/content/IContentProvider;)V|] @Access PUBLIC {
+      local temp ;
+
+
+        v0;
+        v1;
+        v2;
+        v3;
+      
+#L0017b0.   v0:= v4.[|com:android:commands:content:Content$UpdateCommand.mUri|]   @type object;
+#L0017b4.   v1:= v4.[|com:android:commands:content:Content$UpdateCommand.mContentValues|]   @type object;
+#L0017b8.   v2:= v4.[|com:android:commands:content:Content$UpdateCommand.mWhere|]   @type object;
+#L0017bc.   v3:= 0  @length 4;
+#L0017be.   call temp:=  [|android:content:IContentProvider.update|](v5, v0, v1, v2, v3) @signature [|Landroid/content/IContentProvider;.update:(Landroid/net/Uri;Landroid/content/ContentValues;Ljava/lang/String;[Ljava/lang/String;)I|] @classDescriptor [|android:content:IContentProvider|] @type interface;
+#L0017c4.   return @void ;
+
+   }
+record [|com:android:commands:content:Content|]  @type class @AccessFlag PUBLIC  {
+   }
+      global [|java:lang:String|] @@[|com:android:commands:content:Content.USAGE|]    @AccessFlag PRIVATE_STATIC_FINAL;
+    procedure [|void|] [|com:android:commands:content:Content.<init>|] ([|com:android:commands:content:Content|] v0 @type (this)) @owner [|com:android:commands:content:Content|] @signature [|Lcom/android/commands/content/Content;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
+      local temp ;
+
+      
+#L0017d8.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
+#L0017de.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:content:Content.main|] ([|java:lang:String|][] v2 @type (object)) @owner [|com:android:commands:content:Content|] @signature [|Lcom/android/commands/content/Content;.main:([Ljava/lang/String;)V|] @Access PUBLIC_STATIC {
+      local temp ;
+        [|com:android:commands:content:Content$Command|] v0 @varname [|command|] @scope ((L0009,L000f));
+        [|com:android:commands:content:Content$Parser|] v1 @varname [|parser|] @scope ((L0005,L000f));
+
+      
+#L0017f0.   v1:= new [|com:android:commands:content:Content$Parser|];
+#L0017f4.   call temp:=  [|com:android:commands:content:Content$Parser.<init>|](v1, v2) @signature [|Lcom/android/commands/content/Content$Parser;.<init>:([Ljava/lang/String;)V|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type direct;
+#L0017fa.   call temp:=  [|com:android:commands:content:Content$Parser.parseCommand|](v1) @signature [|Lcom/android/commands/content/Content$Parser;.parseCommand:()Lcom/android/commands/content/Content$Command;|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type virtual;
+#L001800.   v0:= temp  @type object;
+#L001802.   if v0 == 0 then goto L00180c;
+#L001806.   call temp:=  [|com:android:commands:content:Content$Command.execute|](v0) @signature [|Lcom/android/commands/content/Content$Command;.execute:()V|] @classDescriptor [|com:android:commands:content:Content$Command|] @type virtual;
+#L00180c.   return @void ;
+
+   }

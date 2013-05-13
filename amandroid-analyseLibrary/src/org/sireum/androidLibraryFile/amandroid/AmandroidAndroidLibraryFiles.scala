@@ -3,6 +3,7 @@ package org.sireum.androidLibraryFile.amandroid
 import org.sireum.androidLibraryFile.AndroidLibraryFiles
 import org.sireum.androidLibraryFile.AndroidLibraryPilarFiles
 import org.sireum.androidLibraryFile.AndroidLibraryXmlFiles
+import org.sireum.androidLibraryFile.AndroidLibrarySplitPilarFiles
 
 
 object AmandroidAndroidLibraryFiles extends AndroidLibraryFiles{
@@ -12,10 +13,15 @@ object AmandroidAndroidLibraryFiles extends AndroidLibraryFiles{
 
 object AmandroidAndroidLibraryPilarFiles extends AndroidLibraryPilarFiles{
   val PILAR_MODEL_DIR_URI = sourceDirUri(this.getClass, "./library/pilar")
-  def dexModelFiles = androidLibraryFiles(PILAR_MODEL_DIR_URI)
+  def pilarModelFiles = androidLibraryFiles(PILAR_MODEL_DIR_URI)
+}
+
+object AmandroidAndroidLibrarySplitPilarFiles extends AndroidLibrarySplitPilarFiles{
+  val PLR_MODEL_DIR_URI = sourceDirUri(this.getClass, "./library/pilar/splitedPilar")
+  def plrModelFiles = androidLibraryFiles(PLR_MODEL_DIR_URI)
 }
 
 object AmandroidAndroidLibraryXmlFiles extends AndroidLibraryXmlFiles{
   val XML_MODEL_DIR_URI = sourceDirUri(this.getClass, "./library/pilar/result")
-  def dexModelFiles = androidLibraryFiles(XML_MODEL_DIR_URI)
+  def xmlModelFiles = androidLibraryFiles(XML_MODEL_DIR_URI)
 }

@@ -13,7 +13,7 @@ import org.sireum.alir.AlirEdgeAccesses
 import java.util.regex.Matcher
 import org.sireum.alir.ReachingDefinitionAnalysis
 import org.sireum.alir.ControlFlowGraph
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 
 class ObjectFlowGraph[Node <: OfaNode] 
   extends AlirGraph[Node]
@@ -414,8 +414,8 @@ class ObjectFlowGraph[Node <: OfaNode]
   }
   
   def getDirectCallee(pi : PointI,
-                      androidVirtualMethodTables : AndroidVirtualMethodTables) : ResourceUri = {
-    androidVirtualMethodTables.getProcedureUriBySignature(pi.varName)
+                      androidLibInfoTables : AndroidLibInfoTables) : ResourceUri = {
+    androidLibInfoTables.getProcedureUriBySignature(pi.varName)
   }
   
   /**
@@ -423,17 +423,17 @@ class ObjectFlowGraph[Node <: OfaNode]
    */ 
   def getCalleeSet(diffSet : MMap[ResourceUri, ResourceUri],
                 pi : PointI,
-                androidVirtualMethodTables : AndroidVirtualMethodTables) : MSet[ResourceUri] = {
+                androidLibInfoTables : AndroidLibInfoTables) : MSet[ResourceUri] = {
     val calleeSet : MSet[ResourceUri] = msetEmpty
     diffSet.values.toSet[ResourceUri].foreach(
       d => {
-        val recordUri = androidVirtualMethodTables.getRecordUri(d)
-        val procSigs = androidVirtualMethodTables.getProcedureSigsByRecordUri(recordUri)
+        val recordUri = androidLibInfoTables.getRecordUri(d)
+        val procSigs = androidLibInfoTables.getProcedureSigsByRecordUri(recordUri)
         val str = pi.varName.substring(pi.varName.indexOf(";."))
         procSigs.foreach(
           sig => {
             if(sig.substring(sig.indexOf(";.")).equals(str)){
-              calleeSet += androidVirtualMethodTables.getProcedureUriBySignature(sig)
+              calleeSet += androidLibInfoTables.getProcedureUriBySignature(sig)
             }
           }  
         )

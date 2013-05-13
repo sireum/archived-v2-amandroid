@@ -5,7 +5,7 @@ import org.sireum.option.PipelineMode
 import org.sireum.pipeline.gen.ModuleGenerator
 import org.sireum.util._
 import org.sireum.core.module.AlirIntraProcedural
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.scfg.{CompressedControlFlowGraph, SystemControlFlowGraph}
 import org.sireum.pilar.ast.{LocationDecl, CatchClause}
 import org.sireum.amandroid.cache.AndroidCacheFile
@@ -67,7 +67,7 @@ case class AndroidInterIntraProcedural(
   symbolTable : SymbolTable,
   
   @Input
-  androidVirtualMethodTables : AndroidVirtualMethodTables,
+  androidLibInfoTables : AndroidLibInfoTables,
   
   @Input
   androidCache : scala.Option[AndroidCacheFile[ResourceUri]] = None,
@@ -102,7 +102,7 @@ case class AndroidInterIntraProcedural(
     { (_, _) => (Array.empty[CatchClause], false) },
     
 //modified for building RDA       
-  @Input defRef : SymbolTable => DefRef = { st => new org.sireum.amandroid.objectflowanalysis.AndroidDefRef(st, new org.sireum.amandroid.objectflowanalysis.AndroidVarAccesses(st)) },
+  @Input defRef : (SymbolTable, AndroidLibInfoTables) => DefRef = { (st, alit) => new org.sireum.amandroid.objectflowanalysis.AndroidDefRef(st, new org.sireum.amandroid.objectflowanalysis.AndroidVarAccesses(st), alit) },
 
   @Input isInputOutputParamPredicate : ProcedureSymbolTable => (ResourceUri => java.lang.Boolean, ResourceUri => java.lang.Boolean) = { pst =>
     val params = pst.params.toSet[ResourceUri]
@@ -149,7 +149,10 @@ case class Rda(
 
   @Input @Consume(Array(classOf[Cfg])) cfg : ControlFlowGraph[String],
 
-  @Input defRef : SymbolTable => DefRef = { st => new org.sireum.amandroid.objectflowanalysis.AndroidDefRef(st, new org.sireum.amandroid.objectflowanalysis.AndroidVarAccesses(st)) },
+  @Input
+  androidLibInfoTables : AndroidLibInfoTables,
+  
+  @Input defRef : (SymbolTable, AndroidLibInfoTables) => DefRef = { (st, alit) => new org.sireum.amandroid.objectflowanalysis.AndroidDefRef(st, new org.sireum.amandroid.objectflowanalysis.AndroidVarAccesses(st), alit) },
 
   @Input isInputOutputParamPredicate : ProcedureSymbolTable => (ResourceUri => java.lang.Boolean, ResourceUri => java.lang.Boolean),
 
@@ -190,7 +193,7 @@ case class OFAPreprocess(
   procedureSymbolTable : ProcedureSymbolTable,
 
   @Input
-  androidVirtualMethodTables : AndroidVirtualMethodTables,
+  androidLibInfoTables : AndroidLibInfoTables,
   
   // for test now. Later will change it.
   @Output
@@ -213,7 +216,7 @@ case class OFAsCfg(
   procedureSymbolTables : Seq[ProcedureSymbolTable],
 
   @Input
-  androidVirtualMethodTables : AndroidVirtualMethodTables,
+  androidLibInfoTables : AndroidLibInfoTables,
   
   // for test now. Later will change it.
   @Output
@@ -230,7 +233,7 @@ case class sCfg(
   cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
 
   @Input
-  androidVirtualMethodTables : AndroidVirtualMethodTables,
+  androidLibInfoTables : AndroidLibInfoTables,
   
   @Output
   @Produce
@@ -247,7 +250,7 @@ case class sCfg(
   cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
 
   @Input
-  androidVirtualMethodTables : AndroidVirtualMethodTables,
+  androidLibInfoTables : AndroidLibInfoTables,
   
   @Input
   sCfg : SystemControlFlowGraph[String],

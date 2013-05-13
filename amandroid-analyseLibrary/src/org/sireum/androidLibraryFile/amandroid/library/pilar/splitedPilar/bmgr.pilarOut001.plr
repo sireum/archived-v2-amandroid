@@ -1,0 +1,1148 @@
+record [|com:android:commands:bmgr:Bmgr$RestoreObserver|]  @type class @AccessFlag   extends [|android:app:backup:IRestoreObserver$Stub|] {
+      [|boolean|] [|com:android:commands:bmgr:Bmgr$RestoreObserver.done|]    @AccessFlag ;
+      [|android:app:backup:RestoreSet|][] [|com:android:commands:bmgr:Bmgr$RestoreObserver.sets|]    @AccessFlag ;
+      [|com:android:commands:bmgr:Bmgr|] [|com:android:commands:bmgr:Bmgr$RestoreObserver.this$0|]    @AccessFlag FINAL_SYNTHETIC;
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr$RestoreObserver.<init>|] ([|com:android:commands:bmgr:Bmgr$RestoreObserver|] v1 @type (this), [|com:android:commands:bmgr:Bmgr|] v2 @type (object)) @owner [|com:android:commands:bmgr:Bmgr$RestoreObserver|] @signature [|Lcom/android/commands/bmgr/Bmgr$RestoreObserver;.<init>:(Lcom/android/commands/bmgr/Bmgr;)V|] @Access CONSTRUCTOR {
+      local temp ;
+
+        v0;
+      
+#L0008cc.   v1.[|com:android:commands:bmgr:Bmgr$RestoreObserver.this$0|]  := v2 @type object;
+#L0008d0.   call temp:=  [|android:app:backup:IRestoreObserver$Stub.<init>|](v1) @signature [|Landroid/app/backup/IRestoreObserver$Stub;.<init>:()V|] @classDescriptor [|android:app:backup:IRestoreObserver$Stub|] @type direct;
+#L0008d6.   v0:= 0  @length 4;
+#L0008d8.   v1.[|com:android:commands:bmgr:Bmgr$RestoreObserver.sets|]  := v0 @type object;
+#L0008dc.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr$RestoreObserver.onUpdate|] ([|com:android:commands:bmgr:Bmgr$RestoreObserver|] v3 @type (this), [|int|] v4, [|java:lang:String|] v5 @type (object)) @owner [|com:android:commands:bmgr:Bmgr$RestoreObserver|] @signature [|Lcom/android/commands/bmgr/Bmgr$RestoreObserver;.onUpdate:(ILjava/lang/String;)V|] @Access PUBLIC {
+      local temp ;
+
+
+
+        v0;
+        v1;
+        v2;
+      
+#L0008f0.   v0:= @@[|java:lang:System.out|]   @type object;
+#L0008f4.   v1:= new [|java:lang:StringBuilder|];
+#L0008f8.   call temp:=  [|java:lang:StringBuilder.<init>|](v1) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L0008fe.   v2:= "onUpdate: " @type (object, string);
+#L000902.   call temp:=  [|java:lang:StringBuilder.append|](v1, v2) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000908.   v1:= temp  @type object;
+#L00090a.   call temp:=  [|java:lang:StringBuilder.append|](v1, v4) @signature [|Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000910.   v1:= temp  @type object;
+#L000912.   v2:= " = " @type (object, string);
+#L000916.   call temp:=  [|java:lang:StringBuilder.append|](v1, v2) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L00091c.   v1:= temp  @type object;
+#L00091e.   call temp:=  [|java:lang:StringBuilder.append|](v1, v5) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000924.   v1:= temp  @type object;
+#L000926.   call temp:=  [|java:lang:StringBuilder.toString|](v1) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L00092c.   v1:= temp  @type object;
+#L00092e.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000934.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr$RestoreObserver.restoreFinished|] ([|com:android:commands:bmgr:Bmgr$RestoreObserver|] v3 @type (this), [|int|] v4) @owner [|com:android:commands:bmgr:Bmgr$RestoreObserver|] @signature [|Lcom/android/commands/bmgr/Bmgr$RestoreObserver;.restoreFinished:(I)V|] @Access PUBLIC {
+      local temp ;
+
+
+        v0;
+        v1;
+        v2;
+      
+#L000948.   v0:= @@[|java:lang:System.out|]   @type object;
+#L00094c.   v1:= new [|java:lang:StringBuilder|];
+#L000950.   call temp:=  [|java:lang:StringBuilder.<init>|](v1) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L000956.   v2:= "restoreFinished: " @type (object, string);
+#L00095a.   call temp:=  [|java:lang:StringBuilder.append|](v1, v2) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000960.   v1:= temp  @type object;
+#L000962.   call temp:=  [|java:lang:StringBuilder.append|](v1, v4) @signature [|Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000968.   v1:= temp  @type object;
+#L00096a.   call temp:=  [|java:lang:StringBuilder.toString|](v1) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000970.   v1:= temp  @type object;
+#L000972.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000978.   (@monitorenter v3)
+#L00097a.   v0:= 1  @length 4;
+#L00097c.   v3.[|com:android:commands:bmgr:Bmgr$RestoreObserver.done|]  := v0 @boolean;
+#L000980.   call temp:=  [|java:lang:Object.notify|](v3) @signature [|Ljava/lang/Object;.notify:()V|] @classDescriptor [|java:lang:Object|] @type virtual;
+#L000986.   (@monitorexit v3)
+#L000988.   return @void ;
+#L00098a.   v0:= Exception  @type object;
+#L00098c.   (@monitorexit v3)
+#L00098e.   throw v0;
+  catch  [|any|] @[L00097c..L00098e] goto L00098a;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr$RestoreObserver.restoreSetsAvailable|] ([|com:android:commands:bmgr:Bmgr$RestoreObserver|] v1 @type (this), [|android:app:backup:RestoreSet|][] v2 @type (object)) @owner [|com:android:commands:bmgr:Bmgr$RestoreObserver|] @signature [|Lcom/android/commands/bmgr/Bmgr$RestoreObserver;.restoreSetsAvailable:([Landroid/app/backup/RestoreSet;)V|] @Access PUBLIC {
+      local temp ;
+
+
+        v0;
+      
+#L0009ac.   (@monitorenter v1)
+#L0009ae.   v1.[|com:android:commands:bmgr:Bmgr$RestoreObserver.sets|]  := v2 @type object;
+#L0009b2.   v0:= 1  @length 4;
+#L0009b4.   v1.[|com:android:commands:bmgr:Bmgr$RestoreObserver.done|]  := v0 @boolean;
+#L0009b8.   call temp:=  [|java:lang:Object.notify|](v1) @signature [|Ljava/lang/Object;.notify:()V|] @classDescriptor [|java:lang:Object|] @type virtual;
+#L0009be.   (@monitorexit v1)
+#L0009c0.   return @void ;
+#L0009c2.   v0:= Exception  @type object;
+#L0009c4.   (@monitorexit v1)
+#L0009c6.   throw v0;
+  catch  [|any|] @[L0009ae..L0009c6] goto L0009c2;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr$RestoreObserver.restoreStarting|] ([|com:android:commands:bmgr:Bmgr$RestoreObserver|] v3 @type (this), [|int|] v4) @owner [|com:android:commands:bmgr:Bmgr$RestoreObserver|] @signature [|Lcom/android/commands/bmgr/Bmgr$RestoreObserver;.restoreStarting:(I)V|] @Access PUBLIC {
+      local temp ;
+
+
+        v0;
+        v1;
+        v2;
+      
+#L0009e4.   v0:= @@[|java:lang:System.out|]   @type object;
+#L0009e8.   v1:= new [|java:lang:StringBuilder|];
+#L0009ec.   call temp:=  [|java:lang:StringBuilder.<init>|](v1) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L0009f2.   v2:= "restoreStarting: " @type (object, string);
+#L0009f6.   call temp:=  [|java:lang:StringBuilder.append|](v1, v2) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0009fc.   v1:= temp  @type object;
+#L0009fe.   call temp:=  [|java:lang:StringBuilder.append|](v1, v4) @signature [|Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000a04.   v1:= temp  @type object;
+#L000a06.   v2:= " packages" @type (object, string);
+#L000a0a.   call temp:=  [|java:lang:StringBuilder.append|](v1, v2) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000a10.   v1:= temp  @type object;
+#L000a12.   call temp:=  [|java:lang:StringBuilder.toString|](v1) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000a18.   v1:= temp  @type object;
+#L000a1a.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000a20.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr$RestoreObserver.waitForCompletion|] ([|com:android:commands:bmgr:Bmgr$RestoreObserver|] v1 @type (this)) @owner [|com:android:commands:bmgr:Bmgr$RestoreObserver|] @signature [|Lcom/android/commands/bmgr/Bmgr$RestoreObserver;.waitForCompletion:()V|] @Access PUBLIC {
+      local temp ;
+
+        v0;
+      
+#L000a34.   (@monitorenter v1)
+#L000a36.   v0:= v1.[|com:android:commands:bmgr:Bmgr$RestoreObserver.done|]   @boolean;
+#L000a3a.   if v0 != 0 then goto L000a4a;
+#L000a3e.   call temp:=  [|java:lang:Object.wait|](v1) @signature [|Ljava/lang/Object;.wait:()V|] @classDescriptor [|java:lang:Object|] @type virtual;
+#L000a44.   goto L000a36;
+#L000a46.   v0:= Exception  @type object;
+#L000a48.   goto L000a36;
+#L000a4a.   (@monitorexit v1)
+#L000a4c.   return @void ;
+#L000a4e.   v0:= Exception  @type object;
+#L000a50.   (@monitorexit v1)
+#L000a52.   throw v0;
+  catch  [|any|] @[L000a36..L000a3a] goto L000a4e;
+  catch  [|java:lang:InterruptedException|] @[L000a3e..L000a44] goto L000a46;
+  catch  [|any|] @[L000a3e..L000a44] goto L000a4e;
+  catch  [|any|] @[L000a4a..L000a52] goto L000a4e;
+
+   }
+record [|com:android:commands:bmgr:Bmgr|]  @type class @AccessFlag PUBLIC_FINAL  {
+      [|java:lang:String|][] [|com:android:commands:bmgr:Bmgr.mArgs|]    @AccessFlag PRIVATE;
+      [|android:app:backup:IBackupManager|] [|com:android:commands:bmgr:Bmgr.mBmgr|]    @AccessFlag ;
+      [|int|] [|com:android:commands:bmgr:Bmgr.mNextArg|]    @AccessFlag PRIVATE;
+      [|android:app:backup:IRestoreSession|] [|com:android:commands:bmgr:Bmgr.mRestore|]    @AccessFlag ;
+   }
+      global [|java:lang:String|] @@[|com:android:commands:bmgr:Bmgr.BMGR_NOT_RUNNING_ERR|]    @AccessFlag STATIC_FINAL;
+      global [|java:lang:String|] @@[|com:android:commands:bmgr:Bmgr.TRANSPORT_NOT_RUNNING_ERR|]    @AccessFlag STATIC_FINAL;
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr.<init>|] ([|com:android:commands:bmgr:Bmgr|] v0 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
+      local temp ;
+
+      
+#L000a84.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
+#L000a8a.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr.doBackup|] ([|com:android:commands:bmgr:Bmgr|] v4 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doBackup:()V|] @Access PRIVATE {
+      local temp ;
+        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L0011,L0022));
+        [|java:lang:String|] v1 @varname [|pkg|] @scope ((L0004,L0022));
+
+        v2;
+        v3;
+      
+#L000a9c.   call temp:=  [|com:android:commands:bmgr:Bmgr.nextArg|](v4) @signature [|Lcom/android/commands/bmgr/Bmgr;.nextArg:()Ljava/lang/String;|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L000aa2.   v1:= temp  @type object;
+#L000aa4.   if v1 != 0 then goto L000ab0;
+#L000aa8.   call temp:=  [|com:android:commands:bmgr:Bmgr.showUsage|]() @signature [|Lcom/android/commands/bmgr/Bmgr;.showUsage:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type static;
+#L000aae.   return @void ;
+#L000ab0.   v2:= v4.[|com:android:commands:bmgr:Bmgr.mBmgr|]   @type object;
+#L000ab4.   call temp:=  [|android:app:backup:IBackupManager.dataChanged|](v2, v1) @signature [|Landroid/app/backup/IBackupManager;.dataChanged:(Ljava/lang/String;)V|] @classDescriptor [|android:app:backup:IBackupManager|] @type interface;
+#L000aba.   goto L000aae;
+#L000abc.   v0:= Exception  @type object;
+#L000abe.   v2:= @@[|java:lang:System.err|]   @type object;
+#L000ac2.   call temp:=  [|android:os:RemoteException.toString|](v0) @signature [|Landroid/os/RemoteException;.toString:()Ljava/lang/String;|] @classDescriptor [|android:os:RemoteException|] @type virtual;
+#L000ac8.   v3:= temp  @type object;
+#L000aca.   call temp:=  [|java:io:PrintStream.println|](v2, v3) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000ad0.   v2:= @@[|java:lang:System.err|]   @type object;
+#L000ad4.   v3:= "Error: Could not access the Backup Manager.  Is the system running?" @type (object, string);
+#L000ad8.   call temp:=  [|java:io:PrintStream.println|](v2, v3) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000ade.   goto L000aae;
+  catch  [|android:os:RemoteException|] @[L000ab0..L000aba] goto L000abc;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr.doEnable|] ([|com:android:commands:bmgr:Bmgr|] v6 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doEnable:()V|] @Access PRIVATE {
+      local temp ;
+        [|boolean|] v2 @varname [|enable|] @scope ((L000e,L0030));
+        [|java:lang:NumberFormatException|] v1 @varname [|e|] @scope ((L0031,L0035), (L0036,L0047));
+        [|java:lang:String|] v0 @varname [|arg|] @scope ((L0004,L0047));
+
+        v3;
+        v4;
+        v5;
+      
+#L000afc.   call temp:=  [|com:android:commands:bmgr:Bmgr.nextArg|](v6) @signature [|Lcom/android/commands/bmgr/Bmgr;.nextArg:()Ljava/lang/String;|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L000b02.   v0:= temp  @type object;
+#L000b04.   if v0 != 0 then goto L000b10;
+#L000b08.   call temp:=  [|com:android:commands:bmgr:Bmgr.showUsage|]() @signature [|Lcom/android/commands/bmgr/Bmgr;.showUsage:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type static;
+#L000b0e.   return @void ;
+#L000b10.   call temp:=  [|java:lang:Boolean.parseBoolean|](v0) @signature [|Ljava/lang/Boolean;.parseBoolean:(Ljava/lang/String;)Z|] @classDescriptor [|java:lang:Boolean|] @type static;
+#L000b16.   v2:= temp;
+#L000b18.   v3:= v6.[|com:android:commands:bmgr:Bmgr.mBmgr|]   @type object;
+#L000b1c.   call temp:=  [|android:app:backup:IBackupManager.setBackupEnabled|](v3, v2) @signature [|Landroid/app/backup/IBackupManager;.setBackupEnabled:(Z)V|] @classDescriptor [|android:app:backup:IBackupManager|] @type interface;
+#L000b22.   v3:= @@[|java:lang:System.out|]   @type object;
+#L000b26.   v4:= new [|java:lang:StringBuilder|];
+#L000b2a.   call temp:=  [|java:lang:StringBuilder.<init>|](v4) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L000b30.   v5:= "Backup Manager now " @type (object, string);
+#L000b34.   call temp:=  [|java:lang:StringBuilder.append|](v4, v5) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000b3a.   v4:= temp  @type object;
+#L000b3c.   call temp:=  [|com:android:commands:bmgr:Bmgr.enableToString|](v6, v2) @signature [|Lcom/android/commands/bmgr/Bmgr;.enableToString:(Z)Ljava/lang/String;|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L000b42.   v5:= temp  @type object;
+#L000b44.   call temp:=  [|java:lang:StringBuilder.append|](v4, v5) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000b4a.   v4:= temp  @type object;
+#L000b4c.   call temp:=  [|java:lang:StringBuilder.toString|](v4) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000b52.   v4:= temp  @type object;
+#L000b54.   call temp:=  [|java:io:PrintStream.println|](v3, v4) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000b5a.   goto L000b0e;
+#L000b5c.   v1:= Exception  @type object;
+#L000b5e.   call temp:=  [|com:android:commands:bmgr:Bmgr.showUsage|]() @signature [|Lcom/android/commands/bmgr/Bmgr;.showUsage:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type static;
+#L000b64.   goto L000b0e;
+#L000b66.   v1:= Exception  @type object;
+#L000b68.   v3:= @@[|java:lang:System.err|]   @type object;
+#L000b6c.   call temp:=  [|android:os:RemoteException.toString|](v1) @signature [|Landroid/os/RemoteException;.toString:()Ljava/lang/String;|] @classDescriptor [|android:os:RemoteException|] @type virtual;
+#L000b72.   v4:= temp  @type object;
+#L000b74.   call temp:=  [|java:io:PrintStream.println|](v3, v4) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000b7a.   v3:= @@[|java:lang:System.err|]   @type object;
+#L000b7e.   v4:= "Error: Could not access the Backup Manager.  Is the system running?" @type (object, string);
+#L000b82.   call temp:=  [|java:io:PrintStream.println|](v3, v4) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000b88.   goto L000b0e;
+  catch  [|java:lang:NumberFormatException|] @[L000b10..L000b5a] goto L000b5c;
+  catch  [|android:os:RemoteException|] @[L000b10..L000b5a] goto L000b66;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr.doEnabled|] ([|com:android:commands:bmgr:Bmgr|] v5 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doEnabled:()V|] @Access PRIVATE {
+      local temp ;
+        [|boolean|] v1 @varname [|isEnabled|] @scope ((L0006,L0022));
+        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L0024,L0035));
+
+        v2;
+        v3;
+        v4;
+      
+#L000bac.   v2:= v5.[|com:android:commands:bmgr:Bmgr.mBmgr|]   @type object;
+#L000bb0.   call temp:=  [|android:app:backup:IBackupManager.isBackupEnabled|](v2) @signature [|Landroid/app/backup/IBackupManager;.isBackupEnabled:()Z|] @classDescriptor [|android:app:backup:IBackupManager|] @type interface;
+#L000bb6.   v1:= temp;
+#L000bb8.   v2:= @@[|java:lang:System.out|]   @type object;
+#L000bbc.   v3:= new [|java:lang:StringBuilder|];
+#L000bc0.   call temp:=  [|java:lang:StringBuilder.<init>|](v3) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L000bc6.   v4:= "Backup Manager currently " @type (object, string);
+#L000bca.   call temp:=  [|java:lang:StringBuilder.append|](v3, v4) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000bd0.   v3:= temp  @type object;
+#L000bd2.   call temp:=  [|com:android:commands:bmgr:Bmgr.enableToString|](v5, v1) @signature [|Lcom/android/commands/bmgr/Bmgr;.enableToString:(Z)Ljava/lang/String;|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L000bd8.   v4:= temp  @type object;
+#L000bda.   call temp:=  [|java:lang:StringBuilder.append|](v3, v4) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000be0.   v3:= temp  @type object;
+#L000be2.   call temp:=  [|java:lang:StringBuilder.toString|](v3) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000be8.   v3:= temp  @type object;
+#L000bea.   call temp:=  [|java:io:PrintStream.println|](v2, v3) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000bf0.   return @void ;
+#L000bf2.   v0:= Exception  @type object;
+#L000bf4.   v2:= @@[|java:lang:System.err|]   @type object;
+#L000bf8.   call temp:=  [|android:os:RemoteException.toString|](v0) @signature [|Landroid/os/RemoteException;.toString:()Ljava/lang/String;|] @classDescriptor [|android:os:RemoteException|] @type virtual;
+#L000bfe.   v3:= temp  @type object;
+#L000c00.   call temp:=  [|java:io:PrintStream.println|](v2, v3) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000c06.   v2:= @@[|java:lang:System.err|]   @type object;
+#L000c0a.   v3:= "Error: Could not access the Backup Manager.  Is the system running?" @type (object, string);
+#L000c0e.   call temp:=  [|java:io:PrintStream.println|](v2, v3) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000c14.   goto L000bf0;
+  catch  [|android:os:RemoteException|] @[L000bac..L000bf0] goto L000bf2;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr.doList|] ([|com:android:commands:bmgr:Bmgr|] v5 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doList:()V|] @Access PRIVATE {
+      local temp ;
+        [|android:os:RemoteException|] v1 @varname [|e|] @scope ((L0027,L0038));
+        [|java:lang:String|] v0 @varname [|arg|] @scope ((L0004,L0055));
+
+        v2;
+        v3;
+        v4;
+      
+#L000c34.   call temp:=  [|com:android:commands:bmgr:Bmgr.nextArg|](v5) @signature [|Lcom/android/commands/bmgr/Bmgr;.nextArg:()Ljava/lang/String;|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L000c3a.   v0:= temp  @type object;
+#L000c3c.   v2:= "transports" @type (object, string);
+#L000c40.   call temp:=  [|java:lang:String.equals|](v2, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000c46.   v2:= temp;
+#L000c48.   if v2 == 0 then goto L000c54;
+#L000c4c.   call temp:=  [|com:android:commands:bmgr:Bmgr.doListTransports|](v5) @signature [|Lcom/android/commands/bmgr/Bmgr;.doListTransports:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L000c52.   return @void ;
+#L000c54.   v2:= v5.[|com:android:commands:bmgr:Bmgr.mBmgr|]   @type object;
+#L000c58.   v3:= 0  @length 4;
+#L000c5a.   v4:= 0  @length 4;
+#L000c5c.   call temp:=  [|android:app:backup:IBackupManager.beginRestoreSession|](v2, v3, v4) @signature [|Landroid/app/backup/IBackupManager;.beginRestoreSession:(Ljava/lang/String;Ljava/lang/String;)Landroid/app/backup/IRestoreSession;|] @classDescriptor [|android:app:backup:IBackupManager|] @type interface;
+#L000c62.   v2:= temp  @type object;
+#L000c64.   v5.[|com:android:commands:bmgr:Bmgr.mRestore|]  := v2 @type object;
+#L000c68.   v2:= v5.[|com:android:commands:bmgr:Bmgr.mRestore|]   @type object;
+#L000c6c.   if v2 != 0 then goto L000ca4;
+#L000c70.   v2:= @@[|java:lang:System.err|]   @type object;
+#L000c74.   v3:= "Error: Could not access the Backup Manager.  Is the system running?" @type (object, string);
+#L000c78.   call temp:=  [|java:io:PrintStream.println|](v2, v3) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000c7e.   goto L000c52;
+#L000c80.   v1:= Exception  @type object;
+#L000c82.   v2:= @@[|java:lang:System.err|]   @type object;
+#L000c86.   call temp:=  [|android:os:RemoteException.toString|](v1) @signature [|Landroid/os/RemoteException;.toString:()Ljava/lang/String;|] @classDescriptor [|android:os:RemoteException|] @type virtual;
+#L000c8c.   v3:= temp  @type object;
+#L000c8e.   call temp:=  [|java:io:PrintStream.println|](v2, v3) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000c94.   v2:= @@[|java:lang:System.err|]   @type object;
+#L000c98.   v3:= "Error: Could not access the Backup Manager.  Is the system running?" @type (object, string);
+#L000c9c.   call temp:=  [|java:io:PrintStream.println|](v2, v3) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000ca2.   goto L000c52;
+#L000ca4.   v2:= "sets" @type (object, string);
+#L000ca8.   call temp:=  [|java:lang:String.equals|](v2, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000cae.   v2:= temp;
+#L000cb0.   if v2 == 0 then goto L000cc6;
+#L000cb4.   call temp:=  [|com:android:commands:bmgr:Bmgr.doListRestoreSets|](v5) @signature [|Lcom/android/commands/bmgr/Bmgr;.doListRestoreSets:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L000cba.   v2:= v5.[|com:android:commands:bmgr:Bmgr.mRestore|]   @type object;
+#L000cbe.   call temp:=  [|android:app:backup:IRestoreSession.endRestoreSession|](v2) @signature [|Landroid/app/backup/IRestoreSession;.endRestoreSession:()V|] @classDescriptor [|android:app:backup:IRestoreSession|] @type interface;
+#L000cc4.   goto L000c52;
+#L000cc6.   v2:= "transports" @type (object, string);
+#L000cca.   call temp:=  [|java:lang:String.equals|](v2, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000cd0.   v2:= temp;
+#L000cd2.   if v2 == 0 then goto L000cba;
+#L000cd6.   call temp:=  [|com:android:commands:bmgr:Bmgr.doListTransports|](v5) @signature [|Lcom/android/commands/bmgr/Bmgr;.doListTransports:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L000cdc.   goto L000cba;
+  catch  [|android:os:RemoteException|] @[L000c54..L000c7e] goto L000c80;
+  catch  [|android:os:RemoteException|] @[L000ca4..L000cdc] goto L000c80;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr.doListRestoreSets|] ([|com:android:commands:bmgr:Bmgr|] v5 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doListRestoreSets:()V|] @Access PRIVATE {
+      local temp ;
+        [|int|] v1 @varname [|err|] @scope ((L000b,L0014), (L0015,L001e));
+        [|com:android:commands:bmgr:Bmgr$RestoreObserver|] v2 @varname [|observer|] @scope ((L0005,L0014), (L0015,L001e));
+        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L001f,L0030));
+
+        v3;
+        v4;
+      
+#L000d04.   v2:= new [|com:android:commands:bmgr:Bmgr$RestoreObserver|];
+#L000d08.   call temp:=  [|com:android:commands:bmgr:Bmgr$RestoreObserver.<init>|](v2, v5) @signature [|Lcom/android/commands/bmgr/Bmgr$RestoreObserver;.<init>:(Lcom/android/commands/bmgr/Bmgr;)V|] @classDescriptor [|com:android:commands:bmgr:Bmgr$RestoreObserver|] @type direct;
+#L000d0e.   v3:= v5.[|com:android:commands:bmgr:Bmgr.mRestore|]   @type object;
+#L000d12.   call temp:=  [|android:app:backup:IRestoreSession.getAvailableRestoreSets|](v3, v2) @signature [|Landroid/app/backup/IRestoreSession;.getAvailableRestoreSets:(Landroid/app/backup/IRestoreObserver;)I|] @classDescriptor [|android:app:backup:IRestoreSession|] @type interface;
+#L000d18.   v1:= temp;
+#L000d1a.   if v1 == 0 then goto L000d2e;
+#L000d1e.   v3:= @@[|java:lang:System.out|]   @type object;
+#L000d22.   v4:= "Unable to request restore sets" @type (object, string);
+#L000d26.   call temp:=  [|java:io:PrintStream.println|](v3, v4) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000d2c.   return @void ;
+#L000d2e.   call temp:=  [|com:android:commands:bmgr:Bmgr$RestoreObserver.waitForCompletion|](v2) @signature [|Lcom/android/commands/bmgr/Bmgr$RestoreObserver;.waitForCompletion:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr$RestoreObserver|] @type virtual;
+#L000d34.   v3:= v2.[|com:android:commands:bmgr:Bmgr$RestoreObserver.sets|]   @type object;
+#L000d38.   call temp:=  [|com:android:commands:bmgr:Bmgr.printRestoreSets|](v5, v3) @signature [|Lcom/android/commands/bmgr/Bmgr;.printRestoreSets:([Landroid/app/backup/RestoreSet;)V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L000d3e.   goto L000d2c;
+#L000d40.   v0:= Exception  @type object;
+#L000d42.   v3:= @@[|java:lang:System.err|]   @type object;
+#L000d46.   call temp:=  [|android:os:RemoteException.toString|](v0) @signature [|Landroid/os/RemoteException;.toString:()Ljava/lang/String;|] @classDescriptor [|android:os:RemoteException|] @type virtual;
+#L000d4c.   v4:= temp  @type object;
+#L000d4e.   call temp:=  [|java:io:PrintStream.println|](v3, v4) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000d54.   v3:= @@[|java:lang:System.err|]   @type object;
+#L000d58.   v4:= "Error: Could not access the backup transport.  Is the system running?" @type (object, string);
+#L000d5c.   call temp:=  [|java:io:PrintStream.println|](v3, v4) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000d62.   goto L000d2c;
+  catch  [|android:os:RemoteException|] @[L000d04..L000d3e] goto L000d40;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr.doListTransports|] ([|com:android:commands:bmgr:Bmgr|] v10 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doListTransports:()V|] @Access PRIVATE {
+      local temp ;
+        [|java:lang:String|] v1 @varname [|current|] @scope ((L0006,L0018), (L0019,L0044));
+        [|java:lang:String|][] v7 @varname [|transports|] @scope ((L000c,L0018), (L0019,L0044));
+        [|java:lang:String|] v5 @varname [|pad|] @scope ((L0028,L0041));
+        [|java:lang:String|][] v0 @varname [|arr$|] @scope ((L001a,L0044));
+        [|int|] v3 @varname [|i$|] @scope ((L001c,L0044));
+        [|int|] v4 @varname [|len$|] @scope ((L001b,L0044));
+        [|java:lang:String|] v6 @varname [|t|] @scope ((L0020,L0044));
+        [|android:os:RemoteException|] v2 @varname [|e|] @scope ((L0045,L0056));
+
+        v8;
+        v9;
+      
+#L000d80.   v8:= v10.[|com:android:commands:bmgr:Bmgr.mBmgr|]   @type object;
+#L000d84.   call temp:=  [|android:app:backup:IBackupManager.getCurrentTransport|](v8) @signature [|Landroid/app/backup/IBackupManager;.getCurrentTransport:()Ljava/lang/String;|] @classDescriptor [|android:app:backup:IBackupManager|] @type interface;
+#L000d8a.   v1:= temp  @type object;
+#L000d8c.   v8:= v10.[|com:android:commands:bmgr:Bmgr.mBmgr|]   @type object;
+#L000d90.   call temp:=  [|android:app:backup:IBackupManager.listAllTransports|](v8) @signature [|Landroid/app/backup/IBackupManager;.listAllTransports:()[Ljava/lang/String;|] @classDescriptor [|android:app:backup:IBackupManager|] @type interface;
+#L000d96.   v7:= temp  @type object;
+#L000d98.   if v7 == 0 then goto L000da2;
+#L000d9c.   v8:= v7.length;
+#L000d9e.   if v8 != 0 then goto L000db2;
+#L000da2.   v8:= @@[|java:lang:System.out|]   @type object;
+#L000da6.   v9:= "No transports available." @type (object, string);
+#L000daa.   call temp:=  [|java:io:PrintStream.println|](v8, v9) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000db0.   return @void ;
+#L000db2.   v0:= v7  @type object;
+#L000db4.   v4:= v0.length;
+#L000db6.   v3:= 0  @length 4;
+#L000db8.   if v3 >= v4 then goto L000db0;
+#L000dbc.   v6:= v0[v3]  @type object;
+#L000dc0.   call temp:=  [|java:lang:String.equals|](v6, v1) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000dc6.   v8:= temp;
+#L000dc8.   if v8 == 0 then goto L000e02;
+#L000dcc.   v5:= "  * " @type (object, string);
+#L000dd0.   v8:= @@[|java:lang:System.out|]   @type object;
+#L000dd4.   v9:= new [|java:lang:StringBuilder|];
+#L000dd8.   call temp:=  [|java:lang:StringBuilder.<init>|](v9) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L000dde.   call temp:=  [|java:lang:StringBuilder.append|](v9, v5) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000de4.   v9:= temp  @type object;
+#L000de6.   call temp:=  [|java:lang:StringBuilder.append|](v9, v6) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000dec.   v9:= temp  @type object;
+#L000dee.   call temp:=  [|java:lang:StringBuilder.toString|](v9) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000df4.   v9:= temp  @type object;
+#L000df6.   call temp:=  [|java:io:PrintStream.println|](v8, v9) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000dfc.   v3:= v3 + 1;
+#L000e00.   goto L000db8;
+#L000e02.   v5:= "    " @type (object, string);
+#L000e06.   goto L000dd0;
+#L000e08.   v2:= Exception  @type object;
+#L000e0a.   v8:= @@[|java:lang:System.err|]   @type object;
+#L000e0e.   call temp:=  [|android:os:RemoteException.toString|](v2) @signature [|Landroid/os/RemoteException;.toString:()Ljava/lang/String;|] @classDescriptor [|android:os:RemoteException|] @type virtual;
+#L000e14.   v9:= temp  @type object;
+#L000e16.   call temp:=  [|java:io:PrintStream.println|](v8, v9) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000e1c.   v8:= @@[|java:lang:System.err|]   @type object;
+#L000e20.   v9:= "Error: Could not access the Backup Manager.  Is the system running?" @type (object, string);
+#L000e24.   call temp:=  [|java:io:PrintStream.println|](v8, v9) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000e2a.   goto L000db0;
+  catch  [|android:os:RemoteException|] @[L000d80..L000e06] goto L000e08;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr.doRestore|] ([|com:android:commands:bmgr:Bmgr|] v7 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doRestore:()V|] @Access PRIVATE {
+      local temp ;
+        [|java:util:HashSet|] v2 @varname [|filter|] @scope ((L0024,L002e), (L0031,L0035), (L003a,L003e));
+        [|long|] v3 @varname [|token|] @scope ((L0023,L0035), (L003a,L003e));
+        [|java:lang:NumberFormatException|] v1 @varname [|e|] @scope ((L0036,L003a));
+        [|java:lang:String|] v0 @varname [|arg|] @scope ((L0004,L003e));
+
+        v4;
+        v5;
+        v6;
+      
+#L000e48.   call temp:=  [|com:android:commands:bmgr:Bmgr.nextArg|](v7) @signature [|Lcom/android/commands/bmgr/Bmgr;.nextArg:()Ljava/lang/String;|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L000e4e.   v0:= temp  @type object;
+#L000e50.   if v0 != 0 then goto L000e5c;
+#L000e54.   call temp:=  [|com:android:commands:bmgr:Bmgr.showUsage|]() @signature [|Lcom/android/commands/bmgr/Bmgr;.showUsage:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type static;
+#L000e5a.   return @void ;
+#L000e5c.   v5:= 46  @length 16;
+#L000e60.   call temp:=  [|java:lang:String.indexOf|](v0, v5) @signature [|Ljava/lang/String;.indexOf:(I)I|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000e66.   v5:= temp;
+#L000e68.   if v5 < 0 then goto L000e82;
+#L000e6c.   call temp:=  [|com:android:commands:bmgr:Bmgr.doRestorePackage|](v7, v0) @signature [|Lcom/android/commands/bmgr/Bmgr;.doRestorePackage:(Ljava/lang/String;)V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L000e72.   v5:= @@[|java:lang:System.out|]   @type object;
+#L000e76.   v6:= "done" @type (object, string);
+#L000e7a.   call temp:=  [|java:io:PrintStream.println|](v5, v6) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000e80.   goto L000e5a;
+#L000e82.   v5:= 16  @length 16;
+#L000e86.   call temp:=  [|java:lang:Long.parseLong|](v0, v5) @signature [|Ljava/lang/Long;.parseLong:(Ljava/lang/String;I)J|] @classDescriptor [|java:lang:Long|] @type static;
+#L000e8c.   v3:= temp  @type wide;
+#L000e8e.   v2:= 0  @length 4;
+#L000e90.   call temp:=  [|com:android:commands:bmgr:Bmgr.nextArg|](v7) @signature [|Lcom/android/commands/bmgr/Bmgr;.nextArg:()Ljava/lang/String;|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L000e96.   v0:= temp  @type object;
+#L000e98.   if v0 == 0 then goto L000ebc;
+#L000e9c.   if v2 != 0 then goto L000eaa;
+#L000ea0.   v2:= new [|java:util:HashSet|];
+#L000ea4.   call temp:=  [|java:util:HashSet.<init>|](v2) @signature [|Ljava/util/HashSet;.<init>:()V|] @classDescriptor [|java:util:HashSet|] @type direct;
+#L000eaa.   call temp:=  [|java:util:HashSet.add|](v2, v0) @signature [|Ljava/util/HashSet;.add:(Ljava/lang/Object;)Z|] @classDescriptor [|java:util:HashSet|] @type virtual;
+#L000eb0.   goto L000e90;
+#L000eb2.   v1:= Exception  @type object;
+#L000eb4.   call temp:=  [|com:android:commands:bmgr:Bmgr.showUsage|]() @signature [|Lcom/android/commands/bmgr/Bmgr;.showUsage:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type static;
+#L000eba.   goto L000e5a;
+#L000ebc.   call temp:=  [|com:android:commands:bmgr:Bmgr.doRestoreAll|](v7, v3, v4, v2) @signature [|Lcom/android/commands/bmgr/Bmgr;.doRestoreAll:(JLjava/util/HashSet;)V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L000ec2.   goto L000e72;
+  catch  [|java:lang:NumberFormatException|] @[L000e86..L000eb0] goto L000eb2;
+  catch  [|java:lang:NumberFormatException|] @[L000ebc..L000ec2] goto L000eb2;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr.doRestoreAll|] ([|com:android:commands:bmgr:Bmgr|] v15 @type (this), [|long|] v16, [|java:util:HashSet|] v18 @type (object)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doRestoreAll:(JLjava/util/HashSet;)V|] @Access PRIVATE {
+      local temp ;
+        [|android:app:backup:RestoreSet|][] v2 @varname [|arr$|] @scope ((L002d,L0060), (L008b,L00a9));
+        [|int|] v6 @varname [|i$|] @scope ((L002f,L0060), (L008b,L00a9));
+        [|int|] v7 @varname [|len$|] @scope ((L002e,L0060), (L008b,L00a9));
+        [|android:app:backup:RestoreSet|] v10 @varname [|s|] @scope ((L0033,L0060), (L008b,L00a9));
+        [|int|] v5 @varname [|err|] @scope ((L0023,L0079), (L008b,L00b4));
+        [|android:app:backup:RestoreSet|][] v11 @varname [|sets|] @scope ((L001d,L0079), (L008b,L00b4));
+        [|android:os:RemoteException|] v4 @varname [|e|] @scope ((L007a,L008b));
+        [|java:lang:String|][] v8 @varname [|names|] @scope ((L0093,L00a6));
+        [|boolean|] v3 @varname [|didRestore|] @scope ((L0006,L00b4));
+        [|com:android:commands:bmgr:Bmgr$RestoreObserver|] v9 @varname [|observer|] @scope ((L0005,L00b4));
+
+
+
+        v0;
+        v1;
+        v12;
+        v13;
+        v14;
+      
+#L000ee8.   v9:= new [|com:android:commands:bmgr:Bmgr$RestoreObserver|];
+#L000eec.   call temp:=  [|com:android:commands:bmgr:Bmgr$RestoreObserver.<init>|](v9, v15) @signature [|Lcom/android/commands/bmgr/Bmgr$RestoreObserver;.<init>:(Lcom/android/commands/bmgr/Bmgr;)V|] @classDescriptor [|com:android:commands:bmgr:Bmgr$RestoreObserver|] @type direct;
+#L000ef2.   v3:= 0  @length 4;
+#L000ef4.   v12:= v15.[|com:android:commands:bmgr:Bmgr.mBmgr|]   @type object;
+#L000ef8.   v13:= 0  @length 4;
+#L000efa.   v14:= 0  @length 4;
+#L000efc.   call temp:=  [|android:app:backup:IBackupManager.beginRestoreSession|](v12, v13, v14) @signature [|Landroid/app/backup/IBackupManager;.beginRestoreSession:(Ljava/lang/String;Ljava/lang/String;)Landroid/app/backup/IRestoreSession;|] @classDescriptor [|android:app:backup:IBackupManager|] @type interface;
+#L000f02.   v12:= temp  @type object;
+#L000f04.   v15.[|com:android:commands:bmgr:Bmgr.mRestore|]  := v12 @type object;
+#L000f08.   v12:= v15.[|com:android:commands:bmgr:Bmgr.mRestore|]   @type object;
+#L000f0c.   if v12 != 0 then goto L000f20;
+#L000f10.   v12:= @@[|java:lang:System.err|]   @type object;
+#L000f14.   v13:= "Error: Could not access the Backup Manager.  Is the system running?" @type (object, string);
+#L000f18.   call temp:=  [|java:io:PrintStream.println|](v12, v13) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000f1e.   return @void ;
+#L000f20.   v11:= 0  @length 4;
+#L000f22.   v12:= v15.[|com:android:commands:bmgr:Bmgr.mRestore|]   @type object;
+#L000f26.   call temp:=  [|android:app:backup:IRestoreSession.getAvailableRestoreSets|](v12, v9) @signature [|Landroid/app/backup/IRestoreSession;.getAvailableRestoreSets:(Landroid/app/backup/IRestoreObserver;)I|] @classDescriptor [|android:app:backup:IRestoreSession|] @type interface;
+#L000f2c.   v5:= temp;
+#L000f2e.   if v5 != 0 then goto L000fa8;
+#L000f32.   call temp:=  [|com:android:commands:bmgr:Bmgr$RestoreObserver.waitForCompletion|](v9) @signature [|Lcom/android/commands/bmgr/Bmgr$RestoreObserver;.waitForCompletion:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr$RestoreObserver|] @type virtual;
+#L000f38.   v11:= v9.[|com:android:commands:bmgr:Bmgr$RestoreObserver.sets|]   @type object;
+#L000f3c.   if v11 == 0 then goto L000fa8;
+#L000f40.   v2:= v11  @type object;
+#L000f42.   v7:= v2.length;
+#L000f44.   v6:= 0  @length 4;
+#L000f46.   if v6 >= v7 then goto L000fa8;
+#L000f4a.   v10:= v2[v6]  @type object;
+#L000f4e.   v12:= v10.[|android:app:backup:RestoreSet.token|]   @wide;
+#L000f52.   v12:= cmp(v12,v16);
+#L000f56.   if v12 != 0 then goto L001034;
+#L000f5a.   v12:= @@[|java:lang:System.out|]   @type object;
+#L000f5e.   v13:= new [|java:lang:StringBuilder|];
+#L000f62.   call temp:=  [|java:lang:StringBuilder.<init>|](v13) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L000f68.   v14:= "Scheduling restore: " @type (object, string);
+#L000f6c.   call temp:=  [|java:lang:StringBuilder.append|](v13, v14) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000f72.   v13:= temp  @type object;
+#L000f74.   v14:= v10.[|android:app:backup:RestoreSet.name|]   @type object;
+#L000f78.   call temp:=  [|java:lang:StringBuilder.append|](v13, v14) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000f7e.   v13:= temp  @type object;
+#L000f80.   call temp:=  [|java:lang:StringBuilder.toString|](v13) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000f86.   v13:= temp  @type object;
+#L000f88.   call temp:=  [|java:io:PrintStream.println|](v12, v13) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000f8e.   if v18 != 0 then goto L001002;
+#L000f92.   v12:= v15.[|com:android:commands:bmgr:Bmgr.mRestore|]   @type object;
+#L000f96.   v0:= v16  @type wide;
+#L000f9a.   call temp:=  [|android:app:backup:IRestoreSession.restoreAll|](v12, v0, v1, v9) @signature [|Landroid/app/backup/IRestoreSession;.restoreAll:(JLandroid/app/backup/IRestoreObserver;)I|] @classDescriptor [|android:app:backup:IRestoreSession|] @type interface;
+#L000fa0.   v12:= temp;
+#L000fa2.   if v12 != 0 then goto L000ffe;
+#L000fa6.   v3:= 1  @length 4;
+#L000fa8.   if v3 != 0 then goto L000fc4;
+#L000fac.   if v11 == 0 then goto L000fb6;
+#L000fb0.   v12:= v11.length;
+#L000fb2.   if v12 != 0 then goto L00103a;
+#L000fb6.   v12:= @@[|java:lang:System.out|]   @type object;
+#L000fba.   v13:= "No available restore sets; no restore performed" @type (object, string);
+#L000fbe.   call temp:=  [|java:io:PrintStream.println|](v12, v13) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000fc4.   if v3 == 0 then goto L000fce;
+#L000fc8.   call temp:=  [|com:android:commands:bmgr:Bmgr$RestoreObserver.waitForCompletion|](v9) @signature [|Lcom/android/commands/bmgr/Bmgr$RestoreObserver;.waitForCompletion:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr$RestoreObserver|] @type virtual;
+#L000fce.   v12:= v15.[|com:android:commands:bmgr:Bmgr.mRestore|]   @type object;
+#L000fd2.   call temp:=  [|android:app:backup:IRestoreSession.endRestoreSession|](v12) @signature [|Landroid/app/backup/IRestoreSession;.endRestoreSession:()V|] @classDescriptor [|android:app:backup:IRestoreSession|] @type interface;
+#L000fd8.   goto L000f1e;
+#L000fda.   v4:= Exception  @type object;
+#L000fdc.   v12:= @@[|java:lang:System.err|]   @type object;
+#L000fe0.   call temp:=  [|android:os:RemoteException.toString|](v4) @signature [|Landroid/os/RemoteException;.toString:()Ljava/lang/String;|] @classDescriptor [|android:os:RemoteException|] @type virtual;
+#L000fe6.   v13:= temp  @type object;
+#L000fe8.   call temp:=  [|java:io:PrintStream.println|](v12, v13) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000fee.   v12:= @@[|java:lang:System.err|]   @type object;
+#L000ff2.   v13:= "Error: Could not access the Backup Manager.  Is the system running?" @type (object, string);
+#L000ff6.   call temp:=  [|java:io:PrintStream.println|](v12, v13) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000ffc.   goto L000f1e;
+#L000ffe.   v3:= 0  @length 4;
+#L001000.   goto L000fa8;
+#L001002.   call temp:=  [|java:util:HashSet.size|](v18) @signature [|Ljava/util/HashSet;.size:()I|] @classDescriptor [|java:util:HashSet|] @type virtual;
+#L001008.   v12:= temp;
+#L00100a.   v8:= new [|java:lang:String|][v12];
+#L00100e.   v0:= v18  @type object;
+#L001012.   call temp:=  [|java:util:HashSet.toArray|](v0, v8) @signature [|Ljava/util/HashSet;.toArray:([Ljava/lang/Object;)[Ljava/lang/Object;|] @classDescriptor [|java:util:HashSet|] @type virtual;
+#L001018.   v12:= v15.[|com:android:commands:bmgr:Bmgr.mRestore|]   @type object;
+#L00101c.   v0:= v16  @type wide;
+#L001020.   call temp:=  [|android:app:backup:IRestoreSession.restoreSome|](v12, v0, v1, v9, v8) @signature [|Landroid/app/backup/IRestoreSession;.restoreSome:(JLandroid/app/backup/IRestoreObserver;[Ljava/lang/String;)I|] @classDescriptor [|android:app:backup:IRestoreSession|] @type interface;
+#L001026.   v12:= temp;
+#L001028.   if v12 != 0 then goto L001030;
+#L00102c.   v3:= 1  @length 4;
+#L00102e.   goto L000fa8;
+#L001030.   v3:= 0  @length 4;
+#L001032.   goto L00102e;
+#L001034.   v6:= v6 + 1;
+#L001038.   goto L000f46;
+#L00103a.   v12:= @@[|java:lang:System.out|]   @type object;
+#L00103e.   v13:= "No matching restore set token.  Available sets:" @type (object, string);
+#L001042.   call temp:=  [|java:io:PrintStream.println|](v12, v13) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001048.   call temp:=  [|com:android:commands:bmgr:Bmgr.printRestoreSets|](v15, v11) @signature [|Lcom/android/commands/bmgr/Bmgr;.printRestoreSets:([Landroid/app/backup/RestoreSet;)V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L00104e.   goto L000fc4;
+  catch  [|android:os:RemoteException|] @[L000ef4..L000fd8] goto L000fda;
+  catch  [|android:os:RemoteException|] @[L001002..L00104e] goto L000fda;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr.doRestorePackage|] ([|com:android:commands:bmgr:Bmgr|] v6 @type (this), [|java:lang:String|] v7 @type (object)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doRestorePackage:(Ljava/lang/String;)V|] @Access PRIVATE {
+      local temp ;
+        [|int|] v1 @varname [|err|] @scope ((L0020,L002b), (L003d,L0056));
+        [|com:android:commands:bmgr:Bmgr$RestoreObserver|] v2 @varname [|observer|] @scope ((L001a,L002b), (L003d,L0056));
+        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L002c,L003d));
+
+
+        v3;
+        v4;
+        v5;
+      
+#L001074.   v3:= v6.[|com:android:commands:bmgr:Bmgr.mBmgr|]   @type object;
+#L001078.   v4:= 0  @length 4;
+#L00107a.   call temp:=  [|android:app:backup:IBackupManager.beginRestoreSession|](v3, v7, v4) @signature [|Landroid/app/backup/IBackupManager;.beginRestoreSession:(Ljava/lang/String;Ljava/lang/String;)Landroid/app/backup/IRestoreSession;|] @classDescriptor [|android:app:backup:IBackupManager|] @type interface;
+#L001080.   v3:= temp  @type object;
+#L001082.   v6.[|com:android:commands:bmgr:Bmgr.mRestore|]  := v3 @type object;
+#L001086.   v3:= v6.[|com:android:commands:bmgr:Bmgr.mRestore|]   @type object;
+#L00108a.   if v3 != 0 then goto L00109e;
+#L00108e.   v3:= @@[|java:lang:System.err|]   @type object;
+#L001092.   v4:= "Error: Could not access the Backup Manager.  Is the system running?" @type (object, string);
+#L001096.   call temp:=  [|java:io:PrintStream.println|](v3, v4) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00109c.   return @void ;
+#L00109e.   v2:= new [|com:android:commands:bmgr:Bmgr$RestoreObserver|];
+#L0010a2.   call temp:=  [|com:android:commands:bmgr:Bmgr$RestoreObserver.<init>|](v2, v6) @signature [|Lcom/android/commands/bmgr/Bmgr$RestoreObserver;.<init>:(Lcom/android/commands/bmgr/Bmgr;)V|] @classDescriptor [|com:android:commands:bmgr:Bmgr$RestoreObserver|] @type direct;
+#L0010a8.   v3:= v6.[|com:android:commands:bmgr:Bmgr.mRestore|]   @type object;
+#L0010ac.   call temp:=  [|android:app:backup:IRestoreSession.restorePackage|](v3, v7, v2) @signature [|Landroid/app/backup/IRestoreSession;.restorePackage:(Ljava/lang/String;Landroid/app/backup/IRestoreObserver;)I|] @classDescriptor [|android:app:backup:IRestoreSession|] @type interface;
+#L0010b2.   v1:= temp;
+#L0010b4.   if v1 != 0 then goto L0010ee;
+#L0010b8.   call temp:=  [|com:android:commands:bmgr:Bmgr$RestoreObserver.waitForCompletion|](v2) @signature [|Lcom/android/commands/bmgr/Bmgr$RestoreObserver;.waitForCompletion:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr$RestoreObserver|] @type virtual;
+#L0010be.   v3:= v6.[|com:android:commands:bmgr:Bmgr.mRestore|]   @type object;
+#L0010c2.   call temp:=  [|android:app:backup:IRestoreSession.endRestoreSession|](v3) @signature [|Landroid/app/backup/IRestoreSession;.endRestoreSession:()V|] @classDescriptor [|android:app:backup:IRestoreSession|] @type interface;
+#L0010c8.   goto L00109c;
+#L0010ca.   v0:= Exception  @type object;
+#L0010cc.   v3:= @@[|java:lang:System.err|]   @type object;
+#L0010d0.   call temp:=  [|android:os:RemoteException.toString|](v0) @signature [|Landroid/os/RemoteException;.toString:()Ljava/lang/String;|] @classDescriptor [|android:os:RemoteException|] @type virtual;
+#L0010d6.   v4:= temp  @type object;
+#L0010d8.   call temp:=  [|java:io:PrintStream.println|](v3, v4) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0010de.   v3:= @@[|java:lang:System.err|]   @type object;
+#L0010e2.   v4:= "Error: Could not access the Backup Manager.  Is the system running?" @type (object, string);
+#L0010e6.   call temp:=  [|java:io:PrintStream.println|](v3, v4) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0010ec.   goto L00109c;
+#L0010ee.   v3:= @@[|java:lang:System.err|]   @type object;
+#L0010f2.   v4:= new [|java:lang:StringBuilder|];
+#L0010f6.   call temp:=  [|java:lang:StringBuilder.<init>|](v4) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L0010fc.   v5:= "Unable to restore package " @type (object, string);
+#L001100.   call temp:=  [|java:lang:StringBuilder.append|](v4, v5) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L001106.   v4:= temp  @type object;
+#L001108.   call temp:=  [|java:lang:StringBuilder.append|](v4, v7) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L00110e.   v4:= temp  @type object;
+#L001110.   call temp:=  [|java:lang:StringBuilder.toString|](v4) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L001116.   v4:= temp  @type object;
+#L001118.   call temp:=  [|java:io:PrintStream.println|](v3, v4) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00111e.   goto L0010be;
+  catch  [|android:os:RemoteException|] @[L001074..L0010c8] goto L0010ca;
+  catch  [|android:os:RemoteException|] @[L0010ee..L00111e] goto L0010ca;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr.doRun|] ([|com:android:commands:bmgr:Bmgr|] v3 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doRun:()V|] @Access PRIVATE {
+      local temp ;
+        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L0007,L0018));
+
+        v1;
+        v2;
+      
+#L001144.   v1:= v3.[|com:android:commands:bmgr:Bmgr.mBmgr|]   @type object;
+#L001148.   call temp:=  [|android:app:backup:IBackupManager.backupNow|](v1) @signature [|Landroid/app/backup/IBackupManager;.backupNow:()V|] @classDescriptor [|android:app:backup:IBackupManager|] @type interface;
+#L00114e.   return @void ;
+#L001150.   v0:= Exception  @type object;
+#L001152.   v1:= @@[|java:lang:System.err|]   @type object;
+#L001156.   call temp:=  [|android:os:RemoteException.toString|](v0) @signature [|Landroid/os/RemoteException;.toString:()Ljava/lang/String;|] @classDescriptor [|android:os:RemoteException|] @type virtual;
+#L00115c.   v2:= temp  @type object;
+#L00115e.   call temp:=  [|java:io:PrintStream.println|](v1, v2) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001164.   v1:= @@[|java:lang:System.err|]   @type object;
+#L001168.   v2:= "Error: Could not access the Backup Manager.  Is the system running?" @type (object, string);
+#L00116c.   call temp:=  [|java:io:PrintStream.println|](v1, v2) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001172.   goto L00114e;
+  catch  [|android:os:RemoteException|] @[L001144..L00114e] goto L001150;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr.doTransport|] ([|com:android:commands:bmgr:Bmgr|] v6 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doTransport:()V|] @Access PRIVATE {
+      local temp ;
+        [|java:lang:String|] v2 @varname [|which|] @scope ((L0004,L0009), (L000a,L0031), (L0043,L006c));
+        [|java:lang:String|] v1 @varname [|old|] @scope ((L0010,L0031), (L0043,L006c));
+        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L0032,L0043));
+
+        v3;
+        v4;
+        v5;
+      
+#L001190.   call temp:=  [|com:android:commands:bmgr:Bmgr.nextArg|](v6) @signature [|Lcom/android/commands/bmgr/Bmgr;.nextArg:()Ljava/lang/String;|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L001196.   v2:= temp  @type object;
+#L001198.   if v2 != 0 then goto L0011a4;
+#L00119c.   call temp:=  [|com:android:commands:bmgr:Bmgr.showUsage|]() @signature [|Lcom/android/commands/bmgr/Bmgr;.showUsage:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type static;
+#L0011a2.   return @void ;
+#L0011a4.   v3:= v6.[|com:android:commands:bmgr:Bmgr.mBmgr|]   @type object;
+#L0011a8.   call temp:=  [|android:app:backup:IBackupManager.selectBackupTransport|](v3, v2) @signature [|Landroid/app/backup/IBackupManager;.selectBackupTransport:(Ljava/lang/String;)Ljava/lang/String;|] @classDescriptor [|android:app:backup:IBackupManager|] @type interface;
+#L0011ae.   v1:= temp  @type object;
+#L0011b0.   if v1 != 0 then goto L001216;
+#L0011b4.   v3:= @@[|java:lang:System.out|]   @type object;
+#L0011b8.   v4:= new [|java:lang:StringBuilder|];
+#L0011bc.   call temp:=  [|java:lang:StringBuilder.<init>|](v4) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L0011c2.   v5:= "Unknown transport '" @type (object, string);
+#L0011c6.   call temp:=  [|java:lang:StringBuilder.append|](v4, v5) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0011cc.   v4:= temp  @type object;
+#L0011ce.   call temp:=  [|java:lang:StringBuilder.append|](v4, v2) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0011d4.   v4:= temp  @type object;
+#L0011d6.   v5:= "' specified; no changes made." @type (object, string);
+#L0011da.   call temp:=  [|java:lang:StringBuilder.append|](v4, v5) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0011e0.   v4:= temp  @type object;
+#L0011e2.   call temp:=  [|java:lang:StringBuilder.toString|](v4) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0011e8.   v4:= temp  @type object;
+#L0011ea.   call temp:=  [|java:io:PrintStream.println|](v3, v4) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0011f0.   goto L0011a2;
+#L0011f2.   v0:= Exception  @type object;
+#L0011f4.   v3:= @@[|java:lang:System.err|]   @type object;
+#L0011f8.   call temp:=  [|android:os:RemoteException.toString|](v0) @signature [|Landroid/os/RemoteException;.toString:()Ljava/lang/String;|] @classDescriptor [|android:os:RemoteException|] @type virtual;
+#L0011fe.   v4:= temp  @type object;
+#L001200.   call temp:=  [|java:io:PrintStream.println|](v3, v4) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001206.   v3:= @@[|java:lang:System.err|]   @type object;
+#L00120a.   v4:= "Error: Could not access the Backup Manager.  Is the system running?" @type (object, string);
+#L00120e.   call temp:=  [|java:io:PrintStream.println|](v3, v4) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001214.   goto L0011a2;
+#L001216.   v3:= @@[|java:lang:System.out|]   @type object;
+#L00121a.   v4:= new [|java:lang:StringBuilder|];
+#L00121e.   call temp:=  [|java:lang:StringBuilder.<init>|](v4) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L001224.   v5:= "Selected transport " @type (object, string);
+#L001228.   call temp:=  [|java:lang:StringBuilder.append|](v4, v5) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L00122e.   v4:= temp  @type object;
+#L001230.   call temp:=  [|java:lang:StringBuilder.append|](v4, v2) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L001236.   v4:= temp  @type object;
+#L001238.   v5:= " (formerly " @type (object, string);
+#L00123c.   call temp:=  [|java:lang:StringBuilder.append|](v4, v5) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L001242.   v4:= temp  @type object;
+#L001244.   call temp:=  [|java:lang:StringBuilder.append|](v4, v1) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L00124a.   v4:= temp  @type object;
+#L00124c.   v5:= ")" @type (object, string);
+#L001250.   call temp:=  [|java:lang:StringBuilder.append|](v4, v5) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L001256.   v4:= temp  @type object;
+#L001258.   call temp:=  [|java:lang:StringBuilder.toString|](v4) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L00125e.   v4:= temp  @type object;
+#L001260.   call temp:=  [|java:io:PrintStream.println|](v3, v4) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001266.   goto L0011a2;
+  catch  [|android:os:RemoteException|] @[L001190..L0011f0] goto L0011f2;
+  catch  [|android:os:RemoteException|] @[L001216..L001266] goto L0011f2;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr.doWipe|] ([|com:android:commands:bmgr:Bmgr|] v5 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doWipe:()V|] @Access PRIVATE {
+      local temp ;
+        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L0029,L003a));
+        [|java:lang:String|] v1 @varname [|pkg|] @scope ((L0004,L003a));
+
+        v2;
+        v3;
+        v4;
+      
+#L00128c.   call temp:=  [|com:android:commands:bmgr:Bmgr.nextArg|](v5) @signature [|Lcom/android/commands/bmgr/Bmgr;.nextArg:()Ljava/lang/String;|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L001292.   v1:= temp  @type object;
+#L001294.   if v1 != 0 then goto L0012a0;
+#L001298.   call temp:=  [|com:android:commands:bmgr:Bmgr.showUsage|]() @signature [|Lcom/android/commands/bmgr/Bmgr;.showUsage:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type static;
+#L00129e.   return @void ;
+#L0012a0.   v2:= v5.[|com:android:commands:bmgr:Bmgr.mBmgr|]   @type object;
+#L0012a4.   call temp:=  [|android:app:backup:IBackupManager.clearBackupData|](v2, v1) @signature [|Landroid/app/backup/IBackupManager;.clearBackupData:(Ljava/lang/String;)V|] @classDescriptor [|android:app:backup:IBackupManager|] @type interface;
+#L0012aa.   v2:= @@[|java:lang:System.out|]   @type object;
+#L0012ae.   v3:= new [|java:lang:StringBuilder|];
+#L0012b2.   call temp:=  [|java:lang:StringBuilder.<init>|](v3) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L0012b8.   v4:= "Wiped backup data for " @type (object, string);
+#L0012bc.   call temp:=  [|java:lang:StringBuilder.append|](v3, v4) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0012c2.   v3:= temp  @type object;
+#L0012c4.   call temp:=  [|java:lang:StringBuilder.append|](v3, v1) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0012ca.   v3:= temp  @type object;
+#L0012cc.   call temp:=  [|java:lang:StringBuilder.toString|](v3) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0012d2.   v3:= temp  @type object;
+#L0012d4.   call temp:=  [|java:io:PrintStream.println|](v2, v3) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0012da.   goto L00129e;
+#L0012dc.   v0:= Exception  @type object;
+#L0012de.   v2:= @@[|java:lang:System.err|]   @type object;
+#L0012e2.   call temp:=  [|android:os:RemoteException.toString|](v0) @signature [|Landroid/os/RemoteException;.toString:()Ljava/lang/String;|] @classDescriptor [|android:os:RemoteException|] @type virtual;
+#L0012e8.   v3:= temp  @type object;
+#L0012ea.   call temp:=  [|java:io:PrintStream.println|](v2, v3) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0012f0.   v2:= @@[|java:lang:System.err|]   @type object;
+#L0012f4.   v3:= "Error: Could not access the Backup Manager.  Is the system running?" @type (object, string);
+#L0012f8.   call temp:=  [|java:io:PrintStream.println|](v2, v3) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0012fe.   goto L00129e;
+  catch  [|android:os:RemoteException|] @[L0012a0..L0012da] goto L0012dc;
+
+   }
+    procedure [|java:lang:String|] [|com:android:commands:bmgr:Bmgr.enableToString|] ([|com:android:commands:bmgr:Bmgr|] v1 @type (this), [|boolean|] v2) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.enableToString:(Z)Ljava/lang/String;|] @Access PRIVATE {
+      local temp ;
+
+
+        v0;
+      
+#L00131c.   if v2 == 0 then goto L001326;
+#L001320.   v0:= "enabled" @type (object, string);
+#L001324.   return v0  @type object;
+#L001326.   v0:= "disabled" @type (object, string);
+#L00132a.   goto L001324;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr.main|] ([|java:lang:String|][] v3 @type (object)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.main:([Ljava/lang/String;)V|] @Access PUBLIC_STATIC {
+      local temp ;
+        [|java:lang:Exception|] v0 @varname [|e|] @scope ((L000a,L0015));
+
+        v1;
+        v2;
+      
+#L00133c.   v1:= new [|com:android:commands:bmgr:Bmgr|];
+#L001340.   call temp:=  [|com:android:commands:bmgr:Bmgr.<init>|](v1) @signature [|Lcom/android/commands/bmgr/Bmgr;.<init>:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L001346.   call temp:=  [|com:android:commands:bmgr:Bmgr.run|](v1, v3) @signature [|Lcom/android/commands/bmgr/Bmgr;.run:([Ljava/lang/String;)V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type virtual;
+#L00134c.   return @void ;
+#L00134e.   v0:= Exception  @type object;
+#L001350.   v1:= @@[|java:lang:System.err|]   @type object;
+#L001354.   v2:= "Exception caught:" @type (object, string);
+#L001358.   call temp:=  [|java:io:PrintStream.println|](v1, v2) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00135e.   call temp:=  [|java:lang:Exception.printStackTrace|](v0) @signature [|Ljava/lang/Exception;.printStackTrace:()V|] @classDescriptor [|java:lang:Exception|] @type virtual;
+#L001364.   goto L00134c;
+  catch  [|java:lang:Exception|] @[L00133c..L00134c] goto L00134e;
+
+   }
+    procedure [|java:lang:String|] [|com:android:commands:bmgr:Bmgr.nextArg|] ([|com:android:commands:bmgr:Bmgr|] v3 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.nextArg:()Ljava/lang/String;|] @Access PRIVATE {
+      local temp ;
+        [|java:lang:String|] v0 @varname [|arg|] @scope ((L000f,L0016));
+
+        v1;
+        v2;
+      
+#L001384.   v1:= v3.[|com:android:commands:bmgr:Bmgr.mNextArg|] ;
+#L001388.   v2:= v3.[|com:android:commands:bmgr:Bmgr.mArgs|]   @type object;
+#L00138c.   v2:= v2.length;
+#L00138e.   if v1 < v2 then goto L001396;
+#L001392.   v0:= 0  @length 4;
+#L001394.   return v0  @type object;
+#L001396.   v1:= v3.[|com:android:commands:bmgr:Bmgr.mArgs|]   @type object;
+#L00139a.   v2:= v3.[|com:android:commands:bmgr:Bmgr.mNextArg|] ;
+#L00139e.   v0:= v1[v2]  @type object;
+#L0013a2.   v1:= v3.[|com:android:commands:bmgr:Bmgr.mNextArg|] ;
+#L0013a6.   v1:= v1 + 1;
+#L0013aa.   v3.[|com:android:commands:bmgr:Bmgr.mNextArg|]  := v1;
+#L0013ae.   goto L001394;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr.printRestoreSets|] ([|com:android:commands:bmgr:Bmgr|] v8 @type (this), [|android:app:backup:RestoreSet|][] v9 @type (object)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.printRestoreSets:([Landroid/app/backup/RestoreSet;)V|] @Access PRIVATE {
+      local temp ;
+        [|android:app:backup:RestoreSet|][] v0 @varname [|arr$|] @scope ((L000e,L0041));
+        [|int|] v1 @varname [|i$|] @scope ((L0010,L0041));
+        [|int|] v2 @varname [|len$|] @scope ((L000f,L0041));
+        [|android:app:backup:RestoreSet|] v3 @varname [|s|] @scope ((L0014,L0041));
+
+
+        v4;
+        v5;
+        v6;
+        v7;
+      
+#L0013c0.   if v9 == 0 then goto L0013ca;
+#L0013c4.   v4:= v9.length;
+#L0013c6.   if v4 != 0 then goto L0013da;
+#L0013ca.   v4:= @@[|java:lang:System.out|]   @type object;
+#L0013ce.   v5:= "No restore sets" @type (object, string);
+#L0013d2.   call temp:=  [|java:io:PrintStream.println|](v4, v5) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0013d8.   return @void ;
+#L0013da.   v0:= v9  @type object;
+#L0013dc.   v2:= v0.length;
+#L0013de.   v1:= 0  @length 4;
+#L0013e0.   if v1 >= v2 then goto L0013d8;
+#L0013e4.   v3:= v0[v1]  @type object;
+#L0013e8.   v4:= @@[|java:lang:System.out|]   @type object;
+#L0013ec.   v5:= new [|java:lang:StringBuilder|];
+#L0013f0.   call temp:=  [|java:lang:StringBuilder.<init>|](v5) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L0013f6.   v6:= "  " @type (object, string);
+#L0013fa.   call temp:=  [|java:lang:StringBuilder.append|](v5, v6) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L001400.   v5:= temp  @type object;
+#L001402.   v6:= v3.[|android:app:backup:RestoreSet.token|]   @wide;
+#L001406.   call temp:=  [|java:lang:Long.toHexString|](v6, v7) @signature [|Ljava/lang/Long;.toHexString:(J)Ljava/lang/String;|] @classDescriptor [|java:lang:Long|] @type static;
+#L00140c.   v6:= temp  @type object;
+#L00140e.   call temp:=  [|java:lang:StringBuilder.append|](v5, v6) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L001414.   v5:= temp  @type object;
+#L001416.   v6:= " : " @type (object, string);
+#L00141a.   call temp:=  [|java:lang:StringBuilder.append|](v5, v6) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L001420.   v5:= temp  @type object;
+#L001422.   v6:= v3.[|android:app:backup:RestoreSet.name|]   @type object;
+#L001426.   call temp:=  [|java:lang:StringBuilder.append|](v5, v6) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L00142c.   v5:= temp  @type object;
+#L00142e.   call temp:=  [|java:lang:StringBuilder.toString|](v5) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L001434.   v5:= temp  @type object;
+#L001436.   call temp:=  [|java:io:PrintStream.println|](v4, v5) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00143c.   v1:= v1 + 1;
+#L001440.   goto L0013e0;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr.showUsage|] () @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.showUsage:()V|] @Access PRIVATE_STATIC {
+      local temp ;
+        v0;
+        v1;
+      
+#L001454.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001458.   v1:= "usage: bmgr [backup|restore|list|transport|run]" @type (object, string);
+#L00145c.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001462.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001466.   v1:= "       bmgr backup PACKAGE" @type (object, string);
+#L00146a.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001470.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001474.   v1:= "       bmgr enable BOOL" @type (object, string);
+#L001478.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00147e.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001482.   v1:= "       bmgr enabled" @type (object, string);
+#L001486.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00148c.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001490.   v1:= "       bmgr list transports" @type (object, string);
+#L001494.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00149a.   v0:= @@[|java:lang:System.err|]   @type object;
+#L00149e.   v1:= "       bmgr list sets" @type (object, string);
+#L0014a2.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0014a8.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0014ac.   v1:= "       bmgr transport WHICH" @type (object, string);
+#L0014b0.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0014b6.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0014ba.   v1:= "       bmgr restore TOKEN" @type (object, string);
+#L0014be.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0014c4.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0014c8.   v1:= "       bmgr restore TOKEN PACKAGE..." @type (object, string);
+#L0014cc.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0014d2.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0014d6.   v1:= "       bmgr restore PACKAGE" @type (object, string);
+#L0014da.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0014e0.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0014e4.   v1:= "       bmgr run" @type (object, string);
+#L0014e8.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0014ee.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0014f2.   v1:= "       bmgr wipe PACKAGE" @type (object, string);
+#L0014f6.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0014fc.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001500.   v1:= "" @type (object, string);
+#L001504.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00150a.   v0:= @@[|java:lang:System.err|]   @type object;
+#L00150e.   v1:= "The 'backup' command schedules a backup pass for the named package." @type (object, string);
+#L001512.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001518.   v0:= @@[|java:lang:System.err|]   @type object;
+#L00151c.   v1:= "Note that the backup pass will effectively be a no-op if the package" @type (object, string);
+#L001520.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001526.   v0:= @@[|java:lang:System.err|]   @type object;
+#L00152a.   v1:= "does not actually have changed data to store." @type (object, string);
+#L00152e.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001534.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001538.   v1:= "" @type (object, string);
+#L00153c.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001542.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001546.   v1:= "The 'enable' command enables or disables the entire backup mechanism." @type (object, string);
+#L00154a.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001550.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001554.   v1:= "If the argument is 'true' it will be enabled, otherwise it will be" @type (object, string);
+#L001558.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00155e.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001562.   v1:= "disabled.  When disabled, neither backup or restore operations will" @type (object, string);
+#L001566.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00156c.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001570.   v1:= "be performed." @type (object, string);
+#L001574.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00157a.   v0:= @@[|java:lang:System.err|]   @type object;
+#L00157e.   v1:= "" @type (object, string);
+#L001582.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001588.   v0:= @@[|java:lang:System.err|]   @type object;
+#L00158c.   v1:= "The 'enabled' command reports the current enabled/disabled state of" @type (object, string);
+#L001590.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001596.   v0:= @@[|java:lang:System.err|]   @type object;
+#L00159a.   v1:= "the backup mechanism." @type (object, string);
+#L00159e.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0015a4.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0015a8.   v1:= "" @type (object, string);
+#L0015ac.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0015b2.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0015b6.   v1:= "The 'list transports' command reports the names of the backup transports" @type (object, string);
+#L0015ba.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0015c0.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0015c4.   v1:= "currently available on the device.  These names can be passed as arguments" @type (object, string);
+#L0015c8.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0015ce.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0015d2.   v1:= "to the 'transport' command.  The currently selected transport is indicated" @type (object, string);
+#L0015d6.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0015dc.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0015e0.   v1:= "with a '*' character." @type (object, string);
+#L0015e4.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0015ea.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0015ee.   v1:= "" @type (object, string);
+#L0015f2.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0015f8.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0015fc.   v1:= "The 'list sets' command reports the token and name of each restore set" @type (object, string);
+#L001600.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001606.   v0:= @@[|java:lang:System.err|]   @type object;
+#L00160a.   v1:= "available to the device via the current transport." @type (object, string);
+#L00160e.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001614.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001618.   v1:= "" @type (object, string);
+#L00161c.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001622.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001626.   v1:= "The 'transport' command designates the named transport as the currently" @type (object, string);
+#L00162a.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001630.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001634.   v1:= "active one.  This setting is persistent across reboots." @type (object, string);
+#L001638.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00163e.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001642.   v1:= "" @type (object, string);
+#L001646.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00164c.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001650.   v1:= "The 'restore' command when given just a restore token initiates a full-system" @type (object, string);
+#L001654.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00165a.   v0:= @@[|java:lang:System.err|]   @type object;
+#L00165e.   v1:= "restore operation from the currently active transport.  It will deliver" @type (object, string);
+#L001662.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001668.   v0:= @@[|java:lang:System.err|]   @type object;
+#L00166c.   v1:= "the restore set designated by the TOKEN argument to each application" @type (object, string);
+#L001670.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001676.   v0:= @@[|java:lang:System.err|]   @type object;
+#L00167a.   v1:= "that had contributed data to that restore set." @type (object, string);
+#L00167e.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001684.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001688.   v1:= "" @type (object, string);
+#L00168c.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001692.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001696.   v1:= "The 'restore' command when given a token and one or more package names" @type (object, string);
+#L00169a.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0016a0.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0016a4.   v1:= "initiates a restore operation of just those given packages from the restore" @type (object, string);
+#L0016a8.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0016ae.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0016b2.   v1:= "set designated by the TOKEN argument.  It is effectively the same as the" @type (object, string);
+#L0016b6.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0016bc.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0016c0.   v1:= "'restore' operation supplying only a token, but applies a filter to the" @type (object, string);
+#L0016c4.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0016ca.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0016ce.   v1:= "set of applications to be restored." @type (object, string);
+#L0016d2.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0016d8.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0016dc.   v1:= "" @type (object, string);
+#L0016e0.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0016e6.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0016ea.   v1:= "The 'restore' command when given just a package name intiates a restore of" @type (object, string);
+#L0016ee.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0016f4.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0016f8.   v1:= "just that one package according to the restore set selection algorithm" @type (object, string);
+#L0016fc.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001702.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001706.   v1:= "used by the RestoreSession.restorePackage() method." @type (object, string);
+#L00170a.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001710.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001714.   v1:= "" @type (object, string);
+#L001718.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00171e.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001722.   v1:= "The 'run' command causes any scheduled backup operation to be initiated" @type (object, string);
+#L001726.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00172c.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001730.   v1:= "immediately, without the usual waiting period for batching together" @type (object, string);
+#L001734.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L00173a.   v0:= @@[|java:lang:System.err|]   @type object;
+#L00173e.   v1:= "data changes." @type (object, string);
+#L001742.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001748.   v0:= @@[|java:lang:System.err|]   @type object;
+#L00174c.   v1:= "" @type (object, string);
+#L001750.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001756.   v0:= @@[|java:lang:System.err|]   @type object;
+#L00175a.   v1:= "The 'wipe' command causes all backed-up data for the given package to be" @type (object, string);
+#L00175e.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001764.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001768.   v1:= "erased from the current transport's storage.  The next backup operation" @type (object, string);
+#L00176c.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001772.   v0:= @@[|java:lang:System.err|]   @type object;
+#L001776.   v1:= "that the given application performs will rewrite its entire data set." @type (object, string);
+#L00177a.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L001780.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:bmgr:Bmgr.run|] ([|com:android:commands:bmgr:Bmgr|] v3 @type (this), [|java:lang:String|][] v4 @type (object)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.run:([Ljava/lang/String;)V|] @Access PUBLIC {
+      local temp ;
+        [|java:lang:String|] v0 @varname [|op|] @scope ((L0025,L0093));
+
+
+        v1;
+        v2;
+      
+#L001794.   v2:= 1  @length 4;
+#L001796.   v1:= v4.length;
+#L001798.   if v1 >= v2 then goto L0017a4;
+#L00179c.   call temp:=  [|com:android:commands:bmgr:Bmgr.showUsage|]() @signature [|Lcom/android/commands/bmgr/Bmgr;.showUsage:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type static;
+#L0017a2.   return @void ;
+#L0017a4.   v1:= "backup" @type (object, string);
+#L0017a8.   call temp:=  [|android:os:ServiceManager.getService|](v1) @signature [|Landroid/os/ServiceManager;.getService:(Ljava/lang/String;)Landroid/os/IBinder;|] @classDescriptor [|android:os:ServiceManager|] @type static;
+#L0017ae.   v1:= temp  @type object;
+#L0017b0.   call temp:=  [|android:app:backup:IBackupManager$Stub.asInterface|](v1) @signature [|Landroid/app/backup/IBackupManager$Stub;.asInterface:(Landroid/os/IBinder;)Landroid/app/backup/IBackupManager;|] @classDescriptor [|android:app:backup:IBackupManager$Stub|] @type static;
+#L0017b6.   v1:= temp  @type object;
+#L0017b8.   v3.[|com:android:commands:bmgr:Bmgr.mBmgr|]  := v1 @type object;
+#L0017bc.   v1:= v3.[|com:android:commands:bmgr:Bmgr.mBmgr|]   @type object;
+#L0017c0.   if v1 != 0 then goto L0017d4;
+#L0017c4.   v1:= @@[|java:lang:System.err|]   @type object;
+#L0017c8.   v2:= "Error: Could not access the Backup Manager.  Is the system running?" @type (object, string);
+#L0017cc.   call temp:=  [|java:io:PrintStream.println|](v1, v2) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0017d2.   goto L0017a2;
+#L0017d4.   v3.[|com:android:commands:bmgr:Bmgr.mArgs|]  := v4 @type object;
+#L0017d8.   v1:= 0  @length 4;
+#L0017da.   v0:= v4[v1]  @type object;
+#L0017de.   v3.[|com:android:commands:bmgr:Bmgr.mNextArg|]  := v2;
+#L0017e2.   v1:= "enabled" @type (object, string);
+#L0017e6.   call temp:=  [|java:lang:String.equals|](v1, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L0017ec.   v1:= temp;
+#L0017ee.   if v1 == 0 then goto L0017fa;
+#L0017f2.   call temp:=  [|com:android:commands:bmgr:Bmgr.doEnabled|](v3) @signature [|Lcom/android/commands/bmgr/Bmgr;.doEnabled:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L0017f8.   goto L0017a2;
+#L0017fa.   v1:= "enable" @type (object, string);
+#L0017fe.   call temp:=  [|java:lang:String.equals|](v1, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L001804.   v1:= temp;
+#L001806.   if v1 == 0 then goto L001812;
+#L00180a.   call temp:=  [|com:android:commands:bmgr:Bmgr.doEnable|](v3) @signature [|Lcom/android/commands/bmgr/Bmgr;.doEnable:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L001810.   goto L0017a2;
+#L001812.   v1:= "run" @type (object, string);
+#L001816.   call temp:=  [|java:lang:String.equals|](v1, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L00181c.   v1:= temp;
+#L00181e.   if v1 == 0 then goto L00182a;
+#L001822.   call temp:=  [|com:android:commands:bmgr:Bmgr.doRun|](v3) @signature [|Lcom/android/commands/bmgr/Bmgr;.doRun:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L001828.   goto L0017a2;
+#L00182a.   v1:= "backup" @type (object, string);
+#L00182e.   call temp:=  [|java:lang:String.equals|](v1, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L001834.   v1:= temp;
+#L001836.   if v1 == 0 then goto L001842;
+#L00183a.   call temp:=  [|com:android:commands:bmgr:Bmgr.doBackup|](v3) @signature [|Lcom/android/commands/bmgr/Bmgr;.doBackup:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L001840.   goto L0017a2;
+#L001842.   v1:= "list" @type (object, string);
+#L001846.   call temp:=  [|java:lang:String.equals|](v1, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L00184c.   v1:= temp;
+#L00184e.   if v1 == 0 then goto L00185a;
+#L001852.   call temp:=  [|com:android:commands:bmgr:Bmgr.doList|](v3) @signature [|Lcom/android/commands/bmgr/Bmgr;.doList:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L001858.   goto L0017a2;
+#L00185a.   v1:= "restore" @type (object, string);
+#L00185e.   call temp:=  [|java:lang:String.equals|](v1, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L001864.   v1:= temp;
+#L001866.   if v1 == 0 then goto L001872;
+#L00186a.   call temp:=  [|com:android:commands:bmgr:Bmgr.doRestore|](v3) @signature [|Lcom/android/commands/bmgr/Bmgr;.doRestore:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L001870.   goto L0017a2;
+#L001872.   v1:= "transport" @type (object, string);
+#L001876.   call temp:=  [|java:lang:String.equals|](v1, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L00187c.   v1:= temp;
+#L00187e.   if v1 == 0 then goto L00188a;
+#L001882.   call temp:=  [|com:android:commands:bmgr:Bmgr.doTransport|](v3) @signature [|Lcom/android/commands/bmgr/Bmgr;.doTransport:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L001888.   goto L0017a2;
+#L00188a.   v1:= "wipe" @type (object, string);
+#L00188e.   call temp:=  [|java:lang:String.equals|](v1, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L001894.   v1:= temp;
+#L001896.   if v1 == 0 then goto L0018a2;
+#L00189a.   call temp:=  [|com:android:commands:bmgr:Bmgr.doWipe|](v3) @signature [|Lcom/android/commands/bmgr/Bmgr;.doWipe:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type direct;
+#L0018a0.   goto L0017a2;
+#L0018a2.   v1:= @@[|java:lang:System.err|]   @type object;
+#L0018a6.   v2:= "Unknown command" @type (object, string);
+#L0018aa.   call temp:=  [|java:io:PrintStream.println|](v1, v2) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L0018b0.   call temp:=  [|com:android:commands:bmgr:Bmgr.showUsage|]() @signature [|Lcom/android/commands/bmgr/Bmgr;.showUsage:()V|] @classDescriptor [|com:android:commands:bmgr:Bmgr|] @type static;
+#L0018b6.   goto L0017a2;
+
+   }

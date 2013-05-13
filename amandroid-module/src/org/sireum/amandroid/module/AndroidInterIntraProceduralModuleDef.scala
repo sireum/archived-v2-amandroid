@@ -29,7 +29,7 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
   type VirtualLabel = String
   val par = this.parallel
   val aCache = this.androidCache
-  val avmt = this.androidVirtualMethodTables
+  val avmt = this.androidLibInfoTables
   val st = this.symbolTable
   val psts = st.procedureSymbolTables.toSeq
   val siff = this.shouldIncludeFlowFunction
@@ -54,7 +54,7 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
     AndroidInterIntraProceduralModule.setDefRef(options, dr)
     AndroidInterIntraProceduralModule.setIsInputOutputParamPredicate(options, iopp)
     AndroidInterIntraProceduralModule.setSwitchAsOrderedMatch(options, saom)
-    if(this.shouldPreprocessOfg) OFAPreprocessModule.setAndroidVirtualMethodTables(options, avmt)
+    if(this.shouldPreprocessOfg) OFAPreprocessModule.setAndroidLibInfoTables(options, avmt)
     intraPipeline.compute(j)
     info.hasError = j.hasError
     if (info.hasError) {
@@ -113,7 +113,7 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
     val options = j.properties
     if(this.shouldBuildSCfg || this.shouldBuildCSCfg){  // SCfg=system(wide)-control-flow-graph, CSCfg=compressedSCfg
       sCfgModule.setAndroidCache(options, aCache)
-      sCfgModule.setAndroidVirtualMethodTables(options, avmt)
+      sCfgModule.setAndroidLibInfoTables(options, avmt)
       sCfgModule.setCCfgs(options, cCfgs)
       
       if(this.shouldBuildCSCfg){
@@ -141,7 +141,7 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
         ))
     } else if(this.shouldBuildOFAsCfg) {
       OFAsCfgModule.setAndroidCache(options, aCache)
-      OFAsCfgModule.setAndroidVirtualMethodTables(options, avmt)
+      OFAsCfgModule.setAndroidLibInfoTables(options, avmt)
       OFAsCfgModule.setCfgs(options, cfgs)
       OFAsCfgModule.setProcedureSymbolTables(options, psts)
       OFAsCfgModule.setRdas(options, rdas)
@@ -224,9 +224,10 @@ class CfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends
 class RdaModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends RdaModule {
   val pst = this.procedureSymbolTable
   val iiopp = this.isInputOutputParamPredicate(pst)
+  val alit = this.androidLibInfoTables
   this.rda_=(ReachingDefinitionAnalysis[String](pst,
     this.cfg,
-    this.defRef(pst.symbolTable),
+    this.defRef(pst.symbolTable, alit),
     first2(iiopp),
     this.switchAsOrderedMatch))
 }
@@ -239,7 +240,7 @@ class cCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extend
 class sCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends sCfgModule {
   this.androidCache match{
     case Some(ac) =>
-      this.sCfg_=(SystemControlFlowGraph[String](this.androidVirtualMethodTables, this.cCfgs, ac))
+      this.sCfg_=(SystemControlFlowGraph[String](this.androidLibInfoTables, this.cCfgs, ac))
       println("sCfg is built")
     case None =>
       this.sCfg_=(SystemControlFlowGraph[String]())
@@ -255,13 +256,13 @@ class csCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) exten
 }
 
 class OFAPreprocessModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends OFAPreprocessModule {
-  this.OFG_=(ObjectFlowGraphPreprocessor(this.procedureSymbolTable, this.cfg, this.rda, this.androidVirtualMethodTables))
+  this.OFG_=(ObjectFlowGraphPreprocessor(this.procedureSymbolTable, this.cfg, this.rda, this.androidLibInfoTables))
 }
 
 class OFAsCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends OFAsCfgModule {
   this.androidCache match{
     case Some(ac) =>
-      val ofg = ObjectFlowGraphBuilder(this.procedureSymbolTables, this.cfgs, this.rdas, this.androidVirtualMethodTables, ac)
+      val ofg = ObjectFlowGraphBuilder(this.procedureSymbolTables, this.cfgs, this.rdas, this.androidLibInfoTables, ac)
     case None =>
   }
   this.OFAsCfg_=(SystemControlFlowGraph[String]())

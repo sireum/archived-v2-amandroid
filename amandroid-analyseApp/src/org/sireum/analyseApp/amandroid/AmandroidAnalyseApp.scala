@@ -10,7 +10,7 @@ import org.sireum.amandroid.xml.AndroidXStream
 import org.sireum.util._
 import org.sireum.alir.AlirIntraProceduralGraph
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.cache.AndroidCacheFile
 import java.util.zip.GZIPInputStream
 
@@ -20,11 +20,11 @@ class AmandroidAnalyseApp extends AmandroidAnalyseAppFrameWork{
   val srcs = AmandroidFiles.apkModelFiles(0)
   val d = srcs.substring(srcs.indexOf("/"), srcs.lastIndexOf("/")+1)
   val xStream = AndroidXStream
-  xStream.xstream.alias("AndroidVirtualMethodTables", classOf[AndroidVirtualMethodTables])
+  xStream.xstream.alias("AndroidVirtualMethodTables", classOf[AndroidLibInfoTables])
   
   val libVmTablesFile = new File(d + "../../../../../../../amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/libVmTables/libVmTables.xml.zip")
   val interAVMT = new GZIPInputStream(new FileInputStream(libVmTablesFile))
-  val libVmTables = xStream.fromXml(interAVMT).asInstanceOf[AndroidVirtualMethodTables]
+  val libVmTables = xStream.fromXml(interAVMT).asInstanceOf[AndroidLibInfoTables]
   val libraryFilePath = d + "../../../../../../../amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/ccfgs/"
   val aCache = new AndroidCacheFile[ResourceUri]
   val serializer : (Any, OutputStream) --> Unit = {

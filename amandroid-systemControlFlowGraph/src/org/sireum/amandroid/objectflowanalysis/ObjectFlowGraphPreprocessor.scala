@@ -4,7 +4,7 @@ import org.sireum.alir.AlirEdge
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.alir.ReachingDefinitionAnalysis
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 
 object ObjectFlowGraphPreprocessor {
   type Node = OfaNode
@@ -13,18 +13,18 @@ object ObjectFlowGraphPreprocessor {
   def apply(pst : ProcedureSymbolTable,
             cfg : ControlFlowGraph[String],
             rda : ReachingDefinitionAnalysis.Result,
-            androidVirtualMethodTables : AndroidVirtualMethodTables) 
+            androidLibInfoTables : AndroidLibInfoTables) 
             = build(pst : ProcedureSymbolTable,
                     cfg : ControlFlowGraph[String],
                     rda : ReachingDefinitionAnalysis.Result,
-                    androidVirtualMethodTables : AndroidVirtualMethodTables)
+                    androidLibInfoTables : AndroidLibInfoTables)
                     
   def build(pst : ProcedureSymbolTable,
             cfg : ControlFlowGraph[String],
             rda : ReachingDefinitionAnalysis.Result,
-            androidVirtualMethodTables : AndroidVirtualMethodTables) : ObjectFlowGraph[Node] = {
+            androidLibInfoTables : AndroidLibInfoTables) : ObjectFlowGraph[Node] = {
     val result = new ObjectFlowGraph[Node]
-    doOFA(pst, cfg,rda, result, androidVirtualMethodTables)
+    doOFA(pst, cfg,rda, result, androidLibInfoTables)
     result
   }
   
@@ -32,7 +32,7 @@ object ObjectFlowGraphPreprocessor {
             cfg : ControlFlowGraph[String],
             rda : ReachingDefinitionAnalysis.Result,
             ofg : ObjectFlowGraph[Node],
-            androidVirtualMethodTables : AndroidVirtualMethodTables) = {
+            androidLibInfoTables : AndroidLibInfoTables) = {
     val points = new PointsCollector().points(pst, ofg)
     ofg.points ++= points
     ofg.constructGraph(points, cfg, rda)

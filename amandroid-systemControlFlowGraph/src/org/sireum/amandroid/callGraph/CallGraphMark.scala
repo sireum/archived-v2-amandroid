@@ -2,8 +2,8 @@ package org.sireum.amandroid.callGraph
 
 import org.sireum.util._
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTablesProducer
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTablesProducer
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.alir.AlirLocationNode
 
 
@@ -26,7 +26,7 @@ class CallGraphMark {
   
   def callGraphMark[VirtualLabel](cCfgs: MMap[ResourceUri, CompressedControlFlowGraph[VirtualLabel]],
 		  						  pUriToBitsetMap : MMap[ResourceUri, (MBitSet,MMap[ResourceUri, Integer])],
-		  						  libVmTables : AndroidVirtualMethodTables) = {
+		  						  libVmTables : AndroidLibInfoTables) = {
     var flag = true
     var i = 0
     while(flag) {

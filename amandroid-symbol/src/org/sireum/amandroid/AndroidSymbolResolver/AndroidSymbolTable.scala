@@ -28,14 +28,16 @@ trait AndroidSymbolTable extends SymbolTable
 object AndroidSymbolTable {
   def apply(models : ISeq[Model],
             stpConstructor : Unit => SymbolTableProducer,
-            parallel : Boolean) =
-    buildSymbolTable(models, stpConstructor, parallel)
+            parallel : Boolean,
+            shouldBuildLibInfoTables : Boolean) =
+    buildSymbolTable(models, stpConstructor, parallel, shouldBuildLibInfoTables)
     
   def apply(models : ISeq[Model],
             stpConstructor : Unit => SymbolTableProducer,
-            existingAndroidVirtualMethodTables : AndroidVirtualMethodTables,
-            parallel : Boolean) =
-    buildSymbolTable(models, stpConstructor, existingAndroidVirtualMethodTables, parallel)
+            existingAndroidVirtualMethodTables : AndroidLibInfoTables,
+            parallel : Boolean,
+            shouldBuildLibInfoTables : Boolean) =
+    buildSymbolTable(models, stpConstructor, existingAndroidVirtualMethodTables, parallel, shouldBuildLibInfoTables)
 
 
   def minePackageElements[P <: SymbolTableProducer] //
@@ -73,10 +75,10 @@ object AndroidSymbolTable {
     }.toIterable.reduce(H.combine)
   }
 
-  def resolveVirtualMethod(stp : SymbolTableProducer) : AndroidVirtualMethodTables = {
-    val avmr = new AndroidVirtualMethodResolver
-    avmr.resolveAndroidVirtualMethod(stp)
-    avmr.toAndroidVirtualMethodTables
+  def resolveVirtualMethod(stp : SymbolTableProducer) : AndroidLibInfoTables = {
+    val avmr = new AndroidLibInfoResolver
+    avmr.resolveAndroidLibInfo(stp)
+    avmr.toAndroidLibInfoTables
   }
 
 //  def buildProcedureSymbolTables(stp : AndroidSymbolTableProducer, parallel : Boolean = true) : Unit = {
@@ -108,7 +110,7 @@ object AndroidSymbolTable {
   def buildProcedureSymbolTables(stp : SymbolTableProducer, parallel : Boolean = true) : Unit = {
     val procedures = stp.tables.procedureAbsTable.keys.toSeq
     println("parallel=" + parallel)
-    val col : GenSeq[ResourceUri] = if (parallel) procedures.par else procedures
+    val col : GenSeq[ResourceUri] = if (false) procedures.par else procedures
     println("col size=" + col.size)
     col.map { procedureUri =>
       val pstp = stp.procedureSymbolTableProducer(procedureUri)
@@ -127,12 +129,13 @@ object AndroidSymbolTable {
   
   def buildSymbolTable(models : ISeq[Model],
                        stpConstructor : Unit => SymbolTableProducer,
-                       parallel : Boolean) = {
+                       parallel : Boolean,
+                       shouldBuildLibInfoTables : Boolean) = {
     val stp = minePackageElements(models, stpConstructor, parallel)
-    val tables = resolveVirtualMethod(stp)
+    val tablesOpt = if(shouldBuildLibInfoTables) Some(resolveVirtualMethod(stp)) else None
     resolvePackageElements(models, stp, parallel)
     buildProcedureSymbolTables(stp, parallel)
-    (stp.toSymbolTable, tables)
+    (stp.toSymbolTable, tablesOpt)
   }
   
   def resolvePackageElements(models : ISeq[Model], stp : SymbolTableProducer,
@@ -151,16 +154,22 @@ object AndroidSymbolTable {
   
   def buildSymbolTable(models : ISeq[Model],
                        stpConstructor : Unit => SymbolTableProducer,
-                       existingAndroidVirtualMethodTables : AndroidVirtualMethodTables,
-                       parallel : Boolean) = {
+                       existingAndroidLibInfoTables : AndroidLibInfoTables,
+                       parallel : Boolean,
+                       shouldBuildLibInfoTables : Boolean) = {
     val stp = minePackageElements(models, stpConstructor, parallel)
-    val tables = resolveVirtualMethod(stp)
+    val tablesOpt = if(shouldBuildLibInfoTables) Some(resolveVirtualMethod(stp)) else None
     resolvePackageElements(models, stp, parallel)
     buildProcedureSymbolTables(stp, parallel)
-    println("before merge : " + tables.asInstanceOf[AndroidVirtualMethodTablesProducer].tables.cannotFindRecordTable)
-    tables.mergeWith(existingAndroidVirtualMethodTables)
-    println("after merge : " + tables.asInstanceOf[AndroidVirtualMethodTablesProducer].tables.cannotFindRecordTable)
-    (stp.toSymbolTable, tables)
+    tablesOpt match {
+      case Some(tables) =>
+        println("before merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
+	    tables.mergeWith(existingAndroidLibInfoTables)
+	    println("after merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
+	    (stp.toSymbolTable, Some(tables))
+      case None =>
+        (stp.toSymbolTable, Some(existingAndroidLibInfoTables))
+    }
   }
 
   
