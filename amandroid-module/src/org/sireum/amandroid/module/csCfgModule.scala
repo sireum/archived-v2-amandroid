@@ -75,33 +75,6 @@ object csCfgModule extends PipelineModule {
 
   def inputDefined (job : PipelineJob) : MBuffer[Tag] = {
     val tags = marrayEmpty[Tag]
-    var _androidLibInfoTables : scala.Option[AnyRef] = None
-    var _androidLibInfoTablesKey : scala.Option[String] = None
-
-    val keylistandroidLibInfoTables = List(csCfgModule.globalAndroidLibInfoTablesKey)
-    keylistandroidLibInfoTables.foreach(key => 
-      if(job ? key) { 
-        if(_androidLibInfoTables.isEmpty) {
-          _androidLibInfoTables = Some(job(key))
-          _androidLibInfoTablesKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _androidLibInfoTables.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'androidLibInfoTables' keys '" + _androidLibInfoTablesKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _androidLibInfoTables match{
-      case Some(x) =>
-        if(!x.isInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'androidLibInfoTables'.  Expecting 'org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'androidLibInfoTables'")       
-    }
     var _androidCache : scala.Option[AnyRef] = None
     var _androidCacheKey : scala.Option[String] = None
 
@@ -128,6 +101,33 @@ object csCfgModule extends PipelineModule {
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'androidCache'")       
+    }
+    var _androidLibInfoTables : scala.Option[AnyRef] = None
+    var _androidLibInfoTablesKey : scala.Option[String] = None
+
+    val keylistandroidLibInfoTables = List(csCfgModule.globalAndroidLibInfoTablesKey)
+    keylistandroidLibInfoTables.foreach(key => 
+      if(job ? key) { 
+        if(_androidLibInfoTables.isEmpty) {
+          _androidLibInfoTables = Some(job(key))
+          _androidLibInfoTablesKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _androidLibInfoTables.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'androidLibInfoTables' keys '" + _androidLibInfoTablesKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _androidLibInfoTables match{
+      case Some(x) =>
+        if(!x.isInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'androidLibInfoTables'.  Expecting 'org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'androidLibInfoTables'")       
     }
     var _sCfg : scala.Option[AnyRef] = None
     var _sCfgKey : scala.Option[String] = None
@@ -234,21 +234,6 @@ object csCfgModule extends PipelineModule {
     return tags
   }
 
-  def getAndroidLibInfoTables (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = {
-    if (options.contains(csCfgModule.globalAndroidLibInfoTablesKey)) {
-       return options(csCfgModule.globalAndroidLibInfoTablesKey).asInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setAndroidLibInfoTables (options : MMap[Property.Key, Any], androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables) : MMap[Property.Key, Any] = {
-
-    options(csCfgModule.globalAndroidLibInfoTablesKey) = androidLibInfoTables
-
-    return options
-  }
-
   def getAndroidCache (options : scala.collection.Map[Property.Key, Any]) : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = {
     if (options.contains(csCfgModule.globalAndroidCacheKey)) {
        return options(csCfgModule.globalAndroidCacheKey).asInstanceOf[scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]]
@@ -260,6 +245,21 @@ object csCfgModule extends PipelineModule {
   def setAndroidCache (options : MMap[Property.Key, Any], androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]) : MMap[Property.Key, Any] = {
 
     options(csCfgModule.globalAndroidCacheKey) = androidCache
+
+    return options
+  }
+
+  def getAndroidLibInfoTables (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = {
+    if (options.contains(csCfgModule.globalAndroidLibInfoTablesKey)) {
+       return options(csCfgModule.globalAndroidLibInfoTablesKey).asInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setAndroidLibInfoTables (options : MMap[Property.Key, Any], androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables) : MMap[Property.Key, Any] = {
+
+    options(csCfgModule.globalAndroidLibInfoTablesKey) = androidLibInfoTables
 
     return options
   }
@@ -330,8 +330,8 @@ object csCfgModule extends PipelineModule {
 
   object ConsumerView {
     implicit class csCfgModuleConsumerView (val job : PropertyProvider) extends AnyVal {
-      def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = csCfgModule.getAndroidLibInfoTables(job.propertyMap)
       def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = csCfgModule.getAndroidCache(job.propertyMap)
+      def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = csCfgModule.getAndroidLibInfoTables(job.propertyMap)
       def sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = csCfgModule.getSCfg(job.propertyMap)
       def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = csCfgModule.getCCfgs(job.propertyMap)
       def csCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = csCfgModule.getCsCfg(job.propertyMap)
@@ -342,11 +342,11 @@ object csCfgModule extends PipelineModule {
   object ProducerView {
     implicit class csCfgModuleProducerView (val job : PropertyProvider) extends AnyVal {
 
-      def androidLibInfoTables_=(androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables) { csCfgModule.setAndroidLibInfoTables(job.propertyMap, androidLibInfoTables) }
-      def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = csCfgModule.getAndroidLibInfoTables(job.propertyMap)
-
       def androidCache_=(androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]) { csCfgModule.setAndroidCache(job.propertyMap, androidCache) }
       def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = csCfgModule.getAndroidCache(job.propertyMap)
+
+      def androidLibInfoTables_=(androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables) { csCfgModule.setAndroidLibInfoTables(job.propertyMap, androidLibInfoTables) }
+      def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = csCfgModule.getAndroidLibInfoTables(job.propertyMap)
 
       def sCfg_=(sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]) { csCfgModule.setSCfg(job.propertyMap, sCfg) }
       def sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = csCfgModule.getSCfg(job.propertyMap)
@@ -366,9 +366,9 @@ object csCfgModule extends PipelineModule {
 trait csCfgModule {
   def job : PipelineJob
 
-  def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = csCfgModule.getAndroidLibInfoTables(job.propertyMap)
-
   def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = csCfgModule.getAndroidCache(job.propertyMap)
+
+  def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = csCfgModule.getAndroidLibInfoTables(job.propertyMap)
 
   def sCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = csCfgModule.getSCfg(job.propertyMap)
 

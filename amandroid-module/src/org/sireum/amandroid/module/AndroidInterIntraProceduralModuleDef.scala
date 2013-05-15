@@ -29,7 +29,8 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
   type VirtualLabel = String
   val par = this.parallel
   val aCache = this.androidCache
-  val avmt = this.androidLibInfoTables
+  val alitOpt = this.androidLibInfoTablesOpt
+  val alit = alitOpt match{case Some(n) => n; case None => null}
   val st = this.symbolTable
   val psts = st.procedureSymbolTables.toSeq
   val siff = this.shouldIncludeFlowFunction
@@ -54,7 +55,8 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
     AndroidInterIntraProceduralModule.setDefRef(options, dr)
     AndroidInterIntraProceduralModule.setIsInputOutputParamPredicate(options, iopp)
     AndroidInterIntraProceduralModule.setSwitchAsOrderedMatch(options, saom)
-    if(this.shouldPreprocessOfg) OFAPreprocessModule.setAndroidLibInfoTables(options, avmt)
+    if(this.shouldBuildRda) RdaModule.setAndroidLibInfoTables(options, alit)
+    if(this.shouldPreprocessOfg) OFAPreprocessModule.setAndroidLibInfoTables(options, alit)
     intraPipeline.compute(j)
     info.hasError = j.hasError
     if (info.hasError) {
@@ -67,12 +69,7 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
     val rdaOpt = if (this.shouldBuildRda) Some(RdaModule.getRda(options)) else None
     val ofgOpt = if (this.shouldPreprocessOfg) Some(OFAPreprocessModule.getOFG(options)) else None
     val cCfgOpt = if (this.shouldBuildCCfg) Some(cCfgModule.getCCfg(options)) else None
-//    cfgs(pst.procedureUri) = cfg
-//    if(this.shouldBuildOFAsCfg) rdas(pst.procedureUri) = RdaModule.getRda(options)
-//    cCfgOpt match {
-//      case Some(item) => cCfgs(pst.procedureUri) = item
-//      case None =>
-//    }
+
     Map(pst.procedureUri ->
       AndroidInterIntraProcedural.AndroidIntraAnalysisResult(
         pool, cfg, rdaOpt, ofgOpt, cCfgOpt
@@ -93,7 +90,6 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
   
   intraResults ++= 
     (col.map { pst =>
-//      println(pst.procedureUri)
       compute(pst)
     }).reduce(combine)
 
@@ -104,6 +100,22 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
   logger.info(s"End computing: Time: ${(endtime - starttime) / 1000d} s")
   
   
+  if(this.shouldBuildOFAsCfg || this.shouldBuildSCfg || this.shouldBuildCSCfg) {
+    intraResults.foreach(
+      item => {
+        val pUri = item._1
+        cfgs(pUri) = item._2.cfg
+        item._2.rdaOpt match {
+          case Some(rda) => rdas(pUri) = rda
+          case None =>
+        }
+	    item._2.cCfgOpt match {
+	      case Some(item) => cCfgs(pUri) = item
+	      case None =>
+	    }
+      }  
+    )
+  }
   
   /**
    * below is the inter procedure analysis
@@ -113,7 +125,7 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
     val options = j.properties
     if(this.shouldBuildSCfg || this.shouldBuildCSCfg){  // SCfg=system(wide)-control-flow-graph, CSCfg=compressedSCfg
       sCfgModule.setAndroidCache(options, aCache)
-      sCfgModule.setAndroidLibInfoTables(options, avmt)
+      sCfgModule.setAndroidLibInfoTables(options, alit)
       sCfgModule.setCCfgs(options, cCfgs)
       
       if(this.shouldBuildCSCfg){
@@ -141,7 +153,7 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
         ))
     } else if(this.shouldBuildOFAsCfg) {
       OFAsCfgModule.setAndroidCache(options, aCache)
-      OFAsCfgModule.setAndroidLibInfoTables(options, avmt)
+      OFAsCfgModule.setAndroidLibInfoTables(options, alit)
       OFAsCfgModule.setCfgs(options, cfgs)
       OFAsCfgModule.setProcedureSymbolTables(options, psts)
       OFAsCfgModule.setRdas(options, rdas)

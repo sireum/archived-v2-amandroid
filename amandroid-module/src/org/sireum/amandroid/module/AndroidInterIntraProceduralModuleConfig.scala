@@ -67,7 +67,7 @@ case class AndroidInterIntraProcedural(
   symbolTable : SymbolTable,
   
   @Input
-  androidLibInfoTables : AndroidLibInfoTables,
+  androidLibInfoTablesOpt : Option[AndroidLibInfoTables],
   
   @Input
   androidCache : scala.Option[AndroidCacheFile[ResourceUri]] = None,

@@ -8,6 +8,9 @@ import org.sireum.pilar.ast._
 import org.sireum.alir.ReachingDefinitionAnalysis
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.cache.AndroidCacheFile
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStreamWriter
 
 object ObjectFlowGraphBuilder {
   
@@ -40,7 +43,7 @@ object ObjectFlowGraphBuilder {
     val entryPoints : MSet[ResourceUri] = msetEmpty
     psts.foreach(
       pst =>{
-        if(pst.procedureUri.contains(".main")) entryPoints += pst.procedureUri
+        if(pst.procedureUri.contains(".onStartCommand")) entryPoints += pst.procedureUri
         pstMap(pst.procedureUri) = pst
       }  
     )
@@ -61,12 +64,15 @@ object ObjectFlowGraphBuilder {
           node => {
             val name = node.toString()
             val valueSet = node.getProperty(result.VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
-            println("node:" + name + "\nvalueSet:" + valueSet)
+//            println("node:" + name + "\nvalueSet:" + valueSet)
           }
         )
+        println("processed--->" + processed.size)
         println("arrayrepo------>" + result.arrayRepo)
         println("globalrepo------>" + result.globalDefRepo)
-        val w = new java.io.PrintWriter(System.out, true)
+        val f = new File(System.getProperty("user.home") + "/Desktop/ofg.dot")
+        val o = new FileOutputStream(f)
+        val w = new OutputStreamWriter(o)
         result.toDot(w)
         result
       }
@@ -103,7 +109,7 @@ object ObjectFlowGraphBuilder {
       while(!ofg.staticMethodList.isEmpty) {
         val pi = ofg.staticMethodList.remove(0)
         val callee = ofg.getDirectCallee(pi, androidLibInfoTables)
-        extendGraphWithConstructGraph(callee, pi, ofg)
+        extendGraphWithConstructGraph(callee, pi, ofg, androidCache)
       }
       //end
       val n = ofg.worklist.remove(0)
@@ -145,7 +151,7 @@ object ObjectFlowGraphBuilder {
                 }
                 calleeSet.foreach(
                   callee => {
-                    extendGraphWithConstructGraph(callee, pi, ofg)
+                    extendGraphWithConstructGraph(callee, pi, ofg, androidCache)
                   }  
                 )
               case None =>
@@ -156,7 +162,7 @@ object ObjectFlowGraphBuilder {
     }
   }
   
-  def extendGraphWithConstructGraph(callee : ResourceUri, pi : PointI, ofg : ObjectFlowGraph[Node]) = {
+  def extendGraphWithConstructGraph(callee : ResourceUri, pi : PointI, ofg : ObjectFlowGraph[Node], androidCache : AndroidCacheFile[String]) = {
     val points : MList[Point] = mlistEmpty
     if(!processed.contains(callee)){
       if(pstMap.contains(callee)){
@@ -164,16 +170,15 @@ object ObjectFlowGraphBuilder {
         val rda = rdas(callee)
         points ++= new PointsCollector().points(pstMap(callee), ofg)
         ofg.points ++= points
-        points.foreach(
-          point => {
-            if(point.isInstanceOf[PointProc]){
-              processed(callee) = point.asInstanceOf[PointProc]
-            }
-          }
-        )
+        setProcessed(points, callee)
         ofg.constructGraph(points, cfg, rda)
       } else {
         //need to extend
+//        val cfg = androidCache.load[ControlFlowGraph[String]](callee, "cfg")
+        val calleeOfg = androidCache.load[ObjectFlowGraph[OfaNode]](callee, "ofg")
+//        val es = androidCache.load[MMap[org.sireum.alir.ControlFlowGraph.Node, ISet[(org.sireum.alir.Slot, org.sireum.alir.DefDesc)]]](callee, "rda")
+        setProcessed(calleeOfg.points, callee)
+        ofg.combineOfgs(calleeOfg)
       }
     }
     if(processed.contains(callee)){
@@ -183,6 +188,16 @@ object ObjectFlowGraphBuilder {
     } else {
       //need to extend
     }
+  }
+  
+  def setProcessed(points : MList[Point], callee : ResourceUri) = {
+    points.foreach(
+      point => {
+        if(point.isInstanceOf[PointProc]){
+          processed(callee) = point.asInstanceOf[PointProc]
+        }
+      }
+    )
   }
  
 }

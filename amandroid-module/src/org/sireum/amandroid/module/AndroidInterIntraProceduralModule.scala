@@ -27,11 +27,11 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
   val globalAPIpermOptKey = "Global.APIpermOpt"
   val globalAndroidCacheKey = "Global.androidCache"
   val globalIsInputOutputParamPredicateKey = "Global.isInputOutputParamPredicate"
-  val globalAndroidLibInfoTablesKey = "Global.androidLibInfoTables"
   val globalShouldIncludeFlowFunctionKey = "Global.shouldIncludeFlowFunction"
   val globalShouldBuildCfgKey = "Global.shouldBuildCfg"
   val globalShouldBuildSCfgKey = "Global.shouldBuildSCfg"
   val globalSymbolTableKey = "Global.symbolTable"
+  val globalAndroidLibInfoTablesOptKey = "Global.androidLibInfoTablesOpt"
   val globalShouldBuildCCfgKey = "Global.shouldBuildCCfg"
   val globalShouldBuildOFAsCfgKey = "Global.shouldBuildOFAsCfg"
   val globalShouldBuildCSCfgKey = "Global.shouldBuildCSCfg"
@@ -198,32 +198,32 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'symbolTable'")       
     }
-    var _androidLibInfoTables : scala.Option[AnyRef] = None
-    var _androidLibInfoTablesKey : scala.Option[String] = None
+    var _androidLibInfoTablesOpt : scala.Option[AnyRef] = None
+    var _androidLibInfoTablesOptKey : scala.Option[String] = None
 
-    val keylistandroidLibInfoTables = List(AndroidInterIntraProceduralModule.globalAndroidLibInfoTablesKey)
-    keylistandroidLibInfoTables.foreach(key => 
+    val keylistandroidLibInfoTablesOpt = List(AndroidInterIntraProceduralModule.globalAndroidLibInfoTablesOptKey)
+    keylistandroidLibInfoTablesOpt.foreach(key => 
       if(job ? key) { 
-        if(_androidLibInfoTables.isEmpty) {
-          _androidLibInfoTables = Some(job(key))
-          _androidLibInfoTablesKey = Some(key)
+        if(_androidLibInfoTablesOpt.isEmpty) {
+          _androidLibInfoTablesOpt = Some(job(key))
+          _androidLibInfoTablesOptKey = Some(key)
         }
-        if(!(job(key).asInstanceOf[AnyRef] eq _androidLibInfoTables.get)) {
+        if(!(job(key).asInstanceOf[AnyRef] eq _androidLibInfoTablesOpt.get)) {
           tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'androidLibInfoTables' keys '" + _androidLibInfoTablesKey.get + " and '" + key + "' point to different objects.")
+            "Input error for '" + this.title + "': 'androidLibInfoTablesOpt' keys '" + _androidLibInfoTablesOptKey.get + " and '" + key + "' point to different objects.")
         }
       }
     )
 
-    _androidLibInfoTables match{
+    _androidLibInfoTablesOpt match{
       case Some(x) =>
-        if(!x.isInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]){
+        if(!x.isInstanceOf[scala.Option[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]]){
           tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'androidLibInfoTables'.  Expecting 'org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables' but found '" + x.getClass.toString + "'")
+            "Input error for '" + this.title + "': Wrong type found for 'androidLibInfoTablesOpt'.  Expecting 'scala.Option[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]' but found '" + x.getClass.toString + "'")
         }
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'androidLibInfoTables'")       
+          "Input error for '" + this.title + "': No value found for 'androidLibInfoTablesOpt'")       
     }
     var _androidCache : scala.Option[AnyRef] = None
     var _androidCacheKey : scala.Option[String] = None
@@ -662,17 +662,17 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
     return options
   }
 
-  def getAndroidLibInfoTables (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = {
-    if (options.contains(AndroidInterIntraProceduralModule.globalAndroidLibInfoTablesKey)) {
-       return options(AndroidInterIntraProceduralModule.globalAndroidLibInfoTablesKey).asInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]
+  def getAndroidLibInfoTablesOpt (options : scala.collection.Map[Property.Key, Any]) : scala.Option[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables] = {
+    if (options.contains(AndroidInterIntraProceduralModule.globalAndroidLibInfoTablesOptKey)) {
+       return options(AndroidInterIntraProceduralModule.globalAndroidLibInfoTablesOptKey).asInstanceOf[scala.Option[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def setAndroidLibInfoTables (options : MMap[Property.Key, Any], androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables) : MMap[Property.Key, Any] = {
+  def setAndroidLibInfoTablesOpt (options : MMap[Property.Key, Any], androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]) : MMap[Property.Key, Any] = {
 
-    options(AndroidInterIntraProceduralModule.globalAndroidLibInfoTablesKey) = androidLibInfoTables
+    options(AndroidInterIntraProceduralModule.globalAndroidLibInfoTablesOptKey) = androidLibInfoTablesOpt
 
     return options
   }
@@ -921,7 +921,7 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
     implicit class AndroidInterIntraProceduralModuleConsumerView (val job : PropertyProvider) extends AnyVal {
       def parallel : scala.Boolean = AndroidInterIntraProceduralModule.getParallel(job.propertyMap)
       def symbolTable : org.sireum.pilar.symbol.SymbolTable = AndroidInterIntraProceduralModule.getSymbolTable(job.propertyMap)
-      def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = AndroidInterIntraProceduralModule.getAndroidLibInfoTables(job.propertyMap)
+      def androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables] = AndroidInterIntraProceduralModule.getAndroidLibInfoTablesOpt(job.propertyMap)
       def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = AndroidInterIntraProceduralModule.getAndroidCache(job.propertyMap)
       def shouldBuildCfg : scala.Boolean = AndroidInterIntraProceduralModule.getShouldBuildCfg(job.propertyMap)
       def shouldBuildRda : scala.Boolean = AndroidInterIntraProceduralModule.getShouldBuildRda(job.propertyMap)
@@ -950,8 +950,8 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
       def symbolTable_=(symbolTable : org.sireum.pilar.symbol.SymbolTable) { AndroidInterIntraProceduralModule.setSymbolTable(job.propertyMap, symbolTable) }
       def symbolTable : org.sireum.pilar.symbol.SymbolTable = AndroidInterIntraProceduralModule.getSymbolTable(job.propertyMap)
 
-      def androidLibInfoTables_=(androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables) { AndroidInterIntraProceduralModule.setAndroidLibInfoTables(job.propertyMap, androidLibInfoTables) }
-      def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = AndroidInterIntraProceduralModule.getAndroidLibInfoTables(job.propertyMap)
+      def androidLibInfoTablesOpt_=(androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]) { AndroidInterIntraProceduralModule.setAndroidLibInfoTablesOpt(job.propertyMap, androidLibInfoTablesOpt) }
+      def androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables] = AndroidInterIntraProceduralModule.getAndroidLibInfoTablesOpt(job.propertyMap)
 
       def androidCache_=(androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]) { AndroidInterIntraProceduralModule.setAndroidCache(job.propertyMap, androidCache) }
       def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = AndroidInterIntraProceduralModule.getAndroidCache(job.propertyMap)
@@ -1011,7 +1011,7 @@ trait AndroidInterIntraProceduralModule {
 
   def symbolTable : org.sireum.pilar.symbol.SymbolTable = AndroidInterIntraProceduralModule.getSymbolTable(job.propertyMap)
 
-  def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = AndroidInterIntraProceduralModule.getAndroidLibInfoTables(job.propertyMap)
+  def androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables] = AndroidInterIntraProceduralModule.getAndroidLibInfoTablesOpt(job.propertyMap)
 
   def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = AndroidInterIntraProceduralModule.getAndroidCache(job.propertyMap)
 

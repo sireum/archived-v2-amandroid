@@ -181,6 +181,7 @@ class PointsCollector {
             if(le.typ.name.equals("STRING")){
               pl = processLHS(as.lhs)
               pr = new PointStringO(le.text, loc, locIndex)
+              ofg.iFieldDefRepo(pr.toString) = mmapEmpty
             }
           case n : NewExp =>
             pl = processLHS(as.lhs)

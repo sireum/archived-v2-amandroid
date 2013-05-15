@@ -76,7 +76,7 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
 //          val ze = entries.nextElement()
 //          if(ze.toString().endsWith(".dex")){
 //            val loadFile = new File(d+ze.getName())
-//            val ops = new FileOutputStream(d + dirName + "/classes.dex")
+//            val ops = new FileOutputStream(d + dirName + "/" + dirName + ".dex")
 //            val ips = apkFile.getInputStream(ze)
 //            var reading = true
 //            while(reading){
@@ -90,24 +90,23 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
 //          }
 //        }
       
-        srcFiles += FileUtil.toUri(d + "/" + dirName + ".pilar")
+        srcFiles += FileUtil.toUri(d + dirName + "/" + dirName + ".dex")
         
         val job = PipelineJob()
         val options = job.properties
-//        Dex2PilarWrapperModule.setSrcFiles(options, srcFiles)
+        Dex2PilarWrapperModule.setSrcFiles(options, srcFiles)
         
         ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d + "/" + dirName + ".pilar"))))
         
         PilarAndroidSymbolResolverModule.setParallel(options, false)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidLibInfoTables(options, Some(libInfoTables))
+//        AndroidInterIntraProceduralModule.setAndroidLibInfoTablesOpt(options, libInfoTables) //need to change later
+        AndroidInterIntraProceduralModule.setParallel(options, false)
         AndroidInterIntraProceduralModule.setAndroidCache(options, Some(aCache))
         AndroidInterIntraProceduralModule.setShouldBuildCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildRda(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildOFAsCfg(options, true)
-        AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, false)
-        AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, false)
-        AndroidInterIntraProceduralModule.setShouldBuildCSCfg(options, false) // CSCFG = compressed system-wide control flow graph of an app X
-  
+        
         // experimental code starts which does not have any significant role now; later we will delete it after some related cleaning 
         
         val apiPermission : MMap[ResourceUri, MList[String]] = mmapEmpty

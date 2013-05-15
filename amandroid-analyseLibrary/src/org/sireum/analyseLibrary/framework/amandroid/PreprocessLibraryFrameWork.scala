@@ -85,9 +85,9 @@ trait PreprocessLibraryFrameWork extends TestFramework {
         val options = job.properties
 
         ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d+ "/" +f.getName()))))
-        PilarAndroidSymbolResolverModule.setHasExistingAndroidLibInfoTables(options, None)
+        PilarAndroidSymbolResolverModule.setHasExistingAndroidLibInfoTables(options, Some(alit))
         PilarAndroidSymbolResolverModule.setShouldBuildLibInfoTables(options, false)
-        AndroidInterIntraProceduralModule.setAndroidLibInfoTables(options, alit)
+        AndroidInterIntraProceduralModule.setAndroidLibInfoTablesOpt(options, Some(alit))
         AndroidInterIntraProceduralModule.setParallel(options, true)
         AndroidInterIntraProceduralModule.setAndroidCache(options, Some(aCache))
         AndroidInterIntraProceduralModule.setShouldBuildCfg(options, true)
