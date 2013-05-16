@@ -168,7 +168,7 @@ static char* descriptorToDot(const char* str)
         }
     }
     //******************* kui's modification begins  *******************
-    newStr = (char*)malloc(targetLen +20 + arrayDepth * 2 +1);
+    newStr = (char*)malloc(targetLen +20 + arrayDepth * 2 +1); // source of memory leak ?
 
     /* copy class name over */
 
@@ -217,7 +217,7 @@ static char* arraySym(const char* str)
     }
     arrayDepth = offset;
 
-    newStr = (char*)malloc(2*arrayDepth + 1);
+    newStr = (char*)malloc(2*arrayDepth + 1); // source of memory leak as this space is never freed;
 
     int i = 0;
 

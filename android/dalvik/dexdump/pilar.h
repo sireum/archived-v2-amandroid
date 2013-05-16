@@ -16,7 +16,7 @@ static char* toPilar(const char* str)
     int targetLen = strlen(str) + 4; // [| |] are extra 4 chars
     int offset = strlen(str) - 1;
     int arrayDepth = 0;
-    char* newStr = (char*)malloc(targetLen + 1);
+    char* newStr = (char*)malloc(targetLen + 1);   // source of memory leak as this space is never freed  
 
     /* strip trailing []s; this will again be added to end */
     while (offset > 1) {
@@ -72,7 +72,7 @@ static char* toPilarS(const char* str)
     int targetLen = strlen(str) + 4; // [| |] are extra 4 chars
     int offset = 0;
     int leng = strlen(str);
-    char* newStr = (char*)malloc(targetLen + 1);
+    char* newStr = (char*)malloc(targetLen + 1); // source of memory leak as this space is never freed;
     bool arrayFlag = false;
 
     /* move the offset to the first [ of trailing []s or [v1]s */
