@@ -7,7 +7,7 @@ import org.sireum.pilar.ast.Model
 import org.sireum.pilar.symbol.SymbolTable
 import org.sireum.option.PipelineMode
 import org.sireum.pipeline.gen.ModuleGenerator
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 
 
 /*
@@ -34,7 +34,10 @@ case class PilarAndroidSymbolResolver(
 // Fengguo Wei put this three input as below.  
   
   @Input
-  hasExistingAndroidVirtualMethodTables : scala.Option[AndroidVirtualMethodTables],
+  hasExistingAndroidLibInfoTables : scala.Option[AndroidLibInfoTables],
+  
+  @Input
+  shouldBuildLibInfoTables : Boolean = true,
   
   @Input 
   @Consume(Array(classOf[PilarParser]))
@@ -44,7 +47,7 @@ case class PilarAndroidSymbolResolver(
   
 // Fengguo Wei put this output: androidRecordProcedureDependencyTables
   @Output
-  androidVirtualMethodTables : AndroidVirtualMethodTables,
+  androidLibInfoTablesOpt : Option[AndroidLibInfoTables],
  
   
   @Output

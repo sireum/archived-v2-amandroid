@@ -8,7 +8,7 @@ import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTable
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTableProducer
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTableData
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidProcedureSymbolTableProducer
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 
 
 
@@ -36,12 +36,12 @@ class PilarAndroidSymbolResolverModuleDef (val job : PipelineJob, info : Pipelin
   val par = this.parallel
   val fst = { _ : Unit => new ST }
   val result = 
-    if (this.hasExistingAndroidVirtualMethodTables.isDefined) {
-      require(this.hasExistingAndroidVirtualMethodTables.isDefined)
-      val eavmt = this.hasExistingAndroidVirtualMethodTables.get.asInstanceOf[AndroidVirtualMethodTables]
-      AndroidSymbolTable(ms, fst, eavmt, par)
+    if (this.hasExistingAndroidLibInfoTables.isDefined) {
+      require(this.hasExistingAndroidLibInfoTables.isDefined)
+      val eavmt = this.hasExistingAndroidLibInfoTables.get.asInstanceOf[AndroidLibInfoTables]
+      AndroidSymbolTable(ms, fst, eavmt, par, shouldBuildLibInfoTables)
     }
-    else AndroidSymbolTable(ms, fst, par)
+    else AndroidSymbolTable(ms, fst, par, shouldBuildLibInfoTables)
     
 
   val st = result._1.asInstanceOf[ST]
@@ -52,7 +52,7 @@ class PilarAndroidSymbolResolverModuleDef (val job : PipelineJob, info : Pipelin
     
   this.symbolTable_=(result._1)
   
-  this.androidVirtualMethodTables_=(result._2)
+  this.androidLibInfoTablesOpt=(result._2)
 
   class ST extends SymbolTable with SymbolTableProducer {
     st =>

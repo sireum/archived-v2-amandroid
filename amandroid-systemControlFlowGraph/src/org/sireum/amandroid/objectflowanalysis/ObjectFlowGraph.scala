@@ -13,7 +13,7 @@ import org.sireum.alir.AlirEdgeAccesses
 import java.util.regex.Matcher
 import org.sireum.alir.ReachingDefinitionAnalysis
 import org.sireum.alir.ControlFlowGraph
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 
 class ObjectFlowGraph[Node <: OfaNode] 
   extends AlirGraph[Node]
@@ -414,8 +414,8 @@ class ObjectFlowGraph[Node <: OfaNode]
   }
   
   def getDirectCallee(pi : PointI,
-                      androidVirtualMethodTables : AndroidVirtualMethodTables) : ResourceUri = {
-    androidVirtualMethodTables.getProcedureUriBySignature(pi.varName)
+                      androidLibInfoTables : AndroidLibInfoTables) : ResourceUri = {
+    androidLibInfoTables.getProcedureUriBySignature(pi.varName)
   }
   
   /**
@@ -423,17 +423,18 @@ class ObjectFlowGraph[Node <: OfaNode]
    */ 
   def getCalleeSet(diffSet : MMap[ResourceUri, ResourceUri],
                 pi : PointI,
-                androidVirtualMethodTables : AndroidVirtualMethodTables) : MSet[ResourceUri] = {
+                androidLibInfoTables : AndroidLibInfoTables) : MSet[ResourceUri] = {
     val calleeSet : MSet[ResourceUri] = msetEmpty
     diffSet.values.toSet[ResourceUri].foreach(
       d => {
-        val recordUri = androidVirtualMethodTables.getRecordUri(d)
-        val procSigs = androidVirtualMethodTables.getProcedureSigsByRecordUri(recordUri)
-        val str = pi.varName.substring(pi.varName.indexOf(";."))
+        val recordUri = androidLibInfoTables.getRecordUri(d)
+        val procSigs = androidLibInfoTables.getProcedureSigsByRecordUri(recordUri)
+        
+        val str = pi.varName.substring(pi.varName.indexOf("."))
         procSigs.foreach(
           sig => {
-            if(sig.substring(sig.indexOf(";.")).equals(str)){
-              calleeSet += androidVirtualMethodTables.getProcedureUriBySignature(sig)
+            if(sig.substring(sig.indexOf(".")).equals(str)){
+              calleeSet += androidLibInfoTables.getProcedureUriBySignature(sig)
             }
           }  
         )
@@ -498,6 +499,12 @@ class ObjectFlowGraph[Node <: OfaNode]
           node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
           node
         } else getNode("arg:" + pa.varName, pa.locationUri)
+      case pso : PointStringO =>
+        if(!nodeExists("newString:" + pso.varName, pso.locationUri)){
+          val node = addNode("newString:" + pso.varName, pso.locationUri)
+          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
+          node
+        } else getNode("newString:" + pso.varName, pso.locationUri)
       case po : PointO =>
         if(!nodeExists("new:" + po.varName, po.locationUri)){
           val node = addNode("new:" + po.varName, po.locationUri)
@@ -668,6 +675,8 @@ class ObjectFlowGraph[Node <: OfaNode]
         getNode("recv:" + pr.varName, pr.locationUri)
       case pa : PointArg =>
         getNode("arg:" + pa.varName, pa.locationUri)
+      case po : PointStringO =>
+        getNode("newString:" + po.varName, po.locationUri)
       case po : PointO =>
         getNode("new:" + po.varName, po.locationUri)
       case pwi : PointWithIndex =>
@@ -718,17 +727,29 @@ class ObjectFlowGraph[Node <: OfaNode]
   }
 
   protected val vlabelProvider = new VertexNameProvider[Node]() {
+    
+    def containSpecialCharacter(name : String) : String = {
+      if(name.startsWith("newString") && (name.contains("*") || name.contains("#") || name.contains("^") || name.contains("!") || name.contains("?") || name.contains("\\"))){
+        "string_has_special_characters"
+      } else if(name.startsWith("new") && (name.contains("*") || name.contains("#") || name.contains("^") || name.contains("!") || name.contains("?") || name.contains("\\"))){
+        "object_has_special_characters"
+      } else {
+        name
+      }
+    }
     def getVertexName(v : Node) : String = {
       v match {
         case n : OfaNode => {
-          n.toString().replaceAll("pilar:/procedure/[a-zA-Z0-9]*/%5B%7C", "")
-                .replaceAll("%7C%5D/[0-9]*/[0-9]*/", "_")
-                .replaceAll("[-:./;\\ ]", "_")
+          containSpecialCharacter(n.toString()).replaceAll("pilar:/procedure/[a-zA-Z0-9]*/%5B%7C", "")
+                .replaceAll("%7C%5D", "_")
+                .replaceAll("[-:./;,\\ ]", "_")
                 .replaceAll("@", "_AT_")
                 .replaceAll("=", "_EQ_")
                 .replaceAll("\\$", "_DOLLAR_")
+                .replaceAll("\\+", "_PLUS_")
                 .replaceAll("%3[CE]", "")
-                .replaceAll("[\\[\\]()<>\"\\|\\']", "")
+                .replaceAll("[[%c%02][%02]]", "")
+                .replaceAll("[\\[\\](){}<>\"\\|\\']", "")
         }
       }
     }

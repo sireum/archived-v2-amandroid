@@ -8,7 +8,7 @@ import org.sireum.amandroid.xml.AndroidXStream
 import org.sireum.util._
 import org.sireum.alir.AlirIntraProceduralGraph
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.cache.AndroidCacheFile
 import java.util.zip.GZIPInputStream
 import org.sireum.analyseApp.framework.amandroid.AmandroidOFAAppFrameWork
@@ -19,12 +19,11 @@ class AmandroidOFAApp extends AmandroidOFAAppFrameWork{
   val srcs = AmandroidFiles.apkModelFiles(0)
   val d = srcs.substring(srcs.indexOf("/"), srcs.lastIndexOf("/")+1)
   val xStream = AndroidXStream
-  xStream.xstream.alias("AndroidVirtualMethodTables", classOf[AndroidVirtualMethodTables])
+	xStream.xstream.alias("AndroidLibInfoTables", classOf[AndroidLibInfoTables])
   
-  val libVmTablesFile = new File(d + "../../../../../../../amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/libVmTables/libVmTables.xml.zip")
-  val interAVMT = new GZIPInputStream(new FileInputStream(libVmTablesFile))
-  val libVmTables = xStream.fromXml(interAVMT).asInstanceOf[AndroidVirtualMethodTables]
-  val libraryFilePath = d + "../../../../../../../amandroid-analyseLibrary/bin/org/sireum/androidLibraryFile/amandroid/library/pilar/result/ccfgs/"
+  val libInfoTablesFile = new File(System.getProperty("user.home") + "/AndroidLibData/libInfoTables/libInfoTables.xml.zip")
+  val interALIT = new GZIPInputStream(new FileInputStream(libInfoTablesFile))
+  val libInfoTables = xStream.fromXml(interALIT).asInstanceOf[AndroidLibInfoTables]
   val aCache = new AndroidCacheFile[ResourceUri]
   val serializer : (Any, OutputStream) --> Unit = {
     case (v, o) =>
@@ -34,14 +33,22 @@ class AmandroidOFAApp extends AmandroidOFAAppFrameWork{
     case o =>
       xStream.fromXml(o)
   }
-  aCache.setRootDirectory(libraryFilePath)
+  val libInfoDir = new File(System.getProperty("user.home") + "/AndroidLibData/libInfoDataBase")
+  aCache.setRootDirectory(libInfoDir + "/")
   aCache.setValueSerializer(serializer, unSerializer)
   aCache.setCacheSize(100000)
   aCache.setRemovePercent(20)
   
+//  AmandroidFiles.apkModelFiles.foreach(
+//      {fileUri=>
+//        if(fileUri.indexOf("0eb4b") > 0)
+//    	  Analyzing title fileUri file(fileUri, libInfoTables, aCache)
+//      }  
+//  )
+  
   AmandroidFiles.pilarModelFiles.
   foreach{fileUri=>
-     if(fileUri.indexOf("testGlobalArray.pilar") > 0)
-      Analyzing title fileUri file(fileUri, libVmTables, aCache)
+     if(fileUri.indexOf("0eb4b") > 0)
+      Analyzing title fileUri file(fileUri, libInfoTables, aCache)
   }
 }

@@ -1,0 +1,573 @@
+record [|com:android:location:provider:GeocodeProvider$1|]  @type class @AccessFlag   extends [|android:location:IGeocodeProvider$Stub|] {
+      [|com:android:location:provider:GeocodeProvider|] [|com:android:location:provider:GeocodeProvider$1.this$0|]    @AccessFlag FINAL_SYNTHETIC;
+   }
+    procedure [|void|] [|com:android:location:provider:GeocodeProvider$1.<init>|] ([|com:android:location:provider:GeocodeProvider$1|] v0 @type (this), [|com:android:location:provider:GeocodeProvider|] v1 @type (object)) @owner [|com:android:location:provider:GeocodeProvider$1|] @signature [|Lcom/android/location/provider/GeocodeProvider$1;.<init>:(Lcom/android/location/provider/GeocodeProvider;)V|] @Access CONSTRUCTOR {
+      local temp ;
+
+      
+#L0009cc.   v0.[|com:android:location:provider:GeocodeProvider$1.this$0|]  := v1 @type object;
+#L0009d0.   call temp:=  [|android:location:IGeocodeProvider$Stub.<init>|](v0) @signature [|Landroid/location/IGeocodeProvider$Stub;.<init>:()V|] @classDescriptor [|android:location:IGeocodeProvider$Stub|] @type direct;
+#L0009d6.   return @void ;
+
+   }
+    procedure [|java:lang:String|] [|com:android:location:provider:GeocodeProvider$1.getFromLocation|] ([|com:android:location:provider:GeocodeProvider$1|] v8 @type (this), [|double|] v9, [|double|] v11, [|int|] v13, [|android:location:GeocoderParams|] v14 @type (object), [|java:util:List|] v15 @type (object)) @owner [|com:android:location:provider:GeocodeProvider$1|] @signature [|Lcom/android/location/provider/GeocodeProvider$1;.getFromLocation:(DDILandroid/location/GeocoderParams;Ljava/util/List;)Ljava/lang/String;|] @Access PUBLIC {
+      local temp ;
+
+
+
+
+
+
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
+      
+#L0009e8.   v0:= v8.[|com:android:location:provider:GeocodeProvider$1.this$0|]   @type object;
+#L0009ec.   v1:= v9  @type wide;
+#L0009ee.   v3:= v11  @type wide;
+#L0009f0.   v5:= v13;
+#L0009f2.   v6:= v14  @type object;
+#L0009f4.   v7:= v15  @type object;
+#L0009f6.   call temp:=  [|com:android:location:provider:GeocodeProvider.onGetFromLocation|](v0, v1, v2, v3, v4, v5, v6, v7) @signature [|Lcom/android/location/provider/GeocodeProvider;.onGetFromLocation:(DDILandroid/location/GeocoderParams;Ljava/util/List;)Ljava/lang/String;|] @classDescriptor [|com:android:location:provider:GeocodeProvider|] @type virtual;
+#L0009fc.   v0:= temp  @type object;
+#L0009fe.   return v0  @type object;
+
+   }
+    procedure [|java:lang:String|] [|com:android:location:provider:GeocodeProvider$1.getFromLocationName|] ([|com:android:location:provider:GeocodeProvider$1|] v13 @type (this), [|java:lang:String|] v14 @type (object), [|double|] v15, [|double|] v17, [|double|] v19, [|double|] v21, [|int|] v23, [|android:location:GeocoderParams|] v24 @type (object), [|java:util:List|] v25 @type (object)) @owner [|com:android:location:provider:GeocodeProvider$1|] @signature [|Lcom/android/location/provider/GeocodeProvider$1;.getFromLocationName:(Ljava/lang/String;DDDDILandroid/location/GeocoderParams;Ljava/util/List;)Ljava/lang/String;|] @Access PUBLIC {
+      local temp ;
+
+
+
+
+
+
+
+
+
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
+        v9;
+        v10;
+        v11;
+        v12;
+      
+#L000a10.   v0:= v13.[|com:android:location:provider:GeocodeProvider$1.this$0|]   @type object;
+#L000a14.   v1:= v14  @type object;
+#L000a16.   v2:= v15  @type wide;
+#L000a18.   v4:= v17  @type wide;
+#L000a1c.   v6:= v19  @type wide;
+#L000a20.   v8:= v21  @type wide;
+#L000a24.   v10:= v23;
+#L000a28.   v11:= v24  @type object;
+#L000a2c.   v12:= v25  @type object;
+#L000a30.   call temp:=  [|com:android:location:provider:GeocodeProvider.onGetFromLocationName|](v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12) @signature [|Lcom/android/location/provider/GeocodeProvider;.onGetFromLocationName:(Ljava/lang/String;DDDDILandroid/location/GeocoderParams;Ljava/util/List;)Ljava/lang/String;|] @classDescriptor [|com:android:location:provider:GeocodeProvider|] @type virtual;
+#L000a36.   v0:= temp  @type object;
+#L000a38.   return v0  @type object;
+
+   }
+record [|com:android:location:provider:GeocodeProvider|]  @type class @AccessFlag PUBLIC_ABSTRACT  {
+      [|android:location:IGeocodeProvider$Stub|] [|com:android:location:provider:GeocodeProvider.mProvider|]    @AccessFlag PRIVATE;
+   }
+    procedure [|void|] [|com:android:location:provider:GeocodeProvider.<init>|] ([|com:android:location:provider:GeocodeProvider|] v1 @type (this)) @owner [|com:android:location:provider:GeocodeProvider|] @signature [|Lcom/android/location/provider/GeocodeProvider;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
+      local temp ;
+
+        v0;
+      
+#L000a4c.   call temp:=  [|java:lang:Object.<init>|](v1) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
+#L000a52.   v0:= new [|com:android:location:provider:GeocodeProvider$1|];
+#L000a56.   call temp:=  [|com:android:location:provider:GeocodeProvider$1.<init>|](v0, v1) @signature [|Lcom/android/location/provider/GeocodeProvider$1;.<init>:(Lcom/android/location/provider/GeocodeProvider;)V|] @classDescriptor [|com:android:location:provider:GeocodeProvider$1|] @type direct;
+#L000a5c.   v1.[|com:android:location:provider:GeocodeProvider.mProvider|]  := v0 @type object;
+#L000a60.   return @void ;
+
+   }
+    procedure [|android:os:IBinder|] [|com:android:location:provider:GeocodeProvider.getBinder|] ([|com:android:location:provider:GeocodeProvider|] v1 @type (this)) @owner [|com:android:location:provider:GeocodeProvider|] @signature [|Lcom/android/location/provider/GeocodeProvider;.getBinder:()Landroid/os/IBinder;|] @Access PUBLIC {
+      local temp ;
+
+        v0;
+      
+#L000a74.   v0:= v1.[|com:android:location:provider:GeocodeProvider.mProvider|]   @type object;
+#L000a78.   return v0  @type object;
+
+   }
+    procedure [|java:lang:String|] [|com:android:location:provider:GeocodeProvider.onGetFromLocation|] ([|double|] v0, [|double|] v2, [|int|] v4, [|android:location:GeocoderParams|] v5 @type (object), [|java:util:List|] v6 @type (object)) @owner [|com:android:location:provider:GeocodeProvider|] @signature [|Lcom/android/location/provider/GeocodeProvider;.onGetFromLocation:(DDILandroid/location/GeocoderParams;Ljava/util/List;)Ljava/lang/String;|] @Access PUBLIC_ABSTRACT {
+      # return;
+   }
+    procedure [|java:lang:String|] [|com:android:location:provider:GeocodeProvider.onGetFromLocationName|] ([|java:lang:String|] v0 @type (object), [|double|] v1, [|double|] v3, [|double|] v5, [|double|] v7, [|int|] v9, [|android:location:GeocoderParams|] v10 @type (object), [|java:util:List|] v11 @type (object)) @owner [|com:android:location:provider:GeocodeProvider|] @signature [|Lcom/android/location/provider/GeocodeProvider;.onGetFromLocationName:(Ljava/lang/String;DDDDILandroid/location/GeocoderParams;Ljava/util/List;)Ljava/lang/String;|] @Access PUBLIC_ABSTRACT {
+      # return;
+   }
+record [|com:android:location:provider:LocationProviderBase$1|]  @type class @AccessFlag SYNTHETIC  {
+   }
+record [|com:android:location:provider:LocationProviderBase$Service|]  @type class @AccessFlag FINAL  extends [|com:android:internal:location:ILocationProvider$Stub|] {
+      [|com:android:location:provider:LocationProviderBase|] [|com:android:location:provider:LocationProviderBase$Service.this$0|]    @AccessFlag FINAL_SYNTHETIC;
+   }
+    procedure [|void|] [|com:android:location:provider:LocationProviderBase$Service.<init>|] ([|com:android:location:provider:LocationProviderBase$Service|] v0 @type (this), [|com:android:location:provider:LocationProviderBase|] v1 @type (object)) @owner [|com:android:location:provider:LocationProviderBase$Service|] @signature [|Lcom/android/location/provider/LocationProviderBase$Service;.<init>:(Lcom/android/location/provider/LocationProviderBase;)V|] @Access PRIVATE_CONSTRUCTOR {
+      local temp ;
+
+      
+#L000a8c.   v0.[|com:android:location:provider:LocationProviderBase$Service.this$0|]  := v1 @type object;
+#L000a90.   call temp:=  [|com:android:internal:location:ILocationProvider$Stub.<init>|](v0) @signature [|Lcom/android/internal/location/ILocationProvider$Stub;.<init>:()V|] @classDescriptor [|com:android:internal:location:ILocationProvider$Stub|] @type direct;
+#L000a96.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:location:provider:LocationProviderBase$Service.<init>|] ([|com:android:location:provider:LocationProviderBase$Service|] v0 @type (this), [|com:android:location:provider:LocationProviderBase|] v1 @type (object), [|com:android:location:provider:LocationProviderBase$1|] v2 @type (object)) @owner [|com:android:location:provider:LocationProviderBase$Service|] @signature [|Lcom/android/location/provider/LocationProviderBase$Service;.<init>:(Lcom/android/location/provider/LocationProviderBase;Lcom/android/location/provider/LocationProviderBase$1;)V|] @Access SYNTHETIC_CONSTRUCTOR {
+      local temp ;
+
+
+
+      
+#L000aa8.   call temp:=  [|com:android:location:provider:LocationProviderBase$Service.<init>|](v0, v1) @signature [|Lcom/android/location/provider/LocationProviderBase$Service;.<init>:(Lcom/android/location/provider/LocationProviderBase;)V|] @classDescriptor [|com:android:location:provider:LocationProviderBase$Service|] @type direct;
+#L000aae.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:location:provider:LocationProviderBase$Service.disable|] ([|com:android:location:provider:LocationProviderBase$Service|] v1 @type (this)) @owner [|com:android:location:provider:LocationProviderBase$Service|] @signature [|Lcom/android/location/provider/LocationProviderBase$Service;.disable:()V|] @Access PUBLIC {
+      local temp ;
+
+        v0;
+      
+#L000ac0.   v0:= v1.[|com:android:location:provider:LocationProviderBase$Service.this$0|]   @type object;
+#L000ac4.   call temp:=  [|com:android:location:provider:LocationProviderBase.onDisable|](v0) @signature [|Lcom/android/location/provider/LocationProviderBase;.onDisable:()V|] @classDescriptor [|com:android:location:provider:LocationProviderBase|] @type virtual;
+#L000aca.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:location:provider:LocationProviderBase$Service.dump|] ([|com:android:location:provider:LocationProviderBase$Service|] v2 @type (this), [|java:io:FileDescriptor|] v3 @type (object), [|java:lang:String|][] v4 @type (object)) @owner [|com:android:location:provider:LocationProviderBase$Service|] @signature [|Lcom/android/location/provider/LocationProviderBase$Service;.dump:(Ljava/io/FileDescriptor;[Ljava/lang/String;)V|] @Access PUBLIC {
+      local temp ;
+        [|java:io:PrintWriter|] v0 @varname [|pw|] @scope ((L000a,L0013));
+
+
+
+        v1;
+      
+#L000adc.   v0:= new [|java:io:PrintWriter|];
+#L000ae0.   v1:= new [|java:io:FileOutputStream|];
+#L000ae4.   call temp:=  [|java:io:FileOutputStream.<init>|](v1, v3) @signature [|Ljava/io/FileOutputStream;.<init>:(Ljava/io/FileDescriptor;)V|] @classDescriptor [|java:io:FileOutputStream|] @type direct;
+#L000aea.   call temp:=  [|java:io:PrintWriter.<init>|](v0, v1) @signature [|Ljava/io/PrintWriter;.<init>:(Ljava/io/OutputStream;)V|] @classDescriptor [|java:io:PrintWriter|] @type direct;
+#L000af0.   v1:= v2.[|com:android:location:provider:LocationProviderBase$Service.this$0|]   @type object;
+#L000af4.   call temp:=  [|com:android:location:provider:LocationProviderBase.onDump|](v1, v3, v0, v4) @signature [|Lcom/android/location/provider/LocationProviderBase;.onDump:(Ljava/io/FileDescriptor;Ljava/io/PrintWriter;[Ljava/lang/String;)V|] @classDescriptor [|com:android:location:provider:LocationProviderBase|] @type virtual;
+#L000afa.   call temp:=  [|java:io:PrintWriter.flush|](v0) @signature [|Ljava/io/PrintWriter;.flush:()V|] @classDescriptor [|java:io:PrintWriter|] @type virtual;
+#L000b00.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:location:provider:LocationProviderBase$Service.enable|] ([|com:android:location:provider:LocationProviderBase$Service|] v1 @type (this)) @owner [|com:android:location:provider:LocationProviderBase$Service|] @signature [|Lcom/android/location/provider/LocationProviderBase$Service;.enable:()V|] @Access PUBLIC {
+      local temp ;
+
+        v0;
+      
+#L000b14.   v0:= v1.[|com:android:location:provider:LocationProviderBase$Service.this$0|]   @type object;
+#L000b18.   call temp:=  [|com:android:location:provider:LocationProviderBase.onEnable|](v0) @signature [|Lcom/android/location/provider/LocationProviderBase;.onEnable:()V|] @classDescriptor [|com:android:location:provider:LocationProviderBase|] @type virtual;
+#L000b1e.   return @void ;
+
+   }
+    procedure [|com:android:internal:location:ProviderProperties|] [|com:android:location:provider:LocationProviderBase$Service.getProperties|] ([|com:android:location:provider:LocationProviderBase$Service|] v1 @type (this)) @owner [|com:android:location:provider:LocationProviderBase$Service|] @signature [|Lcom/android/location/provider/LocationProviderBase$Service;.getProperties:()Lcom/android/internal/location/ProviderProperties;|] @Access PUBLIC {
+      local temp ;
+
+        v0;
+      
+#L000b30.   v0:= v1.[|com:android:location:provider:LocationProviderBase$Service.this$0|]   @type object;
+#L000b34.   call temp:=  [|com:android:location:provider:LocationProviderBase.access$000|](v0) @signature [|Lcom/android/location/provider/LocationProviderBase;.access$000:(Lcom/android/location/provider/LocationProviderBase;)Lcom/android/internal/location/ProviderProperties;|] @classDescriptor [|com:android:location:provider:LocationProviderBase|] @type static;
+#L000b3a.   v0:= temp  @type object;
+#L000b3c.   return v0  @type object;
+
+   }
+    procedure [|int|] [|com:android:location:provider:LocationProviderBase$Service.getStatus|] ([|com:android:location:provider:LocationProviderBase$Service|] v1 @type (this), [|android:os:Bundle|] v2 @type (object)) @owner [|com:android:location:provider:LocationProviderBase$Service|] @signature [|Lcom/android/location/provider/LocationProviderBase$Service;.getStatus:(Landroid/os/Bundle;)I|] @Access PUBLIC {
+      local temp ;
+
+
+        v0;
+      
+#L000b50.   v0:= v1.[|com:android:location:provider:LocationProviderBase$Service.this$0|]   @type object;
+#L000b54.   call temp:=  [|com:android:location:provider:LocationProviderBase.onGetStatus|](v0, v2) @signature [|Lcom/android/location/provider/LocationProviderBase;.onGetStatus:(Landroid/os/Bundle;)I|] @classDescriptor [|com:android:location:provider:LocationProviderBase|] @type virtual;
+#L000b5a.   v0:= temp;
+#L000b5c.   return v0;
+
+   }
+    procedure [|long|] [|com:android:location:provider:LocationProviderBase$Service.getStatusUpdateTime|] ([|com:android:location:provider:LocationProviderBase$Service|] v2 @type (this)) @owner [|com:android:location:provider:LocationProviderBase$Service|] @signature [|Lcom/android/location/provider/LocationProviderBase$Service;.getStatusUpdateTime:()J|] @Access PUBLIC {
+      local temp ;
+
+        v0;
+        v1;
+      
+#L000b70.   v0:= v2.[|com:android:location:provider:LocationProviderBase$Service.this$0|]   @type object;
+#L000b74.   call temp:=  [|com:android:location:provider:LocationProviderBase.onGetStatusUpdateTime|](v0) @signature [|Lcom/android/location/provider/LocationProviderBase;.onGetStatusUpdateTime:()J|] @classDescriptor [|com:android:location:provider:LocationProviderBase|] @type virtual;
+#L000b7a.   v0:= temp  @type wide;
+#L000b7c.   return v0  @type wide;
+
+   }
+    procedure [|boolean|] [|com:android:location:provider:LocationProviderBase$Service.sendExtraCommand|] ([|com:android:location:provider:LocationProviderBase$Service|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|android:os:Bundle|] v3 @type (object)) @owner [|com:android:location:provider:LocationProviderBase$Service|] @signature [|Lcom/android/location/provider/LocationProviderBase$Service;.sendExtraCommand:(Ljava/lang/String;Landroid/os/Bundle;)Z|] @Access PUBLIC {
+      local temp ;
+
+
+
+        v0;
+      
+#L000b90.   v0:= v1.[|com:android:location:provider:LocationProviderBase$Service.this$0|]   @type object;
+#L000b94.   call temp:=  [|com:android:location:provider:LocationProviderBase.onSendExtraCommand|](v0, v2, v3) @signature [|Lcom/android/location/provider/LocationProviderBase;.onSendExtraCommand:(Ljava/lang/String;Landroid/os/Bundle;)Z|] @classDescriptor [|com:android:location:provider:LocationProviderBase|] @type virtual;
+#L000b9a.   v0:= temp;
+#L000b9c.   return v0;
+
+   }
+    procedure [|void|] [|com:android:location:provider:LocationProviderBase$Service.setRequest|] ([|com:android:location:provider:LocationProviderBase$Service|] v2 @type (this), [|com:android:internal:location:ProviderRequest|] v3 @type (object), [|android:os:WorkSource|] v4 @type (object)) @owner [|com:android:location:provider:LocationProviderBase$Service|] @signature [|Lcom/android/location/provider/LocationProviderBase$Service;.setRequest:(Lcom/android/internal/location/ProviderRequest;Landroid/os/WorkSource;)V|] @Access PUBLIC {
+      local temp ;
+
+
+
+        v0;
+        v1;
+      
+#L000bb0.   v0:= v2.[|com:android:location:provider:LocationProviderBase$Service.this$0|]   @type object;
+#L000bb4.   v1:= new [|com:android:location:provider:ProviderRequestUnbundled|];
+#L000bb8.   call temp:=  [|com:android:location:provider:ProviderRequestUnbundled.<init>|](v1, v3) @signature [|Lcom/android/location/provider/ProviderRequestUnbundled;.<init>:(Lcom/android/internal/location/ProviderRequest;)V|] @classDescriptor [|com:android:location:provider:ProviderRequestUnbundled|] @type direct;
+#L000bbe.   call temp:=  [|com:android:location:provider:LocationProviderBase.onSetRequest|](v0, v1, v4) @signature [|Lcom/android/location/provider/LocationProviderBase;.onSetRequest:(Lcom/android/location/provider/ProviderRequestUnbundled;Landroid/os/WorkSource;)V|] @classDescriptor [|com:android:location:provider:LocationProviderBase|] @type virtual;
+#L000bc4.   return @void ;
+
+   }
+record [|com:android:location:provider:LocationProviderBase|]  @type class @AccessFlag PUBLIC_ABSTRACT  {
+      [|java:lang:String|] [|com:android:location:provider:LocationProviderBase.TAG|]    @AccessFlag PRIVATE_FINAL;
+      [|android:os:IBinder|] [|com:android:location:provider:LocationProviderBase.mBinder|]    @AccessFlag PRIVATE_FINAL;
+      [|android:location:ILocationManager|] [|com:android:location:provider:LocationProviderBase.mLocationManager|]    @AccessFlag PROTECTED_FINAL;
+      [|com:android:internal:location:ProviderProperties|] [|com:android:location:provider:LocationProviderBase.mProperties|]    @AccessFlag PRIVATE_FINAL;
+   }
+      global [|java:lang:String|] @@[|com:android:location:provider:LocationProviderBase.EXTRA_NO_GPS_LOCATION|]    @AccessFlag PUBLIC_STATIC_FINAL;
+      global [|java:lang:String|] @@[|com:android:location:provider:LocationProviderBase.FUSED_PROVIDER|]    @AccessFlag PUBLIC_STATIC_FINAL;
+    procedure [|void|] [|com:android:location:provider:LocationProviderBase.<init>|] ([|com:android:location:provider:LocationProviderBase|] v3 @type (this), [|java:lang:String|] v4 @type (object), [|com:android:location:provider:ProviderPropertiesUnbundled|] v5 @type (object)) @owner [|com:android:location:provider:LocationProviderBase|] @signature [|Lcom/android/location/provider/LocationProviderBase;.<init>:(Ljava/lang/String;Lcom/android/location/provider/ProviderPropertiesUnbundled;)V|] @Access PUBLIC_CONSTRUCTOR {
+      local temp ;
+        [|android:os:IBinder|] v0 @varname [|b|] @scope ((L000b,L0020));
+
+
+
+        v1;
+        v2;
+      
+#L000bd8.   call temp:=  [|java:lang:Object.<init>|](v3) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
+#L000bde.   v3.[|com:android:location:provider:LocationProviderBase.TAG|]  := v4 @type object;
+#L000be2.   v1:= "location" @type (object, string);
+#L000be6.   call temp:=  [|android:os:ServiceManager.getService|](v1) @signature [|Landroid/os/ServiceManager;.getService:(Ljava/lang/String;)Landroid/os/IBinder;|] @classDescriptor [|android:os:ServiceManager|] @type static;
+#L000bec.   v0:= temp  @type object;
+#L000bee.   call temp:=  [|android:location:ILocationManager$Stub.asInterface|](v0) @signature [|Landroid/location/ILocationManager$Stub;.asInterface:(Landroid/os/IBinder;)Landroid/location/ILocationManager;|] @classDescriptor [|android:location:ILocationManager$Stub|] @type static;
+#L000bf4.   v1:= temp  @type object;
+#L000bf6.   v3.[|com:android:location:provider:LocationProviderBase.mLocationManager|]  := v1 @type object;
+#L000bfa.   call temp:=  [|com:android:location:provider:ProviderPropertiesUnbundled.getProviderProperties|](v5) @signature [|Lcom/android/location/provider/ProviderPropertiesUnbundled;.getProviderProperties:()Lcom/android/internal/location/ProviderProperties;|] @classDescriptor [|com:android:location:provider:ProviderPropertiesUnbundled|] @type virtual;
+#L000c00.   v1:= temp  @type object;
+#L000c02.   v3.[|com:android:location:provider:LocationProviderBase.mProperties|]  := v1 @type object;
+#L000c06.   v1:= new [|com:android:location:provider:LocationProviderBase$Service|];
+#L000c0a.   v2:= 0  @length 4;
+#L000c0c.   call temp:=  [|com:android:location:provider:LocationProviderBase$Service.<init>|](v1, v3, v2) @signature [|Lcom/android/location/provider/LocationProviderBase$Service;.<init>:(Lcom/android/location/provider/LocationProviderBase;Lcom/android/location/provider/LocationProviderBase$1;)V|] @classDescriptor [|com:android:location:provider:LocationProviderBase$Service|] @type direct;
+#L000c12.   v3.[|com:android:location:provider:LocationProviderBase.mBinder|]  := v1 @type object;
+#L000c16.   return @void ;
+
+   }
+    procedure [|com:android:internal:location:ProviderProperties|] [|com:android:location:provider:LocationProviderBase.access$000|] ([|com:android:location:provider:LocationProviderBase|] v1 @type (object)) @owner [|com:android:location:provider:LocationProviderBase|] @signature [|Lcom/android/location/provider/LocationProviderBase;.access$000:(Lcom/android/location/provider/LocationProviderBase;)Lcom/android/internal/location/ProviderProperties;|] @Access STATIC_SYNTHETIC {
+      local temp ;
+
+        v0;
+      
+#L000c28.   v0:= v1.[|com:android:location:provider:LocationProviderBase.mProperties|]   @type object;
+#L000c2c.   return v0  @type object;
+
+   }
+    procedure [|android:os:IBinder|] [|com:android:location:provider:LocationProviderBase.getBinder|] ([|com:android:location:provider:LocationProviderBase|] v1 @type (this)) @owner [|com:android:location:provider:LocationProviderBase|] @signature [|Lcom/android/location/provider/LocationProviderBase;.getBinder:()Landroid/os/IBinder;|] @Access PUBLIC {
+      local temp ;
+
+        v0;
+      
+#L000c40.   v0:= v1.[|com:android:location:provider:LocationProviderBase.mBinder|]   @type object;
+#L000c44.   return v0  @type object;
+
+   }
+    procedure [|void|] [|com:android:location:provider:LocationProviderBase.onDisable|] () @owner [|com:android:location:provider:LocationProviderBase|] @signature [|Lcom/android/location/provider/LocationProviderBase;.onDisable:()V|] @Access PUBLIC_ABSTRACT {
+      # return;
+   }
+    procedure [|void|] [|com:android:location:provider:LocationProviderBase.onDump|] ([|com:android:location:provider:LocationProviderBase|] v0 @type (this), [|java:io:FileDescriptor|] v1 @type (object), [|java:io:PrintWriter|] v2 @type (object), [|java:lang:String|][] v3 @type (object)) @owner [|com:android:location:provider:LocationProviderBase|] @signature [|Lcom/android/location/provider/LocationProviderBase;.onDump:(Ljava/io/FileDescriptor;Ljava/io/PrintWriter;[Ljava/lang/String;)V|] @Access PUBLIC {
+      local temp ;
+
+
+
+
+      
+#L000c58.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:location:provider:LocationProviderBase.onEnable|] () @owner [|com:android:location:provider:LocationProviderBase|] @signature [|Lcom/android/location/provider/LocationProviderBase;.onEnable:()V|] @Access PUBLIC_ABSTRACT {
+      # return;
+   }
+    procedure [|int|] [|com:android:location:provider:LocationProviderBase.onGetStatus|] ([|android:os:Bundle|] v0 @type (object)) @owner [|com:android:location:provider:LocationProviderBase|] @signature [|Lcom/android/location/provider/LocationProviderBase;.onGetStatus:(Landroid/os/Bundle;)I|] @Access PUBLIC_ABSTRACT {
+      # return;
+   }
+    procedure [|long|] [|com:android:location:provider:LocationProviderBase.onGetStatusUpdateTime|] () @owner [|com:android:location:provider:LocationProviderBase|] @signature [|Lcom/android/location/provider/LocationProviderBase;.onGetStatusUpdateTime:()J|] @Access PUBLIC_ABSTRACT {
+      # return;
+   }
+    procedure [|boolean|] [|com:android:location:provider:LocationProviderBase.onSendExtraCommand|] ([|com:android:location:provider:LocationProviderBase|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|android:os:Bundle|] v3 @type (object)) @owner [|com:android:location:provider:LocationProviderBase|] @signature [|Lcom/android/location/provider/LocationProviderBase;.onSendExtraCommand:(Ljava/lang/String;Landroid/os/Bundle;)Z|] @Access PUBLIC {
+      local temp ;
+
+
+
+        v0;
+      
+#L000c6c.   v0:= 0  @length 4;
+#L000c6e.   return v0;
+
+   }
+    procedure [|void|] [|com:android:location:provider:LocationProviderBase.onSetRequest|] ([|com:android:location:provider:ProviderRequestUnbundled|] v0 @type (object), [|android:os:WorkSource|] v1 @type (object)) @owner [|com:android:location:provider:LocationProviderBase|] @signature [|Lcom/android/location/provider/LocationProviderBase;.onSetRequest:(Lcom/android/location/provider/ProviderRequestUnbundled;Landroid/os/WorkSource;)V|] @Access PUBLIC_ABSTRACT {
+      # return;
+   }
+    procedure [|void|] [|com:android:location:provider:LocationProviderBase.reportLocation|] ([|com:android:location:provider:LocationProviderBase|] v3 @type (this), [|android:location:Location|] v4 @type (object)) @owner [|com:android:location:provider:LocationProviderBase|] @signature [|Lcom/android/location/provider/LocationProviderBase;.reportLocation:(Landroid/location/Location;)V|] @Access PUBLIC_FINAL {
+      local temp ;
+        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L0008,L0010), (L0011,L0019));
+
+
+        v1;
+        v2;
+      
+#L000c80.   v1:= v3.[|com:android:location:provider:LocationProviderBase.mLocationManager|]   @type object;
+#L000c84.   v2:= 0  @length 4;
+#L000c86.   call temp:=  [|android:location:ILocationManager.reportLocation|](v1, v4, v2) @signature [|Landroid/location/ILocationManager;.reportLocation:(Landroid/location/Location;Z)V|] @classDescriptor [|android:location:ILocationManager|] @type interface;
+#L000c8c.   return @void ;
+#L000c8e.   v0:= Exception  @type object;
+#L000c90.   v1:= v3.[|com:android:location:provider:LocationProviderBase.TAG|]   @type object;
+#L000c94.   v2:= "RemoteException" @type (object, string);
+#L000c98.   call temp:=  [|android:util:Log.e|](v1, v2, v0) @signature [|Landroid/util/Log;.e:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I|] @classDescriptor [|android:util:Log|] @type static;
+#L000c9e.   goto L000c8c;
+#L000ca0.   v0:= Exception  @type object;
+#L000ca2.   v1:= v3.[|com:android:location:provider:LocationProviderBase.TAG|]   @type object;
+#L000ca6.   v2:= "Exception" @type (object, string);
+#L000caa.   call temp:=  [|android:util:Log.e|](v1, v2, v0) @signature [|Landroid/util/Log;.e:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I|] @classDescriptor [|android:util:Log|] @type static;
+#L000cb0.   goto L000c8c;
+  catch  [|android:os:RemoteException|] @[L000c80..L000c8c] goto L000c8e;
+  catch  [|java:lang:Exception|] @[L000c80..L000c8c] goto L000ca0;
+
+   }
+record [|com:android:location:provider:LocationRequestUnbundled|]  @type class @AccessFlag PUBLIC_FINAL  {
+      [|android:location:LocationRequest|] [|com:android:location:provider:LocationRequestUnbundled.delegate|]    @AccessFlag PRIVATE_FINAL;
+   }
+      global [|int|] @@[|com:android:location:provider:LocationRequestUnbundled.ACCURACY_BLOCK|]    @AccessFlag PUBLIC_STATIC_FINAL;
+      global [|int|] @@[|com:android:location:provider:LocationRequestUnbundled.ACCURACY_CITY|]    @AccessFlag PUBLIC_STATIC_FINAL;
+      global [|int|] @@[|com:android:location:provider:LocationRequestUnbundled.ACCURACY_FINE|]    @AccessFlag PUBLIC_STATIC_FINAL;
+      global [|int|] @@[|com:android:location:provider:LocationRequestUnbundled.POWER_HIGH|]    @AccessFlag PUBLIC_STATIC_FINAL;
+      global [|int|] @@[|com:android:location:provider:LocationRequestUnbundled.POWER_LOW|]    @AccessFlag PUBLIC_STATIC_FINAL;
+      global [|int|] @@[|com:android:location:provider:LocationRequestUnbundled.POWER_NONE|]    @AccessFlag PUBLIC_STATIC_FINAL;
+    procedure [|void|] [|com:android:location:provider:LocationRequestUnbundled.<init>|] ([|com:android:location:provider:LocationRequestUnbundled|] v0 @type (this), [|android:location:LocationRequest|] v1 @type (object)) @owner [|com:android:location:provider:LocationRequestUnbundled|] @signature [|Lcom/android/location/provider/LocationRequestUnbundled;.<init>:(Landroid/location/LocationRequest;)V|] @Access CONSTRUCTOR {
+      local temp ;
+
+
+      
+#L000cd4.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
+#L000cda.   v0.[|com:android:location:provider:LocationRequestUnbundled.delegate|]  := v1 @type object;
+#L000cde.   return @void ;
+
+   }
+    procedure [|long|] [|com:android:location:provider:LocationRequestUnbundled.getFastestInterval|] ([|com:android:location:provider:LocationRequestUnbundled|] v2 @type (this)) @owner [|com:android:location:provider:LocationRequestUnbundled|] @signature [|Lcom/android/location/provider/LocationRequestUnbundled;.getFastestInterval:()J|] @Access PUBLIC {
+      local temp ;
+
+        v0;
+        v1;
+      
+#L000cf0.   v0:= v2.[|com:android:location:provider:LocationRequestUnbundled.delegate|]   @type object;
+#L000cf4.   call temp:=  [|android:location:LocationRequest.getFastestInterval|](v0) @signature [|Landroid/location/LocationRequest;.getFastestInterval:()J|] @classDescriptor [|android:location:LocationRequest|] @type virtual;
+#L000cfa.   v0:= temp  @type wide;
+#L000cfc.   return v0  @type wide;
+
+   }
+    procedure [|long|] [|com:android:location:provider:LocationRequestUnbundled.getInterval|] ([|com:android:location:provider:LocationRequestUnbundled|] v2 @type (this)) @owner [|com:android:location:provider:LocationRequestUnbundled|] @signature [|Lcom/android/location/provider/LocationRequestUnbundled;.getInterval:()J|] @Access PUBLIC {
+      local temp ;
+
+        v0;
+        v1;
+      
+#L000d10.   v0:= v2.[|com:android:location:provider:LocationRequestUnbundled.delegate|]   @type object;
+#L000d14.   call temp:=  [|android:location:LocationRequest.getInterval|](v0) @signature [|Landroid/location/LocationRequest;.getInterval:()J|] @classDescriptor [|android:location:LocationRequest|] @type virtual;
+#L000d1a.   v0:= temp  @type wide;
+#L000d1c.   return v0  @type wide;
+
+   }
+    procedure [|int|] [|com:android:location:provider:LocationRequestUnbundled.getQuality|] ([|com:android:location:provider:LocationRequestUnbundled|] v1 @type (this)) @owner [|com:android:location:provider:LocationRequestUnbundled|] @signature [|Lcom/android/location/provider/LocationRequestUnbundled;.getQuality:()I|] @Access PUBLIC {
+      local temp ;
+
+        v0;
+      
+#L000d30.   v0:= v1.[|com:android:location:provider:LocationRequestUnbundled.delegate|]   @type object;
+#L000d34.   call temp:=  [|android:location:LocationRequest.getQuality|](v0) @signature [|Landroid/location/LocationRequest;.getQuality:()I|] @classDescriptor [|android:location:LocationRequest|] @type virtual;
+#L000d3a.   v0:= temp;
+#L000d3c.   return v0;
+
+   }
+    procedure [|float|] [|com:android:location:provider:LocationRequestUnbundled.getSmallestDisplacement|] ([|com:android:location:provider:LocationRequestUnbundled|] v1 @type (this)) @owner [|com:android:location:provider:LocationRequestUnbundled|] @signature [|Lcom/android/location/provider/LocationRequestUnbundled;.getSmallestDisplacement:()F|] @Access PUBLIC {
+      local temp ;
+
+        v0;
+      
+#L000d50.   v0:= v1.[|com:android:location:provider:LocationRequestUnbundled.delegate|]   @type object;
+#L000d54.   call temp:=  [|android:location:LocationRequest.getSmallestDisplacement|](v0) @signature [|Landroid/location/LocationRequest;.getSmallestDisplacement:()F|] @classDescriptor [|android:location:LocationRequest|] @type virtual;
+#L000d5a.   v0:= temp;
+#L000d5c.   return v0;
+
+   }
+    procedure [|java:lang:String|] [|com:android:location:provider:LocationRequestUnbundled.toString|] ([|com:android:location:provider:LocationRequestUnbundled|] v1 @type (this)) @owner [|com:android:location:provider:LocationRequestUnbundled|] @signature [|Lcom/android/location/provider/LocationRequestUnbundled;.toString:()Ljava/lang/String;|] @Access PUBLIC {
+      local temp ;
+
+        v0;
+      
+#L000d70.   v0:= v1.[|com:android:location:provider:LocationRequestUnbundled.delegate|]   @type object;
+#L000d74.   call temp:=  [|android:location:LocationRequest.toString|](v0) @signature [|Landroid/location/LocationRequest;.toString:()Ljava/lang/String;|] @classDescriptor [|android:location:LocationRequest|] @type virtual;
+#L000d7a.   v0:= temp  @type object;
+#L000d7c.   return v0  @type object;
+
+   }
+record [|com:android:location:provider:ProviderPropertiesUnbundled|]  @type class @AccessFlag PUBLIC_FINAL  {
+      [|com:android:internal:location:ProviderProperties|] [|com:android:location:provider:ProviderPropertiesUnbundled.mProperties|]    @AccessFlag PRIVATE_FINAL;
+   }
+    procedure [|void|] [|com:android:location:provider:ProviderPropertiesUnbundled.<init>|] ([|com:android:location:provider:ProviderPropertiesUnbundled|] v0 @type (this), [|com:android:internal:location:ProviderProperties|] v1 @type (object)) @owner [|com:android:location:provider:ProviderPropertiesUnbundled|] @signature [|Lcom/android/location/provider/ProviderPropertiesUnbundled;.<init>:(Lcom/android/internal/location/ProviderProperties;)V|] @Access PRIVATE_CONSTRUCTOR {
+      local temp ;
+
+
+      
+#L000d90.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
+#L000d96.   v0.[|com:android:location:provider:ProviderPropertiesUnbundled.mProperties|]  := v1 @type object;
+#L000d9a.   return @void ;
+
+   }
+    procedure [|com:android:location:provider:ProviderPropertiesUnbundled|] [|com:android:location:provider:ProviderPropertiesUnbundled.create|] ([|boolean|] v11, [|boolean|] v12, [|boolean|] v13, [|boolean|] v14, [|boolean|] v15, [|boolean|] v16, [|boolean|] v17, [|int|] v18, [|int|] v19) @owner [|com:android:location:provider:ProviderPropertiesUnbundled|] @signature [|Lcom/android/location/provider/ProviderPropertiesUnbundled;.create:(ZZZZZZZII)Lcom/android/location/provider/ProviderPropertiesUnbundled;|] @Access PUBLIC_STATIC {
+      local temp ;
+
+
+
+
+
+
+
+
+
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
+        v9;
+        v10;
+      
+#L000dac.   v10:= new [|com:android:location:provider:ProviderPropertiesUnbundled|];
+#L000db0.   v0:= new [|com:android:internal:location:ProviderProperties|];
+#L000db4.   v1:= v11;
+#L000db6.   v2:= v12;
+#L000db8.   v3:= v13;
+#L000dba.   v4:= v14;
+#L000dbc.   v5:= v15;
+#L000dbe.   v6:= v16;
+#L000dc2.   v7:= v17;
+#L000dc6.   v8:= v18;
+#L000dca.   v9:= v19;
+#L000dce.   call temp:=  [|com:android:internal:location:ProviderProperties.<init>|](v0, v1, v2, v3, v4, v5, v6, v7, v8, v9) @signature [|Lcom/android/internal/location/ProviderProperties;.<init>:(ZZZZZZZII)V|] @classDescriptor [|com:android:internal:location:ProviderProperties|] @type direct;
+#L000dd4.   call temp:=  [|com:android:location:provider:ProviderPropertiesUnbundled.<init>|](v10, v0) @signature [|Lcom/android/location/provider/ProviderPropertiesUnbundled;.<init>:(Lcom/android/internal/location/ProviderProperties;)V|] @classDescriptor [|com:android:location:provider:ProviderPropertiesUnbundled|] @type direct;
+#L000dda.   return v10  @type object;
+
+   }
+    procedure [|com:android:internal:location:ProviderProperties|] [|com:android:location:provider:ProviderPropertiesUnbundled.getProviderProperties|] ([|com:android:location:provider:ProviderPropertiesUnbundled|] v1 @type (this)) @owner [|com:android:location:provider:ProviderPropertiesUnbundled|] @signature [|Lcom/android/location/provider/ProviderPropertiesUnbundled;.getProviderProperties:()Lcom/android/internal/location/ProviderProperties;|] @Access PUBLIC {
+      local temp ;
+
+        v0;
+      
+#L000dec.   v0:= v1.[|com:android:location:provider:ProviderPropertiesUnbundled.mProperties|]   @type object;
+#L000df0.   return v0  @type object;
+
+   }
+    procedure [|java:lang:String|] [|com:android:location:provider:ProviderPropertiesUnbundled.toString|] ([|com:android:location:provider:ProviderPropertiesUnbundled|] v1 @type (this)) @owner [|com:android:location:provider:ProviderPropertiesUnbundled|] @signature [|Lcom/android/location/provider/ProviderPropertiesUnbundled;.toString:()Ljava/lang/String;|] @Access PUBLIC {
+      local temp ;
+
+        v0;
+      
+#L000e04.   v0:= v1.[|com:android:location:provider:ProviderPropertiesUnbundled.mProperties|]   @type object;
+#L000e08.   call temp:=  [|java:lang:Object.toString|](v0) @signature [|Ljava/lang/Object;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:Object|] @type virtual;
+#L000e0e.   v0:= temp  @type object;
+#L000e10.   return v0  @type object;
+
+   }
+record [|com:android:location:provider:ProviderRequestUnbundled|]  @type class @AccessFlag PUBLIC_FINAL  {
+      [|com:android:internal:location:ProviderRequest|] [|com:android:location:provider:ProviderRequestUnbundled.mRequest|]    @AccessFlag PRIVATE_FINAL;
+   }
+    procedure [|void|] [|com:android:location:provider:ProviderRequestUnbundled.<init>|] ([|com:android:location:provider:ProviderRequestUnbundled|] v0 @type (this), [|com:android:internal:location:ProviderRequest|] v1 @type (object)) @owner [|com:android:location:provider:ProviderRequestUnbundled|] @signature [|Lcom/android/location/provider/ProviderRequestUnbundled;.<init>:(Lcom/android/internal/location/ProviderRequest;)V|] @Access PUBLIC_CONSTRUCTOR {
+      local temp ;
+
+
+      
+#L000e24.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
+#L000e2a.   v0.[|com:android:location:provider:ProviderRequestUnbundled.mRequest|]  := v1 @type object;
+#L000e2e.   return @void ;
+
+   }
+    procedure [|long|] [|com:android:location:provider:ProviderRequestUnbundled.getInterval|] ([|com:android:location:provider:ProviderRequestUnbundled|] v2 @type (this)) @owner [|com:android:location:provider:ProviderRequestUnbundled|] @signature [|Lcom/android/location/provider/ProviderRequestUnbundled;.getInterval:()J|] @Access PUBLIC {
+      local temp ;
+
+        v0;
+        v1;
+      
+#L000e40.   v0:= v2.[|com:android:location:provider:ProviderRequestUnbundled.mRequest|]   @type object;
+#L000e44.   v0:= v0.[|com:android:internal:location:ProviderRequest.interval|]   @wide;
+#L000e48.   return v0  @type wide;
+
+   }
+    procedure [|java:util:List|] [|com:android:location:provider:ProviderRequestUnbundled.getLocationRequests|] ([|com:android:location:provider:ProviderRequestUnbundled|] v4 @type (this)) @owner [|com:android:location:provider:ProviderRequestUnbundled|] @signature [|Lcom/android/location/provider/ProviderRequestUnbundled;.getLocationRequests:()Ljava/util/List;|] @Access PUBLIC {
+      local temp ;
+        [|android:location:LocationRequest|] v1 @varname [|r|] @scope ((L0021,L002a));
+        [|java:util:Iterator|] v0 @varname [|i$|] @scope ((L0015,L002b));
+        [|java:util:List|] v2 @varname [|result|] @scope ((L000d,L002b));
+
+        v3;
+      
+#L000e5c.   v2:= new [|java:util:ArrayList|];
+#L000e60.   v3:= v4.[|com:android:location:provider:ProviderRequestUnbundled.mRequest|]   @type object;
+#L000e64.   v3:= v3.[|com:android:internal:location:ProviderRequest.locationRequests|]   @type object;
+#L000e68.   call temp:=  [|java:util:List.size|](v3) @signature [|Ljava/util/List;.size:()I|] @classDescriptor [|java:util:List|] @type interface;
+#L000e6e.   v3:= temp;
+#L000e70.   call temp:=  [|java:util:ArrayList.<init>|](v2, v3) @signature [|Ljava/util/ArrayList;.<init>:(I)V|] @classDescriptor [|java:util:ArrayList|] @type direct;
+#L000e76.   v3:= v4.[|com:android:location:provider:ProviderRequestUnbundled.mRequest|]   @type object;
+#L000e7a.   v3:= v3.[|com:android:internal:location:ProviderRequest.locationRequests|]   @type object;
+#L000e7e.   call temp:=  [|java:util:List.iterator|](v3) @signature [|Ljava/util/List;.iterator:()Ljava/util/Iterator;|] @classDescriptor [|java:util:List|] @type interface;
+#L000e84.   v0:= temp  @type object;
+#L000e86.   call temp:=  [|java:util:Iterator.hasNext|](v0) @signature [|Ljava/util/Iterator;.hasNext:()Z|] @classDescriptor [|java:util:Iterator|] @type interface;
+#L000e8c.   v3:= temp;
+#L000e8e.   if v3 == 0 then goto L000eb0;
+#L000e92.   call temp:=  [|java:util:Iterator.next|](v0) @signature [|Ljava/util/Iterator;.next:()Ljava/lang/Object;|] @classDescriptor [|java:util:Iterator|] @type interface;
+#L000e98.   v1:= temp  @type object;
+#L000e9a.   v1:= ([|android:location:LocationRequest|])v1;
+#L000e9e.   v3:= new [|com:android:location:provider:LocationRequestUnbundled|];
+#L000ea2.   call temp:=  [|com:android:location:provider:LocationRequestUnbundled.<init>|](v3, v1) @signature [|Lcom/android/location/provider/LocationRequestUnbundled;.<init>:(Landroid/location/LocationRequest;)V|] @classDescriptor [|com:android:location:provider:LocationRequestUnbundled|] @type direct;
+#L000ea8.   call temp:=  [|java:util:List.add|](v2, v3) @signature [|Ljava/util/List;.add:(Ljava/lang/Object;)Z|] @classDescriptor [|java:util:List|] @type interface;
+#L000eae.   goto L000e86;
+#L000eb0.   return v2  @type object;
+
+   }
+    procedure [|boolean|] [|com:android:location:provider:ProviderRequestUnbundled.getReportLocation|] ([|com:android:location:provider:ProviderRequestUnbundled|] v1 @type (this)) @owner [|com:android:location:provider:ProviderRequestUnbundled|] @signature [|Lcom/android/location/provider/ProviderRequestUnbundled;.getReportLocation:()Z|] @Access PUBLIC {
+      local temp ;
+
+        v0;
+      
+#L000ec4.   v0:= v1.[|com:android:location:provider:ProviderRequestUnbundled.mRequest|]   @type object;
+#L000ec8.   v0:= v0.[|com:android:internal:location:ProviderRequest.reportLocation|]   @boolean;
+#L000ecc.   return v0;
+
+   }
+    procedure [|java:lang:String|] [|com:android:location:provider:ProviderRequestUnbundled.toString|] ([|com:android:location:provider:ProviderRequestUnbundled|] v1 @type (this)) @owner [|com:android:location:provider:ProviderRequestUnbundled|] @signature [|Lcom/android/location/provider/ProviderRequestUnbundled;.toString:()Ljava/lang/String;|] @Access PUBLIC {
+      local temp ;
+
+        v0;
+      
+#L000ee0.   v0:= v1.[|com:android:location:provider:ProviderRequestUnbundled.mRequest|]   @type object;
+#L000ee4.   call temp:=  [|com:android:internal:location:ProviderRequest.toString|](v0) @signature [|Lcom/android/internal/location/ProviderRequest;.toString:()Ljava/lang/String;|] @classDescriptor [|com:android:internal:location:ProviderRequest|] @type virtual;
+#L000eea.   v0:= temp  @type object;
+#L000eec.   return v0  @type object;
+
+   }

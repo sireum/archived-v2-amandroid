@@ -10,13 +10,12 @@ import org.sireum.alir.AlirIntraProceduralNode
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.alir.DefRef
 import org.sireum.alir.MonotoneDataFlowAnalysisResult
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.module.AndroidInterIntraProcedural.AndroidInterAnalysisResult
 import org.sireum.amandroid.module.AndroidInterIntraProcedural.AndroidIntraAnalysisResult
 import org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph
 import org.sireum.amandroid.objectflowanalysis.OfaNode
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
-import org.sireum.amandroid.scfg.SystemControlFlowGraph
 import org.sireum.pilar.ast.LocationDecl
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.pilar.symbol.SymbolTable
@@ -31,12 +30,13 @@ object OFAsCfgModule extends PipelineModule {
   def origin = classOf[OFAsCfg]
 
   val globalOFAsCfgKey = "Global.OFAsCfg"
-  val globalAndroidVirtualMethodTablesKey = "Global.androidVirtualMethodTables"
   val globalProcedureSymbolTablesKey = "Global.procedureSymbolTables"
   val globalAndroidCacheKey = "Global.androidCache"
+  val globalAndroidLibInfoTablesKey = "Global.androidLibInfoTables"
   val globalCfgsKey = "Global.cfgs"
   val globalRdasKey = "Global.rdas"
   val OFAsCfgKey = "OFAsCfg.OFAsCfg"
+  val globalCCfgsKey = "Global.cCfgs"
 
   def compute(job : PipelineJob, info : PipelineJobModuleInfo) : MBuffer[Tag] = {
     val tags = marrayEmpty[Tag]
@@ -71,33 +71,6 @@ object OFAsCfgModule extends PipelineModule {
 
   def inputDefined (job : PipelineJob) : MBuffer[Tag] = {
     val tags = marrayEmpty[Tag]
-    var _androidVirtualMethodTables : scala.Option[AnyRef] = None
-    var _androidVirtualMethodTablesKey : scala.Option[String] = None
-
-    val keylistandroidVirtualMethodTables = List(OFAsCfgModule.globalAndroidVirtualMethodTablesKey)
-    keylistandroidVirtualMethodTables.foreach(key => 
-      if(job ? key) { 
-        if(_androidVirtualMethodTables.isEmpty) {
-          _androidVirtualMethodTables = Some(job(key))
-          _androidVirtualMethodTablesKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _androidVirtualMethodTables.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'androidVirtualMethodTables' keys '" + _androidVirtualMethodTablesKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _androidVirtualMethodTables match{
-      case Some(x) =>
-        if(!x.isInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'androidVirtualMethodTables'.  Expecting 'org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'androidVirtualMethodTables'")       
-    }
     var _androidCache : scala.Option[AnyRef] = None
     var _androidCacheKey : scala.Option[String] = None
 
@@ -124,6 +97,33 @@ object OFAsCfgModule extends PipelineModule {
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'androidCache'")       
+    }
+    var _androidLibInfoTables : scala.Option[AnyRef] = None
+    var _androidLibInfoTablesKey : scala.Option[String] = None
+
+    val keylistandroidLibInfoTables = List(OFAsCfgModule.globalAndroidLibInfoTablesKey)
+    keylistandroidLibInfoTables.foreach(key => 
+      if(job ? key) { 
+        if(_androidLibInfoTables.isEmpty) {
+          _androidLibInfoTables = Some(job(key))
+          _androidLibInfoTablesKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _androidLibInfoTables.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'androidLibInfoTables' keys '" + _androidLibInfoTablesKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _androidLibInfoTables match{
+      case Some(x) =>
+        if(!x.isInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'androidLibInfoTables'.  Expecting 'org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'androidLibInfoTables'")       
     }
     var _cfgs : scala.Option[AnyRef] = None
     var _cfgsKey : scala.Option[String] = None
@@ -179,6 +179,33 @@ object OFAsCfgModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'rdas'")       
     }
+    var _cCfgs : scala.Option[AnyRef] = None
+    var _cCfgsKey : scala.Option[String] = None
+
+    val keylistcCfgs = List(OFAsCfgModule.globalCCfgsKey)
+    keylistcCfgs.foreach(key => 
+      if(job ? key) { 
+        if(_cCfgs.isEmpty) {
+          _cCfgs = Some(job(key))
+          _cCfgsKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _cCfgs.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'cCfgs' keys '" + _cCfgsKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _cCfgs match{
+      case Some(x) =>
+        if(!x.isInstanceOf[scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'cCfgs'.  Expecting 'scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'cCfgs'")       
+    }
     var _procedureSymbolTables : scala.Option[AnyRef] = None
     var _procedureSymbolTablesKey : scala.Option[String] = None
 
@@ -216,33 +243,18 @@ object OFAsCfgModule extends PipelineModule {
         "Output error for '" + this.title + "': No entry found for 'OFAsCfg'. Expecting (OFAsCfgModule.OFAsCfgKey or OFAsCfgModule.globalOFAsCfgKey)") 
     }
 
-    if(job ? OFAsCfgModule.OFAsCfgKey && !job(OFAsCfgModule.OFAsCfgKey).isInstanceOf[org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]) {
+    if(job ? OFAsCfgModule.OFAsCfgKey && !job(OFAsCfgModule.OFAsCfgKey).isInstanceOf[scala.collection.mutable.Map[java.lang.String, scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]]]) {
       tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker, 
-        "Output error for '" + this.title + "': Wrong type found for OFAsCfgModule.OFAsCfgKey.  Expecting 'org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]' but found '" + 
+        "Output error for '" + this.title + "': Wrong type found for OFAsCfgModule.OFAsCfgKey.  Expecting 'scala.collection.mutable.Map[java.lang.String, scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]]' but found '" + 
         job(OFAsCfgModule.OFAsCfgKey).getClass.toString + "'")
     } 
 
-    if(job ? OFAsCfgModule.globalOFAsCfgKey && !job(OFAsCfgModule.globalOFAsCfgKey).isInstanceOf[org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]) {
+    if(job ? OFAsCfgModule.globalOFAsCfgKey && !job(OFAsCfgModule.globalOFAsCfgKey).isInstanceOf[scala.collection.mutable.Map[java.lang.String, scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]]]) {
       tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker, 
-        "Output error for '" + this.title + "': Wrong type found for OFAsCfgModule.globalOFAsCfgKey.  Expecting 'org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]' but found '" + 
+        "Output error for '" + this.title + "': Wrong type found for OFAsCfgModule.globalOFAsCfgKey.  Expecting 'scala.collection.mutable.Map[java.lang.String, scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]]' but found '" + 
         job(OFAsCfgModule.globalOFAsCfgKey).getClass.toString + "'")
     } 
     return tags
-  }
-
-  def getAndroidVirtualMethodTables (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = {
-    if (options.contains(OFAsCfgModule.globalAndroidVirtualMethodTablesKey)) {
-       return options(OFAsCfgModule.globalAndroidVirtualMethodTablesKey).asInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setAndroidVirtualMethodTables (options : MMap[Property.Key, Any], androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables) : MMap[Property.Key, Any] = {
-
-    options(OFAsCfgModule.globalAndroidVirtualMethodTablesKey) = androidVirtualMethodTables
-
-    return options
   }
 
   def getAndroidCache (options : scala.collection.Map[Property.Key, Any]) : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = {
@@ -260,21 +272,17 @@ object OFAsCfgModule extends PipelineModule {
     return options
   }
 
-  def getOFAsCfg (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = {
-    if (options.contains(OFAsCfgModule.globalOFAsCfgKey)) {
-       return options(OFAsCfgModule.globalOFAsCfgKey).asInstanceOf[org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]
-    }
-    if (options.contains(OFAsCfgModule.OFAsCfgKey)) {
-       return options(OFAsCfgModule.OFAsCfgKey).asInstanceOf[org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]
+  def getAndroidLibInfoTables (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = {
+    if (options.contains(OFAsCfgModule.globalAndroidLibInfoTablesKey)) {
+       return options(OFAsCfgModule.globalAndroidLibInfoTablesKey).asInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def setOFAsCfg (options : MMap[Property.Key, Any], OFAsCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]) : MMap[Property.Key, Any] = {
+  def setAndroidLibInfoTables (options : MMap[Property.Key, Any], androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables) : MMap[Property.Key, Any] = {
 
-    options(OFAsCfgModule.globalOFAsCfgKey) = OFAsCfg
-    options(OFAsCfgKey) = OFAsCfg
+    options(OFAsCfgModule.globalAndroidLibInfoTablesKey) = androidLibInfoTables
 
     return options
   }
@@ -294,6 +302,25 @@ object OFAsCfgModule extends PipelineModule {
     return options
   }
 
+  def getOFAsCfg (options : scala.collection.Map[Property.Key, Any]) : scala.collection.mutable.Map[java.lang.String, scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]] = {
+    if (options.contains(OFAsCfgModule.globalOFAsCfgKey)) {
+       return options(OFAsCfgModule.globalOFAsCfgKey).asInstanceOf[scala.collection.mutable.Map[java.lang.String, scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]]]
+    }
+    if (options.contains(OFAsCfgModule.OFAsCfgKey)) {
+       return options(OFAsCfgModule.OFAsCfgKey).asInstanceOf[scala.collection.mutable.Map[java.lang.String, scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]]]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setOFAsCfg (options : MMap[Property.Key, Any], OFAsCfg : scala.collection.mutable.Map[java.lang.String, scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]]) : MMap[Property.Key, Any] = {
+
+    options(OFAsCfgModule.globalOFAsCfgKey) = OFAsCfg
+    options(OFAsCfgKey) = OFAsCfg
+
+    return options
+  }
+
   def getRdas (options : scala.collection.Map[Property.Key, Any]) : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]] = {
     if (options.contains(OFAsCfgModule.globalRdasKey)) {
        return options(OFAsCfgModule.globalRdasKey).asInstanceOf[scala.collection.mutable.Map[java.lang.String, org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]]]
@@ -305,6 +332,21 @@ object OFAsCfgModule extends PipelineModule {
   def setRdas (options : MMap[Property.Key, Any], rdas : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]]) : MMap[Property.Key, Any] = {
 
     options(OFAsCfgModule.globalRdasKey) = rdas
+
+    return options
+  }
+
+  def getCCfgs (options : scala.collection.Map[Property.Key, Any]) : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = {
+    if (options.contains(OFAsCfgModule.globalCCfgsKey)) {
+       return options(OFAsCfgModule.globalCCfgsKey).asInstanceOf[scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setCCfgs (options : MMap[Property.Key, Any], cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]) : MMap[Property.Key, Any] = {
+
+    options(OFAsCfgModule.globalCCfgsKey) = cCfgs
 
     return options
   }
@@ -326,11 +368,12 @@ object OFAsCfgModule extends PipelineModule {
 
   object ConsumerView {
     implicit class OFAsCfgModuleConsumerView (val job : PropertyProvider) extends AnyVal {
-      def androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = OFAsCfgModule.getAndroidVirtualMethodTables(job.propertyMap)
       def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = OFAsCfgModule.getAndroidCache(job.propertyMap)
-      def OFAsCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = OFAsCfgModule.getOFAsCfg(job.propertyMap)
+      def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = OFAsCfgModule.getAndroidLibInfoTables(job.propertyMap)
       def cfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]] = OFAsCfgModule.getCfgs(job.propertyMap)
+      def OFAsCfg : scala.collection.mutable.Map[java.lang.String, scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]] = OFAsCfgModule.getOFAsCfg(job.propertyMap)
       def rdas : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]] = OFAsCfgModule.getRdas(job.propertyMap)
+      def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = OFAsCfgModule.getCCfgs(job.propertyMap)
       def procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = OFAsCfgModule.getProcedureSymbolTables(job.propertyMap)
     }
   }
@@ -338,20 +381,23 @@ object OFAsCfgModule extends PipelineModule {
   object ProducerView {
     implicit class OFAsCfgModuleProducerView (val job : PropertyProvider) extends AnyVal {
 
-      def androidVirtualMethodTables_=(androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables) { OFAsCfgModule.setAndroidVirtualMethodTables(job.propertyMap, androidVirtualMethodTables) }
-      def androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = OFAsCfgModule.getAndroidVirtualMethodTables(job.propertyMap)
-
       def androidCache_=(androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]) { OFAsCfgModule.setAndroidCache(job.propertyMap, androidCache) }
       def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = OFAsCfgModule.getAndroidCache(job.propertyMap)
 
-      def OFAsCfg_=(OFAsCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]) { OFAsCfgModule.setOFAsCfg(job.propertyMap, OFAsCfg) }
-      def OFAsCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = OFAsCfgModule.getOFAsCfg(job.propertyMap)
+      def androidLibInfoTables_=(androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables) { OFAsCfgModule.setAndroidLibInfoTables(job.propertyMap, androidLibInfoTables) }
+      def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = OFAsCfgModule.getAndroidLibInfoTables(job.propertyMap)
 
       def cfgs_=(cfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]]) { OFAsCfgModule.setCfgs(job.propertyMap, cfgs) }
       def cfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]] = OFAsCfgModule.getCfgs(job.propertyMap)
 
+      def OFAsCfg_=(OFAsCfg : scala.collection.mutable.Map[java.lang.String, scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]]) { OFAsCfgModule.setOFAsCfg(job.propertyMap, OFAsCfg) }
+      def OFAsCfg : scala.collection.mutable.Map[java.lang.String, scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]] = OFAsCfgModule.getOFAsCfg(job.propertyMap)
+
       def rdas_=(rdas : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]]) { OFAsCfgModule.setRdas(job.propertyMap, rdas) }
       def rdas : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]] = OFAsCfgModule.getRdas(job.propertyMap)
+
+      def cCfgs_=(cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]) { OFAsCfgModule.setCCfgs(job.propertyMap, cCfgs) }
+      def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = OFAsCfgModule.getCCfgs(job.propertyMap)
 
       def procedureSymbolTables_=(procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable]) { OFAsCfgModule.setProcedureSymbolTables(job.propertyMap, procedureSymbolTables) }
       def procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = OFAsCfgModule.getProcedureSymbolTables(job.propertyMap)
@@ -362,17 +408,19 @@ object OFAsCfgModule extends PipelineModule {
 trait OFAsCfgModule {
   def job : PipelineJob
 
-  def androidVirtualMethodTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidVirtualMethodTables = OFAsCfgModule.getAndroidVirtualMethodTables(job.propertyMap)
-
   def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = OFAsCfgModule.getAndroidCache(job.propertyMap)
 
-
-  def OFAsCfg_=(OFAsCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]) { OFAsCfgModule.setOFAsCfg(job.propertyMap, OFAsCfg) }
-  def OFAsCfg : org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String] = OFAsCfgModule.getOFAsCfg(job.propertyMap)
+  def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = OFAsCfgModule.getAndroidLibInfoTables(job.propertyMap)
 
   def cfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]] = OFAsCfgModule.getCfgs(job.propertyMap)
 
+
+  def OFAsCfg_=(OFAsCfg : scala.collection.mutable.Map[java.lang.String, scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]]) { OFAsCfgModule.setOFAsCfg(job.propertyMap, OFAsCfg) }
+  def OFAsCfg : scala.collection.mutable.Map[java.lang.String, scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]] = OFAsCfgModule.getOFAsCfg(job.propertyMap)
+
   def rdas : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]] = OFAsCfgModule.getRdas(job.propertyMap)
+
+  def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = OFAsCfgModule.getCCfgs(job.propertyMap)
 
   def procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = OFAsCfgModule.getProcedureSymbolTables(job.propertyMap)
 }

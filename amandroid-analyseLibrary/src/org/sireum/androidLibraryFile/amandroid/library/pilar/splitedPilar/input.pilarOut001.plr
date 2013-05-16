@@ -1,0 +1,620 @@
+record [|com:android:commands:input:Input|]  @type class @AccessFlag PUBLIC  {
+   }
+      global [|java:lang:String|] @@[|com:android:commands:input:Input.TAG|]    @AccessFlag PRIVATE_STATIC_FINAL;
+    procedure [|void|] [|com:android:commands:input:Input.<init>|] ([|com:android:commands:input:Input|] v0 @type (this)) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
+      local temp ;
+
+      
+#L0005a0.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
+#L0005a6.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:input:Input.injectKeyEvent|] ([|com:android:commands:input:Input|] v3 @type (this), [|android:view:KeyEvent|] v4 @type (object)) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.injectKeyEvent:(Landroid/view/KeyEvent;)V|] @Access PRIVATE {
+      local temp ;
+
+
+        v0;
+        v1;
+        v2;
+      
+#L0005b8.   v0:= "Input" @type (object, string);
+#L0005bc.   v1:= new [|java:lang:StringBuilder|];
+#L0005c0.   call temp:=  [|java:lang:StringBuilder.<init>|](v1) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L0005c6.   v2:= "injectKeyEvent: " @type (object, string);
+#L0005ca.   call temp:=  [|java:lang:StringBuilder.append|](v1, v2) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0005d0.   v1:= temp  @type object;
+#L0005d2.   call temp:=  [|java:lang:StringBuilder.append|](v1, v4) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0005d8.   v1:= temp  @type object;
+#L0005da.   call temp:=  [|java:lang:StringBuilder.toString|](v1) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0005e0.   v1:= temp  @type object;
+#L0005e2.   call temp:=  [|android:util:Log.i|](v0, v1) @signature [|Landroid/util/Log;.i:(Ljava/lang/String;Ljava/lang/String;)I|] @classDescriptor [|android:util:Log|] @type static;
+#L0005e8.   call temp:=  [|android:hardware:input:InputManager.getInstance|]() @signature [|Landroid/hardware/input/InputManager;.getInstance:()Landroid/hardware/input/InputManager;|] @classDescriptor [|android:hardware:input:InputManager|] @type static;
+#L0005ee.   v0:= temp  @type object;
+#L0005f0.   v1:= 2  @length 4;
+#L0005f2.   call temp:=  [|android:hardware:input:InputManager.injectInputEvent|](v0, v4, v1) @signature [|Landroid/hardware/input/InputManager;.injectInputEvent:(Landroid/view/InputEvent;I)Z|] @classDescriptor [|android:hardware:input:InputManager|] @type virtual;
+#L0005f8.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:input:Input.injectMotionEvent|] ([|com:android:commands:input:Input|] v23 @type (this), [|int|] v24, [|int|] v25, [|long|] v26, [|float|] v28, [|float|] v29, [|float|] v30) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.injectMotionEvent:(IIJFFF)V|] @Access PRIVATE {
+      local temp ;
+        [|int|] v16 @varname [|DEFAULT_DEVICE_ID|] @scope ((L000a,L0051));
+        [|int|] v17 @varname [|DEFAULT_EDGE_FLAGS|] @scope ((L000c,L0051));
+        [|int|] v18 @varname [|DEFAULT_META_STATE|] @scope ((L0004,L0051));
+        [|float|] v19 @varname [|DEFAULT_PRECISION_X|] @scope ((L0006,L0051));
+        [|float|] v20 @varname [|DEFAULT_PRECISION_Y|] @scope ((L0008,L0051));
+        [|float|] v21 @varname [|DEFAULT_SIZE|] @scope ((L0002,L0051));
+        [|android:view:MotionEvent|] v22 @varname [|event|] @scope ((L0025,L0051));
+
+
+
+
+
+
+
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
+        v9;
+        v10;
+        v11;
+        v12;
+        v13;
+        v14;
+        v15;
+      
+#L00060c.   v21:= 1065353216  @length high16;
+#L000610.   v18:= 0  @length 16;
+#L000614.   v19:= 1065353216  @length high16;
+#L000618.   v20:= 1065353216  @length high16;
+#L00061c.   v16:= 0  @length 16;
+#L000620.   v17:= 0  @length 16;
+#L000624.   v10:= 1065353216  @length high16;
+#L000628.   v11:= 0  @length 4;
+#L00062a.   v12:= 1065353216  @length high16;
+#L00062e.   v13:= 1065353216  @length high16;
+#L000632.   v14:= 0  @length 4;
+#L000634.   v15:= 0  @length 4;
+#L000636.   v2:= v26  @type wide;
+#L00063a.   v4:= v26  @type wide;
+#L00063e.   v6:= v25;
+#L000642.   v7:= v28;
+#L000646.   v8:= v29;
+#L00064a.   v9:= v30;
+#L00064e.   call temp:=  [|android:view:MotionEvent.obtain|](v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15) @signature [|Landroid/view/MotionEvent;.obtain:(JJIFFFFIFFII)Landroid/view/MotionEvent;|] @classDescriptor [|android:view:MotionEvent|] @type static;
+#L000654.   v22:= temp  @type object;
+#L000656.   v0:= v22  @type object;
+#L00065a.   v1:= v24;
+#L00065e.   call temp:=  [|android:view:MotionEvent.setSource|](v0, v1) @signature [|Landroid/view/MotionEvent;.setSource:(I)V|] @classDescriptor [|android:view:MotionEvent|] @type virtual;
+#L000664.   v2:= "Input" @type (object, string);
+#L000668.   v3:= new [|java:lang:StringBuilder|];
+#L00066c.   call temp:=  [|java:lang:StringBuilder.<init>|](v3) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L000672.   v4:= "injectMotionEvent: " @type (object, string);
+#L000676.   call temp:=  [|java:lang:StringBuilder.append|](v3, v4) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L00067c.   v3:= temp  @type object;
+#L00067e.   v0:= v22  @type object;
+#L000682.   call temp:=  [|java:lang:StringBuilder.append|](v3, v0) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000688.   v3:= temp  @type object;
+#L00068a.   call temp:=  [|java:lang:StringBuilder.toString|](v3) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000690.   v3:= temp  @type object;
+#L000692.   call temp:=  [|android:util:Log.i|](v2, v3) @signature [|Landroid/util/Log;.i:(Ljava/lang/String;Ljava/lang/String;)I|] @classDescriptor [|android:util:Log|] @type static;
+#L000698.   call temp:=  [|android:hardware:input:InputManager.getInstance|]() @signature [|Landroid/hardware/input/InputManager;.getInstance:()Landroid/hardware/input/InputManager;|] @classDescriptor [|android:hardware:input:InputManager|] @type static;
+#L00069e.   v2:= temp  @type object;
+#L0006a0.   v3:= 2  @length 4;
+#L0006a2.   v0:= v22  @type object;
+#L0006a6.   call temp:=  [|android:hardware:input:InputManager.injectInputEvent|](v2, v0, v3) @signature [|Landroid/hardware/input/InputManager;.injectInputEvent:(Landroid/view/InputEvent;I)Z|] @classDescriptor [|android:hardware:input:InputManager|] @type virtual;
+#L0006ac.   return @void ;
+
+   }
+    procedure [|float|] [|com:android:commands:input:Input.lerp|] ([|float|] v1, [|float|] v2, [|float|] v3) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.lerp:(FFF)F|] @Access PRIVATE_STATIC_FINAL {
+      local temp ;
+
+
+
+        v0;
+      
+#L0006c0.   v0:= v2 - v1  @type float;
+#L0006c4.   v0:= v0 * v3  @type float;
+#L0006c6.   v0:= v0 + v1  @type float;
+#L0006c8.   return v0;
+
+   }
+    procedure [|void|] [|com:android:commands:input:Input.main|] ([|java:lang:String|][] v1 @type (object)) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.main:([Ljava/lang/String;)V|] @Access PUBLIC_STATIC {
+      local temp ;
+
+        v0;
+      
+#L0006dc.   v0:= new [|com:android:commands:input:Input|];
+#L0006e0.   call temp:=  [|com:android:commands:input:Input.<init>|](v0) @signature [|Lcom/android/commands/input/Input;.<init>:()V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L0006e6.   call temp:=  [|com:android:commands:input:Input.run|](v0, v1) @signature [|Lcom/android/commands/input/Input;.run:([Ljava/lang/String;)V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L0006ec.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:input:Input.run|] ([|com:android:commands:input:Input|] v9 @type (this), [|java:lang:String|][] v10 @type (object)) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.run:([Ljava/lang/String;)V|] @Access PRIVATE {
+      local temp ;
+        [|int|] v7 @varname [|keyCode|] @scope ((L004f,L006f));
+        [|int|] v1 @varname [|inputSource|] @scope ((L00d1,L012e));
+        [|java:lang:String|] v8 @varname [|subcommand|] @scope ((L00e2,L012e), (L013c,L016f));
+        [|java:lang:String|] v6 @varname [|command|] @scope ((L000e,L018c));
+
+
+        v0;
+        v2;
+        v3;
+        v4;
+        v5;
+      
+#L000700.   v5:= 4  @length 4;
+#L000702.   v4:= 3  @length 4;
+#L000704.   v3:= 2  @length 4;
+#L000706.   v2:= 1  @length 4;
+#L000708.   v0:= v10.length;
+#L00070a.   if v0 >= v2 then goto L000716;
+#L00070e.   call temp:=  [|com:android:commands:input:Input.showUsage|](v9) @signature [|Lcom/android/commands/input/Input;.showUsage:()V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L000714.   return @void ;
+#L000716.   v0:= 0  @length 4;
+#L000718.   v6:= v10[v0]  @type object;
+#L00071c.   v0:= "text" @type (object, string);
+#L000720.   call temp:=  [|java:lang:String.equals|](v6, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000726.   v0:= temp;
+#L000728.   if v0 == 0 then goto L00077a;
+#L00072c.   v0:= v10.length;
+#L00072e.   if v0 != v3 then goto L000742;
+#L000732.   v0:= 1  @length 4;
+#L000734.   v0:= v10[v0]  @type object;
+#L000738.   call temp:=  [|com:android:commands:input:Input.sendText|](v9, v0) @signature [|Lcom/android/commands/input/Input;.sendText:(Ljava/lang/String;)V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L00073e.   goto L000714;
+#L000740.   v0:= Exception  @type object;
+#L000742.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000746.   v2:= new [|java:lang:StringBuilder|];
+#L00074a.   call temp:=  [|java:lang:StringBuilder.<init>|](v2) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L000750.   v3:= "Error: Invalid arguments for command: " @type (object, string);
+#L000754.   call temp:=  [|java:lang:StringBuilder.append|](v2, v3) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L00075a.   v2:= temp  @type object;
+#L00075c.   call temp:=  [|java:lang:StringBuilder.append|](v2, v6) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000762.   v2:= temp  @type object;
+#L000764.   call temp:=  [|java:lang:StringBuilder.toString|](v2) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L00076a.   v2:= temp  @type object;
+#L00076c.   call temp:=  [|java:io:PrintStream.println|](v0, v2) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000772.   call temp:=  [|com:android:commands:input:Input.showUsage|](v9) @signature [|Lcom/android/commands/input/Input;.showUsage:()V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L000778.   goto L000714;
+#L00077a.   v0:= "keyevent" @type (object, string);
+#L00077e.   call temp:=  [|java:lang:String.equals|](v6, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000784.   v0:= temp;
+#L000786.   if v0 == 0 then goto L0007de;
+#L00078a.   v0:= v10.length;
+#L00078c.   if v0 != v3 then goto L000742;
+#L000790.   v0:= 1  @length 4;
+#L000792.   v0:= v10[v0]  @type object;
+#L000796.   call temp:=  [|android:view:KeyEvent.keyCodeFromString|](v0) @signature [|Landroid/view/KeyEvent;.keyCodeFromString:(Ljava/lang/String;)I|] @classDescriptor [|android:view:KeyEvent|] @type static;
+#L00079c.   v7:= temp;
+#L00079e.   if v7 != 0 then goto L0007d6;
+#L0007a2.   v0:= new [|java:lang:StringBuilder|];
+#L0007a6.   call temp:=  [|java:lang:StringBuilder.<init>|](v0) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L0007ac.   v2:= "KEYCODE_" @type (object, string);
+#L0007b0.   call temp:=  [|java:lang:StringBuilder.append|](v0, v2) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0007b6.   v0:= temp  @type object;
+#L0007b8.   v2:= 1  @length 4;
+#L0007ba.   v2:= v10[v2]  @type object;
+#L0007be.   call temp:=  [|java:lang:StringBuilder.append|](v0, v2) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0007c4.   v0:= temp  @type object;
+#L0007c6.   call temp:=  [|java:lang:StringBuilder.toString|](v0) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0007cc.   v0:= temp  @type object;
+#L0007ce.   call temp:=  [|android:view:KeyEvent.keyCodeFromString|](v0) @signature [|Landroid/view/KeyEvent;.keyCodeFromString:(Ljava/lang/String;)I|] @classDescriptor [|android:view:KeyEvent|] @type static;
+#L0007d4.   v7:= temp;
+#L0007d6.   call temp:=  [|com:android:commands:input:Input.sendKeyEvent|](v9, v7) @signature [|Lcom/android/commands/input/Input;.sendKeyEvent:(I)V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L0007dc.   goto L000714;
+#L0007de.   v0:= "tap" @type (object, string);
+#L0007e2.   call temp:=  [|java:lang:String.equals|](v6, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L0007e8.   v0:= temp;
+#L0007ea.   if v0 == 0 then goto L00081e;
+#L0007ee.   v0:= v10.length;
+#L0007f0.   if v0 != v4 then goto L000742;
+#L0007f4.   v0:= 4098  @length 16;
+#L0007f8.   v2:= 1  @length 4;
+#L0007fa.   v2:= v10[v2]  @type object;
+#L0007fe.   call temp:=  [|java:lang:Float.parseFloat|](v2) @signature [|Ljava/lang/Float;.parseFloat:(Ljava/lang/String;)F|] @classDescriptor [|java:lang:Float|] @type static;
+#L000804.   v2:= temp;
+#L000806.   v3:= 2  @length 4;
+#L000808.   v3:= v10[v3]  @type object;
+#L00080c.   call temp:=  [|java:lang:Float.parseFloat|](v3) @signature [|Ljava/lang/Float;.parseFloat:(Ljava/lang/String;)F|] @classDescriptor [|java:lang:Float|] @type static;
+#L000812.   v3:= temp;
+#L000814.   call temp:=  [|com:android:commands:input:Input.sendTap|](v9, v0, v2, v3) @signature [|Lcom/android/commands/input/Input;.sendTap:(IFF)V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L00081a.   goto L000714;
+#L00081e.   v0:= "swipe" @type (object, string);
+#L000822.   call temp:=  [|java:lang:String.equals|](v6, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000828.   v0:= temp;
+#L00082a.   if v0 == 0 then goto L00087e;
+#L00082e.   v0:= v10.length;
+#L000830.   v2:= 5  @length 4;
+#L000832.   if v0 != v2 then goto L000742;
+#L000836.   v1:= 4098  @length 16;
+#L00083a.   v0:= 1  @length 4;
+#L00083c.   v0:= v10[v0]  @type object;
+#L000840.   call temp:=  [|java:lang:Float.parseFloat|](v0) @signature [|Ljava/lang/Float;.parseFloat:(Ljava/lang/String;)F|] @classDescriptor [|java:lang:Float|] @type static;
+#L000846.   v2:= temp;
+#L000848.   v0:= 2  @length 4;
+#L00084a.   v0:= v10[v0]  @type object;
+#L00084e.   call temp:=  [|java:lang:Float.parseFloat|](v0) @signature [|Ljava/lang/Float;.parseFloat:(Ljava/lang/String;)F|] @classDescriptor [|java:lang:Float|] @type static;
+#L000854.   v3:= temp;
+#L000856.   v0:= 3  @length 4;
+#L000858.   v0:= v10[v0]  @type object;
+#L00085c.   call temp:=  [|java:lang:Float.parseFloat|](v0) @signature [|Ljava/lang/Float;.parseFloat:(Ljava/lang/String;)F|] @classDescriptor [|java:lang:Float|] @type static;
+#L000862.   v4:= temp;
+#L000864.   v0:= 4  @length 4;
+#L000866.   v0:= v10[v0]  @type object;
+#L00086a.   call temp:=  [|java:lang:Float.parseFloat|](v0) @signature [|Ljava/lang/Float;.parseFloat:(Ljava/lang/String;)F|] @classDescriptor [|java:lang:Float|] @type static;
+#L000870.   v5:= temp;
+#L000872.   v0:= v9  @type object;
+#L000874.   call temp:=  [|com:android:commands:input:Input.sendSwipe|](v0, v1, v2, v3, v4, v5) @signature [|Lcom/android/commands/input/Input;.sendSwipe:(IFFFF)V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L00087a.   goto L000714;
+#L00087e.   v0:= "touchscreen" @type (object, string);
+#L000882.   call temp:=  [|java:lang:String.equals|](v6, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000888.   v0:= temp;
+#L00088a.   if v0 != 0 then goto L00089e;
+#L00088e.   v0:= "touchpad" @type (object, string);
+#L000892.   call temp:=  [|java:lang:String.equals|](v6, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000898.   v0:= temp;
+#L00089a.   if v0 == 0 then goto L00095c;
+#L00089e.   v1:= 4098  @length 16;
+#L0008a2.   v0:= "touchpad" @type (object, string);
+#L0008a6.   call temp:=  [|java:lang:String.equals|](v6, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L0008ac.   v0:= temp;
+#L0008ae.   if v0 == 0 then goto L0008b8;
+#L0008b2.    v1:= 0.000000;
+#L0008b8.   v0:= v10.length;
+#L0008ba.   if v0 <= v2 then goto L000742;
+#L0008be.   v0:= 1  @length 4;
+#L0008c0.   v8:= v10[v0]  @type object;
+#L0008c4.   v0:= "tap" @type (object, string);
+#L0008c8.   call temp:=  [|java:lang:String.equals|](v8, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L0008ce.   v0:= temp;
+#L0008d0.   if v0 == 0 then goto L000900;
+#L0008d4.   v0:= v10.length;
+#L0008d6.   if v0 != v5 then goto L000742;
+#L0008da.   v0:= 2  @length 4;
+#L0008dc.   v0:= v10[v0]  @type object;
+#L0008e0.   call temp:=  [|java:lang:Float.parseFloat|](v0) @signature [|Ljava/lang/Float;.parseFloat:(Ljava/lang/String;)F|] @classDescriptor [|java:lang:Float|] @type static;
+#L0008e6.   v0:= temp;
+#L0008e8.   v2:= 3  @length 4;
+#L0008ea.   v2:= v10[v2]  @type object;
+#L0008ee.   call temp:=  [|java:lang:Float.parseFloat|](v2) @signature [|Ljava/lang/Float;.parseFloat:(Ljava/lang/String;)F|] @classDescriptor [|java:lang:Float|] @type static;
+#L0008f4.   v2:= temp;
+#L0008f6.   call temp:=  [|com:android:commands:input:Input.sendTap|](v9, v1, v0, v2) @signature [|Lcom/android/commands/input/Input;.sendTap:(IFF)V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L0008fc.   goto L000714;
+#L000900.   v0:= "swipe" @type (object, string);
+#L000904.   call temp:=  [|java:lang:String.equals|](v8, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L00090a.   v0:= temp;
+#L00090c.   if v0 == 0 then goto L000742;
+#L000910.   v0:= v10.length;
+#L000912.   v2:= 6  @length 4;
+#L000914.   if v0 != v2 then goto L000742;
+#L000918.   v0:= 2  @length 4;
+#L00091a.   v0:= v10[v0]  @type object;
+#L00091e.   call temp:=  [|java:lang:Float.parseFloat|](v0) @signature [|Ljava/lang/Float;.parseFloat:(Ljava/lang/String;)F|] @classDescriptor [|java:lang:Float|] @type static;
+#L000924.   v2:= temp;
+#L000926.   v0:= 3  @length 4;
+#L000928.   v0:= v10[v0]  @type object;
+#L00092c.   call temp:=  [|java:lang:Float.parseFloat|](v0) @signature [|Ljava/lang/Float;.parseFloat:(Ljava/lang/String;)F|] @classDescriptor [|java:lang:Float|] @type static;
+#L000932.   v3:= temp;
+#L000934.   v0:= 4  @length 4;
+#L000936.   v0:= v10[v0]  @type object;
+#L00093a.   call temp:=  [|java:lang:Float.parseFloat|](v0) @signature [|Ljava/lang/Float;.parseFloat:(Ljava/lang/String;)F|] @classDescriptor [|java:lang:Float|] @type static;
+#L000940.   v4:= temp;
+#L000942.   v0:= 5  @length 4;
+#L000944.   v0:= v10[v0]  @type object;
+#L000948.   call temp:=  [|java:lang:Float.parseFloat|](v0) @signature [|Ljava/lang/Float;.parseFloat:(Ljava/lang/String;)F|] @classDescriptor [|java:lang:Float|] @type static;
+#L00094e.   v5:= temp;
+#L000950.   v0:= v9  @type object;
+#L000952.   call temp:=  [|com:android:commands:input:Input.sendSwipe|](v0, v1, v2, v3, v4, v5) @signature [|Lcom/android/commands/input/Input;.sendSwipe:(IFFFF)V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L000958.   goto L000714;
+#L00095c.   v0:= "trackball" @type (object, string);
+#L000960.   call temp:=  [|java:lang:String.equals|](v6, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000966.   v0:= temp;
+#L000968.   if v0 == 0 then goto L0009de;
+#L00096c.   v0:= v10.length;
+#L00096e.   if v0 <= v2 then goto L000742;
+#L000972.   v0:= 1  @length 4;
+#L000974.   v8:= v10[v0]  @type object;
+#L000978.   v0:= "press" @type (object, string);
+#L00097c.   call temp:=  [|java:lang:String.equals|](v8, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000982.   v0:= temp;
+#L000984.   if v0 == 0 then goto L00099c;
+#L000988.    v0:= 0.000000;
+#L00098e.   v2:= 0  @length 4;
+#L000990.   v3:= 0  @length 4;
+#L000992.   call temp:=  [|com:android:commands:input:Input.sendTap|](v9, v0, v2, v3) @signature [|Lcom/android/commands/input/Input;.sendTap:(IFF)V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L000998.   goto L000714;
+#L00099c.   v0:= "roll" @type (object, string);
+#L0009a0.   call temp:=  [|java:lang:String.equals|](v8, v0) @signature [|Ljava/lang/String;.equals:(Ljava/lang/Object;)Z|] @classDescriptor [|java:lang:String|] @type virtual;
+#L0009a6.   v0:= temp;
+#L0009a8.   if v0 == 0 then goto L000742;
+#L0009ac.   v0:= v10.length;
+#L0009ae.   if v0 != v5 then goto L000742;
+#L0009b2.    v0:= 0.000000;
+#L0009b8.   v2:= 2  @length 4;
+#L0009ba.   v2:= v10[v2]  @type object;
+#L0009be.   call temp:=  [|java:lang:Float.parseFloat|](v2) @signature [|Ljava/lang/Float;.parseFloat:(Ljava/lang/String;)F|] @classDescriptor [|java:lang:Float|] @type static;
+#L0009c4.   v2:= temp;
+#L0009c6.   v3:= 3  @length 4;
+#L0009c8.   v3:= v10[v3]  @type object;
+#L0009cc.   call temp:=  [|java:lang:Float.parseFloat|](v3) @signature [|Ljava/lang/Float;.parseFloat:(Ljava/lang/String;)F|] @classDescriptor [|java:lang:Float|] @type static;
+#L0009d2.   v3:= temp;
+#L0009d4.   call temp:=  [|com:android:commands:input:Input.sendMove|](v9, v0, v2, v3) @signature [|Lcom/android/commands/input/Input;.sendMove:(IFF)V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L0009da.   goto L000714;
+#L0009de.   v0:= @@[|java:lang:System.err|]   @type object;
+#L0009e2.   v2:= new [|java:lang:StringBuilder|];
+#L0009e6.   call temp:=  [|java:lang:StringBuilder.<init>|](v2) @signature [|Ljava/lang/StringBuilder;.<init>:()V|] @classDescriptor [|java:lang:StringBuilder|] @type direct;
+#L0009ec.   v3:= "Error: Unknown command: " @type (object, string);
+#L0009f0.   call temp:=  [|java:lang:StringBuilder.append|](v2, v3) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0009f6.   v2:= temp  @type object;
+#L0009f8.   call temp:=  [|java:lang:StringBuilder.append|](v2, v6) @signature [|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L0009fe.   v2:= temp  @type object;
+#L000a00.   call temp:=  [|java:lang:StringBuilder.toString|](v2) @signature [|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuilder|] @type virtual;
+#L000a06.   v2:= temp  @type object;
+#L000a08.   call temp:=  [|java:io:PrintStream.println|](v0, v2) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000a0e.   call temp:=  [|com:android:commands:input:Input.showUsage|](v9) @signature [|Lcom/android/commands/input/Input;.showUsage:()V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L000a14.   goto L000714;
+  catch  [|java:lang:NumberFormatException|] @[L00071c..L00073e] goto L000740;
+  catch  [|java:lang:NumberFormatException|] @[L00077a..L000a14] goto L000740;
+
+   }
+    procedure [|void|] [|com:android:commands:input:Input.sendKeyEvent|] ([|com:android:commands:input:Input|] v13 @type (this), [|int|] v14) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.sendKeyEvent:(I)V|] @Access PRIVATE {
+      local temp ;
+        [|long|] v1 @varname [|now|] @scope ((L0004,L0029));
+
+
+        v0;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
+        v9;
+        v10;
+        v11;
+        v12;
+      
+#L000a3c.   call temp:=  [|android:os:SystemClock.uptimeMillis|]() @signature [|Landroid/os/SystemClock;.uptimeMillis:()J|] @classDescriptor [|android:os:SystemClock|] @type static;
+#L000a42.   v1:= temp  @type wide;
+#L000a44.   v0:= new [|android:view:KeyEvent|];
+#L000a48.   v5:= 0  @length 4;
+#L000a4a.   v7:= 0  @length 4;
+#L000a4c.   v8:= 0  @length 4;
+#L000a4e.   v9:= -1  @length 4;
+#L000a50.   v10:= 0  @length 4;
+#L000a52.   v11:= 0  @length 4;
+#L000a54.   v12:= 257  @length 16;
+#L000a58.   v3:= v1  @type wide;
+#L000a5a.   v6:= v14;
+#L000a5c.   call temp:=  [|android:view:KeyEvent.<init>|](v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12) @signature [|Landroid/view/KeyEvent;.<init>:(JJIIIIIIII)V|] @classDescriptor [|android:view:KeyEvent|] @type direct;
+#L000a62.   call temp:=  [|com:android:commands:input:Input.injectKeyEvent|](v13, v0) @signature [|Lcom/android/commands/input/Input;.injectKeyEvent:(Landroid/view/KeyEvent;)V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L000a68.   v0:= new [|android:view:KeyEvent|];
+#L000a6c.   v5:= 1  @length 4;
+#L000a6e.   v7:= 0  @length 4;
+#L000a70.   v8:= 0  @length 4;
+#L000a72.   v9:= -1  @length 4;
+#L000a74.   v10:= 0  @length 4;
+#L000a76.   v11:= 0  @length 4;
+#L000a78.   v12:= 257  @length 16;
+#L000a7c.   v3:= v1  @type wide;
+#L000a7e.   v6:= v14;
+#L000a80.   call temp:=  [|android:view:KeyEvent.<init>|](v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12) @signature [|Landroid/view/KeyEvent;.<init>:(JJIIIIIIII)V|] @classDescriptor [|android:view:KeyEvent|] @type direct;
+#L000a86.   call temp:=  [|com:android:commands:input:Input.injectKeyEvent|](v13, v0) @signature [|Lcom/android/commands/input/Input;.injectKeyEvent:(Landroid/view/KeyEvent;)V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L000a8c.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:input:Input.sendMove|] ([|com:android:commands:input:Input|] v8 @type (this), [|int|] v9, [|float|] v10, [|float|] v11) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.sendMove:(IFF)V|] @Access PRIVATE {
+      local temp ;
+        [|long|] v3 @varname [|now|] @scope ((L0004,L000e));
+
+
+
+
+        v0;
+        v1;
+        v2;
+        v4;
+        v5;
+        v6;
+        v7;
+      
+#L000aa0.   call temp:=  [|android:os:SystemClock.uptimeMillis|]() @signature [|Landroid/os/SystemClock;.uptimeMillis:()J|] @classDescriptor [|android:os:SystemClock|] @type static;
+#L000aa6.   v3:= temp  @type wide;
+#L000aa8.   v2:= 2  @length 4;
+#L000aaa.   v7:= 0  @length 4;
+#L000aac.   v0:= v8  @type object;
+#L000aae.   v1:= v9;
+#L000ab0.   v5:= v10;
+#L000ab2.   v6:= v11;
+#L000ab4.   call temp:=  [|com:android:commands:input:Input.injectMotionEvent|](v0, v1, v2, v3, v4, v5, v6, v7) @signature [|Lcom/android/commands/input/Input;.injectMotionEvent:(IIJFFF)V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L000aba.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:input:Input.sendSwipe|] ([|com:android:commands:input:Input|] v12 @type (this), [|int|] v13, [|float|] v14, [|float|] v15, [|float|] v16, [|float|] v17) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.sendSwipe:(IFFFF)V|] @Access PRIVATE {
+      local temp ;
+        [|float|] v10 @varname [|alpha|] @scope ((L001a,L0031));
+        [|long|] v4 @varname [|now|] @scope ((L0006,L003b));
+        [|int|] v9 @varname [|NUM_STEPS|] @scope ((L0002,L003b));
+        [|int|] v11 @varname [|i|] @scope ((L0011,L003b));
+
+
+
+
+
+
+        v0;
+        v1;
+        v2;
+        v3;
+        v5;
+        v6;
+        v7;
+        v8;
+      
+#L000acc.   v9:= 11  @length 16;
+#L000ad0.   call temp:=  [|android:os:SystemClock.uptimeMillis|]() @signature [|Landroid/os/SystemClock;.uptimeMillis:()J|] @classDescriptor [|android:os:SystemClock|] @type static;
+#L000ad6.   v4:= temp  @type wide;
+#L000ad8.   v3:= 0  @length 4;
+#L000ada.   v8:= 1065353216  @length high16;
+#L000ade.   v1:= v12  @type object;
+#L000ae0.   v2:= v13;
+#L000ae2.   v6:= v14;
+#L000ae4.   v7:= v15;
+#L000ae6.   call temp:=  [|com:android:commands:input:Input.injectMotionEvent|](v1, v2, v3, v4, v5, v6, v7, v8) @signature [|Lcom/android/commands/input/Input;.injectMotionEvent:(IIJFFF)V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L000aec.   v11:= 1  @length 4;
+#L000aee.   v1:= 11  @length 16;
+#L000af2.   if v11 >= v1 then goto L000b2e;
+#L000af6.   v1:= (float)v11  @type i2f;
+#L000af8.   v2:= 1093664768  @length high16;
+#L000afc.   v10:= v1 / v2  @type float;
+#L000b00.   v3:= 2  @length 4;
+#L000b02.   v0:= v16;
+#L000b06.   call temp:=  [|com:android:commands:input:Input.lerp|](v14, v0, v10) @signature [|Lcom/android/commands/input/Input;.lerp:(FFF)F|] @classDescriptor [|com:android:commands:input:Input|] @type static;
+#L000b0c.   v6:= temp;
+#L000b0e.   v0:= v17;
+#L000b12.   call temp:=  [|com:android:commands:input:Input.lerp|](v15, v0, v10) @signature [|Lcom/android/commands/input/Input;.lerp:(FFF)F|] @classDescriptor [|com:android:commands:input:Input|] @type static;
+#L000b18.   v7:= temp;
+#L000b1a.   v8:= 1065353216  @length high16;
+#L000b1e.   v1:= v12  @type object;
+#L000b20.   v2:= v13;
+#L000b22.   call temp:=  [|com:android:commands:input:Input.injectMotionEvent|](v1, v2, v3, v4, v5, v6, v7, v8) @signature [|Lcom/android/commands/input/Input;.injectMotionEvent:(IIJFFF)V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L000b28.   v11:= v11 + 1;
+#L000b2c.   goto L000aee;
+#L000b2e.   v3:= 1  @length 4;
+#L000b30.   v8:= 0  @length 4;
+#L000b32.   v1:= v12  @type object;
+#L000b34.   v2:= v13;
+#L000b36.   v6:= v14;
+#L000b38.   v7:= v15;
+#L000b3a.   call temp:=  [|com:android:commands:input:Input.injectMotionEvent|](v1, v2, v3, v4, v5, v6, v7, v8) @signature [|Lcom/android/commands/input/Input;.injectMotionEvent:(IIJFFF)V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L000b40.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:input:Input.sendTap|] ([|com:android:commands:input:Input|] v8 @type (this), [|int|] v9, [|float|] v10, [|float|] v11) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.sendTap:(IFF)V|] @Access PRIVATE {
+      local temp ;
+        [|long|] v3 @varname [|now|] @scope ((L0004,L0018));
+
+
+
+
+        v0;
+        v1;
+        v2;
+        v4;
+        v5;
+        v6;
+        v7;
+      
+#L000b54.   call temp:=  [|android:os:SystemClock.uptimeMillis|]() @signature [|Landroid/os/SystemClock;.uptimeMillis:()J|] @classDescriptor [|android:os:SystemClock|] @type static;
+#L000b5a.   v3:= temp  @type wide;
+#L000b5c.   v2:= 0  @length 4;
+#L000b5e.   v7:= 1065353216  @length high16;
+#L000b62.   v0:= v8  @type object;
+#L000b64.   v1:= v9;
+#L000b66.   v5:= v10;
+#L000b68.   v6:= v11;
+#L000b6a.   call temp:=  [|com:android:commands:input:Input.injectMotionEvent|](v0, v1, v2, v3, v4, v5, v6, v7) @signature [|Lcom/android/commands/input/Input;.injectMotionEvent:(IIJFFF)V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L000b70.   v2:= 1  @length 4;
+#L000b72.   v7:= 0  @length 4;
+#L000b74.   v0:= v8  @type object;
+#L000b76.   v1:= v9;
+#L000b78.   v5:= v10;
+#L000b7a.   v6:= v11;
+#L000b7c.   call temp:=  [|com:android:commands:input:Input.injectMotionEvent|](v0, v1, v2, v3, v4, v5, v6, v7) @signature [|Lcom/android/commands/input/Input;.injectMotionEvent:(IIJFFF)V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L000b82.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:input:Input.sendText|] ([|com:android:commands:input:Input|] v8 @type (this), [|java:lang:String|] v9 @type (object)) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.sendText:(Ljava/lang/String;)V|] @Access PRIVATE {
+      local temp ;
+        [|java:lang:StringBuffer|] v0 @varname [|buff|] @scope ((L0005,L004c));
+        [|char|][] v1 @varname [|chars|] @scope ((L0036,L004c));
+        [|boolean|] v2 @varname [|escapeFlag|] @scope ((L0006,L004c));
+        [|android:view:KeyEvent|][] v3 @varname [|events|] @scope ((L003f,L004c));
+        [|int|] v4 @varname [|i|] @scope ((L0007,L004c));
+        [|android:view:KeyCharacterMap|] v5 @varname [|kcm|] @scope ((L003b,L004c));
+
+
+        v6;
+        v7;
+      
+#L000b94.   v0:= new [|java:lang:StringBuffer|];
+#L000b98.   call temp:=  [|java:lang:StringBuffer.<init>|](v0, v9) @signature [|Ljava/lang/StringBuffer;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:StringBuffer|] @type direct;
+#L000b9e.   v2:= 0  @length 4;
+#L000ba0.   v4:= 0  @length 4;
+#L000ba2.   call temp:=  [|java:lang:StringBuffer.length|](v0) @signature [|Ljava/lang/StringBuffer;.length:()I|] @classDescriptor [|java:lang:StringBuffer|] @type virtual;
+#L000ba8.   v6:= temp;
+#L000baa.   if v4 >= v6 then goto L000bf0;
+#L000bae.   if v2 == 0 then goto L000bd8;
+#L000bb2.   v2:= 0  @length 4;
+#L000bb4.   call temp:=  [|java:lang:StringBuffer.charAt|](v0, v4) @signature [|Ljava/lang/StringBuffer;.charAt:(I)C|] @classDescriptor [|java:lang:StringBuffer|] @type virtual;
+#L000bba.   v6:= temp;
+#L000bbc.   v7:= 115  @length 16;
+#L000bc0.   if v6 != v7 then goto L000bd8;
+#L000bc4.   v6:= 32  @length 16;
+#L000bc8.   call temp:=  [|java:lang:StringBuffer.setCharAt|](v0, v4, v6) @signature [|Ljava/lang/StringBuffer;.setCharAt:(IC)V|] @classDescriptor [|java:lang:StringBuffer|] @type virtual;
+#L000bce.   v4:= v4 + -1;
+#L000bd2.   call temp:=  [|java:lang:StringBuffer.deleteCharAt|](v0, v4) @signature [|Ljava/lang/StringBuffer;.deleteCharAt:(I)Ljava/lang/StringBuffer;|] @classDescriptor [|java:lang:StringBuffer|] @type virtual;
+#L000bd8.   call temp:=  [|java:lang:StringBuffer.charAt|](v0, v4) @signature [|Ljava/lang/StringBuffer;.charAt:(I)C|] @classDescriptor [|java:lang:StringBuffer|] @type virtual;
+#L000bde.   v6:= temp;
+#L000be0.   v7:= 37  @length 16;
+#L000be4.   if v6 != v7 then goto L000bea;
+#L000be8.   v2:= 1  @length 4;
+#L000bea.   v4:= v4 + 1;
+#L000bee.   goto L000ba2;
+#L000bf0.   call temp:=  [|java:lang:StringBuffer.toString|](v0) @signature [|Ljava/lang/StringBuffer;.toString:()Ljava/lang/String;|] @classDescriptor [|java:lang:StringBuffer|] @type virtual;
+#L000bf6.   v6:= temp  @type object;
+#L000bf8.   call temp:=  [|java:lang:String.toCharArray|](v6) @signature [|Ljava/lang/String;.toCharArray:()[C|] @classDescriptor [|java:lang:String|] @type virtual;
+#L000bfe.   v1:= temp  @type object;
+#L000c00.   v6:= -1  @length 4;
+#L000c02.   call temp:=  [|android:view:KeyCharacterMap.load|](v6) @signature [|Landroid/view/KeyCharacterMap;.load:(I)Landroid/view/KeyCharacterMap;|] @classDescriptor [|android:view:KeyCharacterMap|] @type static;
+#L000c08.   v5:= temp  @type object;
+#L000c0a.   call temp:=  [|android:view:KeyCharacterMap.getEvents|](v5, v1) @signature [|Landroid/view/KeyCharacterMap;.getEvents:([C)[Landroid/view/KeyEvent;|] @classDescriptor [|android:view:KeyCharacterMap|] @type virtual;
+#L000c10.   v3:= temp  @type object;
+#L000c12.   v4:= 0  @length 4;
+#L000c14.   v6:= v3.length;
+#L000c16.   if v4 >= v6 then goto L000c2a;
+#L000c1a.   v6:= v3[v4]  @type object;
+#L000c1e.   call temp:=  [|com:android:commands:input:Input.injectKeyEvent|](v8, v6) @signature [|Lcom/android/commands/input/Input;.injectKeyEvent:(Landroid/view/KeyEvent;)V|] @classDescriptor [|com:android:commands:input:Input|] @type direct;
+#L000c24.   v4:= v4 + 1;
+#L000c28.   goto L000c14;
+#L000c2a.   return @void ;
+
+   }
+    procedure [|void|] [|com:android:commands:input:Input.showUsage|] ([|com:android:commands:input:Input|] v2 @type (this)) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.showUsage:()V|] @Access PRIVATE {
+      local temp ;
+
+        v0;
+        v1;
+      
+#L000c3c.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000c40.   v1:= "usage: input ..." @type (object, string);
+#L000c44.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000c4a.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000c4e.   v1:= "       input text <string>" @type (object, string);
+#L000c52.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000c58.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000c5c.   v1:= "       input keyevent <key code number or name>" @type (object, string);
+#L000c60.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000c66.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000c6a.   v1:= "       input [touchscreen|touchpad] tap <x> <y>" @type (object, string);
+#L000c6e.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000c74.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000c78.   v1:= "       input [touchscreen|touchpad] swipe <x1> <y1> <x2> <y2>" @type (object, string);
+#L000c7c.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000c82.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000c86.   v1:= "       input trackball press" @type (object, string);
+#L000c8a.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000c90.   v0:= @@[|java:lang:System.err|]   @type object;
+#L000c94.   v1:= "       input trackball roll <dx> <dy>" @type (object, string);
+#L000c98.   call temp:=  [|java:io:PrintStream.println|](v0, v1) @signature [|Ljava/io/PrintStream;.println:(Ljava/lang/String;)V|] @classDescriptor [|java:io:PrintStream|] @type virtual;
+#L000c9e.   return @void ;
+
+   }

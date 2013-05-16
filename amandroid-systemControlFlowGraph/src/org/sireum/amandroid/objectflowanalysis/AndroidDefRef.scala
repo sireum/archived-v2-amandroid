@@ -8,6 +8,7 @@ import org.sireum.util._
 import org.sireum.alir.Slot
 import org.sireum.pilar.symbol.H
 import org.sireum.alir.VarSlot
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 
 
 final class AndroidVarAccesses(st: SymbolTable) extends VarAccesses {
@@ -79,7 +80,7 @@ final class AndroidVarAccesses(st: SymbolTable) extends VarAccesses {
 }
 
 
-final class AndroidDefRef(st: SymbolTable, val varAccesses: VarAccesses)
+final class AndroidDefRef(st: SymbolTable, val varAccesses: VarAccesses, alit : AndroidLibInfoTables)
   extends DefRef {
 
   def definitions(a: Assignment): ISet[Slot] = {
@@ -93,7 +94,14 @@ final class AndroidDefRef(st: SymbolTable, val varAccesses: VarAccesses)
       val lhss = PilarAstUtil.getLHSs(a)
       var result = isetEmpty[Slot]
       for (ne @ NameExp(_) <- lhss.keys) {
-        result = result + VarSlot(ne.name.uri)
+        var uri : ResourceUri = null
+        if(!ne.name.hasResourceInfo){
+          
+        	uri = alit.getGlobalVarUriByName(ne.name.name)
+        } else {
+          uri = ne.name.uri
+        }
+        result = result + VarSlot(uri)
       }
       result
     })
