@@ -25,15 +25,13 @@ http://www.eclipse.org/legal/epl-v10.html
 
 object AndroidInterIntraProcedural {
   type VirtualLabel = String
+  type Node = OfaNode
   type CFG = ControlFlowGraph[VirtualLabel]
-  
   type RDA = ReachingDefinitionAnalysis.Result  //adding for rda building
   
   type CCFG = CompressedControlFlowGraph[VirtualLabel]
   type OFG = ObjectFlowGraph[OfaNode]
-  type OFAsCfg = SystemControlFlowGraph[VirtualLabel]
-  type SCFG = SystemControlFlowGraph[VirtualLabel]
-  // type CSCFG = SystemControlFlowGraph[VirtualLabel]
+  type OFAsCfg = MMap[ResourceUri, (ObjectFlowGraph[OfaNode], SystemControlFlowGraph[String])]
   
   final case class AndroidIntraAnalysisResult(
     pool : AlirIntraProceduralGraph.NodePool,
@@ -86,12 +84,6 @@ case class AndroidInterIntraProcedural(
   
   @Input
   shouldBuildOFAsCfg : Boolean = false,
-  
-  @Input
-  shouldBuildSCfg : Boolean = false,
-  
-  @Input
-  shouldBuildCSCfg : Boolean = false,
   
   @Input
   APIpermOpt : scala.Option[MMap[ResourceUri, MList[String]]] = None,
@@ -212,6 +204,9 @@ case class OFAsCfg(
   @Input 
   rdas : MMap[ResourceUri, ReachingDefinitionAnalysis.Result],
   
+  @Input 
+  cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
+  
   @Input
   procedureSymbolTables : Seq[ProcedureSymbolTable],
 
@@ -221,46 +216,46 @@ case class OFAsCfg(
   // for test now. Later will change it.
   @Output
   @Produce
-  OFAsCfg : SystemControlFlowGraph[String])
+  OFAsCfg : AndroidInterIntraProcedural.OFAsCfg)
   
-case class sCfg(
-  title : String = "System Control Flow Graph Builder",
-
-  @Input
-  androidCache : scala.Option[AndroidCacheFile[ResourceUri]] = None,
-  
-  @Input 
-  cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
-
-  @Input
-  androidLibInfoTables : AndroidLibInfoTables,
-  
-  @Output
-  @Produce
-  sCfg : SystemControlFlowGraph[String])
-  
-  
-  case class csCfg(
-  title : String = "Compressed System Control Flow Graph Builder",
-
-  @Input
-  androidCache : scala.Option[AndroidCacheFile[ResourceUri]] = None,
-  
-  @Input 
-  cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
-
-  @Input
-  androidLibInfoTables : AndroidLibInfoTables,
-  
-  @Input
-  sCfg : SystemControlFlowGraph[String],
-  
-  @Input
-  APIperm : MMap[ResourceUri, MList[String]],  // MList will contain the list of permission strings for one API
-  
-  @Output
-  @Produce
-  csCfg : SystemControlFlowGraph[String])
+//case class sCfg(
+//  title : String = "System Control Flow Graph Builder",
+//
+//  @Input
+//  androidCache : scala.Option[AndroidCacheFile[ResourceUri]] = None,
+//  
+//  @Input 
+//  cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
+//
+//  @Input
+//  androidLibInfoTables : AndroidLibInfoTables,
+//  
+//  @Output
+//  @Produce
+//  sCfg : SystemControlFlowGraph[String])
+//  
+//  
+//  case class csCfg(
+//  title : String = "Compressed System Control Flow Graph Builder",
+//
+//  @Input
+//  androidCache : scala.Option[AndroidCacheFile[ResourceUri]] = None,
+//  
+//  @Input 
+//  cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
+//
+//  @Input
+//  androidLibInfoTables : AndroidLibInfoTables,
+//  
+//  @Input
+//  sCfg : SystemControlFlowGraph[String],
+//  
+//  @Input
+//  APIperm : MMap[ResourceUri, MList[String]],  // MList will contain the list of permission strings for one API
+//  
+//  @Output
+//  @Produce
+//  csCfg : SystemControlFlowGraph[String])
   
   
 /**
@@ -277,9 +272,7 @@ object AndroidInterIntraProceduralModuleBuild {
         Rda.getClass().getName().dropRight(1),
         OFAPreprocess.getClass().getName().dropRight(1),
         cCfg.getClass().getName().dropRight(1),
-        OFAsCfg.getClass().getName().dropRight(1),
-        sCfg.getClass().getName().dropRight(1),
-        csCfg.getClass().getName().dropRight(1)
+        OFAsCfg.getClass().getName().dropRight(1)
         )
     opt.dir = "./src/org/sireum/amandroid/module"
     opt.genClassName = "AndroidInterIntraProceduralModuleCore"

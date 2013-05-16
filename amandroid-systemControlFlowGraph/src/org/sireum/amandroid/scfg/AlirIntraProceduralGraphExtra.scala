@@ -2,6 +2,7 @@ package org.sireum.amandroid.scfg
 
 import org.sireum.alir.AlirIntraProceduralNode
 import org.sireum.alir.AlirIntraProceduralGraph
+import org.sireum.util.ResourceUri
 
 
 
@@ -20,7 +21,24 @@ trait AlirIntraProceduralGraphExtra
 
   def deleteEdge(e : Edge) = graph.removeEdge(e)
 
- 
+  def addNode(procUri : ResourceUri, locUri : ResourceUri, locIndex : Int) : Node = {
+     val extdLocUri = procUri + "." + locUri
+     val node = newNode(Option(extdLocUri), locIndex).asInstanceOf[Node]
+     val n =
+      if (pool.contains(node)) pool(node)
+      else {
+        pool(node) = node
+        node
+      }
+     graph.addVertex(n)
+     n
+   }
+
+  def getNode(procUri : ResourceUri, locUri : ResourceUri, locIndex : Int) : Node =
+  {
+    val extdLocUri =    procUri + "." + locUri
+    pool(newNode(Option(extdLocUri), locIndex).asInstanceOf[Node])
+  }
   
 }
 

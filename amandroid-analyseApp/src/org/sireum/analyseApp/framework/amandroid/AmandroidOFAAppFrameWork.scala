@@ -105,6 +105,7 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
         AndroidInterIntraProceduralModule.setAndroidCache(options, Some(aCache))
         AndroidInterIntraProceduralModule.setShouldBuildCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildRda(options, true)
+        AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildOFAsCfg(options, true)
         
         // experimental code starts which does not have any significant role now; later we will delete it after some related cleaning 

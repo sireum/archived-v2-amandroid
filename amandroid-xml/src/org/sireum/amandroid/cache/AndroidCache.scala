@@ -55,10 +55,10 @@ final class AndroidCacheFile[K] extends CacheProvider[K] with FileCaseFactory[K]
   
   def load[T](key : K, fileName : K) : T = {
     require(!rootDirectory.equals(null))
-    if(cacheMap.contains(key)){
-      cacheUpdate(key)
-      cacheMap(key)._1.asInstanceOf[T]
-    } else {
+//    if(cacheMap.contains(key)){
+//      cacheUpdate(key)
+//      cacheMap(key)._1.asInstanceOf[T]
+//    } else {
       setFileInputStream(key, fileName)
       val value = unSerializer(inner).asInstanceOf[T]
       inner.close()
@@ -71,7 +71,7 @@ final class AndroidCacheFile[K] extends CacheProvider[K] with FileCaseFactory[K]
         cacheMap(key) = (value, 1)
       }
       value
-    }
+//    }
   }
   
   def setCacheSize(s : Int) = {

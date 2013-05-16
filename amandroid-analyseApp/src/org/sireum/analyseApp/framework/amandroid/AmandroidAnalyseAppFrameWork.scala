@@ -102,9 +102,7 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
         PilarAndroidSymbolResolverModule.setHasExistingAndroidLibInfoTables(options, Option(libInfoTables))
         AndroidInterIntraProceduralModule.setAndroidCache(options, Some(aCache))
         AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
-        AndroidInterIntraProceduralModule.setShouldBuildSCfg(options, true)
-        AndroidInterIntraProceduralModule.setShouldBuildCSCfg(options, true) // CSCFG = compressed system-wide control flow graph of an app X
-  
+        
         // experimental code starts which does not have any significant role now; later we will delete it after some related cleaning 
         
         val apiPermission : MMap[ResourceUri, MList[String]] = mmapEmpty
