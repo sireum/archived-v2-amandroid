@@ -338,7 +338,47 @@ class AndroidLibInfoResolver
       }
       else null
     }
-
+// sankar starts
+  
+   def getRecOfProc(procedureUri : ResourceUri) : ResourceUri = {
+     //println("procUri = " + procedureUri)
+			//     val sig = getSignatureByProcedureUri(procedureUri)
+			//     println("sig = " + sig)
+			//     val inside = getInside(sig)
+			//     println("owner = " + inside.substring(0, inside.indexOf(";")))
+     // an example pUri is pilar:/procedure/default/%5B%7Cde:mobinauten:smsspy:EmergencyTask.onProviderDisabled%7C%5D/1/23/c91e7bf8
+     val temp = procedureUri.split("%5B%7C")(1)
+     val owner = temp.substring(0, temp.indexOf(".")) // e.g. de:mobinauten:smsspy:EmergencyTask
+     //println("owner = " + owner)
+     // val owner = inside.substring(0, inside.indexOf(";"))
+     var rec = getRecordUri("[|" + owner + "|]")
+		//      println("rec1 =" + rec)
+		//	     // below is a longer alternative way of doing the above
+		//	      tables.recordProcedureTable.keySet.foreach{
+		//	        item => 
+		//	          val procs = tables.recordProcedureTable.get(item)
+		//	          if(procs.contains(procedureUri))
+		//	            rec = item
+		//	      }
+		//      println("rec2 =" + rec)
+      rec
+    }
+   
+   def getParents(recordUri : ResourceUri) : MSet[ResourceUri] ={
+     if(tables.recordHierarchyTable.keySet.contains(recordUri))
+       tables.recordHierarchyTable.get(recordUri)
+     else msetEmpty
+   }
+  
+   def getSignatureByProcedureUri(pUri : String) : ResourceUri = {
+      if(tables.procedureUriTable.inverse().contains(pUri))
+        tables.procedureUriTable.inverse().get(pUri)
+      else null
+    }
+    
+   
+ // sankar ends
+  
   def getProcedureUriBySignature(sig : String) : ResourceUri = {
       if(tables.procedureUriTable.contains(sig))
         tables.procedureUriTable.get(sig)
@@ -405,6 +445,14 @@ class AndroidLibInfoResolver
         false
       }
     }
+    // sankar adds isOverrider
+    def isOverrider(procUri1 : ResourceUri, procUri2 : ResourceUri) : Boolean = {      
+      if(isConstructor(procUri1) || isConstructor(procUri2))
+        false
+      else
+        sigEqual(procUri1, procUri2)
+    }
+    
     
     def mergeWith(anotherVmTables : AndroidLibInfoTables) = {
       combineTables(anotherVmTables)

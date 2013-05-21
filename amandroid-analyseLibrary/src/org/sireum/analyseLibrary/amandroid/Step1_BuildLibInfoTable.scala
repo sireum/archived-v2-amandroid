@@ -13,7 +13,7 @@ import org.sireum.analyseLibrary.framework.amandroid.BuildLibInfoTableFramework
 class BuildLibInfoTable extends BuildLibInfoTableFramework{
   AmandroidAndroidLibraryFiles.dexModelFiles.
   foreach{fileUri=>
-//     if(fileUri.indexOf("android.policy.jar") > 0)
+//    if(fileUri.indexOf("android.policy.jar") > 0)
     Analyzing title fileUri init fileUri
   }
   

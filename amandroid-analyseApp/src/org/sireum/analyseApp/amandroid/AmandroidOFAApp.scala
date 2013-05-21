@@ -46,8 +46,11 @@ class AmandroidOFAApp extends AmandroidOFAAppFrameWork{
 //      }  
 //  )
   
+  //println("libInfoDir = " + libInfoDir)
+  
   AmandroidFiles.pilarModelFiles.
   foreach{fileUri=>
+    println(fileUri)
      if(fileUri.indexOf("0eb4b") > 0)
       Analyzing title fileUri file(fileUri, libInfoTables, aCache)
   }

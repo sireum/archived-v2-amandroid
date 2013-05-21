@@ -12,6 +12,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 import org.sireum.amandroid.objectflowanalysis._
+import scala.collection.JavaConversions._
 
 class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLabel] {
 
@@ -38,30 +39,55 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
             androidLibInfoTables : AndroidLibInfoTables,
             androidCache : AndroidCacheFile[String])
    : MMap[ResourceUri, (ObjectFlowGraph[Node], SystemControlFlowGraph[String])] = {
+    val preResults : MMap[ResourceUri, (ObjectFlowGraph[Node])] = mmapEmpty
+    val aggPreOfg = new ObjectFlowGraph[Node] // represents the aggregate of preliminary Ofgs of entryPoints
     val results : MMap[ResourceUri, (ObjectFlowGraph[Node], SystemControlFlowGraph[String])] = mmapEmpty
     val entryPoints : MSet[ResourceUri] = msetEmpty
+    
     psts.foreach(
       pst =>{
-        if(pst.procedureUri.contains(".onStartCommand")) entryPoints += pst.procedureUri
+        //if(pst.procedureUri.contains(".onStartCommand")) entryPoints += pst.procedureUri
         pstMap(pst.procedureUri) = pst
       }  
     )
+    
+    
+    entryPoints ++= new EntryPointCollector().getEntryPoints(pstMap, androidLibInfoTables)   
+ 
+    
     this.cfgs = cfgs
     this.rdas = rdas
     this.cCfgs = cCfgs
+    
     entryPoints.foreach(
         ep => {
-          processed = mmapEmpty
           val ofg = new ObjectFlowGraph[Node]
-          val sCfg = new sCfg[String]
           val cfg = cfgs(ep)
           val rda = rdas(ep)
           val cCfg = cCfgs(ep)
-          doOFA(pstMap(ep), cfg, rda, cCfg, ofg, sCfg, androidLibInfoTables, androidCache)
-          results(ep) = (ofg, sCfg)
-          processed.clear
+          doPreOFA(pstMap(ep), cfg, rda, cCfg, ofg, androidLibInfoTables, androidCache)
+          preResults(ep) = ofg
+          aggPreOfg.combineOfgs(ofg)         
         }
     )
+    
+    val sCfg = new sCfg[String]
+    
+    val ep = entryPoints.head
+    
+//    entryPoints.foreach(
+//        ep => {
+          processed = mmapEmpty
+          //val ofg = new ObjectFlowGraph[Node]
+          //val sCfg = new sCfg[String]
+          val cfg = cfgs(ep)
+          val rda = rdas(ep)
+          val cCfg = cCfgs(ep)
+          doOFA(pstMap(ep), cfg, rda, cCfg, aggPreOfg, sCfg, androidLibInfoTables, androidCache)
+          results(ep) = (aggPreOfg, sCfg)
+          processed.clear
+//        }
+//    )
     results.keys.foreach(
       key=> {
         val result = results(key)
@@ -88,6 +114,20 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
     pstMap.clear
     
     results
+  }
+  
+  
+   def doPreOFA(pst : ProcedureSymbolTable,
+            cfg : ControlFlowGraph[String],
+            rda : ReachingDefinitionAnalysis.Result,
+            cCfg : CompressedControlFlowGraph[String],
+            ofg : ObjectFlowGraph[Node],
+            androidLibInfoTables : AndroidLibInfoTables,
+            androidCache : AndroidCacheFile[String]) = {
+    val points = new PointsCollector[Node]().points(pst, ofg)
+    ofg.points ++= points
+    ofg.constructGraph(points, cfg, rda)
+    
   }
   
   def doOFA(pst : ProcedureSymbolTable,

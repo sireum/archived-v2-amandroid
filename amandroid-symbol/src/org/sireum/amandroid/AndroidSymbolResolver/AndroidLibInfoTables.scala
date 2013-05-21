@@ -10,7 +10,9 @@ import java.util.HashSet
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 trait AndroidLibInfoTables {
+  def getRecOfProc(procedureUri : ResourceUri) : ResourceUri  // returns owner recordUri of the procedureUri
   def getRecordUri(recordName : String) : ResourceUri
+  def getParents(recordUri : ResourceUri) : MSet[ResourceUri]  // returns the parent-recordUris of recordUri
   def getProcedureUriBySignature(sig : String) : ResourceUri
   def getProcedureUrisByRecordUri(recordUri : ResourceUri) : java.util.Set[ResourceUri]
   def getProcedureSigsByRecordUri(recordUri : ResourceUri) : MSet[ResourceUri]
@@ -20,6 +22,7 @@ trait AndroidLibInfoTables {
   def isConstructor(sig : String) : Boolean
   def isStaticMethod(sig : String) : Boolean
   def isVirtualMethod(sig : String) : Boolean
+  def isOverrider(sig1 : String, sig2 : String) : Boolean  // checks if a pUri (sig1) is overrider of another pUri (sig2) 
   def mergeWith(anotherVmTables : AndroidLibInfoTables)
 }
 
