@@ -5,6 +5,8 @@ import org.scalatest.junit.JUnitRunner
 import org.sireum.androidLibraryFile.amandroid.AmandroidAndroidLibraryXmlFiles
 import org.sireum.androidLibraryFile.amandroid.AmandroidAndroidLibraryFiles
 import org.sireum.analyseLibrary.framework.amandroid.BuildLibInfoTableFramework
+import org.sireum.androidLibraryFile.amandroid.AmandroidAndroidLibrarySplitPilarFiles
+import org.sireum.androidLibraryFile.amandroid.AmandroidAndroidLibraryPilarFiles
 /*
  * Fengguo Wei, Kansas State University. Implement this libvmtable building step.
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>                           
@@ -16,5 +18,8 @@ class BuildLibInfoTable extends BuildLibInfoTableFramework{
 //     if(fileUri.indexOf("android.policy.jar") > 0)
     Analyzing title fileUri init fileUri
   }
-  
+  AmandroidAndroidLibraryPilarFiles.pilarModelFiles.
+  foreach{fileUri=>
+    Analyzing title fileUri init fileUri
+  }
 }
