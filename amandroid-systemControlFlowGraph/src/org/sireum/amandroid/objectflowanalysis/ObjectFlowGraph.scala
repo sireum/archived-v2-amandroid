@@ -19,7 +19,8 @@ class ObjectFlowGraph[Node <: OfaNode]
   extends AlirGraph[Node]
   with AlirEdgeAccesses[Node]
   with AlirSuccPredAccesses[Node]
-  with ConstraintModel {
+  with ConstraintModel
+  with StringAnalyseModel {
 
   self=>
   
@@ -74,7 +75,7 @@ class ObjectFlowGraph[Node <: OfaNode]
   /**
    * combine two ofgs into one, and combine all repos inside two ofgs.
    */ 
-  def combineOfgs(ofg2 : ObjectFlowGraph[Node]) = {
+  def combineOfgs(ofg2 : ObjectFlowGraph[Node]) : PointProc = {
     pool ++= ofg2.pool
     ofg2.nodes.foreach(
       node=>{
@@ -92,8 +93,32 @@ class ObjectFlowGraph[Node <: OfaNode]
     staticMethodList ++= ofg2.staticMethodList
     arrayRepo ++= ofg2.arrayRepo
     points ++= ofg2.points
+    val ps = ofg2.points.filter(p => if(p.isInstanceOf[PointProc])true else false)
+    ps(0).asInstanceOf[PointProc]
   }
   
+  /**
+   * combine string ofg into current ofg. (just combine proc point and relevant node)
+   */ 
+  def combineStringOfg(sig : ResourceUri, stringOfg : ObjectFlowGraph[Node]) : PointProc = {
+    val ps = stringOfg.points.filter(p => if(p.isInstanceOf[PointProc])true else false)
+    points ++= ps
+    val procP : PointProc = ps(0).asInstanceOf[PointProc]
+    collectNodes(procP)
+    procP.retVar match {
+      case Some(r) =>
+        stringOperationTracker(sig) = (mlistEmpty, Some(getNode(r)))
+      case None =>
+        stringOperationTracker(sig) = (mlistEmpty, None)
+    }
+    
+    procP.thisParamOpt match {
+      case Some(p) => stringOperationTracker(sig)._1 += getNode(p)
+      case None =>
+    } 
+    procP.params.toList.sortBy(f => f._1).foreach{case (k, v) => stringOperationTracker(sig)._1 += getNode(v)}
+    procP
+  }
   
   /**
    * collect all array variables inside one procedure
@@ -233,8 +258,14 @@ class ObjectFlowGraph[Node <: OfaNode]
             val baseNode = getNodeOrElse(pfr.basePoint).asInstanceOf[OfaFieldBaseNode]
             baseNode.fieldNode = fieldNode
             fieldNode.baseNode = baseNode
+          case pso : PointStringO =>
+            rhsNode.propertyMap(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]](pso.varName) = "STRING"
+            worklist += rhsNode
           case po : PointO =>
             rhsNode.propertyMap(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]](po.toString) = po.typ
+            if(isStringKind(po.varName)){
+              rhsNode.propertyMap(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]("") = "STRING"
+            }
             worklist += rhsNode
           case pr : PointR =>
         }
@@ -415,7 +446,7 @@ class ObjectFlowGraph[Node <: OfaNode]
   
   def getDirectCallee(pi : PointI,
                       androidLibInfoTables : AndroidLibInfoTables) : ResourceUri = {
-    androidLibInfoTables.getProcedureUriBySignature(pi.varName)
+    pi.varName
   }
   
   /**
@@ -434,7 +465,7 @@ class ObjectFlowGraph[Node <: OfaNode]
         procSigs.foreach(
           sig => {
             if(sig.substring(sig.indexOf(".")).equals(str)){
-              calleeSet += androidLibInfoTables.getProcedureUriBySignature(sig)
+              calleeSet += sig
             }
           }  
         )

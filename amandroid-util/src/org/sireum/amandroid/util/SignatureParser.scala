@@ -57,6 +57,28 @@ class SignatureParser(sig : String) {
         throw new IllegalArgumentException("Bad method signature: " + signature);
       return signature.substring(endOfParams + 1);
     }
+    
+    def isReturnNonNomal() : Boolean = {
+      val ret = getReturnTypeSignature()
+      ret.startsWith("L") || ret.startsWith("[")
+    }
+    
+    def isReturnObject() : Boolean = {
+      val ret = getReturnTypeSignature()
+      ret.startsWith("L")
+    }
+    
+    def isReturnArray() : Boolean = {
+      val ret = getReturnTypeSignature()
+      ret.startsWith("[")
+    }
+    
+    def getReturnArrayDimension() : Int = {
+      val ret = getReturnTypeSignature()
+      if(ret.startsWith("["))
+      	ret.lastIndexOf('[') - ret.indexOf('[') + 1
+      else 0
+    }
   
     def getParameters() : MList[String] = {
         var count = 0;

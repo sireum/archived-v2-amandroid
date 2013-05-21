@@ -19,16 +19,16 @@ class PointsCollector[Node <: OfaNode] {
         }
       case None => ""
     }
-    val retTyp = new SignatureParser(sig).getParamSig.getReturnTypeSignature
-    if(retTyp.startsWith("L")){
+    val retTypSig = new SignatureParser(sig).getParamSig
+    if(retTypSig.isReturnObject){
       val retP = new PointRNoIndex("ret", pUri)
       pProc.retVar = Some(retP)
-    } else if(retTyp.startsWith("[") 
+    } else if(retTypSig.isReturnArray
 //        && retTyp.charAt(retTyp.lastIndexOf('[')+1) == 'L'
           ){
       val retP = new PointRNoIndex("ret", pUri)
       pProc.retVar = Some(retP)
-      val dimensions = retTyp.lastIndexOf('[') - retTyp.indexOf('[') + 1
+      val dimensions = retTypSig.getReturnArrayDimension
       ofg.arrayRepo(retP.toString) = dimensions
     }
     var i = 0

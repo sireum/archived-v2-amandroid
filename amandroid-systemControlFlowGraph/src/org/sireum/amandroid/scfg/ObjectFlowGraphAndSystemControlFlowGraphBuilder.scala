@@ -12,7 +12,12 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 import org.sireum.amandroid.objectflowanalysis._
+
 import scala.collection.JavaConversions._
+
+import org.sireum.amandroid.util.CombinationIterator
+import org.sireum.amandroid.util.SignatureParser
+
 
 class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLabel] {
 
@@ -23,6 +28,9 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
   var cfgs : MMap[ResourceUri, ControlFlowGraph[String]] = null
   var rdas : MMap[ResourceUri, ReachingDefinitionAnalysis.Result] = null
   var cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]] = null
+  
+  //a map from return node to its possible updated value set
+  var stringValueSetMap : MMap[OfaNode, MMap[ResourceUri, ResourceUri]] = mmapEmpty
   
   def apply(psts : Seq[ProcedureSymbolTable],
             cfgs : MMap[ResourceUri, ControlFlowGraph[String]],
@@ -46,7 +54,11 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
     
     psts.foreach(
       pst =>{
+
         //if(pst.procedureUri.contains(".onStartCommand")) entryPoints += pst.procedureUri
+
+        if(pst.procedureUri.contains("de:mobinauten:smsspy:EmergencyTask.findAndSendLocation")) entryPoints += pst.procedureUri
+
         pstMap(pst.procedureUri) = pst
       }  
     )
@@ -91,13 +103,14 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
     results.keys.foreach(
       key=> {
         val result = results(key)
-//        result.nodes.foreach(
-//          node => {
-//            val name = node.toString()
-//            val valueSet = node.getProperty(result.VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
-////            println("node:" + name + "\nvalueSet:" + valueSet)
-//          }
-//        )
+        result._1.nodes.foreach(
+          node => {
+            val name = node.toString()
+            val valueSet = node.getProperty(result._1.VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]] filter {case (k, v) => v.equals("STRING")}
+            if(!valueSet.isEmpty)
+            	println("node:" + name + "\nvalueSet:" + valueSet)
+          }
+        )
         println("processed--->" + processed.size)
         println("arrayrepo------>" + result._1.arrayRepo)
         println("globalrepo------>" + result._1.globalDefRepo)
@@ -168,8 +181,7 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
           }
           val vsN = n.propertyMap(ofg.VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
           val vsSucc = succ.propertyMap(ofg.VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
-          val d = mmapEmpty[ResourceUri, ResourceUri]
-          vsN.keys.map{ case k => if(vsSucc.contains(k)){if(!vsN(k).equals(vsSucc(k))){d(k) = vsN(k)}}else{d(k) = vsN(k)} }
+          val d = getDiff(vsN, vsSucc)
           if(!d.isEmpty){
             vsSucc ++= d
             ofg.worklist += succ
@@ -190,7 +202,7 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
             piOpt match {
               case Some(pi) =>
                 val calleeSet : MSet[ResourceUri] = msetEmpty
-                if(pi.typ.equals("direct")){
+                if(pi.typ.equals("direct") || pi.typ.equals("super")){
                   calleeSet += ofg.getDirectCallee(pi, androidLibInfoTables)
                 } else {
                   calleeSet ++= ofg.getCalleeSet(d, pi, androidLibInfoTables)
@@ -205,13 +217,47 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
           }
         }  
       )
+      //do string operation
+      val vsMap = ofg.doOperation
+      vsMap.map{
+        case (k, v) =>
+          if(stringValueSetMap.contains(k)){
+          	val d = getDiff(v, stringValueSetMap(k))
+          	if(!d.isEmpty){
+	          	k.getProperty[MMap[ResourceUri, ResourceUri]](ofg.VALUE_SET) ++= d
+	          	ofg.worklist += k.asInstanceOf[Node]
+          	}
+          } else {
+            k.getProperty[MMap[ResourceUri, ResourceUri]](ofg.VALUE_SET) ++= v
+          	ofg.worklist += k.asInstanceOf[Node]
+          }
+      }
+      stringValueSetMap = vsMap
     }
   }
   
-  def extendGraphWithConstructGraph(callee : ResourceUri, pi : PointI, ofg : ObjectFlowGraph[Node], sCfg : SystemControlFlowGraph[String], androidLibInfoTables : AndroidLibInfoTables, androidCache : AndroidCacheFile[String]) = {
+  def getDiff(map1 : MMap[ResourceUri, ResourceUri], map2 : MMap[ResourceUri, ResourceUri]) = {
+    val d = mmapEmpty[ResourceUri, ResourceUri]
+    map1.keys.map{ case k => if(map2.contains(k)){if(!map1(k).equals(map2(k))){d(k) = map1(k)}}else{d(k) = map1(k)} }
+    d
+  }
+  
+  // callee is signature
+  def extendGraphWithConstructGraph(calleeSig : ResourceUri, 
+      															pi : PointI, 
+      															ofg : ObjectFlowGraph[Node], 
+      															sCfg : SystemControlFlowGraph[String], 
+      															androidLibInfoTables : AndroidLibInfoTables, 
+      															androidCache : AndroidCacheFile[String]) = {
     val points : MList[Point] = mlistEmpty
+    val callee : ResourceUri = androidLibInfoTables.getProcedureUriBySignature(calleeSig)
     if(!processed.contains(callee)){
-      if(pstMap.contains(callee)){
+      if(ofg.isStringOperation(calleeSig)){
+        if(new SignatureParser(calleeSig).getParamSig.isReturnNonNomal){
+          val calleeOfg = androidCache.load[ObjectFlowGraph[Node]](callee, "ofg")
+          processed(callee) = ofg.combineStringOfg(calleeSig, calleeOfg)
+        }
+      } else if(pstMap.contains(callee)){
         val cfg = cfgs(callee)
         val rda = rdas(callee)
         val cCfg = cCfgs(callee)
@@ -224,8 +270,7 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
         //get ofg ccfg from file
         val calleeOfg = androidCache.load[ObjectFlowGraph[Node]](callee, "ofg")
         val calleeCCfg = androidCache.load[CompressedControlFlowGraph[String]](callee, "cCfg")
-        setProcessed(calleeOfg.points, callee)
-        ofg.combineOfgs(calleeOfg)
+        processed(callee) = ofg.combineOfgs(calleeOfg)
         sCfg.collectionCCfgToBaseGraph(callee, calleeCCfg)
       }
     }
@@ -233,7 +278,9 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
       val procPoint = processed(callee)
       require(procPoint != null)
       ofg.extendGraph(procPoint, pi)
-      sCfg.extendGraph(callee, pi.owner, pi.locationUri, pi.locationIndex)
+      if(!ofg.isStringOperation(calleeSig))
+      	sCfg.extendGraph(callee, pi.owner, pi.locationUri, pi.locationIndex)
+//      else println("pi--->" + pi)
     } else {
       //need to extend
     }
