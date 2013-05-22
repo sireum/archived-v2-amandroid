@@ -267,12 +267,13 @@ class sCfg[VirtualLabel] extends SystemControlFlowGraph[VirtualLabel]
   def extendGraph(callee : ResourceUri, pUri : ResourceUri, lUri : ResourceUri, lIndex : Int) = {
     val srcNode = getNode(pUri, lUri, lIndex)
     val targetNode = getVirtualNode((callee + "." + "Entry").asInstanceOf[VirtualLabel])
-    addEdge(srcNode, targetNode)
     val retSrcNode = getVirtualNode((callee + "." + "Exit").asInstanceOf[VirtualLabel])
     successors(srcNode).foreach{
       retTargetnode =>
+        deleteEdge(srcNode, retTargetnode)
         addEdge(retSrcNode, retTargetnode)
     }
+    addEdge(srcNode, targetNode)
   }
 }
 

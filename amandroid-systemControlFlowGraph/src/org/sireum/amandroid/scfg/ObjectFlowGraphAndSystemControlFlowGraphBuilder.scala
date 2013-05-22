@@ -64,7 +64,7 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
     )
     
     
-    entryPoints ++= new EntryPointCollector().getEntryPoints(pstMap, androidLibInfoTables)   
+//    entryPoints ++= new EntryPointCollector().getEntryPoints(pstMap, androidLibInfoTables)   
  
     
     this.cfgs = cfgs
