@@ -5,6 +5,9 @@ import org.sireum.amandroid.util.CombinationIterator
 
 trait StringAnalyseModel {
   
+  /**
+   * contain all string operations and involved operation string parameter nodes and return nodes
+   */
   val stringOperationTracker : MMap[ResourceUri, (MList[OfaNode], Option[OfaNode])] = mmapEmpty
   
   def checkOperation(pUri : ResourceUri) : Boolean = {

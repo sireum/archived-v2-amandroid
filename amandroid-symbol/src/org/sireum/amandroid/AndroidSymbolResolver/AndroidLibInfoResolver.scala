@@ -317,15 +317,24 @@ class AndroidLibInfoResolver
       getInside(sig).split(";", 2)(1)
     }
     
-    def sigEqual(procedureUri : ResourceUri, parentProcedureUri : ResourceUri) : Boolean = {
-      val sig1 = tables.procedureUriTable.inverse.get(procedureUri)
-      val sig2 = tables.procedureUriTable.inverse.get(parentProcedureUri)
-      if(sig1 != null && sig2 !=null && getPartSig(sig1).equals(getPartSig(sig2))){
-        true
-      } else {
-        false
-      }
+  def sigEqual(procedureUri : ResourceUri, parentProcedureUri : ResourceUri) : Boolean = {
+    val sig1 = tables.procedureUriTable.inverse.get(procedureUri)
+    val sig2 = tables.procedureUriTable.inverse.get(parentProcedureUri)
+    if(sig1 != null && sig2 !=null && getPartSig(sig1).equals(getPartSig(sig2))){
+      true
+    } else {
+      false
     }
+  }
+  
+  def sigEqualBySubSig(procedureUri : ResourceUri, subSignature : String) : Boolean = {
+    val sig1 = tables.procedureUriTable.inverse.get(procedureUri)
+    if(sig1 != null && subSignature !=null && getPartSig(sig1).equals(subSignature)){
+      true
+    } else {
+      false
+    }
+  }
   
   def getInside(name : String) : String = {
     val rName = name.substring(2, name.length()-2)
@@ -333,11 +342,18 @@ class AndroidLibInfoResolver
   }
   
   def getRecordUri(recordName : String) : ResourceUri = {
-      if(tables.recordUriTable.contains(recordName)){
-        tables.recordUriTable.get(recordName)
-      }
-      else null
+    if(tables.recordUriTable.contains(recordName)){
+      tables.recordUriTable.get(recordName)
     }
+    else null
+  }
+  
+  def getRecordName(recordUri : String) : ResourceUri = {
+    if(tables.recordUriTable.inverse.contains(recordUri)){
+      tables.recordUriTable.inverse.get(recordUri)
+    }
+    else null
+  }
 // sankar starts
   
    def getRecOfProc(procedureUri : ResourceUri) : ResourceUri = {
@@ -364,10 +380,20 @@ class AndroidLibInfoResolver
       rec
     }
    
-   def getParents(recordUri : ResourceUri) : MSet[ResourceUri] ={
+   def getParents(recordUri : ResourceUri) : Set[ResourceUri] ={
      if(tables.recordHierarchyTable.keySet.contains(recordUri))
-       tables.recordHierarchyTable.get(recordUri)
-     else msetEmpty
+       tables.recordHierarchyTable.get(recordUri).toSet
+     else Set()
+   }
+   
+   def getAncestors(recordUri : ResourceUri) : Set[ResourceUri] = doGetAncestors(getParents(recordUri))
+   
+   def doGetAncestors(parents : Set[ResourceUri]) : Set[ResourceUri] = {
+     def combine(s1 : Set[ResourceUri], s2 : Set[ResourceUri]) : Set[ResourceUri] = s1 ++ s2
+     if(parents.isEmpty)
+       Set()
+     else
+    	 parents.map{p => doGetAncestors(getParents(p)) + p}.reduce(combine)
    }
   
    def getSignatureByProcedureUri(pUri : String) : ResourceUri = {
@@ -378,167 +404,190 @@ class AndroidLibInfoResolver
     
    
  // sankar ends
+   
+  def findProcedureUri(rUri : ResourceUri, subSig : String) : ResourceUri = {
+    val pUris = tables.recordProcedureTable.get(rUri)
+    var parents : Set[ResourceUri] = Set()
+    for(pUri <- pUris){
+      if(sigEqualBySubSig(pUri, subSig)) return pUri
+      else{
+        parents ++= tables.recordHierarchyTable.get(rUri)
+      }
+    }
+    for(parent <- parents){
+      return findProcedureUri(parent, subSig)
+    }
+    return null
+  }
   
   def getProcedureUriBySignature(sig : String) : ResourceUri = {
-      if(tables.procedureUriTable.contains(sig))
-        tables.procedureUriTable.get(sig)
-      else null
+    if(tables.procedureUriTable.contains(sig))
+      tables.procedureUriTable.get(sig)
+    else null
+  }
+  
+  def getProcedureSignatureByUri(pUri : ResourceUri) : String = {
+    if(tables.procedureUriTable.inverse().contains(pUri))
+      tables.procedureUriTable.inverse().get(pUri)
+    else null
+  }
+  
+  def getCalleeOptionsByUri(procedureUri : ResourceUri) : java.util.Set[ResourceUri] = {
+    if(procedureUri != null){
+      tables.virtualMethodTable.get(procedureUri)
     }
-    
-    def getCalleeOptionsByUri(procedureUri : ResourceUri) : java.util.Set[ResourceUri] = {
-      if(procedureUri != null){
-        tables.virtualMethodTable.get(procedureUri)
-      }
-      else null
+    else null
+  }
+  
+  def getCalleeOptionsBySignature(sig : String) : java.util.Set[ResourceUri] = {
+    val procedureUri = getProcedureUriBySignature(sig)
+    getCalleeOptionsByUri(procedureUri)
+  }
+  
+  def getProcedureUrisByRecordUri(recordUri : ResourceUri) : java.util.Set[ResourceUri] = {
+    tables.recordProcedureTable.get(recordUri)
+  }
+  
+  def getProcedureSigsByRecordUri(recordUri : ResourceUri) : MSet[ResourceUri] = {
+    val pUris = tables.recordProcedureTable.get(recordUri)
+    val sigs : MSet[ResourceUri] = msetEmpty
+    pUris.foreach(
+      pUri => sigs += tables.procedureUriTable.inverse().get(pUri)  
+    )
+    sigs
+  }
+  
+  def containsRecord(recordName : String) : Boolean = tables.recordUriTable.containsKey(recordName)
+  
+  def isConstructor(procedureUri : ResourceUri) : Boolean = {
+    if(tables.procedureTypeTable.contains(procedureUri)){
+      if(tables.procedureTypeTable.get(procedureUri) != null && tables.procedureTypeTable.get(procedureUri).contains("CONSTRUCTOR")) true
+      else false
     }
-    
-    def getCalleeOptionsBySignature(sig : String) : java.util.Set[ResourceUri] = {
-      val procedureUri = getProcedureUriBySignature(sig)
-      getCalleeOptionsByUri(procedureUri)
+    else {
+      println("procedureTypeTable : cannot find " + procedureUri)
+      false
     }
-    
-    def getProcedureUrisByRecordUri(recordUri : ResourceUri) : java.util.Set[ResourceUri] = {
-      tables.recordProcedureTable.get(recordUri)
+  }
+  
+  def isStaticMethod(procedureUri : ResourceUri) : Boolean = {
+    if(tables.procedureTypeTable.contains(procedureUri)){
+      if(tables.procedureTypeTable.get(procedureUri) != null && tables.procedureTypeTable.get(procedureUri).contains("STATIC")) true
+      else false
     }
-    
-    def getProcedureSigsByRecordUri(recordUri : ResourceUri) : MSet[ResourceUri] = {
-      val pUris = tables.recordProcedureTable.get(recordUri)
-      val sigs : MSet[ResourceUri] = msetEmpty
-      pUris.foreach(
-        pUri => sigs += tables.procedureUriTable.inverse().get(pUri)  
-      )
-      sigs
+    else {
+      println("procedureTypeTable : cannot find " + procedureUri)
+      false
     }
-    
-    def isConstructor(procedureUri : ResourceUri) : Boolean = {
-      if(tables.procedureTypeTable.contains(procedureUri)){
-        if(tables.procedureTypeTable.get(procedureUri) != null && tables.procedureTypeTable.get(procedureUri).contains("CONSTRUCTOR")) true
-        else false
-      }
-      else {
-        println("procedureTypeTable : cannot find " + procedureUri)
-        false
-      }
+  }
+  
+  def isVirtualMethod(procedureUri : ResourceUri) : Boolean = {
+    if(tables.procedureTypeTable.contains(procedureUri)){
+      if(tables.procedureTypeTable.get(procedureUri) != null 
+         && !tables.procedureTypeTable.get(procedureUri).contains("CONSTRUCTOR") 
+         && !tables.procedureTypeTable.get(procedureUri).contains("STATIC")) 
+        true
+      else false
     }
-    
-    def isStaticMethod(procedureUri : ResourceUri) : Boolean = {
-      if(tables.procedureTypeTable.contains(procedureUri)){
-        if(tables.procedureTypeTable.get(procedureUri) != null && tables.procedureTypeTable.get(procedureUri).contains("STATIC")) true
-        else false
-      }
-      else {
-        println("procedureTypeTable : cannot find " + procedureUri)
-        false
-      }
+    else {
+      println("procedureTypeTable : cannot find " + procedureUri)
+      false
     }
+  }
+  // sankar adds isOverrider
+  def isOverrider(procUri1 : ResourceUri, procUri2 : ResourceUri) : Boolean = {      
+    if(isConstructor(procUri1) || isConstructor(procUri2))
+      false
+    else
+      sigEqual(procUri1, procUri2)
+  }
+  
+  
+  def mergeWith(anotherVmTables : AndroidLibInfoTables) = {
+    combineTables(anotherVmTables)
+    mergeRecordHierarchyTableAndVirtualMethodTable()
     
-    def isVirtualMethod(procedureUri : ResourceUri) : Boolean = {
-      if(tables.procedureTypeTable.contains(procedureUri)){
-        if(tables.procedureTypeTable.get(procedureUri) != null 
-           && !tables.procedureTypeTable.get(procedureUri).contains("CONSTRUCTOR") 
-           && !tables.procedureTypeTable.get(procedureUri).contains("STATIC")) 
-          true
-        else false
-      }
-      else {
-        println("procedureTypeTable : cannot find " + procedureUri)
-        false
-      }
-    }
-    // sankar adds isOverrider
-    def isOverrider(procUri1 : ResourceUri, procUri2 : ResourceUri) : Boolean = {      
-      if(isConstructor(procUri1) || isConstructor(procUri2))
-        false
-      else
-        sigEqual(procUri1, procUri2)
-    }
-    
-    
-    def mergeWith(anotherVmTables : AndroidLibInfoTables) = {
-      combineTables(anotherVmTables)
-      mergeRecordHierarchyTableAndVirtualMethodTable()
-      
-    }
-    
-    def combineTables(anotherVmTables : AndroidLibInfoTables) = {
-      tables.virtualMethodTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.virtualMethodTable)
-      tables.recordProcedureTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.recordProcedureTable)
-      tables.recordHierarchyTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.recordHierarchyTable)
-      tables.cannotFindRecordTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
-      tables.procedureTypeTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.procedureTypeTable)
-      tables.procedureUriTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.procedureUriTable)
-      tables.recordUriTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.recordUriTable)
-      tables.recordFieldVarTable ++= anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.recordFieldVarTable
-      tables.globalVarTable ++= anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.globalVarTable
-      tables.interfaceTable.addAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.interfaceTable)
-      tables.globalVarUriTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.globalVarUriTable)
-    }
-    
-    def mergeRecordHierarchyTableAndVirtualMethodTable() = {
-      var tempNotFoundRecordsTable : HashMultimap[ResourceUri, ResourceUri] = HashMultimap.create()
-      val recordSets = tables.recordUriTable.values.toSeq
-      var keys = tables.cannotFindRecordTable.keySet
-      keys.map(
-        key=>
-        {
-          val notFoundRecords = tables.cannotFindRecordTable.get(key)
-          notFoundRecords.map(
-            notFoundRecord =>
-              if(recordSets.contains(notFoundRecord)){
+  }
+  
+  def combineTables(anotherVmTables : AndroidLibInfoTables) = {
+    tables.virtualMethodTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.virtualMethodTable)
+    tables.recordProcedureTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.recordProcedureTable)
+    tables.recordHierarchyTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.recordHierarchyTable)
+    tables.cannotFindRecordTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
+    tables.procedureTypeTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.procedureTypeTable)
+    tables.procedureUriTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.procedureUriTable)
+    tables.recordUriTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.recordUriTable)
+    tables.recordFieldVarTable ++= anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.recordFieldVarTable
+    tables.globalVarTable ++= anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.globalVarTable
+    tables.interfaceTable.addAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.interfaceTable)
+    tables.globalVarUriTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.globalVarUriTable)
+  }
+  
+  def mergeRecordHierarchyTableAndVirtualMethodTable() = {
+    var tempNotFoundRecordsTable : HashMultimap[ResourceUri, ResourceUri] = HashMultimap.create()
+    val recordSets = tables.recordUriTable.values.toSeq
+    var keys = tables.cannotFindRecordTable.keySet
+    keys.map(
+      key=>
+      {
+        val notFoundRecords = tables.cannotFindRecordTable.get(key)
+        notFoundRecords.map(
+          notFoundRecord =>
+            if(recordSets.contains(notFoundRecord)){
 //                println("find: " + notFoundRecord)
-                tables.recordHierarchyTable.put(key, notFoundRecord)
-                resolveVM(key)
-              } 
-              else {
-                tempNotFoundRecordsTable.put(key, notFoundRecord)
-              }
-          )
-        }
-      )
-      tables.cannotFindRecordTable.clear()
-      tables.cannotFindRecordTable.putAll(tempNotFoundRecordsTable)
-    }
-    
-    def addRelation(recordUri : ResourceUri, procedureUri : ResourceUri) : Boolean = {
-      val parentsUri = tables.recordHierarchyTable.get(recordUri)
-      if(parentsUri.isEmpty()) true
-      else{
-        for(parentUri <- parentsUri){
-          val parentProceduresUri = tables.recordProcedureTable.get(parentUri)
-          for (parentProcedureUri <- parentProceduresUri){
-            if(sigEqual(procedureUri, parentProcedureUri)){
-              val vmProceduresUri = tables.virtualMethodTable.get(procedureUri)
-//              println("procedures : " + vmPreceduresUri)
-              vmProceduresUri.map(
-                pUri =>
-                {
-                  buildVirtualMethodTable(parentProcedureUri, pUri)
-                }
-              )
-              
+              tables.recordHierarchyTable.put(key, notFoundRecord)
+              resolveVM(key)
+            } 
+            else {
+              tempNotFoundRecordsTable.put(key, notFoundRecord)
             }
-          }
-          addRelation(parentUri, procedureUri)
-        }
-        false
-      }
-    }
-    
-    def resolveVM(recordUri : ResourceUri) = {
-      if(!isInterface(recordUri)){
-        val proceduresUri = tables.recordProcedureTable.get(recordUri)
-        proceduresUri.foreach(
-          procedureUri =>
-          {
-            if(!isConsStaticFinalOrProtected(tables.procedureTypeTable(procedureUri))){
-              addRelation(recordUri, procedureUri)
-            }
-          }
         )
       }
+    )
+    tables.cannotFindRecordTable.clear()
+    tables.cannotFindRecordTable.putAll(tempNotFoundRecordsTable)
+  }
+  
+  def addRelation(recordUri : ResourceUri, procedureUri : ResourceUri) : Boolean = {
+    val parentsUri = tables.recordHierarchyTable.get(recordUri)
+    if(parentsUri.isEmpty()) true
+    else{
+      for(parentUri <- parentsUri){
+        val parentProceduresUri = tables.recordProcedureTable.get(parentUri)
+        for (parentProcedureUri <- parentProceduresUri){
+          if(sigEqual(procedureUri, parentProcedureUri)){
+            val vmProceduresUri = tables.virtualMethodTable.get(procedureUri)
+//              println("procedures : " + vmPreceduresUri)
+            vmProceduresUri.map(
+              pUri =>
+              {
+                buildVirtualMethodTable(parentProcedureUri, pUri)
+              }
+            )
+            
+          }
+        }
+        addRelation(parentUri, procedureUri)
+      }
+      false
     }
-    
-    def toAndroidLibInfoTables : AndroidLibInfoTables = this
+  }
+  
+  def resolveVM(recordUri : ResourceUri) = {
+    if(!isInterface(recordUri)){
+      val proceduresUri = tables.recordProcedureTable.get(recordUri)
+      proceduresUri.foreach(
+        procedureUri =>
+        {
+          if(!isConsStaticFinalOrProtected(tables.procedureTypeTable(procedureUri))){
+            addRelation(recordUri, procedureUri)
+          }
+        }
+      )
+    }
+  }
+  
+  def toAndroidLibInfoTables : AndroidLibInfoTables = this
 
   
 ////////////////////////////////

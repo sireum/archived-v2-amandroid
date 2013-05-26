@@ -1,0 +1,57 @@
+group PilarCodeGenerator;
+
+delimiters "$", "$"
+
+ProcedureDecl(retTyp, procedureName, params, localVars, body) ::= <<
+procedure $retTyp$ $procedureName$($params ; separator=", "$) {
+  $localVars$
+	
+  $body$
+}
+>>
+
+LocalVars(locals) ::= <<
+local
+  $locals ; separator="\n"$
+>>
+
+LocalVar(typ, name) ::= <<
+$typ$ $name$;
+>>
+
+Body(codeFragments) ::= <<
+$codeFragments ; separator="\n"$
+>>
+
+CodeFragment(label, codes) ::= <<
+#$label$.
+  $codes ; separator="\n"$
+>>
+
+Code(code) ::= <<
+$code$;
+>>
+
+Label(num) ::= <<
+Label$num$
+>>
+
+IfStmt(cond, label) ::= <<
+if $cond$ then goto $label$
+>>
+
+AssignmentStmt(lhs, rhs) ::= <<
+$lhs$:= $rhs$
+>>
+
+CondExp(lhs, rhs) ::= <<
+$lhs$ == $rhs$ 
+>>
+
+NewExp(name) ::= <<
+new $name$
+>>
+
+InvokeStmt(funcName, params, sig, typ) ::= <<
+call temp:= $funcName$($params ; separator=", "$) @signature $sig$ @ type $typ$
+>>

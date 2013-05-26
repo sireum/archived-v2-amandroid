@@ -17,6 +17,7 @@ import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.alir.AlirIntraProceduralGraph
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
 import org.sireum.amandroid.cache.AndroidCacheFile
+import org.sireum.amandroid.module.AndroidInterIntraProceduralModule
 
 // sankar introduces the following framework which adds one stage on top of AmandroidParserTestFrameWork 
 
@@ -69,26 +70,26 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
           graDir.mkdir()
         }
         //deal with apk file
-//        val apkName = f.getName()
-//        val apkFile = new ZipFile(f, ZipFile.OPEN_READ)
-//        val entries = apkFile.entries()
-//        while(entries.hasMoreElements()){
-//          val ze = entries.nextElement()
-//          if(ze.toString().endsWith(".dex")){
-//            val loadFile = new File(d+ze.getName())
-//            val ops = new FileOutputStream(d + dirName + "/" + dirName + ".dex")
-//            val ips = apkFile.getInputStream(ze)
-//            var reading = true
-//            while(reading){
-//              ips.read() match {
-//                case -1 => reading = false
-//                case c => ops.write(c)
-//              }
-//            }
-//            ops.flush()
-//            ips.close()
-//          }
-//        }
+        val apkName = f.getName()
+        val apkFile = new ZipFile(f, ZipFile.OPEN_READ)
+        val entries = apkFile.entries()
+        while(entries.hasMoreElements()){
+          val ze = entries.nextElement()
+          if(ze.toString().endsWith(".dex")){
+            val loadFile = new File(d+ze.getName())
+            val ops = new FileOutputStream(d + dirName + "/" + dirName + ".dex")
+            val ips = apkFile.getInputStream(ze)
+            var reading = true
+            while(reading){
+              ips.read() match {
+                case -1 => reading = false
+                case c => ops.write(c)
+              }
+            }
+            ops.flush()
+            ips.close()
+          }
+        }
       
         srcFiles += FileUtil.toUri(d + dirName + "/" + dirName + ".dex")
         
@@ -96,7 +97,7 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
         val options = job.properties
         Dex2PilarWrapperModule.setSrcFiles(options, srcFiles)
         
-        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d + "/" + dirName + ".pilar"))))
+        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d + dirName + "/" + dirName + ".pilar"))))
         
         PilarAndroidSymbolResolverModule.setParallel(options, false)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidLibInfoTables(options, Some(libInfoTables))
@@ -107,6 +108,7 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
         AndroidInterIntraProceduralModule.setShouldBuildRda(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildOFAsCfg(options, true)
+        AndroidInterIntraProceduralModule.setApkFileLocationOpt(options, Some(f.toString()))
         
         // experimental code starts which does not have any significant role now; later we will delete it after some related cleaning 
         
@@ -171,11 +173,11 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
     PipelineConfiguration(
       "dex2PilarAndParseAndProcedureLocationList test pipeline",
       false,
-//      PipelineStage(
-//        "dex2pilar stage",
-//        false,
-//        Dex2PilarWrapperModule
-//      ),
+      PipelineStage(
+        "dex2pilar stage",
+        false,
+        Dex2PilarWrapperModule
+      ),
       PipelineStage(
         "Chunking pilar parsing stage",
         false,

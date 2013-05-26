@@ -36,6 +36,7 @@ object OFAsCfgModule extends PipelineModule {
   val globalCfgsKey = "Global.cfgs"
   val globalRdasKey = "Global.rdas"
   val OFAsCfgKey = "OFAsCfg.OFAsCfg"
+  val globalApkFileLocationKey = "Global.apkFileLocation"
   val globalCCfgsKey = "Global.cCfgs"
 
   def compute(job : PipelineJob, info : PipelineJobModuleInfo) : MBuffer[Tag] = {
@@ -206,6 +207,33 @@ object OFAsCfgModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'cCfgs'")       
     }
+    var _apkFileLocation : scala.Option[AnyRef] = None
+    var _apkFileLocationKey : scala.Option[String] = None
+
+    val keylistapkFileLocation = List(OFAsCfgModule.globalApkFileLocationKey)
+    keylistapkFileLocation.foreach(key => 
+      if(job ? key) { 
+        if(_apkFileLocation.isEmpty) {
+          _apkFileLocation = Some(job(key))
+          _apkFileLocationKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _apkFileLocation.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'apkFileLocation' keys '" + _apkFileLocationKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _apkFileLocation match{
+      case Some(x) =>
+        if(!x.isInstanceOf[java.lang.String]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'apkFileLocation'.  Expecting 'java.lang.String' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'apkFileLocation'")       
+    }
     var _procedureSymbolTables : scala.Option[AnyRef] = None
     var _procedureSymbolTablesKey : scala.Option[String] = None
 
@@ -351,6 +379,21 @@ object OFAsCfgModule extends PipelineModule {
     return options
   }
 
+  def getApkFileLocation (options : scala.collection.Map[Property.Key, Any]) : java.lang.String = {
+    if (options.contains(OFAsCfgModule.globalApkFileLocationKey)) {
+       return options(OFAsCfgModule.globalApkFileLocationKey).asInstanceOf[java.lang.String]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setApkFileLocation (options : MMap[Property.Key, Any], apkFileLocation : java.lang.String) : MMap[Property.Key, Any] = {
+
+    options(OFAsCfgModule.globalApkFileLocationKey) = apkFileLocation
+
+    return options
+  }
+
   def getProcedureSymbolTables (options : scala.collection.Map[Property.Key, Any]) : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = {
     if (options.contains(OFAsCfgModule.globalProcedureSymbolTablesKey)) {
        return options(OFAsCfgModule.globalProcedureSymbolTablesKey).asInstanceOf[scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable]]
@@ -374,6 +417,7 @@ object OFAsCfgModule extends PipelineModule {
       def OFAsCfg : scala.collection.mutable.Map[java.lang.String, scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]] = OFAsCfgModule.getOFAsCfg(job.propertyMap)
       def rdas : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]] = OFAsCfgModule.getRdas(job.propertyMap)
       def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = OFAsCfgModule.getCCfgs(job.propertyMap)
+      def apkFileLocation : java.lang.String = OFAsCfgModule.getApkFileLocation(job.propertyMap)
       def procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = OFAsCfgModule.getProcedureSymbolTables(job.propertyMap)
     }
   }
@@ -399,6 +443,9 @@ object OFAsCfgModule extends PipelineModule {
       def cCfgs_=(cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]) { OFAsCfgModule.setCCfgs(job.propertyMap, cCfgs) }
       def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = OFAsCfgModule.getCCfgs(job.propertyMap)
 
+      def apkFileLocation_=(apkFileLocation : java.lang.String) { OFAsCfgModule.setApkFileLocation(job.propertyMap, apkFileLocation) }
+      def apkFileLocation : java.lang.String = OFAsCfgModule.getApkFileLocation(job.propertyMap)
+
       def procedureSymbolTables_=(procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable]) { OFAsCfgModule.setProcedureSymbolTables(job.propertyMap, procedureSymbolTables) }
       def procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = OFAsCfgModule.getProcedureSymbolTables(job.propertyMap)
     }
@@ -421,6 +468,8 @@ trait OFAsCfgModule {
   def rdas : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]] = OFAsCfgModule.getRdas(job.propertyMap)
 
   def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = OFAsCfgModule.getCCfgs(job.propertyMap)
+
+  def apkFileLocation : java.lang.String = OFAsCfgModule.getApkFileLocation(job.propertyMap)
 
   def procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = OFAsCfgModule.getProcedureSymbolTables(job.propertyMap)
 }

@@ -39,6 +39,7 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
   val globalSwitchAsOrderedMatchKey = "Global.switchAsOrderedMatch"
   val globalDefRefKey = "Global.defRef"
   val globalShouldPreprocessOfgKey = "Global.shouldPreprocessOfg"
+  val globalApkFileLocationOptKey = "Global.apkFileLocationOpt"
 
   def compute(job : PipelineJob, info : PipelineJobModuleInfo) : MBuffer[Tag] = {
     val tags = marrayEmpty[Tag]
@@ -86,33 +87,38 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
       setShouldBuildOFAsCfg(job.propertyMap, shouldBuildOFAsCfg)
     }
 
+    if(!(job ? AndroidInterIntraProceduralModule.globalApkFileLocationOptKey)) {
+      val apkFileLocationOpt = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$11").invoke(null).asInstanceOf[scala.Option[java.lang.String]]
+      setApkFileLocationOpt(job.propertyMap, apkFileLocationOpt)
+    }
+
     if(!(job ? AndroidInterIntraProceduralModule.globalAPIpermOptKey)) {
-      val APIpermOpt = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$11").invoke(null).asInstanceOf[scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]]]
+      val APIpermOpt = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$12").invoke(null).asInstanceOf[scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]]]
       setAPIpermOpt(job.propertyMap, APIpermOpt)
     }
 
     if(!(job ? AndroidInterIntraProceduralModule.globalShouldIncludeFlowFunctionKey)) {
-      val shouldIncludeFlowFunction = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$12").invoke(null).asInstanceOf[scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]]]
+      val shouldIncludeFlowFunction = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$13").invoke(null).asInstanceOf[scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]]]
       setShouldIncludeFlowFunction(job.propertyMap, shouldIncludeFlowFunction)
     }
 
     if(!(job ? AndroidInterIntraProceduralModule.globalDefRefKey)) {
-      val defRef = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$13").invoke(null).asInstanceOf[scala.Function2[org.sireum.pilar.symbol.SymbolTable, org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables, org.sireum.alir.DefRef]]
+      val defRef = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$14").invoke(null).asInstanceOf[scala.Function2[org.sireum.pilar.symbol.SymbolTable, org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables, org.sireum.alir.DefRef]]
       setDefRef(job.propertyMap, defRef)
     }
 
     if(!(job ? AndroidInterIntraProceduralModule.globalIsInputOutputParamPredicateKey)) {
-      val isInputOutputParamPredicate = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$14").invoke(null).asInstanceOf[scala.Function1[org.sireum.pilar.symbol.ProcedureSymbolTable, scala.Tuple2[scala.Function1[java.lang.String, scala.Boolean], scala.Function1[java.lang.String, scala.Boolean]]]]
+      val isInputOutputParamPredicate = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$15").invoke(null).asInstanceOf[scala.Function1[org.sireum.pilar.symbol.ProcedureSymbolTable, scala.Tuple2[scala.Function1[java.lang.String, scala.Boolean], scala.Function1[java.lang.String, scala.Boolean]]]]
       setIsInputOutputParamPredicate(job.propertyMap, isInputOutputParamPredicate)
     }
 
     if(!(job ? AndroidInterIntraProceduralModule.globalSwitchAsOrderedMatchKey)) {
-      val switchAsOrderedMatch = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$15").invoke(null).asInstanceOf[scala.Boolean]
+      val switchAsOrderedMatch = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$16").invoke(null).asInstanceOf[scala.Boolean]
       setSwitchAsOrderedMatch(job.propertyMap, switchAsOrderedMatch)
     }
 
     if(!(job ? AndroidInterIntraProceduralModule.globalProcedureAbsUriIteratorKey)) {
-      val procedureAbsUriIterator = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$16").invoke(null).asInstanceOf[scala.Option[scala.collection.Iterator[java.lang.String]]]
+      val procedureAbsUriIterator = Class.forName("org.sireum.amandroid.module.AndroidInterIntraProcedural").getDeclaredMethod("$lessinit$greater$default$17").invoke(null).asInstanceOf[scala.Option[scala.collection.Iterator[java.lang.String]]]
       setProcedureAbsUriIterator(job.propertyMap, procedureAbsUriIterator)
     }
   }
@@ -374,6 +380,33 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'shouldBuildOFAsCfg'")       
+    }
+    var _apkFileLocationOpt : scala.Option[AnyRef] = None
+    var _apkFileLocationOptKey : scala.Option[String] = None
+
+    val keylistapkFileLocationOpt = List(AndroidInterIntraProceduralModule.globalApkFileLocationOptKey)
+    keylistapkFileLocationOpt.foreach(key => 
+      if(job ? key) { 
+        if(_apkFileLocationOpt.isEmpty) {
+          _apkFileLocationOpt = Some(job(key))
+          _apkFileLocationOptKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _apkFileLocationOpt.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'apkFileLocationOpt' keys '" + _apkFileLocationOptKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _apkFileLocationOpt match{
+      case Some(x) =>
+        if(!x.isInstanceOf[scala.Option[java.lang.String]]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'apkFileLocationOpt'.  Expecting 'scala.Option[java.lang.String]' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'apkFileLocationOpt'")       
     }
     var _APIpermOpt : scala.Option[AnyRef] = None
     var _APIpermOptKey : scala.Option[String] = None
@@ -701,6 +734,21 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
     return options
   }
 
+  def getApkFileLocationOpt (options : scala.collection.Map[Property.Key, Any]) : scala.Option[java.lang.String] = {
+    if (options.contains(AndroidInterIntraProceduralModule.globalApkFileLocationOptKey)) {
+       return options(AndroidInterIntraProceduralModule.globalApkFileLocationOptKey).asInstanceOf[scala.Option[java.lang.String]]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setApkFileLocationOpt (options : MMap[Property.Key, Any], apkFileLocationOpt : scala.Option[java.lang.String]) : MMap[Property.Key, Any] = {
+
+    options(AndroidInterIntraProceduralModule.globalApkFileLocationOptKey) = apkFileLocationOpt
+
+    return options
+  }
+
   def getAPIpermOpt (options : scala.collection.Map[Property.Key, Any]) : scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]] = {
     if (options.contains(AndroidInterIntraProceduralModule.globalAPIpermOptKey)) {
        return options(AndroidInterIntraProceduralModule.globalAPIpermOptKey).asInstanceOf[scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]]]
@@ -832,6 +880,7 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
       def shouldPreprocessOfg : scala.Boolean = AndroidInterIntraProceduralModule.getShouldPreprocessOfg(job.propertyMap)
       def shouldBuildCCfg : scala.Boolean = AndroidInterIntraProceduralModule.getShouldBuildCCfg(job.propertyMap)
       def shouldBuildOFAsCfg : scala.Boolean = AndroidInterIntraProceduralModule.getShouldBuildOFAsCfg(job.propertyMap)
+      def apkFileLocationOpt : scala.Option[java.lang.String] = AndroidInterIntraProceduralModule.getApkFileLocationOpt(job.propertyMap)
       def APIpermOpt : scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]] = AndroidInterIntraProceduralModule.getAPIpermOpt(job.propertyMap)
       def shouldIncludeFlowFunction : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]] = AndroidInterIntraProceduralModule.getShouldIncludeFlowFunction(job.propertyMap)
       def defRef : scala.Function2[org.sireum.pilar.symbol.SymbolTable, org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables, org.sireum.alir.DefRef] = AndroidInterIntraProceduralModule.getDefRef(job.propertyMap)
@@ -872,6 +921,9 @@ object AndroidInterIntraProceduralModule extends PipelineModule {
 
       def shouldBuildOFAsCfg_=(shouldBuildOFAsCfg : scala.Boolean) { AndroidInterIntraProceduralModule.setShouldBuildOFAsCfg(job.propertyMap, shouldBuildOFAsCfg) }
       def shouldBuildOFAsCfg : scala.Boolean = AndroidInterIntraProceduralModule.getShouldBuildOFAsCfg(job.propertyMap)
+
+      def apkFileLocationOpt_=(apkFileLocationOpt : scala.Option[java.lang.String]) { AndroidInterIntraProceduralModule.setApkFileLocationOpt(job.propertyMap, apkFileLocationOpt) }
+      def apkFileLocationOpt : scala.Option[java.lang.String] = AndroidInterIntraProceduralModule.getApkFileLocationOpt(job.propertyMap)
 
       def APIpermOpt_=(APIpermOpt : scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]]) { AndroidInterIntraProceduralModule.setAPIpermOpt(job.propertyMap, APIpermOpt) }
       def APIpermOpt : scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]] = AndroidInterIntraProceduralModule.getAPIpermOpt(job.propertyMap)
@@ -920,6 +972,8 @@ trait AndroidInterIntraProceduralModule {
   def shouldBuildCCfg : scala.Boolean = AndroidInterIntraProceduralModule.getShouldBuildCCfg(job.propertyMap)
 
   def shouldBuildOFAsCfg : scala.Boolean = AndroidInterIntraProceduralModule.getShouldBuildOFAsCfg(job.propertyMap)
+
+  def apkFileLocationOpt : scala.Option[java.lang.String] = AndroidInterIntraProceduralModule.getApkFileLocationOpt(job.propertyMap)
 
   def APIpermOpt : scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]] = AndroidInterIntraProceduralModule.getAPIpermOpt(job.propertyMap)
 

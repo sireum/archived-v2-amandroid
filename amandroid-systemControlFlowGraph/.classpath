@@ -10,5 +10,9 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-xml"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-cache"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-util"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-codeGenerator"/>
+	<classpathentry kind="lib" path="/git-repo/lib/axml-1.0.jar"/>
+	<classpathentry kind="lib" path="/git-repo/lib/AXMLPrinter2.jar"/>
+	<classpathentry kind="lib" path="/git-repo/lib/polyglot.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -37,36 +37,34 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
             rdas : MMap[ResourceUri, ReachingDefinitionAnalysis.Result],
             cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
             androidLibInfoTables : AndroidLibInfoTables,
-            androidCache : AndroidCacheFile[String]) 
-            = build(psts, cfgs, rdas, cCfgs, androidLibInfoTables, androidCache)
+            androidCache : AndroidCacheFile[String],
+            apkFileLocation : String) 
+            = build(psts, cfgs, rdas, cCfgs, androidLibInfoTables, androidCache, apkFileLocation)
 
   def build(psts : Seq[ProcedureSymbolTable],
             cfgs : MMap[ResourceUri, ControlFlowGraph[String]],
             rdas : MMap[ResourceUri, ReachingDefinitionAnalysis.Result],
             cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
             androidLibInfoTables : AndroidLibInfoTables,
-            androidCache : AndroidCacheFile[String])
+            androidCache : AndroidCacheFile[String],
+            apkFileLocation : String)
    : MMap[ResourceUri, (ObjectFlowGraph[Node], SystemControlFlowGraph[String])] = {
     val preResults : MMap[ResourceUri, (ObjectFlowGraph[Node])] = mmapEmpty
     val aggPreOfg = new ObjectFlowGraph[Node] // represents the aggregate of preliminary Ofgs of entryPoints
     val results : MMap[ResourceUri, (ObjectFlowGraph[Node], SystemControlFlowGraph[String])] = mmapEmpty
     val entryPoints : MSet[ResourceUri] = msetEmpty
     
+    val pre = new PrepareApp(apkFileLocation)
+    pre.setLibInfoTables(androidLibInfoTables)
+    pre.calculateSourcesSinksEntrypoints("")
+    
     psts.foreach(
       pst =>{
-
-        //if(pst.procedureUri.contains(".onStartCommand")) entryPoints += pst.procedureUri
-
         if(pst.procedureUri.contains("de:mobinauten:smsspy:EmergencyTask.findAndSendLocation")) entryPoints += pst.procedureUri
-
         pstMap(pst.procedureUri) = pst
       }  
     )
-    
-    
-//    entryPoints ++= new EntryPointCollector().getEntryPoints(pstMap, androidLibInfoTables)   
- 
-    
+//    entryPoints ++= new EntryPointCollector().getEntryPoints(pstMap, androidLibInfoTables)
     this.cfgs = cfgs
     this.rdas = rdas
     this.cCfgs = cCfgs
@@ -84,9 +82,7 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
     )
     
     val sCfg = new sCfg[String]
-    
     val ep = entryPoints.head
-    
 //    entryPoints.foreach(
 //        ep => {
           processed = mmapEmpty
@@ -103,17 +99,17 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
     results.keys.foreach(
       key=> {
         val result = results(key)
-        result._1.nodes.foreach(
-          node => {
-            val name = node.toString()
-            val valueSet = node.getProperty(result._1.VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]] filter {case (k, v) => v.equals("STRING")}
-            if(!valueSet.isEmpty)
-            	println("node:" + name + "\nvalueSet:" + valueSet)
-          }
-        )
-        println("processed--->" + processed.size)
-        println("arrayrepo------>" + result._1.arrayRepo)
-        println("globalrepo------>" + result._1.globalDefRepo)
+//        result._1.nodes.foreach(
+//          node => {
+//            val name = node.toString()
+//            val valueSet = node.getProperty(result._1.VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]] filter {case (k, v) => v.equals("STRING")}
+//            if(!valueSet.isEmpty)
+//            	println("node:" + name + "\nvalueSet:" + valueSet)
+//          }
+//        )
+//        println("processed--->" + processed.size)
+//        println("arrayrepo------>" + result._1.arrayRepo)
+//        println("globalrepo------>" + result._1.globalDefRepo)
         val f = new File(System.getProperty("user.home") + "/Desktop/ofg.dot")
         val o = new FileOutputStream(f)
         val w = new OutputStreamWriter(o)

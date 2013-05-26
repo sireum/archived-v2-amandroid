@@ -85,6 +85,10 @@ case class AndroidInterIntraProcedural(
   @Input
   shouldBuildOFAsCfg : Boolean = false,
   
+  //for prepare application
+  @Input
+  apkFileLocationOpt : Option[String] = None,
+  
   @Input
   APIpermOpt : scala.Option[MMap[ResourceUri, MList[String]]] = None,
   
@@ -206,6 +210,9 @@ case class OFAsCfg(
   
   @Input 
   cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
+  
+  @Input
+  apkFileLocation : String,
   
   @Input
   procedureSymbolTables : Seq[ProcedureSymbolTable],

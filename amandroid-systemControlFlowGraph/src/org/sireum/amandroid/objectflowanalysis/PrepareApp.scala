@@ -1,0 +1,156 @@
+package org.sireum.amandroid.objectflowanalysis
+
+import org.sireum.util._
+import org.sireum.amandroid.parser.LayoutControl
+import org.sireum.amandroid.parser.ARSCFileParser
+import org.sireum.amandroid.parser.ManifestParser
+import org.sireum.amandroid.parser.LayoutFileParser
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
+import org.sireum.amandroid.dummyMainGen.DummyMainGenerator
+
+class PrepareApp(apkFileLocation : String) {
+//	private var sinks : Set[AndroidMethod] = Set()
+//	private var sources : Set[AndroidMethod] = Set()
+//	private var callbackMethods : Map[String, MList[AndroidMethod]] = Map()
+	private var entrypoints : Set[String] = Set()
+	private var layoutControls : Map[Integer, LayoutControl] = Map()
+	private var resourcePackages : List[ARSCFileParser.ResPackage] = List()
+	private var appPackageName : String = ""
+	private var taintWrapperFile : String = ""
+	private var libInfoTables : AndroidLibInfoTables = null
+
+//	def printSinks() = {
+//		println("Sinks:")
+//		for (am <- sinks) {
+//			println(am.toString())
+//		}
+//		println("End of Sinks")
+//	}
+
+	
+//	def printSources() = {
+//		println("Sources:")
+//		for (am <- sources) {
+//			println(am.toString())
+//		}
+//		println("End of Sources")
+//	}
+
+	def printEntrypoints() = {
+		if (this.entrypoints == null)
+			println("Entry points not initialized")
+		else {
+			println("Classes containing entry points:")
+			for (className <- entrypoints)
+				println("\t" + className)
+			println("End of Entrypoints")
+		}
+	}
+	
+	def setTaintWrapperFile(taintWrapperFile : String) = {
+		this.taintWrapperFile = taintWrapperFile;
+	}
+
+	def setLibInfoTables(libInfoTables : AndroidLibInfoTables) = {
+	  this.libInfoTables = libInfoTables
+	}
+	
+	def calculateSourcesSinksEntrypoints
+			(sourceSinkFile : String) = {
+
+		// To look for callbacks, we need to start somewhere. We use the Android
+		// lifecycle methods for this purpose.
+		ManifestParser.loadManifestFile(apkFileLocation)
+		this.appPackageName = ManifestParser.getPackageName
+		this.entrypoints = ManifestParser.getEntryPointClasses
+		println(ManifestParser.getEntryPointClasses)
+	  println(ManifestParser.getPackageName)
+	  println(ManifestParser.getPermissions)
+	  println(ManifestParser.getIntentDB)
+		// Parse the resource file
+		ARSCFileParser.parse(apkFileLocation);
+		this.resourcePackages = ARSCFileParser.getPackages
+		println("arscstring-->" + ARSCFileParser.getGlobalStringPool)
+	  println("arscpackage-->" + ARSCFileParser.getPackages)
+		// Collect the callback interfaces implemented in the app's source code
+//		AnalyzeJimpleClass jimpleClass = new AnalyzeJimpleClass(this.entrypoints);
+//		jimpleClass.collectCallbackMethods();
+		
+		// Find the user-defined sources in the layout XML files
+		LayoutFileParser.androidLibInfoTables = this.libInfoTables
+		LayoutFileParser.setPackageName(this.appPackageName)
+		LayoutFileParser.parseLayoutFile(apkFileLocation, this.entrypoints)
+		println("layoutcalll--->" + LayoutFileParser.getCallbackMethods)
+	  println("layoutuser--->" + LayoutFileParser.getUserControls)
+	  
+		//generate dummy main method
+		val dmGen = new DummyMainGenerator
+		dmGen.setAndroidLibInfoTables(this.libInfoTables)
+		dmGen.setEntryPointClasses(this.entrypoints)
+		dmGen.generate
+
+		// Collect the results of the soot-based phases
+//		for (Entry<String, List<AndroidMethod>> entry : jimpleClass.getCallbackMethods().entrySet()) {
+//			if (this.callbackMethods.containsKey(entry.getKey()))
+//				this.callbackMethods.get(entry.getKey()).addAll(entry.getValue());
+//			else
+//				this.callbackMethods.put(entry.getKey(), new ArrayList<AndroidMethod>(entry.getValue()));
+//		}
+//		this.layoutControls = lfp.getUserControls();
+//		
+//		// Collect the XML-based callback methods
+//		for (Entry<SootClass, Set<Integer>> lcentry : jimpleClass.getLayoutClasses().entrySet())
+//			for (Integer classId : lcentry.getValue()) {
+//				AbstractResource resource = resParser.findResource(classId);
+//				if (resource instanceof StringResource) {
+//					StringResource strRes = (StringResource) resource;
+//					if (lfp.getCallbackMethods().containsKey(strRes.getValue()))
+//						for (String methodName : lfp.getCallbackMethods().get(strRes.getValue())) {
+//							List<AndroidMethod> methods = this.callbackMethods.get(lcentry.getKey().getName());
+//							if (methods == null) {
+//								methods = new ArrayList<AndroidMethod>();
+//								this.callbackMethods.put(lcentry.getKey().getName(), methods);
+//							}
+//							
+//							// The callback may be declared directly in the class
+//							// or in one of the superclasses
+//							SootMethod callbackMethod = null;
+//							SootClass callbackClass = lcentry.getKey();
+//							while (callbackMethod == null) {
+//								if (callbackClass.declaresMethodByName(methodName))
+//									callbackMethod = callbackClass.getMethodByName(methodName);
+//								if (callbackClass.hasSuperclass())
+//									callbackClass = callbackClass.getSuperclass();
+//								else
+//									break;
+//							}
+//							if (callbackMethod == null) {
+//								System.err.println("Callback method " + methodName + " not found in class "
+//										+ lcentry.getKey().getName());
+//								continue;
+//							}
+//							methods.add(new AndroidMethod(callbackMethod));
+//						}
+//				}
+//				else
+//					System.err.println("Unexpected resource type for layout class");
+//			}
+//		System.out.println("Found " + this.callbackMethods.size() + " callback methods");
+//
+//		PermissionMethodParser parser = PermissionMethodParser.fromFile(sourceSinkFile);
+//		for (AndroidMethod am : parser.parse()){
+//			if (am.isSource())
+//				sources.add(am);
+//			if(am.isSink())
+//				sinks.add(am);
+//		}
+//		
+//		//add sink for Intents:
+//		AndroidMethod setResult = new AndroidMethod(SootMethodRepresentationParser.v().parseSootMethodString
+//				("<android.app.Activity: void startActivity(android.content.Intent)>"));
+//		setResult.setSink(true);
+//		sinks.add(setResult);
+//		
+//		System.out.println("Entry point calculation done.");
+	}
+}

@@ -81,15 +81,39 @@ class SignatureParser(sig : String) {
     }
   
     def getParameters() : MList[String] = {
-        var count = 0;
-        val params : MList[String] = mlistEmpty
-        val iterator = new ParameterSignatureIterator()
-        while(iterator.hasNext){
-          val p = iterator.next();
-          params.insert(count, p)
-          count+=1;
+      var count = 0
+      val params : MList[String] = mlistEmpty
+      val iterator = new ParameterSignatureIterator()
+      while(iterator.hasNext){
+        val p = iterator.next()
+        params.insert(count, p)
+        count+=1
+      }
+      params
+    }
+    
+    def getParameterNum() : Int = {
+      var count = 0
+      val iterator = new ParameterSignatureIterator()
+      while(iterator.hasNext){
+        val p = iterator.next()
+        count+=1
+      }
+      count
+    }
+    
+    def getObjectParameters() : MMap[Int, ResourceUri] = {
+      var count = 0
+      val params : MMap[Int, ResourceUri] = mmapEmpty
+      val iterator = new ParameterSignatureIterator()
+      while(iterator.hasNext){
+        val p = iterator.next()
+        if(p.startsWith("L")){
+        	params(count) = "[|" + p.substring(1, p.length()).replaceAll("\\/", ":").replaceAll(";", "") + "|]"
         }
-        params
+        count+=1
+      }
+      params
     }
     
     //before cut: [|LSavings;.interest:(I)V|], after cut: (I)V

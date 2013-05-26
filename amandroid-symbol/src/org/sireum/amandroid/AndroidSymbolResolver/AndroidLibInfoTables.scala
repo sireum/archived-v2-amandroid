@@ -12,18 +12,29 @@ import java.util.HashSet
 trait AndroidLibInfoTables {
   def getRecOfProc(procedureUri : ResourceUri) : ResourceUri  // returns owner recordUri of the procedureUri
   def getRecordUri(recordName : String) : ResourceUri
-  def getParents(recordUri : ResourceUri) : MSet[ResourceUri]  // returns the parent-recordUris of recordUri
+  def getRecordName(recordUri : String) : ResourceUri
+  def getParents(recordUri : ResourceUri) : Set[ResourceUri]  // returns the parent-recordUris of recordUri
+  def getAncestors(recordUri : ResourceUri) : Set[ResourceUri]
   def getProcedureUriBySignature(sig : String) : ResourceUri
+  def getProcedureSignatureByUri(pUri : ResourceUri) : String
   def getProcedureUrisByRecordUri(recordUri : ResourceUri) : java.util.Set[ResourceUri]
   def getProcedureSigsByRecordUri(recordUri : ResourceUri) : MSet[ResourceUri]
   def getCalleeOptionsByUri(procedureUri : ResourceUri) : java.util.Set[ResourceUri]
   def getCalleeOptionsBySignature(sig : String) : java.util.Set[ResourceUri]
   def getGlobalVarUriByName(name : String) : ResourceUri
-  def isConstructor(sig : String) : Boolean
-  def isStaticMethod(sig : String) : Boolean
-  def isVirtualMethod(sig : String) : Boolean
-  def isOverrider(sig1 : String, sig2 : String) : Boolean  // checks if a pUri (sig1) is overrider of another pUri (sig2) 
+  def isConstructor(procedureUri : String) : Boolean
+  def isStaticMethod(procedureUri : String) : Boolean
+  def isVirtualMethod(procedureUri : String) : Boolean
+  def isOverrider(procedureUri1 : String, procedureUri2 : String) : Boolean  // checks if a pUri is overrider of another pUri 
   def mergeWith(anotherVmTables : AndroidLibInfoTables)
+  def containsRecord(recordName : String) : Boolean
+  /**
+   * Finds a ProcedureUri in the given class or one of its super classes
+   * @param rUri Current record resource uri
+   * @param subSig The sub signature of the procedure to find
+   * @ return The procedure resource uri with the given signature if it has been found, otherwise null
+   */
+  def findProcedureUri(rUri : ResourceUri, subSig : String) : ResourceUri
 }
 
 trait AndroidLibInfoTablesProducer{

@@ -40,6 +40,9 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
   val dr = this.defRef
   val iopp = this.isInputOutputParamPredicate
   val saom = this.switchAsOrderedMatch
+  //for prepare application
+  val apkFLOpt = this.apkFileLocationOpt 
+  val apkFL = apkFLOpt match{case Some(n) => n; case None => null}
   //////end here
   //for inter procedure analysis building
   val cfgs : MMap[ResourceUri, ControlFlowGraph[String]] = mmapEmpty
@@ -126,6 +129,7 @@ class AndroidInterIntraProceduralModuleDef (val job : PipelineJob, info : Pipeli
     val j = PipelineJob()
     val options = j.properties
     if(this.shouldBuildOFAsCfg) {
+    	OFAsCfgModule.setApkFileLocation(options, apkFL)
       OFAsCfgModule.setAndroidCache(options, aCache)
       OFAsCfgModule.setAndroidLibInfoTables(options, alit)
       OFAsCfgModule.setCfgs(options, cfgs)
@@ -225,7 +229,7 @@ class OFAsCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) ext
   val results : MMap[ResourceUri, (ObjectFlowGraph[OfaNode], SystemControlFlowGraph[String])] = mmapEmpty
   this.androidCache match{
     case Some(ac) =>
-      results ++= new ObjectFlowGraphAndSystemControlFlowGraphBuilder[OfaNode, String].apply(this.procedureSymbolTables, this.cfgs, this.rdas, this.cCfgs, this.androidLibInfoTables, ac)
+      results ++= new ObjectFlowGraphAndSystemControlFlowGraphBuilder[OfaNode, String].apply(this.procedureSymbolTables, this.cfgs, this.rdas, this.cCfgs, this.androidLibInfoTables, ac, this.apkFileLocation)
     case None =>
   }
   this.OFAsCfg_=(results)
