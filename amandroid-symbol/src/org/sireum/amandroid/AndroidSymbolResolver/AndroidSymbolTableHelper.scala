@@ -55,6 +55,38 @@ object H1 {
       Visitor.build(Visitor.map(
         ilist(globalVarMiner, procedureMiner, recordMiner), false))
   }
+  
+  class SingleProcedureMiner extends SymbolMiner {
+    
+  	val procedureMiner : VisitorFunction = {
+	    case pd : PackageDecl =>
+	      val packageSymDef = pd.name
+	      pd.elements.foreach {
+	        case pd : ProcedureDecl =>
+	          procedureSymbol(pd, packageSymDef)
+	          val procedureSymDef = pd.name
+	        case _ =>
+	      }
+	      false
+	    case pe : PackageElement =>
+	      false
+	    case a : Annotation =>
+	      false
+	  }
+
+  	def procedureSymbol(procedureDecl : ProcedureDecl,
+                      packageSymDef : Option[SymbolDefinition]) = {
+	    val nameDef = procedureDecl.name
+	    H.symbolInit(nameDef, H.PROCEDURE_TYPE,
+	      H.packagePath(packageSymDef, nameDef.name))
+	
+	    import LineColumnLocation._
+	    H.symbolInit(nameDef, H.PROCEDURE_TYPE,
+	      H.packagePath(packageSymDef, nameDef.name + "/" + 
+	          nameDef.line + "/" + nameDef.column +
+	          "/" + Integer.toHexString(procedureDecl.withoutBody.toString.hashCode)))
+	  }
+}
 
   class ProcedureMinerResolver(pstp : AndroidProcedureSymbolTableProducer)
       extends AndroidProcedureSymbolTableProducer with AndroidProcedureSymbolMiner

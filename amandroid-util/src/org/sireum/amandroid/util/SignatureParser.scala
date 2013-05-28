@@ -109,12 +109,16 @@ class SignatureParser(sig : String) {
       while(iterator.hasNext){
         val p = iterator.next()
         if(p.startsWith("L")){
-        	params(count) = "[|" + p.substring(1, p.length()).replaceAll("\\/", ":").replaceAll(";", "") + "|]"
+        	params(count) = convertSigRecordPartToRecordName(p)
         }
         count+=1
       }
       params
     }
+    
+    private def convertSigRecordPartToRecordName(p : String) : String = "[|" + p.substring(1, p.length()).replaceAll("\\/", ":").replaceAll(";", "") + "|]"
+    
+    def getRecordName : String = convertSigRecordPartToRecordName(signature.substring(2, signature.indexOf('.')))
     
     //before cut: [|LSavings;.interest:(I)V|], after cut: (I)V
     def getParamSig = {

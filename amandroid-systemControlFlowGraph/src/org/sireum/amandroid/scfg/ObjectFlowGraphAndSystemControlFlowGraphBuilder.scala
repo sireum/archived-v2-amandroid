@@ -12,11 +12,10 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 import org.sireum.amandroid.objectflowanalysis._
-
 import scala.collection.JavaConversions._
-
 import org.sireum.amandroid.util.CombinationIterator
 import org.sireum.amandroid.util.SignatureParser
+import org.sireum.pilar.parser.PilarParser
 
 
 class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLabel] {
@@ -37,105 +36,86 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
             rdas : MMap[ResourceUri, ReachingDefinitionAnalysis.Result],
             cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
             androidLibInfoTables : AndroidLibInfoTables,
-            androidCache : AndroidCacheFile[String],
-            apkFileLocation : String) 
-            = build(psts, cfgs, rdas, cCfgs, androidLibInfoTables, androidCache, apkFileLocation)
+            androidCache : AndroidCacheFile[String]) 
+            = build(psts, cfgs, rdas, cCfgs, androidLibInfoTables, androidCache)
 
   def build(psts : Seq[ProcedureSymbolTable],
             cfgs : MMap[ResourceUri, ControlFlowGraph[String]],
             rdas : MMap[ResourceUri, ReachingDefinitionAnalysis.Result],
             cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
             androidLibInfoTables : AndroidLibInfoTables,
-            androidCache : AndroidCacheFile[String],
-            apkFileLocation : String)
+            androidCache : AndroidCacheFile[String])
    : MMap[ResourceUri, (ObjectFlowGraph[Node], SystemControlFlowGraph[String])] = {
     val preResults : MMap[ResourceUri, (ObjectFlowGraph[Node])] = mmapEmpty
     val aggPreOfg = new ObjectFlowGraph[Node] // represents the aggregate of preliminary Ofgs of entryPoints
     val results : MMap[ResourceUri, (ObjectFlowGraph[Node], SystemControlFlowGraph[String])] = mmapEmpty
-    val entryPoints : MSet[ResourceUri] = msetEmpty
-    
-    val pre = new PrepareApp(apkFileLocation)
-    pre.setLibInfoTables(androidLibInfoTables)
-    pre.calculateSourcesSinksEntrypoints("")
+
+    val entryPoint : String = ""
     
     psts.foreach(
       pst =>{
-        if(pst.procedureUri.contains("de:mobinauten:smsspy:EmergencyTask.findAndSendLocation")) entryPoints += pst.procedureUri
         pstMap(pst.procedureUri) = pst
       }  
     )
+    
+    
 //    entryPoints ++= new EntryPointCollector().getEntryPoints(pstMap, androidLibInfoTables)
-    this.cfgs = cfgs
-    this.rdas = rdas
-    this.cCfgs = cCfgs
-    
-    entryPoints.foreach(
-        ep => {
-          val ofg = new ObjectFlowGraph[Node]
-          val cfg = cfgs(ep)
-          val rda = rdas(ep)
-          val cCfg = cCfgs(ep)
-          doPreOFA(pstMap(ep), cfg, rda, cCfg, ofg, androidLibInfoTables, androidCache)
-          preResults(ep) = ofg
-          aggPreOfg.combineOfgs(ofg)         
-        }
-    )
-    
-    val sCfg = new sCfg[String]
-    val ep = entryPoints.head
-//    entryPoints.foreach(
-//        ep => {
-          processed = mmapEmpty
-          //val ofg = new ObjectFlowGraph[Node]
-          //val sCfg = new sCfg[String]
-          val cfg = cfgs(ep)
-          val rda = rdas(ep)
-          val cCfg = cCfgs(ep)
-          doOFA(pstMap(ep), cfg, rda, cCfg, aggPreOfg, sCfg, androidLibInfoTables, androidCache)
-          results(ep) = (aggPreOfg, sCfg)
-          processed.clear
-//        }
+//    this.cfgs = cfgs
+//    this.rdas = rdas
+//    this.cCfgs = cCfgs
+//    val ofg = new ObjectFlowGraph[Node]
+//    val cfg = cfgs(entryPoint)
+//    val rda = rdas(entryPoint)
+//    val cCfg = cCfgs(entryPoint)
+//    doPreOFA(pstMap(entryPoint), cfg, rda, cCfg, ofg, androidLibInfoTables, androidCache)
+//    preResults(entryPoint) = ofg
+//    aggPreOfg.combineOfgs(ofg)         
+//    
+//    val sCfg = new sCfg[String]
+//    processed = mmapEmpty
+//    doOFA(pstMap(entryPoint), cfg, rda, cCfg, aggPreOfg, sCfg, androidLibInfoTables, androidCache)
+//    results(entryPoint) = (aggPreOfg, sCfg)
+//    processed.clear
+//    results.keys.foreach(
+//      key=> {
+//        val result = results(key)
+////        result._1.nodes.foreach(
+////          node => {
+////            val name = node.toString()
+////            val valueSet = node.getProperty(result._1.VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]] filter {case (k, v) => v.equals("STRING")}
+////            if(!valueSet.isEmpty)
+////            	println("node:" + name + "\nvalueSet:" + valueSet)
+////          }
+////        )
+////        println("processed--->" + processed.size)
+////        println("arrayrepo------>" + result._1.arrayRepo)
+////        println("globalrepo------>" + result._1.globalDefRepo)
+//        val f = new File(System.getProperty("user.home") + "/Desktop/ofg.dot")
+//        val o = new FileOutputStream(f)
+//        val w = new OutputStreamWriter(o)
+//        result._1.toDot(w)
+//        val f1 = new File(System.getProperty("user.home") + "/Desktop/sCfg.dot")
+//        val o1 = new FileOutputStream(f1)
+//        val w1 = new OutputStreamWriter(o1)
+//        result._2.toDot(w1)
+//      }
 //    )
-    results.keys.foreach(
-      key=> {
-        val result = results(key)
-//        result._1.nodes.foreach(
-//          node => {
-//            val name = node.toString()
-//            val valueSet = node.getProperty(result._1.VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]] filter {case (k, v) => v.equals("STRING")}
-//            if(!valueSet.isEmpty)
-//            	println("node:" + name + "\nvalueSet:" + valueSet)
-//          }
-//        )
-//        println("processed--->" + processed.size)
-//        println("arrayrepo------>" + result._1.arrayRepo)
-//        println("globalrepo------>" + result._1.globalDefRepo)
-        val f = new File(System.getProperty("user.home") + "/Desktop/ofg.dot")
-        val o = new FileOutputStream(f)
-        val w = new OutputStreamWriter(o)
-        result._1.toDot(w)
-        val f1 = new File(System.getProperty("user.home") + "/Desktop/sCfg.dot")
-        val o1 = new FileOutputStream(f1)
-        val w1 = new OutputStreamWriter(o1)
-        result._2.toDot(w1)
-      }
-    )
     pstMap.clear
     
     results
   }
   
   
-   def doPreOFA(pst : ProcedureSymbolTable,
-            cfg : ControlFlowGraph[String],
-            rda : ReachingDefinitionAnalysis.Result,
-            cCfg : CompressedControlFlowGraph[String],
-            ofg : ObjectFlowGraph[Node],
-            androidLibInfoTables : AndroidLibInfoTables,
-            androidCache : AndroidCacheFile[String]) = {
-    val points = new PointsCollector[Node]().points(pst, ofg)
-    ofg.points ++= points
-    ofg.constructGraph(points, cfg, rda)
+	def doPreOFA(pst : ProcedureSymbolTable,
+			          cfg : ControlFlowGraph[String],
+			          rda : ReachingDefinitionAnalysis.Result,
+			          cCfg : CompressedControlFlowGraph[String],
+			          ofg : ObjectFlowGraph[Node],
+			          androidLibInfoTables : AndroidLibInfoTables,
+			          androidCache : AndroidCacheFile[String]) = {
+	  val points = new PointsCollector[Node]().points(pst, ofg)
+	  ofg.points ++= points
+	  ofg.constructGraph(points, cfg, rda)
     
   }
   

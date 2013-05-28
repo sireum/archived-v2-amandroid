@@ -2,8 +2,8 @@ group PilarCodeGenerator;
 
 delimiters "$", "$"
 
-ProcedureDecl(retTyp, procedureName, params, localVars, body) ::= <<
-procedure $retTyp$ $procedureName$($params ; separator=", "$) {
+ProcedureDecl(retTyp, procedureName, params, localVars, owner, body) ::= <<
+procedure $retTyp$ $procedureName$($params ; separator=", "$) @owner $owner$ {
   $localVars$
 	
   $body$
@@ -11,7 +11,8 @@ procedure $retTyp$ $procedureName$($params ; separator=", "$) {
 >>
 
 LocalVars(locals) ::= <<
-local
+local nop;
+	temp;
   $locals ; separator="\n"$
 >>
 
@@ -24,12 +25,12 @@ $codeFragments ; separator="\n"$
 >>
 
 CodeFragment(label, codes) ::= <<
-#$label$.
-  $codes ; separator="\n"$
+#$label$. nop:= 0;
+$codes ; separator="\n"$
 >>
 
 Code(code) ::= <<
-$code$;
+# $code$;
 >>
 
 Label(num) ::= <<
@@ -38,6 +39,14 @@ Label$num$
 
 IfStmt(cond, label) ::= <<
 if $cond$ then goto $label$
+>>
+
+GotoStmt(label) ::= <<
+goto $label$
+>>
+
+ReturnStmt(variable) ::= <<
+return $variable$
 >>
 
 AssignmentStmt(lhs, rhs) ::= <<

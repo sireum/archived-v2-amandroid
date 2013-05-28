@@ -336,6 +336,10 @@ class AndroidLibInfoResolver
     }
   }
   
+  def getSubSignature(sig : String) : String = getPartSig(sig)
+  
+  def getSubSignatureFromUri(procedureUri : ResourceUri) : String = getPartSig(getProcedureSignatureByUri(procedureUri))
+  
   def getInside(name : String) : String = {
     val rName = name.substring(2, name.length()-2)
     rName

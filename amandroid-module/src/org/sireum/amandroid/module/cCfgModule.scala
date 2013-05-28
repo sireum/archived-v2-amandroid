@@ -69,33 +69,6 @@ object cCfgModule extends PipelineModule {
 
   def inputDefined (job : PipelineJob) : MBuffer[Tag] = {
     val tags = marrayEmpty[Tag]
-    var _cfg : scala.Option[AnyRef] = None
-    var _cfgKey : scala.Option[String] = None
-
-    val keylistcfg = List(cCfgModule.globalCfgKey, CfgModule.cfgKey)
-    keylistcfg.foreach(key => 
-      if(job ? key) { 
-        if(_cfg.isEmpty) {
-          _cfg = Some(job(key))
-          _cfgKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _cfg.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'cfg' keys '" + _cfgKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _cfg match{
-      case Some(x) =>
-        if(!x.isInstanceOf[org.sireum.alir.ControlFlowGraph[java.lang.String]]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'cfg'.  Expecting 'org.sireum.alir.ControlFlowGraph[java.lang.String]' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'cfg'")       
-    }
     var _pool : scala.Option[AnyRef] = None
     var _poolKey : scala.Option[String] = None
 
@@ -150,6 +123,33 @@ object cCfgModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'procedureSymbolTable'")       
     }
+    var _cfg : scala.Option[AnyRef] = None
+    var _cfgKey : scala.Option[String] = None
+
+    val keylistcfg = List(cCfgModule.globalCfgKey, CfgModule.cfgKey)
+    keylistcfg.foreach(key => 
+      if(job ? key) { 
+        if(_cfg.isEmpty) {
+          _cfg = Some(job(key))
+          _cfgKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _cfg.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'cfg' keys '" + _cfgKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _cfg match{
+      case Some(x) =>
+        if(!x.isInstanceOf[org.sireum.alir.ControlFlowGraph[java.lang.String]]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'cfg'.  Expecting 'org.sireum.alir.ControlFlowGraph[java.lang.String]' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'cfg'")       
+    }
     return tags
   }
 
@@ -172,28 +172,6 @@ object cCfgModule extends PipelineModule {
         job(cCfgModule.globalCCfgKey).getClass.toString + "'")
     } 
     return tags
-  }
-
-  def getCfg (options : scala.collection.Map[Property.Key, Any]) : org.sireum.alir.ControlFlowGraph[java.lang.String] = {
-    if (options.contains(cCfgModule.globalCfgKey)) {
-       return options(cCfgModule.globalCfgKey).asInstanceOf[org.sireum.alir.ControlFlowGraph[java.lang.String]]
-    }
-    if (options.contains(cCfgModule.cfgKey)) {
-       return options(cCfgModule.cfgKey).asInstanceOf[org.sireum.alir.ControlFlowGraph[java.lang.String]]
-    }
-    if (options.contains(CfgModule.cfgKey)) {
-       return options(CfgModule.cfgKey).asInstanceOf[org.sireum.alir.ControlFlowGraph[java.lang.String]]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setCfg (options : MMap[Property.Key, Any], cfg : org.sireum.alir.ControlFlowGraph[java.lang.String]) : MMap[Property.Key, Any] = {
-
-    options(cCfgModule.globalCfgKey) = cfg
-    options(cfgKey) = cfg
-
-    return options
   }
 
   def getPool (options : scala.collection.Map[Property.Key, Any]) : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode] = {
@@ -233,6 +211,28 @@ object cCfgModule extends PipelineModule {
     return options
   }
 
+  def getCfg (options : scala.collection.Map[Property.Key, Any]) : org.sireum.alir.ControlFlowGraph[java.lang.String] = {
+    if (options.contains(cCfgModule.globalCfgKey)) {
+       return options(cCfgModule.globalCfgKey).asInstanceOf[org.sireum.alir.ControlFlowGraph[java.lang.String]]
+    }
+    if (options.contains(cCfgModule.cfgKey)) {
+       return options(cCfgModule.cfgKey).asInstanceOf[org.sireum.alir.ControlFlowGraph[java.lang.String]]
+    }
+    if (options.contains(CfgModule.cfgKey)) {
+       return options(CfgModule.cfgKey).asInstanceOf[org.sireum.alir.ControlFlowGraph[java.lang.String]]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setCfg (options : MMap[Property.Key, Any], cfg : org.sireum.alir.ControlFlowGraph[java.lang.String]) : MMap[Property.Key, Any] = {
+
+    options(cCfgModule.globalCfgKey) = cfg
+    options(cfgKey) = cfg
+
+    return options
+  }
+
   def getCCfg (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String] = {
     if (options.contains(cCfgModule.globalCCfgKey)) {
        return options(cCfgModule.globalCCfgKey).asInstanceOf[org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]
@@ -254,9 +254,9 @@ object cCfgModule extends PipelineModule {
 
   object ConsumerView {
     implicit class cCfgModuleConsumerView (val job : PropertyProvider) extends AnyVal {
-      def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = cCfgModule.getCfg(job.propertyMap)
       def pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode] = cCfgModule.getPool(job.propertyMap)
       def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = cCfgModule.getProcedureSymbolTable(job.propertyMap)
+      def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = cCfgModule.getCfg(job.propertyMap)
       def cCfg : org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String] = cCfgModule.getCCfg(job.propertyMap)
     }
   }
@@ -264,14 +264,14 @@ object cCfgModule extends PipelineModule {
   object ProducerView {
     implicit class cCfgModuleProducerView (val job : PropertyProvider) extends AnyVal {
 
-      def cfg_=(cfg : org.sireum.alir.ControlFlowGraph[java.lang.String]) { cCfgModule.setCfg(job.propertyMap, cfg) }
-      def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = cCfgModule.getCfg(job.propertyMap)
-
       def pool_=(pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]) { cCfgModule.setPool(job.propertyMap, pool) }
       def pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode] = cCfgModule.getPool(job.propertyMap)
 
       def procedureSymbolTable_=(procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable) { cCfgModule.setProcedureSymbolTable(job.propertyMap, procedureSymbolTable) }
       def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = cCfgModule.getProcedureSymbolTable(job.propertyMap)
+
+      def cfg_=(cfg : org.sireum.alir.ControlFlowGraph[java.lang.String]) { cCfgModule.setCfg(job.propertyMap, cfg) }
+      def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = cCfgModule.getCfg(job.propertyMap)
 
       def cCfg_=(cCfg : org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]) { cCfgModule.setCCfg(job.propertyMap, cCfg) }
       def cCfg : org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String] = cCfgModule.getCCfg(job.propertyMap)
@@ -282,11 +282,11 @@ object cCfgModule extends PipelineModule {
 trait cCfgModule {
   def job : PipelineJob
 
-  def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = cCfgModule.getCfg(job.propertyMap)
-
   def pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode] = cCfgModule.getPool(job.propertyMap)
 
   def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = cCfgModule.getProcedureSymbolTable(job.propertyMap)
+
+  def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = cCfgModule.getCfg(job.propertyMap)
 
 
   def cCfg_=(cCfg : org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]) { cCfgModule.setCCfg(job.propertyMap, cCfg) }

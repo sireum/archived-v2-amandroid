@@ -7,17 +7,23 @@ import org.sireum.amandroid.parser.ManifestParser
 import org.sireum.amandroid.parser.LayoutFileParser
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.dummyMainGen.DummyMainGenerator
+import org.sireum.amandroid.androidConstants.AndroidConstants
+import org.sireum.amandroid.entryPointConstants.AndroidEntryPointConstants
 
 class PrepareApp(apkFileLocation : String) {
+  
+  private val DEBUG = true
 //	private var sinks : Set[AndroidMethod] = Set()
 //	private var sources : Set[AndroidMethod] = Set()
 //	private var callbackMethods : Map[String, MList[AndroidMethod]] = Map()
+  private var mainComponent : String = null
 	private var entrypoints : Set[String] = Set()
 	private var layoutControls : Map[Integer, LayoutControl] = Map()
 	private var resourcePackages : List[ARSCFileParser.ResPackage] = List()
 	private var appPackageName : String = ""
 	private var taintWrapperFile : String = ""
 	private var libInfoTables : AndroidLibInfoTables = null
+	private var dummyMainMap : Map[ResourceUri, String] = Map()
 
 //	def printSinks() = {
 //		println("Sinks:")
@@ -36,6 +42,9 @@ class PrepareApp(apkFileLocation : String) {
 //		println("End of Sources")
 //	}
 
+	def printDummyMains() =
+	  dummyMainMap.foreach{case(k, v) => println("dummyMain for " + k + "\n" + v)}
+	
 	def printEntrypoints() = {
 		if (this.entrypoints == null)
 			println("Entry points not initialized")
@@ -55,18 +64,59 @@ class PrepareApp(apkFileLocation : String) {
 	  this.libInfoTables = libInfoTables
 	}
 	
-	def calculateSourcesSinksEntrypoints
-			(sourceSinkFile : String) = {
+	def getMainComponent() = this.mainComponent
+	
+	def getDummyMainMap() = this.dummyMainMap
+	
+	private def filterMainComponent(intentDB : Map[String, MMap[String, MSet[String]]]) : String = {
+	  var mainComponent : String = null
+	  this.entrypoints.foreach{
+	    ep =>
+	      if(intentDB.contains(ep) && intentDB(ep).contains("action"))
+	      	intentDB(ep)("action").foreach{
+	          action =>
+	            if(action.equals(AndroidConstants.ACTION_MAIN))
+	              mainComponent = ep
+	      	}
+	  }
+	  if(mainComponent == null){
+	    this.entrypoints.foreach{
+	    	ep =>
+	        val ancestors = libInfoTables.getAncestors(libInfoTables.getRecordUri(ep))
+	        ancestors.foreach{
+	          ancestor =>
+	              if(ancestor.equals(AndroidEntryPointConstants.BROADCASTRECEIVERCLASS)) mainComponent = ep
+	        }
+	    }
+	  }
+	  if(mainComponent == null){
+	    System.err.println("Not found any main component in app: " + apkFileLocation)
+	  }
+	  mainComponent
+	}
+	
+	def generateDummyMain(recordName : String) : Unit = {
+	  if(recordName == null) return
+		//generate dummy main method
+	  if(DEBUG)
+	  	println("Generate DummyMain for " + recordName)
+		val dmGen = new DummyMainGenerator
+		dmGen.setCurrentComponent(recordName)
+		dmGen.setAndroidLibInfoTables(this.libInfoTables)
+		dummyMainMap += (recordName -> dmGen.generate)
+	}
+	
+	def calculateSourcesSinksEntrypoints(sourceSinkFile : String) = {
 
 		// To look for callbacks, we need to start somewhere. We use the Android
 		// lifecycle methods for this purpose.
 		ManifestParser.loadManifestFile(apkFileLocation)
 		this.appPackageName = ManifestParser.getPackageName
 		this.entrypoints = ManifestParser.getEntryPointClasses
-		println(ManifestParser.getEntryPointClasses)
-	  println(ManifestParser.getPackageName)
-	  println(ManifestParser.getPermissions)
-	  println(ManifestParser.getIntentDB)
+		println("entrypoints--->" + ManifestParser.getEntryPointClasses)
+	  println("packagename--->" + ManifestParser.getPackageName)
+	  println("permissions--->" + ManifestParser.getPermissions)
+	  println("intentDB------>" + ManifestParser.getIntentDB)
 		// Parse the resource file
 		ARSCFileParser.parse(apkFileLocation);
 		this.resourcePackages = ARSCFileParser.getPackages
@@ -83,11 +133,9 @@ class PrepareApp(apkFileLocation : String) {
 		println("layoutcalll--->" + LayoutFileParser.getCallbackMethods)
 	  println("layoutuser--->" + LayoutFileParser.getUserControls)
 	  
-		//generate dummy main method
-		val dmGen = new DummyMainGenerator
-		dmGen.setAndroidLibInfoTables(this.libInfoTables)
-		dmGen.setEntryPointClasses(this.entrypoints)
-		dmGen.generate
+	  // filter the main component of this app
+	  this.mainComponent = filterMainComponent(ManifestParser.getIntentDB)
+	  this.entrypoints.foreach(f => generateDummyMain(f))
 
 		// Collect the results of the soot-based phases
 //		for (Entry<String, List<AndroidMethod>> entry : jimpleClass.getCallbackMethods().entrySet()) {

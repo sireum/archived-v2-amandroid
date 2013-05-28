@@ -13,7 +13,10 @@ class DummyMainGenerator {
   
   private var currentComponent : ResourceUri = ""
   private var androidClasses : Set[ResourceUri] = Set()
-  private var callbackFunctions : Map[String, MList[ResourceUri]] = Map()
+  /**
+   * Map from record uri to list of callback procedure uri
+   */
+  private var callbackFunctions : Map[ResourceUri, MList[ResourceUri]] = Map()
   private var intCounter : String = ""
   private var conditionCounter : Int = 0
   private val template = new STGroupFile("org/sireum/amandroid/pilarCodeTemplate/PilarCode.stg")
@@ -69,14 +72,11 @@ class DummyMainGenerator {
 	
 	def generateInternal(methods : List[ResourceUri]) : String = {
 	  var classMap : Map[ResourceUri, MList[ResourceUri]] = Map()
-	  this.androidClasses.foreach{
-	    clazz =>
-	      if(!classMap.contains(clazz))
-	        classMap += (clazz -> mlistEmpty)
-	  }
+	  classMap += (this.currentComponent -> mlistEmpty)
 	  
 	  procDeclTemplate.add("retTyp", "[|void|]")
-	  procDeclTemplate.add("procedureName", "[|dummyMain" + this.currentComponent + "|]")
+	  procDeclTemplate.add("owner", this.currentComponent)
+	  procDeclTemplate.add("procedureName", this.currentComponent.substring(0, this.currentComponent.length() - 2) + ".dummyMain|]")
 	  procDeclTemplate.add("params", "")
 	  
 	  val intVar = template.getInstanceOf("LocalVar")
@@ -166,12 +166,12 @@ class DummyMainGenerator {
 	  val outerExitFragment = new CodeFragmentGenerator
     outerExitFragment.addLabel
     createIfStmt(outerStartFragment, outerExitFragment)
+	  createReturnStmt("@void", outerExitFragment)
 	  codeFragments.add(outerExitFragment)
 	  localVarsTemplate.add("locals", localVars)
 	  bodyTemplate.add("codeFragments", generateBody)
 	  procDeclTemplate.add("localVars", localVarsTemplate.render())
 	  procDeclTemplate.add("body", bodyTemplate.render())
-	  println(procDeclTemplate.render())
 	  procDeclTemplate.render()
 	}
 	
@@ -183,20 +183,21 @@ class DummyMainGenerator {
 	  body
 	}
 	
-	def generateRecordConstructor(rUri : ResourceUri, constructionStack : MSet[ResourceUri], codefg : CodeFragmentGenerator) : Unit = {
+	def generateRecordConstructor(rUri : ResourceUri, constructionStack : MSet[ResourceUri], codefg : CodeFragmentGenerator) : String = {
 	  constructionStack.add(rUri)
 	  val sigs = androidLibInfoTables.getProcedureSigsByRecordUri(rUri)
-	  var cons : String = ""
+	  var cons : String = null
 	  sigs.foreach{
 	    sig =>
 	      val pUri = androidLibInfoTables.getProcedureUriBySignature(sig)
 	      if(androidLibInfoTables.isConstructor(pUri)) cons = sig
 	  }
-	  if(cons != ""){
+	  if(cons != null){
 	    generateProcedureCall(cons, "direct", localVarsForClasses(rUri), constructionStack, codefg)
 	  } else {
 	    System.err.println("Warning, cannot find constructor for " + rUri)
 	  }
+	  cons
 	}
 	
 	private def generateProcedureCall(pSig : ResourceUri, typ : String, localClassVar : String, constructionStack : MSet[ResourceUri], codefg : CodeFragmentGenerator) : Unit = {
@@ -209,7 +210,6 @@ class DummyMainGenerator {
       param =>
         val paramUri = androidLibInfoTables.getRecordUri(param._2)
         // to protect go into dead constructor create loop
-        println(param._2 + " " + paramUri)
         if(!constructionStack.contains(paramUri)){
           val newExp = template.getInstanceOf("NewExp")
 				  newExp.add("name", param._2)
@@ -267,16 +267,7 @@ class DummyMainGenerator {
 	  searchAndBuildProcedureCall(AndroidEntryPointConstants.CONTENTPROVIDER_ONCREATE, rUri, entryPoints, onCreateFragment)
 	  
 	  //all other entry points of this class can be called in arbitary order
-	  val startWhileFragment = new CodeFragmentGenerator
-	  val endWhileFragment = new CodeFragmentGenerator
-	  startWhileFragment.addLabel
-	  codeFragments.add(startWhileFragment)
-	  ////
-	  
-	  ////
-	  endWhileFragment.addLabel
-	  codeFragments.add(endWhileFragment)
-	  createIfStmt(startWhileFragment, endWhileFragment)
+	  val endWhileFragment = generateAllCallbacks(entryPoints, rUri, classLocalVar)
 	  createIfStmt(onCreateFragment, endWhileFragment)
 	}
 	
@@ -298,16 +289,7 @@ class DummyMainGenerator {
 	  searchAndBuildProcedureCall(AndroidEntryPointConstants.BROADCAST_ONRECEIVE, rUri, entryPoints, onReceiveFragment)
 	  
 	  //all other entry points of this class can be called in arbitary order
-	  val startWhileFragment = new CodeFragmentGenerator
-	  val endWhileFragment = new CodeFragmentGenerator
-	  startWhileFragment.addLabel
-	  codeFragments.add(startWhileFragment)
-	  ////
-	  
-	  ////
-	  endWhileFragment.addLabel
-	  codeFragments.add(endWhileFragment)
-	  createIfStmt(startWhileFragment, endWhileFragment)
+	  val endWhileFragment = generateAllCallbacks(entryPoints, rUri, classLocalVar)
 	  createIfStmt(onReceiveFragment, endWhileFragment)
 	}
 	
@@ -333,16 +315,7 @@ class DummyMainGenerator {
 	  searchAndBuildProcedureCall(AndroidEntryPointConstants.SERVICE_ONSTART1, rUri, entryPoints, onCreateFragment)
 	  searchAndBuildProcedureCall(AndroidEntryPointConstants.SERVICE_ONSTART2, rUri, entryPoints, onCreateFragment)
 	  //all other entry points of this class can be called in arbitary order
-	  val startWhileFragment = new CodeFragmentGenerator
-	  val endWhileFragment = new CodeFragmentGenerator
-	  startWhileFragment.addLabel
-	  codeFragments.add(startWhileFragment)
-	  ////
-	  
-	  ////
-	  endWhileFragment.addLabel
-	  codeFragments.add(endWhileFragment)
-	  createIfStmt(startWhileFragment, endWhileFragment)
+	  generateAllCallbacks(entryPoints, rUri, classLocalVar)
 	  // lifecycle 1 end.
 	  
 	  // lifecycle 2:
@@ -355,16 +328,7 @@ class DummyMainGenerator {
 	  beforemethodsFragment.addLabel
 	  codeFragments.add(beforemethodsFragment)
 	  //all other entry points of this class can be called in arbitary order
-	  val startWhile2Fragment = new CodeFragmentGenerator
-	  val endWhile2Fragment = new CodeFragmentGenerator
-	  startWhile2Fragment.addLabel
-	  codeFragments.add(startWhile2Fragment)
-	  ////
-	  
-	  ////
-	  endWhile2Fragment.addLabel
-	  codeFragments.add(endWhile2Fragment)
-	  createIfStmt(startWhile2Fragment, endWhile2Fragment)
+	  generateAllCallbacks(entryPoints, rUri, classLocalVar)
 	  
 	  // 3. onRebind:
 	  val onRebindFragment = new CodeFragmentGenerator
@@ -419,16 +383,7 @@ class DummyMainGenerator {
 	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONPOSTRESUME, rUri, entryPoints, onResumeFragment)
 	  
 	  // all other entry points of this activity
-	  val startWhileFragment = new CodeFragmentGenerator
-	  startWhileFragment.addLabel
-	  codeFragments.add(startWhileFragment)
-	  val endWhileFragment = new CodeFragmentGenerator
-	  ////
-	  
-	  /////
-	  endWhileFragment.addLabel
-	  codeFragments.add(endWhileFragment)
-	  createIfStmt(startWhileFragment, endWhileFragment)
+	  generateAllCallbacks(entryPoints, rUri, classLocalVar)
 	  // 4. onPause:
 	  val onPauseFragment = new CodeFragmentGenerator
 	  onPauseFragment.addLabel
@@ -458,7 +413,7 @@ class DummyMainGenerator {
 	  codeFragments.add(onRestartFragment)
 	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONRESTART, rUri, entryPoints, onRestartFragment)
 	  if(onStartFragment != null){
-	    
+	    createGotoStmt(onStartFragment, onRestartFragment)
 	  }
 	  
 	  // 7. onDestory:
@@ -467,6 +422,55 @@ class DummyMainGenerator {
 	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONDESTROY, rUri, entryPoints, onDestoryFragment)
 	  
 	  createIfStmt(endClassFragment, onDestoryFragment)
+	}
+	
+	private def generateAllCallbacks(entryPoints : MList[ResourceUri], rUri : ResourceUri, classLocalVar : String) : CodeFragmentGenerator = {
+	  val startWhileFragment = new CodeFragmentGenerator
+	  startWhileFragment.addLabel
+	  codeFragments.add(startWhileFragment)
+	  val endWhileFragment = new CodeFragmentGenerator
+	  val procedureUris = androidLibInfoTables.getProcedureUrisByRecordUri(rUri)
+	  import scala.collection.JavaConversions._
+	  for(currentProcedureUri <- procedureUris){
+	    if(entryPoints.contains(currentProcedureUri)){ 
+	      val pSig = androidLibInfoTables.getProcedureSignatureByUri(currentProcedureUri)
+	      if(!AndroidEntryPointConstants.getActivityLifecycleMethods.contains(androidLibInfoTables.getSubSignature(pSig))){
+		      val thenStmtFragment = new CodeFragmentGenerator
+		      createIfStmt(thenStmtFragment, startWhileFragment)
+		      val elseStmtFragment = new CodeFragmentGenerator
+		      createGotoStmt(elseStmtFragment, startWhileFragment)
+		      thenStmtFragment.addLabel
+		      codeFragments.add(thenStmtFragment)
+		      generateProcedureCall(pSig, "virtual", classLocalVar, msetEmpty + rUri, thenStmtFragment)
+		      elseStmtFragment.addLabel
+		      codeFragments.add(elseStmtFragment)
+	      }
+	    }
+	  }
+	  val callBackFragment = new CodeFragmentGenerator
+	  callBackFragment.addLabel
+	  codeFragments.add(callBackFragment)
+	  addCallbackProcedures(rUri, classLocalVar, callBackFragment)
+	  endWhileFragment.addLabel
+	  codeFragments.add(endWhileFragment)
+	  createIfStmt(startWhileFragment, endWhileFragment)
+	  endWhileFragment
+	}
+	
+	private def generateCallToAllCallbacks(callbackRecordUri : ResourceUri, callbackProcedureUris : List[ResourceUri], classLocalVar : String, codefg : CodeFragmentGenerator) = {
+	  callbackProcedureUris.foreach{
+	    callbackProcedureUri =>
+	      val pSig = androidLibInfoTables.getProcedureSignatureByUri(callbackProcedureUri)
+	      val thenStmtFragment = new CodeFragmentGenerator
+	      createIfStmt(thenStmtFragment, codefg)
+	      val elseStmtFragment = new CodeFragmentGenerator
+	      createGotoStmt(elseStmtFragment, codefg)
+	      thenStmtFragment.addLabel
+	      codeFragments.add(thenStmtFragment)
+	      generateProcedureCall(pSig, "virtual", classLocalVar, msetEmpty + callbackRecordUri, thenStmtFragment)
+	      elseStmtFragment.addLabel
+	      codeFragments.add(elseStmtFragment)
+	  }
 	}
 	
 	private def searchAndBuildProcedureCall(subsignature : String, rUri : ResourceUri, entryPoints : MList[String], codefg : CodeFragmentGenerator) = {
@@ -481,6 +485,47 @@ class DummyMainGenerator {
 	  }
 	}
 	
+	/**
+	 * Generates invocation statements for all callback methods which need to be invoded during the give record's run cycle.
+	 * @param rUri Current record resource uri which under process
+	 * @param classLocalVar The local variable fro current record
+	 */
+	private def addCallbackProcedures(rUri : ResourceUri, parentClassLocalVar : String, codefg : CodeFragmentGenerator) : Unit = {
+	  if(!this.callbackFunctions.contains(rUri)) return
+	  val callbackRecords : Map[ResourceUri, List[ResourceUri]] = 
+	    this.callbackFunctions(rUri).map{
+		    case (pUri) => 
+		      val pSig = androidLibInfoTables.getProcedureSignatureByUri(pUri)
+		      val theRecordUri = androidLibInfoTables.getRecordUri(new SignatureParser(pSig).getRecordName)
+		      val theProcedureUri = androidLibInfoTables.findProcedureUri(theRecordUri, androidLibInfoTables.getSubSignature(pSig))
+		      if(theProcedureUri == null){
+		        System.err.println("Could not find callback method " + pSig)
+		        (theRecordUri, List())
+		      } else {
+		        (theRecordUri, List(theProcedureUri))
+		      }
+		  }.toMap
+		callbackRecords.foreach{
+		  case(callbackRUri, callbackPUris) =>
+		    val classLocalVar : String =
+		      if(isCompatible(rUri, callbackRUri)) parentClassLocalVar
+		      // create a new instance of this class
+		      else generateRecordConstructor(callbackRUri, msetEmpty + rUri, codefg)
+		    if(classLocalVar != null){
+		      // build the calls to all callback procedures in this record
+		      generateCallToAllCallbacks(callbackRUri, callbackPUris, classLocalVar, codefg)
+		    } else {
+		      System.err.println("Constructor cannot be generated for callbck class " + callbackRUri)
+		    }
+		}
+	}
+	
+	private def isCompatible(actual : ResourceUri, expected : ResourceUri) : Boolean = {
+	  val allPossible = androidLibInfoTables.getAncestors(actual) + actual
+	  allPossible.filter(p => if(p.equals(expected))true else false)
+	  allPossible.isEmpty
+	}
+	
 	private def createIfStmt(targetfg : CodeFragmentGenerator, codefg : CodeFragmentGenerator) = {
 	  val target = targetfg.getLabel
 	  if(target != null){
@@ -493,6 +538,21 @@ class DummyMainGenerator {
       ifStmt.add("label", target)
       codefg.setCode(ifStmt)
 	  }
+	}
+	
+	private def createGotoStmt(targetfg : CodeFragmentGenerator, codefg : CodeFragmentGenerator) = {
+	  val target = targetfg.getLabel
+	  if(target != null){
+      val gotoStmt = template.getInstanceOf("GotoStmt")
+      gotoStmt.add("label", target)
+      codefg.setCode(gotoStmt)
+	  }
+	}
+	
+	private def createReturnStmt(variable : String, codefg : CodeFragmentGenerator) = {
+	  val returnStmt = template.getInstanceOf("ReturnStmt")
+      returnStmt.add("variable", variable)
+      codefg.setCode(returnStmt)
 	}
 	
 	private class CodeFragmentGenerator {

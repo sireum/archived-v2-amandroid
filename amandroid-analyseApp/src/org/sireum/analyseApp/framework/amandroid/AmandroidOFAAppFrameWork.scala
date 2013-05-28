@@ -18,6 +18,8 @@ import org.sireum.alir.AlirIntraProceduralGraph
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
 import org.sireum.amandroid.cache.AndroidCacheFile
 import org.sireum.amandroid.module.AndroidInterIntraProceduralModule
+import org.sireum.amandroid.module.AndroidApplicationPrepareModule
+import org.sireum.amandroid.module.AndroidFixPilarSymbolResolverModule
 
 // sankar introduces the following framework which adds one stage on top of AmandroidParserTestFrameWork 
 
@@ -101,14 +103,14 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
         
         PilarAndroidSymbolResolverModule.setParallel(options, false)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidLibInfoTables(options, Some(libInfoTables))
-//        AndroidInterIntraProceduralModule.setAndroidLibInfoTablesOpt(options, libInfoTables) //need to change later
+        AndroidApplicationPrepareModule.setApkFileLocation(options, f.toString())
+//        AndroidFixPilarSymbolResolverModule.set
         AndroidInterIntraProceduralModule.setParallel(options, false)
         AndroidInterIntraProceduralModule.setAndroidCache(options, Some(aCache))
         AndroidInterIntraProceduralModule.setShouldBuildCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildRda(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
         AndroidInterIntraProceduralModule.setShouldBuildOFAsCfg(options, true)
-        AndroidInterIntraProceduralModule.setApkFileLocationOpt(options, Some(f.toString()))
         
         // experimental code starts which does not have any significant role now; later we will delete it after some related cleaning 
         
@@ -131,11 +133,13 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
         
  
         
-        //1. get sCfg
-      //  val sCfgFile = new File(d + dirName + "/graphs/sCfg.graph")
-      //  val outer = new FileOutputStream(sCfgFile)
-      //  val w = new OutputStreamWriter(outer, "GBK")
-        
+        //1. get Cfg
+//        val CfgFile = new File(d + dirName + "/graphs/Cfg.graph")
+//        val outer = new FileOutputStream(CfgFile)
+//        val w = new OutputStreamWriter(outer, "GBK")
+//        val w = new PrintWriter(System.out, true)
+//        val cfgs = AndroidInterIntraProceduralModule.getIntraResult(options)
+//        cfgs.foreach{case(k, v) => println(k) ;if(k.contains("dummyMain")) v.cfg.toDot(w)}
         
 //        val csCfg = AndroidInterIntraProceduralModule.getInterResult(options) match {
 //          case Some(s) => s
@@ -187,6 +191,18 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
         "PilarAndroidSymbolResolverModule stage",
         false,
         PilarAndroidSymbolResolverModule
+      )
+      ,
+      PipelineStage(
+        "AndroidApplicationPrepareModule stage",
+        false,
+        AndroidApplicationPrepareModule
+      )
+      ,
+      PipelineStage(
+        "AndroidFixPilarSymbolResolverModule stage",
+        false,
+        AndroidFixPilarSymbolResolverModule
       )
       ,
       PipelineStage(

@@ -39,6 +39,16 @@ object AndroidSymbolTable {
             shouldBuildLibInfoTables : Boolean) =
     buildSymbolTable(models, stpConstructor, existingAndroidVirtualMethodTables, parallel, shouldBuildLibInfoTables)
 
+  def apply[P <: SymbolTableProducer] //
+  (stp : SymbolTableProducer, stModels : ISeq[Model],
+   changedOrDeletedModelFiles : Set[FileResourceUri],
+   changedOrAddedModels : ISeq[Model],
+   stpConstructor : Unit => P,
+   existingAndroidLibInfoTables : AndroidLibInfoTables,
+   parallel : Boolean,
+   shouldBuildLibInfoTables : Boolean) =
+    fixSymbolTable(stp, stModels, changedOrDeletedModelFiles,
+      changedOrAddedModels, stpConstructor, existingAndroidLibInfoTables, parallel, shouldBuildLibInfoTables)
 
   def minePackageElements[P <: SymbolTableProducer] //
   (models : ISeq[Model], stpConstructor : Unit => P,
@@ -69,8 +79,6 @@ object AndroidSymbolTable {
          set ++= tables.vsetTable.keys
         tables.declaredSymbols(fileUri) = set
       }
-      // println("AndroidSymbolTable :: AndroidSymbolTable :: minePackageElements :: OK2.1") // sankar testing
-//      println("mine = " + stp.toSymbolTable.procedureSymbolTables.size)
       stp
     }.toIterable.reduce(H.combine)
   }
@@ -80,35 +88,17 @@ object AndroidSymbolTable {
     avmr.resolveAndroidLibInfo(stp)
     avmr.toAndroidLibInfoTables
   }
-
-//  def buildProcedureSymbolTables(stp : AndroidSymbolTableProducer, parallel : Boolean = true) : Unit = {
-//    val procedures = stp.tables.procedureAbsTable.keys.toSeq
-//    val col : GenSeq[ResourceUri] = if (parallel) procedures.par else procedures
-//    
-//    def work(procedureUri : ResourceUri) = {
-//      val pstp = stp.procedureSymbolTableProducer(procedureUri)
-//      val pd = stp.tables.procedureAbsTable(procedureUri)
-//      pd.body match {
-//        case body : ImplementedBody =>
-//          pstp.tables.bodyTables =
-//            Some(BodySymbolTableData())
-//        case body : EmptyBody =>
-//      }
-//      val pmr = new H1.ProcedureMinerResolver(pstp)
-//      pmr.procMiner(pd)
-//      pmr.procResolver(pd)
-//     // sleep
-//    }
-//    
-//    println("build pst start! pst number : " + col.size)
-//    
-//    println(time(col.map{procUri=>work(procUri)}))
-//    
-//    println("build pst done! pst number : " + stp.toSymbolTable.procedureSymbolTables.size)
-//  }
   
-  def buildProcedureSymbolTables(stp : SymbolTableProducer, parallel : Boolean = true) : Unit = {
+  def buildProcedureSymbolTables(stp : SymbolTableProducer, parallel : Boolean) : Unit = {
     val procedures = stp.tables.procedureAbsTable.keys.toSeq
+    doBuildPST(stp, procedures, parallel)
+  }
+  
+  def fixProcedureSymbolTables(stp : SymbolTableProducer, newProcedures : Seq[ResourceUri], parallel : Boolean) : Unit = {
+    doBuildPST(stp, newProcedures, parallel)
+  }
+  
+  private def doBuildPST(stp : SymbolTableProducer, procedures : Seq[ResourceUri], parallel : Boolean = true) : Unit = {
     println("parallel=" + parallel)
     val col : GenSeq[ResourceUri] = if (false) procedures.par else procedures
     println("col size=" + col.size)
@@ -171,6 +161,57 @@ object AndroidSymbolTable {
         (stp.toSymbolTable, Some(existingAndroidLibInfoTables))
     }
   }
+  
+  def fixSymbolTable[P <: SymbolTableProducer] //
+  (stp : SymbolTableProducer, stModels : ISeq[Model],
+   changedOrDeletedModelFiles : Set[FileResourceUri],
+   changedOrAddedModels : ISeq[Model],
+   stpConstructor : Unit => P,
+   existingAndroidLibInfoTables : AndroidLibInfoTables,
+   parallel : Boolean,
+   shouldBuildLibInfoTables : Boolean) = {
+
+    val models = mlistEmpty[Model]
+    stModels.foreach { m =>
+      m.sourceURI match {
+        case Some(uri) =>
+          if (changedOrDeletedModelFiles.contains(uri))
+            H.tearDown(stp.tables, m)
+          else
+            models += m
+        case _ =>
+      }
+    }
+    val newStp = minePackageElements(changedOrAddedModels, stpConstructor, parallel)
+    
+    val tablesOpt = if(shouldBuildLibInfoTables) Some(resolveVirtualMethod(newStp)) else None
+    H.combine(stp, newStp)
+    models ++= changedOrAddedModels
+    resolvePackageElements(models.toList, stp, parallel)
+    fixProcedureSymbolTables(stp, newStp.tables.procedureAbsTable.keySet.toSeq, parallel)
+    tablesOpt match {
+      case Some(tables) =>
+        println("before merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
+		    tables.mergeWith(existingAndroidLibInfoTables)
+		    println("after merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
+		    (stp.toSymbolTable, Some(tables))
+      case None =>
+        (stp.toSymbolTable, Some(existingAndroidLibInfoTables))
+    }
+  }
+  
+//  private def combinePST(stp1 : SymbolTableProducer, stp2 : SymbolTableProducer) = {
+//    stp2.tables.procedureAbsTable.keySet.foreach{
+//      k =>
+//        val pstp1 = stp1.procedureSymbolTableProducer(k)
+//        val pstp2 = stp2.procedureSymbolTableProducer(k)
+//        pstp1.tables.localVarTable ++= pstp2.tables.localVarTable
+//        pstp1.tables.params ++= pstp2.tables.params
+//        pstp1.tables.typeVarTable ++= pstp2.tables.typeVarTable
+//        pstp1.tables.bodyTables.get.catchTable ++= pstp2.tables.bodyTables.get.catchTable
+//        pstp1.tables.bodyTables.get.locationTable ++= pstp2.tables.bodyTables.get.locationTable
+//    }
+//  }
 
   
 }

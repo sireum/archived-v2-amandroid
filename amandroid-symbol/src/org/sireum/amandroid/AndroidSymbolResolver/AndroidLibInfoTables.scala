@@ -28,6 +28,8 @@ trait AndroidLibInfoTables {
   def isOverrider(procedureUri1 : String, procedureUri2 : String) : Boolean  // checks if a pUri is overrider of another pUri 
   def mergeWith(anotherVmTables : AndroidLibInfoTables)
   def containsRecord(recordName : String) : Boolean
+  def getSubSignature(sig : String) : String
+  def getSubSignatureFromUri(procedureUri : ResourceUri) : String
   /**
    * Finds a ProcedureUri in the given class or one of its super classes
    * @param rUri Current record resource uri
