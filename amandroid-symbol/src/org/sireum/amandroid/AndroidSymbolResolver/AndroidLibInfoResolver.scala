@@ -367,7 +367,7 @@ class AndroidLibInfoResolver
   }
 // sankar starts
   
-   def getRecOfProc(procedureUri : ResourceUri) : ResourceUri = {
+   def getRecordNameFromProcedureUri(procedureUri : ResourceUri) : ResourceUri = {
      //println("procUri = " + procedureUri)
 			//     val sig = getSignatureByProcedureUri(procedureUri)
 			//     println("sig = " + sig)

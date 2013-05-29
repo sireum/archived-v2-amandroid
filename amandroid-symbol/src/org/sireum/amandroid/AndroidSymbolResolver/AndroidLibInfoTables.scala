@@ -10,7 +10,7 @@ import java.util.HashSet
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 trait AndroidLibInfoTables {
-  def getRecOfProc(procedureUri : ResourceUri) : ResourceUri  // returns owner recordUri of the procedureUri
+  def getRecordNameFromProcedureUri(procedureUri : ResourceUri) : ResourceUri  // returns owner recordUri of the procedureUri
   def getRecordUri(recordName : String) : ResourceUri
   def getRecordName(recordUri : String) : ResourceUri
   def getParents(recordUri : ResourceUri) : Set[ResourceUri]  // returns the parent-recordUris of recordUri
