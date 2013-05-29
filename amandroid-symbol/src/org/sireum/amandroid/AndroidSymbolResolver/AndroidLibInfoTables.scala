@@ -10,7 +10,7 @@ import java.util.HashSet
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 trait AndroidLibInfoTables {
-  def getRecordNameFromProcedureUri(procedureUri : ResourceUri) : ResourceUri  // returns owner recordUri of the procedureUri
+  def getRecordUriFromProcedureUri(procedureUri : ResourceUri) : ResourceUri  // returns owner recordUri of the procedureUri
   def getRecordUri(recordName : String) : ResourceUri
   def getRecordName(recordUri : String) : ResourceUri
   def getParents(recordUri : ResourceUri) : Set[ResourceUri]  // returns the parent-recordUris of recordUri
@@ -25,7 +25,8 @@ trait AndroidLibInfoTables {
   def isConstructor(procedureUri : String) : Boolean
   def isStaticMethod(procedureUri : String) : Boolean
   def isVirtualMethod(procedureUri : String) : Boolean
-  def isOverrider(procedureUri1 : String, procedureUri2 : String) : Boolean  // checks if a pUri is overrider of another pUri 
+  def isOverrider(procedureUri1 : String, procedureUri2 : String) : Boolean  // checks if a pUri is overrider of another pUri
+  def isAbstract(recordUri : ResourceUri) : Boolean 
   def mergeWith(anotherVmTables : AndroidLibInfoTables)
   def containsRecord(recordName : String) : Boolean
   def getSubSignature(sig : String) : String
@@ -94,6 +95,7 @@ sealed case class AndroidLibInfoTablesData
  procedureUriTable : HashBiMap[String, ResourceUri] = HashBiMap.create(),
  globalVarUriTable : HashBiMap[String, ResourceUri] = HashBiMap.create(),
  procedureTypeTable : HashMap[ResourceUri, String] = new HashMap[ResourceUri, String],
+ recordTypeTable : HashMap[ResourceUri, String] = new HashMap[ResourceUri, String],
  recordFieldVarTable : MMap[ResourceUri, MMap[ResourceUri, AndroidFieldData]] = mmapEmpty,
  globalVarTable : MMap[ResourceUri, AndroidFieldData] = mmapEmpty,
  interfaceTable : HashSet[ResourceUri] = new HashSet[ResourceUri]

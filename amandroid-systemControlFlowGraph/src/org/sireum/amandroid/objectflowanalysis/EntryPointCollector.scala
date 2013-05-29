@@ -13,7 +13,7 @@ class EntryPointCollector {
     
     pstMap.foreach(
       pst =>{
-        val recUri = androidLibInfoTables.getRecordNameFromProcedureUri(pst._1)
+        val recUri = androidLibInfoTables.getRecordUriFromProcedureUri(pst._1)
         val parents = androidLibInfoTables.getParents(recUri)
         parents.foreach{
           parent =>

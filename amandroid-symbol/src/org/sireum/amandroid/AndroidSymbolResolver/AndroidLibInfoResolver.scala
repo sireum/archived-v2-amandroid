@@ -77,6 +77,13 @@ class AndroidLibInfoResolver
                 tables.interfaceTable.add(rd._1)
             case _ => null
           }
+        // sankar adds
+        rd._2.getValueAnnotation("AccessFlag") match {
+            case Some(exp : NameExp) =>
+                tables.recordTypeTable(rd._1) = exp.name.name
+            case _ => 
+          }
+        // sankar ends
         rd._2.extendsClauses.foreach { ec =>
           import LineColumnLocation._
           val nameUser = ec.name
@@ -176,6 +183,9 @@ class AndroidLibInfoResolver
     if(tables.interfaceTable.contains(recordUri)) true
     else false
   }
+  
+ 
+  
   
   def getTypeDimensionFromTypeSpec(typeSpec : Option[TypeSpec], i : Int) : (ResourceUri, Option[Int]) = {
     typeSpec match {
@@ -367,7 +377,7 @@ class AndroidLibInfoResolver
   }
 // sankar starts
   
-   def getRecordNameFromProcedureUri(procedureUri : ResourceUri) : ResourceUri = {
+   def getRecordUriFromProcedureUri(procedureUri : ResourceUri) : ResourceUri = {
      //println("procUri = " + procedureUri)
 			//     val sig = getSignatureByProcedureUri(procedureUri)
 			//     println("sig = " + sig)
@@ -413,6 +423,18 @@ class AndroidLibInfoResolver
       else null
     }
     
+   def isAbstract(recordUri : ResourceUri) : Boolean = {
+	    if(tables.recordTypeTable.contains(recordUri)){
+	      if(tables.recordTypeTable(recordUri) == "ABSTRACT")
+	        true
+	      else
+	        false
+	    }
+	    else {
+	      println("recordTypeTable : cannot find " + recordUri)
+	      false
+	    }
+  }
    
  // sankar ends
    
@@ -591,6 +613,7 @@ class AndroidLibInfoResolver
     tables.recordHierarchyTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.recordHierarchyTable)
     tables.cannotFindRecordTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
     tables.procedureTypeTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.procedureTypeTable)
+    tables.recordTypeTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.recordTypeTable) // sankar adds
     tables.procedureUriTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.procedureUriTable)
     tables.recordUriTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.recordUriTable)
     tables.recordFieldVarTable ++= anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.recordFieldVarTable
