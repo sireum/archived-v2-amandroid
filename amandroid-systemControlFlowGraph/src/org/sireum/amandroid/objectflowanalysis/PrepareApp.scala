@@ -11,6 +11,7 @@ import org.sireum.amandroid.androidConstants.AndroidConstants
 import org.sireum.amandroid.entryPointConstants.AndroidEntryPointConstants
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.amandroid.callGraph.CallGraphBuilder
+import org.sireum.amandroid.callGraph.CallGraph
 
 class PrepareApp(apkFileLocation : String) {
   
@@ -114,7 +115,6 @@ class PrepareApp(apkFileLocation : String) {
 	}
 	
 	def calculateSourcesSinksEntrypoints(sourceSinkFile : String) = {
-
 		// To look for callbacks, we need to start somewhere. We use the Android
 		// lifecycle methods for this purpose.
 		ManifestParser.loadManifestFile(apkFileLocation)
@@ -133,12 +133,15 @@ class PrepareApp(apkFileLocation : String) {
 			println("arscstring-->" + ARSCFileParser.getGlobalStringPool)
 		  println("arscpackage-->" + ARSCFileParser.getPackages)
 		}
-	  val callGraph = new CallGraphBuilder(libInfoTables)
+	  val callGraph:CallGraph = new CallGraphBuilder(libInfoTables)
 	  psts.foreach(pst => callGraph.getCallGraph(Left(pst)))
+	  //println("procs =")
+	  //psts.foreach(pst => println(pst.procedureUri))
 	  
 		// Collect the callback interfaces implemented in the app's source code
-//		AnalyzeJimpleClass jimpleClass = new AnalyzeJimpleClass(this.entrypoints);
-//		jimpleClass.collectCallbackMethods();
+		val analysisHelper = new CallBackInfoCollector(this.entrypoints, callGraph, libInfoTables) 
+		analysisHelper.collectCallbackMethods()
+
 		
 		// Find the user-defined sources in the layout XML files
 		LayoutFileParser.androidLibInfoTables = this.libInfoTables
