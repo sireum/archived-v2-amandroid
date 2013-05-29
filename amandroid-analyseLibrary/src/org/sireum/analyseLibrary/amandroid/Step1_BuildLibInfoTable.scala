@@ -13,13 +13,14 @@ import org.sireum.androidLibraryFile.amandroid.AmandroidAndroidLibraryPilarFiles
 */
 @RunWith(classOf[JUnitRunner])
 class BuildLibInfoTable extends BuildLibInfoTableFramework{
-  AmandroidAndroidLibraryFiles.dexModelFiles.
-  foreach{fileUri=>
-//    if(fileUri.indexOf("android.policy.jar") > 0)
-    Analyzing title fileUri init fileUri
-  }
-//  AmandroidAndroidLibraryPilarFiles.pilarModelFiles.
+//  AmandroidAndroidLibraryFiles.dexModelFiles.
 //  foreach{fileUri=>
+////    if(fileUri.indexOf("android.policy.jar") > 0)
 //    Analyzing title fileUri init fileUri
 //  }
+  AmandroidAndroidLibraryPilarFiles.pilarModelFiles.
+  foreach{fileUri=>
+    if(fileUri.indexOf("androidpolicy") > 0)
+    Analyzing title fileUri init fileUri
+  }
 }

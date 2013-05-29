@@ -52,7 +52,7 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
     val aggPreOfg = new ObjectFlowGraph[Node] // represents the aggregate of preliminary Ofgs of entryPoints
     val results : MMap[ResourceUri, (ObjectFlowGraph[Node], SystemControlFlowGraph[String])] = mmapEmpty
 
-    val entryPoint : String = appInfo.getMainComponent
+    val entryPoint = androidLibInfoTables.getProcedureUrisByRecordUri(androidLibInfoTables.getRecordUri(appInfo.getMainComponent))
     println("ep--->" + entryPoint)
     psts.foreach(
       pst =>{
