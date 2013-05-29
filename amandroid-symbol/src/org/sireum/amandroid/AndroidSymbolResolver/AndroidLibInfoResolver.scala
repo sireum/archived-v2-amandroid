@@ -456,25 +456,27 @@ class AndroidLibInfoResolver
     else null
   }
   
-  def getCalleeOptionsByUri(procedureUri : ResourceUri) : java.util.Set[ResourceUri] = {
+  def getCalleeOptionsByUri(procedureUri : ResourceUri) : Set[ResourceUri] = {
     if(procedureUri != null){
-      tables.virtualMethodTable.get(procedureUri)
+      tables.virtualMethodTable.get(procedureUri).toSet
     }
-    else null
+    else Set()
   }
   
-  def getCalleeOptionsBySignature(sig : String) : java.util.Set[ResourceUri] = {
+  def getCalleeOptionsBySignature(sig : String) : Set[ResourceUri] = {
     val procedureUri = getProcedureUriBySignature(sig)
-    getCalleeOptionsByUri(procedureUri)
+    getCalleeOptionsByUri(procedureUri).toSet
   }
   
-  def getProcedureUrisByRecordUri(recordUri : ResourceUri) : java.util.Set[ResourceUri] = {
-    tables.recordProcedureTable.get(recordUri)
+  def getProcedureUrisByRecordUri(recordUri : ResourceUri) : Set[ResourceUri] = {
+    if(tables.recordProcedureTable.containsKey(recordUri))
+    	tables.recordProcedureTable.get(recordUri).toSet
+    else Set()
   }
   
-  def getProcedureSigsByRecordUri(recordUri : ResourceUri) : MSet[ResourceUri] = {
+  def getProcedureSigsByRecordUri(recordUri : ResourceUri) : Set[ResourceUri] = {
     val pUris = tables.recordProcedureTable.get(recordUri)
-    val sigs : MSet[ResourceUri] = msetEmpty
+    var sigs : Set[ResourceUri] = Set()
     pUris.foreach(
       pUri => sigs += tables.procedureUriTable.inverse().get(pUri)  
     )

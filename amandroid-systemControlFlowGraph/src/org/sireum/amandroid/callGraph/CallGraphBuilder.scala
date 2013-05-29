@@ -17,10 +17,10 @@ class CallGraphBuilder(androidLibInfoTable : AndroidLibInfoTables) extends CallG
    * @param source Either procedure symbol table or control flow graph
    * @return CallGraph of given source
    */
-	def getCallGraph(source : Either[ProcedureSymbolTable, ControlFlowGraph[String]]) : CallGraph = {
+	def getCallGraph(source : Either[ProcedureSymbolTable, (ResourceUri, ControlFlowGraph[String])]) : CallGraph = {
 	  source match {
 	    case Left(pst) => buildFromPST(pst)
-	    case Right(cfg) => buildFromCFG(cfg)
+	    case Right((pUri, cfg)) => buildFromCFG(pUri, cfg)
 	  }
 	  this
 	}
@@ -55,8 +55,13 @@ class CallGraphBuilder(androidLibInfoTable : AndroidLibInfoTables) extends CallG
     }
 	}
 	
-	private def buildFromCFG(cfg : ControlFlowGraph[String]) : CallGraph = {
-	  this
+	private def buildFromCFG(currPUri : ResourceUri, cfg : ControlFlowGraph[String]) : Unit = {
+	  cfg.nodes.foreach{
+	    node =>
+	      val sig = node.getProperty[String]("calleeSig")
+	      val pUri = androidLibInfoTable.getProcedureUriBySignature(sig)
+        callMap ++= Map(currPUri -> (callMap.getOrElse(currPUri, msetEmpty) + pUri))
+	  }
 	}
 	
 	/**

@@ -36,22 +36,24 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
             rdas : MMap[ResourceUri, ReachingDefinitionAnalysis.Result],
             cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
             androidLibInfoTables : AndroidLibInfoTables,
+            appInfo : PrepareApp,
             androidCache : AndroidCacheFile[String]) 
-            = build(psts, cfgs, rdas, cCfgs, androidLibInfoTables, androidCache)
+            = build(psts, cfgs, rdas, cCfgs, androidLibInfoTables, appInfo, androidCache)
 
   def build(psts : Seq[ProcedureSymbolTable],
             cfgs : MMap[ResourceUri, ControlFlowGraph[String]],
             rdas : MMap[ResourceUri, ReachingDefinitionAnalysis.Result],
             cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
             androidLibInfoTables : AndroidLibInfoTables,
+            appInfo : PrepareApp,
             androidCache : AndroidCacheFile[String])
    : MMap[ResourceUri, (ObjectFlowGraph[Node], SystemControlFlowGraph[String])] = {
     val preResults : MMap[ResourceUri, (ObjectFlowGraph[Node])] = mmapEmpty
     val aggPreOfg = new ObjectFlowGraph[Node] // represents the aggregate of preliminary Ofgs of entryPoints
     val results : MMap[ResourceUri, (ObjectFlowGraph[Node], SystemControlFlowGraph[String])] = mmapEmpty
 
-    val entryPoint : String = ""
-    
+    val entryPoint : String = appInfo.getMainComponent
+    println("ep--->" + entryPoint)
     psts.foreach(
       pst =>{
         pstMap(pst.procedureUri) = pst

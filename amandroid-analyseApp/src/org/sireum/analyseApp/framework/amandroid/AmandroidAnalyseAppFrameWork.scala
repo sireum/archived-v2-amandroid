@@ -12,7 +12,7 @@ import java.io._
 import java.util.zip.ZipFile
 import org.sireum.core.module.ChunkingPilarParserModule
 import org.sireum.amandroid.module.PilarAndroidSymbolResolverModule
-import org.sireum.amandroid.module.AndroidInterIntraProceduralModule
+import org.sireum.amandroid.module.AndroidIntraProceduralModule
 import org.sireum.amandroid.xml.AndroidXStream
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.alir.AlirIntraProceduralGraph
@@ -100,8 +100,8 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
         
         PilarAndroidSymbolResolverModule.setParallel(options, false)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidLibInfoTables(options, Option(libInfoTables))
-        AndroidInterIntraProceduralModule.setAndroidCache(options, Some(aCache))
-        AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
+        AndroidIntraProceduralModule.setAndroidCache(options, Some(aCache))
+        AndroidIntraProceduralModule.setShouldBuildCCfg(options, true)
         
         // experimental code starts which does not have any significant role now; later we will delete it after some related cleaning 
         
@@ -110,7 +110,7 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
         permList+=("permission")   // put the permission strings e.g. "NETWORKS" here
         val pUri : ResourceUri = "abc"  // replace "abc" by apiUri (e.g. pilar:/procedure/default/%5B%7Candroid::content::Context.startService%7C%5D/1/50/f9cb48df) later
         apiPermission(pUri) = permList
-        AndroidInterIntraProceduralModule.setAPIpermOpt(options, Option(apiPermission)) 
+        AndroidIntraProceduralModule.setAPIpermOpt(options, Option(apiPermission)) 
         
         // experimental code ends
         
@@ -184,7 +184,7 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
       PipelineStage(
       "Android InterIntraProcedural Analysis",
       false,
-      AndroidInterIntraProceduralModule
+      AndroidIntraProceduralModule
       )
     )
 }

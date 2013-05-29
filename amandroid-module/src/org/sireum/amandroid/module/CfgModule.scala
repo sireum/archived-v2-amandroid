@@ -10,8 +10,7 @@ import org.sireum.alir.AlirIntraProceduralNode
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.alir.DefRef
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
-import org.sireum.amandroid.module.AndroidInterIntraProcedural.AndroidInterAnalysisResult
-import org.sireum.amandroid.module.AndroidInterIntraProcedural.AndroidIntraAnalysisResult
+import org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult
 import org.sireum.pilar.ast.LocationDecl
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.pilar.symbol.SymbolTable
@@ -26,8 +25,8 @@ object CfgModule extends PipelineModule {
 
   val poolKey = "Cfg.pool"
   val globalProcedureSymbolTableKey = "Global.procedureSymbolTable"
-  val globalPoolKey = "Global.pool"
   val cfgKey = "Cfg.cfg"
+  val globalPoolKey = "Global.pool"
   val globalShouldIncludeFlowFunctionKey = "Global.shouldIncludeFlowFunction"
   val globalCfgKey = "Global.cfg"
 
@@ -123,23 +122,6 @@ object CfgModule extends PipelineModule {
 
   def outputDefined (job : PipelineJob) : MBuffer[Tag] = {
     val tags = marrayEmpty[Tag]
-    if(!(job ? CfgModule.poolKey) && !(job ? CfgModule.globalPoolKey)) {
-      tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-        "Output error for '" + this.title + "': No entry found for 'pool'. Expecting (CfgModule.poolKey or CfgModule.globalPoolKey)") 
-    }
-
-    if(job ? CfgModule.poolKey && !job(CfgModule.poolKey).isInstanceOf[scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]]) {
-      tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker, 
-        "Output error for '" + this.title + "': Wrong type found for CfgModule.poolKey.  Expecting 'scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]' but found '" + 
-        job(CfgModule.poolKey).getClass.toString + "'")
-    } 
-
-    if(job ? CfgModule.globalPoolKey && !job(CfgModule.globalPoolKey).isInstanceOf[scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]]) {
-      tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker, 
-        "Output error for '" + this.title + "': Wrong type found for CfgModule.globalPoolKey.  Expecting 'scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]' but found '" + 
-        job(CfgModule.globalPoolKey).getClass.toString + "'")
-    } 
-
     if(!(job ? CfgModule.cfgKey) && !(job ? CfgModule.globalCfgKey)) {
       tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
         "Output error for '" + this.title + "': No entry found for 'cfg'. Expecting (CfgModule.cfgKey or CfgModule.globalCfgKey)") 
@@ -156,56 +138,24 @@ object CfgModule extends PipelineModule {
         "Output error for '" + this.title + "': Wrong type found for CfgModule.globalCfgKey.  Expecting 'org.sireum.alir.ControlFlowGraph[java.lang.String]' but found '" + 
         job(CfgModule.globalCfgKey).getClass.toString + "'")
     } 
+
+    if(!(job ? CfgModule.poolKey) && !(job ? CfgModule.globalPoolKey)) {
+      tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+        "Output error for '" + this.title + "': No entry found for 'pool'. Expecting (CfgModule.poolKey or CfgModule.globalPoolKey)") 
+    }
+
+    if(job ? CfgModule.poolKey && !job(CfgModule.poolKey).isInstanceOf[scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]]) {
+      tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker, 
+        "Output error for '" + this.title + "': Wrong type found for CfgModule.poolKey.  Expecting 'scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]' but found '" + 
+        job(CfgModule.poolKey).getClass.toString + "'")
+    } 
+
+    if(job ? CfgModule.globalPoolKey && !job(CfgModule.globalPoolKey).isInstanceOf[scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]]) {
+      tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker, 
+        "Output error for '" + this.title + "': Wrong type found for CfgModule.globalPoolKey.  Expecting 'scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]' but found '" + 
+        job(CfgModule.globalPoolKey).getClass.toString + "'")
+    } 
     return tags
-  }
-
-  def getPool (options : scala.collection.Map[Property.Key, Any]) : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode] = {
-    if (options.contains(CfgModule.globalPoolKey)) {
-       return options(CfgModule.globalPoolKey).asInstanceOf[scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]]
-    }
-    if (options.contains(CfgModule.poolKey)) {
-       return options(CfgModule.poolKey).asInstanceOf[scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setPool (options : MMap[Property.Key, Any], pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]) : MMap[Property.Key, Any] = {
-
-    options(CfgModule.globalPoolKey) = pool
-    options(poolKey) = pool
-
-    return options
-  }
-
-  def getShouldIncludeFlowFunction (options : scala.collection.Map[Property.Key, Any]) : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]] = {
-    if (options.contains(CfgModule.globalShouldIncludeFlowFunctionKey)) {
-       return options(CfgModule.globalShouldIncludeFlowFunctionKey).asInstanceOf[scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]]]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setShouldIncludeFlowFunction (options : MMap[Property.Key, Any], shouldIncludeFlowFunction : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]]) : MMap[Property.Key, Any] = {
-
-    options(CfgModule.globalShouldIncludeFlowFunctionKey) = shouldIncludeFlowFunction
-
-    return options
-  }
-
-  def getProcedureSymbolTable (options : scala.collection.Map[Property.Key, Any]) : org.sireum.pilar.symbol.ProcedureSymbolTable = {
-    if (options.contains(CfgModule.globalProcedureSymbolTableKey)) {
-       return options(CfgModule.globalProcedureSymbolTableKey).asInstanceOf[org.sireum.pilar.symbol.ProcedureSymbolTable]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setProcedureSymbolTable (options : MMap[Property.Key, Any], procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable) : MMap[Property.Key, Any] = {
-
-    options(CfgModule.globalProcedureSymbolTableKey) = procedureSymbolTable
-
-    return options
   }
 
   def getCfg (options : scala.collection.Map[Property.Key, Any]) : org.sireum.alir.ControlFlowGraph[java.lang.String] = {
@@ -227,29 +177,78 @@ object CfgModule extends PipelineModule {
     return options
   }
 
+  def getShouldIncludeFlowFunction (options : scala.collection.Map[Property.Key, Any]) : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]] = {
+    if (options.contains(CfgModule.globalShouldIncludeFlowFunctionKey)) {
+       return options(CfgModule.globalShouldIncludeFlowFunctionKey).asInstanceOf[scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]]]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setShouldIncludeFlowFunction (options : MMap[Property.Key, Any], shouldIncludeFlowFunction : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]]) : MMap[Property.Key, Any] = {
+
+    options(CfgModule.globalShouldIncludeFlowFunctionKey) = shouldIncludeFlowFunction
+
+    return options
+  }
+
+  def getPool (options : scala.collection.Map[Property.Key, Any]) : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode] = {
+    if (options.contains(CfgModule.globalPoolKey)) {
+       return options(CfgModule.globalPoolKey).asInstanceOf[scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]]
+    }
+    if (options.contains(CfgModule.poolKey)) {
+       return options(CfgModule.poolKey).asInstanceOf[scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setPool (options : MMap[Property.Key, Any], pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]) : MMap[Property.Key, Any] = {
+
+    options(CfgModule.globalPoolKey) = pool
+    options(poolKey) = pool
+
+    return options
+  }
+
+  def getProcedureSymbolTable (options : scala.collection.Map[Property.Key, Any]) : org.sireum.pilar.symbol.ProcedureSymbolTable = {
+    if (options.contains(CfgModule.globalProcedureSymbolTableKey)) {
+       return options(CfgModule.globalProcedureSymbolTableKey).asInstanceOf[org.sireum.pilar.symbol.ProcedureSymbolTable]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setProcedureSymbolTable (options : MMap[Property.Key, Any], procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable) : MMap[Property.Key, Any] = {
+
+    options(CfgModule.globalProcedureSymbolTableKey) = procedureSymbolTable
+
+    return options
+  }
+
   object ConsumerView {
     implicit class CfgModuleConsumerView (val job : PropertyProvider) extends AnyVal {
-      def pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode] = CfgModule.getPool(job.propertyMap)
-      def shouldIncludeFlowFunction : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]] = CfgModule.getShouldIncludeFlowFunction(job.propertyMap)
-      def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = CfgModule.getProcedureSymbolTable(job.propertyMap)
       def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = CfgModule.getCfg(job.propertyMap)
+      def shouldIncludeFlowFunction : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]] = CfgModule.getShouldIncludeFlowFunction(job.propertyMap)
+      def pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode] = CfgModule.getPool(job.propertyMap)
+      def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = CfgModule.getProcedureSymbolTable(job.propertyMap)
     }
   }
 
   object ProducerView {
     implicit class CfgModuleProducerView (val job : PropertyProvider) extends AnyVal {
 
-      def pool_=(pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]) { CfgModule.setPool(job.propertyMap, pool) }
-      def pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode] = CfgModule.getPool(job.propertyMap)
+      def cfg_=(cfg : org.sireum.alir.ControlFlowGraph[java.lang.String]) { CfgModule.setCfg(job.propertyMap, cfg) }
+      def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = CfgModule.getCfg(job.propertyMap)
 
       def shouldIncludeFlowFunction_=(shouldIncludeFlowFunction : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]]) { CfgModule.setShouldIncludeFlowFunction(job.propertyMap, shouldIncludeFlowFunction) }
       def shouldIncludeFlowFunction : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]] = CfgModule.getShouldIncludeFlowFunction(job.propertyMap)
 
+      def pool_=(pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]) { CfgModule.setPool(job.propertyMap, pool) }
+      def pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode] = CfgModule.getPool(job.propertyMap)
+
       def procedureSymbolTable_=(procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable) { CfgModule.setProcedureSymbolTable(job.propertyMap, procedureSymbolTable) }
       def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = CfgModule.getProcedureSymbolTable(job.propertyMap)
-
-      def cfg_=(cfg : org.sireum.alir.ControlFlowGraph[java.lang.String]) { CfgModule.setCfg(job.propertyMap, cfg) }
-      def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = CfgModule.getCfg(job.propertyMap)
     }
   }
 }
@@ -258,14 +257,14 @@ trait CfgModule {
   def job : PipelineJob
 
 
-  def pool_=(pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]) { CfgModule.setPool(job.propertyMap, pool) }
-  def pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode] = CfgModule.getPool(job.propertyMap)
+  def cfg_=(cfg : org.sireum.alir.ControlFlowGraph[java.lang.String]) { CfgModule.setCfg(job.propertyMap, cfg) }
+  def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = CfgModule.getCfg(job.propertyMap)
 
   def shouldIncludeFlowFunction : scala.Function2[org.sireum.pilar.ast.LocationDecl, scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Tuple2[scala.collection.Iterable[org.sireum.pilar.ast.CatchClause], scala.Boolean]] = CfgModule.getShouldIncludeFlowFunction(job.propertyMap)
 
+
+  def pool_=(pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode]) { CfgModule.setPool(job.propertyMap, pool) }
+  def pool : scala.collection.mutable.Map[org.sireum.alir.AlirIntraProceduralNode, org.sireum.alir.AlirIntraProceduralNode] = CfgModule.getPool(job.propertyMap)
+
   def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = CfgModule.getProcedureSymbolTable(job.propertyMap)
-
-
-  def cfg_=(cfg : org.sireum.alir.ControlFlowGraph[java.lang.String]) { CfgModule.setCfg(job.propertyMap, cfg) }
-  def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = CfgModule.getCfg(job.propertyMap)
 }

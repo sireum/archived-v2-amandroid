@@ -12,7 +12,7 @@ trait CallGraph {
    * @param source Either procedure symbol table or control flow graph
    * @return CallGraph of given source
    */
-	def getCallGraph(source : Either[ProcedureSymbolTable, ControlFlowGraph[String]]) : CallGraph
+	def getCallGraph(source : Either[ProcedureSymbolTable, (ResourceUri, ControlFlowGraph[String])]) : CallGraph
 	/**
 	 * Get all reachable procedures of given procedure. (Do not include transitive call)
 	 * @param procedureUris Initial procedure resource uri

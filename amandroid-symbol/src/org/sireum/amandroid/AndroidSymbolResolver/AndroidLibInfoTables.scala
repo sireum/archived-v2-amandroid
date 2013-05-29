@@ -17,10 +17,10 @@ trait AndroidLibInfoTables {
   def getAncestors(recordUri : ResourceUri) : Set[ResourceUri]
   def getProcedureUriBySignature(sig : String) : ResourceUri
   def getProcedureSignatureByUri(pUri : ResourceUri) : String
-  def getProcedureUrisByRecordUri(recordUri : ResourceUri) : java.util.Set[ResourceUri]
-  def getProcedureSigsByRecordUri(recordUri : ResourceUri) : MSet[ResourceUri]
-  def getCalleeOptionsByUri(procedureUri : ResourceUri) : java.util.Set[ResourceUri]
-  def getCalleeOptionsBySignature(sig : String) : java.util.Set[ResourceUri]
+  def getProcedureUrisByRecordUri(recordUri : ResourceUri) : Set[ResourceUri]
+  def getProcedureSigsByRecordUri(recordUri : ResourceUri) : Set[ResourceUri]
+  def getCalleeOptionsByUri(procedureUri : ResourceUri) : Set[ResourceUri]
+  def getCalleeOptionsBySignature(sig : String) : Set[ResourceUri]
   def getGlobalVarUriByName(name : String) : ResourceUri
   def isConstructor(procedureUri : String) : Boolean
   def isStaticMethod(procedureUri : String) : Boolean

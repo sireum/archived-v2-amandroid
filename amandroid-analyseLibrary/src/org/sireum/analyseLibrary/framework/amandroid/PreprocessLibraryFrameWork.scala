@@ -23,12 +23,11 @@ import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTableProducer
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.pilar.symbol.ProcedureSymbolTableData
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTableData
-import org.sireum.amandroid.module.AndroidInterIntraProcedural
-import org.sireum.amandroid.module.AndroidInterIntraProceduralModule
+import org.sireum.amandroid.module.AndroidIntraProcedural
+import org.sireum.amandroid.module.AndroidIntraProceduralModule
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
 import org.sireum.amandroid.cache.AndroidCacheFile
 import org.sireum.alir.ControlFlowGraph
-import org.sireum.amandroid.module.AndroidInterIntraProcedural
 import org.sireum.amandroid.module.PilarAndroidSymbolResolverModule
 import java.util.zip.GZIPInputStream
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
@@ -78,22 +77,19 @@ trait PreprocessLibraryFrameWork extends TestFramework {
         }
 
         /*end here*/
-        
-        
-    
         val job = PipelineJob()
         val options = job.properties
 
         ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d+ "/" +f.getName()))))
         PilarAndroidSymbolResolverModule.setHasExistingAndroidLibInfoTables(options, Some(alit))
         PilarAndroidSymbolResolverModule.setShouldBuildLibInfoTables(options, false)
-        AndroidInterIntraProceduralModule.setAndroidLibInfoTablesOpt(options, Some(alit))
-        AndroidInterIntraProceduralModule.setParallel(options, true)
-        AndroidInterIntraProceduralModule.setAndroidCache(options, Some(aCache))
-        AndroidInterIntraProceduralModule.setShouldBuildCfg(options, true)
-        AndroidInterIntraProceduralModule.setShouldBuildRda(options, true)
-        AndroidInterIntraProceduralModule.setShouldPreprocessOfg(options, true)
-        AndroidInterIntraProceduralModule.setShouldBuildCCfg(options, true)
+        AndroidIntraProceduralModule.setAndroidLibInfoTablesOpt(options, Some(alit))
+        AndroidIntraProceduralModule.setParallel(options, true)
+        AndroidIntraProceduralModule.setAndroidCache(options, Some(aCache))
+        AndroidIntraProceduralModule.setShouldBuildCfg(options, true)
+        AndroidIntraProceduralModule.setShouldBuildRda(options, true)
+        AndroidIntraProceduralModule.setShouldPreprocessOfg(options, true)
+        AndroidIntraProceduralModule.setShouldBuildCCfg(options, true)
         pipeline.compute(job)
 
         if(job.hasError){
@@ -114,7 +110,7 @@ trait PreprocessLibraryFrameWork extends TestFramework {
         println("pipeline done!")
         
         println("start convert cfgs, rdas, ofgs to xml!")
-        val intraResult = AndroidInterIntraProceduralModule.getIntraResult(options)
+        val intraResult = AndroidIntraProceduralModule.getIntraResult(options)
         intraResult.keys.foreach(
           key =>
           {
@@ -122,7 +118,7 @@ trait PreprocessLibraryFrameWork extends TestFramework {
 //            val w = new java.io.PrintWriter(System.out, true)
 //            ofg.toDot(w)
             
-            aCache.save[AndroidInterIntraProcedural.CFG](key, "cfg", intraResult(key).cfg)
+            aCache.save[AndroidIntraProcedural.CFG](key, "cfg", intraResult(key).cfg)
             intraResult(key).rdaOpt match {
               case Some(rda) =>
                 val cfg = intraResult(key).cfg
@@ -138,12 +134,12 @@ trait PreprocessLibraryFrameWork extends TestFramework {
             intraResult(key).ofgOpt match {
               case Some(ofg) =>
 //                ofg.toDot(w)
-                aCache.save[AndroidInterIntraProcedural.OFG](key, "ofg", ofg)
+                aCache.save[AndroidIntraProcedural.OFG](key, "ofg", ofg)
               case None =>
             }
             intraResult(key).cCfgOpt match {
               case Some(cCfg) =>
-                aCache.save[AndroidInterIntraProcedural.CCFG](key, "cCfg", cCfg)
+                aCache.save[AndroidIntraProcedural.CCFG](key, "cCfg", cCfg)
               case None =>
             }
           }  
@@ -180,9 +176,9 @@ trait PreprocessLibraryFrameWork extends TestFramework {
       )
       ,
       PipelineStage(
-        "Android InterIntraProcedural Analysis",
+        "Android IntraProcedural Analysis",
         false,
-        AndroidInterIntraProceduralModule
+        AndroidIntraProceduralModule
       )
     )
     
