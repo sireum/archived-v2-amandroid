@@ -24,6 +24,13 @@ class AndroidLibInfoResolver
     if(!tables.recordHierarchyTable.get(self).contains(parent))
       tables.recordHierarchyTable.put(self, parent)
   }
+  def buildClassExtendTable(self : ResourceUri, parent : ResourceUri) : Unit = {
+    tables.classExtendTable(self) = parent
+  }
+  def buildInterfaceImplementTable(self : ResourceUri, parent : ResourceUri) : Unit = {
+    if(!tables.interfaceImplementTable.get(self).contains(parent))
+      tables.interfaceImplementTable.put(self, parent)
+  }
   def buildVirtualMethodTable(from : ResourceUri, to : ResourceUri) : Unit = {
     if(!tables.virtualMethodTable.get(from).contains(to))
       tables.virtualMethodTable.put(from, to)
@@ -427,8 +434,21 @@ class AndroidLibInfoResolver
   def getProcedureUriBySignature(sig : String) : ResourceUri = {
     if(tables.procedureUriTable.contains(sig))
       tables.procedureUriTable.get(sig)
-    else null
+    else{
+      val rName = getRecordNameFromProcedureSig(sig)
+      findProcedureUri(getRecordUri(rName), getSubSignature(sig))
+    }
   }
+  
+  def getRecordNameFromProcedureSig(sig : String) : String = {
+	  val strs = sig.substring(3, sig.indexOf("."))
+	  "[|" + strs.replaceAll("\\/", ":").replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll(";", "") + "|]"
+	}
+  
+  def getProcedureNameFromProcedureSig(sig : String) : String = {
+	  val strs = sig.substring(3, sig.indexOf(":"))
+	  "[|" + strs.replaceAll("\\/", ":").replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll(";", "") + "|]"
+	}
   
   def getProcedureSignatureByUri(pUri : ResourceUri) : String = {
     if(tables.procedureUriTable.inverse().contains(pUri))
@@ -506,11 +526,61 @@ class AndroidLibInfoResolver
       sigEqual(procUri1, procUri2)
   }
   
+  /**
+   * Finds super class of current class.
+   * @param recordUri Current class' resource uri
+   * @return Super class' resource uri
+   */
+  def getSuperClassOf(recordUri : ResourceUri) : ResourceUri = tables.classExtendTable.getOrElse(recordUri, null)
+  
+  /**
+   * Finds all ancestor classes of current class.
+   * @param recordUri Current class' resource uri
+   * @return All ancestor classes' resource uris
+   */
+  def getSuperClassesOf(recordUri : ResourceUri) : Set[ResourceUri] = getSuperClassesOfIncluding(recordUri) - recordUri
+   
+  /**
+   * Finds all ancestor classes of current class (including itself).
+   * @param recordUri Current class' resource uri
+   * @return All ancestor classes' resource uris (including itself)
+   */
+  def getSuperClassesOfIncluding(recordUri : ResourceUri) : Set[ResourceUri] = if(recordUri == null) Set() else getSuperClassesOf(getSuperClassOf(recordUri)) + recordUri
+  
+  /**
+   * Finds all sub classes of current class.
+   * @param recordUri Current class' resource uri
+   * @return All sub classes' resource uris
+   */
+  def getSubClassesOf(recordUri : ResourceUri) : Set[ResourceUri] = tables.classExtendTable.filter{case (k, v) => if(v.equals(recordUri)) true else false}.keySet.toSet
+  
+  /**
+   * Finds all sub classes of current class (including itself).
+   * @param recordUri Current class' resource uri
+   * @return All sub classes' resource uris (including itself)
+   */
+  def getSubClassesOfIncluding(recordUri : ResourceUri) : Set[ResourceUri] = getSubClassesOf(recordUri) + recordUri
+  /**
+   * Finds interfaces which implement by current class.
+   * @param recordUri Current class' resource uri
+   * @return Interfaces' resource uri
+   */
+  def getInterfaces(recordUri : ResourceUri) : Set[ResourceUri] = if(tables.interfaceImplementTable.containsKey(recordUri)) tables.interfaceImplementTable.get(recordUri).toSet else Set()
+  
+  def separateInterfaceImplementAndClassExtend() = {
+    tables.recordHierarchyTable.keySet.foreach{
+      k =>
+        tables.recordHierarchyTable.get(k).foreach{
+          v =>
+            if(isInterface(v)) buildInterfaceImplementTable(k, v)
+            else buildClassExtendTable(k, v)
+        }
+    }
+  }
   
   def mergeWith(anotherVmTables : AndroidLibInfoTables) = {
     combineTables(anotherVmTables)
     mergeRecordHierarchyTableAndVirtualMethodTable()
-    
   }
   
   def combineTables(anotherVmTables : AndroidLibInfoTables) = {
@@ -525,6 +595,8 @@ class AndroidLibInfoResolver
     tables.globalVarTable ++= anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.globalVarTable
     tables.interfaceTable.addAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.interfaceTable)
     tables.globalVarUriTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.globalVarUriTable)
+    tables.classExtendTable ++= anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.classExtendTable
+    tables.interfaceImplementTable.putAll(anotherVmTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.interfaceImplementTable)
   }
   
   def mergeRecordHierarchyTableAndVirtualMethodTable() = {

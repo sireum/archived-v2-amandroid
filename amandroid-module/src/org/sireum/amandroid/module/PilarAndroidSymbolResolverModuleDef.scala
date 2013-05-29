@@ -65,9 +65,7 @@ class ST extends SymbolTable with SymbolTableProducer {
     val tables = SymbolTableData()
     val tags = marrayEmpty[LocationTag]
     var hasErrors = false
- 
-    // println("pilarAndroidSymbolResDef :: AndroidSymbolTable :: class ST :: OK1") // sankar testing
-    
+     
     def reportError(source : Option[FileResourceUri], line : Int,
                     column : Int, message : String) : Unit = {
       tags += Tag.toTag(source, line, column, message, ERROR_TAG_TYPE)

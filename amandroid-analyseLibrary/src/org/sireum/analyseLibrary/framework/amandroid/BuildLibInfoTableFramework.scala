@@ -3,7 +3,6 @@ package org.sireum.analyseLibrary.framework.amandroid
 import org.sireum.test.framework.TestFramework
 import org.sireum.util._
 import java.io._
-import org.sireum.amandroid.xml.AndroidXStream
 import org.sireum.amandroid.AndroidSymbolResolver._
 import java.util.zip.GZIPOutputStream
 import java.util.zip.GZIPInputStream
@@ -14,6 +13,7 @@ import org.sireum.core.module.ChunkingPilarParserModule
 import org.sireum.pilar.symbol.SymbolTable
 import org.sireum.pipeline.PipelineConfiguration
 import org.sireum.pipeline.PipelineStage
+import org.sireum.amandroid.xml.AndroidXStream
 
 
 class BuildLibInfoTableFramework extends TestFramework { 
@@ -28,21 +28,12 @@ class BuildLibInfoTableFramework extends TestFramework {
     _title = caseString + s
     this
   }
-
-  def combine(fileUri : FileResourceUri) =
-    CombineConfiguration(title, fileUri)
     
   def init(fileUri : FileResourceUri) =
     InitConfiguration(title, fileUri)
-    
-    
-    
+
   case class InitConfiguration //
   (title : String, srcs : FileResourceUri) {
-
-    ////////////////////////////////////////////////////////////////////////////
-    // Test Constructor
-    ////////////////////////////////////////////////////////////////////////////
 
     test(title) {
       println("####" + title + "#####")
@@ -155,74 +146,6 @@ class BuildLibInfoTableFramework extends TestFramework {
         PilarAndroidSymbolResolverModule
       )
     )
-    
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Public Case Classes
-  //////////////////////////////////////////////////////////////////////////////
-
-  case class CombineConfiguration //
-  (title : String, srcs : FileResourceUri) {
-
-    ////////////////////////////////////////////////////////////////////////////
-    // Test Constructor
-    ////////////////////////////////////////////////////////////////////////////
-
-    test(title) {
-      println("####" + title + "#####")
-        val currentLibInfoTablesFile = new File(srcs.toString().substring(5))
-        //create directory
-        val nameArray = currentLibInfoTablesFile.getName().split("\\.")
-        var dirName : String = ""
-        for(i <- 0 until nameArray.length-1){
-          dirName += nameArray(i)
-        }
-        val d = srcs.substring(srcs.indexOf("/"), srcs.lastIndexOf("/")+1)
-        val srcFiles = mlistEmpty[FileResourceUri]
-        
-        val libDir = new File(System.getProperty("user.home") + "/AndroidLibData/")
-        if(!libDir.exists()){
-          libDir.mkdir()
-        }
-        val resDir = new File(libDir + "/libInfoTables/")
-        if(!resDir.exists()){
-          resDir.mkdir()
-        }
-        
-        val xStream = AndroidXStream
-        xStream.xstream.alias("AndroidLibInfoTables", classOf[AndroidLibInfoTables])
-        
-        val libInfoTablesFile = new File(resDir + "/libInfoTables.xml.zip")
-        var libInfoTables : AndroidLibInfoTables = null
-        if(libInfoTablesFile.exists()){
-          val interAVMT = new GZIPInputStream(new FileInputStream(libInfoTablesFile))
-          libInfoTables = xStream.fromXml(interAVMT).asInstanceOf[AndroidLibInfoTables]
-          interAVMT.close()
-        }
-        
-        val currentLibInfoTables = xStream.fromXml(currentLibInfoTablesFile).asInstanceOf[AndroidLibInfoTables]
-        
-        if(libInfoTables == null){
-          libInfoTables = currentLibInfoTables
-        } else {
-          println("before merge: " + libInfoTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
-          // if libVmTables already have something means we need to merge.
-          libInfoTables.mergeWith(currentLibInfoTables)
-          println("after merge: " + libInfoTables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
-        }
-        
-        val outerAVMT = new GZIPOutputStream(new FileOutputStream(libInfoTablesFile))
-        
-        println("start convert AVMT to xml!")
-        xStream.toXml(libInfoTables, outerAVMT)
-        outerAVMT.close()
-        println("###############################################")
-    }
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Implemented Protected Methods and Fields
-  //////////////////////////////////////////////////////////////////////////////
 
   protected var _title : String = null
   protected var num = 0

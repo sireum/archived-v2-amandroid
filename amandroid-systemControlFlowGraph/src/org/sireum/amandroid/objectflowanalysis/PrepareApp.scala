@@ -9,6 +9,8 @@ import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.dummyMainGen.DummyMainGenerator
 import org.sireum.amandroid.androidConstants.AndroidConstants
 import org.sireum.amandroid.entryPointConstants.AndroidEntryPointConstants
+import org.sireum.pilar.symbol.ProcedureSymbolTable
+import org.sireum.amandroid.callGraph.CallGraphBuilder
 
 class PrepareApp(apkFileLocation : String) {
   
@@ -24,6 +26,7 @@ class PrepareApp(apkFileLocation : String) {
 	private var taintWrapperFile : String = ""
 	private var libInfoTables : AndroidLibInfoTables = null
 	private var dummyMainMap : Map[ResourceUri, String] = Map()
+	private var psts : Seq[ProcedureSymbolTable] = Seq()
 
 //	def printSinks() = {
 //		println("Sinks:")
@@ -58,6 +61,10 @@ class PrepareApp(apkFileLocation : String) {
 	
 	def setTaintWrapperFile(taintWrapperFile : String) = {
 		this.taintWrapperFile = taintWrapperFile;
+	}
+	
+	def setPSTs(psts : Seq[ProcedureSymbolTable]) = {
+	  this.psts = psts
 	}
 
 	def setLibInfoTables(libInfoTables : AndroidLibInfoTables) = {
@@ -113,15 +120,22 @@ class PrepareApp(apkFileLocation : String) {
 		ManifestParser.loadManifestFile(apkFileLocation)
 		this.appPackageName = ManifestParser.getPackageName
 		this.entrypoints = ManifestParser.getEntryPointClasses
-		println("entrypoints--->" + ManifestParser.getEntryPointClasses)
-	  println("packagename--->" + ManifestParser.getPackageName)
-	  println("permissions--->" + ManifestParser.getPermissions)
-	  println("intentDB------>" + ManifestParser.getIntentDB)
+		if(DEBUG){
+			println("entrypoints--->" + ManifestParser.getEntryPointClasses)
+		  println("packagename--->" + ManifestParser.getPackageName)
+		  println("permissions--->" + ManifestParser.getPermissions)
+		  println("intentDB------>" + ManifestParser.getIntentDB)
+		}
 		// Parse the resource file
 		ARSCFileParser.parse(apkFileLocation);
 		this.resourcePackages = ARSCFileParser.getPackages
-		println("arscstring-->" + ARSCFileParser.getGlobalStringPool)
-	  println("arscpackage-->" + ARSCFileParser.getPackages)
+		if(DEBUG){
+			println("arscstring-->" + ARSCFileParser.getGlobalStringPool)
+		  println("arscpackage-->" + ARSCFileParser.getPackages)
+		}
+	  val callGraph = new CallGraphBuilder(libInfoTables)
+	  psts.foreach(pst => callGraph.getCallGraph(Left(pst)))
+	  
 		// Collect the callback interfaces implemented in the app's source code
 //		AnalyzeJimpleClass jimpleClass = new AnalyzeJimpleClass(this.entrypoints);
 //		jimpleClass.collectCallbackMethods();
@@ -130,9 +144,10 @@ class PrepareApp(apkFileLocation : String) {
 		LayoutFileParser.androidLibInfoTables = this.libInfoTables
 		LayoutFileParser.setPackageName(this.appPackageName)
 		LayoutFileParser.parseLayoutFile(apkFileLocation, this.entrypoints)
-		println("layoutcalll--->" + LayoutFileParser.getCallbackMethods)
-	  println("layoutuser--->" + LayoutFileParser.getUserControls)
-	  
+		if(DEBUG){
+			println("layoutcalll--->" + LayoutFileParser.getCallbackMethods)
+		  println("layoutuser--->" + LayoutFileParser.getUserControls)
+		}
 	  // filter the main component of this app
 	  this.mainComponent = filterMainComponent(ManifestParser.getIntentDB)
 	  this.entrypoints.foreach(f => generateDummyMain(f))

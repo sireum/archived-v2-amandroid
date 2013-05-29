@@ -228,7 +228,7 @@ class DummyMainGenerator {
         }
     }
     val invokeStmt = template.getInstanceOf("InvokeStmt")
-    invokeStmt.add("funcName", getFuncNameFromProcedureSig(pSig))
+    invokeStmt.add("funcName", androidLibInfoTables.getProcedureNameFromProcedureSig(pSig))
     val finalParamVars : ArrayList[String] = new ArrayList[String]
     finalParamVars.add(0, localClassVar)
     for(i <- 0 to paramNum - 1){
@@ -242,11 +242,6 @@ class DummyMainGenerator {
     invokeStmt.add("sig", pSig)
     invokeStmt.add("typ", typ)
     codefg.setCode(invokeStmt)
-	}
-	
-	private def getFuncNameFromProcedureSig(sig : String) : String = {
-	  val strs = sig.substring(3, sig.indexOf(":"))
-	  "[|" + strs.replaceAll("\\/", ":").replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll(";", "") + "|]"
 	}
 	
 	/**

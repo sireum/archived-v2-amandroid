@@ -13,6 +13,7 @@ import org.sireum.core.module._
 import org.sireum.pipeline.PipelineJob
 import org.sireum.amandroid.objectflowanalysis.PrepareApp
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
+import org.sireum.pilar.symbol.SymbolTable
 
 case class AndroidApplicationPrepare(
 	title : String = "Android Application Preparation Module",
@@ -22,6 +23,9 @@ case class AndroidApplicationPrepare(
   
   @Input
   androidLibInfoTablesOpt : Option[AndroidLibInfoTables],
+  
+  @Input
+  symbolTable : SymbolTable,
   
   @Produce
   @Output

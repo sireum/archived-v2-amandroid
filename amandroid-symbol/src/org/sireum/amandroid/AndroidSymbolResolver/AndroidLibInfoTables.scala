@@ -31,12 +31,50 @@ trait AndroidLibInfoTables {
   def getSubSignature(sig : String) : String
   def getSubSignatureFromUri(procedureUri : ResourceUri) : String
   /**
+   * Finds super class of current class.
+   * @param recordUri Current class' resource uri
+   * @return Super class' resource uri
+   */
+  def getSuperClassOf(recordUri : ResourceUri) : ResourceUri
+  /**
+   * Finds all ancestor classes of current class.
+   * @param recordUri Current class' resource uri
+   * @return All ancestor classes' resource uris
+   */
+  def getSuperClassesOf(recordUri : ResourceUri) : Set[ResourceUri]
+  /**
+   * Finds all ancestor classes of current class (including itself).
+   * @param recordUri Current class' resource uri
+   * @return All ancestor classes' resource uris (including itself)
+   */
+  def getSuperClassesOfIncluding(recordUri : ResourceUri) : Set[ResourceUri]
+  /**
+   * Finds all sub classes of current class.
+   * @param recordUri Current class' resource uri
+   * @return All sub classes' resource uris
+   */
+  def getSubClassesOf(recordUri : ResourceUri) : Set[ResourceUri]
+  /**
+   * Finds all sub classes of current class (including itself).
+   * @param recordUri Current class' resource uri
+   * @return All sub classes' resource uris (including itself)
+   */
+  def getSubClassesOfIncluding(recordUri : ResourceUri) : Set[ResourceUri]
+  /**
+   * Finds interfaces which implement by current class.
+   * @param recordUri Current class' resource uri
+   * @return Interfaces' resource uri
+   */
+  def getInterfaces(recordUri : ResourceUri) : Set[ResourceUri]
+  /**
    * Finds a ProcedureUri in the given class or one of its super classes
    * @param rUri Current record resource uri
    * @param subSig The sub signature of the procedure to find
-   * @ return The procedure resource uri with the given signature if it has been found, otherwise null
+   * @return The procedure resource uri with the given signature if it has been found, otherwise null
    */
   def findProcedureUri(rUri : ResourceUri, subSig : String) : ResourceUri
+  def getProcedureNameFromProcedureSig(sig : String) : String
+  def getRecordNameFromProcedureSig(sig : String) : String
 }
 
 trait AndroidLibInfoTablesProducer{
@@ -47,6 +85,8 @@ trait AndroidLibInfoTablesProducer{
 
 sealed case class AndroidLibInfoTablesData
 (recordHierarchyTable : HashMultimap[ResourceUri, ResourceUri] = HashMultimap.create(),
+ classExtendTable : MMap[ResourceUri, ResourceUri] = mmapEmpty,
+ interfaceImplementTable : HashMultimap[ResourceUri, ResourceUri] = HashMultimap.create(),
  virtualMethodTable : HashMultimap[ResourceUri, ResourceUri] = HashMultimap.create(),
  recordProcedureTable : HashMultimap[ResourceUri, ResourceUri] = HashMultimap.create(),
  cannotFindRecordTable : HashMultimap[ResourceUri, ResourceUri] = HashMultimap.create(),

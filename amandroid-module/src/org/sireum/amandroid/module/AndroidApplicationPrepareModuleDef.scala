@@ -6,9 +6,11 @@ import org.sireum.amandroid.objectflowanalysis.PrepareApp
 
 class AndroidApplicationPrepareModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends AndroidApplicationPrepareModule {
   val pre = new PrepareApp(apkFileLocation)
+  val psts = this.symbolTable.procedureSymbolTables.toSeq
   androidLibInfoTablesOpt match {
     case Some(androidLibInfoTables) =>
       pre.setLibInfoTables(androidLibInfoTables)
+      pre.setPSTs(psts)
 		  pre.calculateSourcesSinksEntrypoints("")
 		  pre.printDummyMains
     case None =>
