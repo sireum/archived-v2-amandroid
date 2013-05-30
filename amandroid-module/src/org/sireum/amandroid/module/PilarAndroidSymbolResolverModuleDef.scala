@@ -36,7 +36,12 @@ class PilarAndroidSymbolResolverModuleDef (val job : PipelineJob, info : Pipelin
   val par = this.parallel
   val fst = { _ : Unit => new ST }
   val result = 
-    if (this.hasExistingAndroidLibInfoTables.isDefined) {
+    if (this.buildLibInfoTablesOnly) {
+      require(this.hasExistingAndroidLibInfoTables.isDefined)
+      val eavmt = this.hasExistingAndroidLibInfoTables.get.asInstanceOf[AndroidLibInfoTables]
+      AndroidSymbolTable(ms, fst, eavmt, par)
+    }
+    else if (this.hasExistingAndroidLibInfoTables.isDefined) {
       require(this.hasExistingAndroidLibInfoTables.isDefined)
       val eavmt = this.hasExistingAndroidLibInfoTables.get.asInstanceOf[AndroidLibInfoTables]
       AndroidSymbolTable(ms, fst, eavmt, par, shouldBuildLibInfoTables)

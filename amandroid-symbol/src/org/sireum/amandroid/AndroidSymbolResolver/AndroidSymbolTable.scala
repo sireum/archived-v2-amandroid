@@ -34,10 +34,16 @@ object AndroidSymbolTable {
     
   def apply(models : ISeq[Model],
             stpConstructor : Unit => SymbolTableProducer,
-            existingAndroidVirtualMethodTables : AndroidLibInfoTables,
+            existingLibInfoTables : AndroidLibInfoTables,
             parallel : Boolean,
             shouldBuildLibInfoTables : Boolean) =
-    buildSymbolTable(models, stpConstructor, existingAndroidVirtualMethodTables, parallel, shouldBuildLibInfoTables)
+    buildSymbolTable(models, stpConstructor, existingLibInfoTables, parallel, shouldBuildLibInfoTables)
+    
+  def apply(models : ISeq[Model],
+            stpConstructor : Unit => SymbolTableProducer,
+            existingLibInfoTables : AndroidLibInfoTables,
+            parallel : Boolean) = 
+    buildLibInfoTables(models, stpConstructor, existingLibInfoTables, parallel)
 
   def apply[P <: SymbolTableProducer] //
   (stp : SymbolTableProducer, stModels : ISeq[Model],
@@ -153,14 +159,25 @@ object AndroidSymbolTable {
     buildProcedureSymbolTables(stp, parallel)
     tablesOpt match {
       case Some(tables) =>
-        println("tables-->" + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.procedureUriTable)
-        println("before merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
-	    tables.mergeWith(existingAndroidLibInfoTables)
-	    println("after merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
-	    (stp.toSymbolTable, Some(tables))
+	      println("before merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
+		    tables.mergeWith(existingAndroidLibInfoTables)
+		    println("after merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
+		    (stp.toSymbolTable, Some(tables))
       case None =>
         (stp.toSymbolTable, Some(existingAndroidLibInfoTables))
     }
+  }
+  
+  def buildLibInfoTables(models : ISeq[Model],
+            stpConstructor : Unit => SymbolTableProducer,
+            existingLibInfoTables : AndroidLibInfoTables,
+            parallel : Boolean) = {
+    val stp = minePackageElements(models, stpConstructor, parallel)
+    val tables = resolveVirtualMethod(stp)
+    println("before merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
+    tables.mergeWith(existingLibInfoTables)
+    println("after merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
+    (stp.toSymbolTable, Some(tables))
   }
   
   def fixSymbolTable[P <: SymbolTableProducer] //
@@ -200,21 +217,6 @@ object AndroidSymbolTable {
         (stp.toSymbolTable, Some(existingAndroidLibInfoTables))
     }
   }
-  
-//  private def combinePST(stp1 : SymbolTableProducer, stp2 : SymbolTableProducer) = {
-//    stp2.tables.procedureAbsTable.keySet.foreach{
-//      k =>
-//        val pstp1 = stp1.procedureSymbolTableProducer(k)
-//        val pstp2 = stp2.procedureSymbolTableProducer(k)
-//        pstp1.tables.localVarTable ++= pstp2.tables.localVarTable
-//        pstp1.tables.params ++= pstp2.tables.params
-//        pstp1.tables.typeVarTable ++= pstp2.tables.typeVarTable
-//        pstp1.tables.bodyTables.get.catchTable ++= pstp2.tables.bodyTables.get.catchTable
-//        pstp1.tables.bodyTables.get.locationTable ++= pstp2.tables.bodyTables.get.locationTable
-//    }
-//  }
-
-  
 }
 
 trait AndroidSymbolTableProducer extends SymbolTableReporter {

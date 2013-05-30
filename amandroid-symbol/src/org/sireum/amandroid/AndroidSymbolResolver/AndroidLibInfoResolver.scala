@@ -596,7 +596,7 @@ class AndroidLibInfoResolver
       k =>
         tables.recordHierarchyTable.get(k).foreach{
           v =>
-            if(isInterface(v)) buildInterfaceImplementTable(k, v)
+            if(!isInterface(k) && isInterface(v)) buildInterfaceImplementTable(k, v)
             else buildClassExtendTable(k, v)
         }
     }

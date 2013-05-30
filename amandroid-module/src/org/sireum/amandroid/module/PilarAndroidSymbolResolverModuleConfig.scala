@@ -40,10 +40,10 @@ case class PilarAndroidSymbolResolver(
   @Input
   shouldBuildLibInfoTables : Boolean = true,
   
+  @Input
+  buildLibInfoTablesOnly : Boolean = false,
+  
   @Input 
-  @Consume(Array(classOf[PilarParser]))
-  @Output 
-  @Produce 
   models : ISeq[Model],
   
 // Fengguo Wei put this output: androidRecordProcedureDependencyTables

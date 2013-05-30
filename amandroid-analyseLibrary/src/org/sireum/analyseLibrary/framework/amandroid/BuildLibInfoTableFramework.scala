@@ -89,7 +89,7 @@ class BuildLibInfoTableFramework extends TestFramework {
         val options = job.properties
 //        Dex2PilarWrapperModule.setSrcFiles(options, srcFiles)
         ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d +  "/" + dirName + ".pilar"))))
-        PilarAndroidSymbolResolverModule.setParallel(options, false)
+        PilarAndroidSymbolResolverModule.setParallel(options, true)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidLibInfoTables(options, None)
         pipeline.compute(job)
 

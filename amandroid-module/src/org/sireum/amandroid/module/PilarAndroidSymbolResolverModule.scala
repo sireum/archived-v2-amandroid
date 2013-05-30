@@ -10,7 +10,6 @@ import org.sireum.pilar.ast.Model
 import org.sireum.pilar.symbol.SymbolTable
 import scala.Option
 import scala.collection.immutable.Seq
-import org.sireum.core.module.PilarParserModule
 
 object PilarAndroidSymbolResolverModule extends PipelineModule {
   def title = "Pilar Symbol Resolver for Android"
@@ -19,9 +18,9 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
   val globalParallelKey = "Global.parallel"
   val globalAndroidLibInfoTablesOptKey = "Global.androidLibInfoTablesOpt"
   val globalHasExistingAndroidLibInfoTablesKey = "Global.hasExistingAndroidLibInfoTables"
+  val globalBuildLibInfoTablesOnlyKey = "Global.buildLibInfoTablesOnly"
   val globalModelsKey = "Global.models"
   val globalShouldBuildLibInfoTablesKey = "Global.shouldBuildLibInfoTables"
-  val modelsKey = "PilarAndroidSymbolResolver.models"
   val globalSymbolTableKey = "Global.symbolTable"
 
   def compute(job : PipelineJob, info : PipelineJobModuleInfo) : MBuffer[Tag] = {
@@ -44,11 +43,16 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
       val shouldBuildLibInfoTables = Class.forName("org.sireum.amandroid.module.PilarAndroidSymbolResolver").getDeclaredMethod("$lessinit$greater$default$4").invoke(null).asInstanceOf[scala.Boolean]
       setShouldBuildLibInfoTables(job.propertyMap, shouldBuildLibInfoTables)
     }
+
+    if(!(job ? PilarAndroidSymbolResolverModule.globalBuildLibInfoTablesOnlyKey)) {
+      val buildLibInfoTablesOnly = Class.forName("org.sireum.amandroid.module.PilarAndroidSymbolResolver").getDeclaredMethod("$lessinit$greater$default$5").invoke(null).asInstanceOf[scala.Boolean]
+      setBuildLibInfoTablesOnly(job.propertyMap, buildLibInfoTablesOnly)
+    }
   }
 
   override def validPipeline(stage : PipelineStage, job : PipelineJob) : MBuffer[Tag] = {
     val tags = marrayEmpty[Tag]
-    val deps = ilist[PipelineModule](PilarParserModule)
+    val deps = ilist[PipelineModule]()
     deps.foreach(d =>
       if(stage.modules.contains(d)){
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
@@ -142,10 +146,37 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'shouldBuildLibInfoTables'")       
     }
+    var _buildLibInfoTablesOnly : scala.Option[AnyRef] = None
+    var _buildLibInfoTablesOnlyKey : scala.Option[String] = None
+
+    val keylistbuildLibInfoTablesOnly = List(PilarAndroidSymbolResolverModule.globalBuildLibInfoTablesOnlyKey)
+    keylistbuildLibInfoTablesOnly.foreach(key => 
+      if(job ? key) { 
+        if(_buildLibInfoTablesOnly.isEmpty) {
+          _buildLibInfoTablesOnly = Some(job(key))
+          _buildLibInfoTablesOnlyKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _buildLibInfoTablesOnly.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'buildLibInfoTablesOnly' keys '" + _buildLibInfoTablesOnlyKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _buildLibInfoTablesOnly match{
+      case Some(x) =>
+        if(!x.isInstanceOf[scala.Boolean]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'buildLibInfoTablesOnly'.  Expecting 'scala.Boolean' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'buildLibInfoTablesOnly'")       
+    }
     var _models : scala.Option[AnyRef] = None
     var _modelsKey : scala.Option[String] = None
 
-    val keylistmodels = List(PilarAndroidSymbolResolverModule.globalModelsKey, PilarParserModule.modelsKey)
+    val keylistmodels = List(PilarAndroidSymbolResolverModule.globalModelsKey)
     keylistmodels.foreach(key => 
       if(job ? key) { 
         if(_models.isEmpty) {
@@ -174,23 +205,6 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
 
   def outputDefined (job : PipelineJob) : MBuffer[Tag] = {
     val tags = marrayEmpty[Tag]
-    if(!(job ? PilarAndroidSymbolResolverModule.modelsKey) && !(job ? PilarAndroidSymbolResolverModule.globalModelsKey)) {
-      tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-        "Output error for '" + this.title + "': No entry found for 'models'. Expecting (PilarAndroidSymbolResolverModule.modelsKey or PilarAndroidSymbolResolverModule.globalModelsKey)") 
-    }
-
-    if(job ? PilarAndroidSymbolResolverModule.modelsKey && !job(PilarAndroidSymbolResolverModule.modelsKey).isInstanceOf[scala.collection.immutable.Seq[org.sireum.pilar.ast.Model]]) {
-      tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker, 
-        "Output error for '" + this.title + "': Wrong type found for PilarAndroidSymbolResolverModule.modelsKey.  Expecting 'scala.collection.immutable.Seq[org.sireum.pilar.ast.Model]' but found '" + 
-        job(PilarAndroidSymbolResolverModule.modelsKey).getClass.toString + "'")
-    } 
-
-    if(job ? PilarAndroidSymbolResolverModule.globalModelsKey && !job(PilarAndroidSymbolResolverModule.globalModelsKey).isInstanceOf[scala.collection.immutable.Seq[org.sireum.pilar.ast.Model]]) {
-      tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker, 
-        "Output error for '" + this.title + "': Wrong type found for PilarAndroidSymbolResolverModule.globalModelsKey.  Expecting 'scala.collection.immutable.Seq[org.sireum.pilar.ast.Model]' but found '" + 
-        job(PilarAndroidSymbolResolverModule.globalModelsKey).getClass.toString + "'")
-    } 
-
     if(!(job ? PilarAndroidSymbolResolverModule.globalAndroidLibInfoTablesOptKey)) {
       tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
         "Output error for '" + this.title + "': No entry found for 'androidLibInfoTablesOpt'. Expecting (PilarAndroidSymbolResolverModule.globalAndroidLibInfoTablesOptKey)") 
@@ -260,15 +274,24 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
     return options
   }
 
+  def getBuildLibInfoTablesOnly (options : scala.collection.Map[Property.Key, Any]) : scala.Boolean = {
+    if (options.contains(PilarAndroidSymbolResolverModule.globalBuildLibInfoTablesOnlyKey)) {
+       return options(PilarAndroidSymbolResolverModule.globalBuildLibInfoTablesOnlyKey).asInstanceOf[scala.Boolean]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setBuildLibInfoTablesOnly (options : MMap[Property.Key, Any], buildLibInfoTablesOnly : scala.Boolean) : MMap[Property.Key, Any] = {
+
+    options(PilarAndroidSymbolResolverModule.globalBuildLibInfoTablesOnlyKey) = buildLibInfoTablesOnly
+
+    return options
+  }
+
   def getModels (options : scala.collection.Map[Property.Key, Any]) : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model] = {
     if (options.contains(PilarAndroidSymbolResolverModule.globalModelsKey)) {
        return options(PilarAndroidSymbolResolverModule.globalModelsKey).asInstanceOf[scala.collection.immutable.Seq[org.sireum.pilar.ast.Model]]
-    }
-    if (options.contains(PilarAndroidSymbolResolverModule.modelsKey)) {
-       return options(PilarAndroidSymbolResolverModule.modelsKey).asInstanceOf[scala.collection.immutable.Seq[org.sireum.pilar.ast.Model]]
-    }
-    if (options.contains(PilarParserModule.modelsKey)) {
-       return options(PilarParserModule.modelsKey).asInstanceOf[scala.collection.immutable.Seq[org.sireum.pilar.ast.Model]]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
@@ -277,7 +300,6 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
   def setModels (options : MMap[Property.Key, Any], models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model]) : MMap[Property.Key, Any] = {
 
     options(PilarAndroidSymbolResolverModule.globalModelsKey) = models
-    options(modelsKey) = models
 
     return options
   }
@@ -317,6 +339,7 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
       def parallel : scala.Boolean = PilarAndroidSymbolResolverModule.getParallel(job.propertyMap)
       def hasExistingAndroidLibInfoTables : scala.Option[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables] = PilarAndroidSymbolResolverModule.getHasExistingAndroidLibInfoTables(job.propertyMap)
       def shouldBuildLibInfoTables : scala.Boolean = PilarAndroidSymbolResolverModule.getShouldBuildLibInfoTables(job.propertyMap)
+      def buildLibInfoTablesOnly : scala.Boolean = PilarAndroidSymbolResolverModule.getBuildLibInfoTablesOnly(job.propertyMap)
       def models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model] = PilarAndroidSymbolResolverModule.getModels(job.propertyMap)
       def androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables] = PilarAndroidSymbolResolverModule.getAndroidLibInfoTablesOpt(job.propertyMap)
       def symbolTable : org.sireum.pilar.symbol.SymbolTable = PilarAndroidSymbolResolverModule.getSymbolTable(job.propertyMap)
@@ -334,6 +357,9 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
 
       def shouldBuildLibInfoTables_=(shouldBuildLibInfoTables : scala.Boolean) { PilarAndroidSymbolResolverModule.setShouldBuildLibInfoTables(job.propertyMap, shouldBuildLibInfoTables) }
       def shouldBuildLibInfoTables : scala.Boolean = PilarAndroidSymbolResolverModule.getShouldBuildLibInfoTables(job.propertyMap)
+
+      def buildLibInfoTablesOnly_=(buildLibInfoTablesOnly : scala.Boolean) { PilarAndroidSymbolResolverModule.setBuildLibInfoTablesOnly(job.propertyMap, buildLibInfoTablesOnly) }
+      def buildLibInfoTablesOnly : scala.Boolean = PilarAndroidSymbolResolverModule.getBuildLibInfoTablesOnly(job.propertyMap)
 
       def models_=(models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model]) { PilarAndroidSymbolResolverModule.setModels(job.propertyMap, models) }
       def models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model] = PilarAndroidSymbolResolverModule.getModels(job.propertyMap)
@@ -356,8 +382,8 @@ trait PilarAndroidSymbolResolverModule {
 
   def shouldBuildLibInfoTables : scala.Boolean = PilarAndroidSymbolResolverModule.getShouldBuildLibInfoTables(job.propertyMap)
 
+  def buildLibInfoTablesOnly : scala.Boolean = PilarAndroidSymbolResolverModule.getBuildLibInfoTablesOnly(job.propertyMap)
 
-  def models_=(models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model]) { PilarAndroidSymbolResolverModule.setModels(job.propertyMap, models) }
   def models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model] = PilarAndroidSymbolResolverModule.getModels(job.propertyMap)
 
 

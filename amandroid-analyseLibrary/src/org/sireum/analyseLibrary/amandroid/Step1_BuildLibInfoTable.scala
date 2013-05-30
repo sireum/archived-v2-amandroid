@@ -20,7 +20,7 @@ class BuildLibInfoTable extends BuildLibInfoTableFramework{
 //  }
   AmandroidAndroidLibraryPilarFiles.pilarModelFiles.
   foreach{fileUri=>
-    if(fileUri.indexOf("androidpolicy") > 0)
+//    if(fileUri.indexOf("androidpolicy") > 0)
     Analyzing title fileUri init fileUri
   }
 }
