@@ -369,7 +369,7 @@ class AndroidLibInfoResolver
     else null
   }
   
-  def getRecordName(recordUri : String) : ResourceUri = {
+  def getRecordName(recordUri : ResourceUri) : ResourceUri = {
     if(tables.recordUriTable.inverse.contains(recordUri)){
       tables.recordUriTable.inverse.get(recordUri)
     }
@@ -425,7 +425,7 @@ class AndroidLibInfoResolver
     
    def isAbstract(recordUri : ResourceUri) : Boolean = {
 	    if(tables.recordTypeTable.contains(recordUri)){
-	      if(tables.recordTypeTable(recordUri) == "ABSTRACT")
+	      if(tables.recordTypeTable(recordUri).contains("ABSTRACT"))
 	        true
 	      else
 	        false
@@ -435,6 +435,36 @@ class AndroidLibInfoResolver
 	      false
 	    }
   }
+   
+   def hasName(procSig : String, procName : String) : Boolean = {
+//     println(procSig)
+//     val x = getPartSig(procSig)
+//     println(procName)
+    if(procSig != null && procName !=null && getPartSig(procSig).startsWith(procName)){
+      true
+    } else {
+      false
+    }
+  }
+   
+   def hasName(procSigs : Set[String], procName : String) : Boolean = {
+     var matchh = procSigs.count(procSig => hasName(procSig, procName))
+     if(matchh > 0)
+       true
+     else
+       false
+    
+  }
+   
+   def findSigByName(procSigs : Set[String], procName : String) : String = {
+     var target: String = null
+     procSigs.foreach{
+       procSig =>
+         if(hasName(procSig, procName))
+           target = procSig
+     }
+     target
+   }
    
  // sankar ends
    
@@ -569,7 +599,7 @@ class AndroidLibInfoResolver
    * @param recordUri Current class' resource uri
    * @return All ancestor classes' resource uris (including itself)
    */
-  def getSuperClassesOfIncluding(recordUri : ResourceUri) : Set[ResourceUri] = if(recordUri == null) Set() else getSuperClassesOf(getSuperClassOf(recordUri)) + recordUri
+  def getSuperClassesOfIncluding(recordUri : ResourceUri) : Set[ResourceUri] = if(recordUri == null) Set() else getSuperClassesOfIncluding(getSuperClassOf(recordUri)) + recordUri
   
   /**
    * Finds all sub classes of current class.

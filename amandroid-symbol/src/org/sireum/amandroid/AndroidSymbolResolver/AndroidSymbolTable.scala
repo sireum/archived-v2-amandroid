@@ -159,10 +159,11 @@ object AndroidSymbolTable {
     buildProcedureSymbolTables(stp, parallel)
     tablesOpt match {
       case Some(tables) =>
-	      println("before merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
-		    tables.mergeWith(existingAndroidLibInfoTables)
-		    println("after merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
-		    (stp.toSymbolTable, Some(tables))
+        println("before merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
+	    tables.mergeWith(existingAndroidLibInfoTables)
+	    tables.asInstanceOf[AndroidLibInfoResolver].separateInterfaceImplementAndClassExtend
+	    println("after merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
+	    (stp.toSymbolTable, Some(tables))
       case None =>
         (stp.toSymbolTable, Some(existingAndroidLibInfoTables))
     }

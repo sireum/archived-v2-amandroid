@@ -12,7 +12,7 @@ import java.util.HashSet
 trait AndroidLibInfoTables {
   def getRecordUriFromProcedureUri(procedureUri : ResourceUri) : ResourceUri  // returns owner recordUri of the procedureUri
   def getRecordUri(recordName : String) : ResourceUri
-  def getRecordName(recordUri : String) : ResourceUri
+  def getRecordName(recordUri : ResourceUri) : ResourceUri
   def getParents(recordUri : ResourceUri) : Set[ResourceUri]  // returns the parent-recordUris of recordUri
   def getAncestors(recordUri : ResourceUri) : Set[ResourceUri]
   def getProcedureUriBySignature(sig : String) : ResourceUri
@@ -31,6 +31,9 @@ trait AndroidLibInfoTables {
   def containsRecord(recordName : String) : Boolean
   def getSubSignature(sig : String) : String
   def getSubSignatureFromUri(procedureUri : ResourceUri) : String
+  def hasName(procSig : String, procName : String) : Boolean //  checks if procSig's name part matches with the procName
+  def hasName(procSigs : Set[String], procName : String) : Boolean //  checks if one of procSigs' name part matches with the procName
+  def findSigByName(procSigs : Set[String], procName : String) : String //  returns a procSig from procSigs whose name part matches with the procName; otherwise null
   /**
    * Finds super class of current class.
    * @param recordUri Current class' resource uri
