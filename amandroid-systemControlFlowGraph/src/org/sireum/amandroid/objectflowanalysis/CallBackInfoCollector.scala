@@ -1150,6 +1150,7 @@ class CallBackInfoCollector(entryPointClasses:Set[ResourceUri], callGraph: CallG
 				this.callbackMethods += (baseClass -> (msetEmpty + pUri))
 			
 		}
-		println("callbacks = " + this.callbackMethods)
+		println("added one callback whose sig is =" + pSig)
+		println("current all callbacks = " + this.callbackMethods)
 	}
 }

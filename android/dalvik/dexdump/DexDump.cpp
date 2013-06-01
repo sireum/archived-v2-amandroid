@@ -928,8 +928,8 @@ void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
 				 locVarInf* t1 = (locVarInf*) temp1;
                  if(t1->descriptor && t1->name && !t1->paramFlag)
 				 {
-				    fprintf(pFp, "        %s v%d @varname %s @scope ((L%04x,L%04x)",
-				                     toPilar(t1->descriptor), t1->reg, toPilar(t1->name), t1->startAddress,  t1->endAddress );
+				    // fprintf(pFp, "        %s v%d @varname %s @scope ((L%04x,L%04x)",
+				                     // toPilar(t1->descriptor), t1->reg, toPilar(t1->name), t1->startAddress,  t1->endAddress );
 
                     int conflictCount = 0;
 
@@ -943,7 +943,7 @@ void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
 					          { 
 						        conflictCount++;
 
-			                    fprintf(pFp, ", (L%04x,L%04x)", t2->startAddress,  t2->endAddress);
+			                    // fprintf(pFp, ", (L%04x,L%04x)", t2->startAddress,  t2->endAddress);
 				                delete t2; // is it safe?
 						        locVarList->remove(j); // possible memory leak?
 
@@ -959,10 +959,10 @@ void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
 				          }
 				      }
                  
-				    fprintf(pFp, ");"); // note that ")" closes the scopes which have been already listed for the current local variable
+				    // fprintf(pFp, ");"); // note that ")" closes the scopes which have been already listed for the current local variable
                   }
                  
-				 fprintf(pFp, "\n"); 
+				 // fprintf(pFp, "\n");  
 				 // delete t1; // do it later
 				 // locVarList->remove(i); // do it later
 
@@ -996,7 +996,7 @@ void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
 	    	  }
 	     }
 
-	   if(!presenseFlag)	 
+	   //if(!presenseFlag)  // commenting out -- now we want to print each regForLocals here	 
 	   {
 		   fprintf(pFp, "        v%d;", j); // sankar: not in dexdump; in pilar printing an extra register used as a local but which does not have any var name
 
