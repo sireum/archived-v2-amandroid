@@ -52,8 +52,9 @@ class PilarAndroidSymbolResolverModuleDef (val job : PipelineJob, info : Pipelin
   val st = result._1.asInstanceOf[ST]
   info.tags ++= st.tags
 
-  if (st.hasErrors)
+  if (st.hasErrors){
     info.hasError = true
+  }
     
   this.symbolTable_=(result._1)
   

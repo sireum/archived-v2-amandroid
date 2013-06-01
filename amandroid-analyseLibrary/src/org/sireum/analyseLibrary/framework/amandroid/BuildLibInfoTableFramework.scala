@@ -57,27 +57,27 @@ class BuildLibInfoTableFramework extends TestFramework {
         }
         /*end here*/
         //deal with jar file
-//        val apkName = f.getName()
-//        val apkFile = new ZipFile(f, ZipFile.OPEN_READ)
-//        val entries = apkFile.entries()
-//        while(entries.hasMoreElements()){
-//          val ze = entries.nextElement()
-//          if(ze.toString().endsWith(".dex")){
-//            val loadFile = new File(d+ze.getName())
-//            val ops = new FileOutputStream(d + "pilar/" + dirName + ".dex")
-//            val ips = apkFile.getInputStream(ze)
-//            var reading = true
-//            while(reading){
-//              ips.read() match {
-//                case -1 => reading = false
-//                case c => ops.write(c)
-//              }
-//            }
-//            ops.flush()
-//            ips.close()
-//          }
-//        }
-//        srcFiles += FileUtil.toUri(d + "pilar/" + dirName + ".dex")
+        val apkName = f.getName()
+        val apkFile = new ZipFile(f, ZipFile.OPEN_READ)
+        val entries = apkFile.entries()
+        while(entries.hasMoreElements()){
+          val ze = entries.nextElement()
+          if(ze.toString().endsWith(".dex")){
+            val loadFile = new File(d+ze.getName())
+            val ops = new FileOutputStream(d + "pilar/" + dirName + ".dex")
+            val ips = apkFile.getInputStream(ze)
+            var reading = true
+            while(reading){
+              ips.read() match {
+                case -1 => reading = false
+                case c => ops.write(c)
+              }
+            }
+            ops.flush()
+            ips.close()
+          }
+        }
+        srcFiles += FileUtil.toUri(d + "pilar/" + dirName + ".dex")
 //end here        
 //        val stFile = new File(resDir + "/" + dirName + "SymbolTable.xml")
         
@@ -87,8 +87,8 @@ class BuildLibInfoTableFramework extends TestFramework {
     
         val job = PipelineJob()
         val options = job.properties
-//        Dex2PilarWrapperModule.setSrcFiles(options, srcFiles)
-        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d +  "/" + dirName + ".pilar"))))
+        Dex2PilarWrapperModule.setSrcFiles(options, srcFiles)
+        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d + dirName + "/" + dirName + ".pilar"))))
         PilarAndroidSymbolResolverModule.setParallel(options, true)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidLibInfoTables(options, None)
         pipeline.compute(job)
@@ -129,12 +129,12 @@ class BuildLibInfoTableFramework extends TestFramework {
     PipelineConfiguration(
       "libInfoTable building pipeline",
       false,
-//      PipelineStage(
-//        "dex2pilar stage",
-//        false,
-//        Dex2PilarWrapperModule
-//      )
-//      ,
+      PipelineStage(
+        "dex2pilar stage",
+        false,
+        Dex2PilarWrapperModule
+      )
+      ,
       PipelineStage(
         "Chunking pilar parsing stage",
         false,

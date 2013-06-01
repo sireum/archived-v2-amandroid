@@ -100,7 +100,6 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
         Dex2PilarWrapperModule.setSrcFiles(options, srcFiles)
         
         ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d + dirName + "/" + dirName + ".pilar"))))
-        
         PilarAndroidSymbolResolverModule.setParallel(options, false)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidLibInfoTables(options, Some(libInfoTables))
         AndroidApplicationPrepareModule.setApkFileLocation(options, f.toString())
@@ -125,7 +124,16 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
         pipeline.compute(job)
         if(job.hasError){
           println("Error present: " + job.hasError)
-          job.tags.foreach(f => println(f))
+          job.tags.foreach{f =>
+            f match{
+              case t:LocationTag =>
+                t.location match {
+                  case lcl : LineColumnLocation => println("line --->" + lcl.line + " col --->" + lcl.column)
+                  case _ =>
+                }
+              case _ =>
+            }
+            println(f)}
           job.lastStageInfo.tags.foreach(f => println(f))
         }
 //        val r = AndroidInterIntraProceduralModule.getInterResult(options)

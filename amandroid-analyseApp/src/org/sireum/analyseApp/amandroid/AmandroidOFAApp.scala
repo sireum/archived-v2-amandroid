@@ -7,7 +7,6 @@ import java.io._
 import org.sireum.amandroid.xml.AndroidXStream
 import org.sireum.util._
 import org.sireum.alir.AlirIntraProceduralGraph
-import org.sireum.amandroid.scfg.CompressedControlFlowGraph
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.cache.AndroidCacheFile
 import java.util.zip.GZIPInputStream
@@ -41,7 +40,7 @@ class AmandroidOFAApp extends AmandroidOFAAppFrameWork{
   
   AmandroidFiles.apkModelFiles.foreach(
       {fileUri=>
-        if(fileUri.indexOf("0eb4b") > 0)
+        if(fileUri.indexOf("4bf050f089a0d44d6865ff74b75cb7f1706fdcaa") > 0)
     	  Analyzing title fileUri file(fileUri, libInfoTables, aCache)
       }  
   )
