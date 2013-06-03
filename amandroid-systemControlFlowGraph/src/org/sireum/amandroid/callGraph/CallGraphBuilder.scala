@@ -44,7 +44,10 @@ class CallGraphBuilder(androidLibInfoTable : AndroidLibInfoTables) extends CallG
         }
         if(sig != null){
           val pUri = androidLibInfoTable.getProcedureUriBySignature(sig)
-          callMap ++= Map(currPUri -> (callMap.getOrElse(currPUri, msetEmpty) + pUri))
+          if(pUri == null)
+          	println("sig--->" + sig)
+          else 
+          	callMap ++= Map(currPUri -> (callMap.getOrElse(currPUri, msetEmpty) + pUri))
         }
         false
     })

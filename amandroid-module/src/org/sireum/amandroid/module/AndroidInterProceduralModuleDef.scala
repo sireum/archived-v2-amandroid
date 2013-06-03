@@ -86,11 +86,11 @@ extends AndroidInterProceduralModule with ImplicitLogging {
 }
 
 class OfaSCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends OfaSCfgModule {
-  val results : MMap[ResourceUri, (ObjectFlowGraph[OfaNode], SystemControlFlowGraph[String])] = mmapEmpty
+  var result : (ObjectFlowGraph[OfaNode], SystemControlFlowGraph[String]) = null
   this.androidCache match{
     case Some(ac) =>
-      results ++= new ObjectFlowGraphAndSystemControlFlowGraphBuilder[OfaNode, String].apply(this.procedureSymbolTables, this.cfgs, this.rdas, this.cCfgs, this.androidLibInfoTables, this.appInfo, ac)
+      result = new ObjectFlowGraphAndSystemControlFlowGraphBuilder[OfaNode, String].apply(this.procedureSymbolTables, this.cfgs, this.rdas, this.cCfgs, this.androidLibInfoTables, this.appInfo, ac)
     case None =>
   }
-  this.OFAsCfg_=(results)
+  this.OFAsCfg_=(result)
 }

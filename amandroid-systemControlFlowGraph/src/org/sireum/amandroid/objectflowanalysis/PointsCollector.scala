@@ -33,6 +33,16 @@ class PointsCollector[Node <: OfaNode] {
     }
     var i = 0
     val types = new SignatureParser(sig).getParamSig.getParameters
+    
+    val accessExp = pst.procedure.getValueAnnotation("Access").getOrElse(null)
+    val access = accessExp match {
+      case ne : NameExp =>
+        ne.name.name
+      case _ => null
+    }
+    if(access != null && access.contains("NATIVE") && !access.contains("STATIC")){
+    	resolveNativeProc(pst, pProc)
+    }
     pst.procedure.params.foreach(
       param => {
         if(is("this", param.annotations)){
@@ -56,6 +66,14 @@ class PointsCollector[Node <: OfaNode] {
       }  
     )
     pProc
+  }
+  
+  /**
+   * Resolve native procedure node collect
+   */
+  def resolveNativeProc(pst : ProcedureSymbolTable, pProc : PointProc) = {
+    val thisP = new PointThis("this_native", pst.procedureUri)
+    pProc.thisParamOpt = Option(thisP)
   }
   
   /**

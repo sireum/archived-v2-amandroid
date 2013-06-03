@@ -3,14 +3,9 @@ package org.sireum.amandroid.objectflowanalysis
 import org.sireum.util._
 import org.sireum.alir._
 
-trait ConstraintModel {
+trait ConstraintModel extends ObjectFlowRepo{
   
   val points : MList[Point] = mlistEmpty
-  
-  /**
-   * tracking all array variables
-   */ 
-  final val arrayRepo : MMap[ResourceUri, Int] = mmapEmpty
   
   def applyConstraint(p : Point,
                       ps : MList[Point],

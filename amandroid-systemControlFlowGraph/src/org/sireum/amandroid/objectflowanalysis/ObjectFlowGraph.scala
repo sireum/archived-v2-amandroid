@@ -14,13 +14,16 @@ import java.util.regex.Matcher
 import org.sireum.alir.ReachingDefinitionAnalysis
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
+import org.sireum.amandroid.interComponentCommunication.InterComponentCommunicationModel
 
 class ObjectFlowGraph[Node <: OfaNode] 
   extends AlirGraph[Node]
   with AlirEdgeAccesses[Node]
   with AlirSuccPredAccesses[Node]
   with ConstraintModel
-  with StringAnalyseModel {
+  with StringAnalyseModel
+  with NativeMethodModel
+  with InterComponentCommunicationModel{
 
   self=>
   
@@ -41,17 +44,7 @@ class ObjectFlowGraph[Node <: OfaNode]
   final val worklist : MList[Node] = mlistEmpty
   
   final val staticMethodList : MList[PointI] = mlistEmpty
-  
-  /**
-   * tracking a class's instance field definitions
-   */ 
-  final val iFieldDefRepo : MMap[ResourceUri, MMap[ResourceUri, (MSet[OfaFieldNode], MMap[ResourceUri, ResourceUri])]] = mmapEmpty
-  
-  /**
-   * tracking global variables 
-   */ 
-  final val globalDefRepo : MMap[ResourceUri, (MSet[OfaGlobalVarNode], MMap[ResourceUri, ResourceUri])] = mmapEmpty
-  
+    
   /**
    * create the nodes and edges to reflect the constraints corresponding 
    * to the given program point. If a value is added to a node, then that 
@@ -98,27 +91,44 @@ class ObjectFlowGraph[Node <: OfaNode]
   }
   
   /**
-   * combine string ofg into current ofg. (just combine proc point and relevant node)
+   * combine special ofg into current ofg. (just combine proc point and relevant node)
    */ 
-  def combineStringOfg(sig : ResourceUri, stringOfg : ObjectFlowGraph[Node]) : PointProc = {
+  def combineSpecialOfg(sig : ResourceUri, stringOfg : ObjectFlowGraph[Node], typ : String) : PointProc = {
     val ps = stringOfg.points.filter(p => if(p.isInstanceOf[PointProc])true else false)
     points ++= ps
     val procP : PointProc = ps(0).asInstanceOf[PointProc]
     collectNodes(procP)
-    procP.retVar match {
-      case Some(r) =>
-        stringOperationTracker(sig) = (mlistEmpty, Some(getNode(r)))
-      case None =>
-        stringOperationTracker(sig) = (mlistEmpty, None)
+    if(typ.equals("STRING")){
+	    procP.retVar match {
+	      case Some(r) =>
+	        stringOperationTracker(sig) = (mlistEmpty, Some(getNode(r)))
+	      case None =>
+	        stringOperationTracker(sig) = (mlistEmpty, None)
+	    }
+	    
+	    procP.thisParamOpt match {
+	      case Some(p) => stringOperationTracker(sig)._1 += getNode(p)
+	      case None =>
+	    } 
+	    procP.params.toList.sortBy(f => f._1).foreach{case (k, v) => stringOperationTracker(sig)._1 += getNode(v)}
+    } else if(typ.equals("NATIVE")){
+      procP.retVar match {
+	      case Some(r) =>
+	        nativeOperationTracker(sig) = (mlistEmpty, Some(getNode(r)))
+	      case None =>
+	        nativeOperationTracker(sig) = (mlistEmpty, None)
+	    }
+	    
+	    procP.thisParamOpt match {
+	      case Some(p) => nativeOperationTracker(sig)._1 += getNode(p)
+	      case None =>
+	    } 
+	    procP.params.toList.sortBy(f => f._1).foreach{case (k, v) => nativeOperationTracker(sig)._1 += getNode(v)}
     }
-    
-    procP.thisParamOpt match {
-      case Some(p) => stringOperationTracker(sig)._1 += getNode(p)
-      case None =>
-    } 
-    procP.params.toList.sortBy(f => f._1).foreach{case (k, v) => stringOperationTracker(sig)._1 += getNode(v)}
     procP
   }
+  
+  
   
   /**
    * collect all array variables inside one procedure
@@ -758,29 +768,10 @@ class ObjectFlowGraph[Node <: OfaNode]
   }
 
   protected val vlabelProvider = new VertexNameProvider[Node]() {
-    
-    def containSpecialCharacter(name : String) : String = {
-      if(name.startsWith("newString") && (name.contains("*") || name.contains("#") || name.contains("^") || name.contains("!") || name.contains("?") || name.contains("\\"))){
-        "string_has_special_characters"
-      } else if(name.startsWith("new") && (name.contains("*") || name.contains("#") || name.contains("^") || name.contains("!") || name.contains("?") || name.contains("\\"))){
-        "object_has_special_characters"
-      } else {
-        name
-      }
-    }
     def getVertexName(v : Node) : String = {
       v match {
         case n : OfaNode => {
-          containSpecialCharacter(n.toString()).replaceAll("pilar:/procedure/[a-zA-Z0-9]*/%5B%7C", "")
-                .replaceAll("%7C%5D", "_")
-                .replaceAll("[-:./;,\\ ]", "_")
-                .replaceAll("@", "_AT_")
-                .replaceAll("=", "_EQ_")
-                .replaceAll("\\$", "_DOLLAR_")
-                .replaceAll("\\+", "_PLUS_")
-                .replaceAll("%3[CE]", "")
-                .replaceAll("[[%c%02][%02]]", "")
-                .replaceAll("[\\[\\](){}<>\"\\|\\']", "")
+          n.toString().replaceAll("[^a-zA-Z0-9]+","")
         }
       }
     }

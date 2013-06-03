@@ -175,8 +175,6 @@ object AndroidSymbolTable {
             parallel : Boolean) = {
     val stp = minePackageElements(models, stpConstructor, parallel)
     val tables = resolveVirtualMethod(stp)
-    resolvePackageElements(models, stp, parallel)
-    buildProcedureSymbolTables(stp, parallel)
     println("before merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
     tables.mergeWith(existingLibInfoTables)
     println("after merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)

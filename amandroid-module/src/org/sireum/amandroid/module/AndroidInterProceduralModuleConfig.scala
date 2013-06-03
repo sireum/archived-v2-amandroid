@@ -25,7 +25,7 @@ http://www.eclipse.org/legal/epl-v10.html
 
 object AndroidInterProcedural {
   type VirtualLabel = String
-  type OfaSCfg = MMap[ResourceUri, (ObjectFlowGraph[OfaNode], SystemControlFlowGraph[String])]
+  type OfaSCfg = (ObjectFlowGraph[OfaNode], SystemControlFlowGraph[String])
     
   final case class AndroidInterAnalysisResult(
     ofaScfg : AndroidInterProcedural.OfaSCfg)

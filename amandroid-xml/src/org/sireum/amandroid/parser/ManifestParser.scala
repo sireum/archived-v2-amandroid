@@ -17,13 +17,11 @@ object ManifestParser extends AbstractAndroidXMLParser{
 	private var entryPointsClasses : Set[String] = Set()
 	private var packageName = ""
 	private var permissions : Set[String] = Set()
-	private var intentDB : Map[String, MMap[String, MSet[String]]] = Map()
+	private val intentDB : IntentDataBase = new IntentDataBase
 	private var currentComponent = ""
 	
-	private def buildIntentDB(component : String, typ : String, str : String) = {
-	  if(!this.intentDB.contains(component)) this.intentDB += (component -> mmapEmpty)
-	  if(!this.intentDB(component).contains(typ)) this.intentDB(component) += (typ -> msetEmpty)
-	  this.intentDB(component)(typ) += str
+	private def buildIntentDB(intent : IntentInfo) = {
+	  intentDB.updateIntentMap(intent)
 	}
 	/**
 	 * Opens the given apk file and provides the given handler with a stream for
@@ -95,9 +93,11 @@ object ManifestParser extends AbstractAndroidXMLParser{
 								}
 							}
 						}
-						else if (tagName.equals("action") || tagName.equals("category")){
+						else if (tagName.equals("action")){
 						  val value = getAttributeValue(parser, "name")
-						  buildIntentDB(this.currentComponent, tagName, value)
+						  val intent = new IntentInfo(this.currentComponent)
+						  intent.setAction(value)
+						  buildIntentDB(intent)
 						}
 						else if (tagName.equals("data")){
 						  val scheme = getAttributeValue(parser, "scheme")
@@ -107,26 +107,9 @@ object ManifestParser extends AbstractAndroidXMLParser{
 						  val pathPrefix = getAttributeValue(parser, "pathPrefix")
 						  val pathPattern = getAttributeValue(parser, "pathPattern")
 						  val mimeType = getAttributeValue(parser, "mimeType")
-						  var uri = ""
-						  if(scheme != ""){
-						    uri += scheme
-						    if(host != ""){
-						      uri += "://" + host
-						      if(port != ""){
-						        uri += ":" + port
-						        if(path != ""){
-						          uri += "/" + path
-						        }
-						      }
-						    }
-						    buildIntentDB(this.currentComponent, tagName, uri)
-						  }
-						  if(pathPrefix != ""){
-						    buildIntentDB(this.currentComponent, tagName, pathPrefix)
-						  }
-						  if(pathPattern != ""){
-						    buildIntentDB(this.currentComponent, tagName, pathPattern)
-						  }
+						  val intent = new IntentInfo(this.currentComponent)
+						  intent.setData(scheme, host, port, path, pathPrefix, pathPattern, mimeType)
+						  buildIntentDB(intent)
 						}
 						else if (tagName.equals("uses-permission")) {
 							var permissionName = getAttributeValue(parser, "name")
@@ -155,7 +138,7 @@ object ManifestParser extends AbstractAndroidXMLParser{
 		for (i <- 0 to parser.getAttributeCount() - 1)
 			if (parser.getAttributeName(i).equals(attributeName))
 				return AXMLPrinter.getAttributeValue(parser, i)
-		return ""
+		return null
 	}
 
 	protected def loadClassesFromTextManifest(manifestIS : InputStream) = {

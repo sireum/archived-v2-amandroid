@@ -145,38 +145,38 @@ class AndroidLibInfoResolver
             buildRecordProcedureTable(recordUri, procedureUri)
         }
       }
-      val keys : MSet[ResourceUri] = msetEmpty
-      keys ++= tables.recordProcedureTable.keys
-      keys.foreach(
-        key => {
-          val worklist : MList[ResourceUri] = mlistEmpty
-          worklist += key
-          val pUris = tables.recordProcedureTable.get(key).clone()
-          while(!worklist.isEmpty){
-            val rUri = worklist.remove(0)
-            if(tables.recordHierarchyTable.containsKey(rUri)){
-              val parents = tables.recordHierarchyTable.get(rUri)
-              worklist ++= parents
-              for(parent <- parents){
-                val parentPUris = tables.recordProcedureTable.get(parent).clone()
-                for(parentPUri <- parentPUris){
-                  if(!isConstructor(parentPUri)){
-                    var flag = true
-                    for(pUri <- pUris){
-                      if(sigEqual(pUri, parentPUri)){
-                        flag = false
-                      }
-                    }
-                    if(flag == true){
-                      buildRecordProcedureTable(key, parentPUri)
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }  
-      )
+//      val keys : MSet[ResourceUri] = msetEmpty
+//      keys ++= tables.recordProcedureTable.keys
+//      keys.foreach(
+//        key => {
+//          val worklist : MList[ResourceUri] = mlistEmpty
+//          worklist += key
+//          val pUris = tables.recordProcedureTable.get(key).clone()
+//          while(!worklist.isEmpty){
+//            val rUri = worklist.remove(0)
+//            if(tables.recordHierarchyTable.containsKey(rUri)){
+//              val parents = tables.recordHierarchyTable.get(rUri)
+//              worklist ++= parents
+//              for(parent <- parents){
+//                val parentPUris = tables.recordProcedureTable.get(parent).clone()
+//                for(parentPUri <- parentPUris){
+//                  if(!isConstructor(parentPUri)){
+//                    var flag = true
+//                    for(pUri <- pUris){
+//                      if(sigEqual(pUri, parentPUri)){
+//                        flag = false
+//                      }
+//                    }
+//                    if(flag == true){
+//                      buildRecordProcedureTable(key, parentPUri)
+//                    }
+//                  }
+//                }
+//              }
+//            }
+//          }
+//        }  
+//      )
     }
   
   def isInterface(recordUri : ResourceUri) : Boolean = {
@@ -353,6 +353,15 @@ class AndroidLibInfoResolver
     }
   }
   
+  def sigEqualByName(procedureUri : ResourceUri, name : String) : Boolean = {
+    val sig1 = tables.procedureUriTable.inverse.get(procedureUri)
+    if(sig1 != null && name !=null && getPartSig(sig1).startsWith(name)){
+      true
+    } else {
+      false
+    }
+  }
+  
   def getSubSignature(sig : String) : String = getPartSig(sig)
   
   def getSubSignatureFromUri(procedureUri : ResourceUri) : String = getPartSig(getProcedureSignatureByUri(procedureUri))
@@ -483,6 +492,23 @@ class AndroidLibInfoResolver
     return null
   }
   
+  def findProcedureUriByName(rUri : ResourceUri, name : String) : ResourceUri = {
+    val pUris = tables.recordProcedureTable.get(rUri)
+    var parents : Set[ResourceUri] = Set()
+    for(pUri <- pUris){
+      if(sigEqualByName(pUri, name)) return pUri
+      else{
+        parents ++= tables.recordHierarchyTable.get(rUri)
+      }
+    }
+    for(parent <- parents){
+      return findProcedureUri(parent, name)
+    }
+    return null
+  }
+  
+  def findProcedureSigByName(rUri : ResourceUri, name : String) : String = getProcedureSignatureByUri(findProcedureUriByName(rUri, name))
+  
   def getProcedureUriBySignature(sig : String) : ResourceUri = {
     if(tables.procedureUriTable.contains(sig))
       tables.procedureUriTable.get(sig)
@@ -503,7 +529,7 @@ class AndroidLibInfoResolver
 	}
   
   def getProcedureSignatureByUri(pUri : ResourceUri) : String = {
-    if(tables.procedureUriTable.inverse().contains(pUri))
+    if(pUri != null && tables.procedureUriTable.inverse().contains(pUri))
       tables.procedureUriTable.inverse().get(pUri)
     else null
   }
@@ -536,6 +562,16 @@ class AndroidLibInfoResolver
   }
   
   def containsRecord(recordName : String) : Boolean = tables.recordUriTable.containsKey(recordName)
+  
+  def getAccessFlag(procedureUri : ResourceUri) : String = {
+    if(tables.procedureTypeTable.contains(procedureUri)){
+      tables.procedureTypeTable.get(procedureUri)
+    }
+    else {
+      System.err.println("procedureTypeTable : cannot find " + procedureUri)
+      null
+    }
+  }
   
   def isConstructor(procedureUri : ResourceUri) : Boolean = {
     if(tables.procedureTypeTable.contains(procedureUri)){

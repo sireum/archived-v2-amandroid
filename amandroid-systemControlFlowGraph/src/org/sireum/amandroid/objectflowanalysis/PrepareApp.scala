@@ -12,13 +12,14 @@ import org.sireum.amandroid.entryPointConstants.AndroidEntryPointConstants
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.amandroid.callGraph.CallGraphBuilder
 import org.sireum.amandroid.callGraph.CallGraph
+import org.sireum.amandroid.parser.IntentDataBase
 
 class PrepareApp(apkFileLocation : String) {
   
   private val DEBUG = true
 //	private var sinks : Set[AndroidMethod] = Set()
 //	private var sources : Set[AndroidMethod] = Set()
-//	private var callbackMethods : Map[String, MList[AndroidMethod]] = Map()
+	private var callbackMethods : Map[ResourceUri, MSet[ResourceUri]] = Map()
   private var mainComponent : String = null
 	private var entrypoints : Set[String] = Set()
 	private var layoutControls : Map[Integer, LayoutControl] = Map()
@@ -76,16 +77,14 @@ class PrepareApp(apkFileLocation : String) {
 	
 	def getDummyMainMap() = this.dummyMainMap
 	
-	private def filterMainComponent(intentDB : Map[String, MMap[String, MSet[String]]]) : String = {
+	private def filterMainComponent(intentDB : IntentDataBase) : String = {
 	  var mainComponent : String = null
 	  this.entrypoints.foreach{
 	    ep =>
-	      if(intentDB.contains(ep) && intentDB(ep).contains("action"))
-	      	intentDB(ep)("action").foreach{
-	          action =>
-	            if(action.equals(AndroidConstants.ACTION_MAIN))
-	              mainComponent = ep
-	      	}
+	      val actions = intentDB.getIntentActions(ep)
+	      if(actions != null){
+	        if(actions.contains(AndroidConstants.ACTION_MAIN)) mainComponent = ep
+	      }
 	  }
 	  if(mainComponent == null){
 	    this.entrypoints.foreach{
@@ -103,6 +102,8 @@ class PrepareApp(apkFileLocation : String) {
 	  mainComponent
 	}
 	
+	def getMainEntryName() : String = this.mainComponent.replaceAll("\\[\\|", "%5B%7C").replaceAll("\\|\\]", ".dummyMain%7C%5D")
+	
 	def generateDummyMain(recordName : String) : Unit = {
 	  if(recordName == null) return
 		//generate dummy main method
@@ -110,6 +111,7 @@ class PrepareApp(apkFileLocation : String) {
 	  	println("Generate DummyMain for " + recordName)
 		val dmGen = new DummyMainGenerator
 		dmGen.setCurrentComponent(recordName)
+		dmGen.setCallbackFunctions(this.callbackMethods)
 		dmGen.setAndroidLibInfoTables(this.libInfoTables)
 		dummyMainMap += (recordName -> dmGen.generate)
 	}
@@ -141,7 +143,7 @@ class PrepareApp(apkFileLocation : String) {
 		// Collect the callback interfaces implemented in the app's source code
 		val analysisHelper = new CallBackInfoCollector(this.entrypoints, callGraph, libInfoTables) 
 		analysisHelper.collectCallbackMethods()
-
+		this.callbackMethods = analysisHelper.getCallbackMethods
 		
 		// Find the user-defined sources in the layout XML files
 		LayoutFileParser.androidLibInfoTables = this.libInfoTables

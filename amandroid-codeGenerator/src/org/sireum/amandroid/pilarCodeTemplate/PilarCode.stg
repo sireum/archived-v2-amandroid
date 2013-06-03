@@ -2,8 +2,8 @@ group PilarCodeGenerator;
 
 delimiters "$", "$"
 
-ProcedureDecl(retTyp, procedureName, params, localVars, owner, body) ::= <<
-procedure $retTyp$ $procedureName$($params ; separator=", "$) @owner $owner$ {
+ProcedureDecl(retTyp, procedureName, params, localVars, sig, owner, access, body) ::= <<
+procedure $retTyp$ $procedureName$($params ; separator=", "$) @signature $sig$ @owner $owner$ @Access $access$ {
   $localVars$
 	
   $body$
@@ -29,8 +29,8 @@ CodeFragment(label, codes) ::= <<
 $codes ; separator="\n"$
 >>
 
-Code(code) ::= <<
-# $code$;
+Code(num, code) ::= <<
+#L$num$. $code$;
 >>
 
 Label(num) ::= <<

@@ -40,7 +40,7 @@ class AmandroidOFAApp extends AmandroidOFAAppFrameWork{
   
   AmandroidFiles.apkModelFiles.foreach(
       {fileUri=>
-        if(fileUri.indexOf("4bf050f089a0d44d6865ff74b75cb7f1706fdcaa") > 0)
+        if(fileUri.indexOf("0eb") > 0)
     	  Analyzing title fileUri file(fileUri, libInfoTables, aCache)
       }  
   )

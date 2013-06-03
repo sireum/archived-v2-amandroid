@@ -8,9 +8,9 @@ trait StringAnalyseModel {
   /**
    * contain all string operations and involved operation string parameter nodes and return nodes
    */
-  val stringOperationTracker : MMap[ResourceUri, (MList[OfaNode], Option[OfaNode])] = mmapEmpty
+  val stringOperationTracker : MMap[String, (MList[OfaNode], Option[OfaNode])] = mmapEmpty
   
-  def checkOperation(pUri : ResourceUri) : Boolean = {
+  def checkStringOperation(pUri : ResourceUri) : Boolean = {
     var flag : Boolean = true
     stringOperationTracker(pUri)._1.foreach{
       node =>
@@ -21,11 +21,11 @@ trait StringAnalyseModel {
     flag
   }
   
-  def doOperation() = {
+  def doStringOperation() = {
     val result : MMap[OfaNode, MMap[ResourceUri, ResourceUri]] = mmapEmpty
     stringOperationTracker.map{
       case (k, v) =>
-        if(checkOperation(k)){
+        if(checkStringOperation(k)){
 	        val strings : MList[ResourceUri] = mlistEmpty
 	        val valueSets : MMap[Int, MMap[ResourceUri, ResourceUri]] = mmapEmpty
 	        for(i <- 0 to v._1.size - 1){
@@ -33,7 +33,7 @@ trait StringAnalyseModel {
 	          valueSets(i) ++= v._1(i).getProperty[MMap[ResourceUri, ResourceUri]]("ValueSet").filter(i => if(i._2.equals("STRING"))true else false)
 	        }
 	        val strsList = getStringList(valueSets)
-	        val strs = if(!strsList.isEmpty)strsList.map{l => (applyStringOperation(k, strings ++ l), "STRING")}.toMap
+	        val strs = if(!strsList.isEmpty && !strsList(0).isEmpty)strsList.map{l => (applyStringOperation(k, strings ++ l), "STRING")}.toMap
 	        					 else Map()
 	        v._2 match{
 	          case Some(r) =>
@@ -47,16 +47,16 @@ trait StringAnalyseModel {
     result
   }
   
-  def getStringList(argsValueSets : MMap[Int, MMap[ResourceUri, ResourceUri]]) : List[List[ResourceUri]] = {
+  def getStringList(argsValueSets : MMap[Int, MMap[ResourceUri, ResourceUri]]) : List[List[String]] = {
     val lists = argsValueSets.toList.sortBy(_._1).map{case (k, v) => v.map{case (uri, typ) => uri}.toList}
     CombinationIterator.combinationIterator[ResourceUri](lists).toList
   }
   
   def isStringKind(name : String) : Boolean = name.equals("[|java:lang:StringBuilder|]") || name.equals("[|java:lang:String|]")
   
-  def isStringOperation(sig : ResourceUri) : Boolean = sig.contains("[|Ljava/lang/StringBuilder;.") || sig.contains("[|Ljava/lang/String;.")
+  def isStringOperation(sig : String) : Boolean = sig.contains("[|Ljava/lang/StringBuilder;.") || sig.contains("[|Ljava/lang/String;.")
   
-	def applyStringOperation(sig : ResourceUri, strings : MList[String]) : ResourceUri = {
+	def applyStringOperation(sig : String, strings : MList[String]) : String = {
 	  val size = strings.size
 	  
 	  sig match {
@@ -175,9 +175,11 @@ trait StringAnalyseModel {
 	    case "[|Ljava/lang/String;.trim:()Ljava/lang/String;|]" => 
 	      require(strings.size == 1)
 	      strings(0).trim()
+//	      "trim"
 	    case "[|Ljava/lang/String;.intern:()Ljava/lang/String;|]" =>
 	      require(strings.size == 1)
 	      strings(0).intern()
+//	      "intern"
 	    case "[|Ljava/lang/String;.toLowerCase:()Ljava/lang/String;|]" =>
 	      require(strings.size == 1)
 	      strings(0).toLowerCase()

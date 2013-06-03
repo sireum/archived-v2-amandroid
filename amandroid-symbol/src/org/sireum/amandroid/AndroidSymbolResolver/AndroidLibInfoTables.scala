@@ -22,6 +22,12 @@ trait AndroidLibInfoTables {
   def getCalleeOptionsByUri(procedureUri : ResourceUri) : Set[ResourceUri]
   def getCalleeOptionsBySignature(sig : String) : Set[ResourceUri]
   def getGlobalVarUriByName(name : String) : ResourceUri
+  /**
+   * Get access flag of given procedure uri.
+   * @param procedureUri Procedure uri need to be processed
+   * @return Access flag
+   */
+  def getAccessFlag(procedureUri : ResourceUri) : String
   def isConstructor(procedureUri : String) : Boolean
   def isStaticMethod(procedureUri : String) : Boolean
   def isVirtualMethod(procedureUri : String) : Boolean
@@ -77,6 +83,20 @@ trait AndroidLibInfoTables {
    * @return The procedure resource uri with the given signature if it has been found, otherwise null
    */
   def findProcedureUri(rUri : ResourceUri, subSig : String) : ResourceUri
+  /**
+   * Finds a ProcedureUri in the given class or one of its super classes (donot care about arguments and return type)
+   * @param rUri Current record resource uri
+   * @param name The name of the procedure to find
+   * @return The procedure resource uri with the given name if it has been found, otherwise null
+   */
+  def findProcedureUriByName(rUri : ResourceUri, name : String) : ResourceUri
+  /**
+   * Finds a ProcedureSig in the given class or one of its super classes (donot care about arguments and return type)
+   * @param rUri Current record resource uri
+   * @param name The name of the procedure to find
+   * @return The procedure signature with the given name if it has been found, otherwise null
+   */
+  def findProcedureSigByName(rUri : ResourceUri, name : String) : String
   def getProcedureNameFromProcedureSig(sig : String) : String
   def getRecordNameFromProcedureSig(sig : String) : String
 }

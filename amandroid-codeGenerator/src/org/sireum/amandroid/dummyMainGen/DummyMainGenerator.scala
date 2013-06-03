@@ -16,9 +16,10 @@ class DummyMainGenerator {
   /**
    * Map from record uri to list of callback procedure uri
    */
-  private var callbackFunctions : Map[ResourceUri, MList[ResourceUri]] = Map()
+  private var callbackFunctions : Map[ResourceUri, MSet[ResourceUri]] = Map()
   private var intCounter : String = ""
   private var conditionCounter : Int = 0
+  private var codeCounter : Int = 0
   private val template = new STGroupFile("org/sireum/amandroid/pilarCodeTemplate/PilarCode.stg")
   private val procDeclTemplate = template.getInstanceOf("ProcedureDecl")
   private val localVarsTemplate = template.getInstanceOf("LocalVars")
@@ -58,7 +59,7 @@ class DummyMainGenerator {
 	 * class (activity, service, etc.) to the list of callback methods for that
 	 * element.
 	 */
-	def setCallbackFunctions(callbackFunctions : Map[String, MList[ResourceUri]]) {
+	def setCallbackFunctions(callbackFunctions : Map[String, MSet[ResourceUri]]) {
 		this.callbackFunctions = callbackFunctions
 	}
   
@@ -73,12 +74,13 @@ class DummyMainGenerator {
 	def generateInternal(methods : List[ResourceUri]) : String = {
 	  var classMap : Map[ResourceUri, MList[ResourceUri]] = Map()
 	  classMap += (this.currentComponent -> mlistEmpty)
-	  
+	  val procedureName = this.currentComponent.substring(0, this.currentComponent.length() - 2) + ".dummyMain|]"
 	  procDeclTemplate.add("retTyp", "[|void|]")
 	  procDeclTemplate.add("owner", this.currentComponent)
-	  procDeclTemplate.add("procedureName", this.currentComponent.substring(0, this.currentComponent.length() - 2) + ".dummyMain|]")
+	  procDeclTemplate.add("procedureName", procedureName)
 	  procDeclTemplate.add("params", "")
-	  
+	  procDeclTemplate.add("sig", procedureName.replaceAll("\\[\\|", "[|L").replaceAll("\\:", "/").replaceAll("\\.dummyMain", ";.dummyMain:()V"))
+	  procDeclTemplate.add("access", "STATIC")
 	  val intVar = template.getInstanceOf("LocalVar")
 	  intCounter = varGen.generate("int")
 	  intVar.add("typ", "[|int|]")
@@ -124,18 +126,8 @@ class DummyMainGenerator {
 	          }
 	        }
 	        if(instanceNeeded){
-	          val newExp = template.getInstanceOf("NewExp")
-					  newExp.add("name", item._1)
-					  val va = varGen.generate(item._1)
-					  localVarsForClasses += (rUri -> va)
-					  val variable = template.getInstanceOf("LocalVar")
-					  variable.add("typ", item._1)
-					  variable.add("name", va)
-					  localVars.add(variable.render())
-					  val asmt = template.getInstanceOf("AssignmentStmt")
-					  asmt.add("lhs", va)
-					  asmt.add("rhs", newExp)
-					  classStartFragment.setCode(asmt)
+	          val va = generateInstanceCreation(item._1, classStartFragment)
+	          this.localVarsForClasses += (rUri -> va)
 	          generateRecordConstructor(rUri, msetEmpty, classStartFragment)
 	        }
 	        val classLocalVar = localVarsForClasses(rUri)
@@ -183,6 +175,21 @@ class DummyMainGenerator {
 	  body
 	}
 	
+	private def generateInstanceCreation(recordName : String, codefg : CodeFragmentGenerator) : String = {
+	  val newExp = template.getInstanceOf("NewExp")
+	  newExp.add("name", recordName)
+	  val va = varGen.generate(recordName)
+	  val variable = template.getInstanceOf("LocalVar")
+	  variable.add("typ", recordName)
+	  variable.add("name", va)
+	  localVars.add(variable.render())
+	  val asmt = template.getInstanceOf("AssignmentStmt")
+	  asmt.add("lhs", va)
+	  asmt.add("rhs", newExp)
+	  codefg.setCode(asmt)
+	  va
+	}
+	
 	def generateRecordConstructor(rUri : ResourceUri, constructionStack : MSet[ResourceUri], codefg : CodeFragmentGenerator) : String = {
 	  constructionStack.add(rUri)
 	  val sigs = androidLibInfoTables.getProcedureSigsByRecordUri(rUri)
@@ -211,20 +218,12 @@ class DummyMainGenerator {
         val paramUri = androidLibInfoTables.getRecordUri(param._2)
         // to protect go into dead constructor create loop
         if(!constructionStack.contains(paramUri)){
-          val newExp = template.getInstanceOf("NewExp")
-				  newExp.add("name", param._2)
-				  val va = varGen.generate(param._2)
+				  val va = generateInstanceCreation(param._2, codefg)
 				  localVarsForClasses += (paramUri -> va)
-				  val variable = template.getInstanceOf("LocalVar")
-				  variable.add("typ", param._2)
-				  variable.add("name", va)
-				  localVars.add(variable.render())
-				  val asmt = template.getInstanceOf("AssignmentStmt")
-				  asmt.add("lhs", va)
-				  asmt.add("rhs", newExp.render())
-				  codefg.setCode(asmt)
           paramVars += (param._1 -> va)
           generateRecordConstructor(paramUri, constructionStack, codefg)
+        } else {
+          paramVars += (param._1 -> localVarsForClasses(paramUri))
         }
     }
     val invokeStmt = template.getInstanceOf("InvokeStmt")
@@ -452,7 +451,7 @@ class DummyMainGenerator {
 	  endWhileFragment
 	}
 	
-	private def generateCallToAllCallbacks(callbackRecordUri : ResourceUri, callbackProcedureUris : List[ResourceUri], classLocalVar : String, codefg : CodeFragmentGenerator) = {
+	private def generateCallToAllCallbacks(callbackRecordUri : ResourceUri, callbackProcedureUris : Set[ResourceUri], classLocalVar : String, codefg : CodeFragmentGenerator) = {
 	  callbackProcedureUris.foreach{
 	    callbackProcedureUri =>
 	      val pSig = androidLibInfoTables.getProcedureSignatureByUri(callbackProcedureUri)
@@ -481,36 +480,43 @@ class DummyMainGenerator {
 	}
 	
 	/**
-	 * Generates invocation statements for all callback methods which need to be invoded during the give record's run cycle.
+	 * Generates invocation statements for all callback methods which need to be invoked during the give record's run cycle.
 	 * @param rUri Current record resource uri which under process
 	 * @param classLocalVar The local variable fro current record
 	 */
 	private def addCallbackProcedures(rUri : ResourceUri, parentClassLocalVar : String, codefg : CodeFragmentGenerator) : Unit = {
 	  if(!this.callbackFunctions.contains(rUri)) return
-	  val callbackRecords : Map[ResourceUri, List[ResourceUri]] = 
-	    this.callbackFunctions(rUri).map{
-		    case (pUri) => 
-		      val pSig = androidLibInfoTables.getProcedureSignatureByUri(pUri)
-		      val theRecordUri = androidLibInfoTables.getRecordUri(new SignatureParser(pSig).getRecordName)
-		      val theProcedureUri = androidLibInfoTables.findProcedureUri(theRecordUri, androidLibInfoTables.getSubSignature(pSig))
-		      if(theProcedureUri == null){
-		        System.err.println("Could not find callback method " + pSig)
-		        (theRecordUri, List())
-		      } else {
-		        (theRecordUri, List(theProcedureUri))
-		      }
-		  }.toMap
+	  var callbackRecords : Map[ResourceUri, MSet[ResourceUri]] = Map()
+    this.callbackFunctions(rUri).map{
+	    case (pUri) => 
+	      val pSig = androidLibInfoTables.getProcedureSignatureByUri(pUri)
+	      val theRecordUri = androidLibInfoTables.getRecordUri(new SignatureParser(pSig).getRecordName)
+	      if(!callbackRecords.contains(theRecordUri))
+	      	callbackRecords += (theRecordUri -> msetEmpty)
+	      val theProcedureUri = androidLibInfoTables.findProcedureUri(theRecordUri, androidLibInfoTables.getSubSignature(pSig))
+	      if(theProcedureUri == null){
+	        System.err.println("Could not find callback method " + pSig)
+	      } else {
+	        callbackRecords(theRecordUri) += theProcedureUri
+	      }
+	  }
 		callbackRecords.foreach{
 		  case(callbackRUri, callbackPUris) =>
 		    val classLocalVar : String =
 		      if(isCompatible(rUri, callbackRUri)) parentClassLocalVar
 		      // create a new instance of this class
-		      else generateRecordConstructor(callbackRUri, msetEmpty + rUri, codefg)
+		      else{
+		        val recordName = androidLibInfoTables.getRecordName(callbackRUri)
+			      val va = generateInstanceCreation(recordName, codefg)
+		        this.localVarsForClasses += (callbackRUri -> va)
+		        generateRecordConstructor(callbackRUri, msetEmpty + rUri, codefg)
+		        va
+		      }
 		    if(classLocalVar != null){
 		      // build the calls to all callback procedures in this record
-		      generateCallToAllCallbacks(callbackRUri, callbackPUris, classLocalVar, codefg)
+		      generateCallToAllCallbacks(callbackRUri, callbackPUris.toSet, classLocalVar, codefg)
 		    } else {
-		      System.err.println("Constructor cannot be generated for callbck class " + callbackRUri)
+		      System.err.println("Constructor cannot be generated for callback class " + callbackRUri)
 		    }
 		}
 	}
@@ -568,6 +574,8 @@ class DummyMainGenerator {
 	    val finalCodes = new ArrayList[ST]
 	    for(i <- 0 to codes.size - 1){
 	      val code = template.getInstanceOf("Code")
+	      code.add("num", codeCounter)
+	      codeCounter += 1
 	      code.add("code", codes.get(i))
 	      finalCodes.add(i, code)
 	    }

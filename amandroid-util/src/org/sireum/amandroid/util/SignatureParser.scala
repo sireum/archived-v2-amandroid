@@ -55,7 +55,19 @@ class SignatureParser(sig : String) {
       val endOfParams = signature.lastIndexOf(')')
       if (endOfParams < 0)
         throw new IllegalArgumentException("Bad method signature: " + signature);
-      return signature.substring(endOfParams + 1);
+      return signature.substring(endOfParams + 1)
+    }
+    
+    /**
+     * Get the method return type.
+     * 
+     * @return the method return type signature
+     */
+    def getReturnObjectType() : Option[String] = {
+      if(isReturnObject){
+        val retPart = getReturnTypeSignature
+        Some(convertSigRecordPartToRecordName(retPart))
+      } else None
     }
     
     def isReturnNonNomal() : Boolean = {
