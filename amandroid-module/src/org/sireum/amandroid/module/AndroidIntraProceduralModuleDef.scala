@@ -13,9 +13,9 @@ import org.sireum.pipeline.ErrorneousModulesThrowable
 import org.sireum.pipeline.PipelineStage
 import org.sireum.pipeline.PipelineConfiguration
 import org.sireum.alir.ReachingDefinitionAnalysis
-import org.sireum.amandroid.objectflowanalysis.ObjectFlowGraphPreprocessor
-import org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph
-import org.sireum.amandroid.objectflowanalysis.OfaNode
+import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraphPreprocessor
+import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph
+import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.scfg.ObjectFlowGraphAndSystemControlFlowGraphBuilder
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 

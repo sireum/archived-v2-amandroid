@@ -9,7 +9,7 @@ import java.lang.String
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisResult
 import org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult
-import org.sireum.amandroid.objectflowanalysis.PrepareApp
+import org.sireum.amandroid.objectFlowAnalysis.PrepareApp
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.pilar.symbol.SymbolTable
 import scala.Option
@@ -164,9 +164,9 @@ object OfaSCfgModule extends PipelineModule {
 
     _appInfo match{
       case Some(x) =>
-        if(!x.isInstanceOf[org.sireum.amandroid.objectflowanalysis.PrepareApp]){
+        if(!x.isInstanceOf[org.sireum.amandroid.objectFlowAnalysis.PrepareApp]){
           tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'appInfo'.  Expecting 'org.sireum.amandroid.objectflowanalysis.PrepareApp' but found '" + x.getClass.toString + "'")
+            "Input error for '" + this.title + "': Wrong type found for 'appInfo'.  Expecting 'org.sireum.amandroid.objectFlowAnalysis.PrepareApp' but found '" + x.getClass.toString + "'")
         }
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
@@ -263,15 +263,15 @@ object OfaSCfgModule extends PipelineModule {
         "Output error for '" + this.title + "': No entry found for 'OFAsCfg'. Expecting (OfaSCfgModule.OFAsCfgKey or OfaSCfgModule.globalOFAsCfgKey)") 
     }
 
-    if(job ? OfaSCfgModule.OFAsCfgKey && !job(OfaSCfgModule.OFAsCfgKey).isInstanceOf[scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]]) {
+    if(job ? OfaSCfgModule.OFAsCfgKey && !job(OfaSCfgModule.OFAsCfgKey).isInstanceOf[scala.Tuple2[org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph[org.sireum.amandroid.objectFlowAnalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]]) {
       tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker, 
-        "Output error for '" + this.title + "': Wrong type found for OfaSCfgModule.OFAsCfgKey.  Expecting 'scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]' but found '" + 
+        "Output error for '" + this.title + "': Wrong type found for OfaSCfgModule.OFAsCfgKey.  Expecting 'scala.Tuple2[org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph[org.sireum.amandroid.objectFlowAnalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]' but found '" + 
         job(OfaSCfgModule.OFAsCfgKey).getClass.toString + "'")
     } 
 
-    if(job ? OfaSCfgModule.globalOFAsCfgKey && !job(OfaSCfgModule.globalOFAsCfgKey).isInstanceOf[scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]]) {
+    if(job ? OfaSCfgModule.globalOFAsCfgKey && !job(OfaSCfgModule.globalOFAsCfgKey).isInstanceOf[scala.Tuple2[org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph[org.sireum.amandroid.objectFlowAnalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]]) {
       tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker, 
-        "Output error for '" + this.title + "': Wrong type found for OfaSCfgModule.globalOFAsCfgKey.  Expecting 'scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]' but found '" + 
+        "Output error for '" + this.title + "': Wrong type found for OfaSCfgModule.globalOFAsCfgKey.  Expecting 'scala.Tuple2[org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph[org.sireum.amandroid.objectFlowAnalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]' but found '" + 
         job(OfaSCfgModule.globalOFAsCfgKey).getClass.toString + "'")
     } 
     return tags
@@ -322,15 +322,15 @@ object OfaSCfgModule extends PipelineModule {
     return options
   }
 
-  def getAppInfo (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.objectflowanalysis.PrepareApp = {
+  def getAppInfo (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.objectFlowAnalysis.PrepareApp = {
     if (options.contains(OfaSCfgModule.globalAppInfoKey)) {
-       return options(OfaSCfgModule.globalAppInfoKey).asInstanceOf[org.sireum.amandroid.objectflowanalysis.PrepareApp]
+       return options(OfaSCfgModule.globalAppInfoKey).asInstanceOf[org.sireum.amandroid.objectFlowAnalysis.PrepareApp]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def setAppInfo (options : MMap[Property.Key, Any], appInfo : org.sireum.amandroid.objectflowanalysis.PrepareApp) : MMap[Property.Key, Any] = {
+  def setAppInfo (options : MMap[Property.Key, Any], appInfo : org.sireum.amandroid.objectFlowAnalysis.PrepareApp) : MMap[Property.Key, Any] = {
 
     options(OfaSCfgModule.globalAppInfoKey) = appInfo
 
@@ -382,18 +382,18 @@ object OfaSCfgModule extends PipelineModule {
     return options
   }
 
-  def getOFAsCfg (options : scala.collection.Map[Property.Key, Any]) : scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]] = {
+  def getOFAsCfg (options : scala.collection.Map[Property.Key, Any]) : scala.Tuple2[org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph[org.sireum.amandroid.objectFlowAnalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]] = {
     if (options.contains(OfaSCfgModule.globalOFAsCfgKey)) {
-       return options(OfaSCfgModule.globalOFAsCfgKey).asInstanceOf[scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]]
+       return options(OfaSCfgModule.globalOFAsCfgKey).asInstanceOf[scala.Tuple2[org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph[org.sireum.amandroid.objectFlowAnalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]]
     }
     if (options.contains(OfaSCfgModule.OFAsCfgKey)) {
-       return options(OfaSCfgModule.OFAsCfgKey).asInstanceOf[scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]]
+       return options(OfaSCfgModule.OFAsCfgKey).asInstanceOf[scala.Tuple2[org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph[org.sireum.amandroid.objectFlowAnalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def setOFAsCfg (options : MMap[Property.Key, Any], OFAsCfg : scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]) : MMap[Property.Key, Any] = {
+  def setOFAsCfg (options : MMap[Property.Key, Any], OFAsCfg : scala.Tuple2[org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph[org.sireum.amandroid.objectFlowAnalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]) : MMap[Property.Key, Any] = {
 
     options(OfaSCfgModule.globalOFAsCfgKey) = OFAsCfg
     options(OFAsCfgKey) = OFAsCfg
@@ -406,11 +406,11 @@ object OfaSCfgModule extends PipelineModule {
       def cfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]] = OfaSCfgModule.getCfgs(job.propertyMap)
       def rdas : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]] = OfaSCfgModule.getRdas(job.propertyMap)
       def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = OfaSCfgModule.getAndroidCache(job.propertyMap)
-      def appInfo : org.sireum.amandroid.objectflowanalysis.PrepareApp = OfaSCfgModule.getAppInfo(job.propertyMap)
+      def appInfo : org.sireum.amandroid.objectFlowAnalysis.PrepareApp = OfaSCfgModule.getAppInfo(job.propertyMap)
       def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = OfaSCfgModule.getCCfgs(job.propertyMap)
       def procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = OfaSCfgModule.getProcedureSymbolTables(job.propertyMap)
       def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = OfaSCfgModule.getAndroidLibInfoTables(job.propertyMap)
-      def OFAsCfg : scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]] = OfaSCfgModule.getOFAsCfg(job.propertyMap)
+      def OFAsCfg : scala.Tuple2[org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph[org.sireum.amandroid.objectFlowAnalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]] = OfaSCfgModule.getOFAsCfg(job.propertyMap)
     }
   }
 
@@ -426,8 +426,8 @@ object OfaSCfgModule extends PipelineModule {
       def androidCache_=(androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]]) { OfaSCfgModule.setAndroidCache(job.propertyMap, androidCache) }
       def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = OfaSCfgModule.getAndroidCache(job.propertyMap)
 
-      def appInfo_=(appInfo : org.sireum.amandroid.objectflowanalysis.PrepareApp) { OfaSCfgModule.setAppInfo(job.propertyMap, appInfo) }
-      def appInfo : org.sireum.amandroid.objectflowanalysis.PrepareApp = OfaSCfgModule.getAppInfo(job.propertyMap)
+      def appInfo_=(appInfo : org.sireum.amandroid.objectFlowAnalysis.PrepareApp) { OfaSCfgModule.setAppInfo(job.propertyMap, appInfo) }
+      def appInfo : org.sireum.amandroid.objectFlowAnalysis.PrepareApp = OfaSCfgModule.getAppInfo(job.propertyMap)
 
       def cCfgs_=(cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]]) { OfaSCfgModule.setCCfgs(job.propertyMap, cCfgs) }
       def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = OfaSCfgModule.getCCfgs(job.propertyMap)
@@ -438,8 +438,8 @@ object OfaSCfgModule extends PipelineModule {
       def androidLibInfoTables_=(androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables) { OfaSCfgModule.setAndroidLibInfoTables(job.propertyMap, androidLibInfoTables) }
       def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = OfaSCfgModule.getAndroidLibInfoTables(job.propertyMap)
 
-      def OFAsCfg_=(OFAsCfg : scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]) { OfaSCfgModule.setOFAsCfg(job.propertyMap, OFAsCfg) }
-      def OFAsCfg : scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]] = OfaSCfgModule.getOFAsCfg(job.propertyMap)
+      def OFAsCfg_=(OFAsCfg : scala.Tuple2[org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph[org.sireum.amandroid.objectFlowAnalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]) { OfaSCfgModule.setOFAsCfg(job.propertyMap, OFAsCfg) }
+      def OFAsCfg : scala.Tuple2[org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph[org.sireum.amandroid.objectFlowAnalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]] = OfaSCfgModule.getOFAsCfg(job.propertyMap)
     }
   }
 }
@@ -453,7 +453,7 @@ trait OfaSCfgModule {
 
   def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = OfaSCfgModule.getAndroidCache(job.propertyMap)
 
-  def appInfo : org.sireum.amandroid.objectflowanalysis.PrepareApp = OfaSCfgModule.getAppInfo(job.propertyMap)
+  def appInfo : org.sireum.amandroid.objectFlowAnalysis.PrepareApp = OfaSCfgModule.getAppInfo(job.propertyMap)
 
   def cCfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.scfg.CompressedControlFlowGraph[java.lang.String]] = OfaSCfgModule.getCCfgs(job.propertyMap)
 
@@ -462,6 +462,6 @@ trait OfaSCfgModule {
   def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = OfaSCfgModule.getAndroidLibInfoTables(job.propertyMap)
 
 
-  def OFAsCfg_=(OFAsCfg : scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]) { OfaSCfgModule.setOFAsCfg(job.propertyMap, OFAsCfg) }
-  def OFAsCfg : scala.Tuple2[org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph[org.sireum.amandroid.objectflowanalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]] = OfaSCfgModule.getOFAsCfg(job.propertyMap)
+  def OFAsCfg_=(OFAsCfg : scala.Tuple2[org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph[org.sireum.amandroid.objectFlowAnalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]]) { OfaSCfgModule.setOFAsCfg(job.propertyMap, OFAsCfg) }
+  def OFAsCfg : scala.Tuple2[org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph[org.sireum.amandroid.objectFlowAnalysis.OfaNode], org.sireum.amandroid.scfg.SystemControlFlowGraph[java.lang.String]] = OfaSCfgModule.getOFAsCfg(job.propertyMap)
 }

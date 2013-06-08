@@ -1,4 +1,4 @@
-package org.sireum.amandroid.objectflowanalysis
+package org.sireum.amandroid.objectFlowAnalysis
 
 import org.sireum.util.ResourceUri
 import org.sireum.amandroid.callGraph.CallGraph

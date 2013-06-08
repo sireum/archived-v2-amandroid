@@ -1,4 +1,4 @@
-package org.sireum.amandroid.objectflowanalysis
+package org.sireum.amandroid.objectFlowAnalysis
 
 import org.sireum.alir.AlirEdge
 import org.sireum.pilar.symbol.ProcedureSymbolTable

@@ -9,11 +9,11 @@ import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.scfg.{CompressedControlFlowGraph, SystemControlFlowGraph}
 import org.sireum.pilar.ast.{LocationDecl, CatchClause}
 import org.sireum.amandroid.cache.AndroidCacheFile
-import org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph
-import org.sireum.amandroid.objectflowanalysis.OfaNode
+import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph
+import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.alir._
 import org.sireum.pilar.symbol._
-import org.sireum.amandroid.objectflowanalysis.PrepareApp
+import org.sireum.amandroid.objectFlowAnalysis.PrepareApp
 
 
 /*
@@ -88,7 +88,7 @@ case class AndroidIntraProcedural(
     { (_, _) => (Array.empty[CatchClause], false) },
     
 //modified for building RDA       
-  @Input defRef : (SymbolTable, AndroidLibInfoTables) => DefRef = { (st, alit) => new org.sireum.amandroid.objectflowanalysis.AndroidDefRef(st, new org.sireum.amandroid.objectflowanalysis.AndroidVarAccesses(st), alit) },
+  @Input defRef : (SymbolTable, AndroidLibInfoTables) => DefRef = { (st, alit) => new org.sireum.amandroid.objectFlowAnalysis.AndroidDefRef(st, new org.sireum.amandroid.objectFlowAnalysis.AndroidVarAccesses(st), alit) },
 
   @Input isInputOutputParamPredicate : ProcedureSymbolTable => (ResourceUri => java.lang.Boolean, ResourceUri => java.lang.Boolean) = { pst =>
     val params = pst.params.toSet[ResourceUri]
@@ -136,7 +136,7 @@ case class Rda(
   @Input
   androidLibInfoTables : AndroidLibInfoTables,
   
-  @Input defRef : (SymbolTable, AndroidLibInfoTables) => DefRef = { (st, alit) => new org.sireum.amandroid.objectflowanalysis.AndroidDefRef(st, new org.sireum.amandroid.objectflowanalysis.AndroidVarAccesses(st), alit) },
+  @Input defRef : (SymbolTable, AndroidLibInfoTables) => DefRef = { (st, alit) => new org.sireum.amandroid.objectFlowAnalysis.AndroidDefRef(st, new org.sireum.amandroid.objectFlowAnalysis.AndroidVarAccesses(st), alit) },
 
   @Input isInputOutputParamPredicate : ProcedureSymbolTable => (ResourceUri => java.lang.Boolean, ResourceUri => java.lang.Boolean),
 

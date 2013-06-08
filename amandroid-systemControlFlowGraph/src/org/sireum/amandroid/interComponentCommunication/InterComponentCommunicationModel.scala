@@ -3,10 +3,10 @@ package org.sireum.amandroid.interComponentCommunication
 import org.sireum.amandroid.util.CombinationIterator
 import org.sireum.util._
 import org.sireum.amandroid.util.SignatureParser
-import org.sireum.amandroid.objectflowanalysis.OfaNode
+import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.androidConstants.AndroidConstants
 import org.sireum.amandroid.parser.IntentDataBase
-import org.sireum.amandroid.objectflowanalysis.ObjectFlowRepo
+import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowRepo
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 
 

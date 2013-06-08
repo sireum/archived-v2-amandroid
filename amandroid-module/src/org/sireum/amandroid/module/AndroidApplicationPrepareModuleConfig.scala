@@ -11,7 +11,7 @@ import org.sireum.pipeline.PipelineConfiguration
 import org.sireum.pipeline.PipelineStage
 import org.sireum.core.module._
 import org.sireum.pipeline.PipelineJob
-import org.sireum.amandroid.objectflowanalysis.PrepareApp
+import org.sireum.amandroid.objectFlowAnalysis.PrepareApp
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.pilar.symbol.SymbolTable
 

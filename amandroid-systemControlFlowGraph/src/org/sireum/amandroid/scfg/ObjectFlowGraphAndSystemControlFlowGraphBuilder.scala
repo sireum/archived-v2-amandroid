@@ -11,7 +11,7 @@ import org.sireum.amandroid.cache.AndroidCacheFile
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
-import org.sireum.amandroid.objectflowanalysis._
+import org.sireum.amandroid.objectFlowAnalysis._
 import scala.collection.JavaConversions._
 import org.sireum.amandroid.util.CombinationIterator
 import org.sireum.amandroid.util.SignatureParser

@@ -9,11 +9,11 @@ import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.scfg.{CompressedControlFlowGraph, SystemControlFlowGraph}
 import org.sireum.pilar.ast.{LocationDecl, CatchClause}
 import org.sireum.amandroid.cache.AndroidCacheFile
-import org.sireum.amandroid.objectflowanalysis.ObjectFlowGraph
-import org.sireum.amandroid.objectflowanalysis.OfaNode
+import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph
+import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.alir._
 import org.sireum.pilar.symbol._
-import org.sireum.amandroid.objectflowanalysis.PrepareApp
+import org.sireum.amandroid.objectFlowAnalysis.PrepareApp
 
 /*
 Copyright (c) 2012-2013 Sankardas Roy & Fengguo Wei, Kansas State University.        

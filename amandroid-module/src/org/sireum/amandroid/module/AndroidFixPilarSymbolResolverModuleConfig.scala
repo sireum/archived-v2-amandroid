@@ -15,7 +15,7 @@ import org.sireum.pilar.symbol.SymbolTable
 import org.sireum.option.PipelineMode
 import org.sireum.pipeline.gen.ModuleGenerator
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
-import org.sireum.amandroid.objectflowanalysis.PrepareApp
+import org.sireum.amandroid.objectFlowAnalysis.PrepareApp
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

@@ -6,7 +6,7 @@ package org.sireum.amandroid.module
 import org.sireum.util._
 import org.sireum.pipeline._
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
-import org.sireum.amandroid.objectflowanalysis.PrepareApp
+import org.sireum.amandroid.objectFlowAnalysis.PrepareApp
 import org.sireum.pilar.ast.Model
 import org.sireum.pilar.symbol.SymbolTable
 import scala.Option
@@ -133,9 +133,9 @@ object AndroidFixPilarSymbolResolverModule extends PipelineModule {
 
     _appInfo match{
       case Some(x) =>
-        if(!x.isInstanceOf[org.sireum.amandroid.objectflowanalysis.PrepareApp]){
+        if(!x.isInstanceOf[org.sireum.amandroid.objectFlowAnalysis.PrepareApp]){
           tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'appInfo'.  Expecting 'org.sireum.amandroid.objectflowanalysis.PrepareApp' but found '" + x.getClass.toString + "'")
+            "Input error for '" + this.title + "': Wrong type found for 'appInfo'.  Expecting 'org.sireum.amandroid.objectFlowAnalysis.PrepareApp' but found '" + x.getClass.toString + "'")
         }
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
@@ -227,15 +227,15 @@ object AndroidFixPilarSymbolResolverModule extends PipelineModule {
     return options
   }
 
-  def getAppInfo (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.objectflowanalysis.PrepareApp = {
+  def getAppInfo (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.objectFlowAnalysis.PrepareApp = {
     if (options.contains(AndroidFixPilarSymbolResolverModule.globalAppInfoKey)) {
-       return options(AndroidFixPilarSymbolResolverModule.globalAppInfoKey).asInstanceOf[org.sireum.amandroid.objectflowanalysis.PrepareApp]
+       return options(AndroidFixPilarSymbolResolverModule.globalAppInfoKey).asInstanceOf[org.sireum.amandroid.objectFlowAnalysis.PrepareApp]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def setAppInfo (options : MMap[Property.Key, Any], appInfo : org.sireum.amandroid.objectflowanalysis.PrepareApp) : MMap[Property.Key, Any] = {
+  def setAppInfo (options : MMap[Property.Key, Any], appInfo : org.sireum.amandroid.objectFlowAnalysis.PrepareApp) : MMap[Property.Key, Any] = {
 
     options(AndroidFixPilarSymbolResolverModule.globalAppInfoKey) = appInfo
 
@@ -291,7 +291,7 @@ object AndroidFixPilarSymbolResolverModule extends PipelineModule {
     implicit class AndroidFixPilarSymbolResolverModuleConsumerView (val job : PropertyProvider) extends AnyVal {
       def parallel : scala.Boolean = AndroidFixPilarSymbolResolverModule.getParallel(job.propertyMap)
       def shouldBuildLibInfoTables : scala.Boolean = AndroidFixPilarSymbolResolverModule.getShouldBuildLibInfoTables(job.propertyMap)
-      def appInfo : org.sireum.amandroid.objectflowanalysis.PrepareApp = AndroidFixPilarSymbolResolverModule.getAppInfo(job.propertyMap)
+      def appInfo : org.sireum.amandroid.objectFlowAnalysis.PrepareApp = AndroidFixPilarSymbolResolverModule.getAppInfo(job.propertyMap)
       def models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model] = AndroidFixPilarSymbolResolverModule.getModels(job.propertyMap)
       def androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables] = AndroidFixPilarSymbolResolverModule.getAndroidLibInfoTablesOpt(job.propertyMap)
       def symbolTable : org.sireum.pilar.symbol.SymbolTable = AndroidFixPilarSymbolResolverModule.getSymbolTable(job.propertyMap)
@@ -307,8 +307,8 @@ object AndroidFixPilarSymbolResolverModule extends PipelineModule {
       def shouldBuildLibInfoTables_=(shouldBuildLibInfoTables : scala.Boolean) { AndroidFixPilarSymbolResolverModule.setShouldBuildLibInfoTables(job.propertyMap, shouldBuildLibInfoTables) }
       def shouldBuildLibInfoTables : scala.Boolean = AndroidFixPilarSymbolResolverModule.getShouldBuildLibInfoTables(job.propertyMap)
 
-      def appInfo_=(appInfo : org.sireum.amandroid.objectflowanalysis.PrepareApp) { AndroidFixPilarSymbolResolverModule.setAppInfo(job.propertyMap, appInfo) }
-      def appInfo : org.sireum.amandroid.objectflowanalysis.PrepareApp = AndroidFixPilarSymbolResolverModule.getAppInfo(job.propertyMap)
+      def appInfo_=(appInfo : org.sireum.amandroid.objectFlowAnalysis.PrepareApp) { AndroidFixPilarSymbolResolverModule.setAppInfo(job.propertyMap, appInfo) }
+      def appInfo : org.sireum.amandroid.objectFlowAnalysis.PrepareApp = AndroidFixPilarSymbolResolverModule.getAppInfo(job.propertyMap)
 
       def models_=(models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model]) { AndroidFixPilarSymbolResolverModule.setModels(job.propertyMap, models) }
       def models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model] = AndroidFixPilarSymbolResolverModule.getModels(job.propertyMap)
@@ -329,7 +329,7 @@ trait AndroidFixPilarSymbolResolverModule {
 
   def shouldBuildLibInfoTables : scala.Boolean = AndroidFixPilarSymbolResolverModule.getShouldBuildLibInfoTables(job.propertyMap)
 
-  def appInfo : org.sireum.amandroid.objectflowanalysis.PrepareApp = AndroidFixPilarSymbolResolverModule.getAppInfo(job.propertyMap)
+  def appInfo : org.sireum.amandroid.objectFlowAnalysis.PrepareApp = AndroidFixPilarSymbolResolverModule.getAppInfo(job.propertyMap)
 
   def models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model] = AndroidFixPilarSymbolResolverModule.getModels(job.propertyMap)
 
