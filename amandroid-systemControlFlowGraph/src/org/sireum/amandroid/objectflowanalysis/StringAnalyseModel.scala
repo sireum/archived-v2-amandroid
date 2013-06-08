@@ -30,7 +30,7 @@ trait StringAnalyseModel {
 	        val valueSets : MMap[Int, MMap[ResourceUri, ResourceUri]] = mmapEmpty
 	        for(i <- 0 to v._1.size - 1){
 	          valueSets(i) = mmapEmpty
-	          valueSets(i) ++= v._1(i).getProperty[MMap[ResourceUri, ResourceUri]]("ValueSet").filter(i => if(i._2.equals("STRING"))true else false)
+	          valueSets(i) ++= v._1(i).getProperty[MMap[ResourceUri, ResourceUri]]("ValueSet").filter(item => if(item._2.equals("STRING"))true else false)
 	        }
 	        val strsList = getStringList(valueSets)
 	        val strs = if(!strsList.isEmpty && !strsList(0).isEmpty)strsList.map{l => (applyStringOperation(k, strings ++ l), "STRING")}.toMap

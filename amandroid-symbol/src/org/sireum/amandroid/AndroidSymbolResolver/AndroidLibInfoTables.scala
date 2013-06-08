@@ -99,6 +99,13 @@ trait AndroidLibInfoTables {
   def findProcedureSigByName(rUri : ResourceUri, name : String) : String
   def getProcedureNameFromProcedureSig(sig : String) : String
   def getRecordNameFromProcedureSig(sig : String) : String
+  /**
+   * Matches a child class's one proc Sig with the corresponding one in a parent class  considering inheritance
+   * @param sigParent is a proc sig
+   * @param sigChild is a proc sig
+   * @return true if matches, otherwise false
+   */
+  def matchSigInheritance(sigParent: String, sigChild: String) : Boolean
 }
 
 trait AndroidLibInfoTablesProducer{

@@ -270,6 +270,7 @@ class ObjectFlowGraph[Node <: OfaNode]
             fieldNode.baseNode = baseNode
           case pso : PointStringO =>
             rhsNode.propertyMap(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]](pso.varName) = "STRING"
+            rhsNode.propertyMap(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]](pso.toString) = "[|java:lang:String|]"
             worklist += rhsNode
           case po : PointO =>
             rhsNode.propertyMap(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]](po.toString) = po.typ
@@ -456,29 +457,22 @@ class ObjectFlowGraph[Node <: OfaNode]
   
   def getDirectCallee(pi : PointI,
                       androidLibInfoTables : AndroidLibInfoTables) : ResourceUri = {
-    pi.varName
+    androidLibInfoTables.getProcedureUriBySignature(pi.varName)
   }
   
   /**
    * This is the beta method in original algo
    */ 
-  def getCalleeSet(diffSet : MMap[ResourceUri, ResourceUri],
+  def getCalleeSet(diffSet : MMap[String, String],
                 pi : PointI,
                 androidLibInfoTables : AndroidLibInfoTables) : MSet[ResourceUri] = {
     val calleeSet : MSet[ResourceUri] = msetEmpty
-    diffSet.values.toSet[ResourceUri].foreach(
+    diffSet.values.toSet[String].foreach(
       d => {
         val recordUri = androidLibInfoTables.getRecordUri(d)
-        val procSigs = androidLibInfoTables.getProcedureSigsByRecordUri(recordUri)
-        
-        val str = pi.varName.substring(pi.varName.indexOf("."))
-        procSigs.foreach(
-          sig => {
-            if(sig.substring(sig.indexOf(".")).equals(str)){
-              calleeSet += sig
-            }
-          }  
-        )
+        val procUri = androidLibInfoTables.findProcedureUri(recordUri, androidLibInfoTables.getSubSignature(pi.varName))
+        if(procUri != null)
+        	calleeSet += procUri
       }  
     )
     calleeSet

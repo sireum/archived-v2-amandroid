@@ -255,7 +255,7 @@ class AndroidLibInfoResolver
       for(parentUri <- parentsUri){
         val parentProceduresUri = tables.recordProcedureTable.get(parentUri)
         for (parentProcedureUri <- parentProceduresUri){
-          if(sigEqual(procedureUri, parentProcedureUri)){
+          if(sigEqualByUri(procedureUri, parentProcedureUri)){
             buildVirtualMethodTable(parentProcedureUri,
                                     procedureUri)
           }
@@ -334,9 +334,13 @@ class AndroidLibInfoResolver
       getInside(sig).split(";", 2)(1)
     }
     
-  def sigEqual(procedureUri : ResourceUri, parentProcedureUri : ResourceUri) : Boolean = {
+  def sigEqualByUri(procedureUri : ResourceUri, parentProcedureUri : ResourceUri) : Boolean = {
     val sig1 = tables.procedureUriTable.inverse.get(procedureUri)
     val sig2 = tables.procedureUriTable.inverse.get(parentProcedureUri)
+    sigEqual(sig1, sig2)
+  }
+  
+  def sigEqual(sig1 : ResourceUri, sig2 : ResourceUri) : Boolean = {
     if(sig1 != null && sig2 !=null && getPartSig(sig1).equals(getPartSig(sig2))){
       true
     } else {
@@ -475,6 +479,16 @@ class AndroidLibInfoResolver
      target
    }
    
+   def matchSigInheritance(sigParent: String, sigChild: String) : Boolean = {
+     val parent =getRecordNameFromProcedureSig(sigParent)
+     val child =getRecordNameFromProcedureSig(sigChild)
+     val ancestors = getSuperClassesOfIncluding(getRecordUri(child))
+     if(ancestors.contains(getRecordUri(parent))) 
+       sigEqual(sigParent, sigChild)
+     else
+       false
+   }
+   
  // sankar ends
    
   def findProcedureUri(rUri : ResourceUri, subSig : String) : ResourceUri = {
@@ -502,7 +516,7 @@ class AndroidLibInfoResolver
       }
     }
     for(parent <- parents){
-      return findProcedureUri(parent, name)
+      return findProcedureUriByName(parent, name)
     }
     return null
   }
@@ -513,7 +527,9 @@ class AndroidLibInfoResolver
     if(tables.procedureUriTable.contains(sig))
       tables.procedureUriTable.get(sig)
     else{
+      println("sig =" + sig)
       val rName = getRecordNameFromProcedureSig(sig)
+      println("rName =" + rName)
       findProcedureUri(getRecordUri(rName), getSubSignature(sig))
     }
   }
@@ -613,7 +629,7 @@ class AndroidLibInfoResolver
     if(isConstructor(procUri1) || isConstructor(procUri2))
       false
     else
-      sigEqual(procUri1, procUri2)
+      sigEqualByUri(procUri1, procUri2)
   }
   
   /**
@@ -722,7 +738,7 @@ class AndroidLibInfoResolver
       for(parentUri <- parentsUri){
         val parentProceduresUri = tables.recordProcedureTable.get(parentUri)
         for (parentProcedureUri <- parentProceduresUri){
-          if(sigEqual(procedureUri, parentProcedureUri)){
+          if(sigEqualByUri(procedureUri, parentProcedureUri)){
             val vmProceduresUri = tables.virtualMethodTable.get(procedureUri)
 //              println("procedures : " + vmPreceduresUri)
             vmProceduresUri.map(

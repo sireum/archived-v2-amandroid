@@ -57,11 +57,14 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
     this.androidLibInfoTables = androidLibInfoTables
     this.androidCache = androidCache
     var entryPoint : ResourceUri = getEntryPoint(psts, appInfo)
+    println("entry point = " + entryPoint)
     if(entryPoint == null){
       System.err.println("Cannot find the entry point of the app.")
       return null
     }
     val ofg = new ObjectFlowGraph[Node]
+    ofg.setIntentDB(appInfo.getIntentDB)
+    ofg.setEntryPoints(appInfo.getEntryPoints)
     val sCfg = new sCfg[String]
     processed = mmapEmpty
     val cfg = cfgs(entryPoint)
@@ -81,7 +84,7 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
     println("processed--->" + processed.size)
     println("arrayrepo------>" + result._1.arrayRepo)
     println("globalrepo------>" + result._1.globalDefRepo)
-    println("fieldrepo----->" + result._1.iFieldDefRepo)
+   // println("fieldrepo----->" + result._1.iFieldDefRepo)
     val f = new File(System.getProperty("user.home") + "/Desktop/ofg.dot")
     val o = new FileOutputStream(f)
     val w = new OutputStreamWriter(o)
@@ -167,6 +170,8 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
                 } else {
                   calleeSet ++= ofg.getCalleeSet(d, pi, androidLibInfoTables)
                 }
+//                if(pi.toString.contains("[|Lcom/fgweihlp/wfgnp/MainActivity;.sendBroadcast:(Landroid/content/Intent;)V|]"))
+//                	println("pi = " + (pi, d, calleeSet))
                 calleeSet.foreach(
                   callee => {
                     extendGraphWithConstructGraph(callee, pi, ofg, sCfg)
@@ -244,12 +249,14 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
   }
   
   // callee is signature
-  def extendGraphWithConstructGraph(calleeSig : ResourceUri, 
+  def extendGraphWithConstructGraph(callee : ResourceUri, 
       															pi : PointI, 
       															ofg : ObjectFlowGraph[Node], 
       															sCfg : SystemControlFlowGraph[String]) = {
     val points : MList[Point] = mlistEmpty
-    val callee : ResourceUri = androidLibInfoTables.getProcedureUriBySignature(calleeSig)
+    val calleeSig : ResourceUri = androidLibInfoTables.getProcedureSignatureByUri(callee)
+    if(callee.contains(".intern")) 
+      println("signature--->" + (calleeSig, processed.contains(callee)))
     if(!processed.contains(callee)){
       if(ofg.isStringOperation(calleeSig)){
         if(new SignatureParser(calleeSig).getParamSig.isReturnNonNomal){
@@ -261,14 +268,17 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
           val calleeOfg = androidCache.load[ObjectFlowGraph[Node]](callee, "ofg")
           processed(callee) = ofg.combineSpecialOfg(calleeSig, calleeOfg, "NATIVE")
         }
-      } else if(ofg.isIccOperation(calleeSig)) {
+      } else if(ofg.isIccOperation(calleeSig, androidLibInfoTables)) {
         var paramNodes = Map(0 -> ofg.getNode(pi.recv))
         paramNodes ++= pi.args.map{case (k, v) => (k + 1, ofg.getNode(v))}.toMap
         ofg.iccOperationTracker(calleeSig) = paramNodes
+       // println("in fix: ofg.iccOperationTracker = " + ofg.iccOperationTracker + " and paramNodes = " + paramNodes)
       } else if(pstMap.contains(callee)){
         val cfg = cfgs(callee)
         val rda = rdas(callee)
         val cCfg = cCfgs(callee)
+        if(callee.contains("onCreate"))
+          println("callee =" + callee)
         points ++= new PointsCollector[Node]().points(pstMap(callee), ofg)
         ofg.points ++= points
         setProcessed(points, callee)
@@ -284,11 +294,13 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
     }
     if(processed.contains(callee)){
       val procPoint = processed(callee)
+      if(callee.contains("onCreate"))
+          println("processed callee =" + callee)
       require(procPoint != null)
       ofg.extendGraph(procPoint, pi)
       if(!ofg.isStringOperation(calleeSig) && 
          !ofg.isNativeOperation(androidLibInfoTables.getAccessFlag(callee)) &&
-         !ofg.isIccOperation(calleeSig))
+         !ofg.isIccOperation(calleeSig, androidLibInfoTables))
       	sCfg.extendGraph(callee, pi.owner, pi.locationUri, pi.locationIndex)
 //      else println("pi--->" + pi)
     } else {

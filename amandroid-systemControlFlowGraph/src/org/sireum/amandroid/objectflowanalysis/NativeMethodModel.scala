@@ -7,7 +7,7 @@ import org.sireum.pilar.ast.NameExp
 import org.sireum.amandroid.util.SignatureParser
 
 trait NativeMethodModel {
-	/**
+  /**
    * contain all native operation signatures and involved operation parameter nodes and return nodes
    */
   val nativeOperationTracker : MMap[String, (MList[OfaNode], Option[OfaNode])] = mmapEmpty
@@ -73,10 +73,15 @@ trait NativeMethodModel {
   
 	def applyNativeOperation(sig : ResourceUri, values : MList[String]) : String = {
 	  val size = values.size
+	  //println(values)
 	  sig match {
 	    case "[|Ljava/lang/Class;.getNameNative:()Ljava/lang/String;|]" =>
 	      require(size > 0)
 	      values(0).replaceFirst("new:", "").split("@L")(0)  //before: new:[|de:mobinauten:smsspy:EmergencyService|]@L000bc4 after: [|de:mobinauten:smsspy:EmergencyService|]
+	    case "[|Ljava/lang/String;.intern:()Ljava/lang/String;|]"  =>
+	      require(size > 0)
+	      values(0) 
+	      
 	    case _ =>
 	      require(size > 0)
 	      values(0)

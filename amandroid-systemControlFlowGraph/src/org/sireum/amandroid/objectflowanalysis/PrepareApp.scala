@@ -16,11 +16,11 @@ import org.sireum.amandroid.parser.IntentDataBase
 
 class PrepareApp(apkFileLocation : String) {
   
-  private val DEBUG = true
+    private val DEBUG = true
 //	private var sinks : Set[AndroidMethod] = Set()
 //	private var sources : Set[AndroidMethod] = Set()
 	private var callbackMethods : Map[ResourceUri, MSet[ResourceUri]] = Map()
-  private var mainComponent : String = null
+    private var mainComponent : String = null
 	private var entrypoints : Set[String] = Set()
 	private var layoutControls : Map[Integer, LayoutControl] = Map()
 	private var resourcePackages : List[ARSCFileParser.ResPackage] = List()
@@ -29,6 +29,7 @@ class PrepareApp(apkFileLocation : String) {
 	private var libInfoTables : AndroidLibInfoTables = null
 	private var dummyMainMap : Map[ResourceUri, String] = Map()
 	private var psts : Seq[ProcedureSymbolTable] = Seq()
+	private var intentDB : IntentDataBase = null
 
 //	def printSinks() = {
 //		println("Sinks:")
@@ -73,6 +74,8 @@ class PrepareApp(apkFileLocation : String) {
 	  this.libInfoTables = libInfoTables
 	}
 	
+	def getIntentDB() = this.intentDB
+	def getEntryPoints() = this.entrypoints
 	def getMainComponent() = this.mainComponent
 	
 	def getDummyMainMap() = this.dummyMainMap
@@ -122,6 +125,7 @@ class PrepareApp(apkFileLocation : String) {
 		ManifestParser.loadManifestFile(apkFileLocation)
 		this.appPackageName = ManifestParser.getPackageName
 		this.entrypoints = ManifestParser.getEntryPointClasses
+		this.intentDB = ManifestParser.getIntentDB
 		if(DEBUG){
 			println("entrypoints--->" + ManifestParser.getEntryPointClasses)
 		  println("packagename--->" + ManifestParser.getPackageName)

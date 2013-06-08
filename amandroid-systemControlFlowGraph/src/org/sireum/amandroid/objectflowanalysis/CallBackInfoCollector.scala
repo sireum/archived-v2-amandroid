@@ -157,10 +157,10 @@ class CallBackInfoCollector(entryPointClasses:Set[ResourceUri], callGraph: CallG
 		// reason to look for interface implementations
 		if (androidLibInfoTable.isAbstract(baseClass))
 			return;
-		
+		println("baseClass: = " + baseClass + "clazz = " + clazz + "lifecycleElement:" + lifecycleElement)
 		// For a first take, we consider all classes in the android.* packages
 		// to be part of the operating system
-		if (androidLibInfoTable.getRecordName(baseClass).startsWith("android."))
+		if (androidLibInfoTable.getRecordName(baseClass).startsWith("[|android:"))
 		  return
 		  
 		// If we are a class, one of our superclasses might implement an Android
@@ -303,8 +303,10 @@ class CallBackInfoCollector(entryPointClasses:Set[ResourceUri], callGraph: CallG
 					checkAndAddMethod(androidLibInfoTable.findProcedureSigByName(baseClass,".onLowMemory"), lifecycleElement);
 			}
 			else if (iName.equals(pilarify("android.content.ComponentCallbacks2"))) {
-				if (androidLibInfoTable.hasName(methodSigs, ".onTrimMemory"))
+				if (androidLibInfoTable.hasName(methodSigs, ".onTrimMemory")){
+				  println("cc2--->" + (iName, baseClass, androidLibInfoTable.findProcedureSigByName(baseClass,".onTrimMemory")))
 					checkAndAddMethod(androidLibInfoTable.findProcedureSigByName(baseClass,".onTrimMemory"), lifecycleElement);
+				}
 			}			
 			else if (iName.equals(pilarify("android.content.DialogInterface$OnCancelListener"))) {
 				if (androidLibInfoTable.hasName(methodSigs, ".onCancel"))
@@ -1149,7 +1151,7 @@ class CallBackInfoCollector(entryPointClasses:Set[ResourceUri], callGraph: CallG
 	 */
 	private def checkAndAddMethod(pSig: String, baseClass: ResourceUri) {
 		val pUri = androidLibInfoTable.getProcedureUriBySignature(pSig)
-		if (!pSig.startsWith("android.")) {
+		if (!pSig.startsWith("[|Landroid/")) {
 			if (this.callbackMethods.contains(baseClass))
 				this.callbackMethods(baseClass).add(pUri)
 			else 

@@ -38,8 +38,9 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
 
   def file(fileUri : FileResourceUri,
            libInfoTables : AndroidLibInfoTables,
-           aCache : AndroidCacheFile[ResourceUri]) =
-    AmandroidConfiguration(title, fileUri, libInfoTables, aCache)
+           aCache : AndroidCacheFile[ResourceUri],
+           startFromApk : Boolean) =
+    AmandroidConfiguration(title, fileUri, libInfoTables, aCache, startFromApk)
 
   //////////////////////////////////////////////////////////////////////////////
   // Public Case Classes
@@ -47,12 +48,12 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
 
   type VirtualLabel = String
   
-  
   case class AmandroidConfiguration //
   (title : String,
    srcs : FileResourceUri,
    libInfoTables : AndroidLibInfoTables,
-   aCache : AndroidCacheFile[ResourceUri]) {
+   aCache : AndroidCacheFile[ResourceUri],
+   startFromApk : Boolean) {
 
     ////////////////////////////////////////////////////////////////////////////
     // Test Constructor
@@ -60,6 +61,7 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
 
     test(title) {
       println("####" + title + "#####")
+      if(startFromApk){
         val f = new File(srcs.toString().substring(5))
         //create directory
         val dirName = f.getName().split("\\.")(0)
@@ -121,7 +123,7 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
         
         // experimental code ends
         
-        pipeline.compute(job)
+        apkPipeline.compute(job)
         if(job.hasError){
           println("Error present: " + job.hasError)
           job.tags.foreach{f =>
@@ -136,6 +138,56 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
             println(f)}
           job.lastStageInfo.tags.foreach(f => println(f))
         }
+      } else {
+        
+        val f = new File(srcs.toString().substring(5))
+        //create directory
+        val dirName = f.getName().split("\\.")(0)
+        val d = srcs.substring(srcs.indexOf("/"), srcs.lastIndexOf("/")+1)
+        val apkFile = new File(srcs.substring(srcs.indexOf("/"), srcs.lastIndexOf("/")) + ".apk")
+        println("apkfile--->" + apkFile)
+        val job = PipelineJob()
+        val options = job.properties
+        
+        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d + "/" + dirName + ".pilar"))))
+        PilarAndroidSymbolResolverModule.setParallel(options, false)
+        PilarAndroidSymbolResolverModule.setHasExistingAndroidLibInfoTables(options, Some(libInfoTables))
+        AndroidApplicationPrepareModule.setApkFileLocation(options, apkFile.toString())
+        AndroidIntraProceduralModule.setParallel(options, false)
+        AndroidIntraProceduralModule.setAndroidCache(options, Some(aCache))
+        AndroidIntraProceduralModule.setShouldBuildCfg(options, true)
+        AndroidIntraProceduralModule.setShouldBuildRda(options, true)
+        AndroidIntraProceduralModule.setShouldBuildCCfg(options, true)
+        AndroidInterProceduralModule.setShouldBuildOFAsCfg(options, true)
+        
+        // experimental code starts which does not have any significant role now; later we will delete it after some related cleaning 
+        
+        val apiPermission : MMap[ResourceUri, MList[String]] = mmapEmpty
+        val permList : MList[String] = mlistEmpty
+        permList+=("permission")   // put the permission strings e.g. "NETWORKS" here
+        val pUri : ResourceUri = "abc"  // replace "abc" by apiUri (e.g. pilar:/procedure/default/%5B%7Candroid::content::Context.startService%7C%5D/1/50/f9cb48df) later
+        apiPermission(pUri) = permList
+        AndroidIntraProceduralModule.setAPIpermOpt(options, Option(apiPermission)) 
+        
+        // experimental code ends
+        
+        pilarPipeline.compute(job)
+        if(job.hasError){
+          println("Error present: " + job.hasError)
+          job.tags.foreach{f =>
+            f match{
+              case t:LocationTag =>
+                t.location match {
+                  case lcl : LineColumnLocation => println("line --->" + lcl.line + " col --->" + lcl.column)
+                  case _ =>
+                }
+              case _ =>
+            }
+            println(f)}
+          job.lastStageInfo.tags.foreach(f => println(f))
+        }
+        
+      }
 //        val r = AndroidInterIntraProceduralModule.getInterResult(options)
         
  
@@ -167,6 +219,93 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
 // //       println(csCfg.toString())
 //        println(" csCfg saving is done which is same as sCfg now because no compression was made")
     }
+    
+    
+    protected val apkPipeline =
+	    PipelineConfiguration(
+	      "App analysis pipeline",
+	      false,
+	      PipelineStage(
+	        "dex2pilar stage",
+	        false,
+	        Dex2PilarWrapperModule
+	      ),
+	      PipelineStage(
+	        "Chunking pilar parsing stage",
+	        false,
+	        ChunkingPilarParserModule
+	      ),
+	      PipelineStage(
+	        "PilarAndroidSymbolResolverModule stage",
+	        false,
+	        PilarAndroidSymbolResolverModule
+	      )
+	      ,
+	      PipelineStage(
+	        "AndroidApplicationPrepareModule stage",
+	        false,
+	        AndroidApplicationPrepareModule
+	      )
+	      ,
+	      PipelineStage(
+	        "AndroidFixPilarSymbolResolverModule stage",
+	        false,
+	        AndroidFixPilarSymbolResolverModule
+	      )
+	      ,
+	      PipelineStage(
+	      "Android IntraProcedural Analysis",
+	      false,
+	      AndroidIntraProceduralModule
+	      )
+	      ,
+	      PipelineStage(
+	      "Android InterProcedural Analysis",
+	      false,
+	      AndroidInterProceduralModule
+	      )
+	    )
+	    
+	 protected val pilarPipeline =
+	    PipelineConfiguration(
+	      "App analysis pipeline",
+	      false,
+	      PipelineStage(
+	        "Chunking pilar parsing stage",
+	        false,
+	        ChunkingPilarParserModule
+	      ),
+	      PipelineStage(
+	        "PilarAndroidSymbolResolverModule stage",
+	        false,
+	        PilarAndroidSymbolResolverModule
+	      )
+	      ,
+	      PipelineStage(
+	        "AndroidApplicationPrepareModule stage",
+	        false,
+	        AndroidApplicationPrepareModule
+	      )
+	      ,
+	      PipelineStage(
+	        "AndroidFixPilarSymbolResolverModule stage",
+	        false,
+	        AndroidFixPilarSymbolResolverModule
+	      )
+	      ,
+	      PipelineStage(
+	      "Android IntraProcedural Analysis",
+	      false,
+	      AndroidIntraProceduralModule
+	      )
+	      ,
+	      PipelineStage(
+	      "Android InterProcedural Analysis",
+	      false,
+	      AndroidInterProceduralModule
+	      )
+	    )   
+    
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -179,49 +318,4 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
     num += 1
     "Analysis #" + num
   } else _title
-
-  protected val pipeline =
-    PipelineConfiguration(
-      "App analysis pipeline",
-      false,
-      PipelineStage(
-        "dex2pilar stage",
-        false,
-        Dex2PilarWrapperModule
-      ),
-      PipelineStage(
-        "Chunking pilar parsing stage",
-        false,
-        ChunkingPilarParserModule
-      ),
-      PipelineStage(
-        "PilarAndroidSymbolResolverModule stage",
-        false,
-        PilarAndroidSymbolResolverModule
-      )
-      ,
-      PipelineStage(
-        "AndroidApplicationPrepareModule stage",
-        false,
-        AndroidApplicationPrepareModule
-      )
-      ,
-      PipelineStage(
-        "AndroidFixPilarSymbolResolverModule stage",
-        false,
-        AndroidFixPilarSymbolResolverModule
-      )
-      ,
-      PipelineStage(
-      "Android IntraProcedural Analysis",
-      false,
-      AndroidIntraProceduralModule
-      )
-      ,
-      PipelineStage(
-      "Android InterProcedural Analysis",
-      false,
-      AndroidInterProceduralModule
-      )
-    )
 }

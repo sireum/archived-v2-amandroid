@@ -38,19 +38,18 @@ class AmandroidOFAApp extends AmandroidOFAAppFrameWork{
   aCache.setCacheSize(100000)
   aCache.setRemovePercent(20)
   
-  AmandroidFiles.apkModelFiles.foreach(
-      {fileUri=>
-        if(fileUri.indexOf("0eb") > 0)
-    	  Analyzing title fileUri file(fileUri, libInfoTables, aCache)
-      }  
-  )
+//  AmandroidFiles.apkModelFiles.foreach(
+//      {fileUri=>
+//        if(fileUri.indexOf("Wfg") > 0)
+//    	  Analyzing title fileUri file(fileUri, libInfoTables, aCache)
+//      }  
+//  )
   
-  //println("libInfoDir = " + libInfoDir)
+//println("libInfoDir = " + libInfoDir)
   
-//  AmandroidFiles.pilarModelFiles.
-//  foreach{fileUri=>
-//    println(fileUri)
-//     if(fileUri.indexOf("0eb4b") > 0)
-//      Analyzing title fileUri file(fileUri, libInfoTables, aCache)
-//  }
+  AmandroidFiles.pilarModelFiles.
+  foreach{fileUri=>
+     if(fileUri.indexOf("Wfg") > 0)
+      Analyzing title fileUri file(fileUri, libInfoTables, aCache, false)
+  }
 }
