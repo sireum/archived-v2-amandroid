@@ -27,7 +27,6 @@ class PrepareApp(apkFileLocation : String) {
 	private var appPackageName : String = ""
 	private var taintWrapperFile : String = ""
 	private var libInfoTables : AndroidLibInfoTables = null
-	private var dummyMainMap : Map[ResourceUri, String] = Map()
 	private var psts : Seq[ProcedureSymbolTable] = Seq()
 	private var intentDB : IntentDataBase = null
 
@@ -84,9 +83,7 @@ class PrepareApp(apkFileLocation : String) {
 	
 	def getIntentDB() = this.intentDB
 	def getEntryPoints() = this.entrypoints
-	
-	def getDummyMainMap() = this.dummyMainMap
-	
+		
 	def getMainComponent() = this.mainComponent
 	
 	def getDummyMainCodeMap() = this.dummyMainCodeMap

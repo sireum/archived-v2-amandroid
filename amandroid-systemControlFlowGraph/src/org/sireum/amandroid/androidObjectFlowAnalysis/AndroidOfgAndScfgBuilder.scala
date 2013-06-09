@@ -59,21 +59,31 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
     this.cCfgs = cCfgs
     this.androidLibInfoTables = androidLibInfoTables
     this.androidCache = androidCache
-    var entryPoint : ResourceUri = getEntryPoint(psts)
-    if(entryPoint == null){
-      System.err.println("Cannot find the entry point of the app.")
-      return null
-    }
+    psts.foreach(
+      pst =>{
+        pstMap(pst.procedureUri) = pst
+      }  
+    )
+//    var entryPoint : ResourceUri = getEntryPoint(psts)
+//    if(entryPoint == null){
+//      System.err.println("Cannot find the entry point of the app.")
+//      return null
+//    }
     val ofg = new AndroidObjectFlowGraph[Node]
     ofg.setIntentDB(appInfo.getIntentDB)
     ofg.setEntryPoints(appInfo.getEntryPoints)
     val sCfg = new sCfg[String]
     processed = mmapEmpty
-    val cfg = cfgs(entryPoint)
-    val rda = rdas(entryPoint)
-    val cCfg = cCfgs(entryPoint)
-    val pst = pstMap(entryPoint)
-    doOFA(pst, cfg, rda, cCfg, ofg, sCfg)
+    appInfo.getDummyMainSigMap.values.foreach{
+      dummySig =>
+        val dummyUri = androidLibInfoTables.getProcedureUriBySignature(dummySig)
+        val cfg = cfgs(dummyUri)
+		    val rda = rdas(dummyUri)
+		    val cCfg = cCfgs(dummyUri)
+		    val pst = pstMap(dummyUri)
+		    doOFA(pst, cfg, rda, cCfg, ofg, sCfg)
+    }
+    overallFix(ofg, sCfg)
     result = (ofg, sCfg)
 //    result._1.nodes.foreach(
 //      node => {
@@ -105,7 +115,6 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
     psts.foreach(
       pst =>{
         if(pst.procedureUri.contains(entryName)) entryPoint = pst.procedureUri
-        pstMap(pst.procedureUri) = pst
       }  
     )
     entryPoint
@@ -122,14 +131,14 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
     setProcessed(points, pst.procedureUri)
     ofg.constructGraph(points, cfg, rda)
     sCfg.collectionCCfgToBaseGraph(pst.procedureUri, cCfg)
-    overallFix(ofg, sCfg)
+    fix(ofg, sCfg)
   }
   
   def overallFix(ofg : AndroidObjectFlowGraph[Node],
 		  					 sCfg : SystemControlFlowGraph[String]) : Unit = {
-    do{
-    fix(ofg, sCfg)
-    }while(checkAndDoIccOperation(ofg, sCfg))
+    while(checkAndDoIccOperation(ofg, sCfg)){
+    	fix(ofg, sCfg)
+    }
   }
   
   def fix(ofg : AndroidObjectFlowGraph[Node],
@@ -205,19 +214,6 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
 	      targetSig =>
 	        val targetUri = androidLibInfoTables.getProcedureUriBySignature(targetSig)
 	        if(targetUri != null){
-	          if(!processed.contains(targetUri)){
-		          val points : MList[Point] = mlistEmpty
-		          val cfg = cfgs(targetUri)
-					    val rda = rdas(targetUri)
-					    val cCfg = cCfgs(targetUri)
-					    val pst = pstMap(targetUri)
-	//				    doOFA(pst, cfg, rda, cCfg, ofg, sCfg)
-			        points ++= new PointsCollector[Node]().points(pst, ofg)
-			        ofg.points ++= points
-			        setProcessed(points, targetUri)
-			        ofg.constructGraph(points, cfg, rda)
-			        sCfg.collectionCCfgToBaseGraph(targetUri, cCfg)
-	          }
 	          if(processed.contains(targetUri)){
 			        val procPoint = processed(targetUri)
 				      require(procPoint != null)
