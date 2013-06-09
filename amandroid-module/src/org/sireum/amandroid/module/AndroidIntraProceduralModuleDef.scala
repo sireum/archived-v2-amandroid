@@ -13,11 +13,8 @@ import org.sireum.pipeline.ErrorneousModulesThrowable
 import org.sireum.pipeline.PipelineStage
 import org.sireum.pipeline.PipelineConfiguration
 import org.sireum.alir.ReachingDefinitionAnalysis
-import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraphPreprocessor
-import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph
-import org.sireum.amandroid.objectFlowAnalysis.OfaNode
-import org.sireum.amandroid.scfg.ObjectFlowGraphAndSystemControlFlowGraphBuilder
 import org.sireum.pilar.symbol.ProcedureSymbolTable
+import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidOfgPreprocessor
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -147,7 +144,8 @@ class RdaModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends
 }
 
 class OFAPreprocessModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends OFAPreprocessModule {
-  this.OFG_=(ObjectFlowGraphPreprocessor(this.procedureSymbolTable, this.cfg, this.rda, this.androidLibInfoTables))
+  AndroidOfgPreprocessor.setAndroidLibInfoTables(this.androidLibInfoTables)
+  this.OFG_=(AndroidOfgPreprocessor(this.procedureSymbolTable, this.cfg, this.rda))
 }
 
 class cCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends cCfgModule {

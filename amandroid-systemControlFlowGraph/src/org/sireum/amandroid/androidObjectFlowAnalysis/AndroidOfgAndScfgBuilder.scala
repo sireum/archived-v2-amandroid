@@ -1,4 +1,4 @@
-package org.sireum.amandroid.scfg
+package org.sireum.amandroid.androidObjectFlowAnalysis
 
 import org.sireum.alir.AlirEdge
 import org.sireum.alir.ControlFlowGraph
@@ -11,17 +11,19 @@ import org.sireum.amandroid.cache.AndroidCacheFile
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
-import org.sireum.amandroid.objectFlowAnalysis._
 import scala.collection.JavaConversions._
-import org.sireum.amandroid.util.CombinationIterator
 import org.sireum.amandroid.util.SignatureParser
-import org.sireum.pilar.parser.PilarParser
+import org.sireum.amandroid.scfg.CompressedControlFlowGraph
+import org.sireum.amandroid.scfg.SystemControlFlowGraph
+import org.sireum.amandroid.scfg.sCfg
+import org.sireum.amandroid.objectFlowAnalysis._
 
 
-class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLabel] {
+class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
 
   type Edge = AlirEdge[Node]
   
+  var appInfo : PrepareApp = null
   val pstMap : MMap[ResourceUri, ProcedureSymbolTable] = mmapEmpty
   var processed : MMap[ResourceUri, PointProc] = null
   var cfgs : MMap[ResourceUri, ControlFlowGraph[String]] = null
@@ -49,20 +51,20 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
             androidLibInfoTables : AndroidLibInfoTables,
             appInfo : PrepareApp,
             androidCache : AndroidCacheFile[String])
-   : (ObjectFlowGraph[Node], SystemControlFlowGraph[String]) = {
-    var result : (ObjectFlowGraph[Node], SystemControlFlowGraph[String]) = null
+   : (AndroidObjectFlowGraph[Node], SystemControlFlowGraph[String]) = {
+    var result : (AndroidObjectFlowGraph[Node], SystemControlFlowGraph[String]) = null
+    this.appInfo = appInfo
     this.cfgs = cfgs
     this.rdas = rdas
     this.cCfgs = cCfgs
     this.androidLibInfoTables = androidLibInfoTables
     this.androidCache = androidCache
-    var entryPoint : ResourceUri = getEntryPoint(psts, appInfo)
-    println("entry point = " + entryPoint)
+    var entryPoint : ResourceUri = getEntryPoint(psts)
     if(entryPoint == null){
       System.err.println("Cannot find the entry point of the app.")
       return null
     }
-    val ofg = new ObjectFlowGraph[Node]
+    val ofg = new AndroidObjectFlowGraph[Node]
     ofg.setIntentDB(appInfo.getIntentDB)
     ofg.setEntryPoints(appInfo.getEntryPoints)
     val sCfg = new sCfg[String]
@@ -82,9 +84,9 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
 //      }
 //    )
     println("processed--->" + processed.size)
-    println("arrayrepo------>" + result._1.arrayRepo)
-    println("globalrepo------>" + result._1.globalDefRepo)
-   // println("fieldrepo----->" + result._1.iFieldDefRepo)
+//    println("arrayrepo------>" + result._1.arrayRepo)
+//    println("globalrepo------>" + result._1.globalDefRepo)
+//    println("fieldrepo----->" + result._1.iFieldDefRepo)
     val f = new File(System.getProperty("user.home") + "/Desktop/ofg.dot")
     val o = new FileOutputStream(f)
     val w = new OutputStreamWriter(o)
@@ -97,9 +99,9 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
     result
   }
   
-  def getEntryPoint(psts : Seq[ProcedureSymbolTable], appInfo : PrepareApp) : ResourceUri = {
+  def getEntryPoint(psts : Seq[ProcedureSymbolTable]) : ResourceUri = {
     var entryPoint : ResourceUri = null
-    val entryName = appInfo.getMainEntryName
+    val entryName = this.appInfo.getMainEntryName
     psts.foreach(
       pst =>{
         if(pst.procedureUri.contains(entryName)) entryPoint = pst.procedureUri
@@ -113,18 +115,24 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
             cfg : ControlFlowGraph[String],
             rda : ReachingDefinitionAnalysis.Result,
             cCfg : CompressedControlFlowGraph[String],
-            ofg : ObjectFlowGraph[Node],
+            ofg : AndroidObjectFlowGraph[Node],
             sCfg : SystemControlFlowGraph[String]) : Unit = {
     val points = new PointsCollector[Node]().points(pst, ofg)
     ofg.points ++= points
     setProcessed(points, pst.procedureUri)
     ofg.constructGraph(points, cfg, rda)
     sCfg.collectionCCfgToBaseGraph(pst.procedureUri, cCfg)
-    fix(ofg, sCfg)
-    doIccOperation(ofg, sCfg)
+    overallFix(ofg, sCfg)
   }
   
-  def fix(ofg : ObjectFlowGraph[Node],
+  def overallFix(ofg : AndroidObjectFlowGraph[Node],
+		  					 sCfg : SystemControlFlowGraph[String]) : Unit = {
+    do{
+    fix(ofg, sCfg)
+    }while(checkAndDoIccOperation(ofg, sCfg))
+  }
+  
+  def fix(ofg : AndroidObjectFlowGraph[Node],
 		  		sCfg : SystemControlFlowGraph[String]) : Unit = {
     while (!ofg.worklist.isEmpty) {
       //for construct and extend graph for static method invocation 
@@ -188,21 +196,38 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
     }
   }
   
-  def doIccOperation(ofg : ObjectFlowGraph[Node], sCfg : SystemControlFlowGraph[String]) = {
-    val targetSigs = ofg.doIccOperation
-    if(targetSigs != null){
+  def checkAndDoIccOperation(ofg : AndroidObjectFlowGraph[Node], sCfg : SystemControlFlowGraph[String]) : Boolean = {
+    var flag = true
+    val result = ofg.doIccOperation(this.appInfo.getDummyMainSigMap)
+    if(result != null){
+      val (pi, targetSigs) = result
 	    targetSigs.foreach{
 	      targetSig =>
 	        val targetUri = androidLibInfoTables.getProcedureUriBySignature(targetSig)
 	        if(targetUri != null){
-	          val cfg = cfgs(targetUri)
-				    val rda = rdas(targetUri)
-				    val cCfg = cCfgs(targetUri)
-				    val pst = pstMap(targetUri)
-				    doOFA(pst, cfg, rda, cCfg, ofg, sCfg)
+	          if(!processed.contains(targetUri)){
+		          val points : MList[Point] = mlistEmpty
+		          val cfg = cfgs(targetUri)
+					    val rda = rdas(targetUri)
+					    val cCfg = cCfgs(targetUri)
+					    val pst = pstMap(targetUri)
+	//				    doOFA(pst, cfg, rda, cCfg, ofg, sCfg)
+			        points ++= new PointsCollector[Node]().points(pst, ofg)
+			        ofg.points ++= points
+			        setProcessed(points, targetUri)
+			        ofg.constructGraph(points, cfg, rda)
+			        sCfg.collectionCCfgToBaseGraph(targetUri, cCfg)
+	          }
+	          if(processed.contains(targetUri)){
+			        val procPoint = processed(targetUri)
+				      require(procPoint != null)
+				      ofg.extendGraphForIcc(procPoint, pi)
+				      sCfg.extendGraph(targetUri, pi.owner, pi.locationUri, pi.locationIndex)
+	          }
 	        }
 	    }
-    }
+    } else flag = false
+    flag
   }
   
   def doSpecialOperation(ofg : ObjectFlowGraph[Node], typ : String) = {
@@ -251,29 +276,24 @@ class ObjectFlowGraphAndSystemControlFlowGraphBuilder[Node <: OfaNode, VirtualLa
   // callee is signature
   def extendGraphWithConstructGraph(callee : ResourceUri, 
       															pi : PointI, 
-      															ofg : ObjectFlowGraph[Node], 
+      															ofg : AndroidObjectFlowGraph[Node], 
       															sCfg : SystemControlFlowGraph[String]) = {
     val points : MList[Point] = mlistEmpty
     val calleeSig : ResourceUri = androidLibInfoTables.getProcedureSignatureByUri(callee)
-    if(callee.contains(".intern")) 
-      println("signature--->" + (calleeSig, processed.contains(callee)))
-    if(!processed.contains(callee)){
-      if(ofg.isStringOperation(calleeSig)){
-        if(new SignatureParser(calleeSig).getParamSig.isReturnNonNomal){
-          val calleeOfg = androidCache.load[ObjectFlowGraph[Node]](callee, "ofg")
-          processed(callee) = ofg.combineSpecialOfg(calleeSig, calleeOfg, "STRING")
-        }
-      } else if(ofg.isNativeOperation(androidLibInfoTables.getAccessFlag(callee))) {
-        if(new SignatureParser(calleeSig).getParamSig.isReturnNonNomal){
-          val calleeOfg = androidCache.load[ObjectFlowGraph[Node]](callee, "ofg")
-          processed(callee) = ofg.combineSpecialOfg(calleeSig, calleeOfg, "NATIVE")
-        }
-      } else if(ofg.isIccOperation(calleeSig, androidLibInfoTables)) {
-        var paramNodes = Map(0 -> ofg.getNode(pi.recv))
-        paramNodes ++= pi.args.map{case (k, v) => (k + 1, ofg.getNode(v))}.toMap
-        ofg.iccOperationTracker(calleeSig) = paramNodes
-       // println("in fix: ofg.iccOperationTracker = " + ofg.iccOperationTracker + " and paramNodes = " + paramNodes)
-      } else if(pstMap.contains(callee)){
+    if(ofg.isStringOperation(calleeSig)){
+      if(new SignatureParser(calleeSig).getParamSig.isReturnNonNomal){
+        val calleeOfg = androidCache.load[ObjectFlowGraph[Node]](callee, "ofg")
+        processed(callee) = ofg.combineSpecialOfg(calleeSig, calleeOfg, "STRING")
+      }
+    } else if(ofg.isNativeOperation(androidLibInfoTables.getAccessFlag(callee))) {
+      if(new SignatureParser(calleeSig).getParamSig.isReturnNonNomal){
+        val calleeOfg = androidCache.load[ObjectFlowGraph[Node]](callee, "ofg")
+        processed(callee) = ofg.combineSpecialOfg(calleeSig, calleeOfg, "NATIVE")
+      }
+    } else if(ofg.isIccOperation(calleeSig, androidLibInfoTables)) {
+      ofg.setIccOperationTracker(calleeSig, pi)
+    } else if(!processed.contains(callee)){
+      if(pstMap.contains(callee)){
         val cfg = cfgs(callee)
         val rda = rdas(callee)
         val cCfg = cCfgs(callee)

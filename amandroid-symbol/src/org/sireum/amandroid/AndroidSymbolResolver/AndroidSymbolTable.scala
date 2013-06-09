@@ -202,20 +202,20 @@ object AndroidSymbolTable {
       }
     }
     val newStp = minePackageElements(changedOrAddedModels, stpConstructor, parallel)
-    
     val tablesOpt = if(shouldBuildLibInfoTables) Some(resolveVirtualMethod(newStp)) else None
     H.combine(stp, newStp)
     models ++= changedOrAddedModels
     resolvePackageElements(models.toList, stp, parallel)
+    
     fixProcedureSymbolTables(stp, newStp.tables.procedureAbsTable.keySet.toSeq, parallel)
     tablesOpt match {
       case Some(tables) =>
         println("before merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
 		    tables.mergeWith(existingAndroidLibInfoTables)
 		    println("after merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
-		    (stp.toSymbolTable, Some(tables))
+		    (stp.toSymbolTable, Some(tables), newStp.tables.procedureAbsTable.keySet)
       case None =>
-        (stp.toSymbolTable, Some(existingAndroidLibInfoTables))
+        (stp.toSymbolTable, Some(existingAndroidLibInfoTables), newStp.tables.procedureAbsTable.keySet)
     }
   }
 }

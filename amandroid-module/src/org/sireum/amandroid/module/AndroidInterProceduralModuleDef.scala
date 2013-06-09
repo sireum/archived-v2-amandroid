@@ -5,14 +5,14 @@ import org.sireum.pipeline.PipelineJobModuleInfo
 import org.sireum.pipeline.PipelineStage
 import org.sireum.pipeline.PipelineConfiguration
 import org.sireum.util._
-import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph
-import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.scfg.SystemControlFlowGraph
-import org.sireum.amandroid.scfg.ObjectFlowGraphAndSystemControlFlowGraphBuilder
 import org.sireum.pipeline.ErrorneousModulesThrowable
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
 import org.sireum.alir.ReachingDefinitionAnalysis
+import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidObjectFlowGraph
+import org.sireum.amandroid.objectFlowAnalysis.OfaNode
+import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidOfgAndScfgBuilder
 
 class AndroidInterProceduralModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) 
 extends AndroidInterProceduralModule with ImplicitLogging {
@@ -86,10 +86,10 @@ extends AndroidInterProceduralModule with ImplicitLogging {
 }
 
 class OfaSCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends OfaSCfgModule {
-  var result : (ObjectFlowGraph[OfaNode], SystemControlFlowGraph[String]) = null
+  var result : (AndroidObjectFlowGraph[OfaNode], SystemControlFlowGraph[String]) = null
   this.androidCache match{
     case Some(ac) =>
-      result = new ObjectFlowGraphAndSystemControlFlowGraphBuilder[OfaNode, String].apply(this.procedureSymbolTables, this.cfgs, this.rdas, this.cCfgs, this.androidLibInfoTables, this.appInfo, ac)
+      result = new AndroidOfgAndScfgBuilder[OfaNode, String].apply(this.procedureSymbolTables, this.cfgs, this.rdas, this.cCfgs, this.androidLibInfoTables, this.appInfo, ac)
     case None =>
   }
   this.OFAsCfg_=(result)

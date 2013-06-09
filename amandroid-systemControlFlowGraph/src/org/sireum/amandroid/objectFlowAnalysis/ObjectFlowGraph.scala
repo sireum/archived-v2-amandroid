@@ -1,30 +1,27 @@
 package org.sireum.amandroid.objectFlowAnalysis
 
-import org.sireum.alir.AlirSuccPredAccesses
 import org.sireum.util._
 import org.sireum.alir.AlirGraph
+import org.sireum.alir.AlirEdgeAccesses
+import org.sireum.alir.AlirSuccPredAccesses
+import org.sireum.alir.ControlFlowGraph
+import org.sireum.alir.ReachingDefinitionAnalysis
 import org.jgrapht.graph.DirectedMultigraph
 import org.jgrapht.EdgeFactory
 import org.sireum.alir.AlirEdge
+import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
+import org.jgrapht.ext.VertexNameProvider
 import java.io.Writer
 import org.jgrapht.ext.DOTExporter
-import org.jgrapht.ext.VertexNameProvider
-import org.sireum.alir.AlirEdgeAccesses
-import java.util.regex.Matcher
-import org.sireum.alir.ReachingDefinitionAnalysis
-import org.sireum.alir.ControlFlowGraph
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
-import org.sireum.amandroid.interComponentCommunication.InterComponentCommunicationModel
 
-class ObjectFlowGraph[Node <: OfaNode] 
+abstract class ObjectFlowGraph[Node <: OfaNode] 
   extends AlirGraph[Node]
   with AlirEdgeAccesses[Node]
   with AlirSuccPredAccesses[Node]
+  with ObjectFlowRepo
   with ConstraintModel
   with StringAnalyseModel
-  with NativeMethodModel
-  with InterComponentCommunicationModel{
-
+  with NativeMethodModel{
   self=>
   
   protected val graph = new DirectedMultigraph(
@@ -89,46 +86,6 @@ class ObjectFlowGraph[Node <: OfaNode]
     val ps = ofg2.points.filter(p => if(p.isInstanceOf[PointProc])true else false)
     ps(0).asInstanceOf[PointProc]
   }
-  
-  /**
-   * combine special ofg into current ofg. (just combine proc point and relevant node)
-   */ 
-  def combineSpecialOfg(sig : ResourceUri, stringOfg : ObjectFlowGraph[Node], typ : String) : PointProc = {
-    val ps = stringOfg.points.filter(p => if(p.isInstanceOf[PointProc])true else false)
-    points ++= ps
-    val procP : PointProc = ps(0).asInstanceOf[PointProc]
-    collectNodes(procP)
-    if(typ.equals("STRING")){
-	    procP.retVar match {
-	      case Some(r) =>
-	        stringOperationTracker(sig) = (mlistEmpty, Some(getNode(r)))
-	      case None =>
-	        stringOperationTracker(sig) = (mlistEmpty, None)
-	    }
-	    
-	    procP.thisParamOpt match {
-	      case Some(p) => stringOperationTracker(sig)._1 += getNode(p)
-	      case None =>
-	    } 
-	    procP.params.toList.sortBy(f => f._1).foreach{case (k, v) => stringOperationTracker(sig)._1 += getNode(v)}
-    } else if(typ.equals("NATIVE")){
-      procP.retVar match {
-	      case Some(r) =>
-	        nativeOperationTracker(sig) = (mlistEmpty, Some(getNode(r)))
-	      case None =>
-	        nativeOperationTracker(sig) = (mlistEmpty, None)
-	    }
-	    
-	    procP.thisParamOpt match {
-	      case Some(p) => nativeOperationTracker(sig)._1 += getNode(p)
-	      case None =>
-	    } 
-	    procP.params.toList.sortBy(f => f._1).foreach{case (k, v) => nativeOperationTracker(sig)._1 += getNode(v)}
-    }
-    procP
-  }
-  
-  
   
   /**
    * collect all array variables inside one procedure
@@ -770,7 +727,6 @@ class ObjectFlowGraph[Node <: OfaNode]
       }
     }
   }
-  
 }
 
 sealed abstract class OfaNode extends PropertyProvider {

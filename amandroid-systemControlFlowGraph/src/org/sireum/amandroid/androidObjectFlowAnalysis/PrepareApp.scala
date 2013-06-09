@@ -1,4 +1,4 @@
-package org.sireum.amandroid.objectFlowAnalysis
+package org.sireum.amandroid.androidObjectFlowAnalysis
 
 import org.sireum.util._
 import org.sireum.amandroid.parser.LayoutControl
@@ -16,11 +16,11 @@ import org.sireum.amandroid.parser.IntentDataBase
 
 class PrepareApp(apkFileLocation : String) {
   
-    private val DEBUG = true
+  private val DEBUG = true
 //	private var sinks : Set[AndroidMethod] = Set()
 //	private var sources : Set[AndroidMethod] = Set()
 	private var callbackMethods : Map[ResourceUri, MSet[ResourceUri]] = Map()
-    private var mainComponent : String = null
+  private var mainComponent : String = null
 	private var entrypoints : Set[String] = Set()
 	private var layoutControls : Map[Integer, LayoutControl] = Map()
 	private var resourcePackages : List[ARSCFileParser.ResPackage] = List()
@@ -31,6 +31,15 @@ class PrepareApp(apkFileLocation : String) {
 	private var psts : Seq[ProcedureSymbolTable] = Seq()
 	private var intentDB : IntentDataBase = null
 
+	/**
+	 * Map from record name to it's dummyMain procedure code.
+	 */
+	private var dummyMainCodeMap : Map[String, String] = Map()
+	/**
+	 * Map from record name to it's dummyMain procedure signature.
+	 */
+	private var dummyMainSigMap : Map[String, String] = Map()
+	
 //	def printSinks() = {
 //		println("Sinks:")
 //		for (am <- sinks) {
@@ -47,9 +56,8 @@ class PrepareApp(apkFileLocation : String) {
 //		}
 //		println("End of Sources")
 //	}
-
 	def printDummyMains() =
-	  dummyMainMap.foreach{case(k, v) => println("dummyMain for " + k + "\n" + v)}
+	  dummyMainCodeMap.foreach{case(k, v) => println("dummyMain for " + k + "\n" + v)}
 	
 	def printEntrypoints() = {
 		if (this.entrypoints == null)
@@ -76,9 +84,14 @@ class PrepareApp(apkFileLocation : String) {
 	
 	def getIntentDB() = this.intentDB
 	def getEntryPoints() = this.entrypoints
-	def getMainComponent() = this.mainComponent
 	
 	def getDummyMainMap() = this.dummyMainMap
+	
+	def getMainComponent() = this.mainComponent
+	
+	def getDummyMainCodeMap() = this.dummyMainCodeMap
+	
+	def getDummyMainSigMap() = this.dummyMainSigMap
 	
 	private def filterMainComponent(intentDB : IntentDataBase) : String = {
 	  var mainComponent : String = null
@@ -116,7 +129,9 @@ class PrepareApp(apkFileLocation : String) {
 		dmGen.setCurrentComponent(recordName)
 		dmGen.setCallbackFunctions(this.callbackMethods)
 		dmGen.setAndroidLibInfoTables(this.libInfoTables)
-		dummyMainMap += (recordName -> dmGen.generate)
+    val (sig, code) = dmGen.generateWithParam(List(AndroidEntryPointConstants.INTENT_NAME))
+	  this.dummyMainSigMap += (recordName -> sig)
+	  this.dummyMainCodeMap += (recordName -> code)
 	}
 	
 	def calculateSourcesSinksEntrypoints(sourceSinkFile : String) = {

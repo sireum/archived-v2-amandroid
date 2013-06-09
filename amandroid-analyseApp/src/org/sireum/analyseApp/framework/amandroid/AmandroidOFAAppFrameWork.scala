@@ -19,7 +19,7 @@ import org.sireum.amandroid.scfg.CompressedControlFlowGraph
 import org.sireum.amandroid.cache.AndroidCacheFile
 import org.sireum.amandroid.module.AndroidInterProceduralModule
 import org.sireum.amandroid.module.AndroidApplicationPrepareModule
-import org.sireum.amandroid.module.AndroidFixPilarSymbolResolverModule
+import org.sireum.amandroid.module.AndroidFixIntraProceduralModule
 
 // sankar introduces the following framework which adds one stage on top of AmandroidParserTestFrameWork 
 
@@ -223,88 +223,88 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
     
     protected val apkPipeline =
 	    PipelineConfiguration(
-	      "App analysis pipeline",
-	      false,
-	      PipelineStage(
-	        "dex2pilar stage",
-	        false,
-	        Dex2PilarWrapperModule
-	      ),
-	      PipelineStage(
-	        "Chunking pilar parsing stage",
-	        false,
-	        ChunkingPilarParserModule
-	      ),
-	      PipelineStage(
-	        "PilarAndroidSymbolResolverModule stage",
-	        false,
-	        PilarAndroidSymbolResolverModule
-	      )
-	      ,
-	      PipelineStage(
-	        "AndroidApplicationPrepareModule stage",
-	        false,
-	        AndroidApplicationPrepareModule
-	      )
-	      ,
-	      PipelineStage(
-	        "AndroidFixPilarSymbolResolverModule stage",
-	        false,
-	        AndroidFixPilarSymbolResolverModule
-	      )
-	      ,
-	      PipelineStage(
-	      "Android IntraProcedural Analysis",
-	      false,
-	      AndroidIntraProceduralModule
-	      )
-	      ,
-	      PipelineStage(
-	      "Android InterProcedural Analysis",
-	      false,
-	      AndroidInterProceduralModule
-	      )
-	    )
+      "App analysis pipeline",
+      false,
+      PipelineStage(
+        "dex2pilar stage",
+        false,
+        Dex2PilarWrapperModule
+      ),
+      PipelineStage(
+        "Chunking pilar parsing stage",
+        false,
+        ChunkingPilarParserModule
+      ),
+      PipelineStage(
+        "PilarAndroidSymbolResolverModule stage",
+        false,
+        PilarAndroidSymbolResolverModule
+      )
+      ,
+      PipelineStage(
+      "Android IntraProcedural Analysis",
+      false,
+      AndroidIntraProceduralModule
+      )
+      ,
+      PipelineStage(
+        "AndroidApplicationPrepareModule stage",
+        false,
+        AndroidApplicationPrepareModule
+      )
+      ,
+      PipelineStage(
+        "AndroidFixIntraProceduralModule stage",
+        false,
+        AndroidFixIntraProceduralModule
+      )
+      ,
+      PipelineStage(
+      "Android InterProcedural Analysis",
+      false,
+      AndroidInterProceduralModule
+      )
+    )
 	    
 	 protected val pilarPipeline =
 	    PipelineConfiguration(
-	      "App analysis pipeline",
-	      false,
-	      PipelineStage(
-	        "Chunking pilar parsing stage",
-	        false,
-	        ChunkingPilarParserModule
-	      ),
-	      PipelineStage(
-	        "PilarAndroidSymbolResolverModule stage",
-	        false,
-	        PilarAndroidSymbolResolverModule
-	      )
-	      ,
-	      PipelineStage(
-	        "AndroidApplicationPrepareModule stage",
-	        false,
-	        AndroidApplicationPrepareModule
-	      )
-	      ,
-	      PipelineStage(
-	        "AndroidFixPilarSymbolResolverModule stage",
-	        false,
-	        AndroidFixPilarSymbolResolverModule
-	      )
-	      ,
-	      PipelineStage(
-	      "Android IntraProcedural Analysis",
-	      false,
-	      AndroidIntraProceduralModule
-	      )
-	      ,
-	      PipelineStage(
-	      "Android InterProcedural Analysis",
-	      false,
-	      AndroidInterProceduralModule
-	      )
-	    )   
+      "App analysis pipeline",
+      false,
+      PipelineStage(
+        "Chunking pilar parsing stage",
+        false,
+        ChunkingPilarParserModule
+      ),
+      PipelineStage(
+        "PilarAndroidSymbolResolverModule stage",
+        false,
+        PilarAndroidSymbolResolverModule
+      )
+      ,
+      PipelineStage(
+      "Android IntraProcedural Analysis",
+      false,
+      AndroidIntraProceduralModule
+      )
+      ,
+      PipelineStage(
+        "AndroidApplicationPrepareModule stage",
+        false,
+        AndroidApplicationPrepareModule
+      )
+      ,
+      PipelineStage(
+        "AndroidFixIntraProceduralModule stage",
+        false,
+        AndroidFixIntraProceduralModule
+      )
+      ,
+      PipelineStage(
+      "Android InterProcedural Analysis",
+      false,
+      AndroidInterProceduralModule
+      )
+    )
     
   }
 

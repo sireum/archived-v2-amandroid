@@ -3,53 +3,57 @@ package org.sireum.amandroid.interComponentCommunication
 import org.sireum.amandroid.util.CombinationIterator
 import org.sireum.util._
 import org.sireum.amandroid.util.SignatureParser
-import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.androidConstants.AndroidConstants
 import org.sireum.amandroid.parser.IntentDataBase
 import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowRepo
+import org.sireum.amandroid.objectFlowAnalysis.PointI
+import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph
+import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 
-
-trait InterComponentCommunicationModel extends ObjectFlowRepo {
-  /**
+trait InterComponentCommunicationModel[Node <: OfaNode] extends ObjectFlowGraph[Node] {
+	/**
    * contain all inter component communication method call signatures and caller parameter nodes
    */
-  var iccOperationTracker : MMap[String, Map[Int, OfaNode]] = mmapEmpty
+  private var iccOperationTracker : Map[String, PointI] = Map()
   private var entryPoints : Set[String] = Set()
   private var intentDB : IntentDataBase = null
   def setEntryPoints(eps : Set[String]) = this.entryPoints = eps
   def setIntentDB(db : IntentDataBase) = this.intentDB = db
- 
+
+  def setIccOperationTracker(sig : String, pi : PointI) = iccOperationTracker += (sig -> pi)
   def checkIccOperation(sig : String) : Boolean = {
     var flag : Boolean = true
-    val nodes = iccOperationTracker(sig)
-    if(nodes.size < 2){
+    val pi = iccOperationTracker(sig)
+    if(pi.args.size < 1){
       System.err.println("Ofg param nodes number is not enough for: " + sig)
       flag = false
     } else {
-      if(nodes(1).getProperty[MMap[ResourceUri, ResourceUri]]("ValueSet").isEmpty){
+      val intentNode = getNode(pi.args(0))
+      if(intentNode.getProperty[MMap[ResourceUri, ResourceUri]]("ValueSet").isEmpty){
   		  flag = false
   		}
     }
     flag
   }
   
-  def doIccOperation() : Set[String] = {
-    var result : Set[String] = null
+  def doIccOperation(dummyMainMap : Map[String, String]) : (PointI, Set[String]) = {
+    var result : (PointI, Set[String]) = null
     iccOperationTracker.map{
       case (k, v) =>
         println("(k, v) = " + (k, v))
         if(checkIccOperation(k)){
-	        val intentValueSet : MMap[ResourceUri, ResourceUri] = v(1).getProperty[MMap[ResourceUri, ResourceUri]]("ValueSet")
+          val intentNode = getNode(v.args(0))
+	        val intentValueSet : MMap[ResourceUri, ResourceUri] = intentNode.getProperty[MMap[ResourceUri, ResourceUri]]("ValueSet")
 	        hasExplicitTarget(intentValueSet) match {
 	          case Some(targets) =>
 	            //explicit case
-	            result = targets.map{name => getDummyMain(name)}.toSet
+	            result = (v, targets.map{name => dummyMainMap.getOrElse(name, null)}.filter{item => if(item != null)true else false}.toSet)
 	          case None =>
 	            hasImplicitTarget(intentValueSet) match {
 	              case Some(targets) =>	                
 	            //implicit case
-	                result = targets.map{name => getDummyMain(name)}.toSet
+	                result = (v, targets.map{name => dummyMainMap.getOrElse(name, null)}.filter{item => if(item != null)true else false}.toSet)
 	              case None =>
 	                System.err.println("problem: received Intent is not explicit neither implicit")
 	            }
@@ -58,12 +62,8 @@ trait InterComponentCommunicationModel extends ObjectFlowRepo {
           System.err.println("Inter-Component Communication connection failed for: " + k + ", because of intent object flow error.")
         }
     }
-    iccOperationTracker = mmapEmpty
+    iccOperationTracker = Map()
     result
-  }
-  
-  private def getDummyMain(rName : String) : String = {
-    rName.replaceAll("\\[\\|", "[|L").replaceAll(":", "/").replaceAll("\\|\\]", ";.dummyMain:()V|]")
   }
   
   def hasExplicitTarget(intentValueSet : MMap[ResourceUri, ResourceUri]) : Option[Set[String]] = {

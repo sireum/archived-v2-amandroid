@@ -15,6 +15,12 @@ trait AndroidLibInfoTables {
   def getRecordName(recordUri : ResourceUri) : ResourceUri
   def getParents(recordUri : ResourceUri) : Set[ResourceUri]  // returns the parent-recordUris of recordUri
   def getAncestors(recordUri : ResourceUri) : Set[ResourceUri]
+  /**
+   * Get Procedure resource uri by signature. If signature does not exist in the repo, get
+   * it's record name and get it's sub signature, then find it in it's ancestors.
+   * @param sig Procedure signature
+   * @return Procedure resource uri
+   */
   def getProcedureUriBySignature(sig : String) : ResourceUri
   def getProcedureSignatureByUri(pUri : ResourceUri) : String
   def getProcedureUrisByRecordUri(recordUri : ResourceUri) : Set[ResourceUri]
@@ -28,10 +34,10 @@ trait AndroidLibInfoTables {
    * @return Access flag
    */
   def getAccessFlag(procedureUri : ResourceUri) : String
-  def isConstructor(procedureUri : String) : Boolean
-  def isStaticMethod(procedureUri : String) : Boolean
-  def isVirtualMethod(procedureUri : String) : Boolean
-  def isOverrider(procedureUri1 : String, procedureUri2 : String) : Boolean  // checks if a pUri is overrider of another pUri
+  def isConstructor(procedureUri : ResourceUri) : Boolean
+  def isStaticMethod(procedureUri : ResourceUri) : Boolean
+  def isVirtualMethod(procedureUri : ResourceUri) : Boolean
+  def isOverrider(procedureUri1 : ResourceUri, procedureUri2 : ResourceUri) : Boolean  // checks if a pUri is overrider of another pUri
   def isAbstract(recordUri : ResourceUri) : Boolean 
   def mergeWith(anotherVmTables : AndroidLibInfoTables)
   def containsRecord(recordName : String) : Boolean

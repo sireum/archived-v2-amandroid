@@ -1,4 +1,4 @@
-package org.sireum.amandroid.objectFlowAnalysis
+package org.sireum.amandroid.androidObjectFlowAnalysis
 
 import org.sireum.pilar.symbol.SymbolTable
 import org.sireum.alir.DefRef
@@ -9,6 +9,7 @@ import org.sireum.alir.Slot
 import org.sireum.pilar.symbol.H
 import org.sireum.alir.VarSlot
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
+import org.sireum.pilar.symbol.Symbol.pp2r
 
 
 final class AndroidVarAccesses(st: SymbolTable) extends VarAccesses {

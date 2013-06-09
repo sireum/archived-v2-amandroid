@@ -37,19 +37,19 @@ class AmandroidOFAApp extends AmandroidOFAAppFrameWork{
   aCache.setValueSerializer(serializer, unSerializer)
   aCache.setCacheSize(100000)
   aCache.setRemovePercent(20)
-  
-//  AmandroidFiles.apkModelFiles.foreach(
-//      {fileUri=>
-//        if(fileUri.indexOf("Wfg") > 0)
-//    	  Analyzing title fileUri file(fileUri, libInfoTables, aCache)
-//      }  
-//  )
-  
+
+  AmandroidFiles.apkModelFiles.foreach(
+      {fileUri=>
+        if(fileUri.indexOf("0eb") > 0)
+    	  Analyzing title fileUri file(fileUri, libInfoTables, aCache, true)
+      }  
+  )
+ 
 //println("libInfoDir = " + libInfoDir)
   
-  AmandroidFiles.pilarModelFiles.
-  foreach{fileUri=>
-     if(fileUri.indexOf("Wfg") > 0)
-      Analyzing title fileUri file(fileUri, libInfoTables, aCache, false)
-  }
+//  AmandroidFiles.pilarModelFiles.
+//  foreach{fileUri=>
+//     if(fileUri.indexOf("Wfg") > 0)
+//      Analyzing title fileUri file(fileUri, libInfoTables, aCache, false)
+//  }
 }

@@ -9,11 +9,10 @@ import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.scfg.{CompressedControlFlowGraph, SystemControlFlowGraph}
 import org.sireum.pilar.ast.{LocationDecl, CatchClause}
 import org.sireum.amandroid.cache.AndroidCacheFile
-import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph
-import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.alir._
 import org.sireum.pilar.symbol._
-import org.sireum.amandroid.objectFlowAnalysis.PrepareApp
+import org.sireum.amandroid.objectFlowAnalysis.OfaNode
+import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidObjectFlowGraph
 
 
 /*
@@ -31,7 +30,7 @@ object AndroidIntraProcedural {
   type RDA = ReachingDefinitionAnalysis.Result  //adding for rda building
   
   type CCFG = CompressedControlFlowGraph[VirtualLabel]
-  type OFG = ObjectFlowGraph[OfaNode]
+  type OFG = AndroidObjectFlowGraph[OfaNode]
   
   final case class AndroidIntraAnalysisResult(
     pool : AlirIntraProceduralGraph.NodePool,
@@ -88,7 +87,7 @@ case class AndroidIntraProcedural(
     { (_, _) => (Array.empty[CatchClause], false) },
     
 //modified for building RDA       
-  @Input defRef : (SymbolTable, AndroidLibInfoTables) => DefRef = { (st, alit) => new org.sireum.amandroid.objectFlowAnalysis.AndroidDefRef(st, new org.sireum.amandroid.objectFlowAnalysis.AndroidVarAccesses(st), alit) },
+  @Input defRef : (SymbolTable, AndroidLibInfoTables) => DefRef = { (st, alit) => new org.sireum.amandroid.androidObjectFlowAnalysis.AndroidDefRef(st, new org.sireum.amandroid.androidObjectFlowAnalysis.AndroidVarAccesses(st), alit) },
 
   @Input isInputOutputParamPredicate : ProcedureSymbolTable => (ResourceUri => java.lang.Boolean, ResourceUri => java.lang.Boolean) = { pst =>
     val params = pst.params.toSet[ResourceUri]
@@ -136,7 +135,8 @@ case class Rda(
   @Input
   androidLibInfoTables : AndroidLibInfoTables,
   
-  @Input defRef : (SymbolTable, AndroidLibInfoTables) => DefRef = { (st, alit) => new org.sireum.amandroid.objectFlowAnalysis.AndroidDefRef(st, new org.sireum.amandroid.objectFlowAnalysis.AndroidVarAccesses(st), alit) },
+
+  @Input defRef : (SymbolTable, AndroidLibInfoTables) => DefRef = { (st, alit) => new org.sireum.amandroid.androidObjectFlowAnalysis.AndroidDefRef(st, new org.sireum.amandroid.androidObjectFlowAnalysis.AndroidVarAccesses(st), alit) },
 
   @Input isInputOutputParamPredicate : ProcedureSymbolTable => (ResourceUri => java.lang.Boolean, ResourceUri => java.lang.Boolean),
 

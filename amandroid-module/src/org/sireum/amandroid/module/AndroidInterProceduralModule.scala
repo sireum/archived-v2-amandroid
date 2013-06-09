@@ -7,9 +7,9 @@ import org.sireum.util._
 import org.sireum.pipeline._
 import java.lang.String
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
+import org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp
 import org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisResult
 import org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult
-import org.sireum.amandroid.objectFlowAnalysis.PrepareApp
 import org.sireum.pilar.symbol.SymbolTable
 import scala.Option
 import scala.collection.mutable.Map
@@ -256,9 +256,9 @@ object AndroidInterProceduralModule extends PipelineModule {
 
     _appInfo match{
       case Some(x) =>
-        if(!x.isInstanceOf[org.sireum.amandroid.objectFlowAnalysis.PrepareApp]){
+        if(!x.isInstanceOf[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]){
           tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'appInfo'.  Expecting 'org.sireum.amandroid.objectFlowAnalysis.PrepareApp' but found '" + x.getClass.toString + "'")
+            "Input error for '" + this.title + "': Wrong type found for 'appInfo'.  Expecting 'org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp' but found '" + x.getClass.toString + "'")
         }
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
@@ -399,15 +399,15 @@ object AndroidInterProceduralModule extends PipelineModule {
     return options
   }
 
-  def getAppInfo (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.objectFlowAnalysis.PrepareApp = {
+  def getAppInfo (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp = {
     if (options.contains(AndroidInterProceduralModule.globalAppInfoKey)) {
-       return options(AndroidInterProceduralModule.globalAppInfoKey).asInstanceOf[org.sireum.amandroid.objectFlowAnalysis.PrepareApp]
+       return options(AndroidInterProceduralModule.globalAppInfoKey).asInstanceOf[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def setAppInfo (options : MMap[Property.Key, Any], appInfo : org.sireum.amandroid.objectFlowAnalysis.PrepareApp) : MMap[Property.Key, Any] = {
+  def setAppInfo (options : MMap[Property.Key, Any], appInfo : org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp) : MMap[Property.Key, Any] = {
 
     options(AndroidInterProceduralModule.globalAppInfoKey) = appInfo
 
@@ -452,7 +452,7 @@ object AndroidInterProceduralModule extends PipelineModule {
       def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = AndroidInterProceduralModule.getAndroidCache(job.propertyMap)
       def shouldBuildOFAsCfg : scala.Boolean = AndroidInterProceduralModule.getShouldBuildOFAsCfg(job.propertyMap)
       def APIpermOpt : scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]] = AndroidInterProceduralModule.getAPIpermOpt(job.propertyMap)
-      def appInfo : org.sireum.amandroid.objectFlowAnalysis.PrepareApp = AndroidInterProceduralModule.getAppInfo(job.propertyMap)
+      def appInfo : org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp = AndroidInterProceduralModule.getAppInfo(job.propertyMap)
       def intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult] = AndroidInterProceduralModule.getIntraResult(job.propertyMap)
       def interResult : org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisResult = AndroidInterProceduralModule.getInterResult(job.propertyMap)
     }
@@ -479,8 +479,8 @@ object AndroidInterProceduralModule extends PipelineModule {
       def APIpermOpt_=(APIpermOpt : scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]]) { AndroidInterProceduralModule.setAPIpermOpt(job.propertyMap, APIpermOpt) }
       def APIpermOpt : scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]] = AndroidInterProceduralModule.getAPIpermOpt(job.propertyMap)
 
-      def appInfo_=(appInfo : org.sireum.amandroid.objectFlowAnalysis.PrepareApp) { AndroidInterProceduralModule.setAppInfo(job.propertyMap, appInfo) }
-      def appInfo : org.sireum.amandroid.objectFlowAnalysis.PrepareApp = AndroidInterProceduralModule.getAppInfo(job.propertyMap)
+      def appInfo_=(appInfo : org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp) { AndroidInterProceduralModule.setAppInfo(job.propertyMap, appInfo) }
+      def appInfo : org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp = AndroidInterProceduralModule.getAppInfo(job.propertyMap)
 
       def intraResult_=(intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult]) { AndroidInterProceduralModule.setIntraResult(job.propertyMap, intraResult) }
       def intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult] = AndroidInterProceduralModule.getIntraResult(job.propertyMap)
@@ -506,7 +506,7 @@ trait AndroidInterProceduralModule {
 
   def APIpermOpt : scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]] = AndroidInterProceduralModule.getAPIpermOpt(job.propertyMap)
 
-  def appInfo : org.sireum.amandroid.objectFlowAnalysis.PrepareApp = AndroidInterProceduralModule.getAppInfo(job.propertyMap)
+  def appInfo : org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp = AndroidInterProceduralModule.getAppInfo(job.propertyMap)
 
   def intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult] = AndroidInterProceduralModule.getIntraResult(job.propertyMap)
 
