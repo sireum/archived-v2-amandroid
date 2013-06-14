@@ -17,11 +17,12 @@ object ManifestParser extends AbstractAndroidXMLParser{
 	private var entryPointsClasses : Set[String] = Set()
 	private var packageName = ""
 	private var permissions : Set[String] = Set()
-	private val intentDB : IntentDataBase = new IntentDataBase
+	private val intentFdb : IntentFilterDataBase = new IntentFilterDataBase
 	private var currentComponent = ""
+	private var currentIntentFilter: IntentFilter = null
 	
-	private def buildIntentDB(intent : IntentInfo) = {
-	  intentDB.updateIntentMap(intent)
+	private def buildIntentDB(intentFilter : IntentFilter) = {
+	  intentFdb.updateIntentFmap(intentFilter)
 	}
 	/**
 	 * Opens the given apk file and provides the given handler with a stream for
@@ -93,11 +94,14 @@ object ManifestParser extends AbstractAndroidXMLParser{
 								}
 							}
 						}
+						else if (tagName.equals("intent-filter")){
+						  this.currentIntentFilter = new IntentFilter(this.currentComponent)
+						  buildIntentDB(this.currentIntentFilter)
+						}
 						else if (tagName.equals("action")){
 						  val value = getAttributeValue(parser, "name")
-						  val intent = new IntentInfo(this.currentComponent)
-						  intent.setAction(value)
-						  buildIntentDB(intent)
+						  val intentF = this.currentIntentFilter
+						  intentF.setAction(value)						  
 						}
 						else if (tagName.equals("data")){
 						  val scheme = getAttributeValue(parser, "scheme")
@@ -107,9 +111,9 @@ object ManifestParser extends AbstractAndroidXMLParser{
 						  val pathPrefix = getAttributeValue(parser, "pathPrefix")
 						  val pathPattern = getAttributeValue(parser, "pathPattern")
 						  val mimeType = getAttributeValue(parser, "mimeType")
-						  val intent = new IntentInfo(this.currentComponent)
-						  intent.setData(scheme, host, port, path, pathPrefix, pathPattern, mimeType)
-						  buildIntentDB(intent)
+						  val intentF = this.currentIntentFilter
+						  intentF.setData(scheme, host, port, path, pathPrefix, pathPattern, mimeType)
+						  
 						}
 						else if (tagName.equals("uses-permission")) {
 							var permissionName = getAttributeValue(parser, "name")
@@ -206,5 +210,5 @@ object ManifestParser extends AbstractAndroidXMLParser{
 
 	def getPackageName = this.packageName
 	
-	def getIntentDB = this.intentDB
+	def getIntentDB = this.intentFdb
 }

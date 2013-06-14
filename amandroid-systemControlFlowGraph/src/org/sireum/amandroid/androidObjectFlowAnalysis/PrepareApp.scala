@@ -12,7 +12,7 @@ import org.sireum.amandroid.entryPointConstants.AndroidEntryPointConstants
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.amandroid.callGraph.CallGraphBuilder
 import org.sireum.amandroid.callGraph.CallGraph
-import org.sireum.amandroid.parser.IntentDataBase
+import org.sireum.amandroid.parser.IntentFilterDataBase
 
 class PrepareApp(apkFileLocation : String) {
   
@@ -28,7 +28,7 @@ class PrepareApp(apkFileLocation : String) {
 	private var taintWrapperFile : String = ""
 	private var libInfoTables : AndroidLibInfoTables = null
 	private var psts : Seq[ProcedureSymbolTable] = Seq()
-	private var intentDB : IntentDataBase = null
+	private var intentFdb : IntentFilterDataBase = null
 
 	/**
 	 * Map from record name to it's dummyMain procedure code.
@@ -81,7 +81,7 @@ class PrepareApp(apkFileLocation : String) {
 	  this.libInfoTables = libInfoTables
 	}
 	
-	def getIntentDB() = this.intentDB
+	def getIntentDB() = this.intentFdb
 	def getEntryPoints() = this.entrypoints
 		
 	def getMainComponent() = this.mainComponent
@@ -90,11 +90,11 @@ class PrepareApp(apkFileLocation : String) {
 	
 	def getDummyMainSigMap() = this.dummyMainSigMap
 	
-	private def filterMainComponent(intentDB : IntentDataBase) : String = {
+	private def filterMainComponent(intentFDB : IntentFilterDataBase) : String = {
 	  var mainComponent : String = null
 	  this.entrypoints.foreach{
 	    ep =>
-	      val actions = intentDB.getIntentActions(ep)
+	      val actions = intentFDB.getIntentActions(ep)
 	      if(actions != null){
 	        if(actions.contains(AndroidConstants.ACTION_MAIN)) mainComponent = ep
 	      }
@@ -137,7 +137,7 @@ class PrepareApp(apkFileLocation : String) {
 		ManifestParser.loadManifestFile(apkFileLocation)
 		this.appPackageName = ManifestParser.getPackageName
 		this.entrypoints = ManifestParser.getEntryPointClasses
-		this.intentDB = ManifestParser.getIntentDB
+		this.intentFdb = ManifestParser.getIntentDB
 		if(DEBUG){
 			println("entrypoints--->" + ManifestParser.getEntryPointClasses)
 		  println("packagename--->" + ManifestParser.getPackageName)

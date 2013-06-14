@@ -4,7 +4,7 @@ import org.sireum.amandroid.util.CombinationIterator
 import org.sireum.util._
 import org.sireum.amandroid.util.SignatureParser
 import org.sireum.amandroid.androidConstants.AndroidConstants
-import org.sireum.amandroid.parser.IntentDataBase
+import org.sireum.amandroid.parser.IntentFilterDataBase
 import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowRepo
 import org.sireum.amandroid.objectFlowAnalysis.PointI
 import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph
@@ -17,9 +17,9 @@ trait InterComponentCommunicationModel[Node <: OfaNode] extends ObjectFlowGraph[
    */
   private var iccOperationTracker : Map[String, PointI] = Map()
   private var entryPoints : Set[String] = Set()
-  private var intentDB : IntentDataBase = null
+  private var intentFdb : IntentFilterDataBase = null
   def setEntryPoints(eps : Set[String]) = this.entryPoints = eps
-  def setIntentDB(db : IntentDataBase) = this.intentDB = db
+  def setIntentFdb(db : IntentFilterDataBase) = this.intentFdb = db
 
   def setIccOperationTracker(sig : String, pi : PointI) = iccOperationTracker += (sig -> pi)
   def checkIccOperation(sig : String) : Boolean = {
@@ -94,9 +94,9 @@ trait InterComponentCommunicationModel[Node <: OfaNode] extends ObjectFlowGraph[
           val actionValueSet = intentFields(AndroidConstants.INTENT_ACTION)._2
           actionValueSet.keys.foreach{
             action =>
-              println("action = " + action)
               val comps = findComponents(action)
-              components ++= comps              
+              components ++= comps
+              println("action = " + action + ", found destination component as " + comps)
           }
         }
     }
@@ -111,7 +111,7 @@ trait InterComponentCommunicationModel[Node <: OfaNode] extends ObjectFlowGraph[
 	 
 	  entryPoints.foreach{
 	    ep =>
-	      val actions = intentDB.getIntentActions(ep)
+	      val actions = intentFdb.getIntentActions(ep)
 	      if(actions != null){
 	        if(actions.contains(action)) components += ep
 	      }

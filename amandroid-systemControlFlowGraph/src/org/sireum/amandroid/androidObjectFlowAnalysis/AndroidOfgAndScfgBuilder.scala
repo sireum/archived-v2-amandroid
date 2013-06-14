@@ -70,7 +70,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
 //      return null
 //    }
     val ofg = new AndroidObjectFlowGraph[Node]
-    ofg.setIntentDB(appInfo.getIntentDB)
+    ofg.setIntentFdb(appInfo.getIntentDB)
     ofg.setEntryPoints(appInfo.getEntryPoints)
     val sCfg = new sCfg[String]
     processed = mmapEmpty
