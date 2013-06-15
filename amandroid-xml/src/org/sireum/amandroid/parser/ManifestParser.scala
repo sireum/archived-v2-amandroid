@@ -101,7 +101,12 @@ object ManifestParser extends AbstractAndroidXMLParser{
 						else if (tagName.equals("action")){
 						  val value = getAttributeValue(parser, "name")
 						  val intentF = this.currentIntentFilter
-						  intentF.setAction(value)						  
+						  intentF.addAction(value)						  
+						}
+						else if (tagName.equals("category")){
+						  val value = getAttributeValue(parser, "name")
+						  val intentF = this.currentIntentFilter
+						  intentF.addCategory(value)						  
 						}
 						else if (tagName.equals("data")){
 						  val scheme = getAttributeValue(parser, "scheme")
@@ -112,7 +117,7 @@ object ManifestParser extends AbstractAndroidXMLParser{
 						  val pathPattern = getAttributeValue(parser, "pathPattern")
 						  val mimeType = getAttributeValue(parser, "mimeType")
 						  val intentF = this.currentIntentFilter
-						  intentF.setData(scheme, host, port, path, pathPrefix, pathPattern, mimeType)
+						  intentF.modData(scheme, host, port, path, pathPrefix, pathPattern, mimeType)
 						  
 						}
 						else if (tagName.equals("uses-permission")) {
