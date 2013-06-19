@@ -19,6 +19,7 @@ import org.sireum.amandroid.scfg.sCfg
 import org.sireum.amandroid.objectFlowAnalysis._
 
 
+
 class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
 
   type Edge = AlirEdge[Node]
@@ -105,6 +106,31 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
     val o1 = new FileOutputStream(f1)
     val w1 = new OutputStreamWriter(o1)
     result._2.toDot(w1)
+    
+    // this is only for a test
+    val f2 = new File(System.getProperty("user.home") + "/Desktop/fieldRepo")
+    val o2 = new FileOutputStream(f2)
+    val w2 = new OutputStreamWriter(o2)
+    val fRepo = result._1.iFieldDefRepo
+    
+//    fRepo.keySet.foreach{
+//      item =>
+//        if(item.startsWith("new:[|android:content:Intent|]")){        
+//          println("fRepo.key = " + item)
+//          val stuff = fRepo(item)
+//          println("its stuff = " + stuff)
+//        }
+//    }
+    
+    fRepo.keySet.foreach{
+      item =>
+        w2.write("instance= " + item)
+        w2.write("\n")
+        w2.write(fRepo(item).toString)
+        w2.write("\n")
+    }
+    // the test ends
+    
     pstMap.clear
     result
   }

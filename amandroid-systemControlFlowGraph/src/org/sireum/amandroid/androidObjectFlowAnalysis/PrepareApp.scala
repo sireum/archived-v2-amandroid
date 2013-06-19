@@ -94,7 +94,7 @@ class PrepareApp(apkFileLocation : String) {
 	  var mainComponent : String = null
 	  this.entrypoints.foreach{
 	    ep =>
-	      val actions = intentFDB.getIntentActions(ep)
+	      val actions = intentFDB.getIntentFiltersActions(ep)
 	      if(actions != null){
 	        if(actions.contains(AndroidConstants.ACTION_MAIN)) mainComponent = ep
 	      }

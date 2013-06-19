@@ -10,6 +10,9 @@ import org.sireum.amandroid.objectFlowAnalysis.PointI
 import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph
 import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
+import org.sireum.amandroid.parser.Data
+import org.sireum.amandroid.parser.UriData
+
 
 trait InterComponentCommunicationModel[Node <: OfaNode] extends ObjectFlowGraph[Node] {
 	/**
@@ -89,29 +92,218 @@ trait InterComponentCommunicationModel[Node <: OfaNode] extends ObjectFlowGraph[
     var components : Set[String] = Set()
     intentValueSet.keys.foreach{
       intentIns =>
+        var compsForThisIntent:Set[String] = Set()    
+        println("intentIns = " + intentIns)
         val intentFields = iFieldDefRepo(intentIns)
+        var actions:Set[String] = Set()
         if(intentFields.contains(AndroidConstants.INTENT_ACTION)){
           val actionValueSet = intentFields(AndroidConstants.INTENT_ACTION)._2
           actionValueSet.keys.foreach{
             action =>
-              val comps = findComponents(action)
-              components ++= comps
-              println("action = " + action + ", found destination component as " + comps)
+              actions += action
           }
         }
+        println("actions = " + actions)
+        
+        var categories:Set[String] = Set() // the code to get the valueSet of categories is to be added below
+        
+        var datas:Set[UriData] = Set()
+        if(intentFields.contains(AndroidConstants.INTENT_URI_DATA)){
+          var uriString:String = null
+          val dataValueSet = intentFields(AndroidConstants.INTENT_URI_DATA)._2
+          dataValueSet.keys.foreach{
+            stringUriIns =>              
+              println("stringUriIns = " + stringUriIns)
+              val stringUriFields = iFieldDefRepo(stringUriIns) // do we need to double check if stringUriIns is in fact a stringUri-instance?
+              if(stringUriFields.contains(AndroidConstants.URI_STRING_URI_URI_STRING)){
+                val uriStringValueSet = stringUriFields(AndroidConstants.URI_STRING_URI_URI_STRING)._2
+                println("uriStringValueSet = " + uriStringValueSet)
+                uriStringValueSet.foreach{
+                  case (k, v) =>
+                               if(v.equals("STRING")){
+                                 uriString = k
+                                 var uriData = new UriData
+                                 populateByUri(uriData, uriString)
+                                 println("uriString: " + uriString + " , populated data: (" + uriData +")")
+                                 datas +=uriData
+                               }
+                }
+                
+              }
+          }
+ 
+        }
+        println("datas = " + datas)
+        
+        var mTypes:Set[String] = Set()
+        if(intentFields.contains(AndroidConstants.INTENT_MTYPE)){
+          val mTypeValueSet = intentFields(AndroidConstants.INTENT_MTYPE)._2
+          mTypeValueSet.foreach{
+            case (k, v)  =>
+              if(v.equals("STRING")){
+                mTypes +=k
+                println("mType = " + k)
+              }
+          }
+        }
+        println("mTypes = " + mTypes)
+        
+        compsForThisIntent = findComponents(actions, categories, datas, mTypes)
+        components ++= compsForThisIntent
     }
+    
+    
     if(!components.isEmpty)
       Some(components)
     else
       None
   }
   
-  private def findComponents(action : String) : Set[String] = {
+ 
+  private def populateByUri(data: UriData, uriData: String) = {
+    
+    
+    var scheme:String = null
+    var host:String = null
+    var port:String = null
+    var path:String = null
+    
+    
+    var temp:String = null
+    if(uriData != null){
+        if(uriData.contains("://")){
+            scheme = uriData.split("://")(0)
+            temp = uriData.split("://")(1)
+            // println("scheme = " + scheme + " , rest = " + temp)
+            var temp1:String = null
+            if(temp != null){
+              if(temp.contains(":")){
+	              host = temp.split(":")(0)
+	              temp1 = temp.split(":")(1)
+	              
+	              if(temp1 != null && temp1.contains("/")){
+		              port = temp1.split("/")(0)
+		              path = temp1.split("/")(1)
+	              }
+              }
+              else{
+	              if(temp.contains("/")){
+		              host = temp.split("/")(0)
+		              path = temp.split("/")(1)
+	              }
+              }
+              
+              if(scheme !=null)
+                data.setScheme(scheme)
+              if(host !=null)
+                data.setHost(host)
+              if(port != null)
+                data.setPort(port)
+              
+            }
+            
+        }
+       else if(uriData.contains(":")){  // because e.g. app code can have intent.setdata("http:") instead of intent.setdata("http://xyz:200/pqr/abc")
+         scheme = uriData.split(":")(0)
+         if(scheme != null)
+            data.setScheme(scheme)
+       }
+     } 
+
+  }
+  
+
+  private def findComponents(actions: Set[String], categories: Set[String], datas : Set[UriData], mTypes:Set[String]) : Set[String] = {
+    var components : Set[String] = Set()
+    if(actions.isEmpty){
+	      if(datas.isEmpty){
+	        if(mTypes.isEmpty){
+	          		     val comps = findComps(null, categories, null, null) 
+		                 components ++= comps
+	        }
+	        else{
+		        mTypes.foreach{
+		               mType =>
+		                 val comps = findComps(null, categories, null, mType) 
+		                 components ++= comps
+		            }
+	        }
+	      }
+	      else{
+		         datas.foreach{
+		           data =>
+		             if(mTypes.isEmpty){
+		               val comps = findComps(null, categories, data, null) 
+			           components ++= comps
+		             }
+		             else{
+			             mTypes.foreach{
+			               mType =>
+			                 val comps = findComps(null, categories, data, mType) 
+			                 components ++= comps
+			            }
+		             }
+		        }
+	      }
+    }
+    else {  
+	    actions.foreach{
+	      action =>
+	        if(datas.isEmpty){
+		             if(mTypes.isEmpty){
+		               val comps = findComps(action, categories, null, null) 
+			           components ++= comps
+		             }
+		             else{
+			             mTypes.foreach{
+			               mType =>
+			                 val comps = findComps(action, categories, null, mType) 
+			                 components ++= comps
+			            }
+		             }
+	        }
+	        else{
+		        datas.foreach{
+		          data =>
+		             if(mTypes.isEmpty){
+		               val comps = findComps(action, categories, data, null) 
+			           components ++= comps
+		             }
+		             else{
+			             mTypes.foreach{
+			               mType =>
+			                 val comps = findComps(action, categories, data, mType) 
+			                 components ++= comps
+			            }
+		             }
+		        }
+	        }
+	      }
+    }
+   
+    components
+    
+  }
+  
+  private def findComps(action:String, categories: Set[String], data:UriData, mType:String) : Set[String] = {
+    var components : Set[String] = Set()
+    entryPoints.foreach{
+	    ep =>
+	      val iFilters = intentFdb.getIntentFilters(ep)
+	      if(iFilters != null){
+	        val matchedFilters = iFilters.filter(iFilter => iFilter.isMatchWith(action, categories, data, mType))
+	        if(!matchedFilters.isEmpty)
+	          components += ep
+	      }
+    }
+    components
+  }
+  private def findComponentsByAction(action : String) : Set[String] = {
 	  var components : Set[String] = Set()
 	 
 	  entryPoints.foreach{
 	    ep =>
-	      val actions = intentFdb.getIntentActions(ep)
+	      val actions = intentFdb.getIntentFiltersActions(ep)
 	      if(actions != null){
 	        if(actions.contains(action)) components += ep
 	      }
@@ -121,8 +313,7 @@ trait InterComponentCommunicationModel[Node <: OfaNode] extends ObjectFlowGraph[
 	    System.err.println("No matching component in app found for action " + action)
 	  }
 	  components
-	}
-  
+  }
   def isIccOperation(sig : String, androidLibInfoTables: AndroidLibInfoTables) : Boolean = {
     var flag = false
     if(sig != null)
@@ -150,3 +341,4 @@ trait InterComponentCommunicationModel[Node <: OfaNode] extends ObjectFlowGraph[
 	  }
   }
 }
+
