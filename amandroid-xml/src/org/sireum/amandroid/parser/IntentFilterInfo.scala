@@ -100,7 +100,7 @@ class Data{
   private var pathPrefixs: Set[String] = Set()
   private var pathPatterns: Set[String] = Set()
   private var mimeTypes: Set[String] = Set()
-  // note that in android there is some discrepancy regarding data and mType on the Intent side and the Intent Filter side
+  // note that in android there is some discrepancy regarding data and mType on the Intent side compared to that on the Intent Filter side
   def matchWith(uriData:UriData, mType:String):Boolean = {
     var dataTest = false
     var typeTest = false

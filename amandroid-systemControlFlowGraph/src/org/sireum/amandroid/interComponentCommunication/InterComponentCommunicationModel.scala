@@ -298,6 +298,8 @@ trait InterComponentCommunicationModel[Node <: OfaNode] extends ObjectFlowGraph[
     }
     components
   }
+  
+  // we currently do not use findComponentsByAction(action : String) which is below
   private def findComponentsByAction(action : String) : Set[String] = {
 	  var components : Set[String] = Set()
 	 
