@@ -187,7 +187,7 @@ class DummyMainGenerator {
 	            methodSig =>
 	              val methodUri = androidLibInfoTables.getProcedureUriBySignature(methodSig)
 	              plainMethods += (methodSig -> methodUri)
-	              if(!androidLibInfoTables.isStaticMethod(methodUri)) instanceNeeded = true
+	              if(!androidLibInfoTables.isStaticProcedure(methodUri)) instanceNeeded = true
 	          }
 	        }
 	        if(instanceNeeded){
@@ -321,7 +321,7 @@ class DummyMainGenerator {
 	  codeFragments.add(beforeClassFragment)
 	  plainMethods.foreach{
 	    case (currentProcedureSig, currentProcedureUri) =>
-	      if(androidLibInfoTables.isStaticMethod(currentProcedureUri) || classLocalVar != null){
+	      if(androidLibInfoTables.isStaticProcedure(currentProcedureUri) || classLocalVar != null){
 	        val ifFragment = new CodeFragmentGenerator
 	        val thenFragment = new CodeFragmentGenerator
 	        ifFragment.addLabel
@@ -591,7 +591,7 @@ class DummyMainGenerator {
 	  val pUri = androidLibInfoTables.findProcedureUri(rUri, subsignature)
 	  if(pUri != null){
 	    entryPoints -= pUri
-	    assert(androidLibInfoTables.isStaticMethod(pUri) || localVarsForClasses(rUri) != null)
+	    assert(androidLibInfoTables.isStaticProcedure(pUri) || localVarsForClasses(rUri) != null)
 	    generateProcedureCall(androidLibInfoTables.getProcedureSignatureByUri(pUri), "virtual", localVarsForClasses(rUri), constructionStack, codefg)
 	  } else {
 	    System.err.println("Could not find Android entry point procedure: " + subsignature)

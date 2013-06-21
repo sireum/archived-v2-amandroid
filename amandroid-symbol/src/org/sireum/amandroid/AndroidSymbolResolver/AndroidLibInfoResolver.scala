@@ -179,11 +179,6 @@ class AndroidLibInfoResolver
 //      )
     }
   
-  def isInterface(recordUri : ResourceUri) : Boolean = {
-    if(tables.interfaceTable.contains(recordUri)) true
-    else false
-  }
-  
  
   
   
@@ -435,19 +430,6 @@ class AndroidLibInfoResolver
         tables.procedureUriTable.inverse().get(pUri)
       else null
     }
-    
-   def isAbstract(recordUri : ResourceUri) : Boolean = {
-	    if(tables.recordTypeTable.contains(recordUri)){
-	      if(tables.recordTypeTable(recordUri).contains("ABSTRACT"))
-	        true
-	      else
-	        false
-	    }
-	    else {
-	      println("recordTypeTable : cannot find " + recordUri)
-	      false
-	    }
-  }
    
    def hasName(procSig : String, procName : String) : Boolean = {
 //     println(procSig)
@@ -600,7 +582,27 @@ class AndroidLibInfoResolver
     }
   }
   
-  def isStaticMethod(procedureUri : ResourceUri) : Boolean = {
+  def isInterface(recordUri : ResourceUri) : Boolean = {
+    if(tables.interfaceTable.contains(recordUri)) true
+    else false
+  }
+  
+  def isAbstractRecord(recordUri : ResourceUri) : Boolean = {
+      if(tables.recordTypeTable.contains(recordUri)){
+        if(tables.recordTypeTable(recordUri).contains("ABSTRACT"))
+          true
+        else
+          false
+      }
+      else {
+        println("recordTypeTable : cannot find " + recordUri)
+        false
+      }
+  }
+  
+  def isConcreteRecord(recordUri : ResourceUri) : Boolean = !isInterface(recordUri) && !isAbstractRecord(recordUri)
+  
+  def isStaticProcedure(procedureUri : ResourceUri) : Boolean = {
     if(tables.procedureTypeTable.contains(procedureUri)){
       if(tables.procedureTypeTable.get(procedureUri) != null && tables.procedureTypeTable.get(procedureUri).contains("STATIC")) true
       else false
@@ -611,7 +613,7 @@ class AndroidLibInfoResolver
     }
   }
   
-  def isVirtualMethod(procedureUri : ResourceUri) : Boolean = {
+  def isVirtualProcedure(procedureUri : ResourceUri) : Boolean = {
     if(tables.procedureTypeTable.contains(procedureUri)){
       if(tables.procedureTypeTable.get(procedureUri) != null 
          && !tables.procedureTypeTable.get(procedureUri).contains("CONSTRUCTOR") 
@@ -624,6 +626,35 @@ class AndroidLibInfoResolver
       false
     }
   }
+  
+  def isAbstractProcedure(procedureUri : ResourceUri) : Boolean = {
+    if(tables.procedureTypeTable.contains(procedureUri)){
+        if(tables.procedureTypeTable(procedureUri).contains("ABSTRACT"))
+          true
+        else
+          false
+      }
+      else {
+        println("procedureTypeTable : cannot find " + procedureUri)
+        false
+      }
+  }
+  
+  def isNativeProcedure(procedureUri : ResourceUri) : Boolean = {
+    if(tables.procedureTypeTable.contains(procedureUri)){
+        if(tables.procedureTypeTable(procedureUri).contains("NATIVE"))
+          true
+        else
+          false
+      }
+      else {
+        println("procedureTypeTable : cannot find " + procedureUri)
+        false
+      }
+  }
+  
+  def isConcreteProcedure(procedureUri : ResourceUri) : Boolean = !isAbstractProcedure(procedureUri) && !isNativeProcedure(procedureUri)
+  
   // sankar adds isOverrider
   def isOverrider(procUri1 : ResourceUri, procUri2 : ResourceUri) : Boolean = {      
     if(isConstructor(procUri1) || isConstructor(procUri2))

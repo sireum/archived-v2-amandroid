@@ -35,10 +35,15 @@ trait AndroidLibInfoTables {
    */
   def getAccessFlag(procedureUri : ResourceUri) : String
   def isConstructor(procedureUri : ResourceUri) : Boolean
-  def isStaticMethod(procedureUri : ResourceUri) : Boolean
-  def isVirtualMethod(procedureUri : ResourceUri) : Boolean
+  def isStaticProcedure(procedureUri : ResourceUri) : Boolean
+  def isVirtualProcedure(procedureUri : ResourceUri) : Boolean
   def isOverrider(procedureUri1 : ResourceUri, procedureUri2 : ResourceUri) : Boolean  // checks if a pUri is overrider of another pUri
-  def isAbstract(recordUri : ResourceUri) : Boolean 
+  def isAbstractRecord(recordUri : ResourceUri) : Boolean
+  def isInterface(recordUri : ResourceUri) : Boolean
+  def isConcreteRecord(recordUri : ResourceUri) : Boolean
+  def isAbstractProcedure(procedureUri : ResourceUri) : Boolean
+  def isNativeProcedure(procedureUri : ResourceUri) : Boolean
+  def isConcreteProcedure(procedureUri : ResourceUri) : Boolean
   def mergeWith(anotherVmTables : AndroidLibInfoTables)
   def containsRecord(recordName : String) : Boolean
   def getSubSignature(sig : String) : String

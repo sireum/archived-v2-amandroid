@@ -49,7 +49,19 @@ class CallBackInfoCollector(entryPointClasses:Set[ResourceUri], callGraph: CallG
 	 * Finds the mappings between classes and their respective layout files
 	 */
 	def findClassLayoutMappings() {
-	  
+	  var procedures : Set[ResourceUri] = Set()
+	  this.entryPointClasses.foreach{
+	    compName =>
+	      val recUri = androidLibInfoTable.getRecordUri(compName)
+	      procedures ++= androidLibInfoTable.getProcedureUrisByRecordUri(recUri)
+	  }
+	  println("procedures--->" + procedures)
+	  callGraph.getReachableProcedures(procedures).foreach{
+	    reachableProcedure =>
+	      if(androidLibInfoTable.isConcreteProcedure(reachableProcedure)){
+	        
+	      }
+	  }
 	}
 	
 	/**
@@ -78,7 +90,7 @@ class CallBackInfoCollector(entryPointClasses:Set[ResourceUri], callGraph: CallG
 	}
 	
 	private def analyzeMethodOverrideCallbacks(rUri : ResourceUri):Unit = {
-		if (androidLibInfoTable.isAbstract(rUri))
+		if (androidLibInfoTable.isConcreteRecord(rUri))
 			return;
 		
 	    // There are also some classes that implement interesting callback methods.
@@ -155,7 +167,7 @@ class CallBackInfoCollector(entryPointClasses:Set[ResourceUri], callGraph: CallG
 	  
 	    // We cannot create instances of abstract classes anyway, so there is no
 		// reason to look for interface implementations
-		if (androidLibInfoTable.isAbstract(baseClass))
+		if (androidLibInfoTable.isAbstractRecord(baseClass))
 			return;
 		
 		// For a first take, we consider all classes in the android.* packages
