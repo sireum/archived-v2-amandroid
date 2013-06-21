@@ -40,8 +40,8 @@ trait InterComponentCommunicationModel[Node <: OfaNode] extends ObjectFlowGraph[
     flag
   }
   
-  def doIccOperation(dummyMainMap : Map[String, String]) : (PointI, Set[String]) = {
-    var result : (PointI, Set[String]) = null
+  def doIccOperation(dummyMainMap : Map[String, String]) : Map[PointI, Set[String]] = {
+    var result : Map[PointI, Set[String]] = Map()
     iccOperationTracker.map{
       case (k, v) =>
         println("(k, v) = " + (k, v))
@@ -51,14 +51,14 @@ trait InterComponentCommunicationModel[Node <: OfaNode] extends ObjectFlowGraph[
 	        hasExplicitTarget(intentValueSet) match {
 	          case Some(targets) =>
 	            //explicit case
-	            result = (v, targets.map{name => dummyMainMap.getOrElse(name, null)}.filter{item => if(item != null)true else false}.toSet)
+	            result += (v -> targets.map{name => dummyMainMap.getOrElse(name, null)}.filter{item => if(item != null)true else false}.toSet)
 	          case None =>
 	            hasImplicitTarget(intentValueSet) match {
 	              case Some(targets) =>	                
 	            //implicit case
-	                result = (v, targets.map{name => dummyMainMap.getOrElse(name, null)}.filter{item => if(item != null)true else false}.toSet)
+	                result += (v -> targets.map{name => dummyMainMap.getOrElse(name, null)}.filter{item => if(item != null)true else false}.toSet)
 	              case None =>
-	                System.err.println("problem: received Intent is not explicit neither implicit")
+	                System.err.println("problem: received Intent did not find an explicit or implicit match")
 	            }
 	        }
         } else {

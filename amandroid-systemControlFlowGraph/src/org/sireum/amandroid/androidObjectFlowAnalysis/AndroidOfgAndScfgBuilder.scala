@@ -135,6 +135,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
     result
   }
   
+  // currently, we do not use getEntryPoint(psts : Seq[ProcedureSymbolTable]) which is below
   def getEntryPoint(psts : Seq[ProcedureSymbolTable]) : ResourceUri = {
     var entryPoint : ResourceUri = null
     val entryName = this.appInfo.getMainEntryName
@@ -233,22 +234,25 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
   
   def checkAndDoIccOperation(ofg : AndroidObjectFlowGraph[Node], sCfg : SystemControlFlowGraph[String]) : Boolean = {
     var flag = true
-    val result = ofg.doIccOperation(this.appInfo.getDummyMainSigMap)
-    if(result != null){
-      val (pi, targetSigs) = result
-	    targetSigs.foreach{
-	      targetSig =>
-	        val targetUri = androidLibInfoTables.getProcedureUriBySignature(targetSig)
-	        if(targetUri != null){
-	          if(processed.contains(targetUri)){
-			        val procPoint = processed(targetUri)
-				      require(procPoint != null)
-				      ofg.extendGraphForIcc(procPoint, pi)
-				      sCfg.extendGraph(targetUri, pi.owner, pi.locationUri, pi.locationIndex)
-	          }
-	        }
-	    }
-    } else flag = false
+    val results = ofg.doIccOperation(this.appInfo.getDummyMainSigMap)
+    results.foreach{
+    result =>
+	    if(result != null){
+	      val (pi, targetSigs) = result
+		    targetSigs.foreach{
+		      targetSig =>
+		        val targetUri = androidLibInfoTables.getProcedureUriBySignature(targetSig)
+		        if(targetUri != null){
+		          if(processed.contains(targetUri)){
+				        val procPoint = processed(targetUri)
+					      require(procPoint != null)
+					      ofg.extendGraphForIcc(procPoint, pi)
+					      sCfg.extendGraph(targetUri, pi.owner, pi.locationUri, pi.locationIndex)
+		          }
+		        }
+		    }
+	    }else flag = false
+    }
     flag
   }
   
