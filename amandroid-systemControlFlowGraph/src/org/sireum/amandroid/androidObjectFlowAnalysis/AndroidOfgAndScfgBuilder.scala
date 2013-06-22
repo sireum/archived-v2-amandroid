@@ -84,6 +84,15 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
 		    val pst = pstMap(dummyUri)
 		    doOFA(pst, cfg, rda, cCfg, ofg, sCfg)
     }
+    
+    // this is only for a test, t1
+    val ft1 = new File(System.getProperty("user.home") + "/Desktop/ofg1.dot")
+    val ot1 = new FileOutputStream(ft1)
+    val wt1 = new OutputStreamWriter(ot1)
+    ofg.toDot(wt1)
+    
+    // test t1 ends
+    
     overallFix(ofg, sCfg)
     result = (ofg, sCfg)
 //    result._1.nodes.foreach(
@@ -154,9 +163,14 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
             ofg : AndroidObjectFlowGraph[Node],
             sCfg : SystemControlFlowGraph[String]) : Unit = {
     val points = new PointsCollector[Node]().points(pst, ofg)
+   // println("from "+ pst.procedureUri + " newly collected points = " + points.size)
+   // println("previous points in ofg  = " + ofg.points.size)
     ofg.points ++= points
+   // println("current points in ofg  = " + ofg.points.size)
     setProcessed(points, pst.procedureUri)
+   // println("previous nodes in ofg  = " + ofg.nodes.size)
     ofg.constructGraph(points, cfg, rda)
+   // println("current nodes in ofg  = " + ofg.nodes.size)
     sCfg.collectionCCfgToBaseGraph(pst.procedureUri, cCfg)
     fix(ofg, sCfg)
   }
@@ -165,6 +179,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
 		  					 sCfg : SystemControlFlowGraph[String]) : Unit = {
     while(checkAndDoIccOperation(ofg, sCfg)){
     	fix(ofg, sCfg)
+    	//println("worklist = " + ofg.worklist)
     }
   }
   
@@ -235,26 +250,30 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
   def checkAndDoIccOperation(ofg : AndroidObjectFlowGraph[Node], sCfg : SystemControlFlowGraph[String]) : Boolean = {
     var flag = true
     val results = ofg.doIccOperation(this.appInfo.getDummyMainSigMap)
-    if(results.isEmpty) flag = false
-    else
-      results.foreach{
-        result =>
-    	    if(result != null){
-    	      val (pi, targetSigs) = result
-    		    targetSigs.foreach{
-    		      targetSig =>
-    		        val targetUri = androidLibInfoTables.getProcedureUriBySignature(targetSig)
-    		        if(targetUri != null){
-    		          if(processed.contains(targetUri)){
-    				        val procPoint = processed(targetUri)
-    					      require(procPoint != null)
-    					      ofg.extendGraphForIcc(procPoint, pi)
-    					      sCfg.extendGraph(targetUri, pi.owner, pi.locationUri, pi.locationIndex)
-    		          }
-    		        }
-    		    }
-    	    }else flag = false
-      }
+
+    if(results.isEmpty)
+      flag = false
+    else{
+	    results.foreach{
+	    result =>
+		    if(result != null){
+		      val (pi, targetSigs) = result
+			    targetSigs.foreach{
+			      targetSig =>
+			        val targetUri = androidLibInfoTables.getProcedureUriBySignature(targetSig)
+			        if(targetUri != null){
+			          if(processed.contains(targetUri)){
+					        val procPoint = processed(targetUri)
+						      require(procPoint != null)
+						      ofg.extendGraphForIcc(procPoint, pi)
+						      sCfg.extendGraph(targetUri, pi.owner, pi.locationUri, pi.locationIndex)
+			          }
+			        }
+			    }
+		    }else flag = false
+	    }
+    }
+
     flag
   }
   

@@ -7,8 +7,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-symbol"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-pilar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-cache"/>
-	<classpathentry kind="lib" path="/Users/fgwei/git/soot-infoflow-android/lib/axml-1.0.jar"/>
-	<classpathentry kind="lib" path="/Users/fgwei/git/soot-infoflow-android/lib/AXMLPrinter2.jar"/>
-	<classpathentry kind="lib" path="/Users/fgwei/git/soot-infoflow-android/lib/polyglot.jar"/>
+	<classpathentry kind="lib" path="/Users/sankar/git/soot-infoflow-android/lib/axml-1.0.jar"/>
+	<classpathentry kind="lib" path="/Users/sankar/git/soot-infoflow-android/lib/AXMLPrinter2.jar"/>
+	<classpathentry kind="lib" path="/Users/sankar/git/soot-infoflow-android/lib/polyglot.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
