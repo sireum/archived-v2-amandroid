@@ -89,6 +89,11 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
     val ft1 = new File(System.getProperty("user.home") + "/Desktop/ofg1.dot")
     val ot1 = new FileOutputStream(ft1)
     val wt1 = new OutputStreamWriter(ot1)
+    
+//    val calleeSig = "[|Ljava/lang/StringBuilder;.<init>:(Ljava/lang/String;)V|]"
+//    val callee = androidLibInfoTables.getProcedureUriBySignature(calleeSig)
+//    val calleeOfg = androidCache.load[ObjectFlowGraph[Node]](callee, "ofg")
+//    println("calleeOfg ---->" + calleeOfg)       
     ofg.toDot(wt1)
     
     // test t1 ends
@@ -194,6 +199,8 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
       }
       //end
       val n = ofg.worklist.remove(0)
+      if(n.toString().contains("arg:v2@L02bdb8"))
+        println("in fix(): worklist --->" + ofg.worklist)
       ofg.successors(n).foreach(
         succ => {
           n match {
@@ -330,8 +337,11 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
     if(ofg.isStringOperation(calleeSig)){
       if(new SignatureParser(calleeSig).getParamSig.isReturnNonNomal){
         val calleeOfg = androidCache.load[ObjectFlowGraph[Node]](callee, "ofg")
+//        processed(callee) = ofg.combineVerySpecialOfg(pi, calleeSig, calleeOfg, "STRING")
         processed(callee) = ofg.combineSpecialOfg(calleeSig, calleeOfg, "STRING")
       }
+
+      
     } else if(ofg.isNativeOperation(androidLibInfoTables.getAccessFlag(callee))) {
       if(new SignatureParser(calleeSig).getParamSig.isReturnNonNomal){
         val calleeOfg = androidCache.load[ObjectFlowGraph[Node]](callee, "ofg")
@@ -344,8 +354,6 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
         val cfg = cfgs(callee)
         val rda = rdas(callee)
         val cCfg = cCfgs(callee)
-        if(callee.contains("onCreate"))
-          println("callee =" + callee)
         points ++= new PointsCollector[Node]().points(pstMap(callee), ofg)
         ofg.points ++= points
         setProcessed(points, callee)
@@ -361,8 +369,6 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
     }
     if(processed.contains(callee)){
       val procPoint = processed(callee)
-      if(callee.contains("onCreate"))
-          println("processed callee =" + callee)
       require(procPoint != null)
       ofg.extendGraph(procPoint, pi)
       if(!ofg.isStringOperation(calleeSig) && 

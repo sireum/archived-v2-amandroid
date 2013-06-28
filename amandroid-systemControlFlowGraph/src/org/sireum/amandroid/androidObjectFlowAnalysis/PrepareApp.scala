@@ -17,13 +17,12 @@ import org.sireum.alir.ControlFlowGraph
 import org.sireum.alir.ReachingDefinitionAnalysis
 import org.sireum.amandroid.parser.ARSCFileParser.StringResource
 
-class PrepareApp(apkFileLocation : String) {
-  
+class PrepareApp(apkFileLocation : String) {  
   private val DEBUG = true
 //	private var sinks : Set[AndroidMethod] = Set()
 //	private var sources : Set[AndroidMethod] = Set()
 	private var callbackMethods : Map[ResourceUri, MSet[ResourceUri]] = Map()
-  private var mainComponent : String = null
+    private var mainComponent : String = null
 	private var entrypoints : Set[String] = Set()
 	private var layoutControls : Map[Int, LayoutControl] = Map()
 	private var resourcePackages : List[ARSCFileParser.ResPackage] = List()
@@ -126,19 +125,26 @@ class PrepareApp(apkFileLocation : String) {
 	}
 	
 	def getMainEntryName() : String = this.mainComponent.replaceAll("\\[\\|", "%5B%7C").replaceAll("\\|\\]", ".dummyMain%7C%5D")
-	
-	def generateDummyMain(recordName : String) : Unit = {
-	  if(recordName == null) return
+	/**
+	 * generates dummyMain code for a component like Activity, BroadcastReceiver, etc.
+	 * @param recordName component name
+	 * @param codeCtr code line number of the last generated dummyMain
+	 * @return codeCtr + newly generated number of lines
+	 */
+	def generateDummyMain(recordName : String, codeCtr: Int) : Int = {
+	  if(recordName == null) return 0
 		//generate dummy main method
 	  if(DEBUG)
-	  	println("Generate DummyMain for " + recordName)
-		val dmGen = new DummyMainGenerator
-		dmGen.setCurrentComponent(recordName)
-		dmGen.setCallbackFunctions(this.callbackMethods)
-		dmGen.setAndroidLibInfoTables(this.libInfoTables)
-    val (sig, code) = dmGen.generateWithParam(List(AndroidEntryPointConstants.INTENT_NAME))
+  	    println("Generate DummyMain for " + recordName)
+	  val dmGen = new DummyMainGenerator
+	  dmGen.setCurrentComponent(recordName)
+	  dmGen.setCodeCounter(codeCtr)
+	  dmGen.setCallbackFunctions(this.callbackMethods)
+	  dmGen.setAndroidLibInfoTables(this.libInfoTables)
+      val (sig, code) = dmGen.generateWithParam(List(AndroidEntryPointConstants.INTENT_NAME))
 	  this.dummyMainSigMap += (recordName -> sig)
 	  this.dummyMainCodeMap += (recordName -> code)
+	  dmGen.getCodeCounter
 	}
 	
 	def calculateSourcesSinksEntrypoints(sourceSinkFile : String) = {
@@ -149,7 +155,7 @@ class PrepareApp(apkFileLocation : String) {
 		this.entrypoints = ManifestParser.getEntryPointClasses
 		this.intentFdb = ManifestParser.getIntentDB
 		if(DEBUG){
-			println("entrypoints--->" + ManifestParser.getEntryPointClasses)
+		  println("entrypoints--->" + ManifestParser.getEntryPointClasses)
 		  println("packagename--->" + ManifestParser.getPackageName)
 		  println("permissions--->" + ManifestParser.getPermissions)
 		  println("intentDB------>" + ManifestParser.getIntentDB)
@@ -158,7 +164,7 @@ class PrepareApp(apkFileLocation : String) {
 		ARSCFileParser.parse(apkFileLocation);
 		this.resourcePackages = ARSCFileParser.getPackages
 		if(DEBUG){
-			println("arscstring-->" + ARSCFileParser.getGlobalStringPool)
+		  println("arscstring-->" + ARSCFileParser.getGlobalStringPool)
 		  println("arscpackage-->" + ARSCFileParser.getPackages)
 		}
 	  val callGraph:CallGraph = new CallGraphBuilder(libInfoTables)
@@ -182,7 +188,12 @@ class PrepareApp(apkFileLocation : String) {
 		}
 	  // filter the main component of this app
 	  this.mainComponent = filterMainComponent(ManifestParser.getIntentDB)
-	  this.entrypoints.foreach(f => generateDummyMain(f))
+	  var codeLineCounter : Int = 0
+	  this.entrypoints.foreach{
+	    f => 
+	      val clCounter = generateDummyMain(f, codeLineCounter)
+	      codeLineCounter = clCounter
+	  }
 
 		// Collect the results of the soot-based phases
 		analysisHelper.getCallbackMethods.foreach {

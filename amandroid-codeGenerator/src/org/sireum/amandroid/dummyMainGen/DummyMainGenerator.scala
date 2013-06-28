@@ -55,6 +55,15 @@ class DummyMainGenerator {
     this.currentComponent = clazzName
   }
   
+    
+  def setCodeCounter(codeCtr : Int) = {
+    this.codeCounter = codeCtr
+  }
+  
+   def getCodeCounter():Int = {
+    this.codeCounter
+  }
+  
   /**
 	 * Sets the list of callback functions to be integrated into the Android
 	 * lifecycle
