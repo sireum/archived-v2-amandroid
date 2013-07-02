@@ -8,10 +8,15 @@ import org.sireum.pilar.ast.Transformation
 import org.sireum.pilar.ast.JumpLocation
 import org.sireum.pilar.ast.NameExp
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
+import org.sireum.pilar.ast.LocationDecl
+import org.sireum.alir.AlirLocationUriNode
+import org.sireum.pilar.ast.TupleExp
+
+case class ReachableProcedure(callerProcedureUri : ResourceUri, sig : String, uri : ResourceUri, locUri: Option[org.sireum.util.ResourceUri], locIndex: Int, params : List[String], pst : ProcedureSymbolTable)
 
 class CallGraphBuilder(androidLibInfoTable : AndroidLibInfoTables) extends CallGraph{
-  var callMap : Map[ResourceUri, MSet[ResourceUri]] = Map()
-  def CallMap : Map[ResourceUri, MSet[ResourceUri]] = callMap
+  var callMap : Map[ResourceUri, MSet[ReachableProcedure]] = Map()
+  def CallMap : Map[ResourceUri, MSet[ReachableProcedure]] = callMap
 	/**
    * Building call graph for given procedure symbol table or control flow graph.
    * @param source Either procedure symbol table or control flow graph
@@ -45,25 +50,45 @@ class CallGraphBuilder(androidLibInfoTable : AndroidLibInfoTables) extends CallG
         if(sig != null){
           val pUri = androidLibInfoTable.getProcedureUriBySignature(sig)
           if(pUri == null)
-          	println("sig--->" + sig)
-          else 
-          	callMap ++= Map(currPUri -> (callMap.getOrElse(currPUri, msetEmpty) + pUri))
+          	System.err.println("sig--->" + sig)
+          else
+          	callMap ++= Map(currPUri -> (callMap.getOrElse(currPUri, msetEmpty) + ReachableProcedure(currPUri, sig, pUri, t.locUri, t.locIndex, getParamsFromCallJump(t), pst)))
         }
         false
     })
     val size = locationDecls.size
     for (i <- 0 until size) {
-      val l = locationDecls(i)
-      visitor(l)
+      val currLocDecl = locationDecls(i)
+      visitor(currLocDecl)
     }
 	}
 	
+	private def getParamsFromCallJump(callJump : CallJump) : List[String] = {
+	  var exps : List[String] = null
+	  callJump.callExp.arg match {
+      case te : TupleExp =>{
+        exps = te.exps.map{
+          exp =>
+            exp match {
+              case ne : NameExp =>
+                ne.name.name
+              case _ =>
+                null
+            }
+        }.filter{str => if(str != null) true else false}.toList
+      }
+      case _ =>
+    }
+	  exps
+	}
+	
 	private def buildFromCFG(currPUri : ResourceUri, cfg : ControlFlowGraph[String]) : Unit = {
-	  cfg.nodes.foreach{
+	  cfg.nodes.filter{node => if(node.isInstanceOf[AlirLocationUriNode]) true else false}.foreach{
 	    node =>
-	      val sig = node.getProperty[String]("calleeSig")
+	      val uriNode = node.asInstanceOf[AlirLocationUriNode]
+	      val sig = uriNode.getProperty[String]("calleeSig")
 	      val pUri = androidLibInfoTable.getProcedureUriBySignature(sig)
-        callMap ++= Map(currPUri -> (callMap.getOrElse(currPUri, msetEmpty) + pUri))
+//        callMap ++= Map(currPUri -> (callMap.getOrElse(currPUri, msetEmpty) + ReachableProcedure(sig, pUri, Some(uriNode.locUri), uriNode.locIndex)))
 	  }
 	}
 	
@@ -72,12 +97,12 @@ class CallGraphBuilder(androidLibInfoTable : AndroidLibInfoTables) extends CallG
 	 * @param procedureUris Initial procedure resource uri
 	 * @return Set of reachable procedure resource uris from initial procedure
 	 */
-	def getReachableProcedures(procedureUri : ResourceUri) : Set[ResourceUri] = callMap.getOrElse(procedureUri, msetEmpty).toSet
+	def getReachableProcedures(procedureUri : ResourceUri) : Set[ReachableProcedure] = callMap.getOrElse(procedureUri, msetEmpty).toSet
 	/**
 	 * Get all reachable procedures of given procedure set. (Do not include transitive call)
 	 * @param procedureUris Initial procedure resource uri set
 	 * @return Set of reachable procedure resource uris from initial set
 	 */
-	def getReachableProcedures(procedureUris : Set[ResourceUri]) : Set[ResourceUri] = procedureUris.map{p => getReachableProcedures(p)}.reduce(combine)
-	private def combine(set1 : Set[ResourceUri], set2 : Set[ResourceUri]) : Set[ResourceUri] = set1 ++ set2
+	def getReachableProcedures(procedureUris : Set[ResourceUri]) : Set[ReachableProcedure] = procedureUris.map{p => getReachableProcedures(p)}.reduce(combine)
+	private def combine(set1 : Set[ReachableProcedure], set2 : Set[ReachableProcedure]) : Set[ReachableProcedure] = set1 ++ set2
 }

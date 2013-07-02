@@ -13,6 +13,9 @@ import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.amandroid.callGraph.CallGraphBuilder
 import org.sireum.amandroid.callGraph.CallGraph
 import org.sireum.amandroid.parser.IntentFilterDataBase
+import org.sireum.alir.ControlFlowGraph
+import org.sireum.alir.ReachingDefinitionAnalysis
+import org.sireum.amandroid.parser.ARSCFileParser.StringResource
 
 class PrepareApp(apkFileLocation : String) {
   
@@ -22,13 +25,14 @@ class PrepareApp(apkFileLocation : String) {
 	private var callbackMethods : Map[ResourceUri, MSet[ResourceUri]] = Map()
   private var mainComponent : String = null
 	private var entrypoints : Set[String] = Set()
-	private var layoutControls : Map[Integer, LayoutControl] = Map()
+	private var layoutControls : Map[Int, LayoutControl] = Map()
 	private var resourcePackages : List[ARSCFileParser.ResPackage] = List()
 	private var appPackageName : String = ""
 	private var taintWrapperFile : String = ""
 	private var libInfoTables : AndroidLibInfoTables = null
 	private var psts : Seq[ProcedureSymbolTable] = Seq()
 	private var intentFdb : IntentFilterDataBase = null
+	private var cfgRdaMap : Map[String, (ControlFlowGraph[String], ReachingDefinitionAnalysis.Result)] = Map()
 
 	/**
 	 * Map from record name to it's dummyMain procedure code.
@@ -68,6 +72,12 @@ class PrepareApp(apkFileLocation : String) {
 			println("End of Entrypoints")
 		}
 	}
+	
+	def populateCfgRdaMap(recordUri : ResourceUri, cfg : ControlFlowGraph[String], rda : ReachingDefinitionAnalysis.Result) = {
+	  cfgRdaMap += (recordUri -> (cfg, rda))
+	}
+	
+	def setCfgrdaMap(map : Map[String, (ControlFlowGraph[String], ReachingDefinitionAnalysis.Result)]) = cfgRdaMap ++= map
 	
 	def setTaintWrapperFile(taintWrapperFile : String) = {
 		this.taintWrapperFile = taintWrapperFile;
@@ -157,9 +167,10 @@ class PrepareApp(apkFileLocation : String) {
 	  //psts.foreach(pst => println(pst.procedureUri))
 	  
 		// Collect the callback interfaces implemented in the app's source code
-		val analysisHelper = new CallBackInfoCollector(this.entrypoints, callGraph, libInfoTables) 
+		val analysisHelper = new CallBackInfoCollector(this.entrypoints, callGraph, cfgRdaMap, libInfoTables) 
 		analysisHelper.collectCallbackMethods()
-		this.callbackMethods = analysisHelper.getCallbackMethods
+//		this.callbackMethods = analysisHelper.getCallbackMethods
+//		println("LayoutClasses --> " + analysisHelper.getLayoutClasses)
 		
 		// Find the user-defined sources in the layout XML files
 		LayoutFileParser.androidLibInfoTables = this.libInfoTables
@@ -174,52 +185,59 @@ class PrepareApp(apkFileLocation : String) {
 	  this.entrypoints.foreach(f => generateDummyMain(f))
 
 		// Collect the results of the soot-based phases
-//		for (Entry<String, List<AndroidMethod>> entry : jimpleClass.getCallbackMethods().entrySet()) {
-//			if (this.callbackMethods.containsKey(entry.getKey()))
-//				this.callbackMethods.get(entry.getKey()).addAll(entry.getValue());
-//			else
-//				this.callbackMethods.put(entry.getKey(), new ArrayList<AndroidMethod>(entry.getValue()));
-//		}
-//		this.layoutControls = lfp.getUserControls();
+		analysisHelper.getCallbackMethods.foreach {
+	    case(k, v) =>
+  			if (this.callbackMethods.contains(k))
+  				this.callbackMethods(k) ++= (v)
+  			else
+  				this.callbackMethods += (k -> v)
+		}
+		this.layoutControls = LayoutFileParser.getUserControls
 //		
 //		// Collect the XML-based callback methods
-//		for (Entry<SootClass, Set<Integer>> lcentry : jimpleClass.getLayoutClasses().entrySet())
-//			for (Integer classId : lcentry.getValue()) {
-//				AbstractResource resource = resParser.findResource(classId);
-//				if (resource instanceof StringResource) {
-//					StringResource strRes = (StringResource) resource;
-//					if (lfp.getCallbackMethods().containsKey(strRes.getValue()))
-//						for (String methodName : lfp.getCallbackMethods().get(strRes.getValue())) {
-//							List<AndroidMethod> methods = this.callbackMethods.get(lcentry.getKey().getName());
-//							if (methods == null) {
-//								methods = new ArrayList<AndroidMethod>();
-//								this.callbackMethods.put(lcentry.getKey().getName(), methods);
-//							}
-//							
-//							// The callback may be declared directly in the class
-//							// or in one of the superclasses
-//							SootMethod callbackMethod = null;
-//							SootClass callbackClass = lcentry.getKey();
-//							while (callbackMethod == null) {
-//								if (callbackClass.declaresMethodByName(methodName))
-//									callbackMethod = callbackClass.getMethodByName(methodName);
-//								if (callbackClass.hasSuperclass())
-//									callbackClass = callbackClass.getSuperclass();
-//								else
-//									break;
-//							}
-//							if (callbackMethod == null) {
-//								System.err.println("Callback method " + methodName + " not found in class "
-//										+ lcentry.getKey().getName());
-//								continue;
-//							}
-//							methods.add(new AndroidMethod(callbackMethod));
-//						}
-//				}
-//				else
-//					System.err.println("Unexpected resource type for layout class");
-//			}
-//		System.out.println("Found " + this.callbackMethods.size() + " callback methods");
+		analysisHelper.getLayoutClasses.foreach {
+		  case (k, v) =>
+		    v.foreach {
+		      i =>
+		        val resource = ARSCFileParser.findResource(i)
+		        println("i = " + i + "\nresource = " + resource + "\n")
+		        if(resource.isInstanceOf[StringResource]){
+		          val strRes = resource.asInstanceOf[StringResource]
+		          if(LayoutFileParser.getCallbackMethods.contains(strRes.value)){
+		            LayoutFileParser.getCallbackMethods(strRes.value).foreach{
+		              methodName =>
+		                val methods = this.callbackMethods.getOrElse(k, msetEmpty)
+		                if(methods.isEmpty){
+		                  this.callbackMethods += (k -> methods)
+		                }
+		                
+		                //The callback may be declared directly in the class or in one of the superclasses
+		                var callbackRecordUri : ResourceUri = k
+		                var callbackProcedureUri : ResourceUri = null
+		                while(callbackProcedureUri == null && callbackRecordUri != null){
+		                  val declMethods = libInfoTables.getProcedureUrisByRecordUri(callbackRecordUri)
+		                  declMethods.foreach{
+		                    m =>
+		                      if(m.contains(methodName)){
+		                        callbackProcedureUri = m
+		                      }
+		                  }
+		                  if(callbackProcedureUri == null) callbackRecordUri = libInfoTables.getSuperClassOf(callbackRecordUri)
+		                }
+		                if(callbackRecordUri != null){
+		                  methods += callbackProcedureUri
+		                  println("methods--->" + methods)
+		                } else {
+		                  System.err.println("Callback method " + methodName + " not found in class " + k);
+		                }
+		            }
+		          }
+		        } else {
+		          System.err.println("Unexpected resource type for layout class")
+		        }
+		    }
+		}
+		println("Found " + this.callbackMethods.size + " callback methods")
 //
 //		PermissionMethodParser parser = PermissionMethodParser.fromFile(sourceSinkFile);
 //		for (AndroidMethod am : parser.parse()){
@@ -235,6 +253,6 @@ class PrepareApp(apkFileLocation : String) {
 //		setResult.setSink(true);
 //		sinks.add(setResult);
 //		
-//		System.out.println("Entry point calculation done.");
+		println("Entry point calculation done.")
 	}
 }

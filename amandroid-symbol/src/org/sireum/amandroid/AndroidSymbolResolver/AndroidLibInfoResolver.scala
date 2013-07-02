@@ -509,9 +509,7 @@ class AndroidLibInfoResolver
     if(tables.procedureUriTable.contains(sig))
       tables.procedureUriTable.get(sig)
     else{
-      println("sig =" + sig)
       val rName = getRecordNameFromProcedureSig(sig)
-      println("rName =" + rName)
       findProcedureUri(getRecordUri(rName), getSubSignature(sig))
     }
   }

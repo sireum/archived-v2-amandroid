@@ -235,24 +235,26 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
   def checkAndDoIccOperation(ofg : AndroidObjectFlowGraph[Node], sCfg : SystemControlFlowGraph[String]) : Boolean = {
     var flag = true
     val results = ofg.doIccOperation(this.appInfo.getDummyMainSigMap)
-    results.foreach{
-    result =>
-	    if(result != null){
-	      val (pi, targetSigs) = result
-		    targetSigs.foreach{
-		      targetSig =>
-		        val targetUri = androidLibInfoTables.getProcedureUriBySignature(targetSig)
-		        if(targetUri != null){
-		          if(processed.contains(targetUri)){
-				        val procPoint = processed(targetUri)
-					      require(procPoint != null)
-					      ofg.extendGraphForIcc(procPoint, pi)
-					      sCfg.extendGraph(targetUri, pi.owner, pi.locationUri, pi.locationIndex)
-		          }
-		        }
-		    }
-	    }else flag = false
-    }
+    if(results.isEmpty) flag = false
+    else
+      results.foreach{
+        result =>
+    	    if(result != null){
+    	      val (pi, targetSigs) = result
+    		    targetSigs.foreach{
+    		      targetSig =>
+    		        val targetUri = androidLibInfoTables.getProcedureUriBySignature(targetSig)
+    		        if(targetUri != null){
+    		          if(processed.contains(targetUri)){
+    				        val procPoint = processed(targetUri)
+    					      require(procPoint != null)
+    					      ofg.extendGraphForIcc(procPoint, pi)
+    					      sCfg.extendGraph(targetUri, pi.owner, pi.locationUri, pi.locationIndex)
+    		          }
+    		        }
+    		    }
+    	    }else flag = false
+      }
     flag
   }
   

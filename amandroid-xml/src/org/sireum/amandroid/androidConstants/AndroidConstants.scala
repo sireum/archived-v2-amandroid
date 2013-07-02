@@ -14,6 +14,7 @@ object AndroidConstants {
 	final val COMPONENTNAME_CLASS = "[|android:content:ComponentName.mClass|]"
 	final val URI_STRING_URI = "[|android:net:Uri$StringUri|]"
 	final val URI_STRING_URI_URI_STRING = "[|android:net:Uri$StringUri.uriString|]"  
+	final val ACTIVITY_SETCONTENTVIEW = "pilar:/procedure/default/%5B%7Candroid:app:Activity.setContentView%7C%5D/1/23/8f7588d0"
 	private final val iccMethods = List(START_SERVICE, SEND_BROADCAST, START_ACTIVITY)
 	def getIccMethods() : List[String] = iccMethods
 }

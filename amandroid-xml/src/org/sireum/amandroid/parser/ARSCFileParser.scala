@@ -700,8 +700,7 @@ object ARSCFileParser extends AbstractAndroidXMLParser {
 	 */
 	case class ResourceId(packageId : Int, typeId : Int, itemIndex : Int) {		
 		override def toString() : String = {
-			"Package " + this.packageId + ", type "
-					+ this.typeId + ", item " + this.itemIndex
+			"Package " + this.packageId + ", type " + this.typeId + ", item " + this.itemIndex
 		}
 	}
 	
@@ -932,8 +931,7 @@ object ARSCFileParser extends AbstractAndroidXMLParser {
 											res.resourceID = r.resourceID
 										}
 									if (res.resourceID <= 0)
-										res.resourceID = (packageTable.id << 24)
-												+ (typeTable.id << 16) + resourceIdx
+										res.resourceID = (packageTable.id << 24) + (typeTable.id << 16) + resourceIdx
 									config.resources ::= res
 									resourceIdx+=1
 								}
@@ -1366,6 +1364,7 @@ object ARSCFileParser extends AbstractAndroidXMLParser {
 	 */
 	def findResource(resourceId : Int) : AbstractResource = {
 		val id = parseResourceId(resourceId)
+		System.err.println("id-->" + id + " resourceId = " + resourceId)
 		for (resPackage <- this.packages)
 			if (resPackage.packageId == id.packageId) {
 				for (resType <- resPackage.types)

@@ -102,10 +102,10 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
         Dex2PilarWrapperModule.setSrcFiles(options, srcFiles)
         
         ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d + dirName + "/" + dirName + ".pilar"))))
-        PilarAndroidSymbolResolverModule.setParallel(options, false)
+        PilarAndroidSymbolResolverModule.setParallel(options, true)
         PilarAndroidSymbolResolverModule.setHasExistingAndroidLibInfoTables(options, Some(libInfoTables))
         AndroidApplicationPrepareModule.setApkFileLocation(options, f.toString())
-        AndroidIntraProceduralModule.setParallel(options, false)
+        AndroidIntraProceduralModule.setParallel(options, true)
         AndroidIntraProceduralModule.setAndroidCache(options, Some(aCache))
         AndroidIntraProceduralModule.setShouldBuildCfg(options, true)
         AndroidIntraProceduralModule.setShouldBuildRda(options, true)

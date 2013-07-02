@@ -31,6 +31,9 @@ import org.sireum.alir.ControlFlowGraph
 import org.sireum.amandroid.module.PilarAndroidSymbolResolverModule
 import java.util.zip.GZIPInputStream
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
+import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidObjectFlowGraph
+import org.sireum.amandroid.objectFlowAnalysis.OfaNode
+import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph
 
 trait PreprocessLibraryFrameWork extends TestFramework { 
   
@@ -114,7 +117,7 @@ trait PreprocessLibraryFrameWork extends TestFramework {
         intraResult.keys.foreach(
           key =>
           {
-//            val ofg = aCache.load[AndroidInterIntraProcedural.OFG](key, "ofg")
+//            val ofg = aCache.load[ObjectFlowGraph[OfaNode]](key, "ofg")
 //            val w = new java.io.PrintWriter(System.out, true)
 //            ofg.toDot(w)
             
@@ -134,7 +137,7 @@ trait PreprocessLibraryFrameWork extends TestFramework {
             intraResult(key).ofgOpt match {
               case Some(ofg) =>
 //                ofg.toDot(w)
-                aCache.save[AndroidIntraProcedural.OFG](key, "ofg", ofg)
+                aCache.save[ObjectFlowGraph[OfaNode]](key, "ofg", ofg)
               case None =>
             }
             intraResult(key).cCfgOpt match {

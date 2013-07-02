@@ -5,6 +5,17 @@ import org.sireum.amandroid.callGraph.CallGraph
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.util._
 import org.sireum.amandroid.entryPointConstants.AndroidEntryPointConstants
+import org.sireum.amandroid.androidConstants.AndroidConstants
+import org.sireum.alir.ControlFlowGraph
+import org.sireum.alir.ReachingDefinitionAnalysis
+import org.sireum.alir.Slot
+import org.sireum.alir.DefDesc
+import org.sireum.alir.LocDefDesc
+import org.sireum.pilar.ast.LocationDecl
+import org.sireum.pilar.ast.ActionLocation
+import org.sireum.pilar.ast.AssignAction
+import org.sireum.pilar.ast.LiteralExp
+import org.sireum.pilar.ast.LiteralType
 
 
 /**
@@ -14,12 +25,16 @@ import org.sireum.amandroid.entryPointConstants.AndroidEntryPointConstants
  * @author Sankardas Roy. Adapted Steven Arzt 's equivalent code
  *
  */
-class CallBackInfoCollector(entryPointClasses:Set[ResourceUri], callGraph: CallGraph, androidLibInfoTable : AndroidLibInfoTables) {
+class CallBackInfoCollector(entryPointClasses:Set[ResourceUri], 
+                            callGraph: CallGraph,
+                            cfgRdaMap : Map[String, (ControlFlowGraph[String],ReachingDefinitionAnalysis.Result)],
+                            androidLibInfoTable : AndroidLibInfoTables) {
     
-	private final var callbackMethods : Map[ResourceUri, MSet[ResourceUri]] = Map();
-	private final var layoutClasses: Map[ResourceUri, Set[Integer]] = Map();
+	private final var callbackMethods : Map[ResourceUri, MSet[ResourceUri]] = Map()
+	private final var layoutClasses: Map[ResourceUri, MSet[Int]] = Map()
 	
 	def getCallbackMethods() = this.callbackMethods
+	def getLayoutClasses() = this.layoutClasses
 	
 	/**
 	 * Collects the callback methods for all Android default handlers
@@ -37,9 +52,8 @@ class CallBackInfoCollector(entryPointClasses:Set[ResourceUri], callGraph: CallG
 	    println("componentName = " + compName + " procs = " + methods)
 	    val reachableMethods = callGraph.getReachableProcedures(methods)
 	    println("componentName = " + compName + " reachable procs = " + reachableMethods)
-	    val containerClasses = reachableMethods.map(item => androidLibInfoTable.getRecordUriFromProcedureUri(item))
+	    val containerClasses = reachableMethods.map(item => androidLibInfoTable.getRecordUriFromProcedureUri(item.uri))
 	    containerClasses.map(item => analyzeClass(item, recUri))
-	    
 	  }
 	  println("current all callbacks = " + this.callbackMethods)
 	  
@@ -55,12 +69,55 @@ class CallBackInfoCollector(entryPointClasses:Set[ResourceUri], callGraph: CallG
 	      val recUri = androidLibInfoTable.getRecordUri(compName)
 	      procedures ++= androidLibInfoTable.getProcedureUrisByRecordUri(recUri)
 	  }
-	  println("procedures--->" + procedures)
 	  callGraph.getReachableProcedures(procedures).foreach{
 	    reachableProcedure =>
-	      if(androidLibInfoTable.isConcreteProcedure(reachableProcedure)){
-	        
+	      if(androidLibInfoTable.isConcreteProcedure(reachableProcedure.uri)){
+	        if(reachableProcedure.uri.equals(AndroidConstants.ACTIVITY_SETCONTENTVIEW)){
+	          val (cfg, rda) = cfgRdaMap(reachableProcedure.callerProcedureUri)
+	          val slots = rda.entrySet(cfg.getNode(reachableProcedure.locUri, reachableProcedure.locIndex))
+            slots.foreach(
+              item => {
+                if(item.isInstanceOf[(Slot, DefDesc)]){
+                  val (slot, defDesc) = item.asInstanceOf[(Slot, DefDesc)]
+                  val varName = reachableProcedure.params(1)
+                  if(varName.equals(slot.toString())){
+                    defDesc match {
+                      case ldd : LocDefDesc => 
+                        val node = cfg.getNode(ldd.locUri, ldd.locIndex)
+                        val locDecl = reachableProcedure.pst.location(ldd.locIndex)
+                        val num = getIntegerFromLocationDecl(locDecl)
+                        if(num != -1){
+                          val declRecordUri = androidLibInfoTable.getRecordUriFromProcedureUri(reachableProcedure.callerProcedureUri)
+                          if(this.layoutClasses.contains(declRecordUri))
+                            this.layoutClasses(declRecordUri).add(num)
+                          else
+                            this.layoutClasses += (declRecordUri -> (msetEmpty + num))
+                        }
+                      case _ =>
+                    }
+                  }
+                }
+              }
+            )
+	        }
 	      }
+	  }
+	}
+	
+	def getIntegerFromLocationDecl(locDecl : LocationDecl) : Int = {
+	  locDecl match{
+	    case aLoc : ActionLocation =>
+	      aLoc.action match{
+	        case assignAction : AssignAction =>
+	          assignAction.rhs match{
+	            case lExp : LiteralExp =>
+	              if(lExp.typ == LiteralType.INT) Integer.parseInt(lExp.text)
+	              else -1
+	            case _ => -1
+	          }
+	        case _ => -1
+	      }
+	    case _ => -1
 	  }
 	}
 	
@@ -116,7 +173,7 @@ class CallBackInfoCollector(entryPointClasses:Set[ResourceUri], callGraph: CallG
 			if (androidLibInfoTable.getRecordName(ancestorClass).startsWith("[|android:"))
 				for (method <- androidLibInfoTable.getProcedureUrisByRecordUri(ancestorClass))
 					if (!androidLibInfoTable.isConstructor(method)){
-					    val pSubSig = androidLibInfoTable.getSubSignatureFromUri(method)
+					  val pSubSig = androidLibInfoTable.getSubSignatureFromUri(method)
 						systemMethods.add(pSubSig)
 					}
 		}
