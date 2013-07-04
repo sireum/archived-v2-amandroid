@@ -618,3 +618,4 @@ class PointProc(loc : ResourceUri) extends Point{
   var retVar : Option[PointRNoIndex] = None
   override def toString = loc
 }
+
