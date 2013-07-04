@@ -20,7 +20,7 @@ import org.sireum.amandroid.objectFlowAnalysis._
 
 
 
-class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
+class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, VirtualLabel](val fac: () => ValueSet) {
 
   type Edge = AlirEdge[Node]
   
@@ -33,8 +33,8 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
   var androidLibInfoTables : AndroidLibInfoTables = null
   var androidCache : AndroidCacheFile[String] = null
   //a map from return node to its possible updated value set
-  var stringValueSetMap : MMap[OfaNode, MMap[ResourceUri, ResourceUri]] = mmapEmpty
-  var nativeValueSetMap : MMap[OfaNode, MMap[ResourceUri, ResourceUri]] = mmapEmpty
+  var stringValueSetMap : MMap[OfaNode, ValueSet] = mmapEmpty
+  var nativeValueSetMap : MMap[OfaNode, ValueSet] = mmapEmpty
   
   def apply(psts : Seq[ProcedureSymbolTable],
             cfgs : MMap[ResourceUri, ControlFlowGraph[String]],
@@ -52,8 +52,8 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
             androidLibInfoTables : AndroidLibInfoTables,
             appInfo : PrepareApp,
             androidCache : AndroidCacheFile[String])
-   : (AndroidObjectFlowGraph[Node], SystemControlFlowGraph[String]) = {
-    var result : (AndroidObjectFlowGraph[Node], SystemControlFlowGraph[String]) = null
+   : (AndroidObjectFlowGraph[Node, ValueSet], SystemControlFlowGraph[String]) = {
+    var result : (AndroidObjectFlowGraph[Node, ValueSet], SystemControlFlowGraph[String]) = null
     this.appInfo = appInfo
     this.cfgs = cfgs
     this.rdas = rdas
@@ -70,7 +70,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
 //      System.err.println("Cannot find the entry point of the app.")
 //      return null
 //    }
-    val ofg = new AndroidObjectFlowGraph[Node]
+    val ofg = new AndroidObjectFlowGraph[Node, ValueSet](fac)
     ofg.setIntentFdb(appInfo.getIntentDB)
     ofg.setEntryPoints(appInfo.getEntryPoints)
     val sCfg = new sCfg[String]
@@ -151,9 +151,9 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
             cfg : ControlFlowGraph[String],
             rda : ReachingDefinitionAnalysis.Result,
             cCfg : CompressedControlFlowGraph[String],
-            ofg : AndroidObjectFlowGraph[Node],
+            ofg : AndroidObjectFlowGraph[Node, ValueSet],
             sCfg : SystemControlFlowGraph[String]) : Unit = {
-    val points = new PointsCollector[Node]().points(pst, ofg)
+    val points = new PointsCollector[Node, ValueSet]().points(pst, ofg)
     ofg.points ++= points
     setProcessed(points, pst.procedureUri)
     ofg.constructGraph(points, cfg, rda)
@@ -161,14 +161,14 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
     fix(ofg, sCfg)
   }
   
-  def overallFix(ofg : AndroidObjectFlowGraph[Node],
+  def overallFix(ofg : AndroidObjectFlowGraph[Node, ValueSet],
 		  					 sCfg : SystemControlFlowGraph[String]) : Unit = {
     while(checkAndDoIccOperation(ofg, sCfg)){
     	fix(ofg, sCfg)
     }
   }
   
-  def fix(ofg : AndroidObjectFlowGraph[Node],
+  def fix(ofg : AndroidObjectFlowGraph[Node, ValueSet],
 		  		sCfg : SystemControlFlowGraph[String]) : Unit = {
     while (!ofg.worklist.isEmpty) {
       //for construct and extend graph for static method invocation 
@@ -186,11 +186,11 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
                 ofg.updateFieldValueSet(ofn)
             case _ =>
           }
-          val vsN = n.propertyMap(ofg.VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
-          val vsSucc = succ.propertyMap(ofg.VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
-          val d = getDiff(vsN, vsSucc)
+          val vsN = n.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
+          val vsSucc = succ.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
+          val d = vsN.getDiff(vsSucc).asInstanceOf[ValueSet]
           if(!d.isEmpty){
-            vsSucc ++= d
+            vsSucc.update(d)
             ofg.worklist += succ
             //check whether it's a global variable node, if yes, then populate globalDefRepo
             //check whether it's a base node of field access, if yes, then populate/use iFieldDefRepo.
@@ -232,7 +232,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
     }
   }
   
-  def checkAndDoIccOperation(ofg : AndroidObjectFlowGraph[Node], sCfg : SystemControlFlowGraph[String]) : Boolean = {
+  def checkAndDoIccOperation(ofg : AndroidObjectFlowGraph[Node, ValueSet], sCfg : SystemControlFlowGraph[String]) : Boolean = {
     var flag = true
     val results = ofg.doIccOperation(this.appInfo.getDummyMainSigMap)
     if(results.isEmpty) flag = false
@@ -258,36 +258,36 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
     flag
   }
   
-  def doSpecialOperation(ofg : ObjectFlowGraph[Node], typ : String) = {
+  def doSpecialOperation(ofg : ObjectFlowGraph[Node, ValueSet], typ : String) = {
     typ match{
       case "STRING" =>
-	      val vsMap = ofg.doStringOperation
+	      val vsMap = ofg.doStringOperation(fac)
 	      vsMap.map{
 	        case (k, v) =>
 	          if(stringValueSetMap.contains(k)){
-	          	val d = getDiff(v, stringValueSetMap(k))
+	          	val d = v.getDiff(stringValueSetMap(k))
 	          	if(!d.isEmpty){
-		          	k.getProperty[MMap[ResourceUri, ResourceUri]](ofg.VALUE_SET) ++= d
+		          	k.getProperty[ValueSet](ofg.VALUE_SET).update(d)
 		          	ofg.worklist += k.asInstanceOf[Node]
 	          	}
 	          } else {
-	            k.getProperty[MMap[ResourceUri, ResourceUri]](ofg.VALUE_SET) ++= v
+	            k.getProperty[ValueSet](ofg.VALUE_SET).update(v)
 	          	ofg.worklist += k.asInstanceOf[Node]
 	          }
 	      }
 	      stringValueSetMap = vsMap
       case "NATIVE" =>
-	      val vsMap = ofg.doNativeOperation
+	      val vsMap = ofg.doNativeOperation(fac)
 	      vsMap.map{
 	        case (k, v) =>
 	          if(nativeValueSetMap.contains(k)){
-	          	val d = getDiff(v, nativeValueSetMap(k))
+	          	val d = v.getDiff(nativeValueSetMap(k))
 	          	if(!d.isEmpty){
-		          	k.getProperty[MMap[ResourceUri, ResourceUri]](ofg.VALUE_SET) ++= d
+		          	k.getProperty[ValueSet](ofg.VALUE_SET).update(d)
 		          	ofg.worklist += k.asInstanceOf[Node]
 	          	}
 	          } else {
-	            k.getProperty[MMap[ResourceUri, ResourceUri]](ofg.VALUE_SET) ++= v
+	            k.getProperty[ValueSet](ofg.VALUE_SET).update(v)
 	          	ofg.worklist += k.asInstanceOf[Node]
 	          }
 	      }
@@ -295,27 +295,27 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
     }
   }
   
-  def getDiff(map1 : MMap[ResourceUri, ResourceUri], map2 : MMap[ResourceUri, ResourceUri]) = {
-    val d = mmapEmpty[ResourceUri, ResourceUri]
-    map1.keys.map{ case k => if(map2.contains(k)){if(!map1(k).equals(map2(k))){d(k) = map1(k)}}else{d(k) = map1(k)} }
-    d
-  }
+//  def getDiff(map1 : MMap[ResourceUri, ResourceUri], map2 : MMap[ResourceUri, ResourceUri]) = {
+//    val d = mmapEmpty[ResourceUri, ResourceUri]
+//    map1.keys.map{ case k => if(map2.contains(k)){if(!map1(k).equals(map2(k))){d(k) = map1(k)}}else{d(k) = map1(k)} }
+//    d
+//  }
   
   // callee is signature
   def extendGraphWithConstructGraph(callee : ResourceUri, 
       															pi : PointI, 
-      															ofg : AndroidObjectFlowGraph[Node], 
+      															ofg : AndroidObjectFlowGraph[Node, ValueSet], 
       															sCfg : SystemControlFlowGraph[String]) = {
     val points : MList[Point] = mlistEmpty
     val calleeSig : ResourceUri = androidLibInfoTables.getProcedureSignatureByUri(callee)
     if(ofg.isStringOperation(calleeSig)){
       if(new SignatureParser(calleeSig).getParamSig.isReturnNonNomal){
-        val calleeOfg = androidCache.load[ObjectFlowGraph[Node]](callee, "ofg")
+        val calleeOfg = androidCache.load[ObjectFlowGraph[Node, ValueSet]](callee, "ofg")
         processed(callee) = ofg.combineSpecialOfg(calleeSig, calleeOfg, "STRING")
       }
     } else if(ofg.isNativeOperation(androidLibInfoTables.getAccessFlag(callee))) {
       if(new SignatureParser(calleeSig).getParamSig.isReturnNonNomal){
-        val calleeOfg = androidCache.load[ObjectFlowGraph[Node]](callee, "ofg")
+        val calleeOfg = androidCache.load[ObjectFlowGraph[Node, ValueSet]](callee, "ofg")
         processed(callee) = ofg.combineSpecialOfg(calleeSig, calleeOfg, "NATIVE")
       }
     } else if(ofg.isIccOperation(calleeSig, androidLibInfoTables)) {
@@ -327,14 +327,14 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, VirtualLabel] {
         val cCfg = cCfgs(callee)
         if(callee.contains("onCreate"))
           println("callee =" + callee)
-        points ++= new PointsCollector[Node]().points(pstMap(callee), ofg)
+        points ++= new PointsCollector[Node, ValueSet]().points(pstMap(callee), ofg)
         ofg.points ++= points
         setProcessed(points, callee)
         ofg.constructGraph(points, cfg, rda)
         sCfg.collectionCCfgToBaseGraph(callee, cCfg)
       } else {
         //get ofg ccfg from file
-        val calleeOfg = androidCache.load[ObjectFlowGraph[Node]](callee, "ofg")
+        val calleeOfg = androidCache.load[ObjectFlowGraph[Node, ValueSet]](callee, "ofg")
         val calleeCCfg = androidCache.load[CompressedControlFlowGraph[String]](callee, "cCfg")
         processed(callee) = ofg.combineOfgs(calleeOfg)
         sCfg.collectionCCfgToBaseGraph(callee, calleeCCfg)

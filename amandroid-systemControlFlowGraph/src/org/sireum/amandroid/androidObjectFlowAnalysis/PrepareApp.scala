@@ -180,9 +180,6 @@ class PrepareApp(apkFileLocation : String) {
 			println("layoutcalll--->" + LayoutFileParser.getCallbackMethods)
 		  println("layoutuser--->" + LayoutFileParser.getUserControls)
 		}
-	  // filter the main component of this app
-	  this.mainComponent = filterMainComponent(ManifestParser.getIntentDB)
-	  this.entrypoints.foreach(f => generateDummyMain(f))
 
 		// Collect the results of the soot-based phases
 		analysisHelper.getCallbackMethods.foreach {
@@ -238,6 +235,9 @@ class PrepareApp(apkFileLocation : String) {
 		    }
 		}
 		println("Found " + this.callbackMethods.size + " callback methods")
+		// filter the main component of this app
+    this.mainComponent = filterMainComponent(ManifestParser.getIntentDB)
+    this.entrypoints.foreach(f => generateDummyMain(f))
 //
 //		PermissionMethodParser parser = PermissionMethodParser.fromFile(sourceSinkFile);
 //		for (AndroidMethod am : parser.parse()){

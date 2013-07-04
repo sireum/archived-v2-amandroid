@@ -15,6 +15,7 @@ import org.sireum.amandroid.scfg.CompressedControlFlowGraph
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidOfgPreprocessor
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidObjectFlowGraph
 import org.sireum.amandroid.objectFlowAnalysis.OfaNode
+import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet
 
 class AndroidFixIntraProceduralModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends AndroidFixIntraProceduralModule {
   val newProcedures = this.appInfo.getDummyMainCodeMap
@@ -51,7 +52,7 @@ class AndroidFixIntraProceduralModuleDef (val job : PipelineJob, info : Pipeline
 	      val pst = result._1.procedureSymbolTable(pUri)
 	      val (pool, cfg) = buildCfg(pst)
 		    var rdaOpt : Option[ReachingDefinitionAnalysis.Result] = None
-		    var ofgOpt : Option[AndroidObjectFlowGraph[OfaNode]] = None
+		    var ofgOpt : Option[AndroidObjectFlowGraph[OfaNode, AndroidValueSet]] = None
 		    var cCfgOpt : Option[CompressedControlFlowGraph[VirtualLabel]] = None
 		
 		    if (this.shouldBuildRda){

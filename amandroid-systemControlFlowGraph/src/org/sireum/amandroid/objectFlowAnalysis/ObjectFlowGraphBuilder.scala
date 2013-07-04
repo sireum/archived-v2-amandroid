@@ -12,9 +12,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 
-abstract class ObjectFlowGraphBuilder {
-  
-  type Node = OfaNode
+abstract class ObjectFlowGraphBuilder[Node <: OfaNode, ValueSet <: NormalValueSet] {
+
   type Edge = AlirEdge[Node]
   
   val pstMap : MMap[ResourceUri, ProcedureSymbolTable] = mmapEmpty
@@ -25,11 +24,11 @@ abstract class ObjectFlowGraphBuilder {
   def doOFA(pst : ProcedureSymbolTable,
             cfg : ControlFlowGraph[String],
             rda : ReachingDefinitionAnalysis.Result,
-            ofg : ObjectFlowGraph[Node])
+            ofg : ObjectFlowGraph[Node, ValueSet])
   
-  def fix(ofg : ObjectFlowGraph[Node]) : Unit
+  def fix(ofg : ObjectFlowGraph[Node, ValueSet]) : Unit
   
-  def extendGraphWithConstructGraph(callee : ResourceUri, pi : PointI, ofg : ObjectFlowGraph[Node])
+  def extendGraphWithConstructGraph(callee : ResourceUri, pi : PointI, ofg : ObjectFlowGraph[Node, ValueSet])
   
   def setProcessed(points : MList[Point], callee : ResourceUri)
  

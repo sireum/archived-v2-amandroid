@@ -13,6 +13,7 @@ import org.sireum.alir._
 import org.sireum.pilar.symbol._
 import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidObjectFlowGraph
+import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet
 
 
 /*
@@ -30,7 +31,7 @@ object AndroidIntraProcedural {
   type RDA = ReachingDefinitionAnalysis.Result  //adding for rda building
   
   type CCFG = CompressedControlFlowGraph[VirtualLabel]
-  type OFG = AndroidObjectFlowGraph[OfaNode]
+  type OFG = AndroidObjectFlowGraph[OfaNode, AndroidValueSet]
   
   final case class AndroidIntraAnalysisResult(
     pool : AlirIntraProceduralGraph.NodePool,

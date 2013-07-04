@@ -34,6 +34,7 @@ import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidObjectFlowGraph
 import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph
+import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet
 
 trait PreprocessLibraryFrameWork extends TestFramework { 
   
@@ -137,7 +138,7 @@ trait PreprocessLibraryFrameWork extends TestFramework {
             intraResult(key).ofgOpt match {
               case Some(ofg) =>
 //                ofg.toDot(w)
-                aCache.save[ObjectFlowGraph[OfaNode]](key, "ofg", ofg)
+                aCache.save[AndroidObjectFlowGraph[OfaNode, AndroidValueSet]](key, "ofg", ofg)
               case None =>
             }
             intraResult(key).cCfgOpt match {

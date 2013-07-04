@@ -1,0 +1,26 @@
+package org.sireum.amandroid.objectFlowAnalysis
+
+import org.sireum.util._
+
+class NormalValueSet {
+  protected var insts : Set[PointO] = Set()
+  protected var strs : Set[String] = Set()
+  def instances = this.insts
+  def strings = this.strs
+  def setInstance(po : PointO) = this.insts += po
+  def setString(str : String) = this.strs += str
+  def setInstances(pos : Set[PointO]) = this.insts ++= pos
+  def setStrings(strs : Set[String]) = this.strs ++= strs
+  def update(vs : NormalValueSet) = {
+    this.insts ++= vs.instances
+    this.strs ++= vs.strings
+  }
+  def isEmpty() : Boolean = insts.isEmpty && strs.isEmpty
+  def getDiff(vs : NormalValueSet) : NormalValueSet = {
+    val d : NormalValueSet = new NormalValueSet
+    d.setInstances(this.insts.diff(vs.instances))
+    d.setStrings(this.strs.diff(vs.strings))
+    d
+  }
+  override def toString() : String = "ValueSet: \ninstances: " + insts + "\nstrings: " + strs
+}

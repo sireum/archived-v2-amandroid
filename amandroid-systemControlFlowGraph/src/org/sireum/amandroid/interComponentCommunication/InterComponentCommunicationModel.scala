@@ -12,9 +12,11 @@ import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.parser.Data
 import org.sireum.amandroid.parser.UriData
+import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet
+import org.sireum.amandroid.objectFlowAnalysis.PointO
 
 
-trait InterComponentCommunicationModel[Node <: OfaNode] extends ObjectFlowGraph[Node] {
+trait InterComponentCommunicationModel[Node <: OfaNode, ValueSet <: AndroidValueSet] extends ObjectFlowGraph[Node, ValueSet] {
 	/**
    * contain all inter component communication method call signatures and caller parameter nodes
    */
@@ -33,7 +35,7 @@ trait InterComponentCommunicationModel[Node <: OfaNode] extends ObjectFlowGraph[
       flag = false
     } else {
       val intentNode = getNode(pi.args(0))
-      if(intentNode.getProperty[MMap[ResourceUri, ResourceUri]]("ValueSet").isEmpty){
+      if(intentNode.getProperty[ValueSet](VALUE_SET).isEmpty){
   		  flag = false
   		}
     }
@@ -44,10 +46,10 @@ trait InterComponentCommunicationModel[Node <: OfaNode] extends ObjectFlowGraph[
     var result : Map[PointI, Set[String]] = Map()
     iccOperationTracker.map{
       case (k, v) =>
-        println("(k, v) = " + (k, v))
+        println("k, v -==> " + (k, v))
         if(checkIccOperation(k)){
           val intentNode = getNode(v.args(0))
-	        val intentValueSet : MMap[ResourceUri, ResourceUri] = intentNode.getProperty[MMap[ResourceUri, ResourceUri]]("ValueSet")
+	        val intentValueSet : ValueSet = intentNode.getProperty[ValueSet](VALUE_SET)
 	        hasExplicitTarget(intentValueSet) match {
 	          case Some(targets) =>
 	            //explicit case
@@ -65,22 +67,23 @@ trait InterComponentCommunicationModel[Node <: OfaNode] extends ObjectFlowGraph[
           System.err.println("Inter-Component Communication connection failed for: " + k + ", because of intent object flow error.")
         }
     }
+    println("result==>" + result)
     iccOperationTracker = Map()
     result
   }
   
-  def hasExplicitTarget(intentValueSet : MMap[ResourceUri, ResourceUri]) : Option[Set[String]] = {
-    intentValueSet.keys.foreach{
+  def hasExplicitTarget(intentValueSet : ValueSet) : Option[Set[String]] = {
+    intentValueSet.instances.foreach{
       intentIns =>
         val intentFields = iFieldDefRepo(intentIns)
         if(intentFields.contains(AndroidConstants.INTENT_COMPONENT)){
           val componentValueSet = intentFields(AndroidConstants.INTENT_COMPONENT)._2
-          componentValueSet.keys.foreach{
+          componentValueSet.instances.foreach{
             compIns =>
               val componentFields = iFieldDefRepo(compIns)
               if(componentFields.contains(AndroidConstants.COMPONENTNAME_CLASS)){
                 val classValueSet = componentFields(AndroidConstants.COMPONENTNAME_CLASS)._2
-                return Some(classValueSet.keySet.toSet)
+                return Some(classValueSet.strings)
               }
           }
         }
@@ -88,9 +91,9 @@ trait InterComponentCommunicationModel[Node <: OfaNode] extends ObjectFlowGraph[
     None
   }
   
-  def hasImplicitTarget(intentValueSet : MMap[ResourceUri, ResourceUri]) : Option[Set[String]] = {
+  def hasImplicitTarget(intentValueSet : ValueSet) : Option[Set[String]] = {
     var components : Set[String] = Set()
-    intentValueSet.keys.foreach{
+    intentValueSet.instances.foreach{
       intentIns =>
         var compsForThisIntent:Set[String] = Set()    
         println("intentIns = " + intentIns)
@@ -98,10 +101,7 @@ trait InterComponentCommunicationModel[Node <: OfaNode] extends ObjectFlowGraph[
         var actions:Set[String] = Set()
         if(intentFields.contains(AndroidConstants.INTENT_ACTION)){
           val actionValueSet = intentFields(AndroidConstants.INTENT_ACTION)._2
-          actionValueSet.keys.foreach{
-            action =>
-              actions += action
-          }
+          actions ++= actionValueSet.strings
         }
         println("actions = " + actions)
         
@@ -111,22 +111,20 @@ trait InterComponentCommunicationModel[Node <: OfaNode] extends ObjectFlowGraph[
         if(intentFields.contains(AndroidConstants.INTENT_URI_DATA)){
           var uriString:String = null
           val dataValueSet = intentFields(AndroidConstants.INTENT_URI_DATA)._2
-          dataValueSet.keys.foreach{
+          dataValueSet.instances.foreach{
             stringUriIns =>              
               println("stringUriIns = " + stringUriIns)
               val stringUriFields = iFieldDefRepo(stringUriIns) // do we need to double check if stringUriIns is in fact a stringUri-instance?
               if(stringUriFields.contains(AndroidConstants.URI_STRING_URI_URI_STRING)){
                 val uriStringValueSet = stringUriFields(AndroidConstants.URI_STRING_URI_URI_STRING)._2
                 println("uriStringValueSet = " + uriStringValueSet)
-                uriStringValueSet.foreach{
-                  case (k, v) =>
-                               if(v.equals("STRING")){
-                                 uriString = k
-                                 var uriData = new UriData
-                                 populateByUri(uriData, uriString)
-                                 println("uriString: " + uriString + " , populated data: (" + uriData +")")
-                                 datas +=uriData
-                               }
+                uriStringValueSet.strings.foreach{
+                  k =>
+                     uriString = k
+                     var uriData = new UriData
+                     populateByUri(uriData, uriString)
+                     println("uriString: " + uriString + " , populated data: (" + uriData +")")
+                     datas +=uriData
                 }
                 
               }
@@ -138,12 +136,10 @@ trait InterComponentCommunicationModel[Node <: OfaNode] extends ObjectFlowGraph[
         var mTypes:Set[String] = Set()
         if(intentFields.contains(AndroidConstants.INTENT_MTYPE)){
           val mTypeValueSet = intentFields(AndroidConstants.INTENT_MTYPE)._2
-          mTypeValueSet.foreach{
-            case (k, v)  =>
-              if(v.equals("STRING")){
-                mTypes +=k
-                println("mType = " + k)
-              }
+          mTypeValueSet.strings.foreach{
+            k  =>
+              mTypes +=k
+              println("mType = " + k)
           }
         }
         println("mTypes = " + mTypes)

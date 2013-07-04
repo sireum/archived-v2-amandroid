@@ -3,42 +3,40 @@ package org.sireum.amandroid.objectFlowAnalysis
 import org.sireum.util._
 import org.sireum.amandroid.util.CombinationIterator
 
-trait StringAnalyseModel {
+trait StringAnalyseModel[ValueSet <: NormalValueSet] {
   
   /**
    * contain all string operations and involved operation string parameter nodes and return nodes
    */
   val stringOperationTracker : MMap[String, (MList[OfaNode], Option[OfaNode])] = mmapEmpty
-  
   def checkStringOperation(pUri : ResourceUri) : Boolean = {
     var flag : Boolean = true
     stringOperationTracker(pUri)._1.foreach{
       node =>
-    		if(node.getProperty[MMap[ResourceUri, ResourceUri]]("ValueSet").isEmpty){
+    		if(node.getProperty[ValueSet]("ValueSet").isEmpty){
     		  flag = false
     		}
     }
     flag
   }
   
-  def doStringOperation() = {
-    val result : MMap[OfaNode, MMap[ResourceUri, ResourceUri]] = mmapEmpty
+  def doStringOperation(fac :() => ValueSet) = {
+    val result : MMap[OfaNode, ValueSet] = mmapEmpty
     stringOperationTracker.map{
       case (k, v) =>
         if(checkStringOperation(k)){
 	        val strings : MList[ResourceUri] = mlistEmpty
-	        val valueSets : MMap[Int, MMap[ResourceUri, ResourceUri]] = mmapEmpty
+	        val valueSets : MMap[Int, ValueSet] = mmapEmpty
 	        for(i <- 0 to v._1.size - 1){
-	          valueSets(i) = mmapEmpty
-	          valueSets(i) ++= v._1(i).getProperty[MMap[ResourceUri, ResourceUri]]("ValueSet").filter(item => if(item._2.equals("STRING"))true else false)
+	          valueSets(i) = v._1(i).getProperty[ValueSet]("ValueSet")
 	        }
 	        val strsList = getStringList(valueSets)
-	        val strs = if(!strsList.isEmpty && !strsList(0).isEmpty)strsList.map{l => (applyStringOperation(k, strings ++ l), "STRING")}.toMap
-	        					 else Map()
+	        val strs : Set[String] = if(!strsList.isEmpty && !strsList(0).isEmpty)strsList.map{l => applyStringOperation(k, strings ++ l)}.toSet
+	        					 else Set()
 	        v._2 match{
 	          case Some(r) =>
-	            result(r) = mmapEmpty
-	            result(r) ++= strs
+	            result(r) = fac()
+	            result(r).setStrings(strs)
 	          case None =>
 	        }
         }
@@ -47,8 +45,8 @@ trait StringAnalyseModel {
     result
   }
   
-  def getStringList(argsValueSets : MMap[Int, MMap[ResourceUri, ResourceUri]]) : List[List[String]] = {
-    val lists = argsValueSets.toList.sortBy(_._1).map{case (k, v) => v.map{case (uri, typ) => uri}.toList}
+  def getStringList(argsValueSets : MMap[Int, ValueSet]) : List[List[String]] = {
+    val lists = argsValueSets.toList.sortBy(_._1).map{case (k, v) => v.strings.toList}
     CombinationIterator.combinationIterator[ResourceUri](lists).toList
   }
   

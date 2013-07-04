@@ -14,6 +14,7 @@ import org.sireum.pilar.symbol._
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidObjectFlowGraph
 import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp
+import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet
 
 /*
 Copyright (c) 2012-2013 Sankardas Roy & Fengguo Wei, Kansas State University.        
@@ -25,7 +26,7 @@ http://www.eclipse.org/legal/epl-v10.html
 
 object AndroidInterProcedural {
   type VirtualLabel = String
-  type OfaSCfg = (AndroidObjectFlowGraph[OfaNode], SystemControlFlowGraph[String])
+  type OfaSCfg = (AndroidObjectFlowGraph[OfaNode, AndroidValueSet], SystemControlFlowGraph[String])
     
   final case class AndroidInterAnalysisResult(
     ofaScfg : AndroidInterProcedural.OfaSCfg)

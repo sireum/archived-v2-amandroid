@@ -6,7 +6,7 @@ import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.pilar.ast.NameExp
 import org.sireum.amandroid.util.SignatureParser
 
-trait NativeMethodModel {
+trait NativeMethodModel[ValueSet <: NormalValueSet] {
   /**
    * contain all native operation signatures and involved operation parameter nodes and return nodes
    */
@@ -16,32 +16,32 @@ trait NativeMethodModel {
     var flag : Boolean = true
     nativeOperationTracker(pUri)._1.foreach{
       node =>
-    		if(node.getProperty[MMap[ResourceUri, ResourceUri]]("ValueSet").isEmpty){
+    		if(node.getProperty[ValueSet]("ValueSet").isEmpty){
     		  flag = false
     		}
     }
     flag
   }
   
-  def doNativeOperation() = {
-    val result : MMap[OfaNode, MMap[ResourceUri, ResourceUri]] = mmapEmpty
+  def doNativeOperation(fac :() => ValueSet) = {
+    val result : MMap[OfaNode, ValueSet] = mmapEmpty
     nativeOperationTracker.map{
       case (k, v) =>
         if(checkNativeOperation(k)){
           val retTyp = (new SignatureParser(k).getParamSig.getReturnObjectType).getOrElse(null)
 	        val values : MList[ResourceUri] = mlistEmpty
-	        val valueSets : MMap[Int, MMap[ResourceUri, ResourceUri]] = mmapEmpty
+	        val valueSets : MMap[Int, ValueSet] = mmapEmpty
 	        for(i <- 0 to v._1.size - 1){
-	          valueSets(i) = mmapEmpty
-	          valueSets(i) ++= v._1(i).getProperty[MMap[ResourceUri, ResourceUri]]("ValueSet")
+	          valueSets(i) = fac()
+	          valueSets(i).update(v._1(i).getProperty[ValueSet]("ValueSet"))
 	        }
 	        val strsList = getValueSetList(valueSets)
-	        val strs = if(retTyp != null && !strsList.isEmpty && !strsList(0).isEmpty)strsList.map{l => (applyNativeOperation(k, values ++ l), if(retTyp.equals("[|java:lang:String|]"))"STRING" else retTyp)}.toMap
-	        					 else Map()
+	        val strs : Set[String] = if(retTyp != null && !strsList.isEmpty && !strsList(0).isEmpty)strsList.map{l => applyNativeOperation(k, values ++ l)}.toSet
+	        					 else Set()
 	        v._2 match{
 	          case Some(r) =>
-	            result(r) = mmapEmpty
-	            result(r) ++= strs
+	            result(r) = fac()
+	            result(r).setStrings(strs)
 	          case None =>
 	        }
         }
@@ -50,8 +50,8 @@ trait NativeMethodModel {
     result
   }
   
-  def getValueSetList(argsValueSets : MMap[Int, MMap[ResourceUri, ResourceUri]]) : List[List[String]] = {
-    val lists = argsValueSets.toList.sortBy(_._1).map{case (k, v) => v.map{case (uri, typ) => uri}.toList}
+  def getValueSetList(argsValueSets : MMap[Int, ValueSet]) : List[List[String]] = {
+    val lists = argsValueSets.toList.sortBy(_._1).map{case (k, v) => v.strings.toList}
     CombinationIterator.combinationIterator[ResourceUri](lists).toList
   }
   

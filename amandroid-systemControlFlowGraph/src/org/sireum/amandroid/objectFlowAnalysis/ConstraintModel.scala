@@ -3,7 +3,7 @@ package org.sireum.amandroid.objectFlowAnalysis
 import org.sireum.util._
 import org.sireum.alir._
 
-trait ConstraintModel extends ObjectFlowRepo{
+trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSet]{
   
   val points : MList[Point] = mlistEmpty
   

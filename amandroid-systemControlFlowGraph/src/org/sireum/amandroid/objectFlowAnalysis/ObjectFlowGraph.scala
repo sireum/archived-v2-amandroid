@@ -13,15 +13,15 @@ import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.jgrapht.ext.VertexNameProvider
 import java.io.Writer
 import org.jgrapht.ext.DOTExporter
+import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet
 
-abstract class ObjectFlowGraph[Node <: OfaNode] 
+abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val fac: () => ValueSet)
   extends AlirGraph[Node]
   with AlirEdgeAccesses[Node]
   with AlirSuccPredAccesses[Node]
-  with ObjectFlowRepo
-  with ConstraintModel
-  with StringAnalyseModel
-  with NativeMethodModel{
+  with ConstraintModel[ValueSet]
+  with StringAnalyseModel[ValueSet]
+  with NativeMethodModel[ValueSet]{
   self=>
   
   protected val graph = new DirectedMultigraph(
@@ -65,7 +65,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode]
   /**
    * combine two ofgs into one, and combine all repos inside two ofgs.
    */ 
-  def combineOfgs(ofg2 : ObjectFlowGraph[Node]) : PointProc = {
+  def combineOfgs(ofg2 : ObjectFlowGraph[Node, ValueSet]) : PointProc = {
     pool ++= ofg2.pool
     ofg2.nodes.foreach(
       node=>{
@@ -226,14 +226,14 @@ abstract class ObjectFlowGraph[Node <: OfaNode]
             baseNode.fieldNode = fieldNode
             fieldNode.baseNode = baseNode
           case pso : PointStringO =>
-            rhsNode.propertyMap(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]](pso.varName) = "STRING"
-            rhsNode.propertyMap(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]](pso.toString) = "[|java:lang:String|]"
+            rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].setString(pso.varName)
+            rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].setInstance(pso)
             worklist += rhsNode
           case po : PointO =>
-            rhsNode.propertyMap(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]](po.toString) = po.typ
-            if(isStringKind(po.varName)){
-              rhsNode.propertyMap(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]("") = "STRING"
-            }
+            rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].setInstance(po)
+//            if(isStringKind(po.varName)){
+//              rhsNode.propertyMap(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]("") = "STRING"
+//            }
             worklist += rhsNode
           case pr : PointR =>
         }
@@ -330,12 +330,12 @@ abstract class ObjectFlowGraph[Node <: OfaNode]
   
   def updateFieldValueSet(fieldNode : OfaFieldNode) = {
     val baseNode = fieldNode.baseNode
-    val baseValueSet = baseNode.getProperty(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
-    baseValueSet.keys.foreach(
+    val baseValueSet = baseNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
+    baseValueSet.instances.foreach(
       ins => {
         val fieldMap = iFieldDefRepo(ins)
-        val valueSet = fieldNode.getProperty(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
-        valueSet ++= fieldMap(fieldNode.fieldName)._2
+        val valueSet = fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
+        valueSet.update(fieldMap(fieldNode.fieldName)._2)
       }  
     )
   }
@@ -343,21 +343,21 @@ abstract class ObjectFlowGraph[Node <: OfaNode]
   /**
    * @param: d is a map from instance name to type
    */ 
-  def updateFieldValueSet(d : MMap[ResourceUri, ResourceUri], fieldNode : OfaFieldNode) = {
-    val tempVs : MMap[ResourceUri, ResourceUri] = mmapEmpty
-    d.keys.foreach(
+  def updateFieldValueSet(d : ValueSet, fieldNode : OfaFieldNode) = {
+    val tempVs = fac()
+    d.instances.foreach(
       ins => {
         val fieldMap = iFieldDefRepo(ins)
         if(!fieldMap.contains(fieldNode.fieldName)){
-          fieldMap(fieldNode.fieldName) = (msetEmpty, mmapEmpty)
+          fieldMap(fieldNode.fieldName) = (msetEmpty, fac())
         }
         fieldMap(fieldNode.fieldName)._1 += fieldNode
-        tempVs ++= fieldMap(fieldNode.fieldName)._2
+        tempVs.update(fieldMap(fieldNode.fieldName)._2)
       }  
     )
-    val valueSet = fieldNode.getProperty(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
+    val valueSet = fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
     if(!tempVs.isEmpty){
-      valueSet ++= tempVs
+      valueSet.update(tempVs)
       worklist += fieldNode.asInstanceOf[Node]
     }
   }
@@ -365,16 +365,16 @@ abstract class ObjectFlowGraph[Node <: OfaNode]
   /**
    * When a field is assigned then we populate the iFieldDefRepo
    */ 
-  def populateIFieldRepo(d : MMap[ResourceUri, ResourceUri], fieldNode : OfaFieldNode) = {
+  def populateIFieldRepo(d : ValueSet, fieldNode : OfaFieldNode) = {
     val baseNode = fieldNode.baseNode
-    val valueSet = baseNode.getProperty(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
-    valueSet.keys.foreach(
+    val valueSet = baseNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
+    valueSet.instances.foreach(
       ins => {
         val fieldMap = iFieldDefRepo(ins)
         if(!fieldMap.contains(fieldNode.fieldName)){
-          fieldMap(fieldNode.fieldName) = (msetEmpty, mmapEmpty)
+          fieldMap(fieldNode.fieldName) = (msetEmpty, fac())
         }
-        fieldMap(fieldNode.fieldName)._2 ++= d
+        fieldMap(fieldNode.fieldName)._2.update(d)
         worklist ++= fieldMap(fieldNode.fieldName)._1.asInstanceOf[MSet[Node]]
       }  
     )
@@ -383,13 +383,13 @@ abstract class ObjectFlowGraph[Node <: OfaNode]
   /**
    * When a global variable is assigned then we populate the globalDefRepo
    */ 
-  def populateGlobalDefRepo(d : MMap[ResourceUri, ResourceUri], globalVarNode : OfaGlobalVarNode) = {
-    val (usages, valueSet) = globalDefRepo.getOrElseUpdate(globalVarNode.uri, (msetEmpty, mmapEmpty))
-    valueSet ++= d
+  def populateGlobalDefRepo(d : ValueSet, globalVarNode : OfaGlobalVarNode) = {
+    val (usages, valueSet) = globalDefRepo.getOrElseUpdate(globalVarNode.uri, (msetEmpty, fac()))
+    valueSet.update(d)
     usages.foreach(
       usage => {
-        val vs = usage.getProperty(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]
-        vs ++= valueSet
+        val vs = usage.getProperty(VALUE_SET).asInstanceOf[ValueSet]
+        vs.update(valueSet)
       }  
     )
     worklist ++= usages.asInstanceOf[MSet[Node]]
@@ -399,7 +399,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode]
    * When a global variable happen in right hand side then we set the globalDefRepo
    */ 
   def setGlobalDefRepo(globalVarNode : OfaGlobalVarNode) = {
-    val (usages, valueSet) = globalDefRepo.getOrElseUpdate(globalVarNode.uri, (msetEmpty, mmapEmpty))
+    val (usages, valueSet) = globalDefRepo.getOrElseUpdate(globalVarNode.uri, (msetEmpty, fac()))
     usages += globalVarNode
   }
   
@@ -420,13 +420,13 @@ abstract class ObjectFlowGraph[Node <: OfaNode]
   /**
    * This is the beta method in original algo
    */ 
-  def getCalleeSet(diffSet : MMap[String, String],
+  def getCalleeSet(diff : ValueSet,
                 pi : PointI,
                 androidLibInfoTables : AndroidLibInfoTables) : MSet[ResourceUri] = {
     val calleeSet : MSet[ResourceUri] = msetEmpty
-    diffSet.values.toSet[String].foreach(
+    diff.instances.foreach(
       d => {
-        val recordUri = androidLibInfoTables.getRecordUri(d)
+        val recordUri = androidLibInfoTables.getRecordUri(d.typ)
         val procUri = androidLibInfoTables.findProcedureUri(recordUri, androidLibInfoTables.getSubSignature(pi.varName))
         if(procUri != null)
         	calleeSet += procUri
@@ -440,85 +440,85 @@ abstract class ObjectFlowGraph[Node <: OfaNode]
       case pal : PointArrayL =>
         if(!arrayNodeExists(pal.varName, pal.locationUri)){
           val node = addArrayNode(pal.varName, pal.locationUri)
-          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, fac())
           node
         } else getArrayNode(pal.varName, pal.locationUri)
       case par : PointArrayR =>
         if(!arrayNodeExists(par.varName, par.locationUri)){
           val node = addArrayNode(par.varName, par.locationUri)
-          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, fac())
           node
         } else getArrayNode(par.varName, par.locationUri)
       case pgl : PointGlobalL =>
         if(!globalVarNodeExists(pgl.varName, pgl.locationUri)){
           val node = addGlobalVarNode(pgl.varName, pgl.locationUri)
-          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, fac())
           node
         } else getGlobalVarNode(pgl.varName, pgl.locationUri)
       case pgr : PointGlobalR =>
         if(!globalVarNodeExists(pgr.varName, pgr.locationUri)){
           val node = addGlobalVarNode(pgr.varName, pgr.locationUri)
-          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, fac())
           node
         } else getGlobalVarNode(pgr.varName, pgr.locationUri)
       case pb : PointBase =>
         if(!fieldBaseNodeExists(pb.varName, pb.locationUri)){
           val node = addFieldBaseNode(pb.varName, pb.locationUri)
-          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, fac())
           node
         } else getFieldBaseNode(pb.varName, pb.locationUri)
       case pfl : PointFieldL =>
         if(!fieldNodeExists(pfl.basePoint.varName, pfl.varName, pfl.locationUri)){
           val node = addFieldNode(pfl.basePoint.varName, pfl.varName, pfl.locationUri)
-          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, fac())
           node
         } else getFieldNode(pfl.basePoint.varName, pfl.varName, pfl.locationUri)
       case pfr : PointFieldR =>
         if(!fieldNodeExists(pfr.basePoint.varName, pfr.varName, pfr.locationUri)){
           val node = addFieldNode(pfr.basePoint.varName, pfr.varName, pfr.locationUri)
-          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, fac())
           node
         } else getFieldNode(pfr.basePoint.varName, pfr.varName, pfr.locationUri)
       case pr : PointRecv =>
         if(!nodeExists("recv:" + pr.varName, pr.locationUri)){
           val node = addNode("recv:" + pr.varName, pr.locationUri)
-          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, fac())
           node
         } else getNode("recv:" + pr.varName, pr.locationUri)
       case pa : PointArg =>
         if(!nodeExists("arg:" + pa.varName, pa.locationUri)){
           val node = addNode("arg:" + pa.varName, pa.locationUri)
-          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, fac())
           node
         } else getNode("arg:" + pa.varName, pa.locationUri)
       case pso : PointStringO =>
         if(!nodeExists("newString:" + pso.varName, pso.locationUri)){
           val node = addNode("newString:" + pso.varName, pso.locationUri)
-          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, fac())
           node
         } else getNode("newString:" + pso.varName, pso.locationUri)
       case po : PointO =>
         if(!nodeExists("new:" + po.varName, po.locationUri)){
           val node = addNode("new:" + po.varName, po.locationUri)
-          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, fac())
           node
         } else getNode("new:" + po.varName, po.locationUri)
       case pwi : PointWithIndex =>
         if(!nodeExists(pwi.varName, pwi.locationUri)){
           val node = addNode(pwi.varName, pwi.locationUri)
-          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, fac())
           node
         } else getNode(pwi.varName, pwi.locationUri)
       case pr : PointRNoIndex =>
         if(!nodeExists(pr.varName, pr.identifier)){
           val node = addNode(pr.varName, pr.identifier)
-          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, fac())
           node
         } else getNode(pr.varName, pr.identifier)
       case pp : PointProc =>
         if(!nodeExists(pp.pUri)){
           val node = addNode(pp.pUri)
-          node.setProperty(VALUE_SET, mmapEmpty[ResourceUri, ResourceUri])
+          node.setProperty(VALUE_SET, fac())
           node
         } else getNode(pp.pUri)
     }

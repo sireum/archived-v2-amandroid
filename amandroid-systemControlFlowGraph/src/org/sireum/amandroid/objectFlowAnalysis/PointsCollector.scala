@@ -5,9 +5,9 @@ import org.sireum.util._
 import org.sireum.pilar.ast._
 import org.sireum.amandroid.util.SignatureParser
 
-class PointsCollector[Node <: OfaNode] {
+class PointsCollector[Node <: OfaNode, ValueSet <: NormalValueSet] {
   
-  def collectProcPoint(pst : ProcedureSymbolTable, ofg : ObjectFlowGraph[Node]) : PointProc = {
+  def collectProcPoint(pst : ProcedureSymbolTable, ofg : ObjectFlowGraph[Node, ValueSet]) : PointProc = {
     val pUri = pst.procedureUri
     val pProc : PointProc = new PointProc(pUri)
     val sig = pst.procedure.getValueAnnotation("signature") match {
@@ -105,7 +105,7 @@ class PointsCollector[Node <: OfaNode] {
       return false
     }
   
-  def points(pst : ProcedureSymbolTable, ofg : ObjectFlowGraph[Node]) : MList[Point] = {
+  def points(pst : ProcedureSymbolTable, ofg : ObjectFlowGraph[Node, ValueSet]) : MList[Point] = {
     val points : MList[Point] = mlistEmpty
     var loc : ResourceUri = ""
     var locIndex = 0
@@ -199,7 +199,7 @@ class PointsCollector[Node <: OfaNode] {
             if(le.typ.name.equals("STRING")){
               pl = processLHS(as.lhs)
               pr = new PointStringO(le.text, loc, locIndex, pUri)
-              ofg.iFieldDefRepo(pr.toString) = mmapEmpty
+              ofg.iFieldDefRepo(pr.asInstanceOf[PointStringO]) = mmapEmpty
             }
           case n : NewExp =>
             pl = processLHS(as.lhs)
@@ -213,7 +213,7 @@ class PointsCollector[Node <: OfaNode] {
             }
             if(dimensions == 0){
               pr = new PointO(name, loc, locIndex, pUri)
-              ofg.iFieldDefRepo(pr.toString) = mmapEmpty
+              ofg.iFieldDefRepo(pr.asInstanceOf[PointO]) = mmapEmpty
             } else {
               pr = new PointArrayO(name, loc, locIndex, pUri)
               pr.asInstanceOf[PointArrayO].dimensions = dimensions

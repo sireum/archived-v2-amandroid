@@ -10,19 +10,19 @@ import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.objectFlowAnalysis.PointsCollector
 import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraphPreprocessor
 
-object AndroidOfgPreprocessor extends ObjectFlowGraphPreprocessor[OfaNode]{  
+object AndroidOfgPreprocessor extends ObjectFlowGraphPreprocessor[OfaNode, AndroidValueSet]{  
   private var androidLibInfoTables : AndroidLibInfoTables = null
   def setAndroidLibInfoTables(alit : AndroidLibInfoTables) = this.androidLibInfoTables = alit
   
   def apply(pst : ProcedureSymbolTable,
             cfg : ControlFlowGraph[String],
-            rda : ReachingDefinitionAnalysis.Result) : AndroidObjectFlowGraph[OfaNode]
+            rda : ReachingDefinitionAnalysis.Result) : AndroidObjectFlowGraph[OfaNode, AndroidValueSet]
             = build(pst, cfg, rda)
                     
   def build(pst : ProcedureSymbolTable,
             cfg : ControlFlowGraph[String],
-            rda : ReachingDefinitionAnalysis.Result) : AndroidObjectFlowGraph[OfaNode] = {
-    val result = new AndroidObjectFlowGraph[OfaNode]
+            rda : ReachingDefinitionAnalysis.Result) : AndroidObjectFlowGraph[OfaNode, AndroidValueSet] = {
+    val result = new AndroidObjectFlowGraph[OfaNode, AndroidValueSet]({() => new AndroidValueSet})
     doPreOfg(pst, cfg,rda, result)
     result
   }
@@ -30,7 +30,7 @@ object AndroidOfgPreprocessor extends ObjectFlowGraphPreprocessor[OfaNode]{
   override def doPreOfg(pst : ProcedureSymbolTable,
             cfg : ControlFlowGraph[String],
             rda : ReachingDefinitionAnalysis.Result,
-            ofg : ObjectFlowGraph[OfaNode]) = {
+            ofg : ObjectFlowGraph[OfaNode, AndroidValueSet]) = {
     val points = new PointsCollector().points(pst, ofg)
     ofg.points ++= points
     ofg.constructGraph(points, cfg, rda)

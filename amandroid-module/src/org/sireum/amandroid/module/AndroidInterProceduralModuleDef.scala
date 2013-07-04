@@ -13,6 +13,7 @@ import org.sireum.alir.ReachingDefinitionAnalysis
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidObjectFlowGraph
 import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidOfgAndScfgBuilder
+import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet
 
 class AndroidInterProceduralModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) 
 extends AndroidInterProceduralModule with ImplicitLogging {
@@ -86,10 +87,10 @@ extends AndroidInterProceduralModule with ImplicitLogging {
 }
 
 class OfaSCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends OfaSCfgModule {
-  var result : (AndroidObjectFlowGraph[OfaNode], SystemControlFlowGraph[String]) = null
+  var result : (AndroidObjectFlowGraph[OfaNode, AndroidValueSet], SystemControlFlowGraph[String]) = null
   this.androidCache match{
     case Some(ac) =>
-      result = new AndroidOfgAndScfgBuilder[OfaNode, String].apply(this.procedureSymbolTables, this.cfgs, this.rdas, this.cCfgs, this.androidLibInfoTables, this.appInfo, ac)
+      result = new AndroidOfgAndScfgBuilder[OfaNode, AndroidValueSet, String]({() => new AndroidValueSet}).apply(this.procedureSymbolTables, this.cfgs, this.rdas, this.cCfgs, this.androidLibInfoTables, this.appInfo, ac)
     case None =>
   }
   this.OFAsCfg_=(result)
