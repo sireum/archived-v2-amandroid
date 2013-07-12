@@ -12,9 +12,9 @@ import org.sireum.amandroid.xml.AndroidXStream
 import org.sireum.pipeline.ErrorneousModulesThrowable
 import org.sireum.pipeline.PipelineStage
 import org.sireum.pipeline.PipelineConfiguration
-import org.sireum.alir.ReachingDefinitionAnalysis
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidOfgPreprocessor
+import org.sireum.amandroid.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -136,7 +136,7 @@ class RdaModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends
   val pst = this.procedureSymbolTable
   val iiopp = this.isInputOutputParamPredicate(pst)
   val alit = this.androidLibInfoTables
-  this.rda_=(ReachingDefinitionAnalysis[String](pst,
+  this.rda_=(AndroidReachingDefinitionAnalysis[String](pst,
     this.cfg,
     this.defRef(pst.symbolTable, alit),
     first2(iiopp),

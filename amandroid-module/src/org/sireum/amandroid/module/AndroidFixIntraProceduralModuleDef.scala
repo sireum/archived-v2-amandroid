@@ -10,12 +10,12 @@ import org.sireum.pilar.ast._
 import org.sireum.pilar.parser.ChunkingPilarParser
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.alir.AlirIntraProceduralGraph
-import org.sireum.alir.ReachingDefinitionAnalysis
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidOfgPreprocessor
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidObjectFlowGraph
 import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet
+import org.sireum.amandroid.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
 
 class AndroidFixIntraProceduralModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends AndroidFixIntraProceduralModule {
   val newProcedures = this.appInfo.getDummyMainCodeMap
@@ -51,7 +51,7 @@ class AndroidFixIntraProceduralModuleDef (val job : PipelineJob, info : Pipeline
 	    pUri=>
 	      val pst = result._1.procedureSymbolTable(pUri)
 	      val (pool, cfg) = buildCfg(pst)
-		    var rdaOpt : Option[ReachingDefinitionAnalysis.Result] = None
+		    var rdaOpt : Option[AndroidReachingDefinitionAnalysis.Result] = None
 		    var ofgOpt : Option[AndroidObjectFlowGraph[OfaNode, AndroidValueSet]] = None
 		    var cCfgOpt : Option[CompressedControlFlowGraph[VirtualLabel]] = None
 		
@@ -92,14 +92,14 @@ class AndroidFixIntraProceduralModuleDef (val job : PipelineJob, info : Pipeline
 	
 	def buildRda (pst : ProcedureSymbolTable, cfg : ControlFlowGraph[VirtualLabel]) = {
 	  val iiopp = iopp(pst)
-	  ReachingDefinitionAnalysis[VirtualLabel](pst,
+	  AndroidReachingDefinitionAnalysis[VirtualLabel](pst,
 	    cfg,
 	    defRef(pst.symbolTable, libInfoTable),
 	    first2(iiopp),
 	    saom)
 	}
 	
-	def preprocessOFA (pst : ProcedureSymbolTable, cfg : ControlFlowGraph[VirtualLabel], rda : ReachingDefinitionAnalysis.Result) = {
+	def preprocessOFA (pst : ProcedureSymbolTable, cfg : ControlFlowGraph[VirtualLabel], rda : AndroidReachingDefinitionAnalysis.Result) = {
 	  AndroidOfgPreprocessor.setAndroidLibInfoTables(libInfoTable)
 	  AndroidOfgPreprocessor(pst, cfg, rda)
 	}

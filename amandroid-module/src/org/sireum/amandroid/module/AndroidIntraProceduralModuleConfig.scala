@@ -14,6 +14,7 @@ import org.sireum.pilar.symbol._
 import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidObjectFlowGraph
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet
+import org.sireum.amandroid.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
 
 
 /*
@@ -28,7 +29,7 @@ object AndroidIntraProcedural {
   type VirtualLabel = String
   type Node = OfaNode
   type CFG = ControlFlowGraph[VirtualLabel]
-  type RDA = ReachingDefinitionAnalysis.Result  //adding for rda building
+  type RDA = AndroidReachingDefinitionAnalysis.Result  //adding for rda building
   
   type CCFG = CompressedControlFlowGraph[VirtualLabel]
   type OFG = AndroidObjectFlowGraph[OfaNode, AndroidValueSet]
@@ -143,7 +144,7 @@ case class Rda(
 
   @Input switchAsOrderedMatch : Boolean = false,
 
-  @Output @Produce rda : ReachingDefinitionAnalysis.Result)
+  @Output @Produce rda : AndroidIntraProcedural.RDA)
 
 case class cCfg(
   title : String = "Compressed Control Flow Graph Builder",
@@ -172,7 +173,7 @@ case class OFAPreprocess(
   
   @Input
   @Consume(Array(classOf[Rda]))
-  rda : ReachingDefinitionAnalysis.Result,
+  rda : AndroidIntraProcedural.RDA,
   
   @Input
   procedureSymbolTable : ProcedureSymbolTable,

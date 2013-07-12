@@ -91,18 +91,39 @@ final class AndroidDefRef(st: SymbolTable, val varAccesses: VarAccesses, alit : 
   }
 
   def strongDefinitions(a: Assignment): ISet[Slot] =
+    
     defCache.getOrElseUpdate(a, {
       val lhss = PilarAstUtil.getLHSs(a)
       var result = isetEmpty[Slot]
-      for (ne @ NameExp(_) <- lhss.keys) {
+      def resolveNameExp(ne : NameExp) = {
         var uri : ResourceUri = null
         if(!ne.name.hasResourceInfo){
-          
-        	uri = alit.getGlobalVarUriByName(ne.name.name)
+          uri = alit.getGlobalVarUriByName(ne.name.name)
         } else {
           uri = ne.name.uri
         }
         result = result + VarSlot(uri)
+      }
+      lhss.keys.foreach{
+        case key=>
+          key match{
+            case ne : NameExp =>
+              resolveNameExp(ne)
+            case ae : AccessExp =>
+              ae.exp match {
+                case ane : NameExp =>
+                  resolveNameExp(ane)
+                case _ =>
+              }
+            case ie : IndexingExp =>
+              println("indexingExp--->" + ie)
+              ie.exp match {
+                case ine : NameExp =>
+                  resolveNameExp(ine)
+                case _ =>
+              }
+            case _=>
+          }
       }
       result
     })
@@ -125,13 +146,14 @@ final class AndroidDefRef(st: SymbolTable, val varAccesses: VarAccesses, alit : 
   }
 
   def callDefinitions(j: CallJump): ISeq[ISet[Slot]] = {
-    val arg = j.callExp.arg
-    arg match {
-      case e: TupleExp =>
-        e.exps.map { exp => isetEmpty[Slot] }
-      case e =>
-        ivector(isetEmpty[Slot])
-    }
+//    val arg = j.callExp.arg
+//    arg match {
+//      case e: TupleExp =>
+//        e.exps.map { exp => isetEmpty[Slot] }
+//      case e =>
+//        ivector(isetEmpty[Slot])
+//    }
+    callReferences(j)
   }
 
   private def getRefs(n: PilarAstNode): ISet[Slot] = {
