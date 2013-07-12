@@ -147,13 +147,21 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
               }
             } else {
               defDesc match {
+                case pdd : ParamDefDesc =>
+                  pdd.locUri match{
+                    case Some(locU) =>
+                      val tp = getParamPoint(p.varName, pdd.paramIndex, locU, pdd.locIndex, points, avoidMode)
+                      if(tp!=null)
+                        ps += tp
+                    case None =>
+                  }
                 case ldd : LocDefDesc => 
                   ldd.locUri match {
                     case Some(locU) =>
                       val tp = getPoint(p.varName, locU, ldd.locIndex, points, avoidMode)
                       if(tp!=null)
                         ps += tp
-                    case _ =>
+                    case None =>
                   }
                 case _ =>
               }
@@ -177,6 +185,32 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
               val locationIndex = lhs.asInstanceOf[PointWithIndex].locationIndex
               if(lhs.varName.equals(uri) && locUri.equals(locationUri) && locIndex == locationIndex)
                 point = lhs
+            }
+          case _ =>
+        }
+        
+      }
+      
+    )
+    if(!avoidMode)
+      require(point != null)
+    point
+  }
+  
+  def getParamPoint(uri : ResourceUri, paramIndex : Int, locUri : ResourceUri, locIndex : Int, ps : MList[Point], avoidMode : Boolean) : Point = {
+    var point : Point = null
+    ps.foreach(
+      p => {
+        p match {
+          case pi : PointI =>
+            var tmpPoint : PointR = null
+            if(paramIndex > 0 && pi.args.contains(paramIndex - 1)) tmpPoint = pi.args(paramIndex - 1)
+            else tmpPoint = pi.recv
+            if(tmpPoint != null){
+              val locationUri = tmpPoint.asInstanceOf[PointWithIndex].locationUri
+              val locationIndex = tmpPoint.asInstanceOf[PointWithIndex].locationIndex
+              if(tmpPoint.varName.equals(uri) && locUri.equals(locationUri) && locIndex == locationIndex)
+                point = tmpPoint
             }
           case _ =>
         }

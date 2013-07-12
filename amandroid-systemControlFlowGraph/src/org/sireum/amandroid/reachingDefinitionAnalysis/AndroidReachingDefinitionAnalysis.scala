@@ -42,8 +42,8 @@ object AndroidReachingDefinitionAnalysis {
     val result = MonotoneDataFlowAnalysisFramework[RDFact, VirtualLabel](pst,
       cfg, true, true, false, gen, kill, iota, initial, switchAsOrderedMatch)
 
-    print("RDA\n")
-    print(result)
+//    print("RDA\n")
+//    print(result)
 
     result
   }
