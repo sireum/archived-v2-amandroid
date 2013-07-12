@@ -34,7 +34,7 @@ class AndroidObjectFlowGraph[Node <: OfaNode, ValueSet <: AndroidValueSet](fac: 
             baseNode.fieldNode = fieldNode
             fieldNode.baseNode = baseNode
           case pso : PointStringO =>
-            rhsNode.propertyMap(VALUE_SET).asInstanceOf[AndroidValueSet].setString(pso.varName)
+            rhsNode.propertyMap(VALUE_SET).asInstanceOf[AndroidValueSet].setString(pso.str)
             rhsNode.propertyMap(VALUE_SET).asInstanceOf[AndroidValueSet].setInstance(pso)
             worklist += rhsNode
           case po : PointO =>

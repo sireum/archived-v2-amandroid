@@ -204,6 +204,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
           n match {
             case ofn : OfaFieldNode =>
                 ofg.updateFieldValueSet(ofn)
+//                println("ofn-->" + ofn + "\nvalueset--->" + ofn.getProperty[ValueSet](ofg.VALUE_SET))
             case _ =>
           }
           val vsN = n.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
@@ -225,6 +226,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
               case _ =>
             }
             //ends here
+            
             val piOpt = ofg.recvInverse(succ)
             piOpt match {
               case Some(pi) =>
@@ -332,6 +334,8 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
       															sCfg : SystemControlFlowGraph[String]) = {
     val points : MList[Point] = mlistEmpty
     val calleeSig : ResourceUri = androidLibInfoTables.getProcedureSignatureByUri(callee)
+    if(callee.contains("concat"))println("callee-->" + callee)
+    if(calleeSig.equals("[|Ljava/lang/String;.concat:(Ljava/lang/String;)Ljava/lang/String;|]"))println("yes")
     if(ofg.isStringOperation(calleeSig)){
       if(new SignatureParser(calleeSig).getParamSig.isReturnNonNomal){
         val calleeOfg = androidCache.load[ObjectFlowGraph[Node, ValueSet]](callee, "ofg")

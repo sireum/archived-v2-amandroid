@@ -198,7 +198,7 @@ class PointsCollector[Node <: OfaNode, ValueSet <: NormalValueSet] {
           case le : LiteralExp =>
             if(le.typ.name.equals("STRING")){
               pl = processLHS(as.lhs)
-              pr = new PointStringO(le.text, loc, locIndex, pUri)
+              pr = new PointStringO(le.text, "[|java:lang:String|]", loc, locIndex, pUri)
               ofg.iFieldDefRepo(pr.asInstanceOf[PointStringO]) = mmapEmpty
             }
           case n : NewExp =>
@@ -470,8 +470,8 @@ final class PointArrayO(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o 
  * An string object creating program point abstracts all the objects created
  * at that particular program point.
  */
-final class PointStringO(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointO(uri, loc, locIndex, o){ 
-  def str = uri
+final class PointStringO(string : String, uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointO(uri, loc, locIndex, o){ 
+  def str = string
   override def toString = "new_string:" + uri + "@" + loc
 }
 

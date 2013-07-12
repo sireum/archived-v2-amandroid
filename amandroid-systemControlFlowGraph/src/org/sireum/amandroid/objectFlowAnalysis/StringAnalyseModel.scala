@@ -32,7 +32,7 @@ trait StringAnalyseModel[ValueSet <: NormalValueSet] {
 	        }
 	        val strsList = getStringList(valueSets)
 	        val strs : Set[String] = if(!strsList.isEmpty && !strsList(0).isEmpty)strsList.map{l => applyStringOperation(k, strings ++ l)}.toSet
-	        					 else Set()
+	        					               else Set()
 	        v._2 match{
 	          case Some(r) =>
 	            result(r) = fac()
@@ -41,7 +41,6 @@ trait StringAnalyseModel[ValueSet <: NormalValueSet] {
 	        }
         }
     }
-//    println("result---->" + result)
     result
   }
   

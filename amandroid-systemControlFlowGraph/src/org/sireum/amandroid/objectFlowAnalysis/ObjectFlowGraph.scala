@@ -334,8 +334,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     baseValueSet.instances.foreach(
       ins => {
         val fieldMap = iFieldDefRepo(ins)
-        val valueSet = fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
-        valueSet.update(fieldMap(fieldNode.fieldName)._2)
+        fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet].update(fieldMap(fieldNode.fieldName)._2)
       }  
     )
   }
@@ -355,9 +354,9 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
         tempVs.update(fieldMap(fieldNode.fieldName)._2)
       }  
     )
-    val valueSet = fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
     if(!tempVs.isEmpty){
-      valueSet.update(tempVs)
+      fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet].update(tempVs)
+//      println("worklist-->update---->" + fieldNode.asInstanceOf[Node])
       worklist += fieldNode.asInstanceOf[Node]
     }
   }
@@ -375,6 +374,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
           fieldMap(fieldNode.fieldName) = (msetEmpty, fac())
         }
         fieldMap(fieldNode.fieldName)._2.update(d)
+//        println("worklist-->populate---->" + fieldMap(fieldNode.fieldName)._1.asInstanceOf[MSet[Node]])
         worklist ++= fieldMap(fieldNode.fieldName)._1.asInstanceOf[MSet[Node]]
       }  
     )
