@@ -100,14 +100,14 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
     
     overallFix(ofg, sCfg)
     result = (ofg, sCfg)
-    result._1.nodes.foreach(
-      node => {
-        val name = node.toString()
-        val valueSet = node.getProperty(result._1.VALUE_SET).asInstanceOf[ValueSet]
-        if(!valueSet.isEmpty)
-        	println("node:" + name + "\nvalueSet:" + valueSet)
-      }
-    )
+//    result._1.nodes.foreach(
+//      node => {
+//        val name = node.toString()
+//        val valueSet = node.getProperty(result._1.VALUE_SET).asInstanceOf[ValueSet]
+//        if(!valueSet.isEmpty)
+//        	println("node:" + name + "\nvalueSet:" + valueSet)
+//      }
+//    )
     println("processed--->" + processed.size)
 //    println("arrayrepo------>" + result._1.arrayRepo)
 //    println("globalrepo------>" + result._1.globalDefRepo)
@@ -197,8 +197,6 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
       }
       //end
       val n = ofg.worklist.remove(0)
-      if(n.toString().contains("arg:v2@L02bdb8"))
-        println("in fix(): worklist --->" + ofg.worklist)
       ofg.successors(n).foreach(
         succ => {
           n match {

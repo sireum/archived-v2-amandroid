@@ -161,7 +161,7 @@ final class AndroidDefRef(st: SymbolTable, val varAccesses: VarAccesses, alit : 
     val lhss = PilarAstUtil.getLHSs(n)
     Visitor.build({
       case ne: NameExp =>
-        if (!lhss.contains(ne))
+        if (!lhss.contains(ne) && ne.name.hasResourceInfo)
           result = result + VarSlot(ne.name.uri)
         false
     })(n)

@@ -109,7 +109,25 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
               }  
             )
       case procP : PointProc =>
-        
+        val t_exit_opt = procP.thisParamOpt_Exit
+        val ps_exit = procP.params_Exit
+        t_exit_opt match{
+          case Some(t_exit) =>
+            udChainForProcExit(t_exit, ps, cfg, rda, true).foreach{
+              point =>{
+                flowMap.getOrElseUpdate(point, msetEmpty) += t_exit
+              }
+            }
+          case None =>
+        }
+        ps_exit.foreach{
+          case (i, p_exit) =>
+            udChainForProcExit(p_exit, ps, cfg, rda, true).foreach{
+              point =>{
+                flowMap.getOrElseUpdate(point, msetEmpty) += p_exit
+              }
+            }
+        }
       case retP : PointRet =>
         retP.procPoint.retVar match{
           case Some(rev) =>
@@ -127,13 +145,26 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
     flowMap
   }
   
+  def udChainForProcExit(p : PointRNoIndex,
+                         points : MList[Point],
+              cfg : ControlFlowGraph[String],
+              rda : ReachingDefinitionAnalysis.Result,
+              avoidMode : Boolean = true) : Set[Point] = {
+    val slots = rda.entrySet(cfg.getVirtualNode("Exit"))
+    searchRda(p, slots, avoidMode)
+  }
+  
   def udChain(p : PointWithIndex,
               points : MList[Point],
               cfg : ControlFlowGraph[String],
               rda : ReachingDefinitionAnalysis.Result,
-              avoidMode : Boolean = true) : MSet[Point] = {
-    val ps : MSet[Point] = msetEmpty
+              avoidMode : Boolean = true) : Set[Point] = {
     val slots = rda.entrySet(cfg.getNode(Some(p.locationUri), p.locationIndex))
+    searchRda(p, slots, avoidMode)
+  }
+  
+  def searchRda(p : PointWithUri, slots : ISet[(Slot, DefDesc)], avoidMode : Boolean) : Set[Point] = {
+    var ps : Set[Point] = Set()
     slots.foreach(
       item => {
         if(item.isInstanceOf[(Slot, DefDesc)]){
@@ -274,7 +305,7 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
       p => {
         p match {
           case pi : PointI =>
-            if(!pi.typ.equals("static") && ("recv:" +pi.recv_Call.varName).equals(uri) && pi.recv_Call.locationUri.equals(loc)){
+            if(!pi.typ.equals("static") && ("recv_Call:" +pi.recv_Call.varName).equals(uri) && pi.recv_Call.locationUri.equals(loc)){
               pointOpt = Some(pi)
             }
           case _ =>

@@ -784,7 +784,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
       case pr : PointThis_Entry =>
         getNode("this_Entry:" + pr.varName, pr.identifier)
       case pr : PointThis_Exit =>
-        getNode("this_Return:" + pr.varName, pr.identifier)
+        getNode("this_Exit:" + pr.varName, pr.identifier)
       case pr : PointThis =>
         getNode("this:" + pr.varName, pr.identifier)
       case pa : PointParam_Entry =>

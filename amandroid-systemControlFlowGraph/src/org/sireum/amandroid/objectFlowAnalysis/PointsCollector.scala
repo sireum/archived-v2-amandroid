@@ -322,7 +322,7 @@ class PointsCollector[Node <: OfaNode, ValueSet <: NormalValueSet] {
                               ){
                           val arg = new PointArg(ne.name.name, loc, locIndex, pUri)
                           arg.container = pi
-                          pi.setArg(i, arg)
+                          pi.setArg(i-1, arg)
                           val dimensions = typ.lastIndexOf('[') - typ.indexOf('[') + 1
                           ofg.arrayRepo(pi.args_Call(i-1).toString) = dimensions                        
                         }
@@ -391,8 +391,11 @@ class PointsCollector[Node <: OfaNode, ValueSet <: NormalValueSet] {
 
 abstract class Point
 
-abstract class PointWithIndex(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends Point{
+abstract class PointWithUri(uri : ResourceUri) extends Point{
   val varName = uri
+}
+
+abstract class PointWithIndex(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointWithUri(uri){
   val locationUri = loc
   val locationIndex = locIndex
   val owner = o
@@ -688,8 +691,7 @@ final class PointRet(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : R
  * This also include expressions which evaluate to void. 
  * pr represents an element in this set. Pr=P\Pl
  */
-class PointRNoIndex(uri : ResourceUri, loc : ResourceUri) extends Point{ 
-  val varName = uri
+class PointRNoIndex(uri : ResourceUri, loc : ResourceUri) extends PointWithUri(uri){ 
   val identifier = loc
   override def toString = uri + "@" + loc
 }
