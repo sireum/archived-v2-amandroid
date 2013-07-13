@@ -47,19 +47,19 @@ class PointsCollector[Node <: OfaNode, ValueSet <: NormalValueSet] {
       param => {
         if(is("this", param.annotations)){
           val thisP = new PointThis(param.name.name, pUri)
-          pProc.thisParamOpt = Option(thisP)
+          pProc.setThisParam(thisP)
           i-=1
         } else if(is("object", param.annotations)){
           if(types(i).startsWith("[") 
 //              && types(i).charAt(types(i).lastIndexOf('[')+1) == 'L'
                 ){
-            val pPoint = new PointRNoIndex(param.name.name, pUri)
-            pProc.params(i) = pPoint
+            val pPoint = new PointParam(param.name.name, pUri)
+            pProc.setParam(i, pPoint)
             val dimensions = types(i).lastIndexOf('[') - types(i).indexOf('[') + 1
             ofg.arrayRepo(pPoint.toString) = dimensions
           } else if(types(i).startsWith("L")){
-            val pPoint = new PointRNoIndex(param.name.name, pUri)
-            pProc.params(i) = pPoint
+            val pPoint = new PointParam(param.name.name, pUri)
+            pProc.setParam(i, pPoint)
           }
         }
         i+=1
@@ -73,7 +73,7 @@ class PointsCollector[Node <: OfaNode, ValueSet <: NormalValueSet] {
    */
   def resolveNativeProc(pst : ProcedureSymbolTable, pProc : PointProc) = {
     val thisP = new PointThis("this_native", pst.procedureUri)
-    pProc.thisParamOpt = Option(thisP)
+    pProc.setThisParam(thisP)
   }
   
   /**
@@ -284,16 +284,16 @@ class PointsCollector[Node <: OfaNode, ValueSet <: NormalValueSet] {
                       val typ = types(i)
                       if(typ.startsWith("L")){
                         val arg = new PointArg(ne.name.name, loc, locIndex, pUri)
-                        pi.args(i) = arg 
-                        pi.args(i).container = pi
+                        arg.container = pi
+                        pi.setArg(i, arg)
                       } else if(typ.startsWith("[") 
   //                        && typ.charAt(pi.retTyp.lastIndexOf('[')+1) == 'L'
                             ){
                         val arg = new PointArg(ne.name.name, loc, locIndex, pUri)
-                        pi.args(i) = arg 
-                        pi.args(i).container = pi
+                        arg.container = pi
+                        pi.setArg(i, arg)
                         val dimensions = typ.lastIndexOf('[') - typ.indexOf('[') + 1
-                        ofg.arrayRepo(pi.args(i).toString) = dimensions
+                        ofg.arrayRepo(pi.args_Call(i).toString) = dimensions
                       }
                     }
                   case _ =>
@@ -303,8 +303,9 @@ class PointsCollector[Node <: OfaNode, ValueSet <: NormalValueSet] {
               if(exps.size > 0){
                 exps(0) match {
                   case ne : NameExp =>
-                    pi.recv = new PointRecv(ne.name.name, loc, locIndex, pUri)
-                    pi.recv.container = pi
+                    val recv = new PointRecv(ne.name.name, loc, locIndex, pUri)
+                    recv.container = pi
+                    pi.setRecv(recv)
                   case _ =>
                 }
                 for(i <- 1 to (exps.size-1)) {
@@ -314,16 +315,16 @@ class PointsCollector[Node <: OfaNode, ValueSet <: NormalValueSet] {
                         val typ = types(i-1)
                         if(typ.startsWith("L")){
                           val arg = new PointArg(ne.name.name, loc, locIndex, pUri)
-                          pi.args(i-1) = arg 
-                          pi.args(i-1).container = pi
+                          arg.container = pi
+                          pi.setArg(i-1, arg)
                         } else if(typ.startsWith("[") 
   //                          && typ.charAt(pi.retTyp.lastIndexOf('[')+1) == 'L'
                               ){
                           val arg = new PointArg(ne.name.name, loc, locIndex, pUri)
-                          pi.args(i-1) = arg 
-                          pi.args(i-1).container = pi
+                          arg.container = pi
+                          pi.setArg(i, arg)
                           val dimensions = typ.lastIndexOf('[') - typ.indexOf('[') + 1
-                          ofg.arrayRepo(pi.args(i-1).toString) = dimensions                        
+                          ofg.arrayRepo(pi.args_Call(i-1).toString) = dimensions                        
                         }
                       }
                     case _ =>
@@ -410,9 +411,25 @@ final class PointAsmt(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : 
  * Set of program points corresponding to method recv variable.
  * pi represents an element in this set.
  */
-final class PointRecv(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointR(uri, loc, locIndex, o){
+class PointRecv(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointR(uri, loc, locIndex, o){
   var container : PointI = null
   override def toString = "recv:" + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to method recv variable (Entry).
+ * pi represents an element in this set.
+ */
+final class PointRecv_Call(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointRecv(uri, loc, locIndex, o){
+  override def toString = "recv_Call:" + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to method recv variable (Exit).
+ * pi represents an element in this set.
+ */
+final class PointRecv_Return(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointRecv(uri, loc, locIndex, o){
+  override def toString = "recv_Return:" + uri + "@" + loc
 }
 
 /**
@@ -422,6 +439,22 @@ final class PointRecv(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : 
 class PointArg(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointR(uri, loc, locIndex, o){ 
   var container : PointI = null
   override def toString = "arg:" + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to method arg variable (Call).
+ * pi represents an element in this set.
+ */
+final class PointArg_Call(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointArg(uri, loc, locIndex, o){ 
+  override def toString = "arg_Call:" + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to method arg variable (Return).
+ * pi represents an element in this set.
+ */
+class PointArg_Return(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointArg(uri, loc, locIndex, o){ 
+  override def toString = "arg_Return:" + uri + "@" + loc
 }
 
 /**
@@ -437,10 +470,28 @@ final class PointArrayArg(uri : ResourceUri, loc : ResourceUri, locIndex : Int, 
  * pi represents an element in this set.
  */
 final class PointI(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointR(uri, loc, locIndex, o){ 
-  var recv : PointRecv = null
-  val args : MMap[Int, PointArg] = mmapEmpty
+  var recv_Call : PointRecv_Call = null
+  var recv_Return : PointRecv_Return = null
+  val args_Call : MMap[Int, PointArg_Call] = mmapEmpty
+  val args_Return : MMap[Int, PointArg_Return] = mmapEmpty
   var typ : String = null
   var retTyp : String = null
+  def setRecv(pt : PointRecv) = {
+    val r_Call = new PointRecv_Call(pt.varName, pt.locationUri, pt.locationIndex, pt.owner)
+    r_Call.container = pt.container
+    val r_Return = new PointRecv_Return(pt.varName, pt.locationUri, pt.locationIndex, pt.owner)
+    r_Return.container = pt.container
+    this.recv_Call = r_Call
+    this.recv_Return = r_Return
+  }
+  def setArg(i : Int, p : PointArg) = {
+    val a_Call = new PointArg_Call(p.varName, p.locationUri, p.locationIndex, p.owner)
+    a_Call.container = p.container
+    val a_Return = new PointArg_Return(p.varName, p.locationUri, p.locationIndex, p.owner)
+    a_Return.container = p.container
+    this.args_Call.put(i, a_Call)
+    this.args_Return.put(i, a_Return)
+  }
   override def toString = typ + ":" + uri + "@" + loc
 }
 
@@ -585,8 +636,43 @@ final class PointBase(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : 
 /**
  * Set of program points corresponding to this variable.
  */
-final class PointThis(uri : ResourceUri, loc : ResourceUri) extends PointRNoIndex(uri, loc){ 
+class PointThis(uri : ResourceUri, loc : ResourceUri) extends PointRNoIndex(uri, loc){ 
   override def toString = "this:" + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to this variable (Entry).
+ */
+final class PointThis_Entry(uri : ResourceUri, loc : ResourceUri) extends PointThis(uri, loc){ 
+  override def toString = "this_Entry:" + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to this variable (Exit).
+ */
+final class PointThis_Exit(uri : ResourceUri, loc : ResourceUri) extends PointThis(uri, loc){ 
+  override def toString = "this_Exit:" + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to this variable.
+ */
+class PointParam(uri : ResourceUri, loc : ResourceUri) extends PointRNoIndex(uri, loc){ 
+  override def toString = "param:" + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to this variable (Entry).
+ */
+final class PointParam_Entry(uri : ResourceUri, loc : ResourceUri) extends PointParam(uri, loc){ 
+  override def toString = "param_Entry:" + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to this variable (Exit).
+ */
+final class PointParam_Exit(uri : ResourceUri, loc : ResourceUri) extends PointParam(uri, loc){ 
+  override def toString = "param_Exit:" + uri + "@" + loc
 }
 
 /**
@@ -613,9 +699,19 @@ class PointRNoIndex(uri : ResourceUri, loc : ResourceUri) extends Point{
  */
 class PointProc(loc : ResourceUri) extends Point{
   val pUri = loc
-  var thisParamOpt : Option[PointThis] = None
-  val params : MMap[Int, PointRNoIndex] = mmapEmpty
+  var thisParamOpt_Entry : Option[PointThis_Entry] = None
+  var thisParamOpt_Exit : Option[PointThis_Exit] = None
+  val params_Entry : MMap[Int, PointParam_Entry] = mmapEmpty
+  val params_Exit : MMap[Int, PointParam_Exit] = mmapEmpty
   var retVar : Option[PointRNoIndex] = None
+  def setThisParam(pt : PointThis) = {
+    this.thisParamOpt_Entry = Some(new PointThis_Entry(pt.varName, pt.identifier))
+    this.thisParamOpt_Exit = Some(new PointThis_Exit(pt.varName, pt.identifier))
+  }
+  def setParam(i : Int, p : PointParam) = {
+    this.params_Entry.put(i, new PointParam_Entry(p.varName, p.identifier))
+    this.params_Exit.put(i, new PointParam_Exit(p.varName, p.identifier))
+  }
   override def toString = loc
 }
 

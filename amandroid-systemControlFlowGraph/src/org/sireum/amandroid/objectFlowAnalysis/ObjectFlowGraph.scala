@@ -166,13 +166,13 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
                 flag = true
               }
             case pi : PointI =>
-                  pi.args.keys.foreach(
+                  pi.args_Call.keys.foreach(
                     i => {
-                      udChain(pi.args(i), ps, cfg, rda, true).foreach(
+                      udChain(pi.args_Call(i), ps, cfg, rda, true).foreach(
                         point => {
                           if(arrayRepo.contains(point.toString())){
-                            if(!arrayRepo.contains(pi.args(i).toString)){
-                              arrayRepo(pi.args(i).toString) = arrayRepo(point.toString())
+                            if(!arrayRepo.contains(pi.args_Call(i).toString)){
+                              arrayRepo(pi.args_Call(i).toString) = arrayRepo(point.toString())
                             }
                           }
                         }
@@ -241,33 +241,51 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
         if(pi.typ.equals("static")){
           staticMethodList += pi
         } else {
-          val recv = pi.recv
-          val recvNode = getNodeOrElse(recv)
+          getNodeOrElse(pi.recv_Call)
+          getNodeOrElse(pi.recv_Return)
         }
-        val args = pi.args
-        
-        args.keys.foreach(
+        val args_Entry = pi.args_Call
+        val args_Exit = pi.args_Return
+        args_Entry.keys.foreach(
           i => {
-            val pa = args(i)
+            val pa = args_Entry(i)
+            val argNode = getNodeOrElse(pa)
+            argNode.setProperty(PARAM_NUM, i)
+          }  
+        )
+        args_Exit.keys.foreach(
+          i => {
+            val pa = args_Exit(i)
             val argNode = getNodeOrElse(pa)
             argNode.setProperty(PARAM_NUM, i)
           }  
         )
       case procP : PointProc =>
-        val thisP = procP.thisParamOpt match {
+        procP.thisParamOpt_Entry match {
           case Some(thisP) => getNodeOrElse(thisP)
           case None => null
         }
-        val params = procP.params
+        procP.thisParamOpt_Exit match {
+          case Some(thisP) => getNodeOrElse(thisP)
+          case None => null
+        }
         procP.retVar match {
           case Some(rev) =>
             getNodeOrElse(rev)
           case None =>
         }
-        
-        params.keys.foreach(
+        val params_Entry = procP.params_Entry
+        val params_Exit = procP.params_Exit
+        params_Entry.keys.foreach(
           i => {
-            val pa = params(i)
+            val pa = params_Entry(i)
+            val paramNode = getNodeOrElse(pa)
+            paramNode.setProperty(PARAM_NUM, i)
+          } 
+        )
+        params_Exit.keys.foreach(
+          i => {
+            val pa = params_Exit(i)
             val paramNode = getNodeOrElse(pa)
             paramNode.setProperty(PARAM_NUM, i)
           } 
@@ -294,12 +312,12 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
   }
   
   def extendGraph(met : PointProc, pi : PointI) = {
-    met.params.keys.foreach(
+    met.params_Entry.keys.foreach(
       i => {
-        val srcNode = getNode(pi.args(i))
-        val targetNode = getNode(met.params(i))
+        val srcNode = getNode(pi.args_Call(i))
+        val targetNode = getNode(met.params_Entry(i))
         worklist += targetNode
-        if(arrayRepo.contains(pi.args(i).toString)){
+        if(arrayRepo.contains(pi.args_Call(i).toString)){
           if(!graph.containsEdge(srcNode, targetNode))
             addEdge(targetNode, srcNode)
         }
@@ -307,10 +325,32 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
           addEdge(srcNode, targetNode)
       }  
     )
-    met.thisParamOpt match {
+    met.params_Exit.keys.foreach(
+      i => {
+        val srcNode = getNode(met.params_Exit(i))
+        val targetNode = getNode(pi.args_Return(i))
+        worklist += targetNode
+        if(arrayRepo.contains(pi.args_Return(i).toString)){
+          if(!graph.containsEdge(srcNode, targetNode))
+            addEdge(targetNode, srcNode)
+        }
+        if(!graph.containsEdge(srcNode, targetNode))
+          addEdge(srcNode, targetNode)
+      }  
+    )
+    met.thisParamOpt_Entry match {
       case Some(thisParam) =>
-        val srcNode = getNode(pi.recv)
+        val srcNode = getNode(pi.recv_Call)
         val targetNode = getNode(thisParam)
+        worklist += targetNode
+        if(!graph.containsEdge(srcNode, targetNode))
+          addEdge(srcNode, targetNode)
+      case None =>
+    }
+    met.thisParamOpt_Exit match {
+      case Some(thisParam) =>
+        val srcNode = getNode(thisParam)
+        val targetNode = getNode(pi.recv_Return)
         worklist += targetNode
         if(!graph.containsEdge(srcNode, targetNode))
           addEdge(srcNode, targetNode)
@@ -479,12 +519,36 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
           node.setProperty(VALUE_SET, fac())
           node
         } else getFieldNode(pfr.basePoint.varName, pfr.varName, pfr.locationUri)
+      case pr : PointRecv_Call =>
+        if(!nodeExists("recv_Call:" + pr.varName, pr.locationUri)){
+          val node = addNode("recv_Call:" + pr.varName, pr.locationUri)
+          node.setProperty(VALUE_SET, fac())
+          node
+        } else getNode("recv_Call:" + pr.varName, pr.locationUri)
+      case pr : PointRecv_Return =>
+        if(!nodeExists("recv_Return:" + pr.varName, pr.locationUri)){
+          val node = addNode("recv_Return:" + pr.varName, pr.locationUri)
+          node.setProperty(VALUE_SET, fac())
+          node
+        } else getNode("recv_Return:" + pr.varName, pr.locationUri)
       case pr : PointRecv =>
         if(!nodeExists("recv:" + pr.varName, pr.locationUri)){
           val node = addNode("recv:" + pr.varName, pr.locationUri)
           node.setProperty(VALUE_SET, fac())
           node
         } else getNode("recv:" + pr.varName, pr.locationUri)
+      case pa : PointArg_Call =>
+        if(!nodeExists("arg_Call:" + pa.varName, pa.locationUri)){
+          val node = addNode("arg_Call:" + pa.varName, pa.locationUri)
+          node.setProperty(VALUE_SET, fac())
+          node
+        } else getNode("arg_Call:" + pa.varName, pa.locationUri)
+      case pa : PointArg_Return =>
+        if(!nodeExists("arg_Return:" + pa.varName, pa.locationUri)){
+          val node = addNode("arg_Return:" + pa.varName, pa.locationUri)
+          node.setProperty(VALUE_SET, fac())
+          node
+        } else getNode("arg_Return:" + pa.varName, pa.locationUri)
       case pa : PointArg =>
         if(!nodeExists("arg:" + pa.varName, pa.locationUri)){
           val node = addNode("arg:" + pa.varName, pa.locationUri)
@@ -509,6 +573,42 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
           node.setProperty(VALUE_SET, fac())
           node
         } else getNode(pwi.varName, pwi.locationUri)
+      case pr : PointThis_Entry =>
+        if(!nodeExists("this_Entry:" + pr.varName, pr.identifier)){
+          val node = addNode("this_Entry:" + pr.varName, pr.identifier)
+          node.setProperty(VALUE_SET, fac())
+          node
+        } else getNode("this_Entry:" + pr.varName, pr.identifier)
+      case pr : PointThis_Exit =>
+        if(!nodeExists("this_Exit:" + pr.varName, pr.identifier)){
+          val node = addNode("this_Exit:" + pr.varName, pr.identifier)
+          node.setProperty(VALUE_SET, fac())
+          node
+        } else getNode("this_Exit:" + pr.varName, pr.identifier)
+      case pr : PointThis =>
+        if(!nodeExists("this:" + pr.varName, pr.identifier)){
+          val node = addNode("this:" + pr.varName, pr.identifier)
+          node.setProperty(VALUE_SET, fac())
+          node
+        } else getNode("this:" + pr.varName, pr.identifier)
+      case pa : PointParam_Entry =>
+        if(!nodeExists("param_Entry:" + pa.varName, pa.identifier)){
+          val node = addNode("param_Entry:" + pa.varName, pa.identifier)
+          node.setProperty(VALUE_SET, fac())
+          node
+        } else getNode("param_Entry:" + pa.varName, pa.identifier)
+      case pa : PointParam_Exit =>
+        if(!nodeExists("param_Exit:" + pa.varName, pa.identifier)){
+          val node = addNode("param_Exit:" + pa.varName, pa.identifier)
+          node.setProperty(VALUE_SET, fac())
+          node
+        } else getNode("param_Exit:" + pa.varName, pa.identifier)
+      case pa : PointParam =>
+        if(!nodeExists("param:" + pa.varName, pa.identifier)){
+          val node = addNode("param:" + pa.varName, pa.identifier)
+          node.setProperty(VALUE_SET, fac())
+          node
+        } else getNode("param:" + pa.varName, pa.identifier)
       case pr : PointRNoIndex =>
         if(!nodeExists(pr.varName, pr.identifier)){
           val node = addNode(pr.varName, pr.identifier)
@@ -663,8 +763,16 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
         getFieldNode(pfl.basePoint.varName, pfl.varName, pfl.locationUri)
       case pfr : PointFieldR =>
         getFieldNode(pfr.basePoint.varName, pfr.varName, pfr.locationUri)
+      case pr : PointRecv_Call =>
+        getNode("recv_Call:" + pr.varName, pr.locationUri)
+      case pr : PointRecv_Return =>
+        getNode("recv_Return:" + pr.varName, pr.locationUri)
       case pr : PointRecv =>
         getNode("recv:" + pr.varName, pr.locationUri)
+      case pa : PointArg_Call =>
+        getNode("arg_Call:" + pa.varName, pa.locationUri)
+      case pa : PointArg_Return =>
+        getNode("arg_Return:" + pa.varName, pa.locationUri)
       case pa : PointArg =>
         getNode("arg:" + pa.varName, pa.locationUri)
       case po : PointStringO =>
@@ -673,6 +781,18 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
         getNode("new:" + po.varName, po.locationUri)
       case pwi : PointWithIndex =>
         getNode(pwi.varName, pwi.locationUri)
+      case pr : PointThis_Entry =>
+        getNode("this_Entry:" + pr.varName, pr.identifier)
+      case pr : PointThis_Exit =>
+        getNode("this_Return:" + pr.varName, pr.identifier)
+      case pr : PointThis =>
+        getNode("this:" + pr.varName, pr.identifier)
+      case pa : PointParam_Entry =>
+        getNode("param_Entry:" + pa.varName, pa.identifier)
+      case pa : PointParam_Exit =>
+        getNode("param_Exit:" + pa.varName, pa.identifier)
+      case pa : PointParam =>
+        getNode("param:" + pa.varName, pa.identifier)
       case pri : PointRNoIndex =>
         getNode(pri.varName, pri.identifier)
       case pp : PointProc =>

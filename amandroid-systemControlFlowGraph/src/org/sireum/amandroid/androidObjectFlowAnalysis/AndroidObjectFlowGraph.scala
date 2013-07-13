@@ -49,33 +49,53 @@ class AndroidObjectFlowGraph[Node <: OfaNode, ValueSet <: AndroidValueSet](fac: 
         if(pi.typ.equals("static")){
           staticMethodList += pi
         } else {
-          val recv = pi.recv
-          val recvNode = getNodeOrElse(recv)
+          getNodeOrElse(pi.recv_Call)
+          getNodeOrElse(pi.recv_Return)
         }
-        val args = pi.args
-        
-        args.keys.foreach(
+        val args_Call = pi.args_Call
+        val args_Return = pi.args_Return
+        args_Call.keys.foreach(
           i => {
-            val pa = args(i)
+            val pa = args_Call(i)
+            val argNode = getNodeOrElse(pa)
+            argNode.setProperty(PARAM_NUM, i)
+          }  
+        )
+        args_Return.keys.foreach(
+          i => {
+            val pa = args_Return(i)
             val argNode = getNodeOrElse(pa)
             argNode.setProperty(PARAM_NUM, i)
           }  
         )
       case procP : PointProc =>
-        val thisP = procP.thisParamOpt match {
+        procP.thisParamOpt_Entry match {
           case Some(thisP) => getNodeOrElse(thisP)
           case None => null
         }
-        val params = procP.params
+        procP.thisParamOpt_Exit match {
+          case Some(thisP) => getNodeOrElse(thisP)
+          case None => null
+        }
+        
         procP.retVar match {
           case Some(rev) =>
             getNodeOrElse(rev)
           case None =>
         }
         
-        params.keys.foreach(
+        val params_Entry = procP.params_Entry
+        val params_Exit = procP.params_Exit
+        params_Entry.keys.foreach(
           i => {
-            val pa = params(i)
+            val pa = params_Entry(i)
+            val paramNode = getNodeOrElse(pa)
+            paramNode.setProperty(PARAM_NUM, i)
+          } 
+        )
+        params_Exit.keys.foreach(
+          i => {
+            val pa = params_Exit(i)
             val paramNode = getNodeOrElse(pa)
             paramNode.setProperty(PARAM_NUM, i)
           } 
@@ -102,11 +122,11 @@ class AndroidObjectFlowGraph[Node <: OfaNode, ValueSet <: AndroidValueSet](fac: 
 	        stringOperationTracker(sig) = (mlistEmpty, None)
 	    }
 	    
-	    procP.thisParamOpt match {
+	    procP.thisParamOpt_Entry match {
 	      case Some(p) => stringOperationTracker(sig)._1 += getNode(p)
 	      case None =>
-	    } 
-	    procP.params.toList.sortBy(f => f._1).foreach{case (k, v) => stringOperationTracker(sig)._1 += getNode(v)}
+	    }
+	    procP.params_Entry.toList.sortBy(f => f._1).foreach{case (k, v) => stringOperationTracker(sig)._1 += getNode(v)}
     } else if(typ.equals("NATIVE")){
       procP.retVar match {
 	      case Some(r) =>
@@ -115,11 +135,11 @@ class AndroidObjectFlowGraph[Node <: OfaNode, ValueSet <: AndroidValueSet](fac: 
 	        nativeOperationTracker(sig) = (mlistEmpty, None)
 	    }
 	    
-	    procP.thisParamOpt match {
+	    procP.thisParamOpt_Entry match {
 	      case Some(p) => nativeOperationTracker(sig)._1 += getNode(p)
 	      case None =>
 	    } 
-	    procP.params.toList.sortBy(f => f._1).foreach{case (k, v) => nativeOperationTracker(sig)._1 += getNode(v)}
+	    procP.params_Entry.toList.sortBy(f => f._1).foreach{case (k, v) => nativeOperationTracker(sig)._1 += getNode(v)}
     }
     procP
   }
@@ -135,17 +155,17 @@ class AndroidObjectFlowGraph[Node <: OfaNode, ValueSet <: AndroidValueSet](fac: 
     
     def addCallerInfo(caller: PointI, procP : PointProc): PointProc = {
 	    val procP2 = new PointProc(procP.toString + caller.toString)
-	    procP.thisParamOpt match {
+	    procP.thisParamOpt_Entry match {
 	      case Some(thisParam) =>
-	                    val thisParam2 = new PointThis(thisParam.varName, thisParam.identifier + caller.toString)
-	                    procP2.thisParamOpt = Some(thisParam2)
-	      case None => procP2.thisParamOpt = None
+          val thisParam2 = new PointThis_Entry(thisParam.varName, thisParam.identifier + caller.toString)
+          procP2.thisParamOpt_Entry = Some(thisParam2)
+	      case None => procP2.thisParamOpt_Entry = None
 	    }
 	    
-	    procP.params.foreach{
+	    procP.params_Entry.foreach{
 	      case (k, v) =>
-	        val param2 = new PointRNoIndex(v.varName, v.identifier + caller.toString)
-	        procP2.params += (k -> param2)
+	        val param2 = new PointParam_Entry(v.varName, v.identifier + caller.toString)
+	        procP2.params_Entry += (k -> param2)
 	    }
 	    
 	    procP.retVar match {
@@ -168,11 +188,11 @@ class AndroidObjectFlowGraph[Node <: OfaNode, ValueSet <: AndroidValueSet](fac: 
 	        stringOperationTracker(sig) = (mlistEmpty, None)
 	    }
 	    
-	    procP.thisParamOpt match {
+	    procP.thisParamOpt_Entry match {
 	      case Some(p) => stringOperationTracker(sig)._1 += getNode(p)
 	      case None =>
 	    } 
-	    procP.params.toList.sortBy(f => f._1).foreach{case (k, v) => stringOperationTracker(sig)._1 += getNode(v)}
+	    procP.params_Entry.toList.sortBy(f => f._1).foreach{case (k, v) => stringOperationTracker(sig)._1 += getNode(v)}
     } else if(typ.equals("NATIVE")){
       procP.retVar match {
 	      case Some(r) =>
@@ -181,11 +201,11 @@ class AndroidObjectFlowGraph[Node <: OfaNode, ValueSet <: AndroidValueSet](fac: 
 	        nativeOperationTracker(sig) = (mlistEmpty, None)
 	    }
 	    
-	    procP.thisParamOpt match {
+	    procP.thisParamOpt_Entry match {
 	      case Some(p) => nativeOperationTracker(sig)._1 += getNode(p)
 	      case None =>
 	    } 
-	    procP.params.toList.sortBy(f => f._1).foreach{case (k, v) => nativeOperationTracker(sig)._1 += getNode(v)}
+	    procP.params_Entry.toList.sortBy(f => f._1).foreach{case (k, v) => nativeOperationTracker(sig)._1 += getNode(v)}
     }
     procP
   }
@@ -197,8 +217,8 @@ class AndroidObjectFlowGraph[Node <: OfaNode, ValueSet <: AndroidValueSet](fac: 
    * @param paramNode Parameter node for caller intent object 
    */
   def extendGraphForIcc(met : PointProc, pi : PointI) = {
-    val sourceNode = getNode(pi.args(0))
-    val targetNode = getNode(met.params(0))
+    val sourceNode = getNode(pi.args_Call(0))
+    val targetNode = getNode(met.params_Entry(0))
     worklist += targetNode
     println("one icc edge in the ofg is " + (sourceNode, targetNode))
     if(!graph.containsEdge(sourceNode, targetNode))

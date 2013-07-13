@@ -30,11 +30,11 @@ trait InterComponentCommunicationModel[Node <: OfaNode, ValueSet <: AndroidValue
   def checkIccOperation(sig : String) : Boolean = {
     var flag : Boolean = true
     val pi = iccOperationTracker(sig)
-    if(pi.args.size < 1){
+    if(pi.args_Call.size < 1){
       System.err.println("Ofg param nodes number is not enough for: " + sig)
       flag = false
     } else {
-      val intentNode = getNode(pi.args(0))
+      val intentNode = getNode(pi.args_Call(0))
       if(intentNode.getProperty[ValueSet](VALUE_SET).isEmpty){
   		  flag = false
   		}
@@ -48,7 +48,7 @@ trait InterComponentCommunicationModel[Node <: OfaNode, ValueSet <: AndroidValue
       case (k, v) =>
         println("k, v -==> " + (k, v))
         if(checkIccOperation(k)){
-          val intentNode = getNode(v.args(0))
+          val intentNode = getNode(v.args_Call(0))
 	        val intentValueSet : ValueSet = intentNode.getProperty[ValueSet](VALUE_SET)
 	        hasExplicitTarget(intentValueSet) match {
 	          case Some(targets) =>

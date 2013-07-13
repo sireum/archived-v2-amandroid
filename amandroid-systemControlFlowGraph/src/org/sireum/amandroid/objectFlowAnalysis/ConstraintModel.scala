@@ -83,26 +83,26 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
         } 
       case pi : PointI =>
             if(!pi.typ.equals("static")){
-              val recvP = pi.recv
+              val recvP = pi.recv_Call
               udChain(recvP, ps, cfg, rda, true).foreach(
                 point => {
                   flowMap.getOrElseUpdate(point, msetEmpty) += recvP
                 }
               )
             }
-            pi.args.keys.foreach(
+            pi.args_Call.keys.foreach(
               i => {
-                if(arrayRepo.contains(pi.args(i).toString)){
-                  udChain(pi.args(i), ps, cfg, rda, true).foreach(
+                if(arrayRepo.contains(pi.args_Call(i).toString)){
+                  udChain(pi.args_Call(i), ps, cfg, rda, true).foreach(
                     point => {
-                      flowMap.getOrElseUpdate(point, msetEmpty) += pi.args(i)
-                      flowMap.getOrElseUpdate(pi.args(i), msetEmpty) += point
+                      flowMap.getOrElseUpdate(point, msetEmpty) += pi.args_Call(i)
+                      flowMap.getOrElseUpdate(pi.args_Call(i), msetEmpty) += point
                     }
                   )
                 } else {
-                  udChain(pi.args(i), ps, cfg, rda, true).foreach(
+                  udChain(pi.args_Call(i), ps, cfg, rda, true).foreach(
                     point => {
-                      flowMap.getOrElseUpdate(point, msetEmpty) += pi.args(i)
+                      flowMap.getOrElseUpdate(point, msetEmpty) += pi.args_Call(i)
                     }
                   )
                 }
@@ -143,14 +143,14 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
               if(!p.varName.startsWith("@@")){
                 val tp = getPoint(p.varName, points, avoidMode)
                 if(tp!=null)
-                        ps += tp
+                  ps += tp
               }
             } else {
               defDesc match {
                 case pdd : ParamDefDesc =>
                   pdd.locUri match{
                     case Some(locU) =>
-                      val tp = getParamPoint(p.varName, pdd.paramIndex, locU, pdd.locIndex, points, avoidMode)
+                      val tp = getParamPoint_Return(p.varName, pdd.paramIndex, locU, pdd.locIndex, points, avoidMode)
                       if(tp!=null)
                         ps += tp
                     case None =>
@@ -197,15 +197,15 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
     point
   }
   
-  def getParamPoint(uri : ResourceUri, paramIndex : Int, locUri : ResourceUri, locIndex : Int, ps : MList[Point], avoidMode : Boolean) : Point = {
+  def getParamPoint_Return(uri : ResourceUri, paramIndex : Int, locUri : ResourceUri, locIndex : Int, ps : MList[Point], avoidMode : Boolean) : Point = {
     var point : Point = null
     ps.foreach(
       p => {
         p match {
           case pi : PointI =>
             var tmpPoint : PointR = null
-            if(paramIndex > 0 && pi.args.contains(paramIndex - 1)) tmpPoint = pi.args(paramIndex - 1)
-            else tmpPoint = pi.recv
+            if(paramIndex > 0 && pi.args_Return.contains(paramIndex - 1)) tmpPoint = pi.args_Return(paramIndex - 1)
+            else tmpPoint = pi.recv_Return
             if(tmpPoint != null){
               val locationUri = tmpPoint.asInstanceOf[PointWithIndex].locationUri
               val locationIndex = tmpPoint.asInstanceOf[PointWithIndex].locationIndex
@@ -229,14 +229,14 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
       p => {
         p match {
           case pp : PointProc =>
-            pp.thisParamOpt match {
+            pp.thisParamOpt_Entry match {
               case Some(thisP) =>
                 if(thisP.varName.equals(uri)){
                   point = thisP
                 }
               case None =>
             }
-            pp.params.foreach(
+            pp.params_Entry.foreach(
               pa => {
                 if(pa._2.varName.equals(uri)){
                   point = pa._2
@@ -274,7 +274,7 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
       p => {
         p match {
           case pi : PointI =>
-            if(!pi.typ.equals("static") && ("recv:" +pi.recv.varName).equals(uri) && pi.recv.locationUri.equals(loc)){
+            if(!pi.typ.equals("static") && ("recv:" +pi.recv_Call.varName).equals(uri) && pi.recv_Call.locationUri.equals(loc)){
               pointOpt = Some(pi)
             }
           case _ =>
