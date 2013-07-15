@@ -116,7 +116,6 @@ final class AndroidDefRef(st: SymbolTable, val varAccesses: VarAccesses, alit : 
                 case _ =>
               }
             case ie : IndexingExp =>
-              println("indexingExp--->" + ie)
               ie.exp match {
                 case ine : NameExp =>
                   resolveNameExp(ine)

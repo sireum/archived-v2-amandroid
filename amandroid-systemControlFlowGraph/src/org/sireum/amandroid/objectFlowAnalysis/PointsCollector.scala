@@ -178,7 +178,7 @@ class PointsCollector[Node <: OfaNode, ValueSet <: NormalValueSet] {
             case ne : NameExp => ne.name.name
             case _ => ""
           }
-          val pBase = new PointBase(baseName, loc, locIndex, pUri)
+          val pBase = new PointBaseL(baseName, loc, locIndex, pUri)
           new PointFieldL(pBase, a.attributeName.name, loc, locIndex, pUri)
         case _ => null
       }
@@ -199,7 +199,7 @@ class PointsCollector[Node <: OfaNode, ValueSet <: NormalValueSet] {
             if(le.typ.name.equals("STRING")){
               pl = processLHS(as.lhs)
               pr = new PointStringO(le.text, "[|java:lang:String|]", loc, locIndex, pUri)
-              ofg.iFieldDefRepo(pr.asInstanceOf[PointStringO]) = mmapEmpty
+//              ofg.iFieldDefRepo(pr.asInstanceOf[PointStringO]) = mmapEmpty
             }
           case n : NewExp =>
             pl = processLHS(as.lhs)
@@ -213,7 +213,7 @@ class PointsCollector[Node <: OfaNode, ValueSet <: NormalValueSet] {
             }
             if(dimensions == 0){
               pr = new PointO(name, loc, locIndex, pUri)
-              ofg.iFieldDefRepo(pr.asInstanceOf[PointO]) = mmapEmpty
+//              ofg.iFieldDefRepo(pr.asInstanceOf[PointO]) = mmapEmpty
             } else {
               pr = new PointArrayO(name, loc, locIndex, pUri)
               pr.asInstanceOf[PointArrayO].dimensions = dimensions
@@ -235,7 +235,7 @@ class PointsCollector[Node <: OfaNode, ValueSet <: NormalValueSet] {
                 case ne : NameExp => ne.name.name
                 case _ => ""
               }
-              val pBase = new PointBase(baseName, loc, locIndex, pUri)
+              val pBase = new PointBaseR(baseName, loc, locIndex, pUri)
               pr = new PointFieldR(pBase, ae.attributeName.name, loc, locIndex, pUri)
             }
           case ie : IndexingExp =>
@@ -389,13 +389,15 @@ class PointsCollector[Node <: OfaNode, ValueSet <: NormalValueSet] {
   }
 }
 
-abstract class Point
+abstract class Point(loc : ResourceUri){
+  def getLoc = loc
+}
 
-abstract class PointWithUri(uri : ResourceUri) extends Point{
+abstract class PointWithUri(uri : ResourceUri, loc : ResourceUri) extends Point(loc){
   val varName = uri
 }
 
-abstract class PointWithIndex(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointWithUri(uri){
+abstract class PointWithIndex(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointWithUri(uri, loc){
   val locationUri = loc
   val locationIndex = locIndex
   val owner = o
@@ -558,7 +560,7 @@ class PointR(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceU
 /**
  * Set of program points corresponding to l-value field access expressions. 
  */
-class PointFieldL(base : PointBase, uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointL(uri, loc, locIndex, o){ 
+class PointFieldL(base : PointBaseL, uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointL(uri, loc, locIndex, o){ 
   val basePoint = base
   override def toString = basePoint.varName + "." + uri + "@" + loc
 }
@@ -566,7 +568,7 @@ class PointFieldL(base : PointBase, uri : ResourceUri, loc : ResourceUri, locInd
 /**
  * Set of program points corresponding to R-value field access expressions. 
  */
-class PointFieldR(base : PointBase, uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointR(uri, loc, locIndex, o){ 
+class PointFieldR(base : PointBaseR, uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointR(uri, loc, locIndex, o){ 
   val basePoint = base
   override def toString = basePoint.varName + "." + uri + "@" + loc
 }
@@ -604,14 +606,14 @@ final class PointGlobalArrayR(uri : ResourceUri, loc : ResourceUri, locIndex : I
 /**
  * Set of program points corresponding to l-value field array variable. 
  */
-final class PointFieldArrayL(base : PointBase, uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointFieldL(base, uri, loc, locIndex, o){ 
+final class PointFieldArrayL(base : PointBaseL, uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointFieldL(base, uri, loc, locIndex, o){ 
   override def toString = "field_array:" + uri + "@" + loc
 }
 
 /**
  * Set of program points corresponding to R-value field array variable. 
  */
-final class PointFieldArrayR(base : PointBase, uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointFieldR(base, uri, loc, locIndex, o){ 
+final class PointFieldArrayR(base : PointBaseR, uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointFieldR(base, uri, loc, locIndex, o){ 
   override def toString = "field_array:" + uri + "@" + loc
 }
 
@@ -632,8 +634,22 @@ class PointGlobalR(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : Res
 /**
  * Set of program points corresponding to base part of field access expressions. 
  */
-final class PointBase(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointR(uri, loc, locIndex, o){ 
+class PointBase(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointR(uri, loc, locIndex, o){ 
   override def toString = "base:" + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to base part of field access expressions in the LHS. 
+ */
+final class PointBaseL(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointBase(uri, loc, locIndex, o){ 
+  override def toString = "base_lhs:" + uri + "@" + loc
+}
+
+/**
+ * Set of program points corresponding to base part of field access expressions in the RHS. 
+ */
+final class PointBaseR(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointBase(uri, loc, locIndex, o){ 
+  override def toString = "base_rhs:" + uri + "@" + loc
 }
 
 /**
@@ -691,7 +707,7 @@ final class PointRet(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : R
  * This also include expressions which evaluate to void. 
  * pr represents an element in this set. Pr=P\Pl
  */
-class PointRNoIndex(uri : ResourceUri, loc : ResourceUri) extends PointWithUri(uri){ 
+class PointRNoIndex(uri : ResourceUri, loc : ResourceUri) extends PointWithUri(uri, loc){ 
   val identifier = loc
   override def toString = uri + "@" + loc
 }
@@ -699,7 +715,7 @@ class PointRNoIndex(uri : ResourceUri, loc : ResourceUri) extends PointWithUri(u
 /**
  * Set of program points corresponding to params. 
  */
-class PointProc(loc : ResourceUri) extends Point{
+class PointProc(loc : ResourceUri) extends Point(loc){
   val pUri = loc
   var thisParamOpt_Entry : Option[PointThis_Entry] = None
   var thisParamOpt_Exit : Option[PointThis_Exit] = None

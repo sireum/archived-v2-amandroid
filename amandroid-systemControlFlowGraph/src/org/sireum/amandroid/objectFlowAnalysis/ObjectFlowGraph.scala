@@ -32,32 +32,31 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
 
   final val VALUE_SET = "ValueSet"
   final val PARAM_NUM = "param.number"
+  final val K_CONTEXT : Int = 1
   
-  protected val pl : MMap[OfaNode, Node] = mmapEmpty
+  protected var pl : Map[OfaNode, Node] = Map()
   
-  protected def pool : MMap[OfaNode, Node] = pl
+  protected def pool : Map[OfaNode, Node] = pl
   
   //
   final val worklist : MList[Node] = mlistEmpty
-  
-  final val staticMethodList : MList[PointI] = mlistEmpty
     
   /**
    * create the nodes and edges to reflect the constraints corresponding 
    * to the given program point. If a value is added to a node, then that 
    * node is added to the worklist.
    */
-  def constructGraph(ps : MList[Point], cfg : ControlFlowGraph[String], rda : ReachingDefinitionAnalysis.Result) = {
+  def constructGraph(pUri : ResourceUri, ps : MList[Point], callerContext : Context, cfg : ControlFlowGraph[String], rda : ReachingDefinitionAnalysis.Result) = {
     fixArrayVar(ps, cfg, rda)
     ps.foreach(
       p=>{
-        collectNodes(p)
+        collectNodes(pUri, p, callerContext.copy)
       }  
     )
     ps.foreach(
       p=>{
         val constraintMap = applyConstraint(p, points, cfg, rda)
-        buildingEdges(constraintMap)
+        buildingEdges(constraintMap, pUri, callerContext.copy)
       }  
     )
   }
@@ -66,7 +65,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
    * combine two ofgs into one, and combine all repos inside two ofgs.
    */ 
   def combineOfgs(ofg2 : ObjectFlowGraph[Node, ValueSet]) : PointProc = {
-    pool ++= ofg2.pool
+    pl ++= ofg2.pool
     ofg2.nodes.foreach(
       node=>{
         addNode(node)
@@ -80,7 +79,6 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     iFieldDefRepo ++= ofg2.iFieldDefRepo
     globalDefRepo ++= ofg2.globalDefRepo
     worklist ++= ofg2.worklist
-    staticMethodList ++= ofg2.staticMethodList
     arrayRepo ++= ofg2.arrayRepo
     points ++= ofg2.points
     val ps = ofg2.points.filter(p => if(p.isInstanceOf[PointProc])true else false)
@@ -201,77 +199,79 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     }
   }
   
-  def collectNodes(p : Point) = {
+  def collectNodes(pUri : ResourceUri, p : Point, callerContext : Context) = {
+    val context = callerContext.copy
+    context.setContext(pUri, p.getLoc)
     p match {
       case asmtP : PointAsmt =>
         val lhs = asmtP.lhs
         val rhs = asmtP.rhs
-        val lhsNode = getNodeOrElse(lhs)
-        val rhsNode = getNodeOrElse(rhs)
+        val lhsNode = getNodeOrElse(lhs, context.copy)
+        val rhsNode = getNodeOrElse(rhs, context.copy)
         lhs match {
           case pfl : PointFieldL =>
-            val fieldNode = getNodeOrElse(pfl).asInstanceOf[OfaFieldNode]
-            val baseNode = getNodeOrElse(pfl.basePoint).asInstanceOf[OfaFieldBaseNode]
+            val fieldNode = getNodeOrElse(pfl, context.copy).asInstanceOf[OfaFieldNode]
+            val baseNode = getNodeOrElse(pfl.basePoint, context.copy).asInstanceOf[OfaFieldBaseNode]
             baseNode.fieldNode = fieldNode
             fieldNode.baseNode = baseNode
           case _ =>
         }
         rhs match {
           case pgr : PointGlobalR =>
-            val globalVarNode = getNodeOrElse(pgr).asInstanceOf[OfaGlobalVarNode]
+            val globalVarNode = getNodeOrElse(pgr, context.copy).asInstanceOf[OfaGlobalVarNode]
             setGlobalDefRepo(globalVarNode)
           case pfr : PointFieldR =>
-            val fieldNode = getNodeOrElse(pfr).asInstanceOf[OfaFieldNode]
-            val baseNode = getNodeOrElse(pfr.basePoint).asInstanceOf[OfaFieldBaseNode]
+            val fieldNode = getNodeOrElse(pfr, context.copy).asInstanceOf[OfaFieldNode]
+            val baseNode = getNodeOrElse(pfr.basePoint, context.copy).asInstanceOf[OfaFieldBaseNode]
             baseNode.fieldNode = fieldNode
             fieldNode.baseNode = baseNode
           case pso : PointStringO =>
             rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].setString(pso.varName)
-            rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].setInstance(pso)
+            rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].setInstance(pso, context.copy)
             worklist += rhsNode
           case po : PointO =>
-            rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].setInstance(po)
+            rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].setInstance(po, context.copy)
 //            if(isStringKind(po.varName)){
 //              rhsNode.propertyMap(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]("") = "STRING"
 //            }
             worklist += rhsNode
+          case pi : PointI =>
+            if(pi.typ.equals("static")) worklist += rhsNode
           case pr : PointR =>
         }
       case pi : PointI =>
-        if(pi.typ.equals("static")){
-          staticMethodList += pi
-        } else {
-          getNodeOrElse(pi.recv_Call)
-          getNodeOrElse(pi.recv_Return)
+        if(!pi.typ.equals("static")){
+          getNodeOrElse(pi.recv_Call, context.copy)
+          getNodeOrElse(pi.recv_Return, context.copy)
         }
         val args_Entry = pi.args_Call
         val args_Exit = pi.args_Return
         args_Entry.keys.foreach(
           i => {
             val pa = args_Entry(i)
-            val argNode = getNodeOrElse(pa)
+            val argNode = getNodeOrElse(pa, context.copy)
             argNode.setProperty(PARAM_NUM, i)
           }  
         )
         args_Exit.keys.foreach(
           i => {
             val pa = args_Exit(i)
-            val argNode = getNodeOrElse(pa)
+            val argNode = getNodeOrElse(pa, context.copy)
             argNode.setProperty(PARAM_NUM, i)
           }  
         )
       case procP : PointProc =>
         procP.thisParamOpt_Entry match {
-          case Some(thisP) => getNodeOrElse(thisP)
+          case Some(thisP) => getNodeOrElse(thisP, context.copy)
           case None => null
         }
         procP.thisParamOpt_Exit match {
-          case Some(thisP) => getNodeOrElse(thisP)
+          case Some(thisP) => getNodeOrElse(thisP, context.copy)
           case None => null
         }
         procP.retVar match {
           case Some(rev) =>
-            getNodeOrElse(rev)
+            getNodeOrElse(rev, context.copy)
           case None =>
         }
         val params_Entry = procP.params_Entry
@@ -279,30 +279,34 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
         params_Entry.keys.foreach(
           i => {
             val pa = params_Entry(i)
-            val paramNode = getNodeOrElse(pa)
+            val paramNode = getNodeOrElse(pa, context.copy)
             paramNode.setProperty(PARAM_NUM, i)
           } 
         )
         params_Exit.keys.foreach(
           i => {
             val pa = params_Exit(i)
-            val paramNode = getNodeOrElse(pa)
+            val paramNode = getNodeOrElse(pa, context.copy)
             paramNode.setProperty(PARAM_NUM, i)
           } 
         )
       case retP : PointRet =>
-        getNodeOrElse(retP)
+        getNodeOrElse(retP, context.copy)
       case _ =>
     }
   }
   
-  def buildingEdges(map : MMap[Point, MSet[Point]]) = {
+  def buildingEdges(map : MMap[Point, MSet[Point]], pUri : ResourceUri, context : Context) = {
     map.keys.foreach(
       sp => {
-        val srcNode = getNode(sp)
+        val s = context.copy
+        s.setContext(pUri, sp.getLoc)
+        val srcNode = getNode(sp, s)
         map(sp).foreach(
             tp => {
-              val targetNode = getNode(tp)
+              val t = context.copy
+              t.setContext(pUri, tp.getLoc)
+              val targetNode = getNode(tp, t)
               if(!graph.containsEdge(srcNode, targetNode))
                 addEdge(srcNode, targetNode)
             }
@@ -311,11 +315,13 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     )
   }
   
-  def extendGraph(met : PointProc, pi : PointI) = {
+  def extendGraph(met : PointProc, pi : PointI, srcContext : Context) = {
+    val targetContext = srcContext.copy
+    targetContext.setContext(met.pUri, met.getLoc)
     met.params_Entry.keys.foreach(
       i => {
-        val srcNode = getNode(pi.args_Call(i))
-        val targetNode = getNode(met.params_Entry(i))
+        val srcNode = getNode(pi.args_Call(i), srcContext.copy)
+        val targetNode = getNode(met.params_Entry(i), targetContext.copy)
         worklist += targetNode
         if(arrayRepo.contains(pi.args_Call(i).toString)){
           if(!graph.containsEdge(srcNode, targetNode))
@@ -327,8 +333,8 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     )
     met.params_Exit.keys.foreach(
       i => {
-        val srcNode = getNode(met.params_Exit(i))
-        val targetNode = getNode(pi.args_Return(i))
+        val srcNode = getNode(met.params_Exit(i), targetContext.copy)
+        val targetNode = getNode(pi.args_Return(i), srcContext.copy)
         worklist += targetNode
         if(arrayRepo.contains(pi.args_Return(i).toString)){
           if(!graph.containsEdge(srcNode, targetNode))
@@ -340,8 +346,8 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     )
     met.thisParamOpt_Entry match {
       case Some(thisParam) =>
-        val srcNode = getNode(pi.recv_Call)
-        val targetNode = getNode(thisParam)
+        val srcNode = getNode(pi.recv_Call, srcContext.copy)
+        val targetNode = getNode(thisParam, targetContext.copy)
         worklist += targetNode
         if(!graph.containsEdge(srcNode, targetNode))
           addEdge(srcNode, targetNode)
@@ -349,8 +355,8 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     }
     met.thisParamOpt_Exit match {
       case Some(thisParam) =>
-        val srcNode = getNode(thisParam)
-        val targetNode = getNode(pi.recv_Return)
+        val srcNode = getNode(thisParam, targetContext.copy)
+        val targetNode = getNode(pi.recv_Return, srcContext.copy)
         worklist += targetNode
         if(!graph.containsEdge(srcNode, targetNode))
           addEdge(srcNode, targetNode)
@@ -358,8 +364,8 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     }
     met.retVar match {
       case Some(retv) =>
-        val targetNode = getNode(pi)
-        val srcNode = getNode(retv)
+        val targetNode = getNode(pi, srcContext.copy)
+        val srcNode = getNode(retv, targetContext.copy)
         worklist += srcNode
         if(!graph.containsEdge(srcNode, targetNode))
           addEdge(srcNode, targetNode)
@@ -371,33 +377,14 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
   def updateFieldValueSet(fieldNode : OfaFieldNode) = {
     val baseNode = fieldNode.baseNode
     val baseValueSet = baseNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
-    baseValueSet.instances.foreach(
-      ins => {
-        val fieldMap = iFieldDefRepo(ins)
-        fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet].update(fieldMap(fieldNode.fieldName)._2)
-      }  
-    )
-  }
-  
-  /**
-   * @param: d is a map from instance name to type
-   */ 
-  def updateFieldValueSet(d : ValueSet, fieldNode : OfaFieldNode) = {
-    val tempVs = fac()
-    d.instances.foreach(
-      ins => {
-        val fieldMap = iFieldDefRepo(ins)
-        if(!fieldMap.contains(fieldNode.fieldName)){
-          fieldMap(fieldNode.fieldName) = (msetEmpty, fac())
+    baseValueSet.instances.foreach{
+      case (ins, defSiteContext) => 
+        val vsopt = iFieldDefRepo.getValueSet(ins, defSiteContext, fieldNode.fieldName)
+        vsopt match{
+          case Some(vs) =>
+            fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet].update(vs)
+          case None =>
         }
-        fieldMap(fieldNode.fieldName)._1 += fieldNode
-        tempVs.update(fieldMap(fieldNode.fieldName)._2)
-      }  
-    )
-    if(!tempVs.isEmpty){
-      fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet].update(tempVs)
-//      println("worklist-->update---->" + fieldNode.asInstanceOf[Node])
-      worklist += fieldNode.asInstanceOf[Node]
     }
   }
   
@@ -406,18 +393,17 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
    */ 
   def populateIFieldRepo(d : ValueSet, fieldNode : OfaFieldNode) = {
     val baseNode = fieldNode.baseNode
-    val valueSet = baseNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
-    valueSet.instances.foreach(
-      ins => {
-        val fieldMap = iFieldDefRepo(ins)
-        if(!fieldMap.contains(fieldNode.fieldName)){
-          fieldMap(fieldNode.fieldName) = (msetEmpty, fac())
-        }
-        fieldMap(fieldNode.fieldName)._2.update(d)
-//        println("worklist-->populate---->" + fieldMap(fieldNode.fieldName)._1.asInstanceOf[MSet[Node]])
-        worklist ++= fieldMap(fieldNode.fieldName)._1.asInstanceOf[MSet[Node]]
-      }  
-    )
+    val fieldValueSet = fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
+    val baseValueSet = baseNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
+    val newDefSitContext = baseNode.getContext.copy
+    baseValueSet.instances.keys.foreach{
+      k =>
+        baseValueSet.setInstance(k, newDefSitContext)
+    }
+    baseValueSet.instances.foreach{
+      case(ins, newDefSitContext) =>
+        val fieldMap = iFieldDefRepo.setValueSet(ins, newDefSitContext, fieldNode.fieldName, fieldValueSet)
+    }
   }
   
   /**
@@ -443,12 +429,19 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     usages += globalVarNode
   }
   
+  def updateContext(callerContext : Context) = {
+    this.nodes.foreach{
+      node =>
+        node.getContext.updateContext(callerContext)
+    }
+  }
+  
   /**
    * This is the recv bar method in original algo
    */
   def recvInverse(n : Node) : Option[PointI] = {
-    if(n.isInstanceOf[OfaPointNode]){
-      getInvocationPoint(n.asInstanceOf[OfaPointNode].uri, n.asInstanceOf[OfaPointNode].loc)
+    if(n.isInstanceOf[OfaRecvNode]){
+      Some(n.asInstanceOf[OfaRecvNode].getPI)
     } else {None}
   }
   
@@ -464,188 +457,207 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
                 pi : PointI,
                 androidLibInfoTables : AndroidLibInfoTables) : MSet[ResourceUri] = {
     val calleeSet : MSet[ResourceUri] = msetEmpty
-    diff.instances.foreach(
-      d => {
+    diff.instances.foreach{
+      case (d, defSiteContext) => 
         val recordUri = androidLibInfoTables.getRecordUri(d.typ)
         val procUri = androidLibInfoTables.findProcedureUri(recordUri, androidLibInfoTables.getSubSignature(pi.varName))
         if(procUri != null)
         	calleeSet += procUri
-      }  
-    )
+    }
     calleeSet
   }
   
-  def getNodeOrElse(p : Point) : Node = {
+  def getNodeOrElse(p : Point, context : Context) : Node = {
     p match {
       case pal : PointArrayL =>
-        if(!arrayNodeExists(pal.varName, pal.locationUri)){
-          val node = addArrayNode(pal.varName, pal.locationUri)
+        if(!arrayNodeExists(pal.varName, pal.locationUri, context)){
+          val node = addArrayNode(pal.varName, pal.locationUri, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getArrayNode(pal.varName, pal.locationUri)
+        } else getArrayNode(pal.varName, pal.locationUri, context)
       case par : PointArrayR =>
-        if(!arrayNodeExists(par.varName, par.locationUri)){
-          val node = addArrayNode(par.varName, par.locationUri)
+        if(!arrayNodeExists(par.varName, par.locationUri, context)){
+          val node = addArrayNode(par.varName, par.locationUri, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getArrayNode(par.varName, par.locationUri)
+        } else getArrayNode(par.varName, par.locationUri, context)
       case pgl : PointGlobalL =>
-        if(!globalVarNodeExists(pgl.varName, pgl.locationUri)){
-          val node = addGlobalVarNode(pgl.varName, pgl.locationUri)
+        if(!globalVarNodeExists(pgl.varName, pgl.locationUri, context)){
+          val node = addGlobalVarNode(pgl.varName, pgl.locationUri, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getGlobalVarNode(pgl.varName, pgl.locationUri)
+        } else getGlobalVarNode(pgl.varName, pgl.locationUri, context)
       case pgr : PointGlobalR =>
-        if(!globalVarNodeExists(pgr.varName, pgr.locationUri)){
-          val node = addGlobalVarNode(pgr.varName, pgr.locationUri)
+        if(!globalVarNodeExists(pgr.varName, pgr.locationUri, context)){
+          val node = addGlobalVarNode(pgr.varName, pgr.locationUri, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getGlobalVarNode(pgr.varName, pgr.locationUri)
-      case pb : PointBase =>
-        if(!fieldBaseNodeExists(pb.varName, pb.locationUri)){
-          val node = addFieldBaseNode(pb.varName, pb.locationUri)
+        } else getGlobalVarNode(pgr.varName, pgr.locationUri, context)
+      case pbl : PointBaseL =>
+        if(!fieldBaseNodeLExists(pbl.varName, pbl.locationUri, context)){
+          val node = addFieldBaseNodeL(pbl.varName, pbl.locationUri, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getFieldBaseNode(pb.varName, pb.locationUri)
+        } else getFieldBaseNodeL(pbl.varName, pbl.locationUri, context)  
+      case pbr : PointBaseR =>
+        if(!fieldBaseNodeRExists(pbr.varName, pbr.locationUri, context)){
+          val node = addFieldBaseNodeR(pbr.varName, pbr.locationUri, context)
+          node.setProperty(VALUE_SET, fac())
+          node
+        } else getFieldBaseNodeR(pbr.varName, pbr.locationUri, context)
       case pfl : PointFieldL =>
-        if(!fieldNodeExists(pfl.basePoint.varName, pfl.varName, pfl.locationUri)){
-          val node = addFieldNode(pfl.basePoint.varName, pfl.varName, pfl.locationUri)
+        if(!fieldNodeExists(pfl.basePoint.varName, pfl.varName, pfl.locationUri, context)){
+          val node = addFieldNode(pfl.basePoint.varName, pfl.varName, pfl.locationUri, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getFieldNode(pfl.basePoint.varName, pfl.varName, pfl.locationUri)
+        } else getFieldNode(pfl.basePoint.varName, pfl.varName, pfl.locationUri, context)
       case pfr : PointFieldR =>
-        if(!fieldNodeExists(pfr.basePoint.varName, pfr.varName, pfr.locationUri)){
-          val node = addFieldNode(pfr.basePoint.varName, pfr.varName, pfr.locationUri)
+        if(!fieldNodeExists(pfr.basePoint.varName, pfr.varName, pfr.locationUri, context)){
+          val node = addFieldNode(pfr.basePoint.varName, pfr.varName, pfr.locationUri, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getFieldNode(pfr.basePoint.varName, pfr.varName, pfr.locationUri)
+        } else getFieldNode(pfr.basePoint.varName, pfr.varName, pfr.locationUri, context)
       case pr : PointRecv_Call =>
-        if(!nodeExists("recv_Call:" + pr.varName, pr.locationUri)){
-          val node = addNode("recv_Call:" + pr.varName, pr.locationUri)
+        if(!recvNodeExists("recv_Call:" + pr.varName, pr.locationUri, context, pr.container)){
+          val node = addRecvNode("recv_Call:" + pr.varName, pr.locationUri, context, pr.container)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getNode("recv_Call:" + pr.varName, pr.locationUri)
+        } else getRecvNode("recv_Call:" + pr.varName, pr.locationUri, context, pr.container)
       case pr : PointRecv_Return =>
-        if(!nodeExists("recv_Return:" + pr.varName, pr.locationUri)){
-          val node = addNode("recv_Return:" + pr.varName, pr.locationUri)
+        if(!recvNodeExists("recv_Return:" + pr.varName, pr.locationUri, context, pr.container)){
+          val node = addRecvNode("recv_Return:" + pr.varName, pr.locationUri, context, pr.container)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getNode("recv_Return:" + pr.varName, pr.locationUri)
+        } else getRecvNode("recv_Return:" + pr.varName, pr.locationUri, context, pr.container)
       case pr : PointRecv =>
-        if(!nodeExists("recv:" + pr.varName, pr.locationUri)){
-          val node = addNode("recv:" + pr.varName, pr.locationUri)
+        if(!recvNodeExists("recv:" + pr.varName, pr.locationUri, context, pr.container)){
+          val node = addRecvNode("recv:" + pr.varName, pr.locationUri, context, pr.container)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getNode("recv:" + pr.varName, pr.locationUri)
+        } else getRecvNode("recv:" + pr.varName, pr.locationUri, context, pr.container)
       case pa : PointArg_Call =>
-        if(!nodeExists("arg_Call:" + pa.varName, pa.locationUri)){
-          val node = addNode("arg_Call:" + pa.varName, pa.locationUri)
+        if(!pointNodeExists("arg_Call:" + pa.varName, pa.locationUri, context)){
+          val node = addPointNode("arg_Call:" + pa.varName, pa.locationUri, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getNode("arg_Call:" + pa.varName, pa.locationUri)
+        } else getPointNode("arg_Call:" + pa.varName, pa.locationUri, context)
       case pa : PointArg_Return =>
-        if(!nodeExists("arg_Return:" + pa.varName, pa.locationUri)){
-          val node = addNode("arg_Return:" + pa.varName, pa.locationUri)
+        if(!pointNodeExists("arg_Return:" + pa.varName, pa.locationUri, context)){
+          val node = addPointNode("arg_Return:" + pa.varName, pa.locationUri, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getNode("arg_Return:" + pa.varName, pa.locationUri)
+        } else getPointNode("arg_Return:" + pa.varName, pa.locationUri, context)
       case pa : PointArg =>
-        if(!nodeExists("arg:" + pa.varName, pa.locationUri)){
-          val node = addNode("arg:" + pa.varName, pa.locationUri)
+        if(!pointNodeExists("arg:" + pa.varName, pa.locationUri, context)){
+          val node = addPointNode("arg:" + pa.varName, pa.locationUri, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getNode("arg:" + pa.varName, pa.locationUri)
+        } else getPointNode("arg:" + pa.varName, pa.locationUri, context)
       case pso : PointStringO =>
-        if(!nodeExists("newString:" + pso.varName, pso.locationUri)){
-          val node = addNode("newString:" + pso.varName, pso.locationUri)
+        if(!pointNodeExists("newString:" + pso.varName, pso.locationUri, context)){
+          val node = addPointNode("newString:" + pso.varName, pso.locationUri, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getNode("newString:" + pso.varName, pso.locationUri)
+        } else getPointNode("newString:" + pso.varName, pso.locationUri, context)
       case po : PointO =>
-        if(!nodeExists("new:" + po.varName, po.locationUri)){
-          val node = addNode("new:" + po.varName, po.locationUri)
+        if(!pointNodeExists("new:" + po.varName, po.locationUri, context)){
+          val node = addPointNode("new:" + po.varName, po.locationUri, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getNode("new:" + po.varName, po.locationUri)
+        } else getPointNode("new:" + po.varName, po.locationUri, context)
+      case pi : PointI =>
+        if(!invokeNodeExists(pi.varName, pi.locationUri, context, pi)){
+          val node = addInvokeNode(pi.varName, pi.locationUri, context, pi)
+          node.setProperty(VALUE_SET, fac())
+          node
+        } else getInvokeNode(pi.varName, pi.locationUri, context, pi)
       case pwi : PointWithIndex =>
-        if(!nodeExists(pwi.varName, pwi.locationUri)){
-          val node = addNode(pwi.varName, pwi.locationUri)
+        if(!pointNodeExists(pwi.varName, pwi.locationUri, context)){
+          val node = addPointNode(pwi.varName, pwi.locationUri, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getNode(pwi.varName, pwi.locationUri)
+        } else getPointNode(pwi.varName, pwi.locationUri, context)
       case pr : PointThis_Entry =>
-        if(!nodeExists("this_Entry:" + pr.varName, pr.identifier)){
-          val node = addNode("this_Entry:" + pr.varName, pr.identifier)
+        if(!pointNodeExists("this_Entry:" + pr.varName, pr.identifier, context)){
+          val node = addPointNode("this_Entry:" + pr.varName, pr.identifier, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getNode("this_Entry:" + pr.varName, pr.identifier)
+        } else getPointNode("this_Entry:" + pr.varName, pr.identifier, context)
       case pr : PointThis_Exit =>
-        if(!nodeExists("this_Exit:" + pr.varName, pr.identifier)){
-          val node = addNode("this_Exit:" + pr.varName, pr.identifier)
+        if(!pointNodeExists("this_Exit:" + pr.varName, pr.identifier, context)){
+          val node = addPointNode("this_Exit:" + pr.varName, pr.identifier, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getNode("this_Exit:" + pr.varName, pr.identifier)
+        } else getPointNode("this_Exit:" + pr.varName, pr.identifier, context)
       case pr : PointThis =>
-        if(!nodeExists("this:" + pr.varName, pr.identifier)){
-          val node = addNode("this:" + pr.varName, pr.identifier)
+        if(!pointNodeExists("this:" + pr.varName, pr.identifier, context)){
+          val node = addPointNode("this:" + pr.varName, pr.identifier, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getNode("this:" + pr.varName, pr.identifier)
+        } else getPointNode("this:" + pr.varName, pr.identifier, context)
       case pa : PointParam_Entry =>
-        if(!nodeExists("param_Entry:" + pa.varName, pa.identifier)){
-          val node = addNode("param_Entry:" + pa.varName, pa.identifier)
+        if(!pointNodeExists("param_Entry:" + pa.varName, pa.identifier, context)){
+          val node = addPointNode("param_Entry:" + pa.varName, pa.identifier, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getNode("param_Entry:" + pa.varName, pa.identifier)
+        } else getPointNode("param_Entry:" + pa.varName, pa.identifier, context)
       case pa : PointParam_Exit =>
-        if(!nodeExists("param_Exit:" + pa.varName, pa.identifier)){
-          val node = addNode("param_Exit:" + pa.varName, pa.identifier)
+        if(!pointNodeExists("param_Exit:" + pa.varName, pa.identifier, context)){
+          val node = addPointNode("param_Exit:" + pa.varName, pa.identifier, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getNode("param_Exit:" + pa.varName, pa.identifier)
+        } else getPointNode("param_Exit:" + pa.varName, pa.identifier, context)
       case pa : PointParam =>
-        if(!nodeExists("param:" + pa.varName, pa.identifier)){
-          val node = addNode("param:" + pa.varName, pa.identifier)
+        if(!pointNodeExists("param:" + pa.varName, pa.identifier, context)){
+          val node = addPointNode("param:" + pa.varName, pa.identifier, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getNode("param:" + pa.varName, pa.identifier)
+        } else getPointNode("param:" + pa.varName, pa.identifier, context)
       case pr : PointRNoIndex =>
-        if(!nodeExists(pr.varName, pr.identifier)){
-          val node = addNode(pr.varName, pr.identifier)
+        if(!pointNodeExists(pr.varName, pr.identifier, context)){
+          val node = addPointNode(pr.varName, pr.identifier, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getNode(pr.varName, pr.identifier)
+        } else getPointNode(pr.varName, pr.identifier, context)
       case pp : PointProc =>
-        if(!nodeExists(pp.pUri)){
-          val node = addNode(pp.pUri)
+        if(!pointNodeExists(pp.pUri, pp.getLoc, context)){
+          val node = addPointNode(pp.pUri, pp.getLoc, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getNode(pp.pUri)
+        } else getPointNode(pp.pUri, pp.getLoc, context)
     }
   }
   
-  def arrayNodeExists(uri : ResourceUri, loc : ResourceUri) : Boolean = {
-    graph.containsVertex(newArrayNode(uri, loc).asInstanceOf[Node])
+  def arrayNodeExists(uri : ResourceUri, loc : ResourceUri, context : Context) : Boolean = {
+    graph.containsVertex(newArrayNode(uri, loc, context).asInstanceOf[Node])
   }
   
-  def globalVarNodeExists(uri : ResourceUri, loc : ResourceUri) : Boolean = {
-    graph.containsVertex(newGlobalVarNode(uri, loc).asInstanceOf[Node])
+  def globalVarNodeExists(uri : ResourceUri, loc : ResourceUri, context : Context) : Boolean = {
+    graph.containsVertex(newGlobalVarNode(uri, loc, context).asInstanceOf[Node])
   }
   
-  def fieldBaseNodeExists(uri : ResourceUri, loc : ResourceUri) : Boolean = {
-    graph.containsVertex(newFieldBaseNode(uri, loc).asInstanceOf[Node])
+  def fieldBaseNodeLExists(uri : ResourceUri, loc : ResourceUri, context : Context) : Boolean = {
+    graph.containsVertex(newFieldBaseNodeL(uri, loc, context).asInstanceOf[Node])
   }
   
-  def fieldNodeExists(baseName : ResourceUri, fieldName : ResourceUri, loc : ResourceUri) : Boolean = {
-    graph.containsVertex(newFieldNode(baseName, fieldName, loc).asInstanceOf[Node])
+  def fieldBaseNodeRExists(uri : ResourceUri, loc : ResourceUri, context : Context) : Boolean = {
+    graph.containsVertex(newFieldBaseNodeR(uri, loc, context).asInstanceOf[Node])
   }
   
-  def nodeExists(uri : ResourceUri, loc : ResourceUri) : Boolean = {
-    graph.containsVertex(newNode(uri, loc).asInstanceOf[Node])
+  def fieldNodeExists(baseName : ResourceUri, fieldName : ResourceUri, loc : ResourceUri, context : Context) : Boolean = {
+    graph.containsVertex(newFieldNode(baseName, fieldName, loc, context).asInstanceOf[Node])
   }
   
-  def nodeExists(uri : ResourceUri) : Boolean = {
-    graph.containsVertex(newNode(uri).asInstanceOf[Node])
+  def invokeNodeExists(uri : ResourceUri, loc : ResourceUri, context : Context, pi : PointI) : Boolean = {
+    graph.containsVertex(newInvokeNode(uri, loc, context, pi).asInstanceOf[Node])
+  }
+  
+  def recvNodeExists(uri : ResourceUri, loc : ResourceUri, context : Context, pi : PointI) : Boolean = {
+    graph.containsVertex(newRecvNode(uri, loc, context, pi).asInstanceOf[Node])
+  }
+  
+  def pointNodeExists(uri : ResourceUri, loc : ResourceUri, context : Context) : Boolean = {
+    graph.containsVertex(newPointNode(uri, loc, context).asInstanceOf[Node])
   }
 
   def addNode(node : Node) : Node = {
@@ -654,169 +666,217 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     node
   }
   
-  def addArrayNode(uri : ResourceUri, loc : ResourceUri) : Node = {
-    val node = newArrayNode(uri, loc).asInstanceOf[Node]
+  def addArrayNode(uri : ResourceUri, loc : ResourceUri, context : Context) : Node = {
+    val node = newArrayNode(uri, loc, context).asInstanceOf[Node]
     val n =
       if (pool.contains(node)) pool(node)
       else {
-        pool(node) = node
+        pl += (node -> node)
         node
       }
     graph.addVertex(n)
     n
   }
   
-  def addGlobalVarNode(uri : ResourceUri, loc : ResourceUri) : Node = {
-    val node = newGlobalVarNode(uri, loc).asInstanceOf[Node]
+  def addGlobalVarNode(uri : ResourceUri, loc : ResourceUri, context : Context) : Node = {
+    val node = newGlobalVarNode(uri, loc, context).asInstanceOf[Node]
     val n =
       if (pool.contains(node)) pool(node)
       else {
-        pool(node) = node
+        pl += (node -> node)
         node
       }
     graph.addVertex(n)
     n
   }
   
-  def addFieldBaseNode(uri : ResourceUri, loc : ResourceUri) : Node = {
-    val node = newFieldBaseNode(uri, loc).asInstanceOf[Node]
+  def addFieldBaseNodeL(uri : ResourceUri, loc : ResourceUri, context : Context) : Node = {
+    val node = newFieldBaseNodeL(uri, loc, context).asInstanceOf[Node]
     val n =
       if (pool.contains(node)) pool(node)
       else {
-        pool(node) = node
+        pl += (node -> node)
         node
       }
     graph.addVertex(n)
     n
   }
   
-  def addFieldNode(baseName : ResourceUri, fieldName : ResourceUri, loc : ResourceUri) : Node = {
-    val node = newFieldNode(baseName, fieldName, loc).asInstanceOf[Node]
+  def addFieldBaseNodeR(uri : ResourceUri, loc : ResourceUri, context : Context) : Node = {
+    val node = newFieldBaseNodeR(uri, loc, context).asInstanceOf[Node]
     val n =
       if (pool.contains(node)) pool(node)
       else {
-        pool(node) = node
+        pl += (node -> node)
+        node
+      }
+    graph.addVertex(n)
+    n
+  }
+  
+  def addFieldNode(baseName : ResourceUri, fieldName : ResourceUri, loc : ResourceUri, context : Context) : Node = {
+    val node = newFieldNode(baseName, fieldName, loc, context).asInstanceOf[Node]
+    val n =
+      if (pool.contains(node)) pool(node)
+      else {
+        pl += (node -> node)
+        node
+      }
+    graph.addVertex(n)
+    n
+  }
+  
+  def addInvokeNode(uri : ResourceUri, loc : ResourceUri, context : Context, pi : PointI) : Node = {
+    val node = newInvokeNode(uri, loc, context, pi).asInstanceOf[Node]
+    val n =
+      if (pool.contains(node)) pool(node)
+      else {
+        pl += (node -> node)
+        node
+      }
+    graph.addVertex(n)
+    n
+  }
+  
+  def addRecvNode(uri : ResourceUri, loc : ResourceUri, context : Context, pi : PointI) : Node = {
+    val node = newRecvNode(uri, loc, context, pi).asInstanceOf[Node]
+    val n =
+      if (pool.contains(node)) pool(node)
+      else {
+        pl += (node -> node)
         node
       }
     graph.addVertex(n)
     n
   }
 
-  def addNode(uri : ResourceUri, loc : ResourceUri) : Node = {
-    val node = newNode(uri, loc).asInstanceOf[Node]
+  def addPointNode(uri : ResourceUri, loc : ResourceUri, context : Context) : Node = {
+    val node = newPointNode(uri, loc, context).asInstanceOf[Node]
     val n =
       if (pool.contains(node)) pool(node)
       else {
-        pool(node) = node
+        pl += (node -> node)
         node
       }
     graph.addVertex(n)
     n
   }
   
-  def addNode(uri : ResourceUri) : Node = {
-    val node = newNode(uri).asInstanceOf[Node]
-    val n =
-      if (pool.contains(node)) pool(node)
-      else {
-        pool(node) = node
-        node
-      }
-    graph.addVertex(n)
-    n
-  }
+
 
   def getNode(n : Node) : Node =
     pool(n)
     
-  def getArrayNode(uri : ResourceUri, loc : ResourceUri) : Node =
-    pool(newArrayNode(uri, loc))
+  def getArrayNode(uri : ResourceUri, loc : ResourceUri, context : Context) : Node =
+    pool(newArrayNode(uri, loc, context))
     
-  def getGlobalVarNode(uri : ResourceUri, loc : ResourceUri) : Node =
-    pool(newGlobalVarNode(uri, loc))
+  def getGlobalVarNode(uri : ResourceUri, loc : ResourceUri, context : Context) : Node =
+    pool(newGlobalVarNode(uri, loc, context))
     
-  def getFieldBaseNode(uri : ResourceUri, loc : ResourceUri) : Node =
-    pool(newFieldBaseNode(uri, loc))
+  def getFieldBaseNodeL(uri : ResourceUri, loc : ResourceUri, context : Context) : Node =
+    pool(newFieldBaseNodeL(uri, loc, context))
     
-  def getFieldNode(baseName : ResourceUri, fieldName : ResourceUri, loc : ResourceUri) : Node =
-    pool(newFieldNode(baseName, fieldName, loc))
+  def getFieldBaseNodeR(uri : ResourceUri, loc : ResourceUri, context : Context) : Node =
+    pool(newFieldBaseNodeR(uri, loc, context))
+    
+  def getFieldNode(baseName : ResourceUri, fieldName : ResourceUri, loc : ResourceUri, context : Context) : Node =
+    pool(newFieldNode(baseName, fieldName, loc, context))
+    
+  def getInvokeNode(uri : ResourceUri, loc : ResourceUri, context : Context, pi : PointI) : Node =
+    pool(newInvokeNode(uri, loc, context, pi))
+    
+  def getRecvNode(uri : ResourceUri, loc : ResourceUri, context : Context, pi : PointI) : Node =
+    pool(newRecvNode(uri, loc, context, pi))
 
-  def getNode(uri : ResourceUri, loc : ResourceUri) : Node =
-    pool(newNode(uri, loc))
+  def getPointNode(uri : ResourceUri, loc : ResourceUri, context : Context) : Node =
+    pool(newPointNode(uri, loc, context))
     
-  def getNode(uri : ResourceUri) : Node =
-    pool(newNode(uri))
-    
-  def getNode(p : Point) : Node = {
+  def getNode(p : Point, context : Context) : Node = {
     p match {
       case pal : PointArrayL =>
-        getArrayNode(pal.varName, pal.locationUri)
+        getArrayNode(pal.varName, pal.locationUri, context)
       case par : PointArrayR =>
-        getArrayNode(par.varName, par.locationUri)
+        getArrayNode(par.varName, par.locationUri, context)
       case pgl : PointGlobalL =>
-        getGlobalVarNode(pgl.varName, pgl.locationUri)
+        getGlobalVarNode(pgl.varName, pgl.locationUri, context)
       case pgr : PointGlobalR =>
-        getGlobalVarNode(pgr.varName, pgr.locationUri)
-      case pb : PointBase =>
-        getFieldBaseNode(pb.varName, pb.locationUri)
+        getGlobalVarNode(pgr.varName, pgr.locationUri, context)
+      case pbl : PointBaseL =>
+        getFieldBaseNodeL(pbl.varName, pbl.locationUri, context)
+      case pbr : PointBaseR =>
+        getFieldBaseNodeR(pbr.varName, pbr.locationUri, context)
       case pfl : PointFieldL =>
-        getFieldNode(pfl.basePoint.varName, pfl.varName, pfl.locationUri)
+        getFieldNode(pfl.basePoint.varName, pfl.varName, pfl.locationUri, context)
       case pfr : PointFieldR =>
-        getFieldNode(pfr.basePoint.varName, pfr.varName, pfr.locationUri)
+        getFieldNode(pfr.basePoint.varName, pfr.varName, pfr.locationUri, context)
       case pr : PointRecv_Call =>
-        getNode("recv_Call:" + pr.varName, pr.locationUri)
+        getRecvNode("recv_Call:" + pr.varName, pr.locationUri, context, pr.container)
       case pr : PointRecv_Return =>
-        getNode("recv_Return:" + pr.varName, pr.locationUri)
+        getRecvNode("recv_Return:" + pr.varName, pr.locationUri, context, pr.container)
       case pr : PointRecv =>
-        getNode("recv:" + pr.varName, pr.locationUri)
+        getRecvNode("recv:" + pr.varName, pr.locationUri, context, pr.container)
       case pa : PointArg_Call =>
-        getNode("arg_Call:" + pa.varName, pa.locationUri)
+        getPointNode("arg_Call:" + pa.varName, pa.locationUri, context)
       case pa : PointArg_Return =>
-        getNode("arg_Return:" + pa.varName, pa.locationUri)
+        getPointNode("arg_Return:" + pa.varName, pa.locationUri, context)
       case pa : PointArg =>
-        getNode("arg:" + pa.varName, pa.locationUri)
+        getPointNode("arg:" + pa.varName, pa.locationUri, context)
       case po : PointStringO =>
-        getNode("newString:" + po.varName, po.locationUri)
+        getPointNode("newString:" + po.varName, po.locationUri, context)
       case po : PointO =>
-        getNode("new:" + po.varName, po.locationUri)
+        getPointNode("new:" + po.varName, po.locationUri, context)
+      case pi : PointI =>
+        getInvokeNode(pi.varName, pi.locationUri, context, pi)
       case pwi : PointWithIndex =>
-        getNode(pwi.varName, pwi.locationUri)
+        getPointNode(pwi.varName, pwi.locationUri, context)
       case pr : PointThis_Entry =>
-        getNode("this_Entry:" + pr.varName, pr.identifier)
+        getPointNode("this_Entry:" + pr.varName, pr.identifier, context)
       case pr : PointThis_Exit =>
-        getNode("this_Exit:" + pr.varName, pr.identifier)
+        getPointNode("this_Exit:" + pr.varName, pr.identifier, context)
       case pr : PointThis =>
-        getNode("this:" + pr.varName, pr.identifier)
+        getPointNode("this:" + pr.varName, pr.identifier, context)
       case pa : PointParam_Entry =>
-        getNode("param_Entry:" + pa.varName, pa.identifier)
+        getPointNode("param_Entry:" + pa.varName, pa.identifier, context)
       case pa : PointParam_Exit =>
-        getNode("param_Exit:" + pa.varName, pa.identifier)
+        getPointNode("param_Exit:" + pa.varName, pa.identifier, context)
       case pa : PointParam =>
-        getNode("param:" + pa.varName, pa.identifier)
+        getPointNode("param:" + pa.varName, pa.identifier, context)
       case pri : PointRNoIndex =>
-        getNode(pri.varName, pri.identifier)
+        getPointNode(pri.varName, pri.identifier, context)
       case pp : PointProc =>
-        getNode(pp.pUri)
+        getPointNode(pp.pUri, pp.getLoc, context)
     }
   }
   
-  protected def newArrayNode(uri : ResourceUri, loc : ResourceUri) =
-    OfaArrayNode(uri, loc)
+  protected def newArrayNode(uri : ResourceUri, loc : ResourceUri, context : Context) =
+    OfaArrayNode(uri, loc, context)
   
-  protected def newGlobalVarNode(uri : ResourceUri, loc : ResourceUri) =
-    OfaGlobalVarNode(uri, loc)
+  protected def newGlobalVarNode(uri : ResourceUri, loc : ResourceUri, context : Context) =
+    OfaGlobalVarNode(uri, loc, context)
   
-  protected def newFieldNode(baseName : ResourceUri, fieldName : ResourceUri, loc : ResourceUri) =
-    OfaFieldNode(baseName, fieldName, loc)
+  protected def newFieldNode(baseName : ResourceUri, fieldName : ResourceUri, loc : ResourceUri, context : Context) =
+    OfaFieldNode(baseName, fieldName, loc, context)
   
-  protected def newFieldBaseNode(uri : ResourceUri, loc : ResourceUri) =
-    OfaFieldBaseNode(uri, loc)
-
-  protected def newNode(uri : ResourceUri, loc : ResourceUri) =
-    OfaPointNode(uri, loc)
+  protected def newFieldBaseNodeL(uri : ResourceUri, loc : ResourceUri, context : Context) =
+    OfaFieldBaseNodeL(uri, loc, context)
     
-  protected def newNode(uri : ResourceUri) =
-    OfaProcNode(uri)
+  protected def newFieldBaseNodeR(uri : ResourceUri, loc : ResourceUri, context : Context) =
+    OfaFieldBaseNodeR(uri, loc, context)
+
+  protected def newInvokeNode(uri : ResourceUri, loc : ResourceUri, context : Context, pi : PointI) = {
+    val n = OfaInvokeNode(uri, loc, context, pi.typ)
+    n.setPI(pi)
+    n
+  }
+    
+  protected def newRecvNode(uri : ResourceUri, loc : ResourceUri, context : Context, pi : PointI) = {
+    val n = OfaRecvNode(uri, loc, context)
+    n.setPI(pi)
+    n
+  }
+    
+  protected def newPointNode(uri : ResourceUri, loc : ResourceUri, context : Context) =
+    OfaPointNode(uri, loc, context)
     
   override def toString = {
       val sb = new StringBuilder("OFG\n")
@@ -849,45 +909,80 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
   }
 }
 
-sealed abstract class OfaNode extends PropertyProvider {
+sealed abstract class OfaNode(loc : ResourceUri, context : Context) extends PropertyProvider {
   val propertyMap = mlinkedMapEmpty[Property.Key, Any]
+  def getContext = this.context
 }
 
-final case class OfaProcNode(uri : ResourceUri) extends OfaNode {
-  override def toString = uri
+final case class OfaProcNode(uri : ResourceUri, loc : ResourceUri, context : Context) extends OfaNode(loc, context) {
+  override def toString = uri + "@" + context.toString()
 }
 
-final case class OfaPointNode(uri : ResourceUri, loc : ResourceUri) extends OfaNode {
-  override def toString = uri + "@" + loc
+final case class OfaPointNode(uri : ResourceUri, loc : ResourceUri, context : Context) extends OfaNode(loc, context) {
+  override def toString = uri + "@" + context.toString()
+}
+
+/**
+ * Node type for invocation point.
+ */
+final case class OfaInvokeNode(uri : ResourceUri, loc : ResourceUri, context : Context, typ : String) extends OfaNode(loc, context) {
+  private var pi : PointI = null
+  def setPI(pi : PointI) = this.pi = pi
+  def getPI = this.pi
+  override def toString = typ + "_invoke:" + uri + "@" + context.toString()
+}
+
+/**
+ * Node type for receive point.
+ */
+final case class OfaRecvNode(uri : ResourceUri, loc : ResourceUri, context : Context) extends OfaNode(loc, context) {
+  private var pi : PointI = null
+  def setPI(pi : PointI) = this.pi = pi
+  def getPI = this.pi
+  override def toString = "recv:" + uri + "@" + context.toString()
 }
 
 /**
  * Node type for global variable.
  */
-final case class OfaGlobalVarNode(uri : ResourceUri, loc : ResourceUri) extends OfaNode {
-  override def toString = "global:" + uri.replaceAll("@@", "") + "@" + loc
+final case class OfaGlobalVarNode(uri : ResourceUri, loc : ResourceUri, context : Context) extends OfaNode(loc, context) {
+  override def toString = "global:" + uri.replaceAll("@@", "") + "@" + context.toString()
 }
 
 /**
  * Node type for base part of field access to store hidden edge for it's fieldNode.
  */
-final case class OfaFieldBaseNode(uri : ResourceUri, loc : ResourceUri) extends OfaNode {
+sealed abstract class OfaFieldBaseNode(uri : ResourceUri, loc : ResourceUri, context : Context) extends OfaNode(loc, context) {
   var fieldNode : OfaFieldNode = null
-  override def toString = "base:" + uri + "@" + loc
+  override def toString = "base:" + uri + "@" + context.toString()
+}
+
+/**
+ * Node type for base part of field access to store hidden edge for it's fieldNode.
+ */
+final case class OfaFieldBaseNodeL(uri : ResourceUri, loc : ResourceUri, context : Context) extends OfaFieldBaseNode(uri, loc, context) {
+  override def toString = "base_lhs:" + uri + "@" + context.toString()
+}
+
+/**
+ * Node type for base part of field access to store hidden edge for it's fieldNode.
+ */
+final case class OfaFieldBaseNodeR(uri : ResourceUri, loc : ResourceUri, context : Context) extends OfaFieldBaseNode(uri, loc, context) {
+  override def toString = "base_rhs:" + uri + "@" + context.toString()
 }
 
 /**
  * Node type for field access to store hidden edge for it's baseNode.
  */
-final case class OfaFieldNode(baseName : ResourceUri, fieldName : ResourceUri, loc : ResourceUri) extends OfaNode {
+final case class OfaFieldNode(baseName : ResourceUri, fieldName : ResourceUri, loc : ResourceUri, context : Context) extends OfaNode(loc, context) {
   var baseNode : OfaFieldBaseNode = null
-  override def toString = "field:" + baseName + "." + fieldName + "@" + loc
+  override def toString = "field:" + baseName + "." + fieldName + "@" + context.toString()
 }
 
 /**
  * Node type for array variable.
  */
-final case class OfaArrayNode(uri : ResourceUri, loc : ResourceUri) extends OfaNode {
+final case class OfaArrayNode(uri : ResourceUri, loc : ResourceUri, context : Context) extends OfaNode(loc, context) {
   var baseNode : OfaFieldBaseNode = null
-  override def toString = "array:" + uri + "@" + loc
+  override def toString = "array:" + uri + "@" + context.toString()
 }

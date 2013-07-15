@@ -299,19 +299,4 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
     point
   }
   
-  def getInvocationPoint(uri : ResourceUri, loc : ResourceUri) : Option[PointI] = {
-    var pointOpt : Option[PointI] = None
-    points.foreach(
-      p => {
-        p match {
-          case pi : PointI =>
-            if(!pi.typ.equals("static") && ("recv_Call:" +pi.recv_Call.varName).equals(uri) && pi.recv_Call.locationUri.equals(loc)){
-              pointOpt = Some(pi)
-            }
-          case _ =>
-        }
-      }  
-    )
-    pointOpt
-  }
 }

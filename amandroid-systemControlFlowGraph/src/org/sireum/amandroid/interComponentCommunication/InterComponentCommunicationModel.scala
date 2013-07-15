@@ -14,27 +14,28 @@ import org.sireum.amandroid.parser.Data
 import org.sireum.amandroid.parser.UriData
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet
 import org.sireum.amandroid.objectFlowAnalysis.PointO
+import org.sireum.amandroid.objectFlowAnalysis.Context
 
 
 trait InterComponentCommunicationModel[Node <: OfaNode, ValueSet <: AndroidValueSet] extends ObjectFlowGraph[Node, ValueSet] {
 	/**
    * contain all inter component communication method call signatures and caller parameter nodes
    */
-  private var iccOperationTracker : Map[String, PointI] = Map()
+  private var iccOperationTracker : Set[(String, PointI, Context)] = Set()
   private var entryPoints : Set[String] = Set()
   private var intentFdb : IntentFilterDataBase = null
   def setEntryPoints(eps : Set[String]) = this.entryPoints = eps
   def setIntentFdb(db : IntentFilterDataBase) = this.intentFdb = db
 
-  def setIccOperationTracker(sig : String, pi : PointI) = iccOperationTracker += (sig -> pi)
-  def checkIccOperation(sig : String) : Boolean = {
+  def setIccOperationTracker(sig : String, pi : PointI, context : Context) = iccOperationTracker += ((sig, pi, context))
+  
+  def checkIccOperation(sig : String, pi : PointI, context : Context) : Boolean = {
     var flag : Boolean = true
-    val pi = iccOperationTracker(sig)
     if(pi.args_Call.size < 1){
       System.err.println("Ofg param nodes number is not enough for: " + sig)
       flag = false
     } else {
-      val intentNode = getNode(pi.args_Call(0))
+      val intentNode = getNode(pi.args_Call(0), context.copy)
       if(intentNode.getProperty[ValueSet](VALUE_SET).isEmpty){
   		  flag = false
   		}
@@ -42,50 +43,52 @@ trait InterComponentCommunicationModel[Node <: OfaNode, ValueSet <: AndroidValue
     flag
   }
   
-  def doIccOperation(dummyMainMap : Map[String, String]) : Map[PointI, Set[String]] = {
-    var result : Map[PointI, Set[String]] = Map()
+  def doIccOperation(dummyMainMap : Map[String, String]) : Set[(PointI, Context, Set[String])] = {
+    var result : Set[(PointI, Context, Set[String])] = Set()
     iccOperationTracker.map{
-      case (k, v) =>
-        println("k, v -==> " + (k, v))
-        if(checkIccOperation(k)){
-          val intentNode = getNode(v.args_Call(0))
+      case (sig, pi, context) =>
+        println("sig, pi, context -==> " + (sig, pi, context))
+        if(checkIccOperation(sig, pi, context)){
+          val intentNode = getNode(pi.args_Call(0), context.copy)
 	        val intentValueSet : ValueSet = intentNode.getProperty[ValueSet](VALUE_SET)
 	        hasExplicitTarget(intentValueSet) match {
 	          case Some(targets) =>
 	            //explicit case
-	            result += (v -> targets.map{name => dummyMainMap.getOrElse(name, null)}.filter{item => if(item != null)true else false}.toSet)
+	            result += ((pi, context, targets.map{name => dummyMainMap.getOrElse(name, null)}.filter{item => if(item != null)true else false}.toSet))
 	          case None =>
 	            hasImplicitTarget(intentValueSet) match {
 	              case Some(targets) =>	                
 	            //implicit case
-	                result += (v -> targets.map{name => dummyMainMap.getOrElse(name, null)}.filter{item => if(item != null)true else false}.toSet)
+	                result += ((pi, context, targets.map{name => dummyMainMap.getOrElse(name, null)}.filter{item => if(item != null)true else false}.toSet))
 	              case None =>
 	                System.err.println("problem: received Intent did not find an explicit or implicit match")
 	            }
 	        }
         } else {
-          System.err.println("Inter-Component Communication connection failed for: " + k + ", because of intent object flow error.")
+          System.err.println("Inter-Component Communication connection failed for: " + sig + ", because of intent object flow error.")
         }
     }
     println("result==>" + result)
-    iccOperationTracker = Map()
+    iccOperationTracker = Set()
     result
   }
   
   def hasExplicitTarget(intentValueSet : ValueSet) : Option[Set[String]] = {
     intentValueSet.instances.foreach{
-      intentIns =>
-        val intentFields = iFieldDefRepo(intentIns)
-        if(intentFields.contains(AndroidConstants.INTENT_COMPONENT)){
-          val componentValueSet = intentFields(AndroidConstants.INTENT_COMPONENT)._2
-          componentValueSet.instances.foreach{
-            compIns =>
-              val componentFields = iFieldDefRepo(compIns)
-              if(componentFields.contains(AndroidConstants.COMPONENTNAME_CLASS)){
-                val classValueSet = componentFields(AndroidConstants.COMPONENTNAME_CLASS)._2
-                return Some(classValueSet.strings)
-              }
-          }
+      case(intentIns, defSiteContext) =>
+        val componentValueSetOpt = iFieldDefRepo.getValueSet(intentIns, defSiteContext, AndroidConstants.INTENT_COMPONENT)
+        componentValueSetOpt match{
+          case Some(componentValueSet) =>
+            componentValueSet.instances.foreach{
+              case(compIns, defSiteContext) =>
+                val classValueSetOpt = iFieldDefRepo.getValueSet(compIns, defSiteContext, AndroidConstants.COMPONENTNAME_CLASS)
+                classValueSetOpt match{
+                  case Some(classValueSet) =>
+                    return Some(classValueSet.strings)
+                  case None =>
+                }
+            }
+          case None =>
         }
     }
     None
@@ -94,53 +97,55 @@ trait InterComponentCommunicationModel[Node <: OfaNode, ValueSet <: AndroidValue
   def hasImplicitTarget(intentValueSet : ValueSet) : Option[Set[String]] = {
     var components : Set[String] = Set()
     intentValueSet.instances.foreach{
-      intentIns =>
+      case(intentIns, defSiteContext) =>
         var compsForThisIntent:Set[String] = Set()    
         println("intentIns = " + intentIns)
-        val intentFields = iFieldDefRepo(intentIns)
         var actions:Set[String] = Set()
-        if(intentFields.contains(AndroidConstants.INTENT_ACTION)){
-          val actionValueSet = intentFields(AndroidConstants.INTENT_ACTION)._2
-          actions ++= actionValueSet.strings
+        val actionValueSetOpt = iFieldDefRepo.getValueSet(intentIns, defSiteContext, AndroidConstants.INTENT_ACTION)
+        actionValueSetOpt match{
+          case Some(actionValueSet) =>
+            actions ++= actionValueSet.strings
+          case None =>
         }
         println("actions = " + actions)
         
         var categories:Set[String] = Set() // the code to get the valueSet of categories is to be added below
         
         var datas:Set[UriData] = Set()
-        if(intentFields.contains(AndroidConstants.INTENT_URI_DATA)){
-          var uriString:String = null
-          val dataValueSet = intentFields(AndroidConstants.INTENT_URI_DATA)._2
-          dataValueSet.instances.foreach{
-            stringUriIns =>              
-              println("stringUriIns = " + stringUriIns)
-              val stringUriFields = iFieldDefRepo(stringUriIns) // do we need to double check if stringUriIns is in fact a stringUri-instance?
-              if(stringUriFields.contains(AndroidConstants.URI_STRING_URI_URI_STRING)){
-                val uriStringValueSet = stringUriFields(AndroidConstants.URI_STRING_URI_URI_STRING)._2
-                println("uriStringValueSet = " + uriStringValueSet)
-                uriStringValueSet.strings.foreach{
-                  k =>
-                     uriString = k
-                     var uriData = new UriData
-                     populateByUri(uriData, uriString)
-                     println("uriString: " + uriString + " , populated data: (" + uriData +")")
-                     datas +=uriData
+        val dataValueSetOpt = iFieldDefRepo.getValueSet(intentIns, defSiteContext, AndroidConstants.INTENT_URI_DATA)
+        dataValueSetOpt match {
+          case Some(dataValueSet) =>
+            dataValueSet.instances.foreach{
+              case(stringUriIns, defSiteContext) =>              
+                println("stringUriIns = " + stringUriIns)
+                val uriStringValueSetOpt = iFieldDefRepo.getValueSet(stringUriIns, defSiteContext, AndroidConstants.URI_STRING_URI_URI_STRING) // do we need to double check if stringUriIns is in fact a stringUri-instance?
+                uriStringValueSetOpt match{
+                  case Some(uriStringValueSet) =>
+                    println("uriStringValueSet = " + uriStringValueSet)
+                    uriStringValueSet.strings.foreach{
+                      k =>
+                         val uriString = k
+                         var uriData = new UriData
+                         populateByUri(uriData, uriString)
+                         println("uriString: " + uriString + " , populated data: (" + uriData +")")
+                         datas +=uriData
+                    }
+                  case None =>
                 }
-                
-              }
-          }
- 
+            }
+          case None =>
         }
         println("datas = " + datas)
-        
         var mTypes:Set[String] = Set()
-        if(intentFields.contains(AndroidConstants.INTENT_MTYPE)){
-          val mTypeValueSet = intentFields(AndroidConstants.INTENT_MTYPE)._2
-          mTypeValueSet.strings.foreach{
-            k  =>
-              mTypes +=k
-              println("mType = " + k)
-          }
+        val mTypeValueSetOpt = iFieldDefRepo.getValueSet(intentIns, defSiteContext, AndroidConstants.INTENT_MTYPE)
+        mTypeValueSetOpt match{
+          case Some(mTypeValueSet) =>
+            mTypeValueSet.strings.foreach{
+              k  =>
+                mTypes +=k
+                println("mType = " + k)
+            }
+          case None =>
         }
         println("mTypes = " + mTypes)
         

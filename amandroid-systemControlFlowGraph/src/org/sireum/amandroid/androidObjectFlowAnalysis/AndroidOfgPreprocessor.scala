@@ -9,6 +9,7 @@ import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph
 import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.objectFlowAnalysis.PointsCollector
 import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraphPreprocessor
+import org.sireum.amandroid.objectFlowAnalysis.Context
 
 object AndroidOfgPreprocessor extends ObjectFlowGraphPreprocessor[OfaNode, AndroidValueSet]{  
   private var androidLibInfoTables : AndroidLibInfoTables = null
@@ -32,7 +33,8 @@ object AndroidOfgPreprocessor extends ObjectFlowGraphPreprocessor[OfaNode, Andro
             rda : ReachingDefinitionAnalysis.Result,
             ofg : ObjectFlowGraph[OfaNode, AndroidValueSet]) = {
     val points = new PointsCollector().points(pst, ofg)
+    val context = new Context(ofg.K_CONTEXT)
     ofg.points ++= points
-    ofg.constructGraph(points, cfg, rda)
+    ofg.constructGraph(pst.procedureUri, points, context.copy, cfg, rda)
   }
 }
