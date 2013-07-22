@@ -18,8 +18,8 @@ object AndroidApplicationPrepareModule extends PipelineModule {
   def origin = classOf[AndroidApplicationPrepare]
 
   val globalAndroidLibInfoTablesOptKey = "Global.androidLibInfoTablesOpt"
-  val globalAppInfoKey = "Global.appInfo"
-  val appInfoKey = "AndroidApplicationPrepare.appInfo"
+  val globalAppInfoOptKey = "Global.appInfoOpt"
+  val appInfoOptKey = "AndroidApplicationPrepare.appInfoOpt"
   val globalIntraResultKey = "Global.intraResult"
   val globalApkFileLocationKey = "Global.apkFileLocation"
   val globalSymbolTableKey = "Global.symbolTable"
@@ -170,21 +170,21 @@ object AndroidApplicationPrepareModule extends PipelineModule {
 
   def outputDefined (job : PipelineJob) : MBuffer[Tag] = {
     val tags = marrayEmpty[Tag]
-    if(!(job ? AndroidApplicationPrepareModule.appInfoKey) && !(job ? AndroidApplicationPrepareModule.globalAppInfoKey)) {
+    if(!(job ? AndroidApplicationPrepareModule.appInfoOptKey) && !(job ? AndroidApplicationPrepareModule.globalAppInfoOptKey)) {
       tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-        "Output error for '" + this.title + "': No entry found for 'appInfo'. Expecting (AndroidApplicationPrepareModule.appInfoKey or AndroidApplicationPrepareModule.globalAppInfoKey)") 
+        "Output error for '" + this.title + "': No entry found for 'appInfoOpt'. Expecting (AndroidApplicationPrepareModule.appInfoOptKey or AndroidApplicationPrepareModule.globalAppInfoOptKey)") 
     }
 
-    if(job ? AndroidApplicationPrepareModule.appInfoKey && !job(AndroidApplicationPrepareModule.appInfoKey).isInstanceOf[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]) {
+    if(job ? AndroidApplicationPrepareModule.appInfoOptKey && !job(AndroidApplicationPrepareModule.appInfoOptKey).isInstanceOf[scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]]) {
       tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker, 
-        "Output error for '" + this.title + "': Wrong type found for AndroidApplicationPrepareModule.appInfoKey.  Expecting 'org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp' but found '" + 
-        job(AndroidApplicationPrepareModule.appInfoKey).getClass.toString + "'")
+        "Output error for '" + this.title + "': Wrong type found for AndroidApplicationPrepareModule.appInfoOptKey.  Expecting 'scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]' but found '" + 
+        job(AndroidApplicationPrepareModule.appInfoOptKey).getClass.toString + "'")
     } 
 
-    if(job ? AndroidApplicationPrepareModule.globalAppInfoKey && !job(AndroidApplicationPrepareModule.globalAppInfoKey).isInstanceOf[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]) {
+    if(job ? AndroidApplicationPrepareModule.globalAppInfoOptKey && !job(AndroidApplicationPrepareModule.globalAppInfoOptKey).isInstanceOf[scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]]) {
       tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker, 
-        "Output error for '" + this.title + "': Wrong type found for AndroidApplicationPrepareModule.globalAppInfoKey.  Expecting 'org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp' but found '" + 
-        job(AndroidApplicationPrepareModule.globalAppInfoKey).getClass.toString + "'")
+        "Output error for '" + this.title + "': Wrong type found for AndroidApplicationPrepareModule.globalAppInfoOptKey.  Expecting 'scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]' but found '" + 
+        job(AndroidApplicationPrepareModule.globalAppInfoOptKey).getClass.toString + "'")
     } 
     return tags
   }
@@ -249,21 +249,21 @@ object AndroidApplicationPrepareModule extends PipelineModule {
     return options
   }
 
-  def getAppInfo (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp = {
-    if (options.contains(AndroidApplicationPrepareModule.globalAppInfoKey)) {
-       return options(AndroidApplicationPrepareModule.globalAppInfoKey).asInstanceOf[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]
+  def getAppInfoOpt (options : scala.collection.Map[Property.Key, Any]) : scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp] = {
+    if (options.contains(AndroidApplicationPrepareModule.globalAppInfoOptKey)) {
+       return options(AndroidApplicationPrepareModule.globalAppInfoOptKey).asInstanceOf[scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]]
     }
-    if (options.contains(AndroidApplicationPrepareModule.appInfoKey)) {
-       return options(AndroidApplicationPrepareModule.appInfoKey).asInstanceOf[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]
+    if (options.contains(AndroidApplicationPrepareModule.appInfoOptKey)) {
+       return options(AndroidApplicationPrepareModule.appInfoOptKey).asInstanceOf[scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def setAppInfo (options : MMap[Property.Key, Any], appInfo : org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp) : MMap[Property.Key, Any] = {
+  def setAppInfoOpt (options : MMap[Property.Key, Any], appInfoOpt : scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]) : MMap[Property.Key, Any] = {
 
-    options(AndroidApplicationPrepareModule.globalAppInfoKey) = appInfo
-    options(appInfoKey) = appInfo
+    options(AndroidApplicationPrepareModule.globalAppInfoOptKey) = appInfoOpt
+    options(appInfoOptKey) = appInfoOpt
 
     return options
   }
@@ -274,7 +274,7 @@ object AndroidApplicationPrepareModule extends PipelineModule {
       def intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult] = AndroidApplicationPrepareModule.getIntraResult(job.propertyMap)
       def androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables] = AndroidApplicationPrepareModule.getAndroidLibInfoTablesOpt(job.propertyMap)
       def symbolTable : org.sireum.pilar.symbol.SymbolTable = AndroidApplicationPrepareModule.getSymbolTable(job.propertyMap)
-      def appInfo : org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp = AndroidApplicationPrepareModule.getAppInfo(job.propertyMap)
+      def appInfoOpt : scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp] = AndroidApplicationPrepareModule.getAppInfoOpt(job.propertyMap)
     }
   }
 
@@ -293,8 +293,8 @@ object AndroidApplicationPrepareModule extends PipelineModule {
       def symbolTable_=(symbolTable : org.sireum.pilar.symbol.SymbolTable) { AndroidApplicationPrepareModule.setSymbolTable(job.propertyMap, symbolTable) }
       def symbolTable : org.sireum.pilar.symbol.SymbolTable = AndroidApplicationPrepareModule.getSymbolTable(job.propertyMap)
 
-      def appInfo_=(appInfo : org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp) { AndroidApplicationPrepareModule.setAppInfo(job.propertyMap, appInfo) }
-      def appInfo : org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp = AndroidApplicationPrepareModule.getAppInfo(job.propertyMap)
+      def appInfoOpt_=(appInfoOpt : scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]) { AndroidApplicationPrepareModule.setAppInfoOpt(job.propertyMap, appInfoOpt) }
+      def appInfoOpt : scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp] = AndroidApplicationPrepareModule.getAppInfoOpt(job.propertyMap)
     }
   }
 }
@@ -311,6 +311,6 @@ trait AndroidApplicationPrepareModule {
   def symbolTable : org.sireum.pilar.symbol.SymbolTable = AndroidApplicationPrepareModule.getSymbolTable(job.propertyMap)
 
 
-  def appInfo_=(appInfo : org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp) { AndroidApplicationPrepareModule.setAppInfo(job.propertyMap, appInfo) }
-  def appInfo : org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp = AndroidApplicationPrepareModule.getAppInfo(job.propertyMap)
+  def appInfoOpt_=(appInfoOpt : scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]) { AndroidApplicationPrepareModule.setAppInfoOpt(job.propertyMap, appInfoOpt) }
+  def appInfoOpt : scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp] = AndroidApplicationPrepareModule.getAppInfoOpt(job.propertyMap)
 }

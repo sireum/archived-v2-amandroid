@@ -32,7 +32,7 @@ case class AndroidApplicationPrepare(
   
   @Produce
   @Output
-  appInfo : PrepareApp
+  appInfoOpt : scala.Option[PrepareApp]
 )
 
 object prepare {

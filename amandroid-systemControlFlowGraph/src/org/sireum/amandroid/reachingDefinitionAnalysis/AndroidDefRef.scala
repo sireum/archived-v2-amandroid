@@ -66,6 +66,11 @@ final class AndroidVarAccesses(st: SymbolTable) extends VarAccesses {
 
       st.procedureSymbolTables.map { pst =>
         val p = pst.procedure
+        p.params.foreach{
+          case param=>
+            if (H.isLocalVar(param.name))
+            	accessLocalVars += VarSlot(param.name.uri)
+        }
         visitor(p)
         localAccesses(pst.procedureUri) = accessLocalVars
         globalReads(pst.procedureUri) = readGlobalVars

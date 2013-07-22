@@ -23,6 +23,6 @@ class AndroidApplicationPrepareModuleDef (val job : PipelineJob, info : Pipeline
       System.err.println("Need AndroidLibInfoTables!! at " + info.title)
       info.hasError = true
   }
-  this.appInfo_=(pre)
+  this.appInfoOpt_=(Some(pre))
 
 }

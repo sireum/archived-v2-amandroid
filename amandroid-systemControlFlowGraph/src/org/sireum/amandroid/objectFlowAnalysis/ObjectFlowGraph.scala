@@ -20,8 +20,8 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
   with AlirEdgeAccesses[Node]
   with AlirSuccPredAccesses[Node]
   with ConstraintModel[ValueSet]
-  with StringAnalyseModel[ValueSet]
-  with NativeMethodModel[ValueSet]{
+  with StringAnalyseModel[Node, ValueSet]
+  with NativeMethodModel[Node, ValueSet]{
   self=>
   
   protected val graph = new DirectedMultigraph(
@@ -199,7 +199,8 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     }
   }
   
-  def collectNodes(pUri : ResourceUri, p : Point, callerContext : Context) = {
+  def collectNodes(pUri : ResourceUri, p : Point, callerContext : Context) : Set[Node] = {
+    var nodes : Set[Node] = Set()
     val context = callerContext.copy
     context.setContext(pUri, p.getLoc)
     p match {
@@ -207,33 +208,37 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
         val lhs = asmtP.lhs
         val rhs = asmtP.rhs
         val lhsNode = getNodeOrElse(lhs, context.copy)
+        nodes += lhsNode
         val rhsNode = getNodeOrElse(rhs, context.copy)
+        nodes += rhsNode
         lhs match {
           case pfl : PointFieldL =>
-            val fieldNode = getNodeOrElse(pfl, context.copy).asInstanceOf[OfaFieldNode]
-            val baseNode = getNodeOrElse(pfl.basePoint, context.copy).asInstanceOf[OfaFieldBaseNode]
-            baseNode.fieldNode = fieldNode
-            fieldNode.baseNode = baseNode
+            val fieldNode = getNodeOrElse(pfl, context.copy)
+            nodes += fieldNode
+            val baseNode = getNodeOrElse(pfl.basePoint, context.copy)
+            nodes += baseNode
+            baseNode.asInstanceOf[OfaFieldBaseNode].fieldNode = fieldNode.asInstanceOf[OfaFieldNode]
+            fieldNode.asInstanceOf[OfaFieldNode].baseNode = baseNode.asInstanceOf[OfaFieldBaseNode]
           case _ =>
         }
         rhs match {
           case pgr : PointGlobalR =>
-            val globalVarNode = getNodeOrElse(pgr, context.copy).asInstanceOf[OfaGlobalVarNode]
-            setGlobalDefRepo(globalVarNode)
+            val globalVarNode = getNodeOrElse(pgr, context.copy)
+            nodes += globalVarNode
+            setGlobalDefRepo(globalVarNode.asInstanceOf[OfaGlobalVarNode])
           case pfr : PointFieldR =>
-            val fieldNode = getNodeOrElse(pfr, context.copy).asInstanceOf[OfaFieldNode]
-            val baseNode = getNodeOrElse(pfr.basePoint, context.copy).asInstanceOf[OfaFieldBaseNode]
-            baseNode.fieldNode = fieldNode
-            fieldNode.baseNode = baseNode
+            val fieldNode = getNodeOrElse(pfr, context.copy)
+            nodes += fieldNode
+            val baseNode = getNodeOrElse(pfr.basePoint, context.copy)
+            nodes += baseNode
+            baseNode.asInstanceOf[OfaFieldBaseNode].fieldNode = fieldNode.asInstanceOf[OfaFieldNode]
+            fieldNode.asInstanceOf[OfaFieldNode].baseNode = baseNode.asInstanceOf[OfaFieldBaseNode]
           case pso : PointStringO =>
-            rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].setString(pso.varName)
-            rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].setInstance(pso, context.copy)
+            rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].setString(pso.str)
+            rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].setInstance(Instance(pso.typ, pso.locationUri), context.copy)
             worklist += rhsNode
           case po : PointO =>
-            rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].setInstance(po, context.copy)
-//            if(isStringKind(po.varName)){
-//              rhsNode.propertyMap(VALUE_SET).asInstanceOf[MMap[ResourceUri, ResourceUri]]("") = "STRING"
-//            }
+            rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].setInstance(Instance(po.typ, po.locationUri), context.copy)
             worklist += rhsNode
           case pi : PointI =>
             if(pi.typ.equals("static")) worklist += rhsNode
@@ -241,8 +246,8 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
         }
       case pi : PointI =>
         if(!pi.typ.equals("static")){
-          getNodeOrElse(pi.recv_Call, context.copy)
-          getNodeOrElse(pi.recv_Return, context.copy)
+          nodes += getNodeOrElse(pi.recv_Call, context.copy)
+          nodes += getNodeOrElse(pi.recv_Return, context.copy)
         }
         val args_Entry = pi.args_Call
         val args_Exit = pi.args_Return
@@ -250,6 +255,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
           i => {
             val pa = args_Entry(i)
             val argNode = getNodeOrElse(pa, context.copy)
+            nodes += argNode
             argNode.setProperty(PARAM_NUM, i)
           }  
         )
@@ -257,21 +263,22 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
           i => {
             val pa = args_Exit(i)
             val argNode = getNodeOrElse(pa, context.copy)
+            nodes += argNode
             argNode.setProperty(PARAM_NUM, i)
           }  
         )
       case procP : PointProc =>
         procP.thisParamOpt_Entry match {
-          case Some(thisP) => getNodeOrElse(thisP, context.copy)
+          case Some(thisP) => nodes += getNodeOrElse(thisP, context.copy)
           case None => null
         }
         procP.thisParamOpt_Exit match {
-          case Some(thisP) => getNodeOrElse(thisP, context.copy)
+          case Some(thisP) => nodes += getNodeOrElse(thisP, context.copy)
           case None => null
         }
         procP.retVar match {
           case Some(rev) =>
-            getNodeOrElse(rev, context.copy)
+            nodes += getNodeOrElse(rev, context.copy)
           case None =>
         }
         val params_Entry = procP.params_Entry
@@ -280,6 +287,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
           i => {
             val pa = params_Entry(i)
             val paramNode = getNodeOrElse(pa, context.copy)
+            nodes += paramNode
             paramNode.setProperty(PARAM_NUM, i)
           } 
         )
@@ -287,13 +295,15 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
           i => {
             val pa = params_Exit(i)
             val paramNode = getNodeOrElse(pa, context.copy)
+            nodes += paramNode
             paramNode.setProperty(PARAM_NUM, i)
           } 
         )
       case retP : PointRet =>
-        getNodeOrElse(retP, context.copy)
+        nodes += getNodeOrElse(retP, context.copy)
       case _ =>
     }
+    nodes
   }
   
   def buildingEdges(map : MMap[Point, MSet[Point]], pUri : ResourceUri, context : Context) = {
@@ -454,13 +464,14 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
    * This is the beta method in original algo
    */ 
   def getCalleeSet(diff : ValueSet,
-                pi : PointI,
-                androidLibInfoTables : AndroidLibInfoTables) : MSet[ResourceUri] = {
+	                 pi : PointI,
+	                 androidLibInfoTables : AndroidLibInfoTables) : MSet[ResourceUri] = {
     val calleeSet : MSet[ResourceUri] = msetEmpty
     diff.instances.foreach{
       case (d, defSiteContext) => 
-        val recordUri = androidLibInfoTables.getRecordUri(d.typ)
+        val recordUri = androidLibInfoTables.getRecordUri(d.className)
         val procUri = androidLibInfoTables.findProcedureUri(recordUri, androidLibInfoTables.getSubSignature(pi.varName))
+        if(pi.toString.contains("getClass"))println("record-->" + recordUri + "subSig-->" + pi.varName + "\nprocUri" + procUri)
         if(procUri != null)
         	calleeSet += procUri
     }

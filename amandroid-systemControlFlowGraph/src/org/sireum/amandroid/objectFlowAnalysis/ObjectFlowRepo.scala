@@ -6,7 +6,7 @@ trait ObjectFlowRepo[ValueSet <: NormalValueSet] {
 	/**
    * tracking a class's instance field definitions
    */ 
-  final val iFieldDefRepo : FieldRepo[ValueSet] = new FieldRepo
+  final val iFieldDefRepo = new FieldRepo[ValueSet]
   
   /**
    * tracking global variables 
@@ -20,19 +20,20 @@ trait ObjectFlowRepo[ValueSet <: NormalValueSet] {
 }
 
 class FieldRepo[ValueSet <: NormalValueSet]{
-  private final val iFieldDefRepo : MMap[PointO, MMap[Context, MMap[String, ValueSet]]] = mmapEmpty
+  private final val iFieldDefRepo : MMap[Instance, MMap[Context, MMap[String, ValueSet]]] = mmapEmpty
   def getRepo = this.iFieldDefRepo
-  def getValueSet(ins: PointO, defSite : Context, f: String) : Option[ValueSet] = {
+  def getValueSet(ins: Instance, defSite : Context, f: String) : Option[ValueSet] = {
+    println("ifrepo--->" + getRepo)
     if(iFieldDefRepo.contains(ins) && iFieldDefRepo(ins).contains(defSite) && iFieldDefRepo(ins)(defSite).contains(f)){
       Some(iFieldDefRepo(ins)(defSite)(f))
     } else None
   }
   
-  def setValueSet(ins: PointO, baseDefSite : Context, f: String, fieldVs : ValueSet) ={
+  def setValueSet(ins: Instance, baseDefSite : Context, f: String, fieldVs : ValueSet) ={
     iFieldDefRepo.getOrElseUpdate(ins, mmapEmpty).getOrElseUpdate(baseDefSite, mmapEmpty)(f) = fieldVs
   }
   def ++=(repo2 : FieldRepo[ValueSet]) = {
     this.iFieldDefRepo ++= repo2.iFieldDefRepo
   }
-  override def toString() = iFieldDefRepo.toString
+  override def toString() = this.iFieldDefRepo.toString
 }

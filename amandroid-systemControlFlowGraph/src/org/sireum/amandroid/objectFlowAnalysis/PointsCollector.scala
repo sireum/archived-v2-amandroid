@@ -40,6 +40,7 @@ class PointsCollector[Node <: OfaNode, ValueSet <: NormalValueSet] {
         ne.name.name
       case _ => null
     }
+    pProc.accessTyp = access
     if(access != null && access.contains("NATIVE") && !access.contains("STATIC")){
     	resolveNativeProc(pst, pProc)
     }
@@ -72,7 +73,7 @@ class PointsCollector[Node <: OfaNode, ValueSet <: NormalValueSet] {
    * Resolve native procedure node collect
    */
   def resolveNativeProc(pst : ProcedureSymbolTable, pProc : PointProc) = {
-    val thisP = new PointThis("this_native", pst.procedureUri)
+    val thisP = new PointThis("native", pst.procedureUri)
     pProc.setThisParam(thisP)
   }
   
@@ -717,6 +718,7 @@ class PointRNoIndex(uri : ResourceUri, loc : ResourceUri) extends PointWithUri(u
  */
 class PointProc(loc : ResourceUri) extends Point(loc){
   val pUri = loc
+  var accessTyp : String = null
   var thisParamOpt_Entry : Option[PointThis_Entry] = None
   var thisParamOpt_Exit : Option[PointThis_Exit] = None
   val params_Entry : MMap[Int, PointParam_Entry] = mmapEmpty

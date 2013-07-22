@@ -18,7 +18,7 @@ import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet
 import org.sireum.amandroid.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
 
 class AndroidFixIntraProceduralModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends AndroidFixIntraProceduralModule {
-  val newProcedures = this.appInfo.getDummyMainCodeMap
+  val newProcedures = this.appInfoOpt.get.getDummyMainCodeMap
   val newModels = newProcedures.map{case (k, v) => ChunkingPilarParser(Left(v), reporter(info)) match{case Some(m) => m; case None => null}}.toList
   
   val ms = this.models

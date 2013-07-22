@@ -24,7 +24,7 @@ extends AndroidInterProceduralModule with ImplicitLogging {
   val alit = this.androidLibInfoTablesOpt.getOrElse(null)
   val st = this.symbolTable
   val psts = st.procedureSymbolTables.toSeq
-  
+    
   this.intraResult.foreach(
     item => {
       val pUri = item._1
@@ -55,7 +55,7 @@ extends AndroidInterProceduralModule with ImplicitLogging {
       OfaSCfgModule.setCCfgs(options, cCfgs)
       OfaSCfgModule.setProcedureSymbolTables(options, psts)
       OfaSCfgModule.setRdas(options, rdas)
-      OfaSCfgModule.setAppInfo(options, appInfo)
+      OfaSCfgModule.setAppInfoOpt(options, this.appInfoOpt)
       
       interPipeline.compute(j)
       info.hasError = j.hasError
@@ -90,7 +90,7 @@ class OfaSCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) ext
   var result : (AndroidObjectFlowGraph[OfaNode, AndroidValueSet], SystemControlFlowGraph[String]) = null
   this.androidCache match{
     case Some(ac) =>
-      result = new AndroidOfgAndScfgBuilder[OfaNode, AndroidValueSet, String]({() => new AndroidValueSet}).apply(this.procedureSymbolTables, this.cfgs, this.rdas, this.cCfgs, this.androidLibInfoTables, this.appInfo, ac)
+      result = new AndroidOfgAndScfgBuilder[OfaNode, AndroidValueSet, String]({() => new AndroidValueSet}).apply(this.procedureSymbolTables, this.cfgs, this.rdas, this.cCfgs, this.androidLibInfoTables, this.appInfoOpt, ac)
     case None =>
   }
   this.OFAsCfg_=(result)

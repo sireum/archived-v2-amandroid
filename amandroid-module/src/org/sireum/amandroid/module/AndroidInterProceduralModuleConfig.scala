@@ -61,7 +61,7 @@ case class AndroidInterProcedural(
   APIpermOpt : scala.Option[MMap[ResourceUri, MList[String]]] = None,
   
   @Input
-  appInfo : PrepareApp,
+  appInfoOpt : scala.Option[PrepareApp] = None,
   
   @Input
   intraResult : MMap[ResourceUri, AndroidIntraProcedural.AndroidIntraAnalysisResult],
@@ -93,7 +93,7 @@ case class OfaSCfg(
   androidLibInfoTables : AndroidLibInfoTables,
   
   @Input
-  appInfo : PrepareApp,
+  appInfoOpt : scala.Option[PrepareApp],
   
   // for test now. Later will change it.
   @Output

@@ -412,6 +412,8 @@ class AndroidLibInfoResolver
    def getParents(recordUri : ResourceUri) : Set[ResourceUri] ={
      if(tables.recordHierarchyTable.keySet.contains(recordUri))
        tables.recordHierarchyTable.get(recordUri).toSet
+     else if(recordUri != "pilar:/record/default/%5B%7Cjava:lang:Object%7C%5D" && containsRecordUri(recordUri))
+       Set("pilar:/record/default/%5B%7Cjava:lang:Object%7C%5D")
      else Set()
    }
    
@@ -473,17 +475,32 @@ class AndroidLibInfoResolver
    
  // sankar ends
    
-  def findProcedureUri(rUri : ResourceUri, subSig : String) : ResourceUri = {
-    val pUris = tables.recordProcedureTable.get(rUri)
-    var parents : Set[ResourceUri] = Set()
-    for(pUri <- pUris){
-      if(sigEqualBySubSig(pUri, subSig)) return pUri
-      else{
-        parents ++= tables.recordHierarchyTable.get(rUri)
-      }
+  def findProcedureUri(recordUri : ResourceUri, subSig : String) : ResourceUri = {
+    var rUris = Set(recordUri)
+    var pUris = getProcedureUrisByRecordUri(recordUri)
+    var result = doFindProcedureUri(pUris, subSig)
+    while(result == null){
+      rUris = rUris.map{
+        rUri =>
+          getParents(rUri)
+      }.reduce(combine)
+      def combine(set1 : Set[ResourceUri], set2 : Set[ResourceUri]) : Set[ResourceUri] = set1 ++ set2
+      if(rUris.isEmpty) return null
+	    pUris = Set()
+	    for(parent <- rUris){
+	      pUris ++= getProcedureUrisByRecordUri(parent)
+	    }
+	    result = doFindProcedureUri(pUris, subSig)
     }
-    for(parent <- parents){
-      return findProcedureUri(parent, subSig)
+    result
+  }
+  
+  private def doFindProcedureUri(pUris : Set[ResourceUri], subSig : String) : ResourceUri = {
+    var parents : Set[ResourceUri] = Set()
+    if(subSig.contains("getClass")) println("uris-->" + pUris)
+    pUris.foreach{
+      pUri=>
+        if(sigEqualBySubSig(pUri, subSig)) return pUri
     }
     return null
   }
@@ -558,6 +575,8 @@ class AndroidLibInfoResolver
   }
   
   def containsRecord(recordName : String) : Boolean = tables.recordUriTable.containsKey(recordName)
+  
+  def containsRecordUri(recordUri : String) : Boolean = tables.recordUriTable.containsKey(getRecordName(recordUri))
   
   def getAccessFlag(procedureUri : ResourceUri) : String = {
     if(tables.procedureTypeTable.contains(procedureUri)){

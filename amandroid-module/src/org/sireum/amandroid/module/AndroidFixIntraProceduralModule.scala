@@ -28,6 +28,7 @@ object AndroidFixIntraProceduralModule extends PipelineModule {
   val globalAPIpermOptKey = "Global.APIpermOpt"
   val globalAndroidCacheKey = "Global.androidCache"
   val globalIsInputOutputParamPredicateKey = "Global.isInputOutputParamPredicate"
+  val globalAppInfoOptKey = "Global.appInfoOpt"
   val globalShouldIncludeFlowFunctionKey = "Global.shouldIncludeFlowFunction"
   val globalModelsKey = "Global.models"
   val globalShouldBuildCfgKey = "Global.shouldBuildCfg"
@@ -35,7 +36,6 @@ object AndroidFixIntraProceduralModule extends PipelineModule {
   val globalShouldBuildCCfgKey = "Global.shouldBuildCCfg"
   val globalAndroidLibInfoTablesOptKey = "Global.androidLibInfoTablesOpt"
   val globalShouldBuildRdaKey = "Global.shouldBuildRda"
-  val globalAppInfoKey = "Global.appInfo"
   val globalProcedureAbsUriIteratorKey = "Global.procedureAbsUriIterator"
   val globalIntraResultKey = "Global.intraResult"
   val globalSwitchAsOrderedMatchKey = "Global.switchAsOrderedMatch"
@@ -189,32 +189,32 @@ object AndroidFixIntraProceduralModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'shouldBuildLibInfoTables'")       
     }
-    var _appInfo : scala.Option[AnyRef] = None
-    var _appInfoKey : scala.Option[String] = None
+    var _appInfoOpt : scala.Option[AnyRef] = None
+    var _appInfoOptKey : scala.Option[String] = None
 
-    val keylistappInfo = List(AndroidFixIntraProceduralModule.globalAppInfoKey)
-    keylistappInfo.foreach(key => 
+    val keylistappInfoOpt = List(AndroidFixIntraProceduralModule.globalAppInfoOptKey)
+    keylistappInfoOpt.foreach(key => 
       if(job ? key) { 
-        if(_appInfo.isEmpty) {
-          _appInfo = Some(job(key))
-          _appInfoKey = Some(key)
+        if(_appInfoOpt.isEmpty) {
+          _appInfoOpt = Some(job(key))
+          _appInfoOptKey = Some(key)
         }
-        if(!(job(key).asInstanceOf[AnyRef] eq _appInfo.get)) {
+        if(!(job(key).asInstanceOf[AnyRef] eq _appInfoOpt.get)) {
           tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'appInfo' keys '" + _appInfoKey.get + " and '" + key + "' point to different objects.")
+            "Input error for '" + this.title + "': 'appInfoOpt' keys '" + _appInfoOptKey.get + " and '" + key + "' point to different objects.")
         }
       }
     )
 
-    _appInfo match{
+    _appInfoOpt match{
       case Some(x) =>
-        if(!x.isInstanceOf[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]){
+        if(!x.isInstanceOf[scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]]){
           tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'appInfo'.  Expecting 'org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp' but found '" + x.getClass.toString + "'")
+            "Input error for '" + this.title + "': Wrong type found for 'appInfoOpt'.  Expecting 'scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]' but found '" + x.getClass.toString + "'")
         }
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'appInfo'")       
+          "Input error for '" + this.title + "': No value found for 'appInfoOpt'")       
     }
     var _models : scala.Option[AnyRef] = None
     var _modelsKey : scala.Option[String] = None
@@ -610,17 +610,17 @@ object AndroidFixIntraProceduralModule extends PipelineModule {
     return options
   }
 
-  def getAppInfo (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp = {
-    if (options.contains(AndroidFixIntraProceduralModule.globalAppInfoKey)) {
-       return options(AndroidFixIntraProceduralModule.globalAppInfoKey).asInstanceOf[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]
+  def getAppInfoOpt (options : scala.collection.Map[Property.Key, Any]) : scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp] = {
+    if (options.contains(AndroidFixIntraProceduralModule.globalAppInfoOptKey)) {
+       return options(AndroidFixIntraProceduralModule.globalAppInfoOptKey).asInstanceOf[scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def setAppInfo (options : MMap[Property.Key, Any], appInfo : org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp) : MMap[Property.Key, Any] = {
+  def setAppInfoOpt (options : MMap[Property.Key, Any], appInfoOpt : scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]) : MMap[Property.Key, Any] = {
 
-    options(AndroidFixIntraProceduralModule.globalAppInfoKey) = appInfo
+    options(AndroidFixIntraProceduralModule.globalAppInfoOptKey) = appInfoOpt
 
     return options
   }
@@ -854,7 +854,7 @@ object AndroidFixIntraProceduralModule extends PipelineModule {
     implicit class AndroidFixIntraProceduralModuleConsumerView (val job : PropertyProvider) extends AnyVal {
       def parallel : scala.Boolean = AndroidFixIntraProceduralModule.getParallel(job.propertyMap)
       def shouldBuildLibInfoTables : scala.Boolean = AndroidFixIntraProceduralModule.getShouldBuildLibInfoTables(job.propertyMap)
-      def appInfo : org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp = AndroidFixIntraProceduralModule.getAppInfo(job.propertyMap)
+      def appInfoOpt : scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp] = AndroidFixIntraProceduralModule.getAppInfoOpt(job.propertyMap)
       def models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model] = AndroidFixIntraProceduralModule.getModels(job.propertyMap)
       def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = AndroidFixIntraProceduralModule.getAndroidCache(job.propertyMap)
       def shouldBuildCfg : scala.Boolean = AndroidFixIntraProceduralModule.getShouldBuildCfg(job.propertyMap)
@@ -882,8 +882,8 @@ object AndroidFixIntraProceduralModule extends PipelineModule {
       def shouldBuildLibInfoTables_=(shouldBuildLibInfoTables : scala.Boolean) { AndroidFixIntraProceduralModule.setShouldBuildLibInfoTables(job.propertyMap, shouldBuildLibInfoTables) }
       def shouldBuildLibInfoTables : scala.Boolean = AndroidFixIntraProceduralModule.getShouldBuildLibInfoTables(job.propertyMap)
 
-      def appInfo_=(appInfo : org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp) { AndroidFixIntraProceduralModule.setAppInfo(job.propertyMap, appInfo) }
-      def appInfo : org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp = AndroidFixIntraProceduralModule.getAppInfo(job.propertyMap)
+      def appInfoOpt_=(appInfoOpt : scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp]) { AndroidFixIntraProceduralModule.setAppInfoOpt(job.propertyMap, appInfoOpt) }
+      def appInfoOpt : scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp] = AndroidFixIntraProceduralModule.getAppInfoOpt(job.propertyMap)
 
       def models_=(models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model]) { AndroidFixIntraProceduralModule.setModels(job.propertyMap, models) }
       def models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model] = AndroidFixIntraProceduralModule.getModels(job.propertyMap)
@@ -940,7 +940,7 @@ trait AndroidFixIntraProceduralModule {
 
   def shouldBuildLibInfoTables : scala.Boolean = AndroidFixIntraProceduralModule.getShouldBuildLibInfoTables(job.propertyMap)
 
-  def appInfo : org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp = AndroidFixIntraProceduralModule.getAppInfo(job.propertyMap)
+  def appInfoOpt : scala.Option[org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp] = AndroidFixIntraProceduralModule.getAppInfoOpt(job.propertyMap)
 
   def models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model] = AndroidFixIntraProceduralModule.getModels(job.propertyMap)
 

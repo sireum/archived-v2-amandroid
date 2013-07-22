@@ -34,7 +34,7 @@ case class AndroidFixIntraProcedural(
   shouldBuildLibInfoTables : Boolean = true,
   
   @Input
-  appInfo : PrepareApp,
+  appInfoOpt : scala.Option[PrepareApp],
   
   @Input 
   models : ISeq[Model],

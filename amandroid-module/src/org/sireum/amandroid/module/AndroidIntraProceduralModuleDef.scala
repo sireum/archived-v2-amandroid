@@ -62,7 +62,6 @@ class AndroidIntraProceduralModuleDef (val job : PipelineJob, info : PipelineJob
     val rdaOpt = if (this.shouldBuildRda) Some(RdaModule.getRda(options)) else None
     val ofgOpt = if (this.shouldPreprocessOfg) Some(OFAPreprocessModule.getOFG(options)) else None
     val cCfgOpt = if (this.shouldBuildCCfg) Some(cCfgModule.getCCfg(options)) else None
-
     Map(pst.procedureUri ->
       AndroidIntraProcedural.AndroidIntraAnalysisResult(
         pool, cfg, rdaOpt, ofgOpt, cCfgOpt

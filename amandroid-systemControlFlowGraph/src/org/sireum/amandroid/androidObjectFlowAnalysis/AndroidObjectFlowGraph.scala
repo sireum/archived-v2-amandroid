@@ -12,39 +12,49 @@ class AndroidObjectFlowGraph[Node <: OfaNode, ValueSet <: AndroidValueSet](fac: 
   /**
    * combine special ofg into current ofg. (just combine proc point and relevant node)
    */ 
-  def combineSpecialOfg(sig : ResourceUri, stringOfg : ObjectFlowGraph[Node, ValueSet], typ : String, context : Context) : PointProc = {
+  def combineSpecialOfg(sig : ResourceUri, stringOfg : ObjectFlowGraph[Node, ValueSet], typ : String, callerContext : Context) : PointProc = {
     val ps = stringOfg.points.filter(p => if(p.isInstanceOf[PointProc])true else false)
     points ++= ps
     val procP : PointProc = ps(0).asInstanceOf[PointProc]
-    val currentContext = context.copy
-    currentContext.setContext(procP.pUri, procP.getLoc)
-    collectNodes(procP.pUri, procP, context.copy)
+    collectNodes(procP.pUri, procP, callerContext.copy)
+    val calleeContext = callerContext.copy
+    calleeContext.setContext(procP.pUri, procP.getLoc)
+    val retNodeOpt =
+      procP.retVar match{
+       	case Some(r) =>
+	        Some(getNode(r, calleeContext))
+	      case None =>
+	        None
+    	}
+    val thisEntryNodeOpt = 
+      procP.thisParamOpt_Entry match{
+       	case Some(r) =>
+	        Some(getNode(r, calleeContext))
+	      case None =>
+	        None
+    	}
+    val thisExitNodeOpt = 
+      procP.thisParamOpt_Exit match{
+       	case Some(r) =>
+	        Some(getNode(r, calleeContext))
+	      case None =>
+	        None
+    	}
+    val paramEntryNodes = procP.params_Entry.map{case (l, p) => (l, getNode(p, calleeContext))}.toMap
+    val paramExitNodes = procP.params_Exit.map{case (l, p) => (l, getNode(p, calleeContext))}.toMap
+    thisEntryNodeOpt match{
+      case Some(thisEntryNode) => addEdge(thisEntryNode, thisExitNodeOpt.get)
+      case None=>
+    }
+    paramEntryNodes foreach{
+      case(i, paramEntryNode) =>
+        addEdge(paramEntryNode, paramExitNodes(i))
+    }
+    val ppN = ProcedurePointNodes[Node](thisEntryNodeOpt, thisExitNodeOpt, paramEntryNodes, paramExitNodes, retNodeOpt, procP)
     if(typ.equals("STRING")){
-	    procP.retVar match {
-	      case Some(r) =>
-	        stringOperationTracker(sig) = (mlistEmpty, Some(getNode(r, currentContext.copy)))
-	      case None =>
-	        stringOperationTracker(sig) = (mlistEmpty, None)
-	    }
-	    
-	    procP.thisParamOpt_Entry match {
-	      case Some(p) => stringOperationTracker(sig)._1 += getNode(p, currentContext.copy)
-	      case None =>
-	    }
-	    procP.params_Entry.toList.sortBy(f => f._1).foreach{case (k, v) => stringOperationTracker(sig)._1 += getNode(v, currentContext.copy)}
+	    stringOperationTracker += (sig -> ppN)
     } else if(typ.equals("NATIVE")){
-      procP.retVar match {
-	      case Some(r) =>
-	        nativeOperationTracker(sig) = (mlistEmpty, Some(getNode(r, currentContext.copy)))
-	      case None =>
-	        nativeOperationTracker(sig) = (mlistEmpty, None)
-	    }
-	    
-	    procP.thisParamOpt_Entry match {
-	      case Some(p) => nativeOperationTracker(sig)._1 += getNode(p, currentContext.copy)
-	      case None =>
-	    } 
-	    procP.params_Entry.toList.sortBy(f => f._1).foreach{case (k, v) => nativeOperationTracker(sig)._1 += getNode(v, currentContext.copy)}
+      nativeOperationTracker += (sig -> ppN)
     }
     procP
   }
