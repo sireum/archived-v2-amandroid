@@ -1,1 +1,4 @@
 /bin
+/target
+/.cache
+/.scala_dependencies

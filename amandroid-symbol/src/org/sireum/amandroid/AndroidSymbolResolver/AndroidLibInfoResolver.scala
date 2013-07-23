@@ -497,7 +497,6 @@ class AndroidLibInfoResolver
   
   private def doFindProcedureUri(pUris : Set[ResourceUri], subSig : String) : ResourceUri = {
     var parents : Set[ResourceUri] = Set()
-    if(subSig.contains("getClass")) println("uris-->" + pUris)
     pUris.foreach{
       pUri=>
         if(sigEqualBySubSig(pUri, subSig)) return pUri

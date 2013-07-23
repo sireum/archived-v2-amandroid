@@ -83,12 +83,13 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
         } 
       case pi : PointI =>
             if(!pi.typ.equals("static")){
-              val recvP = pi.recv_Call
+              val recvP = pi.recvOpt_Call.get
               udChain(recvP, ps, cfg, rda, true).foreach(
                 point => {
                   flowMap.getOrElseUpdate(point, msetEmpty) += recvP
                 }
               )
+              flowMap.getOrElseUpdate(recvP, msetEmpty) += pi.recvOpt_Return.get
             }
             pi.args_Call.keys.foreach(
               i => {
@@ -99,24 +100,19 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
                       flowMap.getOrElseUpdate(pi.args_Call(i), msetEmpty) += point
                     }
                   )
+                  flowMap.getOrElseUpdate(pi.args_Call(i), msetEmpty) += pi.args_Return(i)
+                  flowMap.getOrElseUpdate(pi.args_Return(i), msetEmpty) += pi.args_Call(i)
                 } else {
                   udChain(pi.args_Call(i), ps, cfg, rda, true).foreach(
                     point => {
                       flowMap.getOrElseUpdate(point, msetEmpty) += pi.args_Call(i)
                     }
                   )
+                  flowMap.getOrElseUpdate(pi.args_Call(i), msetEmpty) += pi.args_Return(i)
                 }
               }  
             )
       case procP : PointProc =>
-        if(procP.accessTyp != null && procP.accessTyp.contains("NATIVE")){
-          procP.thisParamOpt_Entry match{
-            case Some(thisP_En) =>
-              flowMap.getOrElseUpdate(thisP_En, msetEmpty) += procP.thisParamOpt_Exit.get
-            case None=>
-          }
-          
-        }
         val t_exit_opt = procP.thisParamOpt_Exit
         val ps_exit = procP.params_Exit
         t_exit_opt match{
@@ -303,14 +299,17 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
       p => {
         p match {
           case pi : PointI =>
-            var tmpPoint : PointR = null
-            if(paramIndex > 0 && pi.args_Return.contains(paramIndex - 1)) tmpPoint = pi.args_Return(paramIndex - 1)
-            else tmpPoint = pi.recv_Return
-            if(tmpPoint != null){
-              val locationUri = tmpPoint.asInstanceOf[PointWithIndex].locationUri
-              val locationIndex = tmpPoint.asInstanceOf[PointWithIndex].locationIndex
-              if(tmpPoint.varName.equals(uri) && locUri.equals(locationUri) && locIndex == locationIndex)
-                point = tmpPoint
+            var tmpPointOpt : Option[PointR] = None
+            if(pi.typ.equals("static") && pi.args_Return.contains(paramIndex)) tmpPointOpt = Some(pi.args_Return(paramIndex))
+            else if(!pi.typ.equals("static") && paramIndex > 0 && pi.args_Return.contains(paramIndex - 1)) tmpPointOpt = Some(pi.args_Return(paramIndex - 1))
+            else tmpPointOpt = pi.recvOpt_Return
+            tmpPointOpt match{
+              case Some(tmpPoint) =>
+	              val locationUri = tmpPoint.asInstanceOf[PointWithIndex].locationUri
+	              val locationIndex = tmpPoint.asInstanceOf[PointWithIndex].locationIndex
+	              if(tmpPoint.varName.equals(uri) && locUri.equals(locationUri) && locIndex == locationIndex)
+	                point = tmpPoint
+              case None =>
             }
           case _ =>
         }

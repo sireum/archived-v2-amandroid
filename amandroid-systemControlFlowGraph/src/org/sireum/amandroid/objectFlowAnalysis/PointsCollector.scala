@@ -41,9 +41,9 @@ class PointsCollector[Node <: OfaNode, ValueSet <: NormalValueSet] {
       case _ => null
     }
     pProc.accessTyp = access
-    if(access != null && access.contains("NATIVE") && !access.contains("STATIC")){
-    	resolveNativeProc(pst, pProc)
-    }
+//    if(access != null && access.contains("NATIVE") && !access.contains("STATIC")){
+//    	resolveNativeProc(pst, pProc)
+//    }
     pst.procedure.params.foreach(
       param => {
         if(is("this", param.annotations)){
@@ -476,8 +476,8 @@ final class PointArrayArg(uri : ResourceUri, loc : ResourceUri, locIndex : Int, 
  * pi represents an element in this set.
  */
 final class PointI(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : ResourceUri) extends PointR(uri, loc, locIndex, o){ 
-  var recv_Call : PointRecv_Call = null
-  var recv_Return : PointRecv_Return = null
+  var recvOpt_Call : Option[PointRecv_Call] = None
+  var recvOpt_Return : Option[PointRecv_Return] = None
   val args_Call : MMap[Int, PointArg_Call] = mmapEmpty
   val args_Return : MMap[Int, PointArg_Return] = mmapEmpty
   var typ : String = null
@@ -487,8 +487,8 @@ final class PointI(uri : ResourceUri, loc : ResourceUri, locIndex : Int, o : Res
     r_Call.container = pt.container
     val r_Return = new PointRecv_Return(pt.varName, pt.locationUri, pt.locationIndex, pt.owner)
     r_Return.container = pt.container
-    this.recv_Call = r_Call
-    this.recv_Return = r_Return
+    this.recvOpt_Call = Some(r_Call)
+    this.recvOpt_Return = Some(r_Return)
   }
   def setArg(i : Int, p : PointArg) = {
     val a_Call = new PointArg_Call(p.varName, p.locationUri, p.locationIndex, p.owner)

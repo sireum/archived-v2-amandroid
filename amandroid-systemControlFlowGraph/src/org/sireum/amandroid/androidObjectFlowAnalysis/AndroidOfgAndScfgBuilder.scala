@@ -158,12 +158,6 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
     ofg.points ++= points
     setProcessed(points, pst.procedureUri, context.copy)
     ofg.constructGraph(pst.procedureUri, points, context.copy, cfg, rda)
-    
-    if(pst.procedureUri.contains("getClass")){ 
-      val newOfa = new AndroidObjectFlowGraph[Node, ValueSet](fac)
-      newOfa.constructGraph(pst.procedureUri, points, context.copy, cfg, rda)
-      println(newOfa)
-    }
     sCfg.collectionCCfgToBaseGraph(pst.procedureUri, cCfg)
     fix(ofg, sCfg)
 //    println("field-->" + ofg.iFieldDefRepo)

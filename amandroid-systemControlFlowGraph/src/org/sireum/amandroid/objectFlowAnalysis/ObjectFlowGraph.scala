@@ -30,6 +30,11 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
         new AlirEdge(self, source, target)
     })
 
+  def deleteEdge(source : Node, target : Node) : Edge =
+    graph.removeEdge(getNode(source), getNode(target))
+
+  def deleteEdge(e : Edge) = graph.removeEdge(e)
+  
   final val VALUE_SET = "ValueSet"
   final val PARAM_NUM = "param.number"
   final val K_CONTEXT : Int = 1
@@ -246,8 +251,8 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
         }
       case pi : PointI =>
         if(!pi.typ.equals("static")){
-          nodes += getNodeOrElse(pi.recv_Call, context.copy)
-          nodes += getNodeOrElse(pi.recv_Return, context.copy)
+          nodes += getNodeOrElse(pi.recvOpt_Call.get, context.copy)
+          nodes += getNodeOrElse(pi.recvOpt_Return.get, context.copy)
         }
         val args_Entry = pi.args_Call
         val args_Exit = pi.args_Return
@@ -325,7 +330,25 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     )
   }
   
-  def extendGraph(met : PointProc, pi : PointI, srcContext : Context) = {
+  private def breakPiEdges(pi : PointI, calleeAccessTyp : String, srcContext : Context) = {
+    if(!calleeAccessTyp.contains("NATIVE")){
+	    pi.recvOpt_Call match{
+	      case Some(p) =>
+	        val srcNode = getNode(p, srcContext.copy)
+	        val targetNode = getNode(pi.recvOpt_Return.get, srcContext.copy)
+	        deleteEdge(srcNode, targetNode)
+	      case None =>
+	    }
+    }
+    pi.args_Call foreach{
+      case (i, aCall) =>
+        val srcNode = getNode(aCall, srcContext.copy)
+        val targetNode = getNode(pi.args_Return(i), srcContext.copy)
+        deleteEdge(srcNode, targetNode)
+    }
+  }
+  
+  private def connectCallEdges(met : PointProc, pi : PointI, srcContext : Context) ={
     val targetContext = srcContext.copy
     targetContext.setContext(met.pUri, met.getLoc)
     met.params_Entry.keys.foreach(
@@ -356,7 +379,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     )
     met.thisParamOpt_Entry match {
       case Some(thisParam) =>
-        val srcNode = getNode(pi.recv_Call, srcContext.copy)
+        val srcNode = getNode(pi.recvOpt_Call.get, srcContext.copy)
         val targetNode = getNode(thisParam, targetContext.copy)
         worklist += targetNode
         if(!graph.containsEdge(srcNode, targetNode))
@@ -366,7 +389,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     met.thisParamOpt_Exit match {
       case Some(thisParam) =>
         val srcNode = getNode(thisParam, targetContext.copy)
-        val targetNode = getNode(pi.recv_Return, srcContext.copy)
+        val targetNode = getNode(pi.recvOpt_Return.get, srcContext.copy)
         worklist += targetNode
         if(!graph.containsEdge(srcNode, targetNode))
           addEdge(srcNode, targetNode)
@@ -381,7 +404,11 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
           addEdge(srcNode, targetNode)
       case None =>
     }
-    
+  }
+  
+  def extendGraph(met : PointProc, pi : PointI, srcContext : Context) = {
+    breakPiEdges(pi, met.accessTyp, srcContext)
+    connectCallEdges(met, pi, srcContext)
   }
   
   def updateFieldValueSet(fieldNode : OfaFieldNode) = {
@@ -450,9 +477,10 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
    * This is the recv bar method in original algo
    */
   def recvInverse(n : Node) : Option[PointI] = {
-    if(n.isInstanceOf[OfaRecvNode]){
-      Some(n.asInstanceOf[OfaRecvNode].getPI)
-    } else {None}
+    n match{
+      case on : OfaRecvCallNode => Some(on.asInstanceOf[OfaRecvCallNode].getPI)
+      case _ => None
+    }
   }
   
   def getDirectCallee(pi : PointI,
@@ -471,7 +499,6 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
       case (d, defSiteContext) => 
         val recordUri = androidLibInfoTables.getRecordUri(d.className)
         val procUri = androidLibInfoTables.findProcedureUri(recordUri, androidLibInfoTables.getSubSignature(pi.varName))
-        if(pi.toString.contains("getClass"))println("record-->" + recordUri + "subSig-->" + pi.varName + "\nprocUri" + procUri)
         if(procUri != null)
         	calleeSet += procUri
     }
@@ -529,23 +556,23 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
           node
         } else getFieldNode(pfr.basePoint.varName, pfr.varName, pfr.locationUri, context)
       case pr : PointRecv_Call =>
-        if(!recvNodeExists("recv_Call:" + pr.varName, pr.locationUri, context, pr.container)){
-          val node = addRecvNode("recv_Call:" + pr.varName, pr.locationUri, context, pr.container)
+        if(!recvCallNodeExists(pr.varName, pr.locationUri, context, pr.container)){
+          val node = addRecvCallNode(pr.varName, pr.locationUri, context, pr.container)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getRecvNode("recv_Call:" + pr.varName, pr.locationUri, context, pr.container)
+        } else getRecvCallNode(pr.varName, pr.locationUri, context, pr.container)
       case pr : PointRecv_Return =>
-        if(!recvNodeExists("recv_Return:" + pr.varName, pr.locationUri, context, pr.container)){
-          val node = addRecvNode("recv_Return:" + pr.varName, pr.locationUri, context, pr.container)
+        if(!recvReturnNodeExists(pr.varName, pr.locationUri, context)){
+          val node = addRecvReturnNode(pr.varName, pr.locationUri, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getRecvNode("recv_Return:" + pr.varName, pr.locationUri, context, pr.container)
-      case pr : PointRecv =>
-        if(!recvNodeExists("recv:" + pr.varName, pr.locationUri, context, pr.container)){
-          val node = addRecvNode("recv:" + pr.varName, pr.locationUri, context, pr.container)
-          node.setProperty(VALUE_SET, fac())
-          node
-        } else getRecvNode("recv:" + pr.varName, pr.locationUri, context, pr.container)
+        } else getRecvReturnNode(pr.varName, pr.locationUri, context)
+//      case pr : PointRecv =>
+//        if(!recvNodeExists("recv:" + pr.varName, pr.locationUri, context, pr.container)){
+//          val node = addRecvNode("recv:" + pr.varName, pr.locationUri, context, pr.container)
+//          node.setProperty(VALUE_SET, fac())
+//          node
+//        } else getRecvNode("recv:" + pr.varName, pr.locationUri, context, pr.container)
       case pa : PointArg_Call =>
         if(!pointNodeExists("arg_Call:" + pa.varName, pa.locationUri, context)){
           val node = addPointNode("arg_Call:" + pa.varName, pa.locationUri, context)
@@ -663,8 +690,12 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     graph.containsVertex(newInvokeNode(uri, loc, context, pi).asInstanceOf[Node])
   }
   
-  def recvNodeExists(uri : ResourceUri, loc : ResourceUri, context : Context, pi : PointI) : Boolean = {
-    graph.containsVertex(newRecvNode(uri, loc, context, pi).asInstanceOf[Node])
+  def recvCallNodeExists(uri : ResourceUri, loc : ResourceUri, context : Context, pi : PointI) : Boolean = {
+    graph.containsVertex(newRecvCallNode(uri, loc, context, pi).asInstanceOf[Node])
+  }
+  
+  def recvReturnNodeExists(uri : ResourceUri, loc : ResourceUri, context : Context) : Boolean = {
+    graph.containsVertex(newRecvReturnNode(uri, loc, context).asInstanceOf[Node])
   }
   
   def pointNodeExists(uri : ResourceUri, loc : ResourceUri, context : Context) : Boolean = {
@@ -749,8 +780,20 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     n
   }
   
-  def addRecvNode(uri : ResourceUri, loc : ResourceUri, context : Context, pi : PointI) : Node = {
-    val node = newRecvNode(uri, loc, context, pi).asInstanceOf[Node]
+  def addRecvCallNode(uri : ResourceUri, loc : ResourceUri, context : Context, pi : PointI) : Node = {
+    val node = newRecvCallNode(uri, loc, context, pi).asInstanceOf[Node]
+    val n =
+      if (pool.contains(node)) pool(node)
+      else {
+        pl += (node -> node)
+        node
+      }
+    graph.addVertex(n)
+    n
+  }
+  
+  def addRecvReturnNode(uri : ResourceUri, loc : ResourceUri, context : Context) : Node = {
+    val node = newRecvReturnNode(uri, loc, context).asInstanceOf[Node]
     val n =
       if (pool.contains(node)) pool(node)
       else {
@@ -796,8 +839,11 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
   def getInvokeNode(uri : ResourceUri, loc : ResourceUri, context : Context, pi : PointI) : Node =
     pool(newInvokeNode(uri, loc, context, pi))
     
-  def getRecvNode(uri : ResourceUri, loc : ResourceUri, context : Context, pi : PointI) : Node =
-    pool(newRecvNode(uri, loc, context, pi))
+  def getRecvCallNode(uri : ResourceUri, loc : ResourceUri, context : Context, pi : PointI) : Node =
+    pool(newRecvCallNode(uri, loc, context, pi))
+    
+  def getRecvReturnNode(uri : ResourceUri, loc : ResourceUri, context : Context) : Node =
+    pool(newRecvReturnNode(uri, loc, context))
 
   def getPointNode(uri : ResourceUri, loc : ResourceUri, context : Context) : Node =
     pool(newPointNode(uri, loc, context))
@@ -821,11 +867,11 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
       case pfr : PointFieldR =>
         getFieldNode(pfr.basePoint.varName, pfr.varName, pfr.locationUri, context)
       case pr : PointRecv_Call =>
-        getRecvNode("recv_Call:" + pr.varName, pr.locationUri, context, pr.container)
+        getRecvCallNode(pr.varName, pr.locationUri, context, pr.container)
       case pr : PointRecv_Return =>
-        getRecvNode("recv_Return:" + pr.varName, pr.locationUri, context, pr.container)
-      case pr : PointRecv =>
-        getRecvNode("recv:" + pr.varName, pr.locationUri, context, pr.container)
+        getRecvReturnNode(pr.varName, pr.locationUri, context)
+//      case pr : PointRecv =>
+//        getRecvNode("recv:" + pr.varName, pr.locationUri, context, pr.container)
       case pa : PointArg_Call =>
         getPointNode("arg_Call:" + pa.varName, pa.locationUri, context)
       case pa : PointArg_Return =>
@@ -880,11 +926,14 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     n
   }
     
-  protected def newRecvNode(uri : ResourceUri, loc : ResourceUri, context : Context, pi : PointI) = {
-    val n = OfaRecvNode(uri, loc, context)
+  protected def newRecvCallNode(uri : ResourceUri, loc : ResourceUri, context : Context, pi : PointI) = {
+    val n = OfaRecvCallNode(uri, loc, context)
     n.setPI(pi)
     n
   }
+  
+  protected def newRecvReturnNode(uri : ResourceUri, loc : ResourceUri, context : Context) = 
+    OfaRecvReturnNode(uri, loc, context)
     
   protected def newPointNode(uri : ResourceUri, loc : ResourceUri, context : Context) =
     OfaPointNode(uri, loc, context)
@@ -944,13 +993,20 @@ final case class OfaInvokeNode(uri : ResourceUri, loc : ResourceUri, context : C
 }
 
 /**
- * Node type for receive point.
+ * Node type for receive call point.
  */
-final case class OfaRecvNode(uri : ResourceUri, loc : ResourceUri, context : Context) extends OfaNode(loc, context) {
+final case class OfaRecvCallNode(uri : ResourceUri, loc : ResourceUri, context : Context) extends OfaNode(loc, context) {
   private var pi : PointI = null
   def setPI(pi : PointI) = this.pi = pi
   def getPI = this.pi
-  override def toString = "recv:" + uri + "@" + context.toString()
+  override def toString = "recv_Call:" + uri + "@" + context.toString()
+}
+
+/**
+ * Node type for receive return point.
+ */
+final case class OfaRecvReturnNode(uri : ResourceUri, loc : ResourceUri, context : Context) extends OfaNode(loc, context) {
+  override def toString = "recv_Return:" + uri + "@" + context.toString()
 }
 
 /**
