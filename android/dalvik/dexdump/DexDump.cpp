@@ -975,7 +975,7 @@ void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
 
    for(int j=0; j < numOfRegForLocals; j++)
    {
-
+   /*
 	 bool presenseFlag = false;  
 
      if(locVarList)
@@ -995,14 +995,11 @@ void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
                   }
 	    	  }
 	     }
-
+    */
 	   //if(!presenseFlag)  // commenting out -- now we want to print each regForLocals here	 
-	   {
-		   fprintf(pFp, "        v%d;", j); // sankar: not in dexdump; in pilar printing an extra register used as a local but which does not have any var name
-
-           fprintf(pFp, "\n"); // sankar: not in dexdump. NOTE that there is possible error in above print; some registers can be already part of a long local
+	   fprintf(pFp, "        v%d;\n", j); // sankar: not in dexdump; in pilar printing an extra register used as a local but which does not have any var name
+       //fprintf(pFp, "\n"); // sankar: not in dexdump. NOTE that there is possible error in above print; some registers can be already part of a long local
                  
-	   }
    }
 
 // deleting locVarList
