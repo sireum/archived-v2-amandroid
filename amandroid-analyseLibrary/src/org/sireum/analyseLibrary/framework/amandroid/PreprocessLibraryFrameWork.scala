@@ -12,7 +12,7 @@ import org.sireum.util._
 import org.sireum.pipeline._
 import org.sireum.amandroid.module.Dex2PilarWrapperModule
 import org.sireum.core.module.AlirIntraProceduralModule
-import java.io._
+import java.io.PrintWriter
 import java.util.zip.ZipFile
 import org.sireum.core.module.ChunkingPilarParserModule
 import org.sireum.amandroid.module.PilarAndroidSymbolResolverModule
@@ -35,6 +35,7 @@ import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidObjectFlowGraph
 import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet
+import java.io.File
 
 trait PreprocessLibraryFrameWork extends TestFramework { 
   
@@ -96,20 +97,21 @@ trait PreprocessLibraryFrameWork extends TestFramework {
         AndroidIntraProceduralModule.setShouldBuildCCfg(options, true)
         pipeline.compute(job)
 
-        if(job.hasError){
-          println("Error present: " + job.hasError)
-          job.tags.foreach{f =>
-            f match{
-              case t:LocationTag =>
-                t.location match {
-                  case lcl : LineColumnLocation => println("line --->" + lcl.line + " col --->" + lcl.column)
-                  case _ =>
-                }
-              case _ =>
-            }
-            println(f)}
-          job.lastStageInfo.tags.foreach(f => println(f))
-        }
+        if (job.lastStageInfo.hasError) {
+	        val pwOut = new PrintWriter(Console.out)
+	        val pwErr = new PrintWriter(Console.err)
+	        println("Errors from stage: " + job.lastStageInfo.title)
+	        val stageTags = job.lastStageInfo.tags.toList
+	        PipelineUtil.printTags(stageTags, pwOut, pwErr)
+	        pwErr.println(Tag.collateAsString(job.lastStageInfo.tags.toList))
+	        pwErr.flush
+	        for (m <- job.lastStageInfo.info) {
+	          val mTags = m.tags.toList
+	          PipelineUtil.printTags(mTags, pwOut, pwErr)
+	          pwErr.println(Tag.collateAsString(mTags))
+	          pwErr.flush
+	        }
+	      }
         
         println("pipeline done!")
         

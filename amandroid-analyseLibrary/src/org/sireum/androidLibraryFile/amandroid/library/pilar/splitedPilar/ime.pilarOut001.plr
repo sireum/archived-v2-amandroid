@@ -7,7 +7,6 @@ record [|com:android:commands:ime:Ime|]  @type class @AccessFlag PUBLIC_FINAL  {
       global [|java:lang:String|] @@[|com:android:commands:ime:Ime.IMM_NOT_RUNNING_ERR|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|com:android:commands:ime:Ime.<init>|] ([|com:android:commands:ime:Ime|] v0 @type (this)) @owner [|com:android:commands:ime:Ime|] @signature [|Lcom/android/commands/ime/Ime;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L00050c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L000512.   return @void ;
@@ -15,7 +14,6 @@ record [|com:android:commands:ime:Ime|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:ime:Ime.main|] ([|java:lang:String|][] v1 @type (object)) @owner [|com:android:commands:ime:Ime|] @signature [|Lcom/android/commands/ime/Ime;.main:([Ljava/lang/String;)V|] @Access PUBLIC_STATIC {
       local temp ;
-
         v0;
       
 #L000524.   v0:= new [|com:android:commands:ime:Ime|];
@@ -26,8 +24,7 @@ record [|com:android:commands:ime:Ime|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|java:lang:String|] [|com:android:commands:ime:Ime.nextArg|] ([|com:android:commands:ime:Ime|] v3 @type (this)) @owner [|com:android:commands:ime:Ime|] @signature [|Lcom/android/commands/ime/Ime;.nextArg:()Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|arg|] @scope ((L000f,L0016));
-
+        v0;
         v1;
         v2;
       
@@ -48,8 +45,7 @@ record [|com:android:commands:ime:Ime|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|java:lang:String|] [|com:android:commands:ime:Ime.nextOption|] ([|com:android:commands:ime:Ime|] v6 @type (this)) @owner [|com:android:commands:ime:Ime|] @signature [|Lcom/android/commands/ime/Ime;.nextOption:()Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|arg|] @scope ((L0012,L0052));
-
+        v0;
         v1;
         v2;
         v3;
@@ -108,8 +104,7 @@ record [|com:android:commands:ime:Ime|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|java:lang:String|] [|com:android:commands:ime:Ime.nextOptionData|] ([|com:android:commands:ime:Ime|] v3 @type (this)) @owner [|com:android:commands:ime:Ime|] @signature [|Lcom/android/commands/ime/Ime;.nextOptionData:()Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|data|] @scope ((L0016,L001d));
-
+        v0;
         v1;
         v2;
       
@@ -134,15 +129,14 @@ record [|com:android:commands:ime:Ime|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:ime:Ime.runList|] ([|com:android:commands:ime:Ime|] v11 @type (this)) @owner [|com:android:commands:ime:Ime|] @signature [|Lcom/android/commands/ime/Ime;.runList:()V|] @Access PRIVATE {
       local temp ;
-        [|int|] v3 @varname [|i|] @scope ((L004a,L0064), (L008f,L00b1));
-        [|android:view:inputmethod:InputMethodInfo|] v4 @varname [|imi|] @scope ((L0056,L0064), (L008f,L00b1));
-        [|java:util:List|] v5 @varname [|methods|] @scope ((L0040,L0064), (L007c,L007d), (L008f,L00b1));
-        [|android:util:Printer|] v7 @varname [|pr|] @scope ((L0049,L0064), (L008f,L00b1));
-        [|android:os:RemoteException|] v2 @varname [|e|] @scope ((L0065,L0076), (L007e,L008f));
-        [|boolean|] v0 @varname [|all|] @scope ((L0001,L00b1));
-        [|boolean|] v1 @varname [|brief|] @scope ((L0002,L00b1));
-        [|java:lang:String|] v6 @varname [|opt|] @scope ((L0006,L00b1));
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
         v8;
         v9;
         v10;
@@ -243,9 +237,8 @@ record [|com:android:commands:ime:Ime|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:ime:Ime.runSet|] ([|com:android:commands:ime:Ime|] v5 @type (this)) @owner [|com:android:commands:ime:Ime|] @signature [|Lcom/android/commands/ime/Ime;.runSet:()V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:IllegalArgumentException|] v0 @varname [|e|] @scope ((L0037,L0054), (L0055,L0066));
-        [|java:lang:String|] v1 @varname [|id|] @scope ((L0004,L0066));
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -306,11 +299,9 @@ record [|com:android:commands:ime:Ime|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:ime:Ime.runSetEnabled|] ([|com:android:commands:ime:Ime|] v6 @type (this), [|boolean|] v7) @owner [|com:android:commands:ime:Ime|] @signature [|Lcom/android/commands/ime/Ime;.runSetEnabled:(Z)V|] @Access PRIVATE {
       local temp ;
-        [|boolean|] v2 @varname [|res|] @scope ((L0017,L0040), (L005e,L0088), (L009b,L009e));
-        [|java:lang:IllegalArgumentException|] v0 @varname [|e|] @scope ((L0041,L005e), (L0089,L009b));
-        [|java:lang:String|] v1 @varname [|id|] @scope ((L0004,L009e));
-
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -453,9 +444,7 @@ record [|com:android:commands:ime:Ime|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:ime:Ime.run|] ([|com:android:commands:ime:Ime|] v4 @type (this), [|java:lang:String|][] v5 @type (object)) @owner [|com:android:commands:ime:Ime|] @signature [|Lcom/android/commands/ime/Ime;.run:([Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|op|] @scope ((L0025,L007b));
-
-
+        v0;
         v1;
         v2;
         v3;

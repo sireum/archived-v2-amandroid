@@ -76,7 +76,6 @@ record [|com:android:commands:settings:SettingsCmd$CommandVerb|]  @type class @A
    }
     procedure [|void|] [|com:android:commands:settings:SettingsCmd$CommandVerb.<init>|] ([|com:android:commands:settings:SettingsCmd$CommandVerb|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|int|] v2) @owner [|com:android:commands:settings:SettingsCmd$CommandVerb|] @signature [|Lcom/android/commands/settings/SettingsCmd$CommandVerb;.<init>:(Ljava/lang/String;I)V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L00076c.   call temp:=  [|java:lang:Enum.<init>|](v0, v1, v2) @signature [|Ljava/lang/Enum;.<init>:(Ljava/lang/String;I)V|] @classDescriptor [|java:lang:Enum|] @type direct;
 #L000772.   return @void ;
@@ -84,7 +83,6 @@ record [|com:android:commands:settings:SettingsCmd$CommandVerb|]  @type class @A
    }
     procedure [|com:android:commands:settings:SettingsCmd$CommandVerb|] [|com:android:commands:settings:SettingsCmd$CommandVerb.valueOf|] ([|java:lang:String|] v1 @type (object)) @owner [|com:android:commands:settings:SettingsCmd$CommandVerb|] @signature [|Lcom/android/commands/settings/SettingsCmd$CommandVerb;.valueOf:(Ljava/lang/String;)Lcom/android/commands/settings/SettingsCmd$CommandVerb;|] @Access PUBLIC_STATIC {
       local temp ;
-
         v0;
       
 #L000784.   v0:= new [|com:android:commands:settings:SettingsCmd$CommandVerb|];
@@ -117,7 +115,6 @@ record [|com:android:commands:settings:SettingsCmd|]  @type class @AccessFlag PU
       global [|java:lang:String|][] @@[|com:android:commands:settings:SettingsCmd.mArgs|]    @AccessFlag STATIC;
     procedure [|void|] [|com:android:commands:settings:SettingsCmd.<init>|] ([|com:android:commands:settings:SettingsCmd|] v2 @type (this)) @owner [|com:android:commands:settings:SettingsCmd|] @signature [|Lcom/android/commands/settings/SettingsCmd;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
         v0;
         v1;
       
@@ -135,8 +132,7 @@ record [|com:android:commands:settings:SettingsCmd|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|com:android:commands:settings:SettingsCmd.main|] ([|java:lang:String|][] v3 @type (object)) @owner [|com:android:commands:settings:SettingsCmd|] @signature [|Lcom/android/commands/settings/SettingsCmd;.main:([Ljava/lang/String;)V|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:lang:Exception|] v0 @varname [|e|] @scope ((L0016,L001e));
-
+        v0;
         v1;
         v2;
       
@@ -161,8 +157,7 @@ record [|com:android:commands:settings:SettingsCmd|]  @type class @AccessFlag PU
    }
     procedure [|java:lang:String|] [|com:android:commands:settings:SettingsCmd.nextArg|] ([|com:android:commands:settings:SettingsCmd|] v3 @type (this)) @owner [|com:android:commands:settings:SettingsCmd|] @signature [|Lcom/android/commands/settings/SettingsCmd;.nextArg:()Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|arg|] @scope ((L000f,L0016));
-
+        v0;
         v1;
         v2;
       
@@ -203,16 +198,11 @@ record [|com:android:commands:settings:SettingsCmd|]  @type class @AccessFlag PU
    }
     procedure [|java:lang:String|] [|com:android:commands:settings:SettingsCmd.getForUser|] ([|com:android:commands:settings:SettingsCmd|] v8 @type (this), [|android:content:IContentProvider|] v9 @type (object), [|int|] v10, [|java:lang:String|] v11 @type (object), [|java:lang:String|] v12 @type (object)) @owner [|com:android:commands:settings:SettingsCmd|] @signature [|Lcom/android/commands/settings/SettingsCmd;.getForUser:(Landroid/content/IContentProvider;ILjava/lang/String;Ljava/lang/String;)Ljava/lang/String;|] @Access  {
       local temp ;
-        [|android:os:Bundle|] v0 @varname [|arg|] @scope ((L0010,L001f));
-        [|android:os:Bundle|] v1 @varname [|b|] @scope ((L0019,L001f));
-        [|java:lang:String|] v2 @varname [|callGetCommand|] @scope ((L000a,L0020), (L002a,L002b), (L0035,L0036), (L0056,L0084));
-        [|java:lang:String|] v4 @varname [|result|] @scope ((L000b,L0020), (L0056,L0084));
-        [|android:os:RemoteException|] v3 @varname [|e|] @scope ((L0057,L0084));
-
-
-
-
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
         v5;
         v6;
         v7;
@@ -288,15 +278,9 @@ record [|com:android:commands:settings:SettingsCmd|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|com:android:commands:settings:SettingsCmd.putForUser|] ([|com:android:commands:settings:SettingsCmd|] v6 @type (this), [|android:content:IContentProvider|] v7 @type (object), [|int|] v8, [|java:lang:String|] v9 @type (object), [|java:lang:String|] v10 @type (object), [|java:lang:String|] v11 @type (object)) @owner [|com:android:commands:settings:SettingsCmd|] @signature [|Lcom/android/commands/settings/SettingsCmd;.putForUser:(Landroid/content/IContentProvider;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V|] @Access  {
       local temp ;
-        [|android:os:Bundle|] v0 @varname [|arg|] @scope ((L000f,L001c));
-        [|java:lang:String|] v1 @varname [|callPutCommand|] @scope ((L000a,L001c), (L0027,L0028), (L0032,L0033), (L003b,L0069));
-        [|android:os:RemoteException|] v2 @varname [|e|] @scope ((L003c,L0069));
-
-
-
-
-
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -358,19 +342,18 @@ record [|com:android:commands:settings:SettingsCmd|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|com:android:commands:settings:SettingsCmd.run|] ([|com:android:commands:settings:SettingsCmd|] v12 @type (this)) @owner [|com:android:commands:settings:SettingsCmd|] @signature [|Lcom/android/commands/settings/SettingsCmd;.run:()V|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|] v7 @varname [|arg|] @scope ((L0006,L0015), (L004d,L0058), (L005b,L0110));
-        [|android:app:IActivityManager$ContentProviderHolder|] v9 @varname [|holder|] @scope ((L002e,L0038), (L0110,L014c));
-        [|android:content:IContentProvider|] v1 @varname [|provider|] @scope ((L0022,L0041), (L0110,L014c));
-        [|android:app:IActivityManager|] v6 @varname [|activityManager|] @scope ((L0021,L0041), (L0110,L014c));
-        [|android:os:IBinder|] v10 @varname [|token|] @scope ((L0027,L0041), (L0110,L014c));
-        [|java:lang:Exception|] v8 @varname [|e|] @scope ((L0042,L004c), (L0059,L005b));
-        [|boolean|] v11 @varname [|valid|] @scope ((L0002,L015a));
-
         v0;
+        v1;
         v2;
         v3;
         v4;
         v5;
+        v6;
+        v7;
+        v8;
+        v9;
+        v10;
+        v11;
       
 #L000af4.   v4:= 0  @length 4;
 #L000af6.   v11:= 0  @length 4;

@@ -5,7 +5,6 @@ record [|junit:extensions:ActiveTestSuite$1|]  @type class @AccessFlag   extends
    }
     procedure [|void|] [|junit:extensions:ActiveTestSuite$1.<init>|] ([|junit:extensions:ActiveTestSuite$1|] v0 @type (this), [|junit:extensions:ActiveTestSuite|] v1 @type (object), [|junit:framework:Test|] v2 @type (object), [|junit:framework:TestResult|] v3 @type (object)) @owner [|junit:extensions:ActiveTestSuite$1|] @signature [|Ljunit/extensions/ActiveTestSuite$1;.<init>:(Ljunit/extensions/ActiveTestSuite;Ljunit/framework/Test;Ljunit/framework/TestResult;)V|] @Access CONSTRUCTOR {
       local temp ;
-
       
 #L001800.   v0.[|junit:extensions:ActiveTestSuite$1.this$0|]  := v1 @type object;
 #L001804.   v0.[|junit:extensions:ActiveTestSuite$1.val$test|]  := v2 @type object;
@@ -16,7 +15,6 @@ record [|junit:extensions:ActiveTestSuite$1|]  @type class @AccessFlag   extends
    }
     procedure [|void|] [|junit:extensions:ActiveTestSuite$1.run|] ([|junit:extensions:ActiveTestSuite$1|] v2 @type (this)) @owner [|junit:extensions:ActiveTestSuite$1|] @signature [|Ljunit/extensions/ActiveTestSuite$1;.run:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -47,7 +45,6 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|void|] [|junit:framework:TestSuite.<init>|] ([|junit:framework:TestSuite|] v2 @type (this)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
         v0;
         v1;
       
@@ -61,8 +58,6 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|void|] [|junit:framework:TestSuite.<init>|] ([|junit:framework:TestSuite|] v2 @type (this), [|java:lang:Class|] v3 @type (object)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.<init>:(Ljava/lang/Class;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
         v1;
       
@@ -77,9 +72,6 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|void|] [|junit:framework:TestSuite.<init>|] ([|junit:framework:TestSuite|] v0 @type (this), [|java:lang:Class|] v1 @type (object), [|java:lang:String|] v2 @type (object)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.<init>:(Ljava/lang/Class;Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
       
 #L0018c4.   call temp:=  [|junit:framework:TestSuite.<init>|](v0, v1) @signature [|Ljunit/framework/TestSuite;.<init>:(Ljava/lang/Class;)V|] @classDescriptor [|junit:framework:TestSuite|] @type direct;
 #L0018ca.   call temp:=  [|junit:framework:TestSuite.setName|](v0, v2) @signature [|Ljunit/framework/TestSuite;.setName:(Ljava/lang/String;)V|] @classDescriptor [|junit:framework:TestSuite|] @type virtual;
@@ -88,8 +80,6 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|void|] [|junit:framework:TestSuite.<init>|] ([|junit:framework:TestSuite|] v2 @type (this), [|java:lang:String|] v3 @type (object)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
         v1;
       
@@ -104,12 +94,10 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|void|] [|junit:framework:TestSuite.<init>|] ([|junit:framework:TestSuite|] v6 @type (this), [|java:lang:Class|][] v7 @type (object)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.<init>:([Ljava/lang/Class;)V|] @Access PUBLIC_VARARGS_CONSTRUCTOR {
       local temp ;
-        [|java:lang:Class|] v1 @varname [|each|] @scope ((L0013,L001d));
-        [|java:lang:Class|][] v0 @varname [|arr$|] @scope ((L000d,L001e));
-        [|int|] v2 @varname [|i$|] @scope ((L000f,L001e));
-        [|int|] v3 @varname [|len$|] @scope ((L000e,L001e));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
       
@@ -133,9 +121,6 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|void|] [|junit:framework:TestSuite.<init>|] ([|junit:framework:TestSuite|] v0 @type (this), [|java:lang:Class|][] v1 @type (object), [|java:lang:String|] v2 @type (object)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.<init>:([Ljava/lang/Class;Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
       
 #L001960.   call temp:=  [|junit:framework:TestSuite.<init>|](v0, v1) @signature [|Ljunit/framework/TestSuite;.<init>:([Ljava/lang/Class;)V|] @classDescriptor [|junit:framework:TestSuite|] @type direct;
 #L001966.   call temp:=  [|junit:framework:TestSuite.setName|](v0, v2) @signature [|Ljunit/framework/TestSuite;.setName:(Ljava/lang/String;)V|] @classDescriptor [|junit:framework:TestSuite|] @type virtual;
@@ -144,11 +129,7 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|void|] [|junit:framework:TestSuite.addTestMethod|] ([|junit:framework:TestSuite|] v3 @type (this), [|java:lang:reflect:Method|] v4 @type (object), [|java:util:List|] v5 @type (object), [|java:lang:Class|] v6 @type (object)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.addTestMethod:(Ljava/lang/reflect/Method;Ljava/util/List;Ljava/lang/Class;)V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|name|] @scope ((L0004,L0055));
-
-
-
-
+        v0;
         v1;
         v2;
       
@@ -198,15 +179,13 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|void|] [|junit:framework:TestSuite.addTestsFromTestCase|] ([|junit:framework:TestSuite|] v9 @type (this), [|java:lang:Class|] v10 @type (object)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.addTestsFromTestCase:(Ljava/lang/Class;)V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:NoSuchMethodException|] v1 @varname [|e|] @scope ((L0039,L005e));
-        [|java:lang:reflect:Method|] v2 @varname [|each|] @scope ((L0076,L007c));
-        [|java:lang:reflect:Method|][] v0 @varname [|arr$|] @scope ((L0070,L0081));
-        [|int|] v3 @varname [|i$|] @scope ((L0072,L0081));
-        [|int|] v4 @varname [|len$|] @scope ((L0071,L0081));
-        [|java:util:List|] v5 @varname [|names|] @scope ((L0064,L00a8));
-        [|java:lang:Class|] v6 @varname [|superClass|] @scope ((L005f,L00a8));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
         v7;
         v8;
       
@@ -299,12 +278,10 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|junit:framework:Test|] [|junit:framework:TestSuite.createTest|] ([|java:lang:Class|] v6 @type (object), [|java:lang:String|] v7 @type (object)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.createTest:(Ljava/lang/Class;Ljava/lang/String;)Ljunit/framework/Test;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:lang:reflect:Constructor|] v1 @varname [|constructor|] @scope ((L0004,L001f), (L0043,L00db));
-        [|java:lang:Object|] v3 @varname [|test|] @scope ((L0012,L001f), (L004d,L004e));
-        [|java:lang:NoSuchMethodException|] v2 @varname [|e|] @scope ((L0021,L0043), (L004f,L007b), (L007c,L00ad), (L00ae,L00db));
-
-
         v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
       
@@ -433,9 +410,8 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|java:lang:String|] [|junit:framework:TestSuite.exceptionToString|] ([|java:lang:Throwable|] v3 @type (object)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.exceptionToString:(Ljava/lang/Throwable;)Ljava/lang/String;|] @Access PRIVATE_STATIC {
       local temp ;
-        [|java:io:StringWriter|] v0 @varname [|stringWriter|] @scope ((L0005,L0012));
-        [|java:io:PrintWriter|] v1 @varname [|writer|] @scope ((L000a,L0012));
-
+        v0;
+        v1;
         v2;
       
 #L001d94.   v0:= new [|java:io:StringWriter|];
@@ -450,7 +426,6 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|java:lang:reflect:Constructor|] [|junit:framework:TestSuite.getTestConstructor|] ([|java:lang:Class|] v4 @type (object)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.getTestConstructor:(Ljava/lang/Class;)Ljava/lang/reflect/Constructor;|] @Access PUBLIC_STATIC {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -475,8 +450,6 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|boolean|] [|junit:framework:TestSuite.isPublicTestMethod|] ([|junit:framework:TestSuite|] v1 @type (this), [|java:lang:reflect:Method|] v2 @type (object)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.isPublicTestMethod:(Ljava/lang/reflect/Method;)Z|] @Access PRIVATE {
       local temp ;
-
-
         v0;
       
 #L001e10.   call temp:=  [|junit:framework:TestSuite.isTestMethod|](v1, v2) @signature [|Ljunit/framework/TestSuite;.isTestMethod:(Ljava/lang/reflect/Method;)Z|] @classDescriptor [|junit:framework:TestSuite|] @type direct;
@@ -495,8 +468,6 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|boolean|] [|junit:framework:TestSuite.isTestMethod|] ([|junit:framework:TestSuite|] v2 @type (this), [|java:lang:reflect:Method|] v3 @type (object)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.isTestMethod:(Ljava/lang/reflect/Method;)Z|] @Access PRIVATE {
       local temp ;
-
-
         v0;
         v1;
       
@@ -524,8 +495,6 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|junit:framework:Test|] [|junit:framework:TestSuite.testCaseForClass|] ([|junit:framework:TestSuite|] v2 @type (this), [|java:lang:Class|] v3 @type (object)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.testCaseForClass:(Ljava/lang/Class;)Ljunit/framework/Test;|] @Access PRIVATE {
       local temp ;
-
-
         v0;
         v1;
       
@@ -557,7 +526,6 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|junit:framework:Test|] [|junit:framework:TestSuite.warning|] ([|java:lang:String|] v2 @type (object)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.warning:(Ljava/lang/String;)Ljunit/framework/Test;|] @Access PUBLIC_STATIC {
       local temp ;
-
         v0;
         v1;
       
@@ -569,8 +537,6 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|void|] [|junit:framework:TestSuite.addTest|] ([|junit:framework:TestSuite|] v1 @type (this), [|junit:framework:Test|] v2 @type (object)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.addTest:(Ljunit/framework/Test;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L001f30.   v0:= v1.[|junit:framework:TestSuite.fTests|]   @type object;
@@ -580,8 +546,6 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|void|] [|junit:framework:TestSuite.addTestSuite|] ([|junit:framework:TestSuite|] v1 @type (this), [|java:lang:Class|] v2 @type (object)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.addTestSuite:(Ljava/lang/Class;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L001f4c.   v0:= new [|junit:framework:TestSuite|];
@@ -592,10 +556,9 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|int|] [|junit:framework:TestSuite.countTestCases|] ([|junit:framework:TestSuite|] v4 @type (this)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.countTestCases:()I|] @Access PUBLIC {
       local temp ;
-        [|junit:framework:Test|] v1 @varname [|each|] @scope ((L0013,L0019));
-        [|int|] v0 @varname [|count|] @scope ((L0001,L001a));
-        [|java:util:Iterator|] v2 @varname [|i$|] @scope ((L0007,L001a));
-
+        v0;
+        v1;
+        v2;
         v3;
       
 #L001f70.   v0:= 0  @length 4;
@@ -617,7 +580,6 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|java:lang:String|] [|junit:framework:TestSuite.getName|] ([|junit:framework:TestSuite|] v1 @type (this)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.getName:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L001fb4.   v0:= v1.[|junit:framework:TestSuite.fName|]   @type object;
@@ -626,10 +588,8 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|void|] [|junit:framework:TestSuite.run|] ([|junit:framework:TestSuite|] v3 @type (this), [|junit:framework:TestResult|] v4 @type (object)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.run:(Ljunit/framework/TestResult;)V|] @Access PUBLIC {
       local temp ;
-        [|junit:framework:Test|] v0 @varname [|each|] @scope ((L0012,L0018), (L0019,L001d));
-        [|java:util:Iterator|] v1 @varname [|i$|] @scope ((L0006,L001d));
-
-
+        v0;
+        v1;
         v2;
       
 #L001fcc.   v2:= v3.[|junit:framework:TestSuite.fTests|]   @type object;
@@ -651,9 +611,6 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|void|] [|junit:framework:TestSuite.runTest|] ([|junit:framework:TestSuite|] v0 @type (this), [|junit:framework:Test|] v1 @type (object), [|junit:framework:TestResult|] v2 @type (object)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.runTest:(Ljunit/framework/Test;Ljunit/framework/TestResult;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L002018.   call temp:=  [|junit:framework:Test.run|](v1, v2) @signature [|Ljunit/framework/Test;.run:(Ljunit/framework/TestResult;)V|] @classDescriptor [|junit:framework:Test|] @type interface;
 #L00201e.   return @void ;
@@ -661,8 +618,6 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|void|] [|junit:framework:TestSuite.setName|] ([|junit:framework:TestSuite|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.setName:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L002030.   v0.[|junit:framework:TestSuite.fName|]  := v1 @type object;
 #L002034.   return @void ;
@@ -670,8 +625,6 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|junit:framework:Test|] [|junit:framework:TestSuite.testAt|] ([|junit:framework:TestSuite|] v1 @type (this), [|int|] v2) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.testAt:(I)Ljunit/framework/Test;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L002048.   v0:= v1.[|junit:framework:TestSuite.fTests|]   @type object;
@@ -683,7 +636,6 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|int|] [|junit:framework:TestSuite.testCount|] ([|junit:framework:TestSuite|] v1 @type (this)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.testCount:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L00206c.   v0:= v1.[|junit:framework:TestSuite.fTests|]   @type object;
@@ -694,7 +646,6 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|java:util:Enumeration|] [|junit:framework:TestSuite.tests|] ([|junit:framework:TestSuite|] v1 @type (this)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.tests:()Ljava/util/Enumeration;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L00208c.   v0:= v1.[|junit:framework:TestSuite.fTests|]   @type object;
@@ -705,7 +656,6 @@ record [|junit:framework:TestSuite|]  @type class @AccessFlag PUBLIC extends  [|
    }
     procedure [|java:lang:String|] [|junit:framework:TestSuite.toString|] ([|junit:framework:TestSuite|] v1 @type (this)) @owner [|junit:framework:TestSuite|] @signature [|Ljunit/framework/TestSuite;.toString:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L0020ac.   call temp:=  [|junit:framework:TestSuite.getName|](v1) @signature [|Ljunit/framework/TestSuite;.getName:()Ljava/lang/String;|] @classDescriptor [|junit:framework:TestSuite|] @type virtual;
@@ -724,7 +674,6 @@ record [|junit:extensions:ActiveTestSuite|]  @type class @AccessFlag PUBLIC  ext
    }
     procedure [|void|] [|junit:extensions:ActiveTestSuite.<init>|] ([|junit:extensions:ActiveTestSuite|] v0 @type (this)) @owner [|junit:extensions:ActiveTestSuite|] @signature [|Ljunit/extensions/ActiveTestSuite;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L0020dc.   call temp:=  [|junit:framework:TestSuite.<init>|](v0) @signature [|Ljunit/framework/TestSuite;.<init>:()V|] @classDescriptor [|junit:framework:TestSuite|] @type direct;
 #L0020e2.   return @void ;
@@ -732,8 +681,6 @@ record [|junit:extensions:ActiveTestSuite|]  @type class @AccessFlag PUBLIC  ext
    }
     procedure [|void|] [|junit:extensions:ActiveTestSuite.<init>|] ([|junit:extensions:ActiveTestSuite|] v0 @type (this), [|java:lang:Class|] v1 @type (object)) @owner [|junit:extensions:ActiveTestSuite|] @signature [|Ljunit/extensions/ActiveTestSuite;.<init>:(Ljava/lang/Class;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L0020f4.   call temp:=  [|junit:framework:TestSuite.<init>|](v0, v1) @signature [|Ljunit/framework/TestSuite;.<init>:(Ljava/lang/Class;)V|] @classDescriptor [|junit:framework:TestSuite|] @type direct;
 #L0020fa.   return @void ;
@@ -741,9 +688,6 @@ record [|junit:extensions:ActiveTestSuite|]  @type class @AccessFlag PUBLIC  ext
    }
     procedure [|void|] [|junit:extensions:ActiveTestSuite.<init>|] ([|junit:extensions:ActiveTestSuite|] v0 @type (this), [|java:lang:Class|] v1 @type (object), [|java:lang:String|] v2 @type (object)) @owner [|junit:extensions:ActiveTestSuite|] @signature [|Ljunit/extensions/ActiveTestSuite;.<init>:(Ljava/lang/Class;Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
       
 #L00210c.   call temp:=  [|junit:framework:TestSuite.<init>|](v0, v1, v2) @signature [|Ljunit/framework/TestSuite;.<init>:(Ljava/lang/Class;Ljava/lang/String;)V|] @classDescriptor [|junit:framework:TestSuite|] @type direct;
 #L002112.   return @void ;
@@ -751,8 +695,6 @@ record [|junit:extensions:ActiveTestSuite|]  @type class @AccessFlag PUBLIC  ext
    }
     procedure [|void|] [|junit:extensions:ActiveTestSuite.<init>|] ([|junit:extensions:ActiveTestSuite|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|junit:extensions:ActiveTestSuite|] @signature [|Ljunit/extensions/ActiveTestSuite;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L002124.   call temp:=  [|junit:framework:TestSuite.<init>|](v0, v1) @signature [|Ljunit/framework/TestSuite;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|junit:framework:TestSuite|] @type direct;
 #L00212a.   return @void ;
@@ -760,8 +702,6 @@ record [|junit:extensions:ActiveTestSuite|]  @type class @AccessFlag PUBLIC  ext
    }
     procedure [|void|] [|junit:extensions:ActiveTestSuite.run|] ([|junit:extensions:ActiveTestSuite|] v1 @type (this), [|junit:framework:TestResult|] v2 @type (object)) @owner [|junit:extensions:ActiveTestSuite|] @signature [|Ljunit/extensions/ActiveTestSuite;.run:(Ljunit/framework/TestResult;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L00213c.   v0:= 0  @length 4;
@@ -773,7 +713,6 @@ record [|junit:extensions:ActiveTestSuite|]  @type class @AccessFlag PUBLIC  ext
    }
     procedure [|void|] [|junit:extensions:ActiveTestSuite.runFinished|] ([|junit:extensions:ActiveTestSuite|] v1 @type (this)) @owner [|junit:extensions:ActiveTestSuite|] @signature [|Ljunit/extensions/ActiveTestSuite;.runFinished:()V|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
         v0;
       
 #L002160.   (@monitorenter v1)
@@ -791,10 +730,7 @@ record [|junit:extensions:ActiveTestSuite|]  @type class @AccessFlag PUBLIC  ext
    }
     procedure [|void|] [|junit:extensions:ActiveTestSuite.runTest|] ([|junit:extensions:ActiveTestSuite|] v1 @type (this), [|junit:framework:Test|] v2 @type (object), [|junit:framework:TestResult|] v3 @type (object)) @owner [|junit:extensions:ActiveTestSuite|] @signature [|Ljunit/extensions/ActiveTestSuite;.runTest:(Ljunit/framework/Test;Ljunit/framework/TestResult;)V|] @Access PUBLIC {
       local temp ;
-        [|java:lang:Thread|] v0 @varname [|t|] @scope ((L0005,L0009));
-
-
-
+        v0;
       
 #L00219c.   v0:= new [|junit:extensions:ActiveTestSuite$1|];
 #L0021a0.   call temp:=  [|junit:extensions:ActiveTestSuite$1.<init>|](v0, v1, v2, v3) @signature [|Ljunit/extensions/ActiveTestSuite$1;.<init>:(Ljunit/extensions/ActiveTestSuite;Ljunit/framework/Test;Ljunit/framework/TestResult;)V|] @classDescriptor [|junit:extensions:ActiveTestSuite$1|] @type direct;
@@ -804,7 +740,6 @@ record [|junit:extensions:ActiveTestSuite|]  @type class @AccessFlag PUBLIC  ext
    }
     procedure [|void|] [|junit:extensions:ActiveTestSuite.waitUntilFinished|] ([|junit:extensions:ActiveTestSuite|] v3 @type (this)) @owner [|junit:extensions:ActiveTestSuite|] @signature [|Ljunit/extensions/ActiveTestSuite;.waitUntilFinished:()V|] @Access DECLARED_SYNCHRONIZED {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -831,7 +766,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.<init>|] ([|junit:framework:Assert|] v0 @type (this)) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.<init>:()V|] @Access PROTECTED_CONSTRUCTOR {
       local temp ;
-
       
 #L002210.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L002216.   return @void ;
@@ -839,8 +773,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertEquals|] ([|byte|] v1, [|byte|] v2) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertEquals:(BB)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
       
 #L002228.   v0:= 0  @length 4;
@@ -850,8 +782,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertEquals|] ([|char|] v1, [|char|] v2) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertEquals:(CC)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
       
 #L002244.   v0:= 0  @length 4;
@@ -861,9 +791,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertEquals|] ([|double|] v7, [|double|] v9, [|double|] v11) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertEquals:(DDD)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
-
         v0;
         v1;
         v2;
@@ -882,9 +809,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertEquals|] ([|float|] v1, [|float|] v2, [|float|] v3) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertEquals:(FFF)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
-
         v0;
       
 #L002280.   v0:= 0  @length 4;
@@ -894,8 +818,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertEquals|] ([|int|] v1, [|int|] v2) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertEquals:(II)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
       
 #L00229c.   v0:= 0  @length 4;
@@ -905,8 +827,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertEquals|] ([|long|] v1, [|long|] v3) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertEquals:(JJ)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
       
 #L0022b8.   v0:= 0  @length 4;
@@ -916,8 +836,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertEquals|] ([|java:lang:Object|] v1 @type (object), [|java:lang:Object|] v2 @type (object)) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertEquals:(Ljava/lang/Object;Ljava/lang/Object;)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
       
 #L0022d4.   v0:= 0  @length 4;
@@ -927,9 +845,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertEquals|] ([|java:lang:String|] v2 @type (object), [|byte|] v3, [|byte|] v4) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertEquals:(Ljava/lang/String;BB)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -943,9 +858,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertEquals|] ([|java:lang:String|] v2 @type (object), [|char|] v3, [|char|] v4) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertEquals:(Ljava/lang/String;CC)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -959,10 +871,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertEquals|] ([|java:lang:String|] v2 @type (object), [|double|] v3, [|double|] v5, [|double|] v7) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertEquals:(Ljava/lang/String;DDD)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
-
-
         v0;
         v1;
       
@@ -985,10 +893,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertEquals|] ([|java:lang:String|] v2 @type (object), [|float|] v3, [|float|] v4, [|float|] v5) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertEquals:(Ljava/lang/String;FFF)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
-
-
         v0;
         v1;
       
@@ -1011,9 +915,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertEquals|] ([|java:lang:String|] v2 @type (object), [|int|] v3, [|int|] v4) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertEquals:(Ljava/lang/String;II)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -1027,9 +928,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertEquals|] ([|java:lang:String|] v2 @type (object), [|long|] v3, [|long|] v5) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertEquals:(Ljava/lang/String;JJ)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -1043,9 +941,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertEquals|] ([|java:lang:String|] v1 @type (object), [|java:lang:Object|] v2 @type (object), [|java:lang:Object|] v3 @type (object)) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertEquals:(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
-
         v0;
       
 #L002440.   if v2 != 0 then goto L00244a;
@@ -1061,8 +956,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertEquals|] ([|java:lang:String|] v1 @type (object), [|java:lang:String|] v2 @type (object)) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertEquals:(Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
       
 #L002474.   v0:= 0  @length 4;
@@ -1072,10 +965,7 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertEquals|] ([|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object), [|java:lang:String|] v4 @type (object)) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertEquals:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|cleanMessage|] @scope ((L0011,L0017));
-
-
-
+        v0;
         v1;
       
 #L002490.   if v3 != 0 then goto L00249a;
@@ -1096,9 +986,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertEquals|] ([|java:lang:String|] v2 @type (object), [|short|] v3, [|short|] v4) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertEquals:(Ljava/lang/String;SS)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -1112,9 +999,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertEquals|] ([|java:lang:String|] v2 @type (object), [|boolean|] v3, [|boolean|] v4) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertEquals:(Ljava/lang/String;ZZ)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -1128,8 +1012,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertEquals|] ([|short|] v1, [|short|] v2) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertEquals:(SS)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
       
 #L002528.   v0:= 0  @length 4;
@@ -1139,8 +1021,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertEquals|] ([|boolean|] v1, [|boolean|] v2) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertEquals:(ZZ)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
       
 #L002544.   v0:= 0  @length 4;
@@ -1150,8 +1030,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertFalse|] ([|java:lang:String|] v1 @type (object), [|boolean|] v2) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertFalse:(Ljava/lang/String;Z)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
       
 #L002560.   if v2 != 0 then goto L00256e;
@@ -1164,7 +1042,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertFalse|] ([|boolean|] v1) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertFalse:(Z)V|] @Access PUBLIC_STATIC {
       local temp ;
-
         v0;
       
 #L002584.   v0:= 0  @length 4;
@@ -1174,7 +1051,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertNotNull|] ([|java:lang:Object|] v1 @type (object)) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertNotNull:(Ljava/lang/Object;)V|] @Access PUBLIC_STATIC {
       local temp ;
-
         v0;
       
 #L0025a0.   v0:= 0  @length 4;
@@ -1184,8 +1060,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertNotNull|] ([|java:lang:String|] v1 @type (object), [|java:lang:Object|] v2 @type (object)) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertNotNull:(Ljava/lang/String;Ljava/lang/Object;)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
       
 #L0025bc.   if v2 == 0 then goto L0025ca;
@@ -1198,8 +1072,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertNotSame|] ([|java:lang:Object|] v1 @type (object), [|java:lang:Object|] v2 @type (object)) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertNotSame:(Ljava/lang/Object;Ljava/lang/Object;)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
       
 #L0025e0.   v0:= 0  @length 4;
@@ -1209,9 +1081,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertNotSame|] ([|java:lang:String|] v0 @type (object), [|java:lang:Object|] v1 @type (object), [|java:lang:Object|] v2 @type (object)) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertNotSame:(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
-
       
 #L0025fc.   if v1 != v2 then goto L002606;
 #L002600.   call temp:=  [|junit:framework:Assert.failSame|](v0) @signature [|Ljunit/framework/Assert;.failSame:(Ljava/lang/String;)V|] @classDescriptor [|junit:framework:Assert|] @type static;
@@ -1220,8 +1089,7 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertNull|] ([|java:lang:Object|] v3 @type (object)) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertNull:(Ljava/lang/Object;)V|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|message|] @scope ((L0017,L001b));
-
+        v0;
         v1;
         v2;
       
@@ -1242,8 +1110,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertNull|] ([|java:lang:String|] v1 @type (object), [|java:lang:Object|] v2 @type (object)) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertNull:(Ljava/lang/String;Ljava/lang/Object;)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
       
 #L002660.   if v2 != 0 then goto L00266e;
@@ -1256,8 +1122,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertSame|] ([|java:lang:Object|] v1 @type (object), [|java:lang:Object|] v2 @type (object)) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertSame:(Ljava/lang/Object;Ljava/lang/Object;)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
       
 #L002684.   v0:= 0  @length 4;
@@ -1267,9 +1131,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertSame|] ([|java:lang:String|] v0 @type (object), [|java:lang:Object|] v1 @type (object), [|java:lang:Object|] v2 @type (object)) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertSame:(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
-
       
 #L0026a0.   if v1 != v2 then goto L0026a6;
 #L0026a4.   return @void ;
@@ -1279,8 +1140,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertTrue|] ([|java:lang:String|] v0 @type (object), [|boolean|] v1) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertTrue:(Ljava/lang/String;Z)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
       
 #L0026c0.   if v1 != 0 then goto L0026ca;
 #L0026c4.   call temp:=  [|junit:framework:Assert.fail|](v0) @signature [|Ljunit/framework/Assert;.fail:(Ljava/lang/String;)V|] @classDescriptor [|junit:framework:Assert|] @type static;
@@ -1289,7 +1148,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.assertTrue|] ([|boolean|] v1) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.assertTrue:(Z)V|] @Access PUBLIC_STATIC {
       local temp ;
-
         v0;
       
 #L0026dc.   v0:= 0  @length 4;
@@ -1308,7 +1166,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.fail|] ([|java:lang:String|] v1 @type (object)) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.fail:(Ljava/lang/String;)V|] @Access PUBLIC_STATIC {
       local temp ;
-
         v0;
       
 #L002714.   if v1 != 0 then goto L002724;
@@ -1322,9 +1179,6 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.failNotEquals|] ([|java:lang:String|] v1 @type (object), [|java:lang:Object|] v2 @type (object), [|java:lang:Object|] v3 @type (object)) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.failNotEquals:(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
-
         v0;
       
 #L002740.   call temp:=  [|junit:framework:Assert.format|](v1, v2, v3) @signature [|Ljunit/framework/Assert;.format:(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;|] @classDescriptor [|junit:framework:Assert|] @type static;
@@ -1335,10 +1189,7 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.failNotSame|] ([|java:lang:String|] v3 @type (object), [|java:lang:Object|] v4 @type (object), [|java:lang:Object|] v5 @type (object)) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.failNotSame:(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|formatted|] @scope ((L0002,L0042));
-
-
-
+        v0;
         v1;
         v2;
       
@@ -1378,8 +1229,7 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:Assert.failSame|] ([|java:lang:String|] v3 @type (object)) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.failSame:(Ljava/lang/String;)V|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|formatted|] @scope ((L0002,L002e));
-
+        v0;
         v1;
         v2;
       
@@ -1409,10 +1259,7 @@ record [|junit:framework:Assert|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|java:lang:String|] [|junit:framework:Assert.format|] ([|java:lang:String|] v3 @type (object), [|java:lang:Object|] v4 @type (object), [|java:lang:Object|] v5 @type (object)) @owner [|junit:framework:Assert|] @signature [|Ljunit/framework/Assert;.format:(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|formatted|] @scope ((L0002,L0045));
-
-
-
+        v0;
         v1;
         v2;
       
@@ -1457,8 +1304,6 @@ record [|junit:extensions:TestDecorator|]  @type class @AccessFlag PUBLIC  exten
    }
     procedure [|void|] [|junit:extensions:TestDecorator.<init>|] ([|junit:extensions:TestDecorator|] v0 @type (this), [|junit:framework:Test|] v1 @type (object)) @owner [|junit:extensions:TestDecorator|] @signature [|Ljunit/extensions/TestDecorator;.<init>:(Ljunit/framework/Test;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L0028fc.   call temp:=  [|junit:framework:Assert.<init>|](v0) @signature [|Ljunit/framework/Assert;.<init>:()V|] @classDescriptor [|junit:framework:Assert|] @type direct;
 #L002902.   v0.[|junit:extensions:TestDecorator.fTest|]  := v1 @type object;
@@ -1467,8 +1312,6 @@ record [|junit:extensions:TestDecorator|]  @type class @AccessFlag PUBLIC  exten
    }
     procedure [|void|] [|junit:extensions:TestDecorator.basicRun|] ([|junit:extensions:TestDecorator|] v1 @type (this), [|junit:framework:TestResult|] v2 @type (object)) @owner [|junit:extensions:TestDecorator|] @signature [|Ljunit/extensions/TestDecorator;.basicRun:(Ljunit/framework/TestResult;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L002918.   v0:= v1.[|junit:extensions:TestDecorator.fTest|]   @type object;
@@ -1478,7 +1321,6 @@ record [|junit:extensions:TestDecorator|]  @type class @AccessFlag PUBLIC  exten
    }
     procedure [|int|] [|junit:extensions:TestDecorator.countTestCases|] ([|junit:extensions:TestDecorator|] v1 @type (this)) @owner [|junit:extensions:TestDecorator|] @signature [|Ljunit/extensions/TestDecorator;.countTestCases:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L002934.   v0:= v1.[|junit:extensions:TestDecorator.fTest|]   @type object;
@@ -1489,7 +1331,6 @@ record [|junit:extensions:TestDecorator|]  @type class @AccessFlag PUBLIC  exten
    }
     procedure [|junit:framework:Test|] [|junit:extensions:TestDecorator.getTest|] ([|junit:extensions:TestDecorator|] v1 @type (this)) @owner [|junit:extensions:TestDecorator|] @signature [|Ljunit/extensions/TestDecorator;.getTest:()Ljunit/framework/Test;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L002954.   v0:= v1.[|junit:extensions:TestDecorator.fTest|]   @type object;
@@ -1498,8 +1339,6 @@ record [|junit:extensions:TestDecorator|]  @type class @AccessFlag PUBLIC  exten
    }
     procedure [|void|] [|junit:extensions:TestDecorator.run|] ([|junit:extensions:TestDecorator|] v0 @type (this), [|junit:framework:TestResult|] v1 @type (object)) @owner [|junit:extensions:TestDecorator|] @signature [|Ljunit/extensions/TestDecorator;.run:(Ljunit/framework/TestResult;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L00296c.   call temp:=  [|junit:extensions:TestDecorator.basicRun|](v0, v1) @signature [|Ljunit/extensions/TestDecorator;.basicRun:(Ljunit/framework/TestResult;)V|] @classDescriptor [|junit:extensions:TestDecorator|] @type virtual;
 #L002972.   return @void ;
@@ -1507,7 +1346,6 @@ record [|junit:extensions:TestDecorator|]  @type class @AccessFlag PUBLIC  exten
    }
     procedure [|java:lang:String|] [|junit:extensions:TestDecorator.toString|] ([|junit:extensions:TestDecorator|] v1 @type (this)) @owner [|junit:extensions:TestDecorator|] @signature [|Ljunit/extensions/TestDecorator;.toString:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L002984.   v0:= v1.[|junit:extensions:TestDecorator.fTest|]   @type object;
@@ -1521,9 +1359,6 @@ record [|junit:extensions:RepeatedTest|]  @type class @AccessFlag PUBLIC  extend
    }
     procedure [|void|] [|junit:extensions:RepeatedTest.<init>|] ([|junit:extensions:RepeatedTest|] v2 @type (this), [|junit:framework:Test|] v3 @type (object), [|int|] v4) @owner [|junit:extensions:RepeatedTest|] @signature [|Ljunit/extensions/RepeatedTest;.<init>:(Ljunit/framework/Test;I)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -1539,7 +1374,6 @@ record [|junit:extensions:RepeatedTest|]  @type class @AccessFlag PUBLIC  extend
    }
     procedure [|int|] [|junit:extensions:RepeatedTest.countTestCases|] ([|junit:extensions:RepeatedTest|] v2 @type (this)) @owner [|junit:extensions:RepeatedTest|] @signature [|Ljunit/extensions/RepeatedTest;.countTestCases:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -1552,9 +1386,7 @@ record [|junit:extensions:RepeatedTest|]  @type class @AccessFlag PUBLIC  extend
    }
     procedure [|void|] [|junit:extensions:RepeatedTest.run|] ([|junit:extensions:RepeatedTest|] v2 @type (this), [|junit:framework:TestResult|] v3 @type (object)) @owner [|junit:extensions:RepeatedTest|] @signature [|Ljunit/extensions/RepeatedTest;.run:(Ljunit/framework/TestResult;)V|] @Access PUBLIC {
       local temp ;
-        [|int|] v0 @varname [|i|] @scope ((L0001,L0012));
-
-
+        v0;
         v1;
       
 #L0029f4.   v0:= 0  @length 4;
@@ -1571,7 +1403,6 @@ record [|junit:extensions:RepeatedTest|]  @type class @AccessFlag PUBLIC  extend
    }
     procedure [|java:lang:String|] [|junit:extensions:RepeatedTest.toString|] ([|junit:extensions:RepeatedTest|] v2 @type (this)) @owner [|junit:extensions:RepeatedTest|] @signature [|Ljunit/extensions/RepeatedTest;.toString:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -1600,7 +1431,6 @@ record [|junit:extensions:TestSetup$1|]  @type class @AccessFlag  extends  [|jun
    }
     procedure [|void|] [|junit:extensions:TestSetup$1.<init>|] ([|junit:extensions:TestSetup$1|] v0 @type (this), [|junit:extensions:TestSetup|] v1 @type (object), [|junit:framework:TestResult|] v2 @type (object)) @owner [|junit:extensions:TestSetup$1|] @signature [|Ljunit/extensions/TestSetup$1;.<init>:(Ljunit/extensions/TestSetup;Ljunit/framework/TestResult;)V|] @Access CONSTRUCTOR {
       local temp ;
-
       
 #L002a68.   v0.[|junit:extensions:TestSetup$1.this$0|]  := v1 @type object;
 #L002a6c.   v0.[|junit:extensions:TestSetup$1.val$result|]  := v2 @type object;
@@ -1610,7 +1440,6 @@ record [|junit:extensions:TestSetup$1|]  @type class @AccessFlag  extends  [|jun
    }
     procedure [|void|] [|junit:extensions:TestSetup$1.protect|] ([|junit:extensions:TestSetup$1|] v2 @type (this)) @owner [|junit:extensions:TestSetup$1|] @signature [|Ljunit/extensions/TestSetup$1;.protect:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -1628,8 +1457,6 @@ record [|junit:extensions:TestSetup|]  @type class @AccessFlag PUBLIC  extends [
    }
     procedure [|void|] [|junit:extensions:TestSetup.<init>|] ([|junit:extensions:TestSetup|] v0 @type (this), [|junit:framework:Test|] v1 @type (object)) @owner [|junit:extensions:TestSetup|] @signature [|Ljunit/extensions/TestSetup;.<init>:(Ljunit/framework/Test;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L002abc.   call temp:=  [|junit:extensions:TestDecorator.<init>|](v0, v1) @signature [|Ljunit/extensions/TestDecorator;.<init>:(Ljunit/framework/Test;)V|] @classDescriptor [|junit:extensions:TestDecorator|] @type direct;
 #L002ac2.   return @void ;
@@ -1637,9 +1464,7 @@ record [|junit:extensions:TestSetup|]  @type class @AccessFlag PUBLIC  extends [
    }
     procedure [|void|] [|junit:extensions:TestSetup.run|] ([|junit:extensions:TestSetup|] v1 @type (this), [|junit:framework:TestResult|] v2 @type (object)) @owner [|junit:extensions:TestSetup|] @signature [|Ljunit/extensions/TestSetup;.run:(Ljunit/framework/TestResult;)V|] @Access PUBLIC {
       local temp ;
-        [|junit:framework:Protectable|] v0 @varname [|p|] @scope ((L0005,L0009));
-
-
+        v0;
       
 #L002ad4.   v0:= new [|junit:extensions:TestSetup$1|];
 #L002ad8.   call temp:=  [|junit:extensions:TestSetup$1.<init>|](v0, v1, v2) @signature [|Ljunit/extensions/TestSetup$1;.<init>:(Ljunit/extensions/TestSetup;Ljunit/framework/TestResult;)V|] @classDescriptor [|junit:extensions:TestSetup$1|] @type direct;
@@ -1649,14 +1474,12 @@ record [|junit:extensions:TestSetup|]  @type class @AccessFlag PUBLIC  extends [
    }
     procedure [|void|] [|junit:extensions:TestSetup.setUp|] ([|junit:extensions:TestSetup|] v0 @type (this)) @owner [|junit:extensions:TestSetup|] @signature [|Ljunit/extensions/TestSetup;.setUp:()V|] @Access PROTECTED {
       local temp ;
-
       
 #L002af8.   return @void ;
 
    }
     procedure [|void|] [|junit:extensions:TestSetup.tearDown|] ([|junit:extensions:TestSetup|] v0 @type (this)) @owner [|junit:extensions:TestSetup|] @signature [|Ljunit/extensions/TestSetup;.tearDown:()V|] @Access PROTECTED {
       local temp ;
-
       
 #L002b0c.   return @void ;
 
@@ -1666,7 +1489,6 @@ record [|junit:framework:AssertionFailedError|]  @type class @AccessFlag PUBLIC 
       global [|long|] @@[|junit:framework:AssertionFailedError.serialVersionUID|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|junit:framework:AssertionFailedError.<init>|] ([|junit:framework:AssertionFailedError|] v0 @type (this)) @owner [|junit:framework:AssertionFailedError|] @signature [|Ljunit/framework/AssertionFailedError;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L002b20.   call temp:=  [|java:lang:AssertionError.<init>|](v0) @signature [|Ljava/lang/AssertionError;.<init>:()V|] @classDescriptor [|java:lang:AssertionError|] @type direct;
 #L002b26.   return @void ;
@@ -1674,8 +1496,6 @@ record [|junit:framework:AssertionFailedError|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|junit:framework:AssertionFailedError.<init>|] ([|junit:framework:AssertionFailedError|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|junit:framework:AssertionFailedError|] @signature [|Ljunit/framework/AssertionFailedError;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L002b38.   call temp:=  [|junit:framework:AssertionFailedError.defaultString|](v2) @signature [|Ljunit/framework/AssertionFailedError;.defaultString:(Ljava/lang/String;)Ljava/lang/String;|] @classDescriptor [|junit:framework:AssertionFailedError|] @type static;
@@ -1686,7 +1506,6 @@ record [|junit:framework:AssertionFailedError|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|java:lang:String|] [|junit:framework:AssertionFailedError.defaultString|] ([|java:lang:String|] v0 @type (object)) @owner [|junit:framework:AssertionFailedError|] @signature [|Ljunit/framework/AssertionFailedError;.defaultString:(Ljava/lang/String;)Ljava/lang/String;|] @Access PRIVATE_STATIC {
       local temp ;
-
       
 #L002b58.   if v0 != 0 then goto L002b60;
 #L002b5c.   v0:= "" @type (object, string);
@@ -1705,10 +1524,6 @@ record [|junit:framework:ComparisonCompactor|]  @type class @AccessFlag PUBLIC  
       global [|java:lang:String|] @@[|junit:framework:ComparisonCompactor.ELLIPSIS|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|junit:framework:ComparisonCompactor.<init>|] ([|junit:framework:ComparisonCompactor|] v0 @type (this), [|int|] v1, [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object)) @owner [|junit:framework:ComparisonCompactor|] @signature [|Ljunit/framework/ComparisonCompactor;.<init>:(ILjava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
-
       
 #L002b74.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L002b7a.   v0.[|junit:framework:ComparisonCompactor.fContextLength|]  := v1;
@@ -1719,7 +1534,6 @@ record [|junit:framework:ComparisonCompactor|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|boolean|] [|junit:framework:ComparisonCompactor.areStringsEqual|] ([|junit:framework:ComparisonCompactor|] v2 @type (this)) @owner [|junit:framework:ComparisonCompactor|] @signature [|Ljunit/framework/ComparisonCompactor;.areStringsEqual:()Z|] @Access PRIVATE {
       local temp ;
-
         v0;
         v1;
       
@@ -1732,9 +1546,7 @@ record [|junit:framework:ComparisonCompactor|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|java:lang:String|] [|junit:framework:ComparisonCompactor.compactString|] ([|junit:framework:ComparisonCompactor|] v5 @type (this), [|java:lang:String|] v6 @type (object)) @owner [|junit:framework:ComparisonCompactor|] @signature [|Ljunit/framework/ComparisonCompactor;.compactString:(Ljava/lang/String;)Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|result|] @scope ((L0028,L005b));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -1789,7 +1601,6 @@ record [|junit:framework:ComparisonCompactor|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|java:lang:String|] [|junit:framework:ComparisonCompactor.computeCommonPrefix|] ([|junit:framework:ComparisonCompactor|] v5 @type (this)) @owner [|junit:framework:ComparisonCompactor|] @signature [|Ljunit/framework/ComparisonCompactor;.computeCommonPrefix:()Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -1825,8 +1636,7 @@ record [|junit:framework:ComparisonCompactor|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|java:lang:String|] [|junit:framework:ComparisonCompactor.computeCommonSuffix|] ([|junit:framework:ComparisonCompactor|] v5 @type (this)) @owner [|junit:framework:ComparisonCompactor|] @signature [|Ljunit/framework/ComparisonCompactor;.computeCommonSuffix:()Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|int|] v0 @varname [|end|] @scope ((L0018,L0056));
-
+        v0;
         v1;
         v2;
         v3;
@@ -1882,8 +1692,7 @@ record [|junit:framework:ComparisonCompactor|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|junit:framework:ComparisonCompactor.findCommonPrefix|] ([|junit:framework:ComparisonCompactor|] v4 @type (this)) @owner [|junit:framework:ComparisonCompactor|] @signature [|Ljunit/framework/ComparisonCompactor;.findCommonPrefix:()V|] @Access PRIVATE {
       local temp ;
-        [|int|] v0 @varname [|end|] @scope ((L0013,L0031));
-
+        v0;
         v1;
         v2;
         v3;
@@ -1918,9 +1727,8 @@ record [|junit:framework:ComparisonCompactor|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|junit:framework:ComparisonCompactor.findCommonSuffix|] ([|junit:framework:ComparisonCompactor|] v4 @type (this)) @owner [|junit:framework:ComparisonCompactor|] @signature [|Ljunit/framework/ComparisonCompactor;.findCommonSuffix:()V|] @Access PRIVATE {
       local temp ;
-        [|int|] v0 @varname [|actualSuffix|] @scope ((L0010,L0035));
-        [|int|] v1 @varname [|expectedSuffix|] @scope ((L0008,L0035));
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -1956,10 +1764,7 @@ record [|junit:framework:ComparisonCompactor|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|java:lang:String|] [|junit:framework:ComparisonCompactor.format|] ([|java:lang:String|] v3 @type (object), [|java:lang:Object|] v4 @type (object), [|java:lang:Object|] v5 @type (object)) @owner [|junit:framework:ComparisonCompactor|] @signature [|Ljunit/framework/ComparisonCompactor;.format:(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;|] @Access PRIVATE_STATIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|formatted|] @scope ((L0002,L0045));
-
-
-
+        v0;
         v1;
         v2;
       
@@ -2001,10 +1806,8 @@ record [|junit:framework:ComparisonCompactor|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|java:lang:String|] [|junit:framework:ComparisonCompactor.compact|] ([|junit:framework:ComparisonCompactor|] v4 @type (this), [|java:lang:String|] v5 @type (object)) @owner [|junit:framework:ComparisonCompactor|] @signature [|Ljunit/framework/ComparisonCompactor;.compact:(Ljava/lang/String;)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|actual|] @scope ((L0029,L002e));
-        [|java:lang:String|] v1 @varname [|expected|] @scope ((L0023,L002e));
-
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -2041,10 +1844,6 @@ record [|junit:framework:ComparisonFailure|]  @type class @AccessFlag PUBLIC  ex
       global [|long|] @@[|junit:framework:ComparisonFailure.serialVersionUID|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|junit:framework:ComparisonFailure.<init>|] ([|junit:framework:ComparisonFailure|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object)) @owner [|junit:framework:ComparisonFailure|] @signature [|Ljunit/framework/ComparisonFailure;.<init>:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
-
       
 #L002fa8.   call temp:=  [|junit:framework:AssertionFailedError.<init>|](v0, v1) @signature [|Ljunit/framework/AssertionFailedError;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|junit:framework:AssertionFailedError|] @type direct;
 #L002fae.   v0.[|junit:framework:ComparisonFailure.fExpected|]  := v2 @type object;
@@ -2054,7 +1853,6 @@ record [|junit:framework:ComparisonFailure|]  @type class @AccessFlag PUBLIC  ex
    }
     procedure [|java:lang:String|] [|junit:framework:ComparisonFailure.getActual|] ([|junit:framework:ComparisonFailure|] v1 @type (this)) @owner [|junit:framework:ComparisonFailure|] @signature [|Ljunit/framework/ComparisonFailure;.getActual:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L002fc8.   v0:= v1.[|junit:framework:ComparisonFailure.fActual|]   @type object;
@@ -2063,7 +1861,6 @@ record [|junit:framework:ComparisonFailure|]  @type class @AccessFlag PUBLIC  ex
    }
     procedure [|java:lang:String|] [|junit:framework:ComparisonFailure.getExpected|] ([|junit:framework:ComparisonFailure|] v1 @type (this)) @owner [|junit:framework:ComparisonFailure|] @signature [|Ljunit/framework/ComparisonFailure;.getExpected:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L002fe0.   v0:= v1.[|junit:framework:ComparisonFailure.fExpected|]   @type object;
@@ -2072,7 +1869,6 @@ record [|junit:framework:ComparisonFailure|]  @type class @AccessFlag PUBLIC  ex
    }
     procedure [|java:lang:String|] [|junit:framework:ComparisonFailure.getMessage|] ([|junit:framework:ComparisonFailure|] v4 @type (this)) @owner [|junit:framework:ComparisonFailure|] @signature [|Ljunit/framework/ComparisonFailure;.getMessage:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -2095,7 +1891,6 @@ record [|junit:framework:TestCase|]  @type class @AccessFlag PUBLIC_ABSTRACT  ex
    }
     procedure [|void|] [|junit:framework:TestCase.<init>|] ([|junit:framework:TestCase|] v1 @type (this)) @owner [|junit:framework:TestCase|] @signature [|Ljunit/framework/TestCase;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L003030.   call temp:=  [|junit:framework:Assert.<init>|](v1) @signature [|Ljunit/framework/Assert;.<init>:()V|] @classDescriptor [|junit:framework:Assert|] @type direct;
@@ -2106,8 +1901,6 @@ record [|junit:framework:TestCase|]  @type class @AccessFlag PUBLIC_ABSTRACT  ex
    }
     procedure [|void|] [|junit:framework:TestCase.<init>|] ([|junit:framework:TestCase|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|junit:framework:TestCase|] @signature [|Ljunit/framework/TestCase;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L003050.   call temp:=  [|junit:framework:Assert.<init>|](v0) @signature [|Ljunit/framework/Assert;.<init>:()V|] @classDescriptor [|junit:framework:Assert|] @type direct;
 #L003056.   v0.[|junit:framework:TestCase.fName|]  := v1 @type object;
@@ -2116,7 +1909,6 @@ record [|junit:framework:TestCase|]  @type class @AccessFlag PUBLIC_ABSTRACT  ex
    }
     procedure [|int|] [|junit:framework:TestCase.countTestCases|] ([|junit:framework:TestCase|] v1 @type (this)) @owner [|junit:framework:TestCase|] @signature [|Ljunit/framework/TestCase;.countTestCases:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L00306c.   v0:= 1  @length 4;
@@ -2125,7 +1917,6 @@ record [|junit:framework:TestCase|]  @type class @AccessFlag PUBLIC_ABSTRACT  ex
    }
     procedure [|junit:framework:TestResult|] [|junit:framework:TestCase.createResult|] ([|junit:framework:TestCase|] v1 @type (this)) @owner [|junit:framework:TestCase|] @signature [|Ljunit/framework/TestCase;.createResult:()Ljunit/framework/TestResult;|] @Access PROTECTED {
       local temp ;
-
         v0;
       
 #L003080.   v0:= new [|junit:framework:TestResult|];
@@ -2135,7 +1926,6 @@ record [|junit:framework:TestCase|]  @type class @AccessFlag PUBLIC_ABSTRACT  ex
    }
     procedure [|java:lang:String|] [|junit:framework:TestCase.getName|] ([|junit:framework:TestCase|] v1 @type (this)) @owner [|junit:framework:TestCase|] @signature [|Ljunit/framework/TestCase;.getName:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L00309c.   v0:= v1.[|junit:framework:TestCase.fName|]   @type object;
@@ -2144,8 +1934,7 @@ record [|junit:framework:TestCase|]  @type class @AccessFlag PUBLIC_ABSTRACT  ex
    }
     procedure [|junit:framework:TestResult|] [|junit:framework:TestCase.run|] ([|junit:framework:TestCase|] v1 @type (this)) @owner [|junit:framework:TestCase|] @signature [|Ljunit/framework/TestCase;.run:()Ljunit/framework/TestResult;|] @Access PUBLIC {
       local temp ;
-        [|junit:framework:TestResult|] v0 @varname [|result|] @scope ((L0004,L0008));
-
+        v0;
       
 #L0030b4.   call temp:=  [|junit:framework:TestCase.createResult|](v1) @signature [|Ljunit/framework/TestCase;.createResult:()Ljunit/framework/TestResult;|] @classDescriptor [|junit:framework:TestCase|] @type virtual;
 #L0030ba.   v0:= temp  @type object;
@@ -2155,8 +1944,6 @@ record [|junit:framework:TestCase|]  @type class @AccessFlag PUBLIC_ABSTRACT  ex
    }
     procedure [|void|] [|junit:framework:TestCase.run|] ([|junit:framework:TestCase|] v0 @type (this), [|junit:framework:TestResult|] v1 @type (object)) @owner [|junit:framework:TestCase|] @signature [|Ljunit/framework/TestCase;.run:(Ljunit/framework/TestResult;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L0030d4.   call temp:=  [|junit:framework:TestResult.run|](v1, v0) @signature [|Ljunit/framework/TestResult;.run:(Ljunit/framework/TestCase;)V|] @classDescriptor [|junit:framework:TestResult|] @type virtual;
 #L0030da.   return @void ;
@@ -2164,10 +1951,9 @@ record [|junit:framework:TestCase|]  @type class @AccessFlag PUBLIC_ABSTRACT  ex
    }
     procedure [|void|] [|junit:framework:TestCase.runBare|] ([|junit:framework:TestCase|] v4 @type (this)) @owner [|junit:framework:TestCase|] @signature [|Ljunit/framework/TestCase;.runBare:()V|] @Access PUBLIC {
       local temp ;
-        [|java:lang:Throwable|] v2 @varname [|tearingDown|] @scope ((L000e,L0012), (L0019,L001d), (L0023,L0027));
-        [|java:lang:Throwable|] v1 @varname [|running|] @scope ((L0013,L001d));
-        [|java:lang:Throwable|] v0 @varname [|exception|] @scope ((L0001,L0028));
-
+        v0;
+        v1;
+        v2;
         v3;
       
 #L0030ec.   v0:= 0  @length 4;
@@ -2205,9 +1991,8 @@ record [|junit:framework:TestCase|]  @type class @AccessFlag PUBLIC_ABSTRACT  ex
    }
     procedure [|void|] [|junit:framework:TestCase.runTest|] ([|junit:framework:TestCase|] v5 @type (this)) @owner [|junit:framework:TestCase|] @signature [|Ljunit/framework/TestCase;.runTest:()V|] @Access PROTECTED {
       local temp ;
-        [|java:lang:NoSuchMethodException|] v0 @varname [|e|] @scope ((L0045,L0064), (L0065,L006d), (L006e,L0072));
-        [|java:lang:reflect:Method|] v1 @varname [|runMethod|] @scope ((L0008,L0072));
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -2277,8 +2062,6 @@ record [|junit:framework:TestCase|]  @type class @AccessFlag PUBLIC_ABSTRACT  ex
    }
     procedure [|void|] [|junit:framework:TestCase.setName|] ([|junit:framework:TestCase|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|junit:framework:TestCase|] @signature [|Ljunit/framework/TestCase;.setName:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L00328c.   v0.[|junit:framework:TestCase.fName|]  := v1 @type object;
 #L003290.   return @void ;
@@ -2286,21 +2069,18 @@ record [|junit:framework:TestCase|]  @type class @AccessFlag PUBLIC_ABSTRACT  ex
    }
     procedure [|void|] [|junit:framework:TestCase.setUp|] ([|junit:framework:TestCase|] v0 @type (this)) @owner [|junit:framework:TestCase|] @signature [|Ljunit/framework/TestCase;.setUp:()V|] @Access PROTECTED {
       local temp ;
-
       
 #L0032a4.   return @void ;
 
    }
     procedure [|void|] [|junit:framework:TestCase.tearDown|] ([|junit:framework:TestCase|] v0 @type (this)) @owner [|junit:framework:TestCase|] @signature [|Ljunit/framework/TestCase;.tearDown:()V|] @Access PROTECTED {
       local temp ;
-
       
 #L0032b8.   return @void ;
 
    }
     procedure [|java:lang:String|] [|junit:framework:TestCase.toString|] ([|junit:framework:TestCase|] v2 @type (this)) @owner [|junit:framework:TestCase|] @signature [|Ljunit/framework/TestCase;.toString:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -2333,9 +2113,6 @@ record [|junit:framework:TestFailure|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:TestFailure.<init>|] ([|junit:framework:TestFailure|] v0 @type (this), [|junit:framework:Test|] v1 @type (object), [|java:lang:Throwable|] v2 @type (object)) @owner [|junit:framework:TestFailure|] @signature [|Ljunit/framework/TestFailure;.<init>:(Ljunit/framework/Test;Ljava/lang/Throwable;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
       
 #L003330.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L003336.   v0.[|junit:framework:TestFailure.fFailedTest|]  := v1 @type object;
@@ -2345,7 +2122,6 @@ record [|junit:framework:TestFailure|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|java:lang:String|] [|junit:framework:TestFailure.exceptionMessage|] ([|junit:framework:TestFailure|] v1 @type (this)) @owner [|junit:framework:TestFailure|] @signature [|Ljunit/framework/TestFailure;.exceptionMessage:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L003350.   call temp:=  [|junit:framework:TestFailure.thrownException|](v1) @signature [|Ljunit/framework/TestFailure;.thrownException:()Ljava/lang/Throwable;|] @classDescriptor [|junit:framework:TestFailure|] @type virtual;
@@ -2357,7 +2133,6 @@ record [|junit:framework:TestFailure|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|junit:framework:Test|] [|junit:framework:TestFailure.failedTest|] ([|junit:framework:TestFailure|] v1 @type (this)) @owner [|junit:framework:TestFailure|] @signature [|Ljunit/framework/TestFailure;.failedTest:()Ljunit/framework/Test;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L003374.   v0:= v1.[|junit:framework:TestFailure.fFailedTest|]   @type object;
@@ -2366,7 +2141,6 @@ record [|junit:framework:TestFailure|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|boolean|] [|junit:framework:TestFailure.isFailure|] ([|junit:framework:TestFailure|] v1 @type (this)) @owner [|junit:framework:TestFailure|] @signature [|Ljunit/framework/TestFailure;.isFailure:()Z|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L00338c.   call temp:=  [|junit:framework:TestFailure.thrownException|](v1) @signature [|Ljunit/framework/TestFailure;.thrownException:()Ljava/lang/Throwable;|] @classDescriptor [|junit:framework:TestFailure|] @type virtual;
@@ -2377,7 +2151,6 @@ record [|junit:framework:TestFailure|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|java:lang:Throwable|] [|junit:framework:TestFailure.thrownException|] ([|junit:framework:TestFailure|] v1 @type (this)) @owner [|junit:framework:TestFailure|] @signature [|Ljunit/framework/TestFailure;.thrownException:()Ljava/lang/Throwable;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L0033ac.   v0:= v1.[|junit:framework:TestFailure.fThrownException|]   @type object;
@@ -2386,8 +2159,7 @@ record [|junit:framework:TestFailure|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|java:lang:String|] [|junit:framework:TestFailure.toString|] ([|junit:framework:TestFailure|] v3 @type (this)) @owner [|junit:framework:TestFailure|] @signature [|Ljunit/framework/TestFailure;.toString:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-        [|java:lang:StringBuffer|] v0 @varname [|buffer|] @scope ((L0005,L002c));
-
+        v0;
         v1;
         v2;
       
@@ -2416,10 +2188,9 @@ record [|junit:framework:TestFailure|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|java:lang:String|] [|junit:framework:TestFailure.trace|] ([|junit:framework:TestFailure|] v4 @type (this)) @owner [|junit:framework:TestFailure|] @signature [|Ljunit/framework/TestFailure;.trace:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-        [|java:lang:StringBuffer|] v0 @varname [|buffer|] @scope ((L0015,L001a));
-        [|java:io:StringWriter|] v1 @varname [|stringWriter|] @scope ((L0005,L001a));
-        [|java:io:PrintWriter|] v2 @varname [|writer|] @scope ((L000a,L001a));
-
+        v0;
+        v1;
+        v2;
         v3;
       
 #L00342c.   v1:= new [|java:io:StringWriter|];
@@ -2456,7 +2227,6 @@ record [|junit:framework:TestResult$1|]  @type class @AccessFlag  extends  [|jun
    }
     procedure [|void|] [|junit:framework:TestResult$1.<init>|] ([|junit:framework:TestResult$1|] v0 @type (this), [|junit:framework:TestResult|] v1 @type (object), [|junit:framework:TestCase|] v2 @type (object)) @owner [|junit:framework:TestResult$1|] @signature [|Ljunit/framework/TestResult$1;.<init>:(Ljunit/framework/TestResult;Ljunit/framework/TestCase;)V|] @Access CONSTRUCTOR {
       local temp ;
-
       
 #L003470.   v0.[|junit:framework:TestResult$1.this$0|]  := v1 @type object;
 #L003474.   v0.[|junit:framework:TestResult$1.val$test|]  := v2 @type object;
@@ -2466,7 +2236,6 @@ record [|junit:framework:TestResult$1|]  @type class @AccessFlag  extends  [|jun
    }
     procedure [|void|] [|junit:framework:TestResult$1.protect|] ([|junit:framework:TestResult$1|] v1 @type (this)) @owner [|junit:framework:TestResult$1|] @signature [|Ljunit/framework/TestResult$1;.protect:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L003490.   v0:= v1.[|junit:framework:TestResult$1.val$test|]   @type object;
@@ -2483,7 +2252,6 @@ record [|junit:framework:TestResult|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:TestResult.<init>|] ([|junit:framework:TestResult|] v2 @type (this)) @owner [|junit:framework:TestResult|] @signature [|Ljunit/framework/TestResult;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
         v0;
         v1;
       
@@ -2505,8 +2273,7 @@ record [|junit:framework:TestResult|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|java:util:List|] [|junit:framework:TestResult.cloneListeners|] ([|junit:framework:TestResult|] v2 @type (this)) @owner [|junit:framework:TestResult|] @signature [|Ljunit/framework/TestResult;.cloneListeners:()Ljava/util/List;|] @Access PRIVATE_DECLARED_SYNCHRONIZED {
       local temp ;
-        [|java:util:List|] v0 @varname [|result|] @scope ((L0006,L000d));
-
+        v0;
         v1;
       
 #L0034f8.   (@monitorenter v2)
@@ -2524,11 +2291,8 @@ record [|junit:framework:TestResult|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:TestResult.addError|] ([|junit:framework:TestResult|] v4 @type (this), [|junit:framework:Test|] v5 @type (object), [|java:lang:Throwable|] v6 @type (object)) @owner [|junit:framework:TestResult|] @signature [|Ljunit/framework/TestResult;.addError:(Ljunit/framework/Test;Ljava/lang/Throwable;)V|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-        [|junit:framework:TestListener|] v0 @varname [|each|] @scope ((L001f,L0023));
-        [|java:util:Iterator|] v1 @varname [|i$|] @scope ((L0013,L0023), (L0026,L0028));
-
-
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -2559,11 +2323,8 @@ record [|junit:framework:TestResult|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:TestResult.addFailure|] ([|junit:framework:TestResult|] v4 @type (this), [|junit:framework:Test|] v5 @type (object), [|junit:framework:AssertionFailedError|] v6 @type (object)) @owner [|junit:framework:TestResult|] @signature [|Ljunit/framework/TestResult;.addFailure:(Ljunit/framework/Test;Ljunit/framework/AssertionFailedError;)V|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-        [|junit:framework:TestListener|] v0 @varname [|each|] @scope ((L001f,L0023));
-        [|java:util:Iterator|] v1 @varname [|i$|] @scope ((L0013,L0023), (L0026,L0028));
-
-
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -2594,8 +2355,6 @@ record [|junit:framework:TestResult|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:TestResult.addListener|] ([|junit:framework:TestResult|] v1 @type (this), [|junit:framework:TestListener|] v2 @type (object)) @owner [|junit:framework:TestResult|] @signature [|Ljunit/framework/TestResult;.addListener:(Ljunit/framework/TestListener;)V|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
-
         v0;
       
 #L00360c.   (@monitorenter v1)
@@ -2611,10 +2370,8 @@ record [|junit:framework:TestResult|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:TestResult.endTest|] ([|junit:framework:TestResult|] v3 @type (this), [|junit:framework:Test|] v4 @type (object)) @owner [|junit:framework:TestResult|] @signature [|Ljunit/framework/TestResult;.endTest:(Ljunit/framework/Test;)V|] @Access PUBLIC {
       local temp ;
-        [|junit:framework:TestListener|] v0 @varname [|each|] @scope ((L0014,L0018));
-        [|java:util:Iterator|] v1 @varname [|i$|] @scope ((L0008,L0019));
-
-
+        v0;
+        v1;
         v2;
       
 #L003640.   call temp:=  [|junit:framework:TestResult.cloneListeners|](v3) @signature [|Ljunit/framework/TestResult;.cloneListeners:()Ljava/util/List;|] @classDescriptor [|junit:framework:TestResult|] @type direct;
@@ -2634,7 +2391,6 @@ record [|junit:framework:TestResult|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|int|] [|junit:framework:TestResult.errorCount|] ([|junit:framework:TestResult|] v1 @type (this)) @owner [|junit:framework:TestResult|] @signature [|Ljunit/framework/TestResult;.errorCount:()I|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
         v0;
       
 #L003684.   (@monitorenter v1)
@@ -2651,7 +2407,6 @@ record [|junit:framework:TestResult|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|java:util:Enumeration|] [|junit:framework:TestResult.errors|] ([|junit:framework:TestResult|] v1 @type (this)) @owner [|junit:framework:TestResult|] @signature [|Ljunit/framework/TestResult;.errors:()Ljava/util/Enumeration;|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
         v0;
       
 #L0036b8.   (@monitorenter v1)
@@ -2668,7 +2423,6 @@ record [|junit:framework:TestResult|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|int|] [|junit:framework:TestResult.failureCount|] ([|junit:framework:TestResult|] v1 @type (this)) @owner [|junit:framework:TestResult|] @signature [|Ljunit/framework/TestResult;.failureCount:()I|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
         v0;
       
 #L0036ec.   (@monitorenter v1)
@@ -2685,7 +2439,6 @@ record [|junit:framework:TestResult|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|java:util:Enumeration|] [|junit:framework:TestResult.failures|] ([|junit:framework:TestResult|] v1 @type (this)) @owner [|junit:framework:TestResult|] @signature [|Ljunit/framework/TestResult;.failures:()Ljava/util/Enumeration;|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
         v0;
       
 #L003720.   (@monitorenter v1)
@@ -2702,8 +2455,6 @@ record [|junit:framework:TestResult|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:TestResult.removeListener|] ([|junit:framework:TestResult|] v1 @type (this), [|junit:framework:TestListener|] v2 @type (object)) @owner [|junit:framework:TestResult|] @signature [|Ljunit/framework/TestResult;.removeListener:(Ljunit/framework/TestListener;)V|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
-
         v0;
       
 #L003754.   (@monitorenter v1)
@@ -2719,9 +2470,7 @@ record [|junit:framework:TestResult|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:TestResult.run|] ([|junit:framework:TestResult|] v1 @type (this), [|junit:framework:TestCase|] v2 @type (object)) @owner [|junit:framework:TestResult|] @signature [|Ljunit/framework/TestResult;.run:(Ljunit/framework/TestCase;)V|] @Access PROTECTED {
       local temp ;
-        [|junit:framework:Protectable|] v0 @varname [|p|] @scope ((L0008,L000f));
-
-
+        v0;
       
 #L003788.   call temp:=  [|junit:framework:TestResult.startTest|](v1, v2) @signature [|Ljunit/framework/TestResult;.startTest:(Ljunit/framework/Test;)V|] @classDescriptor [|junit:framework:TestResult|] @type virtual;
 #L00378e.   v0:= new [|junit:framework:TestResult$1|];
@@ -2733,7 +2482,6 @@ record [|junit:framework:TestResult|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|int|] [|junit:framework:TestResult.runCount|] ([|junit:framework:TestResult|] v1 @type (this)) @owner [|junit:framework:TestResult|] @signature [|Ljunit/framework/TestResult;.runCount:()I|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
         v0;
       
 #L0037b8.   (@monitorenter v1)
@@ -2748,10 +2496,7 @@ record [|junit:framework:TestResult|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:TestResult.runProtected|] ([|junit:framework:TestResult|] v1 @type (this), [|junit:framework:Test|] v2 @type (object), [|junit:framework:Protectable|] v3 @type (object)) @owner [|junit:framework:TestResult|] @signature [|Ljunit/framework/TestResult;.runProtected:(Ljunit/framework/Test;Ljunit/framework/Protectable;)V|] @Access PUBLIC {
       local temp ;
-        [|junit:framework:AssertionFailedError|] v0 @varname [|e|] @scope ((L0005,L0009), (L000a,L000b), (L000c,L0010));
-
-
-
+        v0;
       
 #L0037e4.   call temp:=  [|junit:framework:Protectable.protect|](v3) @signature [|Ljunit/framework/Protectable;.protect:()V|] @classDescriptor [|junit:framework:Protectable|] @type interface;
 #L0037ea.   return @void ;
@@ -2770,7 +2515,6 @@ record [|junit:framework:TestResult|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|boolean|] [|junit:framework:TestResult.shouldStop|] ([|junit:framework:TestResult|] v1 @type (this)) @owner [|junit:framework:TestResult|] @signature [|Ljunit/framework/TestResult;.shouldStop:()Z|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
         v0;
       
 #L003824.   (@monitorenter v1)
@@ -2785,11 +2529,9 @@ record [|junit:framework:TestResult|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:TestResult.startTest|] ([|junit:framework:TestResult|] v4 @type (this), [|junit:framework:Test|] v5 @type (object)) @owner [|junit:framework:TestResult|] @signature [|Ljunit/framework/TestResult;.startTest:(Ljunit/framework/Test;)V|] @Access PUBLIC {
       local temp ;
-        [|junit:framework:TestListener|] v1 @varname [|each|] @scope ((L001f,L0023));
-        [|java:util:Iterator|] v2 @varname [|i$|] @scope ((L0013,L0023), (L0026,L0027));
-        [|int|] v0 @varname [|count|] @scope ((L0004,L0027));
-
-
+        v0;
+        v1;
+        v2;
         v3;
       
 #L003850.   call temp:=  [|junit:framework:Test.countTestCases|](v5) @signature [|Ljunit/framework/Test;.countTestCases:()I|] @classDescriptor [|junit:framework:Test|] @type interface;
@@ -2821,7 +2563,6 @@ record [|junit:framework:TestResult|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|junit:framework:TestResult.stop|] ([|junit:framework:TestResult|] v1 @type (this)) @owner [|junit:framework:TestResult|] @signature [|Ljunit/framework/TestResult;.stop:()V|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
         v0;
       
 #L0038c4.   (@monitorenter v1)
@@ -2837,7 +2578,6 @@ record [|junit:framework:TestResult|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|boolean|] [|junit:framework:TestResult.wasSuccessful|] ([|junit:framework:TestResult|] v1 @type (this)) @owner [|junit:framework:TestResult|] @signature [|Ljunit/framework/TestResult;.wasSuccessful:()Z|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
         v0;
       
 #L0038f4.   (@monitorenter v1)
@@ -2863,8 +2603,6 @@ record [|junit:framework:TestSuite$1|]  @type class @AccessFlag FINAL  extends [
    }
     procedure [|void|] [|junit:framework:TestSuite$1.<init>|] ([|junit:framework:TestSuite$1|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:String|] v2 @type (object)) @owner [|junit:framework:TestSuite$1|] @signature [|Ljunit/framework/TestSuite$1;.<init>:(Ljava/lang/String;Ljava/lang/String;)V|] @Access CONSTRUCTOR {
       local temp ;
-
-
       
 #L00393c.   v0.[|junit:framework:TestSuite$1.val$message|]  := v2 @type object;
 #L003940.   call temp:=  [|junit:framework:TestCase.<init>|](v0, v1) @signature [|Ljunit/framework/TestCase;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|junit:framework:TestCase|] @type direct;
@@ -2873,7 +2611,6 @@ record [|junit:framework:TestSuite$1|]  @type class @AccessFlag FINAL  extends [
    }
     procedure [|void|] [|junit:framework:TestSuite$1.runTest|] ([|junit:framework:TestSuite$1|] v1 @type (this)) @owner [|junit:framework:TestSuite$1|] @signature [|Ljunit/framework/TestSuite$1;.runTest:()V|] @Access PROTECTED {
       local temp ;
-
         v0;
       
 #L003958.   v0:= v1.[|junit:framework:TestSuite$1.val$message|]   @type object;

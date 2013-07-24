@@ -2,7 +2,6 @@ record [|com:android:internal:telephony:sip:SipPhoneFactory|]  @type class @Acce
    }
     procedure [|void|] [|com:android:internal:telephony:sip:SipPhoneFactory.<init>|] ([|com:android:internal:telephony:sip:SipPhoneFactory|] v0 @type (this)) @owner [|com:android:internal:telephony:sip:SipPhoneFactory|] @signature [|Lcom/android/internal/telephony/sip/SipPhoneFactory;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L09b438.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L09b43e.   return @void ;
@@ -10,11 +9,8 @@ record [|com:android:internal:telephony:sip:SipPhoneFactory|]  @type class @Acce
    }
     procedure [|com:android:internal:telephony:sip:SipPhone|] [|com:android:internal:telephony:sip:SipPhoneFactory.makePhone|] ([|java:lang:String|] v4 @type (object), [|android:content:Context|] v5 @type (object), [|com:android:internal:telephony:PhoneNotifier|] v6 @type (object)) @owner [|com:android:internal:telephony:sip:SipPhoneFactory|] @signature [|Lcom/android/internal/telephony/sip/SipPhoneFactory;.makePhone:(Ljava/lang/String;Landroid/content/Context;Lcom/android/internal/telephony/PhoneNotifier;)Lcom/android/internal/telephony/sip/SipPhone;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|android:net:sip:SipProfile|] v1 @varname [|profile|] @scope ((L0009,L000e));
-        [|java:text:ParseException|] v0 @varname [|e|] @scope ((L0010,L0019));
-
-
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -108,8 +104,6 @@ record [|com:android:internal:telephony:test:CallInfo$State|]  @type class @Acce
    }
     procedure [|void|] [|com:android:internal:telephony:test:CallInfo$State.<init>|] ([|com:android:internal:telephony:test:CallInfo$State|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|int|] v2, [|int|] v3) @owner [|com:android:internal:telephony:test:CallInfo$State|] @signature [|Lcom/android/internal/telephony/test/CallInfo$State;.<init>:(Ljava/lang/String;II)V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
-
       
 #L09b56c.   call temp:=  [|java:lang:Enum.<init>|](v0, v1, v2) @signature [|Ljava/lang/Enum;.<init>:(Ljava/lang/String;I)V|] @classDescriptor [|java:lang:Enum|] @type direct;
 #L09b572.   v0.[|com:android:internal:telephony:test:CallInfo$State.value|]  := v3;
@@ -118,7 +112,6 @@ record [|com:android:internal:telephony:test:CallInfo$State|]  @type class @Acce
    }
     procedure [|com:android:internal:telephony:test:CallInfo$State|] [|com:android:internal:telephony:test:CallInfo$State.valueOf|] ([|java:lang:String|] v1 @type (object)) @owner [|com:android:internal:telephony:test:CallInfo$State|] @signature [|Lcom/android/internal/telephony/test/CallInfo$State;.valueOf:(Ljava/lang/String;)Lcom/android/internal/telephony/test/CallInfo$State;|] @Access PUBLIC_STATIC {
       local temp ;
-
         v0;
       
 #L09b588.   v0:= new [|com:android:internal:telephony:test:CallInfo$State|];
@@ -141,7 +134,6 @@ record [|com:android:internal:telephony:test:CallInfo$State|]  @type class @Acce
    }
     procedure [|int|] [|com:android:internal:telephony:test:CallInfo$State.value|] ([|com:android:internal:telephony:test:CallInfo$State|] v1 @type (this)) @owner [|com:android:internal:telephony:test:CallInfo$State|] @signature [|Lcom/android/internal/telephony/test/CallInfo$State;.value:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09b5d0.   v0:= v1.[|com:android:internal:telephony:test:CallInfo$State.value|] ;
@@ -157,11 +149,6 @@ record [|com:android:internal:telephony:test:CallInfo|]  @type class @AccessFlag
    }
     procedure [|void|] [|com:android:internal:telephony:test:CallInfo.<init>|] ([|com:android:internal:telephony:test:CallInfo|] v2 @type (this), [|boolean|] v3, [|com:android:internal:telephony:test:CallInfo$State|] v4 @type (object), [|boolean|] v5, [|java:lang:String|] v6 @type (object)) @owner [|com:android:internal:telephony:test:CallInfo|] @signature [|Lcom/android/internal/telephony/test/CallInfo;.<init>:(ZLcom/android/internal/telephony/test/CallInfo$State;ZLjava/lang/String;)V|] @Access CONSTRUCTOR {
       local temp ;
-
-
-
-
-
         v0;
         v1;
       
@@ -188,7 +175,6 @@ record [|com:android:internal:telephony:test:CallInfo|]  @type class @AccessFlag
    }
     procedure [|com:android:internal:telephony:test:CallInfo|] [|com:android:internal:telephony:test:CallInfo.createIncomingCall|] ([|java:lang:String|] v4 @type (object)) @owner [|com:android:internal:telephony:test:CallInfo|] @signature [|Lcom/android/internal/telephony/test/CallInfo;.createIncomingCall:(Ljava/lang/String;)Lcom/android/internal/telephony/test/CallInfo;|] @Access STATIC {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -204,7 +190,6 @@ record [|com:android:internal:telephony:test:CallInfo|]  @type class @AccessFlag
    }
     procedure [|com:android:internal:telephony:test:CallInfo|] [|com:android:internal:telephony:test:CallInfo.createOutgoingCall|] ([|java:lang:String|] v3 @type (object)) @owner [|com:android:internal:telephony:test:CallInfo|] @signature [|Lcom/android/internal/telephony/test/CallInfo;.createOutgoingCall:(Ljava/lang/String;)Lcom/android/internal/telephony/test/CallInfo;|] @Access STATIC {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -218,7 +203,6 @@ record [|com:android:internal:telephony:test:CallInfo|]  @type class @AccessFlag
    }
     procedure [|boolean|] [|com:android:internal:telephony:test:CallInfo.isActiveOrHeld|] ([|com:android:internal:telephony:test:CallInfo|] v2 @type (this)) @owner [|com:android:internal:telephony:test:CallInfo|] @signature [|Lcom/android/internal/telephony/test/CallInfo;.isActiveOrHeld:()Z|] @Access  {
       local temp ;
-
         v0;
         v1;
       
@@ -236,7 +220,6 @@ record [|com:android:internal:telephony:test:CallInfo|]  @type class @AccessFlag
    }
     procedure [|boolean|] [|com:android:internal:telephony:test:CallInfo.isConnecting|] ([|com:android:internal:telephony:test:CallInfo|] v2 @type (this)) @owner [|com:android:internal:telephony:test:CallInfo|] @signature [|Lcom/android/internal/telephony/test/CallInfo;.isConnecting:()Z|] @Access  {
       local temp ;
-
         v0;
         v1;
       
@@ -254,7 +237,6 @@ record [|com:android:internal:telephony:test:CallInfo|]  @type class @AccessFlag
    }
     procedure [|boolean|] [|com:android:internal:telephony:test:CallInfo.isRinging|] ([|com:android:internal:telephony:test:CallInfo|] v2 @type (this)) @owner [|com:android:internal:telephony:test:CallInfo|] @signature [|Lcom/android/internal/telephony/test/CallInfo;.isRinging:()Z|] @Access  {
       local temp ;
-
         v0;
         v1;
       
@@ -272,8 +254,6 @@ record [|com:android:internal:telephony:test:CallInfo|]  @type class @AccessFlag
    }
     procedure [|java:lang:String|] [|com:android:internal:telephony:test:CallInfo.toCLCCLine|] ([|com:android:internal:telephony:test:CallInfo|] v2 @type (this), [|int|] v3) @owner [|com:android:internal:telephony:test:CallInfo|] @signature [|Lcom/android/internal/telephony/test/CallInfo;.toCLCCLine:(I)Ljava/lang/String;|] @Access  {
       local temp ;
-
-
         v0;
         v1;
       
@@ -331,10 +311,8 @@ record [|com:android:internal:telephony:test:CallInfo|]  @type class @AccessFlag
    }
     procedure [|com:android:internal:telephony:DriverCall|] [|com:android:internal:telephony:test:CallInfo.toDriverCall|] ([|com:android:internal:telephony:test:CallInfo|] v4 @type (this), [|int|] v5) @owner [|com:android:internal:telephony:test:CallInfo|] @signature [|Lcom/android/internal/telephony/test/CallInfo;.toDriverCall:(I)Lcom/android/internal/telephony/DriverCall;|] @Access  {
       local temp ;
-        [|com:android:internal:telephony:ATParseEx|] v0 @varname [|ex|] @scope ((L002b,L0033));
-        [|com:android:internal:telephony:DriverCall|] v1 @varname [|ret|] @scope ((L0005,L0033));
-
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -373,8 +351,6 @@ record [|com:android:internal:telephony:test:InterpreterEx|]  @type class @Acces
    }
     procedure [|void|] [|com:android:internal:telephony:test:InterpreterEx.<init>|] ([|com:android:internal:telephony:test:InterpreterEx|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|com:android:internal:telephony:test:InterpreterEx|] @signature [|Lcom/android/internal/telephony/test/InterpreterEx;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L09b874.   call temp:=  [|java:lang:Exception.<init>|](v0) @signature [|Ljava/lang/Exception;.<init>:()V|] @classDescriptor [|java:lang:Exception|] @type direct;
 #L09b87a.   v0.[|com:android:internal:telephony:test:InterpreterEx.result|]  := v1 @type object;
@@ -385,7 +361,6 @@ record [|com:android:internal:telephony:test:InvalidStateEx|]  @type class @Acce
    }
     procedure [|void|] [|com:android:internal:telephony:test:InvalidStateEx.<init>|] ([|com:android:internal:telephony:test:InvalidStateEx|] v0 @type (this)) @owner [|com:android:internal:telephony:test:InvalidStateEx|] @signature [|Lcom/android/internal/telephony/test/InvalidStateEx;.<init>:()V|] @Access CONSTRUCTOR {
       local temp ;
-
       
 #L09b890.   call temp:=  [|java:lang:Exception.<init>|](v0) @signature [|Ljava/lang/Exception;.<init>:()V|] @classDescriptor [|java:lang:Exception|] @type direct;
 #L09b896.   return @void ;
@@ -398,8 +373,6 @@ record [|com:android:internal:telephony:test:LineReader|]  @type class @AccessFl
       global [|int|] @@[|com:android:internal:telephony:test:LineReader.BUFFER_SIZE|]    @AccessFlag STATIC_FINAL;
     procedure [|void|] [|com:android:internal:telephony:test:LineReader.<init>|] ([|com:android:internal:telephony:test:LineReader|] v1 @type (this), [|java:io:InputStream|] v2 @type (object)) @owner [|com:android:internal:telephony:test:LineReader|] @signature [|Lcom/android/internal/telephony/test/LineReader;.<init>:(Ljava/io/InputStream;)V|] @Access CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L09b8a8.   call temp:=  [|java:lang:Object.<init>|](v1) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
@@ -412,7 +385,6 @@ record [|com:android:internal:telephony:test:LineReader|]  @type class @AccessFl
    }
     procedure [|java:lang:String|] [|com:android:internal:telephony:test:LineReader.getNextLine|] ([|com:android:internal:telephony:test:LineReader|] v1 @type (this)) @owner [|com:android:internal:telephony:test:LineReader|] @signature [|Lcom/android/internal/telephony/test/LineReader;.getNextLine:()Ljava/lang/String;|] @Access  {
       local temp ;
-
         v0;
       
 #L09b8d0.   v0:= 0  @length 4;
@@ -423,12 +395,10 @@ record [|com:android:internal:telephony:test:LineReader|]  @type class @AccessFl
    }
     procedure [|java:lang:String|] [|com:android:internal:telephony:test:LineReader.getNextLine|] ([|com:android:internal:telephony:test:LineReader|] v9 @type (this), [|boolean|] v10) @owner [|com:android:internal:telephony:test:LineReader|] @signature [|Lcom/android/internal/telephony/test/LineReader;.getNextLine:(Z)Ljava/lang/String;|] @Access  {
       local temp ;
-        [|int|] v1 @varname [|i|] @scope ((L0002,L0003), (L0003,L000c), (L000c,L000d), (L000d,L0014), (L0014,L0020), (L0020,L002f), (L002f,L0033), (L0033,L0036), (L0036,L0037), (L0037,L0039), (L0039,L004e));
-        [|int|] v3 @varname [|result|] @scope ((L0009,L000c), (L000d,L0014), (L0020,L0034), (L004a,L004e));
-        [|java:io:IOException|] v0 @varname [|ex|] @scope ((L0036,L0037), (L0039,L0041), (L0042,L004a));
-
-
+        v0;
+        v1;
         v2;
+        v3;
         v4;
         v5;
         v6;
@@ -496,7 +466,6 @@ record [|com:android:internal:telephony:test:LineReader|]  @type class @AccessFl
    }
     procedure [|java:lang:String|] [|com:android:internal:telephony:test:LineReader.getNextLineCtrlZ|] ([|com:android:internal:telephony:test:LineReader|] v1 @type (this)) @owner [|com:android:internal:telephony:test:LineReader|] @signature [|Lcom/android/internal/telephony/test/LineReader;.getNextLineCtrlZ:()Ljava/lang/String;|] @Access  {
       local temp ;
-
         v0;
       
 #L09b9cc.   v0:= 1  @length 4;
@@ -798,9 +767,6 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.<init>|] ([|com:android:internal:telephony:test:ModelInterpreter|] v1 @type (this), [|java:io:InputStream|] v2 @type (object), [|java:io:OutputStream|] v3 @type (object)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.<init>:(Ljava/io/InputStream;Ljava/io/OutputStream;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
         v0;
       
 #L09bd40.   call temp:=  [|java:lang:Object.<init>|](v1) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
@@ -815,8 +781,6 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.<init>|] ([|com:android:internal:telephony:test:ModelInterpreter|] v2 @type (this), [|java:net:InetSocketAddress|] v3 @type (object)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.<init>:(Ljava/net/InetSocketAddress;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
         v1;
       
@@ -838,8 +802,7 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.conference|] ([|com:android:internal:telephony:test:ModelInterpreter|] v3 @type (this)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.conference:()V|] @Access PRIVATE {
       local temp ;
-        [|boolean|] v0 @varname [|success|] @scope ((L0006,L0011));
-
+        v0;
         v1;
         v2;
       
@@ -856,8 +819,7 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.init|] ([|com:android:internal:telephony:test:ModelInterpreter|] v3 @type (this)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.init:()V|] @Access PRIVATE {
       local temp ;
-        [|android:os:Looper|] v0 @varname [|looper|] @scope ((L001e,L0026));
-
+        v0;
         v1;
         v2;
       
@@ -882,8 +844,7 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.onAnswer|] ([|com:android:internal:telephony:test:ModelInterpreter|] v3 @type (this)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.onAnswer:()V|] @Access PRIVATE {
       local temp ;
-        [|boolean|] v0 @varname [|success|] @scope ((L0006,L0011));
-
+        v0;
         v1;
         v2;
       
@@ -900,11 +861,9 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.onCHLD|] ([|com:android:internal:telephony:test:ModelInterpreter|] v5 @type (this), [|java:lang:String|] v6 @type (object)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.onCHLD:(Ljava/lang/String;)V|] @Access PRIVATE {
       local temp ;
-        [|char|] v0 @varname [|c0|] @scope ((L0006,L0024));
-        [|char|] v1 @varname [|c1|] @scope ((L0001,L0024));
-        [|boolean|] v2 @varname [|success|] @scope ((L0019,L0024));
-
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
       
@@ -932,10 +891,9 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.onCLCC|] ([|com:android:internal:telephony:test:ModelInterpreter|] v4 @type (this)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.onCLCC:()V|] @Access PRIVATE {
       local temp ;
-        [|int|] v0 @varname [|i|] @scope ((L0007,L001a));
-        [|java:util:List|] v1 @varname [|lines|] @scope ((L0006,L001a));
-        [|int|] v2 @varname [|s|] @scope ((L000b,L001a));
-
+        v0;
+        v1;
+        v2;
         v3;
       
 #L09bee0.   v3:= v4.[|com:android:internal:telephony:test:ModelInterpreter.simulatedCallState|]   @type object;
@@ -956,9 +914,7 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.onDial|] ([|com:android:internal:telephony:test:ModelInterpreter|] v3 @type (this), [|java:lang:String|] v4 @type (object)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.onDial:(Ljava/lang/String;)V|] @Access PRIVATE {
       local temp ;
-        [|boolean|] v0 @varname [|success|] @scope ((L000b,L0016));
-
-
+        v0;
         v1;
         v2;
       
@@ -978,8 +934,7 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.onHangup|] ([|com:android:internal:telephony:test:ModelInterpreter|] v3 @type (this)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.onHangup:()V|] @Access PRIVATE {
       local temp ;
-        [|boolean|] v0 @varname [|success|] @scope ((L0001,L0016));
-
+        v0;
         v1;
         v2;
       
@@ -999,9 +954,7 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.onSMSSend|] ([|com:android:internal:telephony:test:ModelInterpreter|] v2 @type (this), [|java:lang:String|] v3 @type (object)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.onSMSSend:(Ljava/lang/String;)V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|pdu|] @scope ((L000b,L0011));
-
-
+        v0;
         v1;
       
 #L09bf9c.   v1:= "> " @type (object, string);
@@ -1016,8 +969,7 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.releaseActiveAcceptHeldOrWaiting|] ([|com:android:internal:telephony:test:ModelInterpreter|] v3 @type (this)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.releaseActiveAcceptHeldOrWaiting:()V|] @Access PRIVATE {
       local temp ;
-        [|boolean|] v0 @varname [|success|] @scope ((L0006,L0011));
-
+        v0;
         v1;
         v2;
       
@@ -1034,8 +986,7 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.releaseHeldOrUDUB|] ([|com:android:internal:telephony:test:ModelInterpreter|] v3 @type (this)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.releaseHeldOrUDUB:()V|] @Access PRIVATE {
       local temp ;
-        [|boolean|] v0 @varname [|success|] @scope ((L0006,L0011));
-
+        v0;
         v1;
         v2;
       
@@ -1052,9 +1003,7 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.separateCall|] ([|com:android:internal:telephony:test:ModelInterpreter|] v3 @type (this), [|int|] v4) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.separateCall:(I)V|] @Access PRIVATE {
       local temp ;
-        [|boolean|] v0 @varname [|success|] @scope ((L0006,L0011));
-
-
+        v0;
         v1;
         v2;
       
@@ -1071,8 +1020,7 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.switchActiveAndHeldOrWaiting|] ([|com:android:internal:telephony:test:ModelInterpreter|] v3 @type (this)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.switchActiveAndHeldOrWaiting:()V|] @Access PRIVATE {
       local temp ;
-        [|boolean|] v0 @varname [|success|] @scope ((L0006,L0011));
-
+        v0;
         v1;
         v2;
       
@@ -1089,7 +1037,6 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.pauseResponses|] ([|com:android:internal:telephony:test:ModelInterpreter|] v2 @type (this)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.pauseResponses:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -1108,10 +1055,8 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.print|] ([|com:android:internal:telephony:test:ModelInterpreter|] v3 @type (this), [|java:lang:String|] v4 @type (object)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.print:(Ljava/lang/String;)V|] @Access  {
       local temp ;
-        [|byte|][] v0 @varname [|bytes|] @scope ((L0007,L000c));
-        [|java:io:IOException|] v1 @varname [|ex|] @scope ((L000f,L0013));
-
-
+        v0;
+        v1;
         v2;
       
 #L09c0d8.   (@monitorenter v3)
@@ -1135,10 +1080,8 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.println|] ([|com:android:internal:telephony:test:ModelInterpreter|] v4 @type (this), [|java:lang:String|] v5 @type (object)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.println:(Ljava/lang/String;)V|] @Access  {
       local temp ;
-        [|byte|][] v0 @varname [|bytes|] @scope ((L0007,L0013));
-        [|java:io:IOException|] v1 @varname [|ex|] @scope ((L0016,L001a));
-
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -1166,14 +1109,12 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.processLine|] ([|com:android:internal:telephony:test:ModelInterpreter|] v8 @type (this), [|java:lang:String|] v9 @type (object)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.processLine:(Ljava/lang/String;)V|] @Access  {
       local temp ;
-        [|java:lang:String|] v5 @varname [|r|] @scope ((L006f,L0075));
-        [|java:lang:String|] v0 @varname [|command|] @scope ((L000a,L0082));
-        [|boolean|] v2 @varname [|found|] @scope ((L0055,L0082));
-        [|int|] v4 @varname [|j|] @scope ((L0056,L0082));
-        [|java:lang:String|][] v1 @varname [|commands|] @scope ((L0004,L0083));
-        [|int|] v3 @varname [|i|] @scope ((L0005,L0083));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
         v6;
         v7;
       
@@ -1251,7 +1192,6 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.progressConnectingCallState|] ([|com:android:internal:telephony:test:ModelInterpreter|] v1 @type (this)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.progressConnectingCallState:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09c2a8.   v0:= v1.[|com:android:internal:telephony:test:ModelInterpreter.simulatedCallState|]   @type object;
@@ -1261,7 +1201,6 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.progressConnectingToActive|] ([|com:android:internal:telephony:test:ModelInterpreter|] v1 @type (this)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.progressConnectingToActive:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09c2c4.   v0:= v1.[|com:android:internal:telephony:test:ModelInterpreter.simulatedCallState|]   @type object;
@@ -1271,7 +1210,6 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.resumeResponses|] ([|com:android:internal:telephony:test:ModelInterpreter|] v2 @type (this)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.resumeResponses:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -1294,10 +1232,9 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.run|] ([|com:android:internal:telephony:test:ModelInterpreter|] v5 @type (this)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.run:()V|] @Access PUBLIC {
       local temp ;
-        [|java:net:Socket|] v2 @varname [|s|] @scope ((L000a,L001d), (L0048,L0051));
-        [|java:lang:String|] v1 @varname [|line|] @scope ((L0031,L003e), (L0051,L0087));
-        [|java:io:IOException|] v0 @varname [|ex|] @scope ((L0040,L0048), (L0049,L0051), (L0077,L007d), (L007e,L0087));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
       
@@ -1390,8 +1327,6 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.sendUnsolicited|] ([|com:android:internal:telephony:test:ModelInterpreter|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.sendUnsolicited:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09c4b0.   (@monitorenter v1)
@@ -1406,8 +1341,6 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.setAutoProgressConnectingCall|] ([|com:android:internal:telephony:test:ModelInterpreter|] v1 @type (this), [|boolean|] v2) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.setAutoProgressConnectingCall:(Z)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09c4e0.   v0:= v1.[|com:android:internal:telephony:test:ModelInterpreter.simulatedCallState|]   @type object;
@@ -1417,16 +1350,12 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.setNextCallFailCause|] ([|com:android:internal:telephony:test:ModelInterpreter|] v0 @type (this), [|int|] v1) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.setNextCallFailCause:(I)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09c4fc.   return @void ;
 
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.setNextDialFailImmediately|] ([|com:android:internal:telephony:test:ModelInterpreter|] v1 @type (this), [|boolean|] v2) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.setNextDialFailImmediately:(Z)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09c510.   v0:= v1.[|com:android:internal:telephony:test:ModelInterpreter.simulatedCallState|]   @type object;
@@ -1436,8 +1365,7 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.shutdown|] ([|com:android:internal:telephony:test:ModelInterpreter|] v2 @type (this)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.shutdown:()V|] @Access PUBLIC {
       local temp ;
-        [|android:os:Looper|] v0 @varname [|looper|] @scope ((L0006,L001a));
-
+        v0;
         v1;
       
 #L09c52c.   v1:= v2.[|com:android:internal:telephony:test:ModelInterpreter.mHandlerThread|]   @type object;
@@ -1460,9 +1388,7 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|java:lang:String|][] [|com:android:internal:telephony:test:ModelInterpreter.splitCommands|] ([|com:android:internal:telephony:test:ModelInterpreter|] v4 @type (this), [|java:lang:String|] v5 @type (object)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.splitCommands:(Ljava/lang/String;)[Ljava/lang/String;|] @Access  {
       local temp ;
-        [|java:lang:String|][] v0 @varname [|ret|] @scope ((L001e,L0025));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -1492,8 +1418,7 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.triggerHangupAll|] ([|com:android:internal:telephony:test:ModelInterpreter|] v2 @type (this)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.triggerHangupAll:()V|] @Access PUBLIC {
       local temp ;
-        [|boolean|] v0 @varname [|success|] @scope ((L0006,L000e));
-
+        v0;
         v1;
       
 #L09c5e8.   v1:= v2.[|com:android:internal:telephony:test:ModelInterpreter.simulatedCallState|]   @type object;
@@ -1507,8 +1432,7 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.triggerHangupBackground|] ([|com:android:internal:telephony:test:ModelInterpreter|] v2 @type (this)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.triggerHangupBackground:()V|] @Access PUBLIC {
       local temp ;
-        [|boolean|] v0 @varname [|success|] @scope ((L0006,L000e));
-
+        v0;
         v1;
       
 #L09c614.   v1:= v2.[|com:android:internal:telephony:test:ModelInterpreter.simulatedCallState|]   @type object;
@@ -1522,8 +1446,7 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.triggerHangupForeground|] ([|com:android:internal:telephony:test:ModelInterpreter|] v2 @type (this)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.triggerHangupForeground:()V|] @Access PUBLIC {
       local temp ;
-        [|boolean|] v0 @varname [|success|] @scope ((L0006,L000e));
-
+        v0;
         v1;
       
 #L09c640.   v1:= v2.[|com:android:internal:telephony:test:ModelInterpreter.simulatedCallState|]   @type object;
@@ -1537,26 +1460,19 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.triggerIncomingSMS|] ([|com:android:internal:telephony:test:ModelInterpreter|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.triggerIncomingSMS:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09c66c.   return @void ;
 
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.triggerIncomingUssd|] ([|com:android:internal:telephony:test:ModelInterpreter|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:String|] v2 @type (object)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.triggerIncomingUssd:(Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L09c680.   return @void ;
 
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.triggerRing|] ([|com:android:internal:telephony:test:ModelInterpreter|] v2 @type (this), [|java:lang:String|] v3 @type (object)) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.triggerRing:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-        [|boolean|] v0 @varname [|success|] @scope ((L0007,L0010));
-
-
+        v0;
         v1;
       
 #L09c694.   (@monitorenter v2)
@@ -1576,9 +1492,6 @@ record [|com:android:internal:telephony:test:ModelInterpreter|]  @type class @Ac
    }
     procedure [|void|] [|com:android:internal:telephony:test:ModelInterpreter.triggerSsn|] ([|com:android:internal:telephony:test:ModelInterpreter|] v0 @type (this), [|int|] v1, [|int|] v2) @owner [|com:android:internal:telephony:test:ModelInterpreter|] @signature [|Lcom/android/internal/telephony/test/ModelInterpreter;.triggerSsn:(II)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L09c6d8.   return @void ;
 
@@ -1635,7 +1548,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands$SimFdnState|]  @t
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands$SimFdnState.<init>|] ([|com:android:internal:telephony:test:SimulatedCommands$SimFdnState|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|int|] v2) @owner [|com:android:internal:telephony:test:SimulatedCommands$SimFdnState|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands$SimFdnState;.<init>:(Ljava/lang/String;I)V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L09c778.   call temp:=  [|java:lang:Enum.<init>|](v0, v1, v2) @signature [|Ljava/lang/Enum;.<init>:(Ljava/lang/String;I)V|] @classDescriptor [|java:lang:Enum|] @type direct;
 #L09c77e.   return @void ;
@@ -1643,7 +1555,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands$SimFdnState|]  @t
    }
     procedure [|com:android:internal:telephony:test:SimulatedCommands$SimFdnState|] [|com:android:internal:telephony:test:SimulatedCommands$SimFdnState.valueOf|] ([|java:lang:String|] v1 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands$SimFdnState|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands$SimFdnState;.valueOf:(Ljava/lang/String;)Lcom/android/internal/telephony/test/SimulatedCommands$SimFdnState;|] @Access PUBLIC_STATIC {
       local temp ;
-
         v0;
       
 #L09c790.   v0:= new [|com:android:internal:telephony:test:SimulatedCommands$SimFdnState|];
@@ -1716,7 +1627,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands$SimLockState|]  @
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands$SimLockState.<init>|] ([|com:android:internal:telephony:test:SimulatedCommands$SimLockState|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|int|] v2) @owner [|com:android:internal:telephony:test:SimulatedCommands$SimLockState|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands$SimLockState;.<init>:(Ljava/lang/String;I)V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L09c864.   call temp:=  [|java:lang:Enum.<init>|](v0, v1, v2) @signature [|Ljava/lang/Enum;.<init>:(Ljava/lang/String;I)V|] @classDescriptor [|java:lang:Enum|] @type direct;
 #L09c86a.   return @void ;
@@ -1724,7 +1634,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands$SimLockState|]  @
    }
     procedure [|com:android:internal:telephony:test:SimulatedCommands$SimLockState|] [|com:android:internal:telephony:test:SimulatedCommands$SimLockState.valueOf|] ([|java:lang:String|] v1 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands$SimLockState|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands$SimLockState;.valueOf:(Ljava/lang/String;)Lcom/android/internal/telephony/test/SimulatedCommands$SimLockState;|] @Access PUBLIC_STATIC {
       local temp ;
-
         v0;
       
 #L09c87c.   v0:= new [|com:android:internal:telephony:test:SimulatedCommands$SimLockState|];
@@ -1784,8 +1693,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.<init>|] ([|com:android:internal:telephony:test:SimulatedCommands|] v5 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-        [|android:os:Looper|] v0 @varname [|looper|] @scope ((L0027,L0059));
-
+        v0;
         v1;
         v2;
         v3;
@@ -1841,7 +1749,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|boolean|] [|com:android:internal:telephony:test:SimulatedCommands.isSimLocked|] ([|com:android:internal:telephony:test:SimulatedCommands|] v2 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.isSimLocked:()Z|] @Access PRIVATE {
       local temp ;
-
         v0;
         v1;
       
@@ -1856,9 +1763,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.resultFail|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|android:os:Message|] v2 @type (object), [|java:lang:Throwable|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.resultFail:(Landroid/os/Message;Ljava/lang/Throwable;)V|] @Access PRIVATE {
       local temp ;
-
-
-
         v0;
       
 #L09c9d0.   if v2 == 0 then goto L09c9f2;
@@ -1876,9 +1780,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.resultSuccess|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|android:os:Message|] v2 @type (object), [|java:lang:Object|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.resultSuccess:(Landroid/os/Message;Ljava/lang/Object;)V|] @Access PRIVATE {
       local temp ;
-
-
-
         v0;
       
 #L09ca0c.   if v2 == 0 then goto L09ca2e;
@@ -1896,8 +1797,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|] ([|com:android:internal:telephony:test:SimulatedCommands|] v3 @type (this), [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @Access PRIVATE {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -1920,9 +1819,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.acceptCall|] ([|com:android:internal:telephony:test:SimulatedCommands|] v3 @type (this), [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.acceptCall:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|boolean|] v0 @varname [|success|] @scope ((L0006,L0018));
-
-
+        v0;
         v1;
         v2;
       
@@ -1942,10 +1839,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.acknowledgeIncomingGsmSmsWithPdu|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|boolean|] v1, [|java:lang:String|] v2 @type (object), [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.acknowledgeIncomingGsmSmsWithPdu:(ZLjava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
       
 #L09cad4.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v3) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09cada.   return @void ;
@@ -1953,10 +1846,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.acknowledgeLastIncomingCdmaSms|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|boolean|] v1, [|int|] v2, [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.acknowledgeLastIncomingCdmaSms:(ZILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
       
 #L09caec.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v3) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09caf2.   return @void ;
@@ -1964,10 +1853,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.acknowledgeLastIncomingGsmSms|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|boolean|] v1, [|int|] v2, [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.acknowledgeLastIncomingGsmSms:(ZILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
       
 #L09cb04.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v3) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09cb0a.   return @void ;
@@ -1975,8 +1860,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.cancelPendingUssd|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.cancelPendingUssd:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09cb1c.   v0:= 0  @length 4;
@@ -1986,11 +1869,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.changeBarringPassword|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object), [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.changeBarringPassword:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
       
 #L09cb38.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v4) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09cb3e.   return @void ;
@@ -1998,11 +1876,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.changeIccPin|] ([|com:android:internal:telephony:test:SimulatedCommands|] v4 @type (this), [|java:lang:String|] v5 @type (object), [|java:lang:String|] v6 @type (object), [|android:os:Message|] v7 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.changeIccPin:(Ljava/lang/String;Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:CommandException|] v0 @varname [|ex|] @scope ((L0026,L002d));
-
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -2032,11 +1906,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.changeIccPin2|] ([|com:android:internal:telephony:test:SimulatedCommands|] v4 @type (this), [|java:lang:String|] v5 @type (object), [|java:lang:String|] v6 @type (object), [|android:os:Message|] v7 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.changeIccPin2:(Ljava/lang/String;Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:CommandException|] v0 @varname [|ex|] @scope ((L0026,L002d));
-
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -2066,11 +1936,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.changeIccPin2ForApp|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object), [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.changeIccPin2ForApp:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
       
 #L09cc28.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v4) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09cc2e.   return @void ;
@@ -2078,11 +1943,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.changeIccPinForApp|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object), [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.changeIccPinForApp:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
       
 #L09cc40.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v4) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09cc46.   return @void ;
@@ -2090,9 +1950,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.conference|] ([|com:android:internal:telephony:test:SimulatedCommands|] v4 @type (this), [|android:os:Message|] v5 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.conference:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|boolean|] v0 @varname [|success|] @scope ((L0009,L001b));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -2115,10 +1973,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.deactivateDataCall|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|int|] v1, [|int|] v2, [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.deactivateDataCall:(IILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
       
 #L09cca0.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v3) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09cca6.   return @void ;
@@ -2126,9 +1980,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.deleteSmsOnRuim|] ([|com:android:internal:telephony:test:SimulatedCommands|] v3 @type (this), [|int|] v4, [|android:os:Message|] v5 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.deleteSmsOnRuim:(ILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
         v2;
@@ -2150,9 +2001,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.deleteSmsOnSim|] ([|com:android:internal:telephony:test:SimulatedCommands|] v3 @type (this), [|int|] v4, [|android:os:Message|] v5 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.deleteSmsOnSim:(ILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
         v2;
@@ -2174,10 +2022,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.dial|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|int|] v3, [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.dial:(Ljava/lang/String;ILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
         v0;
       
 #L09cd48.   v0:= v1.[|com:android:internal:telephony:test:SimulatedCommands.simulatedCallState|]   @type object;
@@ -2189,11 +2033,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.dial|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|int|] v3, [|com:android:internal:telephony:UUSInfo|] v4 @type (object), [|android:os:Message|] v5 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.dial:(Ljava/lang/String;ILcom/android/internal/telephony/UUSInfo;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
         v0;
       
 #L09cd6c.   v0:= v1.[|com:android:internal:telephony:test:SimulatedCommands.simulatedCallState|]   @type object;
@@ -2205,8 +2044,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.exitEmergencyCallbackMode|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|android:os:Message|] v1 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.exitEmergencyCallbackMode:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09cd90.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v1) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09cd96.   return @void ;
@@ -2214,9 +2051,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.explicitCallTransfer|] ([|com:android:internal:telephony:test:SimulatedCommands|] v4 @type (this), [|android:os:Message|] v5 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.explicitCallTransfer:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|boolean|] v0 @varname [|success|] @scope ((L0009,L001b));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -2239,8 +2074,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.forceDataDormancy|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|android:os:Message|] v1 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.forceDataDormancy:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09cdf0.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v1) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09cdf6.   return @void ;
@@ -2248,8 +2081,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getAvailableNetworks|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|android:os:Message|] v1 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getAvailableNetworks:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09ce08.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v1) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09ce0e.   return @void ;
@@ -2257,8 +2088,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getBasebandVersion|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getBasebandVersion:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09ce20.   v0:= "SimulatedCommands" @type (object, string);
@@ -2268,8 +2097,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getCDMASubscription|] ([|com:android:internal:telephony:test:SimulatedCommands|] v2 @type (this), [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getCDMASubscription:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -2282,8 +2109,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getCLIR|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|android:os:Message|] v1 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getCLIR:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09ce64.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v1) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09ce6a.   return @void ;
@@ -2291,8 +2116,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getCdmaBroadcastConfig|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|android:os:Message|] v1 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getCdmaBroadcastConfig:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09ce7c.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v1) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09ce82.   return @void ;
@@ -2300,8 +2123,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getCdmaSubscriptionSource|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|android:os:Message|] v1 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getCdmaSubscriptionSource:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09ce94.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v1) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09ce9a.   return @void ;
@@ -2309,8 +2130,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getCurrentCalls|] ([|com:android:internal:telephony:test:SimulatedCommands|] v2 @type (this), [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getCurrentCalls:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -2334,8 +2153,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getDataCallList|] ([|com:android:internal:telephony:test:SimulatedCommands|] v2 @type (this), [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getDataCallList:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -2348,9 +2165,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getDataRegistrationState|] ([|com:android:internal:telephony:test:SimulatedCommands|] v4 @type (this), [|android:os:Message|] v5 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getDataRegistrationState:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|][] v0 @varname [|ret|] @scope ((L0004,L0018));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -2374,8 +2189,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getDeviceIdentity|] ([|com:android:internal:telephony:test:SimulatedCommands|] v2 @type (this), [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getDeviceIdentity:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -2388,8 +2201,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getGsmBroadcastConfig|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|android:os:Message|] v1 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getGsmBroadcastConfig:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09cf8c.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v1) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09cf92.   return @void ;
@@ -2397,8 +2208,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getIMEI|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getIMEI:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09cfa4.   v0:= "012345678901234" @type (object, string);
@@ -2408,8 +2217,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getIMEISV|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getIMEISV:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09cfc0.   v0:= "99" @type (object, string);
@@ -2419,8 +2226,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getIMSI|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getIMSI:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09cfdc.   v0:= 0  @length 4;
@@ -2430,9 +2235,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getIMSIForApp|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getIMSIForApp:(Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L09cff8.   v0:= "012345678901234" @type (object, string);
@@ -2442,8 +2244,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getIccCardStatus|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|android:os:Message|] v1 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getIccCardStatus:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09d014.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v1) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09d01a.   return @void ;
@@ -2451,9 +2251,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getLastCallFailCause|] ([|com:android:internal:telephony:test:SimulatedCommands|] v3 @type (this), [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getLastCallFailCause:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|int|][] v0 @varname [|ret|] @scope ((L0003,L000c));
-
-
+        v0;
         v1;
         v2;
       
@@ -2468,8 +2266,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getLastDataCallFailCause|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|android:os:Message|] v1 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getLastDataCallFailCause:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09d054.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v1) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09d05a.   return @void ;
@@ -2477,8 +2273,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getLastPdpFailCause|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|android:os:Message|] v1 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getLastPdpFailCause:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09d06c.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v1) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09d072.   return @void ;
@@ -2486,8 +2280,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getMute|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|android:os:Message|] v1 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getMute:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09d084.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v1) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09d08a.   return @void ;
@@ -2495,10 +2287,8 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getNeighboringCids|] ([|com:android:internal:telephony:test:SimulatedCommands|] v5 @type (this), [|android:os:Message|] v6 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getNeighboringCids:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|int|] v0 @varname [|i|] @scope ((L0008,L0013));
-        [|int|][] v1 @varname [|ret|] @scope ((L0003,L0013));
-
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -2519,9 +2309,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getNetworkSelectionMode|] ([|com:android:internal:telephony:test:SimulatedCommands|] v3 @type (this), [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getNetworkSelectionMode:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|int|][] v0 @varname [|ret|] @scope ((L0004,L000a));
-
-
+        v0;
         v1;
         v2;
       
@@ -2535,9 +2323,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getOperator|] ([|com:android:internal:telephony:test:SimulatedCommands|] v3 @type (this), [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getOperator:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|][] v0 @varname [|ret|] @scope ((L0003,L0016));
-
-
+        v0;
         v1;
         v2;
       
@@ -2558,8 +2344,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getPDPContextList|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|android:os:Message|] v1 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getPDPContextList:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09d134.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.getDataCallList|](v0, v1) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getDataCallList:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type virtual;
 #L09d13a.   return @void ;
@@ -2567,9 +2351,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getPreferredNetworkType|] ([|com:android:internal:telephony:test:SimulatedCommands|] v3 @type (this), [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getPreferredNetworkType:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|int|][] v0 @varname [|ret|] @scope ((L0003,L000c));
-
-
+        v0;
         v1;
         v2;
       
@@ -2584,8 +2366,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getPreferredVoicePrivacy|] ([|com:android:internal:telephony:test:SimulatedCommands|] v2 @type (this), [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getPreferredVoicePrivacy:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -2598,9 +2378,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getSignalStrength|] ([|com:android:internal:telephony:test:SimulatedCommands|] v3 @type (this), [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getSignalStrength:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|int|][] v0 @varname [|ret|] @scope ((L0004,L000f));
-
-
+        v0;
         v1;
         v2;
       
@@ -2617,8 +2395,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getSmscAddress|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|android:os:Message|] v1 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getSmscAddress:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09d1cc.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v1) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09d1d2.   return @void ;
@@ -2626,8 +2402,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getVoiceRadioTechnology|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|android:os:Message|] v1 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getVoiceRadioTechnology:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09d1e4.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v1) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09d1ea.   return @void ;
@@ -2635,9 +2409,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.getVoiceRegistrationState|] ([|com:android:internal:telephony:test:SimulatedCommands|] v4 @type (this), [|android:os:Message|] v5 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.getVoiceRegistrationState:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|][] v0 @varname [|ret|] @scope ((L0005,L003b));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -2680,9 +2452,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.handleCallSetupRequestFromSim|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|boolean|] v2, [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.handleCallSetupRequestFromSim:(ZLandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L09d284.   v0:= 0  @length 4;
@@ -2692,10 +2461,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.hangupConnection|] ([|com:android:internal:telephony:test:SimulatedCommands|] v4 @type (this), [|int|] v5, [|android:os:Message|] v6 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.hangupConnection:(ILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|boolean|] v0 @varname [|success|] @scope ((L000b,L002b));
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -2725,9 +2491,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.hangupForegroundResumeBackground|] ([|com:android:internal:telephony:test:SimulatedCommands|] v4 @type (this), [|android:os:Message|] v5 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.hangupForegroundResumeBackground:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|boolean|] v0 @varname [|success|] @scope ((L0009,L001b));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -2750,9 +2514,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.hangupWaitingOrBackground|] ([|com:android:internal:telephony:test:SimulatedCommands|] v4 @type (this), [|android:os:Message|] v5 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.hangupWaitingOrBackground:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|boolean|] v0 @varname [|success|] @scope ((L0009,L001b));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -2775,16 +2537,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.iccIO|] ([|com:android:internal:telephony:test:SimulatedCommands|] v11 @type (this), [|int|] v12, [|int|] v13, [|java:lang:String|] v14 @type (object), [|int|] v15, [|int|] v16, [|int|] v17, [|java:lang:String|] v18 @type (object), [|java:lang:String|] v19 @type (object), [|android:os:Message|] v20 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.iccIO:(IILjava/lang/String;IIILjava/lang/String;Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
-
-
-
-
-
         v0;
         v1;
         v2;
@@ -2814,17 +2566,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.iccIOForApp|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|int|] v1, [|int|] v2, [|java:lang:String|] v3 @type (object), [|int|] v4, [|int|] v5, [|int|] v6, [|java:lang:String|] v7 @type (object), [|java:lang:String|] v8 @type (object), [|java:lang:String|] v9 @type (object), [|android:os:Message|] v10 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.iccIOForApp:(IILjava/lang/String;IIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
-
-
-
-
-
-
       
 #L09d3d0.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v10) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09d3d6.   return @void ;
@@ -2832,9 +2573,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.invokeOemRilRequestRaw|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|byte|][] v2, [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.invokeOemRilRequestRaw:([BLandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L09d3e8.   if v3 == 0 then goto L09d3fe;
@@ -2847,9 +2585,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.invokeOemRilRequestStrings|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|java:lang:String|][] v2 @type (object), [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.invokeOemRilRequestStrings:([Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L09d410.   if v3 == 0 then goto L09d426;
@@ -2862,7 +2597,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.pauseResponses|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.pauseResponses:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09d438.   v0:= v1.[|com:android:internal:telephony:test:SimulatedCommands.pausedResponseCount|] ;
@@ -2873,7 +2607,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.progressConnectingCallState|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.progressConnectingCallState:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09d458.   v0:= v1.[|com:android:internal:telephony:test:SimulatedCommands.simulatedCallState|]   @type object;
@@ -2885,7 +2618,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.progressConnectingToActive|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.progressConnectingToActive:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09d480.   v0:= v1.[|com:android:internal:telephony:test:SimulatedCommands.simulatedCallState|]   @type object;
@@ -2897,9 +2629,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.queryAvailableBandMode|] ([|com:android:internal:telephony:test:SimulatedCommands|] v5 @type (this), [|android:os:Message|] v6 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.queryAvailableBandMode:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|int|][] v0 @varname [|ret|] @scope ((L0005,L0013));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -2921,8 +2651,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.queryCLIP|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|android:os:Message|] v1 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.queryCLIP:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09d4e0.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v1) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09d4e6.   return @void ;
@@ -2930,11 +2658,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.queryCallForwardStatus|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|int|] v1, [|int|] v2, [|java:lang:String|] v3 @type (object), [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.queryCallForwardStatus:(IILjava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
       
 #L09d4f8.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v4) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09d4fe.   return @void ;
@@ -2942,9 +2665,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.queryCallWaiting|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|int|] v1, [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.queryCallWaiting:(ILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L09d510.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v2) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09d516.   return @void ;
@@ -2952,8 +2672,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.queryCdmaRoamingPreference|] ([|com:android:internal:telephony:test:SimulatedCommands|] v2 @type (this), [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.queryCdmaRoamingPreference:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -2966,11 +2684,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.queryFacilityLock|] ([|com:android:internal:telephony:test:SimulatedCommands|] v6 @type (this), [|java:lang:String|] v7 @type (object), [|java:lang:String|] v8 @type (object), [|int|] v9, [|android:os:Message|] v10 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.queryFacilityLock:(Ljava/lang/String;Ljava/lang/String;ILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
         v0;
         v1;
         v2;
@@ -2990,13 +2703,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.queryFacilityLockForApp|] ([|com:android:internal:telephony:test:SimulatedCommands|] v6 @type (this), [|java:lang:String|] v7 @type (object), [|java:lang:String|] v8 @type (object), [|int|] v9, [|java:lang:String|] v10 @type (object), [|android:os:Message|] v11 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.queryFacilityLockForApp:(Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|int|][] v0 @varname [|r|] @scope ((L0011,L003b), (L003c,L0041), (L004f,L007f));
-
-
-
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -3074,8 +2781,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.queryTTYMode|] ([|com:android:internal:telephony:test:SimulatedCommands|] v2 @type (this), [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.queryTTYMode:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -3088,9 +2793,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.rejectCall|] ([|com:android:internal:telephony:test:SimulatedCommands|] v4 @type (this), [|android:os:Message|] v5 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.rejectCall:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|boolean|] v0 @varname [|success|] @scope ((L0009,L001b));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -3113,9 +2816,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.reportSmsMemoryStatus|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|boolean|] v1, [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.reportSmsMemoryStatus:(ZLandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L09d6fc.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v2) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09d702.   return @void ;
@@ -3123,8 +2823,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.reportStkServiceIsRunning|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.reportStkServiceIsRunning:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09d714.   v0:= 0  @length 4;
@@ -3134,9 +2832,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.requestIsimAuthentication|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.requestIsimAuthentication:(Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L09d730.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v2) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09d736.   return @void ;
@@ -3144,8 +2839,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.resetRadio|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|android:os:Message|] v1 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.resetRadio:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09d748.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v1) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09d74e.   return @void ;
@@ -3153,9 +2846,8 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.resumeResponses|] ([|com:android:internal:telephony:test:SimulatedCommands|] v4 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.resumeResponses:()V|] @Access PUBLIC {
       local temp ;
-        [|int|] v0 @varname [|i|] @scope ((L000b,L0026));
-        [|int|] v1 @varname [|s|] @scope ((L0011,L0026));
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -3187,11 +2879,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.sendBurstDtmf|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|int|] v3, [|int|] v4, [|android:os:Message|] v5 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.sendBurstDtmf:(Ljava/lang/String;IILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
         v0;
       
 #L09d7d0.   v0:= 0  @length 4;
@@ -3201,9 +2888,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.sendCDMAFeatureCode|] ([|com:android:internal:telephony:test:SimulatedCommands|] v2 @type (this), [|java:lang:String|] v3 @type (object), [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.sendCDMAFeatureCode:(Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -3216,9 +2900,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.sendCdmaSms|] ([|com:android:internal:telephony:test:SimulatedCommands|] v2 @type (this), [|byte|][] v3, [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.sendCdmaSms:([BLandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -3230,9 +2911,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.sendDtmf|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|char|] v2, [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.sendDtmf:(CLandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L09d834.   v0:= 0  @length 4;
@@ -3242,9 +2920,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.sendEnvelope|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.sendEnvelope:(Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L09d850.   v0:= 0  @length 4;
@@ -3254,9 +2929,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.sendEnvelopeWithStatus|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.sendEnvelopeWithStatus:(Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L09d86c.   v0:= 0  @length 4;
@@ -3266,10 +2938,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.sendSMS|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:String|] v2 @type (object), [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.sendSMS:(Ljava/lang/String;Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
       
 #L09d888.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v3) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09d88e.   return @void ;
@@ -3277,9 +2945,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.sendTerminalResponse|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.sendTerminalResponse:(Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L09d8a0.   v0:= 0  @length 4;
@@ -3289,9 +2954,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.sendUSSD|] ([|com:android:internal:telephony:test:SimulatedCommands|] v2 @type (this), [|java:lang:String|] v3 @type (object), [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.sendUSSD:(Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -3314,11 +2976,8 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.separateConnection|] ([|com:android:internal:telephony:test:SimulatedCommands|] v4 @type (this), [|int|] v5, [|android:os:Message|] v6 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.separateConnection:(ILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|char|] v0 @varname [|ch|] @scope ((L0003,L001d));
-        [|boolean|] v1 @varname [|success|] @scope ((L000b,L001d));
-
-
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -3341,8 +3000,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setAutoProgressConnectingCall|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|boolean|] v2) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setAutoProgressConnectingCall:(Z)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09d958.   v0:= v1.[|com:android:internal:telephony:test:SimulatedCommands.simulatedCallState|]   @type object;
@@ -3352,9 +3009,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setBandMode|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|int|] v2, [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setBandMode:(ILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L09d974.   v0:= 0  @length 4;
@@ -3364,9 +3018,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setCLIR|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|int|] v1, [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setCLIR:(ILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L09d990.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v2) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09d996.   return @void ;
@@ -3374,13 +3025,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setCallForward|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|int|] v1, [|int|] v2, [|int|] v3, [|java:lang:String|] v4 @type (object), [|int|] v5, [|android:os:Message|] v6 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setCallForward:(IIILjava/lang/String;ILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
-
-
       
 #L09d9a8.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v6) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09d9ae.   return @void ;
@@ -3388,10 +3032,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setCallWaiting|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|boolean|] v1, [|int|] v2, [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setCallWaiting:(ZILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
       
 #L09d9c0.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v3) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09d9c6.   return @void ;
@@ -3399,9 +3039,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setCdmaBroadcastActivation|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|boolean|] v1, [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setCdmaBroadcastActivation:(ZLandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L09d9d8.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v2) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09d9de.   return @void ;
@@ -3409,9 +3046,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setCdmaBroadcastConfig|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|int|][] v1, [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setCdmaBroadcastConfig:([ILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L09d9f0.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v2) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09d9f6.   return @void ;
@@ -3419,9 +3053,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setCdmaRoamingPreference|] ([|com:android:internal:telephony:test:SimulatedCommands|] v2 @type (this), [|int|] v3, [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setCdmaRoamingPreference:(ILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -3434,9 +3065,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setCdmaSubscriptionSource|] ([|com:android:internal:telephony:test:SimulatedCommands|] v2 @type (this), [|int|] v3, [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setCdmaSubscriptionSource:(ILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -3449,12 +3077,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setFacilityLock|] ([|com:android:internal:telephony:test:SimulatedCommands|] v7 @type (this), [|java:lang:String|] v8 @type (object), [|boolean|] v9, [|java:lang:String|] v10 @type (object), [|int|] v11, [|android:os:Message|] v12 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setFacilityLock:(Ljava/lang/String;ZLjava/lang/String;ILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
-
         v0;
         v1;
         v2;
@@ -3476,14 +3098,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setFacilityLockForApp|] ([|com:android:internal:telephony:test:SimulatedCommands|] v4 @type (this), [|java:lang:String|] v5 @type (object), [|boolean|] v6, [|java:lang:String|] v7 @type (object), [|int|] v8, [|java:lang:String|] v9 @type (object), [|android:os:Message|] v10 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setFacilityLockForApp:(Ljava/lang/String;ZLjava/lang/String;ILjava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:CommandException|] v0 @varname [|ex|] @scope ((L0037,L003e), (L0074,L007b));
-
-
-
-
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -3551,9 +3166,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setGsmBroadcastActivation|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|boolean|] v1, [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setGsmBroadcastActivation:(ZLandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L09db90.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v2) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09db96.   return @void ;
@@ -3561,9 +3173,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setGsmBroadcastConfig|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|com:android:internal:telephony:gsm:SmsBroadcastConfigInfo|][] v1 @type (object), [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setGsmBroadcastConfig:([Lcom/android/internal/telephony/gsm/SmsBroadcastConfigInfo;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L09dba8.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v2) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09dbae.   return @void ;
@@ -3571,9 +3180,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setLocationUpdates|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|boolean|] v1, [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setLocationUpdates:(ZLandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L09dbc0.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v2) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09dbc6.   return @void ;
@@ -3581,9 +3187,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setMute|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|boolean|] v1, [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setMute:(ZLandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L09dbd8.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v2) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09dbde.   return @void ;
@@ -3591,8 +3194,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setNetworkSelectionModeAutomatic|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|android:os:Message|] v1 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setNetworkSelectionModeAutomatic:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09dbf0.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v1) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09dbf6.   return @void ;
@@ -3600,9 +3201,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setNetworkSelectionModeManual|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setNetworkSelectionModeManual:(Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L09dc08.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v2) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09dc0e.   return @void ;
@@ -3610,8 +3208,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setNextCallFailCause|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|int|] v1) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setNextCallFailCause:(I)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09dc20.   v0.[|com:android:internal:telephony:test:SimulatedCommands.nextCallFailCause|]  := v1;
 #L09dc24.   return @void ;
@@ -3619,8 +3215,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setNextDialFailImmediately|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|boolean|] v2) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setNextDialFailImmediately:(Z)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09dc38.   v0:= v1.[|com:android:internal:telephony:test:SimulatedCommands.simulatedCallState|]   @type object;
@@ -3630,8 +3224,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setPhoneType|] ([|com:android:internal:telephony:test:SimulatedCommands|] v2 @type (this), [|int|] v3) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setPhoneType:(I)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -3643,9 +3235,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setPreferredNetworkType|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|int|] v2, [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setPreferredNetworkType:(ILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L09dc74.   v1.[|com:android:internal:telephony:test:SimulatedCommands.mNetworkType|]  := v2;
@@ -3656,9 +3245,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setPreferredVoicePrivacy|] ([|com:android:internal:telephony:test:SimulatedCommands|] v2 @type (this), [|boolean|] v3, [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setPreferredVoicePrivacy:(ZLandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -3671,9 +3257,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setRadioPower|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|boolean|] v2, [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setRadioPower:(ZLandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L09dcbc.   if v2 == 0 then goto L09dccc;
@@ -3687,9 +3270,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setSmscAddress|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setSmscAddress:(Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L09dce8.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v2) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09dcee.   return @void ;
@@ -3697,9 +3277,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setSuppServiceNotifications|] ([|com:android:internal:telephony:test:SimulatedCommands|] v2 @type (this), [|boolean|] v3, [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setSuppServiceNotifications:(ZLandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -3717,9 +3294,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setTTYMode|] ([|com:android:internal:telephony:test:SimulatedCommands|] v2 @type (this), [|int|] v3, [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setTTYMode:(ILandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -3732,15 +3306,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.setupDataCall|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object), [|java:lang:String|] v4 @type (object), [|java:lang:String|] v5 @type (object), [|java:lang:String|] v6 @type (object), [|java:lang:String|] v7 @type (object), [|android:os:Message|] v8 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.setupDataCall:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
-
-
-
-
       
 #L09dd60.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v8) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09dd66.   return @void ;
@@ -3748,8 +3313,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.shutdown|] ([|com:android:internal:telephony:test:SimulatedCommands|] v2 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.shutdown:()V|] @Access PUBLIC {
       local temp ;
-        [|android:os:Looper|] v0 @varname [|looper|] @scope ((L000b,L0011));
-
+        v0;
         v1;
       
 #L09dd78.   v1:= @@[|com:android:internal:telephony:CommandsInterface$RadioState.RADIO_UNAVAILABLE|]   @type object;
@@ -3764,9 +3328,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.startDtmf|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|char|] v2, [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.startDtmf:(CLandroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L09ddac.   v0:= 0  @length 4;
@@ -3776,8 +3337,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.stopDtmf|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.stopDtmf:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09ddc8.   v0:= 0  @length 4;
@@ -3787,10 +3346,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.supplyIccPin|] ([|com:android:internal:telephony:test:SimulatedCommands|] v5 @type (this), [|java:lang:String|] v6 @type (object), [|android:os:Message|] v7 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.supplyIccPin:(Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:CommandException|] v0 @varname [|ex|] @scope ((L0028,L002e), (L008e,L0095));
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -3870,10 +3426,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.supplyIccPin2|] ([|com:android:internal:telephony:test:SimulatedCommands|] v5 @type (this), [|java:lang:String|] v6 @type (object), [|android:os:Message|] v7 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.supplyIccPin2:(Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:CommandException|] v0 @varname [|ex|] @scope ((L0028,L002e), (L0089,L0090));
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -3951,10 +3504,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.supplyIccPin2ForApp|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:String|] v2 @type (object), [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.supplyIccPin2ForApp:(Ljava/lang/String;Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
       
 #L09e050.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v3) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09e056.   return @void ;
@@ -3962,10 +3511,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.supplyIccPinForApp|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:String|] v2 @type (object), [|android:os:Message|] v3 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.supplyIccPinForApp:(Ljava/lang/String;Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
       
 #L09e068.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v3) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09e06e.   return @void ;
@@ -3973,11 +3518,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.supplyIccPuk|] ([|com:android:internal:telephony:test:SimulatedCommands|] v5 @type (this), [|java:lang:String|] v6 @type (object), [|java:lang:String|] v7 @type (object), [|android:os:Message|] v8 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.supplyIccPuk:(Ljava/lang/String;Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:CommandException|] v0 @varname [|ex|] @scope ((L0028,L002e), (L008f,L0096));
-
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -4057,11 +3598,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.supplyIccPuk2|] ([|com:android:internal:telephony:test:SimulatedCommands|] v5 @type (this), [|java:lang:String|] v6 @type (object), [|java:lang:String|] v7 @type (object), [|android:os:Message|] v8 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.supplyIccPuk2:(Ljava/lang/String;Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:CommandException|] v0 @varname [|ex|] @scope ((L0028,L002e), (L008a,L0091));
-
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -4139,11 +3676,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.supplyIccPuk2ForApp|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object), [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.supplyIccPuk2ForApp:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
       
 #L09e2f0.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v4) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09e2f6.   return @void ;
@@ -4151,11 +3683,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.supplyIccPukForApp|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object), [|android:os:Message|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.supplyIccPukForApp:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
       
 #L09e308.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v4) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09e30e.   return @void ;
@@ -4163,9 +3690,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.supplyNetworkDepersonalization|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.supplyNetworkDepersonalization:(Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L09e320.   call temp:=  [|com:android:internal:telephony:test:SimulatedCommands.unimplemented|](v0, v2) @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.unimplemented:(Landroid/os/Message;)V|] @classDescriptor [|com:android:internal:telephony:test:SimulatedCommands|] @type direct;
 #L09e326.   return @void ;
@@ -4173,9 +3697,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.switchWaitingOrHoldingAndActive|] ([|com:android:internal:telephony:test:SimulatedCommands|] v4 @type (this), [|android:os:Message|] v5 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.switchWaitingOrHoldingAndActive:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|boolean|] v0 @varname [|success|] @scope ((L0009,L001b));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -4198,7 +3720,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.triggerHangupAll|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.triggerHangupAll:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09e380.   v0:= v1.[|com:android:internal:telephony:test:SimulatedCommands.simulatedCallState|]   @type object;
@@ -4210,7 +3731,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.triggerHangupBackground|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.triggerHangupBackground:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09e3a8.   v0:= v1.[|com:android:internal:telephony:test:SimulatedCommands.simulatedCallState|]   @type object;
@@ -4222,7 +3742,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.triggerHangupForeground|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.triggerHangupForeground:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09e3d0.   v0:= v1.[|com:android:internal:telephony:test:SimulatedCommands.simulatedCallState|]   @type object;
@@ -4234,18 +3753,13 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.triggerIncomingSMS|] ([|com:android:internal:telephony:test:SimulatedCommands|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.triggerIncomingSMS:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09e3f8.   return @void ;
 
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.triggerIncomingUssd|] ([|com:android:internal:telephony:test:SimulatedCommands|] v2 @type (this), [|java:lang:String|] v3 @type (object), [|java:lang:String|] v4 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.triggerIncomingUssd:(Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|][] v0 @varname [|result|] @scope ((L000d,L0012));
-
-
-
+        v0;
         v1;
       
 #L09e40c.   v1:= v2.[|com:android:internal:telephony:test:SimulatedCommands.mUSSDRegistrant|]   @type object;
@@ -4263,8 +3777,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.triggerRing|] ([|com:android:internal:telephony:test:SimulatedCommands|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.triggerRing:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09e444.   v0:= v1.[|com:android:internal:telephony:test:SimulatedCommands.simulatedCallState|]   @type object;
@@ -4276,10 +3788,7 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.triggerSsn|] ([|com:android:internal:telephony:test:SimulatedCommands|] v4 @type (this), [|int|] v5, [|int|] v6) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.triggerSsn:(II)V|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:gsm:SuppServiceNotification|] v0 @varname [|not|] @scope ((L0006,L0015));
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -4298,10 +3807,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.writeSmsToRuim|] ([|com:android:internal:telephony:test:SimulatedCommands|] v3 @type (this), [|int|] v4, [|java:lang:String|] v5 @type (object), [|android:os:Message|] v6 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.writeSmsToRuim:(ILjava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
         v0;
         v1;
         v2;
@@ -4323,11 +3828,6 @@ record [|com:android:internal:telephony:test:SimulatedCommands|]  @type class @A
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedCommands.writeSmsToSim|] ([|com:android:internal:telephony:test:SimulatedCommands|] v3 @type (this), [|int|] v4, [|java:lang:String|] v5 @type (object), [|java:lang:String|] v6 @type (object), [|android:os:Message|] v7 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedCommands|] @signature [|Lcom/android/internal/telephony/test/SimulatedCommands;.writeSmsToSim:(ILjava/lang/String;Ljava/lang/String;Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
         v0;
         v1;
         v2;
@@ -4357,8 +3857,6 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
       global [|int|] @@[|com:android:internal:telephony:test:SimulatedGsmCallState.MAX_CALLS|]    @AccessFlag STATIC_FINAL;
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedGsmCallState.<init>|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v1 @type (this), [|android:os:Looper|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.<init>:(Landroid/os/Looper;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L09e538.   call temp:=  [|android:os:Handler.<init>|](v1, v2) @signature [|Landroid/os/Handler;.<init>:(Landroid/os/Looper;)V|] @classDescriptor [|android:os:Handler|] @type direct;
@@ -4372,16 +3870,15 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|int|] [|com:android:internal:telephony:test:SimulatedGsmCallState.countActiveLines|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v13 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.countActiveLines:()I|] @Access PRIVATE {
       local temp ;
-        [|com:android:internal:telephony:test:CallInfo|] v0 @varname [|call|] @scope ((L0012,L007b));
-        [|boolean|] v1 @varname [|hasActive|] @scope ((L0005,L008d));
-        [|boolean|] v2 @varname [|hasConnecting|] @scope ((L0006,L008d));
-        [|boolean|] v3 @varname [|hasHeld|] @scope ((L0004,L008d));
-        [|boolean|] v4 @varname [|hasMpty|] @scope ((L0003,L008d));
-        [|boolean|] v5 @varname [|hasRinging|] @scope ((L0007,L008d));
-        [|int|] v6 @varname [|i|] @scope ((L0009,L008d));
-        [|boolean|] v7 @varname [|mptyIsHeld|] @scope ((L0008,L008d));
-        [|int|] v8 @varname [|ret|] @scope ((L007c,L008d));
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
         v9;
         v10;
         v11;
@@ -4474,10 +3971,9 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|boolean|] [|com:android:internal:telephony:test:SimulatedGsmCallState.conference|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v5 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.conference:()Z|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:test:CallInfo|] v0 @varname [|c|] @scope ((L000c,L0017), (L0018,L001b), (L0025,L0032));
-        [|int|] v1 @varname [|countCalls|] @scope ((L0002,L0032));
-        [|int|] v2 @varname [|i|] @scope ((L0003,L0032));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
       
@@ -4515,10 +4011,9 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|boolean|] [|com:android:internal:telephony:test:SimulatedGsmCallState.explicitCallTransfer|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v4 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.explicitCallTransfer:()Z|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:test:CallInfo|] v0 @varname [|c|] @scope ((L000b,L0016), (L0017,L001a));
-        [|int|] v1 @varname [|countCalls|] @scope ((L0001,L001f));
-        [|int|] v2 @varname [|i|] @scope ((L0002,L001f));
-
+        v0;
+        v1;
+        v2;
         v3;
       
 #L09e700.   v1:= 0  @length 4;
@@ -4544,10 +4039,9 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|java:util:List|] [|com:android:internal:telephony:test:SimulatedGsmCallState.getClccLines|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v4 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.getClccLines:()Ljava/util/List;|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:test:CallInfo|] v0 @varname [|c|] @scope ((L0012,L0020));
-        [|int|] v1 @varname [|i|] @scope ((L0009,L0021));
-        [|java:util:ArrayList|] v2 @varname [|ret|] @scope ((L0008,L0021));
-
+        v0;
+        v1;
+        v2;
         v3;
       
 #L09e750.   v2:= new [|java:util:ArrayList|];
@@ -4572,11 +4066,10 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|java:util:List|] [|com:android:internal:telephony:test:SimulatedGsmCallState.getDriverCalls|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v7 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.getDriverCalls:()Ljava/util/List;|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:DriverCall|] v1 @varname [|dc|] @scope ((L001a,L001d));
-        [|com:android:internal:telephony:test:CallInfo|] v0 @varname [|c|] @scope ((L0012,L0020));
-        [|int|] v2 @varname [|i|] @scope ((L0009,L0039));
-        [|java:util:ArrayList|] v3 @varname [|ret|] @scope ((L0008,L0039));
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -4614,8 +4107,6 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedGsmCallState.handleMessage|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v1 @type (this), [|android:os:Message|] v2 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.handleMessage:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09e828.   (@monitorenter v1)
@@ -4637,9 +4128,8 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|boolean|] [|com:android:internal:telephony:test:SimulatedGsmCallState.onAnswer|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v4 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.onAnswer:()Z|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:test:CallInfo|] v0 @varname [|call|] @scope ((L000b,L001e), (L001f,L0022));
-        [|int|] v1 @varname [|i|] @scope ((L0002,L0028));
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -4674,11 +4164,8 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|boolean|] [|com:android:internal:telephony:test:SimulatedGsmCallState.onChld|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v4 @type (this), [|char|] v5, [|char|] v6) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.onChld:(CC)Z|] @Access PUBLIC {
       local temp ;
-        [|boolean|] v1 @varname [|ret|] @scope ((L0012,L0013), (L0017,L0018), (L001e,L001f), (L0026,L0027), (L002d,L002e), (L0034,L0035), (L0039,L003a), (L003e,L003f), (L0043,L0044), (L0045,L0056));
-        [|int|] v0 @varname [|callIndex|] @scope ((L0001,L0056));
-
-
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -4738,12 +4225,10 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|boolean|] [|com:android:internal:telephony:test:SimulatedGsmCallState.onDial|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v9 @type (this), [|java:lang:String|] v10 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.onDial:(Ljava/lang/String;)Z|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:test:InvalidStateEx|] v0 @varname [|ex|] @scope ((L0069,L0071));
-        [|int|] v1 @varname [|freeSlot|] @scope ((L0003,L00f8));
-        [|int|] v2 @varname [|i|] @scope ((L0072,L00f8));
-        [|java:lang:String|] v3 @varname [|phNum|] @scope ((L0033,L00f8));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -4881,10 +4366,9 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|boolean|] [|com:android:internal:telephony:test:SimulatedGsmCallState.onHangup|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v5 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.onHangup:()Z|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:test:CallInfo|] v0 @varname [|call|] @scope ((L000b,L001c));
-        [|boolean|] v1 @varname [|found|] @scope ((L0001,L001d));
-        [|int|] v2 @varname [|i|] @scope ((L0002,L001d));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
       
@@ -4910,9 +4394,8 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedGsmCallState.progressConnectingCallState|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v5 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.progressConnectingCallState:()V|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:test:CallInfo|] v0 @varname [|call|] @scope ((L000b,L0025), (L0027,L0034), (L0037,L003a));
-        [|int|] v1 @varname [|i|] @scope ((L0002,L003a));
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -4956,9 +4439,8 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedGsmCallState.progressConnectingToActive|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v4 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.progressConnectingToActive:()V|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:test:CallInfo|] v0 @varname [|call|] @scope ((L000b,L001d), (L001f,L0022));
-        [|int|] v1 @varname [|i|] @scope ((L0002,L0025));
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -4990,11 +4472,10 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|boolean|] [|com:android:internal:telephony:test:SimulatedGsmCallState.releaseActiveAcceptHeldOrWaiting|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v8 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.releaseActiveAcceptHeldOrWaiting:()Z|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:test:CallInfo|] v0 @varname [|c|] @scope ((L000e,L001e), (L002a,L0040), (L004a,L005a), (L0067,L0077));
-        [|boolean|] v1 @varname [|foundActive|] @scope ((L0004,L0077));
-        [|boolean|] v2 @varname [|foundHeld|] @scope ((L0003,L0077));
-        [|int|] v3 @varname [|i|] @scope ((L0005,L0077));
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -5074,10 +4555,9 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|boolean|] [|com:android:internal:telephony:test:SimulatedGsmCallState.releaseHeldOrUDUB|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v6 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.releaseHeldOrUDUB:()Z|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:test:CallInfo|] v0 @varname [|c|] @scope ((L000c,L0019), (L0025,L0038));
-        [|boolean|] v1 @varname [|found|] @scope ((L0002,L003a));
-        [|int|] v2 @varname [|i|] @scope ((L0003,L003a));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -5121,14 +4601,12 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|boolean|] [|com:android:internal:telephony:test:SimulatedGsmCallState.separateCall|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v10 @type (this), [|int|] v11) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.separateCall:(I)Z|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:test:CallInfo|] v0 @varname [|c|] @scope ((L0006,L0015), (L0016,L0046));
-        [|com:android:internal:telephony:test:CallInfo|] v1 @varname [|cb|] @scope ((L002b,L003a));
-        [|int|] v2 @varname [|countHeld|] @scope ((L0024,L0046));
-        [|int|] v4 @varname [|i|] @scope ((L001e,L0046));
-        [|int|] v5 @varname [|lastHeld|] @scope ((L0025,L0046));
-        [|com:android:internal:telephony:test:InvalidStateEx|] v3 @varname [|ex|] @scope ((L0047,L0049));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
         v6;
         v7;
         v8;
@@ -5183,8 +4661,6 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedGsmCallState.setAutoProgressConnectingCall|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v0 @type (this), [|boolean|] v1) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.setAutoProgressConnectingCall:(Z)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09ef24.   v0.[|com:android:internal:telephony:test:SimulatedGsmCallState.autoProgressConnecting|]  := v1 @boolean;
 #L09ef28.   return @void ;
@@ -5192,8 +4668,6 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|void|] [|com:android:internal:telephony:test:SimulatedGsmCallState.setNextDialFailImmediately|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v0 @type (this), [|boolean|] v1) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.setNextDialFailImmediately:(Z)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09ef3c.   v0.[|com:android:internal:telephony:test:SimulatedGsmCallState.nextDialFailImmediately|]  := v1 @boolean;
 #L09ef40.   return @void ;
@@ -5201,10 +4675,9 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|boolean|] [|com:android:internal:telephony:test:SimulatedGsmCallState.switchActiveAndHeldOrWaiting|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v5 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.switchActiveAndHeldOrWaiting:()Z|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:test:CallInfo|] v0 @varname [|c|] @scope ((L000b,L0014), (L001e,L0048));
-        [|boolean|] v1 @varname [|hasHeld|] @scope ((L0001,L004a));
-        [|int|] v2 @varname [|i|] @scope ((L0002,L004a));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
       
@@ -5255,10 +4728,9 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|boolean|] [|com:android:internal:telephony:test:SimulatedGsmCallState.triggerHangupAll|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v5 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.triggerHangupAll:()Z|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:test:CallInfo|] v0 @varname [|call|] @scope ((L000c,L001b));
-        [|boolean|] v1 @varname [|found|] @scope ((L0002,L0020));
-        [|int|] v2 @varname [|i|] @scope ((L0003,L0020));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
       
@@ -5289,10 +4761,9 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|boolean|] [|com:android:internal:telephony:test:SimulatedGsmCallState.triggerHangupBackground|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v5 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.triggerHangupBackground:()Z|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:test:CallInfo|] v0 @varname [|call|] @scope ((L000c,L001d));
-        [|boolean|] v1 @varname [|found|] @scope ((L0002,L0022));
-        [|int|] v2 @varname [|i|] @scope ((L0003,L0022));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
       
@@ -5324,10 +4795,9 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|boolean|] [|com:android:internal:telephony:test:SimulatedGsmCallState.triggerHangupForeground|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v5 @type (this)) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.triggerHangupForeground:()Z|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:test:CallInfo|] v0 @varname [|call|] @scope ((L000c,L0023), (L002d,L004a));
-        [|boolean|] v1 @varname [|found|] @scope ((L0002,L004f));
-        [|int|] v2 @varname [|i|] @scope ((L0003,L004f));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
       
@@ -5384,12 +4854,10 @@ record [|com:android:internal:telephony:test:SimulatedGsmCallState|]  @type clas
    }
     procedure [|boolean|] [|com:android:internal:telephony:test:SimulatedGsmCallState.triggerRing|] ([|com:android:internal:telephony:test:SimulatedGsmCallState|] v7 @type (this), [|java:lang:String|] v8 @type (object)) @owner [|com:android:internal:telephony:test:SimulatedGsmCallState|] @signature [|Lcom/android/internal/telephony/test/SimulatedGsmCallState;.triggerRing:(Ljava/lang/String;)Z|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:test:CallInfo|] v0 @varname [|call|] @scope ((L000e,L002c), (L002d,L0031));
-        [|int|] v1 @varname [|empty|] @scope ((L0003,L0058));
-        [|int|] v2 @varname [|i|] @scope ((L0005,L0058));
-        [|boolean|] v3 @varname [|isCallWaiting|] @scope ((L0004,L0058));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -5478,9 +4946,6 @@ record [|com:android:internal:telephony:uicc:UiccController|]  @type class @Acce
    }
     procedure [|void|] [|com:android:internal:telephony:uicc:UiccController.<init>|] ([|com:android:internal:telephony:uicc:UiccController|] v3 @type (this), [|android:content:Context|] v4 @type (object), [|com:android:internal:telephony:CommandsInterface|] v5 @type (object)) @owner [|com:android:internal:telephony:uicc:UiccController|] @signature [|Lcom/android/internal/telephony/uicc/UiccController;.<init>:(Landroid/content/Context;Lcom/android/internal/telephony/CommandsInterface;)V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
-
-
         v0;
         v1;
         v2;
@@ -5528,8 +4993,6 @@ record [|com:android:internal:telephony:uicc:UiccController|]  @type class @Acce
    }
     procedure [|void|] [|com:android:internal:telephony:uicc:UiccController.log|] ([|com:android:internal:telephony:uicc:UiccController|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|com:android:internal:telephony:uicc:UiccController|] @signature [|Lcom/android/internal/telephony/uicc/UiccController;.log:(Ljava/lang/String;)V|] @Access PRIVATE {
       local temp ;
-
-
         v0;
       
 #L09f304.   v0:= "RIL_UiccController" @type (object, string);
@@ -5539,8 +5002,6 @@ record [|com:android:internal:telephony:uicc:UiccController|]  @type class @Acce
    }
     procedure [|com:android:internal:telephony:uicc:UiccController|] [|com:android:internal:telephony:uicc:UiccController.make|] ([|android:content:Context|] v3 @type (object), [|com:android:internal:telephony:CommandsInterface|] v4 @type (object)) @owner [|com:android:internal:telephony:uicc:UiccController|] @signature [|Lcom/android/internal/telephony/uicc/UiccController;.make:(Landroid/content/Context;Lcom/android/internal/telephony/CommandsInterface;)Lcom/android/internal/telephony/uicc/UiccController;|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -5568,9 +5029,7 @@ record [|com:android:internal:telephony:uicc:UiccController|]  @type class @Acce
    }
     procedure [|void|] [|com:android:internal:telephony:uicc:UiccController.onGetIccCardStatusDone|] ([|com:android:internal:telephony:uicc:UiccController|] v4 @type (this), [|android:os:AsyncResult|] v5 @type (object)) @owner [|com:android:internal:telephony:uicc:UiccController|] @signature [|Lcom/android/internal/telephony/uicc/UiccController;.onGetIccCardStatusDone:(Landroid/os/AsyncResult;)V|] @Access PRIVATE_DECLARED_SYNCHRONIZED {
       local temp ;
-        [|com:android:internal:telephony:IccCardStatus|] v0 @varname [|status|] @scope ((L0014,L002e), (L0031,L003b));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -5613,9 +5072,7 @@ record [|com:android:internal:telephony:uicc:UiccController|]  @type class @Acce
    }
     procedure [|com:android:internal:telephony:IccFileHandler|] [|com:android:internal:telephony:uicc:UiccController.getIccFileHandler|] ([|com:android:internal:telephony:uicc:UiccController|] v3 @type (this), [|int|] v4) @owner [|com:android:internal:telephony:uicc:UiccController|] @signature [|Lcom/android/internal/telephony/uicc/UiccController;.getIccFileHandler:(I)Lcom/android/internal/telephony/IccFileHandler;|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:UiccCardApplication|] v0 @varname [|app|] @scope ((L000d,L0014));
-
-
+        v0;
         v1;
         v2;
       
@@ -5642,9 +5099,7 @@ record [|com:android:internal:telephony:uicc:UiccController|]  @type class @Acce
    }
     procedure [|com:android:internal:telephony:IccRecords|] [|com:android:internal:telephony:uicc:UiccController.getIccRecords|] ([|com:android:internal:telephony:uicc:UiccController|] v3 @type (this), [|int|] v4) @owner [|com:android:internal:telephony:uicc:UiccController|] @signature [|Lcom/android/internal/telephony/uicc/UiccController;.getIccRecords:(I)Lcom/android/internal/telephony/IccRecords;|] @Access PUBLIC {
       local temp ;
-        [|com:android:internal:telephony:UiccCardApplication|] v0 @varname [|app|] @scope ((L000d,L0014));
-
-
+        v0;
         v1;
         v2;
       
@@ -5671,7 +5126,6 @@ record [|com:android:internal:telephony:uicc:UiccController|]  @type class @Acce
    }
     procedure [|com:android:internal:telephony:UiccCard|] [|com:android:internal:telephony:uicc:UiccController.getUiccCard|] ([|com:android:internal:telephony:uicc:UiccController|] v2 @type (this)) @owner [|com:android:internal:telephony:uicc:UiccController|] @signature [|Lcom/android/internal/telephony/uicc/UiccController;.getUiccCard:()Lcom/android/internal/telephony/UiccCard;|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -5688,8 +5142,6 @@ record [|com:android:internal:telephony:uicc:UiccController|]  @type class @Acce
    }
     procedure [|com:android:internal:telephony:UiccCardApplication|] [|com:android:internal:telephony:uicc:UiccController.getUiccCardApplication|] ([|com:android:internal:telephony:uicc:UiccController|] v2 @type (this), [|int|] v3) @owner [|com:android:internal:telephony:uicc:UiccController|] @signature [|Lcom/android/internal/telephony/uicc/UiccController;.getUiccCardApplication:(I)Lcom/android/internal/telephony/UiccCardApplication;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -5713,9 +5165,7 @@ record [|com:android:internal:telephony:uicc:UiccController|]  @type class @Acce
    }
     procedure [|void|] [|com:android:internal:telephony:uicc:UiccController.handleMessage|] ([|com:android:internal:telephony:uicc:UiccController|] v5 @type (this), [|android:os:Message|] v6 @type (object)) @owner [|com:android:internal:telephony:uicc:UiccController|] @signature [|Lcom/android/internal/telephony/uicc/UiccController;.handleMessage:(Landroid/os/Message;)V|] @Access PUBLIC {
       local temp ;
-        [|android:os:AsyncResult|] v0 @varname [|ar|] @scope ((L0040,L004c));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -5766,11 +5216,7 @@ record [|com:android:internal:telephony:uicc:UiccController|]  @type class @Acce
    }
     procedure [|void|] [|com:android:internal:telephony:uicc:UiccController.registerForIccChanged|] ([|com:android:internal:telephony:uicc:UiccController|] v3 @type (this), [|android:os:Handler|] v4 @type (object), [|int|] v5, [|java:lang:Object|] v6 @type (object)) @owner [|com:android:internal:telephony:uicc:UiccController|] @signature [|Lcom/android/internal/telephony/uicc/UiccController;.registerForIccChanged:(Landroid/os/Handler;ILjava/lang/Object;)V|] @Access PUBLIC {
       local temp ;
-        [|android:os:Registrant|] v0 @varname [|r|] @scope ((L0008,L0012));
-
-
-
-
+        v0;
         v1;
         v2;
       
@@ -5791,8 +5237,6 @@ record [|com:android:internal:telephony:uicc:UiccController|]  @type class @Acce
    }
     procedure [|void|] [|com:android:internal:telephony:uicc:UiccController.unregisterForIccChanged|] ([|com:android:internal:telephony:uicc:UiccController|] v2 @type (this), [|android:os:Handler|] v3 @type (object)) @owner [|com:android:internal:telephony:uicc:UiccController|] @signature [|Lcom/android/internal/telephony/uicc/UiccController;.unregisterForIccChanged:(Landroid/os/Handler;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       

@@ -3151,7 +3151,8 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 									   strcat(paraThis, " @type (this)");
 									   thisFlag = 1;
 									   t1->paramFlag = true; // the corresponding element of locVarList is set as a parameter so that we can identify it in dumpLocals() 
-									   // note there can be more than one "this" in locVarList 
+									   // note there can be more than one "this" in locVarList; we break out after the 1st one. we assume the 1st one has the first scope.
+									   break;
 									}
 							   }
 						   }

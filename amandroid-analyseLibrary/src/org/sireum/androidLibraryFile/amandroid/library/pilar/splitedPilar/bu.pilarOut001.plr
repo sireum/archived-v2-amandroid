@@ -6,7 +6,6 @@ record [|com:android:commands:bu:Backup|]  @type class @AccessFlag PUBLIC_FINAL 
       global [|java:lang:String|][] @@[|com:android:commands:bu:Backup.mArgs|]    @AccessFlag STATIC;
     procedure [|void|] [|com:android:commands:bu:Backup.<init>|] ([|com:android:commands:bu:Backup|] v0 @type (this)) @owner [|com:android:commands:bu:Backup|] @signature [|Lcom/android/commands/bu/Backup;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L000418.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L00041e.   return @void ;
@@ -14,19 +13,17 @@ record [|com:android:commands:bu:Backup|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|com:android:commands:bu:Backup.doFullBackup|] ([|com:android:commands:bu:Backup|] v12 @type (this), [|int|] v13) @owner [|com:android:commands:bu:Backup|] @signature [|Lcom/android/commands/bu/Backup;.doFullBackup:(I)V|] @Access PRIVATE {
       local temp ;
-        [|android:os:ParcelFileDescriptor|] v1 @varname [|fd|] @scope ((L009f,L00b1));
-        [|java:lang:String|][] v9 @varname [|packArray|] @scope ((L00a5,L00b1));
-        [|boolean|] v2 @varname [|saveApks|] @scope ((L0006,L00ba));
-        [|boolean|] v3 @varname [|saveShared|] @scope ((L0007,L00ba));
-        [|boolean|] v4 @varname [|doEverything|] @scope ((L0008,L00ba));
-        [|boolean|] v5 @varname [|allIncludesSystem|] @scope ((L0009,L00ba));
-        [|java:lang:String|] v7 @varname [|arg|] @scope ((L000d,L00ba));
-        [|android:os:RemoteException|] v8 @varname [|e|] @scope ((L00b2,L00ba));
-        [|java:util:ArrayList|] v10 @varname [|packages|] @scope ((L0005,L00ba));
-
-
         v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
         v6;
+        v7;
+        v8;
+        v9;
+        v10;
         v11;
       
 #L000430.   v10:= new [|java:util:ArrayList|];
@@ -135,10 +132,8 @@ record [|com:android:commands:bu:Backup|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|com:android:commands:bu:Backup.doFullRestore|] ([|com:android:commands:bu:Backup|] v4 @type (this), [|int|] v5) @owner [|com:android:commands:bu:Backup|] @signature [|Lcom/android/commands/bu/Backup;.doFullRestore:(I)V|] @Access PRIVATE {
       local temp ;
-        [|android:os:ParcelFileDescriptor|] v1 @varname [|fd|] @scope ((L0004,L0009));
-        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L000b,L0013));
-
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -157,8 +152,7 @@ record [|com:android:commands:bu:Backup|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|com:android:commands:bu:Backup.main|] ([|java:lang:String|][] v4 @type (object)) @owner [|com:android:commands:bu:Backup|] @signature [|Lcom/android/commands/bu/Backup;.main:([Ljava/lang/String;)V|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:lang:Exception|] v0 @varname [|e|] @scope ((L002e,L0036));
-
+        v0;
         v1;
         v2;
         v3;
@@ -194,8 +188,7 @@ record [|com:android:commands:bu:Backup|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|java:lang:String|] [|com:android:commands:bu:Backup.nextArg|] ([|com:android:commands:bu:Backup|] v3 @type (this)) @owner [|com:android:commands:bu:Backup|] @signature [|Lcom/android/commands/bu/Backup;.nextArg:()Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|arg|] @scope ((L000f,L0016));
-
+        v0;
         v1;
         v2;
       
@@ -216,9 +209,8 @@ record [|com:android:commands:bu:Backup|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|com:android:commands:bu:Backup.run|] ([|com:android:commands:bu:Backup|] v5 @type (this)) @owner [|com:android:commands:bu:Backup|] @signature [|Lcom/android/commands/bu/Backup;.run:()V|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|arg|] @scope ((L0024,L005b));
-        [|int|] v1 @varname [|socketFd|] @scope ((L0020,L005b));
-
+        v0;
+        v1;
         v2;
         v3;
         v4;

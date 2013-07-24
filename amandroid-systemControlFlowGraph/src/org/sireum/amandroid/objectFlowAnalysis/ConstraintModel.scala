@@ -21,7 +21,7 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
         flowMap.getOrElseUpdate(rhs, msetEmpty) += lhs
         lhs match {
           case pfl : PointFieldL =>
-            untilFindUdChain(pfl.basePoint, ps, cfg, rda).foreach(
+            udChain(pfl.basePoint, ps, cfg, rda).foreach(
               point => {
                 flowMap.getOrElseUpdate(point, msetEmpty) += pfl.basePoint
               }
@@ -29,7 +29,7 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
           //if an array point in lhs, then have flow from this array point to most recent array var shadowing place
           case pal : PointArrayL =>
             if(arrayRepo.contains(pal.toString)){
-              untilFindUdChain(pal, ps, cfg, rda).foreach(
+              udChain(pal, ps, cfg, rda).foreach(
                 point => {
                   flowMap.getOrElseUpdate(pal, msetEmpty) += point
                   flowMap.getOrElseUpdate(point, msetEmpty) += pal
@@ -48,13 +48,13 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
           case pgar : PointGlobalArrayR =>
             flowMap.getOrElseUpdate(lhs, msetEmpty) += pgar
           case pfr : PointFieldR =>
-            untilFindUdChain(pfr.basePoint, ps, cfg, rda).foreach(
+            udChain(pfr.basePoint, ps, cfg, rda).foreach(
               point => {
                 flowMap.getOrElseUpdate(point, msetEmpty) += pfr.basePoint
               }
             )
           case par : PointArrayR =>
-            untilFindUdChain(par, ps, cfg, rda).foreach(
+            udChain(par, ps, cfg, rda).foreach(
               point => {
                 flowMap.getOrElseUpdate(point, msetEmpty) += par
                 flowMap.getOrElseUpdate(par, msetEmpty) += point
@@ -158,14 +158,14 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
     searchRda(p, slots, avoidMode)
   }
   
-  def untilFindUdChain(p : PointWithIndex,
-              points : MList[Point],
-              cfg : ControlFlowGraph[String],
-              rda : ReachingDefinitionAnalysis.Result,
-              avoidMode : Boolean = true) : Set[Point] = {
-    val slots = rda.entrySet(cfg.getNode(Some(p.locationUri), p.locationIndex))
-    searchRdaUntilFind(p, slots, cfg, rda, mlistEmpty, avoidMode)
-  }
+//  def untilFindUdChain(p : PointWithIndex,
+//              points : MList[Point],
+//              cfg : ControlFlowGraph[String],
+//              rda : ReachingDefinitionAnalysis.Result,
+//              avoidMode : Boolean = true) : Set[Point] = {
+//    val slots = rda.entrySet(cfg.getNode(Some(p.locationUri), p.locationIndex))
+//    searchRdaUntilFind(p, slots, cfg, rda, mlistEmpty, avoidMode)
+//  }
   
   def udChain(p : PointWithIndex,
               points : MList[Point],
@@ -176,54 +176,54 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
     searchRda(p, slots, avoidMode)
   }
   
-  def searchRdaUntilFind(p : PointWithUri,
-      								 slots : ISet[(Slot, DefDesc)],
-      								 cfg : ControlFlowGraph[String],
-      								 rda : ReachingDefinitionAnalysis.Result,
-      								 rdaStack : MList[DefDesc],
-      								 avoidMode : Boolean) : Set[Point] = {
-    var ps : Set[Point] = Set()
-    slots.foreach{
-      case(slot, defDesc) =>
-        if(p.varName.equals(slot.toString())){
-          if(defDesc.toString().equals("*")){
-            if(!p.varName.startsWith("@@")){
-              val tp = getPoint(p.varName, points, avoidMode)
-              if(tp!=null)
-                ps += tp
-            }
-          } else {
-            defDesc match {
-              case pdd : ParamDefDesc =>
-                pdd.locUri match{
-                  case Some(locU) =>
-                    val tp = getParamPoint_Return(p.varName, pdd.paramIndex, locU, pdd.locIndex, points, avoidMode)
-                    if(tp!=null)
-                      ps += tp
-                  case None =>
-                }
-              case ldd : LocDefDesc =>
-                if(!rdaStack.contains(ldd)){
-                  rdaStack += ldd
-	                ldd.locUri match {
-	                  case Some(locU) =>
-	                    val tp = getPoint(p.varName, locU, ldd.locIndex, points, avoidMode)
-	                    if(tp!=null)
-	                      ps += tp
-	                    else {
-	                      val nextSlots = rda.entrySet(cfg.getNode(ldd.locUri, ldd.locIndex))
-	                      ps ++= searchRdaUntilFind(p, nextSlots, cfg, rda, rdaStack, avoidMode)
-	                    }
-	                  case None =>
-                  }
-                }
-              case _ =>
-            }
-          }
-        }
-      }
-    ps
-  }
+//  def searchRdaUntilFind(p : PointWithUri,
+//      								 slots : ISet[(Slot, DefDesc)],
+//      								 cfg : ControlFlowGraph[String],
+//      								 rda : ReachingDefinitionAnalysis.Result,
+//      								 rdaStack : MList[DefDesc],
+//      								 avoidMode : Boolean) : Set[Point] = {
+//    var ps : Set[Point] = Set()
+//    slots.foreach{
+//      case(slot, defDesc) =>
+//        if(p.varName.equals(slot.toString())){
+//          if(defDesc.toString().equals("*")){
+//            if(!p.varName.startsWith("@@")){
+//              val tp = getPoint(p.varName, points, avoidMode)
+//              if(tp!=null)
+//                ps += tp
+//            }
+//          } else {
+//            defDesc match {
+//              case pdd : ParamDefDesc =>
+//                pdd.locUri match{
+//                  case Some(locU) =>
+//                    val tp = getParamPoint_Return(p.varName, pdd.paramIndex, locU, pdd.locIndex, points, avoidMode)
+//                    if(tp!=null)
+//                      ps += tp
+//                  case None =>
+//                }
+//              case ldd : LocDefDesc =>
+//                if(!rdaStack.contains(ldd)){
+//                  rdaStack += ldd
+//	                ldd.locUri match {
+//	                  case Some(locU) =>
+//	                    val tp = getPoint(p.varName, locU, ldd.locIndex, points, avoidMode)
+//	                    if(tp!=null)
+//	                      ps += tp
+//	                    else {
+//	                      val nextSlots = rda.entrySet(cfg.getNode(ldd.locUri, ldd.locIndex))
+//	                      ps ++= searchRdaUntilFind(p, nextSlots, cfg, rda, rdaStack, avoidMode)
+//	                    }
+//	                  case None =>
+//                  }
+//                }
+//              case _ =>
+//            }
+//          }
+//        }
+//      }
+//    ps
+//  }
   
   def searchRda(p : PointWithUri, slots : ISet[(Slot, DefDesc)], avoidMode : Boolean) : Set[Point] = {
     var ps : Set[Point] = Set()

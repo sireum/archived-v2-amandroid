@@ -21,7 +21,6 @@ record [|org:xml:sax:helpers:NamespaceSupport|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:NamespaceSupport.<init>|] ([|org:xml:sax:helpers:NamespaceSupport|] v0 @type (this)) @owner [|org:xml:sax:helpers:NamespaceSupport|] @signature [|Lorg/xml/sax/helpers/NamespaceSupport;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L1c659c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L1c65a2.   call temp:=  [|org:xml:sax:helpers:NamespaceSupport.reset|](v0) @signature [|Lorg/xml/sax/helpers/NamespaceSupport;.reset:()V|] @classDescriptor [|org:xml:sax:helpers:NamespaceSupport|] @type virtual;
@@ -30,7 +29,6 @@ record [|org:xml:sax:helpers:NamespaceSupport|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|boolean|] [|org:xml:sax:helpers:NamespaceSupport.access$000|] ([|org:xml:sax:helpers:NamespaceSupport|] v1 @type (object)) @owner [|org:xml:sax:helpers:NamespaceSupport|] @signature [|Lorg/xml/sax/helpers/NamespaceSupport;.access$000:(Lorg/xml/sax/helpers/NamespaceSupport;)Z|] @Access STATIC_SYNTHETIC {
       local temp ;
-
         v0;
       
 #L1c65bc.   v0:= v1.[|org:xml:sax:helpers:NamespaceSupport.namespaceDeclUris|]   @boolean;
@@ -47,9 +45,6 @@ record [|org:xml:sax:helpers:NamespaceSupport|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|boolean|] [|org:xml:sax:helpers:NamespaceSupport.declarePrefix|] ([|org:xml:sax:helpers:NamespaceSupport|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object)) @owner [|org:xml:sax:helpers:NamespaceSupport|] @signature [|Lorg/xml/sax/helpers/NamespaceSupport;.declarePrefix:(Ljava/lang/String;Ljava/lang/String;)Z|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L1c65ec.   v0:= "xml" @type (object, string);
@@ -70,7 +65,6 @@ record [|org:xml:sax:helpers:NamespaceSupport|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|java:util:Enumeration|] [|org:xml:sax:helpers:NamespaceSupport.getDeclaredPrefixes|] ([|org:xml:sax:helpers:NamespaceSupport|] v1 @type (this)) @owner [|org:xml:sax:helpers:NamespaceSupport|] @signature [|Lorg/xml/sax/helpers/NamespaceSupport;.getDeclaredPrefixes:()Ljava/util/Enumeration;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c6630.   v0:= v1.[|org:xml:sax:helpers:NamespaceSupport.currentContext|]   @type object;
@@ -81,8 +75,6 @@ record [|org:xml:sax:helpers:NamespaceSupport|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|java:lang:String|] [|org:xml:sax:helpers:NamespaceSupport.getPrefix|] ([|org:xml:sax:helpers:NamespaceSupport|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:xml:sax:helpers:NamespaceSupport|] @signature [|Lorg/xml/sax/helpers/NamespaceSupport;.getPrefix:(Ljava/lang/String;)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c6650.   v0:= v1.[|org:xml:sax:helpers:NamespaceSupport.currentContext|]   @type object;
@@ -93,7 +85,6 @@ record [|org:xml:sax:helpers:NamespaceSupport|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|java:util:Enumeration|] [|org:xml:sax:helpers:NamespaceSupport.getPrefixes|] ([|org:xml:sax:helpers:NamespaceSupport|] v1 @type (this)) @owner [|org:xml:sax:helpers:NamespaceSupport|] @signature [|Lorg/xml/sax/helpers/NamespaceSupport;.getPrefixes:()Ljava/util/Enumeration;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c6670.   v0:= v1.[|org:xml:sax:helpers:NamespaceSupport.currentContext|]   @type object;
@@ -104,11 +95,9 @@ record [|org:xml:sax:helpers:NamespaceSupport|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|java:util:Enumeration|] [|org:xml:sax:helpers:NamespaceSupport.getPrefixes|] ([|org:xml:sax:helpers:NamespaceSupport|] v4 @type (this), [|java:lang:String|] v5 @type (object)) @owner [|org:xml:sax:helpers:NamespaceSupport|] @signature [|Lorg/xml/sax/helpers/NamespaceSupport;.getPrefixes:(Ljava/lang/String;)Ljava/util/Enumeration;|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|] v1 @varname [|prefix|] @scope ((L0015,L0023));
-        [|java:util:Enumeration|] v0 @varname [|allPrefixes|] @scope ((L0009,L0028));
-        [|java:util:ArrayList|] v2 @varname [|prefixes|] @scope ((L0005,L0028));
-
-
+        v0;
+        v1;
+        v2;
         v3;
       
 #L1c6690.   v2:= new [|java:util:ArrayList|];
@@ -135,8 +124,6 @@ record [|org:xml:sax:helpers:NamespaceSupport|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|java:lang:String|] [|org:xml:sax:helpers:NamespaceSupport.getURI|] ([|org:xml:sax:helpers:NamespaceSupport|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:xml:sax:helpers:NamespaceSupport|] @signature [|Lorg/xml/sax/helpers/NamespaceSupport;.getURI:(Ljava/lang/String;)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c66f0.   v0:= v1.[|org:xml:sax:helpers:NamespaceSupport.currentContext|]   @type object;
@@ -147,7 +134,6 @@ record [|org:xml:sax:helpers:NamespaceSupport|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|boolean|] [|org:xml:sax:helpers:NamespaceSupport.isNamespaceDeclUris|] ([|org:xml:sax:helpers:NamespaceSupport|] v1 @type (this)) @owner [|org:xml:sax:helpers:NamespaceSupport|] @signature [|Lorg/xml/sax/helpers/NamespaceSupport;.isNamespaceDeclUris:()Z|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c6710.   v0:= v1.[|org:xml:sax:helpers:NamespaceSupport.namespaceDeclUris|]   @boolean;
@@ -156,7 +142,6 @@ record [|org:xml:sax:helpers:NamespaceSupport|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:NamespaceSupport.popContext|] ([|org:xml:sax:helpers:NamespaceSupport|] v2 @type (this)) @owner [|org:xml:sax:helpers:NamespaceSupport|] @signature [|Lorg/xml/sax/helpers/NamespaceSupport;.popContext:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -181,12 +166,7 @@ record [|org:xml:sax:helpers:NamespaceSupport|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|java:lang:String|][] [|org:xml:sax:helpers:NamespaceSupport.processName|] ([|org:xml:sax:helpers:NamespaceSupport|] v5 @type (this), [|java:lang:String|] v6 @type (object), [|java:lang:String|][] v7 @type (object), [|boolean|] v8) @owner [|org:xml:sax:helpers:NamespaceSupport|] @signature [|Lorg/xml/sax/helpers/NamespaceSupport;.processName:(Ljava/lang/String;[Ljava/lang/String;Z)[Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-        [|java:lang:String|][] v0 @varname [|myParts|] @scope ((L0009,L001a));
-
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -212,9 +192,8 @@ record [|org:xml:sax:helpers:NamespaceSupport|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:NamespaceSupport.pushContext|] ([|org:xml:sax:helpers:NamespaceSupport|] v5 @type (this)) @owner [|org:xml:sax:helpers:NamespaceSupport|] @signature [|Lorg/xml/sax/helpers/NamespaceSupport;.pushContext:()V|] @Access PUBLIC {
       local temp ;
-        [|org:xml:sax:helpers:NamespaceSupport$Context|][] v1 @varname [|newContexts|] @scope ((L001a,L0023));
-        [|int|] v0 @varname [|max|] @scope ((L0004,L004e));
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -262,7 +241,6 @@ record [|org:xml:sax:helpers:NamespaceSupport|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:NamespaceSupport.reset|] ([|org:xml:sax:helpers:NamespaceSupport|] v3 @type (this)) @owner [|org:xml:sax:helpers:NamespaceSupport|] @signature [|Lorg/xml/sax/helpers/NamespaceSupport;.reset:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -288,8 +266,6 @@ record [|org:xml:sax:helpers:NamespaceSupport|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:NamespaceSupport.setNamespaceDeclUris|] ([|org:xml:sax:helpers:NamespaceSupport|] v3 @type (this), [|boolean|] v4) @owner [|org:xml:sax:helpers:NamespaceSupport|] @signature [|Lorg/xml/sax/helpers/NamespaceSupport;.setNamespaceDeclUris:(Z)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -326,7 +302,6 @@ record [|org:xml:sax:helpers:NewInstance|]  @type class @AccessFlag   {
    }
     procedure [|void|] [|org:xml:sax:helpers:NewInstance.<init>|] ([|org:xml:sax:helpers:NewInstance|] v0 @type (this)) @owner [|org:xml:sax:helpers:NewInstance|] @signature [|Lorg/xml/sax/helpers/NewInstance;.<init>:()V|] @Access CONSTRUCTOR {
       local temp ;
-
       
 #L1c6938.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L1c693e.   return @void ;
@@ -334,8 +309,8 @@ record [|org:xml:sax:helpers:NewInstance|]  @type class @AccessFlag   {
    }
     procedure [|java:lang:ClassLoader|] [|org:xml:sax:helpers:NewInstance.getClassLoader|] () @owner [|org:xml:sax:helpers:NewInstance|] @signature [|Lorg/xml/sax/helpers/NewInstance;.getClassLoader:()Ljava/lang/ClassLoader;|] @Access STATIC {
       local temp ;
-        [|java:lang:NoSuchMethodException|] v0 @varname [|e|] @scope ((L001b,L0022), (L0023,L002d), (L002e,L0038));
-        [|java:lang:reflect:Method|] v1 @varname [|m|] @scope ((L0001,L0038));
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -379,9 +354,7 @@ record [|org:xml:sax:helpers:NewInstance|]  @type class @AccessFlag   {
    }
     procedure [|java:lang:Object|] [|org:xml:sax:helpers:NewInstance.newInstance|] ([|java:lang:ClassLoader|] v2 @type (object), [|java:lang:String|] v3 @type (object)) @owner [|org:xml:sax:helpers:NewInstance|] @signature [|Lorg/xml/sax/helpers/NewInstance;.newInstance:(Ljava/lang/ClassLoader;Ljava/lang/String;)Ljava/lang/Object;|] @Access STATIC {
       local temp ;
-        [|java:lang:Class|] v0 @varname [|driverClass|] @scope ((L0006,L000b), (L000f,L0010));
-
-
+        v0;
         v1;
       
 #L1c69ec.   if v2 != 0 then goto L1c6a02;
@@ -401,7 +374,6 @@ record [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|]  @type class @
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.<init>|] ([|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] v0 @type (this), [|org:xml:sax:helpers:ParserAdapter|] v1 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter$AttributeListAdapter;.<init>:(Lorg/xml/sax/helpers/ParserAdapter;)V|] @Access CONSTRUCTOR {
       local temp ;
-
       
 #L1c6a1c.   v0.[|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.this$0|]  := v1 @type object;
 #L1c6a20.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
@@ -410,10 +382,8 @@ record [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|]  @type class @
    }
     procedure [|int|] [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.getIndex|] ([|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] v3 @type (this), [|java:lang:String|] v4 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter$AttributeListAdapter;.getIndex:(Ljava/lang/String;)I|] @Access PUBLIC {
       local temp ;
-        [|int|] v0 @varname [|i|] @scope ((L000b,L0019), (L001a,L001f));
-        [|int|] v1 @varname [|max|] @scope ((L000a,L001f));
-
-
+        v0;
+        v1;
         v2;
       
 #L1c6a38.   v2:= v3.[|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.this$0|]   @type object;
@@ -438,9 +408,6 @@ record [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|]  @type class @
    }
     procedure [|int|] [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.getIndex|] ([|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter$AttributeListAdapter;.getIndex:(Ljava/lang/String;Ljava/lang/String;)I|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L1c6a88.   v0:= -1  @length 4;
@@ -449,7 +416,6 @@ record [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|]  @type class @
    }
     procedure [|int|] [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.getLength|] ([|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] v1 @type (this)) @owner [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter$AttributeListAdapter;.getLength:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c6a9c.   v0:= v1.[|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.qAtts|]   @type object;
@@ -460,8 +426,6 @@ record [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|]  @type class @
    }
     procedure [|java:lang:String|] [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.getLocalName|] ([|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] v1 @type (this), [|int|] v2) @owner [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter$AttributeListAdapter;.getLocalName:(I)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c6abc.   v0:= "" @type (object, string);
@@ -470,8 +434,6 @@ record [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|]  @type class @
    }
     procedure [|java:lang:String|] [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.getQName|] ([|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] v1 @type (this), [|int|] v2) @owner [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter$AttributeListAdapter;.getQName:(I)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c6ad4.   v0:= v1.[|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.qAtts|]   @type object;
@@ -484,8 +446,6 @@ record [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|]  @type class @
    }
     procedure [|java:lang:String|] [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.getType|] ([|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] v1 @type (this), [|int|] v2) @owner [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter$AttributeListAdapter;.getType:(I)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c6afc.   v0:= v1.[|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.qAtts|]   @type object;
@@ -498,8 +458,6 @@ record [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|]  @type class @
    }
     procedure [|java:lang:String|] [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.getType|] ([|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter$AttributeListAdapter;.getType:(Ljava/lang/String;)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c6b24.   v0:= v1.[|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.qAtts|]   @type object;
@@ -512,9 +470,6 @@ record [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|]  @type class @
    }
     procedure [|java:lang:String|] [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.getType|] ([|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter$AttributeListAdapter;.getType:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L1c6b4c.   v0:= 0  @length 4;
@@ -523,8 +478,6 @@ record [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|]  @type class @
    }
     procedure [|java:lang:String|] [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.getURI|] ([|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] v1 @type (this), [|int|] v2) @owner [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter$AttributeListAdapter;.getURI:(I)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c6b60.   v0:= "" @type (object, string);
@@ -533,8 +486,6 @@ record [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|]  @type class @
    }
     procedure [|java:lang:String|] [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.getValue|] ([|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] v1 @type (this), [|int|] v2) @owner [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter$AttributeListAdapter;.getValue:(I)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c6b78.   v0:= v1.[|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.qAtts|]   @type object;
@@ -545,8 +496,6 @@ record [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|]  @type class @
    }
     procedure [|java:lang:String|] [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.getValue|] ([|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter$AttributeListAdapter;.getValue:(Ljava/lang/String;)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c6b98.   v0:= v1.[|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.qAtts|]   @type object;
@@ -557,9 +506,6 @@ record [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|]  @type class @
    }
     procedure [|java:lang:String|] [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.getValue|] ([|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter$AttributeListAdapter;.getValue:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L1c6bb8.   v0:= 0  @length 4;
@@ -568,8 +514,6 @@ record [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|]  @type class @
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.setAttributeList|] ([|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] v0 @type (this), [|org:xml:sax:AttributeList|] v1 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter$AttributeListAdapter;.setAttributeList:(Lorg/xml/sax/AttributeList;)V|] @Access  {
       local temp ;
-
-
       
 #L1c6bcc.   v0.[|org:xml:sax:helpers:ParserAdapter$AttributeListAdapter.qAtts|]  := v1 @type object;
 #L1c6bd0.   return @void ;
@@ -597,13 +541,12 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
       global [|java:lang:String|] @@[|org:xml:sax:helpers:ParserAdapter.XMLNS_URIs|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.<init>|] ([|org:xml:sax:helpers:ParserAdapter|] v9 @type (this)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-        [|java:lang:ClassNotFoundException|] v1 @varname [|e1|] @scope ((L002e,L0047));
-        [|java:lang:IllegalAccessException|] v2 @varname [|e2|] @scope ((L0048,L0067));
-        [|java:lang:InstantiationException|] v3 @varname [|e3|] @scope ((L0068,L0087));
-        [|java:lang:ClassCastException|] v4 @varname [|e4|] @scope ((L0088,L00a7));
-        [|java:lang:String|] v0 @varname [|driver|] @scope ((L0025,L00b0));
-        [|java:lang:NullPointerException|] v5 @varname [|e5|] @scope ((L00a8,L00b0));
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
         v6;
         v7;
         v8;
@@ -707,8 +650,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.<init>|] ([|org:xml:sax:helpers:ParserAdapter|] v3 @type (this), [|org:xml:sax:Parser|] v4 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.<init>:(Lorg/xml/sax/Parser;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -736,7 +677,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|org:xml:sax:helpers:AttributesImpl|] [|org:xml:sax:helpers:ParserAdapter.access$000|] ([|org:xml:sax:helpers:ParserAdapter|] v1 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.access$000:(Lorg/xml/sax/helpers/ParserAdapter;)Lorg/xml/sax/helpers/AttributesImpl;|] @Access STATIC_SYNTHETIC {
       local temp ;
-
         v0;
       
 #L1c6dc8.   v0:= v1.[|org:xml:sax:helpers:ParserAdapter.atts|]   @type object;
@@ -745,9 +685,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.checkNotParsing|] ([|org:xml:sax:helpers:ParserAdapter|] v3 @type (this), [|java:lang:String|] v4 @type (object), [|java:lang:String|] v5 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.checkNotParsing:(Ljava/lang/String;Ljava/lang/String;)V|] @Access PRIVATE {
       local temp ;
-
-
-
         v0;
         v1;
         v2;
@@ -779,8 +716,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|org:xml:sax:SAXParseException|] [|org:xml:sax:helpers:ParserAdapter.makeException|] ([|org:xml:sax:helpers:ParserAdapter|] v6 @type (this), [|java:lang:String|] v7 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.makeException:(Ljava/lang/String;)Lorg/xml/sax/SAXParseException;|] @Access PRIVATE {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -806,11 +741,7 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|java:lang:String|][] [|org:xml:sax:helpers:ParserAdapter.processName|] ([|org:xml:sax:helpers:ParserAdapter|] v4 @type (this), [|java:lang:String|] v5 @type (object), [|boolean|] v6, [|boolean|] v7) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.processName:(Ljava/lang/String;ZZ)[Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|][] v0 @varname [|parts|] @scope ((L0008,L004d));
-
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -859,8 +790,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.setup|] ([|org:xml:sax:helpers:ParserAdapter|] v2 @type (this), [|org:xml:sax:Parser|] v3 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.setup:(Lorg/xml/sax/Parser;)V|] @Access PRIVATE {
       local temp ;
-
-
         v0;
         v1;
       
@@ -884,7 +813,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.setupParser|] ([|org:xml:sax:helpers:ParserAdapter|] v2 @type (this)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.setupParser:()V|] @Access PRIVATE {
       local temp ;
-
         v0;
         v1;
       
@@ -926,10 +854,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.characters|] ([|org:xml:sax:helpers:ParserAdapter|] v1 @type (this), [|char|][] v2, [|int|] v3, [|int|] v4) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.characters:([CII)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
         v0;
       
 #L1c702c.   v0:= v1.[|org:xml:sax:helpers:ParserAdapter.contentHandler|]   @type object;
@@ -941,7 +865,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.endDocument|] ([|org:xml:sax:helpers:ParserAdapter|] v1 @type (this)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.endDocument:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c7050.   v0:= v1.[|org:xml:sax:helpers:ParserAdapter.contentHandler|]   @type object;
@@ -953,11 +876,9 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.endElement|] ([|org:xml:sax:helpers:ParserAdapter|] v7 @type (this), [|java:lang:String|] v8 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.endElement:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|] v1 @varname [|prefix|] @scope ((L003e,L0044));
-        [|java:util:Enumeration|] v2 @varname [|prefixes|] @scope ((L0032,L0044));
-        [|java:lang:String|][] v0 @varname [|names|] @scope ((L001b,L004a));
-
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -1005,7 +926,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|org:xml:sax:ContentHandler|] [|org:xml:sax:helpers:ParserAdapter.getContentHandler|] ([|org:xml:sax:helpers:ParserAdapter|] v1 @type (this)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.getContentHandler:()Lorg/xml/sax/ContentHandler;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c7118.   v0:= v1.[|org:xml:sax:helpers:ParserAdapter.contentHandler|]   @type object;
@@ -1014,7 +934,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|org:xml:sax:DTDHandler|] [|org:xml:sax:helpers:ParserAdapter.getDTDHandler|] ([|org:xml:sax:helpers:ParserAdapter|] v1 @type (this)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.getDTDHandler:()Lorg/xml/sax/DTDHandler;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c7130.   v0:= v1.[|org:xml:sax:helpers:ParserAdapter.dtdHandler|]   @type object;
@@ -1023,7 +942,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|org:xml:sax:EntityResolver|] [|org:xml:sax:helpers:ParserAdapter.getEntityResolver|] ([|org:xml:sax:helpers:ParserAdapter|] v1 @type (this)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.getEntityResolver:()Lorg/xml/sax/EntityResolver;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c7148.   v0:= v1.[|org:xml:sax:helpers:ParserAdapter.entityResolver|]   @type object;
@@ -1032,7 +950,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|org:xml:sax:ErrorHandler|] [|org:xml:sax:helpers:ParserAdapter.getErrorHandler|] ([|org:xml:sax:helpers:ParserAdapter|] v1 @type (this)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.getErrorHandler:()Lorg/xml/sax/ErrorHandler;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c7160.   v0:= v1.[|org:xml:sax:helpers:ParserAdapter.errorHandler|]   @type object;
@@ -1041,8 +958,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|boolean|] [|org:xml:sax:helpers:ParserAdapter.getFeature|] ([|org:xml:sax:helpers:ParserAdapter|] v3 @type (this), [|java:lang:String|] v4 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.getFeature:(Ljava/lang/String;)Z|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -1081,8 +996,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|java:lang:Object|] [|org:xml:sax:helpers:ParserAdapter.getProperty|] ([|org:xml:sax:helpers:ParserAdapter|] v3 @type (this), [|java:lang:String|] v4 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.getProperty:(Ljava/lang/String;)Ljava/lang/Object;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -1103,10 +1016,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.ignorableWhitespace|] ([|org:xml:sax:helpers:ParserAdapter|] v1 @type (this), [|char|][] v2, [|int|] v3, [|int|] v4) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.ignorableWhitespace:([CII)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
         v0;
       
 #L1c7240.   v0:= v1.[|org:xml:sax:helpers:ParserAdapter.contentHandler|]   @type object;
@@ -1118,8 +1027,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.parse|] ([|org:xml:sax:helpers:ParserAdapter|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.parse:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c7264.   v0:= new [|org:xml:sax:InputSource|];
@@ -1130,8 +1037,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.parse|] ([|org:xml:sax:helpers:ParserAdapter|] v2 @type (this), [|org:xml:sax:InputSource|] v3 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.parse:(Lorg/xml/sax/InputSource;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -1158,9 +1063,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.processingInstruction|] ([|org:xml:sax:helpers:ParserAdapter|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.processingInstruction:(Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L1c72e8.   v0:= v1.[|org:xml:sax:helpers:ParserAdapter.contentHandler|]   @type object;
@@ -1172,8 +1074,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.reportError|] ([|org:xml:sax:helpers:ParserAdapter|] v2 @type (this), [|java:lang:String|] v3 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.reportError:(Ljava/lang/String;)V|] @Access  {
       local temp ;
-
-
         v0;
         v1;
       
@@ -1188,8 +1088,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.setContentHandler|] ([|org:xml:sax:helpers:ParserAdapter|] v0 @type (this), [|org:xml:sax:ContentHandler|] v1 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.setContentHandler:(Lorg/xml/sax/ContentHandler;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L1c7338.   v0.[|org:xml:sax:helpers:ParserAdapter.contentHandler|]  := v1 @type object;
 #L1c733c.   return @void ;
@@ -1197,8 +1095,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.setDTDHandler|] ([|org:xml:sax:helpers:ParserAdapter|] v0 @type (this), [|org:xml:sax:DTDHandler|] v1 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.setDTDHandler:(Lorg/xml/sax/DTDHandler;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L1c7350.   v0.[|org:xml:sax:helpers:ParserAdapter.dtdHandler|]  := v1 @type object;
 #L1c7354.   return @void ;
@@ -1206,8 +1102,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.setDocumentLocator|] ([|org:xml:sax:helpers:ParserAdapter|] v1 @type (this), [|org:xml:sax:Locator|] v2 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.setDocumentLocator:(Lorg/xml/sax/Locator;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c7368.   v1.[|org:xml:sax:helpers:ParserAdapter.locator|]  := v2 @type object;
@@ -1220,8 +1114,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.setEntityResolver|] ([|org:xml:sax:helpers:ParserAdapter|] v0 @type (this), [|org:xml:sax:EntityResolver|] v1 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.setEntityResolver:(Lorg/xml/sax/EntityResolver;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L1c7390.   v0.[|org:xml:sax:helpers:ParserAdapter.entityResolver|]  := v1 @type object;
 #L1c7394.   return @void ;
@@ -1229,8 +1121,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.setErrorHandler|] ([|org:xml:sax:helpers:ParserAdapter|] v0 @type (this), [|org:xml:sax:ErrorHandler|] v1 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.setErrorHandler:(Lorg/xml/sax/ErrorHandler;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L1c73a8.   v0.[|org:xml:sax:helpers:ParserAdapter.errorHandler|]  := v1 @type object;
 #L1c73ac.   return @void ;
@@ -1238,9 +1128,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.setFeature|] ([|org:xml:sax:helpers:ParserAdapter|] v3 @type (this), [|java:lang:String|] v4 @type (object), [|boolean|] v5) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.setFeature:(Ljava/lang/String;Z)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
         v2;
@@ -1296,9 +1183,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.setProperty|] ([|org:xml:sax:helpers:ParserAdapter|] v3 @type (this), [|java:lang:String|] v4 @type (object), [|java:lang:Object|] v5 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.setProperty:(Ljava/lang/String;Ljava/lang/Object;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
         v2;
@@ -1319,7 +1203,6 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.startDocument|] ([|org:xml:sax:helpers:ParserAdapter|] v1 @type (this)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.startDocument:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c74d0.   v0:= v1.[|org:xml:sax:helpers:ParserAdapter.contentHandler|]   @type object;
@@ -1331,33 +1214,30 @@ record [|org:xml:sax:helpers:ParserAdapter|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserAdapter.startElement|] ([|org:xml:sax:helpers:ParserAdapter|] v24 @type (this), [|java:lang:String|] v25 @type (object), [|org:xml:sax:AttributeList|] v26 @type (object)) @owner [|org:xml:sax:helpers:ParserAdapter|] @signature [|Lorg/xml/sax/helpers/ParserAdapter;.startElement:(Ljava/lang/String;Lorg/xml/sax/AttributeList;)V|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|] v4 @varname [|prefix|] @scope ((L0065,L0090), (L009b,L00aa), (L00ed,L010c), (L0115,L0116), (L011b,L012e));
-        [|java:lang:String|] v7 @varname [|value|] @scope ((L006d,L0090), (L009c,L00aa), (L00d1,L0168));
-        [|java:lang:String|] v15 @varname [|attQName|] @scope ((L0046,L00aa), (L00c1,L0168));
-        [|int|] v22 @varname [|n|] @scope ((L0057,L00aa), (L00df,L010c), (L010f,L012e));
-        [|java:lang:String|][] v14 @varname [|attName|] @scope ((L0136,L0149));
-        [|java:util:ArrayList|] v18 @varname [|exceptions|] @scope ((L0002,L014e), (L0151,L01b0));
-        [|org:xml:sax:SAXException|] v16 @varname [|e|] @scope ((L014a,L0153));
-        [|java:lang:String|] v6 @varname [|type|] @scope ((L00c9,L0168));
-        [|org:xml:sax:SAXParseException|] v17 @varname [|ex|] @scope ((L0180,L018a));
-        [|java:util:Iterator|] v20 @varname [|i$|] @scope ((L0174,L018a));
-        [|int|] v19 @varname [|i|] @scope ((L0038,L01b0));
-        [|int|] v21 @varname [|length|] @scope ((L0036,L01b0));
-        [|java:lang:String|][] v23 @varname [|name|] @scope ((L019a,L01b0));
-
-
-
         v0;
         v1;
         v2;
         v3;
+        v4;
         v5;
+        v6;
+        v7;
         v8;
         v9;
         v10;
         v11;
         v12;
         v13;
+        v14;
+        v15;
+        v16;
+        v17;
+        v18;
+        v19;
+        v20;
+        v21;
+        v22;
+        v23;
       
 #L1c74f4.   v18:= 0  @length 16;
 #L1c74f8.   v0:= v24  @type object;
@@ -1594,7 +1474,6 @@ record [|org:xml:sax:helpers:ParserFactory|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|org:xml:sax:helpers:ParserFactory.<init>|] ([|org:xml:sax:helpers:ParserFactory|] v0 @type (this)) @owner [|org:xml:sax:helpers:ParserFactory|] @signature [|Lorg/xml/sax/helpers/ParserFactory;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L1c7874.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L1c787a.   return @void ;
@@ -1602,7 +1481,7 @@ record [|org:xml:sax:helpers:ParserFactory|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|org:xml:sax:Parser|] [|org:xml:sax:helpers:ParserFactory.makeParser|] () @owner [|org:xml:sax:helpers:ParserFactory|] @signature [|Lorg/xml/sax/helpers/ParserFactory;.makeParser:()Lorg/xml/sax/Parser;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|className|] @scope ((L0006,L0015));
+        v0;
         v1;
         v2;
       
@@ -1621,7 +1500,6 @@ record [|org:xml:sax:helpers:ParserFactory|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|org:xml:sax:Parser|] [|org:xml:sax:helpers:ParserFactory.makeParser|] ([|java:lang:String|] v1 @type (object)) @owner [|org:xml:sax:helpers:ParserFactory|] @signature [|Lorg/xml/sax/helpers/ParserFactory;.makeParser:(Ljava/lang/String;)Lorg/xml/sax/Parser;|] @Access PUBLIC_STATIC {
       local temp ;
-
         v0;
       
 #L1c78c8.   call temp:=  [|org:xml:sax:helpers:NewInstance.getClassLoader|]() @signature [|Lorg/xml/sax/helpers/NewInstance;.getClassLoader:()Ljava/lang/ClassLoader;|] @classDescriptor [|org:xml:sax:helpers:NewInstance|] @type static;
@@ -1642,7 +1520,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.<init>|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L1c78f0.   v0:= 0  @length 4;
@@ -1658,8 +1535,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.<init>|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this), [|org:xml:sax:XMLReader|] v2 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.<init>:(Lorg/xml/sax/XMLReader;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L1c7924.   v0:= 0  @length 4;
@@ -1676,7 +1551,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.setupParse|] ([|org:xml:sax:helpers:XMLFilterImpl|] v2 @type (this)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.setupParse:()V|] @Access PRIVATE {
       local temp ;
-
         v0;
         v1;
       
@@ -1699,10 +1573,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.characters|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this), [|char|][] v2, [|int|] v3, [|int|] v4) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.characters:([CII)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
         v0;
       
 #L1c79b0.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.contentHandler|]   @type object;
@@ -1714,7 +1584,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.endDocument|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.endDocument:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c79d4.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.contentHandler|]   @type object;
@@ -1726,10 +1595,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.endElement|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object), [|java:lang:String|] v4 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.endElement:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
         v0;
       
 #L1c79f8.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.contentHandler|]   @type object;
@@ -1741,8 +1606,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.endPrefixMapping|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.endPrefixMapping:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c7a1c.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.contentHandler|]   @type object;
@@ -1754,8 +1617,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.error|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this), [|org:xml:sax:SAXParseException|] v2 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.error:(Lorg/xml/sax/SAXParseException;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c7a40.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.errorHandler|]   @type object;
@@ -1767,8 +1628,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.fatalError|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this), [|org:xml:sax:SAXParseException|] v2 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.fatalError:(Lorg/xml/sax/SAXParseException;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c7a64.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.errorHandler|]   @type object;
@@ -1780,7 +1639,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|org:xml:sax:ContentHandler|] [|org:xml:sax:helpers:XMLFilterImpl.getContentHandler|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.getContentHandler:()Lorg/xml/sax/ContentHandler;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c7a88.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.contentHandler|]   @type object;
@@ -1789,7 +1647,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|org:xml:sax:DTDHandler|] [|org:xml:sax:helpers:XMLFilterImpl.getDTDHandler|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.getDTDHandler:()Lorg/xml/sax/DTDHandler;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c7aa0.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.dtdHandler|]   @type object;
@@ -1798,7 +1655,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|org:xml:sax:EntityResolver|] [|org:xml:sax:helpers:XMLFilterImpl.getEntityResolver|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.getEntityResolver:()Lorg/xml/sax/EntityResolver;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c7ab8.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.entityResolver|]   @type object;
@@ -1807,7 +1663,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|org:xml:sax:ErrorHandler|] [|org:xml:sax:helpers:XMLFilterImpl.getErrorHandler|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.getErrorHandler:()Lorg/xml/sax/ErrorHandler;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c7ad0.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.errorHandler|]   @type object;
@@ -1816,8 +1671,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|boolean|] [|org:xml:sax:helpers:XMLFilterImpl.getFeature|] ([|org:xml:sax:helpers:XMLFilterImpl|] v3 @type (this), [|java:lang:String|] v4 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.getFeature:(Ljava/lang/String;)Z|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -1844,7 +1697,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|org:xml:sax:XMLReader|] [|org:xml:sax:helpers:XMLFilterImpl.getParent|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.getParent:()Lorg/xml/sax/XMLReader;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c7b40.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.parent|]   @type object;
@@ -1853,8 +1705,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|java:lang:Object|] [|org:xml:sax:helpers:XMLFilterImpl.getProperty|] ([|org:xml:sax:helpers:XMLFilterImpl|] v3 @type (this), [|java:lang:String|] v4 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.getProperty:(Ljava/lang/String;)Ljava/lang/Object;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -1881,10 +1731,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.ignorableWhitespace|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this), [|char|][] v2, [|int|] v3, [|int|] v4) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.ignorableWhitespace:([CII)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
         v0;
       
 #L1c7bb0.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.contentHandler|]   @type object;
@@ -1896,10 +1742,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.notationDecl|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object), [|java:lang:String|] v4 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.notationDecl:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
         v0;
       
 #L1c7bd4.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.dtdHandler|]   @type object;
@@ -1911,8 +1753,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.parse|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.parse:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c7bf8.   v0:= new [|org:xml:sax:InputSource|];
@@ -1923,8 +1763,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.parse|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this), [|org:xml:sax:InputSource|] v2 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.parse:(Lorg/xml/sax/InputSource;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c7c1c.   call temp:=  [|org:xml:sax:helpers:XMLFilterImpl.setupParse|](v1) @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.setupParse:()V|] @classDescriptor [|org:xml:sax:helpers:XMLFilterImpl|] @type direct;
@@ -1935,9 +1773,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.processingInstruction|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.processingInstruction:(Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L1c7c40.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.contentHandler|]   @type object;
@@ -1949,9 +1784,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|org:xml:sax:InputSource|] [|org:xml:sax:helpers:XMLFilterImpl.resolveEntity|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.resolveEntity:(Ljava/lang/String;Ljava/lang/String;)Lorg/xml/sax/InputSource;|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L1c7c64.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.entityResolver|]   @type object;
@@ -1966,8 +1798,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.setContentHandler|] ([|org:xml:sax:helpers:XMLFilterImpl|] v0 @type (this), [|org:xml:sax:ContentHandler|] v1 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.setContentHandler:(Lorg/xml/sax/ContentHandler;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L1c7c90.   v0.[|org:xml:sax:helpers:XMLFilterImpl.contentHandler|]  := v1 @type object;
 #L1c7c94.   return @void ;
@@ -1975,8 +1805,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.setDTDHandler|] ([|org:xml:sax:helpers:XMLFilterImpl|] v0 @type (this), [|org:xml:sax:DTDHandler|] v1 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.setDTDHandler:(Lorg/xml/sax/DTDHandler;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L1c7ca8.   v0.[|org:xml:sax:helpers:XMLFilterImpl.dtdHandler|]  := v1 @type object;
 #L1c7cac.   return @void ;
@@ -1984,8 +1812,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.setDocumentLocator|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this), [|org:xml:sax:Locator|] v2 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.setDocumentLocator:(Lorg/xml/sax/Locator;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c7cc0.   v1.[|org:xml:sax:helpers:XMLFilterImpl.locator|]  := v2 @type object;
@@ -1998,8 +1824,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.setEntityResolver|] ([|org:xml:sax:helpers:XMLFilterImpl|] v0 @type (this), [|org:xml:sax:EntityResolver|] v1 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.setEntityResolver:(Lorg/xml/sax/EntityResolver;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L1c7ce8.   v0.[|org:xml:sax:helpers:XMLFilterImpl.entityResolver|]  := v1 @type object;
 #L1c7cec.   return @void ;
@@ -2007,8 +1831,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.setErrorHandler|] ([|org:xml:sax:helpers:XMLFilterImpl|] v0 @type (this), [|org:xml:sax:ErrorHandler|] v1 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.setErrorHandler:(Lorg/xml/sax/ErrorHandler;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L1c7d00.   v0.[|org:xml:sax:helpers:XMLFilterImpl.errorHandler|]  := v1 @type object;
 #L1c7d04.   return @void ;
@@ -2016,9 +1838,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.setFeature|] ([|org:xml:sax:helpers:XMLFilterImpl|] v3 @type (this), [|java:lang:String|] v4 @type (object), [|boolean|] v5) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.setFeature:(Ljava/lang/String;Z)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
         v2;
@@ -2044,8 +1863,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.setParent|] ([|org:xml:sax:helpers:XMLFilterImpl|] v0 @type (this), [|org:xml:sax:XMLReader|] v1 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.setParent:(Lorg/xml/sax/XMLReader;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L1c7d70.   v0.[|org:xml:sax:helpers:XMLFilterImpl.parent|]  := v1 @type object;
 #L1c7d74.   return @void ;
@@ -2053,9 +1870,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.setProperty|] ([|org:xml:sax:helpers:XMLFilterImpl|] v3 @type (this), [|java:lang:String|] v4 @type (object), [|java:lang:Object|] v5 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.setProperty:(Ljava/lang/String;Ljava/lang/Object;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
         v2;
@@ -2081,8 +1895,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.skippedEntity|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.skippedEntity:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c7de0.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.contentHandler|]   @type object;
@@ -2094,7 +1906,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.startDocument|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.startDocument:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c7e04.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.contentHandler|]   @type object;
@@ -2106,11 +1917,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.startElement|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object), [|java:lang:String|] v4 @type (object), [|org:xml:sax:Attributes|] v5 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.startElement:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
         v0;
       
 #L1c7e28.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.contentHandler|]   @type object;
@@ -2122,9 +1928,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.startPrefixMapping|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.startPrefixMapping:(Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L1c7e4c.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.contentHandler|]   @type object;
@@ -2136,11 +1939,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.unparsedEntityDecl|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object), [|java:lang:String|] v4 @type (object), [|java:lang:String|] v5 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.unparsedEntityDecl:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
         v0;
       
 #L1c7e70.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.dtdHandler|]   @type object;
@@ -2152,8 +1950,6 @@ record [|org:xml:sax:helpers:XMLFilterImpl|]  @type class @AccessFlag PUBLIC ext
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLFilterImpl.warning|] ([|org:xml:sax:helpers:XMLFilterImpl|] v1 @type (this), [|org:xml:sax:SAXParseException|] v2 @type (object)) @owner [|org:xml:sax:helpers:XMLFilterImpl|] @signature [|Lorg/xml/sax/helpers/XMLFilterImpl;.warning:(Lorg/xml/sax/SAXParseException;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c7e94.   v0:= v1.[|org:xml:sax:helpers:XMLFilterImpl.errorHandler|]   @type object;
@@ -2168,7 +1964,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|]  @type class @
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter.<init>|] ([|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|] v0 @type (this)) @owner [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter$AttributesAdapter;.<init>:()V|] @Access CONSTRUCTOR {
       local temp ;
-
       
 #L1c7eb8.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L1c7ebe.   return @void ;
@@ -2176,7 +1971,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|]  @type class @
    }
     procedure [|int|] [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter.getLength|] ([|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|] v1 @type (this)) @owner [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter$AttributesAdapter;.getLength:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c7ed0.   v0:= v1.[|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter.attributes|]   @type object;
@@ -2187,8 +1981,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|]  @type class @
    }
     procedure [|java:lang:String|] [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter.getName|] ([|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|] v1 @type (this), [|int|] v2) @owner [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter$AttributesAdapter;.getName:(I)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c7ef0.   v0:= v1.[|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter.attributes|]   @type object;
@@ -2199,8 +1991,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|]  @type class @
    }
     procedure [|java:lang:String|] [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter.getType|] ([|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|] v1 @type (this), [|int|] v2) @owner [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter$AttributesAdapter;.getType:(I)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c7f10.   v0:= v1.[|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter.attributes|]   @type object;
@@ -2211,8 +2001,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|]  @type class @
    }
     procedure [|java:lang:String|] [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter.getType|] ([|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter$AttributesAdapter;.getType:(Ljava/lang/String;)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c7f30.   v0:= v1.[|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter.attributes|]   @type object;
@@ -2223,8 +2011,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|]  @type class @
    }
     procedure [|java:lang:String|] [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter.getValue|] ([|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|] v1 @type (this), [|int|] v2) @owner [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter$AttributesAdapter;.getValue:(I)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c7f50.   v0:= v1.[|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter.attributes|]   @type object;
@@ -2235,8 +2021,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|]  @type class @
    }
     procedure [|java:lang:String|] [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter.getValue|] ([|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter$AttributesAdapter;.getValue:(Ljava/lang/String;)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c7f70.   v0:= v1.[|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter.attributes|]   @type object;
@@ -2247,8 +2031,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|]  @type class @
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter.setAttributes|] ([|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|] v0 @type (this), [|org:xml:sax:Attributes|] v1 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter$AttributesAdapter;.setAttributes:(Lorg/xml/sax/Attributes;)V|] @Access  {
       local temp ;
-
-
       
 #L1c7f90.   v0.[|org:xml:sax:helpers:XMLReaderAdapter$AttributesAdapter.attributes|]  := v1 @type object;
 #L1c7f94.   return @void ;
@@ -2261,7 +2043,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.<init>|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v1 @type (this)) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L1c7fa8.   call temp:=  [|java:lang:Object.<init>|](v1) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
@@ -2273,8 +2054,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.<init>|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v0 @type (this), [|org:xml:sax:XMLReader|] v1 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.<init>:(Lorg/xml/sax/XMLReader;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L1c7fd0.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L1c7fd6.   call temp:=  [|org:xml:sax:helpers:XMLReaderAdapter.setup|](v0, v1) @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.setup:(Lorg/xml/sax/XMLReader;)V|] @classDescriptor [|org:xml:sax:helpers:XMLReaderAdapter|] @type direct;
@@ -2283,8 +2062,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.setup|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v2 @type (this), [|org:xml:sax:XMLReader|] v3 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.setup:(Lorg/xml/sax/XMLReader;)V|] @Access PRIVATE {
       local temp ;
-
-
         v0;
         v1;
       
@@ -2302,7 +2079,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.setupXMLReader|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v3 @type (this)) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.setupXMLReader:()V|] @Access PRIVATE {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -2325,10 +2101,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.characters|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v1 @type (this), [|char|][] v2, [|int|] v3, [|int|] v4) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.characters:([CII)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
         v0;
       
 #L1c8078.   v0:= v1.[|org:xml:sax:helpers:XMLReaderAdapter.documentHandler|]   @type object;
@@ -2340,7 +2112,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.endDocument|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v1 @type (this)) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.endDocument:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c809c.   v0:= v1.[|org:xml:sax:helpers:XMLReaderAdapter.documentHandler|]   @type object;
@@ -2352,10 +2123,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.endElement|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object), [|java:lang:String|] v4 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.endElement:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
         v0;
       
 #L1c80c0.   v0:= v1.[|org:xml:sax:helpers:XMLReaderAdapter.documentHandler|]   @type object;
@@ -2367,18 +2134,12 @@ record [|org:xml:sax:helpers:XMLReaderAdapter|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.endPrefixMapping|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.endPrefixMapping:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L1c80e4.   return @void ;
 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.ignorableWhitespace|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v1 @type (this), [|char|][] v2, [|int|] v3, [|int|] v4) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.ignorableWhitespace:([CII)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
         v0;
       
 #L1c80f8.   v0:= v1.[|org:xml:sax:helpers:XMLReaderAdapter.documentHandler|]   @type object;
@@ -2390,8 +2151,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.parse|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.parse:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c811c.   v0:= new [|org:xml:sax:InputSource|];
@@ -2402,8 +2161,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.parse|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v1 @type (this), [|org:xml:sax:InputSource|] v2 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.parse:(Lorg/xml/sax/InputSource;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c8140.   call temp:=  [|org:xml:sax:helpers:XMLReaderAdapter.setupXMLReader|](v1) @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.setupXMLReader:()V|] @classDescriptor [|org:xml:sax:helpers:XMLReaderAdapter|] @type direct;
@@ -2414,9 +2171,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.processingInstruction|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.processingInstruction:(Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L1c8164.   v0:= v1.[|org:xml:sax:helpers:XMLReaderAdapter.documentHandler|]   @type object;
@@ -2428,8 +2182,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.setDTDHandler|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v1 @type (this), [|org:xml:sax:DTDHandler|] v2 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.setDTDHandler:(Lorg/xml/sax/DTDHandler;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c8188.   v0:= v1.[|org:xml:sax:helpers:XMLReaderAdapter.xmlReader|]   @type object;
@@ -2439,8 +2191,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.setDocumentHandler|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v0 @type (this), [|org:xml:sax:DocumentHandler|] v1 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.setDocumentHandler:(Lorg/xml/sax/DocumentHandler;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L1c81a4.   v0.[|org:xml:sax:helpers:XMLReaderAdapter.documentHandler|]  := v1 @type object;
 #L1c81a8.   return @void ;
@@ -2448,8 +2198,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.setDocumentLocator|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v1 @type (this), [|org:xml:sax:Locator|] v2 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.setDocumentLocator:(Lorg/xml/sax/Locator;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c81bc.   v0:= v1.[|org:xml:sax:helpers:XMLReaderAdapter.documentHandler|]   @type object;
@@ -2461,8 +2209,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.setEntityResolver|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v1 @type (this), [|org:xml:sax:EntityResolver|] v2 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.setEntityResolver:(Lorg/xml/sax/EntityResolver;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c81e0.   v0:= v1.[|org:xml:sax:helpers:XMLReaderAdapter.xmlReader|]   @type object;
@@ -2472,8 +2218,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.setErrorHandler|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v1 @type (this), [|org:xml:sax:ErrorHandler|] v2 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.setErrorHandler:(Lorg/xml/sax/ErrorHandler;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c81fc.   v0:= v1.[|org:xml:sax:helpers:XMLReaderAdapter.xmlReader|]   @type object;
@@ -2483,8 +2227,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.setLocale|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v2 @type (this), [|java:util:Locale|] v3 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.setLocale:(Ljava/util/Locale;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -2496,15 +2238,12 @@ record [|org:xml:sax:helpers:XMLReaderAdapter|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.skippedEntity|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.skippedEntity:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L1c8238.   return @void ;
 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.startDocument|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v1 @type (this)) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.startDocument:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c824c.   v0:= v1.[|org:xml:sax:helpers:XMLReaderAdapter.documentHandler|]   @type object;
@@ -2516,11 +2255,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.startElement|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v2 @type (this), [|java:lang:String|] v3 @type (object), [|java:lang:String|] v4 @type (object), [|java:lang:String|] v5 @type (object), [|org:xml:sax:Attributes|] v6 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.startElement:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
         v0;
         v1;
       
@@ -2536,9 +2270,6 @@ record [|org:xml:sax:helpers:XMLReaderAdapter|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderAdapter.startPrefixMapping|] ([|org:xml:sax:helpers:XMLReaderAdapter|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:String|] v2 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderAdapter|] @signature [|Lorg/xml/sax/helpers/XMLReaderAdapter;.startPrefixMapping:(Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L1c82a4.   return @void ;
 
@@ -2548,7 +2279,6 @@ record [|org:xml:sax:helpers:XMLReaderFactory|]  @type class @AccessFlag PUBLIC_
       global [|java:lang:String|] @@[|org:xml:sax:helpers:XMLReaderFactory.property|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|org:xml:sax:helpers:XMLReaderFactory.<init>|] ([|org:xml:sax:helpers:XMLReaderFactory|] v0 @type (this)) @owner [|org:xml:sax:helpers:XMLReaderFactory|] @signature [|Lorg/xml/sax/helpers/XMLReaderFactory;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L1c82b8.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L1c82be.   return @void ;
@@ -2556,12 +2286,12 @@ record [|org:xml:sax:helpers:XMLReaderFactory|]  @type class @AccessFlag PUBLIC_
    }
     procedure [|org:xml:sax:XMLReader|] [|org:xml:sax:helpers:XMLReaderFactory.createXMLReader|] () @owner [|org:xml:sax:helpers:XMLReaderFactory|] @signature [|Lorg/xml/sax/helpers/XMLReaderFactory;.createXMLReader:()Lorg/xml/sax/XMLReader;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:io:InputStream|] v2 @varname [|in|] @scope ((L0015,L002a), (L0037,L0038));
-        [|java:io:BufferedReader|] v4 @varname [|reader|] @scope ((L0023,L002a));
-        [|java:lang:String|] v5 @varname [|service|] @scope ((L000f,L002a), (L0033,L0038));
-        [|java:lang:Exception|] v1 @varname [|e|] @scope ((L0043,L004b));
-        [|java:lang:String|] v0 @varname [|className|] @scope ((L0001,L004f));
-        [|java:lang:ClassLoader|] v3 @varname [|loader|] @scope ((L0005,L004f));
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
         v6;
         v7;
       
@@ -2615,7 +2345,6 @@ record [|org:xml:sax:helpers:XMLReaderFactory|]  @type class @AccessFlag PUBLIC_
    }
     procedure [|org:xml:sax:XMLReader|] [|org:xml:sax:helpers:XMLReaderFactory.createXMLReader|] ([|java:lang:String|] v1 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderFactory|] @signature [|Lorg/xml/sax/helpers/XMLReaderFactory;.createXMLReader:(Ljava/lang/String;)Lorg/xml/sax/XMLReader;|] @Access PUBLIC_STATIC {
       local temp ;
-
         v0;
       
 #L1c83b0.   call temp:=  [|org:xml:sax:helpers:NewInstance.getClassLoader|]() @signature [|Lorg/xml/sax/helpers/NewInstance;.getClassLoader:()Ljava/lang/ClassLoader;|] @classDescriptor [|org:xml:sax:helpers:NewInstance|] @type static;
@@ -2627,12 +2356,10 @@ record [|org:xml:sax:helpers:XMLReaderFactory|]  @type class @AccessFlag PUBLIC_
    }
     procedure [|org:xml:sax:XMLReader|] [|org:xml:sax:helpers:XMLReaderFactory.loadClass|] ([|java:lang:ClassLoader|] v7 @type (object), [|java:lang:String|] v8 @type (object)) @owner [|org:xml:sax:helpers:XMLReaderFactory|] @signature [|Lorg/xml/sax/helpers/XMLReaderFactory;.loadClass:(Ljava/lang/ClassLoader;Ljava/lang/String;)Lorg/xml/sax/XMLReader;|] @Access PRIVATE_STATIC {
       local temp ;
-        [|java:lang:ClassNotFoundException|] v0 @varname [|e1|] @scope ((L0008,L0027));
-        [|java:lang:IllegalAccessException|] v1 @varname [|e2|] @scope ((L0028,L0047));
-        [|java:lang:InstantiationException|] v2 @varname [|e3|] @scope ((L0048,L0067));
-        [|java:lang:ClassCastException|] v3 @varname [|e4|] @scope ((L0068,L0087));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -2718,8 +2445,6 @@ record [|org:xmlpull:v1:XmlPullParserException|]  @type class @AccessFlag PUBLIC
    }
     procedure [|void|] [|org:xmlpull:v1:XmlPullParserException.<init>|] ([|org:xmlpull:v1:XmlPullParserException|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:xmlpull:v1:XmlPullParserException|] @signature [|Lorg/xmlpull/v1/XmlPullParserException;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L1c850c.   v0:= -1  @length 4;
@@ -2731,10 +2456,6 @@ record [|org:xmlpull:v1:XmlPullParserException|]  @type class @AccessFlag PUBLIC
    }
     procedure [|void|] [|org:xmlpull:v1:XmlPullParserException.<init>|] ([|org:xmlpull:v1:XmlPullParserException|] v4 @type (this), [|java:lang:String|] v5 @type (object), [|org:xmlpull:v1:XmlPullParser|] v6 @type (object), [|java:lang:Throwable|] v7 @type (object)) @owner [|org:xmlpull:v1:XmlPullParserException|] @signature [|Lorg/xmlpull/v1/XmlPullParserException;.<init>:(Ljava/lang/String;Lorg/xmlpull/v1/XmlPullParser;Ljava/lang/Throwable;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
-
         v0;
         v1;
         v2;
@@ -2808,7 +2529,6 @@ record [|org:xmlpull:v1:XmlPullParserException|]  @type class @AccessFlag PUBLIC
    }
     procedure [|int|] [|org:xmlpull:v1:XmlPullParserException.getColumnNumber|] ([|org:xmlpull:v1:XmlPullParserException|] v1 @type (this)) @owner [|org:xmlpull:v1:XmlPullParserException|] @signature [|Lorg/xmlpull/v1/XmlPullParserException;.getColumnNumber:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c8640.   v0:= v1.[|org:xmlpull:v1:XmlPullParserException.column|] ;
@@ -2817,7 +2537,6 @@ record [|org:xmlpull:v1:XmlPullParserException|]  @type class @AccessFlag PUBLIC
    }
     procedure [|java:lang:Throwable|] [|org:xmlpull:v1:XmlPullParserException.getDetail|] ([|org:xmlpull:v1:XmlPullParserException|] v1 @type (this)) @owner [|org:xmlpull:v1:XmlPullParserException|] @signature [|Lorg/xmlpull/v1/XmlPullParserException;.getDetail:()Ljava/lang/Throwable;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c8658.   v0:= v1.[|org:xmlpull:v1:XmlPullParserException.detail|]   @type object;
@@ -2826,7 +2545,6 @@ record [|org:xmlpull:v1:XmlPullParserException|]  @type class @AccessFlag PUBLIC
    }
     procedure [|int|] [|org:xmlpull:v1:XmlPullParserException.getLineNumber|] ([|org:xmlpull:v1:XmlPullParserException|] v1 @type (this)) @owner [|org:xmlpull:v1:XmlPullParserException|] @signature [|Lorg/xmlpull/v1/XmlPullParserException;.getLineNumber:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c8670.   v0:= v1.[|org:xmlpull:v1:XmlPullParserException.row|] ;
@@ -2835,7 +2553,6 @@ record [|org:xmlpull:v1:XmlPullParserException|]  @type class @AccessFlag PUBLIC
    }
     procedure [|void|] [|org:xmlpull:v1:XmlPullParserException.printStackTrace|] ([|org:xmlpull:v1:XmlPullParserException|] v4 @type (this)) @owner [|org:xmlpull:v1:XmlPullParserException|] @signature [|Lorg/xmlpull/v1/XmlPullParserException;.printStackTrace:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -2881,7 +2598,7 @@ record [|org:xmlpull:v1:XmlPullParserFactory|]  @type class @AccessFlag PUBLIC  
       global [|java:lang:Class|] @@[|org:xmlpull:v1:XmlPullParserFactory.referenceContextClass|]    @AccessFlag STATIC_FINAL;
     procedure [|void|] [|org:xmlpull:v1:XmlPullParserFactory.<clinit>|] () @owner [|org:xmlpull:v1:XmlPullParserFactory|] @signature [|Lorg/xmlpull/v1/XmlPullParserFactory;.<clinit>:()V|] @Access STATIC_CONSTRUCTOR {
       local temp ;
-        [|org:xmlpull:v1:XmlPullParserFactory|] v0 @varname [|f|] @scope ((L0005,L000c));
+        v0;
         v1;
       
 #L1c8708.   v0:= new [|org:xmlpull:v1:XmlPullParserFactory|];
@@ -2894,7 +2611,6 @@ record [|org:xmlpull:v1:XmlPullParserFactory|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|org:xmlpull:v1:XmlPullParserFactory.<init>|] ([|org:xmlpull:v1:XmlPullParserFactory|] v1 @type (this)) @owner [|org:xmlpull:v1:XmlPullParserFactory|] @signature [|Lorg/xmlpull/v1/XmlPullParserFactory;.<init>:()V|] @Access PROTECTED_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L1c8730.   call temp:=  [|java:lang:Object.<init>|](v1) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
@@ -2916,17 +2632,15 @@ record [|org:xmlpull:v1:XmlPullParserFactory|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|org:xmlpull:v1:XmlPullParserFactory|] [|org:xmlpull:v1:XmlPullParserFactory.newInstance|] ([|java:lang:String|] v12 @type (object), [|java:lang:Class|] v13 @type (object)) @owner [|org:xmlpull:v1:XmlPullParserFactory|] @signature [|Lorg/xmlpull/v1/XmlPullParserFactory;.newInstance:(Ljava/lang/String;Ljava/lang/Class;)Lorg/xmlpull/v1/XmlPullParserFactory;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:lang:Object|] v3 @varname [|instance|] @scope ((L0027,L002f), (L007a,L007c));
-        [|boolean|] v7 @varname [|recognized|] @scope ((L0032,L0067));
-        [|java:lang:Class|] v0 @varname [|candidate|] @scope ((L0026,L006a), (L007a,L007c));
-        [|int|] v1 @varname [|cut|] @scope ((L001a,L006a), (L007a,L007c));
-        [|java:lang:String|] v4 @varname [|name|] @scope ((L0025,L006a), (L007a,L007c));
-        [|org:xmlpull:v1:XmlPullParserFactory|] v2 @varname [|factory|] @scope ((L0003,L006e), (L0071,L007c));
-        [|java:util:ArrayList|] v5 @varname [|parserClasses|] @scope ((L0008,L007c));
-        [|int|] v6 @varname [|pos|] @scope ((L000e,L007c));
-        [|java:util:ArrayList|] v8 @varname [|serializerClasses|] @scope ((L000d,L007c));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
         v9;
         v10;
         v11;
@@ -3002,9 +2716,7 @@ record [|org:xmlpull:v1:XmlPullParserFactory|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|boolean|] [|org:xmlpull:v1:XmlPullParserFactory.getFeature|] ([|org:xmlpull:v1:XmlPullParserFactory|] v2 @type (this), [|java:lang:String|] v3 @type (object)) @owner [|org:xmlpull:v1:XmlPullParserFactory|] @signature [|Lorg/xmlpull/v1/XmlPullParserFactory;.getFeature:(Ljava/lang/String;)Z|] @Access PUBLIC {
       local temp ;
-        [|java:lang:Boolean|] v0 @varname [|value|] @scope ((L0008,L0011));
-
-
+        v0;
         v1;
       
 #L1c888c.   v1:= v2.[|org:xmlpull:v1:XmlPullParserFactory.features|]   @type object;
@@ -3021,7 +2733,6 @@ record [|org:xmlpull:v1:XmlPullParserFactory|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|boolean|] [|org:xmlpull:v1:XmlPullParserFactory.isNamespaceAware|] ([|org:xmlpull:v1:XmlPullParserFactory|] v1 @type (this)) @owner [|org:xmlpull:v1:XmlPullParserFactory|] @signature [|Lorg/xmlpull/v1/XmlPullParserFactory;.isNamespaceAware:()Z|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c88c0.   v0:= "http://xmlpull.org/v1/doc/features.html#process-namespaces" @type (object, string);
@@ -3032,7 +2743,6 @@ record [|org:xmlpull:v1:XmlPullParserFactory|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|boolean|] [|org:xmlpull:v1:XmlPullParserFactory.isValidating|] ([|org:xmlpull:v1:XmlPullParserFactory|] v1 @type (this)) @owner [|org:xmlpull:v1:XmlPullParserFactory|] @signature [|Lorg/xmlpull/v1/XmlPullParserFactory;.isValidating:()Z|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c88e0.   v0:= "http://xmlpull.org/v1/doc/features.html#validation" @type (object, string);
@@ -3043,15 +2753,14 @@ record [|org:xmlpull:v1:XmlPullParserFactory|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|org:xmlpull:v1:XmlPullParser|] [|org:xmlpull:v1:XmlPullParserFactory.newPullParser|] ([|org:xmlpull:v1:XmlPullParserFactory|] v11 @type (this)) @owner [|org:xmlpull:v1:XmlPullParserFactory|] @signature [|Lorg/xmlpull/v1/XmlPullParserFactory;.newPullParser:()Lorg/xmlpull/v1/XmlPullParser;|] @Access PUBLIC {
       local temp ;
-        [|java:util:Iterator|] v3 @varname [|iter|] @scope ((L0068,L0089), (L00ce,L00cf));
-        [|java:lang:String|] v4 @varname [|key|] @scope ((L0074,L0089));
-        [|org:xmlpull:v1:XmlPullParser|] v5 @varname [|pp|] @scope ((L005e,L0089), (L00ce,L00cf));
-        [|java:lang:Boolean|] v7 @varname [|value|] @scope ((L007c,L0089));
-        [|java:lang:Exception|] v0 @varname [|ex|] @scope ((L008a,L00b5));
-        [|java:lang:Class|] v6 @varname [|ppClass|] @scope ((L0058,L00b5), (L00ce,L00cf));
-        [|int|] v1 @varname [|i|] @scope ((L0048,L00cf));
-        [|java:lang:StringBuilder|] v2 @varname [|issues|] @scope ((L0047,L00cf));
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
         v8;
         v9;
         v10;
@@ -3164,12 +2873,11 @@ record [|org:xmlpull:v1:XmlPullParserFactory|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|org:xmlpull:v1:XmlSerializer|] [|org:xmlpull:v1:XmlPullParserFactory.newSerializer|] ([|org:xmlpull:v1:XmlPullParserFactory|] v8 @type (this)) @owner [|org:xmlpull:v1:XmlPullParserFactory|] @signature [|Lorg/xmlpull/v1/XmlPullParserFactory;.newSerializer:()Lorg/xmlpull/v1/XmlSerializer;|] @Access PUBLIC {
       local temp ;
-        [|org:xmlpull:v1:XmlSerializer|] v4 @varname [|ser|] @scope ((L005e,L005f));
-        [|java:lang:Exception|] v0 @varname [|ex|] @scope ((L0060,L008b));
-        [|java:lang:Class|] v3 @varname [|ppClass|] @scope ((L0058,L008b));
-        [|int|] v1 @varname [|i|] @scope ((L0048,L00a4));
-        [|java:lang:StringBuilder|] v2 @varname [|issues|] @scope ((L0047,L00a4));
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
         v5;
         v6;
         v7;
@@ -3260,9 +2968,6 @@ record [|org:xmlpull:v1:XmlPullParserFactory|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|org:xmlpull:v1:XmlPullParserFactory.setFeature|] ([|org:xmlpull:v1:XmlPullParserFactory|] v2 @type (this), [|java:lang:String|] v3 @type (object), [|boolean|] v4) @owner [|org:xmlpull:v1:XmlPullParserFactory|] @signature [|Lorg/xmlpull/v1/XmlPullParserFactory;.setFeature:(Ljava/lang/String;Z)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -3275,8 +2980,6 @@ record [|org:xmlpull:v1:XmlPullParserFactory|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|org:xmlpull:v1:XmlPullParserFactory.setNamespaceAware|] ([|org:xmlpull:v1:XmlPullParserFactory|] v3 @type (this), [|boolean|] v4) @owner [|org:xmlpull:v1:XmlPullParserFactory|] @signature [|Lorg/xmlpull/v1/XmlPullParserFactory;.setNamespaceAware:(Z)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -3291,8 +2994,6 @@ record [|org:xmlpull:v1:XmlPullParserFactory|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|org:xmlpull:v1:XmlPullParserFactory.setValidating|] ([|org:xmlpull:v1:XmlPullParserFactory|] v3 @type (this), [|boolean|] v4) @owner [|org:xmlpull:v1:XmlPullParserFactory|] @signature [|Lorg/xmlpull/v1/XmlPullParserFactory;.setValidating:(Z)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -3320,8 +3021,7 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
       global [|java:lang:String|] @@[|org:xmlpull:v1:sax2:Driver.VALIDATION_FEATURE|]    @AccessFlag PROTECTED_STATIC_FINAL;
     procedure [|void|] [|org:xmlpull:v1:sax2:Driver.<init>|] ([|org:xmlpull:v1:sax2:Driver|] v2 @type (this)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-        [|org:xmlpull:v1:XmlPullParserFactory|] v0 @varname [|factory|] @scope ((L0015,L0020));
-
+        v0;
         v1;
       
 #L1c8c9c.   call temp:=  [|java:lang:Object.<init>|](v2) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
@@ -3343,8 +3043,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|void|] [|org:xmlpull:v1:sax2:Driver.<init>|] ([|org:xmlpull:v1:sax2:Driver|] v1 @type (this), [|org:xmlpull:v1:XmlPullParser|] v2 @type (object)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.<init>:(Lorg/xmlpull/v1/XmlPullParser;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L1c8cec.   call temp:=  [|java:lang:Object.<init>|](v1) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
@@ -3360,7 +3058,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|int|] [|org:xmlpull:v1:sax2:Driver.getColumnNumber|] ([|org:xmlpull:v1:sax2:Driver|] v1 @type (this)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getColumnNumber:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c8d24.   v0:= v1.[|org:xmlpull:v1:sax2:Driver.pp|]   @type object;
@@ -3371,7 +3068,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|org:xml:sax:ContentHandler|] [|org:xmlpull:v1:sax2:Driver.getContentHandler|] ([|org:xmlpull:v1:sax2:Driver|] v1 @type (this)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getContentHandler:()Lorg/xml/sax/ContentHandler;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c8d44.   v0:= v1.[|org:xmlpull:v1:sax2:Driver.contentHandler|]   @type object;
@@ -3380,7 +3076,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|org:xml:sax:DTDHandler|] [|org:xmlpull:v1:sax2:Driver.getDTDHandler|] ([|org:xmlpull:v1:sax2:Driver|] v1 @type (this)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getDTDHandler:()Lorg/xml/sax/DTDHandler;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c8d5c.   v0:= 0  @length 4;
@@ -3389,7 +3084,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|org:xml:sax:EntityResolver|] [|org:xmlpull:v1:sax2:Driver.getEntityResolver|] ([|org:xmlpull:v1:sax2:Driver|] v1 @type (this)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getEntityResolver:()Lorg/xml/sax/EntityResolver;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c8d70.   v0:= 0  @length 4;
@@ -3398,7 +3092,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|org:xml:sax:ErrorHandler|] [|org:xmlpull:v1:sax2:Driver.getErrorHandler|] ([|org:xmlpull:v1:sax2:Driver|] v1 @type (this)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getErrorHandler:()Lorg/xml/sax/ErrorHandler;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c8d84.   v0:= v1.[|org:xmlpull:v1:sax2:Driver.errorHandler|]   @type object;
@@ -3407,8 +3100,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|boolean|] [|org:xmlpull:v1:sax2:Driver.getFeature|] ([|org:xmlpull:v1:sax2:Driver|] v2 @type (this), [|java:lang:String|] v3 @type (object)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getFeature:(Ljava/lang/String;)Z|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -3447,9 +3138,7 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|int|] [|org:xmlpull:v1:sax2:Driver.getIndex|] ([|org:xmlpull:v1:sax2:Driver|] v2 @type (this), [|java:lang:String|] v3 @type (object)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getIndex:(Ljava/lang/String;)I|] @Access PUBLIC {
       local temp ;
-        [|int|] v0 @varname [|i|] @scope ((L0001,L0015), (L0016,L001b));
-
-
+        v0;
         v1;
       
 #L1c8e20.   v0:= 0  @length 4;
@@ -3472,10 +3161,7 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|int|] [|org:xmlpull:v1:sax2:Driver.getIndex|] ([|org:xmlpull:v1:sax2:Driver|] v2 @type (this), [|java:lang:String|] v3 @type (object), [|java:lang:String|] v4 @type (object)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getIndex:(Ljava/lang/String;Ljava/lang/String;)I|] @Access PUBLIC {
       local temp ;
-        [|int|] v0 @varname [|i|] @scope ((L0001,L0021), (L0022,L0027));
-
-
-
+        v0;
         v1;
       
 #L1c8e68.   v0:= 0  @length 4;
@@ -3504,7 +3190,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|int|] [|org:xmlpull:v1:sax2:Driver.getLength|] ([|org:xmlpull:v1:sax2:Driver|] v1 @type (this)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getLength:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c8ec8.   v0:= v1.[|org:xmlpull:v1:sax2:Driver.pp|]   @type object;
@@ -3515,7 +3200,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|int|] [|org:xmlpull:v1:sax2:Driver.getLineNumber|] ([|org:xmlpull:v1:sax2:Driver|] v1 @type (this)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getLineNumber:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c8ee8.   v0:= v1.[|org:xmlpull:v1:sax2:Driver.pp|]   @type object;
@@ -3526,8 +3210,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|java:lang:String|] [|org:xmlpull:v1:sax2:Driver.getLocalName|] ([|org:xmlpull:v1:sax2:Driver|] v1 @type (this), [|int|] v2) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getLocalName:(I)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c8f08.   v0:= v1.[|org:xmlpull:v1:sax2:Driver.pp|]   @type object;
@@ -3538,8 +3220,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|java:lang:Object|] [|org:xmlpull:v1:sax2:Driver.getProperty|] ([|org:xmlpull:v1:sax2:Driver|] v2 @type (this), [|java:lang:String|] v3 @type (object)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getProperty:(Ljava/lang/String;)Ljava/lang/Object;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -3561,7 +3241,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|java:lang:String|] [|org:xmlpull:v1:sax2:Driver.getPublicId|] ([|org:xmlpull:v1:sax2:Driver|] v1 @type (this)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getPublicId:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c8f6c.   v0:= 0  @length 4;
@@ -3570,9 +3249,7 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|java:lang:String|] [|org:xmlpull:v1:sax2:Driver.getQName|] ([|org:xmlpull:v1:sax2:Driver|] v3 @type (this), [|int|] v4) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getQName:(I)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|prefix|] @scope ((L0006,L002d));
-
-
+        v0;
         v1;
         v2;
       
@@ -3603,7 +3280,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|java:lang:String|] [|org:xmlpull:v1:sax2:Driver.getSystemId|] ([|org:xmlpull:v1:sax2:Driver|] v1 @type (this)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getSystemId:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L1c8fec.   v0:= v1.[|org:xmlpull:v1:sax2:Driver.systemId|]   @type object;
@@ -3612,8 +3288,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|java:lang:String|] [|org:xmlpull:v1:sax2:Driver.getType|] ([|org:xmlpull:v1:sax2:Driver|] v1 @type (this), [|int|] v2) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getType:(I)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c9004.   v0:= v1.[|org:xmlpull:v1:sax2:Driver.pp|]   @type object;
@@ -3624,9 +3298,7 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|java:lang:String|] [|org:xmlpull:v1:sax2:Driver.getType|] ([|org:xmlpull:v1:sax2:Driver|] v2 @type (this), [|java:lang:String|] v3 @type (object)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getType:(Ljava/lang/String;)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-        [|int|] v0 @varname [|i|] @scope ((L0001,L0021));
-
-
+        v0;
         v1;
       
 #L1c9024.   v0:= 0  @length 4;
@@ -3652,10 +3324,7 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|java:lang:String|] [|org:xmlpull:v1:sax2:Driver.getType|] ([|org:xmlpull:v1:sax2:Driver|] v2 @type (this), [|java:lang:String|] v3 @type (object), [|java:lang:String|] v4 @type (object)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getType:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-        [|int|] v0 @varname [|i|] @scope ((L0001,L002d));
-
-
-
+        v0;
         v1;
       
 #L1c9078.   v0:= 0  @length 4;
@@ -3687,8 +3356,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|java:lang:String|] [|org:xmlpull:v1:sax2:Driver.getURI|] ([|org:xmlpull:v1:sax2:Driver|] v1 @type (this), [|int|] v2) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getURI:(I)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c90e4.   v0:= v1.[|org:xmlpull:v1:sax2:Driver.pp|]   @type object;
@@ -3699,8 +3366,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|java:lang:String|] [|org:xmlpull:v1:sax2:Driver.getValue|] ([|org:xmlpull:v1:sax2:Driver|] v1 @type (this), [|int|] v2) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getValue:(I)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c9104.   v0:= v1.[|org:xmlpull:v1:sax2:Driver.pp|]   @type object;
@@ -3711,8 +3376,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|java:lang:String|] [|org:xmlpull:v1:sax2:Driver.getValue|] ([|org:xmlpull:v1:sax2:Driver|] v2 @type (this), [|java:lang:String|] v3 @type (object)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getValue:(Ljava/lang/String;)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -3725,9 +3388,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|java:lang:String|] [|org:xmlpull:v1:sax2:Driver.getValue|] ([|org:xmlpull:v1:sax2:Driver|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.getValue:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L1c9144.   v0:= v1.[|org:xmlpull:v1:sax2:Driver.pp|]   @type object;
@@ -3738,8 +3398,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|void|] [|org:xmlpull:v1:sax2:Driver.parse|] ([|org:xmlpull:v1:sax2:Driver|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.parse:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L1c9164.   v0:= new [|org:xml:sax:InputSource|];
@@ -3750,16 +3408,14 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|void|] [|org:xmlpull:v1:sax2:Driver.parse|] ([|org:xmlpull:v1:sax2:Driver|] v10 @type (this), [|org:xml:sax:InputSource|] v11 @type (object)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.parse:(Lorg/xml/sax/InputSource;)V|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|encoding|] @scope ((L0019,L0031), (L0032,L0042), (L0098,L00c3));
-        [|org:xml:sax:SAXParseException|] v5 @varname [|saxException|] @scope ((L002c,L0031), (L0073,L0079), (L0092,L0098), (L00bc,L00c3), (L00dc,L00e3));
-        [|java:io:InputStream|] v6 @varname [|stream|] @scope ((L0015,L0031), (L0032,L0042), (L0098,L009b), (L00a0,L00a1));
-        [|java:net:URL|] v7 @varname [|url|] @scope ((L0039,L003d));
-        [|org:xmlpull:v1:XmlPullParserException|] v1 @varname [|ex|] @scope ((L007a,L0098), (L00c4,L00e3));
-        [|java:io:FileNotFoundException|] v2 @varname [|fnfe|] @scope ((L00a2,L00c3));
-        [|java:net:MalformedURLException|] v3 @varname [|nue|] @scope ((L0099,L00c3));
-        [|java:io:Reader|] v4 @varname [|reader|] @scope ((L000f,L00f6));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
         v8;
         v9;
       
@@ -3892,26 +3548,24 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|void|] [|org:xmlpull:v1:sax2:Driver.parseSubTree|] ([|org:xmlpull:v1:sax2:Driver|] v22 @type (this), [|org:xmlpull:v1:XmlPullParser|] v23 @type (object)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.parseSubTree:(Lorg/xmlpull/v1/XmlPullParser;)V|] @Access PUBLIC {
       local temp ;
-        [|org:xmlpull:v1:XmlPullParserException|] v8 @varname [|ex|] @scope ((L003a,L006a));
-        [|org:xml:sax:SAXParseException|] v16 @varname [|saxException|] @scope ((L005a,L006a));
-        [|int|] v5 @varname [|count|] @scope ((L00ae,L00c9), (L00cb,L0100), (L018f,L01a5));
-        [|int|] v6 @varname [|countPrev|] @scope ((L00a4,L00c9), (L00cb,L0100), (L0181,L01a5));
-        [|int|] v10 @varname [|i|] @scope ((L00af,L00c9), (L00cb,L0100), (L0191,L01a5));
-        [|int|] v7 @varname [|depth|] @scope ((L009c,L0100), (L0173,L01a5), (L01aa,L01ac));
-        [|char|][] v4 @varname [|chars|] @scope ((L011f,L0138));
-        [|int|][] v9 @varname [|holderForStartAndLength|] @scope ((L0071,L01d0));
-        [|int|] v11 @varname [|level|] @scope ((L0082,L01d0));
-        [|java:lang:String|] v12 @varname [|name|] @scope ((L007c,L01d0));
-        [|boolean|] v13 @varname [|namespaceAware|] @scope ((L0010,L01d0));
-        [|java:lang:String|] v14 @varname [|prefix|] @scope ((L007b,L01d0));
-        [|java:lang:StringBuilder|] v15 @varname [|rawName|] @scope ((L007a,L01d0));
-        [|int|] v17 @varname [|type|] @scope ((L0084,L01d0));
-
-
         v0;
         v1;
         v2;
         v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
+        v9;
+        v10;
+        v11;
+        v12;
+        v13;
+        v14;
+        v15;
+        v16;
+        v17;
         v18;
         v19;
         v20;
@@ -4152,8 +3806,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|void|] [|org:xmlpull:v1:sax2:Driver.setContentHandler|] ([|org:xmlpull:v1:sax2:Driver|] v0 @type (this), [|org:xml:sax:ContentHandler|] v1 @type (object)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.setContentHandler:(Lorg/xml/sax/ContentHandler;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L1c97a0.   v0.[|org:xmlpull:v1:sax2:Driver.contentHandler|]  := v1 @type object;
 #L1c97a4.   return @void ;
@@ -4161,24 +3813,18 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|void|] [|org:xmlpull:v1:sax2:Driver.setDTDHandler|] ([|org:xmlpull:v1:sax2:Driver|] v0 @type (this), [|org:xml:sax:DTDHandler|] v1 @type (object)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.setDTDHandler:(Lorg/xml/sax/DTDHandler;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L1c97b8.   return @void ;
 
    }
     procedure [|void|] [|org:xmlpull:v1:sax2:Driver.setEntityResolver|] ([|org:xmlpull:v1:sax2:Driver|] v0 @type (this), [|org:xml:sax:EntityResolver|] v1 @type (object)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.setEntityResolver:(Lorg/xml/sax/EntityResolver;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L1c97cc.   return @void ;
 
    }
     procedure [|void|] [|org:xmlpull:v1:sax2:Driver.setErrorHandler|] ([|org:xmlpull:v1:sax2:Driver|] v0 @type (this), [|org:xml:sax:ErrorHandler|] v1 @type (object)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.setErrorHandler:(Lorg/xml/sax/ErrorHandler;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L1c97e0.   v0.[|org:xmlpull:v1:sax2:Driver.errorHandler|]  := v1 @type object;
 #L1c97e4.   return @void ;
@@ -4186,9 +3832,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|void|] [|org:xmlpull:v1:sax2:Driver.setFeature|] ([|org:xmlpull:v1:sax2:Driver|] v2 @type (this), [|java:lang:String|] v3 @type (object), [|boolean|] v4) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.setFeature:(Ljava/lang/String;Z)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -4231,10 +3874,7 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|void|] [|org:xmlpull:v1:sax2:Driver.setProperty|] ([|org:xmlpull:v1:sax2:Driver|] v4 @type (this), [|java:lang:String|] v5 @type (object), [|java:lang:Object|] v6 @type (object)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.setProperty:(Ljava/lang/String;Ljava/lang/Object;)V|] @Access PUBLIC {
       local temp ;
-        [|org:xmlpull:v1:XmlPullParserException|] v0 @varname [|ex|] @scope ((L0049,L006c));
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -4297,10 +3937,6 @@ record [|org:xmlpull:v1:sax2:Driver|]  @type class @AccessFlag PUBLIC extends  [
    }
     procedure [|void|] [|org:xmlpull:v1:sax2:Driver.startElement|] ([|org:xmlpull:v1:sax2:Driver|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object), [|java:lang:String|] v4 @type (object)) @owner [|org:xmlpull:v1:sax2:Driver|] @signature [|Lorg/xmlpull/v1/sax2/Driver;.startElement:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V|] @Access PROTECTED {
       local temp ;
-
-
-
-
         v0;
       
 #L1c9994.   v0:= v1.[|org:xmlpull:v1:sax2:Driver.contentHandler|]   @type object;
@@ -4323,7 +3959,6 @@ record [|sun:misc:Unsafe|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|sun:misc:Unsafe.<init>|] ([|sun:misc:Unsafe|] v0 @type (this)) @owner [|sun:misc:Unsafe|] @signature [|Lsun/misc/Unsafe;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L1c99d0.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L1c99d6.   return @void ;
@@ -4337,7 +3972,7 @@ record [|sun:misc:Unsafe|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|sun:misc:Unsafe|] [|sun:misc:Unsafe.getUnsafe|] () @owner [|sun:misc:Unsafe|] @signature [|Lsun/misc/Unsafe;.getUnsafe:()Lsun/misc/Unsafe;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:lang:ClassLoader|] v0 @varname [|calling|] @scope ((L0004,L0019));
+        v0;
         v1;
         v2;
       
@@ -4361,8 +3996,6 @@ record [|sun:misc:Unsafe|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|int|] [|sun:misc:Unsafe.arrayBaseOffset|] ([|sun:misc:Unsafe|] v2 @type (this), [|java:lang:Class|] v3 @type (object)) @owner [|sun:misc:Unsafe|] @signature [|Lsun/misc/Unsafe;.arrayBaseOffset:(Ljava/lang/Class;)I|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -4380,8 +4013,6 @@ record [|sun:misc:Unsafe|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|int|] [|sun:misc:Unsafe.arrayIndexScale|] ([|sun:misc:Unsafe|] v2 @type (this), [|java:lang:Class|] v3 @type (object)) @owner [|sun:misc:Unsafe|] @signature [|Lsun/misc/Unsafe;.arrayIndexScale:(Ljava/lang/Class;)I|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -4426,8 +4057,6 @@ record [|sun:misc:Unsafe|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|long|] [|sun:misc:Unsafe.objectFieldOffset|] ([|sun:misc:Unsafe|] v2 @type (this), [|java:lang:reflect:Field|] v3 @type (object)) @owner [|sun:misc:Unsafe|] @signature [|Lsun/misc/Unsafe;.objectFieldOffset:(Ljava/lang/reflect/Field;)J|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -4447,9 +4076,6 @@ record [|sun:misc:Unsafe|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|sun:misc:Unsafe.park|] ([|sun:misc:Unsafe|] v1 @type (this), [|boolean|] v2, [|long|] v3) @owner [|sun:misc:Unsafe|] @signature [|Lsun/misc/Unsafe;.park:(ZJ)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L1c9adc.   if v2 == 0 then goto L1c9af0;
@@ -4492,9 +4118,6 @@ record [|sun:misc:Unsafe|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|sun:misc:Unsafe.unpark|] ([|sun:misc:Unsafe|] v2 @type (this), [|java:lang:Object|] v3 @type (object)) @owner [|sun:misc:Unsafe|] @signature [|Lsun/misc/Unsafe;.unpark:(Ljava/lang/Object;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
       

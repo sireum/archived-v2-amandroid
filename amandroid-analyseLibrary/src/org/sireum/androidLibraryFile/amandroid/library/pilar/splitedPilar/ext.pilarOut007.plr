@@ -2,7 +2,6 @@ record [|org:apache:commons:logging:impl:NoOpLog|]  @type class @AccessFlag PUBL
    }
     procedure [|void|] [|org:apache:commons:logging:impl:NoOpLog.<init>|] ([|org:apache:commons:logging:impl:NoOpLog|] v0 @type (this)) @owner [|org:apache:commons:logging:impl:NoOpLog|] @signature [|Lorg/apache/commons/logging/impl/NoOpLog;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L09820c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L098212.   return @void ;
@@ -10,8 +9,6 @@ record [|org:apache:commons:logging:impl:NoOpLog|]  @type class @AccessFlag PUBL
    }
     procedure [|void|] [|org:apache:commons:logging:impl:NoOpLog.<init>|] ([|org:apache:commons:logging:impl:NoOpLog|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:apache:commons:logging:impl:NoOpLog|] @signature [|Lorg/apache/commons/logging/impl/NoOpLog;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L098224.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L09822a.   return @void ;
@@ -19,75 +16,54 @@ record [|org:apache:commons:logging:impl:NoOpLog|]  @type class @AccessFlag PUBL
    }
     procedure [|void|] [|org:apache:commons:logging:impl:NoOpLog.debug|] ([|org:apache:commons:logging:impl:NoOpLog|] v0 @type (this), [|java:lang:Object|] v1 @type (object)) @owner [|org:apache:commons:logging:impl:NoOpLog|] @signature [|Lorg/apache/commons/logging/impl/NoOpLog;.debug:(Ljava/lang/Object;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09823c.   return @void ;
 
    }
     procedure [|void|] [|org:apache:commons:logging:impl:NoOpLog.debug|] ([|org:apache:commons:logging:impl:NoOpLog|] v0 @type (this), [|java:lang:Object|] v1 @type (object), [|java:lang:Throwable|] v2 @type (object)) @owner [|org:apache:commons:logging:impl:NoOpLog|] @signature [|Lorg/apache/commons/logging/impl/NoOpLog;.debug:(Ljava/lang/Object;Ljava/lang/Throwable;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L098250.   return @void ;
 
    }
     procedure [|void|] [|org:apache:commons:logging:impl:NoOpLog.error|] ([|org:apache:commons:logging:impl:NoOpLog|] v0 @type (this), [|java:lang:Object|] v1 @type (object)) @owner [|org:apache:commons:logging:impl:NoOpLog|] @signature [|Lorg/apache/commons/logging/impl/NoOpLog;.error:(Ljava/lang/Object;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L098264.   return @void ;
 
    }
     procedure [|void|] [|org:apache:commons:logging:impl:NoOpLog.error|] ([|org:apache:commons:logging:impl:NoOpLog|] v0 @type (this), [|java:lang:Object|] v1 @type (object), [|java:lang:Throwable|] v2 @type (object)) @owner [|org:apache:commons:logging:impl:NoOpLog|] @signature [|Lorg/apache/commons/logging/impl/NoOpLog;.error:(Ljava/lang/Object;Ljava/lang/Throwable;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L098278.   return @void ;
 
    }
     procedure [|void|] [|org:apache:commons:logging:impl:NoOpLog.fatal|] ([|org:apache:commons:logging:impl:NoOpLog|] v0 @type (this), [|java:lang:Object|] v1 @type (object)) @owner [|org:apache:commons:logging:impl:NoOpLog|] @signature [|Lorg/apache/commons/logging/impl/NoOpLog;.fatal:(Ljava/lang/Object;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09828c.   return @void ;
 
    }
     procedure [|void|] [|org:apache:commons:logging:impl:NoOpLog.fatal|] ([|org:apache:commons:logging:impl:NoOpLog|] v0 @type (this), [|java:lang:Object|] v1 @type (object), [|java:lang:Throwable|] v2 @type (object)) @owner [|org:apache:commons:logging:impl:NoOpLog|] @signature [|Lorg/apache/commons/logging/impl/NoOpLog;.fatal:(Ljava/lang/Object;Ljava/lang/Throwable;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L0982a0.   return @void ;
 
    }
     procedure [|void|] [|org:apache:commons:logging:impl:NoOpLog.info|] ([|org:apache:commons:logging:impl:NoOpLog|] v0 @type (this), [|java:lang:Object|] v1 @type (object)) @owner [|org:apache:commons:logging:impl:NoOpLog|] @signature [|Lorg/apache/commons/logging/impl/NoOpLog;.info:(Ljava/lang/Object;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L0982b4.   return @void ;
 
    }
     procedure [|void|] [|org:apache:commons:logging:impl:NoOpLog.info|] ([|org:apache:commons:logging:impl:NoOpLog|] v0 @type (this), [|java:lang:Object|] v1 @type (object), [|java:lang:Throwable|] v2 @type (object)) @owner [|org:apache:commons:logging:impl:NoOpLog|] @signature [|Lorg/apache/commons/logging/impl/NoOpLog;.info:(Ljava/lang/Object;Ljava/lang/Throwable;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L0982c8.   return @void ;
 
    }
     procedure [|boolean|] [|org:apache:commons:logging:impl:NoOpLog.isDebugEnabled|] ([|org:apache:commons:logging:impl:NoOpLog|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:NoOpLog|] @signature [|Lorg/apache/commons/logging/impl/NoOpLog;.isDebugEnabled:()Z|] @Access PUBLIC_FINAL {
       local temp ;
-
         v0;
       
 #L0982dc.   v0:= 0  @length 4;
@@ -96,7 +72,6 @@ record [|org:apache:commons:logging:impl:NoOpLog|]  @type class @AccessFlag PUBL
    }
     procedure [|boolean|] [|org:apache:commons:logging:impl:NoOpLog.isErrorEnabled|] ([|org:apache:commons:logging:impl:NoOpLog|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:NoOpLog|] @signature [|Lorg/apache/commons/logging/impl/NoOpLog;.isErrorEnabled:()Z|] @Access PUBLIC_FINAL {
       local temp ;
-
         v0;
       
 #L0982f0.   v0:= 0  @length 4;
@@ -105,7 +80,6 @@ record [|org:apache:commons:logging:impl:NoOpLog|]  @type class @AccessFlag PUBL
    }
     procedure [|boolean|] [|org:apache:commons:logging:impl:NoOpLog.isFatalEnabled|] ([|org:apache:commons:logging:impl:NoOpLog|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:NoOpLog|] @signature [|Lorg/apache/commons/logging/impl/NoOpLog;.isFatalEnabled:()Z|] @Access PUBLIC_FINAL {
       local temp ;
-
         v0;
       
 #L098304.   v0:= 0  @length 4;
@@ -114,7 +88,6 @@ record [|org:apache:commons:logging:impl:NoOpLog|]  @type class @AccessFlag PUBL
    }
     procedure [|boolean|] [|org:apache:commons:logging:impl:NoOpLog.isInfoEnabled|] ([|org:apache:commons:logging:impl:NoOpLog|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:NoOpLog|] @signature [|Lorg/apache/commons/logging/impl/NoOpLog;.isInfoEnabled:()Z|] @Access PUBLIC_FINAL {
       local temp ;
-
         v0;
       
 #L098318.   v0:= 0  @length 4;
@@ -123,7 +96,6 @@ record [|org:apache:commons:logging:impl:NoOpLog|]  @type class @AccessFlag PUBL
    }
     procedure [|boolean|] [|org:apache:commons:logging:impl:NoOpLog.isTraceEnabled|] ([|org:apache:commons:logging:impl:NoOpLog|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:NoOpLog|] @signature [|Lorg/apache/commons/logging/impl/NoOpLog;.isTraceEnabled:()Z|] @Access PUBLIC_FINAL {
       local temp ;
-
         v0;
       
 #L09832c.   v0:= 0  @length 4;
@@ -132,7 +104,6 @@ record [|org:apache:commons:logging:impl:NoOpLog|]  @type class @AccessFlag PUBL
    }
     procedure [|boolean|] [|org:apache:commons:logging:impl:NoOpLog.isWarnEnabled|] ([|org:apache:commons:logging:impl:NoOpLog|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:NoOpLog|] @signature [|Lorg/apache/commons/logging/impl/NoOpLog;.isWarnEnabled:()Z|] @Access PUBLIC_FINAL {
       local temp ;
-
         v0;
       
 #L098340.   v0:= 0  @length 4;
@@ -141,34 +112,24 @@ record [|org:apache:commons:logging:impl:NoOpLog|]  @type class @AccessFlag PUBL
    }
     procedure [|void|] [|org:apache:commons:logging:impl:NoOpLog.trace|] ([|org:apache:commons:logging:impl:NoOpLog|] v0 @type (this), [|java:lang:Object|] v1 @type (object)) @owner [|org:apache:commons:logging:impl:NoOpLog|] @signature [|Lorg/apache/commons/logging/impl/NoOpLog;.trace:(Ljava/lang/Object;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L098354.   return @void ;
 
    }
     procedure [|void|] [|org:apache:commons:logging:impl:NoOpLog.trace|] ([|org:apache:commons:logging:impl:NoOpLog|] v0 @type (this), [|java:lang:Object|] v1 @type (object), [|java:lang:Throwable|] v2 @type (object)) @owner [|org:apache:commons:logging:impl:NoOpLog|] @signature [|Lorg/apache/commons/logging/impl/NoOpLog;.trace:(Ljava/lang/Object;Ljava/lang/Throwable;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L098368.   return @void ;
 
    }
     procedure [|void|] [|org:apache:commons:logging:impl:NoOpLog.warn|] ([|org:apache:commons:logging:impl:NoOpLog|] v0 @type (this), [|java:lang:Object|] v1 @type (object)) @owner [|org:apache:commons:logging:impl:NoOpLog|] @signature [|Lorg/apache/commons/logging/impl/NoOpLog;.warn:(Ljava/lang/Object;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09837c.   return @void ;
 
    }
     procedure [|void|] [|org:apache:commons:logging:impl:NoOpLog.warn|] ([|org:apache:commons:logging:impl:NoOpLog|] v0 @type (this), [|java:lang:Object|] v1 @type (object), [|java:lang:Throwable|] v2 @type (object)) @owner [|org:apache:commons:logging:impl:NoOpLog|] @signature [|Lorg/apache/commons/logging/impl/NoOpLog;.warn:(Ljava/lang/Object;Ljava/lang/Throwable;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L098390.   return @void ;
 
@@ -178,7 +139,6 @@ record [|org:apache:commons:logging:impl:SimpleLog$1|]  @type class @AccessFlag 
    }
     procedure [|void|] [|org:apache:commons:logging:impl:SimpleLog$1.<init>|] ([|org:apache:commons:logging:impl:SimpleLog$1|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:apache:commons:logging:impl:SimpleLog$1|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog$1;.<init>:(Ljava/lang/String;)V|] @Access CONSTRUCTOR {
       local temp ;
-
       
 #L0983a4.   v0.[|org:apache:commons:logging:impl:SimpleLog$1.val$name|]  := v1 @type object;
 #L0983a8.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
@@ -187,8 +147,7 @@ record [|org:apache:commons:logging:impl:SimpleLog$1|]  @type class @AccessFlag 
    }
     procedure [|java:lang:Object|] [|org:apache:commons:logging:impl:SimpleLog$1.run|] ([|org:apache:commons:logging:impl:SimpleLog$1|] v2 @type (this)) @owner [|org:apache:commons:logging:impl:SimpleLog$1|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog$1;.run:()Ljava/lang/Object;|] @Access PUBLIC {
       local temp ;
-        [|java:lang:ClassLoader|] v0 @varname [|threadCL|] @scope ((L0004,L0014));
-
+        v0;
         v1;
       
 #L0983c0.   call temp:=  [|org:apache:commons:logging:impl:SimpleLog.access$000|]() @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.access$000:()Ljava/lang/ClassLoader;|] @classDescriptor [|org:apache:commons:logging:impl:SimpleLog|] @type static;
@@ -227,8 +186,8 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
       global [|java:lang:String|] @@[|org:apache:commons:logging:impl:SimpleLog.systemPrefix|]    @AccessFlag PROTECTED_STATIC_FINAL;
     procedure [|void|] [|org:apache:commons:logging:impl:SimpleLog.<clinit>|] () @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.<clinit>:()V|] @Access STATIC_CONSTRUCTOR {
       local temp ;
-        [|java:lang:IllegalArgumentException|] v0 @varname [|e|] @scope ((L005d,L006b));
-        [|java:io:InputStream|] v1 @varname [|in|] @scope ((L001c,L006d));
+        v0;
+        v1;
         v2;
         v3;
       
@@ -294,10 +253,8 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:commons:logging:impl:SimpleLog.<init>|] ([|org:apache:commons:logging:impl:SimpleLog|] v6 @type (this), [|java:lang:String|] v7 @type (object)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-        [|int|] v0 @varname [|i|] @scope ((L0032,L00cb));
-        [|java:lang:String|] v1 @varname [|lvl|] @scope ((L0028,L00cb));
-
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -421,10 +378,7 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|boolean|] [|org:apache:commons:logging:impl:SimpleLog.getBooleanProperty|] ([|java:lang:String|] v2 @type (object), [|boolean|] v3) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.getBooleanProperty:(Ljava/lang/String;Z)Z|] @Access PRIVATE_STATIC {
       local temp ;
-
-        [|java:lang:String|] v0 @varname [|prop|] @scope ((L0004,L000e));
-
-
+        v0;
         v1;
       
 #L0986c4.   call temp:=  [|org:apache:commons:logging:impl:SimpleLog.getStringProperty|](v2) @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.getStringProperty:(Ljava/lang/String;)Ljava/lang/String;|] @classDescriptor [|org:apache:commons:logging:impl:SimpleLog|] @type static;
@@ -439,10 +393,10 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|java:lang:ClassLoader|] [|org:apache:commons:logging:impl:SimpleLog.getContextClassLoader|] () @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.getContextClassLoader:()Ljava/lang/ClassLoader;|] @Access PRIVATE_STATIC {
       local temp ;
-        [|java:lang:reflect:Method|] v3 @varname [|method|] @scope ((L000e,L001d), (L0026,L003b), (L003d,L003f));
-        [|java:lang:reflect:InvocationTargetException|] v2 @varname [|e|] @scope ((L0027,L003b));
-        [|java:lang:ClassLoader|] v1 @varname [|classLoader|] @scope ((L0001,L003f));
         v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -493,7 +447,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|java:io:InputStream|] [|org:apache:commons:logging:impl:SimpleLog.getResourceAsStream|] ([|java:lang:String|] v1 @type (object)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.getResourceAsStream:(Ljava/lang/String;)Ljava/io/InputStream;|] @Access PRIVATE_STATIC {
       local temp ;
-
         v0;
       
 #L0987a8.   v0:= new [|org:apache:commons:logging:impl:SimpleLog$1|];
@@ -506,8 +459,7 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|java:lang:String|] [|org:apache:commons:logging:impl:SimpleLog.getStringProperty|] ([|java:lang:String|] v2 @type (object)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.getStringProperty:(Ljava/lang/String;)Ljava/lang/String;|] @Access PRIVATE_STATIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|prop|] @scope ((L0001,L000d), (L000e,L0010));
-
+        v0;
         v1;
       
 #L0987d0.   v0:= 0  @length 4;
@@ -525,10 +477,7 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|java:lang:String|] [|org:apache:commons:logging:impl:SimpleLog.getStringProperty|] ([|java:lang:String|] v1 @type (object), [|java:lang:String|] v2 @type (object)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.getStringProperty:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;|] @Access PRIVATE_STATIC {
       local temp ;
-
-        [|java:lang:String|] v0 @varname [|prop|] @scope ((L0004,L0009));
-
-
+        v0;
       
 #L098810.   call temp:=  [|org:apache:commons:logging:impl:SimpleLog.getStringProperty|](v1) @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.getStringProperty:(Ljava/lang/String;)Ljava/lang/String;|] @classDescriptor [|org:apache:commons:logging:impl:SimpleLog|] @type static;
 #L098816.   v0:= temp  @type object;
@@ -540,8 +489,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:commons:logging:impl:SimpleLog.debug|] ([|org:apache:commons:logging:impl:SimpleLog|] v2 @type (this), [|java:lang:Object|] v3 @type (object)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.debug:(Ljava/lang/Object;)V|] @Access PUBLIC_FINAL {
       local temp ;
-
-
         v0;
         v1;
       
@@ -556,9 +503,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:commons:logging:impl:SimpleLog.debug|] ([|org:apache:commons:logging:impl:SimpleLog|] v2 @type (this), [|java:lang:Object|] v3 @type (object), [|java:lang:Throwable|] v4 @type (object)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.debug:(Ljava/lang/Object;Ljava/lang/Throwable;)V|] @Access PUBLIC_FINAL {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -572,8 +516,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:commons:logging:impl:SimpleLog.error|] ([|org:apache:commons:logging:impl:SimpleLog|] v2 @type (this), [|java:lang:Object|] v3 @type (object)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.error:(Ljava/lang/Object;)V|] @Access PUBLIC_FINAL {
       local temp ;
-
-
         v0;
         v1;
       
@@ -588,9 +530,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:commons:logging:impl:SimpleLog.error|] ([|org:apache:commons:logging:impl:SimpleLog|] v2 @type (this), [|java:lang:Object|] v3 @type (object), [|java:lang:Throwable|] v4 @type (object)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.error:(Ljava/lang/Object;Ljava/lang/Throwable;)V|] @Access PUBLIC_FINAL {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -604,8 +543,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:commons:logging:impl:SimpleLog.fatal|] ([|org:apache:commons:logging:impl:SimpleLog|] v2 @type (this), [|java:lang:Object|] v3 @type (object)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.fatal:(Ljava/lang/Object;)V|] @Access PUBLIC_FINAL {
       local temp ;
-
-
         v0;
         v1;
       
@@ -620,9 +557,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:commons:logging:impl:SimpleLog.fatal|] ([|org:apache:commons:logging:impl:SimpleLog|] v2 @type (this), [|java:lang:Object|] v3 @type (object), [|java:lang:Throwable|] v4 @type (object)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.fatal:(Ljava/lang/Object;Ljava/lang/Throwable;)V|] @Access PUBLIC_FINAL {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -636,7 +570,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|int|] [|org:apache:commons:logging:impl:SimpleLog.getLevel|] ([|org:apache:commons:logging:impl:SimpleLog|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.getLevel:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L098924.   v0:= v1.[|org:apache:commons:logging:impl:SimpleLog.currentLogLevel|] ;
@@ -645,8 +578,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:commons:logging:impl:SimpleLog.info|] ([|org:apache:commons:logging:impl:SimpleLog|] v2 @type (this), [|java:lang:Object|] v3 @type (object)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.info:(Ljava/lang/Object;)V|] @Access PUBLIC_FINAL {
       local temp ;
-
-
         v0;
         v1;
       
@@ -661,9 +592,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:commons:logging:impl:SimpleLog.info|] ([|org:apache:commons:logging:impl:SimpleLog|] v2 @type (this), [|java:lang:Object|] v3 @type (object), [|java:lang:Throwable|] v4 @type (object)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.info:(Ljava/lang/Object;Ljava/lang/Throwable;)V|] @Access PUBLIC_FINAL {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -677,7 +605,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|boolean|] [|org:apache:commons:logging:impl:SimpleLog.isDebugEnabled|] ([|org:apache:commons:logging:impl:SimpleLog|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.isDebugEnabled:()Z|] @Access PUBLIC_FINAL {
       local temp ;
-
         v0;
       
 #L09898c.   v0:= 2  @length 4;
@@ -688,7 +615,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|boolean|] [|org:apache:commons:logging:impl:SimpleLog.isErrorEnabled|] ([|org:apache:commons:logging:impl:SimpleLog|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.isErrorEnabled:()Z|] @Access PUBLIC_FINAL {
       local temp ;
-
         v0;
       
 #L0989a8.   v0:= 5  @length 4;
@@ -699,7 +625,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|boolean|] [|org:apache:commons:logging:impl:SimpleLog.isFatalEnabled|] ([|org:apache:commons:logging:impl:SimpleLog|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.isFatalEnabled:()Z|] @Access PUBLIC_FINAL {
       local temp ;
-
         v0;
       
 #L0989c4.   v0:= 6  @length 4;
@@ -710,7 +635,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|boolean|] [|org:apache:commons:logging:impl:SimpleLog.isInfoEnabled|] ([|org:apache:commons:logging:impl:SimpleLog|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.isInfoEnabled:()Z|] @Access PUBLIC_FINAL {
       local temp ;
-
         v0;
       
 #L0989e0.   v0:= 3  @length 4;
@@ -721,8 +645,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|boolean|] [|org:apache:commons:logging:impl:SimpleLog.isLevelEnabled|] ([|org:apache:commons:logging:impl:SimpleLog|] v1 @type (this), [|int|] v2) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.isLevelEnabled:(I)Z|] @Access PROTECTED {
       local temp ;
-
-
         v0;
       
 #L0989fc.   v0:= v1.[|org:apache:commons:logging:impl:SimpleLog.currentLogLevel|] ;
@@ -735,7 +657,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|boolean|] [|org:apache:commons:logging:impl:SimpleLog.isTraceEnabled|] ([|org:apache:commons:logging:impl:SimpleLog|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.isTraceEnabled:()Z|] @Access PUBLIC_FINAL {
       local temp ;
-
         v0;
       
 #L098a1c.   v0:= 1  @length 4;
@@ -746,7 +667,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|boolean|] [|org:apache:commons:logging:impl:SimpleLog.isWarnEnabled|] ([|org:apache:commons:logging:impl:SimpleLog|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.isWarnEnabled:()Z|] @Access PUBLIC_FINAL {
       local temp ;
-
         v0;
       
 #L098a38.   v0:= 4  @length 4;
@@ -757,13 +677,9 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:commons:logging:impl:SimpleLog.log|] ([|org:apache:commons:logging:impl:SimpleLog|] v6 @type (this), [|int|] v7, [|java:lang:Object|] v8 @type (object), [|java:lang:Throwable|] v9 @type (object)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.log:(ILjava/lang/Object;Ljava/lang/Throwable;)V|] @Access PROTECTED {
       local temp ;
-        [|java:io:PrintWriter|] v1 @varname [|pw|] @scope ((L0080,L008d));
-        [|java:io:StringWriter|] v2 @varname [|sw|] @scope ((L007b,L008d));
-        [|java:lang:StringBuffer|] v0 @varname [|buf|] @scope ((L0005,L00de));
-
-
-
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -874,8 +790,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:commons:logging:impl:SimpleLog.setLevel|] ([|org:apache:commons:logging:impl:SimpleLog|] v0 @type (this), [|int|] v1) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.setLevel:(I)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L098c20.   v0.[|org:apache:commons:logging:impl:SimpleLog.currentLogLevel|]  := v1;
 #L098c24.   return @void ;
@@ -883,8 +797,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:commons:logging:impl:SimpleLog.trace|] ([|org:apache:commons:logging:impl:SimpleLog|] v2 @type (this), [|java:lang:Object|] v3 @type (object)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.trace:(Ljava/lang/Object;)V|] @Access PUBLIC_FINAL {
       local temp ;
-
-
         v0;
         v1;
       
@@ -899,9 +811,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:commons:logging:impl:SimpleLog.trace|] ([|org:apache:commons:logging:impl:SimpleLog|] v2 @type (this), [|java:lang:Object|] v3 @type (object), [|java:lang:Throwable|] v4 @type (object)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.trace:(Ljava/lang/Object;Ljava/lang/Throwable;)V|] @Access PUBLIC_FINAL {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -915,8 +824,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:commons:logging:impl:SimpleLog.warn|] ([|org:apache:commons:logging:impl:SimpleLog|] v2 @type (this), [|java:lang:Object|] v3 @type (object)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.warn:(Ljava/lang/Object;)V|] @Access PUBLIC_FINAL {
       local temp ;
-
-
         v0;
         v1;
       
@@ -931,9 +838,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:commons:logging:impl:SimpleLog.warn|] ([|org:apache:commons:logging:impl:SimpleLog|] v2 @type (this), [|java:lang:Object|] v3 @type (object), [|java:lang:Throwable|] v4 @type (object)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.warn:(Ljava/lang/Object;Ljava/lang/Throwable;)V|] @Access PUBLIC_FINAL {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -947,8 +851,6 @@ record [|org:apache:commons:logging:impl:SimpleLog|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:commons:logging:impl:SimpleLog.write|] ([|org:apache:commons:logging:impl:SimpleLog|] v2 @type (this), [|java:lang:StringBuffer|] v3 @type (object)) @owner [|org:apache:commons:logging:impl:SimpleLog|] @signature [|Lorg/apache/commons/logging/impl/SimpleLog;.write:(Ljava/lang/StringBuffer;)V|] @Access PROTECTED {
       local temp ;
-
-
         v0;
         v1;
       
@@ -965,7 +867,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable$1|]  @type class @AccessF
    }
     procedure [|void|] [|org:apache:commons:logging:impl:WeakHashtable$1.<init>|] ([|org:apache:commons:logging:impl:WeakHashtable$1|] v0 @type (this), [|org:apache:commons:logging:impl:WeakHashtable|] v1 @type (object), [|java:util:Enumeration|] v2 @type (object)) @owner [|org:apache:commons:logging:impl:WeakHashtable$1|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$1;.<init>:(Lorg/apache/commons/logging/impl/WeakHashtable;Ljava/util/Enumeration;)V|] @Access CONSTRUCTOR {
       local temp ;
-
       
 #L098cfc.   v0.[|org:apache:commons:logging:impl:WeakHashtable$1.this$0|]  := v1 @type object;
 #L098d00.   v0.[|org:apache:commons:logging:impl:WeakHashtable$1.val$enumer|]  := v2 @type object;
@@ -975,7 +876,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable$1|]  @type class @AccessF
    }
     procedure [|boolean|] [|org:apache:commons:logging:impl:WeakHashtable$1.hasMoreElements|] ([|org:apache:commons:logging:impl:WeakHashtable$1|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:WeakHashtable$1|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$1;.hasMoreElements:()Z|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L098d1c.   v0:= v1.[|org:apache:commons:logging:impl:WeakHashtable$1.val$enumer|]   @type object;
@@ -986,8 +886,7 @@ record [|org:apache:commons:logging:impl:WeakHashtable$1|]  @type class @AccessF
    }
     procedure [|java:lang:Object|] [|org:apache:commons:logging:impl:WeakHashtable$1.nextElement|] ([|org:apache:commons:logging:impl:WeakHashtable$1|] v2 @type (this)) @owner [|org:apache:commons:logging:impl:WeakHashtable$1|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$1;.nextElement:()Ljava/lang/Object;|] @Access PUBLIC {
       local temp ;
-        [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] v0 @varname [|nextReference|] @scope ((L0008,L000d));
-
+        v0;
         v1;
       
 #L098d3c.   v1:= v2.[|org:apache:commons:logging:impl:WeakHashtable$1.val$enumer|]   @type object;
@@ -1005,9 +904,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable$Entry|]  @type class @Acc
    }
     procedure [|void|] [|org:apache:commons:logging:impl:WeakHashtable$Entry.<init>|] ([|org:apache:commons:logging:impl:WeakHashtable$Entry|] v0 @type (this), [|java:lang:Object|] v1 @type (object), [|java:lang:Object|] v2 @type (object)) @owner [|org:apache:commons:logging:impl:WeakHashtable$Entry|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$Entry;.<init>:(Ljava/lang/Object;Ljava/lang/Object;)V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
-
-
       
 #L098d68.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L098d6e.   v0.[|org:apache:commons:logging:impl:WeakHashtable$Entry.key|]  := v1 @type object;
@@ -1017,10 +913,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable$Entry|]  @type class @Acc
    }
     procedure [|void|] [|org:apache:commons:logging:impl:WeakHashtable$Entry.<init>|] ([|org:apache:commons:logging:impl:WeakHashtable$Entry|] v0 @type (this), [|java:lang:Object|] v1 @type (object), [|java:lang:Object|] v2 @type (object), [|org:apache:commons:logging:impl:WeakHashtable$1|] v3 @type (object)) @owner [|org:apache:commons:logging:impl:WeakHashtable$Entry|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$Entry;.<init>:(Ljava/lang/Object;Ljava/lang/Object;Lorg/apache/commons/logging/impl/WeakHashtable$1;)V|] @Access SYNTHETIC_CONSTRUCTOR {
       local temp ;
-
-
-
-
       
 #L098d88.   call temp:=  [|org:apache:commons:logging:impl:WeakHashtable$Entry.<init>|](v0, v1, v2) @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$Entry;.<init>:(Ljava/lang/Object;Ljava/lang/Object;)V|] @classDescriptor [|org:apache:commons:logging:impl:WeakHashtable$Entry|] @type direct;
 #L098d8e.   return @void ;
@@ -1028,10 +920,8 @@ record [|org:apache:commons:logging:impl:WeakHashtable$Entry|]  @type class @Acc
    }
     procedure [|boolean|] [|org:apache:commons:logging:impl:WeakHashtable$Entry.equals|] ([|org:apache:commons:logging:impl:WeakHashtable$Entry|] v4 @type (this), [|java:lang:Object|] v5 @type (object)) @owner [|org:apache:commons:logging:impl:WeakHashtable$Entry|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$Entry;.equals:(Ljava/lang/Object;)Z|] @Access PUBLIC {
       local temp ;
-        [|java:util:Map$Entry|] v0 @varname [|entry|] @scope ((L000a,L0023), (L0024,L0043));
-        [|boolean|] v1 @varname [|result|] @scope ((L0001,L0043));
-
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -1076,7 +966,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable$Entry|]  @type class @Acc
    }
     procedure [|java:lang:Object|] [|org:apache:commons:logging:impl:WeakHashtable$Entry.getKey|] ([|org:apache:commons:logging:impl:WeakHashtable$Entry|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:WeakHashtable$Entry|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$Entry;.getKey:()Ljava/lang/Object;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L098e38.   v0:= v1.[|org:apache:commons:logging:impl:WeakHashtable$Entry.key|]   @type object;
@@ -1085,7 +974,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable$Entry|]  @type class @Acc
    }
     procedure [|java:lang:Object|] [|org:apache:commons:logging:impl:WeakHashtable$Entry.getValue|] ([|org:apache:commons:logging:impl:WeakHashtable$Entry|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:WeakHashtable$Entry|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$Entry;.getValue:()Ljava/lang/Object;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L098e50.   v0:= v1.[|org:apache:commons:logging:impl:WeakHashtable$Entry.value|]   @type object;
@@ -1094,7 +982,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable$Entry|]  @type class @Acc
    }
     procedure [|int|] [|org:apache:commons:logging:impl:WeakHashtable$Entry.hashCode|] ([|org:apache:commons:logging:impl:WeakHashtable$Entry|] v3 @type (this)) @owner [|org:apache:commons:logging:impl:WeakHashtable$Entry|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$Entry;.hashCode:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -1123,8 +1010,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable$Entry|]  @type class @Acc
    }
     procedure [|java:lang:Object|] [|org:apache:commons:logging:impl:WeakHashtable$Entry.setValue|] ([|org:apache:commons:logging:impl:WeakHashtable$Entry|] v2 @type (this), [|java:lang:Object|] v3 @type (object)) @owner [|org:apache:commons:logging:impl:WeakHashtable$Entry|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$Entry;.setValue:(Ljava/lang/Object;)Ljava/lang/Object;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -1140,8 +1025,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable$Referenced|]  @type class
    }
     procedure [|void|] [|org:apache:commons:logging:impl:WeakHashtable$Referenced.<init>|] ([|org:apache:commons:logging:impl:WeakHashtable$Referenced|] v1 @type (this), [|java:lang:Object|] v2 @type (object)) @owner [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;.<init>:(Ljava/lang/Object;)V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L098edc.   call temp:=  [|java:lang:Object.<init>|](v1) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
@@ -1156,9 +1039,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable$Referenced|]  @type class
    }
     procedure [|void|] [|org:apache:commons:logging:impl:WeakHashtable$Referenced.<init>|] ([|org:apache:commons:logging:impl:WeakHashtable$Referenced|] v2 @type (this), [|java:lang:Object|] v3 @type (object), [|java:lang:ref:ReferenceQueue|] v4 @type (object)) @owner [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;.<init>:(Ljava/lang/Object;Ljava/lang/ref/ReferenceQueue;)V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -1175,10 +1055,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable$Referenced|]  @type class
    }
     procedure [|void|] [|org:apache:commons:logging:impl:WeakHashtable$Referenced.<init>|] ([|org:apache:commons:logging:impl:WeakHashtable$Referenced|] v0 @type (this), [|java:lang:Object|] v1 @type (object), [|java:lang:ref:ReferenceQueue|] v2 @type (object), [|org:apache:commons:logging:impl:WeakHashtable$1|] v3 @type (object)) @owner [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;.<init>:(Ljava/lang/Object;Ljava/lang/ref/ReferenceQueue;Lorg/apache/commons/logging/impl/WeakHashtable$1;)V|] @Access SYNTHETIC_CONSTRUCTOR {
       local temp ;
-
-
-
-
       
 #L098f44.   call temp:=  [|org:apache:commons:logging:impl:WeakHashtable$Referenced.<init>|](v0, v1, v2) @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;.<init>:(Ljava/lang/Object;Ljava/lang/ref/ReferenceQueue;)V|] @classDescriptor [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] @type direct;
 #L098f4a.   return @void ;
@@ -1186,9 +1062,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable$Referenced|]  @type class
    }
     procedure [|void|] [|org:apache:commons:logging:impl:WeakHashtable$Referenced.<init>|] ([|org:apache:commons:logging:impl:WeakHashtable$Referenced|] v0 @type (this), [|java:lang:Object|] v1 @type (object), [|org:apache:commons:logging:impl:WeakHashtable$1|] v2 @type (object)) @owner [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;.<init>:(Ljava/lang/Object;Lorg/apache/commons/logging/impl/WeakHashtable$1;)V|] @Access SYNTHETIC_CONSTRUCTOR {
       local temp ;
-
-
-
       
 #L098f5c.   call temp:=  [|org:apache:commons:logging:impl:WeakHashtable$Referenced.<init>|](v0, v1) @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;.<init>:(Ljava/lang/Object;)V|] @classDescriptor [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] @type direct;
 #L098f62.   return @void ;
@@ -1196,7 +1069,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable$Referenced|]  @type class
    }
     procedure [|java:lang:Object|] [|org:apache:commons:logging:impl:WeakHashtable$Referenced.access$100|] ([|org:apache:commons:logging:impl:WeakHashtable$Referenced|] v1 @type (object)) @owner [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;.access$100:(Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;)Ljava/lang/Object;|] @Access STATIC_SYNTHETIC {
       local temp ;
-
         v0;
       
 #L098f74.   call temp:=  [|org:apache:commons:logging:impl:WeakHashtable$Referenced.getValue|](v1) @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;.getValue:()Ljava/lang/Object;|] @classDescriptor [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] @type direct;
@@ -1206,7 +1078,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable$Referenced|]  @type class
    }
     procedure [|java:lang:Object|] [|org:apache:commons:logging:impl:WeakHashtable$Referenced.getValue|] ([|org:apache:commons:logging:impl:WeakHashtable$Referenced|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;.getValue:()Ljava/lang/Object;|] @Access PRIVATE {
       local temp ;
-
         v0;
       
 #L098f90.   v0:= v1.[|org:apache:commons:logging:impl:WeakHashtable$Referenced.reference|]   @type object;
@@ -1217,12 +1088,10 @@ record [|org:apache:commons:logging:impl:WeakHashtable$Referenced|]  @type class
    }
     procedure [|boolean|] [|org:apache:commons:logging:impl:WeakHashtable$Referenced.equals|] ([|org:apache:commons:logging:impl:WeakHashtable$Referenced|] v8 @type (this), [|java:lang:Object|] v9 @type (object)) @owner [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;.equals:(Ljava/lang/Object;)Z|] @Access PUBLIC {
       local temp ;
-        [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] v0 @varname [|otherKey|] @scope ((L000a,L0024), (L0025,L002e));
-        [|java:lang:Object|] v1 @varname [|otherKeyValue|] @scope ((L0012,L0024), (L0025,L002e));
-        [|java:lang:Object|] v3 @varname [|thisKeyValue|] @scope ((L000e,L0024), (L0025,L002e));
-        [|boolean|] v2 @varname [|result|] @scope ((L0003,L002e));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -1261,7 +1130,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable$Referenced|]  @type class
    }
     procedure [|int|] [|org:apache:commons:logging:impl:WeakHashtable$Referenced.hashCode|] ([|org:apache:commons:logging:impl:WeakHashtable$Referenced|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;.hashCode:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09901c.   v0:= v1.[|org:apache:commons:logging:impl:WeakHashtable$Referenced.hashCode|] ;
@@ -1273,10 +1141,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable$WeakKey|]  @type class @A
    }
     procedure [|void|] [|org:apache:commons:logging:impl:WeakHashtable$WeakKey.<init>|] ([|org:apache:commons:logging:impl:WeakHashtable$WeakKey|] v0 @type (this), [|java:lang:Object|] v1 @type (object), [|java:lang:ref:ReferenceQueue|] v2 @type (object), [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] v3 @type (object)) @owner [|org:apache:commons:logging:impl:WeakHashtable$WeakKey|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$WeakKey;.<init>:(Ljava/lang/Object;Ljava/lang/ref/ReferenceQueue;Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;)V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
-
-
-
       
 #L099034.   call temp:=  [|java:lang:ref:WeakReference.<init>|](v0, v1, v2) @signature [|Ljava/lang/ref/WeakReference;.<init>:(Ljava/lang/Object;Ljava/lang/ref/ReferenceQueue;)V|] @classDescriptor [|java:lang:ref:WeakReference|] @type direct;
 #L09903a.   v0.[|org:apache:commons:logging:impl:WeakHashtable$WeakKey.referenced|]  := v3 @type object;
@@ -1285,11 +1149,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable$WeakKey|]  @type class @A
    }
     procedure [|void|] [|org:apache:commons:logging:impl:WeakHashtable$WeakKey.<init>|] ([|org:apache:commons:logging:impl:WeakHashtable$WeakKey|] v0 @type (this), [|java:lang:Object|] v1 @type (object), [|java:lang:ref:ReferenceQueue|] v2 @type (object), [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] v3 @type (object), [|org:apache:commons:logging:impl:WeakHashtable$1|] v4 @type (object)) @owner [|org:apache:commons:logging:impl:WeakHashtable$WeakKey|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$WeakKey;.<init>:(Ljava/lang/Object;Ljava/lang/ref/ReferenceQueue;Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;Lorg/apache/commons/logging/impl/WeakHashtable$1;)V|] @Access SYNTHETIC_CONSTRUCTOR {
       local temp ;
-
-
-
-
-
       
 #L099050.   call temp:=  [|org:apache:commons:logging:impl:WeakHashtable$WeakKey.<init>|](v0, v1, v2, v3) @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$WeakKey;.<init>:(Ljava/lang/Object;Ljava/lang/ref/ReferenceQueue;Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;)V|] @classDescriptor [|org:apache:commons:logging:impl:WeakHashtable$WeakKey|] @type direct;
 #L099056.   return @void ;
@@ -1297,7 +1156,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable$WeakKey|]  @type class @A
    }
     procedure [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] [|org:apache:commons:logging:impl:WeakHashtable$WeakKey.access$400|] ([|org:apache:commons:logging:impl:WeakHashtable$WeakKey|] v1 @type (object)) @owner [|org:apache:commons:logging:impl:WeakHashtable$WeakKey|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$WeakKey;.access$400:(Lorg/apache/commons/logging/impl/WeakHashtable$WeakKey;)Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;|] @Access STATIC_SYNTHETIC {
       local temp ;
-
         v0;
       
 #L099068.   call temp:=  [|org:apache:commons:logging:impl:WeakHashtable$WeakKey.getReferenced|](v1) @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$WeakKey;.getReferenced:()Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;|] @classDescriptor [|org:apache:commons:logging:impl:WeakHashtable$WeakKey|] @type direct;
@@ -1307,7 +1165,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable$WeakKey|]  @type class @A
    }
     procedure [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] [|org:apache:commons:logging:impl:WeakHashtable$WeakKey.getReferenced|] ([|org:apache:commons:logging:impl:WeakHashtable$WeakKey|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:WeakHashtable$WeakKey|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable$WeakKey;.getReferenced:()Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;|] @Access PRIVATE {
       local temp ;
-
         v0;
       
 #L099084.   v0:= v1.[|org:apache:commons:logging:impl:WeakHashtable$WeakKey.referenced|]   @type object;
@@ -1322,7 +1179,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable|]  @type class @AccessFla
       global [|int|] @@[|org:apache:commons:logging:impl:WeakHashtable.PARTIAL_PURGE_COUNT|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|org:apache:commons:logging:impl:WeakHashtable.<init>|] ([|org:apache:commons:logging:impl:WeakHashtable|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:WeakHashtable|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L09909c.   call temp:=  [|java:util:Hashtable.<init>|](v1) @signature [|Ljava/util/Hashtable;.<init>:()V|] @classDescriptor [|java:util:Hashtable|] @type direct;
@@ -1336,8 +1192,7 @@ record [|org:apache:commons:logging:impl:WeakHashtable|]  @type class @AccessFla
    }
     procedure [|void|] [|org:apache:commons:logging:impl:WeakHashtable.purge|] ([|org:apache:commons:logging:impl:WeakHashtable|] v3 @type (this)) @owner [|org:apache:commons:logging:impl:WeakHashtable|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.purge:()V|] @Access PRIVATE {
       local temp ;
-        [|org:apache:commons:logging:impl:WeakHashtable$WeakKey|] v0 @varname [|key|] @scope ((L000b,L0015), (L0018,L001a));
-
+        v0;
         v1;
         v2;
       
@@ -1363,8 +1218,7 @@ record [|org:apache:commons:logging:impl:WeakHashtable|]  @type class @AccessFla
    }
     procedure [|void|] [|org:apache:commons:logging:impl:WeakHashtable.purgeOne|] ([|org:apache:commons:logging:impl:WeakHashtable|] v3 @type (this)) @owner [|org:apache:commons:logging:impl:WeakHashtable|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.purgeOne:()V|] @Access PRIVATE {
       local temp ;
-        [|org:apache:commons:logging:impl:WeakHashtable$WeakKey|] v0 @varname [|key|] @scope ((L000b,L0016));
-
+        v0;
         v1;
         v2;
       
@@ -1388,9 +1242,7 @@ record [|org:apache:commons:logging:impl:WeakHashtable|]  @type class @AccessFla
    }
     procedure [|boolean|] [|org:apache:commons:logging:impl:WeakHashtable.containsKey|] ([|org:apache:commons:logging:impl:WeakHashtable|] v2 @type (this), [|java:lang:Object|] v3 @type (object)) @owner [|org:apache:commons:logging:impl:WeakHashtable|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.containsKey:(Ljava/lang/Object;)Z|] @Access PUBLIC {
       local temp ;
-        [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] v0 @varname [|referenced|] @scope ((L0006,L000b));
-
-
+        v0;
         v1;
       
 #L099170.   v0:= new [|org:apache:commons:logging:impl:WeakHashtable$Referenced|];
@@ -1403,7 +1255,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable|]  @type class @AccessFla
    }
     procedure [|java:util:Enumeration|] [|org:apache:commons:logging:impl:WeakHashtable.elements|] ([|org:apache:commons:logging:impl:WeakHashtable|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:WeakHashtable|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.elements:()Ljava/util/Enumeration;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L099198.   call temp:=  [|org:apache:commons:logging:impl:WeakHashtable.purge|](v1) @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.purge:()V|] @classDescriptor [|org:apache:commons:logging:impl:WeakHashtable|] @type direct;
@@ -1414,15 +1265,14 @@ record [|org:apache:commons:logging:impl:WeakHashtable|]  @type class @AccessFla
    }
     procedure [|java:util:Set|] [|org:apache:commons:logging:impl:WeakHashtable.entrySet|] ([|org:apache:commons:logging:impl:WeakHashtable|] v9 @type (this)) @owner [|org:apache:commons:logging:impl:WeakHashtable|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.entrySet:()Ljava/util/Set;|] @Access PUBLIC {
       local temp ;
-        [|org:apache:commons:logging:impl:WeakHashtable$Entry|] v0 @varname [|dereferencedEntry|] @scope ((L0032,L0036));
-        [|java:util:Map$Entry|] v1 @varname [|entry|] @scope ((L001c,L0036));
-        [|java:lang:Object|] v3 @varname [|key|] @scope ((L0026,L0036));
-        [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] v5 @varname [|referencedKey|] @scope ((L0022,L0036));
-        [|java:lang:Object|] v7 @varname [|value|] @scope ((L002a,L0036));
-        [|java:util:Iterator|] v2 @varname [|it|] @scope ((L0010,L0037));
-        [|java:util:Set|] v4 @varname [|referencedEntries|] @scope ((L0007,L0037));
-        [|java:util:Set|] v6 @varname [|unreferencedEntries|] @scope ((L000c,L0037));
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
         v8;
       
 #L0991b8.   call temp:=  [|org:apache:commons:logging:impl:WeakHashtable.purge|](v9) @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.purge:()V|] @classDescriptor [|org:apache:commons:logging:impl:WeakHashtable|] @type direct;
@@ -1456,9 +1306,7 @@ record [|org:apache:commons:logging:impl:WeakHashtable|]  @type class @AccessFla
    }
     procedure [|java:lang:Object|] [|org:apache:commons:logging:impl:WeakHashtable.get|] ([|org:apache:commons:logging:impl:WeakHashtable|] v2 @type (this), [|java:lang:Object|] v3 @type (object)) @owner [|org:apache:commons:logging:impl:WeakHashtable|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.get:(Ljava/lang/Object;)Ljava/lang/Object;|] @Access PUBLIC {
       local temp ;
-        [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] v0 @varname [|referenceKey|] @scope ((L0006,L000b));
-
-
+        v0;
         v1;
       
 #L099238.   v0:= new [|org:apache:commons:logging:impl:WeakHashtable$Referenced|];
@@ -1471,7 +1319,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable|]  @type class @AccessFla
    }
     procedure [|boolean|] [|org:apache:commons:logging:impl:WeakHashtable.isEmpty|] ([|org:apache:commons:logging:impl:WeakHashtable|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:WeakHashtable|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.isEmpty:()Z|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L099260.   call temp:=  [|org:apache:commons:logging:impl:WeakHashtable.purge|](v1) @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.purge:()V|] @classDescriptor [|org:apache:commons:logging:impl:WeakHashtable|] @type direct;
@@ -1482,12 +1329,11 @@ record [|org:apache:commons:logging:impl:WeakHashtable|]  @type class @AccessFla
    }
     procedure [|java:util:Set|] [|org:apache:commons:logging:impl:WeakHashtable.keySet|] ([|org:apache:commons:logging:impl:WeakHashtable|] v6 @type (this)) @owner [|org:apache:commons:logging:impl:WeakHashtable|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.keySet:()Ljava/util/Set;|] @Access PUBLIC {
       local temp ;
-        [|java:lang:Object|] v1 @varname [|keyValue|] @scope ((L0020,L0026));
-        [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] v2 @varname [|referenceKey|] @scope ((L001c,L0026));
-        [|java:util:Iterator|] v0 @varname [|it|] @scope ((L0010,L0027));
-        [|java:util:Set|] v3 @varname [|referencedKeys|] @scope ((L0007,L0027));
-        [|java:util:Set|] v4 @varname [|unreferencedKeys|] @scope ((L000c,L0027));
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
         v5;
       
 #L099280.   call temp:=  [|org:apache:commons:logging:impl:WeakHashtable.purge|](v6) @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.purge:()V|] @classDescriptor [|org:apache:commons:logging:impl:WeakHashtable|] @type direct;
@@ -1513,8 +1359,7 @@ record [|org:apache:commons:logging:impl:WeakHashtable|]  @type class @AccessFla
    }
     procedure [|java:util:Enumeration|] [|org:apache:commons:logging:impl:WeakHashtable.keys|] ([|org:apache:commons:logging:impl:WeakHashtable|] v2 @type (this)) @owner [|org:apache:commons:logging:impl:WeakHashtable|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.keys:()Ljava/util/Enumeration;|] @Access PUBLIC {
       local temp ;
-        [|java:util:Enumeration|] v0 @varname [|enumer|] @scope ((L0007,L000d));
-
+        v0;
         v1;
       
 #L0992e0.   call temp:=  [|org:apache:commons:logging:impl:WeakHashtable.purge|](v2) @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.purge:()V|] @classDescriptor [|org:apache:commons:logging:impl:WeakHashtable|] @type direct;
@@ -1527,11 +1372,8 @@ record [|org:apache:commons:logging:impl:WeakHashtable|]  @type class @AccessFla
    }
     procedure [|java:lang:Object|] [|org:apache:commons:logging:impl:WeakHashtable.put|] ([|org:apache:commons:logging:impl:WeakHashtable|] v4 @type (this), [|java:lang:Object|] v5 @type (object), [|java:lang:Object|] v6 @type (object)) @owner [|org:apache:commons:logging:impl:WeakHashtable|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;|] @Access PUBLIC {
       local temp ;
-        [|org:apache:commons:logging:impl:WeakHashtable$Referenced|] v0 @varname [|keyRef|] @scope ((L002d,L0032));
-        [|java:lang:Object|] v1 @varname [|result|] @scope ((L0025,L0032));
-
-
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -1570,11 +1412,9 @@ record [|org:apache:commons:logging:impl:WeakHashtable|]  @type class @AccessFla
    }
     procedure [|void|] [|org:apache:commons:logging:impl:WeakHashtable.putAll|] ([|org:apache:commons:logging:impl:WeakHashtable|] v5 @type (this), [|java:util:Map|] v6 @type (object)) @owner [|org:apache:commons:logging:impl:WeakHashtable|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.putAll:(Ljava/util/Map;)V|] @Access PUBLIC {
       local temp ;
-        [|java:util:Map$Entry|] v0 @varname [|entry|] @scope ((L0016,L0022));
-        [|java:util:Set|] v1 @varname [|entrySet|] @scope ((L0006,L0022));
-        [|java:util:Iterator|] v2 @varname [|it|] @scope ((L000a,L0022));
-
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
       
@@ -1600,7 +1440,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable|]  @type class @AccessFla
    }
     procedure [|void|] [|org:apache:commons:logging:impl:WeakHashtable.rehash|] ([|org:apache:commons:logging:impl:WeakHashtable|] v0 @type (this)) @owner [|org:apache:commons:logging:impl:WeakHashtable|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.rehash:()V|] @Access PROTECTED {
       local temp ;
-
       
 #L0993ec.   call temp:=  [|org:apache:commons:logging:impl:WeakHashtable.purge|](v0) @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.purge:()V|] @classDescriptor [|org:apache:commons:logging:impl:WeakHashtable|] @type direct;
 #L0993f2.   call temp:=  [|java:util:Hashtable.rehash|](v0) @signature [|Ljava/util/Hashtable;.rehash:()V|] @classDescriptor [|java:util:Hashtable|] @type super;
@@ -1609,8 +1448,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable|]  @type class @AccessFla
    }
     procedure [|java:lang:Object|] [|org:apache:commons:logging:impl:WeakHashtable.remove|] ([|org:apache:commons:logging:impl:WeakHashtable|] v2 @type (this), [|java:lang:Object|] v3 @type (object)) @owner [|org:apache:commons:logging:impl:WeakHashtable|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.remove:(Ljava/lang/Object;)Ljava/lang/Object;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -1637,7 +1474,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable|]  @type class @AccessFla
    }
     procedure [|int|] [|org:apache:commons:logging:impl:WeakHashtable.size|] ([|org:apache:commons:logging:impl:WeakHashtable|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:WeakHashtable|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.size:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L099468.   call temp:=  [|org:apache:commons:logging:impl:WeakHashtable.purge|](v1) @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.purge:()V|] @classDescriptor [|org:apache:commons:logging:impl:WeakHashtable|] @type direct;
@@ -1648,7 +1484,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable|]  @type class @AccessFla
    }
     procedure [|java:lang:String|] [|org:apache:commons:logging:impl:WeakHashtable.toString|] ([|org:apache:commons:logging:impl:WeakHashtable|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:WeakHashtable|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.toString:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L099488.   call temp:=  [|org:apache:commons:logging:impl:WeakHashtable.purge|](v1) @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.purge:()V|] @classDescriptor [|org:apache:commons:logging:impl:WeakHashtable|] @type direct;
@@ -1659,7 +1494,6 @@ record [|org:apache:commons:logging:impl:WeakHashtable|]  @type class @AccessFla
    }
     procedure [|java:util:Collection|] [|org:apache:commons:logging:impl:WeakHashtable.values|] ([|org:apache:commons:logging:impl:WeakHashtable|] v1 @type (this)) @owner [|org:apache:commons:logging:impl:WeakHashtable|] @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.values:()Ljava/util/Collection;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L0994a8.   call temp:=  [|org:apache:commons:logging:impl:WeakHashtable.purge|](v1) @signature [|Lorg/apache/commons/logging/impl/WeakHashtable;.purge:()V|] @classDescriptor [|org:apache:commons:logging:impl:WeakHashtable|] @type direct;
@@ -1673,8 +1507,6 @@ record [|org:apache:http:ConnectionClosedException|]  @type class @AccessFlag PU
       global [|long|] @@[|org:apache:http:ConnectionClosedException.serialVersionUID|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:ConnectionClosedException.<init>|] ([|org:apache:http:ConnectionClosedException|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:apache:http:ConnectionClosedException|] @signature [|Lorg/apache/http/ConnectionClosedException;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L0994c8.   call temp:=  [|java:io:IOException.<init>|](v0, v1) @signature [|Ljava/io/IOException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:io:IOException|] @type direct;
 #L0994ce.   return @void ;
@@ -1906,7 +1738,6 @@ record [|org:apache:http:HttpException|]  @type class @AccessFlag PUBLIC  extend
       global [|long|] @@[|org:apache:http:HttpException.serialVersionUID|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:HttpException.<init>|] ([|org:apache:http:HttpException|] v0 @type (this)) @owner [|org:apache:http:HttpException|] @signature [|Lorg/apache/http/HttpException;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L0994e0.   call temp:=  [|java:lang:Exception.<init>|](v0) @signature [|Ljava/lang/Exception;.<init>:()V|] @classDescriptor [|java:lang:Exception|] @type direct;
 #L0994e6.   return @void ;
@@ -1914,8 +1745,6 @@ record [|org:apache:http:HttpException|]  @type class @AccessFlag PUBLIC  extend
    }
     procedure [|void|] [|org:apache:http:HttpException.<init>|] ([|org:apache:http:HttpException|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:apache:http:HttpException|] @signature [|Lorg/apache/http/HttpException;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L0994f8.   call temp:=  [|java:lang:Exception.<init>|](v0, v1) @signature [|Ljava/lang/Exception;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:Exception|] @type direct;
 #L0994fe.   return @void ;
@@ -1923,9 +1752,6 @@ record [|org:apache:http:HttpException|]  @type class @AccessFlag PUBLIC  extend
    }
     procedure [|void|] [|org:apache:http:HttpException.<init>|] ([|org:apache:http:HttpException|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:Throwable|] v2 @type (object)) @owner [|org:apache:http:HttpException|] @signature [|Lorg/apache/http/HttpException;.<init>:(Ljava/lang/String;Ljava/lang/Throwable;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
       
 #L099510.   call temp:=  [|java:lang:Exception.<init>|](v0, v1) @signature [|Ljava/lang/Exception;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:Exception|] @type direct;
 #L099516.   call temp:=  [|org:apache:http:util:ExceptionUtils.initCause|](v0, v2) @signature [|Lorg/apache/http/util/ExceptionUtils;.initCause:(Ljava/lang/Throwable;Ljava/lang/Throwable;)V|] @classDescriptor [|org:apache:http:util:ExceptionUtils|] @type static;
@@ -1941,8 +1767,6 @@ record [|org:apache:http:HttpHost|]  @type class @AccessFlag PUBLIC_FINAL extend
       global [|java:lang:String|] @@[|org:apache:http:HttpHost.DEFAULT_SCHEME_NAME|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:HttpHost.<init>|] ([|org:apache:http:HttpHost|] v2 @type (this), [|java:lang:String|] v3 @type (object)) @owner [|org:apache:http:HttpHost|] @signature [|Lorg/apache/http/HttpHost;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
         v1;
       
@@ -1954,9 +1778,6 @@ record [|org:apache:http:HttpHost|]  @type class @AccessFlag PUBLIC_FINAL extend
    }
     procedure [|void|] [|org:apache:http:HttpHost.<init>|] ([|org:apache:http:HttpHost|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|int|] v3) @owner [|org:apache:http:HttpHost|] @signature [|Lorg/apache/http/HttpHost;.<init>:(Ljava/lang/String;I)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
         v0;
       
 #L09954c.   v0:= 0  @length 4;
@@ -1966,10 +1787,6 @@ record [|org:apache:http:HttpHost|]  @type class @AccessFlag PUBLIC_FINAL extend
    }
     procedure [|void|] [|org:apache:http:HttpHost.<init>|] ([|org:apache:http:HttpHost|] v2 @type (this), [|java:lang:String|] v3 @type (object), [|int|] v4, [|java:lang:String|] v5 @type (object)) @owner [|org:apache:http:HttpHost|] @signature [|Lorg/apache/http/HttpHost;.<init>:(Ljava/lang/String;ILjava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
-
         v0;
         v1;
       
@@ -1998,8 +1815,6 @@ record [|org:apache:http:HttpHost|]  @type class @AccessFlag PUBLIC_FINAL extend
    }
     procedure [|void|] [|org:apache:http:HttpHost.<init>|] ([|org:apache:http:HttpHost|] v3 @type (this), [|org:apache:http:HttpHost|] v4 @type (object)) @owner [|org:apache:http:HttpHost|] @signature [|Lorg/apache/http/HttpHost;.<init>:(Lorg/apache/http/HttpHost;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -2013,7 +1828,6 @@ record [|org:apache:http:HttpHost|]  @type class @AccessFlag PUBLIC_FINAL extend
    }
     procedure [|java:lang:Object|] [|org:apache:http:HttpHost.clone|] ([|org:apache:http:HttpHost|] v1 @type (this)) @owner [|org:apache:http:HttpHost|] @signature [|Lorg/apache/http/HttpHost;.clone:()Ljava/lang/Object;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L0995f0.   call temp:=  [|java:lang:Object.clone|](v1) @signature [|Ljava/lang/Object;.clone:()Ljava/lang/Object;|] @classDescriptor [|java:lang:Object|] @type super;
@@ -2023,9 +1837,7 @@ record [|org:apache:http:HttpHost|]  @type class @AccessFlag PUBLIC_FINAL extend
    }
     procedure [|boolean|] [|org:apache:http:HttpHost.equals|] ([|org:apache:http:HttpHost|] v5 @type (this), [|java:lang:Object|] v6 @type (object)) @owner [|org:apache:http:HttpHost|] @signature [|Lorg/apache/http/HttpHost;.equals:(Ljava/lang/Object;)Z|] @Access PUBLIC {
       local temp ;
-        [|org:apache:http:HttpHost|] v0 @varname [|that|] @scope ((L0010,L002e));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -2063,7 +1875,6 @@ record [|org:apache:http:HttpHost|]  @type class @AccessFlag PUBLIC_FINAL extend
    }
     procedure [|java:lang:String|] [|org:apache:http:HttpHost.getHostName|] ([|org:apache:http:HttpHost|] v1 @type (this)) @owner [|org:apache:http:HttpHost|] @signature [|Lorg/apache/http/HttpHost;.getHostName:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L099678.   v0:= v1.[|org:apache:http:HttpHost.hostname|]   @type object;
@@ -2072,7 +1883,6 @@ record [|org:apache:http:HttpHost|]  @type class @AccessFlag PUBLIC_FINAL extend
    }
     procedure [|int|] [|org:apache:http:HttpHost.getPort|] ([|org:apache:http:HttpHost|] v1 @type (this)) @owner [|org:apache:http:HttpHost|] @signature [|Lorg/apache/http/HttpHost;.getPort:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L099690.   v0:= v1.[|org:apache:http:HttpHost.port|] ;
@@ -2081,7 +1891,6 @@ record [|org:apache:http:HttpHost|]  @type class @AccessFlag PUBLIC_FINAL extend
    }
     procedure [|java:lang:String|] [|org:apache:http:HttpHost.getSchemeName|] ([|org:apache:http:HttpHost|] v1 @type (this)) @owner [|org:apache:http:HttpHost|] @signature [|Lorg/apache/http/HttpHost;.getSchemeName:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L0996a8.   v0:= v1.[|org:apache:http:HttpHost.schemeName|]   @type object;
@@ -2090,8 +1899,7 @@ record [|org:apache:http:HttpHost|]  @type class @AccessFlag PUBLIC_FINAL extend
    }
     procedure [|int|] [|org:apache:http:HttpHost.hashCode|] ([|org:apache:http:HttpHost|] v2 @type (this)) @owner [|org:apache:http:HttpHost|] @signature [|Lorg/apache/http/HttpHost;.hashCode:()I|] @Access PUBLIC {
       local temp ;
-        [|int|] v0 @varname [|hash|] @scope ((L0002,L0015));
-
+        v0;
         v1;
       
 #L0996c0.   v0:= 17  @length 16;
@@ -2109,8 +1917,7 @@ record [|org:apache:http:HttpHost|]  @type class @AccessFlag PUBLIC_FINAL extend
    }
     procedure [|java:lang:String|] [|org:apache:http:HttpHost.toHostString|] ([|org:apache:http:HttpHost|] v3 @type (this)) @owner [|org:apache:http:HttpHost|] @signature [|Lorg/apache/http/HttpHost;.toHostString:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-        [|org:apache:http:util:CharArrayBuffer|] v0 @varname [|buffer|] @scope ((L0007,L0024));
-
+        v0;
         v1;
         v2;
       
@@ -2135,7 +1942,6 @@ record [|org:apache:http:HttpHost|]  @type class @AccessFlag PUBLIC_FINAL extend
    }
     procedure [|java:lang:String|] [|org:apache:http:HttpHost.toString|] ([|org:apache:http:HttpHost|] v1 @type (this)) @owner [|org:apache:http:HttpHost|] @signature [|Lorg/apache/http/HttpHost;.toString:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L099754.   call temp:=  [|org:apache:http:HttpHost.toURI|](v1) @signature [|Lorg/apache/http/HttpHost;.toURI:()Ljava/lang/String;|] @classDescriptor [|org:apache:http:HttpHost|] @type virtual;
@@ -2145,8 +1951,7 @@ record [|org:apache:http:HttpHost|]  @type class @AccessFlag PUBLIC_FINAL extend
    }
     procedure [|java:lang:String|] [|org:apache:http:HttpHost.toURI|] ([|org:apache:http:HttpHost|] v3 @type (this)) @owner [|org:apache:http:HttpHost|] @signature [|Lorg/apache/http/HttpHost;.toURI:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-        [|org:apache:http:util:CharArrayBuffer|] v0 @varname [|buffer|] @scope ((L0007,L002e));
-
+        v0;
         v1;
         v2;
       
@@ -2320,10 +2125,6 @@ record [|org:apache:http:ProtocolVersion|]  @type class @AccessFlag PUBLIC exten
       global [|long|] @@[|org:apache:http:ProtocolVersion.serialVersionUID|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:ProtocolVersion.<init>|] ([|org:apache:http:ProtocolVersion|] v2 @type (this), [|java:lang:String|] v3 @type (object), [|int|] v4, [|int|] v5) @owner [|org:apache:http:ProtocolVersion|] @signature [|Lorg/apache/http/ProtocolVersion;.<init>:(Ljava/lang/String;II)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
-
         v0;
         v1;
       
@@ -2351,7 +2152,6 @@ record [|org:apache:http:ProtocolVersion|]  @type class @AccessFlag PUBLIC exten
    }
     procedure [|java:lang:Object|] [|org:apache:http:ProtocolVersion.clone|] ([|org:apache:http:ProtocolVersion|] v1 @type (this)) @owner [|org:apache:http:ProtocolVersion|] @signature [|Lorg/apache/http/ProtocolVersion;.clone:()Ljava/lang/Object;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09983c.   call temp:=  [|java:lang:Object.clone|](v1) @signature [|Ljava/lang/Object;.clone:()Ljava/lang/Object;|] @classDescriptor [|java:lang:Object|] @type super;
@@ -2361,9 +2161,7 @@ record [|org:apache:http:ProtocolVersion|]  @type class @AccessFlag PUBLIC exten
    }
     procedure [|int|] [|org:apache:http:ProtocolVersion.compareToVersion|] ([|org:apache:http:ProtocolVersion|] v4 @type (this), [|org:apache:http:ProtocolVersion|] v5 @type (object)) @owner [|org:apache:http:ProtocolVersion|] @signature [|Lorg/apache/http/ProtocolVersion;.compareToVersion:(Lorg/apache/http/ProtocolVersion;)I|] @Access PUBLIC {
       local temp ;
-        [|int|] v0 @varname [|delta|] @scope ((L0041,L004e));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -2411,9 +2209,7 @@ record [|org:apache:http:ProtocolVersion|]  @type class @AccessFlag PUBLIC exten
    }
     procedure [|boolean|] [|org:apache:http:ProtocolVersion.equals|] ([|org:apache:http:ProtocolVersion|] v5 @type (this), [|java:lang:Object|] v6 @type (object)) @owner [|org:apache:http:ProtocolVersion|] @signature [|Lorg/apache/http/ProtocolVersion;.equals:(Ljava/lang/Object;)Z|] @Access PUBLIC_FINAL {
       local temp ;
-        [|org:apache:http:ProtocolVersion|] v0 @varname [|that|] @scope ((L000e,L0026));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -2446,10 +2242,6 @@ record [|org:apache:http:ProtocolVersion|]  @type class @AccessFlag PUBLIC exten
    }
     procedure [|org:apache:http:ProtocolVersion|] [|org:apache:http:ProtocolVersion.forVersion|] ([|org:apache:http:ProtocolVersion|] v2 @type (this), [|int|] v3, [|int|] v4) @owner [|org:apache:http:ProtocolVersion|] @signature [|Lorg/apache/http/ProtocolVersion;.forVersion:(II)Lorg/apache/http/ProtocolVersion;|] @Access PUBLIC {
       local temp ;
-
-
-
-
         v0;
         v1;
       
@@ -2467,7 +2259,6 @@ record [|org:apache:http:ProtocolVersion|]  @type class @AccessFlag PUBLIC exten
    }
     procedure [|int|] [|org:apache:http:ProtocolVersion.getMajor|] ([|org:apache:http:ProtocolVersion|] v1 @type (this)) @owner [|org:apache:http:ProtocolVersion|] @signature [|Lorg/apache/http/ProtocolVersion;.getMajor:()I|] @Access PUBLIC_FINAL {
       local temp ;
-
         v0;
       
 #L099994.   v0:= v1.[|org:apache:http:ProtocolVersion.major|] ;
@@ -2476,7 +2267,6 @@ record [|org:apache:http:ProtocolVersion|]  @type class @AccessFlag PUBLIC exten
    }
     procedure [|int|] [|org:apache:http:ProtocolVersion.getMinor|] ([|org:apache:http:ProtocolVersion|] v1 @type (this)) @owner [|org:apache:http:ProtocolVersion|] @signature [|Lorg/apache/http/ProtocolVersion;.getMinor:()I|] @Access PUBLIC_FINAL {
       local temp ;
-
         v0;
       
 #L0999ac.   v0:= v1.[|org:apache:http:ProtocolVersion.minor|] ;
@@ -2485,7 +2275,6 @@ record [|org:apache:http:ProtocolVersion|]  @type class @AccessFlag PUBLIC exten
    }
     procedure [|java:lang:String|] [|org:apache:http:ProtocolVersion.getProtocol|] ([|org:apache:http:ProtocolVersion|] v1 @type (this)) @owner [|org:apache:http:ProtocolVersion|] @signature [|Lorg/apache/http/ProtocolVersion;.getProtocol:()Ljava/lang/String;|] @Access PUBLIC_FINAL {
       local temp ;
-
         v0;
       
 #L0999c4.   v0:= v1.[|org:apache:http:ProtocolVersion.protocol|]   @type object;
@@ -2494,8 +2283,6 @@ record [|org:apache:http:ProtocolVersion|]  @type class @AccessFlag PUBLIC exten
    }
     procedure [|boolean|] [|org:apache:http:ProtocolVersion.greaterEquals|] ([|org:apache:http:ProtocolVersion|] v1 @type (this), [|org:apache:http:ProtocolVersion|] v2 @type (object)) @owner [|org:apache:http:ProtocolVersion|] @signature [|Lorg/apache/http/ProtocolVersion;.greaterEquals:(Lorg/apache/http/ProtocolVersion;)Z|] @Access PUBLIC_FINAL {
       local temp ;
-
-
         v0;
       
 #L0999dc.   call temp:=  [|org:apache:http:ProtocolVersion.isComparable|](v1, v2) @signature [|Lorg/apache/http/ProtocolVersion;.isComparable:(Lorg/apache/http/ProtocolVersion;)Z|] @classDescriptor [|org:apache:http:ProtocolVersion|] @type virtual;
@@ -2512,7 +2299,6 @@ record [|org:apache:http:ProtocolVersion|]  @type class @AccessFlag PUBLIC exten
    }
     procedure [|int|] [|org:apache:http:ProtocolVersion.hashCode|] ([|org:apache:http:ProtocolVersion|] v3 @type (this)) @owner [|org:apache:http:ProtocolVersion|] @signature [|Lorg/apache/http/ProtocolVersion;.hashCode:()I|] @Access PUBLIC_FINAL {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -2531,8 +2317,6 @@ record [|org:apache:http:ProtocolVersion|]  @type class @AccessFlag PUBLIC exten
    }
     procedure [|boolean|] [|org:apache:http:ProtocolVersion.isComparable|] ([|org:apache:http:ProtocolVersion|] v2 @type (this), [|org:apache:http:ProtocolVersion|] v3 @type (object)) @owner [|org:apache:http:ProtocolVersion|] @signature [|Lorg/apache/http/ProtocolVersion;.isComparable:(Lorg/apache/http/ProtocolVersion;)Z|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -2550,8 +2334,6 @@ record [|org:apache:http:ProtocolVersion|]  @type class @AccessFlag PUBLIC exten
    }
     procedure [|boolean|] [|org:apache:http:ProtocolVersion.lessEquals|] ([|org:apache:http:ProtocolVersion|] v1 @type (this), [|org:apache:http:ProtocolVersion|] v2 @type (object)) @owner [|org:apache:http:ProtocolVersion|] @signature [|Lorg/apache/http/ProtocolVersion;.lessEquals:(Lorg/apache/http/ProtocolVersion;)Z|] @Access PUBLIC_FINAL {
       local temp ;
-
-
         v0;
       
 #L099a70.   call temp:=  [|org:apache:http:ProtocolVersion.isComparable|](v1, v2) @signature [|Lorg/apache/http/ProtocolVersion;.isComparable:(Lorg/apache/http/ProtocolVersion;)Z|] @classDescriptor [|org:apache:http:ProtocolVersion|] @type virtual;
@@ -2568,8 +2350,7 @@ record [|org:apache:http:ProtocolVersion|]  @type class @AccessFlag PUBLIC exten
    }
     procedure [|java:lang:String|] [|org:apache:http:ProtocolVersion.toString|] ([|org:apache:http:ProtocolVersion|] v2 @type (this)) @owner [|org:apache:http:ProtocolVersion|] @signature [|Lorg/apache/http/ProtocolVersion;.toString:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-        [|org:apache:http:util:CharArrayBuffer|] v0 @varname [|buffer|] @scope ((L0007,L002d));
-
+        v0;
         v1;
       
 #L099aa0.   v0:= new [|org:apache:http:util:CharArrayBuffer|];
@@ -2625,9 +2406,6 @@ record [|org:apache:http:HttpVersion|]  @type class @AccessFlag PUBLIC_FINAL  ex
    }
     procedure [|void|] [|org:apache:http:HttpVersion.<init>|] ([|org:apache:http:HttpVersion|] v1 @type (this), [|int|] v2, [|int|] v3) @owner [|org:apache:http:HttpVersion|] @signature [|Lorg/apache/http/HttpVersion;.<init>:(II)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
         v0;
       
 #L099b50.   v0:= "HTTP" @type (object, string);
@@ -2637,10 +2415,6 @@ record [|org:apache:http:HttpVersion|]  @type class @AccessFlag PUBLIC_FINAL  ex
    }
     procedure [|org:apache:http:ProtocolVersion|] [|org:apache:http:HttpVersion.forVersion|] ([|org:apache:http:HttpVersion|] v2 @type (this), [|int|] v3, [|int|] v4) @owner [|org:apache:http:HttpVersion|] @signature [|Lorg/apache/http/HttpVersion;.forVersion:(II)Lorg/apache/http/ProtocolVersion;|] @Access PUBLIC {
       local temp ;
-
-
-
-
         v0;
         v1;
       
@@ -2672,7 +2446,6 @@ record [|org:apache:http:MalformedChunkCodingException|]  @type class @AccessFla
       global [|long|] @@[|org:apache:http:MalformedChunkCodingException.serialVersionUID|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:MalformedChunkCodingException.<init>|] ([|org:apache:http:MalformedChunkCodingException|] v0 @type (this)) @owner [|org:apache:http:MalformedChunkCodingException|] @signature [|Lorg/apache/http/MalformedChunkCodingException;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L099bc8.   call temp:=  [|java:io:IOException.<init>|](v0) @signature [|Ljava/io/IOException;.<init>:()V|] @classDescriptor [|java:io:IOException|] @type direct;
 #L099bce.   return @void ;
@@ -2680,8 +2453,6 @@ record [|org:apache:http:MalformedChunkCodingException|]  @type class @AccessFla
    }
     procedure [|void|] [|org:apache:http:MalformedChunkCodingException.<init>|] ([|org:apache:http:MalformedChunkCodingException|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:apache:http:MalformedChunkCodingException|] @signature [|Lorg/apache/http/MalformedChunkCodingException;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L099be0.   call temp:=  [|java:io:IOException.<init>|](v0, v1) @signature [|Ljava/io/IOException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:io:IOException|] @type direct;
 #L099be6.   return @void ;
@@ -2692,8 +2463,6 @@ record [|org:apache:http:MethodNotSupportedException|]  @type class @AccessFlag 
       global [|long|] @@[|org:apache:http:MethodNotSupportedException.serialVersionUID|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:MethodNotSupportedException.<init>|] ([|org:apache:http:MethodNotSupportedException|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:apache:http:MethodNotSupportedException|] @signature [|Lorg/apache/http/MethodNotSupportedException;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L099bf8.   call temp:=  [|org:apache:http:HttpException.<init>|](v0, v1) @signature [|Lorg/apache/http/HttpException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|org:apache:http:HttpException|] @type direct;
 #L099bfe.   return @void ;
@@ -2701,9 +2470,6 @@ record [|org:apache:http:MethodNotSupportedException|]  @type class @AccessFlag 
    }
     procedure [|void|] [|org:apache:http:MethodNotSupportedException.<init>|] ([|org:apache:http:MethodNotSupportedException|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:Throwable|] v2 @type (object)) @owner [|org:apache:http:MethodNotSupportedException|] @signature [|Lorg/apache/http/MethodNotSupportedException;.<init>:(Ljava/lang/String;Ljava/lang/Throwable;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
       
 #L099c10.   call temp:=  [|org:apache:http:HttpException.<init>|](v0, v1, v2) @signature [|Lorg/apache/http/HttpException;.<init>:(Ljava/lang/String;Ljava/lang/Throwable;)V|] @classDescriptor [|org:apache:http:HttpException|] @type direct;
 #L099c16.   return @void ;
@@ -2722,8 +2488,6 @@ record [|org:apache:http:NoHttpResponseException|]  @type class @AccessFlag PUBL
       global [|long|] @@[|org:apache:http:NoHttpResponseException.serialVersionUID|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:NoHttpResponseException.<init>|] ([|org:apache:http:NoHttpResponseException|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:apache:http:NoHttpResponseException|] @signature [|Lorg/apache/http/NoHttpResponseException;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L099c28.   call temp:=  [|java:io:IOException.<init>|](v0, v1) @signature [|Ljava/io/IOException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:io:IOException|] @type direct;
 #L099c2e.   return @void ;
@@ -2734,7 +2498,6 @@ record [|org:apache:http:ParseException|]  @type class @AccessFlag PUBLIC  exten
       global [|long|] @@[|org:apache:http:ParseException.serialVersionUID|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:ParseException.<init>|] ([|org:apache:http:ParseException|] v0 @type (this)) @owner [|org:apache:http:ParseException|] @signature [|Lorg/apache/http/ParseException;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L099c40.   call temp:=  [|java:lang:RuntimeException.<init>|](v0) @signature [|Ljava/lang/RuntimeException;.<init>:()V|] @classDescriptor [|java:lang:RuntimeException|] @type direct;
 #L099c46.   return @void ;
@@ -2742,8 +2505,6 @@ record [|org:apache:http:ParseException|]  @type class @AccessFlag PUBLIC  exten
    }
     procedure [|void|] [|org:apache:http:ParseException.<init>|] ([|org:apache:http:ParseException|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:apache:http:ParseException|] @signature [|Lorg/apache/http/ParseException;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L099c58.   call temp:=  [|java:lang:RuntimeException.<init>|](v0, v1) @signature [|Ljava/lang/RuntimeException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:lang:RuntimeException|] @type direct;
 #L099c5e.   return @void ;
@@ -2754,7 +2515,6 @@ record [|org:apache:http:ProtocolException|]  @type class @AccessFlag PUBLIC  ex
       global [|long|] @@[|org:apache:http:ProtocolException.serialVersionUID|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:ProtocolException.<init>|] ([|org:apache:http:ProtocolException|] v0 @type (this)) @owner [|org:apache:http:ProtocolException|] @signature [|Lorg/apache/http/ProtocolException;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L099c70.   call temp:=  [|org:apache:http:HttpException.<init>|](v0) @signature [|Lorg/apache/http/HttpException;.<init>:()V|] @classDescriptor [|org:apache:http:HttpException|] @type direct;
 #L099c76.   return @void ;
@@ -2762,8 +2522,6 @@ record [|org:apache:http:ProtocolException|]  @type class @AccessFlag PUBLIC  ex
    }
     procedure [|void|] [|org:apache:http:ProtocolException.<init>|] ([|org:apache:http:ProtocolException|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:apache:http:ProtocolException|] @signature [|Lorg/apache/http/ProtocolException;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L099c88.   call temp:=  [|org:apache:http:HttpException.<init>|](v0, v1) @signature [|Lorg/apache/http/HttpException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|org:apache:http:HttpException|] @type direct;
 #L099c8e.   return @void ;
@@ -2771,9 +2529,6 @@ record [|org:apache:http:ProtocolException|]  @type class @AccessFlag PUBLIC  ex
    }
     procedure [|void|] [|org:apache:http:ProtocolException.<init>|] ([|org:apache:http:ProtocolException|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:Throwable|] v2 @type (object)) @owner [|org:apache:http:ProtocolException|] @signature [|Lorg/apache/http/ProtocolException;.<init>:(Ljava/lang/String;Ljava/lang/Throwable;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
       
 #L099ca0.   call temp:=  [|org:apache:http:HttpException.<init>|](v0, v1, v2) @signature [|Lorg/apache/http/HttpException;.<init>:(Ljava/lang/String;Ljava/lang/Throwable;)V|] @classDescriptor [|org:apache:http:HttpException|] @type direct;
 #L099ca6.   return @void ;
@@ -2819,7 +2574,6 @@ record [|org:apache:http:UnsupportedHttpVersionException|]  @type class @AccessF
       global [|long|] @@[|org:apache:http:UnsupportedHttpVersionException.serialVersionUID|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:UnsupportedHttpVersionException.<init>|] ([|org:apache:http:UnsupportedHttpVersionException|] v0 @type (this)) @owner [|org:apache:http:UnsupportedHttpVersionException|] @signature [|Lorg/apache/http/UnsupportedHttpVersionException;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L099cb8.   call temp:=  [|org:apache:http:ProtocolException.<init>|](v0) @signature [|Lorg/apache/http/ProtocolException;.<init>:()V|] @classDescriptor [|org:apache:http:ProtocolException|] @type direct;
 #L099cbe.   return @void ;
@@ -2827,8 +2581,6 @@ record [|org:apache:http:UnsupportedHttpVersionException|]  @type class @AccessF
    }
     procedure [|void|] [|org:apache:http:UnsupportedHttpVersionException.<init>|] ([|org:apache:http:UnsupportedHttpVersionException|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:apache:http:UnsupportedHttpVersionException|] @signature [|Lorg/apache/http/UnsupportedHttpVersionException;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L099cd0.   call temp:=  [|org:apache:http:ProtocolException.<init>|](v0, v1) @signature [|Lorg/apache/http/ProtocolException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|org:apache:http:ProtocolException|] @type direct;
 #L099cd6.   return @void ;
@@ -2842,7 +2594,6 @@ record [|org:apache:http:auth:AUTH|]  @type class @AccessFlag PUBLIC_FINAL  {
       global [|java:lang:String|] @@[|org:apache:http:auth:AUTH.WWW_AUTH_RESP|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:auth:AUTH.<init>|] ([|org:apache:http:auth:AUTH|] v0 @type (this)) @owner [|org:apache:http:auth:AUTH|] @signature [|Lorg/apache/http/auth/AUTH;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L099ce8.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L099cee.   return @void ;
@@ -2881,7 +2632,6 @@ record [|org:apache:http:auth:AuthSchemeRegistry|]  @type class @AccessFlag PUBL
    }
     procedure [|void|] [|org:apache:http:auth:AuthSchemeRegistry.<init>|] ([|org:apache:http:auth:AuthSchemeRegistry|] v1 @type (this)) @owner [|org:apache:http:auth:AuthSchemeRegistry|] @signature [|Lorg/apache/http/auth/AuthSchemeRegistry;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L099d00.   call temp:=  [|java:lang:Object.<init>|](v1) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
@@ -2893,10 +2643,7 @@ record [|org:apache:http:auth:AuthSchemeRegistry|]  @type class @AccessFlag PUBL
    }
     procedure [|org:apache:http:auth:AuthScheme|] [|org:apache:http:auth:AuthSchemeRegistry.getAuthScheme|] ([|org:apache:http:auth:AuthSchemeRegistry|] v4 @type (this), [|java:lang:String|] v5 @type (object), [|org:apache:http:params:HttpParams|] v6 @type (object)) @owner [|org:apache:http:auth:AuthSchemeRegistry|] @signature [|Lorg/apache/http/auth/AuthSchemeRegistry;.getAuthScheme:(Ljava/lang/String;Lorg/apache/http/params/HttpParams;)Lorg/apache/http/auth/AuthScheme;|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-        [|org:apache:http:auth:AuthSchemeFactory|] v0 @varname [|factory|] @scope ((L001c,L003d));
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -2941,7 +2688,6 @@ record [|org:apache:http:auth:AuthSchemeRegistry|]  @type class @AccessFlag PUBL
    }
     procedure [|java:util:List|] [|org:apache:http:auth:AuthSchemeRegistry.getSchemeNames|] ([|org:apache:http:auth:AuthSchemeRegistry|] v2 @type (this)) @owner [|org:apache:http:auth:AuthSchemeRegistry|] @signature [|Lorg/apache/http/auth/AuthSchemeRegistry;.getSchemeNames:()Ljava/util/List;|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
         v0;
         v1;
       
@@ -2961,9 +2707,6 @@ record [|org:apache:http:auth:AuthSchemeRegistry|]  @type class @AccessFlag PUBL
    }
     procedure [|void|] [|org:apache:http:auth:AuthSchemeRegistry.register|] ([|org:apache:http:auth:AuthSchemeRegistry|] v2 @type (this), [|java:lang:String|] v3 @type (object), [|org:apache:http:auth:AuthSchemeFactory|] v4 @type (object)) @owner [|org:apache:http:auth:AuthSchemeRegistry|] @signature [|Lorg/apache/http/auth/AuthSchemeRegistry;.register:(Ljava/lang/String;Lorg/apache/http/auth/AuthSchemeFactory;)V|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -2994,8 +2737,6 @@ record [|org:apache:http:auth:AuthSchemeRegistry|]  @type class @AccessFlag PUBL
    }
     procedure [|void|] [|org:apache:http:auth:AuthSchemeRegistry.setItems|] ([|org:apache:http:auth:AuthSchemeRegistry|] v1 @type (this), [|java:util:Map|] v2 @type (object)) @owner [|org:apache:http:auth:AuthSchemeRegistry|] @signature [|Lorg/apache/http/auth/AuthSchemeRegistry;.setItems:(Ljava/util/Map;)V|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
-
         v0;
       
 #L099e80.   (@monitorenter v1)
@@ -3015,8 +2756,6 @@ record [|org:apache:http:auth:AuthSchemeRegistry|]  @type class @AccessFlag PUBL
    }
     procedure [|void|] [|org:apache:http:auth:AuthSchemeRegistry.unregister|] ([|org:apache:http:auth:AuthSchemeRegistry|] v2 @type (this), [|java:lang:String|] v3 @type (object)) @owner [|org:apache:http:auth:AuthSchemeRegistry|] @signature [|Lorg/apache/http/auth/AuthSchemeRegistry;.unregister:(Ljava/lang/String;)V|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
-
         v0;
         v1;
       
@@ -3075,9 +2814,6 @@ record [|org:apache:http:auth:AuthScope|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|org:apache:http:auth:AuthScope.<init>|] ([|org:apache:http:auth:AuthScope|] v2 @type (this), [|java:lang:String|] v3 @type (object), [|int|] v4) @owner [|org:apache:http:auth:AuthScope|] @signature [|Lorg/apache/http/auth/AuthScope;.<init>:(Ljava/lang/String;I)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -3089,10 +2825,6 @@ record [|org:apache:http:auth:AuthScope|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|org:apache:http:auth:AuthScope.<init>|] ([|org:apache:http:auth:AuthScope|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|int|] v3, [|java:lang:String|] v4 @type (object)) @owner [|org:apache:http:auth:AuthScope|] @signature [|Lorg/apache/http/auth/AuthScope;.<init>:(Ljava/lang/String;ILjava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
-
         v0;
       
 #L099f7c.   v0:= @@[|org:apache:http:auth:AuthScope.ANY_SCHEME|]   @type object;
@@ -3102,13 +2834,6 @@ record [|org:apache:http:auth:AuthScope|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|org:apache:http:auth:AuthScope.<init>|] ([|org:apache:http:auth:AuthScope|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|int|] v3, [|java:lang:String|] v4 @type (object), [|java:lang:String|] v5 @type (object)) @owner [|org:apache:http:auth:AuthScope|] @signature [|Lorg/apache/http/auth/AuthScope;.<init>:(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
-
-
-
-
         v0;
       
 #L099f98.   call temp:=  [|java:lang:Object.<init>|](v1) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
@@ -3137,8 +2862,6 @@ record [|org:apache:http:auth:AuthScope|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|org:apache:http:auth:AuthScope.<init>|] ([|org:apache:http:auth:AuthScope|] v2 @type (this), [|org:apache:http:auth:AuthScope|] v3 @type (object)) @owner [|org:apache:http:auth:AuthScope|] @signature [|Lorg/apache/http/auth/AuthScope;.<init>:(Lorg/apache/http/auth/AuthScope;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
         v1;
       
@@ -3165,9 +2888,7 @@ record [|org:apache:http:auth:AuthScope|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|boolean|] [|org:apache:http:auth:AuthScope.equals|] ([|org:apache:http:auth:AuthScope|] v5 @type (this), [|java:lang:Object|] v6 @type (object)) @owner [|org:apache:http:auth:AuthScope|] @signature [|Lorg/apache/http/auth/AuthScope;.equals:(Ljava/lang/Object;)Z|] @Access PUBLIC {
       local temp ;
-        [|org:apache:http:auth:AuthScope|] v0 @varname [|that|] @scope ((L0014,L003a));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -3210,7 +2931,6 @@ record [|org:apache:http:auth:AuthScope|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|java:lang:String|] [|org:apache:http:auth:AuthScope.getHost|] ([|org:apache:http:auth:AuthScope|] v1 @type (this)) @owner [|org:apache:http:auth:AuthScope|] @signature [|Lorg/apache/http/auth/AuthScope;.getHost:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09a0dc.   v0:= v1.[|org:apache:http:auth:AuthScope.host|]   @type object;
@@ -3219,7 +2939,6 @@ record [|org:apache:http:auth:AuthScope|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|int|] [|org:apache:http:auth:AuthScope.getPort|] ([|org:apache:http:auth:AuthScope|] v1 @type (this)) @owner [|org:apache:http:auth:AuthScope|] @signature [|Lorg/apache/http/auth/AuthScope;.getPort:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09a0f4.   v0:= v1.[|org:apache:http:auth:AuthScope.port|] ;
@@ -3228,7 +2947,6 @@ record [|org:apache:http:auth:AuthScope|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|java:lang:String|] [|org:apache:http:auth:AuthScope.getRealm|] ([|org:apache:http:auth:AuthScope|] v1 @type (this)) @owner [|org:apache:http:auth:AuthScope|] @signature [|Lorg/apache/http/auth/AuthScope;.getRealm:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09a10c.   v0:= v1.[|org:apache:http:auth:AuthScope.realm|]   @type object;
@@ -3237,7 +2955,6 @@ record [|org:apache:http:auth:AuthScope|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|java:lang:String|] [|org:apache:http:auth:AuthScope.getScheme|] ([|org:apache:http:auth:AuthScope|] v1 @type (this)) @owner [|org:apache:http:auth:AuthScope|] @signature [|Lorg/apache/http/auth/AuthScope;.getScheme:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09a124.   v0:= v1.[|org:apache:http:auth:AuthScope.scheme|]   @type object;
@@ -3246,8 +2963,7 @@ record [|org:apache:http:auth:AuthScope|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|int|] [|org:apache:http:auth:AuthScope.hashCode|] ([|org:apache:http:auth:AuthScope|] v2 @type (this)) @owner [|org:apache:http:auth:AuthScope|] @signature [|Lorg/apache/http/auth/AuthScope;.hashCode:()I|] @Access PUBLIC {
       local temp ;
-        [|int|] v0 @varname [|hash|] @scope ((L0002,L001b));
-
+        v0;
         v1;
       
 #L09a13c.   v0:= 17  @length 16;
@@ -3268,9 +2984,7 @@ record [|org:apache:http:auth:AuthScope|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|int|] [|org:apache:http:auth:AuthScope.match|] ([|org:apache:http:auth:AuthScope|] v4 @type (this), [|org:apache:http:auth:AuthScope|] v5 @type (object)) @owner [|org:apache:http:auth:AuthScope|] @signature [|Lorg/apache/http/auth/AuthScope;.match:(Lorg/apache/http/auth/AuthScope;)I|] @Access PUBLIC {
       local temp ;
-        [|int|] v0 @varname [|factor|] @scope ((L0002,L0060));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -3331,8 +3045,7 @@ record [|org:apache:http:auth:AuthScope|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|java:lang:String|] [|org:apache:http:auth:AuthScope.toString|] ([|org:apache:http:auth:AuthScope|] v4 @type (this)) @owner [|org:apache:http:auth:AuthScope|] @signature [|Lorg/apache/http/auth/AuthScope;.toString:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-        [|java:lang:StringBuffer|] v0 @varname [|buffer|] @scope ((L0007,L0051));
-
+        v0;
         v1;
         v2;
         v3;
@@ -3382,7 +3095,6 @@ record [|org:apache:http:auth:AuthState|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|org:apache:http:auth:AuthState.<init>|] ([|org:apache:http:auth:AuthState|] v0 @type (this)) @owner [|org:apache:http:auth:AuthState|] @signature [|Lorg/apache/http/auth/AuthState;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L09a308.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L09a30e.   return @void ;
@@ -3390,7 +3102,6 @@ record [|org:apache:http:auth:AuthState|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|org:apache:http:auth:AuthScheme|] [|org:apache:http:auth:AuthState.getAuthScheme|] ([|org:apache:http:auth:AuthState|] v1 @type (this)) @owner [|org:apache:http:auth:AuthState|] @signature [|Lorg/apache/http/auth/AuthState;.getAuthScheme:()Lorg/apache/http/auth/AuthScheme;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09a320.   v0:= v1.[|org:apache:http:auth:AuthState.authScheme|]   @type object;
@@ -3399,7 +3110,6 @@ record [|org:apache:http:auth:AuthState|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|org:apache:http:auth:AuthScope|] [|org:apache:http:auth:AuthState.getAuthScope|] ([|org:apache:http:auth:AuthState|] v1 @type (this)) @owner [|org:apache:http:auth:AuthState|] @signature [|Lorg/apache/http/auth/AuthState;.getAuthScope:()Lorg/apache/http/auth/AuthScope;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09a338.   v0:= v1.[|org:apache:http:auth:AuthState.authScope|]   @type object;
@@ -3408,7 +3118,6 @@ record [|org:apache:http:auth:AuthState|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|org:apache:http:auth:Credentials|] [|org:apache:http:auth:AuthState.getCredentials|] ([|org:apache:http:auth:AuthState|] v1 @type (this)) @owner [|org:apache:http:auth:AuthState|] @signature [|Lorg/apache/http/auth/AuthState;.getCredentials:()Lorg/apache/http/auth/Credentials;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09a350.   v0:= v1.[|org:apache:http:auth:AuthState.credentials|]   @type object;
@@ -3417,7 +3126,6 @@ record [|org:apache:http:auth:AuthState|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|org:apache:http:auth:AuthState.invalidate|] ([|org:apache:http:auth:AuthState|] v1 @type (this)) @owner [|org:apache:http:auth:AuthState|] @signature [|Lorg/apache/http/auth/AuthState;.invalidate:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09a368.   v0:= 0  @length 4;
@@ -3429,7 +3137,6 @@ record [|org:apache:http:auth:AuthState|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|boolean|] [|org:apache:http:auth:AuthState.isValid|] ([|org:apache:http:auth:AuthState|] v1 @type (this)) @owner [|org:apache:http:auth:AuthState|] @signature [|Lorg/apache/http/auth/AuthState;.isValid:()Z|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09a388.   v0:= v1.[|org:apache:http:auth:AuthState.authScheme|]   @type object;
@@ -3442,8 +3149,6 @@ record [|org:apache:http:auth:AuthState|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|org:apache:http:auth:AuthState.setAuthScheme|] ([|org:apache:http:auth:AuthState|] v0 @type (this), [|org:apache:http:auth:AuthScheme|] v1 @type (object)) @owner [|org:apache:http:auth:AuthState|] @signature [|Lorg/apache/http/auth/AuthState;.setAuthScheme:(Lorg/apache/http/auth/AuthScheme;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09a3a8.   if v1 != 0 then goto L09a3b4;
 #L09a3ac.   call temp:=  [|org:apache:http:auth:AuthState.invalidate|](v0) @signature [|Lorg/apache/http/auth/AuthState;.invalidate:()V|] @classDescriptor [|org:apache:http:auth:AuthState|] @type virtual;
@@ -3454,8 +3159,6 @@ record [|org:apache:http:auth:AuthState|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|org:apache:http:auth:AuthState.setAuthScope|] ([|org:apache:http:auth:AuthState|] v0 @type (this), [|org:apache:http:auth:AuthScope|] v1 @type (object)) @owner [|org:apache:http:auth:AuthState|] @signature [|Lorg/apache/http/auth/AuthState;.setAuthScope:(Lorg/apache/http/auth/AuthScope;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09a3cc.   v0.[|org:apache:http:auth:AuthState.authScope|]  := v1 @type object;
 #L09a3d0.   return @void ;
@@ -3463,8 +3166,6 @@ record [|org:apache:http:auth:AuthState|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|org:apache:http:auth:AuthState.setCredentials|] ([|org:apache:http:auth:AuthState|] v0 @type (this), [|org:apache:http:auth:Credentials|] v1 @type (object)) @owner [|org:apache:http:auth:AuthState|] @signature [|Lorg/apache/http/auth/AuthState;.setCredentials:(Lorg/apache/http/auth/Credentials;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09a3e4.   v0.[|org:apache:http:auth:AuthState.credentials|]  := v1 @type object;
 #L09a3e8.   return @void ;
@@ -3472,8 +3173,7 @@ record [|org:apache:http:auth:AuthState|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|java:lang:String|] [|org:apache:http:auth:AuthState.toString|] ([|org:apache:http:auth:AuthState|] v2 @type (this)) @owner [|org:apache:http:auth:AuthState|] @signature [|Lorg/apache/http/auth/AuthState;.toString:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-        [|java:lang:StringBuilder|] v0 @varname [|buffer|] @scope ((L0005,L002a));
-
+        v0;
         v1;
       
 #L09a3fc.   v0:= new [|java:lang:StringBuilder|];
@@ -3502,7 +3202,6 @@ record [|org:apache:http:auth:AuthenticationException|]  @type class @AccessFlag
       global [|long|] @@[|org:apache:http:auth:AuthenticationException.serialVersionUID|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:auth:AuthenticationException.<init>|] ([|org:apache:http:auth:AuthenticationException|] v0 @type (this)) @owner [|org:apache:http:auth:AuthenticationException|] @signature [|Lorg/apache/http/auth/AuthenticationException;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L09a460.   call temp:=  [|org:apache:http:ProtocolException.<init>|](v0) @signature [|Lorg/apache/http/ProtocolException;.<init>:()V|] @classDescriptor [|org:apache:http:ProtocolException|] @type direct;
 #L09a466.   return @void ;
@@ -3510,8 +3209,6 @@ record [|org:apache:http:auth:AuthenticationException|]  @type class @AccessFlag
    }
     procedure [|void|] [|org:apache:http:auth:AuthenticationException.<init>|] ([|org:apache:http:auth:AuthenticationException|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:apache:http:auth:AuthenticationException|] @signature [|Lorg/apache/http/auth/AuthenticationException;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L09a478.   call temp:=  [|org:apache:http:ProtocolException.<init>|](v0, v1) @signature [|Lorg/apache/http/ProtocolException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|org:apache:http:ProtocolException|] @type direct;
 #L09a47e.   return @void ;
@@ -3519,9 +3216,6 @@ record [|org:apache:http:auth:AuthenticationException|]  @type class @AccessFlag
    }
     procedure [|void|] [|org:apache:http:auth:AuthenticationException.<init>|] ([|org:apache:http:auth:AuthenticationException|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:Throwable|] v2 @type (object)) @owner [|org:apache:http:auth:AuthenticationException|] @signature [|Lorg/apache/http/auth/AuthenticationException;.<init>:(Ljava/lang/String;Ljava/lang/Throwable;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
       
 #L09a490.   call temp:=  [|org:apache:http:ProtocolException.<init>|](v0, v1, v2) @signature [|Lorg/apache/http/ProtocolException;.<init>:(Ljava/lang/String;Ljava/lang/Throwable;)V|] @classDescriptor [|org:apache:http:ProtocolException|] @type direct;
 #L09a496.   return @void ;
@@ -3532,8 +3226,6 @@ record [|org:apache:http:auth:BasicUserPrincipal|]  @type class @AccessFlag PUBL
    }
     procedure [|void|] [|org:apache:http:auth:BasicUserPrincipal.<init>|] ([|org:apache:http:auth:BasicUserPrincipal|] v2 @type (this), [|java:lang:String|] v3 @type (object)) @owner [|org:apache:http:auth:BasicUserPrincipal|] @signature [|Lorg/apache/http/auth/BasicUserPrincipal;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
         v1;
       
@@ -3549,9 +3241,7 @@ record [|org:apache:http:auth:BasicUserPrincipal|]  @type class @AccessFlag PUBL
    }
     procedure [|boolean|] [|org:apache:http:auth:BasicUserPrincipal.equals|] ([|org:apache:http:auth:BasicUserPrincipal|] v5 @type (this), [|java:lang:Object|] v6 @type (object)) @owner [|org:apache:http:auth:BasicUserPrincipal|] @signature [|Lorg/apache/http/auth/BasicUserPrincipal;.equals:(Ljava/lang/Object;)Z|] @Access PUBLIC {
       local temp ;
-        [|org:apache:http:auth:BasicUserPrincipal|] v0 @varname [|that|] @scope ((L0010,L001c));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -3579,7 +3269,6 @@ record [|org:apache:http:auth:BasicUserPrincipal|]  @type class @AccessFlag PUBL
    }
     procedure [|java:lang:String|] [|org:apache:http:auth:BasicUserPrincipal.getName|] ([|org:apache:http:auth:BasicUserPrincipal|] v1 @type (this)) @owner [|org:apache:http:auth:BasicUserPrincipal|] @signature [|Lorg/apache/http/auth/BasicUserPrincipal;.getName:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09a520.   v0:= v1.[|org:apache:http:auth:BasicUserPrincipal.username|]   @type object;
@@ -3588,8 +3277,7 @@ record [|org:apache:http:auth:BasicUserPrincipal|]  @type class @AccessFlag PUBL
    }
     procedure [|int|] [|org:apache:http:auth:BasicUserPrincipal.hashCode|] ([|org:apache:http:auth:BasicUserPrincipal|] v2 @type (this)) @owner [|org:apache:http:auth:BasicUserPrincipal|] @signature [|Lorg/apache/http/auth/BasicUserPrincipal;.hashCode:()I|] @Access PUBLIC {
       local temp ;
-        [|int|] v0 @varname [|hash|] @scope ((L0002,L0009));
-
+        v0;
         v1;
       
 #L09a538.   v0:= 17  @length 16;
@@ -3601,8 +3289,7 @@ record [|org:apache:http:auth:BasicUserPrincipal|]  @type class @AccessFlag PUBL
    }
     procedure [|java:lang:String|] [|org:apache:http:auth:BasicUserPrincipal.toString|] ([|org:apache:http:auth:BasicUserPrincipal|] v2 @type (this)) @owner [|org:apache:http:auth:BasicUserPrincipal|] @signature [|Lorg/apache/http/auth/BasicUserPrincipal;.toString:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-        [|java:lang:StringBuilder|] v0 @varname [|buffer|] @scope ((L0005,L0019));
-
+        v0;
         v1;
       
 #L09a55c.   v0:= new [|java:lang:StringBuilder|];
@@ -3631,7 +3318,6 @@ record [|org:apache:http:auth:InvalidCredentialsException|]  @type class @Access
       global [|long|] @@[|org:apache:http:auth:InvalidCredentialsException.serialVersionUID|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:auth:InvalidCredentialsException.<init>|] ([|org:apache:http:auth:InvalidCredentialsException|] v0 @type (this)) @owner [|org:apache:http:auth:InvalidCredentialsException|] @signature [|Lorg/apache/http/auth/InvalidCredentialsException;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L09a5a0.   call temp:=  [|org:apache:http:auth:AuthenticationException.<init>|](v0) @signature [|Lorg/apache/http/auth/AuthenticationException;.<init>:()V|] @classDescriptor [|org:apache:http:auth:AuthenticationException|] @type direct;
 #L09a5a6.   return @void ;
@@ -3639,8 +3325,6 @@ record [|org:apache:http:auth:InvalidCredentialsException|]  @type class @Access
    }
     procedure [|void|] [|org:apache:http:auth:InvalidCredentialsException.<init>|] ([|org:apache:http:auth:InvalidCredentialsException|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:apache:http:auth:InvalidCredentialsException|] @signature [|Lorg/apache/http/auth/InvalidCredentialsException;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L09a5b8.   call temp:=  [|org:apache:http:auth:AuthenticationException.<init>|](v0, v1) @signature [|Lorg/apache/http/auth/AuthenticationException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|org:apache:http:auth:AuthenticationException|] @type direct;
 #L09a5be.   return @void ;
@@ -3648,9 +3332,6 @@ record [|org:apache:http:auth:InvalidCredentialsException|]  @type class @Access
    }
     procedure [|void|] [|org:apache:http:auth:InvalidCredentialsException.<init>|] ([|org:apache:http:auth:InvalidCredentialsException|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:Throwable|] v2 @type (object)) @owner [|org:apache:http:auth:InvalidCredentialsException|] @signature [|Lorg/apache/http/auth/InvalidCredentialsException;.<init>:(Ljava/lang/String;Ljava/lang/Throwable;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
       
 #L09a5d0.   call temp:=  [|org:apache:http:auth:AuthenticationException.<init>|](v0, v1, v2) @signature [|Lorg/apache/http/auth/AuthenticationException;.<init>:(Ljava/lang/String;Ljava/lang/Throwable;)V|] @classDescriptor [|org:apache:http:auth:AuthenticationException|] @type direct;
 #L09a5d6.   return @void ;
@@ -3661,7 +3342,6 @@ record [|org:apache:http:auth:MalformedChallengeException|]  @type class @Access
       global [|long|] @@[|org:apache:http:auth:MalformedChallengeException.serialVersionUID|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:auth:MalformedChallengeException.<init>|] ([|org:apache:http:auth:MalformedChallengeException|] v0 @type (this)) @owner [|org:apache:http:auth:MalformedChallengeException|] @signature [|Lorg/apache/http/auth/MalformedChallengeException;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L09a5e8.   call temp:=  [|org:apache:http:ProtocolException.<init>|](v0) @signature [|Lorg/apache/http/ProtocolException;.<init>:()V|] @classDescriptor [|org:apache:http:ProtocolException|] @type direct;
 #L09a5ee.   return @void ;
@@ -3669,8 +3349,6 @@ record [|org:apache:http:auth:MalformedChallengeException|]  @type class @Access
    }
     procedure [|void|] [|org:apache:http:auth:MalformedChallengeException.<init>|] ([|org:apache:http:auth:MalformedChallengeException|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:apache:http:auth:MalformedChallengeException|] @signature [|Lorg/apache/http/auth/MalformedChallengeException;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L09a600.   call temp:=  [|org:apache:http:ProtocolException.<init>|](v0, v1) @signature [|Lorg/apache/http/ProtocolException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|org:apache:http:ProtocolException|] @type direct;
 #L09a606.   return @void ;
@@ -3678,9 +3356,6 @@ record [|org:apache:http:auth:MalformedChallengeException|]  @type class @Access
    }
     procedure [|void|] [|org:apache:http:auth:MalformedChallengeException.<init>|] ([|org:apache:http:auth:MalformedChallengeException|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:Throwable|] v2 @type (object)) @owner [|org:apache:http:auth:MalformedChallengeException|] @signature [|Lorg/apache/http/auth/MalformedChallengeException;.<init>:(Ljava/lang/String;Ljava/lang/Throwable;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
       
 #L09a618.   call temp:=  [|org:apache:http:ProtocolException.<init>|](v0, v1, v2) @signature [|Lorg/apache/http/ProtocolException;.<init>:(Ljava/lang/String;Ljava/lang/Throwable;)V|] @classDescriptor [|org:apache:http:ProtocolException|] @type direct;
 #L09a61e.   return @void ;
@@ -3693,11 +3368,9 @@ record [|org:apache:http:auth:NTCredentials|]  @type class @AccessFlag PUBLIC ex
    }
     procedure [|void|] [|org:apache:http:auth:NTCredentials.<init>|] ([|org:apache:http:auth:NTCredentials|] v7 @type (this), [|java:lang:String|] v8 @type (object)) @owner [|org:apache:http:auth:NTCredentials|] @signature [|Lorg/apache/http/auth/NTCredentials;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-        [|int|] v1 @varname [|atSlash|] @scope ((L0029,L0045), (L0049,L0057));
-        [|java:lang:String|] v2 @varname [|username|] @scope ((L001b,L0045), (L0046,L0057));
-        [|int|] v0 @varname [|atColon|] @scope ((L0015,L0057));
-
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -3752,11 +3425,6 @@ record [|org:apache:http:auth:NTCredentials|]  @type class @AccessFlag PUBLIC ex
    }
     procedure [|void|] [|org:apache:http:auth:NTCredentials.<init>|] ([|org:apache:http:auth:NTCredentials|] v2 @type (this), [|java:lang:String|] v3 @type (object), [|java:lang:String|] v4 @type (object), [|java:lang:String|] v5 @type (object), [|java:lang:String|] v6 @type (object)) @owner [|org:apache:http:auth:NTCredentials|] @signature [|Lorg/apache/http/auth/NTCredentials;.<init>:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
-
-
         v0;
         v1;
       
@@ -3783,9 +3451,7 @@ record [|org:apache:http:auth:NTCredentials|]  @type class @AccessFlag PUBLIC ex
    }
     procedure [|boolean|] [|org:apache:http:auth:NTCredentials.equals|] ([|org:apache:http:auth:NTCredentials|] v5 @type (this), [|java:lang:Object|] v6 @type (object)) @owner [|org:apache:http:auth:NTCredentials|] @signature [|Lorg/apache/http/auth/NTCredentials;.equals:(Ljava/lang/Object;)Z|] @Access PUBLIC {
       local temp ;
-        [|org:apache:http:auth:NTCredentials|] v0 @varname [|that|] @scope ((L0010,L0026));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -3818,7 +3484,6 @@ record [|org:apache:http:auth:NTCredentials|]  @type class @AccessFlag PUBLIC ex
    }
     procedure [|java:lang:String|] [|org:apache:http:auth:NTCredentials.getDomain|] ([|org:apache:http:auth:NTCredentials|] v1 @type (this)) @owner [|org:apache:http:auth:NTCredentials|] @signature [|Lorg/apache/http/auth/NTCredentials;.getDomain:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09a7a8.   v0:= v1.[|org:apache:http:auth:NTCredentials.principal|]   @type object;
@@ -3829,7 +3494,6 @@ record [|org:apache:http:auth:NTCredentials|]  @type class @AccessFlag PUBLIC ex
    }
     procedure [|java:lang:String|] [|org:apache:http:auth:NTCredentials.getPassword|] ([|org:apache:http:auth:NTCredentials|] v1 @type (this)) @owner [|org:apache:http:auth:NTCredentials|] @signature [|Lorg/apache/http/auth/NTCredentials;.getPassword:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09a7c8.   v0:= v1.[|org:apache:http:auth:NTCredentials.password|]   @type object;
@@ -3838,7 +3502,6 @@ record [|org:apache:http:auth:NTCredentials|]  @type class @AccessFlag PUBLIC ex
    }
     procedure [|java:lang:String|] [|org:apache:http:auth:NTCredentials.getUserName|] ([|org:apache:http:auth:NTCredentials|] v1 @type (this)) @owner [|org:apache:http:auth:NTCredentials|] @signature [|Lorg/apache/http/auth/NTCredentials;.getUserName:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09a7e0.   v0:= v1.[|org:apache:http:auth:NTCredentials.principal|]   @type object;
@@ -3849,7 +3512,6 @@ record [|org:apache:http:auth:NTCredentials|]  @type class @AccessFlag PUBLIC ex
    }
     procedure [|java:security:Principal|] [|org:apache:http:auth:NTCredentials.getUserPrincipal|] ([|org:apache:http:auth:NTCredentials|] v1 @type (this)) @owner [|org:apache:http:auth:NTCredentials|] @signature [|Lorg/apache/http/auth/NTCredentials;.getUserPrincipal:()Ljava/security/Principal;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09a800.   v0:= v1.[|org:apache:http:auth:NTCredentials.principal|]   @type object;
@@ -3858,7 +3520,6 @@ record [|org:apache:http:auth:NTCredentials|]  @type class @AccessFlag PUBLIC ex
    }
     procedure [|java:lang:String|] [|org:apache:http:auth:NTCredentials.getWorkstation|] ([|org:apache:http:auth:NTCredentials|] v1 @type (this)) @owner [|org:apache:http:auth:NTCredentials|] @signature [|Lorg/apache/http/auth/NTCredentials;.getWorkstation:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09a818.   v0:= v1.[|org:apache:http:auth:NTCredentials.workstation|]   @type object;
@@ -3867,8 +3528,7 @@ record [|org:apache:http:auth:NTCredentials|]  @type class @AccessFlag PUBLIC ex
    }
     procedure [|int|] [|org:apache:http:auth:NTCredentials.hashCode|] ([|org:apache:http:auth:NTCredentials|] v2 @type (this)) @owner [|org:apache:http:auth:NTCredentials|] @signature [|Lorg/apache/http/auth/NTCredentials;.hashCode:()I|] @Access PUBLIC {
       local temp ;
-        [|int|] v0 @varname [|hash|] @scope ((L0002,L000f));
-
+        v0;
         v1;
       
 #L09a830.   v0:= 17  @length 16;
@@ -3883,8 +3543,7 @@ record [|org:apache:http:auth:NTCredentials|]  @type class @AccessFlag PUBLIC ex
    }
     procedure [|java:lang:String|] [|org:apache:http:auth:NTCredentials.toString|] ([|org:apache:http:auth:NTCredentials|] v2 @type (this)) @owner [|org:apache:http:auth:NTCredentials|] @signature [|Lorg/apache/http/auth/NTCredentials;.toString:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-        [|java:lang:StringBuilder|] v0 @varname [|buffer|] @scope ((L0005,L0023));
-
+        v0;
         v1;
       
 #L09a860.   v0:= new [|java:lang:StringBuilder|];
@@ -3911,10 +3570,7 @@ record [|org:apache:http:auth:NTUserPrincipal|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|org:apache:http:auth:NTUserPrincipal.<init>|] ([|org:apache:http:auth:NTUserPrincipal|] v3 @type (this), [|java:lang:String|] v4 @type (object), [|java:lang:String|] v5 @type (object)) @owner [|org:apache:http:auth:NTUserPrincipal|] @signature [|Lorg/apache/http/auth/NTUserPrincipal;.<init>:(Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-        [|java:lang:StringBuilder|] v0 @varname [|buffer|] @scope ((L002a,L003f));
-
-
-
+        v0;
         v1;
         v2;
       
@@ -3958,9 +3614,7 @@ record [|org:apache:http:auth:NTUserPrincipal|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|boolean|] [|org:apache:http:auth:NTUserPrincipal.equals|] ([|org:apache:http:auth:NTUserPrincipal|] v5 @type (this), [|java:lang:Object|] v6 @type (object)) @owner [|org:apache:http:auth:NTUserPrincipal|] @signature [|Lorg/apache/http/auth/NTUserPrincipal;.equals:(Ljava/lang/Object;)Z|] @Access PUBLIC {
       local temp ;
-        [|org:apache:http:auth:NTUserPrincipal|] v0 @varname [|that|] @scope ((L0010,L0026));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -3993,7 +3647,6 @@ record [|org:apache:http:auth:NTUserPrincipal|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|java:lang:String|] [|org:apache:http:auth:NTUserPrincipal.getDomain|] ([|org:apache:http:auth:NTUserPrincipal|] v1 @type (this)) @owner [|org:apache:http:auth:NTUserPrincipal|] @signature [|Lorg/apache/http/auth/NTUserPrincipal;.getDomain:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09a9b8.   v0:= v1.[|org:apache:http:auth:NTUserPrincipal.domain|]   @type object;
@@ -4002,7 +3655,6 @@ record [|org:apache:http:auth:NTUserPrincipal|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|java:lang:String|] [|org:apache:http:auth:NTUserPrincipal.getName|] ([|org:apache:http:auth:NTUserPrincipal|] v1 @type (this)) @owner [|org:apache:http:auth:NTUserPrincipal|] @signature [|Lorg/apache/http/auth/NTUserPrincipal;.getName:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09a9d0.   v0:= v1.[|org:apache:http:auth:NTUserPrincipal.ntname|]   @type object;
@@ -4011,7 +3663,6 @@ record [|org:apache:http:auth:NTUserPrincipal|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|java:lang:String|] [|org:apache:http:auth:NTUserPrincipal.getUsername|] ([|org:apache:http:auth:NTUserPrincipal|] v1 @type (this)) @owner [|org:apache:http:auth:NTUserPrincipal|] @signature [|Lorg/apache/http/auth/NTUserPrincipal;.getUsername:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09a9e8.   v0:= v1.[|org:apache:http:auth:NTUserPrincipal.username|]   @type object;
@@ -4020,8 +3671,7 @@ record [|org:apache:http:auth:NTUserPrincipal|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|int|] [|org:apache:http:auth:NTUserPrincipal.hashCode|] ([|org:apache:http:auth:NTUserPrincipal|] v2 @type (this)) @owner [|org:apache:http:auth:NTUserPrincipal|] @signature [|Lorg/apache/http/auth/NTUserPrincipal;.hashCode:()I|] @Access PUBLIC {
       local temp ;
-        [|int|] v0 @varname [|hash|] @scope ((L0002,L000f));
-
+        v0;
         v1;
       
 #L09aa00.   v0:= 17  @length 16;
@@ -4036,7 +3686,6 @@ record [|org:apache:http:auth:NTUserPrincipal|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|java:lang:String|] [|org:apache:http:auth:NTUserPrincipal.toString|] ([|org:apache:http:auth:NTUserPrincipal|] v1 @type (this)) @owner [|org:apache:http:auth:NTUserPrincipal|] @signature [|Lorg/apache/http/auth/NTUserPrincipal;.toString:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09aa30.   v0:= v1.[|org:apache:http:auth:NTUserPrincipal.ntname|]   @type object;
@@ -4049,9 +3698,7 @@ record [|org:apache:http:auth:UsernamePasswordCredentials|]  @type class @Access
    }
     procedure [|void|] [|org:apache:http:auth:UsernamePasswordCredentials.<init>|] ([|org:apache:http:auth:UsernamePasswordCredentials|] v3 @type (this), [|java:lang:String|] v4 @type (object)) @owner [|org:apache:http:auth:UsernamePasswordCredentials|] @signature [|Lorg/apache/http/auth/UsernamePasswordCredentials;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-        [|int|] v0 @varname [|atColon|] @scope ((L0013,L0035));
-
-
+        v0;
         v1;
         v2;
       
@@ -4086,9 +3733,6 @@ record [|org:apache:http:auth:UsernamePasswordCredentials|]  @type class @Access
    }
     procedure [|void|] [|org:apache:http:auth:UsernamePasswordCredentials.<init>|] ([|org:apache:http:auth:UsernamePasswordCredentials|] v2 @type (this), [|java:lang:String|] v3 @type (object), [|java:lang:String|] v4 @type (object)) @owner [|org:apache:http:auth:UsernamePasswordCredentials|] @signature [|Lorg/apache/http/auth/UsernamePasswordCredentials;.<init>:(Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -4107,9 +3751,7 @@ record [|org:apache:http:auth:UsernamePasswordCredentials|]  @type class @Access
    }
     procedure [|boolean|] [|org:apache:http:auth:UsernamePasswordCredentials.equals|] ([|org:apache:http:auth:UsernamePasswordCredentials|] v5 @type (this), [|java:lang:Object|] v6 @type (object)) @owner [|org:apache:http:auth:UsernamePasswordCredentials|] @signature [|Lorg/apache/http/auth/UsernamePasswordCredentials;.equals:(Ljava/lang/Object;)Z|] @Access PUBLIC {
       local temp ;
-        [|org:apache:http:auth:UsernamePasswordCredentials|] v0 @varname [|that|] @scope ((L0010,L001c));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -4137,7 +3779,6 @@ record [|org:apache:http:auth:UsernamePasswordCredentials|]  @type class @Access
    }
     procedure [|java:lang:String|] [|org:apache:http:auth:UsernamePasswordCredentials.getPassword|] ([|org:apache:http:auth:UsernamePasswordCredentials|] v1 @type (this)) @owner [|org:apache:http:auth:UsernamePasswordCredentials|] @signature [|Lorg/apache/http/auth/UsernamePasswordCredentials;.getPassword:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09ab4c.   v0:= v1.[|org:apache:http:auth:UsernamePasswordCredentials.password|]   @type object;
@@ -4146,7 +3787,6 @@ record [|org:apache:http:auth:UsernamePasswordCredentials|]  @type class @Access
    }
     procedure [|java:lang:String|] [|org:apache:http:auth:UsernamePasswordCredentials.getUserName|] ([|org:apache:http:auth:UsernamePasswordCredentials|] v1 @type (this)) @owner [|org:apache:http:auth:UsernamePasswordCredentials|] @signature [|Lorg/apache/http/auth/UsernamePasswordCredentials;.getUserName:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09ab64.   v0:= v1.[|org:apache:http:auth:UsernamePasswordCredentials.principal|]   @type object;
@@ -4157,7 +3797,6 @@ record [|org:apache:http:auth:UsernamePasswordCredentials|]  @type class @Access
    }
     procedure [|java:security:Principal|] [|org:apache:http:auth:UsernamePasswordCredentials.getUserPrincipal|] ([|org:apache:http:auth:UsernamePasswordCredentials|] v1 @type (this)) @owner [|org:apache:http:auth:UsernamePasswordCredentials|] @signature [|Lorg/apache/http/auth/UsernamePasswordCredentials;.getUserPrincipal:()Ljava/security/Principal;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09ab84.   v0:= v1.[|org:apache:http:auth:UsernamePasswordCredentials.principal|]   @type object;
@@ -4166,7 +3805,6 @@ record [|org:apache:http:auth:UsernamePasswordCredentials|]  @type class @Access
    }
     procedure [|int|] [|org:apache:http:auth:UsernamePasswordCredentials.hashCode|] ([|org:apache:http:auth:UsernamePasswordCredentials|] v1 @type (this)) @owner [|org:apache:http:auth:UsernamePasswordCredentials|] @signature [|Lorg/apache/http/auth/UsernamePasswordCredentials;.hashCode:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09ab9c.   v0:= v1.[|org:apache:http:auth:UsernamePasswordCredentials.principal|]   @type object;
@@ -4177,7 +3815,6 @@ record [|org:apache:http:auth:UsernamePasswordCredentials|]  @type class @Access
    }
     procedure [|java:lang:String|] [|org:apache:http:auth:UsernamePasswordCredentials.toString|] ([|org:apache:http:auth:UsernamePasswordCredentials|] v1 @type (this)) @owner [|org:apache:http:auth:UsernamePasswordCredentials|] @signature [|Lorg/apache/http/auth/UsernamePasswordCredentials;.toString:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09abbc.   v0:= v1.[|org:apache:http:auth:UsernamePasswordCredentials.principal|]   @type object;
@@ -4194,8 +3831,6 @@ record [|org:apache:http:params:HttpAbstractParamBean|]  @type class @AccessFlag
    }
     procedure [|void|] [|org:apache:http:params:HttpAbstractParamBean.<init>|] ([|org:apache:http:params:HttpAbstractParamBean|] v2 @type (this), [|org:apache:http:params:HttpParams|] v3 @type (object)) @owner [|org:apache:http:params:HttpAbstractParamBean|] @signature [|Lorg/apache/http/params/HttpAbstractParamBean;.<init>:(Lorg/apache/http/params/HttpParams;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
         v1;
       
@@ -4213,8 +3848,6 @@ record [|org:apache:http:auth:params:AuthParamBean|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:http:auth:params:AuthParamBean.<init>|] ([|org:apache:http:auth:params:AuthParamBean|] v0 @type (this), [|org:apache:http:params:HttpParams|] v1 @type (object)) @owner [|org:apache:http:auth:params:AuthParamBean|] @signature [|Lorg/apache/http/auth/params/AuthParamBean;.<init>:(Lorg/apache/http/params/HttpParams;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L09ac0c.   call temp:=  [|org:apache:http:params:HttpAbstractParamBean.<init>|](v0, v1) @signature [|Lorg/apache/http/params/HttpAbstractParamBean;.<init>:(Lorg/apache/http/params/HttpParams;)V|] @classDescriptor [|org:apache:http:params:HttpAbstractParamBean|] @type direct;
 #L09ac12.   return @void ;
@@ -4222,8 +3855,6 @@ record [|org:apache:http:auth:params:AuthParamBean|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:http:auth:params:AuthParamBean.setCredentialCharset|] ([|org:apache:http:auth:params:AuthParamBean|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:apache:http:auth:params:AuthParamBean|] @signature [|Lorg/apache/http/auth/params/AuthParamBean;.setCredentialCharset:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09ac24.   v0:= v1.[|org:apache:http:auth:params:AuthParamBean.params|]   @type object;
@@ -4235,7 +3866,6 @@ record [|org:apache:http:auth:params:AuthParams|]  @type class @AccessFlag PUBLI
    }
     procedure [|void|] [|org:apache:http:auth:params:AuthParams.<init>|] ([|org:apache:http:auth:params:AuthParams|] v0 @type (this)) @owner [|org:apache:http:auth:params:AuthParams|] @signature [|Lorg/apache/http/auth/params/AuthParams;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L09ac40.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L09ac46.   return @void ;
@@ -4243,8 +3873,7 @@ record [|org:apache:http:auth:params:AuthParams|]  @type class @AccessFlag PUBLI
    }
     procedure [|java:lang:String|] [|org:apache:http:auth:params:AuthParams.getCredentialCharset|] ([|org:apache:http:params:HttpParams|] v3 @type (object)) @owner [|org:apache:http:auth:params:AuthParams|] @signature [|Lorg/apache/http/auth/params/AuthParams;.getCredentialCharset:(Lorg/apache/http/params/HttpParams;)Ljava/lang/String;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|charset|] @scope ((L0012,L0017));
-
+        v0;
         v1;
         v2;
       
@@ -4264,8 +3893,6 @@ record [|org:apache:http:auth:params:AuthParams|]  @type class @AccessFlag PUBLI
    }
     procedure [|void|] [|org:apache:http:auth:params:AuthParams.setCredentialCharset|] ([|org:apache:http:params:HttpParams|] v2 @type (object), [|java:lang:String|] v3 @type (object)) @owner [|org:apache:http:auth:params:AuthParams|] @signature [|Lorg/apache/http/auth/params/AuthParams;.setCredentialCharset:(Lorg/apache/http/params/HttpParams;Ljava/lang/String;)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -4295,7 +3922,6 @@ record [|org:apache:http:client:RedirectException|]  @type class @AccessFlag PUB
       global [|long|] @@[|org:apache:http:client:RedirectException.serialVersionUID|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:client:RedirectException.<init>|] ([|org:apache:http:client:RedirectException|] v0 @type (this)) @owner [|org:apache:http:client:RedirectException|] @signature [|Lorg/apache/http/client/RedirectException;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L09acc8.   call temp:=  [|org:apache:http:ProtocolException.<init>|](v0) @signature [|Lorg/apache/http/ProtocolException;.<init>:()V|] @classDescriptor [|org:apache:http:ProtocolException|] @type direct;
 #L09acce.   return @void ;
@@ -4303,8 +3929,6 @@ record [|org:apache:http:client:RedirectException|]  @type class @AccessFlag PUB
    }
     procedure [|void|] [|org:apache:http:client:RedirectException.<init>|] ([|org:apache:http:client:RedirectException|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:apache:http:client:RedirectException|] @signature [|Lorg/apache/http/client/RedirectException;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L09ace0.   call temp:=  [|org:apache:http:ProtocolException.<init>|](v0, v1) @signature [|Lorg/apache/http/ProtocolException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|org:apache:http:ProtocolException|] @type direct;
 #L09ace6.   return @void ;
@@ -4312,9 +3936,6 @@ record [|org:apache:http:client:RedirectException|]  @type class @AccessFlag PUB
    }
     procedure [|void|] [|org:apache:http:client:RedirectException.<init>|] ([|org:apache:http:client:RedirectException|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:Throwable|] v2 @type (object)) @owner [|org:apache:http:client:RedirectException|] @signature [|Lorg/apache/http/client/RedirectException;.<init>:(Ljava/lang/String;Ljava/lang/Throwable;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
       
 #L09acf8.   call temp:=  [|org:apache:http:ProtocolException.<init>|](v0, v1, v2) @signature [|Lorg/apache/http/ProtocolException;.<init>:(Ljava/lang/String;Ljava/lang/Throwable;)V|] @classDescriptor [|org:apache:http:ProtocolException|] @type direct;
 #L09acfe.   return @void ;
@@ -4325,7 +3946,6 @@ record [|org:apache:http:client:CircularRedirectException|]  @type class @Access
       global [|long|] @@[|org:apache:http:client:CircularRedirectException.serialVersionUID|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:client:CircularRedirectException.<init>|] ([|org:apache:http:client:CircularRedirectException|] v0 @type (this)) @owner [|org:apache:http:client:CircularRedirectException|] @signature [|Lorg/apache/http/client/CircularRedirectException;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L09ad10.   call temp:=  [|org:apache:http:client:RedirectException.<init>|](v0) @signature [|Lorg/apache/http/client/RedirectException;.<init>:()V|] @classDescriptor [|org:apache:http:client:RedirectException|] @type direct;
 #L09ad16.   return @void ;
@@ -4333,8 +3953,6 @@ record [|org:apache:http:client:CircularRedirectException|]  @type class @Access
    }
     procedure [|void|] [|org:apache:http:client:CircularRedirectException.<init>|] ([|org:apache:http:client:CircularRedirectException|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:apache:http:client:CircularRedirectException|] @signature [|Lorg/apache/http/client/CircularRedirectException;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L09ad28.   call temp:=  [|org:apache:http:client:RedirectException.<init>|](v0, v1) @signature [|Lorg/apache/http/client/RedirectException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|org:apache:http:client:RedirectException|] @type direct;
 #L09ad2e.   return @void ;
@@ -4342,9 +3960,6 @@ record [|org:apache:http:client:CircularRedirectException|]  @type class @Access
    }
     procedure [|void|] [|org:apache:http:client:CircularRedirectException.<init>|] ([|org:apache:http:client:CircularRedirectException|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:Throwable|] v2 @type (object)) @owner [|org:apache:http:client:CircularRedirectException|] @signature [|Lorg/apache/http/client/CircularRedirectException;.<init>:(Ljava/lang/String;Ljava/lang/Throwable;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
       
 #L09ad40.   call temp:=  [|org:apache:http:client:RedirectException.<init>|](v0, v1, v2) @signature [|Lorg/apache/http/client/RedirectException;.<init>:(Ljava/lang/String;Ljava/lang/Throwable;)V|] @classDescriptor [|org:apache:http:client:RedirectException|] @type direct;
 #L09ad46.   return @void ;
@@ -4355,7 +3970,6 @@ record [|org:apache:http:client:ClientProtocolException|]  @type class @AccessFl
       global [|long|] @@[|org:apache:http:client:ClientProtocolException.serialVersionUID|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:client:ClientProtocolException.<init>|] ([|org:apache:http:client:ClientProtocolException|] v0 @type (this)) @owner [|org:apache:http:client:ClientProtocolException|] @signature [|Lorg/apache/http/client/ClientProtocolException;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L09ad58.   call temp:=  [|java:io:IOException.<init>|](v0) @signature [|Ljava/io/IOException;.<init>:()V|] @classDescriptor [|java:io:IOException|] @type direct;
 #L09ad5e.   return @void ;
@@ -4363,8 +3977,6 @@ record [|org:apache:http:client:ClientProtocolException|]  @type class @AccessFl
    }
     procedure [|void|] [|org:apache:http:client:ClientProtocolException.<init>|] ([|org:apache:http:client:ClientProtocolException|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:apache:http:client:ClientProtocolException|] @signature [|Lorg/apache/http/client/ClientProtocolException;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L09ad70.   call temp:=  [|java:io:IOException.<init>|](v0, v1) @signature [|Ljava/io/IOException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:io:IOException|] @type direct;
 #L09ad76.   return @void ;
@@ -4372,9 +3984,6 @@ record [|org:apache:http:client:ClientProtocolException|]  @type class @AccessFl
    }
     procedure [|void|] [|org:apache:http:client:ClientProtocolException.<init>|] ([|org:apache:http:client:ClientProtocolException|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:Throwable|] v2 @type (object)) @owner [|org:apache:http:client:ClientProtocolException|] @signature [|Lorg/apache/http/client/ClientProtocolException;.<init>:(Ljava/lang/String;Ljava/lang/Throwable;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
       
 #L09ad88.   call temp:=  [|java:io:IOException.<init>|](v0, v1) @signature [|Ljava/io/IOException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|java:io:IOException|] @type direct;
 #L09ad8e.   call temp:=  [|org:apache:http:client:ClientProtocolException.initCause|](v0, v2) @signature [|Lorg/apache/http/client/ClientProtocolException;.initCause:(Ljava/lang/Throwable;)Ljava/lang/Throwable;|] @classDescriptor [|org:apache:http:client:ClientProtocolException|] @type virtual;
@@ -4383,8 +3992,6 @@ record [|org:apache:http:client:ClientProtocolException|]  @type class @AccessFl
    }
     procedure [|void|] [|org:apache:http:client:ClientProtocolException.<init>|] ([|org:apache:http:client:ClientProtocolException|] v0 @type (this), [|java:lang:Throwable|] v1 @type (object)) @owner [|org:apache:http:client:ClientProtocolException|] @signature [|Lorg/apache/http/client/ClientProtocolException;.<init>:(Ljava/lang/Throwable;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L09ada8.   call temp:=  [|java:io:IOException.<init>|](v0) @signature [|Ljava/io/IOException;.<init>:()V|] @classDescriptor [|java:io:IOException|] @type direct;
 #L09adae.   call temp:=  [|org:apache:http:client:ClientProtocolException.initCause|](v0, v1) @signature [|Lorg/apache/http/client/ClientProtocolException;.initCause:(Ljava/lang/Throwable;)Ljava/lang/Throwable;|] @classDescriptor [|org:apache:http:client:ClientProtocolException|] @type virtual;
@@ -4459,9 +4066,6 @@ record [|org:apache:http:client:HttpResponseException|]  @type class @AccessFlag
       global [|long|] @@[|org:apache:http:client:HttpResponseException.serialVersionUID|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:client:HttpResponseException.<init>|] ([|org:apache:http:client:HttpResponseException|] v0 @type (this), [|int|] v1, [|java:lang:String|] v2 @type (object)) @owner [|org:apache:http:client:HttpResponseException|] @signature [|Lorg/apache/http/client/HttpResponseException;.<init>:(ILjava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
       
 #L09adc8.   call temp:=  [|org:apache:http:client:ClientProtocolException.<init>|](v0, v2) @signature [|Lorg/apache/http/client/ClientProtocolException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|org:apache:http:client:ClientProtocolException|] @type direct;
 #L09adce.   v0.[|org:apache:http:client:HttpResponseException.statusCode|]  := v1;
@@ -4470,7 +4074,6 @@ record [|org:apache:http:client:HttpResponseException|]  @type class @AccessFlag
    }
     procedure [|int|] [|org:apache:http:client:HttpResponseException.getStatusCode|] ([|org:apache:http:client:HttpResponseException|] v1 @type (this)) @owner [|org:apache:http:client:HttpResponseException|] @signature [|Lorg/apache/http/client/HttpResponseException;.getStatusCode:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09ade4.   v0:= v1.[|org:apache:http:client:HttpResponseException.statusCode|] ;
@@ -4482,7 +4085,6 @@ record [|org:apache:http:client:NonRepeatableRequestException|]  @type class @Ac
       global [|long|] @@[|org:apache:http:client:NonRepeatableRequestException.serialVersionUID|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:client:NonRepeatableRequestException.<init>|] ([|org:apache:http:client:NonRepeatableRequestException|] v0 @type (this)) @owner [|org:apache:http:client:NonRepeatableRequestException|] @signature [|Lorg/apache/http/client/NonRepeatableRequestException;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L09adfc.   call temp:=  [|org:apache:http:ProtocolException.<init>|](v0) @signature [|Lorg/apache/http/ProtocolException;.<init>:()V|] @classDescriptor [|org:apache:http:ProtocolException|] @type direct;
 #L09ae02.   return @void ;
@@ -4490,8 +4092,6 @@ record [|org:apache:http:client:NonRepeatableRequestException|]  @type class @Ac
    }
     procedure [|void|] [|org:apache:http:client:NonRepeatableRequestException.<init>|] ([|org:apache:http:client:NonRepeatableRequestException|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:apache:http:client:NonRepeatableRequestException|] @signature [|Lorg/apache/http/client/NonRepeatableRequestException;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L09ae14.   call temp:=  [|org:apache:http:ProtocolException.<init>|](v0, v1) @signature [|Lorg/apache/http/ProtocolException;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|org:apache:http:ProtocolException|] @type direct;
 #L09ae1a.   return @void ;
@@ -4527,7 +4127,6 @@ record [|org:apache:http:entity:AbstractHttpEntity|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:http:entity:AbstractHttpEntity.<init>|] ([|org:apache:http:entity:AbstractHttpEntity|] v0 @type (this)) @owner [|org:apache:http:entity:AbstractHttpEntity|] @signature [|Lorg/apache/http/entity/AbstractHttpEntity;.<init>:()V|] @Access PROTECTED_CONSTRUCTOR {
       local temp ;
-
       
 #L09ae2c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L09ae32.   return @void ;
@@ -4535,7 +4134,6 @@ record [|org:apache:http:entity:AbstractHttpEntity|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:http:entity:AbstractHttpEntity.consumeContent|] ([|org:apache:http:entity:AbstractHttpEntity|] v2 @type (this)) @owner [|org:apache:http:entity:AbstractHttpEntity|] @signature [|Lorg/apache/http/entity/AbstractHttpEntity;.consumeContent:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -4551,7 +4149,6 @@ record [|org:apache:http:entity:AbstractHttpEntity|]  @type class @AccessFlag PU
    }
     procedure [|org:apache:http:Header|] [|org:apache:http:entity:AbstractHttpEntity.getContentEncoding|] ([|org:apache:http:entity:AbstractHttpEntity|] v1 @type (this)) @owner [|org:apache:http:entity:AbstractHttpEntity|] @signature [|Lorg/apache/http/entity/AbstractHttpEntity;.getContentEncoding:()Lorg/apache/http/Header;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09ae74.   v0:= v1.[|org:apache:http:entity:AbstractHttpEntity.contentEncoding|]   @type object;
@@ -4560,7 +4157,6 @@ record [|org:apache:http:entity:AbstractHttpEntity|]  @type class @AccessFlag PU
    }
     procedure [|org:apache:http:Header|] [|org:apache:http:entity:AbstractHttpEntity.getContentType|] ([|org:apache:http:entity:AbstractHttpEntity|] v1 @type (this)) @owner [|org:apache:http:entity:AbstractHttpEntity|] @signature [|Lorg/apache/http/entity/AbstractHttpEntity;.getContentType:()Lorg/apache/http/Header;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09ae8c.   v0:= v1.[|org:apache:http:entity:AbstractHttpEntity.contentType|]   @type object;
@@ -4569,7 +4165,6 @@ record [|org:apache:http:entity:AbstractHttpEntity|]  @type class @AccessFlag PU
    }
     procedure [|boolean|] [|org:apache:http:entity:AbstractHttpEntity.isChunked|] ([|org:apache:http:entity:AbstractHttpEntity|] v1 @type (this)) @owner [|org:apache:http:entity:AbstractHttpEntity|] @signature [|Lorg/apache/http/entity/AbstractHttpEntity;.isChunked:()Z|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09aea4.   v0:= v1.[|org:apache:http:entity:AbstractHttpEntity.chunked|]   @boolean;
@@ -4578,8 +4173,6 @@ record [|org:apache:http:entity:AbstractHttpEntity|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:http:entity:AbstractHttpEntity.setChunked|] ([|org:apache:http:entity:AbstractHttpEntity|] v0 @type (this), [|boolean|] v1) @owner [|org:apache:http:entity:AbstractHttpEntity|] @signature [|Lorg/apache/http/entity/AbstractHttpEntity;.setChunked:(Z)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09aebc.   v0.[|org:apache:http:entity:AbstractHttpEntity.chunked|]  := v1 @boolean;
 #L09aec0.   return @void ;
@@ -4587,9 +4180,7 @@ record [|org:apache:http:entity:AbstractHttpEntity|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:http:entity:AbstractHttpEntity.setContentEncoding|] ([|org:apache:http:entity:AbstractHttpEntity|] v2 @type (this), [|java:lang:String|] v3 @type (object)) @owner [|org:apache:http:entity:AbstractHttpEntity|] @signature [|Lorg/apache/http/entity/AbstractHttpEntity;.setContentEncoding:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-        [|org:apache:http:Header|] v0 @varname [|h|] @scope ((L0001,L0005), (L000a,L000e));
-
-
+        v0;
         v1;
       
 #L09aed4.   v0:= 0  @length 4;
@@ -4603,8 +4194,6 @@ record [|org:apache:http:entity:AbstractHttpEntity|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:http:entity:AbstractHttpEntity.setContentEncoding|] ([|org:apache:http:entity:AbstractHttpEntity|] v0 @type (this), [|org:apache:http:Header|] v1 @type (object)) @owner [|org:apache:http:entity:AbstractHttpEntity|] @signature [|Lorg/apache/http/entity/AbstractHttpEntity;.setContentEncoding:(Lorg/apache/http/Header;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09af00.   v0.[|org:apache:http:entity:AbstractHttpEntity.contentEncoding|]  := v1 @type object;
 #L09af04.   return @void ;
@@ -4612,9 +4201,7 @@ record [|org:apache:http:entity:AbstractHttpEntity|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:http:entity:AbstractHttpEntity.setContentType|] ([|org:apache:http:entity:AbstractHttpEntity|] v2 @type (this), [|java:lang:String|] v3 @type (object)) @owner [|org:apache:http:entity:AbstractHttpEntity|] @signature [|Lorg/apache/http/entity/AbstractHttpEntity;.setContentType:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-        [|org:apache:http:Header|] v0 @varname [|h|] @scope ((L0001,L0005), (L000a,L000e));
-
-
+        v0;
         v1;
       
 #L09af18.   v0:= 0  @length 4;
@@ -4628,8 +4215,6 @@ record [|org:apache:http:entity:AbstractHttpEntity|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:http:entity:AbstractHttpEntity.setContentType|] ([|org:apache:http:entity:AbstractHttpEntity|] v0 @type (this), [|org:apache:http:Header|] v1 @type (object)) @owner [|org:apache:http:entity:AbstractHttpEntity|] @signature [|Lorg/apache/http/entity/AbstractHttpEntity;.setContentType:(Lorg/apache/http/Header;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09af44.   v0.[|org:apache:http:entity:AbstractHttpEntity.contentType|]  := v1 @type object;
 #L09af48.   return @void ;
@@ -4640,8 +4225,6 @@ record [|org:apache:http:entity:StringEntity|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|org:apache:http:entity:StringEntity.<init>|] ([|org:apache:http:entity:StringEntity|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:apache:http:entity:StringEntity|] @signature [|Lorg/apache/http/entity/StringEntity;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L09af5c.   v0:= 0  @length 4;
@@ -4651,9 +4234,6 @@ record [|org:apache:http:entity:StringEntity|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|org:apache:http:entity:StringEntity.<init>|] ([|org:apache:http:entity:StringEntity|] v2 @type (this), [|java:lang:String|] v3 @type (object), [|java:lang:String|] v4 @type (object)) @owner [|org:apache:http:entity:StringEntity|] @signature [|Lorg/apache/http/entity/StringEntity;.<init>:(Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -4683,7 +4263,6 @@ record [|org:apache:http:entity:StringEntity|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|java:lang:Object|] [|org:apache:http:entity:StringEntity.clone|] ([|org:apache:http:entity:StringEntity|] v1 @type (this)) @owner [|org:apache:http:entity:StringEntity|] @signature [|Lorg/apache/http/entity/StringEntity;.clone:()Ljava/lang/Object;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09afe4.   call temp:=  [|java:lang:Object.clone|](v1) @signature [|Ljava/lang/Object;.clone:()Ljava/lang/Object;|] @classDescriptor [|java:lang:Object|] @type super;
@@ -4693,7 +4272,6 @@ record [|org:apache:http:entity:StringEntity|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|java:io:InputStream|] [|org:apache:http:entity:StringEntity.getContent|] ([|org:apache:http:entity:StringEntity|] v2 @type (this)) @owner [|org:apache:http:entity:StringEntity|] @signature [|Lorg/apache/http/entity/StringEntity;.getContent:()Ljava/io/InputStream;|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -4705,7 +4283,6 @@ record [|org:apache:http:entity:StringEntity|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|long|] [|org:apache:http:entity:StringEntity.getContentLength|] ([|org:apache:http:entity:StringEntity|] v2 @type (this)) @owner [|org:apache:http:entity:StringEntity|] @signature [|Lorg/apache/http/entity/StringEntity;.getContentLength:()J|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -4717,7 +4294,6 @@ record [|org:apache:http:entity:StringEntity|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|boolean|] [|org:apache:http:entity:StringEntity.isRepeatable|] ([|org:apache:http:entity:StringEntity|] v1 @type (this)) @owner [|org:apache:http:entity:StringEntity|] @signature [|Lorg/apache/http/entity/StringEntity;.isRepeatable:()Z|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09b03c.   v0:= 1  @length 4;
@@ -4726,7 +4302,6 @@ record [|org:apache:http:entity:StringEntity|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|boolean|] [|org:apache:http:entity:StringEntity.isStreaming|] ([|org:apache:http:entity:StringEntity|] v1 @type (this)) @owner [|org:apache:http:entity:StringEntity|] @signature [|Lorg/apache/http/entity/StringEntity;.isStreaming:()Z|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09b050.   v0:= 0  @length 4;
@@ -4735,8 +4310,6 @@ record [|org:apache:http:entity:StringEntity|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|org:apache:http:entity:StringEntity.writeTo|] ([|org:apache:http:entity:StringEntity|] v2 @type (this), [|java:io:OutputStream|] v3 @type (object)) @owner [|org:apache:http:entity:StringEntity|] @signature [|Lorg/apache/http/entity/StringEntity;.writeTo:(Ljava/io/OutputStream;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -4755,8 +4328,6 @@ record [|org:apache:http:client:entity:UrlEncodedFormEntity|]  @type class @Acce
    }
     procedure [|void|] [|org:apache:http:client:entity:UrlEncodedFormEntity.<init>|] ([|org:apache:http:client:entity:UrlEncodedFormEntity|] v2 @type (this), [|java:util:List|] v3 @type (object)) @owner [|org:apache:http:client:entity:UrlEncodedFormEntity|] @signature [|Lorg/apache/http/client/entity/UrlEncodedFormEntity;.<init>:(Ljava/util/List;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
         v1;
       
@@ -4772,9 +4343,6 @@ record [|org:apache:http:client:entity:UrlEncodedFormEntity|]  @type class @Acce
    }
     procedure [|void|] [|org:apache:http:client:entity:UrlEncodedFormEntity.<init>|] ([|org:apache:http:client:entity:UrlEncodedFormEntity|] v1 @type (this), [|java:util:List|] v2 @type (object), [|java:lang:String|] v3 @type (object)) @owner [|org:apache:http:client:entity:UrlEncodedFormEntity|] @signature [|Lorg/apache/http/client/entity/UrlEncodedFormEntity;.<init>:(Ljava/util/List;Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
         v0;
       
 #L09b0d0.   call temp:=  [|org:apache:http:client:utils:URLEncodedUtils.format|](v2, v3) @signature [|Lorg/apache/http/client/utils/URLEncodedUtils;.format:(Ljava/util/List;Ljava/lang/String;)Ljava/lang/String;|] @classDescriptor [|org:apache:http:client:utils:URLEncodedUtils|] @type static;
@@ -4802,7 +4370,6 @@ record [|org:apache:http:message:AbstractHttpMessage|]  @type class @AccessFlag 
    }
     procedure [|void|] [|org:apache:http:message:AbstractHttpMessage.<init>|] ([|org:apache:http:message:AbstractHttpMessage|] v1 @type (this)) @owner [|org:apache:http:message:AbstractHttpMessage|] @signature [|Lorg/apache/http/message/AbstractHttpMessage;.<init>:()V|] @Access PROTECTED_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L09b0fc.   v0:= 0  @length 4;
@@ -4812,8 +4379,6 @@ record [|org:apache:http:message:AbstractHttpMessage|]  @type class @AccessFlag 
    }
     procedure [|void|] [|org:apache:http:message:AbstractHttpMessage.<init>|] ([|org:apache:http:message:AbstractHttpMessage|] v1 @type (this), [|org:apache:http:params:HttpParams|] v2 @type (object)) @owner [|org:apache:http:message:AbstractHttpMessage|] @signature [|Lorg/apache/http/message/AbstractHttpMessage;.<init>:(Lorg/apache/http/params/HttpParams;)V|] @Access PROTECTED_CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L09b118.   call temp:=  [|java:lang:Object.<init>|](v1) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
@@ -4826,9 +4391,6 @@ record [|org:apache:http:message:AbstractHttpMessage|]  @type class @AccessFlag 
    }
     procedure [|void|] [|org:apache:http:message:AbstractHttpMessage.addHeader|] ([|org:apache:http:message:AbstractHttpMessage|] v2 @type (this), [|java:lang:String|] v3 @type (object), [|java:lang:String|] v4 @type (object)) @owner [|org:apache:http:message:AbstractHttpMessage|] @signature [|Lorg/apache/http/message/AbstractHttpMessage;.addHeader:(Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -4846,8 +4408,6 @@ record [|org:apache:http:message:AbstractHttpMessage|]  @type class @AccessFlag 
    }
     procedure [|void|] [|org:apache:http:message:AbstractHttpMessage.addHeader|] ([|org:apache:http:message:AbstractHttpMessage|] v1 @type (this), [|org:apache:http:Header|] v2 @type (object)) @owner [|org:apache:http:message:AbstractHttpMessage|] @signature [|Lorg/apache/http/message/AbstractHttpMessage;.addHeader:(Lorg/apache/http/Header;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09b180.   v0:= v1.[|org:apache:http:message:AbstractHttpMessage.headergroup|]   @type object;
@@ -4857,8 +4417,6 @@ record [|org:apache:http:message:AbstractHttpMessage|]  @type class @AccessFlag 
    }
     procedure [|boolean|] [|org:apache:http:message:AbstractHttpMessage.containsHeader|] ([|org:apache:http:message:AbstractHttpMessage|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:apache:http:message:AbstractHttpMessage|] @signature [|Lorg/apache/http/message/AbstractHttpMessage;.containsHeader:(Ljava/lang/String;)Z|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09b19c.   v0:= v1.[|org:apache:http:message:AbstractHttpMessage.headergroup|]   @type object;
@@ -4869,7 +4427,6 @@ record [|org:apache:http:message:AbstractHttpMessage|]  @type class @AccessFlag 
    }
     procedure [|org:apache:http:Header|][] [|org:apache:http:message:AbstractHttpMessage.getAllHeaders|] ([|org:apache:http:message:AbstractHttpMessage|] v1 @type (this)) @owner [|org:apache:http:message:AbstractHttpMessage|] @signature [|Lorg/apache/http/message/AbstractHttpMessage;.getAllHeaders:()[Lorg/apache/http/Header;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09b1bc.   v0:= v1.[|org:apache:http:message:AbstractHttpMessage.headergroup|]   @type object;
@@ -4880,8 +4437,6 @@ record [|org:apache:http:message:AbstractHttpMessage|]  @type class @AccessFlag 
    }
     procedure [|org:apache:http:Header|] [|org:apache:http:message:AbstractHttpMessage.getFirstHeader|] ([|org:apache:http:message:AbstractHttpMessage|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:apache:http:message:AbstractHttpMessage|] @signature [|Lorg/apache/http/message/AbstractHttpMessage;.getFirstHeader:(Ljava/lang/String;)Lorg/apache/http/Header;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09b1dc.   v0:= v1.[|org:apache:http:message:AbstractHttpMessage.headergroup|]   @type object;
@@ -4892,8 +4447,6 @@ record [|org:apache:http:message:AbstractHttpMessage|]  @type class @AccessFlag 
    }
     procedure [|org:apache:http:Header|][] [|org:apache:http:message:AbstractHttpMessage.getHeaders|] ([|org:apache:http:message:AbstractHttpMessage|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:apache:http:message:AbstractHttpMessage|] @signature [|Lorg/apache/http/message/AbstractHttpMessage;.getHeaders:(Ljava/lang/String;)[Lorg/apache/http/Header;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09b1fc.   v0:= v1.[|org:apache:http:message:AbstractHttpMessage.headergroup|]   @type object;
@@ -4904,8 +4457,6 @@ record [|org:apache:http:message:AbstractHttpMessage|]  @type class @AccessFlag 
    }
     procedure [|org:apache:http:Header|] [|org:apache:http:message:AbstractHttpMessage.getLastHeader|] ([|org:apache:http:message:AbstractHttpMessage|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:apache:http:message:AbstractHttpMessage|] @signature [|Lorg/apache/http/message/AbstractHttpMessage;.getLastHeader:(Ljava/lang/String;)Lorg/apache/http/Header;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09b21c.   v0:= v1.[|org:apache:http:message:AbstractHttpMessage.headergroup|]   @type object;
@@ -4916,7 +4467,6 @@ record [|org:apache:http:message:AbstractHttpMessage|]  @type class @AccessFlag 
    }
     procedure [|org:apache:http:params:HttpParams|] [|org:apache:http:message:AbstractHttpMessage.getParams|] ([|org:apache:http:message:AbstractHttpMessage|] v1 @type (this)) @owner [|org:apache:http:message:AbstractHttpMessage|] @signature [|Lorg/apache/http/message/AbstractHttpMessage;.getParams:()Lorg/apache/http/params/HttpParams;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09b23c.   v0:= v1.[|org:apache:http:message:AbstractHttpMessage.params|]   @type object;
@@ -4930,7 +4480,6 @@ record [|org:apache:http:message:AbstractHttpMessage|]  @type class @AccessFlag 
    }
     procedure [|org:apache:http:HeaderIterator|] [|org:apache:http:message:AbstractHttpMessage.headerIterator|] ([|org:apache:http:message:AbstractHttpMessage|] v1 @type (this)) @owner [|org:apache:http:message:AbstractHttpMessage|] @signature [|Lorg/apache/http/message/AbstractHttpMessage;.headerIterator:()Lorg/apache/http/HeaderIterator;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09b268.   v0:= v1.[|org:apache:http:message:AbstractHttpMessage.headergroup|]   @type object;
@@ -4941,8 +4490,6 @@ record [|org:apache:http:message:AbstractHttpMessage|]  @type class @AccessFlag 
    }
     procedure [|org:apache:http:HeaderIterator|] [|org:apache:http:message:AbstractHttpMessage.headerIterator|] ([|org:apache:http:message:AbstractHttpMessage|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:apache:http:message:AbstractHttpMessage|] @signature [|Lorg/apache/http/message/AbstractHttpMessage;.headerIterator:(Ljava/lang/String;)Lorg/apache/http/HeaderIterator;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09b288.   v0:= v1.[|org:apache:http:message:AbstractHttpMessage.headergroup|]   @type object;
@@ -4953,8 +4500,6 @@ record [|org:apache:http:message:AbstractHttpMessage|]  @type class @AccessFlag 
    }
     procedure [|void|] [|org:apache:http:message:AbstractHttpMessage.removeHeader|] ([|org:apache:http:message:AbstractHttpMessage|] v1 @type (this), [|org:apache:http:Header|] v2 @type (object)) @owner [|org:apache:http:message:AbstractHttpMessage|] @signature [|Lorg/apache/http/message/AbstractHttpMessage;.removeHeader:(Lorg/apache/http/Header;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09b2a8.   v0:= v1.[|org:apache:http:message:AbstractHttpMessage.headergroup|]   @type object;
@@ -4964,10 +4509,8 @@ record [|org:apache:http:message:AbstractHttpMessage|]  @type class @AccessFlag 
    }
     procedure [|void|] [|org:apache:http:message:AbstractHttpMessage.removeHeaders|] ([|org:apache:http:message:AbstractHttpMessage|] v3 @type (this), [|java:lang:String|] v4 @type (object)) @owner [|org:apache:http:message:AbstractHttpMessage|] @signature [|Lorg/apache/http/message/AbstractHttpMessage;.removeHeaders:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-        [|org:apache:http:Header|] v0 @varname [|header|] @scope ((L0015,L0023));
-        [|java:util:Iterator|] v1 @varname [|i|] @scope ((L0009,L0023));
-
-
+        v0;
+        v1;
         v2;
       
 #L09b2c4.   if v4 != 0 then goto L09b2ca;
@@ -4992,9 +4535,6 @@ record [|org:apache:http:message:AbstractHttpMessage|]  @type class @AccessFlag 
    }
     procedure [|void|] [|org:apache:http:message:AbstractHttpMessage.setHeader|] ([|org:apache:http:message:AbstractHttpMessage|] v2 @type (this), [|java:lang:String|] v3 @type (object), [|java:lang:String|] v4 @type (object)) @owner [|org:apache:http:message:AbstractHttpMessage|] @signature [|Lorg/apache/http/message/AbstractHttpMessage;.setHeader:(Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -5012,8 +4552,6 @@ record [|org:apache:http:message:AbstractHttpMessage|]  @type class @AccessFlag 
    }
     procedure [|void|] [|org:apache:http:message:AbstractHttpMessage.setHeader|] ([|org:apache:http:message:AbstractHttpMessage|] v1 @type (this), [|org:apache:http:Header|] v2 @type (object)) @owner [|org:apache:http:message:AbstractHttpMessage|] @signature [|Lorg/apache/http/message/AbstractHttpMessage;.setHeader:(Lorg/apache/http/Header;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09b358.   v0:= v1.[|org:apache:http:message:AbstractHttpMessage.headergroup|]   @type object;
@@ -5023,8 +4561,6 @@ record [|org:apache:http:message:AbstractHttpMessage|]  @type class @AccessFlag 
    }
     procedure [|void|] [|org:apache:http:message:AbstractHttpMessage.setHeaders|] ([|org:apache:http:message:AbstractHttpMessage|] v1 @type (this), [|org:apache:http:Header|][] v2 @type (object)) @owner [|org:apache:http:message:AbstractHttpMessage|] @signature [|Lorg/apache/http/message/AbstractHttpMessage;.setHeaders:([Lorg/apache/http/Header;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L09b374.   v0:= v1.[|org:apache:http:message:AbstractHttpMessage.headergroup|]   @type object;
@@ -5034,8 +4570,6 @@ record [|org:apache:http:message:AbstractHttpMessage|]  @type class @AccessFlag 
    }
     procedure [|void|] [|org:apache:http:message:AbstractHttpMessage.setParams|] ([|org:apache:http:message:AbstractHttpMessage|] v2 @type (this), [|org:apache:http:params:HttpParams|] v3 @type (object)) @owner [|org:apache:http:message:AbstractHttpMessage|] @signature [|Lorg/apache/http/message/AbstractHttpMessage;.setParams:(Lorg/apache/http/params/HttpParams;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -5071,7 +4605,6 @@ record [|org:apache:http:client:methods:HttpRequestBase|]  @type class @AccessFl
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpRequestBase.<init>|] ([|org:apache:http:client:methods:HttpRequestBase|] v1 @type (this)) @owner [|org:apache:http:client:methods:HttpRequestBase|] @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L09b3bc.   call temp:=  [|org:apache:http:message:AbstractHttpMessage.<init>|](v1) @signature [|Lorg/apache/http/message/AbstractHttpMessage;.<init>:()V|] @classDescriptor [|org:apache:http:message:AbstractHttpMessage|] @type direct;
@@ -5083,9 +4616,8 @@ record [|org:apache:http:client:methods:HttpRequestBase|]  @type class @AccessFl
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpRequestBase.abort|] ([|org:apache:http:client:methods:HttpRequestBase|] v4 @type (this)) @owner [|org:apache:http:client:methods:HttpRequestBase|] @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.abort:()V|] @Access PUBLIC {
       local temp ;
-        [|org:apache:http:conn:ClientConnectionRequest|] v0 @varname [|localRequest|] @scope ((L0014,L0028));
-        [|org:apache:http:conn:ConnectionReleaseTrigger|] v1 @varname [|localTrigger|] @scope ((L0016,L0028));
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -5120,8 +4652,7 @@ record [|org:apache:http:client:methods:HttpRequestBase|]  @type class @AccessFl
    }
     procedure [|java:lang:Object|] [|org:apache:http:client:methods:HttpRequestBase.clone|] ([|org:apache:http:client:methods:HttpRequestBase|] v3 @type (this)) @owner [|org:apache:http:client:methods:HttpRequestBase|] @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.clone:()Ljava/lang/Object;|] @Access PUBLIC {
       local temp ;
-        [|org:apache:http:client:methods:HttpRequestBase|] v0 @varname [|clone|] @scope ((L0007,L002a));
-
+        v0;
         v1;
         v2;
       
@@ -5154,7 +4685,6 @@ record [|org:apache:http:client:methods:HttpRequestBase|]  @type class @AccessFl
    }
     procedure [|org:apache:http:ProtocolVersion|] [|org:apache:http:client:methods:HttpRequestBase.getProtocolVersion|] ([|org:apache:http:client:methods:HttpRequestBase|] v1 @type (this)) @owner [|org:apache:http:client:methods:HttpRequestBase|] @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.getProtocolVersion:()Lorg/apache/http/ProtocolVersion;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09b4d8.   call temp:=  [|org:apache:http:client:methods:HttpRequestBase.getParams|](v1) @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.getParams:()Lorg/apache/http/params/HttpParams;|] @classDescriptor [|org:apache:http:client:methods:HttpRequestBase|] @type virtual;
@@ -5166,11 +4696,10 @@ record [|org:apache:http:client:methods:HttpRequestBase|]  @type class @AccessFl
    }
     procedure [|org:apache:http:RequestLine|] [|org:apache:http:client:methods:HttpRequestBase.getRequestLine|] ([|org:apache:http:client:methods:HttpRequestBase|] v5 @type (this)) @owner [|org:apache:http:client:methods:HttpRequestBase|] @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.getRequestLine:()Lorg/apache/http/RequestLine;|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|method|] @scope ((L0004,L0023));
-        [|java:net:URI|] v1 @varname [|uri|] @scope ((L000c,L0023));
-        [|java:lang:String|] v2 @varname [|uritext|] @scope ((L000d,L0023));
-        [|org:apache:http:ProtocolVersion|] v3 @varname [|ver|] @scope ((L0008,L0023));
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
       
 #L09b4fc.   call temp:=  [|org:apache:http:client:methods:HttpRequestBase.getMethod|](v5) @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.getMethod:()Ljava/lang/String;|] @classDescriptor [|org:apache:http:client:methods:HttpRequestBase|] @type virtual;
@@ -5195,7 +4724,6 @@ record [|org:apache:http:client:methods:HttpRequestBase|]  @type class @AccessFl
    }
     procedure [|java:net:URI|] [|org:apache:http:client:methods:HttpRequestBase.getURI|] ([|org:apache:http:client:methods:HttpRequestBase|] v1 @type (this)) @owner [|org:apache:http:client:methods:HttpRequestBase|] @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.getURI:()Ljava/net/URI;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09b554.   v0:= v1.[|org:apache:http:client:methods:HttpRequestBase.uri|]   @type object;
@@ -5204,7 +4732,6 @@ record [|org:apache:http:client:methods:HttpRequestBase|]  @type class @AccessFl
    }
     procedure [|boolean|] [|org:apache:http:client:methods:HttpRequestBase.isAborted|] ([|org:apache:http:client:methods:HttpRequestBase|] v1 @type (this)) @owner [|org:apache:http:client:methods:HttpRequestBase|] @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.isAborted:()Z|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09b56c.   v0:= v1.[|org:apache:http:client:methods:HttpRequestBase.aborted|]   @boolean;
@@ -5213,8 +4740,6 @@ record [|org:apache:http:client:methods:HttpRequestBase|]  @type class @AccessFl
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpRequestBase.setConnectionRequest|] ([|org:apache:http:client:methods:HttpRequestBase|] v2 @type (this), [|org:apache:http:conn:ClientConnectionRequest|] v3 @type (object)) @owner [|org:apache:http:client:methods:HttpRequestBase|] @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.setConnectionRequest:(Lorg/apache/http/conn/ClientConnectionRequest;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -5242,8 +4767,6 @@ record [|org:apache:http:client:methods:HttpRequestBase|]  @type class @AccessFl
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpRequestBase.setReleaseTrigger|] ([|org:apache:http:client:methods:HttpRequestBase|] v2 @type (this), [|org:apache:http:conn:ConnectionReleaseTrigger|] v3 @type (object)) @owner [|org:apache:http:client:methods:HttpRequestBase|] @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.setReleaseTrigger:(Lorg/apache/http/conn/ConnectionReleaseTrigger;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -5271,8 +4794,6 @@ record [|org:apache:http:client:methods:HttpRequestBase|]  @type class @AccessFl
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpRequestBase.setURI|] ([|org:apache:http:client:methods:HttpRequestBase|] v0 @type (this), [|java:net:URI|] v1 @type (object)) @owner [|org:apache:http:client:methods:HttpRequestBase|] @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.setURI:(Ljava/net/URI;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09b65c.   v0.[|org:apache:http:client:methods:HttpRequestBase.uri|]  := v1 @type object;
 #L09b660.   return @void ;
@@ -5283,7 +4804,6 @@ record [|org:apache:http:client:methods:HttpDelete|]  @type class @AccessFlag PU
       global [|java:lang:String|] @@[|org:apache:http:client:methods:HttpDelete.METHOD_NAME|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:client:methods:HttpDelete.<init>|] ([|org:apache:http:client:methods:HttpDelete|] v0 @type (this)) @owner [|org:apache:http:client:methods:HttpDelete|] @signature [|Lorg/apache/http/client/methods/HttpDelete;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L09b674.   call temp:=  [|org:apache:http:client:methods:HttpRequestBase.<init>|](v0) @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpRequestBase|] @type direct;
 #L09b67a.   return @void ;
@@ -5291,8 +4811,6 @@ record [|org:apache:http:client:methods:HttpDelete|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpDelete.<init>|] ([|org:apache:http:client:methods:HttpDelete|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:apache:http:client:methods:HttpDelete|] @signature [|Lorg/apache/http/client/methods/HttpDelete;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L09b68c.   call temp:=  [|org:apache:http:client:methods:HttpRequestBase.<init>|](v1) @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpRequestBase|] @type direct;
@@ -5304,8 +4822,6 @@ record [|org:apache:http:client:methods:HttpDelete|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpDelete.<init>|] ([|org:apache:http:client:methods:HttpDelete|] v0 @type (this), [|java:net:URI|] v1 @type (object)) @owner [|org:apache:http:client:methods:HttpDelete|] @signature [|Lorg/apache/http/client/methods/HttpDelete;.<init>:(Ljava/net/URI;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L09b6b4.   call temp:=  [|org:apache:http:client:methods:HttpRequestBase.<init>|](v0) @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpRequestBase|] @type direct;
 #L09b6ba.   call temp:=  [|org:apache:http:client:methods:HttpDelete.setURI|](v0, v1) @signature [|Lorg/apache/http/client/methods/HttpDelete;.setURI:(Ljava/net/URI;)V|] @classDescriptor [|org:apache:http:client:methods:HttpDelete|] @type virtual;
@@ -5314,7 +4830,6 @@ record [|org:apache:http:client:methods:HttpDelete|]  @type class @AccessFlag PU
    }
     procedure [|java:lang:String|] [|org:apache:http:client:methods:HttpDelete.getMethod|] ([|org:apache:http:client:methods:HttpDelete|] v1 @type (this)) @owner [|org:apache:http:client:methods:HttpDelete|] @signature [|Lorg/apache/http/client/methods/HttpDelete;.getMethod:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09b6d4.   v0:= "DELETE" @type (object, string);
@@ -5326,7 +4841,6 @@ record [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|]  @type 
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase.<init>|] ([|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|] v0 @type (this)) @owner [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|] @signature [|Lorg/apache/http/client/methods/HttpEntityEnclosingRequestBase;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L09b6ec.   call temp:=  [|org:apache:http:client:methods:HttpRequestBase.<init>|](v0) @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpRequestBase|] @type direct;
 #L09b6f2.   return @void ;
@@ -5334,8 +4848,7 @@ record [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|]  @type 
    }
     procedure [|java:lang:Object|] [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase.clone|] ([|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|] v2 @type (this)) @owner [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|] @signature [|Lorg/apache/http/client/methods/HttpEntityEnclosingRequestBase;.clone:()Ljava/lang/Object;|] @Access PUBLIC {
       local temp ;
-        [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|] v0 @varname [|clone|] @scope ((L0006,L0015));
-
+        v0;
         v1;
       
 #L09b704.   call temp:=  [|org:apache:http:client:methods:HttpRequestBase.clone|](v2) @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.clone:()Ljava/lang/Object;|] @classDescriptor [|org:apache:http:client:methods:HttpRequestBase|] @type super;
@@ -5353,8 +4866,7 @@ record [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|]  @type 
    }
     procedure [|boolean|] [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase.expectContinue|] ([|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|] v3 @type (this)) @owner [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|] @signature [|Lorg/apache/http/client/methods/HttpEntityEnclosingRequestBase;.expectContinue:()Z|] @Access PUBLIC {
       local temp ;
-        [|org:apache:http:Header|] v0 @varname [|expect|] @scope ((L0006,L0018));
-
+        v0;
         v1;
         v2;
       
@@ -5376,7 +4888,6 @@ record [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|]  @type 
    }
     procedure [|org:apache:http:HttpEntity|] [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase.getEntity|] ([|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|] v1 @type (this)) @owner [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|] @signature [|Lorg/apache/http/client/methods/HttpEntityEnclosingRequestBase;.getEntity:()Lorg/apache/http/HttpEntity;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09b780.   v0:= v1.[|org:apache:http:client:methods:HttpEntityEnclosingRequestBase.entity|]   @type object;
@@ -5385,8 +4896,6 @@ record [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|]  @type 
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase.setEntity|] ([|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|] v0 @type (this), [|org:apache:http:HttpEntity|] v1 @type (object)) @owner [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|] @signature [|Lorg/apache/http/client/methods/HttpEntityEnclosingRequestBase;.setEntity:(Lorg/apache/http/HttpEntity;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L09b798.   v0.[|org:apache:http:client:methods:HttpEntityEnclosingRequestBase.entity|]  := v1 @type object;
 #L09b79c.   return @void ;
@@ -5397,7 +4906,6 @@ record [|org:apache:http:client:methods:HttpGet|]  @type class @AccessFlag PUBLI
       global [|java:lang:String|] @@[|org:apache:http:client:methods:HttpGet.METHOD_NAME|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:client:methods:HttpGet.<init>|] ([|org:apache:http:client:methods:HttpGet|] v0 @type (this)) @owner [|org:apache:http:client:methods:HttpGet|] @signature [|Lorg/apache/http/client/methods/HttpGet;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L09b7b0.   call temp:=  [|org:apache:http:client:methods:HttpRequestBase.<init>|](v0) @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpRequestBase|] @type direct;
 #L09b7b6.   return @void ;
@@ -5405,8 +4913,6 @@ record [|org:apache:http:client:methods:HttpGet|]  @type class @AccessFlag PUBLI
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpGet.<init>|] ([|org:apache:http:client:methods:HttpGet|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:apache:http:client:methods:HttpGet|] @signature [|Lorg/apache/http/client/methods/HttpGet;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L09b7c8.   call temp:=  [|org:apache:http:client:methods:HttpRequestBase.<init>|](v1) @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpRequestBase|] @type direct;
@@ -5418,8 +4924,6 @@ record [|org:apache:http:client:methods:HttpGet|]  @type class @AccessFlag PUBLI
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpGet.<init>|] ([|org:apache:http:client:methods:HttpGet|] v0 @type (this), [|java:net:URI|] v1 @type (object)) @owner [|org:apache:http:client:methods:HttpGet|] @signature [|Lorg/apache/http/client/methods/HttpGet;.<init>:(Ljava/net/URI;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L09b7f0.   call temp:=  [|org:apache:http:client:methods:HttpRequestBase.<init>|](v0) @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpRequestBase|] @type direct;
 #L09b7f6.   call temp:=  [|org:apache:http:client:methods:HttpGet.setURI|](v0, v1) @signature [|Lorg/apache/http/client/methods/HttpGet;.setURI:(Ljava/net/URI;)V|] @classDescriptor [|org:apache:http:client:methods:HttpGet|] @type virtual;
@@ -5428,7 +4932,6 @@ record [|org:apache:http:client:methods:HttpGet|]  @type class @AccessFlag PUBLI
    }
     procedure [|java:lang:String|] [|org:apache:http:client:methods:HttpGet.getMethod|] ([|org:apache:http:client:methods:HttpGet|] v1 @type (this)) @owner [|org:apache:http:client:methods:HttpGet|] @signature [|Lorg/apache/http/client/methods/HttpGet;.getMethod:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09b810.   v0:= "GET" @type (object, string);
@@ -5440,7 +4943,6 @@ record [|org:apache:http:client:methods:HttpHead|]  @type class @AccessFlag PUBL
       global [|java:lang:String|] @@[|org:apache:http:client:methods:HttpHead.METHOD_NAME|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:client:methods:HttpHead.<init>|] ([|org:apache:http:client:methods:HttpHead|] v0 @type (this)) @owner [|org:apache:http:client:methods:HttpHead|] @signature [|Lorg/apache/http/client/methods/HttpHead;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L09b828.   call temp:=  [|org:apache:http:client:methods:HttpRequestBase.<init>|](v0) @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpRequestBase|] @type direct;
 #L09b82e.   return @void ;
@@ -5448,8 +4950,6 @@ record [|org:apache:http:client:methods:HttpHead|]  @type class @AccessFlag PUBL
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpHead.<init>|] ([|org:apache:http:client:methods:HttpHead|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:apache:http:client:methods:HttpHead|] @signature [|Lorg/apache/http/client/methods/HttpHead;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L09b840.   call temp:=  [|org:apache:http:client:methods:HttpRequestBase.<init>|](v1) @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpRequestBase|] @type direct;
@@ -5461,8 +4961,6 @@ record [|org:apache:http:client:methods:HttpHead|]  @type class @AccessFlag PUBL
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpHead.<init>|] ([|org:apache:http:client:methods:HttpHead|] v0 @type (this), [|java:net:URI|] v1 @type (object)) @owner [|org:apache:http:client:methods:HttpHead|] @signature [|Lorg/apache/http/client/methods/HttpHead;.<init>:(Ljava/net/URI;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L09b868.   call temp:=  [|org:apache:http:client:methods:HttpRequestBase.<init>|](v0) @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpRequestBase|] @type direct;
 #L09b86e.   call temp:=  [|org:apache:http:client:methods:HttpHead.setURI|](v0, v1) @signature [|Lorg/apache/http/client/methods/HttpHead;.setURI:(Ljava/net/URI;)V|] @classDescriptor [|org:apache:http:client:methods:HttpHead|] @type virtual;
@@ -5471,7 +4969,6 @@ record [|org:apache:http:client:methods:HttpHead|]  @type class @AccessFlag PUBL
    }
     procedure [|java:lang:String|] [|org:apache:http:client:methods:HttpHead.getMethod|] ([|org:apache:http:client:methods:HttpHead|] v1 @type (this)) @owner [|org:apache:http:client:methods:HttpHead|] @signature [|Lorg/apache/http/client/methods/HttpHead;.getMethod:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09b888.   v0:= "HEAD" @type (object, string);
@@ -5483,7 +4980,6 @@ record [|org:apache:http:client:methods:HttpOptions|]  @type class @AccessFlag P
       global [|java:lang:String|] @@[|org:apache:http:client:methods:HttpOptions.METHOD_NAME|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:client:methods:HttpOptions.<init>|] ([|org:apache:http:client:methods:HttpOptions|] v0 @type (this)) @owner [|org:apache:http:client:methods:HttpOptions|] @signature [|Lorg/apache/http/client/methods/HttpOptions;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L09b8a0.   call temp:=  [|org:apache:http:client:methods:HttpRequestBase.<init>|](v0) @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpRequestBase|] @type direct;
 #L09b8a6.   return @void ;
@@ -5491,8 +4987,6 @@ record [|org:apache:http:client:methods:HttpOptions|]  @type class @AccessFlag P
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpOptions.<init>|] ([|org:apache:http:client:methods:HttpOptions|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:apache:http:client:methods:HttpOptions|] @signature [|Lorg/apache/http/client/methods/HttpOptions;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L09b8b8.   call temp:=  [|org:apache:http:client:methods:HttpRequestBase.<init>|](v1) @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpRequestBase|] @type direct;
@@ -5504,8 +4998,6 @@ record [|org:apache:http:client:methods:HttpOptions|]  @type class @AccessFlag P
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpOptions.<init>|] ([|org:apache:http:client:methods:HttpOptions|] v0 @type (this), [|java:net:URI|] v1 @type (object)) @owner [|org:apache:http:client:methods:HttpOptions|] @signature [|Lorg/apache/http/client/methods/HttpOptions;.<init>:(Ljava/net/URI;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L09b8e0.   call temp:=  [|org:apache:http:client:methods:HttpRequestBase.<init>|](v0) @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpRequestBase|] @type direct;
 #L09b8e6.   call temp:=  [|org:apache:http:client:methods:HttpOptions.setURI|](v0, v1) @signature [|Lorg/apache/http/client/methods/HttpOptions;.setURI:(Ljava/net/URI;)V|] @classDescriptor [|org:apache:http:client:methods:HttpOptions|] @type virtual;
@@ -5514,16 +5006,14 @@ record [|org:apache:http:client:methods:HttpOptions|]  @type class @AccessFlag P
    }
     procedure [|java:util:Set|] [|org:apache:http:client:methods:HttpOptions.getAllowedMethods|] ([|org:apache:http:client:methods:HttpOptions|] v10 @type (this), [|org:apache:http:HttpResponse|] v11 @type (object)) @owner [|org:apache:http:client:methods:HttpOptions|] @signature [|Lorg/apache/http/client/methods/HttpOptions;.getAllowedMethods:(Lorg/apache/http/HttpResponse;)Ljava/util/Set;|] @Access PUBLIC {
       local temp ;
-        [|org:apache:http:HeaderElement|][] v0 @varname [|arr$|] @scope ((L0024,L0034));
-        [|org:apache:http:HeaderElement|] v1 @varname [|element|] @scope ((L002a,L0034));
-        [|org:apache:http:HeaderElement|][] v2 @varname [|elements|] @scope ((L0023,L0034));
-        [|org:apache:http:Header|] v3 @varname [|header|] @scope ((L001f,L0034));
-        [|int|] v4 @varname [|i$|] @scope ((L0026,L0034));
-        [|int|] v6 @varname [|len$|] @scope ((L0025,L0034));
-        [|org:apache:http:HeaderIterator|] v5 @varname [|it|] @scope ((L0010,L0035));
-        [|java:util:Set|] v7 @varname [|methods|] @scope ((L0015,L0035));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
         v8;
         v9;
       
@@ -5559,7 +5049,6 @@ record [|org:apache:http:client:methods:HttpOptions|]  @type class @AccessFlag P
    }
     procedure [|java:lang:String|] [|org:apache:http:client:methods:HttpOptions.getMethod|] ([|org:apache:http:client:methods:HttpOptions|] v1 @type (this)) @owner [|org:apache:http:client:methods:HttpOptions|] @signature [|Lorg/apache/http/client/methods/HttpOptions;.getMethod:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09b97c.   v0:= "OPTIONS" @type (object, string);
@@ -5571,7 +5060,6 @@ record [|org:apache:http:client:methods:HttpPost|]  @type class @AccessFlag PUBL
       global [|java:lang:String|] @@[|org:apache:http:client:methods:HttpPost.METHOD_NAME|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:client:methods:HttpPost.<init>|] ([|org:apache:http:client:methods:HttpPost|] v0 @type (this)) @owner [|org:apache:http:client:methods:HttpPost|] @signature [|Lorg/apache/http/client/methods/HttpPost;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L09b994.   call temp:=  [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase.<init>|](v0) @signature [|Lorg/apache/http/client/methods/HttpEntityEnclosingRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|] @type direct;
 #L09b99a.   return @void ;
@@ -5579,8 +5067,6 @@ record [|org:apache:http:client:methods:HttpPost|]  @type class @AccessFlag PUBL
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpPost.<init>|] ([|org:apache:http:client:methods:HttpPost|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:apache:http:client:methods:HttpPost|] @signature [|Lorg/apache/http/client/methods/HttpPost;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L09b9ac.   call temp:=  [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase.<init>|](v1) @signature [|Lorg/apache/http/client/methods/HttpEntityEnclosingRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|] @type direct;
@@ -5592,8 +5078,6 @@ record [|org:apache:http:client:methods:HttpPost|]  @type class @AccessFlag PUBL
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpPost.<init>|] ([|org:apache:http:client:methods:HttpPost|] v0 @type (this), [|java:net:URI|] v1 @type (object)) @owner [|org:apache:http:client:methods:HttpPost|] @signature [|Lorg/apache/http/client/methods/HttpPost;.<init>:(Ljava/net/URI;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L09b9d4.   call temp:=  [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase.<init>|](v0) @signature [|Lorg/apache/http/client/methods/HttpEntityEnclosingRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|] @type direct;
 #L09b9da.   call temp:=  [|org:apache:http:client:methods:HttpPost.setURI|](v0, v1) @signature [|Lorg/apache/http/client/methods/HttpPost;.setURI:(Ljava/net/URI;)V|] @classDescriptor [|org:apache:http:client:methods:HttpPost|] @type virtual;
@@ -5602,7 +5086,6 @@ record [|org:apache:http:client:methods:HttpPost|]  @type class @AccessFlag PUBL
    }
     procedure [|java:lang:String|] [|org:apache:http:client:methods:HttpPost.getMethod|] ([|org:apache:http:client:methods:HttpPost|] v1 @type (this)) @owner [|org:apache:http:client:methods:HttpPost|] @signature [|Lorg/apache/http/client/methods/HttpPost;.getMethod:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09b9f4.   v0:= "POST" @type (object, string);
@@ -5614,7 +5097,6 @@ record [|org:apache:http:client:methods:HttpPut|]  @type class @AccessFlag PUBLI
       global [|java:lang:String|] @@[|org:apache:http:client:methods:HttpPut.METHOD_NAME|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:client:methods:HttpPut.<init>|] ([|org:apache:http:client:methods:HttpPut|] v0 @type (this)) @owner [|org:apache:http:client:methods:HttpPut|] @signature [|Lorg/apache/http/client/methods/HttpPut;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L09ba0c.   call temp:=  [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase.<init>|](v0) @signature [|Lorg/apache/http/client/methods/HttpEntityEnclosingRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|] @type direct;
 #L09ba12.   return @void ;
@@ -5622,8 +5104,6 @@ record [|org:apache:http:client:methods:HttpPut|]  @type class @AccessFlag PUBLI
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpPut.<init>|] ([|org:apache:http:client:methods:HttpPut|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:apache:http:client:methods:HttpPut|] @signature [|Lorg/apache/http/client/methods/HttpPut;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L09ba24.   call temp:=  [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase.<init>|](v1) @signature [|Lorg/apache/http/client/methods/HttpEntityEnclosingRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|] @type direct;
@@ -5635,8 +5115,6 @@ record [|org:apache:http:client:methods:HttpPut|]  @type class @AccessFlag PUBLI
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpPut.<init>|] ([|org:apache:http:client:methods:HttpPut|] v0 @type (this), [|java:net:URI|] v1 @type (object)) @owner [|org:apache:http:client:methods:HttpPut|] @signature [|Lorg/apache/http/client/methods/HttpPut;.<init>:(Ljava/net/URI;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L09ba4c.   call temp:=  [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase.<init>|](v0) @signature [|Lorg/apache/http/client/methods/HttpEntityEnclosingRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpEntityEnclosingRequestBase|] @type direct;
 #L09ba52.   call temp:=  [|org:apache:http:client:methods:HttpPut.setURI|](v0, v1) @signature [|Lorg/apache/http/client/methods/HttpPut;.setURI:(Ljava/net/URI;)V|] @classDescriptor [|org:apache:http:client:methods:HttpPut|] @type virtual;
@@ -5645,7 +5123,6 @@ record [|org:apache:http:client:methods:HttpPut|]  @type class @AccessFlag PUBLI
    }
     procedure [|java:lang:String|] [|org:apache:http:client:methods:HttpPut.getMethod|] ([|org:apache:http:client:methods:HttpPut|] v1 @type (this)) @owner [|org:apache:http:client:methods:HttpPut|] @signature [|Lorg/apache/http/client/methods/HttpPut;.getMethod:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09ba6c.   v0:= "PUT" @type (object, string);
@@ -5657,7 +5134,6 @@ record [|org:apache:http:client:methods:HttpTrace|]  @type class @AccessFlag PUB
       global [|java:lang:String|] @@[|org:apache:http:client:methods:HttpTrace.METHOD_NAME|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|org:apache:http:client:methods:HttpTrace.<init>|] ([|org:apache:http:client:methods:HttpTrace|] v0 @type (this)) @owner [|org:apache:http:client:methods:HttpTrace|] @signature [|Lorg/apache/http/client/methods/HttpTrace;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L09ba84.   call temp:=  [|org:apache:http:client:methods:HttpRequestBase.<init>|](v0) @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpRequestBase|] @type direct;
 #L09ba8a.   return @void ;
@@ -5665,8 +5141,6 @@ record [|org:apache:http:client:methods:HttpTrace|]  @type class @AccessFlag PUB
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpTrace.<init>|] ([|org:apache:http:client:methods:HttpTrace|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:apache:http:client:methods:HttpTrace|] @signature [|Lorg/apache/http/client/methods/HttpTrace;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L09ba9c.   call temp:=  [|org:apache:http:client:methods:HttpRequestBase.<init>|](v1) @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpRequestBase|] @type direct;
@@ -5678,8 +5152,6 @@ record [|org:apache:http:client:methods:HttpTrace|]  @type class @AccessFlag PUB
    }
     procedure [|void|] [|org:apache:http:client:methods:HttpTrace.<init>|] ([|org:apache:http:client:methods:HttpTrace|] v0 @type (this), [|java:net:URI|] v1 @type (object)) @owner [|org:apache:http:client:methods:HttpTrace|] @signature [|Lorg/apache/http/client/methods/HttpTrace;.<init>:(Ljava/net/URI;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L09bac4.   call temp:=  [|org:apache:http:client:methods:HttpRequestBase.<init>|](v0) @signature [|Lorg/apache/http/client/methods/HttpRequestBase;.<init>:()V|] @classDescriptor [|org:apache:http:client:methods:HttpRequestBase|] @type direct;
 #L09baca.   call temp:=  [|org:apache:http:client:methods:HttpTrace.setURI|](v0, v1) @signature [|Lorg/apache/http/client/methods/HttpTrace;.setURI:(Ljava/net/URI;)V|] @classDescriptor [|org:apache:http:client:methods:HttpTrace|] @type virtual;
@@ -5688,7 +5160,6 @@ record [|org:apache:http:client:methods:HttpTrace|]  @type class @AccessFlag PUB
    }
     procedure [|java:lang:String|] [|org:apache:http:client:methods:HttpTrace.getMethod|] ([|org:apache:http:client:methods:HttpTrace|] v1 @type (this)) @owner [|org:apache:http:client:methods:HttpTrace|] @signature [|Lorg/apache/http/client/methods/HttpTrace;.getMethod:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L09bae4.   v0:= "TRACE" @type (object, string);

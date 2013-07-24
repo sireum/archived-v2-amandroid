@@ -5,7 +5,6 @@ record [|com:android:commands:bmgr:Bmgr$RestoreObserver|]  @type class @AccessFl
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr$RestoreObserver.<init>|] ([|com:android:commands:bmgr:Bmgr$RestoreObserver|] v1 @type (this), [|com:android:commands:bmgr:Bmgr|] v2 @type (object)) @owner [|com:android:commands:bmgr:Bmgr$RestoreObserver|] @signature [|Lcom/android/commands/bmgr/Bmgr$RestoreObserver;.<init>:(Lcom/android/commands/bmgr/Bmgr;)V|] @Access CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L0008cc.   v1.[|com:android:commands:bmgr:Bmgr$RestoreObserver.this$0|]  := v2 @type object;
@@ -17,9 +16,6 @@ record [|com:android:commands:bmgr:Bmgr$RestoreObserver|]  @type class @AccessFl
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr$RestoreObserver.onUpdate|] ([|com:android:commands:bmgr:Bmgr$RestoreObserver|] v3 @type (this), [|int|] v4, [|java:lang:String|] v5 @type (object)) @owner [|com:android:commands:bmgr:Bmgr$RestoreObserver|] @signature [|Lcom/android/commands/bmgr/Bmgr$RestoreObserver;.onUpdate:(ILjava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
         v2;
@@ -45,8 +41,6 @@ record [|com:android:commands:bmgr:Bmgr$RestoreObserver|]  @type class @AccessFl
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr$RestoreObserver.restoreFinished|] ([|com:android:commands:bmgr:Bmgr$RestoreObserver|] v3 @type (this), [|int|] v4) @owner [|com:android:commands:bmgr:Bmgr$RestoreObserver|] @signature [|Lcom/android/commands/bmgr/Bmgr$RestoreObserver;.restoreFinished:(I)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -76,8 +70,6 @@ record [|com:android:commands:bmgr:Bmgr$RestoreObserver|]  @type class @AccessFl
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr$RestoreObserver.restoreSetsAvailable|] ([|com:android:commands:bmgr:Bmgr$RestoreObserver|] v1 @type (this), [|android:app:backup:RestoreSet|][] v2 @type (object)) @owner [|com:android:commands:bmgr:Bmgr$RestoreObserver|] @signature [|Lcom/android/commands/bmgr/Bmgr$RestoreObserver;.restoreSetsAvailable:([Landroid/app/backup/RestoreSet;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L0009ac.   (@monitorenter v1)
@@ -95,8 +87,6 @@ record [|com:android:commands:bmgr:Bmgr$RestoreObserver|]  @type class @AccessFl
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr$RestoreObserver.restoreStarting|] ([|com:android:commands:bmgr:Bmgr$RestoreObserver|] v3 @type (this), [|int|] v4) @owner [|com:android:commands:bmgr:Bmgr$RestoreObserver|] @signature [|Lcom/android/commands/bmgr/Bmgr$RestoreObserver;.restoreStarting:(I)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -120,7 +110,6 @@ record [|com:android:commands:bmgr:Bmgr$RestoreObserver|]  @type class @AccessFl
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr$RestoreObserver.waitForCompletion|] ([|com:android:commands:bmgr:Bmgr$RestoreObserver|] v1 @type (this)) @owner [|com:android:commands:bmgr:Bmgr$RestoreObserver|] @signature [|Lcom/android/commands/bmgr/Bmgr$RestoreObserver;.waitForCompletion:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L000a34.   (@monitorenter v1)
@@ -151,7 +140,6 @@ record [|com:android:commands:bmgr:Bmgr|]  @type class @AccessFlag PUBLIC_FINAL 
       global [|java:lang:String|] @@[|com:android:commands:bmgr:Bmgr.TRANSPORT_NOT_RUNNING_ERR|]    @AccessFlag STATIC_FINAL;
     procedure [|void|] [|com:android:commands:bmgr:Bmgr.<init>|] ([|com:android:commands:bmgr:Bmgr|] v0 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L000a84.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L000a8a.   return @void ;
@@ -159,9 +147,8 @@ record [|com:android:commands:bmgr:Bmgr|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr.doBackup|] ([|com:android:commands:bmgr:Bmgr|] v4 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doBackup:()V|] @Access PRIVATE {
       local temp ;
-        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L0011,L0022));
-        [|java:lang:String|] v1 @varname [|pkg|] @scope ((L0004,L0022));
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -187,10 +174,9 @@ record [|com:android:commands:bmgr:Bmgr|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr.doEnable|] ([|com:android:commands:bmgr:Bmgr|] v6 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doEnable:()V|] @Access PRIVATE {
       local temp ;
-        [|boolean|] v2 @varname [|enable|] @scope ((L000e,L0030));
-        [|java:lang:NumberFormatException|] v1 @varname [|e|] @scope ((L0031,L0035), (L0036,L0047));
-        [|java:lang:String|] v0 @varname [|arg|] @scope ((L0004,L0047));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -236,9 +222,8 @@ record [|com:android:commands:bmgr:Bmgr|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr.doEnabled|] ([|com:android:commands:bmgr:Bmgr|] v5 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doEnabled:()V|] @Access PRIVATE {
       local temp ;
-        [|boolean|] v1 @varname [|isEnabled|] @scope ((L0006,L0022));
-        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L0024,L0035));
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -274,9 +259,8 @@ record [|com:android:commands:bmgr:Bmgr|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr.doList|] ([|com:android:commands:bmgr:Bmgr|] v5 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doList:()V|] @Access PRIVATE {
       local temp ;
-        [|android:os:RemoteException|] v1 @varname [|e|] @scope ((L0027,L0038));
-        [|java:lang:String|] v0 @varname [|arg|] @scope ((L0004,L0055));
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -330,10 +314,9 @@ record [|com:android:commands:bmgr:Bmgr|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr.doListRestoreSets|] ([|com:android:commands:bmgr:Bmgr|] v5 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doListRestoreSets:()V|] @Access PRIVATE {
       local temp ;
-        [|int|] v1 @varname [|err|] @scope ((L000b,L0014), (L0015,L001e));
-        [|com:android:commands:bmgr:Bmgr$RestoreObserver|] v2 @varname [|observer|] @scope ((L0005,L0014), (L0015,L001e));
-        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L001f,L0030));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
       
@@ -365,15 +348,14 @@ record [|com:android:commands:bmgr:Bmgr|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr.doListTransports|] ([|com:android:commands:bmgr:Bmgr|] v10 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doListTransports:()V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v1 @varname [|current|] @scope ((L0006,L0018), (L0019,L0044));
-        [|java:lang:String|][] v7 @varname [|transports|] @scope ((L000c,L0018), (L0019,L0044));
-        [|java:lang:String|] v5 @varname [|pad|] @scope ((L0028,L0041));
-        [|java:lang:String|][] v0 @varname [|arr$|] @scope ((L001a,L0044));
-        [|int|] v3 @varname [|i$|] @scope ((L001c,L0044));
-        [|int|] v4 @varname [|len$|] @scope ((L001b,L0044));
-        [|java:lang:String|] v6 @varname [|t|] @scope ((L0020,L0044));
-        [|android:os:RemoteException|] v2 @varname [|e|] @scope ((L0045,L0056));
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
         v8;
         v9;
       
@@ -427,11 +409,10 @@ record [|com:android:commands:bmgr:Bmgr|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr.doRestore|] ([|com:android:commands:bmgr:Bmgr|] v7 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doRestore:()V|] @Access PRIVATE {
       local temp ;
-        [|java:util:HashSet|] v2 @varname [|filter|] @scope ((L0024,L002e), (L0031,L0035), (L003a,L003e));
-        [|long|] v3 @varname [|token|] @scope ((L0023,L0035), (L003a,L003e));
-        [|java:lang:NumberFormatException|] v1 @varname [|e|] @scope ((L0036,L003a));
-        [|java:lang:String|] v0 @varname [|arg|] @scope ((L0004,L003e));
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -473,21 +454,18 @@ record [|com:android:commands:bmgr:Bmgr|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr.doRestoreAll|] ([|com:android:commands:bmgr:Bmgr|] v15 @type (this), [|long|] v16, [|java:util:HashSet|] v18 @type (object)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doRestoreAll:(JLjava/util/HashSet;)V|] @Access PRIVATE {
       local temp ;
-        [|android:app:backup:RestoreSet|][] v2 @varname [|arr$|] @scope ((L002d,L0060), (L008b,L00a9));
-        [|int|] v6 @varname [|i$|] @scope ((L002f,L0060), (L008b,L00a9));
-        [|int|] v7 @varname [|len$|] @scope ((L002e,L0060), (L008b,L00a9));
-        [|android:app:backup:RestoreSet|] v10 @varname [|s|] @scope ((L0033,L0060), (L008b,L00a9));
-        [|int|] v5 @varname [|err|] @scope ((L0023,L0079), (L008b,L00b4));
-        [|android:app:backup:RestoreSet|][] v11 @varname [|sets|] @scope ((L001d,L0079), (L008b,L00b4));
-        [|android:os:RemoteException|] v4 @varname [|e|] @scope ((L007a,L008b));
-        [|java:lang:String|][] v8 @varname [|names|] @scope ((L0093,L00a6));
-        [|boolean|] v3 @varname [|didRestore|] @scope ((L0006,L00b4));
-        [|com:android:commands:bmgr:Bmgr$RestoreObserver|] v9 @varname [|observer|] @scope ((L0005,L00b4));
-
-
-
         v0;
         v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
+        v9;
+        v10;
+        v11;
         v12;
         v13;
         v14;
@@ -592,11 +570,9 @@ record [|com:android:commands:bmgr:Bmgr|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr.doRestorePackage|] ([|com:android:commands:bmgr:Bmgr|] v6 @type (this), [|java:lang:String|] v7 @type (object)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doRestorePackage:(Ljava/lang/String;)V|] @Access PRIVATE {
       local temp ;
-        [|int|] v1 @varname [|err|] @scope ((L0020,L002b), (L003d,L0056));
-        [|com:android:commands:bmgr:Bmgr$RestoreObserver|] v2 @varname [|observer|] @scope ((L001a,L002b), (L003d,L0056));
-        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L002c,L003d));
-
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -649,8 +625,7 @@ record [|com:android:commands:bmgr:Bmgr|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr.doRun|] ([|com:android:commands:bmgr:Bmgr|] v3 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doRun:()V|] @Access PRIVATE {
       local temp ;
-        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L0007,L0018));
-
+        v0;
         v1;
         v2;
       
@@ -671,10 +646,9 @@ record [|com:android:commands:bmgr:Bmgr|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr.doTransport|] ([|com:android:commands:bmgr:Bmgr|] v6 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doTransport:()V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v2 @varname [|which|] @scope ((L0004,L0009), (L000a,L0031), (L0043,L006c));
-        [|java:lang:String|] v1 @varname [|old|] @scope ((L0010,L0031), (L0043,L006c));
-        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L0032,L0043));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -738,9 +712,8 @@ record [|com:android:commands:bmgr:Bmgr|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr.doWipe|] ([|com:android:commands:bmgr:Bmgr|] v5 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.doWipe:()V|] @Access PRIVATE {
       local temp ;
-        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L0029,L003a));
-        [|java:lang:String|] v1 @varname [|pkg|] @scope ((L0004,L003a));
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -778,8 +751,6 @@ record [|com:android:commands:bmgr:Bmgr|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|java:lang:String|] [|com:android:commands:bmgr:Bmgr.enableToString|] ([|com:android:commands:bmgr:Bmgr|] v1 @type (this), [|boolean|] v2) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.enableToString:(Z)Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-
-
         v0;
       
 #L00131c.   if v2 == 0 then goto L001326;
@@ -791,8 +762,7 @@ record [|com:android:commands:bmgr:Bmgr|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr.main|] ([|java:lang:String|][] v3 @type (object)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.main:([Ljava/lang/String;)V|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:lang:Exception|] v0 @varname [|e|] @scope ((L000a,L0015));
-
+        v0;
         v1;
         v2;
       
@@ -811,8 +781,7 @@ record [|com:android:commands:bmgr:Bmgr|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|java:lang:String|] [|com:android:commands:bmgr:Bmgr.nextArg|] ([|com:android:commands:bmgr:Bmgr|] v3 @type (this)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.nextArg:()Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|arg|] @scope ((L000f,L0016));
-
+        v0;
         v1;
         v2;
       
@@ -833,12 +802,10 @@ record [|com:android:commands:bmgr:Bmgr|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr.printRestoreSets|] ([|com:android:commands:bmgr:Bmgr|] v8 @type (this), [|android:app:backup:RestoreSet|][] v9 @type (object)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.printRestoreSets:([Landroid/app/backup/RestoreSet;)V|] @Access PRIVATE {
       local temp ;
-        [|android:app:backup:RestoreSet|][] v0 @varname [|arr$|] @scope ((L000e,L0041));
-        [|int|] v1 @varname [|i$|] @scope ((L0010,L0041));
-        [|int|] v2 @varname [|len$|] @scope ((L000f,L0041));
-        [|android:app:backup:RestoreSet|] v3 @varname [|s|] @scope ((L0014,L0041));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -1064,9 +1031,7 @@ record [|com:android:commands:bmgr:Bmgr|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|com:android:commands:bmgr:Bmgr.run|] ([|com:android:commands:bmgr:Bmgr|] v3 @type (this), [|java:lang:String|][] v4 @type (object)) @owner [|com:android:commands:bmgr:Bmgr|] @signature [|Lcom/android/commands/bmgr/Bmgr;.run:([Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|op|] @scope ((L0025,L0093));
-
-
+        v0;
         v1;
         v2;
       

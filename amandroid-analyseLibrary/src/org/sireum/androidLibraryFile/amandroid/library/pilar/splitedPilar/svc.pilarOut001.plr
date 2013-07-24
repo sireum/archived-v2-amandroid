@@ -3,8 +3,6 @@ record [|com:android:commands:svc:Svc$Command|]  @type class @AccessFlag PUBLIC_
    }
     procedure [|void|] [|com:android:commands:svc:Svc$Command.<init>|] ([|com:android:commands:svc:Svc$Command|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|com:android:commands:svc:Svc$Command|] @signature [|Lcom/android/commands/svc/Svc$Command;.<init>:(Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L00075c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L000762.   v0.[|com:android:commands:svc:Svc$Command.mName|]  := v1 @type object;
@@ -16,7 +14,6 @@ record [|com:android:commands:svc:Svc$Command|]  @type class @AccessFlag PUBLIC_
    }
     procedure [|java:lang:String|] [|com:android:commands:svc:Svc$Command.name|] ([|com:android:commands:svc:Svc$Command|] v1 @type (this)) @owner [|com:android:commands:svc:Svc$Command|] @signature [|Lcom/android/commands/svc/Svc$Command;.name:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L000778.   v0:= v1.[|com:android:commands:svc:Svc$Command.mName|]   @type object;
@@ -33,7 +30,6 @@ record [|com:android:commands:svc:DataCommand|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|com:android:commands:svc:DataCommand.<init>|] ([|com:android:commands:svc:DataCommand|] v1 @type (this)) @owner [|com:android:commands:svc:DataCommand|] @signature [|Lcom/android/commands/svc/DataCommand;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L000790.   v0:= "data" @type (object, string);
@@ -43,7 +39,6 @@ record [|com:android:commands:svc:DataCommand|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|java:lang:String|] [|com:android:commands:svc:DataCommand.longHelp|] ([|com:android:commands:svc:DataCommand|] v2 @type (this)) @owner [|com:android:commands:svc:DataCommand|] @signature [|Lcom/android/commands/svc/DataCommand;.longHelp:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -78,13 +73,11 @@ record [|com:android:commands:svc:DataCommand|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|com:android:commands:svc:DataCommand.run|] ([|com:android:commands:svc:DataCommand|] v8 @type (this), [|java:lang:String|][] v9 @type (object)) @owner [|com:android:commands:svc:DataCommand|] @signature [|Lcom/android/commands/svc/DataCommand;.run:([Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-        [|boolean|] v2 @varname [|flag|] @scope ((L0007,L0024), (L0025,L0083));
-        [|com:android:internal:telephony:ITelephony|] v3 @varname [|phoneMgr|] @scope ((L001f,L0024), (L0065,L0083));
-        [|android:net:IConnectivityManager|] v0 @varname [|connMgr|] @scope ((L0046,L0065));
-        [|android:os:RemoteException|] v1 @varname [|e|] @scope ((L004c,L0065), (L006a,L0083));
-        [|boolean|] v4 @varname [|validCommand|] @scope ((L0002,L008d));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
         v5;
         v6;
         v7;
@@ -172,7 +165,6 @@ record [|com:android:commands:svc:DataCommand|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|java:lang:String|] [|com:android:commands:svc:DataCommand.shortHelp|] ([|com:android:commands:svc:DataCommand|] v1 @type (this)) @owner [|com:android:commands:svc:DataCommand|] @signature [|Lcom/android/commands/svc/DataCommand;.shortHelp:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L000974.   v0:= "Control mobile data connectivity" @type (object, string);
@@ -183,7 +175,6 @@ record [|com:android:commands:svc:PowerCommand|]  @type class @AccessFlag PUBLIC
    }
     procedure [|void|] [|com:android:commands:svc:PowerCommand.<init>|] ([|com:android:commands:svc:PowerCommand|] v1 @type (this)) @owner [|com:android:commands:svc:PowerCommand|] @signature [|Lcom/android/commands/svc/PowerCommand;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L00098c.   v0:= "power" @type (object, string);
@@ -193,7 +184,6 @@ record [|com:android:commands:svc:PowerCommand|]  @type class @AccessFlag PUBLIC
    }
     procedure [|java:lang:String|] [|com:android:commands:svc:PowerCommand.longHelp|] ([|com:android:commands:svc:PowerCommand|] v2 @type (this)) @owner [|com:android:commands:svc:PowerCommand|] @signature [|Lcom/android/commands/svc/PowerCommand;.longHelp:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -222,11 +212,9 @@ record [|com:android:commands:svc:PowerCommand|]  @type class @AccessFlag PUBLIC
    }
     procedure [|void|] [|com:android:commands:svc:PowerCommand.run|] ([|com:android:commands:svc:PowerCommand|] v6 @type (this), [|java:lang:String|][] v7 @type (object)) @owner [|com:android:commands:svc:PowerCommand|] @signature [|Lcom/android/commands/svc/PowerCommand;.run:([Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-        [|android:os:IPowerManager|] v1 @varname [|pm|] @scope ((L0028,L0034), (L0065,L007f));
-        [|int|] v2 @varname [|val|] @scope ((L001e,L0034), (L0040,L0041), (L004c,L004d), (L0058,L0059), (L0064,L007f));
-        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L0066,L007f));
-
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -311,7 +299,6 @@ record [|com:android:commands:svc:PowerCommand|]  @type class @AccessFlag PUBLIC
    }
     procedure [|java:lang:String|] [|com:android:commands:svc:PowerCommand.shortHelp|] ([|com:android:commands:svc:PowerCommand|] v1 @type (this)) @owner [|com:android:commands:svc:PowerCommand|] @signature [|Lcom/android/commands/svc/PowerCommand;.shortHelp:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L000b3c.   v0:= "Control the power manager" @type (object, string);
@@ -322,8 +309,6 @@ record [|com:android:commands:svc:Svc$1|]  @type class @AccessFlag FINAL  extend
    }
     procedure [|void|] [|com:android:commands:svc:Svc$1.<init>|] ([|com:android:commands:svc:Svc$1|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|com:android:commands:svc:Svc$1|] @signature [|Lcom/android/commands/svc/Svc$1;.<init>:(Ljava/lang/String;)V|] @Access CONSTRUCTOR {
       local temp ;
-
-
       
 #L000b54.   call temp:=  [|com:android:commands:svc:Svc$Command.<init>|](v0, v1) @signature [|Lcom/android/commands/svc/Svc$Command;.<init>:(Ljava/lang/String;)V|] @classDescriptor [|com:android:commands:svc:Svc$Command|] @type direct;
 #L000b5a.   return @void ;
@@ -331,7 +316,6 @@ record [|com:android:commands:svc:Svc$1|]  @type class @AccessFlag FINAL  extend
    }
     procedure [|java:lang:String|] [|com:android:commands:svc:Svc$1.longHelp|] ([|com:android:commands:svc:Svc$1|] v1 @type (this)) @owner [|com:android:commands:svc:Svc$1|] @signature [|Lcom/android/commands/svc/Svc$1;.longHelp:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L000b6c.   call temp:=  [|com:android:commands:svc:Svc$1.shortHelp|](v1) @signature [|Lcom/android/commands/svc/Svc$1;.shortHelp:()Ljava/lang/String;|] @classDescriptor [|com:android:commands:svc:Svc$1|] @type virtual;
@@ -341,14 +325,12 @@ record [|com:android:commands:svc:Svc$1|]  @type class @AccessFlag FINAL  extend
    }
     procedure [|void|] [|com:android:commands:svc:Svc$1.run|] ([|com:android:commands:svc:Svc$1|] v12 @type (this), [|java:lang:String|][] v13 @type (object)) @owner [|com:android:commands:svc:Svc$1|] @signature [|Lcom/android/commands/svc/Svc$1;.run:([Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-        [|com:android:commands:svc:Svc$Command|] v1 @varname [|c|] @scope ((L000b,L0016), (L0029,L0037), (L0057,L0072));
-        [|int|] v4 @varname [|len|] @scope ((L0031,L0037));
-        [|int|] v0 @varname [|N|] @scope ((L0021,L0072));
-        [|java:lang:String|] v2 @varname [|format|] @scope ((L0050,L0072));
-        [|int|] v3 @varname [|i|] @scope ((L0023,L0072));
-        [|int|] v5 @varname [|maxlen|] @scope ((L0022,L0072));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
         v6;
         v7;
         v8;
@@ -421,7 +403,6 @@ record [|com:android:commands:svc:Svc$1|]  @type class @AccessFlag FINAL  extend
    }
     procedure [|java:lang:String|] [|com:android:commands:svc:Svc$1.shortHelp|] ([|com:android:commands:svc:Svc$1|] v1 @type (this)) @owner [|com:android:commands:svc:Svc$1|] @signature [|Lcom/android/commands/svc/Svc$1;.shortHelp:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L000c7c.   v0:= "Show information about the subcommands" @type (object, string);
@@ -469,7 +450,6 @@ record [|com:android:commands:svc:Svc|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:svc:Svc.<init>|] ([|com:android:commands:svc:Svc|] v0 @type (this)) @owner [|com:android:commands:svc:Svc|] @signature [|Lcom/android/commands/svc/Svc;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L000d0c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L000d12.   return @void ;
@@ -477,7 +457,6 @@ record [|com:android:commands:svc:Svc|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|com:android:commands:svc:Svc$Command|] [|com:android:commands:svc:Svc.access$000|] ([|java:lang:String|] v1 @type (object)) @owner [|com:android:commands:svc:Svc|] @signature [|Lcom/android/commands/svc/Svc;.access$000:(Ljava/lang/String;)Lcom/android/commands/svc/Svc$Command;|] @Access STATIC_SYNTHETIC {
       local temp ;
-
         v0;
       
 #L000d24.   call temp:=  [|com:android:commands:svc:Svc.lookupCommand|](v1) @signature [|Lcom/android/commands/svc/Svc;.lookupCommand:(Ljava/lang/String;)Lcom/android/commands/svc/Svc$Command;|] @classDescriptor [|com:android:commands:svc:Svc|] @type static;
@@ -487,10 +466,9 @@ record [|com:android:commands:svc:Svc|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|com:android:commands:svc:Svc$Command|] [|com:android:commands:svc:Svc.lookupCommand|] ([|java:lang:String|] v4 @type (object)) @owner [|com:android:commands:svc:Svc|] @signature [|Lcom/android/commands/svc/Svc;.lookupCommand:(Ljava/lang/String;)Lcom/android/commands/svc/Svc$Command;|] @Access PRIVATE_STATIC {
       local temp ;
-        [|com:android:commands:svc:Svc$Command|] v1 @varname [|c|] @scope ((L000a,L0014), (L0015,L0018));
-        [|int|] v0 @varname [|N|] @scope ((L0003,L001a));
-        [|int|] v2 @varname [|i|] @scope ((L0004,L001a));
-
+        v0;
+        v1;
+        v2;
         v3;
       
 #L000d40.   v3:= @@[|com:android:commands:svc:Svc.COMMANDS|]   @type object;
@@ -513,8 +491,7 @@ record [|com:android:commands:svc:Svc|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:svc:Svc.main|] ([|java:lang:String|][] v3 @type (object)) @owner [|com:android:commands:svc:Svc|] @signature [|Lcom/android/commands/svc/Svc;.main:([Ljava/lang/String;)V|] @Access PUBLIC_STATIC {
       local temp ;
-        [|com:android:commands:svc:Svc$Command|] v0 @varname [|c|] @scope ((L000b,L0010));
-
+        v0;
         v1;
         v2;
       
@@ -537,7 +514,6 @@ record [|com:android:commands:svc:UsbCommand|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|com:android:commands:svc:UsbCommand.<init>|] ([|com:android:commands:svc:UsbCommand|] v1 @type (this)) @owner [|com:android:commands:svc:UsbCommand|] @signature [|Lcom/android/commands/svc/UsbCommand;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L000dc4.   v0:= "usb" @type (object, string);
@@ -547,7 +523,6 @@ record [|com:android:commands:svc:UsbCommand|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|java:lang:String|] [|com:android:commands:svc:UsbCommand.longHelp|] ([|com:android:commands:svc:UsbCommand|] v2 @type (this)) @owner [|com:android:commands:svc:UsbCommand|] @signature [|Lcom/android/commands/svc/UsbCommand;.longHelp:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -582,11 +557,9 @@ record [|com:android:commands:svc:UsbCommand|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|com:android:commands:svc:UsbCommand.run|] ([|com:android:commands:svc:UsbCommand|] v6 @type (this), [|java:lang:String|][] v7 @type (object)) @owner [|com:android:commands:svc:UsbCommand|] @signature [|Lcom/android/commands/svc/UsbCommand;.run:([Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-        [|android:hardware:usb:IUsbManager|] v1 @varname [|usbMgr|] @scope ((L001a,L0025), (L0026,L0042));
-        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L0029,L0042));
-        [|boolean|] v2 @varname [|validCommand|] @scope ((L0003,L0062));
-
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -650,7 +623,6 @@ record [|com:android:commands:svc:UsbCommand|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|java:lang:String|] [|com:android:commands:svc:UsbCommand.shortHelp|] ([|com:android:commands:svc:UsbCommand|] v1 @type (this)) @owner [|com:android:commands:svc:UsbCommand|] @signature [|Lcom/android/commands/svc/UsbCommand;.shortHelp:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L000f3c.   v0:= "Control Usb state" @type (object, string);
@@ -661,7 +633,6 @@ record [|com:android:commands:svc:WifiCommand|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|com:android:commands:svc:WifiCommand.<init>|] ([|com:android:commands:svc:WifiCommand|] v1 @type (this)) @owner [|com:android:commands:svc:WifiCommand|] @signature [|Lcom/android/commands/svc/WifiCommand;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L000f54.   v0:= "wifi" @type (object, string);
@@ -671,7 +642,6 @@ record [|com:android:commands:svc:WifiCommand|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|java:lang:String|] [|com:android:commands:svc:WifiCommand.longHelp|] ([|com:android:commands:svc:WifiCommand|] v2 @type (this)) @owner [|com:android:commands:svc:WifiCommand|] @signature [|Lcom/android/commands/svc/WifiCommand;.longHelp:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -706,13 +676,11 @@ record [|com:android:commands:svc:WifiCommand|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|com:android:commands:svc:WifiCommand.run|] ([|com:android:commands:svc:WifiCommand|] v8 @type (this), [|java:lang:String|][] v9 @type (object)) @owner [|com:android:commands:svc:WifiCommand|] @signature [|Lcom/android/commands/svc/WifiCommand;.run:([Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-        [|boolean|] v2 @varname [|flag|] @scope ((L0007,L0022), (L0023,L007d));
-        [|android:net:wifi:IWifiManager|] v4 @varname [|wifiMgr|] @scope ((L001f,L0022), (L0063,L007d));
-        [|android:net:IConnectivityManager|] v0 @varname [|connMgr|] @scope ((L0044,L0063));
-        [|android:os:RemoteException|] v1 @varname [|e|] @scope ((L004a,L0063), (L0064,L007d));
-        [|boolean|] v3 @varname [|validCommand|] @scope ((L0002,L0087));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
         v5;
         v6;
         v7;
@@ -796,7 +764,6 @@ record [|com:android:commands:svc:WifiCommand|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|java:lang:String|] [|com:android:commands:svc:WifiCommand.shortHelp|] ([|com:android:commands:svc:WifiCommand|] v1 @type (this)) @owner [|com:android:commands:svc:WifiCommand|] @signature [|Lcom/android/commands/svc/WifiCommand;.shortHelp:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L001124.   v0:= "Control the Wi-Fi manager" @type (object, string);

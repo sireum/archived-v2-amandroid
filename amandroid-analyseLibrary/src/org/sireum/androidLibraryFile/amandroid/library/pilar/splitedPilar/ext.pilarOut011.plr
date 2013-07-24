@@ -3,7 +3,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|]  @typ
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper.<init>|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|] v0 @type (this)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter$AttributesWrapper;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L0ca408.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L0ca40e.   return @void ;
@@ -11,7 +10,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|]  @typ
    }
     procedure [|int|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper.getLength|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|] v1 @type (this)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter$AttributesWrapper;.getLength:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L0ca420.   v0:= v1.[|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper.attrs|]   @type object;
@@ -22,9 +20,7 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|]  @typ
    }
     procedure [|java:lang:String|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper.getName|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|] v2 @type (this), [|int|] v3) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter$AttributesWrapper;.getName:(I)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|n|] @scope ((L0006,L000e));
-
-
+        v0;
         v1;
       
 #L0ca440.   v1:= v2.[|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper.attrs|]   @type object;
@@ -39,8 +35,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|]  @typ
    }
     procedure [|java:lang:String|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper.getType|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|] v1 @type (this), [|int|] v2) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter$AttributesWrapper;.getType:(I)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L0ca470.   v0:= v1.[|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper.attrs|]   @type object;
@@ -51,8 +45,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|]  @typ
    }
     procedure [|java:lang:String|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper.getType|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter$AttributesWrapper;.getType:(Ljava/lang/String;)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L0ca490.   v0:= v1.[|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper.attrs|]   @type object;
@@ -63,8 +55,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|]  @typ
    }
     procedure [|java:lang:String|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper.getValue|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|] v1 @type (this), [|int|] v2) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter$AttributesWrapper;.getValue:(I)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L0ca4b0.   v0:= v1.[|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper.attrs|]   @type object;
@@ -75,8 +65,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|]  @typ
    }
     procedure [|java:lang:String|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper.getValue|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter$AttributesWrapper;.getValue:(Ljava/lang/String;)Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L0ca4d0.   v0:= v1.[|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper.attrs|]   @type object;
@@ -87,8 +75,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|]  @typ
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper.setAttributes|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|] v0 @type (this), [|org:xml:sax:Attributes|] v1 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter$AttributesWrapper;.setAttributes:(Lorg/xml/sax/Attributes;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L0ca4f0.   v0.[|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$AttributesWrapper.attrs|]  := v1 @type object;
 #L0ca4f4.   return @void ;
@@ -100,8 +86,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|]  @typ
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper.<init>|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] v1 @type (this), [|org:xml:sax:DocumentHandler|] v2 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter$DocHandlerWrapper;.<init>:(Lorg/xml/sax/DocumentHandler;)V|] @Access CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L0ca508.   call temp:=  [|java:lang:Object.<init>|](v1) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
@@ -114,10 +98,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|]  @typ
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper.characters|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] v1 @type (this), [|char|][] v2, [|int|] v3, [|int|] v4) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter$DocHandlerWrapper;.characters:([CII)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
         v0;
       
 #L0ca534.   v0:= v1.[|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper.docHandler|]   @type object;
@@ -127,7 +107,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|]  @typ
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper.endDocument|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] v1 @type (this)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter$DocHandlerWrapper;.endDocument:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L0ca550.   v0:= v1.[|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper.docHandler|]   @type object;
@@ -137,10 +116,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|]  @typ
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper.endElement|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object), [|java:lang:String|] v4 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter$DocHandlerWrapper;.endElement:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
         v0;
       
 #L0ca56c.   if v4 != 0 then goto L0ca572;
@@ -152,18 +127,12 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|]  @typ
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper.endPrefixMapping|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter$DocHandlerWrapper;.endPrefixMapping:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L0ca590.   return @void ;
 
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper.ignorableWhitespace|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] v1 @type (this), [|char|][] v2, [|int|] v3, [|int|] v4) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter$DocHandlerWrapper;.ignorableWhitespace:([CII)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
         v0;
       
 #L0ca5a4.   v0:= v1.[|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper.docHandler|]   @type object;
@@ -173,9 +142,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|]  @typ
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper.processingInstruction|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter$DocHandlerWrapper;.processingInstruction:(Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L0ca5c0.   v0:= v1.[|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper.docHandler|]   @type object;
@@ -185,8 +151,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|]  @typ
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper.setDocumentLocator|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] v1 @type (this), [|org:xml:sax:Locator|] v2 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter$DocHandlerWrapper;.setDocumentLocator:(Lorg/xml/sax/Locator;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L0ca5dc.   v0:= v1.[|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper.docHandler|]   @type object;
@@ -196,15 +160,12 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|]  @typ
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper.skippedEntity|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter$DocHandlerWrapper;.skippedEntity:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L0ca5f8.   return @void ;
 
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper.startDocument|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] v1 @type (this)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter$DocHandlerWrapper;.startDocument:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L0ca60c.   v0:= v1.[|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper.docHandler|]   @type object;
@@ -214,11 +175,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|]  @typ
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper.startElement|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] v2 @type (this), [|java:lang:String|] v3 @type (object), [|java:lang:String|] v4 @type (object), [|java:lang:String|] v5 @type (object), [|org:xml:sax:Attributes|] v6 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter$DocHandlerWrapper;.startElement:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
         v0;
         v1;
       
@@ -234,9 +190,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|]  @typ
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper.startPrefixMapping|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] v0 @type (this), [|java:lang:String|] v1 @type (object), [|java:lang:String|] v2 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter$DocHandlerWrapper|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter$DocHandlerWrapper;.startPrefixMapping:(Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L0ca658.   return @void ;
 
@@ -246,8 +199,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|]  @type class @AccessFla
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter.<init>|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|] v0 @type (this), [|org:xml:sax:XMLReader|] v1 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter;.<init>:(Lorg/xml/sax/XMLReader;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L0ca66c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L0ca672.   v0.[|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter.xmlReader|]  := v1 @type object;
@@ -256,9 +207,7 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|]  @type class @AccessFla
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter.parse|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|] v2 @type (this), [|java:lang:String|] v3 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter;.parse:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-        [|java:io:IOException|] v0 @varname [|ioe|] @scope ((L0007,L000d));
-
-
+        v0;
         v1;
       
 #L0ca688.   v1:= v2.[|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter.xmlReader|]   @type object;
@@ -273,9 +222,7 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|]  @type class @AccessFla
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter.parse|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|] v2 @type (this), [|org:xml:sax:InputSource|] v3 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter;.parse:(Lorg/xml/sax/InputSource;)V|] @Access PUBLIC {
       local temp ;
-        [|java:io:IOException|] v0 @varname [|ioe|] @scope ((L0007,L000d));
-
-
+        v0;
         v1;
       
 #L0ca6c4.   v1:= v2.[|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter.xmlReader|]   @type object;
@@ -290,8 +237,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|]  @type class @AccessFla
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter.setDTDHandler|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|] v1 @type (this), [|org:xml:sax:DTDHandler|] v2 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter;.setDTDHandler:(Lorg/xml/sax/DTDHandler;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L0ca700.   v0:= v1.[|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter.xmlReader|]   @type object;
@@ -301,8 +246,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|]  @type class @AccessFla
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter.setDocumentHandler|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|] v2 @type (this), [|org:xml:sax:DocumentHandler|] v3 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter;.setDocumentHandler:(Lorg/xml/sax/DocumentHandler;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -315,8 +258,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|]  @type class @AccessFla
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter.setEntityResolver|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|] v1 @type (this), [|org:xml:sax:EntityResolver|] v2 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter;.setEntityResolver:(Lorg/xml/sax/EntityResolver;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L0ca744.   v0:= v1.[|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter.xmlReader|]   @type object;
@@ -326,8 +267,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|]  @type class @AccessFla
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter.setErrorHandler|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|] v1 @type (this), [|org:xml:sax:ErrorHandler|] v2 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter;.setErrorHandler:(Lorg/xml/sax/ErrorHandler;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L0ca760.   v0:= v1.[|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter.xmlReader|]   @type object;
@@ -337,8 +276,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|]  @type class @AccessFla
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter.setLocale|] ([|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|] v2 @type (this), [|java:util:Locale|] v3 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAX1ParserAdapter|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAX1ParserAdapter;.setLocale:(Ljava/util/Locale;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -354,7 +291,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl|]  @type class @AccessFlag P
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl.<init>|] ([|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl|] v1 @type (this)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAXFactoryImpl;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L0ca79c.   v0:= 0  @length 4;
@@ -366,7 +302,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl|]  @type class @AccessFlag P
    }
     procedure [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] [|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl.getPrototype|] ([|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl|] v1 @type (this)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAXFactoryImpl;.getPrototype:()Lorg/ccil/cowan/tagsoup/jaxp/SAXParserImpl;|] @Access PRIVATE {
       local temp ;
-
         v0;
       
 #L0ca7c0.   v0:= v1.[|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl.prototypeParser|]   @type object;
@@ -380,8 +315,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl|]  @type class @AccessFlag P
    }
     procedure [|boolean|] [|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl.getFeature|] ([|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAXFactoryImpl;.getFeature:(Ljava/lang/String;)Z|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L0ca7ec.   call temp:=  [|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl.getPrototype|](v1) @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAXFactoryImpl;.getPrototype:()Lorg/ccil/cowan/tagsoup/jaxp/SAXParserImpl;|] @classDescriptor [|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl|] @type direct;
@@ -393,8 +326,7 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl|]  @type class @AccessFlag P
    }
     procedure [|javax:xml:parsers:SAXParser|] [|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl.newSAXParser|] ([|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl|] v3 @type (this)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAXFactoryImpl;.newSAXParser:()Ljavax/xml/parsers/SAXParser;|] @Access PUBLIC {
       local temp ;
-        [|org:xml:sax:SAXException|] v0 @varname [|se|] @scope ((L0008,L0012));
-
+        v0;
         v1;
         v2;
       
@@ -413,9 +345,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl|]  @type class @AccessFlag P
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl.setFeature|] ([|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl|] v2 @type (this), [|java:lang:String|] v3 @type (object), [|boolean|] v4) @owner [|org:ccil:cowan:tagsoup:jaxp:SAXFactoryImpl|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAXFactoryImpl;.setFeature:(Ljava/lang/String;Z)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -441,7 +370,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl.<init>|] ([|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] v1 @type (this)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAXParserImpl;.<init>:()V|] @Access PROTECTED_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L0ca8a4.   call temp:=  [|javax:xml:parsers:SAXParser.<init>|](v1) @signature [|Ljavax/xml/parsers/SAXParser;.<init>:()V|] @classDescriptor [|javax:xml:parsers:SAXParser|] @type direct;
@@ -453,10 +381,9 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|]  @type class @AccessFlag PU
    }
     procedure [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl.newInstance|] ([|java:util:Map|] v5 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAXParserImpl;.newInstance:(Ljava/util/Map;)Lorg/ccil/cowan/tagsoup/jaxp/SAXParserImpl;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:util:Map$Entry|] v0 @varname [|entry|] @scope ((L001b,L002f));
-        [|java:util:Iterator|] v1 @varname [|it|] @scope ((L000f,L002f));
-        [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] v2 @varname [|parser|] @scope ((L0005,L0030));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
       
@@ -488,8 +415,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|]  @type class @AccessFlag PU
    }
     procedure [|boolean|] [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl.getFeature|] ([|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAXParserImpl;.getFeature:(Ljava/lang/String;)Z|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L0ca93c.   v0:= v1.[|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl.parser|]   @type object;
@@ -500,7 +425,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|]  @type class @AccessFlag PU
    }
     procedure [|org:xml:sax:Parser|] [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl.getParser|] ([|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] v2 @type (this)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAXParserImpl;.getParser:()Lorg/xml/sax/Parser;|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -512,8 +436,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|]  @type class @AccessFlag PU
    }
     procedure [|java:lang:Object|] [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl.getProperty|] ([|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] v1 @type (this), [|java:lang:String|] v2 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAXParserImpl;.getProperty:(Ljava/lang/String;)Ljava/lang/Object;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L0ca97c.   v0:= v1.[|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl.parser|]   @type object;
@@ -524,7 +446,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|]  @type class @AccessFlag PU
    }
     procedure [|org:xml:sax:XMLReader|] [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl.getXMLReader|] ([|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] v1 @type (this)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAXParserImpl;.getXMLReader:()Lorg/xml/sax/XMLReader;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L0ca99c.   v0:= v1.[|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl.parser|]   @type object;
@@ -533,8 +454,7 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|]  @type class @AccessFlag PU
    }
     procedure [|boolean|] [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl.isNamespaceAware|] ([|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] v3 @type (this)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAXParserImpl;.isNamespaceAware:()Z|] @Access PUBLIC {
       local temp ;
-        [|org:xml:sax:SAXException|] v0 @varname [|sex|] @scope ((L000a,L0014));
-
+        v0;
         v1;
         v2;
       
@@ -554,8 +474,7 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|]  @type class @AccessFlag PU
    }
     procedure [|boolean|] [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl.isValidating|] ([|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] v3 @type (this)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAXParserImpl;.isValidating:()Z|] @Access PUBLIC {
       local temp ;
-        [|org:xml:sax:SAXException|] v0 @varname [|sex|] @scope ((L000a,L0014));
-
+        v0;
         v1;
         v2;
       
@@ -575,9 +494,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl.setFeature|] ([|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|boolean|] v3) @owner [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAXParserImpl;.setFeature:(Ljava/lang/String;Z)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L0caa44.   v0:= v1.[|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl.parser|]   @type object;
@@ -587,9 +503,6 @@ record [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl.setProperty|] ([|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|java:lang:Object|] v3 @type (object)) @owner [|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl|] @signature [|Lorg/ccil/cowan/tagsoup/jaxp/SAXParserImpl;.setProperty:(Ljava/lang/String;Ljava/lang/Object;)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L0caa60.   v0:= v1.[|org:ccil:cowan:tagsoup:jaxp:SAXParserImpl.parser|]   @type object;

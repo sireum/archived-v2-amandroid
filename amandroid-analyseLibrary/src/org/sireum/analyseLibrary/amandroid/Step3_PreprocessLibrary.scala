@@ -52,7 +52,7 @@ class PreprocessLibrary extends PreprocessLibraryFrameWork{
   
     AmandroidAndroidLibrarySplitPilarFiles.plrModelFiles.foreach{
       fileUri =>
-//        if(fileUri.indexOf("core.pilarOut005.plr") > 0)
+        if(fileUri.indexOf("core.pilarOut010.plr") > 0)
           Analyzing title fileUri file (fileUri, libInfoTables, aCache) 
     }
 }

@@ -94,6 +94,32 @@ final class AndroidDefRef(st: SymbolTable, val varAccesses: VarAccesses, alit : 
 
     strongDefinitions(a)
   }
+  
+  private def is(typ : String, annots : ISeq[Annotation]) : Boolean = {
+      annots.foreach(
+        annot => {
+          if(annot.name.name.equals(typ)){
+            return true
+          } else {
+            annot.params.foreach(
+              param =>{
+                if(param.isInstanceOf[ExpAnnotationParam]){
+                  param.asInstanceOf[ExpAnnotationParam].exp match {
+                    case exp : NameExp =>
+                      if(exp.name.name.equals(typ)){
+                        return true
+                      }
+                    case _ => 
+                  }
+                }
+              }
+            )
+          }
+          
+        }
+      )
+      return false
+    }
 
   def strongDefinitions(a: Assignment): ISet[Slot] =
     
@@ -115,16 +141,20 @@ final class AndroidDefRef(st: SymbolTable, val varAccesses: VarAccesses, alit : 
             case ne : NameExp =>
               resolveNameExp(ne)
             case ae : AccessExp =>
-              ae.exp match {
-                case ane : NameExp =>
-                  resolveNameExp(ane)
-                case _ =>
+              if(is("object", a.annotations)){
+	              ae.exp match {
+	                case ane : NameExp =>
+	                  resolveNameExp(ane)
+	                case _ =>
+	              }
               }
             case ie : IndexingExp =>
-              ie.exp match {
-                case ine : NameExp =>
-                  resolveNameExp(ine)
-                case _ =>
+              if(is("object", a.annotations)){
+	              ie.exp match {
+	                case ine : NameExp =>
+	                  resolveNameExp(ine)
+	                case _ =>
+	              }
               }
             case _=>
           }

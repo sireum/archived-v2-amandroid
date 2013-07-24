@@ -331,7 +331,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
   }
   
   private def breakPiEdges(pi : PointI, calleeAccessTyp : String, srcContext : Context) = {
-    if(!calleeAccessTyp.contains("NATIVE")){
+    if(calleeAccessTyp != null && !calleeAccessTyp.contains("NATIVE")){
 	    pi.recvOpt_Call match{
 	      case Some(p) =>
 	        val srcNode = getNode(p, srcContext.copy)

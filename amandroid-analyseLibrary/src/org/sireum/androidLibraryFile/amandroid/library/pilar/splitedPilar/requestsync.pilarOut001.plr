@@ -9,7 +9,6 @@ record [|com:android:commands:requestsync:RequestSync|]  @type class @AccessFlag
    }
     procedure [|void|] [|com:android:commands:requestsync:RequestSync.<init>|] ([|com:android:commands:requestsync:RequestSync|] v1 @type (this)) @owner [|com:android:commands:requestsync:RequestSync|] @signature [|Lcom/android/commands/requestsync/RequestSync;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L0006d0.   v0:= 0  @length 4;
@@ -25,8 +24,7 @@ record [|com:android:commands:requestsync:RequestSync|]  @type class @AccessFlag
    }
     procedure [|void|] [|com:android:commands:requestsync:RequestSync.main|] ([|java:lang:String|][] v4 @type (object)) @owner [|com:android:commands:requestsync:RequestSync|] @signature [|Lcom/android/commands/requestsync/RequestSync;.main:([Ljava/lang/String;)V|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:lang:IllegalArgumentException|] v0 @varname [|e|] @scope ((L000a,L0029), (L002a,L0034));
-
+        v0;
         v1;
         v2;
         v3;
@@ -62,8 +60,7 @@ record [|com:android:commands:requestsync:RequestSync|]  @type class @AccessFlag
    }
     procedure [|java:lang:String|] [|com:android:commands:requestsync:RequestSync.nextArg|] ([|com:android:commands:requestsync:RequestSync|] v4 @type (this)) @owner [|com:android:commands:requestsync:RequestSync|] @signature [|Lcom/android/commands/requestsync/RequestSync;.nextArg:()Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|arg|] @scope ((L0007,L0009));
-
+        v0;
         v1;
         v2;
         v3;
@@ -90,9 +87,8 @@ record [|com:android:commands:requestsync:RequestSync|]  @type class @AccessFlag
    }
     procedure [|java:lang:String|] [|com:android:commands:requestsync:RequestSync.nextArgRequired|] ([|com:android:commands:requestsync:RequestSync|] v5 @type (this)) @owner [|com:android:commands:requestsync:RequestSync|] @signature [|Lcom/android/commands/requestsync/RequestSync;.nextArgRequired:()Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v1 @varname [|prev|] @scope ((L000e,L002d));
-        [|java:lang:String|] v0 @varname [|arg|] @scope ((L0004,L002e));
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -124,9 +120,8 @@ record [|com:android:commands:requestsync:RequestSync|]  @type class @AccessFlag
    }
     procedure [|java:lang:String|] [|com:android:commands:requestsync:RequestSync.nextOption|] ([|com:android:commands:requestsync:RequestSync|] v7 @type (this)) @owner [|com:android:commands:requestsync:RequestSync|] @signature [|Lcom/android/commands/requestsync/RequestSync;.nextOption:()Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v1 @varname [|prev|] @scope ((L000f,L002e));
-        [|java:lang:String|] v0 @varname [|arg|] @scope ((L003d,L007d));
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -206,10 +201,9 @@ record [|com:android:commands:requestsync:RequestSync|]  @type class @AccessFlag
    }
     procedure [|boolean|] [|com:android:commands:requestsync:RequestSync.parseArgs|] ([|com:android:commands:requestsync:RequestSync|] v8 @type (this)) @owner [|com:android:commands:requestsync:RequestSync|] @signature [|Lcom/android/commands/requestsync/RequestSync;.parseArgs:()Z|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|key|] @scope ((L015d,L0168), (L017c,L0184), (L0198,L01ab), (L01bf,L01d2), (L01e6,L01fa), (L020e,L0222), (L0236,L0249));
-        [|java:lang:String|] v2 @varname [|value|] @scope ((L0161,L0168), (L019c,L01ab), (L01c3,L01d2), (L01ea,L01fa), (L0212,L0222), (L023a,L0249));
-        [|java:lang:String|] v1 @varname [|opt|] @scope ((L0006,L0275));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -530,12 +524,10 @@ record [|com:android:commands:requestsync:RequestSync|]  @type class @AccessFlag
    }
     procedure [|void|] [|com:android:commands:requestsync:RequestSync.run|] ([|com:android:commands:requestsync:RequestSync|] v11 @type (this), [|java:lang:String|][] v12 @type (object)) @owner [|com:android:commands:requestsync:RequestSync|] @signature [|Lcom/android/commands/requestsync/RequestSync;.run:([Ljava/lang/String;)V|] @Access PRIVATE {
       local temp ;
-        [|android:accounts:Account|] v0 @varname [|account|] @scope ((L001e,L0086), (L0088,L009c));
-        [|java:util:Iterator|] v1 @varname [|i$|] @scope ((L0066,L0086));
-        [|java:lang:String|] v2 @varname [|key|] @scope ((L0072,L0086));
-        [|boolean|] v3 @varname [|ok|] @scope ((L000b,L009d));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;

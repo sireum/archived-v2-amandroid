@@ -16,8 +16,6 @@ record [|android:preference:SeekBarPreference|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|android:preference:SeekBarPreference.<init>|] ([|android:preference:SeekBarPreference|] v1 @type (this), [|android:content:Context|] v2 @type (object)) @owner [|android:preference:SeekBarPreference|] @signature [|Landroid/preference/SeekBarPreference;.<init>:(Landroid/content/Context;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L397c20.   v0:= 0  @length 4;
@@ -27,9 +25,6 @@ record [|android:preference:SeekBarPreference|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|android:preference:SeekBarPreference.<init>|] ([|android:preference:SeekBarPreference|] v1 @type (this), [|android:content:Context|] v2 @type (object), [|android:util:AttributeSet|] v3 @type (object)) @owner [|android:preference:SeekBarPreference|] @signature [|Landroid/preference/SeekBarPreference;.<init>:(Landroid/content/Context;Landroid/util/AttributeSet;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
         v0;
       
 #L397c3c.   v0:= 0  @length 4;
@@ -39,11 +34,7 @@ record [|android:preference:SeekBarPreference|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|android:preference:SeekBarPreference.<init>|] ([|android:preference:SeekBarPreference|] v3 @type (this), [|android:content:Context|] v4 @type (object), [|android:util:AttributeSet|] v5 @type (object), [|int|] v6) @owner [|android:preference:SeekBarPreference|] @signature [|Landroid/preference/SeekBarPreference;.<init>:(Landroid/content/Context;Landroid/util/AttributeSet;I)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-        [|android:content:res:TypedArray|] v0 @varname [|a|] @scope ((L000a,L001e));
-
-
-
-
+        v0;
         v1;
         v2;
       
@@ -65,9 +56,6 @@ record [|android:preference:SeekBarPreference|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|android:preference:SeekBarPreference.setProgress|] ([|android:preference:SeekBarPreference|] v1 @type (this), [|int|] v2, [|boolean|] v3) @owner [|android:preference:SeekBarPreference|] @signature [|Landroid/preference/SeekBarPreference;.setProgress:(IZ)V|] @Access PRIVATE {
       local temp ;
-
-
-
         v0;
       
 #L397ca4.   v0:= v1.[|android:preference:SeekBarPreference.mMax|] ;
@@ -86,7 +74,6 @@ record [|android:preference:SeekBarPreference|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|int|] [|android:preference:SeekBarPreference.getProgress|] ([|android:preference:SeekBarPreference|] v1 @type (this)) @owner [|android:preference:SeekBarPreference|] @signature [|Landroid/preference/SeekBarPreference;.getProgress:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L397ce4.   v0:= v1.[|android:preference:SeekBarPreference.mProgress|] ;
@@ -95,7 +82,6 @@ record [|android:preference:SeekBarPreference|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|java:lang:CharSequence|] [|android:preference:SeekBarPreference.getSummary|] ([|android:preference:SeekBarPreference|] v1 @type (this)) @owner [|android:preference:SeekBarPreference|] @signature [|Landroid/preference/SeekBarPreference;.getSummary:()Ljava/lang/CharSequence;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L397cfc.   v0:= 0  @length 4;
@@ -104,9 +90,7 @@ record [|android:preference:SeekBarPreference|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|android:preference:SeekBarPreference.onBindView|] ([|android:preference:SeekBarPreference|] v2 @type (this), [|android:view:View|] v3 @type (object)) @owner [|android:preference:SeekBarPreference|] @signature [|Landroid/preference/SeekBarPreference;.onBindView:(Landroid/view/View;)V|] @Access PROTECTED {
       local temp ;
-        [|android:widget:SeekBar|] v0 @varname [|seekBar|] @scope ((L000c,L0021));
-
-
+        v0;
         v1;
       
 #L397d10.   call temp:=  [|android:preference:Preference.onBindView|](v2, v3) @signature [|Landroid/preference/Preference;.onBindView:(Landroid/view/View;)V|] @classDescriptor [|android:preference:Preference|] @type super;
@@ -127,9 +111,6 @@ record [|android:preference:SeekBarPreference|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|java:lang:Object|] [|android:preference:SeekBarPreference.onGetDefaultValue|] ([|android:preference:SeekBarPreference|] v1 @type (this), [|android:content:res:TypedArray|] v2 @type (object), [|int|] v3) @owner [|android:preference:SeekBarPreference|] @signature [|Landroid/preference/SeekBarPreference;.onGetDefaultValue:(Landroid/content/res/TypedArray;I)Ljava/lang/Object;|] @Access PROTECTED {
       local temp ;
-
-
-
         v0;
       
 #L397d64.   v0:= 0  @length 4;
@@ -142,10 +123,6 @@ record [|android:preference:SeekBarPreference|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|boolean|] [|android:preference:SeekBarPreference.onKey|] ([|android:preference:SeekBarPreference|] v2 @type (this), [|android:view:View|] v3 @type (object), [|int|] v4, [|android:view:KeyEvent|] v5 @type (object)) @owner [|android:preference:SeekBarPreference|] @signature [|Landroid/preference/SeekBarPreference;.onKey:(Landroid/view/View;ILandroid/view/KeyEvent;)Z|] @Access PUBLIC {
       local temp ;
-
-
-
-
         v0;
         v1;
       
@@ -175,10 +152,6 @@ record [|android:preference:SeekBarPreference|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|android:preference:SeekBarPreference.onProgressChanged|] ([|android:preference:SeekBarPreference|] v1 @type (this), [|android:widget:SeekBar|] v2 @type (object), [|int|] v3, [|boolean|] v4) @owner [|android:preference:SeekBarPreference|] @signature [|Landroid/preference/SeekBarPreference;.onProgressChanged:(Landroid/widget/SeekBar;IZ)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
         v0;
       
 #L397dec.   if v4 == 0 then goto L397dfe;
@@ -190,9 +163,7 @@ record [|android:preference:SeekBarPreference|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|android:preference:SeekBarPreference.onRestoreInstanceState|] ([|android:preference:SeekBarPreference|] v3 @type (this), [|android:os:Parcelable|] v4 @type (object)) @owner [|android:preference:SeekBarPreference|] @signature [|Landroid/preference/SeekBarPreference;.onRestoreInstanceState:(Landroid/os/Parcelable;)V|] @Access PROTECTED {
       local temp ;
-        [|android:preference:SeekBarPreference$SavedState|] v0 @varname [|myState|] @scope ((L0013,L0026));
-
-
+        v0;
         v1;
         v2;
       
@@ -219,9 +190,8 @@ record [|android:preference:SeekBarPreference|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|android:os:Parcelable|] [|android:preference:SeekBarPreference.onSaveInstanceState|] ([|android:preference:SeekBarPreference|] v3 @type (this)) @owner [|android:preference:SeekBarPreference|] @signature [|Landroid/preference/SeekBarPreference;.onSaveInstanceState:()Landroid/os/Parcelable;|] @Access PROTECTED {
       local temp ;
-        [|android:os:Parcelable|] v1 @varname [|superState|] @scope ((L0004,L000a), (L000b,L001a));
-        [|android:preference:SeekBarPreference$SavedState|] v0 @varname [|myState|] @scope ((L0010,L001a));
-
+        v0;
+        v1;
         v2;
       
 #L397e6c.   call temp:=  [|android:preference:Preference.onSaveInstanceState|](v3) @signature [|Landroid/preference/Preference;.onSaveInstanceState:()Landroid/os/Parcelable;|] @classDescriptor [|android:preference:Preference|] @type super;
@@ -242,10 +212,6 @@ record [|android:preference:SeekBarPreference|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|android:preference:SeekBarPreference.onSetInitialValue|] ([|android:preference:SeekBarPreference|] v1 @type (this), [|boolean|] v2, [|java:lang:Object|] v3 @type (object)) @owner [|android:preference:SeekBarPreference|] @signature [|Landroid/preference/SeekBarPreference;.onSetInitialValue:(ZLjava/lang/Object;)V|] @Access PROTECTED {
       local temp ;
-
-
-
-
         v0;
       
 #L397eb0.   if v2 == 0 then goto L397ec8;
@@ -262,8 +228,6 @@ record [|android:preference:SeekBarPreference|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|android:preference:SeekBarPreference.onStartTrackingTouch|] ([|android:preference:SeekBarPreference|] v1 @type (this), [|android:widget:SeekBar|] v2 @type (object)) @owner [|android:preference:SeekBarPreference|] @signature [|Landroid/preference/SeekBarPreference;.onStartTrackingTouch:(Landroid/widget/SeekBar;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L397ee8.   v0:= 1  @length 4;
@@ -273,8 +237,6 @@ record [|android:preference:SeekBarPreference|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|android:preference:SeekBarPreference.onStopTrackingTouch|] ([|android:preference:SeekBarPreference|] v2 @type (this), [|android:widget:SeekBar|] v3 @type (object)) @owner [|android:preference:SeekBarPreference|] @signature [|Landroid/preference/SeekBarPreference;.onStopTrackingTouch:(Landroid/widget/SeekBar;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -290,8 +252,6 @@ record [|android:preference:SeekBarPreference|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|android:preference:SeekBarPreference.setMax|] ([|android:preference:SeekBarPreference|] v1 @type (this), [|int|] v2) @owner [|android:preference:SeekBarPreference|] @signature [|Landroid/preference/SeekBarPreference;.setMax:(I)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L397f30.   v0:= v1.[|android:preference:SeekBarPreference.mMax|] ;
@@ -303,8 +263,6 @@ record [|android:preference:SeekBarPreference|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|android:preference:SeekBarPreference.setProgress|] ([|android:preference:SeekBarPreference|] v1 @type (this), [|int|] v2) @owner [|android:preference:SeekBarPreference|] @signature [|Landroid/preference/SeekBarPreference;.setProgress:(I)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L397f54.   v0:= 1  @length 4;
@@ -314,9 +272,7 @@ record [|android:preference:SeekBarPreference|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|android:preference:SeekBarPreference.syncProgress|] ([|android:preference:SeekBarPreference|] v2 @type (this), [|android:widget:SeekBar|] v3 @type (object)) @owner [|android:preference:SeekBarPreference|] @signature [|Landroid/preference/SeekBarPreference;.syncProgress:(Landroid/widget/SeekBar;)V|] @Access  {
       local temp ;
-        [|int|] v0 @varname [|progress|] @scope ((L0004,L001d));
-
-
+        v0;
         v1;
       
 #L397f70.   call temp:=  [|android:widget:SeekBar.getProgress|](v3) @signature [|Landroid/widget/SeekBar;.getProgress:()I|] @classDescriptor [|android:widget:SeekBar|] @type virtual;
@@ -348,7 +304,6 @@ record [|android:preference:SwitchPreference$Listener|]  @type class @AccessFlag
    }
     procedure [|void|] [|android:preference:SwitchPreference$Listener.<init>|] ([|android:preference:SwitchPreference$Listener|] v0 @type (this), [|android:preference:SwitchPreference|] v1 @type (object)) @owner [|android:preference:SwitchPreference$Listener|] @signature [|Landroid/preference/SwitchPreference$Listener;.<init>:(Landroid/preference/SwitchPreference;)V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L397fbc.   v0.[|android:preference:SwitchPreference$Listener.this$0|]  := v1 @type object;
 #L397fc0.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
@@ -357,9 +312,6 @@ record [|android:preference:SwitchPreference$Listener|]  @type class @AccessFlag
    }
     procedure [|void|] [|android:preference:SwitchPreference$Listener.<init>|] ([|android:preference:SwitchPreference$Listener|] v0 @type (this), [|android:preference:SwitchPreference|] v1 @type (object), [|android:preference:SwitchPreference$1|] v2 @type (object)) @owner [|android:preference:SwitchPreference$Listener|] @signature [|Landroid/preference/SwitchPreference$Listener;.<init>:(Landroid/preference/SwitchPreference;Landroid/preference/SwitchPreference$1;)V|] @Access SYNTHETIC_CONSTRUCTOR {
       local temp ;
-
-
-
       
 #L397fd8.   call temp:=  [|android:preference:SwitchPreference$Listener.<init>|](v0, v1) @signature [|Landroid/preference/SwitchPreference$Listener;.<init>:(Landroid/preference/SwitchPreference;)V|] @classDescriptor [|android:preference:SwitchPreference$Listener|] @type direct;
 #L397fde.   return @void ;
@@ -367,9 +319,6 @@ record [|android:preference:SwitchPreference$Listener|]  @type class @AccessFlag
    }
     procedure [|void|] [|android:preference:SwitchPreference$Listener.onCheckedChanged|] ([|android:preference:SwitchPreference$Listener|] v2 @type (this), [|android:widget:CompoundButton|] v3 @type (object), [|boolean|] v4) @owner [|android:preference:SwitchPreference$Listener|] @signature [|Landroid/preference/SwitchPreference$Listener;.onCheckedChanged:(Landroid/widget/CompoundButton;Z)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -397,8 +346,6 @@ record [|android:preference:SwitchPreference|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|android:preference:SwitchPreference.<init>|] ([|android:preference:SwitchPreference|] v1 @type (this), [|android:content:Context|] v2 @type (object)) @owner [|android:preference:SwitchPreference|] @signature [|Landroid/preference/SwitchPreference;.<init>:(Landroid/content/Context;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L398038.   v0:= 0  @length 4;
@@ -408,9 +355,6 @@ record [|android:preference:SwitchPreference|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|android:preference:SwitchPreference.<init>|] ([|android:preference:SwitchPreference|] v1 @type (this), [|android:content:Context|] v2 @type (object), [|android:util:AttributeSet|] v3 @type (object)) @owner [|android:preference:SwitchPreference|] @signature [|Landroid/preference/SwitchPreference;.<init>:(Landroid/content/Context;Landroid/util/AttributeSet;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
         v0;
       
 #L398054.    v0:= 0.000000;
@@ -420,11 +364,7 @@ record [|android:preference:SwitchPreference|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|android:preference:SwitchPreference.<init>|] ([|android:preference:SwitchPreference|] v4 @type (this), [|android:content:Context|] v5 @type (object), [|android:util:AttributeSet|] v6 @type (object), [|int|] v7) @owner [|android:preference:SwitchPreference|] @signature [|Landroid/preference/SwitchPreference;.<init>:(Landroid/content/Context;Landroid/util/AttributeSet;I)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-        [|android:content:res:TypedArray|] v0 @varname [|a|] @scope ((L0012,L003d));
-
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -463,7 +403,6 @@ record [|android:preference:SwitchPreference|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|java:lang:CharSequence|] [|android:preference:SwitchPreference.getSwitchTextOff|] ([|android:preference:SwitchPreference|] v1 @type (this)) @owner [|android:preference:SwitchPreference|] @signature [|Landroid/preference/SwitchPreference;.getSwitchTextOff:()Ljava/lang/CharSequence;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L398100.   v0:= v1.[|android:preference:SwitchPreference.mSwitchOff|]   @type object;
@@ -472,7 +411,6 @@ record [|android:preference:SwitchPreference|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|java:lang:CharSequence|] [|android:preference:SwitchPreference.getSwitchTextOn|] ([|android:preference:SwitchPreference|] v1 @type (this)) @owner [|android:preference:SwitchPreference|] @signature [|Landroid/preference/SwitchPreference;.getSwitchTextOn:()Ljava/lang/CharSequence;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L398118.   v0:= v1.[|android:preference:SwitchPreference.mSwitchOn|]   @type object;
@@ -481,10 +419,8 @@ record [|android:preference:SwitchPreference|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|android:preference:SwitchPreference.onBindView|] ([|android:preference:SwitchPreference|] v4 @type (this), [|android:view:View|] v5 @type (object)) @owner [|android:preference:SwitchPreference|] @signature [|Landroid/preference/SwitchPreference;.onBindView:(Landroid/view/View;)V|] @Access PROTECTED {
       local temp ;
-        [|android:widget:Switch|] v1 @varname [|switchView|] @scope ((L0022,L0031));
-        [|android:view:View|] v0 @varname [|checkableView|] @scope ((L000a,L0035));
-
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -516,8 +452,6 @@ record [|android:preference:SwitchPreference|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|android:preference:SwitchPreference.setSwitchTextOff|] ([|android:preference:SwitchPreference|] v1 @type (this), [|int|] v2) @owner [|android:preference:SwitchPreference|] @signature [|Landroid/preference/SwitchPreference;.setSwitchTextOff:(I)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L3981ac.   call temp:=  [|android:preference:SwitchPreference.getContext|](v1) @signature [|Landroid/preference/SwitchPreference;.getContext:()Landroid/content/Context;|] @classDescriptor [|android:preference:SwitchPreference|] @type virtual;
@@ -530,8 +464,6 @@ record [|android:preference:SwitchPreference|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|android:preference:SwitchPreference.setSwitchTextOff|] ([|android:preference:SwitchPreference|] v0 @type (this), [|java:lang:CharSequence|] v1 @type (object)) @owner [|android:preference:SwitchPreference|] @signature [|Landroid/preference/SwitchPreference;.setSwitchTextOff:(Ljava/lang/CharSequence;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L3981d4.   v0.[|android:preference:SwitchPreference.mSwitchOff|]  := v1 @type object;
 #L3981d8.   call temp:=  [|android:preference:SwitchPreference.notifyChanged|](v0) @signature [|Landroid/preference/SwitchPreference;.notifyChanged:()V|] @classDescriptor [|android:preference:SwitchPreference|] @type virtual;
@@ -540,8 +472,6 @@ record [|android:preference:SwitchPreference|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|android:preference:SwitchPreference.setSwitchTextOn|] ([|android:preference:SwitchPreference|] v1 @type (this), [|int|] v2) @owner [|android:preference:SwitchPreference|] @signature [|Landroid/preference/SwitchPreference;.setSwitchTextOn:(I)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L3981f0.   call temp:=  [|android:preference:SwitchPreference.getContext|](v1) @signature [|Landroid/preference/SwitchPreference;.getContext:()Landroid/content/Context;|] @classDescriptor [|android:preference:SwitchPreference|] @type virtual;
@@ -554,8 +484,6 @@ record [|android:preference:SwitchPreference|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|android:preference:SwitchPreference.setSwitchTextOn|] ([|android:preference:SwitchPreference|] v0 @type (this), [|java:lang:CharSequence|] v1 @type (object)) @owner [|android:preference:SwitchPreference|] @signature [|Landroid/preference/SwitchPreference;.setSwitchTextOn:(Ljava/lang/CharSequence;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L398218.   v0.[|android:preference:SwitchPreference.mSwitchOn|]  := v1 @type object;
 #L39821c.   call temp:=  [|android:preference:SwitchPreference.notifyChanged|](v0) @signature [|Landroid/preference/SwitchPreference;.notifyChanged:()V|] @classDescriptor [|android:preference:SwitchPreference|] @type virtual;
@@ -566,7 +494,6 @@ record [|android:preference:TwoStatePreference$SavedState$1|]  @type class @Acce
    }
     procedure [|void|] [|android:preference:TwoStatePreference$SavedState$1.<init>|] ([|android:preference:TwoStatePreference$SavedState$1|] v0 @type (this)) @owner [|android:preference:TwoStatePreference$SavedState$1|] @signature [|Landroid/preference/TwoStatePreference$SavedState$1;.<init>:()V|] @Access CONSTRUCTOR {
       local temp ;
-
       
 #L398234.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39823a.   return @void ;
@@ -574,8 +501,6 @@ record [|android:preference:TwoStatePreference$SavedState$1|]  @type class @Acce
    }
     procedure [|android:preference:TwoStatePreference$SavedState|] [|android:preference:TwoStatePreference$SavedState$1.createFromParcel|] ([|android:preference:TwoStatePreference$SavedState$1|] v1 @type (this), [|android:os:Parcel|] v2 @type (object)) @owner [|android:preference:TwoStatePreference$SavedState$1|] @signature [|Landroid/preference/TwoStatePreference$SavedState$1;.createFromParcel:(Landroid/os/Parcel;)Landroid/preference/TwoStatePreference$SavedState;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L39824c.   v0:= new [|android:preference:TwoStatePreference$SavedState|];
@@ -585,8 +510,6 @@ record [|android:preference:TwoStatePreference$SavedState$1|]  @type class @Acce
    }
     procedure [|java:lang:Object|] [|android:preference:TwoStatePreference$SavedState$1.createFromParcel|] ([|android:preference:TwoStatePreference$SavedState$1|] v1 @type (this), [|android:os:Parcel|] v2 @type (object)) @owner [|android:preference:TwoStatePreference$SavedState$1|] @signature [|Landroid/preference/TwoStatePreference$SavedState$1;.createFromParcel:(Landroid/os/Parcel;)Ljava/lang/Object;|] @Access PUBLIC_BRIDGE_SYNTHETIC {
       local temp ;
-
-
         v0;
       
 #L398268.   call temp:=  [|android:preference:TwoStatePreference$SavedState$1.createFromParcel|](v1, v2) @signature [|Landroid/preference/TwoStatePreference$SavedState$1;.createFromParcel:(Landroid/os/Parcel;)Landroid/preference/TwoStatePreference$SavedState;|] @classDescriptor [|android:preference:TwoStatePreference$SavedState$1|] @type virtual;
@@ -596,8 +519,6 @@ record [|android:preference:TwoStatePreference$SavedState$1|]  @type class @Acce
    }
     procedure [|android:preference:TwoStatePreference$SavedState|][] [|android:preference:TwoStatePreference$SavedState$1.newArray|] ([|android:preference:TwoStatePreference$SavedState$1|] v1 @type (this), [|int|] v2) @owner [|android:preference:TwoStatePreference$SavedState$1|] @signature [|Landroid/preference/TwoStatePreference$SavedState$1;.newArray:(I)[Landroid/preference/TwoStatePreference$SavedState;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L398284.   v0:= new [|android:preference:TwoStatePreference$SavedState|][v2];
@@ -606,8 +527,6 @@ record [|android:preference:TwoStatePreference$SavedState$1|]  @type class @Acce
    }
     procedure [|java:lang:Object|][] [|android:preference:TwoStatePreference$SavedState$1.newArray|] ([|android:preference:TwoStatePreference$SavedState$1|] v1 @type (this), [|int|] v2) @owner [|android:preference:TwoStatePreference$SavedState$1|] @signature [|Landroid/preference/TwoStatePreference$SavedState$1;.newArray:(I)[Ljava/lang/Object;|] @Access PUBLIC_BRIDGE_SYNTHETIC {
       local temp ;
-
-
         v0;
       
 #L39829c.   call temp:=  [|android:preference:TwoStatePreference$SavedState$1.newArray|](v1, v2) @signature [|Landroid/preference/TwoStatePreference$SavedState$1;.newArray:(I)[Landroid/preference/TwoStatePreference$SavedState;|] @classDescriptor [|android:preference:TwoStatePreference$SavedState$1|] @type virtual;
@@ -631,8 +550,6 @@ record [|android:preference:TwoStatePreference$SavedState|]  @type class @Access
    }
     procedure [|void|] [|android:preference:TwoStatePreference$SavedState.<init>|] ([|android:preference:TwoStatePreference$SavedState|] v2 @type (this), [|android:os:Parcel|] v3 @type (object)) @owner [|android:preference:TwoStatePreference$SavedState|] @signature [|Landroid/preference/TwoStatePreference$SavedState;.<init>:(Landroid/os/Parcel;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
         v1;
       
@@ -649,8 +566,6 @@ record [|android:preference:TwoStatePreference$SavedState|]  @type class @Access
    }
     procedure [|void|] [|android:preference:TwoStatePreference$SavedState.<init>|] ([|android:preference:TwoStatePreference$SavedState|] v0 @type (this), [|android:os:Parcelable|] v1 @type (object)) @owner [|android:preference:TwoStatePreference$SavedState|] @signature [|Landroid/preference/TwoStatePreference$SavedState;.<init>:(Landroid/os/Parcelable;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L398308.   call temp:=  [|android:preference:Preference$BaseSavedState.<init>|](v0, v1) @signature [|Landroid/preference/Preference$BaseSavedState;.<init>:(Landroid/os/Parcelable;)V|] @classDescriptor [|android:preference:Preference$BaseSavedState|] @type direct;
 #L39830e.   return @void ;
@@ -658,9 +573,6 @@ record [|android:preference:TwoStatePreference$SavedState|]  @type class @Access
    }
     procedure [|void|] [|android:preference:TwoStatePreference$SavedState.writeToParcel|] ([|android:preference:TwoStatePreference$SavedState|] v1 @type (this), [|android:os:Parcel|] v2 @type (object), [|int|] v3) @owner [|android:preference:TwoStatePreference$SavedState|] @signature [|Landroid/preference/TwoStatePreference$SavedState;.writeToParcel:(Landroid/os/Parcel;I)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L398320.   call temp:=  [|android:preference:Preference$BaseSavedState.writeToParcel|](v1, v2, v3) @signature [|Landroid/preference/Preference$BaseSavedState;.writeToParcel:(Landroid/os/Parcel;I)V|] @classDescriptor [|android:preference:Preference$BaseSavedState|] @type super;
@@ -677,7 +589,6 @@ record [|android:preference:VolumePreference$SavedState$1|]  @type class @Access
    }
     procedure [|void|] [|android:preference:VolumePreference$SavedState$1.<init>|] ([|android:preference:VolumePreference$SavedState$1|] v0 @type (this)) @owner [|android:preference:VolumePreference$SavedState$1|] @signature [|Landroid/preference/VolumePreference$SavedState$1;.<init>:()V|] @Access CONSTRUCTOR {
       local temp ;
-
       
 #L39834c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L398352.   return @void ;
@@ -685,8 +596,6 @@ record [|android:preference:VolumePreference$SavedState$1|]  @type class @Access
    }
     procedure [|android:preference:VolumePreference$SavedState|] [|android:preference:VolumePreference$SavedState$1.createFromParcel|] ([|android:preference:VolumePreference$SavedState$1|] v1 @type (this), [|android:os:Parcel|] v2 @type (object)) @owner [|android:preference:VolumePreference$SavedState$1|] @signature [|Landroid/preference/VolumePreference$SavedState$1;.createFromParcel:(Landroid/os/Parcel;)Landroid/preference/VolumePreference$SavedState;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L398364.   v0:= new [|android:preference:VolumePreference$SavedState|];
@@ -696,8 +605,6 @@ record [|android:preference:VolumePreference$SavedState$1|]  @type class @Access
    }
     procedure [|java:lang:Object|] [|android:preference:VolumePreference$SavedState$1.createFromParcel|] ([|android:preference:VolumePreference$SavedState$1|] v1 @type (this), [|android:os:Parcel|] v2 @type (object)) @owner [|android:preference:VolumePreference$SavedState$1|] @signature [|Landroid/preference/VolumePreference$SavedState$1;.createFromParcel:(Landroid/os/Parcel;)Ljava/lang/Object;|] @Access PUBLIC_BRIDGE_SYNTHETIC {
       local temp ;
-
-
         v0;
       
 #L398380.   call temp:=  [|android:preference:VolumePreference$SavedState$1.createFromParcel|](v1, v2) @signature [|Landroid/preference/VolumePreference$SavedState$1;.createFromParcel:(Landroid/os/Parcel;)Landroid/preference/VolumePreference$SavedState;|] @classDescriptor [|android:preference:VolumePreference$SavedState$1|] @type virtual;
@@ -707,8 +614,6 @@ record [|android:preference:VolumePreference$SavedState$1|]  @type class @Access
    }
     procedure [|android:preference:VolumePreference$SavedState|][] [|android:preference:VolumePreference$SavedState$1.newArray|] ([|android:preference:VolumePreference$SavedState$1|] v1 @type (this), [|int|] v2) @owner [|android:preference:VolumePreference$SavedState$1|] @signature [|Landroid/preference/VolumePreference$SavedState$1;.newArray:(I)[Landroid/preference/VolumePreference$SavedState;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L39839c.   v0:= new [|android:preference:VolumePreference$SavedState|][v2];
@@ -717,8 +622,6 @@ record [|android:preference:VolumePreference$SavedState$1|]  @type class @Access
    }
     procedure [|java:lang:Object|][] [|android:preference:VolumePreference$SavedState$1.newArray|] ([|android:preference:VolumePreference$SavedState$1|] v1 @type (this), [|int|] v2) @owner [|android:preference:VolumePreference$SavedState$1|] @signature [|Landroid/preference/VolumePreference$SavedState$1;.newArray:(I)[Ljava/lang/Object;|] @Access PUBLIC_BRIDGE_SYNTHETIC {
       local temp ;
-
-
         v0;
       
 #L3983b4.   call temp:=  [|android:preference:VolumePreference$SavedState$1.newArray|](v1, v2) @signature [|Landroid/preference/VolumePreference$SavedState$1;.newArray:(I)[Landroid/preference/VolumePreference$SavedState;|] @classDescriptor [|android:preference:VolumePreference$SavedState$1|] @type virtual;
@@ -742,8 +645,6 @@ record [|android:preference:VolumePreference$SavedState|]  @type class @AccessFl
    }
     procedure [|void|] [|android:preference:VolumePreference$SavedState.<init>|] ([|android:preference:VolumePreference$SavedState|] v2 @type (this), [|android:os:Parcel|] v3 @type (object)) @owner [|android:preference:VolumePreference$SavedState|] @signature [|Landroid/preference/VolumePreference$SavedState;.<init>:(Landroid/os/Parcel;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
         v1;
       
@@ -764,8 +665,6 @@ record [|android:preference:VolumePreference$SavedState|]  @type class @AccessFl
    }
     procedure [|void|] [|android:preference:VolumePreference$SavedState.<init>|] ([|android:preference:VolumePreference$SavedState|] v1 @type (this), [|android:os:Parcelable|] v2 @type (object)) @owner [|android:preference:VolumePreference$SavedState|] @signature [|Landroid/preference/VolumePreference$SavedState;.<init>:(Landroid/os/Parcelable;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L398438.   call temp:=  [|android:preference:Preference$BaseSavedState.<init>|](v1, v2) @signature [|Landroid/preference/Preference$BaseSavedState;.<init>:(Landroid/os/Parcelable;)V|] @classDescriptor [|android:preference:Preference$BaseSavedState|] @type direct;
@@ -777,7 +676,6 @@ record [|android:preference:VolumePreference$SavedState|]  @type class @AccessFl
    }
     procedure [|android:preference:VolumePreference$VolumeStore|] [|android:preference:VolumePreference$SavedState.getVolumeStore|] ([|android:preference:VolumePreference$SavedState|] v1 @type (this)) @owner [|android:preference:VolumePreference$SavedState|] @signature [|Landroid/preference/VolumePreference$SavedState;.getVolumeStore:()Landroid/preference/VolumePreference$VolumeStore;|] @Access  {
       local temp ;
-
         v0;
       
 #L398460.   v0:= v1.[|android:preference:VolumePreference$SavedState.mVolumeStore|]   @type object;
@@ -786,9 +684,6 @@ record [|android:preference:VolumePreference$SavedState|]  @type class @AccessFl
    }
     procedure [|void|] [|android:preference:VolumePreference$SavedState.writeToParcel|] ([|android:preference:VolumePreference$SavedState|] v1 @type (this), [|android:os:Parcel|] v2 @type (object), [|int|] v3) @owner [|android:preference:VolumePreference$SavedState|] @signature [|Landroid/preference/VolumePreference$SavedState;.writeToParcel:(Landroid/os/Parcel;I)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L398478.   call temp:=  [|android:preference:Preference$BaseSavedState.writeToParcel|](v1, v2, v3) @signature [|Landroid/preference/Preference$BaseSavedState;.writeToParcel:(Landroid/os/Parcel;I)V|] @classDescriptor [|android:preference:Preference$BaseSavedState|] @type super;
@@ -806,8 +701,6 @@ record [|android:preference:VolumePreference$SeekBarVolumizer$1|]  @type class @
    }
     procedure [|void|] [|android:preference:VolumePreference$SeekBarVolumizer$1.<init>|] ([|android:preference:VolumePreference$SeekBarVolumizer$1|] v0 @type (this), [|android:preference:VolumePreference$SeekBarVolumizer|] v1 @type (object), [|android:os:Handler|] v2 @type (object)) @owner [|android:preference:VolumePreference$SeekBarVolumizer$1|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer$1;.<init>:(Landroid/preference/VolumePreference$SeekBarVolumizer;Landroid/os/Handler;)V|] @Access CONSTRUCTOR {
       local temp ;
-
-
       
 #L3984ac.   v0.[|android:preference:VolumePreference$SeekBarVolumizer$1.this$1|]  := v1 @type object;
 #L3984b0.   call temp:=  [|android:database:ContentObserver.<init>|](v0, v2) @signature [|Landroid/database/ContentObserver;.<init>:(Landroid/os/Handler;)V|] @classDescriptor [|android:database:ContentObserver|] @type direct;
@@ -816,9 +709,7 @@ record [|android:preference:VolumePreference$SeekBarVolumizer$1|]  @type class @
    }
     procedure [|void|] [|android:preference:VolumePreference$SeekBarVolumizer$1.onChange|] ([|android:preference:VolumePreference$SeekBarVolumizer$1|] v3 @type (this), [|boolean|] v4) @owner [|android:preference:VolumePreference$SeekBarVolumizer$1|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer$1;.onChange:(Z)V|] @Access PUBLIC {
       local temp ;
-        [|int|] v0 @varname [|volume|] @scope ((L0023,L002c));
-
-
+        v0;
         v1;
         v2;
       
@@ -861,10 +752,6 @@ record [|android:preference:VolumePreference$SeekBarVolumizer|]  @type class @Ac
    }
     procedure [|void|] [|android:preference:VolumePreference$SeekBarVolumizer.<init>|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v6 @type (this), [|android:preference:VolumePreference|] v7 @type (object), [|android:content:Context|] v8 @type (object), [|android:widget:SeekBar|] v9 @type (object), [|int|] v10) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.<init>:(Landroid/preference/VolumePreference;Landroid/content/Context;Landroid/widget/SeekBar;I)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
-
         v0;
         v1;
         v2;
@@ -884,11 +771,6 @@ record [|android:preference:VolumePreference$SeekBarVolumizer|]  @type class @Ac
    }
     procedure [|void|] [|android:preference:VolumePreference$SeekBarVolumizer.<init>|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v2 @type (this), [|android:preference:VolumePreference|] v3 @type (object), [|android:content:Context|] v4 @type (object), [|android:widget:SeekBar|] v5 @type (object), [|int|] v6, [|android:net:Uri|] v7 @type (object)) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.<init>:(Landroid/preference/VolumePreference;Landroid/content/Context;Landroid/widget/SeekBar;ILandroid/net/Uri;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
-
-
         v0;
         v1;
       
@@ -918,7 +800,6 @@ record [|android:preference:VolumePreference$SeekBarVolumizer|]  @type class @Ac
    }
     procedure [|android:widget:SeekBar|] [|android:preference:VolumePreference$SeekBarVolumizer.access$000|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v1 @type (object)) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.access$000:(Landroid/preference/VolumePreference$SeekBarVolumizer;)Landroid/widget/SeekBar;|] @Access STATIC_SYNTHETIC {
       local temp ;
-
         v0;
       
 #L3985c4.   v0:= v1.[|android:preference:VolumePreference$SeekBarVolumizer.mSeekBar|]   @type object;
@@ -927,7 +808,6 @@ record [|android:preference:VolumePreference$SeekBarVolumizer|]  @type class @Ac
    }
     procedure [|android:media:AudioManager|] [|android:preference:VolumePreference$SeekBarVolumizer.access$100|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v1 @type (object)) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.access$100:(Landroid/preference/VolumePreference$SeekBarVolumizer;)Landroid/media/AudioManager;|] @Access STATIC_SYNTHETIC {
       local temp ;
-
         v0;
       
 #L3985dc.   v0:= v1.[|android:preference:VolumePreference$SeekBarVolumizer.mAudioManager|]   @type object;
@@ -936,7 +816,6 @@ record [|android:preference:VolumePreference$SeekBarVolumizer|]  @type class @Ac
    }
     procedure [|int|] [|android:preference:VolumePreference$SeekBarVolumizer.access$200|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v1 @type (object)) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.access$200:(Landroid/preference/VolumePreference$SeekBarVolumizer;)I|] @Access STATIC_SYNTHETIC {
       local temp ;
-
         v0;
       
 #L3985f4.   v0:= v1.[|android:preference:VolumePreference$SeekBarVolumizer.mStreamType|] ;
@@ -945,9 +824,6 @@ record [|android:preference:VolumePreference$SeekBarVolumizer|]  @type class @Ac
    }
     procedure [|void|] [|android:preference:VolumePreference$SeekBarVolumizer.initSeekBar|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v4 @type (this), [|android:widget:SeekBar|] v5 @type (object), [|android:net:Uri|] v6 @type (object)) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.initSeekBar:(Landroid/widget/SeekBar;Landroid/net/Uri;)V|] @Access PRIVATE {
       local temp ;
-
-
-
         v0;
         v1;
         v2;
@@ -1003,8 +879,6 @@ record [|android:preference:VolumePreference$SeekBarVolumizer|]  @type class @Ac
    }
     procedure [|void|] [|android:preference:VolumePreference$SeekBarVolumizer.changeVolumeBy|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v1 @type (this), [|int|] v2) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.changeVolumeBy:(I)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L3986d4.   v0:= v1.[|android:preference:VolumePreference$SeekBarVolumizer.mSeekBar|]   @type object;
@@ -1024,7 +898,6 @@ record [|android:preference:VolumePreference$SeekBarVolumizer|]  @type class @Ac
    }
     procedure [|android:widget:SeekBar|] [|android:preference:VolumePreference$SeekBarVolumizer.getSeekBar|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v1 @type (this)) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.getSeekBar:()Landroid/widget/SeekBar;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L39871c.   v0:= v1.[|android:preference:VolumePreference$SeekBarVolumizer.mSeekBar|]   @type object;
@@ -1033,7 +906,6 @@ record [|android:preference:VolumePreference$SeekBarVolumizer|]  @type class @Ac
    }
     procedure [|boolean|] [|android:preference:VolumePreference$SeekBarVolumizer.isSamplePlaying|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v1 @type (this)) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.isSamplePlaying:()Z|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L398734.   v0:= v1.[|android:preference:VolumePreference$SeekBarVolumizer.mRingtone|]   @type object;
@@ -1050,7 +922,6 @@ record [|android:preference:VolumePreference$SeekBarVolumizer|]  @type class @Ac
    }
     procedure [|void|] [|android:preference:VolumePreference$SeekBarVolumizer.muteVolume|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v3 @type (this)) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.muteVolume:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -1080,10 +951,6 @@ record [|android:preference:VolumePreference$SeekBarVolumizer|]  @type class @Ac
    }
     procedure [|void|] [|android:preference:VolumePreference$SeekBarVolumizer.onProgressChanged|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v0 @type (this), [|android:widget:SeekBar|] v1 @type (object), [|int|] v2, [|boolean|] v3) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.onProgressChanged:(Landroid/widget/SeekBar;IZ)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
       
 #L3987cc.   if v3 != 0 then goto L3987d2;
 #L3987d0.   return @void ;
@@ -1093,8 +960,6 @@ record [|android:preference:VolumePreference$SeekBarVolumizer|]  @type class @Ac
    }
     procedure [|void|] [|android:preference:VolumePreference$SeekBarVolumizer.onRestoreInstanceState|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v2 @type (this), [|android:preference:VolumePreference$VolumeStore|] v3 @type (object)) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.onRestoreInstanceState:(Landroid/preference/VolumePreference$VolumeStore;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -1112,8 +977,6 @@ record [|android:preference:VolumePreference$SeekBarVolumizer|]  @type class @Ac
    }
     procedure [|void|] [|android:preference:VolumePreference$SeekBarVolumizer.onSaveInstanceState|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v1 @type (this), [|android:preference:VolumePreference$VolumeStore|] v2 @type (object)) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.onSaveInstanceState:(Landroid/preference/VolumePreference$VolumeStore;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L398824.   v0:= v1.[|android:preference:VolumePreference$SeekBarVolumizer.mLastProgress|] ;
@@ -1127,16 +990,12 @@ record [|android:preference:VolumePreference$SeekBarVolumizer|]  @type class @Ac
    }
     procedure [|void|] [|android:preference:VolumePreference$SeekBarVolumizer.onStartTrackingTouch|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v0 @type (this), [|android:widget:SeekBar|] v1 @type (object)) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.onStartTrackingTouch:(Landroid/widget/SeekBar;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L398850.   return @void ;
 
    }
     procedure [|void|] [|android:preference:VolumePreference$SeekBarVolumizer.onStopTrackingTouch|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v1 @type (this), [|android:widget:SeekBar|] v2 @type (object)) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.onStopTrackingTouch:(Landroid/widget/SeekBar;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L398864.   call temp:=  [|android:preference:VolumePreference$SeekBarVolumizer.isSamplePlaying|](v1) @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.isSamplePlaying:()Z|] @classDescriptor [|android:preference:VolumePreference$SeekBarVolumizer|] @type virtual;
@@ -1148,8 +1007,6 @@ record [|android:preference:VolumePreference$SeekBarVolumizer|]  @type class @Ac
    }
     procedure [|void|] [|android:preference:VolumePreference$SeekBarVolumizer.postSetVolume|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v1 @type (this), [|int|] v2) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.postSetVolume:(I)V|] @Access  {
       local temp ;
-
-
         v0;
       
 #L398888.   v1.[|android:preference:VolumePreference$SeekBarVolumizer.mLastProgress|]  := v2;
@@ -1162,7 +1019,6 @@ record [|android:preference:VolumePreference$SeekBarVolumizer|]  @type class @Ac
    }
     procedure [|void|] [|android:preference:VolumePreference$SeekBarVolumizer.revertVolume|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v4 @type (this)) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.revertVolume:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -1178,7 +1034,6 @@ record [|android:preference:VolumePreference$SeekBarVolumizer|]  @type class @Ac
    }
     procedure [|void|] [|android:preference:VolumePreference$SeekBarVolumizer.run|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v4 @type (this)) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.run:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -1194,7 +1049,6 @@ record [|android:preference:VolumePreference$SeekBarVolumizer|]  @type class @Ac
    }
     procedure [|void|] [|android:preference:VolumePreference$SeekBarVolumizer.startSample|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v1 @type (this)) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.startSample:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L398904.   v0:= v1.[|android:preference:VolumePreference$SeekBarVolumizer.this$0|]   @type object;
@@ -1208,7 +1062,6 @@ record [|android:preference:VolumePreference$SeekBarVolumizer|]  @type class @Ac
    }
     procedure [|void|] [|android:preference:VolumePreference$SeekBarVolumizer.stop|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v2 @type (this)) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.stop:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -1226,7 +1079,6 @@ record [|android:preference:VolumePreference$SeekBarVolumizer|]  @type class @Ac
    }
     procedure [|void|] [|android:preference:VolumePreference$SeekBarVolumizer.stopSample|] ([|android:preference:VolumePreference$SeekBarVolumizer|] v1 @type (this)) @owner [|android:preference:VolumePreference$SeekBarVolumizer|] @signature [|Landroid/preference/VolumePreference$SeekBarVolumizer;.stopSample:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L398970.   v0:= v1.[|android:preference:VolumePreference$SeekBarVolumizer.mRingtone|]   @type object;
@@ -1242,7 +1094,6 @@ record [|android:preference:VolumePreference$VolumeStore|]  @type class @AccessF
    }
     procedure [|void|] [|android:preference:VolumePreference$VolumeStore.<init>|] ([|android:preference:VolumePreference$VolumeStore|] v1 @type (this)) @owner [|android:preference:VolumePreference$VolumeStore|] @signature [|Landroid/preference/VolumePreference$VolumeStore;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L398994.   v0:= -1  @length 4;
@@ -1259,10 +1110,7 @@ record [|android:preference:VolumePreference|]  @type class @AccessFlag PUBLIC  
       global [|java:lang:String|] @@[|android:preference:VolumePreference.TAG|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|android:preference:VolumePreference.<init>|] ([|android:preference:VolumePreference|] v3 @type (this), [|android:content:Context|] v4 @type (object), [|android:util:AttributeSet|] v5 @type (object)) @owner [|android:preference:VolumePreference|] @signature [|Landroid/preference/VolumePreference;.<init>:(Landroid/content/Context;Landroid/util/AttributeSet;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-        [|android:content:res:TypedArray|] v0 @varname [|a|] @scope ((L000a,L0014));
-
-
-
+        v0;
         v1;
         v2;
       
@@ -1280,9 +1128,8 @@ record [|android:preference:VolumePreference|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|android:preference:VolumePreference.cleanup|] ([|android:preference:VolumePreference|] v5 @type (this)) @owner [|android:preference:VolumePreference|] @signature [|Landroid/preference/VolumePreference;.cleanup:()V|] @Access PRIVATE {
       local temp ;
-        [|android:view:View|] v1 @varname [|view|] @scope ((L0027,L0031));
-        [|android:app:Dialog|] v0 @varname [|dialog|] @scope ((L0010,L0038));
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -1318,7 +1165,6 @@ record [|android:preference:VolumePreference|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|android:preference:VolumePreference.onActivityStop|] ([|android:preference:VolumePreference|] v1 @type (this)) @owner [|android:preference:VolumePreference|] @signature [|Landroid/preference/VolumePreference;.onActivityStop:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L398a74.   v0:= v1.[|android:preference:VolumePreference.mSeekBarVolumizer|]   @type object;
@@ -1330,9 +1176,7 @@ record [|android:preference:VolumePreference|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|android:preference:VolumePreference.onBindDialogView|] ([|android:preference:VolumePreference|] v4 @type (this), [|android:view:View|] v5 @type (object)) @owner [|android:preference:VolumePreference|] @signature [|Landroid/preference/VolumePreference;.onBindDialogView:(Landroid/view/View;)V|] @Access PROTECTED {
       local temp ;
-        [|android:widget:SeekBar|] v0 @varname [|seekBar|] @scope ((L000c,L002b));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -1360,8 +1204,6 @@ record [|android:preference:VolumePreference|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|android:preference:VolumePreference.onDialogClosed|] ([|android:preference:VolumePreference|] v1 @type (this), [|boolean|] v2) @owner [|android:preference:VolumePreference|] @signature [|Landroid/preference/VolumePreference;.onDialogClosed:(Z)V|] @Access PROTECTED {
       local temp ;
-
-
         v0;
       
 #L398b00.   call temp:=  [|android:preference:SeekBarDialogPreference.onDialogClosed|](v1, v2) @signature [|Landroid/preference/SeekBarDialogPreference;.onDialogClosed:(Z)V|] @classDescriptor [|android:preference:SeekBarDialogPreference|] @type super;
@@ -1376,11 +1218,7 @@ record [|android:preference:VolumePreference|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|boolean|] [|android:preference:VolumePreference.onKey|] ([|android:preference:VolumePreference|] v4 @type (this), [|android:view:View|] v5 @type (object), [|int|] v6, [|android:view:KeyEvent|] v7 @type (object)) @owner [|android:preference:VolumePreference|] @signature [|Landroid/preference/VolumePreference;.onKey:(Landroid/view/View;ILandroid/view/KeyEvent;)Z|] @Access PUBLIC {
       local temp ;
-        [|boolean|] v0 @varname [|isdown|] @scope ((L000e,L0013), (L0015,L003c));
-
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -1421,9 +1259,7 @@ record [|android:preference:VolumePreference|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|android:preference:VolumePreference.onRestoreInstanceState|] ([|android:preference:VolumePreference|] v3 @type (this), [|android:os:Parcelable|] v4 @type (object)) @owner [|android:preference:VolumePreference|] @signature [|Landroid/preference/VolumePreference;.onRestoreInstanceState:(Landroid/os/Parcelable;)V|] @Access PROTECTED {
       local temp ;
-        [|android:preference:VolumePreference$SavedState|] v0 @varname [|myState|] @scope ((L0015,L002a));
-
-
+        v0;
         v1;
         v2;
       
@@ -1452,8 +1288,6 @@ record [|android:preference:VolumePreference|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|android:preference:VolumePreference.onSampleStarting|] ([|android:preference:VolumePreference|] v1 @type (this), [|android:preference:VolumePreference$SeekBarVolumizer|] v2 @type (object)) @owner [|android:preference:VolumePreference|] @signature [|Landroid/preference/VolumePreference;.onSampleStarting:(Landroid/preference/VolumePreference$SeekBarVolumizer;)V|] @Access PROTECTED {
       local temp ;
-
-
         v0;
       
 #L398c20.   v0:= v1.[|android:preference:VolumePreference.mSeekBarVolumizer|]   @type object;
@@ -1467,9 +1301,8 @@ record [|android:preference:VolumePreference|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|android:os:Parcelable|] [|android:preference:VolumePreference.onSaveInstanceState|] ([|android:preference:VolumePreference|] v4 @type (this)) @owner [|android:preference:VolumePreference|] @signature [|Landroid/preference/VolumePreference;.onSaveInstanceState:()Landroid/os/Parcelable;|] @Access PROTECTED {
       local temp ;
-        [|android:os:Parcelable|] v1 @varname [|superState|] @scope ((L0004,L000a), (L000b,L001f));
-        [|android:preference:VolumePreference$SavedState|] v0 @varname [|myState|] @scope ((L0010,L001f));
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -1493,8 +1326,6 @@ record [|android:preference:VolumePreference|]  @type class @AccessFlag PUBLIC  
    }
     procedure [|void|] [|android:preference:VolumePreference.setStreamType|] ([|android:preference:VolumePreference|] v0 @type (this), [|int|] v1) @owner [|android:preference:VolumePreference|] @signature [|Landroid/preference/VolumePreference;.setStreamType:(I)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L398c9c.   v0.[|android:preference:VolumePreference.mStreamType|]  := v1;
 #L398ca0.   return @void ;
@@ -1509,7 +1340,6 @@ record [|android:provider:AlarmClock|]  @type class @AccessFlag PUBLIC_FINAL  {
       global [|java:lang:String|] @@[|android:provider:AlarmClock.EXTRA_SKIP_UI|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|android:provider:AlarmClock.<init>|] ([|android:provider:AlarmClock|] v0 @type (this)) @owner [|android:provider:AlarmClock|] @signature [|Landroid/provider/AlarmClock;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L398cb4.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L398cba.   return @void ;
@@ -1546,7 +1376,6 @@ record [|android:provider:Applications|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|android:provider:Applications.<init>|] ([|android:provider:Applications|] v0 @type (this)) @owner [|android:provider:Applications|] @signature [|Landroid/provider/Applications;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L398cf0.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L398cf6.   return @void ;
@@ -1554,8 +1383,6 @@ record [|android:provider:Applications|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|android:net:Uri|] [|android:provider:Applications.componentNameToUri|] ([|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object)) @owner [|android:provider:Applications|] @signature [|Landroid/provider/Applications;.componentNameToUri:(Ljava/lang/String;Ljava/lang/String;)Landroid/net/Uri;|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -1576,10 +1403,8 @@ record [|android:provider:Applications|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|android:database:Cursor|] [|android:provider:Applications.search|] ([|android:content:ContentResolver|] v6 @type (object), [|java:lang:String|] v7 @type (object)) @owner [|android:provider:Applications|] @signature [|Landroid/provider/Applications;.search:(Landroid/content/ContentResolver;Ljava/lang/String;)Landroid/database/Cursor;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|android:net:Uri|] v1 @varname [|searchUri|] @scope ((L0016,L001f));
-
-
         v0;
+        v1;
         v2;
         v3;
         v4;
@@ -1607,10 +1432,9 @@ record [|android:provider:Applications|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|android:content:ComponentName|] [|android:provider:Applications.uriToComponentName|] ([|android:net:Uri|] v6 @type (object)) @owner [|android:provider:Applications|] @signature [|Landroid/provider/Applications;.uriToComponentName:(Landroid/net/Uri;)Landroid/content/ComponentName;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|name|] @scope ((L0042,L0048));
-        [|java:lang:String|] v1 @varname [|packageName|] @scope ((L003b,L0048));
-        [|java:util:List|] v2 @varname [|pathSegments|] @scope ((L0020,L0048));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -1670,7 +1494,6 @@ record [|android:provider:Browser$BookmarkColumns|]  @type class @AccessFlag PUB
       global [|java:lang:String|] @@[|android:provider:Browser$BookmarkColumns.VISITS|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|android:provider:Browser$BookmarkColumns.<init>|] ([|android:provider:Browser$BookmarkColumns|] v0 @type (this)) @owner [|android:provider:Browser$BookmarkColumns|] @signature [|Landroid/provider/Browser$BookmarkColumns;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L398e3c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L398e42.   return @void ;
@@ -1683,7 +1506,6 @@ record [|android:provider:Browser$SearchColumns|]  @type class @AccessFlag PUBLI
       global [|java:lang:String|] @@[|android:provider:Browser$SearchColumns.URL|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|android:provider:Browser$SearchColumns.<init>|] ([|android:provider:Browser$SearchColumns|] v0 @type (this)) @owner [|android:provider:Browser$SearchColumns|] @signature [|Landroid/provider/Browser$SearchColumns;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L398e54.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L398e5a.   return @void ;
@@ -1787,7 +1609,6 @@ record [|android:provider:Browser|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|android:provider:Browser.<init>|] ([|android:provider:Browser|] v0 @type (this)) @owner [|android:provider:Browser|] @signature [|Landroid/provider/Browser;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L398f58.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L398f5e.   return @void ;
@@ -1795,7 +1616,6 @@ record [|android:provider:Browser|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|android:provider:Browser.addOrUrlEquals|] ([|java:lang:StringBuilder|] v1 @type (object)) @owner [|android:provider:Browser|] @signature [|Landroid/provider/Browser;.addOrUrlEquals:(Ljava/lang/StringBuilder;)V|] @Access PRIVATE_STATIC_FINAL {
       local temp ;
-
         v0;
       
 #L398f70.   v0:= " OR url = " @type (object, string);
@@ -1805,9 +1625,7 @@ record [|android:provider:Browser|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|android:provider:Browser.addSearchUrl|] ([|android:content:ContentResolver|] v4 @type (object), [|java:lang:String|] v5 @type (object)) @owner [|android:provider:Browser|] @signature [|Landroid/provider/Browser;.addSearchUrl:(Landroid/content/ContentResolver;Ljava/lang/String;)V|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|android:content:ContentValues|] v0 @varname [|values|] @scope ((L0005,L001e));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -1829,16 +1647,15 @@ record [|android:provider:Browser|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|boolean|] [|android:provider:Browser.canClearHistory|] ([|android:content:ContentResolver|] v11 @type (object)) @owner [|android:provider:Browser|] @signature [|Landroid/provider/Browser;.canClearHistory:(Landroid/content/ContentResolver;)Z|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|java:lang:IllegalStateException|] v7 @varname [|e|] @scope ((L002c,L0039));
-        [|android:database:Cursor|] v6 @varname [|cursor|] @scope ((L0003,L0040));
-        [|boolean|] v8 @varname [|ret|] @scope ((L0004,L0040));
-
         v0;
         v1;
         v2;
         v3;
         v4;
         v5;
+        v6;
+        v7;
+        v8;
         v9;
         v10;
       
@@ -1888,7 +1705,6 @@ record [|android:provider:Browser|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|android:provider:Browser.clearHistory|] ([|android:content:ContentResolver|] v1 @type (object)) @owner [|android:provider:Browser|] @signature [|Landroid/provider/Browser;.clearHistory:(Landroid/content/ContentResolver;)V|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-
         v0;
       
 #L399080.   v0:= 0  @length 4;
@@ -1898,8 +1714,7 @@ record [|android:provider:Browser|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|android:provider:Browser.clearSearches|] ([|android:content:ContentResolver|] v4 @type (object)) @owner [|android:provider:Browser|] @signature [|Landroid/provider/Browser;.clearSearches:(Landroid/content/ContentResolver;)V|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|java:lang:IllegalStateException|] v0 @varname [|e|] @scope ((L0009,L0011));
-
+        v0;
         v1;
         v2;
         v3;
@@ -1919,8 +1734,6 @@ record [|android:provider:Browser|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|android:provider:Browser.deleteFromHistory|] ([|android:content:ContentResolver|] v4 @type (object), [|java:lang:String|] v5 @type (object)) @owner [|android:provider:Browser|] @signature [|Landroid/provider/Browser;.deleteFromHistory:(Landroid/content/ContentResolver;Ljava/lang/String;)V|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -1938,11 +1751,8 @@ record [|android:provider:Browser|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|android:provider:Browser.deleteHistoryTimeFrame|] ([|android:content:ContentResolver|] v5 @type (object), [|long|] v6, [|long|] v8) @owner [|android:provider:Browser|] @signature [|Landroid/provider/Browser;.deleteHistoryTimeFrame:(Landroid/content/ContentResolver;JJ)V|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|java:lang:String|] v1 @varname [|whereClause|] @scope ((L002b,L002f), (L004e,L004f), (L0082,L0083));
-        [|java:lang:String|] v0 @varname [|date|] @scope ((L0004,L0083));
-
-
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -2016,17 +1826,15 @@ record [|android:provider:Browser|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|android:provider:Browser.deleteHistoryWhere|] ([|android:content:ContentResolver|] v9 @type (object), [|java:lang:String|] v10 @type (object)) @owner [|android:provider:Browser|] @signature [|Landroid/provider/Browser;.deleteHistoryWhere:(Landroid/content/ContentResolver;Ljava/lang/String;)V|] @Access PRIVATE_STATIC_FINAL {
       local temp ;
-        [|android:webkit:WebIconDatabase|] v8 @varname [|iconDb|] @scope ((L001e,L0032));
-        [|java:lang:IllegalStateException|] v7 @varname [|e|] @scope ((L0039,L0046));
-        [|android:database:Cursor|] v6 @varname [|cursor|] @scope ((L0001,L004d));
-
-
         v0;
         v1;
         v2;
         v3;
         v4;
         v5;
+        v6;
+        v7;
+        v8;
       
 #L399228.   v6:= 0  @length 4;
 #L39922a.   v1:= @@[|android:provider:BrowserContract$History.CONTENT_URI|]   @type object;
@@ -2077,7 +1885,6 @@ record [|android:provider:Browser|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|android:database:Cursor|] [|android:provider:Browser.getAllBookmarks|] ([|android:content:ContentResolver|] v6 @type (object)) @owner [|android:provider:Browser|] @signature [|Landroid/provider/Browser;.getAllBookmarks:(Landroid/content/ContentResolver;)Landroid/database/Cursor;|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -2102,7 +1909,6 @@ record [|android:provider:Browser|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|android:database:Cursor|] [|android:provider:Browser.getAllVisitedUrls|] ([|android:content:ContentResolver|] v6 @type (object)) @owner [|android:provider:Browser|] @signature [|Landroid/provider/Browser;.getAllVisitedUrls:(Landroid/content/ContentResolver;)Landroid/database/Cursor;|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -2127,17 +1933,16 @@ record [|android:provider:Browser|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|java:lang:String|][] [|android:provider:Browser.getVisitedHistory|] ([|android:content:ContentResolver|] v10 @type (object)) @owner [|android:provider:Browser|] @signature [|Landroid/provider/Browser;.getVisitedHistory:(Landroid/content/ContentResolver;)[Ljava/lang/String;|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|java:lang:String|][] v2 @varname [|projection|] @scope ((L000b,L0021), (L0022,L003e));
-        [|int|] v8 @varname [|i|] @scope ((L0029,L003e));
-        [|java:lang:IllegalStateException|] v7 @varname [|e|] @scope ((L0041,L0051));
-        [|android:database:Cursor|] v6 @varname [|c|] @scope ((L0001,L0058));
-        [|java:lang:String|][] v9 @varname [|str|] @scope ((L0002,L0058));
-
         v0;
         v1;
+        v2;
         v3;
         v4;
         v5;
+        v6;
+        v7;
+        v8;
+        v9;
       
 #L399364.   v6:= 0  @length 4;
 #L399366.   v9:= 0  @length 4;
@@ -2198,18 +2003,16 @@ record [|android:provider:Browser|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|android:database:Cursor|] [|android:provider:Browser.getVisitedLike|] ([|android:content:ContentResolver|] v10 @type (object), [|java:lang:String|] v11 @type (object)) @owner [|android:provider:Browser|] @signature [|Landroid/provider/Browser;.getVisitedLike:(Landroid/content/ContentResolver;Ljava/lang/String;)Landroid/database/Cursor;|] @Access PRIVATE_STATIC_FINAL {
       local temp ;
-        [|java:lang:StringBuilder|] v8 @varname [|whereClause|] @scope ((L001f,L0023), (L0029,L0073), (L0083,L0085), (L008b,L00dc));
-        [|java:lang:String|] v6 @varname [|compareString|] @scope ((L0003,L00dc));
-        [|boolean|] v7 @varname [|secure|] @scope ((L0002,L00dc));
-        [|java:lang:String|] v9 @varname [|wwwString|] @scope ((L00a5,L00dc));
-
-
         v0;
         v1;
         v2;
         v3;
         v4;
         v5;
+        v6;
+        v7;
+        v8;
+        v9;
       
 #L399444.   v4:= 0  @length 4;
 #L399446.   v7:= 0  @length 4;
@@ -2321,9 +2124,6 @@ record [|android:provider:Browser|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|android:provider:Browser.requestAllIcons|] ([|android:content:ContentResolver|] v1 @type (object), [|java:lang:String|] v2 @type (object), [|android:webkit:WebIconDatabase$IconListener|] v3 @type (object)) @owner [|android:provider:Browser|] @signature [|Landroid/provider/Browser;.requestAllIcons:(Landroid/content/ContentResolver;Ljava/lang/String;Landroid/webkit/WebIconDatabase$IconListener;)V|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-
-
-
         v0;
       
 #L39960c.   call temp:=  [|android:webkit:WebIconDatabase.getInstance|]() @signature [|Landroid/webkit/WebIconDatabase;.getInstance:()Landroid/webkit/WebIconDatabase;|] @classDescriptor [|android:webkit:WebIconDatabase|] @type static;
@@ -2334,10 +2134,7 @@ record [|android:provider:Browser|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|android:provider:Browser.saveBookmark|] ([|android:content:Context|] v3 @type (object), [|java:lang:String|] v4 @type (object), [|java:lang:String|] v5 @type (object)) @owner [|android:provider:Browser|] @signature [|Landroid/provider/Browser;.saveBookmark:(Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|android:content:Intent|] v0 @varname [|i|] @scope ((L0009,L0019));
-
-
-
+        v0;
         v1;
         v2;
       
@@ -2355,8 +2152,6 @@ record [|android:provider:Browser|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|android:provider:Browser.sendString|] ([|android:content:Context|] v1 @type (object), [|java:lang:String|] v2 @type (object)) @owner [|android:provider:Browser|] @signature [|Landroid/provider/Browser;.sendString:(Landroid/content/Context;Ljava/lang/String;)V|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-
-
         v0;
       
 #L399670.    v0:= 0.000000;
@@ -2368,11 +2163,8 @@ record [|android:provider:Browser|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|android:provider:Browser.sendString|] ([|android:content:Context|] v3 @type (object), [|java:lang:String|] v4 @type (object), [|java:lang:String|] v5 @type (object)) @owner [|android:provider:Browser|] @signature [|Landroid/provider/Browser;.sendString:(Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|android:content:Intent|] v0 @varname [|i|] @scope ((L0016,L001e));
-        [|android:content:Intent|] v1 @varname [|send|] @scope ((L0007,L0021));
-
-
-
+        v0;
+        v1;
         v2;
       
 #L399698.   v1:= new [|android:content:Intent|];
@@ -2395,17 +2187,16 @@ record [|android:provider:Browser|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|android:provider:Browser.truncateHistory|] ([|android:content:ContentResolver|] v10 @type (object)) @owner [|android:provider:Browser|] @signature [|Landroid/provider/Browser;.truncateHistory:(Landroid/content/ContentResolver;)V|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|int|] v8 @varname [|i|] @scope ((L0032,L0053), (L0059,L005c));
-        [|android:webkit:WebIconDatabase|] v9 @varname [|iconDb|] @scope ((L0031,L0053), (L0059,L005c));
-        [|java:lang:IllegalStateException|] v7 @varname [|e|] @scope ((L005d,L006b));
-        [|android:database:Cursor|] v6 @varname [|cursor|] @scope ((L0001,L0072));
-
         v0;
         v1;
         v2;
         v3;
         v4;
         v5;
+        v6;
+        v7;
+        v8;
+        v9;
       
 #L3996fc.   v6:= 0  @length 4;
 #L3996fe.   v1:= @@[|android:provider:BrowserContract$History.CONTENT_URI|]   @type object;
@@ -2477,16 +2268,13 @@ record [|android:provider:Browser|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|android:provider:Browser.updateVisitedHistory|] ([|android:content:ContentResolver|] v10 @type (object), [|java:lang:String|] v11 @type (object), [|boolean|] v12) @owner [|android:provider:Browser|] @signature [|Landroid/provider/Browser;.updateVisitedHistory:(Landroid/content/ContentResolver;Ljava/lang/String;Z)V|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|android:content:ContentValues|] v5 @varname [|values|] @scope ((L0014,L0045), (L0046,L0052), (L0069,L00a6), (L00ad,L00b0));
-        [|java:lang:IllegalStateException|] v1 @varname [|e|] @scope ((L0053,L0061));
-        [|int|] v4 @varname [|user_entered|] @scope ((L006d,L00a6), (L00af,L00b0));
-        [|int|] v6 @varname [|visits|] @scope ((L006c,L00a6), (L00ae,L00b0));
-        [|android:database:Cursor|] v0 @varname [|c|] @scope ((L0005,L00b0));
-        [|long|] v2 @varname [|now|] @scope ((L0004,L00b0));
-
-
-
+        v0;
+        v1;
+        v2;
         v3;
+        v4;
+        v5;
+        v6;
         v7;
         v8;
         v9;
@@ -2610,7 +2398,6 @@ record [|android:provider:BrowserContract$Accounts|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|android:provider:BrowserContract$Accounts.<init>|] ([|android:provider:BrowserContract$Accounts|] v0 @type (this)) @owner [|android:provider:BrowserContract$Accounts|] @signature [|Landroid/provider/BrowserContract$Accounts;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L3999dc.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L3999e2.   return @void ;
@@ -2684,7 +2471,6 @@ record [|android:provider:BrowserContract$Bookmarks|]  @type class @AccessFlag P
    }
     procedure [|void|] [|android:provider:BrowserContract$Bookmarks.<init>|] ([|android:provider:BrowserContract$Bookmarks|] v0 @type (this)) @owner [|android:provider:BrowserContract$Bookmarks|] @signature [|Landroid/provider/BrowserContract$Bookmarks;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L399a30.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L399a36.   return @void ;
@@ -2692,7 +2478,6 @@ record [|android:provider:BrowserContract$Bookmarks|]  @type class @AccessFlag P
    }
     procedure [|android:net:Uri|] [|android:provider:BrowserContract$Bookmarks.buildFolderUri|] ([|long|] v1) @owner [|android:provider:BrowserContract$Bookmarks|] @signature [|Landroid/provider/BrowserContract$Bookmarks;.buildFolderUri:(J)Landroid/net/Uri;|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-
         v0;
       
 #L399a48.   v0:= @@[|android:provider:BrowserContract$Bookmarks.CONTENT_URI_DEFAULT_FOLDER|]   @type object;
@@ -2711,7 +2496,6 @@ record [|android:provider:BrowserContract$ChromeSyncColumns|]  @type class @Acce
       global [|java:lang:String|] @@[|android:provider:BrowserContract$ChromeSyncColumns.SERVER_UNIQUE|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|android:provider:BrowserContract$ChromeSyncColumns.<init>|] ([|android:provider:BrowserContract$ChromeSyncColumns|] v0 @type (this)) @owner [|android:provider:BrowserContract$ChromeSyncColumns|] @signature [|Landroid/provider/BrowserContract$ChromeSyncColumns;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L399a68.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L399a6e.   return @void ;
@@ -2741,7 +2525,6 @@ record [|android:provider:BrowserContract$Combined|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|android:provider:BrowserContract$Combined.<init>|] ([|android:provider:BrowserContract$Combined|] v0 @type (this)) @owner [|android:provider:BrowserContract$Combined|] @signature [|Landroid/provider/BrowserContract$Combined;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L399aa8.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L399aae.   return @void ;
@@ -2767,7 +2550,6 @@ record [|android:provider:BrowserContract$History|]  @type class @AccessFlag PUB
    }
     procedure [|void|] [|android:provider:BrowserContract$History.<init>|] ([|android:provider:BrowserContract$History|] v0 @type (this)) @owner [|android:provider:BrowserContract$History|] @signature [|Landroid/provider/BrowserContract$History;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L399ae8.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L399aee.   return @void ;
@@ -2797,7 +2579,6 @@ record [|android:provider:BrowserContract$ImageMappings|]  @type class @AccessFl
    }
     procedure [|void|] [|android:provider:BrowserContract$ImageMappings.<init>|] ([|android:provider:BrowserContract$ImageMappings|] v0 @type (this)) @owner [|android:provider:BrowserContract$ImageMappings|] @signature [|Landroid/provider/BrowserContract$ImageMappings;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L399b28.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L399b2e.   return @void ;
@@ -2829,7 +2610,6 @@ record [|android:provider:BrowserContract$Images|]  @type class @AccessFlag PUBL
    }
     procedure [|void|] [|android:provider:BrowserContract$Images.<init>|] ([|android:provider:BrowserContract$Images|] v0 @type (this)) @owner [|android:provider:BrowserContract$Images|] @signature [|Landroid/provider/BrowserContract$Images;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L399b68.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L399b6e.   return @void ;
@@ -2858,7 +2638,6 @@ record [|android:provider:BrowserContract$Searches|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|android:provider:BrowserContract$Searches.<init>|] ([|android:provider:BrowserContract$Searches|] v0 @type (this)) @owner [|android:provider:BrowserContract$Searches|] @signature [|Landroid/provider/BrowserContract$Searches;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L399ba8.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L399bae.   return @void ;
@@ -2885,7 +2664,6 @@ record [|android:provider:BrowserContract$Settings|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|android:provider:BrowserContract$Settings.<init>|] ([|android:provider:BrowserContract$Settings|] v0 @type (this)) @owner [|android:provider:BrowserContract$Settings|] @signature [|Landroid/provider/BrowserContract$Settings;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L399be8.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L399bee.   return @void ;
@@ -2893,14 +2671,13 @@ record [|android:provider:BrowserContract$Settings|]  @type class @AccessFlag PU
    }
     procedure [|boolean|] [|android:provider:BrowserContract$Settings.isSyncEnabled|] ([|android:content:Context|] v10 @type (object)) @owner [|android:provider:BrowserContract$Settings|] @signature [|Landroid/provider/BrowserContract$Settings;.isSyncEnabled:(Landroid/content/Context;)Z|] @Access PUBLIC_STATIC {
       local temp ;
-        [|android:database:Cursor|] v6 @varname [|cursor|] @scope ((L0003,L0048));
-
         v0;
         v1;
         v2;
         v3;
         v4;
         v5;
+        v6;
         v7;
         v8;
         v9;
@@ -2953,9 +2730,7 @@ record [|android:provider:BrowserContract$Settings|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|android:provider:BrowserContract$Settings.setSyncEnabled|] ([|android:content:Context|] v3 @type (object), [|boolean|] v4) @owner [|android:provider:BrowserContract$Settings|] @signature [|Landroid/provider/BrowserContract$Settings;.setSyncEnabled:(Landroid/content/Context;Z)V|] @Access PUBLIC_STATIC {
       local temp ;
-        [|android:content:ContentValues|] v0 @varname [|values|] @scope ((L0005,L0026));
-
-
+        v0;
         v1;
         v2;
       
@@ -3003,7 +2778,6 @@ record [|android:provider:BrowserContract$SyncState|]  @type class @AccessFlag P
    }
     procedure [|void|] [|android:provider:BrowserContract$SyncState.<init>|] ([|android:provider:BrowserContract$SyncState|] v0 @type (this)) @owner [|android:provider:BrowserContract$SyncState|] @signature [|Landroid/provider/BrowserContract$SyncState;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L399d38.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L399d3e.   return @void ;
@@ -3011,8 +2785,6 @@ record [|android:provider:BrowserContract$SyncState|]  @type class @AccessFlag P
    }
     procedure [|byte|][] [|android:provider:BrowserContract$SyncState.get|] ([|android:content:ContentProviderClient|] v1 @type (object), [|android:accounts:Account|] v2 @type (object)) @owner [|android:provider:BrowserContract$SyncState|] @signature [|Landroid/provider/BrowserContract$SyncState;.get:(Landroid/content/ContentProviderClient;Landroid/accounts/Account;)[B|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
       
 #L399d50.   v0:= @@[|android:provider:BrowserContract$SyncState.CONTENT_URI|]   @type object;
@@ -3023,8 +2795,6 @@ record [|android:provider:BrowserContract$SyncState|]  @type class @AccessFlag P
    }
     procedure [|android:util:Pair|] [|android:provider:BrowserContract$SyncState.getWithUri|] ([|android:content:ContentProviderClient|] v1 @type (object), [|android:accounts:Account|] v2 @type (object)) @owner [|android:provider:BrowserContract$SyncState|] @signature [|Landroid/provider/BrowserContract$SyncState;.getWithUri:(Landroid/content/ContentProviderClient;Landroid/accounts/Account;)Landroid/util/Pair;|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
       
 #L399d70.   v0:= @@[|android:provider:BrowserContract$SyncState.CONTENT_URI|]   @type object;
@@ -3035,8 +2805,6 @@ record [|android:provider:BrowserContract$SyncState|]  @type class @AccessFlag P
    }
     procedure [|android:content:ContentProviderOperation|] [|android:provider:BrowserContract$SyncState.newSetOperation|] ([|android:accounts:Account|] v1 @type (object), [|byte|][] v2) @owner [|android:provider:BrowserContract$SyncState|] @signature [|Landroid/provider/BrowserContract$SyncState;.newSetOperation:(Landroid/accounts/Account;[B)Landroid/content/ContentProviderOperation;|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
       
 #L399d90.   v0:= @@[|android:provider:BrowserContract$SyncState.CONTENT_URI|]   @type object;
@@ -3047,9 +2815,6 @@ record [|android:provider:BrowserContract$SyncState|]  @type class @AccessFlag P
    }
     procedure [|void|] [|android:provider:BrowserContract$SyncState.set|] ([|android:content:ContentProviderClient|] v1 @type (object), [|android:accounts:Account|] v2 @type (object), [|byte|][] v3) @owner [|android:provider:BrowserContract$SyncState|] @signature [|Landroid/provider/BrowserContract$SyncState;.set:(Landroid/content/ContentProviderClient;Landroid/accounts/Account;[B)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-
-
         v0;
       
 #L399db0.   v0:= @@[|android:provider:BrowserContract$SyncState.CONTENT_URI|]   @type object;
@@ -3076,7 +2841,6 @@ record [|android:provider:BrowserContract|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|android:provider:BrowserContract.<init>|] ([|android:provider:BrowserContract|] v0 @type (this)) @owner [|android:provider:BrowserContract|] @signature [|Landroid/provider/BrowserContract;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L399df0.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L399df6.   return @void ;
@@ -3184,7 +2948,6 @@ record [|android:provider:CalendarContract$Attendees|]  @type class @AccessFlag 
    }
     procedure [|void|] [|android:provider:CalendarContract$Attendees.<init>|] ([|android:provider:CalendarContract$Attendees|] v0 @type (this)) @owner [|android:provider:CalendarContract$Attendees|] @signature [|Landroid/provider/CalendarContract$Attendees;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L399e2c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L399e32.   return @void ;
@@ -3192,14 +2955,11 @@ record [|android:provider:CalendarContract$Attendees|]  @type class @AccessFlag 
    }
     procedure [|android:database:Cursor|] [|android:provider:CalendarContract$Attendees.query|] ([|android:content:ContentResolver|] v6 @type (object), [|long|] v7, [|java:lang:String|][] v9 @type (object)) @owner [|android:provider:CalendarContract$Attendees|] @signature [|Landroid/provider/CalendarContract$Attendees;.query:(Landroid/content/ContentResolver;J[Ljava/lang/String;)Landroid/database/Cursor;|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|java:lang:String|][] v4 @varname [|attArgs|] @scope ((L000a,L0016));
-
-
-
         v0;
         v1;
         v2;
         v3;
+        v4;
         v5;
       
 #L399e44.   v0:= 1  @length 4;
@@ -3286,7 +3046,6 @@ record [|android:provider:CalendarContract$CalendarAlerts|]  @type class @Access
    }
     procedure [|void|] [|android:provider:CalendarContract$CalendarAlerts.<init>|] ([|android:provider:CalendarContract$CalendarAlerts|] v0 @type (this)) @owner [|android:provider:CalendarContract$CalendarAlerts|] @signature [|Landroid/provider/CalendarContract$CalendarAlerts;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L399eb4.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L399eba.   return @void ;
@@ -3294,18 +3053,14 @@ record [|android:provider:CalendarContract$CalendarAlerts|]  @type class @Access
    }
     procedure [|boolean|] [|android:provider:CalendarContract$CalendarAlerts.alarmExists|] ([|android:content:ContentResolver|] v9 @type (object), [|long|] v10, [|long|] v12, [|long|] v14) @owner [|android:provider:CalendarContract$CalendarAlerts|] @signature [|Landroid/provider/CalendarContract$CalendarAlerts;.alarmExists:(Landroid/content/ContentResolver;JJJ)Z|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|java:lang:String|][] v2 @varname [|projection|] @scope ((L0008,L003f));
-        [|android:database:Cursor|] v6 @varname [|cursor|] @scope ((L0028,L003f));
-        [|boolean|] v7 @varname [|found|] @scope ((L0029,L003f));
-
-
-
-
         v0;
         v1;
+        v2;
         v3;
         v4;
         v5;
+        v6;
+        v7;
         v8;
       
 #L399ecc.   v8:= 1  @length 4;
@@ -3349,18 +3104,16 @@ record [|android:provider:CalendarContract$CalendarAlerts|]  @type class @Access
    }
     procedure [|long|] [|android:provider:CalendarContract$CalendarAlerts.findNextAlarmTime|] ([|android:content:ContentResolver|] v10 @type (object), [|long|] v11) @owner [|android:provider:CalendarContract$CalendarAlerts|] @signature [|Landroid/provider/CalendarContract$CalendarAlerts;.findNextAlarmTime:(Landroid/content/ContentResolver;J)J|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|java:lang:String|][] v2 @varname [|projection|] @scope ((L001b,L004a));
-        [|long|] v6 @varname [|alarmTime|] @scope ((L0030,L004a));
-        [|android:database:Cursor|] v8 @varname [|cursor|] @scope ((L002e,L004a));
-        [|java:lang:String|] v9 @varname [|selection|] @scope ((L0015,L004a));
-
-
         v0;
         v1;
+        v2;
         v3;
         v4;
         v5;
+        v6;
         v7;
+        v8;
+        v9;
       
 #L399f68.   v4:= 1  @length 4;
 #L399f6a.   v5:= 0  @length 4;
@@ -3406,15 +3159,9 @@ record [|android:provider:CalendarContract$CalendarAlerts|]  @type class @Access
    }
     procedure [|android:net:Uri|] [|android:provider:CalendarContract$CalendarAlerts.insert|] ([|android:content:ContentResolver|] v6 @type (object), [|long|] v7, [|long|] v9, [|long|] v11, [|long|] v13, [|int|] v15) @owner [|android:provider:CalendarContract$CalendarAlerts|] @signature [|Landroid/provider/CalendarContract$CalendarAlerts;.insert:(Landroid/content/ContentResolver;JJJJI)Landroid/net/Uri;|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|long|] v0 @varname [|currentTime|] @scope ((L002e,L0066));
-        [|android:content:ContentValues|] v2 @varname [|values|] @scope ((L0006,L0066));
-
-
-
-
-
-
+        v0;
         v1;
+        v2;
         v3;
         v4;
         v5;
@@ -3468,25 +3215,22 @@ record [|android:provider:CalendarContract$CalendarAlerts|]  @type class @Access
    }
     procedure [|void|] [|android:provider:CalendarContract$CalendarAlerts.rescheduleMissedAlarms|] ([|android:content:ContentResolver|] v17 @type (object), [|android:content:Context|] v18 @type (object), [|android:app:AlarmManager|] v19 @type (object)) @owner [|android:provider:CalendarContract$CalendarAlerts|] @signature [|Landroid/provider/CalendarContract$CalendarAlerts;.rescheduleMissedAlarms:(Landroid/content/ContentResolver;Landroid/content/Context;Landroid/app/AlarmManager;)V|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|long|] v13 @varname [|newAlarmTime|] @scope ((L0046,L0053));
-        [|java:lang:String|][] v4 @varname [|projection|] @scope ((L0011,L005c));
-        [|long|] v8 @varname [|alarmTime|] @scope ((L003b,L005c));
-        [|long|] v10 @varname [|ancient|] @scope ((L0009,L005c));
-        [|android:database:Cursor|] v12 @varname [|cursor|] @scope ((L0036,L005c));
-        [|long|] v15 @varname [|now|] @scope ((L0004,L005c));
-
-
-
         v0;
         v1;
         v2;
         v3;
+        v4;
         v5;
         v6;
         v7;
+        v8;
         v9;
+        v10;
         v11;
+        v12;
+        v13;
         v14;
+        v15;
         v16;
       
 #L39a0f4.   call temp:=  [|java:lang:System.currentTimeMillis|]() @signature [|Ljava/lang/System;.currentTimeMillis:()J|] @classDescriptor [|java:lang:System|] @type static;
@@ -3544,12 +3288,8 @@ record [|android:provider:CalendarContract$CalendarAlerts|]  @type class @Access
    }
     procedure [|void|] [|android:provider:CalendarContract$CalendarAlerts.scheduleAlarm|] ([|android:content:Context|] v4 @type (object), [|android:app:AlarmManager|] v5 @type (object), [|long|] v6) @owner [|android:provider:CalendarContract$CalendarAlerts|] @signature [|Landroid/provider/CalendarContract$CalendarAlerts;.scheduleAlarm:(Landroid/content/Context;Landroid/app/AlarmManager;J)V|] @Access PUBLIC_STATIC {
       local temp ;
-
-        [|android:content:Intent|] v0 @varname [|intent|] @scope ((L0012,L0028));
-        [|android:app:PendingIntent|] v1 @varname [|pi|] @scope ((L0024,L0028));
-
-
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -3599,7 +3339,6 @@ record [|android:provider:CalendarContract$CalendarCache|]  @type class @AccessF
    }
     procedure [|void|] [|android:provider:CalendarContract$CalendarCache.<init>|] ([|android:provider:CalendarContract$CalendarCache|] v0 @type (this)) @owner [|android:provider:CalendarContract$CalendarCache|] @signature [|Landroid/provider/CalendarContract$CalendarCache;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39a24c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39a252.   return @void ;
@@ -3609,8 +3348,6 @@ record [|android:provider:CalendarContract$CalendarEntity$EntityIteratorImpl|]  
    }
     procedure [|void|] [|android:provider:CalendarContract$CalendarEntity$EntityIteratorImpl.<init>|] ([|android:provider:CalendarContract$CalendarEntity$EntityIteratorImpl|] v0 @type (this), [|android:database:Cursor|] v1 @type (object)) @owner [|android:provider:CalendarContract$CalendarEntity$EntityIteratorImpl|] @signature [|Landroid/provider/CalendarContract$CalendarEntity$EntityIteratorImpl;.<init>:(Landroid/database/Cursor;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L39a264.   call temp:=  [|android:content:CursorEntityIterator.<init>|](v0, v1) @signature [|Landroid/content/CursorEntityIterator;.<init>:(Landroid/database/Cursor;)V|] @classDescriptor [|android:content:CursorEntityIterator|] @type direct;
 #L39a26a.   return @void ;
@@ -3618,12 +3355,10 @@ record [|android:provider:CalendarContract$CalendarEntity$EntityIteratorImpl|]  
    }
     procedure [|android:content:Entity|] [|android:provider:CalendarContract$CalendarEntity$EntityIteratorImpl.getEntityAndIncrementCursor|] ([|android:provider:CalendarContract$CalendarEntity$EntityIteratorImpl|] v6 @type (this), [|android:database:Cursor|] v7 @type (object)) @owner [|android:provider:CalendarContract$CalendarEntity$EntityIteratorImpl|] @signature [|Landroid/provider/CalendarContract$CalendarEntity$EntityIteratorImpl;.getEntityAndIncrementCursor:(Landroid/database/Cursor;)Landroid/content/Entity;|] @Access PUBLIC {
       local temp ;
-        [|long|] v0 @varname [|calendarId|] @scope ((L000a,L00b7));
-        [|android:content:ContentValues|] v2 @varname [|cv|] @scope ((L000f,L00b7));
-        [|android:content:Entity|] v3 @varname [|entity|] @scope ((L00b3,L00b7));
-
-
+        v0;
         v1;
+        v2;
+        v3;
         v4;
         v5;
       
@@ -3738,7 +3473,6 @@ record [|android:provider:CalendarContract$CalendarEntity|]  @type class @Access
    }
     procedure [|void|] [|android:provider:CalendarContract$CalendarEntity.<init>|] ([|android:provider:CalendarContract$CalendarEntity|] v0 @type (this)) @owner [|android:provider:CalendarContract$CalendarEntity|] @signature [|Landroid/provider/CalendarContract$CalendarEntity;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39a420.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39a426.   return @void ;
@@ -3746,7 +3480,6 @@ record [|android:provider:CalendarContract$CalendarEntity|]  @type class @Access
    }
     procedure [|android:content:EntityIterator|] [|android:provider:CalendarContract$CalendarEntity.newEntityIterator|] ([|android:database:Cursor|] v1 @type (object)) @owner [|android:provider:CalendarContract$CalendarEntity|] @signature [|Landroid/provider/CalendarContract$CalendarEntity;.newEntityIterator:(Landroid/database/Cursor;)Landroid/content/EntityIterator;|] @Access PUBLIC_STATIC {
       local temp ;
-
         v0;
       
 #L39a438.   v0:= new [|android:provider:CalendarContract$CalendarEntity$EntityIteratorImpl|];
@@ -3765,7 +3498,6 @@ record [|android:provider:CalendarContract$CalendarMetaData|]  @type class @Acce
    }
     procedure [|void|] [|android:provider:CalendarContract$CalendarMetaData.<init>|] ([|android:provider:CalendarContract$CalendarMetaData|] v0 @type (this)) @owner [|android:provider:CalendarContract$CalendarMetaData|] @signature [|Landroid/provider/CalendarContract$CalendarMetaData;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39a454.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39a45a.   return @void ;
@@ -3868,7 +3600,6 @@ record [|android:provider:CalendarContract$Calendars|]  @type class @AccessFlag 
    }
     procedure [|void|] [|android:provider:CalendarContract$Calendars.<init>|] ([|android:provider:CalendarContract$Calendars|] v0 @type (this)) @owner [|android:provider:CalendarContract$Calendars|] @signature [|Landroid/provider/CalendarContract$Calendars;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39a5b0.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39a5b6.   return @void ;
@@ -3898,7 +3629,6 @@ record [|android:provider:CalendarContract$Colors|]  @type class @AccessFlag PUB
    }
     procedure [|void|] [|android:provider:CalendarContract$Colors.<init>|] ([|android:provider:CalendarContract$Colors|] v0 @type (this)) @owner [|android:provider:CalendarContract$Colors|] @signature [|Landroid/provider/CalendarContract$Colors;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39a5ec.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39a5f2.   return @void ;
@@ -3925,7 +3655,6 @@ record [|android:provider:CalendarContract$EventDays|]  @type class @AccessFlag 
    }
     procedure [|void|] [|android:provider:CalendarContract$EventDays.<init>|] ([|android:provider:CalendarContract$EventDays|] v0 @type (this)) @owner [|android:provider:CalendarContract$EventDays|] @signature [|Landroid/provider/CalendarContract$EventDays;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39a628.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39a62e.   return @void ;
@@ -3933,18 +3662,14 @@ record [|android:provider:CalendarContract$EventDays|]  @type class @AccessFlag 
    }
     procedure [|android:database:Cursor|] [|android:provider:CalendarContract$EventDays.query|] ([|android:content:ContentResolver|] v8 @type (object), [|int|] v9, [|int|] v10, [|java:lang:String|][] v11 @type (object)) @owner [|android:provider:CalendarContract$EventDays|] @signature [|Landroid/provider/CalendarContract$EventDays;.query:(Landroid/content/ContentResolver;II[Ljava/lang/String;)Landroid/database/Cursor;|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|android:net:Uri$Builder|] v6 @varname [|builder|] @scope ((L000f,L0028));
-        [|int|] v7 @varname [|endDay|] @scope ((L0009,L0028));
-
-
-
-
         v0;
         v1;
         v2;
         v3;
         v4;
         v5;
+        v6;
+        v7;
       
 #L39a640.   v4:= 0  @length 4;
 #L39a642.   v0:= 1  @length 4;
@@ -4110,7 +3835,6 @@ record [|android:provider:CalendarContract$Events|]  @type class @AccessFlag PUB
    }
     procedure [|void|] [|android:provider:CalendarContract$Events.<init>|] ([|android:provider:CalendarContract$Events|] v0 @type (this)) @owner [|android:provider:CalendarContract$Events|] @signature [|Landroid/provider/CalendarContract$Events;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39a888.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39a88e.   return @void ;
@@ -4189,9 +3913,6 @@ record [|android:provider:CalendarContract$EventsEntity$EntityIteratorImpl|]  @t
    }
     procedure [|void|] [|android:provider:CalendarContract$EventsEntity$EntityIteratorImpl.<init>|] ([|android:provider:CalendarContract$EventsEntity$EntityIteratorImpl|] v1 @type (this), [|android:database:Cursor|] v2 @type (object), [|android:content:ContentProviderClient|] v3 @type (object)) @owner [|android:provider:CalendarContract$EventsEntity$EntityIteratorImpl|] @signature [|Landroid/provider/CalendarContract$EventsEntity$EntityIteratorImpl;.<init>:(Landroid/database/Cursor;Landroid/content/ContentProviderClient;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
         v0;
       
 #L39a944.   call temp:=  [|android:content:CursorEntityIterator.<init>|](v1, v2) @signature [|Landroid/content/CursorEntityIterator;.<init>:(Landroid/database/Cursor;)V|] @classDescriptor [|android:content:CursorEntityIterator|] @type direct;
@@ -4203,9 +3924,6 @@ record [|android:provider:CalendarContract$EventsEntity$EntityIteratorImpl|]  @t
    }
     procedure [|void|] [|android:provider:CalendarContract$EventsEntity$EntityIteratorImpl.<init>|] ([|android:provider:CalendarContract$EventsEntity$EntityIteratorImpl|] v1 @type (this), [|android:database:Cursor|] v2 @type (object), [|android:content:ContentResolver|] v3 @type (object)) @owner [|android:provider:CalendarContract$EventsEntity$EntityIteratorImpl|] @signature [|Landroid/provider/CalendarContract$EventsEntity$EntityIteratorImpl;.<init>:(Landroid/database/Cursor;Landroid/content/ContentResolver;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
         v0;
       
 #L39a968.   call temp:=  [|android:content:CursorEntityIterator.<init>|](v1, v2) @signature [|Landroid/content/CursorEntityIterator;.<init>:(Landroid/database/Cursor;)V|] @classDescriptor [|android:content:CursorEntityIterator|] @type direct;
@@ -4217,15 +3935,6 @@ record [|android:provider:CalendarContract$EventsEntity$EntityIteratorImpl|]  @t
    }
     procedure [|android:content:Entity|] [|android:provider:CalendarContract$EventsEntity$EntityIteratorImpl.getEntityAndIncrementCursor|] ([|android:provider:CalendarContract$EventsEntity$EntityIteratorImpl|] v16 @type (this), [|android:database:Cursor|] v17 @type (object)) @owner [|android:provider:CalendarContract$EventsEntity$EntityIteratorImpl|] @signature [|Landroid/provider/CalendarContract$EventsEntity$EntityIteratorImpl;.getEntityAndIncrementCursor:(Landroid/database/Cursor;)Landroid/content/Entity;|] @Access PUBLIC {
       local temp ;
-        [|android:content:ContentValues|] v13 @varname [|reminderValues|] @scope ((L01f5,L0219));
-        [|android:database:Cursor|] v14 @varname [|subCursor|] @scope ((L01ea,L021e), (L0237,L0356));
-        [|android:content:ContentValues|] v7 @varname [|attendeeValues|] @scope ((L0265,L02bd));
-        [|android:content:ContentValues|] v12 @varname [|extendedValues|] @scope ((L030a,L0330));
-        [|android:content:ContentValues|] v8 @varname [|cv|] @scope ((L0013,L0356));
-        [|android:content:Entity|] v9 @varname [|entity|] @scope ((L01cb,L0356));
-        [|long|] v10 @varname [|eventId|] @scope ((L000e,L0356));
-
-
         v0;
         v1;
         v2;
@@ -4233,7 +3942,14 @@ record [|android:provider:CalendarContract$EventsEntity$EntityIteratorImpl|]  @t
         v4;
         v5;
         v6;
+        v7;
+        v8;
+        v9;
+        v10;
         v11;
+        v12;
+        v13;
+        v14;
         v15;
       
 #L39a98c.   v1:= "_id" @type (object, string);
@@ -4650,7 +4366,6 @@ record [|android:provider:CalendarContract$EventsEntity|]  @type class @AccessFl
    }
     procedure [|void|] [|android:provider:CalendarContract$EventsEntity.<init>|] ([|android:provider:CalendarContract$EventsEntity|] v0 @type (this)) @owner [|android:provider:CalendarContract$EventsEntity|] @signature [|Landroid/provider/CalendarContract$EventsEntity;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39b090.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39b096.   return @void ;
@@ -4658,8 +4373,6 @@ record [|android:provider:CalendarContract$EventsEntity|]  @type class @AccessFl
    }
     procedure [|android:content:EntityIterator|] [|android:provider:CalendarContract$EventsEntity.newEntityIterator|] ([|android:database:Cursor|] v1 @type (object), [|android:content:ContentProviderClient|] v2 @type (object)) @owner [|android:provider:CalendarContract$EventsEntity|] @signature [|Landroid/provider/CalendarContract$EventsEntity;.newEntityIterator:(Landroid/database/Cursor;Landroid/content/ContentProviderClient;)Landroid/content/EntityIterator;|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
       
 #L39b0a8.   v0:= new [|android:provider:CalendarContract$EventsEntity$EntityIteratorImpl|];
@@ -4669,8 +4382,6 @@ record [|android:provider:CalendarContract$EventsEntity|]  @type class @AccessFl
    }
     procedure [|android:content:EntityIterator|] [|android:provider:CalendarContract$EventsEntity.newEntityIterator|] ([|android:database:Cursor|] v1 @type (object), [|android:content:ContentResolver|] v2 @type (object)) @owner [|android:provider:CalendarContract$EventsEntity|] @signature [|Landroid/provider/CalendarContract$EventsEntity;.newEntityIterator:(Landroid/database/Cursor;Landroid/content/ContentResolver;)Landroid/content/EntityIterator;|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
       
 #L39b0c4.   v0:= new [|android:provider:CalendarContract$EventsEntity$EntityIteratorImpl|];
@@ -4689,7 +4400,6 @@ record [|android:provider:CalendarContract$EventsRawTimes|]  @type class @Access
    }
     procedure [|void|] [|android:provider:CalendarContract$EventsRawTimes.<init>|] ([|android:provider:CalendarContract$EventsRawTimes|] v0 @type (this)) @owner [|android:provider:CalendarContract$EventsRawTimes|] @signature [|Landroid/provider/CalendarContract$EventsRawTimes;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39b0e0.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39b0e6.   return @void ;
@@ -4716,7 +4426,6 @@ record [|android:provider:CalendarContract$ExtendedProperties|]  @type class @Ac
    }
     procedure [|void|] [|android:provider:CalendarContract$ExtendedProperties.<init>|] ([|android:provider:CalendarContract$ExtendedProperties|] v0 @type (this)) @owner [|android:provider:CalendarContract$ExtendedProperties|] @signature [|Landroid/provider/CalendarContract$ExtendedProperties;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39b11c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39b122.   return @void ;
@@ -4771,7 +4480,6 @@ record [|android:provider:CalendarContract$Instances|]  @type class @AccessFlag 
    }
     procedure [|void|] [|android:provider:CalendarContract$Instances.<init>|] ([|android:provider:CalendarContract$Instances|] v0 @type (this)) @owner [|android:provider:CalendarContract$Instances|] @signature [|Landroid/provider/CalendarContract$Instances;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39b19c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39b1a2.   return @void ;
@@ -4779,17 +4487,13 @@ record [|android:provider:CalendarContract$Instances|]  @type class @AccessFlag 
    }
     procedure [|android:database:Cursor|] [|android:provider:CalendarContract$Instances.query|] ([|android:content:ContentResolver|] v7 @type (object), [|java:lang:String|][] v8 @type (object), [|long|] v9, [|long|] v11) @owner [|android:provider:CalendarContract$Instances|] @signature [|Landroid/provider/CalendarContract$Instances;.query:(Landroid/content/ContentResolver;[Ljava/lang/String;JJ)Landroid/database/Cursor;|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|android:net:Uri$Builder|] v6 @varname [|builder|] @scope ((L0006,L001e));
-
-
-
-
         v0;
         v1;
         v2;
         v3;
         v4;
         v5;
+        v6;
       
 #L39b1b4.   v0:= @@[|android:provider:CalendarContract$Instances.CONTENT_URI|]   @type object;
 #L39b1b8.   call temp:=  [|android:net:Uri.buildUpon|](v0) @signature [|Landroid/net/Uri;.buildUpon:()Landroid/net/Uri$Builder;|] @classDescriptor [|android:net:Uri|] @type virtual;
@@ -4810,18 +4514,13 @@ record [|android:provider:CalendarContract$Instances|]  @type class @AccessFlag 
    }
     procedure [|android:database:Cursor|] [|android:provider:CalendarContract$Instances.query|] ([|android:content:ContentResolver|] v7 @type (object), [|java:lang:String|][] v8 @type (object), [|long|] v9, [|long|] v11, [|java:lang:String|] v13 @type (object)) @owner [|android:provider:CalendarContract$Instances|] @signature [|Landroid/provider/CalendarContract$Instances;.query:(Landroid/content/ContentResolver;[Ljava/lang/String;JJLjava/lang/String;)Landroid/database/Cursor;|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|android:net:Uri$Builder|] v6 @varname [|builder|] @scope ((L0006,L0022));
-
-
-
-
-
         v0;
         v1;
         v2;
         v3;
         v4;
         v5;
+        v6;
       
 #L39b200.   v0:= @@[|android:provider:CalendarContract$Instances.CONTENT_SEARCH_URI|]   @type object;
 #L39b204.   call temp:=  [|android:net:Uri.buildUpon|](v0) @signature [|Landroid/net/Uri;.buildUpon:()Landroid/net/Uri$Builder;|] @classDescriptor [|android:net:Uri|] @type virtual;
@@ -4870,7 +4569,6 @@ record [|android:provider:CalendarContract$Reminders|]  @type class @AccessFlag 
    }
     procedure [|void|] [|android:provider:CalendarContract$Reminders.<init>|] ([|android:provider:CalendarContract$Reminders|] v0 @type (this)) @owner [|android:provider:CalendarContract$Reminders|] @signature [|Landroid/provider/CalendarContract$Reminders;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39b278.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39b27e.   return @void ;
@@ -4878,14 +4576,11 @@ record [|android:provider:CalendarContract$Reminders|]  @type class @AccessFlag 
    }
     procedure [|android:database:Cursor|] [|android:provider:CalendarContract$Reminders.query|] ([|android:content:ContentResolver|] v6 @type (object), [|long|] v7, [|java:lang:String|][] v9 @type (object)) @owner [|android:provider:CalendarContract$Reminders|] @signature [|Landroid/provider/CalendarContract$Reminders;.query:(Landroid/content/ContentResolver;J[Ljava/lang/String;)Landroid/database/Cursor;|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|java:lang:String|][] v4 @varname [|remArgs|] @scope ((L000a,L0016));
-
-
-
         v0;
         v1;
         v2;
         v3;
+        v4;
         v5;
       
 #L39b290.   v0:= 1  @length 4;
@@ -4923,7 +4618,6 @@ record [|android:provider:CalendarContract$SyncState|]  @type class @AccessFlag 
    }
     procedure [|void|] [|android:provider:CalendarContract$SyncState.<init>|] ([|android:provider:CalendarContract$SyncState|] v0 @type (this)) @owner [|android:provider:CalendarContract$SyncState|] @signature [|Landroid/provider/CalendarContract$SyncState;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39b2f4.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39b2fa.   return @void ;
@@ -4955,7 +4649,6 @@ record [|android:provider:CalendarContract|]  @type class @AccessFlag PUBLIC_FIN
    }
     procedure [|void|] [|android:provider:CalendarContract.<init>|] ([|android:provider:CalendarContract|] v0 @type (this)) @owner [|android:provider:CalendarContract|] @signature [|Landroid/provider/CalendarContract;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39b330.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39b336.   return @void ;
@@ -5022,7 +4715,6 @@ record [|android:provider:CallLog$Calls|]  @type class @AccessFlag PUBLIC extend
    }
     procedure [|void|] [|android:provider:CallLog$Calls.<init>|] ([|android:provider:CallLog$Calls|] v0 @type (this)) @owner [|android:provider:CallLog$Calls|] @signature [|Landroid/provider/CallLog$Calls;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L39b3a4.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39b3aa.   return @void ;
@@ -5030,26 +4722,19 @@ record [|android:provider:CallLog$Calls|]  @type class @AccessFlag PUBLIC extend
    }
     procedure [|android:net:Uri|] [|android:provider:CallLog$Calls.addCall|] ([|com:android:internal:telephony:CallerInfo|] v15 @type (object), [|android:content:Context|] v16 @type (object), [|java:lang:String|] v17 @type (object), [|int|] v18, [|int|] v19, [|long|] v20, [|int|] v22) @owner [|android:provider:CallLog$Calls|] @signature [|Landroid/provider/CallLog$Calls;.addCall:(Lcom/android/internal/telephony/CallerInfo;Landroid/content/Context;Ljava/lang/String;IIJI)Landroid/net/Uri;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:lang:String|] v9 @varname [|normalizedPhoneNumber|] @scope ((L0087,L00a7));
-        [|android:net:Uri|] v8 @varname [|feedbackUri|] @scope ((L00d1,L00db));
-        [|android:database:Cursor|] v7 @varname [|cursor|] @scope ((L00a7,L00de), (L0139,L013b), (L013e,L0143));
-        [|android:net:Uri|] v11 @varname [|result|] @scope ((L00e4,L00e8));
-        [|android:content:ContentValues|] v12 @varname [|values|] @scope ((L0018,L00e8), (L010e,L0143));
-        [|java:lang:String|] v10 @varname [|phoneNumber|] @scope ((L0114,L013b));
-        [|android:content:ContentResolver|] v1 @varname [|resolver|] @scope ((L0004,L0143));
-
-
-
-
-
-
-
         v0;
+        v1;
         v2;
         v3;
         v4;
         v5;
         v6;
+        v7;
+        v8;
+        v9;
+        v10;
+        v11;
+        v12;
         v13;
         v14;
       
@@ -5220,14 +4905,13 @@ record [|android:provider:CallLog$Calls|]  @type class @AccessFlag PUBLIC extend
    }
     procedure [|java:lang:String|] [|android:provider:CallLog$Calls.getLastOutgoingCall|] ([|android:content:Context|] v7 @type (object)) @owner [|android:provider:CallLog$Calls|] @signature [|Landroid/provider/CallLog$Calls;.getLastOutgoingCall:(Landroid/content/Context;)Ljava/lang/String;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|android:content:ContentResolver|] v0 @varname [|resolver|] @scope ((L0004,L003c));
-        [|android:database:Cursor|] v6 @varname [|c|] @scope ((L0005,L003c));
-
+        v0;
         v1;
         v2;
         v3;
         v4;
         v5;
+        v6;
       
 #L39b660.   call temp:=  [|android:content:Context.getContentResolver|](v7) @signature [|Landroid/content/Context;.getContentResolver:()Landroid/content/ContentResolver;|] @classDescriptor [|android:content:Context|] @type virtual;
 #L39b666.   v0:= temp  @type object;
@@ -5267,8 +4951,7 @@ record [|android:provider:CallLog$Calls|]  @type class @AccessFlag PUBLIC extend
    }
     procedure [|void|] [|android:provider:CallLog$Calls.removeExpiredEntries|] ([|android:content:Context|] v4 @type (object)) @owner [|android:provider:CallLog$Calls|] @signature [|Landroid/provider/CallLog$Calls;.removeExpiredEntries:(Landroid/content/Context;)V|] @Access PRIVATE_STATIC {
       local temp ;
-        [|android:content:ContentResolver|] v0 @varname [|resolver|] @scope ((L0004,L000d));
-
+        v0;
         v1;
         v2;
         v3;
@@ -5299,7 +4982,6 @@ record [|android:provider:CallLog|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|android:provider:CallLog.<init>|] ([|android:provider:CallLog|] v0 @type (this)) @owner [|android:provider:CallLog|] @signature [|Landroid/provider/CallLog;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L39b74c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39b752.   return @void ;
@@ -5382,7 +5064,6 @@ record [|android:provider:Contacts$ContactMethods|]  @type class @AccessFlag PUB
    }
     procedure [|void|] [|android:provider:Contacts$ContactMethods.<init>|] ([|android:provider:Contacts$ContactMethods|] v0 @type (this)) @owner [|android:provider:Contacts$ContactMethods|] @signature [|Landroid/provider/Contacts$ContactMethods;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39b798.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39b79e.   return @void ;
@@ -5390,7 +5071,6 @@ record [|android:provider:Contacts$ContactMethods|]  @type class @AccessFlag PUB
    }
     procedure [|java:lang:Object|] [|android:provider:Contacts$ContactMethods.decodeImProtocol|] ([|java:lang:String|] v3 @type (object)) @owner [|android:provider:Contacts$ContactMethods|] @signature [|Landroid/provider/Contacts$ContactMethods;.decodeImProtocol:(Ljava/lang/String;)Ljava/lang/Object;|] @Access PUBLIC_STATIC {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -5434,7 +5114,6 @@ record [|android:provider:Contacts$ContactMethods|]  @type class @AccessFlag PUB
    }
     procedure [|java:lang:String|] [|android:provider:Contacts$ContactMethods.encodeCustomImProtocol|] ([|java:lang:String|] v2 @type (object)) @owner [|android:provider:Contacts$ContactMethods|] @signature [|Landroid/provider/Contacts$ContactMethods;.encodeCustomImProtocol:(Ljava/lang/String;)Ljava/lang/String;|] @Access PUBLIC_STATIC {
       local temp ;
-
         v0;
         v1;
       
@@ -5452,7 +5131,6 @@ record [|android:provider:Contacts$ContactMethods|]  @type class @AccessFlag PUB
    }
     procedure [|java:lang:String|] [|android:provider:Contacts$ContactMethods.encodePredefinedImProtocol|] ([|int|] v2) @owner [|android:provider:Contacts$ContactMethods|] @signature [|Landroid/provider/Contacts$ContactMethods;.encodePredefinedImProtocol:(I)Ljava/lang/String;|] @Access PUBLIC_STATIC {
       local temp ;
-
         v0;
         v1;
       
@@ -5470,13 +5148,9 @@ record [|android:provider:Contacts$ContactMethods|]  @type class @AccessFlag PUB
    }
     procedure [|java:lang:CharSequence|] [|android:provider:Contacts$ContactMethods.getDisplayLabel|] ([|android:content:Context|] v6 @type (object), [|int|] v7, [|int|] v8, [|java:lang:CharSequence|] v9 @type (object)) @owner [|android:provider:Contacts$ContactMethods|] @signature [|Landroid/provider/Contacts$ContactMethods;.getDisplayLabel:(Landroid/content/Context;IILjava/lang/CharSequence;)Ljava/lang/CharSequence;|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|java:lang:ArrayIndexOutOfBoundsException|] v1 @varname [|e|] @scope ((L0020,L0023), (L003e,L0041));
-        [|java:lang:CharSequence|][] v2 @varname [|labels|] @scope ((L001a,L0023), (L0038,L0041));
-        [|java:lang:CharSequence|] v0 @varname [|display|] @scope ((L0003,L0052));
-
-
-
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -5533,7 +5207,6 @@ record [|android:provider:Contacts$ContactMethods|]  @type class @AccessFlag PUB
    }
     procedure [|java:lang:String|] [|android:provider:Contacts$ContactMethods.lookupProviderNameFromId|] ([|int|] v1) @owner [|android:provider:Contacts$ContactMethods|] @signature [|Landroid/provider/Contacts$ContactMethods;.lookupProviderNameFromId:(I)Ljava/lang/String;|] @Access PUBLIC_STATIC {
       local temp ;
-
         v0;
       
 #L39b98c.   goto L39b9c8;
@@ -5570,16 +5243,11 @@ record [|android:provider:Contacts$ContactMethods|]  @type class @AccessFlag PUB
    }
     procedure [|void|] [|android:provider:Contacts$ContactMethods.addPostalLocation|] ([|android:provider:Contacts$ContactMethods|] v8 @type (this), [|android:content:Context|] v9 @type (object), [|long|] v10, [|double|] v12, [|double|] v14) @owner [|android:provider:Contacts$ContactMethods|] @signature [|Landroid/provider/Contacts$ContactMethods;.addPostalLocation:(Landroid/content/Context;JDD)V|] @Access PUBLIC {
       local temp ;
-        [|android:net:Uri|] v0 @varname [|loc|] @scope ((L0023,L003d));
-        [|long|] v1 @varname [|locId|] @scope ((L0027,L003d));
-        [|android:content:ContentResolver|] v3 @varname [|resolver|] @scope ((L0005,L003d));
-        [|android:content:ContentValues|] v4 @varname [|values|] @scope ((L000b,L003d));
-
-
-
-
-
+        v0;
+        v1;
         v2;
+        v3;
+        v4;
         v5;
         v6;
         v7;
@@ -5639,7 +5307,6 @@ record [|android:provider:Contacts$Extensions|]  @type class @AccessFlag PUBLIC_
    }
     procedure [|void|] [|android:provider:Contacts$Extensions.<init>|] ([|android:provider:Contacts$Extensions|] v0 @type (this)) @owner [|android:provider:Contacts$Extensions|] @signature [|Landroid/provider/Contacts$Extensions;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39bab0.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39bab6.   return @void ;
@@ -5681,7 +5348,6 @@ record [|android:provider:Contacts$GroupMembership|]  @type class @AccessFlag PU
    }
     procedure [|void|] [|android:provider:Contacts$GroupMembership.<init>|] ([|android:provider:Contacts$GroupMembership|] v0 @type (this)) @owner [|android:provider:Contacts$GroupMembership|] @signature [|Landroid/provider/Contacts$GroupMembership;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39bafc.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39bb02.   return @void ;
@@ -5725,7 +5391,6 @@ record [|android:provider:Contacts$Groups|]  @type class @AccessFlag PUBLIC_FINA
    }
     procedure [|void|] [|android:provider:Contacts$Groups.<init>|] ([|android:provider:Contacts$Groups|] v0 @type (this)) @owner [|android:provider:Contacts$Groups|] @signature [|Landroid/provider/Contacts$Groups;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39bb48.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39bb4e.   return @void ;
@@ -5762,7 +5427,6 @@ record [|android:provider:Contacts$Intents$Insert|]  @type class @AccessFlag PUB
       global [|java:lang:String|] @@[|android:provider:Contacts$Intents$Insert.TERTIARY_PHONE_TYPE|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|android:provider:Contacts$Intents$Insert.<init>|] ([|android:provider:Contacts$Intents$Insert|] v0 @type (this)) @owner [|android:provider:Contacts$Intents$Insert|] @signature [|Landroid/provider/Contacts$Intents$Insert;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L39bb60.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39bb66.   return @void ;
@@ -5783,7 +5447,6 @@ record [|android:provider:Contacts$Intents$UI|]  @type class @AccessFlag PUBLIC_
       global [|java:lang:String|] @@[|android:provider:Contacts$Intents$UI.TITLE_EXTRA_KEY|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|android:provider:Contacts$Intents$UI.<init>|] ([|android:provider:Contacts$Intents$UI|] v0 @type (this)) @owner [|android:provider:Contacts$Intents$UI|] @signature [|Landroid/provider/Contacts$Intents$UI;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L39bb78.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39bb7e.   return @void ;
@@ -5801,7 +5464,6 @@ record [|android:provider:Contacts$Intents|]  @type class @AccessFlag PUBLIC_FIN
       global [|java:lang:String|] @@[|android:provider:Contacts$Intents.SHOW_OR_CREATE_CONTACT|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|android:provider:Contacts$Intents.<init>|] ([|android:provider:Contacts$Intents|] v0 @type (this)) @owner [|android:provider:Contacts$Intents|] @signature [|Landroid/provider/Contacts$Intents;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L39bb90.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39bb96.   return @void ;
@@ -5836,7 +5498,6 @@ record [|android:provider:Contacts$Organizations|]  @type class @AccessFlag PUBL
    }
     procedure [|void|] [|android:provider:Contacts$Organizations.<init>|] ([|android:provider:Contacts$Organizations|] v0 @type (this)) @owner [|android:provider:Contacts$Organizations|] @signature [|Landroid/provider/Contacts$Organizations;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39bbcc.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39bbd2.   return @void ;
@@ -5844,12 +5505,9 @@ record [|android:provider:Contacts$Organizations|]  @type class @AccessFlag PUBL
    }
     procedure [|java:lang:CharSequence|] [|android:provider:Contacts$Organizations.getDisplayLabel|] ([|android:content:Context|] v5 @type (object), [|int|] v6, [|java:lang:CharSequence|] v7 @type (object)) @owner [|android:provider:Contacts$Organizations|] @signature [|Landroid/provider/Contacts$Organizations;.getDisplayLabel:(Landroid/content/Context;ILjava/lang/CharSequence;)Ljava/lang/CharSequence;|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|java:lang:CharSequence|][] v2 @varname [|labels|] @scope ((L000f,L0013), (L0014,L0019));
-        [|java:lang:ArrayIndexOutOfBoundsException|] v1 @varname [|e|] @scope ((L0015,L0019));
-        [|java:lang:CharSequence|] v0 @varname [|display|] @scope ((L0002,L0021));
-
-
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
       
@@ -5881,7 +5539,6 @@ record [|android:provider:Contacts$People$ContactMethods|]  @type class @AccessF
       global [|java:lang:String|] @@[|android:provider:Contacts$People$ContactMethods.DEFAULT_SORT_ORDER|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|android:provider:Contacts$People$ContactMethods.<init>|] ([|android:provider:Contacts$People$ContactMethods|] v0 @type (this)) @owner [|android:provider:Contacts$People$ContactMethods|] @signature [|Landroid/provider/Contacts$People$ContactMethods;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39bc48.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39bc4e.   return @void ;
@@ -5894,7 +5551,6 @@ record [|android:provider:Contacts$People$Extensions|]  @type class @AccessFlag 
       global [|java:lang:String|] @@[|android:provider:Contacts$People$Extensions.PERSON_ID|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|android:provider:Contacts$People$Extensions.<init>|] ([|android:provider:Contacts$People$Extensions|] v0 @type (this)) @owner [|android:provider:Contacts$People$Extensions|] @signature [|Landroid/provider/Contacts$People$Extensions;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39bc60.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39bc66.   return @void ;
@@ -5921,7 +5577,6 @@ record [|android:provider:Contacts$People$Phones|]  @type class @AccessFlag PUBL
       global [|java:lang:String|] @@[|android:provider:Contacts$People$Phones.DEFAULT_SORT_ORDER|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|android:provider:Contacts$People$Phones.<init>|] ([|android:provider:Contacts$People$Phones|] v0 @type (this)) @owner [|android:provider:Contacts$People$Phones|] @signature [|Landroid/provider/Contacts$People$Phones;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39bc78.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39bc7e.   return @void ;
@@ -5987,7 +5642,6 @@ record [|android:provider:Contacts$People|]  @type class @AccessFlag PUBLIC_FINA
    }
     procedure [|void|] [|android:provider:Contacts$People.<init>|] ([|android:provider:Contacts$People|] v0 @type (this)) @owner [|android:provider:Contacts$People|] @signature [|Landroid/provider/Contacts$People;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39bcf8.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39bcfe.   return @void ;
@@ -5995,10 +5649,7 @@ record [|android:provider:Contacts$People|]  @type class @AccessFlag PUBLIC_FINA
    }
     procedure [|android:net:Uri|] [|android:provider:Contacts$People.addToGroup|] ([|android:content:ContentResolver|] v3 @type (object), [|long|] v4, [|long|] v6) @owner [|android:provider:Contacts$People|] @signature [|Landroid/provider/Contacts$People;.addToGroup:(Landroid/content/ContentResolver;JJ)Landroid/net/Uri;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|android:content:ContentValues|] v0 @varname [|values|] @scope ((L0005,L001f));
-
-
-
+        v0;
         v1;
         v2;
       
@@ -6020,18 +5671,15 @@ record [|android:provider:Contacts$People|]  @type class @AccessFlag PUBLIC_FINA
    }
     procedure [|android:net:Uri|] [|android:provider:Contacts$People.addToGroup|] ([|android:content:ContentResolver|] v9 @type (object), [|long|] v10, [|java:lang:String|] v12 @type (object)) @owner [|android:provider:Contacts$People|] @signature [|Landroid/provider/Contacts$People;.addToGroup:(Landroid/content/ContentResolver;JLjava/lang/String;)Landroid/net/Uri;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|long|] v6 @varname [|groupId|] @scope ((L0003,L003d));
-        [|android:database:Cursor|] v8 @varname [|groupsCursor|] @scope ((L0015,L003d));
-
-
-
         v0;
         v1;
         v2;
         v3;
         v4;
         v5;
+        v6;
         v7;
+        v8;
       
 #L39bd60.   v5:= 0  @length 4;
 #L39bd62.   v6:= 0  @length wide16;
@@ -6071,9 +5719,7 @@ record [|android:provider:Contacts$People|]  @type class @AccessFlag PUBLIC_FINA
    }
     procedure [|android:net:Uri|] [|android:provider:Contacts$People.addToMyContactsGroup|] ([|android:content:ContentResolver|] v4 @type (object), [|long|] v5) @owner [|android:provider:Contacts$People|] @signature [|Landroid/provider/Contacts$People;.addToMyContactsGroup:(Landroid/content/ContentResolver;J)Landroid/net/Uri;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|long|] v0 @varname [|groupId|] @scope ((L0004,L0017));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -6094,9 +5740,7 @@ record [|android:provider:Contacts$People|]  @type class @AccessFlag PUBLIC_FINA
    }
     procedure [|android:net:Uri|] [|android:provider:Contacts$People.createPersonInMyContactsGroup|] ([|android:content:ContentResolver|] v4 @type (object), [|android:content:ContentValues|] v5 @type (object)) @owner [|android:provider:Contacts$People|] @signature [|Landroid/provider/Contacts$People;.createPersonInMyContactsGroup:(Landroid/content/ContentResolver;Landroid/content/ContentValues;)Landroid/net/Uri;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|android:net:Uri|] v0 @varname [|contactUri|] @scope ((L0007,L0011), (L0012,L0021));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -6123,12 +5767,8 @@ record [|android:provider:Contacts$People|]  @type class @AccessFlag PUBLIC_FINA
    }
     procedure [|android:graphics:Bitmap|] [|android:provider:Contacts$People.loadContactPhoto|] ([|android:content:Context|] v3 @type (object), [|android:net:Uri|] v4 @type (object), [|int|] v5, [|android:graphics:BitmapFactory$Options|] v6 @type (object)) @owner [|android:provider:Contacts$People|] @signature [|Landroid/provider/Contacts$People;.loadContactPhoto:(Landroid/content/Context;Landroid/net/Uri;ILandroid/graphics/BitmapFactory$Options;)Landroid/graphics/Bitmap;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|android:graphics:Bitmap|] v0 @varname [|bm|] @scope ((L0016,L001d));
-        [|java:io:InputStream|] v1 @varname [|stream|] @scope ((L0010,L001d));
-
-
-
-
+        v0;
+        v1;
         v2;
       
 #L39be8c.   v0:= 0  @length 4;
@@ -6151,9 +5791,6 @@ record [|android:provider:Contacts$People|]  @type class @AccessFlag PUBLIC_FINA
    }
     procedure [|android:graphics:Bitmap|] [|android:provider:Contacts$People.loadPlaceholderPhoto|] ([|int|] v1, [|android:content:Context|] v2 @type (object), [|android:graphics:BitmapFactory$Options|] v3 @type (object)) @owner [|android:provider:Contacts$People|] @signature [|Landroid/provider/Contacts$People;.loadPlaceholderPhoto:(ILandroid/content/Context;Landroid/graphics/BitmapFactory$Options;)Landroid/graphics/Bitmap;|] @Access PRIVATE_STATIC {
       local temp ;
-
-
-
         v0;
       
 #L39bed8.   if v1 != 0 then goto L39bee0;
@@ -6168,10 +5805,8 @@ record [|android:provider:Contacts$People|]  @type class @AccessFlag PUBLIC_FINA
    }
     procedure [|void|] [|android:provider:Contacts$People.markAsContacted|] ([|android:content:ContentResolver|] v6 @type (object), [|long|] v7) @owner [|android:provider:Contacts$People|] @signature [|Landroid/provider/Contacts$People;.markAsContacted:(Landroid/content/ContentResolver;J)V|] @Access PUBLIC_STATIC {
       local temp ;
-        [|android:net:Uri|] v0 @varname [|uri|] @scope ((L0007,L0024));
-        [|android:content:ContentValues|] v1 @varname [|values|] @scope ((L0013,L0024));
-
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -6198,16 +5833,14 @@ record [|android:provider:Contacts$People|]  @type class @AccessFlag PUBLIC_FINA
    }
     procedure [|java:io:InputStream|] [|android:provider:Contacts$People.openContactPhotoInputStream|] ([|android:content:ContentResolver|] v8 @type (object), [|android:net:Uri|] v9 @type (object)) @owner [|android:provider:Contacts$People|] @signature [|Landroid/provider/Contacts$People;.openContactPhotoInputStream:(Landroid/content/ContentResolver;Landroid/net/Uri;)Ljava/io/InputStream;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|byte|][] v7 @varname [|data|] @scope ((L002a,L003d));
-        [|android:net:Uri|] v1 @varname [|photoUri|] @scope ((L0009,L0044));
-        [|android:database:Cursor|] v6 @varname [|cursor|] @scope ((L0017,L0044));
-
-
         v0;
+        v1;
         v2;
         v3;
         v4;
         v5;
+        v6;
+        v7;
       
 #L39bf5c.   v4:= 0  @length 4;
 #L39bf5e.   v3:= 0  @length 4;
@@ -6253,8 +5886,6 @@ record [|android:provider:Contacts$People|]  @type class @AccessFlag PUBLIC_FINA
    }
     procedure [|android:database:Cursor|] [|android:provider:Contacts$People.queryGroups|] ([|android:content:ContentResolver|] v6 @type (object), [|long|] v7) @owner [|android:provider:Contacts$People|] @signature [|Landroid/provider/Contacts$People;.queryGroups:(Landroid/content/ContentResolver;J)Landroid/database/Cursor;|] @Access PUBLIC_STATIC {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -6280,11 +5911,8 @@ record [|android:provider:Contacts$People|]  @type class @AccessFlag PUBLIC_FINA
    }
     procedure [|void|] [|android:provider:Contacts$People.setPhotoData|] ([|android:content:ContentResolver|] v4 @type (object), [|android:net:Uri|] v5 @type (object), [|byte|][] v6) @owner [|android:provider:Contacts$People|] @signature [|Landroid/provider/Contacts$People;.setPhotoData:(Landroid/content/ContentResolver;Landroid/net/Uri;[B)V|] @Access PUBLIC_STATIC {
       local temp ;
-        [|android:net:Uri|] v0 @varname [|photoUri|] @scope ((L0008,L0016));
-        [|android:content:ContentValues|] v1 @varname [|values|] @scope ((L000d,L0016));
-
-
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -6302,14 +5930,13 @@ record [|android:provider:Contacts$People|]  @type class @AccessFlag PUBLIC_FINA
    }
     procedure [|long|] [|android:provider:Contacts$People.tryGetMyContactsGroupId|] ([|android:content:ContentResolver|] v7 @type (object)) @owner [|android:provider:Contacts$People|] @signature [|Landroid/provider/Contacts$People;.tryGetMyContactsGroupId:(Landroid/content/ContentResolver;)J|] @Access PUBLIC_STATIC {
       local temp ;
-        [|android:database:Cursor|] v6 @varname [|groupsCursor|] @scope ((L000e,L002a));
-
         v0;
         v1;
         v2;
         v3;
         v4;
         v5;
+        v6;
       
 #L39c090.   v4:= 0  @length 4;
 #L39c092.   v1:= @@[|android:provider:Contacts$Groups.CONTENT_URI|]   @type object;
@@ -6362,7 +5989,6 @@ record [|android:provider:Contacts$Phones|]  @type class @AccessFlag PUBLIC_FINA
    }
     procedure [|void|] [|android:provider:Contacts$Phones.<init>|] ([|android:provider:Contacts$Phones|] v0 @type (this)) @owner [|android:provider:Contacts$Phones|] @signature [|Landroid/provider/Contacts$Phones;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39c134.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39c13a.   return @void ;
@@ -6370,9 +5996,6 @@ record [|android:provider:Contacts$Phones|]  @type class @AccessFlag PUBLIC_FINA
    }
     procedure [|java:lang:CharSequence|] [|android:provider:Contacts$Phones.getDisplayLabel|] ([|android:content:Context|] v1 @type (object), [|int|] v2, [|java:lang:CharSequence|] v3 @type (object)) @owner [|android:provider:Contacts$Phones|] @signature [|Landroid/provider/Contacts$Phones;.getDisplayLabel:(Landroid/content/Context;ILjava/lang/CharSequence;)Ljava/lang/CharSequence;|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-
-
-
         v0;
       
 #L39c14c.   v0:= 0  @length 4;
@@ -6383,13 +6006,9 @@ record [|android:provider:Contacts$Phones|]  @type class @AccessFlag PUBLIC_FINA
    }
     procedure [|java:lang:CharSequence|] [|android:provider:Contacts$Phones.getDisplayLabel|] ([|android:content:Context|] v5 @type (object), [|int|] v6, [|java:lang:CharSequence|] v7 @type (object), [|java:lang:CharSequence|][] v8 @type (object)) @owner [|android:provider:Contacts$Phones|] @signature [|Landroid/provider/Contacts$Phones;.getDisplayLabel:(Landroid/content/Context;ILjava/lang/CharSequence;[Ljava/lang/CharSequence;)Ljava/lang/CharSequence;|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-        [|java:lang:CharSequence|][] v2 @varname [|labels|] @scope ((L0007,L000b), (L0018,L001d));
-        [|java:lang:ArrayIndexOutOfBoundsException|] v1 @varname [|e|] @scope ((L0019,L001d));
-        [|java:lang:CharSequence|] v0 @varname [|display|] @scope ((L0002,L0025));
-
-
-
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
       
@@ -6444,7 +6063,6 @@ record [|android:provider:Contacts$Photos|]  @type class @AccessFlag PUBLIC_FINA
    }
     procedure [|void|] [|android:provider:Contacts$Photos.<init>|] ([|android:provider:Contacts$Photos|] v0 @type (this)) @owner [|android:provider:Contacts$Photos|] @signature [|Landroid/provider/Contacts$Photos;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39c1f8.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39c1fe.   return @void ;
@@ -6467,7 +6085,6 @@ record [|android:provider:Contacts$Presence|]  @type class @AccessFlag PUBLIC_FI
    }
     procedure [|void|] [|android:provider:Contacts$Presence.<init>|] ([|android:provider:Contacts$Presence|] v0 @type (this)) @owner [|android:provider:Contacts$Presence|] @signature [|Landroid/provider/Contacts$Presence;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L39c234.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39c23a.   return @void ;
@@ -6475,7 +6092,6 @@ record [|android:provider:Contacts$Presence|]  @type class @AccessFlag PUBLIC_FI
    }
     procedure [|int|] [|android:provider:Contacts$Presence.getPresenceIconResourceId|] ([|int|] v1) @owner [|android:provider:Contacts$Presence|] @signature [|Landroid/provider/Contacts$Presence;.getPresenceIconResourceId:(I)I|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-
         v0;
       
 #L39c24c.   goto L39c27c;
@@ -6501,8 +6117,6 @@ record [|android:provider:Contacts$Presence|]  @type class @AccessFlag PUBLIC_FI
    }
     procedure [|void|] [|android:provider:Contacts$Presence.setPresenceIcon|] ([|android:widget:ImageView|] v1 @type (object), [|int|] v2) @owner [|android:provider:Contacts$Presence|] @signature [|Landroid/provider/Contacts$Presence;.setPresenceIcon:(Landroid/widget/ImageView;I)V|] @Access PUBLIC_STATIC_FINAL {
       local temp ;
-
-
         v0;
       
 #L39c2a8.   call temp:=  [|android:provider:Contacts$Presence.getPresenceIconResourceId|](v2) @signature [|Landroid/provider/Contacts$Presence;.getPresenceIconResourceId:(I)I|] @classDescriptor [|android:provider:Contacts$Presence|] @type static;
@@ -6536,7 +6150,6 @@ record [|android:provider:Contacts$Settings|]  @type class @AccessFlag PUBLIC_FI
    }
     procedure [|void|] [|android:provider:Contacts$Settings.<init>|] ([|android:provider:Contacts$Settings|] v0 @type (this)) @owner [|android:provider:Contacts$Settings|] @signature [|Landroid/provider/Contacts$Settings;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39c2ec.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39c2f2.   return @void ;
@@ -6544,16 +6157,13 @@ record [|android:provider:Contacts$Settings|]  @type class @AccessFlag PUBLIC_FI
    }
     procedure [|java:lang:String|] [|android:provider:Contacts$Settings.getSetting|] ([|android:content:ContentResolver|] v8 @type (object), [|java:lang:String|] v9 @type (object), [|java:lang:String|] v10 @type (object)) @owner [|android:provider:Contacts$Settings|] @signature [|Landroid/provider/Contacts$Settings;.getSetting:(Landroid/content/ContentResolver;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:lang:String|] v3 @varname [|selectString|] @scope ((L0005,L002f));
-        [|java:lang:String|][] v4 @varname [|selectArgs|] @scope ((L0009,L002f));
-        [|android:database:Cursor|] v6 @varname [|cursor|] @scope ((L0017,L002f));
-
-
-
         v0;
         v1;
         v2;
+        v3;
+        v4;
         v5;
+        v6;
         v7;
       
 #L39c304.   v5:= 0  @length 4;
@@ -6588,11 +6198,7 @@ record [|android:provider:Contacts$Settings|]  @type class @AccessFlag PUBLIC_FI
    }
     procedure [|void|] [|android:provider:Contacts$Settings.setSetting|] ([|android:content:ContentResolver|] v3 @type (object), [|java:lang:String|] v4 @type (object), [|java:lang:String|] v5 @type (object), [|java:lang:String|] v6 @type (object)) @owner [|android:provider:Contacts$Settings|] @signature [|Landroid/provider/Contacts$Settings;.setSetting:(Landroid/content/ContentResolver;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC_STATIC {
       local temp ;
-        [|android:content:ContentValues|] v0 @varname [|values|] @scope ((L0006,L0017));
-
-
-
-
+        v0;
         v1;
         v2;
       
@@ -6631,7 +6237,6 @@ record [|android:provider:Contacts|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|android:provider:Contacts.<init>|] ([|android:provider:Contacts|] v0 @type (this)) @owner [|android:provider:Contacts|] @signature [|Landroid/provider/Contacts;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L39c3ec.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L39c3f2.   return @void ;

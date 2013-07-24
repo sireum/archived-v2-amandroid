@@ -14,6 +14,18 @@ trait AndroidLibraryFiles {
     FileUtil.listFiles(dirUri, ext, true)
 }
 
+trait AndroidLibraryDexFiles {
+  val DEX_FILE_EXT = ".dex"
+    
+  def sourceDirUri(claz : Class[_], path : String) = { 
+    FileUtil.fileUri(claz, path)
+  }    
+  
+  def androidLibraryFiles(dirUri : FileResourceUri,
+                   ext : String = DEX_FILE_EXT) : ISeq[FileResourceUri] =
+    FileUtil.listFiles(dirUri, ext, true)
+}
+
 trait AndroidLibraryPilarFiles {
   val PILAR_FILE_EXT = ".pilar"
     

@@ -3,7 +3,6 @@ record [|com:android:commands:input:Input|]  @type class @AccessFlag PUBLIC  {
       global [|java:lang:String|] @@[|com:android:commands:input:Input.TAG|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|com:android:commands:input:Input.<init>|] ([|com:android:commands:input:Input|] v0 @type (this)) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L0005a0.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L0005a6.   return @void ;
@@ -11,8 +10,6 @@ record [|com:android:commands:input:Input|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:input:Input.injectKeyEvent|] ([|com:android:commands:input:Input|] v3 @type (this), [|android:view:KeyEvent|] v4 @type (object)) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.injectKeyEvent:(Landroid/view/KeyEvent;)V|] @Access PRIVATE {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -37,20 +34,6 @@ record [|com:android:commands:input:Input|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:input:Input.injectMotionEvent|] ([|com:android:commands:input:Input|] v23 @type (this), [|int|] v24, [|int|] v25, [|long|] v26, [|float|] v28, [|float|] v29, [|float|] v30) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.injectMotionEvent:(IIJFFF)V|] @Access PRIVATE {
       local temp ;
-        [|int|] v16 @varname [|DEFAULT_DEVICE_ID|] @scope ((L000a,L0051));
-        [|int|] v17 @varname [|DEFAULT_EDGE_FLAGS|] @scope ((L000c,L0051));
-        [|int|] v18 @varname [|DEFAULT_META_STATE|] @scope ((L0004,L0051));
-        [|float|] v19 @varname [|DEFAULT_PRECISION_X|] @scope ((L0006,L0051));
-        [|float|] v20 @varname [|DEFAULT_PRECISION_Y|] @scope ((L0008,L0051));
-        [|float|] v21 @varname [|DEFAULT_SIZE|] @scope ((L0002,L0051));
-        [|android:view:MotionEvent|] v22 @varname [|event|] @scope ((L0025,L0051));
-
-
-
-
-
-
-
         v0;
         v1;
         v2;
@@ -67,6 +50,13 @@ record [|com:android:commands:input:Input|]  @type class @AccessFlag PUBLIC  {
         v13;
         v14;
         v15;
+        v16;
+        v17;
+        v18;
+        v19;
+        v20;
+        v21;
+        v22;
       
 #L00060c.   v21:= 1065353216  @length high16;
 #L000610.   v18:= 0  @length 16;
@@ -113,9 +103,6 @@ record [|com:android:commands:input:Input|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|float|] [|com:android:commands:input:Input.lerp|] ([|float|] v1, [|float|] v2, [|float|] v3) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.lerp:(FFF)F|] @Access PRIVATE_STATIC_FINAL {
       local temp ;
-
-
-
         v0;
       
 #L0006c0.   v0:= v2 - v1  @type float;
@@ -126,7 +113,6 @@ record [|com:android:commands:input:Input|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:input:Input.main|] ([|java:lang:String|][] v1 @type (object)) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.main:([Ljava/lang/String;)V|] @Access PUBLIC_STATIC {
       local temp ;
-
         v0;
       
 #L0006dc.   v0:= new [|com:android:commands:input:Input|];
@@ -137,17 +123,15 @@ record [|com:android:commands:input:Input|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:input:Input.run|] ([|com:android:commands:input:Input|] v9 @type (this), [|java:lang:String|][] v10 @type (object)) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.run:([Ljava/lang/String;)V|] @Access PRIVATE {
       local temp ;
-        [|int|] v7 @varname [|keyCode|] @scope ((L004f,L006f));
-        [|int|] v1 @varname [|inputSource|] @scope ((L00d1,L012e));
-        [|java:lang:String|] v8 @varname [|subcommand|] @scope ((L00e2,L012e), (L013c,L016f));
-        [|java:lang:String|] v6 @varname [|command|] @scope ((L000e,L018c));
-
-
         v0;
+        v1;
         v2;
         v3;
         v4;
         v5;
+        v6;
+        v7;
+        v8;
       
 #L000700.   v5:= 4  @length 4;
 #L000702.   v4:= 3  @length 4;
@@ -366,10 +350,8 @@ record [|com:android:commands:input:Input|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:input:Input.sendKeyEvent|] ([|com:android:commands:input:Input|] v13 @type (this), [|int|] v14) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.sendKeyEvent:(I)V|] @Access PRIVATE {
       local temp ;
-        [|long|] v1 @varname [|now|] @scope ((L0004,L0029));
-
-
         v0;
+        v1;
         v2;
         v3;
         v4;
@@ -413,14 +395,10 @@ record [|com:android:commands:input:Input|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:input:Input.sendMove|] ([|com:android:commands:input:Input|] v8 @type (this), [|int|] v9, [|float|] v10, [|float|] v11) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.sendMove:(IFF)V|] @Access PRIVATE {
       local temp ;
-        [|long|] v3 @varname [|now|] @scope ((L0004,L000e));
-
-
-
-
         v0;
         v1;
         v2;
+        v3;
         v4;
         v5;
         v6;
@@ -440,24 +418,18 @@ record [|com:android:commands:input:Input|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:input:Input.sendSwipe|] ([|com:android:commands:input:Input|] v12 @type (this), [|int|] v13, [|float|] v14, [|float|] v15, [|float|] v16, [|float|] v17) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.sendSwipe:(IFFFF)V|] @Access PRIVATE {
       local temp ;
-        [|float|] v10 @varname [|alpha|] @scope ((L001a,L0031));
-        [|long|] v4 @varname [|now|] @scope ((L0006,L003b));
-        [|int|] v9 @varname [|NUM_STEPS|] @scope ((L0002,L003b));
-        [|int|] v11 @varname [|i|] @scope ((L0011,L003b));
-
-
-
-
-
-
         v0;
         v1;
         v2;
         v3;
+        v4;
         v5;
         v6;
         v7;
         v8;
+        v9;
+        v10;
+        v11;
       
 #L000acc.   v9:= 11  @length 16;
 #L000ad0.   call temp:=  [|android:os:SystemClock.uptimeMillis|]() @signature [|Landroid/os/SystemClock;.uptimeMillis:()J|] @classDescriptor [|android:os:SystemClock|] @type static;
@@ -500,14 +472,10 @@ record [|com:android:commands:input:Input|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:input:Input.sendTap|] ([|com:android:commands:input:Input|] v8 @type (this), [|int|] v9, [|float|] v10, [|float|] v11) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.sendTap:(IFF)V|] @Access PRIVATE {
       local temp ;
-        [|long|] v3 @varname [|now|] @scope ((L0004,L0018));
-
-
-
-
         v0;
         v1;
         v2;
+        v3;
         v4;
         v5;
         v6;
@@ -534,14 +502,12 @@ record [|com:android:commands:input:Input|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:input:Input.sendText|] ([|com:android:commands:input:Input|] v8 @type (this), [|java:lang:String|] v9 @type (object)) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.sendText:(Ljava/lang/String;)V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:StringBuffer|] v0 @varname [|buff|] @scope ((L0005,L004c));
-        [|char|][] v1 @varname [|chars|] @scope ((L0036,L004c));
-        [|boolean|] v2 @varname [|escapeFlag|] @scope ((L0006,L004c));
-        [|android:view:KeyEvent|][] v3 @varname [|events|] @scope ((L003f,L004c));
-        [|int|] v4 @varname [|i|] @scope ((L0007,L004c));
-        [|android:view:KeyCharacterMap|] v5 @varname [|kcm|] @scope ((L003b,L004c));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
         v6;
         v7;
       
@@ -590,7 +556,6 @@ record [|com:android:commands:input:Input|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:input:Input.showUsage|] ([|com:android:commands:input:Input|] v2 @type (this)) @owner [|com:android:commands:input:Input|] @signature [|Lcom/android/commands/input/Input;.showUsage:()V|] @Access PRIVATE {
       local temp ;
-
         v0;
         v1;
       

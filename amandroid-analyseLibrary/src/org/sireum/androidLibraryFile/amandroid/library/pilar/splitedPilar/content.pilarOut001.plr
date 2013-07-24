@@ -4,9 +4,6 @@ record [|com:android:commands:content:Content$Command|]  @type class @AccessFlag
    }
     procedure [|void|] [|com:android:commands:content:Content$Command.<init>|] ([|com:android:commands:content:Content$Command|] v0 @type (this), [|android:net:Uri|] v1 @type (object), [|int|] v2) @owner [|com:android:commands:content:Content$Command|] @signature [|Lcom/android/commands/content/Content$Command;.<init>:(Landroid/net/Uri;I)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
       
 #L000c48.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L000c4e.   v0.[|com:android:commands:content:Content$Command.mUri|]  := v1 @type object;
@@ -16,13 +13,12 @@ record [|com:android:commands:content:Content$Command|]  @type class @AccessFlag
    }
     procedure [|void|] [|com:android:commands:content:Content$Command.execute|] ([|com:android:commands:content:Content$Command|] v9 @type (this)) @owner [|com:android:commands:content:Content$Command|] @signature [|Lcom/android/commands/content/Content$Command;.execute:()V|] @Access PUBLIC_FINAL {
       local temp ;
-        [|android:app:IActivityManager$ContentProviderHolder|] v2 @varname [|holder|] @scope ((L0016,L0031), (L0055,L0060));
-        [|android:app:IActivityManager|] v0 @varname [|activityManager|] @scope ((L000a,L0038), (L0055,L0060));
-        [|android:content:IContentProvider|] v3 @varname [|provider|] @scope ((L000b,L0038), (L0055,L0060));
-        [|android:os:IBinder|] v5 @varname [|token|] @scope ((L0010,L0038), (L0055,L0060));
-        [|java:lang:Exception|] v1 @varname [|e|] @scope ((L0039,L0054));
-        [|java:lang:String|] v4 @varname [|providerName|] @scope ((L0006,L0060));
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
         v6;
         v7;
         v8;
@@ -89,10 +85,6 @@ record [|com:android:commands:content:Content$DeleteCommand|]  @type class @Acce
    }
     procedure [|void|] [|com:android:commands:content:Content$DeleteCommand.<init>|] ([|com:android:commands:content:Content$DeleteCommand|] v0 @type (this), [|android:net:Uri|] v1 @type (object), [|int|] v2, [|java:lang:String|] v3 @type (object)) @owner [|com:android:commands:content:Content$DeleteCommand|] @signature [|Lcom/android/commands/content/Content$DeleteCommand;.<init>:(Landroid/net/Uri;ILjava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
-
       
 #L000d68.   call temp:=  [|com:android:commands:content:Content$Command.<init>|](v0, v1, v2) @signature [|Lcom/android/commands/content/Content$Command;.<init>:(Landroid/net/Uri;I)V|] @classDescriptor [|com:android:commands:content:Content$Command|] @type direct;
 #L000d6e.   v0.[|com:android:commands:content:Content$DeleteCommand.mWhere|]  := v3 @type object;
@@ -101,8 +93,6 @@ record [|com:android:commands:content:Content$DeleteCommand|]  @type class @Acce
    }
     procedure [|void|] [|com:android:commands:content:Content$DeleteCommand.onExecute|] ([|com:android:commands:content:Content$DeleteCommand|] v3 @type (this), [|android:content:IContentProvider|] v4 @type (object)) @owner [|com:android:commands:content:Content$DeleteCommand|] @signature [|Lcom/android/commands/content/Content$DeleteCommand;.onExecute:(Landroid/content/IContentProvider;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -119,10 +109,6 @@ record [|com:android:commands:content:Content$InsertCommand|]  @type class @Acce
    }
     procedure [|void|] [|com:android:commands:content:Content$InsertCommand.<init>|] ([|com:android:commands:content:Content$InsertCommand|] v0 @type (this), [|android:net:Uri|] v1 @type (object), [|int|] v2, [|android:content:ContentValues|] v3 @type (object)) @owner [|com:android:commands:content:Content$InsertCommand|] @signature [|Lcom/android/commands/content/Content$InsertCommand;.<init>:(Landroid/net/Uri;ILandroid/content/ContentValues;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
-
       
 #L000da8.   call temp:=  [|com:android:commands:content:Content$Command.<init>|](v0, v1, v2) @signature [|Lcom/android/commands/content/Content$Command;.<init>:(Landroid/net/Uri;I)V|] @classDescriptor [|com:android:commands:content:Content$Command|] @type direct;
 #L000dae.   v0.[|com:android:commands:content:Content$InsertCommand.mContentValues|]  := v3 @type object;
@@ -131,8 +117,6 @@ record [|com:android:commands:content:Content$InsertCommand|]  @type class @Acce
    }
     procedure [|void|] [|com:android:commands:content:Content$InsertCommand.onExecute|] ([|com:android:commands:content:Content$InsertCommand|] v2 @type (this), [|android:content:IContentProvider|] v3 @type (object)) @owner [|com:android:commands:content:Content$InsertCommand|] @signature [|Lcom/android/commands/content/Content$InsertCommand;.onExecute:(Landroid/content/IContentProvider;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -165,8 +149,6 @@ record [|com:android:commands:content:Content$Parser|]  @type class @AccessFlag 
       global [|java:lang:String|] @@[|com:android:commands:content:Content$Parser.TYPE_STRING|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|com:android:commands:content:Content$Parser.<init>|] ([|com:android:commands:content:Content$Parser|] v1 @type (this), [|java:lang:String|][] v2 @type (object)) @owner [|com:android:commands:content:Content$Parser|] @signature [|Lcom/android/commands/content/Content$Parser;.<init>:([Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L000de4.   call temp:=  [|java:lang:Object.<init>|](v1) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
@@ -178,9 +160,7 @@ record [|com:android:commands:content:Content$Parser|]  @type class @AccessFlag 
    }
     procedure [|java:lang:String|] [|com:android:commands:content:Content$Parser.argumentValueRequired|] ([|com:android:commands:content:Content$Parser|] v4 @type (this), [|java:lang:String|] v5 @type (object)) @owner [|com:android:commands:content:Content$Parser|] @signature [|Lcom/android/commands/content/Content$Parser;.argumentValueRequired:(Ljava/lang/String;)Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|value|] @scope ((L0006,L002e));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -212,14 +192,12 @@ record [|com:android:commands:content:Content$Parser|]  @type class @AccessFlag 
    }
     procedure [|void|] [|com:android:commands:content:Content$Parser.parseBindValue|] ([|com:android:commands:content:Content$Parser|] v9 @type (this), [|android:content:ContentValues|] v10 @type (object)) @owner [|com:android:commands:content:Content$Parser|] @signature [|Lcom/android/commands/content/Content$Parser;.parseBindValue:(Landroid/content/ContentValues;)V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|argument|] @scope ((L0006,L00eb));
-        [|java:lang:String|] v1 @varname [|column|] @scope ((L006e,L00eb));
-        [|int|] v2 @varname [|firstColonIndex|] @scope ((L002b,L00eb));
-        [|int|] v3 @varname [|secondColonIndex|] @scope ((L004e,L00eb));
-        [|java:lang:String|] v4 @varname [|type|] @scope ((L0074,L00eb));
-        [|java:lang:String|] v5 @varname [|value|] @scope ((L007a,L00eb));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
         v6;
         v7;
         v8;
@@ -344,11 +322,10 @@ record [|com:android:commands:content:Content$Parser|]  @type class @AccessFlag 
    }
     procedure [|com:android:commands:content:Content$DeleteCommand|] [|com:android:commands:content:Content$Parser.parseDeleteCommand|] ([|com:android:commands:content:Content$Parser|] v7 @type (this)) @owner [|com:android:commands:content:Content$Parser|] @signature [|Lcom/android/commands/content/Content$Parser;.parseDeleteCommand:()Lcom/android/commands/content/Content$DeleteCommand;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|argument|] @scope ((L0009,L0063));
-        [|android:net:Uri|] v1 @varname [|uri|] @scope ((L0001,L0063));
-        [|int|] v2 @varname [|userId|] @scope ((L0002,L0063));
-        [|java:lang:String|] v3 @varname [|where|] @scope ((L0003,L0063));
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -409,11 +386,10 @@ record [|com:android:commands:content:Content$Parser|]  @type class @AccessFlag 
    }
     procedure [|com:android:commands:content:Content$InsertCommand|] [|com:android:commands:content:Content$Parser.parseInsertCommand|] ([|com:android:commands:content:Content$Parser|] v7 @type (this)) @owner [|com:android:commands:content:Content$Parser|] @signature [|Lcom/android/commands/content/Content$Parser;.parseInsertCommand:()Lcom/android/commands/content/Content$InsertCommand;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|argument|] @scope ((L000d,L0074));
-        [|android:net:Uri|] v1 @varname [|uri|] @scope ((L0001,L0074));
-        [|int|] v2 @varname [|userId|] @scope ((L0002,L0074));
-        [|android:content:ContentValues|] v3 @varname [|values|] @scope ((L0007,L0074));
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -481,12 +457,11 @@ record [|com:android:commands:content:Content$Parser|]  @type class @AccessFlag 
    }
     procedure [|com:android:commands:content:Content$UpdateCommand|] [|com:android:commands:content:Content$Parser.parseUpdateCommand|] ([|com:android:commands:content:Content$Parser|] v8 @type (this)) @owner [|com:android:commands:content:Content$Parser|] @signature [|Lcom/android/commands/content/Content$Parser;.parseUpdateCommand:()Lcom/android/commands/content/Content$UpdateCommand;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|argument|] @scope ((L000e,L0082));
-        [|android:net:Uri|] v1 @varname [|uri|] @scope ((L0001,L0082));
-        [|int|] v2 @varname [|userId|] @scope ((L0002,L0082));
-        [|android:content:ContentValues|] v3 @varname [|values|] @scope ((L0008,L0082));
-        [|java:lang:String|] v4 @varname [|where|] @scope ((L0003,L0082));
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
         v5;
         v6;
         v7;
@@ -562,9 +537,8 @@ record [|com:android:commands:content:Content$Parser|]  @type class @AccessFlag 
    }
     procedure [|com:android:commands:content:Content$Command|] [|com:android:commands:content:Content$Parser.parseCommand|] ([|com:android:commands:content:Content$Parser|] v5 @type (this)) @owner [|com:android:commands:content:Content$Parser|] @signature [|Lcom/android/commands/content/Content$Parser;.parseCommand:()Lcom/android/commands/content/Content$Command;|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|] v1 @varname [|operation|] @scope ((L0006,L0012), (L0013,L0053));
-        [|java:lang:IllegalArgumentException|] v0 @varname [|iae|] @scope ((L0054,L0079));
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -636,14 +610,13 @@ record [|com:android:commands:content:Content$Parser|]  @type class @AccessFlag 
    }
     procedure [|com:android:commands:content:Content$QueryCommand|] [|com:android:commands:content:Content$Parser.parseQueryCommand|] ([|com:android:commands:content:Content$Parser|] v9 @type (this)) @owner [|com:android:commands:content:Content$Parser|] @signature [|Lcom/android/commands/content/Content$Parser;.parseQueryCommand:()Lcom/android/commands/content/Content$QueryCommand;|] @Access PUBLIC {
       local temp ;
-        [|android:net:Uri|] v1 @varname [|uri|] @scope ((L0001,L0085));
-        [|int|] v2 @varname [|userId|] @scope ((L0002,L0085));
-        [|java:lang:String|][] v3 @varname [|projection|] @scope ((L0003,L0085));
-        [|java:lang:String|] v4 @varname [|where|] @scope ((L0005,L0085));
-        [|java:lang:String|] v5 @varname [|sort|] @scope ((L0004,L0085));
-        [|java:lang:String|] v6 @varname [|argument|] @scope ((L000b,L0085));
-
         v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
         v7;
         v8;
       
@@ -726,12 +699,6 @@ record [|com:android:commands:content:Content$QueryCommand|]  @type class @Acces
    }
     procedure [|void|] [|com:android:commands:content:Content$QueryCommand.<init>|] ([|com:android:commands:content:Content$QueryCommand|] v0 @type (this), [|android:net:Uri|] v1 @type (object), [|int|] v2, [|java:lang:String|][] v3 @type (object), [|java:lang:String|] v4 @type (object), [|java:lang:String|] v5 @type (object)) @owner [|com:android:commands:content:Content$QueryCommand|] @signature [|Lcom/android/commands/content/Content$QueryCommand;.<init>:(Landroid/net/Uri;I[Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
-
-
-
       
 #L001570.   call temp:=  [|com:android:commands:content:Content$DeleteCommand.<init>|](v0, v1, v2, v4) @signature [|Lcom/android/commands/content/Content$DeleteCommand;.<init>:(Landroid/net/Uri;ILjava/lang/String;)V|] @classDescriptor [|com:android:commands:content:Content$DeleteCommand|] @type direct;
 #L001576.   v0.[|com:android:commands:content:Content$QueryCommand.mProjection|]  := v3 @type object;
@@ -741,17 +708,6 @@ record [|com:android:commands:content:Content$QueryCommand|]  @type class @Acces
    }
     procedure [|void|] [|com:android:commands:content:Content$QueryCommand.onExecute|] ([|com:android:commands:content:Content$QueryCommand|] v17 @type (this), [|android:content:IContentProvider|] v18 @type (object)) @owner [|com:android:commands:content:Content$QueryCommand|] @signature [|Lcom/android/commands/content/Content$QueryCommand;.onExecute:(Landroid/content/IContentProvider;)V|] @Access PUBLIC {
       local temp ;
-        [|int|] v10 @varname [|columnIndex|] @scope ((L005a,L008e));
-        [|java:lang:String|] v11 @varname [|columnName|] @scope ((L0055,L008e));
-        [|java:lang:String|] v12 @varname [|columnValue|] @scope ((L0056,L008e));
-        [|int|] v16 @varname [|type|] @scope ((L005e,L008e));
-        [|java:lang:StringBuilder|] v8 @varname [|builder|] @scope ((L002e,L0099));
-        [|int|] v9 @varname [|columnCount|] @scope ((L0047,L0099));
-        [|int|] v14 @varname [|i|] @scope ((L0048,L0099));
-        [|int|] v15 @varname [|rowIndex|] @scope ((L0029,L0099));
-        [|android:database:Cursor|] v13 @varname [|cursor|] @scope ((L0018,L00b8));
-
-
         v0;
         v1;
         v2;
@@ -760,6 +716,15 @@ record [|com:android:commands:content:Content$QueryCommand|]  @type class @Acces
         v5;
         v6;
         v7;
+        v8;
+        v9;
+        v10;
+        v11;
+        v12;
+        v13;
+        v14;
+        v15;
+        v16;
       
 #L001590.   v0:= v17  @type object;
 #L001594.   v2:= v0.[|com:android:commands:content:Content$QueryCommand.mUri|]   @type object;
@@ -866,8 +831,6 @@ record [|com:android:commands:content:Content$Tokenizer|]  @type class @AccessFl
    }
     procedure [|void|] [|com:android:commands:content:Content$Tokenizer.<init>|] ([|com:android:commands:content:Content$Tokenizer|] v0 @type (this), [|java:lang:String|][] v1 @type (object)) @owner [|com:android:commands:content:Content$Tokenizer|] @signature [|Lcom/android/commands/content/Content$Tokenizer;.<init>:([Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
       
 #L001724.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L00172a.   v0.[|com:android:commands:content:Content$Tokenizer.mArgs|]  := v1 @type object;
@@ -876,7 +839,6 @@ record [|com:android:commands:content:Content$Tokenizer|]  @type class @AccessFl
    }
     procedure [|java:lang:String|] [|com:android:commands:content:Content$Tokenizer.access$000|] ([|com:android:commands:content:Content$Tokenizer|] v1 @type (object)) @owner [|com:android:commands:content:Content$Tokenizer|] @signature [|Lcom/android/commands/content/Content$Tokenizer;.access$000:(Lcom/android/commands/content/Content$Tokenizer;)Ljava/lang/String;|] @Access STATIC_SYNTHETIC {
       local temp ;
-
         v0;
       
 #L001740.   call temp:=  [|com:android:commands:content:Content$Tokenizer.nextArg|](v1) @signature [|Lcom/android/commands/content/Content$Tokenizer;.nextArg:()Ljava/lang/String;|] @classDescriptor [|com:android:commands:content:Content$Tokenizer|] @type direct;
@@ -886,7 +848,6 @@ record [|com:android:commands:content:Content$Tokenizer|]  @type class @AccessFl
    }
     procedure [|java:lang:String|] [|com:android:commands:content:Content$Tokenizer.nextArg|] ([|com:android:commands:content:Content$Tokenizer|] v3 @type (this)) @owner [|com:android:commands:content:Content$Tokenizer|] @signature [|Lcom/android/commands/content/Content$Tokenizer;.nextArg:()Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -910,11 +871,6 @@ record [|com:android:commands:content:Content$UpdateCommand|]  @type class @Acce
    }
     procedure [|void|] [|com:android:commands:content:Content$UpdateCommand.<init>|] ([|com:android:commands:content:Content$UpdateCommand|] v0 @type (this), [|android:net:Uri|] v1 @type (object), [|int|] v2, [|android:content:ContentValues|] v3 @type (object), [|java:lang:String|] v4 @type (object)) @owner [|com:android:commands:content:Content$UpdateCommand|] @signature [|Lcom/android/commands/content/Content$UpdateCommand;.<init>:(Landroid/net/Uri;ILandroid/content/ContentValues;Ljava/lang/String;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
-
-
       
 #L001794.   call temp:=  [|com:android:commands:content:Content$InsertCommand.<init>|](v0, v1, v2, v3) @signature [|Lcom/android/commands/content/Content$InsertCommand;.<init>:(Landroid/net/Uri;ILandroid/content/ContentValues;)V|] @classDescriptor [|com:android:commands:content:Content$InsertCommand|] @type direct;
 #L00179a.   v0.[|com:android:commands:content:Content$UpdateCommand.mWhere|]  := v4 @type object;
@@ -923,8 +879,6 @@ record [|com:android:commands:content:Content$UpdateCommand|]  @type class @Acce
    }
     procedure [|void|] [|com:android:commands:content:Content$UpdateCommand.onExecute|] ([|com:android:commands:content:Content$UpdateCommand|] v4 @type (this), [|android:content:IContentProvider|] v5 @type (object)) @owner [|com:android:commands:content:Content$UpdateCommand|] @signature [|Lcom/android/commands/content/Content$UpdateCommand;.onExecute:(Landroid/content/IContentProvider;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -943,7 +897,6 @@ record [|com:android:commands:content:Content|]  @type class @AccessFlag PUBLIC 
       global [|java:lang:String|] @@[|com:android:commands:content:Content.USAGE|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|com:android:commands:content:Content.<init>|] ([|com:android:commands:content:Content|] v0 @type (this)) @owner [|com:android:commands:content:Content|] @signature [|Lcom/android/commands/content/Content;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L0017d8.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L0017de.   return @void ;
@@ -951,9 +904,8 @@ record [|com:android:commands:content:Content|]  @type class @AccessFlag PUBLIC 
    }
     procedure [|void|] [|com:android:commands:content:Content.main|] ([|java:lang:String|][] v2 @type (object)) @owner [|com:android:commands:content:Content|] @signature [|Lcom/android/commands/content/Content;.main:([Ljava/lang/String;)V|] @Access PUBLIC_STATIC {
       local temp ;
-        [|com:android:commands:content:Content$Command|] v0 @varname [|command|] @scope ((L0009,L000f));
-        [|com:android:commands:content:Content$Parser|] v1 @varname [|parser|] @scope ((L0005,L000f));
-
+        v0;
+        v1;
       
 #L0017f0.   v1:= new [|com:android:commands:content:Content$Parser|];
 #L0017f4.   call temp:=  [|com:android:commands:content:Content$Parser.<init>|](v1, v2) @signature [|Lcom/android/commands/content/Content$Parser;.<init>:([Ljava/lang/String;)V|] @classDescriptor [|com:android:commands:content:Content$Parser|] @type direct;

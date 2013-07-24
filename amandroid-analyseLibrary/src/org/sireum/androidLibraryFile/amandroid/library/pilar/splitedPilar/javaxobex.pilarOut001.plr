@@ -10,7 +10,6 @@ record [|javax:obex:ApplicationParameter$TRIPLET_LENGTH|]  @type class @AccessFl
       global [|byte|] @@[|javax:obex:ApplicationParameter$TRIPLET_LENGTH.SEARCH_ATTRIBUTE_LENGTH|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|javax:obex:ApplicationParameter$TRIPLET_LENGTH.<init>|] ([|javax:obex:ApplicationParameter$TRIPLET_LENGTH|] v0 @type (this)) @owner [|javax:obex:ApplicationParameter$TRIPLET_LENGTH|] @signature [|Ljavax/obex/ApplicationParameter$TRIPLET_LENGTH;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L00201c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L002022.   return @void ;
@@ -29,7 +28,6 @@ record [|javax:obex:ApplicationParameter$TRIPLET_TAGID|]  @type class @AccessFla
       global [|byte|] @@[|javax:obex:ApplicationParameter$TRIPLET_TAGID.SEARCH_VALUE_TAGID|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|javax:obex:ApplicationParameter$TRIPLET_TAGID.<init>|] ([|javax:obex:ApplicationParameter$TRIPLET_TAGID|] v0 @type (this)) @owner [|javax:obex:ApplicationParameter$TRIPLET_TAGID|] @signature [|Ljavax/obex/ApplicationParameter$TRIPLET_TAGID;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L002034.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L00203a.   return @void ;
@@ -41,7 +39,6 @@ record [|javax:obex:ApplicationParameter$TRIPLET_VALUE$FORMAT|]  @type class @Ac
       global [|byte|] @@[|javax:obex:ApplicationParameter$TRIPLET_VALUE$FORMAT.VCARD_VERSION_30|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|javax:obex:ApplicationParameter$TRIPLET_VALUE$FORMAT.<init>|] ([|javax:obex:ApplicationParameter$TRIPLET_VALUE$FORMAT|] v0 @type (this)) @owner [|javax:obex:ApplicationParameter$TRIPLET_VALUE$FORMAT|] @signature [|Ljavax/obex/ApplicationParameter$TRIPLET_VALUE$FORMAT;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L00204c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L002052.   return @void ;
@@ -54,7 +51,6 @@ record [|javax:obex:ApplicationParameter$TRIPLET_VALUE$ORDER|]  @type class @Acc
       global [|byte|] @@[|javax:obex:ApplicationParameter$TRIPLET_VALUE$ORDER.ORDER_BY_PHONETIC|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|javax:obex:ApplicationParameter$TRIPLET_VALUE$ORDER.<init>|] ([|javax:obex:ApplicationParameter$TRIPLET_VALUE$ORDER|] v0 @type (this)) @owner [|javax:obex:ApplicationParameter$TRIPLET_VALUE$ORDER|] @signature [|Ljavax/obex/ApplicationParameter$TRIPLET_VALUE$ORDER;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L002064.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L00206a.   return @void ;
@@ -67,7 +63,6 @@ record [|javax:obex:ApplicationParameter$TRIPLET_VALUE$SEARCHATTRIBUTE|]  @type 
       global [|byte|] @@[|javax:obex:ApplicationParameter$TRIPLET_VALUE$SEARCHATTRIBUTE.SEARCH_BY_SOUND|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|javax:obex:ApplicationParameter$TRIPLET_VALUE$SEARCHATTRIBUTE.<init>|] ([|javax:obex:ApplicationParameter$TRIPLET_VALUE$SEARCHATTRIBUTE|] v0 @type (this)) @owner [|javax:obex:ApplicationParameter$TRIPLET_VALUE$SEARCHATTRIBUTE|] @signature [|Ljavax/obex/ApplicationParameter$TRIPLET_VALUE$SEARCHATTRIBUTE;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L00207c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L002082.   return @void ;
@@ -77,7 +72,6 @@ record [|javax:obex:ApplicationParameter$TRIPLET_VALUE|]  @type class @AccessFla
    }
     procedure [|void|] [|javax:obex:ApplicationParameter$TRIPLET_VALUE.<init>|] ([|javax:obex:ApplicationParameter$TRIPLET_VALUE|] v0 @type (this)) @owner [|javax:obex:ApplicationParameter$TRIPLET_VALUE|] @signature [|Ljavax/obex/ApplicationParameter$TRIPLET_VALUE;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L002094.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L00209a.   return @void ;
@@ -90,7 +84,6 @@ record [|javax:obex:ApplicationParameter|]  @type class @AccessFlag PUBLIC_FINAL
    }
     procedure [|void|] [|javax:obex:ApplicationParameter.<init>|] ([|javax:obex:ApplicationParameter|] v1 @type (this)) @owner [|javax:obex:ApplicationParameter|] @signature [|Ljavax/obex/ApplicationParameter;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L0020ac.   call temp:=  [|java:lang:Object.<init>|](v1) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
@@ -106,11 +99,7 @@ record [|javax:obex:ApplicationParameter|]  @type class @AccessFlag PUBLIC_FINAL
    }
     procedure [|void|] [|javax:obex:ApplicationParameter.addAPPHeader|] ([|javax:obex:ApplicationParameter|] v5 @type (this), [|byte|] v6, [|byte|] v7, [|byte|][] v8) @owner [|javax:obex:ApplicationParameter|] @signature [|Ljavax/obex/ApplicationParameter;.addAPPHeader:(BB[B)V|] @Access PUBLIC {
       local temp ;
-        [|byte|][] v0 @varname [|array_tmp|] @scope ((L0011,L0021));
-
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -155,8 +144,7 @@ record [|javax:obex:ApplicationParameter|]  @type class @AccessFlag PUBLIC_FINAL
    }
     procedure [|byte|][] [|javax:obex:ApplicationParameter.getAPPparam|] ([|javax:obex:ApplicationParameter|] v4 @type (this)) @owner [|javax:obex:ApplicationParameter|] @signature [|Ljavax/obex/ApplicationParameter;.getAPPparam:()[B|] @Access PUBLIC {
       local temp ;
-        [|byte|][] v0 @varname [|para|] @scope ((L0005,L000d));
-
+        v0;
         v1;
         v2;
         v3;
@@ -253,13 +241,8 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|void|] [|javax:obex:ClientOperation.<init>|] ([|javax:obex:ClientOperation|] v6 @type (this), [|int|] v7, [|javax:obex:ClientSession|] v8 @type (object), [|javax:obex:HeaderSet|] v9 @type (object), [|boolean|] v10) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.<init>:(ILjavax/obex/ClientSession;Ljavax/obex/HeaderSet;Z)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-        [|int|] v1 @varname [|i|] @scope ((L002f,L0042));
-        [|int|][] v0 @varname [|headerList|] @scope ((L002c,L0075));
-
-
-
-
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -330,16 +313,14 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|boolean|] [|javax:obex:ClientOperation.sendRequest|] ([|javax:obex:ClientOperation|] v14 @type (this), [|int|] v15) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.sendRequest:(I)Z|] @Access PRIVATE {
       local temp ;
-        [|int|] v2 @varname [|end|] @scope ((L0025,L006d), (L006e,L007c));
-        [|byte|][] v6 @varname [|sendHeader|] @scope ((L005d,L006d), (L006e,L0078));
-        [|int|] v7 @varname [|start|] @scope ((L0026,L006d), (L006e,L007c));
-        [|byte|][] v0 @varname [|body|] @scope ((L0096,L00be), (L00ed,L00f1));
-        [|int|] v1 @varname [|bodyLength|] @scope ((L000d,L011d));
-        [|byte|][] v3 @varname [|headerArray|] @scope ((L0013,L011d));
-        [|java:io:ByteArrayOutputStream|] v4 @varname [|out|] @scope ((L000c,L011d));
-        [|boolean|] v5 @varname [|returnValue|] @scope ((L0007,L011d));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
         v8;
         v9;
         v10;
@@ -502,8 +483,7 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|void|] [|javax:obex:ClientOperation.startProcessing|] ([|javax:obex:ClientOperation|] v7 @type (this)) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.startProcessing:()V|] @Access PRIVATE_DECLARED_SYNCHRONIZED {
       local temp ;
-        [|boolean|] v0 @varname [|more|] @scope ((L000f,L007c));
-
+        v0;
         v1;
         v2;
         v3;
@@ -587,7 +567,6 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|void|] [|javax:obex:ClientOperation.validateConnection|] ([|javax:obex:ClientOperation|] v1 @type (this)) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.validateConnection:()V|] @Access PRIVATE {
       local temp ;
-
         v0;
       
 #L00260c.   call temp:=  [|javax:obex:ClientOperation.ensureOpen|](v1) @signature [|Ljavax/obex/ClientOperation;.ensureOpen:()V|] @classDescriptor [|javax:obex:ClientOperation|] @type virtual;
@@ -599,7 +578,6 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|void|] [|javax:obex:ClientOperation.abort|] ([|javax:obex:ClientOperation|] v5 @type (this)) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.abort:()V|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -655,7 +633,6 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|void|] [|javax:obex:ClientOperation.close|] ([|javax:obex:ClientOperation|] v1 @type (this)) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.close:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L0026f8.   v0:= 0  @length 4;
@@ -669,9 +646,6 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|boolean|] [|javax:obex:ClientOperation.continueOperation|] ([|javax:obex:ClientOperation|] v7 @type (this), [|boolean|] v8, [|boolean|] v9) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.continueOperation:(ZZ)Z|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
-
-
         v0;
         v1;
         v2;
@@ -751,7 +725,6 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|void|] [|javax:obex:ClientOperation.ensureNotDone|] ([|javax:obex:ClientOperation|] v2 @type (this)) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.ensureNotDone:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -766,7 +739,6 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|void|] [|javax:obex:ClientOperation.ensureOpen|] ([|javax:obex:ClientOperation|] v2 @type (this)) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.ensureOpen:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -789,7 +761,6 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|java:lang:String|] [|javax:obex:ClientOperation.getEncoding|] ([|javax:obex:ClientOperation|] v1 @type (this)) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.getEncoding:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L0028a4.   v0:= 0  @length 4;
@@ -798,8 +769,7 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|int|] [|javax:obex:ClientOperation.getHeaderLength|] ([|javax:obex:ClientOperation|] v3 @type (this)) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.getHeaderLength:()I|] @Access PUBLIC {
       local temp ;
-        [|byte|][] v0 @varname [|headerArray|] @scope ((L0007,L0009));
-
+        v0;
         v1;
         v2;
       
@@ -813,9 +783,8 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|long|] [|javax:obex:ClientOperation.getLength|] ([|javax:obex:ClientOperation|] v6 @type (this)) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.getLength:()J|] @Access PUBLIC {
       local temp ;
-        [|java:lang:Long|] v1 @varname [|temp|] @scope ((L000c,L000e), (L000f,L0014));
-        [|java:io:IOException|] v0 @varname [|e|] @scope ((L0015,L0016));
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -839,7 +808,6 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|int|] [|javax:obex:ClientOperation.getMaxPacketSize|] ([|javax:obex:ClientOperation|] v2 @type (this)) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.getMaxPacketSize:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -853,7 +821,6 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|javax:obex:HeaderSet|] [|javax:obex:ClientOperation.getReceivedHeader|] ([|javax:obex:ClientOperation|] v1 @type (this)) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.getReceivedHeader:()Ljavax/obex/HeaderSet;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L002948.   call temp:=  [|javax:obex:ClientOperation.ensureOpen|](v1) @signature [|Ljavax/obex/ClientOperation;.ensureOpen:()V|] @classDescriptor [|javax:obex:ClientOperation|] @type virtual;
@@ -863,7 +830,6 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|int|] [|javax:obex:ClientOperation.getResponseCode|] ([|javax:obex:ClientOperation|] v2 @type (this)) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.getResponseCode:()I|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
         v0;
         v1;
       
@@ -889,8 +855,7 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|java:lang:String|] [|javax:obex:ClientOperation.getType|] ([|javax:obex:ClientOperation|] v3 @type (this)) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.getType:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-        [|java:io:IOException|] v0 @varname [|e|] @scope ((L000c,L000e));
-
+        v0;
         v1;
         v2;
       
@@ -908,7 +873,6 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|java:io:DataInputStream|] [|javax:obex:ClientOperation.openDataInputStream|] ([|javax:obex:ClientOperation|] v2 @type (this)) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.openDataInputStream:()Ljava/io/DataInputStream;|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -921,7 +885,6 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|java:io:DataOutputStream|] [|javax:obex:ClientOperation.openDataOutputStream|] ([|javax:obex:ClientOperation|] v2 @type (this)) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.openDataOutputStream:()Ljava/io/DataOutputStream;|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -934,7 +897,6 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|java:io:InputStream|] [|javax:obex:ClientOperation.openInputStream|] ([|javax:obex:ClientOperation|] v2 @type (this)) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.openInputStream:()Ljava/io/InputStream;|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -962,7 +924,6 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|java:io:OutputStream|] [|javax:obex:ClientOperation.openOutputStream|] ([|javax:obex:ClientOperation|] v2 @type (this)) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.openOutputStream:()Ljava/io/OutputStream;|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -989,10 +950,8 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|void|] [|javax:obex:ClientOperation.sendHeaders|] ([|javax:obex:ClientOperation|] v5 @type (this), [|javax:obex:HeaderSet|] v6 @type (object)) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.sendHeaders:(Ljavax/obex/HeaderSet;)V|] @Access PUBLIC {
       local temp ;
-        [|int|] v1 @varname [|i|] @scope ((L0020,L0033));
-        [|int|][] v0 @varname [|headerList|] @scope ((L001d,L0034));
-
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -1028,10 +987,8 @@ record [|javax:obex:ClientOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|void|] [|javax:obex:ClientOperation.streamClosed|] ([|javax:obex:ClientOperation|] v9 @type (this), [|boolean|] v10) @owner [|javax:obex:ClientOperation|] @signature [|Ljavax/obex/ClientOperation;.streamClosed:(Z)V|] @Access PUBLIC {
       local temp ;
-        [|byte|][] v0 @varname [|headerArray|] @scope ((L0024,L0028), (L00a1,L00a5));
-        [|boolean|] v1 @varname [|more|] @scope ((L0012,L004e), (L008f,L00dc));
-
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -1166,7 +1123,6 @@ record [|javax:obex:ObexSession|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|javax:obex:ObexSession.<init>|] ([|javax:obex:ObexSession|] v0 @type (this)) @owner [|javax:obex:ObexSession|] @signature [|Ljavax/obex/ObexSession;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
       
 #L002d38.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L002d3e.   return @void ;
@@ -1174,21 +1130,19 @@ record [|javax:obex:ObexSession|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|boolean|] [|javax:obex:ObexSession.handleAuthChall|] ([|javax:obex:ObexSession|] v18 @type (this), [|javax:obex:HeaderSet|] v19 @type (object)) @owner [|javax:obex:ObexSession|] @signature [|Ljavax/obex/ObexSession;.handleAuthChall:(Ljavax/obex/HeaderSet;)Z|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|] v9 @varname [|realm|] @scope ((L0024,L0043), (L0048,L006e), (L0077,L012e));
-        [|byte|][] v10 @varname [|realmString|] @scope ((L002b,L0048), (L006e,L007d));
-        [|boolean|] v5 @varname [|isFullAccess|] @scope ((L004a,L006e), (L007d,L012e));
-        [|boolean|] v6 @varname [|isUserIDRequired|] @scope ((L0049,L006e), (L007d,L012e));
-        [|javax:obex:PasswordAuthentication|] v11 @varname [|result|] @scope ((L005d,L006e), (L007d,L012e));
-        [|java:lang:Exception|] v4 @varname [|e|] @scope ((L006f,L0077), (L007e,L0080));
-        [|byte|][] v3 @varname [|digest|] @scope ((L00be,L0116));
-        [|byte|][] v1 @varname [|challenge|] @scope ((L0011,L012e));
-        [|byte|][] v2 @varname [|description|] @scope ((L0023,L012e));
-        [|byte|][] v7 @varname [|option|] @scope ((L001a,L012e));
-        [|byte|][] v8 @varname [|password|] @scope ((L0084,L012e));
-        [|byte|][] v12 @varname [|userName|] @scope ((L008c,L012e));
-
-
         v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
+        v9;
+        v10;
+        v11;
+        v12;
         v13;
         v14;
         v15;
@@ -1373,13 +1327,11 @@ record [|javax:obex:ObexSession|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|boolean|] [|javax:obex:ObexSession.handleAuthResp|] ([|javax:obex:ObexSession|] v10 @type (this), [|byte|][] v11) @owner [|javax:obex:ObexSession|] @signature [|Ljavax/obex/ObexSession;.handleAuthResp:([B)Z|] @Access PUBLIC {
       local temp ;
-        [|byte|][] v0 @varname [|actualResponse|] @scope ((L002b,L0039));
-        [|byte|][] v1 @varname [|correctPassword|] @scope ((L0013,L0039));
-        [|byte|][] v2 @varname [|correctResponse|] @scope ((L0027,L0039));
-        [|int|] v3 @varname [|i|] @scope ((L002c,L0039));
-        [|byte|][] v4 @varname [|temp|] @scope ((L001a,L0039));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
         v5;
         v6;
         v7;
@@ -1431,8 +1383,6 @@ record [|javax:obex:ClientSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|void|] [|javax:obex:ClientSession.<init>|] ([|javax:obex:ClientSession|] v1 @type (this), [|javax:obex:ObexTransport|] v2 @type (object)) @owner [|javax:obex:ClientSession|] @signature [|Ljavax/obex/ClientSession;.<init>:(Ljavax/obex/ObexTransport;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
       
 #L003058.   call temp:=  [|javax:obex:ObexSession.<init>|](v1) @signature [|Ljavax/obex/ObexSession;.<init>:()V|] @classDescriptor [|javax:obex:ObexSession|] @type direct;
@@ -1455,7 +1405,6 @@ record [|javax:obex:ClientSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|void|] [|javax:obex:ClientSession.setRequestActive|] ([|javax:obex:ClientSession|] v2 @type (this)) @owner [|javax:obex:ClientSession|] @signature [|Ljavax/obex/ClientSession;.setRequestActive:()V|] @Access PRIVATE_DECLARED_SYNCHRONIZED {
       local temp ;
-
         v0;
         v1;
       
@@ -1479,7 +1428,6 @@ record [|javax:obex:ClientSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|void|] [|javax:obex:ClientSession.close|] ([|javax:obex:ClientSession|] v1 @type (this)) @owner [|javax:obex:ClientSession|] @signature [|Ljavax/obex/ClientSession;.close:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L0030f4.   v0:= 0  @length 4;
@@ -1493,12 +1441,10 @@ record [|javax:obex:ClientSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|javax:obex:HeaderSet|] [|javax:obex:ClientSession.connect|] ([|javax:obex:ClientSession|] v9 @type (this), [|javax:obex:HeaderSet|] v10 @type (object)) @owner [|javax:obex:ClientSession|] @signature [|Ljavax/obex/ClientSession;.connect:(Ljavax/obex/HeaderSet;)Ljavax/obex/HeaderSet;|] @Access PUBLIC {
       local temp ;
-        [|byte|][] v0 @varname [|head|] @scope ((L0018,L006b));
-        [|byte|][] v1 @varname [|requestPacket|] @scope ((L0031,L006b));
-        [|javax:obex:HeaderSet|] v2 @varname [|returnHeaderSet|] @scope ((L0059,L006b));
-        [|int|] v3 @varname [|totalLength|] @scope ((L0017,L006b));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -1566,10 +1512,8 @@ record [|javax:obex:ClientSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|javax:obex:HeaderSet|] [|javax:obex:ClientSession.delete|] ([|javax:obex:ClientSession|] v2 @type (this), [|javax:obex:HeaderSet|] v3 @type (object)) @owner [|javax:obex:ClientSession|] @signature [|Ljavax/obex/ClientSession;.delete:(Ljavax/obex/HeaderSet;)Ljavax/obex/HeaderSet;|] @Access PUBLIC {
       local temp ;
-        [|javax:obex:Operation|] v0 @varname [|op|] @scope ((L0004,L000f));
-        [|javax:obex:HeaderSet|] v1 @varname [|returnValue|] @scope ((L000b,L000f));
-
-
+        v0;
+        v1;
       
 #L003208.   call temp:=  [|javax:obex:ClientSession.put|](v2, v3) @signature [|Ljavax/obex/ClientSession;.put:(Ljavax/obex/HeaderSet;)Ljavax/obex/Operation;|] @classDescriptor [|javax:obex:ClientSession|] @type virtual;
 #L00320e.   v0:= temp  @type object;
@@ -1582,10 +1526,8 @@ record [|javax:obex:ClientSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|javax:obex:HeaderSet|] [|javax:obex:ClientSession.disconnect|] ([|javax:obex:ClientSession|] v7 @type (this), [|javax:obex:HeaderSet|] v8 @type (object)) @owner [|javax:obex:ClientSession|] @signature [|Ljavax/obex/ClientSession;.disconnect:(Ljavax/obex/HeaderSet;)Ljavax/obex/HeaderSet;|] @Access PUBLIC {
       local temp ;
-        [|byte|][] v0 @varname [|head|] @scope ((L0017,L0072));
-        [|javax:obex:HeaderSet|] v1 @varname [|returnHeaderSet|] @scope ((L0060,L0072));
-
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -1657,7 +1599,6 @@ record [|javax:obex:ClientSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|void|] [|javax:obex:ClientSession.ensureOpen|] ([|javax:obex:ClientSession|] v2 @type (this)) @owner [|javax:obex:ClientSession|] @signature [|Ljavax/obex/ClientSession;.ensureOpen:()V|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
         v0;
         v1;
       
@@ -1678,9 +1619,7 @@ record [|javax:obex:ClientSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|javax:obex:Operation|] [|javax:obex:ClientSession.get|] ([|javax:obex:ClientSession|] v6 @type (this), [|javax:obex:HeaderSet|] v7 @type (object)) @owner [|javax:obex:ClientSession|] @signature [|Ljavax/obex/ClientSession;.get:(Ljavax/obex/HeaderSet;)Ljavax/obex/Operation;|] @Access PUBLIC {
       local temp ;
-        [|javax:obex:HeaderSet|] v0 @varname [|head|] @scope ((L001d,L0035), (L0036,L0046));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -1726,7 +1665,6 @@ record [|javax:obex:ClientSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|long|] [|javax:obex:ClientSession.getConnectionID|] ([|javax:obex:ClientSession|] v2 @type (this)) @owner [|javax:obex:ClientSession|] @signature [|Ljavax/obex/ClientSession;.getConnectionID:()J|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -1742,9 +1680,7 @@ record [|javax:obex:ClientSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|javax:obex:Operation|] [|javax:obex:ClientSession.put|] ([|javax:obex:ClientSession|] v6 @type (this), [|javax:obex:HeaderSet|] v7 @type (object)) @owner [|javax:obex:ClientSession|] @signature [|Ljavax/obex/ClientSession;.put:(Ljavax/obex/HeaderSet;)Ljavax/obex/Operation;|] @Access PUBLIC {
       local temp ;
-        [|javax:obex:HeaderSet|] v0 @varname [|head|] @scope ((L001d,L0034), (L0035,L0045));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -1789,23 +1725,18 @@ record [|javax:obex:ClientSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|boolean|] [|javax:obex:ClientSession.sendRequest|] ([|javax:obex:ClientSession|] v17 @type (this), [|int|] v18, [|byte|][] v19, [|javax:obex:HeaderSet|] v20 @type (object), [|javax:obex:PrivateInputStream|] v21 @type (object)) @owner [|javax:obex:ClientSession|] @signature [|Ljavax/obex/ClientSession;.sendRequest:(I[BLjavax/obex/HeaderSet;Ljavax/obex/PrivateInputStream;)Z|] @Access PUBLIC {
       local temp ;
-        [|int|] v8 @varname [|length|] @scope ((L005b,L0068), (L0082,L01ba));
-        [|int|] v5 @varname [|bytesReceived|] @scope ((L00d2,L00e2), (L00f0,L01b7));
-        [|byte|][] v6 @varname [|data|] @scope ((L0086,L00e3), (L00e4,L01b7));
-        [|int|] v7 @varname [|flags|] @scope ((L009c,L00e3));
-        [|int|] v11 @varname [|version|] @scope ((L0094,L00e3));
-        [|byte|][] v4 @varname [|body|] @scope ((L010e,L01b7));
-        [|byte|][] v10 @varname [|sendHeaders|] @scope ((L019f,L01b7));
-        [|java:io:ByteArrayOutputStream|] v9 @varname [|out|] @scope ((L0019,L01ba));
-
-
-
-
-
         v0;
         v1;
         v2;
         v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
+        v9;
+        v10;
+        v11;
         v12;
         v13;
         v14;
@@ -2046,8 +1977,6 @@ record [|javax:obex:ClientSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|void|] [|javax:obex:ClientSession.setAuthenticator|] ([|javax:obex:ClientSession|] v2 @type (this), [|javax:obex:Authenticator|] v3 @type (object)) @owner [|javax:obex:ClientSession|] @signature [|Ljavax/obex/ClientSession;.setAuthenticator:(Ljavax/obex/Authenticator;)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -2062,8 +1991,6 @@ record [|javax:obex:ClientSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|void|] [|javax:obex:ClientSession.setConnectionID|] ([|javax:obex:ClientSession|] v2 @type (this), [|long|] v3) @owner [|javax:obex:ClientSession|] @signature [|Ljavax/obex/ClientSession;.setConnectionID:(J)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -2085,16 +2012,12 @@ record [|javax:obex:ClientSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|javax:obex:HeaderSet|] [|javax:obex:ClientSession.setPath|] ([|javax:obex:ClientSession|] v11 @type (this), [|javax:obex:HeaderSet|] v12 @type (object), [|boolean|] v13, [|boolean|] v14) @owner [|javax:obex:ClientSession|] @signature [|Ljavax/obex/ClientSession;.setPath:(Ljavax/obex/HeaderSet;ZZ)Ljavax/obex/HeaderSet;|] @Access PUBLIC {
       local temp ;
-        [|javax:obex:HeaderSet|] v2 @varname [|headset|] @scope ((L001f,L004f), (L0050,L0087));
-        [|int|] v0 @varname [|flags|] @scope ((L0061,L0087));
-        [|byte|][] v1 @varname [|head|] @scope ((L0018,L0087));
-        [|byte|][] v3 @varname [|packet|] @scope ((L006b,L0087));
-        [|javax:obex:HeaderSet|] v4 @varname [|returnHeaderSet|] @scope ((L007d,L0087));
-        [|int|] v5 @varname [|totalLength|] @scope ((L0017,L0087));
-
-
-
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
         v6;
         v7;
         v8;
@@ -2175,7 +2098,6 @@ record [|javax:obex:ClientSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|void|] [|javax:obex:ClientSession.setRequestInactive|] ([|javax:obex:ClientSession|] v1 @type (this)) @owner [|javax:obex:ClientSession|] @signature [|Ljavax/obex/ClientSession;.setRequestInactive:()V|] @Access DECLARED_SYNCHRONIZED {
       local temp ;
-
         v0;
       
 #L0039f8.   (@monitorenter v1)
@@ -2232,7 +2154,6 @@ record [|javax:obex:HeaderSet|]  @type class @AccessFlag PUBLIC_FINAL  {
       global [|int|] @@[|javax:obex:HeaderSet.WHO|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|javax:obex:HeaderSet.<init>|] ([|javax:obex:HeaderSet|] v2 @type (this)) @owner [|javax:obex:HeaderSet|] @signature [|Ljavax/obex/HeaderSet;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
         v0;
         v1;
       
@@ -2256,11 +2177,7 @@ record [|javax:obex:HeaderSet|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|javax:obex:HeaderSet.createAuthenticationChallenge|] ([|javax:obex:HeaderSet|] v4 @type (this), [|java:lang:String|] v5 @type (object), [|boolean|] v6, [|boolean|] v7) @owner [|javax:obex:HeaderSet|] @signature [|Ljavax/obex/HeaderSet;.createAuthenticationChallenge:(Ljava/lang/String;ZZ)V|] @Access PUBLIC {
       local temp ;
-        [|int|] v0 @varname [|i|] @scope ((L0007,L0020));
-
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -2287,8 +2204,6 @@ record [|javax:obex:HeaderSet|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|java:lang:Object|] [|javax:obex:HeaderSet.getHeader|] ([|javax:obex:HeaderSet|] v2 @type (this), [|int|] v3) @owner [|javax:obex:HeaderSet|] @signature [|Ljavax/obex/HeaderSet;.getHeader:(I)Ljava/lang/Object;|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -2372,11 +2287,10 @@ record [|javax:obex:HeaderSet|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|int|][] [|javax:obex:HeaderSet.getHeaderList|] ([|javax:obex:HeaderSet|] v7 @type (this)) @owner [|javax:obex:HeaderSet|] @signature [|Ljavax/obex/HeaderSet;.getHeaderList:()[I|] @Access PUBLIC {
       local temp ;
-        [|byte|][] v0 @varname [|headers|] @scope ((L00c1,L00db));
-        [|int|] v1 @varname [|i|] @scope ((L0071,L00db));
-        [|java:io:ByteArrayOutputStream|] v2 @varname [|out|] @scope ((L0007,L00db));
-        [|int|][] v3 @varname [|result|] @scope ((L00ce,L00db));
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -2492,7 +2406,6 @@ record [|javax:obex:HeaderSet|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|int|] [|javax:obex:HeaderSet.getResponseCode|] ([|javax:obex:HeaderSet|] v2 @type (this)) @owner [|javax:obex:HeaderSet|] @signature [|Ljavax/obex/HeaderSet;.getResponseCode:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -2509,21 +2422,7 @@ record [|javax:obex:HeaderSet|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|javax:obex:HeaderSet.setHeader|] ([|javax:obex:HeaderSet|] v10 @type (this), [|int|] v11, [|java:lang:Object|] v12 @type (object)) @owner [|javax:obex:HeaderSet|] @signature [|Ljavax/obex/HeaderSet;.setHeader:(ILjava/lang/Object;)V|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
-
-
-
-
-
-
-        [|long|] v0 @varname [|temp|] @scope ((L000b,L0280));
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -2883,7 +2782,6 @@ record [|javax:obex:ObexHelper|]  @type class @AccessFlag PUBLIC_FINAL  {
       global [|int|] @@[|javax:obex:ObexHelper.OBEX_OPCODE_SETPATH|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|javax:obex:ObexHelper.<init>|] ([|javax:obex:ObexHelper|] v0 @type (this)) @owner [|javax:obex:ObexHelper|] @signature [|Ljavax/obex/ObexHelper;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L00431c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L004322.   return @void ;
@@ -2891,11 +2789,7 @@ record [|javax:obex:ObexHelper|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|byte|][] [|javax:obex:ObexHelper.computeAuthenticationChallenge|] ([|byte|][] v9, [|java:lang:String|] v10 @type (object), [|boolean|] v11, [|boolean|] v12) @owner [|javax:obex:ObexHelper|] @signature [|Ljavax/obex/ObexHelper;.computeAuthenticationChallenge:([BLjava/lang/String;ZZ)[B|] @Access PUBLIC_STATIC {
       local temp ;
-        [|byte|][] v0 @varname [|authChall|] @scope ((L0008,L0078));
-
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -2973,9 +2867,8 @@ record [|javax:obex:ObexHelper|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|byte|][] [|javax:obex:ObexHelper.computeMd5Hash|] ([|byte|][] v3) @owner [|javax:obex:ObexHelper|] @signature [|Ljavax/obex/ObexHelper;.computeMd5Hash:([B)[B|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:security:MessageDigest|] v1 @varname [|md5|] @scope ((L0006,L000b));
-        [|java:security:NoSuchAlgorithmException|] v0 @varname [|e|] @scope ((L000c,L0012));
-
+        v0;
+        v1;
         v2;
       
 #L004434.   v2:= "MD5" @type (object, string);
@@ -2993,8 +2886,7 @@ record [|javax:obex:ObexHelper|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|byte|][] [|javax:obex:ObexHelper.convertToByteArray|] ([|long|] v6) @owner [|javax:obex:ObexHelper|] @signature [|Ljavax/obex/ObexHelper;.convertToByteArray:(J)[B|] @Access PUBLIC_STATIC {
       local temp ;
-        [|byte|][] v0 @varname [|b|] @scope ((L0005,L002b));
-
+        v0;
         v1;
         v2;
         v3;
@@ -3035,13 +2927,12 @@ record [|javax:obex:ObexHelper|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|long|] [|javax:obex:ObexHelper.convertToLong|] ([|byte|][] v9) @owner [|javax:obex:ObexHelper|] @signature [|Ljavax/obex/ObexHelper;.convertToLong:([B)J|] @Access PUBLIC_STATIC {
       local temp ;
-        [|int|] v0 @varname [|i|] @scope ((L0009,L0022));
-        [|long|] v1 @varname [|power|] @scope ((L0006,L0022));
-        [|long|] v3 @varname [|result|] @scope ((L0002,L0022));
-        [|long|] v5 @varname [|value|] @scope ((L0004,L0022));
-
+        v0;
+        v1;
         v2;
+        v3;
         v4;
+        v5;
         v6;
         v7;
         v8;
@@ -3071,13 +2962,11 @@ record [|javax:obex:ObexHelper|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|java:lang:String|] [|javax:obex:ObexHelper.convertToUnicode|] ([|byte|][] v7, [|boolean|] v8) @owner [|javax:obex:ObexHelper|] @signature [|Ljavax/obex/ObexHelper;.convertToUnicode:([BZ)Ljava/lang/String;|] @Access PUBLIC_STATIC {
       local temp ;
-        [|int|] v3 @varname [|lower|] @scope ((L0029,L0045));
-        [|int|] v4 @varname [|upper|] @scope ((L0023,L0045));
-        [|int|] v0 @varname [|arrayLength|] @scope ((L0008,L004b));
-        [|char|][] v1 @varname [|c|] @scope ((L001c,L004b));
-        [|int|] v2 @varname [|i|] @scope ((L001d,L004b));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
         v5;
         v6;
       
@@ -3127,10 +3016,9 @@ record [|javax:obex:ObexHelper|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|byte|][] [|javax:obex:ObexHelper.convertToUnicodeByteArray|] ([|java:lang:String|] v6 @type (object)) @owner [|javax:obex:ObexHelper|] @signature [|Ljavax/obex/ObexHelper;.convertToUnicodeByteArray:(Ljava/lang/String;)[B|] @Access PUBLIC_STATIC {
       local temp ;
-        [|char|][] v0 @varname [|c|] @scope ((L0009,L0034));
-        [|int|] v1 @varname [|i|] @scope ((L0011,L0034));
-        [|byte|][] v2 @varname [|result|] @scope ((L0010,L0034));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -3171,25 +3059,23 @@ record [|javax:obex:ObexHelper|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|byte|][] [|javax:obex:ObexHelper.createHeader|] ([|javax:obex:HeaderSet|] v21 @type (object), [|boolean|] v22) @owner [|javax:obex:ObexHelper|] @signature [|Ljavax/obex/ObexHelper;.createHeader:(Ljavax/obex/HeaderSet;Z)[B|] @Access PUBLIC_STATIC {
       local temp ;
-        [|int|] v10 @varname [|length|] @scope ((L0087,L00ba), (L00df,L0119), (L022b,L0266), (L02bf,L02f2), (L0312,L0345), (L0365,L0398), (L03b8,L03eb), (L040b,L043e), (L045e,L0491), (L04bc,L04ef), (L0512,L0545), (L05d9,L060b), (L0623,L0655));
-        [|java:lang:StringBuffer|] v2 @varname [|buffer|] @scope ((L0005,L015d), (L015d,L0176), (L0176,L0181), (L0181,L0266), (L0266,L05bb), (L05bb,L05bf), (L05bf,L066f), (L066f,L0671), (L0671,L0672));
-        [|int|] v8 @varname [|i|] @scope ((L0166,L0176), (L0181,L0266), (L0492,L05bd), (L05c1,L0661));
-        [|int|] v15 @varname [|temp|] @scope ((L0165,L0176), (L0181,L0266), (L05bb,L05bd));
-        [|java:io:UnsupportedEncodingException|] v6 @varname [|e|] @scope ((L0177,L0178), (L05bc,L05bd));
-        [|java:lang:Byte|] v4 @varname [|byteHeader|] @scope ((L0004,L0672));
-        [|java:util:Calendar|] v5 @varname [|dateHeader|] @scope ((L0003,L0672));
-        [|javax:obex:HeaderSet|] v7 @varname [|headImpl|] @scope ((L000f,L0672));
-        [|java:lang:Long|] v9 @varname [|intHeader|] @scope ((L0001,L0672));
-        [|byte|][] v11 @varname [|lengthArray|] @scope ((L000e,L0672));
-        [|java:io:ByteArrayOutputStream|] v12 @varname [|out|] @scope ((L0014,L0672));
-        [|byte|][] v13 @varname [|result|] @scope ((L0008,L0672));
-        [|java:lang:String|] v14 @varname [|stringHeader|] @scope ((L0002,L0672));
-        [|byte|][] v16 @varname [|value|] @scope ((L0007,L0672));
-
-
         v0;
         v1;
+        v2;
         v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
+        v9;
+        v10;
+        v11;
+        v12;
+        v13;
+        v14;
+        v15;
+        v16;
         v17;
         v18;
         v19;
@@ -4048,14 +3934,11 @@ record [|javax:obex:ObexHelper|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|int|] [|javax:obex:ObexHelper.findHeaderEnd|] ([|byte|][] v6, [|int|] v7, [|int|] v8) @owner [|javax:obex:ObexHelper|] @signature [|Ljavax/obex/ObexHelper;.findHeaderEnd:([BII)I|] @Access PUBLIC_STATIC {
       local temp ;
-        [|int|] v1 @varname [|headerID|] @scope ((L0011,L0038), (L003b,L004d));
-        [|int|] v0 @varname [|fullLength|] @scope ((L0001,L006a));
-        [|int|] v2 @varname [|index|] @scope ((L0003,L006a));
-        [|int|] v3 @varname [|lastLength|] @scope ((L0002,L006a));
-        [|int|] v4 @varname [|length|] @scope ((L0004,L006a));
-
-
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
         v5;
       
 #L0053e0.   v0:= 0  @length 4;
@@ -4122,10 +4005,8 @@ record [|javax:obex:ObexHelper|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|int|] [|javax:obex:ObexHelper.findTag|] ([|byte|] v4, [|byte|][] v5) @owner [|javax:obex:ObexHelper|] @signature [|Ljavax/obex/ObexHelper;.findTag:(B[B)I|] @Access PUBLIC_STATIC {
       local temp ;
-        [|int|] v0 @varname [|index|] @scope ((L0007,L001d));
-        [|int|] v1 @varname [|length|] @scope ((L0002,L001d));
-
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -4153,11 +4034,9 @@ record [|javax:obex:ObexHelper|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|byte|][] [|javax:obex:ObexHelper.getTagValue|] ([|byte|] v4, [|byte|][] v5) @owner [|javax:obex:ObexHelper|] @signature [|Ljavax/obex/ObexHelper;.getTagValue:(B[B)[B|] @Access PUBLIC_STATIC {
       local temp ;
-        [|int|] v0 @varname [|index|] @scope ((L0004,L0018));
-        [|int|] v1 @varname [|length|] @scope ((L000f,L0018));
-        [|byte|][] v2 @varname [|result|] @scope ((L0011,L0018));
-
-
+        v0;
+        v1;
+        v2;
         v3;
       
 #L005510.   call temp:=  [|javax:obex:ObexHelper.findTag|](v4, v5) @signature [|Ljavax/obex/ObexHelper;.findTag:(B[B)I|] @classDescriptor [|javax:obex:ObexHelper|] @type static;
@@ -4178,19 +4057,17 @@ record [|javax:obex:ObexHelper|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|byte|][] [|javax:obex:ObexHelper.updateHeaderSet|] ([|javax:obex:HeaderSet|] v16 @type (object), [|byte|][] v17) @owner [|javax:obex:ObexHelper|] @signature [|Ljavax/obex/ObexHelper;.updateHeaderSet:(Ljavax/obex/HeaderSet;[B)[B|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:io:UnsupportedEncodingException|] v3 @varname [|e|] @scope ((L005d,L005e), (L005f,L0067), (L012b,L012c), (L0172,L017a));
-        [|int|] v4 @varname [|headerID|] @scope ((L000f,L005e), (L0067,L0193), (L0194,L01c6));
-        [|boolean|] v9 @varname [|trimTail|] @scope ((L0016,L005e), (L0067,L0131));
-        [|java:lang:String|] v2 @varname [|dateString|] @scope ((L00a6,L012a));
-        [|java:util:Calendar|] v8 @varname [|temp|] @scope ((L00aa,L012a), (L017e,L0193));
-        [|byte|][] v1 @varname [|body|] @scope ((L0004,L01c6));
-        [|javax:obex:HeaderSet|] v5 @varname [|headerImpl|] @scope ((L0006,L01c6));
-        [|int|] v6 @varname [|index|] @scope ((L0001,L01c6));
-        [|int|] v7 @varname [|length|] @scope ((L0002,L01c6));
-        [|byte|][] v10 @varname [|value|] @scope ((L0003,L01c6));
-
-
         v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
+        v9;
+        v10;
         v11;
         v12;
         v13;
@@ -4489,9 +4366,6 @@ record [|javax:obex:PasswordAuthentication|]  @type class @AccessFlag PUBLIC_FIN
    }
     procedure [|void|] [|javax:obex:PasswordAuthentication.<init>|] ([|javax:obex:PasswordAuthentication|] v3 @type (this), [|byte|][] v4, [|byte|][] v5) @owner [|javax:obex:PasswordAuthentication|] @signature [|Ljavax/obex/PasswordAuthentication;.<init>:([B[B)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
         v0;
         v1;
         v2;
@@ -4516,7 +4390,6 @@ record [|javax:obex:PasswordAuthentication|]  @type class @AccessFlag PUBLIC_FIN
    }
     procedure [|byte|][] [|javax:obex:PasswordAuthentication.getPassword|] ([|javax:obex:PasswordAuthentication|] v1 @type (this)) @owner [|javax:obex:PasswordAuthentication|] @signature [|Ljavax/obex/PasswordAuthentication;.getPassword:()[B|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L0059b4.   v0:= v1.[|javax:obex:PasswordAuthentication.mPassword|]   @type object;
@@ -4525,7 +4398,6 @@ record [|javax:obex:PasswordAuthentication|]  @type class @AccessFlag PUBLIC_FIN
    }
     procedure [|byte|][] [|javax:obex:PasswordAuthentication.getUserName|] ([|javax:obex:PasswordAuthentication|] v1 @type (this)) @owner [|javax:obex:PasswordAuthentication|] @signature [|Ljavax/obex/PasswordAuthentication;.getUserName:()[B|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L0059cc.   v0:= v1.[|javax:obex:PasswordAuthentication.mUserName|]   @type object;
@@ -4540,8 +4412,6 @@ record [|javax:obex:PrivateInputStream|]  @type class @AccessFlag PUBLIC_FINAL  
    }
     procedure [|void|] [|javax:obex:PrivateInputStream.<init>|] ([|javax:obex:PrivateInputStream|] v2 @type (this), [|javax:obex:BaseStream|] v3 @type (object)) @owner [|javax:obex:PrivateInputStream|] @signature [|Ljavax/obex/PrivateInputStream;.<init>:(Ljavax/obex/BaseStream;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
         v0;
         v1;
       
@@ -4558,7 +4428,6 @@ record [|javax:obex:PrivateInputStream|]  @type class @AccessFlag PUBLIC_FINAL  
    }
     procedure [|void|] [|javax:obex:PrivateInputStream.ensureOpen|] ([|javax:obex:PrivateInputStream|] v2 @type (this)) @owner [|javax:obex:PrivateInputStream|] @signature [|Ljavax/obex/PrivateInputStream;.ensureOpen:()V|] @Access PRIVATE {
       local temp ;
-
         v0;
         v1;
       
@@ -4575,7 +4444,6 @@ record [|javax:obex:PrivateInputStream|]  @type class @AccessFlag PUBLIC_FINAL  
    }
     procedure [|int|] [|javax:obex:PrivateInputStream.available|] ([|javax:obex:PrivateInputStream|] v2 @type (this)) @owner [|javax:obex:PrivateInputStream|] @signature [|Ljavax/obex/PrivateInputStream;.available:()I|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
         v0;
         v1;
       
@@ -4595,7 +4463,6 @@ record [|javax:obex:PrivateInputStream|]  @type class @AccessFlag PUBLIC_FINAL  
    }
     procedure [|void|] [|javax:obex:PrivateInputStream.close|] ([|javax:obex:PrivateInputStream|] v2 @type (this)) @owner [|javax:obex:PrivateInputStream|] @signature [|Ljavax/obex/PrivateInputStream;.close:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -4609,7 +4476,6 @@ record [|javax:obex:PrivateInputStream|]  @type class @AccessFlag PUBLIC_FINAL  
    }
     procedure [|int|] [|javax:obex:PrivateInputStream.read|] ([|javax:obex:PrivateInputStream|] v3 @type (this)) @owner [|javax:obex:PrivateInputStream|] @signature [|Ljavax/obex/PrivateInputStream;.read:()I|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -4645,8 +4511,6 @@ record [|javax:obex:PrivateInputStream|]  @type class @AccessFlag PUBLIC_FINAL  
    }
     procedure [|int|] [|javax:obex:PrivateInputStream.read|] ([|javax:obex:PrivateInputStream|] v2 @type (this), [|byte|][] v3) @owner [|javax:obex:PrivateInputStream|] @signature [|Ljavax/obex/PrivateInputStream;.read:([B)I|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -4659,14 +4523,10 @@ record [|javax:obex:PrivateInputStream|]  @type class @AccessFlag PUBLIC_FINAL  
    }
     procedure [|int|] [|javax:obex:PrivateInputStream.read|] ([|javax:obex:PrivateInputStream|] v7 @type (this), [|byte|][] v8, [|int|] v9, [|int|] v10) @owner [|javax:obex:PrivateInputStream|] @signature [|Ljavax/obex/PrivateInputStream;.read:([BII)I|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-        [|int|] v0 @varname [|currentDataLength|] @scope ((L0028,L0066));
-        [|int|] v1 @varname [|offset1|] @scope ((L002a,L0066));
-        [|int|] v2 @varname [|remainReadLength|] @scope ((L0029,L0066));
-        [|int|] v3 @varname [|result|] @scope ((L002b,L0066));
-
-
-
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -4741,11 +4601,8 @@ record [|javax:obex:PrivateInputStream|]  @type class @AccessFlag PUBLIC_FINAL  
    }
     procedure [|void|] [|javax:obex:PrivateInputStream.writeBytes|] ([|javax:obex:PrivateInputStream|] v7 @type (this), [|byte|][] v8, [|int|] v9) @owner [|javax:obex:PrivateInputStream|] @signature [|Ljavax/obex/PrivateInputStream;.writeBytes:([BI)V|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-        [|int|] v0 @varname [|length|] @scope ((L000b,L0030));
-        [|byte|][] v1 @varname [|temp|] @scope ((L000d,L0030));
-
-
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -4796,9 +4653,6 @@ record [|javax:obex:PrivateOutputStream|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|javax:obex:PrivateOutputStream.<init>|] ([|javax:obex:PrivateOutputStream|] v1 @type (this), [|javax:obex:BaseStream|] v2 @type (object), [|int|] v3) @owner [|javax:obex:PrivateOutputStream|] @signature [|Ljavax/obex/PrivateOutputStream;.<init>:(Ljavax/obex/BaseStream;I)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
         v0;
       
 #L005cb8.   call temp:=  [|java:io:OutputStream.<init>|](v1) @signature [|Ljava/io/OutputStream;.<init>:()V|] @classDescriptor [|java:io:OutputStream|] @type direct;
@@ -4814,7 +4668,6 @@ record [|javax:obex:PrivateOutputStream|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|javax:obex:PrivateOutputStream.ensureOpen|] ([|javax:obex:PrivateOutputStream|] v2 @type (this)) @owner [|javax:obex:PrivateOutputStream|] @signature [|Ljavax/obex/PrivateOutputStream;.ensureOpen:()V|] @Access PRIVATE {
       local temp ;
-
         v0;
         v1;
       
@@ -4831,7 +4684,6 @@ record [|javax:obex:PrivateOutputStream|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|javax:obex:PrivateOutputStream.close|] ([|javax:obex:PrivateOutputStream|] v2 @type (this)) @owner [|javax:obex:PrivateOutputStream|] @signature [|Ljavax/obex/PrivateOutputStream;.close:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -4844,7 +4696,6 @@ record [|javax:obex:PrivateOutputStream|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|boolean|] [|javax:obex:PrivateOutputStream.isClosed|] ([|javax:obex:PrivateOutputStream|] v1 @type (this)) @owner [|javax:obex:PrivateOutputStream|] @signature [|Ljavax/obex/PrivateOutputStream;.isClosed:()Z|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L005d44.   v0:= v1.[|javax:obex:PrivateOutputStream.mOpen|]   @boolean;
@@ -4857,10 +4708,8 @@ record [|javax:obex:PrivateOutputStream|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|byte|][] [|javax:obex:PrivateOutputStream.readBytes|] ([|javax:obex:PrivateOutputStream|] v4 @type (this), [|int|] v5) @owner [|javax:obex:PrivateOutputStream|] @signature [|Ljavax/obex/PrivateOutputStream;.readBytes:(I)[B|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-        [|byte|][] v0 @varname [|result|] @scope ((L0016,L0025));
-        [|byte|][] v1 @varname [|temp|] @scope ((L000f,L0025));
-
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -4896,7 +4745,6 @@ record [|javax:obex:PrivateOutputStream|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|int|] [|javax:obex:PrivateOutputStream.size|] ([|javax:obex:PrivateOutputStream|] v1 @type (this)) @owner [|javax:obex:PrivateOutputStream|] @signature [|Ljavax/obex/PrivateOutputStream;.size:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L005dd8.   v0:= v1.[|javax:obex:PrivateOutputStream.mArray|]   @type object;
@@ -4907,8 +4755,6 @@ record [|javax:obex:PrivateOutputStream|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|javax:obex:PrivateOutputStream.write|] ([|javax:obex:PrivateOutputStream|] v3 @type (this), [|int|] v4) @owner [|javax:obex:PrivateOutputStream|] @signature [|Ljavax/obex/PrivateOutputStream;.write:(I)V|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -4938,8 +4784,6 @@ record [|javax:obex:PrivateOutputStream|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|javax:obex:PrivateOutputStream.write|] ([|javax:obex:PrivateOutputStream|] v2 @type (this), [|byte|][] v3) @owner [|javax:obex:PrivateOutputStream|] @signature [|Ljavax/obex/PrivateOutputStream;.write:([B)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -4951,13 +4795,9 @@ record [|javax:obex:PrivateOutputStream|]  @type class @AccessFlag PUBLIC_FINAL 
    }
     procedure [|void|] [|javax:obex:PrivateOutputStream.write|] ([|javax:obex:PrivateOutputStream|] v6 @type (this), [|byte|][] v7, [|int|] v8, [|int|] v9) @owner [|javax:obex:PrivateOutputStream|] @signature [|Ljavax/obex/PrivateOutputStream;.write:([BII)V|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-        [|int|] v0 @varname [|bufferLeft|] @scope ((L003d,L004c));
-        [|int|] v1 @varname [|offset1|] @scope ((L0002,L0055));
-        [|int|] v2 @varname [|remainLength|] @scope ((L0003,L0055));
-
-
-
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -5056,7 +4896,6 @@ record [|javax:obex:ResponseCodes|]  @type class @AccessFlag PUBLIC_FINAL  {
       global [|int|] @@[|javax:obex:ResponseCodes.OBEX_HTTP_VERSION|]    @AccessFlag PUBLIC_STATIC_FINAL;
     procedure [|void|] [|javax:obex:ResponseCodes.<init>|] ([|javax:obex:ResponseCodes|] v0 @type (this)) @owner [|javax:obex:ResponseCodes|] @signature [|Ljavax/obex/ResponseCodes;.<init>:()V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
       
 #L005f48.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
 #L005f4e.   return @void ;
@@ -5083,16 +4922,10 @@ record [|javax:obex:ServerOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|void|] [|javax:obex:ServerOperation.<init>|] ([|javax:obex:ServerOperation|] v9 @type (this), [|javax:obex:ServerSession|] v10 @type (object), [|java:io:InputStream|] v11 @type (object), [|int|] v12, [|int|] v13, [|javax:obex:ServerRequestHandler|] v14 @type (object)) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.<init>:(Ljavax/obex/ServerSession;Ljava/io/InputStream;IILjavax/obex/ServerRequestHandler;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-        [|int|] v3 @varname [|length|] @scope ((L0047,L0064), (L0088,L0174));
-        [|byte|][] v0 @varname [|body|] @scope ((L00a4,L00ee), (L00ef,L0133), (L015e,L0174));
-        [|int|] v1 @varname [|bytesReceived|] @scope ((L0093,L00ee), (L00ef,L0133), (L015e,L0174));
-        [|byte|][] v2 @varname [|data|] @scope ((L008f,L00ee), (L00ef,L0133), (L015e,L0174));
-
-
-
-
-
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -5301,7 +5134,6 @@ record [|javax:obex:ServerOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|void|] [|javax:obex:ServerOperation.abort|] ([|javax:obex:ServerOperation|] v2 @type (this)) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.abort:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -5313,7 +5145,6 @@ record [|javax:obex:ServerOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|void|] [|javax:obex:ServerOperation.close|] ([|javax:obex:ServerOperation|] v1 @type (this)) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.close:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L006278.   call temp:=  [|javax:obex:ServerOperation.ensureOpen|](v1) @signature [|Ljavax/obex/ServerOperation;.ensureOpen:()V|] @classDescriptor [|javax:obex:ServerOperation|] @type virtual;
@@ -5324,9 +5155,6 @@ record [|javax:obex:ServerOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|boolean|] [|javax:obex:ServerOperation.continueOperation|] ([|javax:obex:ServerOperation|] v4 @type (this), [|boolean|] v5, [|boolean|] v6) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.continueOperation:(ZZ)Z|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
-
-
         v0;
         v1;
         v2;
@@ -5371,14 +5199,12 @@ record [|javax:obex:ServerOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|void|] [|javax:obex:ServerOperation.ensureNotDone|] ([|javax:obex:ServerOperation|] v0 @type (this)) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.ensureNotDone:()V|] @Access PUBLIC {
       local temp ;
-
       
 #L00632c.   return @void ;
 
    }
     procedure [|void|] [|javax:obex:ServerOperation.ensureOpen|] ([|javax:obex:ServerOperation|] v2 @type (this)) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.ensureOpen:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -5399,7 +5225,6 @@ record [|javax:obex:ServerOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|java:lang:String|] [|javax:obex:ServerOperation.getEncoding|] ([|javax:obex:ServerOperation|] v1 @type (this)) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.getEncoding:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L006384.   v0:= 0  @length 4;
@@ -5408,9 +5233,8 @@ record [|javax:obex:ServerOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|int|] [|javax:obex:ServerOperation.getHeaderLength|] ([|javax:obex:ServerOperation|] v5 @type (this)) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.getHeaderLength:()I|] @Access PUBLIC {
       local temp ;
-        [|byte|][] v0 @varname [|headerArray|] @scope ((L0018,L001a));
-        [|long|] v1 @varname [|id|] @scope ((L0006,L0023));
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -5439,9 +5263,8 @@ record [|javax:obex:ServerOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|long|] [|javax:obex:ServerOperation.getLength|] ([|javax:obex:ServerOperation|] v6 @type (this)) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.getLength:()J|] @Access PUBLIC {
       local temp ;
-        [|java:lang:Long|] v1 @varname [|temp|] @scope ((L000c,L000e), (L000f,L0014));
-        [|java:io:IOException|] v0 @varname [|e|] @scope ((L0015,L0016));
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -5465,7 +5288,6 @@ record [|javax:obex:ServerOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|int|] [|javax:obex:ServerOperation.getMaxPacketSize|] ([|javax:obex:ServerOperation|] v2 @type (this)) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.getMaxPacketSize:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -5479,7 +5301,6 @@ record [|javax:obex:ServerOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|javax:obex:HeaderSet|] [|javax:obex:ServerOperation.getReceivedHeader|] ([|javax:obex:ServerOperation|] v1 @type (this)) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.getReceivedHeader:()Ljavax/obex/HeaderSet;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L00645c.   call temp:=  [|javax:obex:ServerOperation.ensureOpen|](v1) @signature [|Ljavax/obex/ServerOperation;.ensureOpen:()V|] @classDescriptor [|javax:obex:ServerOperation|] @type virtual;
@@ -5489,7 +5310,6 @@ record [|javax:obex:ServerOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|int|] [|javax:obex:ServerOperation.getResponseCode|] ([|javax:obex:ServerOperation|] v2 @type (this)) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.getResponseCode:()I|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -5501,8 +5321,7 @@ record [|javax:obex:ServerOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|java:lang:String|] [|javax:obex:ServerOperation.getType|] ([|javax:obex:ServerOperation|] v3 @type (this)) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.getType:()Ljava/lang/String;|] @Access PUBLIC {
       local temp ;
-        [|java:io:IOException|] v0 @varname [|e|] @scope ((L000c,L000e));
-
+        v0;
         v1;
         v2;
       
@@ -5520,7 +5339,6 @@ record [|javax:obex:ServerOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|boolean|] [|javax:obex:ServerOperation.isValidBody|] ([|javax:obex:ServerOperation|] v1 @type (this)) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.isValidBody:()Z|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L0064d0.   v0:= v1.[|javax:obex:ServerOperation.mHasBody|]   @boolean;
@@ -5529,7 +5347,6 @@ record [|javax:obex:ServerOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|java:io:DataInputStream|] [|javax:obex:ServerOperation.openDataInputStream|] ([|javax:obex:ServerOperation|] v2 @type (this)) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.openDataInputStream:()Ljava/io/DataInputStream;|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -5542,7 +5359,6 @@ record [|javax:obex:ServerOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|java:io:DataOutputStream|] [|javax:obex:ServerOperation.openDataOutputStream|] ([|javax:obex:ServerOperation|] v2 @type (this)) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.openDataOutputStream:()Ljava/io/DataOutputStream;|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -5555,7 +5371,6 @@ record [|javax:obex:ServerOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|java:io:InputStream|] [|javax:obex:ServerOperation.openInputStream|] ([|javax:obex:ServerOperation|] v1 @type (this)) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.openInputStream:()Ljava/io/InputStream;|] @Access PUBLIC {
       local temp ;
-
         v0;
       
 #L006530.   call temp:=  [|javax:obex:ServerOperation.ensureOpen|](v1) @signature [|Ljavax/obex/ServerOperation;.ensureOpen:()V|] @classDescriptor [|javax:obex:ServerOperation|] @type virtual;
@@ -5565,7 +5380,6 @@ record [|javax:obex:ServerOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|java:io:OutputStream|] [|javax:obex:ServerOperation.openOutputStream|] ([|javax:obex:ServerOperation|] v2 @type (this)) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.openOutputStream:()Ljava/io/OutputStream;|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -5597,10 +5411,8 @@ record [|javax:obex:ServerOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|void|] [|javax:obex:ServerOperation.sendHeaders|] ([|javax:obex:ServerOperation|] v5 @type (this), [|javax:obex:HeaderSet|] v6 @type (object)) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.sendHeaders:(Ljavax/obex/HeaderSet;)V|] @Access PUBLIC {
       local temp ;
-        [|int|] v1 @varname [|i|] @scope ((L0014,L0027));
-        [|int|][] v0 @varname [|headerList|] @scope ((L0011,L0028));
-
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -5630,26 +5442,24 @@ record [|javax:obex:ServerOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|boolean|] [|javax:obex:ServerOperation.sendReply|] ([|javax:obex:ServerOperation|] v23 @type (this), [|int|] v24) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.sendReply:(I)Z|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-        [|int|] v4 @varname [|bodyLength|] @scope ((L0031,L00b5), (L00ca,L0486));
-        [|int|] v7 @varname [|end|] @scope ((L0057,L00b5), (L00ca,L00f3), (L00f5,L00f8));
-        [|byte|][] v8 @varname [|headerArray|] @scope ((L0030,L00b5), (L00ca,L0486));
-        [|long|] v10 @varname [|id|] @scope ((L0010,L00b5), (L00b8,L0486));
-        [|int|] v13 @varname [|orginalBodyLength|] @scope ((L0032,L00b5), (L00ca,L0486));
-        [|java:io:ByteArrayOutputStream|] v14 @varname [|out|] @scope ((L0006,L00b5), (L00b8,L0486));
-        [|int|] v16 @varname [|start|] @scope ((L0059,L00b5), (L00ca,L00f3), (L00f5,L00f8));
-        [|byte|][] v15 @varname [|sendHeader|] @scope ((L00d0,L00ef));
-        [|byte|][] v3 @varname [|body|] @scope ((L0158,L018c), (L0256,L025f), (L0331,L047e));
-        [|int|] v5 @varname [|bytesReceived|] @scope ((L0233,L0256), (L0308,L047e));
-        [|int|] v9 @varname [|headerID|] @scope ((L01e7,L0256), (L025f,L0482));
-        [|int|] v12 @varname [|length|] @scope ((L01f1,L0256), (L025f,L0482));
-        [|byte|][] v17 @varname [|temp|] @scope ((L0225,L0256));
-        [|byte|][] v6 @varname [|data|] @scope ((L02fc,L047e));
-
-
         v0;
         v1;
         v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
+        v9;
+        v10;
         v11;
+        v12;
+        v13;
+        v14;
+        v15;
+        v16;
+        v17;
         v18;
         v19;
         v20;
@@ -6245,8 +6055,6 @@ record [|javax:obex:ServerOperation|]  @type class @AccessFlag PUBLIC_FINAL exte
    }
     procedure [|void|] [|javax:obex:ServerOperation.streamClosed|] ([|javax:obex:ServerOperation|] v0 @type (this), [|boolean|] v1) @owner [|javax:obex:ServerOperation|] @signature [|Ljavax/obex/ServerOperation;.streamClosed:(Z)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L006f54.   return @void ;
 
@@ -6256,7 +6064,6 @@ record [|javax:obex:ServerRequestHandler|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|javax:obex:ServerRequestHandler.<init>|] ([|javax:obex:ServerRequestHandler|] v2 @type (this)) @owner [|javax:obex:ServerRequestHandler|] @signature [|Ljavax/obex/ServerRequestHandler;.<init>:()V|] @Access PROTECTED_CONSTRUCTOR {
       local temp ;
-
         v0;
         v1;
       
@@ -6268,7 +6075,6 @@ record [|javax:obex:ServerRequestHandler|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|long|] [|javax:obex:ServerRequestHandler.getConnectionId|] ([|javax:obex:ServerRequestHandler|] v2 @type (this)) @owner [|javax:obex:ServerRequestHandler|] @signature [|Ljavax/obex/ServerRequestHandler;.getConnectionId:()J|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
       
@@ -6278,9 +6084,6 @@ record [|javax:obex:ServerRequestHandler|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|int|] [|javax:obex:ServerRequestHandler.onAbort|] ([|javax:obex:ServerRequestHandler|] v1 @type (this), [|javax:obex:HeaderSet|] v2 @type (object), [|javax:obex:HeaderSet|] v3 @type (object)) @owner [|javax:obex:ServerRequestHandler|] @signature [|Ljavax/obex/ServerRequestHandler;.onAbort:(Ljavax/obex/HeaderSet;Ljavax/obex/HeaderSet;)I|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L006fa0.   v0:= 209  @length 16;
@@ -6289,24 +6092,18 @@ record [|javax:obex:ServerRequestHandler|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|javax:obex:ServerRequestHandler.onAuthenticationFailure|] ([|javax:obex:ServerRequestHandler|] v0 @type (this), [|byte|][] v1) @owner [|javax:obex:ServerRequestHandler|] @signature [|Ljavax/obex/ServerRequestHandler;.onAuthenticationFailure:([B)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L006fb8.   return @void ;
 
    }
     procedure [|void|] [|javax:obex:ServerRequestHandler.onClose|] ([|javax:obex:ServerRequestHandler|] v0 @type (this)) @owner [|javax:obex:ServerRequestHandler|] @signature [|Ljavax/obex/ServerRequestHandler;.onClose:()V|] @Access PUBLIC {
       local temp ;
-
       
 #L006fcc.   return @void ;
 
    }
     procedure [|int|] [|javax:obex:ServerRequestHandler.onConnect|] ([|javax:obex:ServerRequestHandler|] v1 @type (this), [|javax:obex:HeaderSet|] v2 @type (object), [|javax:obex:HeaderSet|] v3 @type (object)) @owner [|javax:obex:ServerRequestHandler|] @signature [|Ljavax/obex/ServerRequestHandler;.onConnect:(Ljavax/obex/HeaderSet;Ljavax/obex/HeaderSet;)I|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L006fe0.   v0:= 160  @length 16;
@@ -6315,9 +6112,6 @@ record [|javax:obex:ServerRequestHandler|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|int|] [|javax:obex:ServerRequestHandler.onDelete|] ([|javax:obex:ServerRequestHandler|] v1 @type (this), [|javax:obex:HeaderSet|] v2 @type (object), [|javax:obex:HeaderSet|] v3 @type (object)) @owner [|javax:obex:ServerRequestHandler|] @signature [|Ljavax/obex/ServerRequestHandler;.onDelete:(Ljavax/obex/HeaderSet;Ljavax/obex/HeaderSet;)I|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L006ff8.   v0:= 209  @length 16;
@@ -6326,17 +6120,12 @@ record [|javax:obex:ServerRequestHandler|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|javax:obex:ServerRequestHandler.onDisconnect|] ([|javax:obex:ServerRequestHandler|] v0 @type (this), [|javax:obex:HeaderSet|] v1 @type (object), [|javax:obex:HeaderSet|] v2 @type (object)) @owner [|javax:obex:ServerRequestHandler|] @signature [|Ljavax/obex/ServerRequestHandler;.onDisconnect:(Ljavax/obex/HeaderSet;Ljavax/obex/HeaderSet;)V|] @Access PUBLIC {
       local temp ;
-
-
-
       
 #L007010.   return @void ;
 
    }
     procedure [|int|] [|javax:obex:ServerRequestHandler.onGet|] ([|javax:obex:ServerRequestHandler|] v1 @type (this), [|javax:obex:Operation|] v2 @type (object)) @owner [|javax:obex:ServerRequestHandler|] @signature [|Ljavax/obex/ServerRequestHandler;.onGet:(Ljavax/obex/Operation;)I|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L007024.   v0:= 209  @length 16;
@@ -6345,8 +6134,6 @@ record [|javax:obex:ServerRequestHandler|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|int|] [|javax:obex:ServerRequestHandler.onPut|] ([|javax:obex:ServerRequestHandler|] v1 @type (this), [|javax:obex:Operation|] v2 @type (object)) @owner [|javax:obex:ServerRequestHandler|] @signature [|Ljavax/obex/ServerRequestHandler;.onPut:(Ljavax/obex/Operation;)I|] @Access PUBLIC {
       local temp ;
-
-
         v0;
       
 #L00703c.   v0:= 209  @length 16;
@@ -6355,11 +6142,6 @@ record [|javax:obex:ServerRequestHandler|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|int|] [|javax:obex:ServerRequestHandler.onSetPath|] ([|javax:obex:ServerRequestHandler|] v1 @type (this), [|javax:obex:HeaderSet|] v2 @type (object), [|javax:obex:HeaderSet|] v3 @type (object), [|boolean|] v4, [|boolean|] v5) @owner [|javax:obex:ServerRequestHandler|] @signature [|Ljavax/obex/ServerRequestHandler;.onSetPath:(Ljavax/obex/HeaderSet;Ljavax/obex/HeaderSet;ZZ)I|] @Access PUBLIC {
       local temp ;
-
-
-
-
-
         v0;
       
 #L007054.   v0:= 209  @length 16;
@@ -6368,8 +6150,6 @@ record [|javax:obex:ServerRequestHandler|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|javax:obex:ServerRequestHandler.setConnectionId|] ([|javax:obex:ServerRequestHandler|] v2 @type (this), [|long|] v3) @owner [|javax:obex:ServerRequestHandler|] @signature [|Ljavax/obex/ServerRequestHandler;.setConnectionId:(J)V|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
       
@@ -6389,8 +6169,6 @@ record [|javax:obex:ServerRequestHandler|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|javax:obex:ServerRequestHandler.updateStatus|] ([|javax:obex:ServerRequestHandler|] v0 @type (this), [|java:lang:String|] v1 @type (object)) @owner [|javax:obex:ServerRequestHandler|] @signature [|Ljavax/obex/ServerRequestHandler;.updateStatus:(Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L0070b0.   return @void ;
 
@@ -6407,10 +6185,6 @@ record [|javax:obex:ServerSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
       global [|java:lang:String|] @@[|javax:obex:ServerSession.TAG|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|javax:obex:ServerSession.<init>|] ([|javax:obex:ServerSession|] v1 @type (this), [|javax:obex:ObexTransport|] v2 @type (object), [|javax:obex:ServerRequestHandler|] v3 @type (object), [|javax:obex:Authenticator|] v4 @type (object)) @owner [|javax:obex:ServerSession|] @signature [|Ljavax/obex/ServerSession;.<init>:(Ljavax/obex/ObexTransport;Ljavax/obex/ServerRequestHandler;Ljavax/obex/Authenticator;)V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
-
-
-
         v0;
       
 #L0070c4.   call temp:=  [|javax:obex:ObexSession.<init>|](v1) @signature [|Ljavax/obex/ObexSession;.<init>:()V|] @classDescriptor [|javax:obex:ObexSession|] @type direct;
@@ -6439,12 +6213,11 @@ record [|javax:obex:ServerSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|void|] [|javax:obex:ServerSession.handleAbortRequest|] ([|javax:obex:ServerSession|] v8 @type (this)) @owner [|javax:obex:ServerSession|] @signature [|Ljavax/obex/ServerSession;.handleAbortRequest:()V|] @Access PRIVATE {
       local temp ;
-        [|int|] v0 @varname [|code|] @scope ((L0002,L0056));
-        [|int|] v1 @varname [|i|] @scope ((L0029,L0056));
-        [|int|] v2 @varname [|length|] @scope ((L0012,L0056));
-        [|javax:obex:HeaderSet|] v3 @varname [|reply|] @scope ((L000c,L0056));
-        [|javax:obex:HeaderSet|] v4 @varname [|request|] @scope ((L0007,L0056));
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
         v5;
         v6;
         v7;
@@ -6495,25 +6268,24 @@ record [|javax:obex:ServerSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|void|] [|javax:obex:ServerSession.handleConnectRequest|] ([|javax:obex:ServerSession|] v23 @type (this)) @owner [|javax:obex:ServerSession|] @signature [|Ljavax/obex/ServerSession;.handleConnectRequest:()V|] @Access PRIVATE {
       local temp ;
-        [|byte|][] v11 @varname [|length|] @scope ((L0090,L00ea));
-        [|byte|][] v15 @varname [|sendData|] @scope ((L0094,L00ea));
-        [|int|] v3 @varname [|bytesReceived|] @scope ((L0102,L0122));
-        [|byte|][] v8 @varname [|headers|] @scope ((L00f6,L0122));
-        [|long|] v9 @varname [|id|] @scope ((L0203,L022f), (L0250,L0259));
-        [|java:lang:Exception|] v5 @varname [|e|] @scope ((L0246,L0250));
-        [|int|] v4 @varname [|code|] @scope ((L0004,L0259));
-        [|int|] v6 @varname [|flags|] @scope ((L003a,L0259));
-        [|byte|][] v7 @varname [|head|] @scope ((L0003,L0259));
-        [|int|] v12 @varname [|packetLength|] @scope ((L0018,L0259));
-        [|javax:obex:HeaderSet|] v13 @varname [|reply|] @scope ((L000e,L0259));
-        [|javax:obex:HeaderSet|] v14 @varname [|request|] @scope ((L0009,L0259));
-        [|int|] v16 @varname [|totalLength|] @scope ((L0002,L0259));
-        [|int|] v17 @varname [|version|] @scope ((L0030,L0259));
-
         v0;
         v1;
         v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
+        v9;
         v10;
+        v11;
+        v12;
+        v13;
+        v14;
+        v15;
+        v16;
+        v17;
         v18;
         v19;
         v20;
@@ -6828,20 +6600,19 @@ record [|javax:obex:ServerSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|void|] [|javax:obex:ServerSession.handleDisconnectRequest|] ([|javax:obex:ServerSession|] v17 @type (this)) @owner [|javax:obex:ServerSession|] @signature [|Ljavax/obex/ServerSession;.handleDisconnectRequest:()V|] @Access PRIVATE {
       local temp ;
-        [|byte|][] v10 @varname [|replyData|] @scope ((L0031,L0055), (L0111,L0113));
-        [|int|] v1 @varname [|bytesReceived|] @scope ((L0065,L0077));
-        [|byte|][] v5 @varname [|headers|] @scope ((L005d,L0077));
-        [|long|] v6 @varname [|id|] @scope ((L00d6,L00f2), (L0107,L010e));
-        [|java:lang:Exception|] v3 @varname [|e|] @scope ((L00fd,L0107));
-        [|int|] v2 @varname [|code|] @scope ((L0002,L0113));
-        [|byte|][] v4 @varname [|head|] @scope ((L0004,L0113));
-        [|int|] v8 @varname [|length|] @scope ((L0016,L0113));
-        [|javax:obex:HeaderSet|] v9 @varname [|reply|] @scope ((L000e,L0113));
-        [|javax:obex:HeaderSet|] v11 @varname [|request|] @scope ((L0009,L0113));
-        [|int|] v12 @varname [|totalLength|] @scope ((L0003,L0113));
-
         v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
         v7;
+        v8;
+        v9;
+        v10;
+        v11;
+        v12;
         v13;
         v14;
         v15;
@@ -7000,16 +6771,14 @@ record [|javax:obex:ServerSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|void|] [|javax:obex:ServerSession.handleGetRequest|] ([|javax:obex:ServerSession|] v8 @type (this), [|int|] v9) @owner [|javax:obex:ServerSession|] @signature [|Ljavax/obex/ServerSession;.handleGetRequest:(I)V|] @Access PRIVATE {
       local temp ;
-        [|int|] v7 @varname [|response|] @scope ((L0017,L001e));
-        [|javax:obex:ServerOperation|] v0 @varname [|op|] @scope ((L000d,L0027));
-        [|java:lang:Exception|] v6 @varname [|e|] @scope ((L0020,L0027));
-
-
+        v0;
         v1;
         v2;
         v3;
         v4;
         v5;
+        v6;
+        v7;
       
 #L007918.   v0:= new [|javax:obex:ServerOperation|];
 #L00791c.   v2:= v8.[|javax:obex:ServerSession.mInput|]   @type object;
@@ -7037,16 +6806,14 @@ record [|javax:obex:ServerSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|void|] [|javax:obex:ServerSession.handlePutRequest|] ([|javax:obex:ServerSession|] v8 @type (this), [|int|] v9) @owner [|javax:obex:ServerSession|] @signature [|Ljavax/obex/ServerSession;.handlePutRequest:(I)V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:Exception|] v6 @varname [|e|] @scope ((L004c,L0057));
-        [|javax:obex:ServerOperation|] v0 @varname [|op|] @scope ((L000d,L005b));
-        [|int|] v7 @varname [|response|] @scope ((L000e,L005b));
-
-
+        v0;
         v1;
         v2;
         v3;
         v4;
         v5;
+        v6;
+        v7;
       
 #L007984.   v0:= new [|javax:obex:ServerOperation|];
 #L007988.   v2:= v8.[|javax:obex:ServerSession.mInput|]   @type object;
@@ -7102,27 +6869,26 @@ record [|javax:obex:ServerSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|void|] [|javax:obex:ServerSession.handleSetPathRequest|] ([|javax:obex:ServerSession|] v25 @type (this)) @owner [|javax:obex:ServerSession|] @signature [|Ljavax/obex/ServerSession;.handleSetPathRequest:()V|] @Access PRIVATE {
       local temp ;
-        [|byte|][] v17 @varname [|replyData|] @scope ((L004b,L0090));
-        [|int|] v5 @varname [|bytesReceived|] @scope ((L00a9,L012d), (L020e,L021b));
-        [|byte|][] v12 @varname [|headers|] @scope ((L009d,L012d), (L020e,L021b));
-        [|boolean|] v4 @varname [|backup|] @scope ((L0188,L020e), (L021b,L023f));
-        [|boolean|] v8 @varname [|create|] @scope ((L0189,L020e), (L021b,L023f));
-        [|long|] v13 @varname [|id|] @scope ((L01de,L020e), (L0234,L023f));
-        [|java:lang:Exception|] v9 @varname [|e|] @scope ((L021c,L022b));
-        [|int|] v6 @varname [|code|] @scope ((L0004,L023f));
-        [|int|] v7 @varname [|constants|] @scope ((L003a,L023f));
-        [|int|] v10 @varname [|flags|] @scope ((L0030,L023f));
-        [|byte|][] v11 @varname [|head|] @scope ((L0003,L023f));
-        [|int|] v15 @varname [|length|] @scope ((L0018,L023f));
-        [|javax:obex:HeaderSet|] v16 @varname [|reply|] @scope ((L000e,L023f));
-        [|javax:obex:HeaderSet|] v18 @varname [|request|] @scope ((L0009,L023f));
-        [|int|] v19 @varname [|totalLength|] @scope ((L0002,L023f));
-
         v0;
         v1;
         v2;
         v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
+        v9;
+        v10;
+        v11;
+        v12;
+        v13;
         v14;
+        v15;
+        v16;
+        v17;
+        v18;
+        v19;
         v20;
         v21;
         v22;
@@ -7425,9 +7191,6 @@ record [|javax:obex:ServerSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|int|] [|javax:obex:ServerSession.validateResponseCode|] ([|javax:obex:ServerSession|] v2 @type (this), [|int|] v3) @owner [|javax:obex:ServerSession|] @signature [|Ljavax/obex/ServerSession;.validateResponseCode:(I)I|] @Access PRIVATE {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -7458,7 +7221,6 @@ record [|javax:obex:ServerSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|void|] [|javax:obex:ServerSession.close|] ([|javax:obex:ServerSession|] v1 @type (this)) @owner [|javax:obex:ServerSession|] @signature [|Ljavax/obex/ServerSession;.close:()V|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-
         v0;
       
 #L007f68.   (@monitorenter v1)
@@ -7497,12 +7259,11 @@ record [|javax:obex:ServerSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|void|] [|javax:obex:ServerSession.run|] ([|javax:obex:ServerSession|] v7 @type (this)) @owner [|javax:obex:ServerSession|] @signature [|Ljavax/obex/ServerSession;.run:()V|] @Access PUBLIC {
       local temp ;
-        [|int|] v2 @varname [|i|] @scope ((L0021,L002b), (L005f,L008c));
-        [|int|] v3 @varname [|length|] @scope ((L0016,L002b), (L005f,L008c));
-        [|int|] v4 @varname [|requestType|] @scope ((L000d,L002f), (L003d,L0046), (L0051,L008c));
-        [|java:lang:NullPointerException|] v1 @varname [|e|] @scope ((L0030,L0039), (L0047,L0051));
-        [|boolean|] v0 @varname [|done|] @scope ((L0001,L008c));
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
         v5;
         v6;
       
@@ -7581,11 +7342,8 @@ record [|javax:obex:ServerSession|]  @type class @AccessFlag PUBLIC_FINAL  exten
    }
     procedure [|void|] [|javax:obex:ServerSession.sendResponse|] ([|javax:obex:ServerSession|] v6 @type (this), [|int|] v7, [|byte|][] v8) @owner [|javax:obex:ServerSession|] @signature [|Ljavax/obex/ServerSession;.sendResponse:(I[B)V|] @Access PUBLIC {
       local temp ;
-        [|byte|][] v0 @varname [|data|] @scope ((L0005,L0031));
-        [|int|] v1 @varname [|totalLength|] @scope ((L0004,L0031));
-
-
-
+        v0;
+        v1;
         v2;
         v3;
         v4;

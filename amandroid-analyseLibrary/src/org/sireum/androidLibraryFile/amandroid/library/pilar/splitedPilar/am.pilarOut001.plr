@@ -7,7 +7,6 @@ record [|com:android:commands:am:Am$InstrumentationWatcher|]  @type class @Acces
    }
     procedure [|void|] [|com:android:commands:am:Am$InstrumentationWatcher.<init>|] ([|com:android:commands:am:Am$InstrumentationWatcher|] v1 @type (this), [|com:android:commands:am:Am|] v2 @type (object)) @owner [|com:android:commands:am:Am$InstrumentationWatcher|] @signature [|Lcom/android/commands/am/Am$InstrumentationWatcher;.<init>:(Lcom/android/commands/am/Am;)V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L0018d8.   v0:= 0  @length 4;
@@ -20,9 +19,6 @@ record [|com:android:commands:am:Am$InstrumentationWatcher|]  @type class @Acces
    }
     procedure [|void|] [|com:android:commands:am:Am$InstrumentationWatcher.<init>|] ([|com:android:commands:am:Am$InstrumentationWatcher|] v0 @type (this), [|com:android:commands:am:Am|] v1 @type (object), [|com:android:commands:am:Am$1|] v2 @type (object)) @owner [|com:android:commands:am:Am$InstrumentationWatcher|] @signature [|Lcom/android/commands/am/Am$InstrumentationWatcher;.<init>:(Lcom/android/commands/am/Am;Lcom/android/commands/am/Am$1;)V|] @Access SYNTHETIC_CONSTRUCTOR {
       local temp ;
-
-
-
       
 #L001900.   call temp:=  [|com:android:commands:am:Am$InstrumentationWatcher.<init>|](v0, v1) @signature [|Lcom/android/commands/am/Am$InstrumentationWatcher;.<init>:(Lcom/android/commands/am/Am;)V|] @classDescriptor [|com:android:commands:am:Am$InstrumentationWatcher|] @type direct;
 #L001906.   return @void ;
@@ -30,13 +26,9 @@ record [|com:android:commands:am:Am$InstrumentationWatcher|]  @type class @Acces
    }
     procedure [|void|] [|com:android:commands:am:Am$InstrumentationWatcher.instrumentationFinished|] ([|com:android:commands:am:Am$InstrumentationWatcher|] v6 @type (this), [|android:content:ComponentName|] v7 @type (object), [|int|] v8, [|android:os:Bundle|] v9 @type (object)) @owner [|com:android:commands:am:Am$InstrumentationWatcher|] @signature [|Lcom/android/commands/am/Am$InstrumentationWatcher;.instrumentationFinished:(Landroid/content/ComponentName;ILandroid/os/Bundle;)V|] @Access PUBLIC {
       local temp ;
-        [|java:util:Iterator|] v0 @varname [|i$|] @scope ((L0027,L005a));
-        [|java:lang:String|] v1 @varname [|key|] @scope ((L0033,L005a));
-        [|java:lang:String|] v2 @varname [|pretty|] @scope ((L0002,L0076));
-
-
-
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -108,13 +100,9 @@ record [|com:android:commands:am:Am$InstrumentationWatcher|]  @type class @Acces
    }
     procedure [|void|] [|com:android:commands:am:Am$InstrumentationWatcher.instrumentationStatus|] ([|com:android:commands:am:Am$InstrumentationWatcher|] v6 @type (this), [|android:content:ComponentName|] v7 @type (object), [|int|] v8, [|android:os:Bundle|] v9 @type (object)) @owner [|com:android:commands:am:Am$InstrumentationWatcher|] @signature [|Lcom/android/commands/am/Am$InstrumentationWatcher;.instrumentationStatus:(Landroid/content/ComponentName;ILandroid/os/Bundle;)V|] @Access PUBLIC {
       local temp ;
-        [|java:util:Iterator|] v0 @varname [|i$|] @scope ((L0024,L0057));
-        [|java:lang:String|] v1 @varname [|key|] @scope ((L0030,L0057));
-        [|java:lang:String|] v2 @varname [|pretty|] @scope ((L0002,L0073));
-
-
-
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -184,8 +172,6 @@ record [|com:android:commands:am:Am$InstrumentationWatcher|]  @type class @Acces
    }
     procedure [|void|] [|com:android:commands:am:Am$InstrumentationWatcher.setRawOutput|] ([|com:android:commands:am:Am$InstrumentationWatcher|] v0 @type (this), [|boolean|] v1) @owner [|com:android:commands:am:Am$InstrumentationWatcher|] @signature [|Lcom/android/commands/am/Am$InstrumentationWatcher;.setRawOutput:(Z)V|] @Access PUBLIC {
       local temp ;
-
-
       
 #L001b34.   v0.[|com:android:commands:am:Am$InstrumentationWatcher.mRawMode|]  := v1 @boolean;
 #L001b38.   return @void ;
@@ -193,8 +179,7 @@ record [|com:android:commands:am:Am$InstrumentationWatcher|]  @type class @Acces
    }
     procedure [|boolean|] [|com:android:commands:am:Am$InstrumentationWatcher.waitForFinish|] ([|com:android:commands:am:Am$InstrumentationWatcher|] v3 @type (this)) @owner [|com:android:commands:am:Am$InstrumentationWatcher|] @signature [|Lcom/android/commands/am/Am$InstrumentationWatcher;.waitForFinish:()Z|] @Access PUBLIC {
       local temp ;
-        [|java:lang:InterruptedException|] v0 @varname [|e|] @scope ((L001f,L0025));
-
+        v0;
         v1;
         v2;
       
@@ -241,7 +226,6 @@ record [|com:android:commands:am:Am$IntentReceiver|]  @type class @AccessFlag   
    }
     procedure [|void|] [|com:android:commands:am:Am$IntentReceiver.<init>|] ([|com:android:commands:am:Am$IntentReceiver|] v1 @type (this), [|com:android:commands:am:Am|] v2 @type (object)) @owner [|com:android:commands:am:Am$IntentReceiver|] @signature [|Lcom/android/commands/am/Am$IntentReceiver;.<init>:(Lcom/android/commands/am/Am;)V|] @Access PRIVATE_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L001bec.   v1.[|com:android:commands:am:Am$IntentReceiver.this$0|]  := v2 @type object;
@@ -253,9 +237,6 @@ record [|com:android:commands:am:Am$IntentReceiver|]  @type class @AccessFlag   
    }
     procedure [|void|] [|com:android:commands:am:Am$IntentReceiver.<init>|] ([|com:android:commands:am:Am$IntentReceiver|] v0 @type (this), [|com:android:commands:am:Am|] v1 @type (object), [|com:android:commands:am:Am$1|] v2 @type (object)) @owner [|com:android:commands:am:Am$IntentReceiver|] @signature [|Lcom/android/commands/am/Am$IntentReceiver;.<init>:(Lcom/android/commands/am/Am;Lcom/android/commands/am/Am$1;)V|] @Access SYNTHETIC_CONSTRUCTOR {
       local temp ;
-
-
-
       
 #L001c10.   call temp:=  [|com:android:commands:am:Am$IntentReceiver.<init>|](v0, v1) @signature [|Lcom/android/commands/am/Am$IntentReceiver;.<init>:(Lcom/android/commands/am/Am;)V|] @classDescriptor [|com:android:commands:am:Am$IntentReceiver|] @type direct;
 #L001c16.   return @void ;
@@ -263,15 +244,7 @@ record [|com:android:commands:am:Am$IntentReceiver|]  @type class @AccessFlag   
    }
     procedure [|void|] [|com:android:commands:am:Am$IntentReceiver.performReceive|] ([|com:android:commands:am:Am$IntentReceiver|] v3 @type (this), [|android:content:Intent|] v4 @type (object), [|int|] v5, [|java:lang:String|] v6 @type (object), [|android:os:Bundle|] v7 @type (object), [|boolean|] v8, [|boolean|] v9, [|int|] v10) @owner [|com:android:commands:am:Am$IntentReceiver|] @signature [|Lcom/android/commands/am/Am$IntentReceiver;.performReceive:(Landroid/content/Intent;ILjava/lang/String;Landroid/os/Bundle;ZZI)V|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|line|] @scope ((L0013,L005c));
-
-
-
-
-
-
-
-
+        v0;
         v1;
         v2;
       
@@ -327,8 +300,7 @@ record [|com:android:commands:am:Am$IntentReceiver|]  @type class @AccessFlag   
    }
     procedure [|void|] [|com:android:commands:am:Am$IntentReceiver.waitForFinish|] ([|com:android:commands:am:Am$IntentReceiver|] v2 @type (this)) @owner [|com:android:commands:am:Am$IntentReceiver|] @signature [|Lcom/android/commands/am/Am$IntentReceiver;.waitForFinish:()V|] @Access PUBLIC_DECLARED_SYNCHRONIZED {
       local temp ;
-        [|java:lang:InterruptedException|] v0 @varname [|e|] @scope ((L000a,L0010));
-
+        v0;
         v1;
       
 #L001cfc.   (@monitorenter v2)
@@ -356,7 +328,6 @@ record [|com:android:commands:am:Am$MyActivityController$1|]  @type class @Acces
    }
     procedure [|void|] [|com:android:commands:am:Am$MyActivityController$1.<init>|] ([|com:android:commands:am:Am$MyActivityController$1|] v0 @type (this), [|com:android:commands:am:Am$MyActivityController|] v1 @type (object), [|java:io:InputStreamReader|] v2 @type (object)) @owner [|com:android:commands:am:Am$MyActivityController$1|] @signature [|Lcom/android/commands/am/Am$MyActivityController$1;.<init>:(Lcom/android/commands/am/Am$MyActivityController;Ljava/io/InputStreamReader;)V|] @Access CONSTRUCTOR {
       local temp ;
-
       
 #L001d50.   v0.[|com:android:commands:am:Am$MyActivityController$1.this$1|]  := v1 @type object;
 #L001d54.   v0.[|com:android:commands:am:Am$MyActivityController$1.val$converter|]  := v2 @type object;
@@ -366,11 +337,10 @@ record [|com:android:commands:am:Am$MyActivityController$1|]  @type class @Acces
    }
     procedure [|void|] [|com:android:commands:am:Am$MyActivityController$1.run|] ([|com:android:commands:am:Am$MyActivityController$1|] v7 @type (this)) @owner [|com:android:commands:am:Am$MyActivityController$1|] @signature [|Lcom/android/commands/am/Am$MyActivityController$1;.run:()V|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|] v3 @varname [|line|] @scope ((L0025,L0042));
-        [|int|] v0 @varname [|count|] @scope ((L0008,L0047));
-        [|java:io:IOException|] v1 @varname [|e|] @scope ((L0046,L0047));
-        [|java:io:BufferedReader|] v2 @varname [|in|] @scope ((L0007,L0047));
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -443,8 +413,6 @@ record [|com:android:commands:am:Am$MyActivityController|]  @type class @AccessF
       global [|int|] @@[|com:android:commands:am:Am$MyActivityController.STATE_NORMAL|]    @AccessFlag STATIC_FINAL;
     procedure [|void|] [|com:android:commands:am:Am$MyActivityController.<init>|] ([|com:android:commands:am:Am$MyActivityController|] v0 @type (this), [|com:android:commands:am:Am|] v1 @type (object), [|java:lang:String|] v2 @type (object)) @owner [|com:android:commands:am:Am$MyActivityController|] @signature [|Lcom/android/commands/am/Am$MyActivityController;.<init>:(Lcom/android/commands/am/Am;Ljava/lang/String;)V|] @Access CONSTRUCTOR {
       local temp ;
-
-
       
 #L001e30.   v0.[|com:android:commands:am:Am$MyActivityController.this$0|]  := v1 @type object;
 #L001e34.   call temp:=  [|android:app:IActivityController$Stub.<init>|](v0) @signature [|Landroid/app/IActivityController$Stub;.<init>:()V|] @classDescriptor [|android:app:IActivityController$Stub|] @type direct;
@@ -454,8 +422,6 @@ record [|com:android:commands:am:Am$MyActivityController|]  @type class @AccessF
    }
     procedure [|boolean|] [|com:android:commands:am:Am$MyActivityController.activityResuming|] ([|com:android:commands:am:Am$MyActivityController|] v3 @type (this), [|java:lang:String|] v4 @type (object)) @owner [|com:android:commands:am:Am$MyActivityController|] @signature [|Lcom/android/commands/am/Am$MyActivityController;.activityResuming:(Ljava/lang/String;)Z|] @Access PUBLIC {
       local temp ;
-
-
         v0;
         v1;
         v2;
@@ -483,9 +449,6 @@ record [|com:android:commands:am:Am$MyActivityController|]  @type class @AccessF
    }
     procedure [|boolean|] [|com:android:commands:am:Am$MyActivityController.activityStarting|] ([|com:android:commands:am:Am$MyActivityController|] v3 @type (this), [|android:content:Intent|] v4 @type (object), [|java:lang:String|] v5 @type (object)) @owner [|com:android:commands:am:Am$MyActivityController|] @signature [|Lcom/android/commands/am/Am$MyActivityController;.activityStarting:(Landroid/content/Intent;Ljava/lang/String;)Z|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
         v2;
@@ -513,14 +476,7 @@ record [|com:android:commands:am:Am$MyActivityController|]  @type class @AccessF
    }
     procedure [|boolean|] [|com:android:commands:am:Am$MyActivityController.appCrashed|] ([|com:android:commands:am:Am$MyActivityController|] v5 @type (this), [|java:lang:String|] v6 @type (object), [|int|] v7, [|java:lang:String|] v8 @type (object), [|java:lang:String|] v9 @type (object), [|long|] v10, [|java:lang:String|] v12 @type (object)) @owner [|com:android:commands:am:Am$MyActivityController|] @signature [|Lcom/android/commands/am/Am$MyActivityController;.appCrashed:(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;JLjava/lang/String;)Z|] @Access PUBLIC {
       local temp ;
-        [|int|] v0 @varname [|result|] @scope ((L0099,L009e));
-
-
-
-
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -609,11 +565,7 @@ record [|com:android:commands:am:Am$MyActivityController|]  @type class @AccessF
    }
     procedure [|int|] [|com:android:commands:am:Am$MyActivityController.appEarlyNotResponding|] ([|com:android:commands:am:Am$MyActivityController|] v4 @type (this), [|java:lang:String|] v5 @type (object), [|int|] v6, [|java:lang:String|] v7 @type (object)) @owner [|com:android:commands:am:Am$MyActivityController|] @signature [|Lcom/android/commands/am/Am$MyActivityController;.appEarlyNotResponding:(Ljava/lang/String;ILjava/lang/String;)I|] @Access PUBLIC {
       local temp ;
-        [|int|] v0 @varname [|result|] @scope ((L0055,L005e));
-
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -674,11 +626,7 @@ record [|com:android:commands:am:Am$MyActivityController|]  @type class @AccessF
    }
     procedure [|int|] [|com:android:commands:am:Am$MyActivityController.appNotResponding|] ([|com:android:commands:am:Am$MyActivityController|] v5 @type (this), [|java:lang:String|] v6 @type (object), [|int|] v7, [|java:lang:String|] v8 @type (object)) @owner [|com:android:commands:am:Am$MyActivityController|] @signature [|Lcom/android/commands/am/Am$MyActivityController;.appNotResponding:(Ljava/lang/String;ILjava/lang/String;)I|] @Access PUBLIC {
       local temp ;
-        [|int|] v0 @varname [|result|] @scope ((L0051,L005a), (L005d,L0060));
-
-
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -741,7 +689,6 @@ record [|com:android:commands:am:Am$MyActivityController|]  @type class @AccessF
    }
     procedure [|void|] [|com:android:commands:am:Am$MyActivityController.killGdbLocked|] ([|com:android:commands:am:Am$MyActivityController|] v3 @type (this)) @owner [|com:android:commands:am:Am$MyActivityController|] @signature [|Lcom/android/commands/am/Am$MyActivityController;.killGdbLocked:()V|] @Access  {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -767,7 +714,6 @@ record [|com:android:commands:am:Am$MyActivityController|]  @type class @AccessF
    }
     procedure [|void|] [|com:android:commands:am:Am$MyActivityController.printMessageForState|] ([|com:android:commands:am:Am$MyActivityController|] v2 @type (this)) @owner [|com:android:commands:am:Am$MyActivityController|] @signature [|Lcom/android/commands/am/Am$MyActivityController;.printMessageForState:()V|] @Access  {
       local temp ;
-
         v0;
         v1;
       
@@ -824,8 +770,6 @@ record [|com:android:commands:am:Am$MyActivityController|]  @type class @AccessF
    }
     procedure [|void|] [|com:android:commands:am:Am$MyActivityController.resumeController|] ([|com:android:commands:am:Am$MyActivityController|] v1 @type (this), [|int|] v2) @owner [|com:android:commands:am:Am$MyActivityController|] @signature [|Lcom/android/commands/am/Am$MyActivityController;.resumeController:(I)V|] @Access  {
       local temp ;
-
-
         v0;
       
 #L002364.   (@monitorenter v1)
@@ -843,12 +787,11 @@ record [|com:android:commands:am:Am$MyActivityController|]  @type class @AccessF
    }
     procedure [|void|] [|com:android:commands:am:Am$MyActivityController.run|] ([|com:android:commands:am:Am$MyActivityController|] v10 @type (this)) @owner [|com:android:commands:am:Am$MyActivityController|] @signature [|Lcom/android/commands/am/Am$MyActivityController;.run:()V|] @Access  {
       local temp ;
-        [|boolean|] v0 @varname [|addNewline|] @scope ((L0024,L003d), (L004b,L005f), (L0069,L0082), (L008d,L0182));
-        [|java:io:InputStreamReader|] v1 @varname [|converter|] @scope ((L0018,L003d), (L004b,L0082), (L008d,L0182));
-        [|java:io:BufferedReader|] v3 @varname [|in|] @scope ((L001d,L003d), (L004b,L0082), (L008d,L0182));
-        [|java:lang:String|] v4 @varname [|line|] @scope ((L0021,L003d), (L004b,L0082), (L008d,L0182));
-        [|java:io:IOException|] v2 @varname [|e|] @scope ((L003e,L004a));
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
         v5;
         v6;
         v7;
@@ -1065,11 +1008,8 @@ record [|com:android:commands:am:Am$MyActivityController|]  @type class @AccessF
    }
     procedure [|int|] [|com:android:commands:am:Am$MyActivityController.waitControllerLocked|] ([|com:android:commands:am:Am$MyActivityController|] v7 @type (this), [|int|] v8, [|int|] v9) @owner [|com:android:commands:am:Am$MyActivityController|] @signature [|Lcom/android/commands/am/Am$MyActivityController;.waitControllerLocked:(II)I|] @Access  {
       local temp ;
-        [|java:io:InputStreamReader|] v0 @varname [|converter|] @scope ((L00a9,L00ba), (L00f3,L00f5));
-        [|java:io:IOException|] v1 @varname [|e|] @scope ((L00d1,L00ed));
-
-
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -1218,7 +1158,6 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
       global [|java:lang:String|] @@[|com:android:commands:am:Am.NO_SYSTEM_ERROR_CODE|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|com:android:commands:am:Am.<init>|] ([|com:android:commands:am:Am|] v1 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L002918.   v0:= 0  @length 4;
@@ -1232,7 +1171,6 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|android:app:IActivityManager|] [|com:android:commands:am:Am.access$200|] ([|com:android:commands:am:Am|] v1 @type (object)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.access$200:(Lcom/android/commands/am/Am;)Landroid/app/IActivityManager;|] @Access STATIC_SYNTHETIC {
       local temp ;
-
         v0;
       
 #L002944.   v0:= v1.[|com:android:commands:am:Am.mAm|]   @type object;
@@ -1241,8 +1179,7 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.main|] ([|java:lang:String|][] v4 @type (object)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.main:([Ljava/lang/String;)V|] @Access PUBLIC_STATIC {
       local temp ;
-        [|java:lang:IllegalArgumentException|] v0 @varname [|e|] @scope ((L000a,L002a), (L002b,L0035));
-
+        v0;
         v1;
         v2;
         v3;
@@ -1279,30 +1216,28 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|android:content:Intent|] [|com:android:commands:am:Am.makeIntent|] ([|com:android:commands:am:Am|] v25 @type (this), [|int|] v26) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.makeIntent:(I)Landroid/content/Intent;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v14 @varname [|key|] @scope ((L00b8,L00c3), (L00d3,L00de), (L00ee,L00fd), (L010d,L011c), (L012c,L0158), (L0168,L0199), (L01a9,L01b8), (L01c8,L01fa), (L020a,L021a), (L022a,L025c), (L026c,L027b));
-        [|java:lang:String|] v21 @varname [|value|] @scope ((L00bc,L00c3), (L00f2,L00fd), (L0111,L011c), (L0130,L0158), (L016c,L0199), (L01ad,L01b8), (L01cc,L01fa), (L020e,L021a), (L022e,L025c), (L0270,L027b));
-        [|android:content:ComponentName|] v6 @varname [|cn|] @scope ((L0134,L0158), (L028f,L02b6));
-        [|int|] v11 @varname [|i|] @scope ((L017c,L0199), (L01dc,L01fa), (L023e,L025c));
-        [|int|][] v15 @varname [|list|] @scope ((L017b,L0199), (L01db,L01fa), (L023d,L025c));
-        [|java:lang:String|][] v18 @varname [|strings|] @scope ((L0172,L0199), (L01d2,L01fa), (L0234,L025c));
-        [|java:lang:String|] v17 @varname [|str|] @scope ((L028b,L02b6), (L02c6,L02d5));
-        [|android:content:Intent|] v13 @varname [|intent|] @scope ((L0005,L04b7), (L04ba,L06aa));
-        [|android:content:Intent|] v3 @varname [|baseIntent|] @scope ((L0006,L05e0), (L05e7,L0656), (L065d,L0670), (L0677,L06aa));
-        [|java:lang:String|] v2 @varname [|arg|] @scope ((L05d9,L0635), (L0637,L06aa));
-        [|java:lang:String|] v4 @varname [|c|] @scope ((L0631,L0635));
-        [|java:util:HashSet|] v5 @varname [|cats|] @scope ((L0621,L0635));
-        [|android:os:Bundle|] v8 @varname [|extras|] @scope ((L05f4,L0635), (L0683,L0692), (L069c,L06a6));
-        [|boolean|] v10 @varname [|hasSelector|] @scope ((L05cf,L0635), (L0637,L06aa));
-        [|java:util:Iterator|] v12 @varname [|i$|] @scope ((L0625,L0635));
-        [|android:os:Bundle|] v20 @varname [|uriExtras|] @scope ((L0601,L0635), (L0683,L0692), (L069c,L06a6));
-        [|android:net:Uri|] v7 @varname [|data|] @scope ((L0036,L06aa));
-        [|boolean|] v9 @varname [|hasIntentInfo|] @scope ((L0007,L06aa));
-        [|java:lang:String|] v16 @varname [|opt|] @scope ((L003c,L06aa));
-        [|java:lang:String|] v19 @varname [|type|] @scope ((L0038,L06aa));
-
-
         v0;
         v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
+        v9;
+        v10;
+        v11;
+        v12;
+        v13;
+        v14;
+        v15;
+        v16;
+        v17;
+        v18;
+        v19;
+        v20;
+        v21;
         v22;
         v23;
         v24;
@@ -2152,8 +2087,7 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|java:lang:String|] [|com:android:commands:am:Am.nextArg|] ([|com:android:commands:am:Am|] v4 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.nextArg:()Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|arg|] @scope ((L0007,L0009));
-
+        v0;
         v1;
         v2;
         v3;
@@ -2180,9 +2114,8 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|java:lang:String|] [|com:android:commands:am:Am.nextArgRequired|] ([|com:android:commands:am:Am|] v5 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.nextArgRequired:()Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v1 @varname [|prev|] @scope ((L000e,L002d));
-        [|java:lang:String|] v0 @varname [|arg|] @scope ((L0004,L002e));
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -2214,9 +2147,8 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|java:lang:String|] [|com:android:commands:am:Am.nextOption|] ([|com:android:commands:am:Am|] v7 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.nextOption:()Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v1 @varname [|prev|] @scope ((L000f,L002e));
-        [|java:lang:String|] v0 @varname [|arg|] @scope ((L003d,L007d));
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -2296,7 +2228,7 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.removeWallOption|] () @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.removeWallOption:()V|] @Access STATIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|props|] @scope ((L0006,L0022));
+        v0;
         v1;
         v2;
       
@@ -2321,9 +2253,7 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.run|] ([|com:android:commands:am:Am|] v4 @type (this), [|java:lang:String|][] v5 @type (object)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.run:([Ljava/lang/String;)V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|op|] @scope ((L0026,L013d));
-
-
+        v0;
         v1;
         v2;
         v3;
@@ -2485,7 +2415,6 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.runBugReport|] ([|com:android:commands:am:Am|] v2 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.runBugReport:()V|] @Access PRIVATE {
       local temp ;
-
         v0;
         v1;
       
@@ -2499,7 +2428,6 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.runClearDebugApp|] ([|com:android:commands:am:Am|] v4 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.runClearDebugApp:()V|] @Access PRIVATE {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -2515,11 +2443,10 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.runDisplayDensity|] ([|com:android:commands:am:Am|] v7 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.runDisplayDensity:()V|] @Access PRIVATE {
       local temp ;
-        [|int|] v0 @varname [|density|] @scope ((L000d,L0028), (L002c,L0037), (L0052,L0060));
-        [|android:view:IWindowManager|] v3 @varname [|wm|] @scope ((L0017,L0028), (L0052,L0060));
-        [|java:lang:NumberFormatException|] v2 @varname [|e|] @scope ((L0039,L0052));
-        [|java:lang:String|] v1 @varname [|densityStr|] @scope ((L0004,L0060));
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -2580,15 +2507,14 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.runDisplaySize|] ([|com:android:commands:am:Am|] v11 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.runDisplaySize:()V|] @Access PRIVATE {
       local temp ;
-        [|int|] v2 @varname [|h|] @scope ((L000e,L002a), (L0065,L0066), (L0080,L0090));
-        [|int|] v5 @varname [|w|] @scope ((L000f,L002a), (L0061,L0066), (L0080,L0090));
-        [|android:view:IWindowManager|] v6 @varname [|wm|] @scope ((L0019,L002a), (L0080,L0090));
-        [|int|] v0 @varname [|div|] @scope ((L0030,L0052), (L0053,L0080));
-        [|java:lang:NumberFormatException|] v1 @varname [|e|] @scope ((L0067,L0080));
-        [|java:lang:String|] v3 @varname [|hstr|] @scope ((L005d,L0080));
-        [|java:lang:String|] v7 @varname [|wstr|] @scope ((L0057,L0080));
-        [|java:lang:String|] v4 @varname [|size|] @scope ((L0005,L0090));
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
         v8;
         v9;
         v10;
@@ -2674,16 +2600,15 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.runDumpHeap|] ([|com:android:commands:am:Am|] v11 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.runDumpHeap:()V|] @Access PRIVATE {
       local temp ;
-        [|java:io:File|] v7 @varname [|file|] @scope ((L0054,L007e));
-        [|java:lang:String|] v1 @varname [|process|] @scope ((L004a,L0098));
-        [|int|] v2 @varname [|userId|] @scope ((L0002,L0098));
-        [|boolean|] v3 @varname [|managed|] @scope ((L0001,L0098));
-        [|java:lang:String|] v4 @varname [|heapFile|] @scope ((L004e,L0098));
-        [|android:os:ParcelFileDescriptor|] v5 @varname [|fd|] @scope ((L004f,L0098));
-        [|java:io:FileNotFoundException|] v6 @varname [|e|] @scope ((L007f,L0098));
-        [|java:lang:String|] v8 @varname [|opt|] @scope ((L0006,L0098));
-
         v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
         v9;
         v10;
       
@@ -2769,9 +2694,8 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.runForceStop|] ([|com:android:commands:am:Am|] v5 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.runForceStop:()V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|opt|] @scope ((L0005,L003b));
-        [|int|] v1 @varname [|userId|] @scope ((L0001,L003b));
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -2810,24 +2734,23 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.runInstrument|] ([|com:android:commands:am:Am|] v18 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.runInstrument:()V|] @Access PRIVATE {
       local temp ;
-        [|com:android:commands:am:Am$InstrumentationWatcher|] v6 @varname [|watcher|] @scope ((L00c2,L00c6), (L00cc,L0128));
-        [|android:content:ComponentName|] v2 @varname [|cn|] @scope ((L00a4,L0128));
-        [|java:lang:String|] v3 @varname [|profileFile|] @scope ((L0001,L0128));
-        [|android:os:Bundle|] v5 @varname [|args|] @scope ((L000a,L0128));
-        [|int|] v7 @varname [|userId|] @scope ((L0005,L0128));
-        [|java:lang:String|] v8 @varname [|argKey|] @scope ((L000b,L0128));
-        [|java:lang:String|] v9 @varname [|argValue|] @scope ((L000c,L0128));
-        [|java:lang:String|] v10 @varname [|cnArg|] @scope ((L00a0,L0128));
-        [|boolean|] v11 @varname [|no_window_animation|] @scope ((L0004,L0128));
-        [|float|][] v12 @varname [|oldAnims|] @scope ((L00d0,L0128));
-        [|java:lang:String|] v13 @varname [|opt|] @scope ((L001a,L0128));
-        [|boolean|] v14 @varname [|rawMode|] @scope ((L0003,L0128));
-        [|boolean|] v15 @varname [|wait|] @scope ((L0002,L0128));
-        [|android:view:IWindowManager|] v16 @varname [|wm|] @scope ((L0016,L0128));
-
         v0;
         v1;
+        v2;
+        v3;
         v4;
+        v5;
+        v6;
+        v7;
+        v8;
+        v9;
+        v10;
+        v11;
+        v12;
+        v13;
+        v14;
+        v15;
+        v16;
         v17;
       
 #L004044.   v3:= 0  @length 4;
@@ -2989,9 +2912,8 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.runKill|] ([|com:android:commands:am:Am|] v5 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.runKill:()V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|opt|] @scope ((L0005,L003b));
-        [|int|] v1 @varname [|userId|] @scope ((L0001,L003b));
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -3030,7 +2952,6 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.runKillAll|] ([|com:android:commands:am:Am|] v1 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.runKillAll:()V|] @Access PRIVATE {
       local temp ;
-
         v0;
       
 #L00432c.   v0:= v1.[|com:android:commands:am:Am.mAm|]   @type object;
@@ -3040,10 +2961,9 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.runMonitor|] ([|com:android:commands:am:Am|] v6 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.runMonitor:()V|] @Access PRIVATE {
       local temp ;
-        [|com:android:commands:am:Am$MyActivityController|] v0 @varname [|controller|] @scope ((L0032,L0036));
-        [|java:lang:String|] v1 @varname [|gdbPort|] @scope ((L0001,L0036));
-        [|java:lang:String|] v2 @varname [|opt|] @scope ((L0005,L0036));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -3079,19 +2999,18 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.runProfile|] ([|com:android:commands:am:Am|] v14 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.runProfile:()V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v9 @varname [|opt|] @scope ((L0017,L004c), (L004d,L0051), (L0068,L0099));
-        [|java:lang:String|] v10 @varname [|props|] @scope ((L00e9,L0105));
-        [|java:io:FileNotFoundException|] v8 @varname [|e|] @scope ((L012c,L0146));
-        [|java:lang:String|] v1 @varname [|process|] @scope ((L0006,L014d));
-        [|int|] v2 @varname [|userId|] @scope ((L0004,L014d));
-        [|boolean|] v3 @varname [|start|] @scope ((L0002,L014d));
-        [|java:lang:String|] v4 @varname [|profileFile|] @scope ((L0001,L014d));
-        [|android:os:ParcelFileDescriptor|] v5 @varname [|fd|] @scope ((L00d0,L014d));
-        [|int|] v6 @varname [|profileType|] @scope ((L0005,L014d));
-        [|java:lang:String|] v7 @varname [|cmd|] @scope ((L000a,L014d));
-        [|boolean|] v11 @varname [|wall|] @scope ((L0003,L014d));
-
         v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
+        v9;
+        v10;
+        v11;
         v12;
         v13;
       
@@ -3274,10 +3193,9 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.runScreenCompat|] ([|com:android:commands:am:Am|] v6 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.runScreenCompat:()V|] @Access PRIVATE {
       local temp ;
-        [|boolean|] v0 @varname [|enabled|] @scope ((L000d,L001f), (L0029,L002a), (L0043,L0047));
-        [|java:lang:String|] v2 @varname [|packageName|] @scope ((L0011,L001f), (L0043,L0047));
-        [|java:lang:String|] v1 @varname [|mode|] @scope ((L0004,L0047));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -3326,11 +3244,10 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.runSetDebugApp|] ([|com:android:commands:am:Am|] v7 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.runSetDebugApp:()V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|opt|] @scope ((L0006,L003f));
-        [|boolean|] v1 @varname [|persistent|] @scope ((L0002,L003f));
-        [|java:lang:String|] v2 @varname [|pkg|] @scope ((L0039,L003f));
-        [|boolean|] v3 @varname [|wait|] @scope ((L0001,L003f));
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -3373,28 +3290,27 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.runStart|] ([|com:android:commands:am:Am|] v21 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.runStart:()V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v17 @varname [|packageName|] @scope ((L0056,L0082), (L0243,L0245));
-        [|android:app:IActivityManager$WaitResult|] v20 @varname [|result|] @scope ((L00b7,L010e), (L0111,L01d3), (L0264,L0328));
-        [|android:os:ParcelFileDescriptor|] v10 @varname [|fd|] @scope ((L00a0,L01d3), (L0245,L0328));
-        [|boolean|] v15 @varname [|launched|] @scope ((L00e5,L01d3), (L0283,L0328));
-        [|java:io:PrintStream|] v16 @varname [|out|] @scope ((L00e4,L01d3), (L0283,L0328));
-        [|int|] v19 @varname [|res|] @scope ((L00dc,L01d3), (L027d,L0328));
-        [|java:util:List|] v13 @varname [|activities|] @scope ((L01f3,L0245));
-        [|android:content:pm:IPackageManager|] v18 @varname [|pm|] @scope ((L01dd,L0245));
-        [|java:io:FileNotFoundException|] v14 @varname [|e|] @scope ((L0246,L0264));
-        [|android:content:Intent|] v3 @varname [|intent|] @scope ((L0007,L0328));
-        [|java:lang:String|] v4 @varname [|mimeType|] @scope ((L001a,L0328));
-
         v0;
         v1;
         v2;
+        v3;
+        v4;
         v5;
         v6;
         v7;
         v8;
         v9;
+        v10;
         v11;
         v12;
+        v13;
+        v14;
+        v15;
+        v16;
+        v17;
+        v18;
+        v19;
+        v20;
       
 #L0047c4.   v1:= -2  @length 4;
 #L0047c6.   v0:= v21  @type object;
@@ -3798,9 +3714,8 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.runStartService|] ([|com:android:commands:am:Am|] v6 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.runStartService:()V|] @Access PRIVATE {
       local temp ;
-        [|android:content:ComponentName|] v0 @varname [|cn|] @scope ((L0037,L0094));
-        [|android:content:Intent|] v1 @varname [|intent|] @scope ((L0005,L0094));
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -3883,10 +3798,9 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.runStopUser|] ([|com:android:commands:am:Am|] v6 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.runStopUser:()V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v1 @varname [|txt|] @scope ((L0013,L0032), (L0033,L0058));
-        [|int|] v0 @varname [|res|] @scope ((L000f,L0058));
-        [|java:lang:String|] v2 @varname [|user|] @scope ((L0004,L0058));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -3939,8 +3853,7 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.runSwitchUser|] ([|com:android:commands:am:Am|] v3 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.runSwitchUser:()V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|user|] @scope ((L0004,L000e));
-
+        v0;
         v1;
         v2;
       
@@ -3955,9 +3868,7 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.runToUri|] ([|com:android:commands:am:Am|] v3 @type (this), [|boolean|] v4) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.runToUri:(Z)V|] @Access PRIVATE {
       local temp ;
-        [|android:content:Intent|] v0 @varname [|intent|] @scope ((L0005,L0014));
-
-
+        v0;
         v1;
         v2;
       
@@ -3977,12 +3888,11 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|void|] [|com:android:commands:am:Am.sendBroadcast|] ([|com:android:commands:am:Am|] v12 @type (this)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.sendBroadcast:()V|] @Access PRIVATE {
       local temp ;
-        [|android:content:Intent|] v2 @varname [|intent|] @scope ((L0007,L0035));
-        [|com:android:commands:am:Am$IntentReceiver|] v4 @varname [|receiver|] @scope ((L000c,L0035));
-
         v0;
         v1;
+        v2;
         v3;
+        v4;
         v5;
         v6;
         v7;
@@ -4035,9 +3945,7 @@ record [|com:android:commands:am:Am|]  @type class @AccessFlag PUBLIC  {
    }
     procedure [|int|] [|com:android:commands:am:Am.parseUserArg|] ([|com:android:commands:am:Am|] v2 @type (this), [|java:lang:String|] v3 @type (object)) @owner [|com:android:commands:am:Am|] @signature [|Lcom/android/commands/am/Am;.parseUserArg:(Ljava/lang/String;)I|] @Access  {
       local temp ;
-        [|int|] v0 @varname [|userId|] @scope ((L0009,L000a), (L001b,L001c), (L0020,L0021));
-
-
+        v0;
         v1;
       
 #L00512c.   v1:= "all" @type (object, string);

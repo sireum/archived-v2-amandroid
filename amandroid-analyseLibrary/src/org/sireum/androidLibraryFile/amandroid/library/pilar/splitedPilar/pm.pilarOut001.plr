@@ -3,7 +3,6 @@ record [|com:android:commands:pm:Pm$1|]  @type class @AccessFlag  extends  [|jav
    }
     procedure [|void|] [|com:android:commands:pm:Pm$1.<init>|] ([|com:android:commands:pm:Pm$1|] v0 @type (this), [|com:android:commands:pm:Pm|] v1 @type (object)) @owner [|com:android:commands:pm:Pm$1|] @signature [|Lcom/android/commands/pm/Pm$1;.<init>:(Lcom/android/commands/pm/Pm;)V|] @Access CONSTRUCTOR {
       local temp ;
-
       
 #L001718.   v0.[|com:android:commands:pm:Pm$1.this$0|]  := v1 @type object;
 #L00171c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
@@ -12,9 +11,6 @@ record [|com:android:commands:pm:Pm$1|]  @type class @AccessFlag  extends  [|jav
    }
     procedure [|int|] [|com:android:commands:pm:Pm$1.compare|] ([|com:android:commands:pm:Pm$1|] v2 @type (this), [|android:content:pm:FeatureInfo|] v3 @type (object), [|android:content:pm:FeatureInfo|] v4 @type (object)) @owner [|com:android:commands:pm:Pm$1|] @signature [|Lcom/android/commands/pm/Pm$1;.compare:(Landroid/content/pm/FeatureInfo;Landroid/content/pm/FeatureInfo;)I|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -40,9 +36,6 @@ record [|com:android:commands:pm:Pm$1|]  @type class @AccessFlag  extends  [|jav
    }
     procedure [|int|] [|com:android:commands:pm:Pm$1.compare|] ([|com:android:commands:pm:Pm$1|] v1 @type (this), [|java:lang:Object|] v2 @type (object), [|java:lang:Object|] v3 @type (object)) @owner [|com:android:commands:pm:Pm$1|] @signature [|Lcom/android/commands/pm/Pm$1;.compare:(Ljava/lang/Object;Ljava/lang/Object;)I|] @Access PUBLIC_BRIDGE_SYNTHETIC {
       local temp ;
-
-
-
         v0;
       
 #L001780.   v2:= ([|android:content:pm:FeatureInfo|])v2;
@@ -57,7 +50,6 @@ record [|com:android:commands:pm:Pm$2|]  @type class @AccessFlag  extends  [|jav
    }
     procedure [|void|] [|com:android:commands:pm:Pm$2.<init>|] ([|com:android:commands:pm:Pm$2|] v0 @type (this), [|com:android:commands:pm:Pm|] v1 @type (object)) @owner [|com:android:commands:pm:Pm$2|] @signature [|Lcom/android/commands/pm/Pm$2;.<init>:(Lcom/android/commands/pm/Pm;)V|] @Access CONSTRUCTOR {
       local temp ;
-
       
 #L0017a4.   v0.[|com:android:commands:pm:Pm$2.this$0|]  := v1 @type object;
 #L0017a8.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
@@ -66,9 +58,6 @@ record [|com:android:commands:pm:Pm$2|]  @type class @AccessFlag  extends  [|jav
    }
     procedure [|int|] [|com:android:commands:pm:Pm$2.compare|] ([|com:android:commands:pm:Pm$2|] v1 @type (this), [|java:lang:Object|] v2 @type (object), [|java:lang:Object|] v3 @type (object)) @owner [|com:android:commands:pm:Pm$2|] @signature [|Lcom/android/commands/pm/Pm$2;.compare:(Ljava/lang/Object;Ljava/lang/Object;)I|] @Access PUBLIC_BRIDGE_SYNTHETIC {
       local temp ;
-
-
-
         v0;
       
 #L0017c0.   v2:= ([|java:lang:String|])v2;
@@ -80,9 +69,6 @@ record [|com:android:commands:pm:Pm$2|]  @type class @AccessFlag  extends  [|jav
    }
     procedure [|int|] [|com:android:commands:pm:Pm$2.compare|] ([|com:android:commands:pm:Pm$2|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|java:lang:String|] v3 @type (object)) @owner [|com:android:commands:pm:Pm$2|] @signature [|Lcom/android/commands/pm/Pm$2;.compare:(Ljava/lang/String;Ljava/lang/String;)I|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L0017e4.   if v2 != v3 then goto L0017ec;
@@ -104,7 +90,6 @@ record [|com:android:commands:pm:Pm$3|]  @type class @AccessFlag  extends  [|jav
    }
     procedure [|void|] [|com:android:commands:pm:Pm$3.<init>|] ([|com:android:commands:pm:Pm$3|] v0 @type (this), [|com:android:commands:pm:Pm|] v1 @type (object)) @owner [|com:android:commands:pm:Pm$3|] @signature [|Lcom/android/commands/pm/Pm$3;.<init>:(Lcom/android/commands/pm/Pm;)V|] @Access CONSTRUCTOR {
       local temp ;
-
       
 #L001818.   v0.[|com:android:commands:pm:Pm$3.this$0|]  := v1 @type object;
 #L00181c.   call temp:=  [|java:lang:Object.<init>|](v0) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
@@ -113,9 +98,6 @@ record [|com:android:commands:pm:Pm$3|]  @type class @AccessFlag  extends  [|jav
    }
     procedure [|int|] [|com:android:commands:pm:Pm$3.compare|] ([|com:android:commands:pm:Pm$3|] v2 @type (this), [|android:content:pm:InstrumentationInfo|] v3 @type (object), [|android:content:pm:InstrumentationInfo|] v4 @type (object)) @owner [|com:android:commands:pm:Pm$3|] @signature [|Lcom/android/commands/pm/Pm$3;.compare:(Landroid/content/pm/InstrumentationInfo;Landroid/content/pm/InstrumentationInfo;)I|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -128,9 +110,6 @@ record [|com:android:commands:pm:Pm$3|]  @type class @AccessFlag  extends  [|jav
    }
     procedure [|int|] [|com:android:commands:pm:Pm$3.compare|] ([|com:android:commands:pm:Pm$3|] v1 @type (this), [|java:lang:Object|] v2 @type (object), [|java:lang:Object|] v3 @type (object)) @owner [|com:android:commands:pm:Pm$3|] @signature [|Lcom/android/commands/pm/Pm$3;.compare:(Ljava/lang/Object;Ljava/lang/Object;)I|] @Access PUBLIC_BRIDGE_SYNTHETIC {
       local temp ;
-
-
-
         v0;
       
 #L001858.   v2:= ([|android:content:pm:InstrumentationInfo|])v2;
@@ -146,7 +125,6 @@ record [|com:android:commands:pm:Pm$ClearCacheObserver|]  @type class @AccessFla
    }
     procedure [|void|] [|com:android:commands:pm:Pm$ClearCacheObserver.<init>|] ([|com:android:commands:pm:Pm$ClearCacheObserver|] v0 @type (this)) @owner [|com:android:commands:pm:Pm$ClearCacheObserver|] @signature [|Lcom/android/commands/pm/Pm$ClearCacheObserver;.<init>:()V|] @Access CONSTRUCTOR {
       local temp ;
-
       
 #L00187c.   call temp:=  [|android:content:pm:IPackageDataObserver$Stub.<init>|](v0) @signature [|Landroid/content/pm/IPackageDataObserver$Stub;.<init>:()V|] @classDescriptor [|android:content:pm:IPackageDataObserver$Stub|] @type direct;
 #L001882.   return @void ;
@@ -154,9 +132,6 @@ record [|com:android:commands:pm:Pm$ClearCacheObserver|]  @type class @AccessFla
    }
     procedure [|void|] [|com:android:commands:pm:Pm$ClearCacheObserver.onRemoveCompleted|] ([|com:android:commands:pm:Pm$ClearCacheObserver|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|boolean|] v3) @owner [|com:android:commands:pm:Pm$ClearCacheObserver|] @signature [|Lcom/android/commands/pm/Pm$ClearCacheObserver;.onRemoveCompleted:(Ljava/lang/String;Z)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L001894.   (@monitorenter v1)
@@ -178,7 +153,6 @@ record [|com:android:commands:pm:Pm$ClearDataObserver|]  @type class @AccessFlag
    }
     procedure [|void|] [|com:android:commands:pm:Pm$ClearDataObserver.<init>|] ([|com:android:commands:pm:Pm$ClearDataObserver|] v0 @type (this)) @owner [|com:android:commands:pm:Pm$ClearDataObserver|] @signature [|Lcom/android/commands/pm/Pm$ClearDataObserver;.<init>:()V|] @Access CONSTRUCTOR {
       local temp ;
-
       
 #L0018cc.   call temp:=  [|android:content:pm:IPackageDataObserver$Stub.<init>|](v0) @signature [|Landroid/content/pm/IPackageDataObserver$Stub;.<init>:()V|] @classDescriptor [|android:content:pm:IPackageDataObserver$Stub|] @type direct;
 #L0018d2.   return @void ;
@@ -186,9 +160,6 @@ record [|com:android:commands:pm:Pm$ClearDataObserver|]  @type class @AccessFlag
    }
     procedure [|void|] [|com:android:commands:pm:Pm$ClearDataObserver.onRemoveCompleted|] ([|com:android:commands:pm:Pm$ClearDataObserver|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|boolean|] v3) @owner [|com:android:commands:pm:Pm$ClearDataObserver|] @signature [|Lcom/android/commands/pm/Pm$ClearDataObserver;.onRemoveCompleted:(Ljava/lang/String;Z)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L0018e4.   (@monitorenter v1)
@@ -211,7 +182,6 @@ record [|com:android:commands:pm:Pm$PackageDeleteObserver|]  @type class @Access
    }
     procedure [|void|] [|com:android:commands:pm:Pm$PackageDeleteObserver.<init>|] ([|com:android:commands:pm:Pm$PackageDeleteObserver|] v0 @type (this), [|com:android:commands:pm:Pm|] v1 @type (object)) @owner [|com:android:commands:pm:Pm$PackageDeleteObserver|] @signature [|Lcom/android/commands/pm/Pm$PackageDeleteObserver;.<init>:(Lcom/android/commands/pm/Pm;)V|] @Access CONSTRUCTOR {
       local temp ;
-
       
 #L00191c.   v0.[|com:android:commands:pm:Pm$PackageDeleteObserver.this$0|]  := v1 @type object;
 #L001920.   call temp:=  [|android:content:pm:IPackageDeleteObserver$Stub.<init>|](v0) @signature [|Landroid/content/pm/IPackageDeleteObserver$Stub;.<init>:()V|] @classDescriptor [|android:content:pm:IPackageDeleteObserver$Stub|] @type direct;
@@ -220,9 +190,6 @@ record [|com:android:commands:pm:Pm$PackageDeleteObserver|]  @type class @Access
    }
     procedure [|void|] [|com:android:commands:pm:Pm$PackageDeleteObserver.packageDeleted|] ([|com:android:commands:pm:Pm$PackageDeleteObserver|] v2 @type (this), [|java:lang:String|] v3 @type (object), [|int|] v4) @owner [|com:android:commands:pm:Pm$PackageDeleteObserver|] @signature [|Lcom/android/commands/pm/Pm$PackageDeleteObserver;.packageDeleted:(Ljava/lang/String;I)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
         v1;
       
@@ -250,7 +217,6 @@ record [|com:android:commands:pm:Pm$PackageInstallObserver|]  @type class @Acces
    }
     procedure [|void|] [|com:android:commands:pm:Pm$PackageInstallObserver.<init>|] ([|com:android:commands:pm:Pm$PackageInstallObserver|] v0 @type (this), [|com:android:commands:pm:Pm|] v1 @type (object)) @owner [|com:android:commands:pm:Pm$PackageInstallObserver|] @signature [|Lcom/android/commands/pm/Pm$PackageInstallObserver;.<init>:(Lcom/android/commands/pm/Pm;)V|] @Access CONSTRUCTOR {
       local temp ;
-
       
 #L00197c.   v0.[|com:android:commands:pm:Pm$PackageInstallObserver.this$0|]  := v1 @type object;
 #L001980.   call temp:=  [|android:content:pm:IPackageInstallObserver$Stub.<init>|](v0) @signature [|Landroid/content/pm/IPackageInstallObserver$Stub;.<init>:()V|] @classDescriptor [|android:content:pm:IPackageInstallObserver$Stub|] @type direct;
@@ -259,9 +225,6 @@ record [|com:android:commands:pm:Pm$PackageInstallObserver|]  @type class @Acces
    }
     procedure [|void|] [|com:android:commands:pm:Pm$PackageInstallObserver.packageInstalled|] ([|com:android:commands:pm:Pm$PackageInstallObserver|] v1 @type (this), [|java:lang:String|] v2 @type (object), [|int|] v3) @owner [|com:android:commands:pm:Pm$PackageInstallObserver|] @signature [|Lcom/android/commands/pm/Pm$PackageInstallObserver;.packageInstalled:(Ljava/lang/String;I)V|] @Access PUBLIC {
       local temp ;
-
-
-
         v0;
       
 #L001998.   (@monitorenter v1)
@@ -288,7 +251,6 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
       global [|java:lang:String|] @@[|com:android:commands:pm:Pm.PM_NOT_RUNNING_ERR|]    @AccessFlag PRIVATE_STATIC_FINAL;
     procedure [|void|] [|com:android:commands:pm:Pm.<init>|] ([|com:android:commands:pm:Pm|] v1 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.<init>:()V|] @Access PUBLIC_CONSTRUCTOR {
       local temp ;
-
         v0;
       
 #L0019d0.   call temp:=  [|java:lang:Object.<init>|](v1) @signature [|Ljava/lang/Object;.<init>:()V|] @classDescriptor [|java:lang:Object|] @type direct;
@@ -300,11 +262,8 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|boolean|] [|com:android:commands:pm:Pm.deletePackage|] ([|com:android:commands:pm:Pm|] v4 @type (this), [|java:lang:String|] v5 @type (object), [|int|] v6) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.deletePackage:(Ljava/lang/String;I)Z|] @Access PRIVATE {
       local temp ;
-        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L001d,L002e));
-        [|com:android:commands:pm:Pm$PackageDeleteObserver|] v1 @varname [|obs|] @scope ((L0005,L002e));
-
-
-
+        v0;
+        v1;
         v2;
         v3;
       
@@ -345,10 +304,8 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.displayPackageFilePath|] ([|com:android:commands:pm:Pm|] v5 @type (this), [|java:lang:String|] v6 @type (object)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.displayPackageFilePath:(Ljava/lang/String;)V|] @Access PRIVATE {
       local temp ;
-        [|android:content:pm:PackageInfo|] v1 @varname [|info|] @scope ((L0008,L001e));
-        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L0020,L0031));
-
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -383,25 +340,18 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.doListPermissions|] ([|com:android:commands:pm:Pm|] v16 @type (this), [|java:util:ArrayList|] v17 @type (object), [|boolean|] v18, [|boolean|] v19, [|boolean|] v20, [|int|] v21, [|int|] v22) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.doListPermissions:(Ljava/util/ArrayList;ZZZII)V|] @Access PRIVATE {
       local temp ;
-        [|android:content:pm:PermissionGroupInfo|] v7 @varname [|pgi|] @scope ((L0027,L0053), (L007f,L012a));
-        [|android:content:res:Resources|] v11 @varname [|res|] @scope ((L002f,L0053), (L007f,L009a), (L00de,L0126), (L0164,L0177), (L017f,L0188), (L01d4,L0246));
-        [|int|] v2 @varname [|count|] @scope ((L006a,L007f), (L014d,L0257));
-        [|boolean|] v3 @varname [|first|] @scope ((L006b,L007f), (L014d,L0257));
-        [|int|] v6 @varname [|p|] @scope ((L006c,L007f), (L014d,L0257));
-        [|android:content:pm:PermissionInfo|] v8 @varname [|pi|] @scope ((L0074,L007f), (L014d,L024a));
-        [|java:util:List|] v10 @varname [|ps|] @scope ((L0066,L007f), (L014d,L0257));
-        [|int|] v1 @varname [|base|] @scope ((L0151,L024a));
-        [|java:lang:String|] v4 @varname [|groupName|] @scope ((L000f,L0257));
-        [|java:lang:String|] v9 @varname [|prefix|] @scope ((L0011,L0257));
-        [|int|] v5 @varname [|i|] @scope ((L0001,L0258));
-
-
-
-
-
-
-
         v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
+        v9;
+        v10;
+        v11;
         v12;
         v13;
         v14;
@@ -702,7 +652,6 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|java:lang:String|] [|com:android:commands:pm:Pm.enabledSettingToString|] ([|int|] v1) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.enabledSettingToString:(I)Ljava/lang/String;|] @Access PRIVATE_STATIC {
       local temp ;
-
         v0;
       
 #L001fe0.   goto L002004;
@@ -726,14 +675,10 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|java:util:List|] [|com:android:commands:pm:Pm.getInstalledPackages|] ([|com:android:commands:pm:Pm|] v5 @type (this), [|android:content:pm:IPackageManager|] v6 @type (object), [|int|] v7, [|int|] v8) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.getInstalledPackages:(Landroid/content/pm/IPackageManager;II)Ljava/util/List;|] @Access PRIVATE {
       local temp ;
-        [|android:content:pm:PackageInfo|] v0 @varname [|lastItem|] @scope ((L0006,L0014), (L0016,L001f));
-        [|java:lang:String|] v1 @varname [|lastKey|] @scope ((L000a,L001d));
-        [|android:content:pm:ParceledListSlice|] v3 @varname [|slice|] @scope ((L000e,L001d));
-        [|java:util:List|] v2 @varname [|packageInfos|] @scope ((L0005,L001f));
-
-
-
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
       
 #L00202c.   v2:= new [|java:util:ArrayList|];
@@ -757,12 +702,10 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|android:content:res:Resources|] [|com:android:commands:pm:Pm.getResources|] ([|com:android:commands:pm:Pm|] v10 @type (this), [|android:content:pm:PackageItemInfo|] v11 @type (object)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.getResources:(Landroid/content/pm/PackageItemInfo;)Landroid/content/res/Resources;|] @Access PRIVATE {
       local temp ;
-        [|android:content:res:Resources|] v3 @varname [|res|] @scope ((L000b,L002a), (L002a,L0032), (L0032,L0046), (L0046,L0048), (L0048,L0049));
-        [|android:content:pm:ApplicationInfo|] v0 @varname [|ai|] @scope ((L0019,L0033), (L0046,L0049));
-        [|android:content:res:AssetManager|] v1 @varname [|am|] @scope ((L001e,L0033), (L0046,L0049));
-        [|android:os:RemoteException|] v2 @varname [|e|] @scope ((L0034,L0046));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -817,14 +760,12 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|byte|][] [|com:android:commands:pm:Pm.hexToBytes|] ([|com:android:commands:pm:Pm|] v8 @type (this), [|java:lang:String|] v9 @type (object)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.hexToBytes:(Ljava/lang/String;)[B|] @Access PRIVATE {
       local temp ;
-        [|int|] v0 @varname [|byteIndex|] @scope ((L001a,L001b), (L001b,L001f), (L001f,L0031), (L0031,L0032));
-        [|int|] v2 @varname [|byteLength|] @scope ((L0016,L0032));
-        [|int|] v3 @varname [|inputIndex|] @scope ((L0019,L0032));
-        [|int|] v4 @varname [|inputLength|] @scope ((L0008,L0032));
-        [|byte|][] v5 @varname [|output|] @scope ((L0018,L0032));
-
-
+        v0;
         v1;
+        v2;
+        v3;
+        v4;
+        v5;
         v6;
         v7;
       
@@ -861,15 +802,13 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|java:lang:String|] [|com:android:commands:pm:Pm.installFailureToString|] ([|com:android:commands:pm:Pm|] v9 @type (this), [|int|] v10) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.installFailureToString:(I)Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:reflect:Field|] v1 @varname [|f|] @scope ((L000d,L0040), (L0041,L0045));
-        [|java:lang:String|] v2 @varname [|fieldName|] @scope ((L0029,L0040), (L0041,L0042));
-        [|int|] v6 @varname [|modifiers|] @scope ((L0019,L0040), (L0041,L0042));
-        [|java:lang:reflect:Field|][] v0 @varname [|arr$|] @scope ((L0007,L004a));
-        [|java:lang:reflect:Field|][] v3 @varname [|fields|] @scope ((L0006,L004a));
-        [|int|] v4 @varname [|i$|] @scope ((L0009,L004a));
-        [|int|] v5 @varname [|len$|] @scope ((L0008,L004a));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
         v7;
         v8;
       
@@ -919,8 +858,7 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|boolean|] [|com:android:commands:pm:Pm.isNumber|] ([|java:lang:String|] v2 @type (object)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.isNumber:(Ljava/lang/String;)Z|] @Access PRIVATE_STATIC {
       local temp ;
-        [|java:lang:NumberFormatException|] v0 @varname [|nfe|] @scope ((L0006,L0008));
-
+        v0;
         v1;
       
 #L00225c.   call temp:=  [|java:lang:Integer.parseInt|](v2) @signature [|Ljava/lang/Integer;.parseInt:(Ljava/lang/String;)I|] @classDescriptor [|java:lang:Integer|] @type static;
@@ -934,11 +872,7 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|java:lang:String|] [|com:android:commands:pm:Pm.loadText|] ([|com:android:commands:pm:Pm|] v2 @type (this), [|android:content:pm:PackageItemInfo|] v3 @type (object), [|int|] v4, [|java:lang:CharSequence|] v5 @type (object)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.loadText:(Landroid/content/pm/PackageItemInfo;ILjava/lang/CharSequence;)Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|android:content:res:Resources|] v0 @varname [|r|] @scope ((L000d,L0014));
-
-
-
-
+        v0;
         v1;
       
 #L002288.   if v5 == 0 then goto L002296;
@@ -958,7 +892,6 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.main|] ([|java:lang:String|][] v1 @type (object)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.main:([Ljava/lang/String;)V|] @Access PUBLIC_STATIC {
       local temp ;
-
         v0;
       
 #L0022c4.   v0:= new [|com:android:commands:pm:Pm|];
@@ -969,8 +902,7 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|java:lang:String|] [|com:android:commands:pm:Pm.nextArg|] ([|com:android:commands:pm:Pm|] v3 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.nextArg:()Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|arg|] @scope ((L000f,L0016));
-
+        v0;
         v1;
         v2;
       
@@ -991,8 +923,7 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|java:lang:String|] [|com:android:commands:pm:Pm.nextOption|] ([|com:android:commands:pm:Pm|] v6 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.nextOption:()Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|arg|] @scope ((L0012,L0052));
-
+        v0;
         v1;
         v2;
         v3;
@@ -1051,8 +982,7 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|java:lang:String|] [|com:android:commands:pm:Pm.nextOptionData|] ([|com:android:commands:pm:Pm|] v3 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.nextOptionData:()Ljava/lang/String;|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|data|] @scope ((L0016,L001d));
-
+        v0;
         v1;
         v2;
       
@@ -1077,13 +1007,12 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runClear|] ([|com:android:commands:pm:Pm|] v8 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runClear:()V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v3 @varname [|optionData|] @scope ((L0013,L0025), (L0026,L002a));
-        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L006a,L007b));
-        [|com:android:commands:pm:Pm$ClearDataObserver|] v1 @varname [|obs|] @scope ((L0040,L0086));
-        [|java:lang:String|] v2 @varname [|option|] @scope ((L0005,L0086));
-        [|java:lang:String|] v4 @varname [|pkg|] @scope ((L002e,L0086));
-        [|int|] v5 @varname [|userId|] @scope ((L0001,L0086));
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
         v6;
         v7;
       
@@ -1168,10 +1097,9 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runGetInstallLocation|] ([|com:android:commands:pm:Pm|] v6 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runGetInstallLocation:()V|] @Access PRIVATE {
       local temp ;
-        [|int|] v1 @varname [|loc|] @scope ((L0006,L002e), (L002f,L003b));
-        [|java:lang:String|] v2 @varname [|locStr|] @scope ((L0008,L002e), (L002f,L003b));
-        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L003c,L004d));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -1221,11 +1149,9 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runGrantRevokePermission|] ([|com:android:commands:pm:Pm|] v6 @type (this), [|boolean|] v7) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runGrantRevokePermission:(Z)V|] @Access PRIVATE {
       local temp ;
-        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L002b,L003c), (L0043,L0063), (L0064,L0081));
-        [|java:lang:String|] v1 @varname [|perm|] @scope ((L0015,L0081));
-        [|java:lang:String|] v2 @varname [|pkg|] @scope ((L0004,L0081));
-
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -1303,37 +1229,36 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runInstall|] ([|com:android:commands:pm:Pm|] v30 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runInstall:()V|] @Access PRIVATE {
       local temp ;
-        [|javax:crypto:SecretKey|] v4 @varname [|encKey|] @scope ((L01b4,L01cf), (L0257,L0262));
-        [|javax:crypto:SecretKey|] v7 @varname [|macSecretKey|] @scope ((L01bc,L01cf), (L0260,L0262));
-        [|android:content:pm:ContainerEncryptionParams|] v1 @varname [|encryptionParams|] @scope ((L01cf,L0257), (L0269,L02c8));
-        [|android:content:pm:VerificationParams|] v9 @varname [|verificationParams|] @scope ((L023f,L0257), (L027c,L028e), (L02a1,L02c8));
-        [|android:net:Uri|] v10 @varname [|verificationURI|] @scope ((L0231,L0257), (L027b,L02c8));
-        [|android:net:Uri|] v11 @varname [|originatingURI|] @scope ((L01d5,L0257), (L026c,L02c8));
-        [|android:net:Uri|] v12 @varname [|referrerURI|] @scope ((L01db,L0257), (L026f,L02c8));
-        [|com:android:commands:pm:Pm$PackageInstallObserver|] v15 @varname [|obs|] @scope ((L0238,L0257), (L027c,L02c8));
-        [|java:lang:String|] v20 @varname [|apkFilePath|] @scope ((L01df,L0257), (L0271,L02c8));
-        [|android:net:Uri|] v21 @varname [|apkURI|] @scope ((L0206,L0257), (L027a,L02c8));
-        [|java:lang:String|] v29 @varname [|verificationFilePath|] @scope ((L020a,L0257), (L027a,L02c8));
-        [|java:security:InvalidAlgorithmParameterException|] v22 @varname [|e|] @scope ((L0263,L0268), (L028f,L02a1));
-        [|java:lang:String|] v2 @varname [|algo|] @scope ((L0005,L02c8));
-        [|java:lang:String|] v5 @varname [|macAlgo|] @scope ((L000a,L02c8));
-        [|byte|][] v8 @varname [|tag|] @scope ((L000d,L02c8));
-        [|int|] v16 @varname [|installFlags|] @scope ((L0002,L02c8));
-        [|java:lang:String|] v17 @varname [|installerPackageName|] @scope ((L0004,L02c8));
-        [|byte|][] v23 @varname [|iv|] @scope ((L0007,L02c8));
-        [|byte|][] v24 @varname [|key|] @scope ((L0009,L02c8));
-        [|byte|][] v25 @varname [|macKey|] @scope ((L000c,L02c8));
-        [|java:lang:String|] v26 @varname [|opt|] @scope ((L0015,L02c8));
-        [|java:lang:String|] v27 @varname [|originatingUriString|] @scope ((L000f,L02c8));
-        [|java:lang:String|] v28 @varname [|referrer|] @scope ((L0011,L02c8));
-
         v0;
+        v1;
+        v2;
         v3;
+        v4;
+        v5;
         v6;
+        v7;
+        v8;
+        v9;
+        v10;
+        v11;
+        v12;
         v13;
         v14;
+        v15;
+        v16;
+        v17;
         v18;
         v19;
+        v20;
+        v21;
+        v22;
+        v23;
+        v24;
+        v25;
+        v26;
+        v27;
+        v28;
+        v29;
       
 #L002768.   v16:= 64  @length 16;
 #L00276c.   v17:= 0  @length 16;
@@ -1704,8 +1629,7 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runList|] ([|com:android:commands:pm:Pm|] v4 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runList:()V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|type|] @scope ((L0004,L008a));
-
+        v0;
         v1;
         v2;
         v3;
@@ -1783,14 +1707,13 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runListFeatures|] ([|com:android:commands:pm:Pm|] v10 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runListFeatures:()V|] @Access PRIVATE {
       local temp ;
-        [|int|] v0 @varname [|count|] @scope ((L0025,L0043), (L0045,L0064));
-        [|android:content:pm:FeatureInfo|] v2 @varname [|fi|] @scope ((L002e,L0043), (L0045,L0064));
-        [|int|] v5 @varname [|p|] @scope ((L0026,L0043), (L0045,L0064));
-        [|int|] v3 @varname [|i|] @scope ((L000c,L0064));
-        [|java:util:List|] v4 @varname [|list|] @scope ((L0005,L0064));
-        [|android:content:pm:FeatureInfo|][] v6 @varname [|rawList|] @scope ((L000b,L0064));
-        [|android:os:RemoteException|] v1 @varname [|e|] @scope ((L0065,L0075));
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
         v7;
         v8;
         v9;
@@ -1859,18 +1782,17 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runListInstrumentation|] ([|com:android:commands:pm:Pm|] v14 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runListInstrumentation:()V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v7 @varname [|opt|] @scope ((L0008,L0037), (L0056,L00c7));
-        [|java:lang:RuntimeException|] v3 @varname [|ex|] @scope ((L0039,L0056));
-        [|android:content:ComponentName|] v0 @varname [|cn|] @scope ((L0093,L00b4));
-        [|int|] v1 @varname [|count|] @scope ((L006a,L00b4));
-        [|android:content:pm:InstrumentationInfo|] v5 @varname [|ii|] @scope ((L0073,L00b4));
-        [|java:util:List|] v6 @varname [|list|] @scope ((L005c,L00b4));
-        [|int|] v8 @varname [|p|] @scope ((L006b,L00b4));
-        [|android:os:RemoteException|] v2 @varname [|e|] @scope ((L00b5,L00c7));
-        [|int|] v4 @varname [|flags|] @scope ((L0002,L00c7));
-        [|boolean|] v9 @varname [|showPackage|] @scope ((L0003,L00c7));
-        [|java:lang:String|] v10 @varname [|targetPackage|] @scope ((L0004,L00c7));
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
+        v9;
+        v10;
         v11;
         v12;
         v13;
@@ -1980,14 +1902,13 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runListLibraries|] ([|com:android:commands:pm:Pm|] v9 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runListLibraries:()V|] @Access PRIVATE {
       local temp ;
-        [|int|] v0 @varname [|count|] @scope ((L0025,L003d));
-        [|java:lang:String|] v3 @varname [|lib|] @scope ((L002e,L003d));
-        [|int|] v5 @varname [|p|] @scope ((L0026,L003d));
-        [|int|] v2 @varname [|i|] @scope ((L000c,L003f));
-        [|java:util:List|] v4 @varname [|list|] @scope ((L0005,L003f));
-        [|java:lang:String|][] v6 @varname [|rawList|] @scope ((L000b,L003f));
-        [|android:os:RemoteException|] v1 @varname [|e|] @scope ((L0040,L0050));
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
+        v6;
         v7;
         v8;
       
@@ -2037,27 +1958,25 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runListPackages|] ([|com:android:commands:pm:Pm|] v22 @type (this), [|boolean|] v23) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runListPackages:(Z)V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v15 @varname [|opt|] @scope ((L000c,L00a9), (L00c8,L0194));
-        [|java:lang:RuntimeException|] v5 @varname [|ex|] @scope ((L00ab,L00c8));
-        [|int|] v3 @varname [|count|] @scope ((L00e0,L017e), (L0191,L0194));
-        [|android:content:pm:PackageInfo|] v8 @varname [|info|] @scope ((L00f0,L017e), (L0191,L0194));
-        [|boolean|] v9 @varname [|isSystem|] @scope ((L0110,L017e));
-        [|int|] v16 @varname [|p|] @scope ((L00e2,L017e), (L0191,L0194));
-        [|java:util:List|] v17 @varname [|packages|] @scope ((L00dc,L017e), (L0191,L0194));
-        [|android:os:RemoteException|] v4 @varname [|e|] @scope ((L017f,L0191));
-        [|java:lang:String|] v6 @varname [|filter|] @scope ((L00cc,L0194));
-        [|int|] v7 @varname [|getFlags|] @scope ((L0001,L0194));
-        [|boolean|] v10 @varname [|listDisabled|] @scope ((L0002,L0194));
-        [|boolean|] v11 @varname [|listEnabled|] @scope ((L0003,L0194));
-        [|boolean|] v12 @varname [|listInstaller|] @scope ((L0006,L0194));
-        [|boolean|] v13 @varname [|listSystem|] @scope ((L0004,L0194));
-        [|boolean|] v14 @varname [|listThirdParty|] @scope ((L0005,L0194));
-        [|int|] v18 @varname [|userId|] @scope ((L0008,L0194));
-
-
         v0;
         v1;
         v2;
+        v3;
+        v4;
+        v5;
+        v6;
+        v7;
+        v8;
+        v9;
+        v10;
+        v11;
+        v12;
+        v13;
+        v14;
+        v15;
+        v16;
+        v17;
+        v18;
         v19;
         v20;
         v21;
@@ -2277,12 +2196,11 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runListPermissionGroups|] ([|com:android:commands:pm:Pm|] v7 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runListPermissionGroups:()V|] @Access PRIVATE {
       local temp ;
-        [|int|] v0 @varname [|count|] @scope ((L000b,L0025));
-        [|int|] v2 @varname [|p|] @scope ((L000c,L0025));
-        [|android:content:pm:PermissionGroupInfo|] v3 @varname [|pgi|] @scope ((L0014,L0025));
-        [|java:util:List|] v4 @varname [|pgs|] @scope ((L0007,L0025));
-        [|android:os:RemoteException|] v1 @varname [|e|] @scope ((L0026,L0036));
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
         v5;
         v6;
       
@@ -2319,21 +2237,20 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runListPermissions|] ([|com:android:commands:pm:Pm|] v14 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runListPermissions:()V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v12 @varname [|opt|] @scope ((L0009,L0057), (L0058,L00b0), (L00c2,L00f6));
-        [|int|] v10 @varname [|i|] @scope ((L006b,L0083));
-        [|java:util:List|] v11 @varname [|infos|] @scope ((L006a,L0083));
-        [|java:util:ArrayList|] v1 @varname [|groupList|] @scope ((L0061,L00b0), (L00c2,L00f6));
-        [|java:lang:String|] v9 @varname [|grp|] @scope ((L005c,L00b0), (L00c2,L00f6));
-        [|android:os:RemoteException|] v8 @varname [|e|] @scope ((L00b1,L00c2));
-        [|boolean|] v2 @varname [|groups|] @scope ((L0002,L00f6));
-        [|boolean|] v3 @varname [|labels|] @scope ((L0001,L00f6));
-        [|boolean|] v4 @varname [|summary|] @scope ((L0004,L00f6));
-        [|boolean|] v7 @varname [|dangerousOnly|] @scope ((L0005,L00f6));
-        [|boolean|] v13 @varname [|userOnly|] @scope ((L0003,L00f6));
-
         v0;
+        v1;
+        v2;
+        v3;
+        v4;
         v5;
         v6;
+        v7;
+        v8;
+        v9;
+        v10;
+        v11;
+        v12;
+        v13;
       
 #L0035e0.   v3:= 0  @length 4;
 #L0035e2.   v2:= 0  @length 4;
@@ -2472,8 +2389,7 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runPath|] ([|com:android:commands:pm:Pm|] v3 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runPath:()V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|pkg|] @scope ((L0004,L0012));
-
+        v0;
         v1;
         v2;
       
@@ -2490,14 +2406,12 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runSetEnabledSetting|] ([|com:android:commands:pm:Pm|] v9 @type (this), [|int|] v10) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runSetEnabledSetting:(I)V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v3 @varname [|optionData|] @scope ((L0013,L0025), (L0026,L002a));
-        [|android:os:RemoteException|] v1 @varname [|e|] @scope ((L0075,L0086), (L00bf,L00d1));
-        [|android:content:ComponentName|] v0 @varname [|cn|] @scope ((L003f,L00d1));
-        [|java:lang:String|] v2 @varname [|option|] @scope ((L0005,L00d1));
-        [|java:lang:String|] v4 @varname [|pkg|] @scope ((L002e,L00d1));
-        [|int|] v5 @varname [|userId|] @scope ((L0001,L00d1));
-
-
+        v0;
+        v1;
+        v2;
+        v3;
+        v4;
+        v5;
         v6;
         v7;
         v8;
@@ -2610,10 +2524,9 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runSetInstallLocation|] ([|com:android:commands:pm:Pm|] v5 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runSetInstallLocation:()V|] @Access PRIVATE {
       local temp ;
-        [|android:os:RemoteException|] v1 @varname [|e|] @scope ((L0023,L0034), (L0035,L003d));
-        [|int|] v2 @varname [|loc|] @scope ((L0012,L0034));
-        [|java:lang:String|] v0 @varname [|arg|] @scope ((L0004,L003d));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
       
@@ -2654,11 +2567,10 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runSetPermissionEnforced|] ([|com:android:commands:pm:Pm|] v7 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runSetPermissionEnforced:()V|] @Access PRIVATE {
       local temp ;
-        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L002d,L003e), (L003f,L005f), (L0060,L007d));
-        [|boolean|] v1 @varname [|enforced|] @scope ((L0026,L007d));
-        [|java:lang:String|] v2 @varname [|enforcedRaw|] @scope ((L0015,L007d));
-        [|java:lang:String|] v3 @varname [|permission|] @scope ((L0004,L007d));
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -2731,15 +2643,14 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runTrimCaches|] ([|com:android:commands:pm:Pm|] v12 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runTrimCaches:()V|] @Access PRIVATE {
       local temp ;
-        [|char|] v0 @varname [|c|] @scope ((L0020,L0031), (L004c,L0080));
-        [|com:android:commands:pm:Pm$ClearDataObserver|] v5 @varname [|obs|] @scope ((L003c,L004c), (L009e,L00f8));
-        [|long|] v7 @varname [|sizeVal|] @scope ((L0037,L004c), (L009e,L00f8));
-        [|java:lang:NumberFormatException|] v1 @varname [|e|] @scope ((L0081,L009e), (L00a5,L00b7), (L00b8,L00d9), (L00da,L00f8));
-        [|int|] v2 @varname [|len|] @scope ((L0015,L00f8));
-        [|long|] v3 @varname [|multiplier|] @scope ((L0017,L00f8));
-        [|java:lang:String|] v6 @varname [|size|] @scope ((L0004,L00f8));
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
+        v5;
+        v6;
+        v7;
         v8;
         v9;
         v10;
@@ -2883,11 +2794,10 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runUninstall|] ([|com:android:commands:pm:Pm|] v7 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runUninstall:()V|] @Access PRIVATE {
       local temp ;
-        [|java:lang:String|] v0 @varname [|opt|] @scope ((L0005,L0052));
-        [|java:lang:String|] v1 @varname [|pkg|] @scope ((L002f,L0052));
-        [|boolean|] v2 @varname [|result|] @scope ((L0040,L0052));
-        [|int|] v3 @varname [|unInstallFlags|] @scope ((L0001,L0052));
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -3236,10 +3146,8 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.run|] ([|com:android:commands:pm:Pm|] v6 @type (this), [|java:lang:String|][] v7 @type (object)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.run:([Ljava/lang/String;)V|] @Access PUBLIC {
       local temp ;
-        [|java:lang:String|] v0 @varname [|op|] @scope ((L0033,L0194));
-        [|boolean|] v1 @varname [|validCommand|] @scope ((L0004,L0194));
-
-
+        v0;
+        v1;
         v2;
         v3;
         v4;
@@ -3455,11 +3363,10 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runCreateUser|] ([|com:android:commands:pm:Pm|] v7 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runCreateUser:()V|] @Access PUBLIC {
       local temp ;
-        [|android:content:pm:UserInfo|] v2 @varname [|info|] @scope ((L0016,L0033), (L0045,L004d));
-        [|android:os:RemoteException|] v1 @varname [|e|] @scope ((L0034,L0045));
-        [|java:lang:String|] v0 @varname [|arg|] @scope ((L0004,L004d));
-        [|java:lang:String|] v3 @varname [|name|] @scope ((L000f,L004d));
-
+        v0;
+        v1;
+        v2;
+        v3;
         v4;
         v5;
         v6;
@@ -3509,7 +3416,6 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runGetMaxUsers|] ([|com:android:commands:pm:Pm|] v3 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runGetMaxUsers:()V|] @Access PUBLIC {
       local temp ;
-
         v0;
         v1;
         v2;
@@ -3532,10 +3438,9 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runListUsers|] ([|com:android:commands:pm:Pm|] v6 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runListUsers:()V|] @Access PUBLIC {
       local temp ;
-        [|java:util:List|] v2 @varname [|users|] @scope ((L0007,L0010), (L0011,L0044));
-        [|int|] v1 @varname [|i|] @scope ((L0019,L0044));
-        [|android:os:RemoteException|] v0 @varname [|e|] @scope ((L0045,L0056));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
@@ -3588,10 +3493,9 @@ record [|com:android:commands:pm:Pm|]  @type class @AccessFlag PUBLIC_FINAL  {
    }
     procedure [|void|] [|com:android:commands:pm:Pm.runRemoveUser|] ([|com:android:commands:pm:Pm|] v6 @type (this)) @owner [|com:android:commands:pm:Pm|] @signature [|Lcom/android/commands/pm/Pm;.runRemoveUser:()V|] @Access PUBLIC {
       local temp ;
-        [|android:os:RemoteException|] v1 @varname [|e|] @scope ((L0023,L0034), (L0035,L0054));
-        [|int|] v2 @varname [|userId|] @scope ((L0012,L0034), (L0054,L006d));
-        [|java:lang:String|] v0 @varname [|arg|] @scope ((L0004,L006d));
-
+        v0;
+        v1;
+        v2;
         v3;
         v4;
         v5;
