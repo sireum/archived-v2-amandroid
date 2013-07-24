@@ -890,7 +890,7 @@ static void dumpLocalsCb(void *cnxt, u2 reg, u4 startAddress,
  */
 
 void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
-        const DexMethod *pDexMethod)
+        const DexMethod *pDexMethod, char* tailRegs)
 {
 	/**** moved the following block to dumpMethod() ***
 
@@ -1002,6 +1002,9 @@ void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
                  
    }
 
+   fprintf(pFp, "%s", tailRegs); // printing tail registers of Long and Double parameters
+   if(tailRegs) 
+	   free(tailRegs);
 // deleting locVarList
 
      if(locVarList)
@@ -3006,7 +3009,7 @@ void dumpBytecodes(DexFile* pDexFile, const DexMethod* pDexMethod)
 /*
  * Dump a "code" struct.
  */
-void dumpCode(DexFile* pDexFile, const DexMethod* pDexMethod)
+void dumpCode(DexFile* pDexFile, const DexMethod* pDexMethod, char* tailRegs)
 {
     const DexCode* pCode = dexGetCode(pDexFile, pDexMethod);
     printf("      @registers     : %d\n", pCode->registersSize);
@@ -3014,7 +3017,7 @@ void dumpCode(DexFile* pDexFile, const DexMethod* pDexMethod)
     printf("      outs          : %d\n", pCode->outsSize);
     printf("      insns size    : %d 16-bit code units\n", pCode->insnsSize);
     //******************* kui's modification begins  *******************
-    dumpLocals(pDexFile, pCode, pDexMethod);
+    dumpLocals(pDexFile, pCode, pDexMethod, tailRegs);
     if (gOptions.disassemble)
         dumpBytecodes(pDexFile, pDexMethod);
     dumpCatches(pDexFile, pCode);
@@ -3118,9 +3121,11 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
                    char* para=(char*)malloc(sizeof(char)*5000);  // sankar increased the size from 1000 to 5000
                    char* paraThis=(char*)malloc(sizeof(char)*1000);  // sankar adds
                    char* paraTotal=(char*)malloc(sizeof(char)*6000);  // sankar adds
+				   char* tailRegisters = (char*)malloc(sizeof(char)*5000); // sankar adds. this is the collection of tail registers of long or double parameters
                    strcpy(para,"");
 				   strcpy(paraThis,""); // initializing with null string
 				   strcpy(paraTotal,"");
+				   strcpy(tailRegisters, "");
 
 				   int thisFlag = 0; // if 1 then this method has "this" as the first param as well as a local variable
 				   int paramCount = 0; // this count does not include "this"
@@ -3231,8 +3236,12 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 
                         if(*base !=')') strcat(para,", ");
                      }
-                     if(flag==1)
+                     if(flag==1){
+						 char buffer[20];
+						 sprintf(buffer, "       v%d;\n", startReg);
+						 strcat(tailRegisters,buffer);
 						 startReg++;
+					 }
                      free(tmp);
                  }
 
@@ -3261,7 +3270,7 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
                  fprintf(pFp, "      # return;"); // sankar changed from "#" to "#return;" because some abstract interface method body was containing only {#} which was causing symbol resolution error 
               } else {
                   printf("      code          -\n");
-                  dumpCode(pDexFile, pDexMethod);
+                  dumpCode(pDexFile, pDexMethod, tailRegisters);
               }
 
               if (gOptions.disassemble)
