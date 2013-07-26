@@ -10,11 +10,18 @@ trait NativeMethodModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
   /**
    * contain all native operation signatures and involved operation parameter nodes and return nodes
    */
-  var nativeOperationTracker : Map[String, ProcedurePointNodes[Node]] = Map()
+  var nativeOperationTracker : Set[InvokePointNode[Node]] = Set()
   
-  def checkNativeOperation(pUri : ResourceUri) : Boolean = {
+  def checkNativeOperation(ipN : InvokePointNode[Node]) : Boolean = {
     var flag : Boolean = true
-    nativeOperationTracker(pUri).paramEntryNodes.foreach{
+    ipN.recvCallNodeOpt match{
+      case Some(node) =>
+        if(node.getProperty[ValueSet]("ValueSet").isEmpty){
+    		  flag = false
+    		}
+      case None =>
+    }
+    ipN.argCallNodes.foreach{
       case(i, node) =>
     		if(node.getProperty[ValueSet]("ValueSet").isEmpty){
     		  flag = false
@@ -23,31 +30,36 @@ trait NativeMethodModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
     flag
   }
   
-  def doNativeOperation(fac :() => ValueSet) = {
+  def getInvokePointNodeInNativeTrackerFromCallComponent(node : Node) : Option[InvokePointNode[Node]] = {
+    var ipNOpt : Option[InvokePointNode[Node]]  = None
+    if(node.isInstanceOf[OfaRecvCallNode] || node.isInstanceOf[OfaArgCallNode])
+	    nativeOperationTracker.foreach{
+	      ipN =>
+	        if(ipN.contains(node)) ipNOpt = Some(ipN)
+	    }
+    ipNOpt
+  }
+  
+  def doNativeOperation(ipN : InvokePointNode[Node], fac :() => ValueSet) = {
     var result : Map[Node, ValueSet] = Map()
-    nativeOperationTracker.map{
-      case (k, v) =>
-        if(checkNativeOperation(k)){
-          val retTyp = (new SignatureParser(k).getParamSig.getReturnObjectType).getOrElse(null)
-	        val values : MList[ResourceUri] = mlistEmpty
-	        val valueSets : Map[Int, ValueSet] =
-		        v.paramEntryNodes.map{
-	            case(i, node) =>
-		          	(i, node.getProperty[ValueSet]("ValueSet"))
-		        }.toMap
-	        val strsList = getValueSetList(valueSets)
-	        val strs : Set[String] = if(retTyp != null && !strsList.isEmpty && !strsList(0).isEmpty)strsList.map{l => applyNativeOperation(k, values ++ l)}.toSet
-	        					 else Set()
-	        v.retNodeOpt match{
-	          case Some(r) =>
-	            result += (r -> fac())
-	            result(r).setInstance(Instance("[|java:lang:String|]", v.procPoint.getLoc), r.getContext)
-	            result(r).setStrings(strs)
-	          case None =>
-	        }
-        }
+    if(checkNativeOperation(ipN)){
+      val retTyp = (new SignatureParser(ipN.getCalleeSig).getParamSig.getReturnObjectType).getOrElse(null)
+      val values : MList[ResourceUri] = mlistEmpty
+      var valueSets : Map[Int, ValueSet] = Map()
+      ipN.recvCallNodeOpt match {
+      	case Some(thisEntryNode) => valueSets += (0 -> thisEntryNode.getProperty[ValueSet]("ValueSet"))
+      	case None =>
+    	}
+      ipN.argCallNodes.toList.sortBy(_._1).foreach{case (k, v) => valueSets += (k + 1 -> v.getProperty[ValueSet]("ValueSet"))}
+      val strsList = getValueSetList(valueSets)
+      val strs : Set[String] = if(!strsList.isEmpty && !strsList(0).isEmpty)strsList.map{l => applyNativeOperation(ipN.getCalleeSig, values ++ l)}.toSet
+      					               else Set()
+      result += (ipN.piNode -> fac())
+      val ins = Instance("[|java:lang:String|]", ipN.invokePoint.getLoc)
+      ins.updateContext(ipN.piNode.getContext.copy)
+      result(ipN.piNode).setInstance(ins)
+      result(ipN.piNode).setStrings(strs)
     }
-//    println("result---->" + result)
     result
   }
   

@@ -5,8 +5,9 @@ import org.sireum.amandroid.objectFlowAnalysis._
 class AndroidValueSet extends NormalValueSet{
   def getDiff(vs : AndroidValueSet) : AndroidValueSet = {
     val d : AndroidValueSet = new AndroidValueSet
-    d.setInstances(getMapDiff(this.insts, vs.instances))
+    d.setInstances(this.insts.diff(vs.instances))
     d.setStrings(this.strs.diff(vs.strings))
+    d.setChanges(getMapDiff(this.setOfChanges, vs.changes))
     d
   }
 }

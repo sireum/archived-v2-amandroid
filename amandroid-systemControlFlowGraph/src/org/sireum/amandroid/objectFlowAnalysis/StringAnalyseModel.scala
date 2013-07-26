@@ -8,10 +8,17 @@ trait StringAnalyseModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
   /**
    * contain all string operations and involved operation string parameter nodes and return nodes
    */
-  var stringOperationTracker : Map[String, ProcedurePointNodes[Node]] = Map()
-  def checkStringOperation(pUri : ResourceUri) : Boolean = {
+  var stringOperationTracker : Set[InvokePointNode[Node]] = Set()
+  def checkStringOperation(ipN : InvokePointNode[Node]) : Boolean = {
     var flag : Boolean = true
-    stringOperationTracker(pUri).paramEntryNodes.foreach{
+    ipN.recvCallNodeOpt match{
+      case Some(node) =>
+        if(node.getProperty[ValueSet]("ValueSet").isEmpty){
+    		  flag = false
+    		}
+      case None =>
+    }
+    ipN.argCallNodes.foreach{
       case(i, node) =>
     		if(node.getProperty[ValueSet]("ValueSet").isEmpty){
     		  flag = false
@@ -20,33 +27,42 @@ trait StringAnalyseModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
     flag
   }
   
-  def doStringOperation(fac :() => ValueSet) = {
+  def getInvokePointNodeInStringTrackerFromCallComponent(node : Node) : Option[InvokePointNode[Node]] = {
+    var ipNOpt : Option[InvokePointNode[Node]]  = None
+    if(node.isInstanceOf[OfaRecvCallNode] || node.isInstanceOf[OfaArgCallNode])
+	    stringOperationTracker.foreach{
+	      ipN =>
+	        if(ipN.contains(node)) ipNOpt = Some(ipN)
+	    }
+    ipNOpt
+  }
+  
+  def doStringOperation(ipN : InvokePointNode[Node], fac :() => ValueSet) = {
     var result : Map[Node, ValueSet] = Map()
-    stringOperationTracker.map{
-      case (k, v) =>
-        if(checkStringOperation(k)){
-	        val strings : MList[ResourceUri] = mlistEmpty
-	        val valueSets : Map[Int, ValueSet] = 
-	          v.paramEntryNodes.map{
-	          	case(i, node) => (i, node.getProperty[ValueSet]("ValueSet"))
-		        }.toMap
-	        val strsList = getStringList(valueSets)
-	        val strs : Set[String] = if(!strsList.isEmpty && !strsList(0).isEmpty)strsList.map{l => applyStringOperation(k, strings ++ l)}.toSet
-	        					               else Set()
-	        v.retNodeOpt match{
-	          case Some(r) =>
-	            result += (r -> fac())
-	            result(r).setInstance(Instance("[|java:lang:String|]", v.procPoint.getLoc), r.getContext)
-	            result(r).setStrings(strs)
-	          case None =>
-	        }
-        }
+    if(checkStringOperation(ipN)){
+      val strings : MList[ResourceUri] = mlistEmpty
+      var valueSets : Map[Int, ValueSet] = Map()
+      ipN.recvCallNodeOpt match {
+      	case Some(thisEntryNode) => valueSets += (0 -> thisEntryNode.getProperty[ValueSet]("ValueSet"))
+      	case None =>
+    	}
+      ipN.argCallNodes.toList.sortBy(_._1).foreach{case (k, v) => valueSets += (k + 1 -> v.getProperty[ValueSet]("ValueSet"))}
+      val strsList = getStringList(valueSets)
+      val strs : Set[String] = if(!strsList.isEmpty && !strsList(0).isEmpty)strsList.map{l => applyStringOperation(ipN.getCalleeSig, strings ++ l)}.toSet
+      					               else Set()
+      result += (ipN.piNode -> fac())
+      val ins = Instance("[|java:lang:String|]", ipN.invokePoint.getLoc)
+      ins.updateContext(ipN.piNode.getContext.copy)
+      result(ipN.piNode).setInstance(ins)
+      result(ipN.piNode).setStrings(strs)
+      println("piNode-->" + ipN)
+      println("strings-->" + strs)
     }
     result
   }
   
   def getStringList(argsValueSets : Map[Int, ValueSet]) : List[List[String]] = {
-    val lists = argsValueSets.toList.sortBy(_._1).map{case (k, v) => v.strings.toList}
+    val lists = argsValueSets.toList.sortBy(_._1).map{case(k, v) => v.strings.toList}
     CombinationIterator.combinationIterator[ResourceUri](lists).toList
   }
   
@@ -173,11 +189,9 @@ trait StringAnalyseModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	    case "[|Ljava/lang/String;.trim:()Ljava/lang/String;|]" => 
 	      require(strings.size == 1)
 	      strings(0).trim()
-//	      "trim"
 	    case "[|Ljava/lang/String;.intern:()Ljava/lang/String;|]" =>
 	      require(strings.size == 1)
 	      strings(0).intern()
-//	      "intern"
 	    case "[|Ljava/lang/String;.toLowerCase:()Ljava/lang/String;|]" =>
 	      require(strings.size == 1)
 	      strings(0).toLowerCase()
@@ -192,6 +206,7 @@ trait StringAnalyseModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	      strings(0)
 	    case "[|Ljava/lang/String;.concat:(Ljava/lang/String;)Ljava/lang/String;|]" =>
 	      require(strings.size == 2)
+	      println("1:" + strings(0) + "2:" + strings(1))
 	      strings(0).concat(strings(1))
 	    case "[|Ljava/lang/String;.replaceFirst:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;|]" => 
 	      require(strings.size == 3)

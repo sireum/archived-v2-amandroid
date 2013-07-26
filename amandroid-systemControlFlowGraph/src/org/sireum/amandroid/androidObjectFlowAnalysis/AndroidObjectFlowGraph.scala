@@ -12,51 +12,31 @@ class AndroidObjectFlowGraph[Node <: OfaNode, ValueSet <: AndroidValueSet](fac: 
   /**
    * combine special ofg into current ofg. (just combine proc point and relevant node)
    */ 
-  def combineSpecialOfg(sig : ResourceUri, stringOfg : ObjectFlowGraph[Node, ValueSet], typ : String, callerContext : Context) : PointProc = {
-    val ps = stringOfg.points.filter(p => if(p.isInstanceOf[PointProc])true else false)
-    points ++= ps
-    val procP : PointProc = ps(0).asInstanceOf[PointProc]
-    collectNodes(procP.pUri, procP, callerContext.copy)
-    val calleeContext = callerContext.copy
-    calleeContext.setContext(procP.pUri, procP.getLoc)
-    val retNodeOpt =
-      procP.retVar match{
+  def collectTrackerNodes(sig : String, pi : PointI, callerContext : Context, typ : String) = {
+    val recvCallNodeOpt =
+      pi.recvOpt_Call match{
        	case Some(r) =>
-	        Some(getNode(r, calleeContext))
+	        Some(getNode(r, callerContext))
 	      case None =>
 	        None
     	}
-    val thisEntryNodeOpt = 
-      procP.thisParamOpt_Entry match{
+    val recvReturnNodeOpt = 
+      pi.recvOpt_Return match{
        	case Some(r) =>
-	        Some(getNode(r, calleeContext))
+	        Some(getNode(r, callerContext))
 	      case None =>
 	        None
     	}
-    val thisExitNodeOpt = 
-      procP.thisParamOpt_Exit match{
-       	case Some(r) =>
-	        Some(getNode(r, calleeContext))
-	      case None =>
-	        None
-    	}
-    val paramEntryNodes = procP.params_Entry.map{case (l, p) => (l, getNode(p, calleeContext))}.toMap
-    val paramExitNodes = procP.params_Exit.map{case (l, p) => (l, getNode(p, calleeContext))}.toMap
-    thisEntryNodeOpt match{
-      case Some(thisEntryNode) => addEdge(thisEntryNode, thisExitNodeOpt.get)
-      case None=>
-    }
-    paramEntryNodes foreach{
-      case(i, paramEntryNode) =>
-        addEdge(paramEntryNode, paramExitNodes(i))
-    }
-    val ppN = ProcedurePointNodes[Node](thisEntryNodeOpt, thisExitNodeOpt, paramEntryNodes, paramExitNodes, retNodeOpt, procP)
+    val invokeNode = getNode(pi, callerContext)
+    val argCallNodes = pi.args_Call.map{case (l, p) => (l, getNode(p, callerContext))}.toMap
+    val argReturnNodes = pi.args_Return.map{case (l, p) => (l, getNode(p, callerContext))}.toMap
+    val ipN = InvokePointNode[Node](recvCallNodeOpt, recvReturnNodeOpt, argCallNodes, argReturnNodes, invokeNode, pi)
+    ipN.setCalleeSig(sig)
     if(typ.equals("STRING")){
-	    stringOperationTracker += (sig -> ppN)
+	    stringOperationTracker += (ipN)
     } else if(typ.equals("NATIVE")){
-      nativeOperationTracker += (sig -> ppN)
+      nativeOperationTracker += (ipN)
     }
-    procP
   }
   
   
