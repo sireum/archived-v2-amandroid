@@ -2,7 +2,7 @@ package org.sireum.amandroid.objectFlowAnalysis
 
 import org.sireum.util._
 
-class Context(k : Int) extends Cloneable {
+class Context(var k : Int) extends Cloneable {
   def copy : Context = clone.asInstanceOf[Context]
   def copy(c : Context) = this.callStack = c.getContext
   private var callStack : List[(ResourceUri, String)] = List()
@@ -15,6 +15,7 @@ class Context(k : Int) extends Cloneable {
     }
   }
   def updateContext(context2 : Context) = {
+    this.k = context2.k
     val size2 = context2.length
     val callStack2 = context2.getContext
     val size = length
