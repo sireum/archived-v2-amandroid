@@ -76,15 +76,15 @@ trait InterComponentCommunicationModel[Node <: OfaNode, ValueSet <: AndroidValue
   def hasExplicitTarget(intentValueSet : ValueSet) : Option[Set[String]] = {
     intentValueSet.instances.foreach{
       intentIns =>
-        val componentValueSetOpt = iFieldDefRepo.getValueSet(intentIns, AndroidConstants.INTENT_COMPONENT)
+        val componentValueSetOpt = intentIns.getFieldValueSet(AndroidConstants.INTENT_COMPONENT)
         componentValueSetOpt match{
           case Some(componentValueSet) =>
             componentValueSet.instances.foreach{
               compIns =>
-                val classValueSetOpt = iFieldDefRepo.getValueSet(compIns, AndroidConstants.COMPONENTNAME_CLASS)
+                val classValueSetOpt = compIns.getFieldValueSet(AndroidConstants.COMPONENTNAME_CLASS)
                 classValueSetOpt match{
                   case Some(classValueSet) =>
-                    return Some(classValueSet.strings)
+                    return Some(classValueSet.checkAndGetStrings.get)
                   case None =>
                 }
             }
@@ -101,10 +101,10 @@ trait InterComponentCommunicationModel[Node <: OfaNode, ValueSet <: AndroidValue
         var compsForThisIntent:Set[String] = Set()    
         println("intentIns = " + intentIns)
         var actions:Set[String] = Set()
-        val actionValueSetOpt = iFieldDefRepo.getValueSet(intentIns, AndroidConstants.INTENT_ACTION)
+        val actionValueSetOpt = intentIns.getFieldValueSet(AndroidConstants.INTENT_ACTION)
         actionValueSetOpt match{
           case Some(actionValueSet) =>
-            actions ++= actionValueSet.strings
+            actions ++= actionValueSet.checkAndGetStrings.get
           case None =>
         }
         println("actions = " + actions)
@@ -112,17 +112,17 @@ trait InterComponentCommunicationModel[Node <: OfaNode, ValueSet <: AndroidValue
         var categories:Set[String] = Set() // the code to get the valueSet of categories is to be added below
         
         var datas:Set[UriData] = Set()
-        val dataValueSetOpt = iFieldDefRepo.getValueSet(intentIns, AndroidConstants.INTENT_URI_DATA)
+        val dataValueSetOpt = intentIns.getFieldValueSet(AndroidConstants.INTENT_URI_DATA)
         dataValueSetOpt match {
           case Some(dataValueSet) =>
             dataValueSet.instances.foreach{
               stringUriIns =>              
                 println("stringUriIns = " + stringUriIns)
-                val uriStringValueSetOpt = iFieldDefRepo.getValueSet(stringUriIns, AndroidConstants.URI_STRING_URI_URI_STRING) // do we need to double check if stringUriIns is in fact a stringUri-instance?
+                val uriStringValueSetOpt = stringUriIns.getFieldValueSet(AndroidConstants.URI_STRING_URI_URI_STRING) // do we need to double check if stringUriIns is in fact a stringUri-instance?
                 uriStringValueSetOpt match{
                   case Some(uriStringValueSet) =>
                     println("uriStringValueSet = " + uriStringValueSet)
-                    uriStringValueSet.strings.foreach{
+                    uriStringValueSet.checkAndGetStrings.get.foreach{
                       k =>
                          val uriString = k
                          var uriData = new UriData
@@ -137,10 +137,10 @@ trait InterComponentCommunicationModel[Node <: OfaNode, ValueSet <: AndroidValue
         }
         println("datas = " + datas)
         var mTypes:Set[String] = Set()
-        val mTypeValueSetOpt = iFieldDefRepo.getValueSet(intentIns, AndroidConstants.INTENT_MTYPE)
+        val mTypeValueSetOpt = intentIns.getFieldValueSet(AndroidConstants.INTENT_MTYPE)
         mTypeValueSetOpt match{
           case Some(mTypeValueSet) =>
-            mTypeValueSet.strings.foreach{
+            mTypeValueSet.checkAndGetStrings.get.foreach{
               k  =>
                 mTypes +=k
                 println("mType = " + k)

@@ -55,16 +55,15 @@ trait NativeMethodModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
       val strs : Set[String] = if(!strsList.isEmpty && !strsList(0).isEmpty)strsList.map{l => applyNativeOperation(ipN.getCalleeSig, values ++ l)}.toSet
       					               else Set()
       result += (ipN.piNode -> fac())
-      val ins = Instance("[|java:lang:String|]", ipN.invokePoint.getLoc)
-      ins.updateContext(ipN.piNode.getContext.copy)
-      result(ipN.piNode).setInstance(ins)
-      result(ipN.piNode).setStrings(strs)
+      val ins = StringInstance("[|java:lang:String|]", ipN.piNode.getContext.copy)
+      ins.addStrings(strs)
+      result(ipN.piNode).addInstance(ins)
     }
     result
   }
   
   def getValueSetList(argsValueSets : Map[Int, ValueSet]) : List[List[String]] = {
-    val lists = argsValueSets.toList.sortBy(_._1).map{case (k, v) => v.strings.toList}
+    val lists = argsValueSets.toList.sortBy(_._1).map{case (k, v) => v.checkAndGetStrings.get.toList}
     CombinationIterator.combinationIterator[ResourceUri](lists).toList
   }
   

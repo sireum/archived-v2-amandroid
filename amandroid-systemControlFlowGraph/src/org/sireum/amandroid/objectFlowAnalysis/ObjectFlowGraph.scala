@@ -81,7 +81,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
         addEdge(edge)
       }  
     )
-    iFieldDefRepo ++= ofg2.iFieldDefRepo
+//    iFieldDefRepo ++= ofg2.iFieldDefRepo
     globalDefRepo ++= ofg2.globalDefRepo
     worklist ++= ofg2.worklist
     arrayRepo ++= ofg2.arrayRepo
@@ -239,15 +239,13 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
             baseNode.asInstanceOf[OfaFieldBaseNode].fieldNode = fieldNode.asInstanceOf[OfaFieldNode]
             fieldNode.asInstanceOf[OfaFieldNode].baseNode = baseNode.asInstanceOf[OfaFieldBaseNode]
           case pso : PointStringO =>
-            rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].setString(pso.str)
-            val ins = Instance(pso.typ, pso.locationUri)
-            ins.updateContext(context.copy)
-            rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].setInstance(ins)
+            val ins = StringInstance(pso.typ, context.copy)
+            ins.addString(pso.str)
+            rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].addInstance(ins)
             worklist += rhsNode
           case po : PointO =>
-            val ins = Instance(po.typ, po.locationUri)
-            ins.updateContext(context.copy)
-            rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].setInstance(ins)
+            val ins = RegClassInstance(po.typ, context.copy)
+            rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].addInstance(ins)
             worklist += rhsNode
           case pi : PointI =>
             if(pi.typ.equals("static")) worklist += rhsNode
@@ -355,13 +353,11 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
   private def connectCallEdges(met : PointProc, pi : PointI, srcContext : Context) ={
     val targetContext = srcContext.copy
     targetContext.setContext(met.pUri, met.getLoc)
-    println("pi-->" + pi)
     met.params_Entry.keys.foreach(
       i => {
         val srcNode = getNode(pi.args_Call(i), srcContext.copy)
         val targetNode = getNode(met.params_Entry(i), targetContext.copy)
         worklist += srcNode
-        println("add in params_Entry")
         if(arrayRepo.contains(pi.args_Call(i).toString)){
           if(!graph.containsEdge(srcNode, targetNode))
             addEdge(targetNode, srcNode)
@@ -375,7 +371,6 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
         val srcNode = getNode(met.params_Exit(i), targetContext.copy)
         val targetNode = getNode(pi.args_Return(i), srcContext.copy)
         worklist += srcNode
-        println("add in params_Exit")
         if(arrayRepo.contains(pi.args_Return(i).toString)){
           if(!graph.containsEdge(srcNode, targetNode))
             addEdge(targetNode, srcNode)
@@ -389,7 +384,6 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
         val srcNode = getNode(pi.recvOpt_Call.get, srcContext.copy)
         val targetNode = getNode(thisParam, targetContext.copy)
         worklist += srcNode
-        println("add in thisParamOpt_Entry")
         if(!graph.containsEdge(srcNode, targetNode))
           addEdge(srcNode, targetNode)
       case None =>
@@ -399,7 +393,6 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
         val srcNode = getNode(thisParam, targetContext.copy)
         val targetNode = getNode(pi.recvOpt_Return.get, srcContext.copy)
         worklist += srcNode
-        println("add in thisParamOpt_Exit")
         if(!graph.containsEdge(srcNode, targetNode))
           addEdge(srcNode, targetNode)
       case None =>
@@ -409,7 +402,6 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
         val targetNode = getNode(pi, srcContext.copy)
         val srcNode = getNode(retv, targetContext.copy)
         worklist += srcNode
-        println("add in retVar")
         if(!graph.containsEdge(srcNode, targetNode))
           addEdge(srcNode, targetNode)
       case None =>
@@ -426,7 +418,11 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     val baseValueSet = baseNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
     baseValueSet.instances.foreach{
       ins => 
-        val vsopt = iFieldDefRepo.getValueSet(ins, fieldNode.fieldName)
+        val vsopt = ins.getFieldValueSet(fieldNode.fieldName)
+        println("fieldNode-->" + fieldNode)
+        println("fieldDefRepo--->" + ins.fieldDefSiteRepo)
+        println("vsopt--->" + vsopt)
+//        val vsopt = iFieldDefRepo.getValueSet(ins, fieldNode.fieldName)
         vsopt match{
           case Some(vs) =>
             fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet].update(vs)
@@ -436,31 +432,18 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
   }
   
   /**
-   * When a field is assigned then we populate the iFieldDefRepo
+   * When a field is assigned then we populate the FieldDefRepo
    */ 
-  def populateIFieldRepo(fieldNode : OfaFieldNode) = {
+  def populateFieldRepo(fieldNode : OfaFieldNode) = {
     val baseNode = fieldNode.baseNode
     val fieldValueSet = fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
     val baseValueSet = baseNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
     val newDefSitContext = baseNode.getContext.copy
     baseValueSet.instances.foreach{
-      k =>
-        k.updateContext(newDefSitContext)
-        baseValueSet.setInstance(k)
-    }
-    baseValueSet.setChange(baseNode.getContext.copy, fieldValueSet)
-//    println("fieldNode" + fieldNode + "\nfieldValueSet--+" + fieldValueSet)
-    baseValueSet.instances.foreach{
       ins =>
-        ins.getContext match{
-          case Right(cons) => cons.foreach{
-            con => 
-              iFieldDefRepo.setValueSet(ins, con, fieldNode.fieldName, fieldValueSet)
-          }
-          case Left(con) =>
-		          iFieldDefRepo.setValueSet(ins, con, fieldNode.fieldName, fieldValueSet)
-        }
-//        println("populate-->" + iFieldDefRepo)
+        ins.updateFieldDefSite(fieldNode.fieldName, newDefSitContext, fieldValueSet)
+        println("populate--->" + ins.fieldDefSiteRepo)
+//        iFieldDefRepo.setValueSet(ins, newDefSitContext, fieldNode.fieldName, fieldValueSet)
     }
   }
   
@@ -469,21 +452,9 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     val fieldValueSet = baseNode.fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
     val newDefSitContext = baseNode.getContext.copy
     baseValueSet.instances.foreach{
-      k =>
-        k.updateContext(newDefSitContext)
-        baseValueSet.setInstance(k)
-    }
-//    baseValueSet.setChange(baseNode.getContext.copy, fieldValueSet)
-    baseValueSet.instances.foreach{
-      case(ins) =>
-        ins.getContext match{
-          case Right(cons) => cons.foreach{
-            con => 
-              iFieldDefRepo.setValueSet(ins, con, baseNode.fieldNode.fieldName, fieldValueSet)
-          }
-          case Left(con) =>
-		        iFieldDefRepo.setValueSet(ins, con, baseNode.fieldNode.fieldName, fieldValueSet)
-		    }
+      ins =>
+        ins.updateFieldDefSite(baseNode.fieldNode.fieldName, newDefSitContext, fieldValueSet)
+//        iFieldDefRepo.setValueSet(ins, newDefSitContext, baseNode.fieldNode.fieldName, fieldValueSet)
     }
   }
   
@@ -541,7 +512,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     val calleeSet : MSet[ResourceUri] = msetEmpty
     diff.instances.foreach{
       d => 
-        val recordUri = androidLibInfoTables.getRecordUri(d.className)
+        val recordUri = androidLibInfoTables.getRecordUri(d.getClassName)
         val procUri = androidLibInfoTables.findProcedureUri(recordUri, androidLibInfoTables.getSubSignature(pi.varName))
         if(procUri != null)
         	calleeSet += procUri

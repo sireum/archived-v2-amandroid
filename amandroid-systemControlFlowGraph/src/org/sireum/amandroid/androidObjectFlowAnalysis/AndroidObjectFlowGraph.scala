@@ -37,6 +37,7 @@ class AndroidObjectFlowGraph[Node <: OfaNode, ValueSet <: AndroidValueSet](fac: 
     } else if(typ.equals("NATIVE")){
       nativeOperationTracker += (ipN)
     }
+    ipN
   }
   
   

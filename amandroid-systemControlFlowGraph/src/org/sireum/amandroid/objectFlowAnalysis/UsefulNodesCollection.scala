@@ -20,15 +20,18 @@ case class InvokePointNode[Node](recvCallNodeOpt : Option[Node],
 	def getCalleeSig = calleeSig
 	def contains(node : Node) : Boolean = {
 	  recvCallNodeOpt match{
-	    case Some(rcN) => if(rcN == node) return true 
+	    case Some(rcN) => 
+	      if(rcN == node) return true 
 	    case None =>
 	  }
 	  recvReturnNodeOpt match{
 	    case Some(rrN) => if(rrN == node) return true 
 	    case None =>
 	  }
-	  argCallNodes.foreach{acN => if(acN == node) return true }
-	  argReturnNodes.foreach{arN => if(arN == node) return true }
+	  
+	  argCallNodes.foreach{case(i, acN) => 
+	    if(acN == node) return true }
+	  argReturnNodes.foreach{case(i, arN) => if(arN == node) return true }
 	  if(piNode == node) return true
 	  false
 	}
