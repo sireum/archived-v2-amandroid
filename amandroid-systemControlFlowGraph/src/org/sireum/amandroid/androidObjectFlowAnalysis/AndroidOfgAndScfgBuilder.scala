@@ -73,14 +73,14 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
         ofa(ofg, sCfg)
     }
     val result = (ofg, sCfg)
-    ofg.nodes.foreach(
-      node => {
-        val name = node.toString()
-        val valueSet = node.getProperty(result._1.VALUE_SET).asInstanceOf[ValueSet]
-//        if(!valueSet.isEmpty)
-        	println("node:" + name + "\nvalueSet:" + valueSet)
-      }
-    )
+//    ofg.nodes.foreach(
+//      node => {
+//        val name = node.toString()
+//        val valueSet = node.getProperty(result._1.VALUE_SET).asInstanceOf[ValueSet]
+////        if(!valueSet.isEmpty)
+//        	println("node:" + name + "\nvalueSet:" + valueSet)
+//      }
+//    )
     println("processed--->" + processed.size)
 //    processed.foreach{
 //      item =>
@@ -223,23 +223,21 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
       case ofbnl : OfaFieldBaseNodeL =>
         val vsN = ofbnl.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
         val vsSucc = ofg.successors(ofbnl.asInstanceOf[Node]).head.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
-        println("ofn.baseNode-->" + ofbnl)
-        println("vsN-->" + vsN)
-        println("ofg.successors(ofn.baseNode.asInstanceOf[Node]).head-->" + ofg.successors(ofbnl.asInstanceOf[Node]).head)
-        println("vsSucc-->" + vsSucc)
         ofg.updateBaseNodeValueSet(ofbnl)
         val vsN2 = ofbnl.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
         val vsSucc2 = ofg.successors(ofbnl.asInstanceOf[Node]).head.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
-        println("ofn.baseNode-->" + ofbnl)
-        println("vsN2-->" + vsN2)
-        println("ofg.successors(ofn.baseNode.asInstanceOf[Node]).head-->" + ofg.successors(ofbnl.asInstanceOf[Node]).head)
-        println("vsSucc2-->" + vsSucc2)
       case ofbnr : OfaFieldBaseNodeR =>
+        
         ofg.updateFieldValueSet(ofbnr.fieldNode)
         ofg.worklist += ofbnr.fieldNode.asInstanceOf[Node]
+        
       case ofn : OfaFieldNode =>		//this means field appear on LHS and n is on RHS
-//        ofg.populateFieldRepo(ofn)
+        val vsN = ofn.baseNode.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
+        val vsSucc = ofg.successors(ofn.baseNode.asInstanceOf[Node]).head.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
+        ofg.populateFieldRepo(ofn)
         ofg.worklist += ofn.baseNode.asInstanceOf[Node]
+        val vsN2 = ofn.baseNode.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
+        val vsSucc2 = ofg.successors(ofn.baseNode.asInstanceOf[Node]).head.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
       case _ =>
     }
   }
@@ -357,11 +355,11 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
         sCfg.collectionCCfgToBaseGraph(callee, cCfg)
       } else {
         //get ofg ccfg from file
-//        val calleeOfg = androidCache.load[ObjectFlowGraph[Node, ValueSet]](callee, "ofg")
-//        val calleeCCfg = androidCache.load[CompressedControlFlowGraph[String]](callee, "cCfg")
-//        calleeOfg.updateContext(callerContext)
-//        processed += ((callee, callerContext.copy) -> ofg.combineOfgs(calleeOfg))
-//        sCfg.collectionCCfgToBaseGraph(callee, calleeCCfg)
+        val calleeOfg = androidCache.load[ObjectFlowGraph[Node, ValueSet]](callee, "ofg")
+        val calleeCCfg = androidCache.load[CompressedControlFlowGraph[String]](callee, "cCfg")
+        calleeOfg.updateContext(callerContext)
+        processed += ((callee, callerContext.copy) -> ofg.combineOfgs(calleeOfg))
+        sCfg.collectionCCfgToBaseGraph(callee, calleeCCfg)
       }
     }
     if(processed.contains(callee, callerContext)){

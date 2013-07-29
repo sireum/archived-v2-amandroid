@@ -43,17 +43,21 @@ trait StringAnalyseModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
       val strings : MList[ResourceUri] = mlistEmpty
       var valueSets : Map[Int, ValueSet] = Map()
       ipN.recvCallNodeOpt match {
-      	case Some(thisEntryNode) => valueSets += (0 -> thisEntryNode.getProperty[ValueSet]("ValueSet"))
+      	case Some(thisEntryNode) => 
+      	  valueSets += (0 -> thisEntryNode.getProperty[ValueSet]("ValueSet"))
       	case None =>
     	}
       ipN.argCallNodes.toList.sortBy(_._1).foreach{case (k, v) => valueSets += (k + 1 -> v.getProperty[ValueSet]("ValueSet"))}
       val strsList = getStringList(valueSets)
       val strs : Set[String] = if(!strsList.isEmpty && !strsList(0).isEmpty)strsList.map{l => applyStringOperation(ipN.getCalleeSig, strings ++ l)}.toSet
       					               else Set()
+      println("strs-->" + strs)
       result += (ipN.piNode -> fac())
       val ins = StringInstance("[|java:lang:String|]", ipN.piNode.getContext.copy)
       ins.addStrings(strs)
       result(ipN.piNode).addInstance(ins)
+      println("ipN.piNode-->" + ipN.piNode)
+      println("ins-->" + ins)
     }
     result
   }

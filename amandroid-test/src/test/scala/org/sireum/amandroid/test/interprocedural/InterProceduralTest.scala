@@ -39,7 +39,7 @@ class InterProceduralTest extends InterProceduralTestFramework {
   aCache.setRemovePercent(20)
   
   InterproceduralExamples.ofgModelFiles.
-    filter { s => s.endsWith("smallWfgNP.pilar") }.
+    filter { s => s.endsWith("bigWfgNp.pilar") }.
     foreach { fileUri =>
       Analyzing title fileUri file (fileUri, libInfoTables, aCache)
     }
