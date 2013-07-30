@@ -73,14 +73,19 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
         ofa(ofg, sCfg)
     }
     val result = (ofg, sCfg)
-//    ofg.nodes.foreach(
-//      node => {
-//        val name = node.toString()
-//        val valueSet = node.getProperty(result._1.VALUE_SET).asInstanceOf[ValueSet]
-////        if(!valueSet.isEmpty)
-//        	println("node:" + name + "\nvalueSet:" + valueSet)
-//      }
-//    )
+    ofg.nodes.foreach(
+      node => {
+        val name = node.toString()
+        if(name == "arg_Call:v0@List((pilar:/procedure/default/%5B%7Ccom:fgweihlp:wfgnp:MainActivity.onCreate%7C%5D/1/23/38758143,L000850), (pilar:/procedure/default/%5B%7Ccom:fgweihlp:wfgnp:MainActivity.dummyMain%7C%5D/1/19/acaa3d3c,L10))")
+        {
+          val valueSet = node.getProperty(result._1.VALUE_SET).asInstanceOf[ValueSet]
+          println(valueSet.instances.head.fieldDefSiteRepo("[|android:content:Intent.mAction|]")(0) == valueSet.instances.head.fieldDefSiteRepo("[|android:content:Intent.mAction|]")(1))
+        }
+        val valueSet = node.getProperty(result._1.VALUE_SET).asInstanceOf[ValueSet]
+//        if(!valueSet.isEmpty)
+        	println("node:" + name + "\n" + valueSet)
+      }
+    )
     println("processed--->" + processed.size)
 //    processed.foreach{
 //      item =>
@@ -221,23 +226,13 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
       case ogvn : OfaGlobalVarNode =>
         ofg.populateGlobalDefRepo(d, ogvn)
       case ofbnl : OfaFieldBaseNodeL =>
-        val vsN = ofbnl.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
-        val vsSucc = ofg.successors(ofbnl.asInstanceOf[Node]).head.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
         ofg.updateBaseNodeValueSet(ofbnl)
-        val vsN2 = ofbnl.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
-        val vsSucc2 = ofg.successors(ofbnl.asInstanceOf[Node]).head.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
       case ofbnr : OfaFieldBaseNodeR =>
-        
         ofg.updateFieldValueSet(ofbnr.fieldNode)
         ofg.worklist += ofbnr.fieldNode.asInstanceOf[Node]
-        
       case ofn : OfaFieldNode =>		//this means field appear on LHS and n is on RHS
-        val vsN = ofn.baseNode.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
-        val vsSucc = ofg.successors(ofn.baseNode.asInstanceOf[Node]).head.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
         ofg.populateFieldRepo(ofn)
         ofg.worklist += ofn.baseNode.asInstanceOf[Node]
-        val vsN2 = ofn.baseNode.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
-        val vsSucc2 = ofg.successors(ofn.baseNode.asInstanceOf[Node]).head.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
       case _ =>
     }
   }

@@ -43,8 +43,14 @@ class NormalValueSet {
     map1.keys.map{ case k => if(map2.contains(k)){if(!map1(k).equals(map2(k))){d += (k -> map1(k))}}else{d += (k -> map1(k))} }
     d
   }
-//  override def hashCode() : Int = this.insts.hashCode
-  override def toString() : String = "      ValueSet: \n        instances: " + insts + "\n"
+  override def equals(a : Any) : Boolean = {
+    a match{
+      case vs : NormalValueSet => this.insts == vs.instances
+      case _ => false
+    }
+  }
+  override def hashCode() : Int = this.insts.hashCode
+  override def toString() : String = "\n      ValueSet: \n        instances: " + insts + "\n"
 }
 
 abstract class Instance(className : String, defSite : Context) extends Cloneable{
@@ -78,12 +84,12 @@ abstract class Instance(className : String, defSite : Context) extends Cloneable
   def isSameInstance(ins : Instance) : Boolean = this.className == ins.getClassName && this.defSite == ins.getDefSite
   override def equals(a : Any) : Boolean = {
     a match{
-      case ins : Instance => this.className == ins.getClassName && this.defSite == ins.getDefSite && this.fieldDefSiteRepo == ins.fieldDefSiteRepo
+      case ins : Instance => this.className == ins.getClassName && this.defSite == ins.getDefSite && this.fieldDefSiteRepo == ins.fieldDefSiteRepo && this.fieldLastDefSite == ins.fieldLastDefSite
       case _ => false
     }
   }
-  override def hashCode() : Int = (this.className + this.defSite + this.fieldDefSiteRepo).hashCode
-  override def toString : String = "Instance(name:" + this.className + ". defsite:" + this.defSite + ". fieldDefRepo:" + this.fieldDefSiteRepo + ") "
+  override def hashCode() : Int = (this.className + this.defSite + this.fieldDefSiteRepo + this.fieldLastDefSite).hashCode
+  override def toString : String = "\n+++++++++++++++++++++\nInstance(\nname:" + this.className + ". \ndefsite:" + this.defSite + ". \nfieldDefRepo:" + this.fieldDefSiteRepo + ") \n-----------------------\n"
 }
 
 final case class StringInstance(className : String, defSite : Context) extends Instance(className, defSite){
@@ -98,7 +104,7 @@ final case class StringInstance(className : String, defSite : Context) extends I
     }
   }
   override def hashCode() : Int = (this.className + this.defSite + this.fieldDefSiteRepo + this.strings).hashCode
-  override def toString : String = "StringInstance(strings:" + this.strings + ". name:" + this.className + ". defsite:" + this.defSite + ". fieldDefRepo:" + this.fieldDefSiteRepo + ") "
+  override def toString : String = "\n***********************\nStringInstance(\nstrings:" + this.strings + ". \nname:" + this.className + ". \ndefsite:" + this.defSite + ". \nfieldDefRepo:" + this.fieldDefSiteRepo + ") \n.............................\n"
 }
 
 final case class RegClassInstance(className : String, defSite : Context) extends Instance(className, defSite)

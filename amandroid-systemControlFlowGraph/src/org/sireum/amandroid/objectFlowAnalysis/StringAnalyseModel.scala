@@ -40,7 +40,6 @@ trait StringAnalyseModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
   def doStringOperation(ipN : InvokePointNode[Node], fac :() => ValueSet) = {
     var result : Map[Node, ValueSet] = Map()
     if(checkStringOperation(ipN)){
-      val strings : MList[ResourceUri] = mlistEmpty
       var valueSets : Map[Int, ValueSet] = Map()
       ipN.recvCallNodeOpt match {
       	case Some(thisEntryNode) => 
@@ -49,7 +48,7 @@ trait StringAnalyseModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
     	}
       ipN.argCallNodes.toList.sortBy(_._1).foreach{case (k, v) => valueSets += (k + 1 -> v.getProperty[ValueSet]("ValueSet"))}
       val strsList = getStringList(valueSets)
-      val strs : Set[String] = if(!strsList.isEmpty && !strsList(0).isEmpty)strsList.map{l => applyStringOperation(ipN.getCalleeSig, strings ++ l)}.toSet
+      val strs : Set[String] = if(!strsList.isEmpty && !strsList(0).isEmpty)strsList.map{l => applyStringOperation(ipN.getCalleeSig, l)}.toSet
       					               else Set()
       println("strs-->" + strs)
       result += (ipN.piNode -> fac())
@@ -66,12 +65,11 @@ trait StringAnalyseModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
     val lists = argsValueSets.toList.sortBy(_._1).map{case(k, v) => require(v.checkAndGetStrings.isDefined); v.checkAndGetStrings.get.toList}
     CombinationIterator.combinationIterator[ResourceUri](lists).toList
   }
+    
   
-  def isStringKind(name : String) : Boolean = name.equals("[|java:lang:StringBuilder|]") || name.equals("[|java:lang:String|]")
+  def isStringOperation(sig : String) : Boolean = sig.contains("[|Ljava/lang/String;.")
   
-  def isStringOperation(sig : String) : Boolean = sig.contains("[|Ljava/lang/StringBuilder;.") || sig.contains("[|Ljava/lang/String;.")
-  
-	def applyStringOperation(sig : String, strings : MList[String]) : String = {
+	def applyStringOperation(sig : String, strings : List[String]) : String = {
 	  val size = strings.size
 	  
 	  sig match {
