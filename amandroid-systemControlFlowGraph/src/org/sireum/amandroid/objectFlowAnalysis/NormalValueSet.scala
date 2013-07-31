@@ -2,7 +2,8 @@ package org.sireum.amandroid.objectFlowAnalysis
 
 import org.sireum.util._
 
-class NormalValueSet {
+class NormalValueSet extends Cloneable{
+  def copy : NormalValueSet = clone.asInstanceOf[NormalValueSet]
   protected var insts : Set[Instance] = Set()
   def instances = this.insts
   def addInstance(ins : Instance) = this.insts += (ins.copy)
@@ -23,7 +24,7 @@ class NormalValueSet {
   protected def getSameInstance(ins : Instance) : Option[Instance] = {
     this.insts.foreach{
       instance =>
-        if(instance.isSameInstance(ins))return Some(instance)
+        if(instance.isSameInstance(ins) && instance.fieldLastDefSite == ins.fieldLastDefSite)return Some(instance)
     }
     None
   }
@@ -57,39 +58,27 @@ abstract class Instance(className : String, defSite : Context) extends Cloneable
   def copy : Instance = clone.asInstanceOf[Instance]
   def getClassName = className
   def getDefSite = defSite
-  var fieldDefSiteRepo : Map[String, List[(Context, NormalValueSet)]] = Map()
+  var fieldDefSiteRepo : Map[String, Map[Context, NormalValueSet]] = Map()
   var fieldLastDefSite : Map[String, Context] = Map()
-  private var isLoop : Boolean = false
   def setFieldLastDefSite(fieldName : String, defsitContext : Context) = fieldLastDefSite += (fieldName -> defsitContext)
   def updateFieldDefSite(fieldName : String, defsitContext : Context, vs : NormalValueSet) = {
-//    if(fieldDefSiteRepo.contains(fieldName) && fieldDefSiteRepo(fieldName).contains((defsitContext, vs))) isLoop = true
-//    else {
-      val defSites = fieldDefSiteRepo.getOrElse(fieldName, List())
-      fieldDefSiteRepo += (fieldName -> ((defsitContext, vs) :: defSites))
-//    }
+    val defSiteMap = fieldDefSiteRepo.getOrElse(fieldName, Map()) + (defsitContext -> vs)
+    fieldDefSiteRepo += (fieldName -> defSiteMap)
   }
   def getFieldValueSet(fieldName : String) : Option[NormalValueSet] = {
-    if(fieldDefSiteRepo.contains(fieldName) && fieldLastDefSite.contains(fieldName)){
-	    if(isLoop) {
-	      Some(fieldDefSiteRepo(fieldName).map(f => f._2).reduce((vs1, vs2) => vs1.update(vs2)))
-	    }
-	    else{
-	      if(fieldDefSiteRepo(fieldName).head._1 == fieldLastDefSite(fieldName))
-	      	Some(fieldDefSiteRepo(fieldName).head._2)
-	      else None
-	    }
-    }
+    if(fieldDefSiteRepo.contains(fieldName) && fieldLastDefSite.contains(fieldName) && fieldDefSiteRepo(fieldName).contains(fieldLastDefSite(fieldName)))
+      Some(fieldDefSiteRepo(fieldName)(fieldLastDefSite(fieldName)))
     else None
   }
   def isSameInstance(ins : Instance) : Boolean = this.className == ins.getClassName && this.defSite == ins.getDefSite
   override def equals(a : Any) : Boolean = {
     a match{
-      case ins : Instance => this.className == ins.getClassName && this.defSite == ins.getDefSite && this.fieldDefSiteRepo == ins.fieldDefSiteRepo && this.fieldLastDefSite == ins.fieldLastDefSite
+      case ins : Instance => this.className == ins.getClassName && this.defSite == ins.getDefSite && this.fieldDefSiteRepo == ins.fieldDefSiteRepo
       case _ => false
     }
   }
-  override def hashCode() : Int = (this.className + this.defSite + this.fieldDefSiteRepo + this.fieldLastDefSite).hashCode
-  override def toString : String = "\n+++++++++++++++++++++\nInstance(\nname:" + this.className + ". \ndefsite:" + this.defSite + ". \nfieldDefRepo:" + this.fieldDefSiteRepo + ") \n-----------------------\n"
+  override def hashCode() : Int = (this.className + this.defSite + this.fieldDefSiteRepo).hashCode
+  override def toString : String = "\n+++++++++++++++++++++\nInstance(\nname:" + this.className + ". \ndefsite:" + this.defSite + ". \nfieldLastDefSite:" + this.fieldLastDefSite + ". \nfieldDefRepo:" + this.fieldDefSiteRepo + ") \n-----------------------\n"
 }
 
 final case class StringInstance(className : String, defSite : Context) extends Instance(className, defSite){
@@ -104,7 +93,7 @@ final case class StringInstance(className : String, defSite : Context) extends I
     }
   }
   override def hashCode() : Int = (this.className + this.defSite + this.fieldDefSiteRepo + this.strings).hashCode
-  override def toString : String = "\n***********************\nStringInstance(\nstrings:" + this.strings + ". \nname:" + this.className + ". \ndefsite:" + this.defSite + ". \nfieldDefRepo:" + this.fieldDefSiteRepo + ") \n.............................\n"
+  override def toString : String = "\n***********************\nStringInstance(\nstrings:" + this.strings + ". \nname:" + this.className + ". \ndefsite:" + this.defSite + ". \nfieldLastDefSite:" + this.fieldLastDefSite + ". \nfieldDefRepo:" + this.fieldDefSiteRepo + ") \n.............................\n"
 }
 
 final case class RegClassInstance(className : String, defSite : Context) extends Instance(className, defSite)

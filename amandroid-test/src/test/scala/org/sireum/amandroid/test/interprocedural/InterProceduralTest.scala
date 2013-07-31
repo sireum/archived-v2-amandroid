@@ -39,7 +39,7 @@ class InterProceduralTest extends InterProceduralTestFramework {
   aCache.setRemovePercent(20)
   
   InterproceduralExamples.ofgModelFiles.
-    filter { s => s.endsWith("ImplicitLoopTest.pilar") }.
+    filter { s => s.endsWith("/BranchAndMergeTest2Fields.pilar") }.
     foreach { fileUri =>
       Analyzing title fileUri file (fileUri, libInfoTables, aCache)
     }

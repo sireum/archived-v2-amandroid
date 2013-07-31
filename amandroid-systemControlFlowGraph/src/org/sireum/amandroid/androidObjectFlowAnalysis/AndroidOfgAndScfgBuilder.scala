@@ -76,11 +76,6 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
     ofg.nodes.foreach(
       node => {
         val name = node.toString()
-        if(name == "arg_Call:v0@List((pilar:/procedure/default/%5B%7Ccom:fgweihlp:wfgnp:MainActivity.onCreate%7C%5D/1/23/38758143,L000850), (pilar:/procedure/default/%5B%7Ccom:fgweihlp:wfgnp:MainActivity.dummyMain%7C%5D/1/19/acaa3d3c,L10))")
-        {
-          val valueSet = node.getProperty(result._1.VALUE_SET).asInstanceOf[ValueSet]
-          println(valueSet.instances.head.fieldDefSiteRepo("[|android:content:Intent.mAction|]")(0) == valueSet.instances.head.fieldDefSiteRepo("[|android:content:Intent.mAction|]")(1))
-        }
         val valueSet = node.getProperty(result._1.VALUE_SET).asInstanceOf[ValueSet]
 //        if(!valueSet.isEmpty)
         	println("node:" + name + "\n" + valueSet)
@@ -190,8 +185,14 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
         succ => {
           val vsSucc = succ.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
           val d = vsN.getDiff(vsSucc).asInstanceOf[ValueSet]
+//          println("n--->" + n)
+//          println("vsN--->" + vsN)
+//          println("succ--->" + succ)
+//          println("vsSucc--->" + vsSucc)
+//          println("d-->" + d)
           if(!d.isEmpty){
             vsSucc.update(d)
+            
             ofg.worklist += succ
             checkAndDoFieldAndGlobalOperation(succ, d, ofg)
             checkAndDoModelOperation(succ, ofg)
@@ -219,6 +220,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
     }
   }
   
+  
   def checkAndDoFieldAndGlobalOperation(succNode : Node, d : ValueSet, ofg : ObjectFlowGraph[Node, ValueSet]) = {
     //check whether it's a global variable node, if yes, then populate globalDefRepo
      //check whether it's a base node of field access, if yes, then populate/use iFieldDefRepo.
@@ -226,12 +228,20 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
       case ogvn : OfaGlobalVarNode =>
         ofg.populateGlobalDefRepo(d, ogvn)
       case ofbnl : OfaFieldBaseNodeL =>
+        if(ofbnl.toString.contains("L000750"))
+          println("before update-->" + ofbnl.getProperty("ValueSet"))
         ofg.updateBaseNodeValueSet(ofbnl)
+        if(ofbnl.toString.contains("L000750"))
+          println("after update-->" + ofbnl.getProperty("ValueSet"))
       case ofbnr : OfaFieldBaseNodeR =>
         ofg.updateFieldValueSet(ofbnr.fieldNode)
         ofg.worklist += ofbnr.fieldNode.asInstanceOf[Node]
       case ofn : OfaFieldNode =>		//this means field appear on LHS and n is on RHS
+        if(ofn.toString.contains("L000750"))
+          println("before populate-->" + ofn.baseNode.getProperty("ValueSet"))
         ofg.populateFieldRepo(ofn)
+        if(ofn.toString.contains("L000750"))
+          println("after populate-->" + ofn.baseNode.getProperty("ValueSet"))
         ofg.worklist += ofn.baseNode.asInstanceOf[Node]
       case _ =>
     }
@@ -350,11 +360,11 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
         sCfg.collectionCCfgToBaseGraph(callee, cCfg)
       } else {
         //get ofg ccfg from file
-        val calleeOfg = androidCache.load[ObjectFlowGraph[Node, ValueSet]](callee, "ofg")
-        val calleeCCfg = androidCache.load[CompressedControlFlowGraph[String]](callee, "cCfg")
-        calleeOfg.updateContext(callerContext)
-        processed += ((callee, callerContext.copy) -> ofg.combineOfgs(calleeOfg))
-        sCfg.collectionCCfgToBaseGraph(callee, calleeCCfg)
+//        val calleeOfg = androidCache.load[ObjectFlowGraph[Node, ValueSet]](callee, "ofg")
+//        val calleeCCfg = androidCache.load[CompressedControlFlowGraph[String]](callee, "cCfg")
+//        calleeOfg.updateContext(callerContext)
+//        processed += ((callee, callerContext.copy) -> ofg.combineOfgs(calleeOfg))
+//        sCfg.collectionCCfgToBaseGraph(callee, calleeCCfg)
       }
     }
     if(processed.contains(callee, callerContext)){

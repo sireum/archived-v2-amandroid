@@ -37,7 +37,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
   
   final val VALUE_SET = "ValueSet"
   final val PARAM_NUM = "param.number"
-  final val K_CONTEXT : Int = 1
+  final val K_CONTEXT : Int = 2
   
   protected var pl : Map[OfaNode, Node] = Map()
   
@@ -419,7 +419,6 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     baseValueSet.instances.foreach{
       ins => 
         val vsopt = ins.getFieldValueSet(fieldNode.fieldName)
-//        val vsopt = iFieldDefRepo.getValueSet(ins, fieldNode.fieldName)
         vsopt match{
           case Some(vs) =>
             fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet].update(vs)
@@ -439,8 +438,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     baseValueSet.instances.foreach{
       ins =>
         ins.setFieldLastDefSite(fieldNode.fieldName, newDefSitContext)
-        ins.updateFieldDefSite(fieldNode.fieldName, newDefSitContext, fieldValueSet)
-//        iFieldDefRepo.setValueSet(ins, newDefSitContext, fieldNode.fieldName, fieldValueSet)
+        ins.updateFieldDefSite(fieldNode.fieldName, newDefSitContext, fieldValueSet.copy)
     }
   }
   
@@ -448,12 +446,10 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     val baseValueSet = baseNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
     val fieldValueSet = baseNode.fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
     val newDefSitContext = baseNode.getContext.copy
-//    if(!fieldValueSet.isEmpty)
     baseValueSet.instances.foreach{
       ins =>
         ins.setFieldLastDefSite(baseNode.fieldNode.fieldName, newDefSitContext)
-        ins.updateFieldDefSite(baseNode.fieldNode.fieldName, newDefSitContext, fieldValueSet)
-//        iFieldDefRepo.setValueSet(ins, newDefSitContext, baseNode.fieldNode.fieldName, fieldValueSet)
+        ins.updateFieldDefSite(baseNode.fieldNode.fieldName, newDefSitContext, fieldValueSet.copy)
     }
   }
   
