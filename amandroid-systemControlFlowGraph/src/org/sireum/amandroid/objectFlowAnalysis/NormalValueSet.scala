@@ -8,6 +8,7 @@ class NormalValueSet extends Cloneable{
   def instances = this.insts
   def addInstance(ins : Instance) = this.insts += (ins.copy)
   def addInstances(insts : Set[Instance]) = this.insts ++= insts.map{ins => ins.copy}
+  def setInstances(insts : Set[Instance]) = this.insts = insts.map{ins => ins.copy}
   /**
    * merge valueset with predecessor's valueset vs
    */
@@ -84,9 +85,22 @@ abstract class Instance(className : String, defSite : Context) extends Cloneable
   }
   
   def merge(instance : Instance) = {
-    if(isSameInstance(instance) && this.fieldLastDefSite == instance.fieldLastDefSite)
-    	this.fieldDefSiteRepo ++= instance.fieldDefSiteRepo
+    if(isSameInstance(instance) && this.fieldLastDefSite == instance.fieldLastDefSite){
+    	instance.fieldDefSiteRepo foreach{
+    	  case (fieldName, map) =>
+    	    this.fieldDefSiteRepo += (fieldName -> copyMap(map))
+    	}
+    }
     this
+  }
+  
+  def copyMap(map : Map[Context, NormalValueSet]) : Map[Context, NormalValueSet] = {
+    map map{
+      case(k, v) =>
+        val copyV = v.copy
+        copyV.setInstances(v.instances)
+      	(k -> copyV) 
+    }
   }
   
   def getFieldValueSet(fieldName : String) : Option[NormalValueSet] = {
@@ -94,6 +108,7 @@ abstract class Instance(className : String, defSite : Context) extends Cloneable
       Some(fieldDefSiteRepo(fieldName)(fieldLastDefSite(fieldName)))
     else None
   }
+  // get diff : map1 - map2
   protected def getMapDiff[K, V](map1 : Map[K, V], map2 : Map[K, V]) = {
     var d : Map[K, V] = Map()
     map1.keys.map{ case k => if(map2.contains(k)){if(!map1(k).equals(map2(k))){d += (k -> map1(k))}}else{d += (k -> map1(k))} }
@@ -125,6 +140,14 @@ final case class StringInstance(className : String, defSite : Context) extends I
   def getStrings = strings
   def addString(str : String) = strings += str
   def addStrings(strs : Set[String]) = strings ++= strs
+  override def merge(instance : Instance) = {
+    require(instance.isInstanceOf[StringInstance])
+    if(isSameInstance(instance) && this.fieldLastDefSite == instance.fieldLastDefSite){
+    	super.merge(instance)
+    	this.strings ++= instance.asInstanceOf[StringInstance].getStrings
+    }
+    this
+  }
   override def equals(a : Any) : Boolean = {
     a match{
       case ins : StringInstance => this.className == ins.getClassName && this.defSite == ins.getDefSite && this.fieldDefSiteRepo == ins.fieldDefSiteRepo && this.strings == ins.strings

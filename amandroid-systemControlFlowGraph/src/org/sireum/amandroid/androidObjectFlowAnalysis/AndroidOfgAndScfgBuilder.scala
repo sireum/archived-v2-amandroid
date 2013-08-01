@@ -202,11 +202,14 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
         succ => {
           val vsSucc = getValueSet(succ, ofg, true)
           val d = vsN.getDiff(vsSucc).asInstanceOf[ValueSet]
-//          println("n--->" + n)
-//          println("vsN--->" + vsN)
-//          println("succ--->" + succ)
-//          println("vsSucc--->" + vsSucc)
-//          println("d-->" + d)
+          if(succ.toString() == "base_rhs:v1@List((pilar:/procedure/default/%5B%7Ccom:fgweihlp:wfgnp:myStringBuilder.append%7C%5D/1/53/2f73d03a,L00063c), (pilar:/procedure/default/%5B%7Ccom:fgweihlp:wfgnp:MainActivity.onCreate%7C%5D/1/23/38758143,L00053c))")
+          {
+          println("n--->" + n)
+          println("vsN--->" + vsN)
+          println("succ--->" + succ)
+          println("vsSucc--->" + vsSucc)
+          println("d-->" + d)
+          }
 //          if(vsSucc.instances.size > 30){
 //            println(vsSucc.instances.toList(26) == vsSucc.instances.toList(27))
 //            if(vsSucc.instances.toList(0) != vsSucc.instances.toList(1)){

@@ -56,7 +56,7 @@ trait StringAnalyseModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
       ins.addStrings(strs)
       result(ipN.piNode).addInstance(ins)
       println("ipN.piNode-->" + ipN.piNode)
-      println("ins-->" + ins)
+      println("result(ipN.piNode)-->" + result(ipN.piNode))
     }
     result
   }
