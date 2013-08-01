@@ -36,8 +36,10 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
   def deleteEdge(e : Edge) = graph.removeEdge(e)
   
   final val VALUE_SET = "ValueSet"
+  final val VALUE_SET_ENTRY = "ValueSetEntry"
+  final val VALUE_SET_EXIT = "ValueSetExit"
   final val PARAM_NUM = "param.number"
-  final val K_CONTEXT : Int = 2
+  final val K_CONTEXT : Int = 1
   
   protected var pl : Map[OfaNode, Node] = Map()
   
@@ -421,7 +423,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
         val vsopt = ins.getFieldValueSet(fieldNode.fieldName)
         vsopt match{
           case Some(vs) =>
-            fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet].update(vs)
+            fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet].merge(vs)
           case None =>
         }
     }
@@ -432,25 +434,38 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
    */ 
   def populateFieldRepo(fieldNode : OfaFieldNode) = {
     val baseNode = fieldNode.baseNode
-    val fieldValueSet = fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
-    val baseValueSet = baseNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
+    val baseEntryValueSet = baseNode.getProperty[ValueSet](VALUE_SET_ENTRY)
+    val baseExitValueSet = baseNode.getProperty[ValueSet](VALUE_SET_EXIT)
+    val fieldValueSet = fieldNode.getProperty[ValueSet](VALUE_SET)
     val newDefSitContext = baseNode.getContext.copy
-    baseValueSet.instances.foreach{
+    baseEntryValueSet.instances.foreach{
       ins =>
-        ins.setFieldLastDefSite(fieldNode.fieldName, newDefSitContext)
-        ins.updateFieldDefSite(fieldNode.fieldName, newDefSitContext, fieldValueSet.copy)
+        val tmpIns = ins.copy
+        tmpIns.setFieldLastDefSite(fieldNode.fieldName, newDefSitContext)
+        tmpIns.updateFieldDefSite(fieldNode.fieldName, newDefSitContext, fieldValueSet.copy)
+        baseExitValueSet.mergeInstance(tmpIns)
     }
+//    println("baseNode-->" + baseNode)
+//    println("baseEntryValueSet-->" + baseEntryValueSet)
+//    println("baseExitValueSet-->" + baseExitValueSet)
   }
   
   def updateBaseNodeValueSet(baseNode : OfaFieldBaseNodeL) = {
-    val baseValueSet = baseNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
-    val fieldValueSet = baseNode.fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
+    val fieldNode = baseNode.fieldNode
+    val baseEntryValueSet = baseNode.getProperty[ValueSet](VALUE_SET_ENTRY)
+    val baseExitValueSet = baseNode.getProperty[ValueSet](VALUE_SET_EXIT)
+    val fieldValueSet = baseNode.fieldNode.getProperty[ValueSet](VALUE_SET)
     val newDefSitContext = baseNode.getContext.copy
-    baseValueSet.instances.foreach{
+    baseEntryValueSet.instances.foreach{
       ins =>
-        ins.setFieldLastDefSite(baseNode.fieldNode.fieldName, newDefSitContext)
-        ins.updateFieldDefSite(baseNode.fieldNode.fieldName, newDefSitContext, fieldValueSet.copy)
+        val tmpIns = ins.copy
+        tmpIns.setFieldLastDefSite(fieldNode.fieldName, newDefSitContext)
+        tmpIns.updateFieldDefSite(fieldNode.fieldName, newDefSitContext, fieldValueSet.copy)
+        baseExitValueSet.mergeInstance(tmpIns)
     }
+//    println("baseNode-->" + baseNode)
+//    println("baseEntryValueSet-->" + baseEntryValueSet)
+//    println("baseExitValueSet-->" + baseExitValueSet)
   }
   
   /**
@@ -458,11 +473,11 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
    */ 
   def populateGlobalDefRepo(d : ValueSet, globalVarNode : OfaGlobalVarNode) = {
     val (usages, valueSet) = globalDefRepo.getOrElseUpdate(globalVarNode.uri, (msetEmpty, fac()))
-    valueSet.update(d)
+    valueSet.merge(d)
     usages.foreach(
       usage => {
         val vs = usage.getProperty(VALUE_SET).asInstanceOf[ValueSet]
-        vs.update(valueSet)
+        vs.merge(valueSet)
       }  
     )
     worklist ++= usages.asInstanceOf[MSet[Node]]
@@ -544,7 +559,8 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
       case pbl : PointBaseL =>
         if(!fieldBaseNodeLExists(pbl.varName, pbl.locationUri, context)){
           val node = addFieldBaseNodeL(pbl.varName, pbl.locationUri, context)
-          node.setProperty(VALUE_SET, fac())
+          node.setProperty(VALUE_SET_ENTRY, fac())
+          node.setProperty(VALUE_SET_EXIT, fac())
           node
         } else getFieldBaseNodeL(pbl.varName, pbl.locationUri, context)  
       case pbr : PointBaseR =>

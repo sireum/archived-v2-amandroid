@@ -8,26 +8,43 @@ class NormalValueSet extends Cloneable{
   def instances = this.insts
   def addInstance(ins : Instance) = this.insts += (ins.copy)
   def addInstances(insts : Set[Instance]) = this.insts ++= insts.map{ins => ins.copy}
-  def update(vs : NormalValueSet) = {
+  /**
+   * merge valueset with predecessor's valueset vs
+   */
+  def merge(vs : NormalValueSet) = {
     vs.instances.foreach{
       ins =>
-        if(!insts.contains(ins)){
-          getSameInstance(ins) match{
-            case Some(instance) => insts -= instance
-            case None =>
-          }
-          insts += ins.copy
-        }
+        mergeInstance(ins)
     }
     this
   }
-  protected def getSameInstance(ins : Instance) : Option[Instance] = {
+  
+  def mergeInstance(ins : Instance) = {
+    if(!insts.contains(ins)){
+      getSameInstanceFromSamePred(ins) match{
+        case Some(instance) => instance.merge(ins)
+        case None => addInstance(ins)
+      }
+    }
+  }
+  
+  protected def getSameInstanceFromSamePred(ins : Instance) : Option[Instance] = {
+    var sins : Set[Instance]= Set()
     this.insts.foreach{
       instance =>
-        if(instance.isSameInstance(ins) && instance.fieldLastDefSite == ins.fieldLastDefSite)return Some(instance)
+        if(isSameInstanceFromSamePred(instance, ins))sins += instance
+    }
+    require(sins.size <= 1)
+    this.insts.foreach{
+      instance =>
+        if(isSameInstanceFromSamePred(instance, ins))return Some(instance)
     }
     None
   }
+  
+  protected def isSameInstanceFromSamePred(ins1 : Instance, ins2 : Instance) : Boolean =
+    ins1.isSameInstance(ins2) && ins1.fieldLastDefSite == ins2.fieldLastDefSite
+  
   def isEmpty() : Boolean = insts.isEmpty
   def getDiff(vsSucc : NormalValueSet) : NormalValueSet = {
     val d : NormalValueSet = new NormalValueSet
@@ -65,10 +82,32 @@ abstract class Instance(className : String, defSite : Context) extends Cloneable
     val defSiteMap = fieldDefSiteRepo.getOrElse(fieldName, Map()) + (defsitContext -> vs)
     fieldDefSiteRepo += (fieldName -> defSiteMap)
   }
+  
+  def merge(instance : Instance) = {
+    if(isSameInstance(instance) && this.fieldLastDefSite == instance.fieldLastDefSite)
+    	this.fieldDefSiteRepo ++= instance.fieldDefSiteRepo
+    this
+  }
+  
   def getFieldValueSet(fieldName : String) : Option[NormalValueSet] = {
     if(fieldDefSiteRepo.contains(fieldName) && fieldLastDefSite.contains(fieldName) && fieldDefSiteRepo(fieldName).contains(fieldLastDefSite(fieldName)))
       Some(fieldDefSiteRepo(fieldName)(fieldLastDefSite(fieldName)))
     else None
+  }
+  protected def getMapDiff[K, V](map1 : Map[K, V], map2 : Map[K, V]) = {
+    var d : Map[K, V] = Map()
+    map1.keys.map{ case k => if(map2.contains(k)){if(!map1(k).equals(map2(k))){d += (k -> map1(k))}}else{d += (k -> map1(k))} }
+    d
+  }
+  def getDiff(ins : Instance) : Instance = {
+  	var className : String = null
+  	var defSite : Context = null
+    if(this.className != ins.getClassName) className = this.className
+    if(this.defSite != ins.getDefSite) defSite = this.defSite
+    val d = RegClassInstance(className, defSite)
+    if(this.fieldDefSiteRepo != ins.fieldDefSiteRepo) d.fieldDefSiteRepo = getMapDiff(this.fieldDefSiteRepo, ins.fieldDefSiteRepo)
+    if(this.fieldLastDefSite != ins.fieldLastDefSite) d.fieldLastDefSite = getMapDiff(this.fieldLastDefSite, ins.fieldLastDefSite)
+    d
   }
   def isSameInstance(ins : Instance) : Boolean = this.className == ins.getClassName && this.defSite == ins.getDefSite
   override def equals(a : Any) : Boolean = {

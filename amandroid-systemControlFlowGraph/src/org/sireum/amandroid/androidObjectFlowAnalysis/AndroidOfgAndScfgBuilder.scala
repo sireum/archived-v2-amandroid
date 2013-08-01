@@ -76,9 +76,14 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
     ofg.nodes.foreach(
       node => {
         val name = node.toString()
-        val valueSet = node.getProperty(result._1.VALUE_SET).asInstanceOf[ValueSet]
-//        if(!valueSet.isEmpty)
-        	println("node:" + name + "\n" + valueSet)
+        node match{
+          case ofbl : OfaFieldBaseNodeL =>
+            val valueSet = node.getProperty(result._1.VALUE_SET_EXIT).asInstanceOf[ValueSet]
+	        	println("node:" + name + "\n" + valueSet)
+          case _ =>
+            val valueSet = node.getProperty(result._1.VALUE_SET).asInstanceOf[ValueSet]
+	        	println("node:" + name + "\n" + valueSet)
+        }
       }
     )
     println("processed--->" + processed.size)
@@ -169,6 +174,18 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
     }
   }
   
+  private def getValueSet(node : Node, ofg : AndroidObjectFlowGraph[Node, ValueSet], isSucc : Boolean) : ValueSet = {
+    node match{
+      case ofbl : OfaFieldBaseNodeL =>
+        if(isSucc)
+          ofbl.getProperty[ValueSet](ofg.VALUE_SET_ENTRY)
+        else
+        	ofbl.getProperty[ValueSet](ofg.VALUE_SET_EXIT)
+      case _ => 
+        node.getProperty[ValueSet](ofg.VALUE_SET)
+    }
+  }
+  
   def fix(ofg : AndroidObjectFlowGraph[Node, ValueSet],
 		  		sCfg : SystemControlFlowGraph[String]) : Unit = {
     while (!ofg.worklist.isEmpty) {
@@ -180,19 +197,24 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
         val callee = ofg.getDirectCallee(pi, androidLibInfoTables)
         extendGraphWithConstructGraph(callee, pi, callerContext.copy, ofg, sCfg)
       }
-      val vsN = n.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
+      val vsN = getValueSet(n, ofg, false)
       ofg.successors(n).foreach(
         succ => {
-          val vsSucc = succ.propertyMap(ofg.VALUE_SET).asInstanceOf[ValueSet]
+          val vsSucc = getValueSet(succ, ofg, true)
           val d = vsN.getDiff(vsSucc).asInstanceOf[ValueSet]
 //          println("n--->" + n)
 //          println("vsN--->" + vsN)
 //          println("succ--->" + succ)
 //          println("vsSucc--->" + vsSucc)
 //          println("d-->" + d)
+//          if(vsSucc.instances.size > 30){
+//            println(vsSucc.instances.toList(26) == vsSucc.instances.toList(27))
+//            if(vsSucc.instances.toList(0) != vsSucc.instances.toList(1)){
+//              println("diff--->" + vsSucc.instances.toList(0).getDiff(vsSucc.instances.toList(1)))
+//            }
+//          }
           if(!d.isEmpty){
-            vsSucc.update(d)
-            
+            vsSucc.merge(d)            
             ofg.worklist += succ
             checkAndDoFieldAndGlobalOperation(succ, d, ofg)
             checkAndDoModelOperation(succ, ofg)
@@ -228,20 +250,12 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
       case ogvn : OfaGlobalVarNode =>
         ofg.populateGlobalDefRepo(d, ogvn)
       case ofbnl : OfaFieldBaseNodeL =>
-        if(ofbnl.toString.contains("L000750"))
-          println("before update-->" + ofbnl.getProperty("ValueSet"))
         ofg.updateBaseNodeValueSet(ofbnl)
-        if(ofbnl.toString.contains("L000750"))
-          println("after update-->" + ofbnl.getProperty("ValueSet"))
       case ofbnr : OfaFieldBaseNodeR =>
         ofg.updateFieldValueSet(ofbnr.fieldNode)
         ofg.worklist += ofbnr.fieldNode.asInstanceOf[Node]
       case ofn : OfaFieldNode =>		//this means field appear on LHS and n is on RHS
-        if(ofn.toString.contains("L000750"))
-          println("before populate-->" + ofn.baseNode.getProperty("ValueSet"))
         ofg.populateFieldRepo(ofn)
-        if(ofn.toString.contains("L000750"))
-          println("after populate-->" + ofn.baseNode.getProperty("ValueSet"))
         ofg.worklist += ofn.baseNode.asInstanceOf[Node]
       case _ =>
     }
@@ -294,11 +308,11 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
 	          if(stringValueSetMap.contains(k)){
 	          	val d = v.getDiff(stringValueSetMap(k))
 	          	if(!d.isEmpty){
-		          	k.getProperty[ValueSet](ofg.VALUE_SET).update(d)
+		          	k.getProperty[ValueSet](ofg.VALUE_SET).merge(d)
 		          	ofg.worklist += k.asInstanceOf[Node]
 	          	}
 	          } else {
-	            k.getProperty[ValueSet](ofg.VALUE_SET).update(v)
+	            k.getProperty[ValueSet](ofg.VALUE_SET).merge(v)
 	          	ofg.worklist += k.asInstanceOf[Node]
 	          }
 	      }
@@ -310,11 +324,11 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
 	          if(nativeValueSetMap.contains(k)){
 	          	val d = v.getDiff(nativeValueSetMap(k))
 	          	if(!d.isEmpty){
-		          	k.getProperty[ValueSet](ofg.VALUE_SET).update(d)
+		          	k.getProperty[ValueSet](ofg.VALUE_SET).merge(d)
 		          	ofg.worklist += k.asInstanceOf[Node]
 	          	}
 	          } else {
-	            k.getProperty[ValueSet](ofg.VALUE_SET).update(v)
+	            k.getProperty[ValueSet](ofg.VALUE_SET).merge(v)
 	          	ofg.worklist += k.asInstanceOf[Node]
 	          }
 	      }
