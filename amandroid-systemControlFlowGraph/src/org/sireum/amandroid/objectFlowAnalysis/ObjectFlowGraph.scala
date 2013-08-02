@@ -40,6 +40,10 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
   final val VALUE_SET_EXIT = "ValueSetExit"
   final val PARAM_NUM = "param.number"
   final val K_CONTEXT : Int = 1
+  /**
+   * represents max number of strings in the strings set of a StringInstance
+   */
+  final val K_STRING : Int = 5
   
   protected var pl : Map[OfaNode, Node] = Map()
   
@@ -241,7 +245,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
             baseNode.asInstanceOf[OfaFieldBaseNode].fieldNode = fieldNode.asInstanceOf[OfaFieldNode]
             fieldNode.asInstanceOf[OfaFieldNode].baseNode = baseNode.asInstanceOf[OfaFieldBaseNode]
           case pso : PointStringO =>
-            val ins = StringInstance(pso.typ, context.copy)
+            val ins = StringInstance(pso.typ, context.copy, K_STRING)
             ins.addString(pso.str)
             rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].addInstance(ins)
             worklist += rhsNode
@@ -421,14 +425,9 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     baseValueSet.instances.foreach{
       ins => 
         val vsopt = ins.getFieldValueSet(fieldNode.fieldName)
-        println("ins-->" + ins)
-        println("vsopt-->" + vsopt)
         vsopt match{
           case Some(vs) =>
-            println("fieldNode-->" + fieldNode)
-            println("before merge fieldNode-->" + fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet])
             fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet].merge(vs)
-            println("after merge fieldNode-->" + fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet])
           case None =>
         }
     }

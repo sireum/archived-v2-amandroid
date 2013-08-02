@@ -37,7 +37,7 @@ trait StringAnalyseModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
     ipNOpt
   }
   
-  def doStringOperation(ipN : InvokePointNode[Node], fac :() => ValueSet) = {
+  def doStringOperation(ipN : InvokePointNode[Node], fac :() => ValueSet, k_string : Int) = {
     var result : Map[Node, ValueSet] = Map()
     if(checkStringOperation(ipN)){
       var valueSets : Map[Int, ValueSet] = Map()
@@ -50,13 +50,13 @@ trait StringAnalyseModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
       val strsList = getStringList(valueSets)
       val strs : Set[String] = if(!strsList.isEmpty && !strsList(0).isEmpty)strsList.map{l => applyStringOperation(ipN.getCalleeSig, l)}.toSet
       					               else Set()
-      println("strs-->" + strs)
-      result += (ipN.piNode -> fac())
-      val ins = StringInstance("[|java:lang:String|]", ipN.piNode.getContext.copy)
-      ins.addStrings(strs)
-      result(ipN.piNode).addInstance(ins)
-      println("ipN.piNode-->" + ipN.piNode)
-      println("result(ipN.piNode)-->" + result(ipN.piNode))
+//      println("strs-->" + strs)
+      if(strs.size <= k_string){
+	      result += (ipN.piNode -> fac())
+	      val ins = StringInstance("[|java:lang:String|]", ipN.piNode.getContext.copy, k_string)
+	      ins.addStrings(strs)
+	      result(ipN.piNode).addInstance(ins)
+      }
     }
     result
   }
@@ -205,7 +205,7 @@ trait StringAnalyseModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	      strings(0)
 	    case "[|Ljava/lang/String;.concat:(Ljava/lang/String;)Ljava/lang/String;|]" =>
 	      require(strings.size == 2)
-	      println("1:" + strings(0) + "2:" + strings(1))
+//	      println("1:" + strings(0) + "2:" + strings(1))
 	      strings(0).concat(strings(1))
 	    case "[|Ljava/lang/String;.replaceFirst:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;|]" => 
 	      require(strings.size == 3)

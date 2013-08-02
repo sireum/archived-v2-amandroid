@@ -43,21 +43,21 @@ trait NativeMethodModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
   def doNativeOperation(ipN : InvokePointNode[Node], fac :() => ValueSet) = {
     var result : Map[Node, ValueSet] = Map()
     if(checkNativeOperation(ipN)){
-      val retTyp = (new SignatureParser(ipN.getCalleeSig).getParamSig.getReturnObjectType).getOrElse(null)
-      val values : MList[ResourceUri] = mlistEmpty
-      var valueSets : Map[Int, ValueSet] = Map()
-      ipN.recvCallNodeOpt match {
-      	case Some(thisEntryNode) => valueSets += (0 -> thisEntryNode.getProperty[ValueSet]("ValueSet"))
-      	case None =>
-    	}
-      ipN.argCallNodes.toList.sortBy(_._1).foreach{case (k, v) => valueSets += (k + 1 -> v.getProperty[ValueSet]("ValueSet"))}
-      val strsList = getValueSetList(valueSets)
-      val strs : Set[String] = if(!strsList.isEmpty && !strsList(0).isEmpty)strsList.map{l => applyNativeOperation(ipN.getCalleeSig, values ++ l)}.toSet
-      					               else Set()
-      result += (ipN.piNode -> fac())
-      val ins = StringInstance("[|java:lang:String|]", ipN.piNode.getContext.copy)
-      ins.addStrings(strs)
-      result(ipN.piNode).addInstance(ins)
+//      val retTyp = (new SignatureParser(ipN.getCalleeSig).getParamSig.getReturnObjectType).getOrElse(null)
+//      val values : MList[ResourceUri] = mlistEmpty
+//      var valueSets : Map[Int, ValueSet] = Map()
+//      ipN.recvCallNodeOpt match {
+//      	case Some(thisEntryNode) => valueSets += (0 -> thisEntryNode.getProperty[ValueSet]("ValueSet"))
+//      	case None =>
+//    	}
+//      ipN.argCallNodes.toList.sortBy(_._1).foreach{case (k, v) => valueSets += (k + 1 -> v.getProperty[ValueSet]("ValueSet"))}
+//      val strsList = getValueSetList(valueSets)
+//      val strs : Set[String] = if(!strsList.isEmpty && !strsList(0).isEmpty)strsList.map{l => applyNativeOperation(ipN.getCalleeSig, values ++ l)}.toSet
+//      					               else Set()
+//      result += (ipN.piNode -> fac())
+//      val ins = StringInstance("[|java:lang:String|]", ipN.piNode.getContext.copy)
+//      ins.addStrings(strs)
+//      result(ipN.piNode).addInstance(ins)
     }
     result
   }

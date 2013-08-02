@@ -2,13 +2,16 @@ package org.sireum.amandroid.objectFlowAnalysis
 
 import org.sireum.util._
 
-class NormalValueSet extends Cloneable{
-  def copy : NormalValueSet = clone.asInstanceOf[NormalValueSet]
+class NormalValueSet{
+  def copy : NormalValueSet = {
+    val clone = new NormalValueSet
+    clone.addInstances(this.insts)
+    clone
+  }
   protected var insts : Set[Instance] = Set()
   def instances = this.insts
   def addInstance(ins : Instance) = this.insts += (ins.copy)
   def addInstances(insts : Set[Instance]) = this.insts ++= insts.map{ins => ins.copy}
-  def setInstances(insts : Set[Instance]) = this.insts = insts.map{ins => ins.copy}
   /**
    * merge valueset with predecessor's valueset vs
    */
@@ -72,8 +75,8 @@ class NormalValueSet extends Cloneable{
   override def toString() : String = "\n      ValueSet: \n        instances: " + insts + "\n"
 }
 
-abstract class Instance(className : String, defSite : Context) extends Cloneable{
-  def copy : Instance = clone.asInstanceOf[Instance]
+abstract class Instance(className : String, defSite : Context){
+  def copy : Instance
   def getClassName = className
   def getDefSite = defSite
   var fieldDefSiteRepo : Map[String, Map[Context, NormalValueSet]] = Map()
@@ -98,8 +101,7 @@ abstract class Instance(className : String, defSite : Context) extends Cloneable
     map map{
       case(k, v) =>
         val copyV = v.copy
-        copyV.setInstances(v.instances)
-      	(k -> copyV) 
+      	(k.copy -> copyV) 
     }
   }
   
@@ -135,16 +137,30 @@ abstract class Instance(className : String, defSite : Context) extends Cloneable
   override def toString : String = "\n+++++++++++++++++++++\nInstance(\nname:" + this.className + ". \ndefsite:" + this.defSite + ". \nfieldLastDefSite:" + this.fieldLastDefSite + ". \nfieldDefRepo:" + this.fieldDefSiteRepo + ") \n-----------------------\n"
 }
 
-final case class StringInstance(className : String, defSite : Context) extends Instance(className, defSite){
+final case class StringInstance(className : String, defSite : Context, k : Int) extends Instance(className, defSite){
+  override def copy : StringInstance  = {
+    val clone = new StringInstance(className, defSite, k)
+    this.fieldDefSiteRepo foreach{
+  	  case (fieldName, map) =>
+  	    clone.fieldDefSiteRepo += (fieldName -> copyMap(map))
+  	}
+    this.fieldLastDefSite.foreach{
+      case (fieldName, context)=>
+        clone.fieldLastDefSite += (fieldName -> context.copy)
+    }
+    clone.strings ++= this.strings
+    clone
+  }
   private var strings : Set[String] = Set()
   def getStrings = strings
-  def addString(str : String) = strings += str
-  def addStrings(strs : Set[String]) = strings ++= strs
+  def addString(str : String) = if(strings.size < k)strings += str
+  def addStrings(strs : Set[String]) = strs foreach{str => addString(str)}
+
   override def merge(instance : Instance) = {
     require(instance.isInstanceOf[StringInstance])
     if(isSameInstance(instance) && this.fieldLastDefSite == instance.fieldLastDefSite){
     	super.merge(instance)
-    	this.strings ++= instance.asInstanceOf[StringInstance].getStrings
+    	this.strings = instance.asInstanceOf[StringInstance].getStrings
     }
     this
   }
@@ -158,4 +174,17 @@ final case class StringInstance(className : String, defSite : Context) extends I
   override def toString : String = "\n***********************\nStringInstance(\nstrings:" + this.strings + ". \nname:" + this.className + ". \ndefsite:" + this.defSite + ". \nfieldLastDefSite:" + this.fieldLastDefSite + ". \nfieldDefRepo:" + this.fieldDefSiteRepo + ") \n.............................\n"
 }
 
-final case class RegClassInstance(className : String, defSite : Context) extends Instance(className, defSite)
+final case class RegClassInstance(className : String, defSite : Context) extends Instance(className, defSite){
+  override def copy : RegClassInstance  = {
+    val clone = new RegClassInstance(className, defSite)
+    this.fieldDefSiteRepo foreach{
+  	  case (fieldName, map) =>
+  	    clone.fieldDefSiteRepo += (fieldName -> copyMap(map))
+  	}
+    this.fieldLastDefSite.foreach{
+      case (fieldName, context)=>
+        clone.fieldLastDefSite += (fieldName -> context.copy)
+    }
+    clone
+  }
+}
