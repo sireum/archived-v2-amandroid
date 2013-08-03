@@ -137,7 +137,7 @@ abstract class Instance(className : String, defSite : Context){
   override def toString : String = "\n+++++++++++++++++++++\nInstance(\nname:" + this.className + ". \ndefsite:" + this.defSite + ". \nfieldLastDefSite:" + this.fieldLastDefSite + ". \nfieldDefRepo:" + this.fieldDefSiteRepo + ") \n-----------------------\n"
 }
 
-final case class StringInstance(className : String, defSite : Context, k : Int) extends Instance(className, defSite){
+final case class StringInstance(className : String, var defSite : Context, k : Int) extends Instance(className, defSite){
   override def copy : StringInstance  = {
     val clone = new StringInstance(className, defSite, k)
     this.fieldDefSiteRepo foreach{
@@ -155,6 +155,7 @@ final case class StringInstance(className : String, defSite : Context, k : Int) 
   def getStrings = strings
   def addString(str : String) = if(strings.size < k)strings += str
   def addStrings(strs : Set[String]) = strs foreach{str => addString(str)}
+  def setStrings(strs : Set[String]) = this.strings = strs
 
   override def merge(instance : Instance) = {
     require(instance.isInstanceOf[StringInstance])

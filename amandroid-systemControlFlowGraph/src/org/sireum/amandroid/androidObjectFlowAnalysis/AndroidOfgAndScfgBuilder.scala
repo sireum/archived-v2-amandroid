@@ -33,8 +33,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
   var androidLibInfoTables : AndroidLibInfoTables = null
   var androidCache : AndroidCacheFile[String] = null
   //a map from return node to its possible updated value set
-  var stringValueSetMap : Map[Node, ValueSet] = Map()
-  var nativeValueSetMap : Map[Node, ValueSet] = Map()
+  var modelOperationValueSetMap : Map[Node, ValueSet] = Map()
   
   def apply(psts : Seq[ProcedureSymbolTable],
             cfgs : MMap[ResourceUri, ControlFlowGraph[String]],
@@ -265,15 +264,10 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
   }
   
   def checkAndDoModelOperation(succNode : Node, ofg : AndroidObjectFlowGraph[Node, ValueSet]) = {
-    ofg.getInvokePointNodeInStringTrackerFromCallComponent(succNode) match{
+    ofg.getInvokePointNodeInModelOperationTrackerFromCallComponent(succNode) match{
       case Some(ipN) =>
-        doSpecialOperation(ipN, ofg, "STRING")
+        doSpecialOperation(ipN, ofg)
       case None =>
-        ofg.getInvokePointNodeInNativeTrackerFromCallComponent(succNode) match{
-		      case Some(ipN) =>
-//		        doSpecialOperation(ipN, ofg, "NATIVE")
-		      case None =>
-		    }
     }
   }
   
@@ -302,41 +296,22 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
     flag
   }
   
-  def doSpecialOperation(ipN : InvokePointNode[Node], ofg : ObjectFlowGraph[Node, ValueSet], typ : String) = {
-    typ match{
-      case "STRING" =>
-	      val vsMap = ofg.doStringOperation(ipN, fac, ofg.K_STRING)
-	      vsMap.foreach{
-	        case (k, v) =>
-	          if(stringValueSetMap.contains(k)){
-	          	val d = v.getDiff(stringValueSetMap(k))
-	          	if(!d.isEmpty){
-		          	k.getProperty[ValueSet](ofg.VALUE_SET).merge(d)
-		          	ofg.worklist += k.asInstanceOf[Node]
-	          	}
-	          } else {
-	            k.getProperty[ValueSet](ofg.VALUE_SET).merge(v)
-	          	ofg.worklist += k.asInstanceOf[Node]
-	          }
-	      }
-	      stringValueSetMap = vsMap
-      case "NATIVE" =>
-	      val vsMap = ofg.doNativeOperation(ipN, fac)
-	      vsMap.map{
-	        case (k, v) =>
-	          if(nativeValueSetMap.contains(k)){
-	          	val d = v.getDiff(nativeValueSetMap(k))
-	          	if(!d.isEmpty){
-		          	k.getProperty[ValueSet](ofg.VALUE_SET).merge(d)
-		          	ofg.worklist += k.asInstanceOf[Node]
-	          	}
-	          } else {
-	            k.getProperty[ValueSet](ofg.VALUE_SET).merge(v)
-	          	ofg.worklist += k.asInstanceOf[Node]
-	          }
-	      }
-	      nativeValueSetMap = vsMap
+  def doSpecialOperation(ipN : InvokePointNode[Node], ofg : ObjectFlowGraph[Node, ValueSet]) = {
+    val vsMap = ofg.doModelOperation(ipN, fac, ofg)
+    vsMap.foreach{
+      case (k, v) =>
+        if(modelOperationValueSetMap.contains(k)){
+        	val d = v.getDiff(modelOperationValueSetMap(k))
+        	if(!d.isEmpty){
+          	k.getProperty[ValueSet](ofg.VALUE_SET).merge(d)
+          	ofg.worklist += k.asInstanceOf[Node]
+        	}
+        } else {
+          k.getProperty[ValueSet](ofg.VALUE_SET).merge(v)
+        	ofg.worklist += k.asInstanceOf[Node]
+        }
     }
+    modelOperationValueSetMap = vsMap
   }
   
 //  def getDiff(map1 : MMap[ResourceUri, ResourceUri], map2 : MMap[ResourceUri, ResourceUri]) = {
@@ -353,16 +328,10 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
       															sCfg : SystemControlFlowGraph[String]) = {
     val points : MList[Point] = mlistEmpty
     val calleeSig : String = androidLibInfoTables.getProcedureSignatureByUri(callee)
-    if(ofg.isStringOperation(calleeSig)){
-      if(new SignatureParser(calleeSig).getParamSig.isReturnNonNomal){
-        val ipN = ofg.collectTrackerNodes(calleeSig, pi, callerContext.copy, "STRING")
-        doSpecialOperation(ipN, ofg, "STRING")
-      }
-    } else if(ofg.isNativeOperation(androidLibInfoTables.getAccessFlag(callee))) {
-      if(new SignatureParser(calleeSig).getParamSig.isReturnNonNomal){
-        val ipN = ofg.collectTrackerNodes(calleeSig, pi, callerContext.copy, "NATIVE")
-//        doSpecialOperation(ipN, ofg, "NATIVE")
-      }
+    if(ofg.isModelOperation(calleeSig)){
+      val ipN = ofg.collectTrackerNodes(calleeSig, pi, callerContext.copy)
+      ofg.breakPiEdges(pi, "", callerContext)
+      doSpecialOperation(ipN, ofg)
     } else if(ofg.isIccOperation(calleeSig, androidLibInfoTables)) {
       ofg.setIccOperationTracker(calleeSig, pi, callerContext.copy)
     } else if(!processed.contains((callee, callerContext))){
@@ -388,8 +357,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
       val procPoint = processed(callee, callerContext)
       require(procPoint != null)
       ofg.extendGraph(procPoint, pi, callerContext.copy)
-      if(!ofg.isStringOperation(calleeSig) && 
-         !ofg.isNativeOperation(androidLibInfoTables.getAccessFlag(callee)) &&
+      if(!ofg.isModelOperation(calleeSig) &&
          !ofg.isIccOperation(calleeSig, androidLibInfoTables))
       	sCfg.extendGraph(callee, pi.owner, pi.locationUri, pi.locationIndex)
     } else {

@@ -20,8 +20,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
   with AlirEdgeAccesses[Node]
   with AlirSuccPredAccesses[Node]
   with ConstraintModel[ValueSet]
-  with StringAnalyseModel[Node, ValueSet]
-  with NativeMethodModel[Node, ValueSet]{
+  with JavaObjectModel[Node, ValueSet]{
   self=>
   
   protected val graph = new DirectedMultigraph(
@@ -61,6 +60,8 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     fixArrayVar(ps, cfg, rda)
     ps.foreach(
       p=>{
+        if(p.toString == "direct:[|Ljava/lang/StringBuilder;.<init>:(Ljava/lang/String;)V|]@L000532")
+          println("nodes-->" + collectNodes(pUri, p, callerContext.copy))
         collectNodes(pUri, p, callerContext.copy)
       }  
     )
@@ -338,7 +339,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     )
   }
   
-  private def breakPiEdges(pi : PointI, calleeAccessTyp : String, srcContext : Context) = {
+  def breakPiEdges(pi : PointI, calleeAccessTyp : String, srcContext : Context) = {
     if(calleeAccessTyp != null && !calleeAccessTyp.contains("NATIVE")){
 	    pi.recvOpt_Call match{
 	      case Some(p) =>
@@ -422,9 +423,11 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
   def updateFieldValueSet(fieldNode : OfaFieldNode) = {
     val baseNode = fieldNode.baseNode
     val baseValueSet = baseNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
+    
     baseValueSet.instances.foreach{
       ins => 
         val vsopt = ins.getFieldValueSet(fieldNode.fieldName)
+        println("vsopt-->" + vsopt)
         vsopt match{
           case Some(vs) =>
             fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet].merge(vs)

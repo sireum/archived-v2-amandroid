@@ -52,10 +52,11 @@ trait StringAnalyseModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
       					               else Set()
 //      println("strs-->" + strs)
       if(strs.size <= k_string){
-	      result += (ipN.piNode -> fac())
-	      val ins = StringInstance("[|java:lang:String|]", ipN.piNode.getContext.copy, k_string)
+        require(ipN.piNodeOpt.isDefined)
+	      result += (ipN.piNodeOpt.get -> fac())
+	      val ins = StringInstance("[|java:lang:String|]", ipN.piNodeOpt.get.getContext.copy, k_string)
 	      ins.addStrings(strs)
-	      result(ipN.piNode).addInstance(ins)
+	      result(ipN.piNodeOpt.get).addInstance(ins)
       }
     }
     result

@@ -13,10 +13,13 @@ case class InvokePointNode[Node](recvCallNodeOpt : Option[Node],
   																recvReturnNodeOpt : Option[Node], 
   																argCallNodes : Map[Int, Node], 
   																argReturnNodes : Map[Int, Node], 
-  																piNode : Node, 
+  																piNodeOpt : Option[Node], 
   																invokePoint : PointI) {
+  private var context : Context = null
+  def setContext(context : Context) = this.context = context
+	def getContext = context
 	private var calleeSig : String = null
-	def setCalleeSig(calleeSig : String) = InvokePointNode.this.calleeSig = calleeSig
+	def setCalleeSig(calleeSig : String) = this.calleeSig = calleeSig
 	def getCalleeSig = calleeSig
 	def contains(node : Node) : Boolean = {
 	  recvCallNodeOpt match{
@@ -32,7 +35,7 @@ case class InvokePointNode[Node](recvCallNodeOpt : Option[Node],
 	  argCallNodes.foreach{case(i, acN) => 
 	    if(acN == node) return true }
 	  argReturnNodes.foreach{case(i, arN) => if(arN == node) return true }
-	  if(piNode == node) return true
+	  if(piNodeOpt == Some(node)) return true
 	  false
 	}
 }

@@ -12,7 +12,7 @@ class AndroidObjectFlowGraph[Node <: OfaNode, ValueSet <: AndroidValueSet](fac: 
   /**
    * combine special ofg into current ofg. (just combine proc point and relevant node)
    */ 
-  def collectTrackerNodes(sig : String, pi : PointI, callerContext : Context, typ : String) = {
+  def collectTrackerNodes(sig : String, pi : PointI, callerContext : Context) = {
     val recvCallNodeOpt =
       pi.recvOpt_Call match{
        	case Some(r) =>
@@ -27,16 +27,13 @@ class AndroidObjectFlowGraph[Node <: OfaNode, ValueSet <: AndroidValueSet](fac: 
 	      case None =>
 	        None
     	}
-    val invokeNode = getNode(pi, callerContext)
+    val invokeNodeOpt = if(invokeNodeExists(pi.varName, pi.locationUri, callerContext, pi)) Some(getNode(pi, callerContext)) else None
     val argCallNodes = pi.args_Call.map{case (l, p) => (l, getNode(p, callerContext))}.toMap
     val argReturnNodes = pi.args_Return.map{case (l, p) => (l, getNode(p, callerContext))}.toMap
-    val ipN = InvokePointNode[Node](recvCallNodeOpt, recvReturnNodeOpt, argCallNodes, argReturnNodes, invokeNode, pi)
+    val ipN = InvokePointNode[Node](recvCallNodeOpt, recvReturnNodeOpt, argCallNodes, argReturnNodes, invokeNodeOpt, pi)
     ipN.setCalleeSig(sig)
-    if(typ.equals("STRING")){
-	    stringOperationTracker += (ipN)
-    } else if(typ.equals("NATIVE")){
-      nativeOperationTracker += (ipN)
-    }
+    ipN.setContext(callerContext)
+	  modelOperationTracker += (ipN)
     ipN
   }
   
