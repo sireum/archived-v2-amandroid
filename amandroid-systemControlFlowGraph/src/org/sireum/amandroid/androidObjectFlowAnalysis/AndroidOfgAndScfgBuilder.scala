@@ -216,7 +216,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
 //            }
 //          }
           if(!d.isEmpty){
-            vsSucc.merge(d)            
+            vsSucc.merge(d)
             ofg.worklist += succ
             checkAndDoFieldAndGlobalOperation(succ, d, ofg)
             checkAndDoModelOperation(succ, ofg)

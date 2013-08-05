@@ -12,6 +12,8 @@ class NormalValueSet{
   def instances = this.insts
   def addInstance(ins : Instance) = this.insts += (ins.copy)
   def addInstances(insts : Set[Instance]) = this.insts ++= insts.map{ins => ins.copy}
+  def removeInstance(ins : Instance) = this.insts -= (ins)
+  def removeInstances(insts : Set[Instance]) = this.insts --= insts.map{ins => ins}
   /**
    * merge valueset with predecessor's valueset vs
    */
@@ -137,7 +139,7 @@ abstract class Instance(className : String, defSite : Context){
   override def toString : String = "\n+++++++++++++++++++++\nInstance(\nname:" + this.className + ". \ndefsite:" + this.defSite + ". \nfieldLastDefSite:" + this.fieldLastDefSite + ". \nfieldDefRepo:" + this.fieldDefSiteRepo + ") \n-----------------------\n"
 }
 
-final case class StringInstance(className : String, var defSite : Context, k : Int) extends Instance(className, defSite){
+final case class StringInstance(className : String, var defSite : Context, var k : Int) extends Instance(className, defSite){
   override def copy : StringInstance  = {
     val clone = new StringInstance(className, defSite, k)
     this.fieldDefSiteRepo foreach{
@@ -148,19 +150,40 @@ final case class StringInstance(className : String, var defSite : Context, k : I
       case (fieldName, context)=>
         clone.fieldLastDefSite += (fieldName -> context.copy)
     }
+    clone.operationCalculator ++= this.operationCalculator
     clone.strings ++= this.strings
     clone
   }
+  def setK(i : Int) = k = i
   private var strings : Set[String] = Set()
   def getStrings = strings
-  def addString(str : String) = if(strings.size < k)strings += str
-  def addStrings(strs : Set[String]) = strs foreach{str => addString(str)}
-  def setStrings(strs : Set[String]) = this.strings = strs
-
+  def addString(str : String) = strings += str
+  def addStrings(strs : Set[String], operation : Context) = 
+    if(checkOperation(operation)){
+      updateOperation(operation)
+      strs foreach{str => addString(str)}
+    }
+  def setStrings(strs : Set[String], operation : Context) = 
+    if(checkOperation(operation)){
+      updateOperation(operation)
+      this.strings = strs
+    }
+  private var operationCalculator : Map[Int, Int] = Map()
+  def updateOperation(operation : Context) = {
+    this.operationCalculator += (operation.hashCode -> (this.operationCalculator.getOrElse(operation.hashCode, 0) + 1))
+  }
+  def checkOperation(operation : Context) : Boolean = {
+    if(this.operationCalculator.getOrElse(operation.hashCode, 0) < k) true
+    else false
+  }
   override def merge(instance : Instance) = {
     require(instance.isInstanceOf[StringInstance])
     if(isSameInstance(instance) && this.fieldLastDefSite == instance.fieldLastDefSite){
     	super.merge(instance)
+    	instance.asInstanceOf[StringInstance].operationCalculator foreach{
+    	  case(op, time) =>
+    	    this.operationCalculator += (op -> (this.operationCalculator.getOrElse(op, 0) + time))
+    	}
     	this.strings = instance.asInstanceOf[StringInstance].getStrings
     }
     this

@@ -48,38 +48,78 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
       ipN.argCallNodes.toList.sortBy(_._1).foreach{case (k, v) => valueSets += (k + 1 -> v.getProperty[ValueSet]("ValueSet").copy.asInstanceOf[ValueSet])}
       if(isStringOperation(ipN.getCalleeSig)) doStringOperation(ipN, valueSets, fac, ofg.K_STRING)
       else if(isStringBuilderOperation(ipN.getCalleeSig)) doStringBuilderOperation(ipN, valueSets, fac, ofg)
+      else if(isHashSetOperation(ipN.getCalleeSig)) doHashSetOperation(ipN, valueSets, fac, ofg)
       else Map()
     } else Map()
   }
   
   private def doStringOperation(ipN : InvokePointNode[Node], valueSets : Map[Int, ValueSet], fac :() => ValueSet, k_string : Int) = {
     var result : Map[Node, ValueSet] = Map()
-    val strsList = getStringList(valueSets)
-    val strs : Set[String] = if(!strsList.isEmpty && !strsList(0).isEmpty)strsList.map{l => applyStringOperation(ipN.getCalleeSig, l)}.toSet
-    					               else Set()	
-    flowRecvAndArgs(ipN, valueSets)					             
+    if(ipN.piNodeOpt.isDefined && checkOperationTimes(ipN.piNodeOpt.get.getProperty[ValueSet]("ValueSet"), ipN.piNodeOpt.get.getContext)){
+	    val strsList = getStringList(valueSets)
+	    val strs : Set[String] = if(!strsList.isEmpty && !strsList(0).isEmpty)strsList.map{l => applyStringOperation(ipN.getCalleeSig, l)}.toSet
+    					               else Set()				             
 //      println("strs-->" + strs)
-    if(strs.size <= k_string){
-      require(ipN.piNodeOpt.isDefined)
       result += (ipN.piNodeOpt.get -> fac())
       val ins = StringInstance("[|java:lang:String|]", ipN.piNodeOpt.get.getContext.copy, k_string)
-      ins.addStrings(strs)
+      ins.addStrings(strs, ipN.getContext)
       result(ipN.piNodeOpt.get).addInstance(ins)
-    }
+  	}
+    flowRecvAndArgs(ipN, valueSets)		
     result
+  }
+  
+  private def checkOperationTimes(vs : ValueSet, operationContext : Context) : Boolean = {
+  	checkOperationTimes(vs.instances, operationContext)
+  }
+  
+  private def checkOperationTimes(insts : Set[Instance], operationContext : Context) : Boolean = {
+    var flag : Boolean = true
+    insts.foreach{
+      ins =>
+        ins match{
+          case strIns : StringInstance => flag = strIns.checkOperation(operationContext)
+          case _ =>
+        }
+    }
+    flag
   }
   
   private def doStringBuilderOperation(ipN : InvokePointNode[Node], valueSets : Map[Int, ValueSet], fac :() => ValueSet, ofg : ObjectFlowGraph[Node, ValueSet]) = {
     var result : Map[Node, ValueSet] = Map()
     require(valueSets.contains(0))
     val sbVs = valueSets(0)
-    val strings : Set[String] = if(valueSets.contains(1) && valueSets(1).checkAndGetStrings.isDefined) valueSets(1).checkAndGetStrings.get else Set()
-    val vs : ValueSet = applyStringBuilderOperation(ipN, sbVs, strings, fac, ofg.K_STRING)
+    val insts : Set[Instance] = sbVs.instances.map{
+      ins => 
+        ins.getFieldValueSet("[|java:lang:StringBuilder.value|]") match{
+          case Some(vs) => vs.instances
+          case None => Set[Instance]()
+        }
+    }.reduce((set1, set2) => set1 ++ set2)
+    if(checkOperationTimes(insts, ipN.getContext)){
+	    val strings : Set[String] = if(valueSets.contains(1) && valueSets(1).checkAndGetStrings.isDefined) valueSets(1).checkAndGetStrings.get else Set()
+	    val vs : ValueSet = applyStringBuilderOperation(ipN, sbVs, strings, fac, ofg.K_STRING)
+	    flowRecvAndArgs(ipN, valueSets)
+	    require(ipN.recvReturnNodeOpt.isDefined)
+	    ofg.worklist += ipN.recvReturnNodeOpt.get
+	    ipN.piNodeOpt match{
+	      case Some(node) => result += (node -> vs.copy.asInstanceOf[ValueSet])
+	      case None =>
+	    }
+    }
+    result
+  }
+  
+  private def doHashSetOperation(ipN : InvokePointNode[Node], valueSets : Map[Int, ValueSet], fac :() => ValueSet, ofg : ObjectFlowGraph[Node, ValueSet]) = {
+    var result : Map[Node, ValueSet] = Map()
+    require(valueSets.contains(0))
+    val hsVs = valueSets(0)
+    val vsOpt : Option[ValueSet] = applyHashSetOperation(ipN, hsVs, valueSets, fac)
     flowRecvAndArgs(ipN, valueSets)
     require(ipN.recvReturnNodeOpt.isDefined)
     ofg.worklist += ipN.recvReturnNodeOpt.get
     ipN.piNodeOpt match{
-      case Some(node) => result += (node -> vs.copy.asInstanceOf[ValueSet])
+      case Some(node) => result += (node -> vsOpt.getOrElse(fac()).copy.asInstanceOf[ValueSet])
       case None =>
     }
     result
@@ -103,11 +143,13 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
   }
     
   
-  def isModelOperation(sig : String) : Boolean = isStringOperation(sig) || isStringBuilderOperation(sig)
+  def isModelOperation(sig : String) : Boolean = isStringOperation(sig) || isStringBuilderOperation(sig) || isHashSetOperation(sig)
   
   def isStringBuilderOperation(sig : String) : Boolean = sig.contains("[|Ljava/lang/StringBuilder;.")
   
   def isStringOperation(sig : String) : Boolean = sig.contains("[|Ljava/lang/String;.")
+  
+  def isHashSetOperation(sig : String) : Boolean = sig.contains("[|Ljava/util/HashSet;.")
   
   private def applyStringOperation(sig : String, strings : List[String]) : String = {
     val size = strings.size
@@ -224,7 +266,7 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	      sbValueSet.instances.map{
 	        ins =>
 	          val sIns = StringInstance("[|java:lang:String|]", ipN.getContext.copy, k_string)
-	          sIns.setStrings(Set(""))
+	          sIns.setStrings(Set(""), ipN.getContext)
 	          val strVs = fac()
 	          strVs.addInstance(sIns)
 	          ins.updateFieldDefSite("[|java:lang:StringBuilder.value|]", ipN.getContext.copy, strVs.asInstanceOf[NormalValueSet])
@@ -236,7 +278,7 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	      sbValueSet.instances.map{
 	        ins =>
 	          val sIns = StringInstance("[|java:lang:String|]", ipN.getContext.copy, k_string)
-	          sIns.setStrings(Set(""))
+	          sIns.setStrings(Set(""), ipN.getContext)
 	          val strVs = fac()
 	          strVs.addInstance(sIns)
 	          ins.updateFieldDefSite("[|java:lang:StringBuilder.value|]", ipN.getContext.copy, strVs.asInstanceOf[NormalValueSet])
@@ -248,7 +290,7 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	      sbValueSet.instances.map{
 	        ins =>
 	          val sIns = StringInstance("[|java:lang:String|]", ipN.getContext.copy, k_string)
-	          sIns.setStrings(Set(""))
+	          sIns.setStrings(Set(""), ipN.getContext)
 	          val strVs = fac()
 	          strVs.addInstance(sIns)
 	          ins.updateFieldDefSite("[|java:lang:StringBuilder.value|]", ipN.getContext.copy, strVs.asInstanceOf[NormalValueSet])
@@ -260,7 +302,7 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	      sbValueSet.instances.map{
 	        ins =>
 	          val sIns = StringInstance("[|java:lang:String|]", ipN.getContext.copy, k_string)
-	          sIns.setStrings(strings)
+	          sIns.setStrings(strings, ipN.getContext)
 	          val strVs = fac()
 	          strVs.addInstance(sIns)
 	          ins.updateFieldDefSite("[|java:lang:StringBuilder.value|]", ipN.getContext.copy, strVs.asInstanceOf[NormalValueSet])
@@ -293,7 +335,7 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
 					            	  }
 					            }.reduce((set1, set2) => set1 ++ set2)
 					          strIns.asInstanceOf[StringInstance].defSite = ipN.getContext.copy
-					          strIns.asInstanceOf[StringInstance].setStrings(strs)
+					          strIns.asInstanceOf[StringInstance].setStrings(strs, ipN.getContext)
 					      }
 	              ins.updateFieldDefSite("[|java:lang:StringBuilder.value|]", ipN.getContext.copy, tmpVs.asInstanceOf[NormalValueSet])
 					      ins.setFieldLastDefSite("[|java:lang:StringBuilder.value|]", ipN.getContext.copy)
@@ -328,7 +370,7 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	              vs.instances.foreach{
 					        strIns =>
 					          val strings = strIns.asInstanceOf[StringInstance].getStrings.map{str => str.reverse}
-					          strIns.asInstanceOf[StringInstance].setStrings(strings)
+					          strIns.asInstanceOf[StringInstance].setStrings(strings, ipN.getContext)
 					          strIns.asInstanceOf[StringInstance].defSite = ipN.getContext.copy
 					      }
 	              ins.updateFieldDefSite("[|java:lang:StringBuilder.value|]", ipN.getContext.copy, vs.asInstanceOf[NormalValueSet])
@@ -348,7 +390,7 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
 					        strIns =>
 					          val sIns = StringInstance("[|java:lang:String|]", ipN.getContext.copy, k_string)
 					          val strs = strIns.asInstanceOf[StringInstance].getStrings
-					          sIns.setStrings(strs)
+					          sIns.setStrings(strs, ipN.getContext)
 					          insts += sIns
 					      }
 	            case None =>
@@ -359,4 +401,112 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	      vs
   	}
   }
+	
+	def applyHashSetOperation(ipN : InvokePointNode[Node], hsValueSet : ValueSet, argsValueSets : Map[Int, ValueSet], fac :() => ValueSet) : Option[ValueSet] = {
+	  
+	  ipN.getCalleeSig match {
+	    case "[|Ljava/util/HashSet;.<init>:()V|]" =>
+	      hsValueSet.instances.map{
+	        ins =>
+	          val vs = fac()
+	          ins.updateFieldDefSite("[|java:util:HashSet.items|]", ipN.getContext.copy, vs.asInstanceOf[NormalValueSet])
+	          ins.setFieldLastDefSite("[|java:util:HashSet.items|]", ipN.getContext.copy)
+	      }
+	      Some(hsValueSet)
+	    case "[|Ljava/util/HashSet;.<init>:(I)V|]" =>
+	      hsValueSet.instances.map{
+	        ins =>
+	          val vs = fac()
+	          ins.updateFieldDefSite("[|java:util:HashSet.items|]", ipN.getContext.copy, vs.asInstanceOf[NormalValueSet])
+	          ins.setFieldLastDefSite("[|java:util:HashSet.items|]", ipN.getContext.copy)
+	      }
+	      Some(hsValueSet)
+	    case "[|Ljava/util/HashSet;.<init>:(IF)V|]" =>
+	      hsValueSet.instances.map{
+	        ins =>
+	          val vs = fac()
+	          ins.updateFieldDefSite("[|java:util:HashSet.items|]", ipN.getContext.copy, vs.asInstanceOf[NormalValueSet])
+	          ins.setFieldLastDefSite("[|java:util:HashSet.items|]", ipN.getContext.copy)
+	      }
+	      Some(hsValueSet)
+	    case "[|Ljava/util/HashSet;.<init>:(Ljava/util/Collection;)V|]" =>
+//	      hsValueSet.instances.map{
+//	        ins =>
+//	          val vs = fac()
+//	          ins.updateFieldDefSite("[|java:util:HashSet.items|]", ipN.getContext.copy, vs.asInstanceOf[NormalValueSet])
+//	          ins.setFieldLastDefSite("[|java:util:HashSet.items|]", ipN.getContext.copy)
+//	      }
+	      Some(hsValueSet)
+	    case "[|Ljava/util/HashSet;.<init>:(Ljava/util/HashMap;)V|]" =>
+//	      hsValueSet.instances.map{
+//	        ins =>
+//	          val vs = fac()
+//	          require(argsValueSets.contains(1))
+//	          val hpVs = argsValueSets(1)
+//	          vs.addInstances(argsValueSets(1).instances)
+//	          ins.updateFieldDefSite("[|java:util:HashSet.items|]", ipN.getContext.copy, vs.asInstanceOf[NormalValueSet])
+//	          ins.setFieldLastDefSite("[|java:util:HashSet.items|]", ipN.getContext.copy)
+//	      }
+	      Some(hsValueSet)
+	    case "[|Ljava/util/HashSet;.readObject:(Ljava/io/ObjectInputStream;)V|]" =>
+	      None
+	    case "[|Ljava/util/HashSet;.writeObject:(Ljava/io/ObjectOutputStream;)V|]" =>
+	      None
+	    case "[|Ljava/util/HashSet;.add:(Ljava/lang/Object;)Z|]" =>
+	      hsValueSet.instances.map{
+	        ins =>
+	          val vs = ins.getFieldValueSet("[|java:util:HashSet.items|]") match{
+	            				 case Some(fieldVs) => fieldVs.copy
+	            				 case None => fac()
+	          				 }
+	          require(argsValueSets.contains(1))
+	          vs.addInstances(argsValueSets(1).instances)
+	          ins.updateFieldDefSite("[|java:util:HashSet.items|]", ipN.getContext.copy, vs.asInstanceOf[NormalValueSet])
+	          ins.setFieldLastDefSite("[|java:util:HashSet.items|]", ipN.getContext.copy)
+	      }
+	      Some(hsValueSet)
+	    case "[|Ljava/util/HashSet;.clear:()V|]" => 
+	      hsValueSet.instances.map{
+	        ins =>
+	          val vs = fac()
+	          ins.updateFieldDefSite("[|java:util:HashSet.items|]", ipN.getContext.copy, vs.asInstanceOf[NormalValueSet])
+	          ins.setFieldLastDefSite("[|java:util:HashSet.items|]", ipN.getContext.copy)
+	      }
+	      Some(hsValueSet)
+	    case "[|Ljava/util/HashSet;.clone:()Ljava/lang/Object;|]" =>
+	       hsValueSet.instances.map{
+	        ins =>
+	          val vs = ins.getFieldValueSet("[|java:util:HashSet.items|]") match{
+	            				 case Some(fieldVs) => fieldVs.copy
+	            				 case None => fac()
+	          				 }
+	          ins.updateFieldDefSite("[|java:util:HashSet.items|]", ipN.getContext.copy, vs.asInstanceOf[NormalValueSet])
+	          ins.setFieldLastDefSite("[|java:util:HashSet.items|]", ipN.getContext.copy)
+	      }
+	      Some(hsValueSet)
+	    case "[|Ljava/util/HashSet;.contains:(Ljava/lang/Object;)Z|]" =>
+	      None
+	    case "[|Ljava/util/HashSet;.createBackingMap:(IF)Ljava/util/HashMap;|]" =>
+	      None
+	    case "[|Ljava/util/HashSet;.isEmpty:()Z|]" =>
+	      None
+	    case "[|Ljava/util/HashSet;.iterator:()Ljava/util/Iterator;|]" =>
+	      None
+	    case "[|Ljava/util/HashSet;.remove:(Ljava/lang/Object;)Z|]" =>
+	      hsValueSet.instances.map{
+	        ins =>
+	          val vs = ins.getFieldValueSet("[|java:util:HashSet.items|]") match{
+	            				 case Some(fieldVs) => fieldVs.copy
+	            				 case None => fac()
+	          				 }
+	          require(argsValueSets.contains(1))
+	          vs.removeInstances(argsValueSets(1).instances)
+	          ins.updateFieldDefSite("[|java:util:HashSet.items|]", ipN.getContext.copy, vs.asInstanceOf[NormalValueSet])
+	          ins.setFieldLastDefSite("[|java:util:HashSet.items|]", ipN.getContext.copy)
+	      }
+	      Some(hsValueSet)
+	    case "[|Ljava/util/HashSet;.size:()I|]" =>
+	      None
+	  }
+	}
 }

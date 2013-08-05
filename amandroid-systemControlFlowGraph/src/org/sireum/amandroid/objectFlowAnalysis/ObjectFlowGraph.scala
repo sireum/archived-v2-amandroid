@@ -427,7 +427,6 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     baseValueSet.instances.foreach{
       ins => 
         val vsopt = ins.getFieldValueSet(fieldNode.fieldName)
-        println("vsopt-->" + vsopt)
         vsopt match{
           case Some(vs) =>
             fieldNode.getProperty(VALUE_SET).asInstanceOf[ValueSet].merge(vs)
