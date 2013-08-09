@@ -84,6 +84,7 @@ abstract class Instance(className : String, defSite : Context){
   var fieldDefSiteRepo : Map[String, Map[Context, NormalValueSet]] = Map()
   var fieldLastDefSite : Map[String, Context] = Map()
   def setFieldLastDefSite(fieldName : String, defsitContext : Context) = fieldLastDefSite += (fieldName -> defsitContext)
+  def getFieldLastDefSite(fieldName : String) = if(fieldLastDefSite.contains(fieldName)) Some(fieldLastDefSite(fieldName)) else None
   def updateFieldDefSite(fieldName : String, defsitContext : Context, vs : NormalValueSet) = {
     val defSiteMap = fieldDefSiteRepo.getOrElse(fieldName, Map()) + (defsitContext -> vs)
     fieldDefSiteRepo += (fieldName -> defSiteMap)

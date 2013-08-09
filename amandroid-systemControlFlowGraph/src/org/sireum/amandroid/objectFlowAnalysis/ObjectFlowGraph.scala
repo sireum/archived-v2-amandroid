@@ -57,11 +57,11 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
    * node is added to the worklist.
    */
   def constructGraph(pUri : ResourceUri, ps : MList[Point], callerContext : Context, cfg : ControlFlowGraph[String], rda : ReachingDefinitionAnalysis.Result) = {
-    fixArrayVar(ps, cfg, rda)
+    collectArrayVars(ps, cfg, rda)
+    collectFieldVars(ps, cfg, rda)
+    println("repo:" + fieldVarRepo)
     ps.foreach(
       p=>{
-        if(p.toString == "direct:[|Ljava/lang/StringBuilder;.<init>:(Ljava/lang/String;)V|]@L000532")
-          println("nodes-->" + collectNodes(pUri, p, callerContext.copy))
         collectNodes(pUri, p, callerContext.copy)
       }  
     )
@@ -92,6 +92,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     globalDefRepo ++= ofg2.globalDefRepo
     worklist ++= ofg2.worklist
     arrayRepo ++= ofg2.arrayRepo
+    fieldVarRepo ++= ofg2.fieldVarRepo
     points ++= ofg2.points
     val ps = ofg2.points.filter(p => if(p.isInstanceOf[PointProc])true else false)
     ps(0).asInstanceOf[PointProc]
@@ -100,7 +101,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
   /**
    * collect all array variables inside one procedure
    */ 
-  def fixArrayVar(ps : MList[Point],
+  def collectArrayVars(ps : MList[Point],
                   cfg : ControlFlowGraph[String],
                   rda : ReachingDefinitionAnalysis.Result) = {
     var flag = true
@@ -198,6 +199,155 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
                       if(arrayRepo.contains(point.toString())){
                         if(!arrayRepo.contains(retP.toString)){
                           arrayRepo(retP.toString) = arrayRepo(point.toString())
+                        }
+                      }
+                    }
+                  )
+                case None =>
+              }
+              
+            case _ =>
+          }
+      )
+    }
+  }
+  
+  /**
+   * collect all field variables inside one procedure
+   */ 
+  def collectFieldVars(ps : MList[Point],
+                  cfg : ControlFlowGraph[String],
+                  rda : ReachingDefinitionAnalysis.Result) = {
+    var flag = true
+    while(flag){
+      flag = false
+      ps.foreach(
+        p =>
+          p match {
+            case asmtP : PointAsmt =>
+              val lhs = asmtP.lhs
+              val rhs = asmtP.rhs
+              if(!fieldVarRepo.contains(lhs.toString)){
+                lhs match {
+                  case pfl : PointFieldL =>
+                    udChain(pfl.basePoint, ps, cfg, rda).foreach(
+                      point => {
+                        if(fieldVarRepo.contains(point.toString())){
+                          fieldVarRepo += pfl.basePoint.toString
+                          flag = true
+                        }
+                      }
+                    )
+                  case pl : PointL =>
+//                    udChain(pl, ps, cfg, rda).foreach(
+//                      point => {
+//                        if(fieldVarRepo.contains(point.toString())){
+//                          fieldVarRepo += pl.toString
+//                          flag = true
+//                        }
+//                      }
+//                    )
+                }
+              }
+              if(!fieldVarRepo.contains(rhs.toString)){
+                rhs match {
+                  case pgar : PointGlobalArrayR =>
+                  case pfr : PointFieldR =>
+                    if(!fieldVarRepo.contains(lhs.toString)){
+                      fieldVarRepo += (lhs.toString)
+                      flag = true
+                    }
+                    if(!fieldVarRepo.contains(pfr.toString)){
+                      fieldVarRepo += (pfr.toString)
+                      flag = true
+                    }
+                    udChain(pfr.basePoint, ps, cfg, rda).foreach(
+                      point => {
+                        if(fieldVarRepo.contains(point.toString())){
+                          fieldVarRepo += (pfr.basePoint.toString)
+                          flag = true
+                        }
+                      }
+                    )
+                  case po : PointO =>
+                  case pi : PointI =>
+                  case pr : PointR =>
+                    udChain(pr, ps, cfg, rda, true).foreach(
+                      point => {
+                        if(fieldVarRepo.contains(point.toString())){
+                          fieldVarRepo += pr.toString
+                          fieldVarRepo += lhs.toString
+                          flag = true
+                        }
+                      }
+                    )
+                }
+              } else if(!fieldVarRepo.contains(lhs.toString)){
+                fieldVarRepo += lhs.toString
+                flag = true
+              }
+            case pi : PointI =>
+              pi.recvOpt_Call match{
+                case Some(recv_Call) =>
+                  udChain(recv_Call, ps, cfg, rda, true).foreach(
+                    point => {
+                      if(fieldVarRepo.contains(point.toString())){
+                        if(!fieldVarRepo.contains(recv_Call.toString)){
+                          fieldVarRepo += recv_Call.toString
+                        }
+                      }
+                    }
+                  )
+                case None =>
+              }
+              pi.recvOpt_Return match{
+                case Some(recv_Return) =>
+                  udChain(recv_Return, ps, cfg, rda, true).foreach(
+                    point => {
+                      if(fieldVarRepo.contains(point.toString())){
+                        if(!fieldVarRepo.contains(recv_Return.toString)){
+                          fieldVarRepo += recv_Return.toString
+                        }
+                      }
+                    }
+                  )
+                case None =>
+              }
+              pi.args_Call.keys.foreach(
+                i => {
+                  udChain(pi.args_Call(i), ps, cfg, rda, true).foreach(
+                    point => {
+                      if(fieldVarRepo.contains(point.toString())){
+                        if(!fieldVarRepo.contains(pi.args_Call(i).toString)){
+                          fieldVarRepo += pi.args_Call(i).toString
+                        }
+                      }
+                    }
+                  )
+                }  
+              )
+              pi.args_Return.keys.foreach(
+                i => {
+                  udChain(pi.args_Return(i), ps, cfg, rda, true).foreach(
+                    point => {
+                      if(fieldVarRepo.contains(point.toString())){
+                        if(!fieldVarRepo.contains(pi.args_Return(i).toString)){
+                          fieldVarRepo += pi.args_Return(i).toString
+                        }
+                      }
+                    }
+                  )
+                }  
+              )
+            case procP : PointProc =>
+            case retP : PointRet =>
+              retP.procPoint.retVar match{
+                case Some(rev) =>
+                  udChain(retP, ps, cfg, rda, true).foreach(
+                    point => {
+                      if(fieldVarRepo.contains(point.toString())){
+                        if(!fieldVarRepo.contains(retP.toString)){
+                          fieldVarRepo += retP.toString
                         }
                       }
                     }
@@ -345,6 +495,8 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
 	      case Some(p) =>
 	        val srcNode = getNode(p, srcContext.copy)
 	        val targetNode = getNode(pi.recvOpt_Return.get, srcContext.copy)
+	        if(arrayRepo.contains(p.toString) || fieldVarRepo.contains(p.toString))
+	          deleteEdge(targetNode, srcNode)
 	        deleteEdge(srcNode, targetNode)
 	      case None =>
 	    }
@@ -353,6 +505,8 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
       case (i, aCall) =>
         val srcNode = getNode(aCall, srcContext.copy)
         val targetNode = getNode(pi.args_Return(i), srcContext.copy)
+        if(arrayRepo.contains(aCall.toString) || fieldVarRepo.contains(aCall.toString))
+	        deleteEdge(targetNode, srcNode)
         deleteEdge(srcNode, targetNode)
     }
   }
@@ -366,6 +520,12 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
         val targetNode = getNode(met.params_Entry(i), targetContext.copy)
         worklist += srcNode
         if(arrayRepo.contains(pi.args_Call(i).toString)){
+          arrayRepo(met.params_Entry(i).toString) = arrayRepo(pi.args_Call(i).toString)
+          if(!graph.containsEdge(srcNode, targetNode))
+            addEdge(targetNode, srcNode)
+        }
+        if(fieldVarRepo.contains(pi.args_Call(i).toString)){
+          fieldVarRepo += met.params_Entry(i).toString
           if(!graph.containsEdge(srcNode, targetNode))
             addEdge(targetNode, srcNode)
         }
@@ -379,6 +539,12 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
         val targetNode = getNode(pi.args_Return(i), srcContext.copy)
         worklist += srcNode
         if(arrayRepo.contains(pi.args_Return(i).toString)){
+          arrayRepo(met.params_Exit(i).toString) = arrayRepo(pi.args_Return(i).toString)
+          if(!graph.containsEdge(srcNode, targetNode))
+            addEdge(targetNode, srcNode)
+        }
+        if(fieldVarRepo.contains(pi.args_Return(i).toString)){
+          fieldVarRepo += met.params_Exit(i).toString
           if(!graph.containsEdge(srcNode, targetNode))
             addEdge(targetNode, srcNode)
         }
@@ -391,6 +557,16 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
         val srcNode = getNode(pi.recvOpt_Call.get, srcContext.copy)
         val targetNode = getNode(thisParam, targetContext.copy)
         worklist += srcNode
+        if(arrayRepo.contains(pi.recvOpt_Call.get.toString)){
+          arrayRepo(thisParam.toString) = arrayRepo(pi.recvOpt_Call.get.toString)
+          if(!graph.containsEdge(srcNode, targetNode))
+            addEdge(targetNode, srcNode)
+        }
+        if(fieldVarRepo.contains(pi.recvOpt_Call.get.toString)){
+          fieldVarRepo += thisParam.toString
+          if(!graph.containsEdge(srcNode, targetNode))
+            addEdge(targetNode, srcNode)
+        }
         if(!graph.containsEdge(srcNode, targetNode))
           addEdge(srcNode, targetNode)
       case None =>
@@ -400,6 +576,16 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
         val srcNode = getNode(thisParam, targetContext.copy)
         val targetNode = getNode(pi.recvOpt_Return.get, srcContext.copy)
         worklist += srcNode
+        if(arrayRepo.contains(pi.recvOpt_Return.get.toString)){
+          arrayRepo(thisParam.toString) = arrayRepo(pi.recvOpt_Return.get.toString)
+          if(!graph.containsEdge(srcNode, targetNode))
+            addEdge(targetNode, srcNode)
+        }
+        if(fieldVarRepo.contains(pi.recvOpt_Return.get.toString)){
+          fieldVarRepo += thisParam.toString
+          if(!graph.containsEdge(srcNode, targetNode))
+            addEdge(targetNode, srcNode)
+        }
         if(!graph.containsEdge(srcNode, targetNode))
           addEdge(srcNode, targetNode)
       case None =>
@@ -409,6 +595,16 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
         val targetNode = getNode(pi, srcContext.copy)
         val srcNode = getNode(retv, targetContext.copy)
         worklist += srcNode
+        if(arrayRepo.contains(pi.toString)){
+          arrayRepo(retv.toString) = arrayRepo(pi.toString)
+          if(!graph.containsEdge(srcNode, targetNode))
+            addEdge(targetNode, srcNode)
+        }
+        if(fieldVarRepo.contains(pi.toString)){
+          fieldVarRepo += retv.toString
+          if(!graph.containsEdge(srcNode, targetNode))
+            addEdge(targetNode, srcNode)
+        }
         if(!graph.containsEdge(srcNode, targetNode))
           addEdge(srcNode, targetNode)
       case None =>
@@ -422,9 +618,10 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
   
   def updateFieldValueSet(fieldNode : OfaFieldNode) = {
     val baseNode = fieldNode.baseNode
-    val baseValueSet = baseNode.getProperty(VALUE_SET).asInstanceOf[ValueSet]
-    
-    baseValueSet.instances.foreach{
+    val baseValueSet_Entry = baseNode.getProperty(VALUE_SET_ENTRY).asInstanceOf[ValueSet]
+    val baseValueSet_Exit = baseNode.getProperty(VALUE_SET_EXIT).asInstanceOf[ValueSet]
+    baseValueSet_Exit.merge(baseValueSet_Entry)
+    baseValueSet_Exit.instances.foreach{
       ins => 
         val vsopt = ins.getFieldValueSet(fieldNode.fieldName)
         vsopt match{
@@ -447,14 +644,24 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     baseEntryValueSet.instances.foreach{
       ins =>
         val tmpIns = ins.copy
-        tmpIns.setFieldLastDefSite(fieldNode.fieldName, newDefSitContext)
-        tmpIns.updateFieldDefSite(fieldNode.fieldName, newDefSitContext, fieldValueSet.copy)
+        baseNode match{
+          case bsl : OfaFieldBaseNodeL =>
+            tmpIns.setFieldLastDefSite(fieldNode.fieldName, newDefSitContext)
+            tmpIns.updateFieldDefSite(fieldNode.fieldName, newDefSitContext, fieldValueSet.copy)
+          case _ =>
+            tmpIns.getFieldValueSet(fieldNode.fieldName) match{
+              case Some(vs) => vs.merge(fieldValueSet)
+              case None => 
+                tmpIns.getFieldLastDefSite(fieldNode.fieldName) match{
+                  case Some(ds) => tmpIns.updateFieldDefSite(fieldNode.fieldName, ds, fieldValueSet.copy)
+                  case None =>
+                }
+            }
+        }
         baseExitValueSet.mergeInstance(tmpIns)
     }
-//    println("baseNode-->" + baseNode)
-//    println("baseEntryValueSet-->" + baseEntryValueSet)
-//    println("baseExitValueSet-->" + baseExitValueSet)
   }
+  
   
   def updateBaseNodeValueSet(baseNode : OfaFieldBaseNodeL) = {
     val fieldNode = baseNode.fieldNode
@@ -572,7 +779,8 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
       case pbr : PointBaseR =>
         if(!fieldBaseNodeRExists(pbr.varName, pbr.locationUri, context)){
           val node = addFieldBaseNodeR(pbr.varName, pbr.locationUri, context)
-          node.setProperty(VALUE_SET, fac())
+          node.setProperty(VALUE_SET_ENTRY, fac())
+          node.setProperty(VALUE_SET_EXIT, fac())
           node
         } else getFieldBaseNodeR(pbr.varName, pbr.locationUri, context)
       case pfl : PointFieldL =>

@@ -21,14 +21,23 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
         flowMap.getOrElseUpdate(rhs, msetEmpty) += lhs
         lhs match {
           case pfl : PointFieldL =>
-            udChain(pfl.basePoint, ps, cfg, rda).foreach(
-              point => {
-                flowMap.getOrElseUpdate(point, msetEmpty) += pfl.basePoint
-              }
-            )
+            if(fieldVarRepo.contains(pfl.basePoint.toString)){
+              udChain(pfl.basePoint, ps, cfg, rda).foreach(
+                point => {
+                  flowMap.getOrElseUpdate(pfl.basePoint, msetEmpty) += point
+                  flowMap.getOrElseUpdate(point, msetEmpty) += pfl.basePoint
+                }
+              )
+            } else {
+	            udChain(pfl.basePoint, ps, cfg, rda).foreach(
+	              point => {
+	                flowMap.getOrElseUpdate(point, msetEmpty) += pfl.basePoint
+	              }
+	            )
+            }
           //if an array point in lhs, then have flow from this array point to most recent array var shadowing place
           case pal : PointArrayL =>
-            if(arrayRepo.contains(pal.toString)){
+            if(arrayRepo.contains(pal.toString) || fieldVarRepo.contains(pal.toString)){
               udChain(pal, ps, cfg, rda).foreach(
                 point => {
                   flowMap.getOrElseUpdate(pal, msetEmpty) += point
@@ -48,8 +57,10 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
           case pgar : PointGlobalArrayR =>
             flowMap.getOrElseUpdate(lhs, msetEmpty) += pgar
           case pfr : PointFieldR =>
+            flowMap.getOrElseUpdate(lhs, msetEmpty) += pfr
             udChain(pfr.basePoint, ps, cfg, rda).foreach(
               point => {
+                flowMap.getOrElseUpdate(pfr.basePoint, msetEmpty) += point
                 flowMap.getOrElseUpdate(point, msetEmpty) += pfr.basePoint
               }
             )
@@ -65,7 +76,7 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
           case pao : PointArrayO =>
           case pi : PointI =>
           case pr : PointR =>
-            if(arrayRepo.contains(pr.toString)){
+            if(arrayRepo.contains(pr.toString) || fieldVarRepo.contains(pr.toString)){
               flowMap.getOrElseUpdate(lhs, msetEmpty) += pr
               udChain(pr, ps, cfg, rda).foreach(
                 point => {
@@ -82,36 +93,47 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
             }
         } 
       case pi : PointI =>
-            if(!pi.typ.equals("static")){
-              val recvP = pi.recvOpt_Call.get
-              udChain(recvP, ps, cfg, rda, true).foreach(
+        if(!pi.typ.equals("static")){
+          val recvP_Call = pi.recvOpt_Call.get
+          if(arrayRepo.contains(recvP_Call.toString) || fieldVarRepo.contains(recvP_Call.toString)){
+            udChain(recvP_Call, ps, cfg, rda, true).foreach(
+              point => {
+                flowMap.getOrElseUpdate(point, msetEmpty) += recvP_Call
+                flowMap.getOrElseUpdate(pi.recvOpt_Return.get, msetEmpty) += point
+              }
+            )
+            flowMap.getOrElseUpdate(recvP_Call, msetEmpty) += pi.recvOpt_Return.get
+            flowMap.getOrElseUpdate(pi.recvOpt_Return.get, msetEmpty) += recvP_Call
+          } else {
+	          udChain(recvP_Call, ps, cfg, rda, true).foreach(
+	            point => {
+	              flowMap.getOrElseUpdate(point, msetEmpty) += recvP_Call
+	            }
+	          )
+	          flowMap.getOrElseUpdate(recvP_Call, msetEmpty) += pi.recvOpt_Return.get
+          }
+        }
+        pi.args_Call.keys.foreach(
+          i => {
+            if(arrayRepo.contains(pi.args_Call(i).toString) || fieldVarRepo.contains(pi.args_Call(i).toString)){
+              udChain(pi.args_Call(i), ps, cfg, rda, true).foreach(
                 point => {
-                  flowMap.getOrElseUpdate(point, msetEmpty) += recvP
+                  flowMap.getOrElseUpdate(point, msetEmpty) += pi.args_Call(i)
+                  flowMap.getOrElseUpdate(pi.args_Return(i), msetEmpty) += point
                 }
               )
-              flowMap.getOrElseUpdate(recvP, msetEmpty) += pi.recvOpt_Return.get
-            }
-            pi.args_Call.keys.foreach(
-              i => {
-                if(arrayRepo.contains(pi.args_Call(i).toString)){
-                  udChain(pi.args_Call(i), ps, cfg, rda, true).foreach(
-                    point => {
-                      flowMap.getOrElseUpdate(point, msetEmpty) += pi.args_Call(i)
-                      flowMap.getOrElseUpdate(pi.args_Call(i), msetEmpty) += point
-                    }
-                  )
-                  flowMap.getOrElseUpdate(pi.args_Call(i), msetEmpty) += pi.args_Return(i)
-                  flowMap.getOrElseUpdate(pi.args_Return(i), msetEmpty) += pi.args_Call(i)
-                } else {
-                  udChain(pi.args_Call(i), ps, cfg, rda, true).foreach(
-                    point => {
-                      flowMap.getOrElseUpdate(point, msetEmpty) += pi.args_Call(i)
-                    }
-                  )
-                  flowMap.getOrElseUpdate(pi.args_Call(i), msetEmpty) += pi.args_Return(i)
+              flowMap.getOrElseUpdate(pi.args_Call(i), msetEmpty) += pi.args_Return(i)
+              flowMap.getOrElseUpdate(pi.args_Return(i), msetEmpty) += pi.args_Call(i)
+            } else {
+              udChain(pi.args_Call(i), ps, cfg, rda, true).foreach(
+                point => {
+                  flowMap.getOrElseUpdate(point, msetEmpty) += pi.args_Call(i)
                 }
-              }  
-            )
+              )
+              flowMap.getOrElseUpdate(pi.args_Call(i), msetEmpty) += pi.args_Return(i)
+            }
+          }  
+        )
       case procP : PointProc =>
         val t_exit_opt = procP.thisParamOpt_Exit
         val ps_exit = procP.params_Exit
@@ -154,7 +176,7 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
               cfg : ControlFlowGraph[String],
               rda : ReachingDefinitionAnalysis.Result,
               avoidMode : Boolean = true) : Set[Point] = {
-    val slots = rda.entrySet(cfg.getVirtualNode("Exit"))
+    val slots = rda.entrySet(cfg.exitNode)
     searchRda(p, slots, avoidMode)
   }
   
@@ -232,7 +254,7 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
         if(p.varName.equals(slot.toString())){
           if(defDesc.toString().equals("*")){
             if(!p.varName.startsWith("@@")){
-              val tp = getPoint(p.varName, points, avoidMode)
+              val tp = getPointFromEntry(p.varName, points, avoidMode)
               if(tp!=null)
                 ps += tp
             }
@@ -322,7 +344,7 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
     point
   }
   
-  def getPoint(uri : ResourceUri, ps : MList[Point], avoidMode : Boolean) : Point = {
+  def getPointFromEntry(uri : ResourceUri, ps : MList[Point], avoidMode : Boolean) : Point = {
     var point : Point = null
     ps.foreach(
       p => {
@@ -336,6 +358,35 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
               case None =>
             }
             pp.params_Entry.foreach(
+              pa => {
+                if(pa._2.varName.equals(uri)){
+                  point = pa._2
+                }
+              } 
+            )
+          case _ =>
+        }
+      }  
+    )
+    if(!avoidMode)
+      require(point != null)
+    point
+  }
+  
+  def getPointFromExit(uri : ResourceUri, ps : MList[Point], avoidMode : Boolean) : Point = {
+    var point : Point = null
+    ps.foreach(
+      p => {
+        p match {
+          case pp : PointProc =>
+            pp.thisParamOpt_Exit match {
+              case Some(thisP) =>
+                if(thisP.varName.equals(uri)){
+                  point = thisP
+                }
+              case None =>
+            }
+            pp.params_Exit.foreach(
               pa => {
                 if(pa._2.varName.equals(uri)){
                   point = pa._2

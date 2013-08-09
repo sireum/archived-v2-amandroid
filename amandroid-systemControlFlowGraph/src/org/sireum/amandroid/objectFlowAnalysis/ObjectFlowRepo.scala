@@ -13,4 +13,9 @@ trait ObjectFlowRepo[ValueSet <: NormalValueSet] {
    * tracking all array variables
    */ 
   final val arrayRepo : MMap[ResourceUri, Int] = mmapEmpty
+  
+  /**
+   * tracking all field variables
+   */ 
+  final var fieldVarRepo : Set[ResourceUri] = Set()
 }

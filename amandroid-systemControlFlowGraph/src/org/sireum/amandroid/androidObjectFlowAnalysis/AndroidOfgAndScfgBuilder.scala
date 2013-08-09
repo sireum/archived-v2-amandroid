@@ -76,7 +76,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
       node => {
         val name = node.toString()
         node match{
-          case ofbl : OfaFieldBaseNodeL =>
+          case ofb : OfaFieldBaseNode =>
             val valueSet = node.getProperty(result._1.VALUE_SET_EXIT).asInstanceOf[ValueSet]
 	        	println("node:" + name + "\n" + valueSet)
           case _ =>
@@ -180,6 +180,11 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
           ofbl.getProperty[ValueSet](ofg.VALUE_SET_ENTRY)
         else
         	ofbl.getProperty[ValueSet](ofg.VALUE_SET_EXIT)
+      case ofbr : OfaFieldBaseNodeR =>
+        if(isSucc)
+          ofbr.getProperty[ValueSet](ofg.VALUE_SET_ENTRY)
+        else
+        	ofbr.getProperty[ValueSet](ofg.VALUE_SET_EXIT)
       case _ => 
         node.getProperty[ValueSet](ofg.VALUE_SET)
     }
@@ -201,14 +206,14 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
         succ => {
           val vsSucc = getValueSet(succ, ofg, true)
           val d = vsN.getDiff(vsSucc).asInstanceOf[ValueSet]
-//          if(succ.toString() == "base_rhs:v1@List((pilar:/procedure/default/%5B%7Ccom:fgweihlp:wfgnp:myStringBuilder.append%7C%5D/1/53/2f73d03a,L00063c), (pilar:/procedure/default/%5B%7Ccom:fgweihlp:wfgnp:MainActivity.onCreate%7C%5D/1/23/38758143,L00053c))")
-//          {
-//          println("n--->" + n)
-//          println("vsN--->" + vsN)
-//          println("succ--->" + succ)
-//          println("vsSucc--->" + vsSucc)
-//          println("d-->" + d)
-//          }
+          if(n.toString() == "recv_Return:v0@List((pilar:/procedure/default/%5B%7Ccom:fgweihlp:wfgnp:MainActivity.onCreate%7C%5D/1/23/38758143,L0005dc), (pilar:/procedure/default/%5B%7Ccom:fgweihlp:wfgnp:MainActivity.dummyMain%7C%5D/1/19/acaa3d3c,L10))")
+          {
+	          println("n--->" + n)
+	          println("vsN--->" + vsN)
+	          println("succ--->" + succ)
+	          println("vsSucc--->" + vsSucc)
+	          println("d-->" + d)
+          }
 //          if(vsSucc.instances.size > 30){
 //            println(vsSucc.instances.toList(26) == vsSucc.instances.toList(27))
 //            if(vsSucc.instances.toList(0) != vsSucc.instances.toList(1)){
@@ -256,7 +261,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
       case ofbnr : OfaFieldBaseNodeR =>
         ofg.updateFieldValueSet(ofbnr.fieldNode)
         ofg.worklist += ofbnr.fieldNode.asInstanceOf[Node]
-      case ofn : OfaFieldNode =>		//this means field appear on LHS and n is on RHS
+      case ofn : OfaFieldNode =>		//this means field appear on LHS and n is on RHS (vice versa)
         ofg.populateFieldRepo(ofn)
         ofg.worklist += ofn.baseNode.asInstanceOf[Node]
       case _ =>
