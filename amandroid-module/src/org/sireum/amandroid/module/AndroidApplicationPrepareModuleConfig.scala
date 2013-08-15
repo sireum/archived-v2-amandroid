@@ -13,7 +13,7 @@ import org.sireum.core.module._
 import org.sireum.pipeline.PipelineJob
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.pilar.symbol.SymbolTable
-import org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp
+import org.sireum.amandroid.appInfo.PrepareApp
 
 case class AndroidApplicationPrepare(
 	title : String = "Android Application Preparation Module",

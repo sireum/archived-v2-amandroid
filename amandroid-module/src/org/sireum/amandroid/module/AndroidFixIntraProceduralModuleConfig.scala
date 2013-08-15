@@ -19,7 +19,7 @@ import org.sireum.amandroid.cache.AndroidCacheFile
 import org.sireum.pilar.ast.CatchClause
 import org.sireum.alir.DefRef
 import org.sireum.pilar.symbol.ProcedureSymbolTable
-import org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp
+import org.sireum.amandroid.appInfo.PrepareApp
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

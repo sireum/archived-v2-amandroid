@@ -6,7 +6,6 @@ import org.sireum.alir.ControlFlowGraph
 import org.sireum.util._
 import org.sireum.alir.AlirIntraProceduralGraph
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
-import org.sireum.amandroid.scfg.SystemControlFlowGraph
 import java.io._
 import org.sireum.amandroid.xml.AndroidXStream
 import org.sireum.pipeline.ErrorneousModulesThrowable

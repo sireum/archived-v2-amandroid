@@ -36,7 +36,7 @@ trait InterProceduralTestFramework extends TestFramework {
    aCache : AndroidCacheFile[ResourceUri]) {
 
     test(title) {
-
+    	println("####" + title + "#####")
       val job = PipelineJob()
       
       {

@@ -14,13 +14,16 @@ import org.jgrapht.ext.VertexNameProvider
 import java.io.Writer
 import org.jgrapht.ext.DOTExporter
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet
+import org.sireum.amandroid.programPoints._
+import org.sireum.amandroid.contextProvider.Context
+import org.sireum.amandroid.instance._
 
 abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val fac: () => ValueSet)
   extends AlirGraph[Node]
   with AlirEdgeAccesses[Node]
   with AlirSuccPredAccesses[Node]
   with ConstraintModel[ValueSet]
-  with JavaObjectModel[Node, ValueSet]{
+  with JavaObjectModelForOfa[Node, ValueSet]{
   self=>
   
   protected val graph = new DirectedMultigraph(
@@ -37,7 +40,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
   final val VALUE_SET = "ValueSet"
   final val VALUE_SET_ENTRY = "ValueSetEntry"
   final val VALUE_SET_EXIT = "ValueSetExit"
-  final val PARAM_NUM = "param.number"
+  final val PARAM_NUM = "ParamNumber"
   final val K_CONTEXT : Int = 1
   /**
    * represents max number of strings in the strings set of a StringInstance
@@ -96,6 +99,34 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     points ++= ofg2.points
     val ps = ofg2.points.filter(p => if(p.isInstanceOf[PointProc])true else false)
     ps(0).asInstanceOf[PointProc]
+  }
+  
+  /**
+   * combine special ofg into current ofg. (just combine proc point and relevant node)
+   */ 
+  def collectTrackerNodes(sig : String, pi : PointI, callerContext : Context) = {
+    val recvCallNodeOpt =
+      pi.recvOpt_Call match{
+       	case Some(r) =>
+	        Some(getNode(r, callerContext))
+	      case None =>
+	        None
+    	}
+    val recvReturnNodeOpt = 
+      pi.recvOpt_Return match{
+       	case Some(r) =>
+	        Some(getNode(r, callerContext))
+	      case None =>
+	        None
+    	}
+    val invokeNodeOpt = if(invokeNodeExists(pi.varName, pi.locationUri, callerContext, pi)) Some(getNode(pi, callerContext)) else None
+    val argCallNodes = pi.args_Call.map{case (l, p) => (l, getNode(p, callerContext))}.toMap
+    val argReturnNodes = pi.args_Return.map{case (l, p) => (l, getNode(p, callerContext))}.toMap
+    val ipN = InvokePointNode[Node](recvCallNodeOpt, recvReturnNodeOpt, argCallNodes, argReturnNodes, invokeNodeOpt, pi)
+    ipN.setCalleeSig(sig)
+    ipN.setContext(callerContext)
+	  modelOperationTracker += (ipN)
+    ipN
   }
   
   /**
@@ -396,12 +427,12 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
             baseNode.asInstanceOf[OfaFieldBaseNode].fieldNode = fieldNode.asInstanceOf[OfaFieldNode]
             fieldNode.asInstanceOf[OfaFieldNode].baseNode = baseNode.asInstanceOf[OfaFieldBaseNode]
           case pso : PointStringO =>
-            val ins = StringInstance(pso.typ, context.copy, K_STRING)
+            val ins = OFAStringInstance(pso.typ, context.copy, K_STRING)
             ins.addString(pso.str)
             rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].addInstance(ins)
             worklist += rhsNode
           case po : PointO =>
-            val ins = RegClassInstance(po.typ, context.copy)
+            val ins = OFARegClassInstance(po.typ, context.copy)
             rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].addInstance(ins)
             worklist += rhsNode
           case pi : PointI =>

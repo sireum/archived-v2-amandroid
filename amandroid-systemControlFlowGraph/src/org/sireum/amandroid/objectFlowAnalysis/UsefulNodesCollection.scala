@@ -1,5 +1,8 @@
 package org.sireum.amandroid.objectFlowAnalysis
 
+import org.sireum.amandroid.programPoints._
+import org.sireum.amandroid.contextProvider.Context
+
 case class ProcedurePointNode[Node](thisEntryNodeOpt : Option[Node], 
     																 thisExitNodeOpt : Option[Node], 
     																 paramEntryNodes : Map[Int, Node], 

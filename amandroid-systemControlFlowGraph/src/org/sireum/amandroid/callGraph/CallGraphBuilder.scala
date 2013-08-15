@@ -3,106 +3,392 @@ package org.sireum.amandroid.callGraph
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.util._
-import org.sireum.pilar.ast.CallJump
-import org.sireum.pilar.ast.Transformation
-import org.sireum.pilar.ast.JumpLocation
-import org.sireum.pilar.ast.NameExp
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
-import org.sireum.pilar.ast.LocationDecl
-import org.sireum.alir.AlirLocationUriNode
-import org.sireum.pilar.ast.TupleExp
+import org.sireum.alir.AlirEdge
+import org.sireum.amandroid.pointsToAnalysis.PtaNode
+import org.sireum.amandroid.appInfo._
+import org.sireum.amandroid.contextProvider.Context
+import org.sireum.amandroid.programPoints._
+import org.sireum.alir.ReachingDefinitionAnalysis
+import org.sireum.amandroid.cache.AndroidCacheFile
+import org.sireum.amandroid.pointsToAnalysis.PtaFieldBaseNodeL
+import java.io._
+import org.sireum.amandroid.pointsToAnalysis.PointerAssignmentGraph
+import org.sireum.amandroid.pointsToAnalysis.PtaFieldNode
+import org.sireum.amandroid.scfg._
+import org.sireum.amandroid.instance.PTAInstance
+import org.sireum.amandroid.objectFlowAnalysis.InvokePointNode
+import org.sireum.amandroid.instance.PTAInstance
+import org.sireum.amandroid.pointsToAnalysis.PtaFieldBaseNodeR
 
-case class ReachableProcedure(callerProcedureUri : ResourceUri, sig : String, uri : ResourceUri, locUri: Option[org.sireum.util.ResourceUri], locIndex: Int, params : List[String], pst : ProcedureSymbolTable)
+class CallGraphBuilder {
+  
+  var appInfo : PrepareApp = null
+  var pstMap : Map[ResourceUri, ProcedureSymbolTable] = Map()
+  var processed : Map[(ResourceUri, Context), PointProc] = Map()
+  var cfgs : MMap[ResourceUri, ControlFlowGraph[String]] = null
+  var rdas : MMap[ResourceUri, ReachingDefinitionAnalysis.Result] = null
+  var androidLibInfoTables : AndroidLibInfoTables = null
+  var androidCache : AndroidCacheFile[String] = null
+  //a map from return node to its possible updated value set
+  var modelOperationValueSetMap : Map[PtaNode, MSet[PTAInstance]] = Map()
 
-class CallGraphBuilder(androidLibInfoTable : AndroidLibInfoTables) extends CallGraph{
-  var callMap : Map[ResourceUri, MSet[ReachableProcedure]] = Map()
-  def CallMap : Map[ResourceUri, MSet[ReachableProcedure]] = callMap
-	/**
-   * Building call graph for given procedure symbol table or control flow graph.
-   * @param source Either procedure symbol table or control flow graph
-   * @return CallGraph of given source
-   */
-	def getCallGraph(source : Either[ProcedureSymbolTable, (ResourceUri, ControlFlowGraph[String])]) : CallGraph = {
-	  source match {
-	    case Left(pst) => buildFromPST(pst)
-	    case Right((pUri, cfg)) => buildFromCFG(pUri, cfg)
-	  }
-	  this
-	}
-	
-	private def buildFromPST(pst : ProcedureSymbolTable) : Unit = {
-	  val locationDecls = pst.locations.toSeq
-	  val currPUri = pst.procedureUri
-    if (locationDecls.isEmpty) return
-    val visitor = Visitor.build({
-      case jl : JumpLocation =>
-        true
-      case t : Transformation =>
-        true
-      case t : CallJump if t.jump.isEmpty =>
-        val sig = t.getValueAnnotation("signature") match {
-          case Some(s) => s match {
-            case ne : NameExp => ne.name.name
-            case _ => ""
-          }
-          case None => null
-        }
-        if(sig != null){
-          val pUri = androidLibInfoTable.getProcedureUriBySignature(sig)
-          if(pUri == null)
-          	System.err.println("sig--->" + sig)
-          else
-          	callMap ++= Map(currPUri -> (callMap.getOrElse(currPUri, msetEmpty) + ReachableProcedure(currPUri, sig, pUri, t.locUri, t.locIndex, getParamsFromCallJump(t), pst)))
-        }
-        false
-    })
-    val size = locationDecls.size
-    for (i <- 0 until size) {
-      val currLocDecl = locationDecls(i)
-      visitor(currLocDecl)
+  def apply(psts : Seq[ProcedureSymbolTable],
+            cfgs : MMap[ResourceUri, ControlFlowGraph[String]],
+            rdas : MMap[ResourceUri, ReachingDefinitionAnalysis.Result],
+            androidLibInfoTables : AndroidLibInfoTables,
+            appInfoOpt : Option[PrepareApp],
+            androidCache : AndroidCacheFile[String]) 
+            = build(psts, cfgs, rdas, androidLibInfoTables, appInfoOpt, androidCache)
+
+  def build(psts : Seq[ProcedureSymbolTable],
+            cfgs : MMap[ResourceUri, ControlFlowGraph[String]],
+            rdas : MMap[ResourceUri, ReachingDefinitionAnalysis.Result],
+            androidLibInfoTables : AndroidLibInfoTables,
+            appInfoOpt : Option[PrepareApp],
+            androidCache : AndroidCacheFile[String])
+   : CallGraph[String] = {
+    this.cfgs = cfgs
+    this.rdas = rdas
+    this.androidLibInfoTables = androidLibInfoTables
+    this.androidCache = androidCache
+    this.pstMap =
+      psts.map{
+	      pst =>
+	        (pst.procedureUri, pst)
+    	}.toMap
+    val pag = new PointerAssignmentGraph[PtaNode]()
+    val cg = new CallGraph[String]
+    appInfoOpt match{
+      case Some(appInfo) =>
+        this.appInfo = appInfo
+        ptaWithIcc(pag, cg)
+      case None =>
+        pta(pag, cg)
     }
-	}
-	
-	private def getParamsFromCallJump(callJump : CallJump) : List[String] = {
-	  var exps : List[String] = null
-	  callJump.callExp.arg match {
-      case te : TupleExp =>{
-        exps = te.exps.map{
-          exp =>
-            exp match {
-              case ne : NameExp =>
-                ne.name.name
-              case _ =>
-                null
-            }
-        }.filter{str => if(str != null) true else false}.toList
+    val result = cg
+    pag.pointsToMap.pointsToMap.foreach{
+      item =>
+        println("item--->" + item)
+    }
+    val f1 = new File(System.getProperty("user.home") + "/Desktop/CallGraph.dot")
+    val o1 = new FileOutputStream(f1)
+    val w1 = new OutputStreamWriter(o1)
+    result.toDot(w1)
+    
+    val f2 = new File(System.getProperty("user.home") + "/Desktop/PointerAssignmentGraph.dot")
+    val o2 = new FileOutputStream(f2)
+    val w2 = new OutputStreamWriter(o2)
+    pag.toDot(w2)
+
+    result
+  }
+  
+  def pta(pag : PointerAssignmentGraph[PtaNode],
+          sCfg : SuperControlFlowGraph[String]) = {
+    pstMap.keys.foreach{
+      uri =>
+        if(uri.contains(".main%7C%5D") || uri.contains(".dummyMain%7C%5D")){
+	        val cfg = cfgs(uri)
+			    val rda = rdas(uri)
+			    val pst = pstMap(uri)
+			    doPTA(pst, cfg, rda, pag, sCfg)
+        }
+    }
+  }
+  
+  def ptaWithIcc(pag : PointerAssignmentGraph[PtaNode],
+          sCfg : SuperControlFlowGraph[String]) = {
+//    pag.setIntentFdb(appInfo.getIntentDB)
+//    pag.setEntryPoints(appInfo.getEntryPoints)
+//    appInfo.getDummyMainSigMap.values.foreach{
+//      dummySig =>
+//        val dummyUri = androidLibInfoTables.getProcedureUriBySignature(dummySig)
+//        val cfg = cfgs(dummyUri)
+//		    val rda = rdas(dummyUri)
+//		    val pst = pstMap(dummyUri)
+//		    doPTA(pst, cfg, rda, pag, sCfg)
+//    }
+//    overallFix(pag, sCfg)
+  }
+  
+  // currently, we do not use getEntryPoint(psts : Seq[ProcedureSymbolTable]) which is below
+  def getEntryPoint(psts : Seq[ProcedureSymbolTable]) : ResourceUri = {
+    var entryPoint : ResourceUri = null
+    val entryName = this.appInfo.getMainEntryName
+    psts.foreach(
+      pst =>{
+        if(pst.procedureUri.contains(entryName)) entryPoint = pst.procedureUri
+      }  
+    )
+    entryPoint
+  }
+  
+  def doPTA(pst : ProcedureSymbolTable,
+            cfg : ControlFlowGraph[String],
+            rda : ReachingDefinitionAnalysis.Result,
+            pag : PointerAssignmentGraph[PtaNode],
+            sCfg : SuperControlFlowGraph[String]) : Unit = {
+    val points = new PointsCollector().points(pst)
+    val context : Context = new Context(pag.K_CONTEXT)
+    pag.points ++= points
+    setProcessed(points, pst.procedureUri, context.copy)
+    pag.constructGraph(pst.procedureUri, points, context.copy, cfg, rda)
+    sCfg.collectionCfgToBaseGraph(pst.procedureUri, cfg)
+    workListPropagation(pag, sCfg)
+  }
+  
+  def overallFix(pag : PointerAssignmentGraph[PtaNode],
+		  					 sCfg : SuperControlFlowGraph[String]) : Unit = {
+//    while(checkAndDoIccOperation(ofg, sCfg)){
+////    	fix(ofg, sCfg)
+//    }
+  }
+  
+  def workListPropagation(pag : PointerAssignmentGraph[PtaNode],
+		  					 sCfg : SuperControlFlowGraph[String]) : Unit = {
+    pag.edges.foreach{
+      edge =>
+        pag.getEdgeType(edge) match{
+          case pag.EdgeType.ALLOCATION =>
+            pag.pointsToMap.propagatePointsToSet(edge.source, edge.target)
+            pag.worklist += edge.target
+          case _ =>
+        }
+    }
+    while (!pag.worklist.isEmpty) {
+      while (!pag.worklist.isEmpty) {
+      	val srcNode = pag.worklist.remove(0)
+      	srcNode match{
+      	  case ofbnl : PtaFieldBaseNodeR => // ofbnl.f -> q
+      	    val f = ofbnl.fieldNode
+      	    pag.successorEdges(f).foreach{
+      	    	edge => //edge is FIELD_LOAD type
+		      	    val dstNode = pag.successor(edge)
+		  	        if(pag.pointsToMap.isDiff(f, dstNode)) pag.worklist += dstNode
+		  	        pag.pointsToMap.propagatePointsToSet(f, dstNode)
+      	    }
+      	  case _ =>
+      	}
+  	    pag.successorEdges(srcNode).foreach{
+      	  edge =>
+      	    pag.getEdgeType(edge) match{
+      	      case pag.EdgeType.TRANSFER => // e.g. L0: p = q; L1:  r = p; transfer means p@L0 -> p@L1
+      	        val dstNode = pag.successor(edge)
+      	        if(pag.pointsToMap.isDiff(srcNode, dstNode)){
+      	          pag.worklist += dstNode
+      	          val d = pag.pointsToMap.getDiff(srcNode, dstNode)
+      	          pag.pointsToMap.transferPointsToSet(srcNode, dstNode)
+      	          checkAndDoModelOperation(dstNode, pag)
+      	          checkAndDoCall(dstNode, d, pag, sCfg)
+      	        }
+      	      case pag.EdgeType.ASSIGNMENT => // p -> q
+      	        val dstNode = pag.successor(edge)
+      	        if(pag.pointsToMap.isDiff(srcNode, dstNode)){
+      	          pag.worklist += dstNode
+      	          pag.pointsToMap.propagatePointsToSet(srcNode, dstNode)
+      	        }
+      	      case pag.EdgeType.FIELD_STORE => // q -> r.f
+      	        val dstNode = pag.successor(edge).asInstanceOf[PtaFieldNode]
+      	        pag.pointsToMap.propagateFieldStorePointsToSet(srcNode, dstNode)
+      	      case _ =>
+      	    }
+      	}
       }
-      case _ =>
+      pag.edges.foreach{
+	      edge =>
+	        pag.getEdgeType(edge) match{
+	          case pag.EdgeType.FIELD_STORE => // q -> r.f
+	            pag.pointsToMap.propagateFieldStorePointsToSet(edge.source, edge.target.asInstanceOf[PtaFieldNode])
+	          case _ =>
+	        }
+	    }
+      pag.edges.foreach{
+	      edge =>
+	        pag.getEdgeType(edge) match{
+	          case pag.EdgeType.FIELD_LOAD => // p.f -> q
+	  	        if(pag.pointsToMap.isDiff(edge.source, edge.target)){
+	  	          pag.worklist += edge.target
+	  	          pag.pointsToMap.propagatePointsToSet(edge.source, edge.target)
+	  	        }
+	          case _ =>
+	        }
+	    }
     }
-	  exps
-	}
-	
-	private def buildFromCFG(currPUri : ResourceUri, cfg : ControlFlowGraph[String]) : Unit = {
-	  cfg.nodes.filter{node => if(node.isInstanceOf[AlirLocationUriNode]) true else false}.foreach{
-	    node =>
-	      val uriNode = node.asInstanceOf[AlirLocationUriNode]
-	      val sig = uriNode.getProperty[String]("calleeSig")
-	      val pUri = androidLibInfoTable.getProcedureUriBySignature(sig)
-//        callMap ++= Map(currPUri -> (callMap.getOrElse(currPUri, msetEmpty) + ReachableProcedure(sig, pUri, Some(uriNode.locUri), uriNode.locIndex)))
-	  }
-	}
-	
-	/**
-	 * Get all reachable procedures of given procedure. (Do not include transitive call)
-	 * @param procedureUris Initial procedure resource uri
-	 * @return Set of reachable procedure resource uris from initial procedure
-	 */
-	def getReachableProcedures(procedureUri : ResourceUri) : Set[ReachableProcedure] = callMap.getOrElse(procedureUri, msetEmpty).toSet
-	/**
-	 * Get all reachable procedures of given procedure set. (Do not include transitive call)
-	 * @param procedureUris Initial procedure resource uri set
-	 * @return Set of reachable procedure resource uris from initial set
-	 */
-	def getReachableProcedures(procedureUris : Set[ResourceUri]) : Set[ReachableProcedure] = procedureUris.map{p => getReachableProcedures(p)}.reduce(combine)
-	private def combine(set1 : Set[ReachableProcedure], set2 : Set[ReachableProcedure]) : Set[ReachableProcedure] = set1 ++ set2
+  }
+  
+  def checkAndDoCall(node : PtaNode,
+      							d : MSet[PTAInstance],
+      							pag : PointerAssignmentGraph[PtaNode],
+      							sCfg : SuperControlFlowGraph[String]) = {
+    val piOpt = pag.recvInverse(node)
+    piOpt match {
+      case Some(pi) =>
+        val callerContext : Context = node.getContext
+        val calleeSet : MSet[ResourceUri] = msetEmpty
+        if(pi.typ.equals("direct") || pi.typ.equals("super")){
+          calleeSet += pag.getDirectCallee(pi, androidLibInfoTables)
+        } else {
+          calleeSet ++= pag.getCalleeSet(d, pi, androidLibInfoTables)
+        }
+        calleeSet.foreach(
+          callee => {
+            extendGraphWithConstructGraph(callee, pi, callerContext.copy, pag, sCfg)
+          }  
+        )
+        pag.edges.foreach{
+		      edge =>
+		        pag.getEdgeType(edge) match{
+		          case pag.EdgeType.ALLOCATION =>
+		            if(pag.pointsToMap.isDiff(edge.source, edge.target)){
+			            pag.pointsToMap.propagatePointsToSet(edge.source, edge.target)
+			            pag.worklist += edge.target
+		            }
+		          case _ =>
+		        }
+		    }
+      case None =>
+    }
+  }
+  
+  def checkAndDoModelOperation(succNode : PtaNode, pag : PointerAssignmentGraph[PtaNode]) = {
+    pag.getInvokePointNodeInModelOperationTrackerFromCallComponent(succNode) match{
+      case Some(ipN) =>
+        doSpecialOperation(ipN, pag)
+      case None =>
+    }
+  }
+//  
+//  def checkAndDoIccOperation(ofg : AndroidObjectFlowGraph[Node, ValueSet], sCfg : SystemControlFlowGraph[String]) : Boolean = {
+//    var flag = true
+//    val results = ofg.doIccOperation(this.appInfo.getDummyMainSigMap)
+//
+//    if(results.isEmpty)
+//      flag = false
+//    else{
+//	    results.foreach{
+//	    result =>
+//		    if(result != null){
+//		      val (pi, context, targetSigs) = result
+//			    targetSigs.foreach{
+//			      targetSig =>
+//			        val targetUri = androidLibInfoTables.getProcedureUriBySignature(targetSig)
+//			        if(targetUri != null){
+//						    extendGraphWithConstructGraph(targetUri, pi, context.copy, ofg, sCfg)
+//			        }
+//			    }
+//		    }else flag = false
+//	    }
+//    }
+//
+//    flag
+//  }
+  
+  def doSpecialOperation(ipN : InvokePointNode[PtaNode], pag : PointerAssignmentGraph[PtaNode]) = {
+    val instsMap = pag.doModelOperation(ipN, pag)
+    instsMap.foreach{
+      case (k, v) =>
+        if(modelOperationValueSetMap.contains(k)){
+        	val d = v.diff(modelOperationValueSetMap(k))
+        	if(!d.isEmpty){
+          	pag.pointsToMap.addInstances(k, d)
+          	pag.worklist += k
+        	}
+        } else {
+          pag.pointsToMap.addInstances(k, v)
+          pag.worklist += k
+        }
+    }
+    modelOperationValueSetMap = instsMap
+  }
+  
+  // callee is signature
+  def extendGraphWithConstructGraph(callee : ResourceUri, 
+      															pi : PointI, 
+      															callerContext : Context,
+      															pag : PointerAssignmentGraph[PtaNode], 
+      															sCfg : SuperControlFlowGraph[String]) = {
+    val points : MList[Point] = mlistEmpty
+    val calleeSig : String = androidLibInfoTables.getProcedureSignatureByUri(callee)
+    if(pag.isModelOperation(calleeSig)){
+      val ipN = pag.collectTrackerNodes(calleeSig, pi, callerContext.copy)
+      doSpecialOperation(ipN, pag)
+//    } else if(pag.isIccOperation(calleeSig, androidLibInfoTables)) {
+//      pag.setIccOperationTracker(calleeSig, pi, callerContext.copy)
+    } else if(!processed.contains((callee, callerContext))){
+//    if(!processed.contains((callee, callerContext))){
+      if(pstMap.contains(callee)){
+        val cfg = cfgs(callee)
+        val rda = rdas(callee)
+        points ++= new PointsCollector().points(pstMap(callee))
+        pag.points ++= points
+        setProcessed(points, callee, callerContext.copy)
+        pag.constructGraph(callee, points, callerContext.copy, cfg, rda)        
+        sCfg.collectionCfgToBaseGraph(callee, cfg)
+      } else {
+        //get ofg ccfg from file
+//        val calleeOfg = androidCache.load[ObjectFlowGraph[Node, ValueSet]](callee, "ofg")
+//        val calleeCCfg = androidCache.load[CompressedControlFlowGraph[String]](callee, "cCfg")
+//        calleeOfg.updateContext(callerContext)
+//        processed += ((callee, callerContext.copy) -> ofg.combineOfgs(calleeOfg))
+//        sCfg.collectionCCfgToBaseGraph(callee, calleeCCfg)
+      }
+    }
+    if(processed.contains(callee, callerContext)){
+      val procPoint = processed(callee, callerContext)
+      require(procPoint != null)
+      pag.extendGraph(procPoint, pi, callerContext.copy)
+      if(!pag.isModelOperation(calleeSig))
+//         !ofg.isIccOperation(calleeSig, androidLibInfoTables))
+      	sCfg.extendGraph(callee, pi.owner, pi.locationUri, pi.locationIndex)
+    } else {
+      //need to extend
+    }
+  }
+  
+//  def extendGraphWithConstructGraphForIcc(callee : ResourceUri, 
+//                                    pi : PointI, 
+//                                    context : Context,
+//                                    ofg : AndroidObjectFlowGraph[Node, ValueSet], 
+//                                    sCfg : SystemControlFlowGraph[String]) = {
+//    val points : MList[Point] = mlistEmpty
+//    val calleeSig : ResourceUri = androidLibInfoTables.getProcedureSignatureByUri(callee)
+//    if(!processed.contains(callee)){
+//      if(pstMap.contains(callee)){
+//        val cfg = cfgs(callee)
+//        val rda = rdas(callee)
+//        val cCfg = cCfgs(callee)
+//        points ++= new PointsCollector[Node, ValueSet]().points(pstMap(callee), ofg)
+//        ofg.points ++= points
+//        setProcessed(points, callee, context)
+//        ofg.constructGraph(callee, points, context, cfg, rda)
+//        sCfg.collectionCCfgToBaseGraph(callee, cCfg)
+//      } else {
+//        //get ofg ccfg from file
+//        val calleeOfg = androidCache.load[ObjectFlowGraph[Node, ValueSet]](callee, "ofg")
+//        val calleeCCfg = androidCache.load[CompressedControlFlowGraph[String]](callee, "cCfg")
+//        calleeOfg.updateContext(context)
+//        processed += ((callee, context) -> ofg.combineOfgs(calleeOfg))
+//        sCfg.collectionCCfgToBaseGraph(callee, calleeCCfg)
+//      }
+//    }
+//    if(processed.contains((callee, context))){
+//      val procPoint = processed((callee, context))
+//      require(procPoint != null)
+//      ofg.extendGraphForIcc(procPoint, pi, context)
+////      sCfg.extendGraph(callee, pi.owner, pi.locationUri, pi.locationIndex)
+//    } else {
+//      //need to extend
+//    }
+//  }
+//  
+  def setProcessed(points : MList[Point], callee : ResourceUri, context : Context) = {
+    points.foreach(
+      point => {
+        if(point.isInstanceOf[PointProc]){
+          processed += ((callee, context) -> point.asInstanceOf[PointProc])
+        }
+      }
+    )
+  }
 }

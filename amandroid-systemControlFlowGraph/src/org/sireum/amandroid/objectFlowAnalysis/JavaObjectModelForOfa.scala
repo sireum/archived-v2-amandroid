@@ -2,8 +2,10 @@ package org.sireum.amandroid.objectFlowAnalysis
 
 import org.sireum.amandroid.util.CombinationIterator
 import org.sireum.util.ResourceUri
+import org.sireum.amandroid.instance._
+import org.sireum.amandroid.contextProvider.Context
 
-trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
+trait JavaObjectModelForOfa[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	/**
    * contain all string operations and involved operation string parameter nodes and return nodes
    */
@@ -61,7 +63,7 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
     					               else Set()				             
 //      println("strs-->" + strs)
       result += (ipN.piNodeOpt.get -> fac())
-      val ins = StringInstance("[|java:lang:String|]", ipN.piNodeOpt.get.getContext.copy, k_string)
+      val ins = OFAStringInstance("[|java:lang:String|]", ipN.piNodeOpt.get.getContext.copy, k_string)
       ins.addStrings(strs, ipN.getContext)
       result(ipN.piNodeOpt.get).addInstance(ins)
   	}
@@ -73,12 +75,12 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
   	checkOperationTimes(vs.instances, operationContext)
   }
   
-  private def checkOperationTimes(insts : Set[Instance], operationContext : Context) : Boolean = {
+  private def checkOperationTimes(insts : Set[OFAInstance], operationContext : Context) : Boolean = {
     var flag : Boolean = true
     insts.foreach{
       ins =>
         ins match{
-          case strIns : StringInstance => flag = strIns.checkOperation(operationContext)
+          case strIns : OFAStringInstance => flag = strIns.checkOperation(operationContext)
           case _ =>
         }
     }
@@ -89,11 +91,11 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
     var result : Map[Node, ValueSet] = Map()
     require(valueSets.contains(0))
     val sbVs = valueSets(0)
-    val insts : Set[Instance] = sbVs.instances.map{
+    val insts : Set[OFAInstance] = sbVs.instances.map{
       ins => 
         ins.getFieldValueSet("[|java:lang:StringBuilder.value|]") match{
           case Some(vs) => vs.instances
-          case None => Set[Instance]()
+          case None => Set[OFAInstance]()
         }
     }.reduce((set1, set2) => set1 ++ set2)
     if(checkOperationTimes(insts, ipN.getContext)){
@@ -265,7 +267,7 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	    case "[|Ljava/lang/StringBuilder;.<init>:()V|]" =>
 	      sbValueSet.instances.map{
 	        ins =>
-	          val sIns = StringInstance("[|java:lang:String|]", ipN.getContext.copy, k_string)
+	          val sIns = OFAStringInstance("[|java:lang:String|]", ipN.getContext.copy, k_string)
 	          sIns.setStrings(Set(""), ipN.getContext)
 	          val strVs = fac()
 	          strVs.addInstance(sIns)
@@ -277,7 +279,7 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	    case "[|Ljava/lang/StringBuilder;.<init>:(I)V|]" =>
 	      sbValueSet.instances.map{
 	        ins =>
-	          val sIns = StringInstance("[|java:lang:String|]", ipN.getContext.copy, k_string)
+	          val sIns = OFAStringInstance("[|java:lang:String|]", ipN.getContext.copy, k_string)
 	          sIns.setStrings(Set(""), ipN.getContext)
 	          val strVs = fac()
 	          strVs.addInstance(sIns)
@@ -289,7 +291,7 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	    case "[|Ljava/lang/StringBuilder;.<init>:(Ljava/lang/CharSequence;)V|]" =>
 	      sbValueSet.instances.map{
 	        ins =>
-	          val sIns = StringInstance("[|java:lang:String|]", ipN.getContext.copy, k_string)
+	          val sIns = OFAStringInstance("[|java:lang:String|]", ipN.getContext.copy, k_string)
 	          sIns.setStrings(Set(""), ipN.getContext)
 	          val strVs = fac()
 	          strVs.addInstance(sIns)
@@ -301,7 +303,7 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	    case "[|Ljava/lang/StringBuilder;.<init>:(Ljava/lang/String;)V|]" =>
 	      sbValueSet.instances.map{
 	        ins =>
-	          val sIns = StringInstance("[|java:lang:String|]", ipN.getContext.copy, k_string)
+	          val sIns = OFAStringInstance("[|java:lang:String|]", ipN.getContext.copy, k_string)
 	          sIns.setStrings(strings, ipN.getContext)
 	          val strVs = fac()
 	          strVs.addInstance(sIns)
@@ -326,7 +328,7 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	              tmpVs.instances.foreach{
 					        strIns =>
 					          val strs = 
-					            strIns.asInstanceOf[StringInstance].getStrings.map{
+					            strIns.asInstanceOf[OFAStringInstance].getStrings.map{
 					            	str1 => 
 					            	  strings map{
 					            	    str2 =>
@@ -334,8 +336,8 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
 					            	      str1 + str2
 					            	  }
 					            }.reduce((set1, set2) => set1 ++ set2)
-					          strIns.asInstanceOf[StringInstance].defSite = ipN.getContext.copy
-					          strIns.asInstanceOf[StringInstance].setStrings(strs, ipN.getContext)
+					          strIns.asInstanceOf[OFAStringInstance].defSite = ipN.getContext.copy
+					          strIns.asInstanceOf[OFAStringInstance].setStrings(strs, ipN.getContext)
 					      }
 	              ins.updateFieldDefSite("[|java:lang:StringBuilder.value|]", ipN.getContext.copy, tmpVs.asInstanceOf[NormalValueSet])
 					      ins.setFieldLastDefSite("[|java:lang:StringBuilder.value|]", ipN.getContext.copy)
@@ -369,9 +371,9 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	              
 	              vs.instances.foreach{
 					        strIns =>
-					          val strings = strIns.asInstanceOf[StringInstance].getStrings.map{str => str.reverse}
-					          strIns.asInstanceOf[StringInstance].setStrings(strings, ipN.getContext)
-					          strIns.asInstanceOf[StringInstance].defSite = ipN.getContext.copy
+					          val strings = strIns.asInstanceOf[OFAStringInstance].getStrings.map{str => str.reverse}
+					          strIns.asInstanceOf[OFAStringInstance].setStrings(strings, ipN.getContext)
+					          strIns.asInstanceOf[OFAStringInstance].defSite = ipN.getContext.copy
 					      }
 	              ins.updateFieldDefSite("[|java:lang:StringBuilder.value|]", ipN.getContext.copy, vs.asInstanceOf[NormalValueSet])
 					      ins.setFieldLastDefSite("[|java:lang:StringBuilder.value|]", ipN.getContext.copy)
@@ -380,7 +382,7 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	      }
 	      sbValueSet
 	    case "[|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|]" =>
-	      var insts : Set[Instance] = Set()
+	      var insts : Set[OFAInstance] = Set()
 	      sbValueSet.instances.foreach{
 	        ins =>
 	          ins.getFieldValueSet("[|java:lang:StringBuilder.value|]") match{
@@ -388,8 +390,8 @@ trait JavaObjectModel[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	              require(vs.isStringInstanceType)
 	              vs.instances.foreach{
 					        strIns =>
-					          val sIns = StringInstance("[|java:lang:String|]", ipN.getContext.copy, k_string)
-					          val strs = strIns.asInstanceOf[StringInstance].getStrings
+					          val sIns = OFAStringInstance("[|java:lang:String|]", ipN.getContext.copy, k_string)
+					          val strs = strIns.asInstanceOf[OFAStringInstance].getStrings
 					          sIns.setStrings(strs, ipN.getContext)
 					          insts += sIns
 					      }

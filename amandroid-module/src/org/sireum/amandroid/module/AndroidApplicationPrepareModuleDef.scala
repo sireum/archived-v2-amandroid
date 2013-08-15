@@ -2,7 +2,7 @@ package org.sireum.amandroid.module
 
 import org.sireum.pipeline.PipelineJob
 import org.sireum.pipeline.PipelineJobModuleInfo
-import org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp
+import org.sireum.amandroid.appInfo.PrepareApp
 
 class AndroidApplicationPrepareModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends AndroidApplicationPrepareModule {
   val pre = new PrepareApp(apkFileLocation)

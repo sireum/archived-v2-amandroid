@@ -1,4 +1,4 @@
-package org.sireum.amandroid.androidObjectFlowAnalysis
+package org.sireum.amandroid.appInfo
 
 import org.sireum.util._
 import org.sireum.amandroid.parser.LayoutControl
@@ -167,80 +167,80 @@ class PrepareApp(apkFileLocation : String) {
 		  println("arscstring-->" + ARSCFileParser.getGlobalStringPool)
 		  println("arscpackage-->" + ARSCFileParser.getPackages)
 		}
-	  val callGraph:CallGraph = new CallGraphBuilder(libInfoTables)
-	  psts.foreach(pst => callGraph.getCallGraph(Left(pst)))
-	  //println("procs =")
-	  //psts.foreach(pst => println(pst.procedureUri))
-	  
-		// Collect the callback interfaces implemented in the app's source code
-		val analysisHelper = new CallBackInfoCollector(this.entrypoints, callGraph, cfgRdaMap, libInfoTables) 
-		analysisHelper.collectCallbackMethods()
-//		this.callbackMethods = analysisHelper.getCallbackMethods
-//		println("LayoutClasses --> " + analysisHelper.getLayoutClasses)
-		
-		// Find the user-defined sources in the layout XML files
-		LayoutFileParser.androidLibInfoTables = this.libInfoTables
-		LayoutFileParser.setPackageName(this.appPackageName)
-		LayoutFileParser.parseLayoutFile(apkFileLocation, this.entrypoints)
-		if(DEBUG){
-			println("layoutcalll--->" + LayoutFileParser.getCallbackMethods)
-		  println("layoutuser--->" + LayoutFileParser.getUserControls)
-		}
-
-		// Collect the results of the soot-based phases
-		analysisHelper.getCallbackMethods.foreach {
-	    case(k, v) =>
-  			if (this.callbackMethods.contains(k))
-  				this.callbackMethods(k) ++= (v)
-  			else
-  				this.callbackMethods += (k -> v)
-		}
-		this.layoutControls = LayoutFileParser.getUserControls
+//	  val callGraph : CallGraph = new CallGraphBuilder(libInfoTables)
+//	  psts.foreach(pst => callGraph.getCallGraph(Left(pst)))
+//	  //println("procs =")
+//	  //psts.foreach(pst => println(pst.procedureUri))
+//	  
+//		// Collect the callback interfaces implemented in the app's source code
+//		val analysisHelper = new CallBackInfoCollector(this.entrypoints, callGraph, cfgRdaMap, libInfoTables) 
+//		analysisHelper.collectCallbackMethods()
+////		this.callbackMethods = analysisHelper.getCallbackMethods
+////		println("LayoutClasses --> " + analysisHelper.getLayoutClasses)
 //		
-//		// Collect the XML-based callback methods
-		analysisHelper.getLayoutClasses.foreach {
-		  case (k, v) =>
-		    v.foreach {
-		      i =>
-		        val resource = ARSCFileParser.findResource(i)
-		        println("i = " + i + "\nresource = " + resource + "\n")
-		        if(resource.isInstanceOf[StringResource]){
-		          val strRes = resource.asInstanceOf[StringResource]
-		          if(LayoutFileParser.getCallbackMethods.contains(strRes.value)){
-		            LayoutFileParser.getCallbackMethods(strRes.value).foreach{
-		              methodName =>
-		                val methods = this.callbackMethods.getOrElse(k, msetEmpty)
-		                if(methods.isEmpty){
-		                  this.callbackMethods += (k -> methods)
-		                }
-		                
-		                //The callback may be declared directly in the class or in one of the superclasses
-		                var callbackRecordUri : ResourceUri = k
-		                var callbackProcedureUri : ResourceUri = null
-		                while(callbackProcedureUri == null && callbackRecordUri != null){
-		                  val declMethods = libInfoTables.getProcedureUrisByRecordUri(callbackRecordUri)
-		                  declMethods.foreach{
-		                    m =>
-		                      if(m.contains(methodName)){
-		                        callbackProcedureUri = m
-		                      }
-		                  }
-		                  if(callbackProcedureUri == null) callbackRecordUri = libInfoTables.getSuperClassOf(callbackRecordUri)
-		                }
-		                if(callbackRecordUri != null){
-		                  methods += callbackProcedureUri
-		                  println("methods--->" + methods)
-		                } else {
-		                  System.err.println("Callback method " + methodName + " not found in class " + k);
-		                }
-		            }
-		          }
-		        } else {
-		          System.err.println("Unexpected resource type for layout class")
-		        }
-		    }
-		}
-		println("Found " + this.callbackMethods.size + " callback methods")
+//		// Find the user-defined sources in the layout XML files
+//		LayoutFileParser.androidLibInfoTables = this.libInfoTables
+//		LayoutFileParser.setPackageName(this.appPackageName)
+//		LayoutFileParser.parseLayoutFile(apkFileLocation, this.entrypoints)
+//		if(DEBUG){
+//			println("layoutcalll--->" + LayoutFileParser.getCallbackMethods)
+//		  println("layoutuser--->" + LayoutFileParser.getUserControls)
+//		}
+//
+//		// Collect the results of the soot-based phases
+//		analysisHelper.getCallbackMethods.foreach {
+//	    case(k, v) =>
+//  			if (this.callbackMethods.contains(k))
+//  				this.callbackMethods(k) ++= (v)
+//  			else
+//  				this.callbackMethods += (k -> v)
+//		}
+//		this.layoutControls = LayoutFileParser.getUserControls
+////		
+////		// Collect the XML-based callback methods
+//		analysisHelper.getLayoutClasses.foreach {
+//		  case (k, v) =>
+//		    v.foreach {
+//		      i =>
+//		        val resource = ARSCFileParser.findResource(i)
+//		        println("i = " + i + "\nresource = " + resource + "\n")
+//		        if(resource.isInstanceOf[StringResource]){
+//		          val strRes = resource.asInstanceOf[StringResource]
+//		          if(LayoutFileParser.getCallbackMethods.contains(strRes.value)){
+//		            LayoutFileParser.getCallbackMethods(strRes.value).foreach{
+//		              methodName =>
+//		                val methods = this.callbackMethods.getOrElse(k, msetEmpty)
+//		                if(methods.isEmpty){
+//		                  this.callbackMethods += (k -> methods)
+//		                }
+//		                
+//		                //The callback may be declared directly in the class or in one of the superclasses
+//		                var callbackRecordUri : ResourceUri = k
+//		                var callbackProcedureUri : ResourceUri = null
+//		                while(callbackProcedureUri == null && callbackRecordUri != null){
+//		                  val declMethods = libInfoTables.getProcedureUrisByRecordUri(callbackRecordUri)
+//		                  declMethods.foreach{
+//		                    m =>
+//		                      if(m.contains(methodName)){
+//		                        callbackProcedureUri = m
+//		                      }
+//		                  }
+//		                  if(callbackProcedureUri == null) callbackRecordUri = libInfoTables.getSuperClassOf(callbackRecordUri)
+//		                }
+//		                if(callbackRecordUri != null){
+//		                  methods += callbackProcedureUri
+//		                  println("methods--->" + methods)
+//		                } else {
+//		                  System.err.println("Callback method " + methodName + " not found in class " + k);
+//		                }
+//		            }
+//		          }
+//		        } else {
+//		          System.err.println("Unexpected resource type for layout class")
+//		        }
+//		    }
+//		}
+//		println("Found " + this.callbackMethods.size + " callback methods")
 		// filter the main component of this app
     this.mainComponent = filterMainComponent(ManifestParser.getIntentDB)
     var codeLineCounter : Int = 0

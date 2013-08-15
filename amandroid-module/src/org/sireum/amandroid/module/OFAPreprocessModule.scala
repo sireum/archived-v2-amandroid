@@ -123,33 +123,6 @@ object OFAPreprocessModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'cfg'")       
     }
-    var _androidLibInfoTables : scala.Option[AnyRef] = None
-    var _androidLibInfoTablesKey : scala.Option[String] = None
-
-    val keylistandroidLibInfoTables = List(OFAPreprocessModule.globalAndroidLibInfoTablesKey)
-    keylistandroidLibInfoTables.foreach(key => 
-      if(job ? key) { 
-        if(_androidLibInfoTables.isEmpty) {
-          _androidLibInfoTables = Some(job(key))
-          _androidLibInfoTablesKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _androidLibInfoTables.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'androidLibInfoTables' keys '" + _androidLibInfoTablesKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _androidLibInfoTables match{
-      case Some(x) =>
-        if(!x.isInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'androidLibInfoTables'.  Expecting 'org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'androidLibInfoTables'")       
-    }
     var _rda : scala.Option[AnyRef] = None
     var _rdaKey : scala.Option[String] = None
 
@@ -176,6 +149,33 @@ object OFAPreprocessModule extends PipelineModule {
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'rda'")       
+    }
+    var _androidLibInfoTables : scala.Option[AnyRef] = None
+    var _androidLibInfoTablesKey : scala.Option[String] = None
+
+    val keylistandroidLibInfoTables = List(OFAPreprocessModule.globalAndroidLibInfoTablesKey)
+    keylistandroidLibInfoTables.foreach(key => 
+      if(job ? key) { 
+        if(_androidLibInfoTables.isEmpty) {
+          _androidLibInfoTables = Some(job(key))
+          _androidLibInfoTablesKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _androidLibInfoTables.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'androidLibInfoTables' keys '" + _androidLibInfoTablesKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _androidLibInfoTables match{
+      case Some(x) =>
+        if(!x.isInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'androidLibInfoTables'.  Expecting 'org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'androidLibInfoTables'")       
     }
     return tags
   }
@@ -238,21 +238,6 @@ object OFAPreprocessModule extends PipelineModule {
     return options
   }
 
-  def getAndroidLibInfoTables (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = {
-    if (options.contains(OFAPreprocessModule.globalAndroidLibInfoTablesKey)) {
-       return options(OFAPreprocessModule.globalAndroidLibInfoTablesKey).asInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setAndroidLibInfoTables (options : MMap[Property.Key, Any], androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables) : MMap[Property.Key, Any] = {
-
-    options(OFAPreprocessModule.globalAndroidLibInfoTablesKey) = androidLibInfoTables
-
-    return options
-  }
-
   def getRda (options : scala.collection.Map[Property.Key, Any]) : org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]] = {
     if (options.contains(OFAPreprocessModule.globalRdaKey)) {
        return options(OFAPreprocessModule.globalRdaKey).asInstanceOf[org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]]
@@ -271,6 +256,21 @@ object OFAPreprocessModule extends PipelineModule {
 
     options(OFAPreprocessModule.globalRdaKey) = rda
     options(rdaKey) = rda
+
+    return options
+  }
+
+  def getAndroidLibInfoTables (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = {
+    if (options.contains(OFAPreprocessModule.globalAndroidLibInfoTablesKey)) {
+       return options(OFAPreprocessModule.globalAndroidLibInfoTablesKey).asInstanceOf[org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setAndroidLibInfoTables (options : MMap[Property.Key, Any], androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables) : MMap[Property.Key, Any] = {
+
+    options(OFAPreprocessModule.globalAndroidLibInfoTablesKey) = androidLibInfoTables
 
     return options
   }
@@ -298,8 +298,8 @@ object OFAPreprocessModule extends PipelineModule {
     implicit class OFAPreprocessModuleConsumerView (val job : PropertyProvider) extends AnyVal {
       def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = OFAPreprocessModule.getProcedureSymbolTable(job.propertyMap)
       def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = OFAPreprocessModule.getCfg(job.propertyMap)
-      def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = OFAPreprocessModule.getAndroidLibInfoTables(job.propertyMap)
       def rda : org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]] = OFAPreprocessModule.getRda(job.propertyMap)
+      def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = OFAPreprocessModule.getAndroidLibInfoTables(job.propertyMap)
       def OFG : org.sireum.amandroid.androidObjectFlowAnalysis.AndroidObjectFlowGraph[org.sireum.amandroid.objectFlowAnalysis.OfaNode, org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet] = OFAPreprocessModule.getOFG(job.propertyMap)
     }
   }
@@ -313,11 +313,11 @@ object OFAPreprocessModule extends PipelineModule {
       def cfg_=(cfg : org.sireum.alir.ControlFlowGraph[java.lang.String]) { OFAPreprocessModule.setCfg(job.propertyMap, cfg) }
       def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = OFAPreprocessModule.getCfg(job.propertyMap)
 
-      def androidLibInfoTables_=(androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables) { OFAPreprocessModule.setAndroidLibInfoTables(job.propertyMap, androidLibInfoTables) }
-      def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = OFAPreprocessModule.getAndroidLibInfoTables(job.propertyMap)
-
       def rda_=(rda : org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]) { OFAPreprocessModule.setRda(job.propertyMap, rda) }
       def rda : org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]] = OFAPreprocessModule.getRda(job.propertyMap)
+
+      def androidLibInfoTables_=(androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables) { OFAPreprocessModule.setAndroidLibInfoTables(job.propertyMap, androidLibInfoTables) }
+      def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = OFAPreprocessModule.getAndroidLibInfoTables(job.propertyMap)
 
       def OFG_=(OFG : org.sireum.amandroid.androidObjectFlowAnalysis.AndroidObjectFlowGraph[org.sireum.amandroid.objectFlowAnalysis.OfaNode, org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet]) { OFAPreprocessModule.setOFG(job.propertyMap, OFG) }
       def OFG : org.sireum.amandroid.androidObjectFlowAnalysis.AndroidObjectFlowGraph[org.sireum.amandroid.objectFlowAnalysis.OfaNode, org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet] = OFAPreprocessModule.getOFG(job.propertyMap)
@@ -332,9 +332,9 @@ trait OFAPreprocessModule {
 
   def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = OFAPreprocessModule.getCfg(job.propertyMap)
 
-  def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = OFAPreprocessModule.getAndroidLibInfoTables(job.propertyMap)
-
   def rda : org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]] = OFAPreprocessModule.getRda(job.propertyMap)
+
+  def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = OFAPreprocessModule.getAndroidLibInfoTables(job.propertyMap)
 
 
   def OFG_=(OFG : org.sireum.amandroid.androidObjectFlowAnalysis.AndroidObjectFlowGraph[org.sireum.amandroid.objectFlowAnalysis.OfaNode, org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet]) { OFAPreprocessModule.setOFG(job.propertyMap, OFG) }

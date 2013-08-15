@@ -6,15 +6,16 @@ import org.sireum.pipeline.gen.ModuleGenerator
 import org.sireum.util._
 import org.sireum.core.module.AlirIntraProcedural
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
-import org.sireum.amandroid.scfg.{CompressedControlFlowGraph, SystemControlFlowGraph}
+import org.sireum.amandroid.scfg.SuperControlFlowGraph
 import org.sireum.pilar.ast.{LocationDecl, CatchClause}
 import org.sireum.amandroid.cache.AndroidCacheFile
 import org.sireum.alir._
 import org.sireum.pilar.symbol._
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidObjectFlowGraph
 import org.sireum.amandroid.objectFlowAnalysis.OfaNode
-import org.sireum.amandroid.androidObjectFlowAnalysis.PrepareApp
+import org.sireum.amandroid.appInfo.PrepareApp
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet
+import org.sireum.amandroid.callGraph.CallGraph
 
 /*
 Copyright (c) 2012-2013 Sankardas Roy & Fengguo Wei, Kansas State University.        
@@ -26,10 +27,10 @@ http://www.eclipse.org/legal/epl-v10.html
 
 object AndroidInterProcedural {
   type VirtualLabel = String
-  type OfaSCfg = (AndroidObjectFlowGraph[OfaNode, AndroidValueSet], SystemControlFlowGraph[String])
+  type CG = CallGraph[String]
     
   final case class AndroidInterAnalysisResult(
-    ofaScfg : AndroidInterProcedural.OfaSCfg)
+    callGraph : AndroidInterProcedural.CG)
         
 }
 
@@ -71,7 +72,7 @@ case class AndroidInterProcedural(
 )
  
 
-case class OfaSCfg(
+case class CG(
   title : String = "System Control Flow Graph with OFA Builder",
 
   @Input
@@ -82,10 +83,7 @@ case class OfaSCfg(
   
   @Input 
   rdas : MMap[ResourceUri, ReachingDefinitionAnalysis.Result],
-  
-  @Input 
-  cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]],
-  
+    
   @Input
   procedureSymbolTables : Seq[ProcedureSymbolTable],
 
@@ -98,7 +96,7 @@ case class OfaSCfg(
   // for test now. Later will change it.
   @Output
   @Produce
-  OFAsCfg : AndroidInterProcedural.OfaSCfg)
+  callGraph : AndroidInterProcedural.CG)
   
   
 /**
@@ -110,7 +108,7 @@ object AndroidInterProceduralModuleBuild {
     val opt = PipelineMode()
     opt.classNames = Array(      
         AndroidInterProcedural.getClass().getName().dropRight(1),
-        OfaSCfg.getClass().getName().dropRight(1)
+        CG.getClass().getName().dropRight(1)
         )
     opt.dir = "./src/org/sireum/amandroid/module"
     opt.genClassName = "AndroidInterProceduralModuleCore"

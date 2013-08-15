@@ -1,4 +1,4 @@
-package org.sireum.amandroid.objectFlowAnalysis
+package org.sireum.amandroid.contextProvider
 
 import org.sireum.util._
 
@@ -36,5 +36,15 @@ class Context(var k : Int){
     else false
   }
   override def hashCode() = if (this.callStack == null) 0 else this.callStack.hashCode
-  override def toString = this.callStack.toString
+  override def toString = {
+    var string = ""
+    this.callStack.foreach{
+      case(uri, str) =>
+        if(str.contains("%7C%5D"))
+          string += "(" + uri.substring(uri.lastIndexOf(".") + 1, uri.lastIndexOf("%7C%5D")) + "," + str.substring(str.lastIndexOf(".") + 1, str.lastIndexOf("%7C%5D")) + ")"
+        else
+          string += "(" + uri.substring(uri.lastIndexOf(".") + 1, uri.lastIndexOf("%7C%5D")) + "," + str + ")"
+    }
+    string
+  }
 }

@@ -9,7 +9,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-tools"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-symbol"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-alir"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-systemControlFlowGraph"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-interProceduralAnalysis"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-xml"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-module"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-util"/>

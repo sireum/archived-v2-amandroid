@@ -1,41 +1,16 @@
 package org.sireum.amandroid.androidObjectFlowAnalysis
+
 import org.sireum.amandroid.interComponentCommunication.InterComponentCommunicationModel
 import org.sireum.util._
 import org.sireum.amandroid.objectFlowAnalysis._
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.alir.ReachingDefinitionAnalysis
+import org.sireum.amandroid.programPoints._
+import org.sireum.amandroid.contextProvider.Context
 
 class AndroidObjectFlowGraph[Node <: OfaNode, ValueSet <: AndroidValueSet](fac: () => ValueSet) 
   extends ObjectFlowGraph[Node, ValueSet](fac)
   with InterComponentCommunicationModel[Node, ValueSet]{
-  
-  /**
-   * combine special ofg into current ofg. (just combine proc point and relevant node)
-   */ 
-  def collectTrackerNodes(sig : String, pi : PointI, callerContext : Context) = {
-    val recvCallNodeOpt =
-      pi.recvOpt_Call match{
-       	case Some(r) =>
-	        Some(getNode(r, callerContext))
-	      case None =>
-	        None
-    	}
-    val recvReturnNodeOpt = 
-      pi.recvOpt_Return match{
-       	case Some(r) =>
-	        Some(getNode(r, callerContext))
-	      case None =>
-	        None
-    	}
-    val invokeNodeOpt = if(invokeNodeExists(pi.varName, pi.locationUri, callerContext, pi)) Some(getNode(pi, callerContext)) else None
-    val argCallNodes = pi.args_Call.map{case (l, p) => (l, getNode(p, callerContext))}.toMap
-    val argReturnNodes = pi.args_Return.map{case (l, p) => (l, getNode(p, callerContext))}.toMap
-    val ipN = InvokePointNode[Node](recvCallNodeOpt, recvReturnNodeOpt, argCallNodes, argReturnNodes, invokeNodeOpt, pi)
-    ipN.setCalleeSig(sig)
-    ipN.setContext(callerContext)
-	  modelOperationTracker += (ipN)
-    ipN
-  }
   
   
   /**

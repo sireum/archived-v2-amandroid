@@ -5,7 +5,7 @@ import org.sireum.pipeline.PipelineJobModuleInfo
 import org.sireum.pipeline.PipelineStage
 import org.sireum.pipeline.PipelineConfiguration
 import org.sireum.util._
-import org.sireum.amandroid.scfg.SystemControlFlowGraph
+import org.sireum.amandroid.scfg.SuperControlFlowGraph
 import org.sireum.pipeline.ErrorneousModulesThrowable
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.amandroid.scfg.CompressedControlFlowGraph
@@ -14,6 +14,8 @@ import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidObjectFlowGraph
 import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidOfgAndScfgBuilder
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet
+import org.sireum.amandroid.callGraph.CallGraph
+import org.sireum.amandroid.callGraph.CallGraphBuilder
 
 class AndroidInterProceduralModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) 
 extends AndroidInterProceduralModule with ImplicitLogging {
@@ -49,13 +51,12 @@ extends AndroidInterProceduralModule with ImplicitLogging {
     val j = PipelineJob()
     val options = j.properties
     if(this.shouldBuildOFAsCfg) {
-      OfaSCfgModule.setAndroidCache(options, aCache)
-      OfaSCfgModule.setAndroidLibInfoTables(options, alit)
-      OfaSCfgModule.setCfgs(options, cfgs)
-      OfaSCfgModule.setCCfgs(options, cCfgs)
-      OfaSCfgModule.setProcedureSymbolTables(options, psts)
-      OfaSCfgModule.setRdas(options, rdas)
-      OfaSCfgModule.setAppInfoOpt(options, this.appInfoOpt)
+      CGModule.setAndroidCache(options, aCache)
+      CGModule.setAndroidLibInfoTables(options, alit)
+      CGModule.setCfgs(options, cfgs)
+      CGModule.setProcedureSymbolTables(options, psts)
+      CGModule.setRdas(options, rdas)
+      CGModule.setAppInfoOpt(options, this.appInfoOpt)
       
       interPipeline.compute(j)
       info.hasError = j.hasError
@@ -64,9 +65,9 @@ extends AndroidInterProceduralModule with ImplicitLogging {
           j.lastStageInfo.info.filter { i => i.hasError }))
       }
 //      println(Tag.collateAsString(j.lastStageInfo.tags))
-      val ofaScfg = OfaSCfgModule.getOFAsCfg(options)
+      val cg = CGModule.getCallGraph(options)
       this.interResult_=(AndroidInterProcedural.AndroidInterAnalysisResult(
-        ofaScfg
+        cg
       ))
     }
   }
@@ -79,19 +80,19 @@ extends AndroidInterProceduralModule with ImplicitLogging {
     val stages = marrayEmpty[PipelineStage]
     
     if (this.shouldBuildOFAsCfg) 
-      stages += PipelineStage("OFASCFG Building", false, OfaSCfgModule)
+      stages += PipelineStage("CallGraph Building", false, CGModule)
       
     PipelineConfiguration("Android Interprocedural Analysis Pipeline",
       false, stages : _*)
   }
 }
 
-class OfaSCfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends OfaSCfgModule {
-  var result : (AndroidObjectFlowGraph[OfaNode, AndroidValueSet], SystemControlFlowGraph[String]) = null
+class CGModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends CGModule {
+  var result : CallGraph[String] = null
   this.androidCache match{
     case Some(ac) =>
-      result = new AndroidOfgAndScfgBuilder[OfaNode, AndroidValueSet, String]({() => new AndroidValueSet}).apply(this.procedureSymbolTables, this.cfgs, this.rdas, this.cCfgs, this.androidLibInfoTables, this.appInfoOpt, ac)
+      result = new CallGraphBuilder().apply(this.procedureSymbolTables, this.cfgs, this.rdas, this.androidLibInfoTables, this.appInfoOpt, ac)
     case None =>
   }
-  this.OFAsCfg_=(result)
+  this.callGraph_=(result)
 }

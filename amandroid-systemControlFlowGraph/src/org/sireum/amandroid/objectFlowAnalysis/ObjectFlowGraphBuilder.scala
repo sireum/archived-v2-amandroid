@@ -11,6 +11,7 @@ import org.sireum.amandroid.cache.AndroidCacheFile
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
+import org.sireum.amandroid.programPoints._
 
 abstract class ObjectFlowGraphBuilder[Node <: OfaNode, ValueSet <: NormalValueSet] {
 

@@ -1,4 +1,4 @@
-package org.sireum.amandroid.androidObjectFlowAnalysis
+package org.sireum.amandroid.appInfo
 
 import org.sireum.util.ResourceUri
 import org.sireum.amandroid.callGraph.CallGraph
@@ -26,7 +26,7 @@ import org.sireum.pilar.ast.LiteralType
  *
  */
 class CallBackInfoCollector(entryPointClasses:Set[ResourceUri], 
-                            callGraph: CallGraph,
+                            callGraph: CallGraph[String],
                             cfgRdaMap : Map[String, (ControlFlowGraph[String],ReachingDefinitionAnalysis.Result)],
                             androidLibInfoTable : AndroidLibInfoTables) {
     

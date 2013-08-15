@@ -1,138 +1,93 @@
-package org.sireum.amandroid.objectFlowAnalysis
+package org.sireum.amandroid.pointsToAnalysis
 
 import org.sireum.util._
 import org.sireum.alir._
 import org.sireum.amandroid.programPoints._
 
-trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSet]{
+trait PAGConstraint{
   
   val points : MList[Point] = mlistEmpty
+  
+  object EdgeType extends Enumeration {
+		val ALLOCATION, ASSIGNMENT, FIELD_STORE, FIELD_LOAD, TRANSFER = Value
+	}
   
   def applyConstraint(p : Point,
                       ps : MList[Point],
                       cfg : ControlFlowGraph[String],
                       rda : ReachingDefinitionAnalysis.Result) 
-                      : MMap[Point, MSet[Point]] = {
+                      : MMap[EdgeType.Value, MMap[Point, MSet[Point]]] = {
     //contains the edge list related to point p
-    val flowMap : MMap[Point, MSet[Point]] = mmapEmpty
+    val flowMap : MMap[EdgeType.Value, MMap[Point, MSet[Point]]] = mmapEmpty
     p match {
       case asmtP : PointAsmt =>
         val lhs = asmtP.lhs
         val rhs = asmtP.rhs
-        flowMap.getOrElseUpdate(rhs, msetEmpty) += lhs
         lhs match {
           case pfl : PointFieldL =>
-            if(fieldVarRepo.contains(pfl.basePoint.toString)){
-              udChain(pfl.basePoint, ps, cfg, rda).foreach(
-                point => {
-                  flowMap.getOrElseUpdate(pfl.basePoint, msetEmpty) += point
-                  flowMap.getOrElseUpdate(point, msetEmpty) += pfl.basePoint
-                }
-              )
-            } else {
-	            udChain(pfl.basePoint, ps, cfg, rda).foreach(
-	              point => {
-	                flowMap.getOrElseUpdate(point, msetEmpty) += pfl.basePoint
-	              }
-	            )
+            flowMap.getOrElseUpdate(EdgeType.FIELD_STORE, mmapEmpty).getOrElseUpdate(rhs, msetEmpty) += pfl
+            udChain(pfl.basePoint, ps, cfg, rda).foreach(
+              point => {
+                flowMap.getOrElseUpdate(EdgeType.TRANSFER, mmapEmpty).getOrElseUpdate(point, msetEmpty) += pfl.basePoint
+              }
+            )
+            rhs match {
+		          case pr : PointR =>
+		            udChain(pr, ps, cfg, rda).foreach(
+		              point => {
+		                flowMap.getOrElseUpdate(EdgeType.TRANSFER, mmapEmpty).getOrElseUpdate(point, msetEmpty) += pr
+		              }
+		            )
+		          case _ =>
             }
           //if an array point in lhs, then have flow from this array point to most recent array var shadowing place
-          case pal : PointArrayL =>
-            if(arrayRepo.contains(pal.toString) || fieldVarRepo.contains(pal.toString)){
-              udChain(pal, ps, cfg, rda).foreach(
-                point => {
-                  flowMap.getOrElseUpdate(pal, msetEmpty) += point
-                  flowMap.getOrElseUpdate(point, msetEmpty) += pal
-                }
-              )
-            } else {
-              udChain(pal, ps, cfg, rda).foreach(
-                point => {
-                  flowMap.getOrElseUpdate(pal, msetEmpty) += point
-                }
-              )
-            }
+//          case pal : PointArrayL =>
+//            udChain(pal, ps, cfg, rda).foreach(
+//              point => {
+//                flowMap.getOrElseUpdate(pal, msetEmpty) += point
+//              }
+//            )
           case _ =>
+            rhs match {
+		          case pfr : PointFieldR =>
+		            flowMap.getOrElseUpdate(EdgeType.FIELD_LOAD, mmapEmpty).getOrElseUpdate(pfr, msetEmpty) += lhs
+		            udChain(pfr.basePoint, ps, cfg, rda).foreach(
+		              point => {
+		                flowMap.getOrElseUpdate(EdgeType.TRANSFER, mmapEmpty).getOrElseUpdate(point, msetEmpty) += pfr.basePoint
+		              }
+		            )
+		          case po : PointO =>
+		            flowMap.getOrElseUpdate(EdgeType.ALLOCATION, mmapEmpty).getOrElseUpdate(rhs, msetEmpty) += lhs
+		          case pi : PointI =>
+		            flowMap.getOrElseUpdate(EdgeType.ASSIGNMENT, mmapEmpty).getOrElseUpdate(rhs, msetEmpty) += lhs
+		          case pr : PointR =>
+		            flowMap.getOrElseUpdate(EdgeType.ASSIGNMENT, mmapEmpty).getOrElseUpdate(pr, msetEmpty) += lhs
+		            udChain(pr, ps, cfg, rda, true).foreach(
+		              point => {
+		                flowMap.getOrElseUpdate(EdgeType.TRANSFER, mmapEmpty).getOrElseUpdate(point, msetEmpty) += pr
+		              }
+		            )
+		        }
         }
-        rhs match {
-          case pgar : PointGlobalArrayR =>
-            flowMap.getOrElseUpdate(lhs, msetEmpty) += pgar
-          case pfr : PointFieldR =>
-            flowMap.getOrElseUpdate(lhs, msetEmpty) += pfr
-            udChain(pfr.basePoint, ps, cfg, rda).foreach(
-              point => {
-                flowMap.getOrElseUpdate(pfr.basePoint, msetEmpty) += point
-                flowMap.getOrElseUpdate(point, msetEmpty) += pfr.basePoint
-              }
-            )
-          case par : PointArrayR =>
-            udChain(par, ps, cfg, rda).foreach(
-              point => {
-                flowMap.getOrElseUpdate(point, msetEmpty) += par
-                flowMap.getOrElseUpdate(par, msetEmpty) += point
-              }
-            )
-            flowMap.getOrElseUpdate(lhs, msetEmpty) += par
-          case po : PointO =>
-          case pao : PointArrayO =>
-          case pi : PointI =>
-          case pr : PointR =>
-            if(arrayRepo.contains(pr.toString) || fieldVarRepo.contains(pr.toString)){
-              flowMap.getOrElseUpdate(lhs, msetEmpty) += pr
-              udChain(pr, ps, cfg, rda).foreach(
-                point => {
-                  flowMap.getOrElseUpdate(point, msetEmpty) += pr
-                  flowMap.getOrElseUpdate(pr, msetEmpty) += point
-                }
-              )
-            } else {
-              udChain(pr, ps, cfg, rda, true).foreach(
-                point => {
-                  flowMap.getOrElseUpdate(point, msetEmpty) += pr
-                }
-              )
-            }
-        } 
+         
       case pi : PointI =>
         if(!pi.typ.equals("static")){
           val recvP_Call = pi.recvOpt_Call.get
-          if(arrayRepo.contains(recvP_Call.toString) || fieldVarRepo.contains(recvP_Call.toString)){
-            udChain(recvP_Call, ps, cfg, rda, true).foreach(
-              point => {
-                flowMap.getOrElseUpdate(point, msetEmpty) += recvP_Call
-                flowMap.getOrElseUpdate(pi.recvOpt_Return.get, msetEmpty) += point
-              }
-            )
-            flowMap.getOrElseUpdate(recvP_Call, msetEmpty) += pi.recvOpt_Return.get
-            flowMap.getOrElseUpdate(pi.recvOpt_Return.get, msetEmpty) += recvP_Call
-          } else {
-	          udChain(recvP_Call, ps, cfg, rda, true).foreach(
-	            point => {
-	              flowMap.getOrElseUpdate(point, msetEmpty) += recvP_Call
-	            }
-	          )
-	          flowMap.getOrElseUpdate(recvP_Call, msetEmpty) += pi.recvOpt_Return.get
-          }
+          udChain(recvP_Call, ps, cfg, rda, true).foreach(
+            point => {
+              flowMap.getOrElseUpdate(EdgeType.TRANSFER, mmapEmpty).getOrElseUpdate(point, msetEmpty) += recvP_Call
+            }
+          )
+          flowMap.getOrElseUpdate(EdgeType.TRANSFER, mmapEmpty).getOrElseUpdate(recvP_Call, msetEmpty) += pi.recvOpt_Return.get
         }
         pi.args_Call.keys.foreach(
           i => {
-            if(arrayRepo.contains(pi.args_Call(i).toString) || fieldVarRepo.contains(pi.args_Call(i).toString)){
-              udChain(pi.args_Call(i), ps, cfg, rda, true).foreach(
-                point => {
-                  flowMap.getOrElseUpdate(point, msetEmpty) += pi.args_Call(i)
-                  flowMap.getOrElseUpdate(pi.args_Return(i), msetEmpty) += point
-                }
-              )
-              flowMap.getOrElseUpdate(pi.args_Call(i), msetEmpty) += pi.args_Return(i)
-              flowMap.getOrElseUpdate(pi.args_Return(i), msetEmpty) += pi.args_Call(i)
-            } else {
-              udChain(pi.args_Call(i), ps, cfg, rda, true).foreach(
-                point => {
-                  flowMap.getOrElseUpdate(point, msetEmpty) += pi.args_Call(i)
-                }
-              )
-              flowMap.getOrElseUpdate(pi.args_Call(i), msetEmpty) += pi.args_Return(i)
-            }
+            udChain(pi.args_Call(i), ps, cfg, rda, true).foreach(
+              point => {
+                flowMap.getOrElseUpdate(EdgeType.TRANSFER, mmapEmpty).getOrElseUpdate(point, msetEmpty) += pi.args_Call(i)
+              }
+            )
+            flowMap.getOrElseUpdate(EdgeType.TRANSFER, mmapEmpty).getOrElseUpdate(pi.args_Call(i), msetEmpty) += pi.args_Return(i)
           }  
         )
       case procP : PointProc =>
@@ -142,7 +97,7 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
           case Some(t_exit) =>
             udChainForProcExit(t_exit, ps, cfg, rda, true).foreach{
               point =>{
-                flowMap.getOrElseUpdate(point, msetEmpty) += t_exit
+                flowMap.getOrElseUpdate(EdgeType.TRANSFER, mmapEmpty).getOrElseUpdate(point, msetEmpty) += t_exit
               }
             }
           case None =>
@@ -151,17 +106,17 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
           case (i, p_exit) =>
             udChainForProcExit(p_exit, ps, cfg, rda, true).foreach{
               point =>{
-                flowMap.getOrElseUpdate(point, msetEmpty) += p_exit
+                flowMap.getOrElseUpdate(EdgeType.TRANSFER, mmapEmpty).getOrElseUpdate(point, msetEmpty) += p_exit
               }
             }
         }
       case retP : PointRet =>
         retP.procPoint.retVar match{
           case Some(rev) =>
-            flowMap.getOrElseUpdate(retP, msetEmpty) += rev
+            flowMap.getOrElseUpdate(EdgeType.TRANSFER, mmapEmpty).getOrElseUpdate(retP, msetEmpty) += rev
             udChain(retP, ps, cfg, rda, true).foreach(
               point => {
-                flowMap.getOrElseUpdate(point, msetEmpty) += retP
+                flowMap.getOrElseUpdate(EdgeType.TRANSFER, mmapEmpty).getOrElseUpdate(point, msetEmpty) += retP
               }
             )
           case None =>
@@ -198,55 +153,6 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
     val slots = rda.entrySet(cfg.getNode(Some(p.locationUri), p.locationIndex))
     searchRda(p, slots, avoidMode)
   }
-  
-//  def searchRdaUntilFind(p : PointWithUri,
-//      								 slots : ISet[(Slot, DefDesc)],
-//      								 cfg : ControlFlowGraph[String],
-//      								 rda : ReachingDefinitionAnalysis.Result,
-//      								 rdaStack : MList[DefDesc],
-//      								 avoidMode : Boolean) : Set[Point] = {
-//    var ps : Set[Point] = Set()
-//    slots.foreach{
-//      case(slot, defDesc) =>
-//        if(p.varName.equals(slot.toString())){
-//          if(defDesc.toString().equals("*")){
-//            if(!p.varName.startsWith("@@")){
-//              val tp = getPoint(p.varName, points, avoidMode)
-//              if(tp!=null)
-//                ps += tp
-//            }
-//          } else {
-//            defDesc match {
-//              case pdd : ParamDefDesc =>
-//                pdd.locUri match{
-//                  case Some(locU) =>
-//                    val tp = getParamPoint_Return(p.varName, pdd.paramIndex, locU, pdd.locIndex, points, avoidMode)
-//                    if(tp!=null)
-//                      ps += tp
-//                  case None =>
-//                }
-//              case ldd : LocDefDesc =>
-//                if(!rdaStack.contains(ldd)){
-//                  rdaStack += ldd
-//	                ldd.locUri match {
-//	                  case Some(locU) =>
-//	                    val tp = getPoint(p.varName, locU, ldd.locIndex, points, avoidMode)
-//	                    if(tp!=null)
-//	                      ps += tp
-//	                    else {
-//	                      val nextSlots = rda.entrySet(cfg.getNode(ldd.locUri, ldd.locIndex))
-//	                      ps ++= searchRdaUntilFind(p, nextSlots, cfg, rda, rdaStack, avoidMode)
-//	                    }
-//	                  case None =>
-//                  }
-//                }
-//              case _ =>
-//            }
-//          }
-//        }
-//      }
-//    ps
-//  }
   
   def searchRda(p : PointWithUri, slots : ISet[(Slot, DefDesc)], avoidMode : Boolean) : Set[Point] = {
     var ps : Set[Point] = Set()

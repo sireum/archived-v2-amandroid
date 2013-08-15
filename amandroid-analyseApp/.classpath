@@ -14,7 +14,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-tools"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-xml"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-cache"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-systemControlFlowGraph"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-interProceduralAnalysis"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-module"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

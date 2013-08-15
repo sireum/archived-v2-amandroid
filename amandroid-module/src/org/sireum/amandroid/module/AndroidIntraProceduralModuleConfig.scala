@@ -6,7 +6,7 @@ import org.sireum.pipeline.gen.ModuleGenerator
 import org.sireum.util._
 import org.sireum.core.module.AlirIntraProcedural
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
-import org.sireum.amandroid.scfg.{CompressedControlFlowGraph, SystemControlFlowGraph}
+import org.sireum.amandroid.scfg.{CompressedControlFlowGraph, SuperControlFlowGraph}
 import org.sireum.pilar.ast.{LocationDecl, CatchClause}
 import org.sireum.amandroid.cache.AndroidCacheFile
 import org.sireum.alir._

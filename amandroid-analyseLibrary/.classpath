@@ -4,7 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-lib"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-symbol"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-systemControlFlowGraph"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-interProceduralAnalysis"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-alir"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-core-test"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-module"/>

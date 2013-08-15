@@ -6,15 +6,14 @@ import org.sireum.amandroid.util.SignatureParser
 import org.sireum.amandroid.androidConstants.AndroidConstants
 import org.sireum.amandroid.parser.IntentFilterDataBase
 import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowRepo
-import org.sireum.amandroid.objectFlowAnalysis.PointI
 import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph
 import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.parser.Data
 import org.sireum.amandroid.parser.UriData
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet
-import org.sireum.amandroid.objectFlowAnalysis.PointO
-import org.sireum.amandroid.objectFlowAnalysis.Context
+import org.sireum.amandroid.programPoints._
+import org.sireum.amandroid.contextProvider.Context
 
 
 trait InterComponentCommunicationModel[Node <: OfaNode, ValueSet <: AndroidValueSet] extends ObjectFlowGraph[Node, ValueSet] {
@@ -36,9 +35,9 @@ trait InterComponentCommunicationModel[Node <: OfaNode, ValueSet <: AndroidValue
       flag = false
     } else {
       val intentNode = getNode(pi.args_Call(0), context.copy)
-      if(intentNode.getProperty[ValueSet](VALUE_SET).isEmpty){
-  		  flag = false
-  		}
+//      if(intentNode.getProperty[ValueSet](VALUE_SET).isEmpty){
+//  		  flag = false
+//  		}
     }
     flag
   }
