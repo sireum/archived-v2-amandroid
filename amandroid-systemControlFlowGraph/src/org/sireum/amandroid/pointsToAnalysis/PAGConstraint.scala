@@ -9,7 +9,7 @@ trait PAGConstraint{
   val points : MList[Point] = mlistEmpty
   
   object EdgeType extends Enumeration {
-		val ALLOCATION, ASSIGNMENT, FIELD_STORE, FIELD_LOAD, TRANSFER = Value
+		val ALLOCATION, ASSIGNMENT, FIELD_STORE, FIELD_LOAD, ARRAY_STORE, ARRAY_LOAD, GLOBAL_STORE, GLOBAL_LOAD, TRANSFER = Value
 	}
   
   def applyConstraint(p : Point,
@@ -41,12 +41,33 @@ trait PAGConstraint{
 		          case _ =>
             }
           //if an array point in lhs, then have flow from this array point to most recent array var shadowing place
-//          case pal : PointArrayL =>
-//            udChain(pal, ps, cfg, rda).foreach(
-//              point => {
-//                flowMap.getOrElseUpdate(pal, msetEmpty) += point
-//              }
-//            )
+          case pal : PointArrayL =>
+            flowMap.getOrElseUpdate(EdgeType.ARRAY_STORE, mmapEmpty).getOrElseUpdate(rhs, msetEmpty) += pal
+            udChain(pal, ps, cfg, rda).foreach(
+              point => {
+                flowMap.getOrElseUpdate(EdgeType.TRANSFER, mmapEmpty).getOrElseUpdate(point, msetEmpty) += pal
+              }
+            )
+            rhs match {
+		          case pr : PointR =>
+		            udChain(pr, ps, cfg, rda).foreach(
+		              point => {
+		                flowMap.getOrElseUpdate(EdgeType.TRANSFER, mmapEmpty).getOrElseUpdate(point, msetEmpty) += pr
+		              }
+		            )
+		          case _ =>
+            }
+          case pgl : PointGlobalL =>
+            flowMap.getOrElseUpdate(EdgeType.GLOBAL_STORE, mmapEmpty).getOrElseUpdate(rhs, msetEmpty) += pgl
+            rhs match {
+		          case pr : PointR =>
+		            udChain(pr, ps, cfg, rda).foreach(
+		              point => {
+		                flowMap.getOrElseUpdate(EdgeType.TRANSFER, mmapEmpty).getOrElseUpdate(point, msetEmpty) += pr
+		              }
+		            )
+		          case _ =>
+            }
           case _ =>
             rhs match {
 		          case pfr : PointFieldR =>
@@ -56,6 +77,15 @@ trait PAGConstraint{
 		                flowMap.getOrElseUpdate(EdgeType.TRANSFER, mmapEmpty).getOrElseUpdate(point, msetEmpty) += pfr.basePoint
 		              }
 		            )
+		          case par : PointArrayR =>
+		            flowMap.getOrElseUpdate(EdgeType.ARRAY_LOAD, mmapEmpty).getOrElseUpdate(par, msetEmpty) += lhs
+		            udChain(par, ps, cfg, rda).foreach(
+		              point => {
+		                flowMap.getOrElseUpdate(EdgeType.TRANSFER, mmapEmpty).getOrElseUpdate(point, msetEmpty) += par
+		              }
+		            )
+		          case pgr : PointGlobalR =>
+		            flowMap.getOrElseUpdate(EdgeType.GLOBAL_LOAD, mmapEmpty).getOrElseUpdate(pgr, msetEmpty) += lhs
 		          case po : PointO =>
 		            flowMap.getOrElseUpdate(EdgeType.ALLOCATION, mmapEmpty).getOrElseUpdate(rhs, msetEmpty) += lhs
 		          case pi : PointI =>

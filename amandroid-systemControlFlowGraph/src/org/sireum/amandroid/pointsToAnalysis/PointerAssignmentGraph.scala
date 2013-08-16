@@ -37,9 +37,17 @@ class PointsToMap {
   /**
    * e.g. L0: p = q; L1:  r = p; transfer means p@L0 -> p@L1
    */
-  def transferPointsToSet(n1 : PtaNode, n2 : PtaNode) = addInstances(n2, pointsToSet(n1))
+  def transferPointsToSet(n1 : PtaNode, n2 : PtaNode) = {
+    n1 match{
+      case pan : PtaArrayNode =>
+        addInstances(n2, pointsToSetOfArrayBaseNode(pan))
+      case _ =>
+        addInstances(n2, pointsToSet(n1))
+    }
+    
+  }
   /**
-   * n1 -> n2 or n1.f -> n2
+   * n1 -> n2 or n1.f -> n2 or n1[] -> n2
    */
   def propagatePointsToSet(n1 : PtaNode, n2 : PtaNode) = setInstances(n2, pointsToSet(n1))
   /**
@@ -51,18 +59,51 @@ class PointsToMap {
         addInstancesInternal(ins.toString + n2.fieldName.toString, pointsToSet(n1))
     }
   }
+  
+  /**
+   * n1 -> n2[]
+   */
+  def propagateArrayStorePointsToSet(n1 : PtaNode, n2 : PtaArrayNode) = {
+    pointsToSetOfArrayBaseNode(n2) foreach{
+      ins =>
+        addInstancesInternal(ins.toString, pointsToSet(n1))
+    }
+  }
+  
+  /**
+   * n1 -> @@n2
+   */
+  def propagateGlobalStorePointsToSet(n1 : PtaNode, n2 : PtaGlobalVarNode) = {
+    addInstancesInternal(n2.name, pointsToSet(n1))
+  }
+  
+  /**
+   * get n[]'s base type pt
+   */
+  def pointsToSetOfArrayBaseNode(n : PtaArrayNode) : MSet[PTAInstance] = {
+    ptMap.getOrElse(n.toString, msetEmpty)
+  }
 	/**
-	 * n or n.f
+	 * n or n.f or n[] or @@n
 	 */
   def pointsToSet(n : PtaNode) : MSet[PTAInstance] = {
     n match{
-      case ofn : PtaFieldNode =>
-        if(!pointsToSet(ofn.baseNode).isEmpty)
-          pointsToSet(ofn.baseNode).map{
+      case pfn : PtaFieldNode =>
+        if(!pointsToSet(pfn.baseNode).isEmpty)
+          pointsToSet(pfn.baseNode).map{
 		        ins =>
-		          ptMap.getOrElse(ins.toString + ofn.fieldName, msetEmpty)
+		          ptMap.getOrElse(ins.toString + pfn.fieldName, msetEmpty)
 		      }.reduce((set1, set2) => set1 ++ set2)
 		    else msetEmpty
+      case pan : PtaArrayNode =>
+        if(!pointsToSetOfArrayBaseNode(pan).isEmpty)
+	        pointsToSetOfArrayBaseNode(pan).map{
+			      ins =>
+			        ptMap.getOrElse(ins.toString, msetEmpty)
+			    }.reduce((set1, set2) => set1 ++ set2)
+			  else msetEmpty
+      case pgn : PtaGlobalVarNode =>
+        ptMap.getOrElse(pgn.name, msetEmpty)
       case _ =>
         ptMap.getOrElse(n.toString, msetEmpty)
     }
@@ -74,6 +115,10 @@ class PointsToMap {
 
   def isDiff(n1 : PtaNode, n2 : PtaNode) : Boolean = {
     pointsToSet(n1) != pointsToSet(n2)
+  }
+  
+  def contained(n1 : PtaNode, n2 : PtaNode) : Boolean = {
+    (pointsToSet(n1) -- pointsToSet(n2)).isEmpty
   }
   
   def getDiff(n1 : PtaNode, n2 : PtaNode) = {
@@ -235,6 +280,9 @@ class PointerAssignmentGraph[Node <: PtaNode]
 //          case pso : PointStringO =>
 //            val ins = PTAStringInstance(pso.typ, context.copy, K_STRING)
 //            ins.addString(pso.str)
+//            pointsToMap.addInstance(rhsNode, ins)
+//          case pao : PointArrayO =>
+//            val ins = PTAInstance(pao.typ, pao.dimensions, context.copy)
 //            pointsToMap.addInstance(rhsNode, ins)
           case po : PointO =>
             val ins = PTAInstance(po.typ, context.copy)
@@ -444,21 +492,21 @@ class PointerAssignmentGraph[Node <: PtaNode]
   def getNodeOrElse(p : Point, context : Context) : Node = {
     p match {
       case pal : PointArrayL =>
-        if(!arrayNodeExists(pal.varName, pal.locationUri, context))
-          addArrayNode(pal.varName, pal.locationUri, context)
-        else getArrayNode(pal.varName, pal.locationUri, context)
+        if(!arrayNodeLExists(pal.varName, pal.locationUri, context, pal.dimensions))
+          addArrayNodeL(pal.varName, pal.locationUri, context, pal.dimensions)
+        else getArrayNodeL(pal.varName, pal.locationUri, context, pal.dimensions)
       case par : PointArrayR =>
-        if(!arrayNodeExists(par.varName, par.locationUri, context))
-          addArrayNode(par.varName, par.locationUri, context)
-        else getArrayNode(par.varName, par.locationUri, context)
+        if(!arrayNodeRExists(par.varName, par.locationUri, context, par.dimensions))
+          addArrayNodeR(par.varName, par.locationUri, context, par.dimensions)
+        else getArrayNodeR(par.varName, par.locationUri, context, par.dimensions)
       case pgl : PointGlobalL =>
-        if(!globalVarNodeExists(pgl.varName, pgl.locationUri, context))
-        	addGlobalVarNode(pgl.varName, pgl.locationUri, context)
-        else getGlobalVarNode(pgl.varName, pgl.locationUri, context)
+        if(!globalVarNodeLExists(pgl.varName, pgl.locationUri, context))
+        	addGlobalVarNodeL(pgl.varName, pgl.locationUri, context)
+        else getGlobalVarNodeL(pgl.varName, pgl.locationUri, context)
       case pgr : PointGlobalR =>
-        if(!globalVarNodeExists(pgr.varName, pgr.locationUri, context))
-          addGlobalVarNode(pgr.varName, pgr.locationUri, context)
-        else getGlobalVarNode(pgr.varName, pgr.locationUri, context)
+        if(!globalVarNodeRExists(pgr.varName, pgr.locationUri, context))
+          addGlobalVarNodeR(pgr.varName, pgr.locationUri, context)
+        else getGlobalVarNodeR(pgr.varName, pgr.locationUri, context)
       case pbl : PointBaseL =>
         if(!fieldBaseNodeLExists(pbl.varName, pbl.locationUri, context))
           addFieldBaseNodeL(pbl.varName, pbl.locationUri, context)
@@ -548,12 +596,20 @@ class PointerAssignmentGraph[Node <: PtaNode]
     }
   }
   
-  def arrayNodeExists(uri : ResourceUri, loc : ResourceUri, context : Context) : Boolean = {
-    graph.containsVertex(newArrayNode(uri, loc, context).asInstanceOf[Node])
+  def arrayNodeLExists(uri : ResourceUri, loc : ResourceUri, context : Context, dimensions : Int) : Boolean = {
+    graph.containsVertex(newArrayNodeL(uri, loc, context, dimensions).asInstanceOf[Node])
   }
   
-  def globalVarNodeExists(uri : ResourceUri, loc : ResourceUri, context : Context) : Boolean = {
-    graph.containsVertex(newGlobalVarNode(uri, loc, context).asInstanceOf[Node])
+  def arrayNodeRExists(uri : ResourceUri, loc : ResourceUri, context : Context, dimensions : Int) : Boolean = {
+    graph.containsVertex(newArrayNodeR(uri, loc, context, dimensions).asInstanceOf[Node])
+  }
+  
+  def globalVarNodeLExists(uri : ResourceUri, loc : ResourceUri, context : Context) : Boolean = {
+    graph.containsVertex(newGlobalVarNodeL(uri, loc, context).asInstanceOf[Node])
+  }
+  
+  def globalVarNodeRExists(uri : ResourceUri, loc : ResourceUri, context : Context) : Boolean = {
+    graph.containsVertex(newGlobalVarNodeR(uri, loc, context).asInstanceOf[Node])
   }
   
   def fieldBaseNodeLExists(uri : ResourceUri, loc : ResourceUri, context : Context) : Boolean = {
@@ -598,8 +654,8 @@ class PointerAssignmentGraph[Node <: PtaNode]
     node
   }
   
-  def addArrayNode(uri : ResourceUri, loc : ResourceUri, context : Context) : Node = {
-    val node = newArrayNode(uri, loc, context).asInstanceOf[Node]
+  def addArrayNodeL(uri : ResourceUri, loc : ResourceUri, context : Context, dimensions : Int) : Node = {
+    val node = newArrayNodeL(uri, loc, context, dimensions).asInstanceOf[Node]
     val n =
       if (pool.contains(node)) pool(node)
       else {
@@ -610,8 +666,32 @@ class PointerAssignmentGraph[Node <: PtaNode]
     n
   }
   
-  def addGlobalVarNode(uri : ResourceUri, loc : ResourceUri, context : Context) : Node = {
-    val node = newGlobalVarNode(uri, loc, context).asInstanceOf[Node]
+  def addArrayNodeR(uri : ResourceUri, loc : ResourceUri, context : Context, dimensions : Int) : Node = {
+    val node = newArrayNodeR(uri, loc, context, dimensions).asInstanceOf[Node]
+    val n =
+      if (pool.contains(node)) pool(node)
+      else {
+        pl += (node -> node)
+        node
+      }
+    graph.addVertex(n)
+    n
+  }
+  
+  def addGlobalVarNodeL(uri : ResourceUri, loc : ResourceUri, context : Context) : Node = {
+    val node = newGlobalVarNodeL(uri, loc, context).asInstanceOf[Node]
+    val n =
+      if (pool.contains(node)) pool(node)
+      else {
+        pl += (node -> node)
+        node
+      }
+    graph.addVertex(n)
+    n
+  }
+  
+  def addGlobalVarNodeR(uri : ResourceUri, loc : ResourceUri, context : Context) : Node = {
+    val node = newGlobalVarNodeR(uri, loc, context).asInstanceOf[Node]
     val n =
       if (pool.contains(node)) pool(node)
       else {
@@ -735,11 +815,17 @@ class PointerAssignmentGraph[Node <: PtaNode]
   def getNode(n : Node) : Node =
     pool(n)
     
-  def getArrayNode(uri : ResourceUri, loc : ResourceUri, context : Context) : Node =
-    pool(newArrayNode(uri, loc, context))
+  def getArrayNodeL(uri : ResourceUri, loc : ResourceUri, context : Context, dimensions : Int) : Node =
+    pool(newArrayNodeL(uri, loc, context, dimensions))
     
-  def getGlobalVarNode(uri : ResourceUri, loc : ResourceUri, context : Context) : Node =
-    pool(newGlobalVarNode(uri, loc, context))
+  def getArrayNodeR(uri : ResourceUri, loc : ResourceUri, context : Context, dimensions : Int) : Node =
+    pool(newArrayNodeR(uri, loc, context, dimensions))
+    
+  def getGlobalVarNodeL(uri : ResourceUri, loc : ResourceUri, context : Context) : Node =
+    pool(newGlobalVarNodeL(uri, loc, context))
+    
+  def getGlobalVarNodeR(uri : ResourceUri, loc : ResourceUri, context : Context) : Node =
+    pool(newGlobalVarNodeR(uri, loc, context))
     
   def getFieldBaseNodeL(uri : ResourceUri, loc : ResourceUri, context : Context) : Node =
     pool(newFieldBaseNodeL(uri, loc, context))
@@ -771,13 +857,13 @@ class PointerAssignmentGraph[Node <: PtaNode]
   def getNode(p : Point, context : Context) : Node = {
     p match {
       case pal : PointArrayL =>
-        getArrayNode(pal.varName, pal.locationUri, context)
+        getArrayNodeL(pal.varName, pal.locationUri, context, pal.dimensions)
       case par : PointArrayR =>
-        getArrayNode(par.varName, par.locationUri, context)
+        getArrayNodeR(par.varName, par.locationUri, context, par.dimensions)
       case pgl : PointGlobalL =>
-        getGlobalVarNode(pgl.varName, pgl.locationUri, context)
+        getGlobalVarNodeL(pgl.varName, pgl.locationUri, context)
       case pgr : PointGlobalR =>
-        getGlobalVarNode(pgr.varName, pgr.locationUri, context)
+        getGlobalVarNodeR(pgr.varName, pgr.locationUri, context)
       case pbl : PointBaseL =>
         getFieldBaseNodeL(pbl.varName, pbl.locationUri, context)
       case pbr : PointBaseR =>
@@ -823,12 +909,6 @@ class PointerAssignmentGraph[Node <: PtaNode]
     }
   }
   
-  protected def newArrayNode(uri : ResourceUri, loc : ResourceUri, context : Context) =
-    PtaArrayNode(uri, loc, context)
-  
-  protected def newGlobalVarNode(uri : ResourceUri, loc : ResourceUri, context : Context) =
-    PtaGlobalVarNode(uri, loc, context)
-  
   protected def newFieldNode(baseName : ResourceUri, fieldName : ResourceUri, loc : ResourceUri, context : Context) =
     PtaFieldNode(baseName, fieldName, loc, context)
   
@@ -837,6 +917,18 @@ class PointerAssignmentGraph[Node <: PtaNode]
     
   protected def newFieldBaseNodeR(uri : ResourceUri, loc : ResourceUri, context : Context) =
     PtaFieldBaseNodeR(uri, loc, context)
+    
+  protected def newArrayNodeL(uri : ResourceUri, loc : ResourceUri, context : Context, dimensions : Int) =
+    PtaArrayNodeL(uri, loc, context, dimensions)
+    
+  protected def newArrayNodeR(uri : ResourceUri, loc : ResourceUri, context : Context, dimensions : Int) =
+    PtaArrayNodeR(uri, loc, context, dimensions)
+    
+  protected def newGlobalVarNodeL(uri : ResourceUri, loc : ResourceUri, context : Context) =
+    PtaGlobalVarNodeL(uri, loc, context)
+    
+  protected def newGlobalVarNodeR(uri : ResourceUri, loc : ResourceUri, context : Context) =
+    PtaGlobalVarNodeR(uri, loc, context)
 
   protected def newInvokeNode(uri : ResourceUri, loc : ResourceUri, context : Context, pi : PointI) = {
     val n = PtaInvokeNode(uri, loc, context, pi.typ)
@@ -948,16 +1040,9 @@ final case class PtaArgReturnNode(uri : ResourceUri, loc : ResourceUri, context 
 }
 
 /**
- * Node type for global variable.
- */
-final case class PtaGlobalVarNode(uri : ResourceUri, loc : ResourceUri, context : Context) extends PtaNode(loc, context) {
-  override def toString = "global:" + uri.replaceAll("@@", "") + "@" + context.toString()
-}
-
-/**
  * Node type for base part of field access to store hidden edge for it's fieldNode.
  */
-sealed abstract class PtaFieldBaseNode(uri : ResourceUri, loc : ResourceUri, context : Context) extends PtaNode(loc, context) {
+abstract class PtaFieldBaseNode(uri : ResourceUri, loc : ResourceUri, context : Context) extends PtaNode(loc, context) {
   var fieldNode : PtaFieldNode = null
   override def toString = "base:" + uri + "@" + context.toString()
 }
@@ -987,7 +1072,42 @@ final case class PtaFieldNode(baseName : ResourceUri, fieldName : ResourceUri, l
 /**
  * Node type for array variable.
  */
-final case class PtaArrayNode(uri : ResourceUri, loc : ResourceUri, context : Context) extends PtaNode(loc, context) {
-  var baseNode : PtaFieldBaseNode = null
-  override def toString = "array:" + uri + "@" + context.toString()
+abstract class PtaArrayNode(uri : ResourceUri, loc : ResourceUri, context : Context, dimensions : Int) extends PtaNode(loc, context){
+  def dimen = dimensions
+}
+
+/**
+ * Node type for array variable in lhs.
+ */
+final case class PtaArrayNodeL(uri : ResourceUri, loc : ResourceUri, context : Context, dimensions : Int) extends PtaArrayNode(uri, loc, context, dimensions) {
+  override def toString = "array_lhs:" + uri + "@" + context.toString()
+}
+
+/**
+ * Node type for array variable in rhs.
+ */
+final case class PtaArrayNodeR(uri : ResourceUri, loc : ResourceUri, context : Context, dimensions : Int) extends PtaArrayNode(uri,loc, context, dimensions) {
+  override def toString = "array_rhs:" + uri + "@" + context.toString()
+}
+
+
+/**
+ * Node type for global variable.
+ */
+abstract class PtaGlobalVarNode(uri : ResourceUri, loc : ResourceUri, context : Context) extends PtaNode(loc, context){
+  def name = uri
+}
+
+/**
+ * Node type for global variable in lhs.
+ */
+final case class PtaGlobalVarNodeL(uri : ResourceUri, loc : ResourceUri, context : Context) extends PtaGlobalVarNode(uri, loc, context) {
+  override def toString = "global_lhs:" + uri.replaceAll("@@", "") + "@" + context.toString()
+}
+
+/**
+ * Node type for global variable in rhs.
+ */
+final case class PtaGlobalVarNodeR(uri : ResourceUri, loc : ResourceUri, context : Context) extends PtaGlobalVarNode(uri,loc, context) {
+  override def toString = "global_rhs:" + uri.replaceAll("@@", "") + "@" + context.toString()
 }
