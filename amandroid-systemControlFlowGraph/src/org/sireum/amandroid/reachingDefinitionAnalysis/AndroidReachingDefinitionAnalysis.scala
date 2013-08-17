@@ -9,7 +9,7 @@ object AndroidReachingDefinitionAnalysis {
   type Result = MonotoneDataFlowAnalysisResult[RDFact]
 
   type RDFact = (Slot, DefDesc)
-
+  
   def apply[VirtualLabel] = build[VirtualLabel] _
 
   def build[VirtualLabel] //

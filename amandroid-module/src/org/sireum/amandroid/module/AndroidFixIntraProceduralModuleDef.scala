@@ -16,6 +16,9 @@ import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidObjectFlowGraph
 import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet
 import org.sireum.amandroid.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
+import org.sireum.amandroid.pointsToAnalysis.IntraPointsToAnalysis
+import org.sireum.amandroid.pointsToAnalysis.PointerAssignmentGraph
+import org.sireum.amandroid.pointsToAnalysis.PtaNode
 
 class AndroidFixIntraProceduralModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends AndroidFixIntraProceduralModule {
   val newProcedures = this.appInfoOpt.get.getDummyMainCodeMap
@@ -52,12 +55,17 @@ class AndroidFixIntraProceduralModuleDef (val job : PipelineJob, info : Pipeline
 	      val pst = result._1.procedureSymbolTable(pUri)
 	      val (pool, cfg) = buildCfg(pst)
 		    var rdaOpt : Option[AndroidReachingDefinitionAnalysis.Result] = None
+		    var pagOpt : Option[PointerAssignmentGraph[PtaNode]] = None
 		    var ofgOpt : Option[AndroidObjectFlowGraph[OfaNode, AndroidValueSet]] = None
 		    var cCfgOpt : Option[CompressedControlFlowGraph[VirtualLabel]] = None
 		
 		    if (this.shouldBuildRda){
 		      val rda = buildRda(pst, cfg)
 		      rdaOpt = Some(rda)
+		      if(this.shouldBuildPag){
+		        val pag = buildPag(pst, cfg, rda)
+		        pagOpt = Some(pag)
+		      }
 		      if(this.shouldPreprocessOfg){
 		        val ofg = preprocessOFA(pst, cfg, rda)
 		        ofgOpt = Some(ofg)
@@ -70,7 +78,7 @@ class AndroidFixIntraProceduralModuleDef (val job : PipelineJob, info : Pipeline
 		    
 		    Map(pst.procedureUri ->
 		      AndroidIntraProcedural.AndroidIntraAnalysisResult(
-		        pool, cfg, rdaOpt, ofgOpt, cCfgOpt
+		        pool, cfg, rdaOpt, pagOpt, ofgOpt, cCfgOpt
 		      ))
 	  }.reduce(combine)
   
@@ -97,6 +105,10 @@ class AndroidFixIntraProceduralModuleDef (val job : PipelineJob, info : Pipeline
 	    defRef(pst.symbolTable, libInfoTable),
 	    first2(iiopp),
 	    saom)
+	}
+	
+	def buildPag (pst : ProcedureSymbolTable, cfg : ControlFlowGraph[VirtualLabel], rda : AndroidReachingDefinitionAnalysis.Result) = {
+	  new IntraPointsToAnalysis().build(pst, cfg, rda)
 	}
 	
 	def preprocessOFA (pst : ProcedureSymbolTable, cfg : ControlFlowGraph[VirtualLabel], rda : AndroidReachingDefinitionAnalysis.Result) = {

@@ -52,7 +52,6 @@ trait InterProceduralTestFramework extends TestFramework {
         job.androidCache = Some(aCache)
         job.shouldBuildCfg = true
         job.shouldBuildRda = true
-        job.shouldBuildCCfg = true
         
         import AndroidInterProceduralModule.ProducerView._
         

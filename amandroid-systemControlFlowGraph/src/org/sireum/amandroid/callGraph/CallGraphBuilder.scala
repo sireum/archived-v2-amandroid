@@ -6,7 +6,7 @@ import org.sireum.util._
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.alir.AlirEdge
 import org.sireum.amandroid.pointsToAnalysis._
-import org.sireum.amandroid.appInfo._
+import org.sireum.amandroid.appInfo.PrepareApp
 import org.sireum.amandroid.contextProvider.Context
 import org.sireum.amandroid.programPoints._
 import org.sireum.alir.ReachingDefinitionAnalysis
@@ -16,31 +16,22 @@ import org.sireum.amandroid.scfg._
 import org.sireum.amandroid.instance.PTAInstance
 import org.sireum.amandroid.objectFlowAnalysis.InvokePointNode
 import org.sireum.amandroid.instance.PTAInstance
-import org.sireum.amandroid.appInfo.PrepareApp
+import org.sireum.amandroid.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
 
 class CallGraphBuilder {
-  
   var appInfo : PrepareApp = null
   var pstMap : Map[ResourceUri, ProcedureSymbolTable] = Map()
   var processed : Map[(ResourceUri, Context), PointProc] = Map()
   var cfgs : MMap[ResourceUri, ControlFlowGraph[String]] = null
-  var rdas : MMap[ResourceUri, ReachingDefinitionAnalysis.Result] = null
+  var rdas : MMap[ResourceUri, AndroidReachingDefinitionAnalysis.Result] = null
   var androidLibInfoTables : AndroidLibInfoTables = null
   var androidCache : AndroidCacheFile[String] = null
   //a map from return node to its possible updated value set
   var modelOperationValueSetMap : Map[PtaNode, MSet[PTAInstance]] = Map()
 
-  def apply(psts : Seq[ProcedureSymbolTable],
-            cfgs : MMap[ResourceUri, ControlFlowGraph[String]],
-            rdas : MMap[ResourceUri, ReachingDefinitionAnalysis.Result],
-            androidLibInfoTables : AndroidLibInfoTables,
-            appInfoOpt : Option[PrepareApp],
-            androidCache : AndroidCacheFile[String]) 
-            = build(psts, cfgs, rdas, androidLibInfoTables, appInfoOpt, androidCache)
-
   def build(psts : Seq[ProcedureSymbolTable],
             cfgs : MMap[ResourceUri, ControlFlowGraph[String]],
-            rdas : MMap[ResourceUri, ReachingDefinitionAnalysis.Result],
+            rdas : MMap[ResourceUri, AndroidReachingDefinitionAnalysis.Result],
             androidLibInfoTables : AndroidLibInfoTables,
             appInfoOpt : Option[PrepareApp],
             androidCache : AndroidCacheFile[String])
@@ -123,7 +114,7 @@ class CallGraphBuilder {
   
   def doPTA(pst : ProcedureSymbolTable,
             cfg : ControlFlowGraph[String],
-            rda : ReachingDefinitionAnalysis.Result,
+            rda : AndroidReachingDefinitionAnalysis.Result,
             pag : PointerAssignmentGraph[PtaNode],
             sCfg : SuperControlFlowGraph[String]) : Unit = {
     val points = new PointsCollector().points(pst)
@@ -172,7 +163,7 @@ class CallGraphBuilder {
       	    pag.getEdgeType(edge) match{
       	      case pag.EdgeType.TRANSFER => // e.g. L0: p = q; L1:  r = p; edge is p@L0 -> p@L1
       	        val dstNode = pag.successor(edge)
-      	        if(pag.pointsToMap.isDiff(srcNode, dstNode)){
+      	        if(pag.pointsToMap.isDiffForTransfer(srcNode, dstNode)){
       	          pag.worklist += dstNode
       	          val d = pag.pointsToMap.getDiff(srcNode, dstNode)
       	          pag.pointsToMap.transferPointsToSet(srcNode, dstNode)
@@ -222,7 +213,8 @@ class CallGraphBuilder {
 	          case pag.EdgeType.FIELD_STORE => // q -> r.f
 	            pag.pointsToMap.propagateFieldStorePointsToSet(edge.source, edge.target.asInstanceOf[PtaFieldNode])
 	          case pag.EdgeType.ARRAY_STORE => // e.g. r[i] = q; Edge: q -> r[i]
-    	        if(!pag.pointsToMap.contained(edge.source, edge.target)){
+    	        if(!pag.pointsToMap.pointsToSetOfArrayBaseNode(edge.target.asInstanceOf[PtaArrayNode]).isEmpty
+    	            && !pag.pointsToMap.contained(edge.source, edge.target)){
     	          pag.worklist += edge.target
     	        	pag.pointsToMap.propagateArrayStorePointsToSet(edge.source, edge.target.asInstanceOf[PtaArrayNode])
     	        }
@@ -367,12 +359,12 @@ class CallGraphBuilder {
         pag.constructGraph(callee, points, callerContext.copy, cfg, rda)        
         sCfg.collectionCfgToBaseGraph(callee, cfg)
       } else {
-        //get ofg ccfg from file
-//        val calleeOfg = androidCache.load[ObjectFlowGraph[Node, ValueSet]](callee, "ofg")
-//        val calleeCCfg = androidCache.load[CompressedControlFlowGraph[String]](callee, "cCfg")
-//        calleeOfg.updateContext(callerContext)
-//        processed += ((callee, callerContext.copy) -> ofg.combineOfgs(calleeOfg))
-//        sCfg.collectionCCfgToBaseGraph(callee, calleeCCfg)
+        //get rda cfg from file
+//      	val calleePag = androidCache.load[PointerAssignmentGraph[PtaNode]](callee, "pag")
+//        val calleeCfg = androidCache.load[CompressedControlFlowGraph[String]](callee, "cfg")
+//        calleePag.updateContext(callerContext)
+//        processed += ((callee, callerContext) -> pag.combineOfgs(calleePag))
+//        sCfg.collectionCfgToBaseGraph(callee, calleeCfg)
       }
     }
     if(processed.contains(callee, callerContext)){

@@ -14,6 +14,7 @@ import org.sireum.pipeline.PipelineConfiguration
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidOfgPreprocessor
 import org.sireum.amandroid.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
+import org.sireum.amandroid.pointsToAnalysis.IntraPointsToAnalysis
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -59,11 +60,12 @@ class AndroidIntraProceduralModuleDef (val job : PipelineJob, info : PipelineJob
     val pool = CfgModule.getPool(options)
     val cfg = CfgModule.getCfg(options)
     val rdaOpt = if (this.shouldBuildRda) Some(RdaModule.getRda(options)) else None
+    val pagOpt = if (this.shouldBuildPag) Some(PagModule.getPag(options)) else None
     val ofgOpt = if (this.shouldPreprocessOfg) Some(OFAPreprocessModule.getOFG(options)) else None
     val cCfgOpt = if (this.shouldBuildCCfg) Some(cCfgModule.getCCfg(options)) else None
     Map(pst.procedureUri ->
       AndroidIntraProcedural.AndroidIntraAnalysisResult(
-        pool, cfg, rdaOpt, ofgOpt, cCfgOpt
+        pool, cfg, rdaOpt, pagOpt, ofgOpt, cCfgOpt
       ))
   }
   
@@ -96,12 +98,16 @@ class AndroidIntraProceduralModuleDef (val job : PipelineJob, info : PipelineJob
   def buildIntraPipeline(job : PipelineJob) = {
     val stages = marrayEmpty[PipelineStage]
 
-    if (this.shouldBuildCfg || this.shouldBuildRda || this.shouldPreprocessOfg || this.shouldBuildCCfg){
+    if (this.shouldBuildCfg || this.shouldBuildRda || this.shouldPreprocessOfg || this.shouldBuildCCfg || this.shouldBuildPag){
       stages += PipelineStage("CFG Building", false, CfgModule)
     }
     
-    if (this.shouldBuildRda || this.shouldPreprocessOfg){
+    if (this.shouldBuildRda || this.shouldPreprocessOfg || this.shouldBuildPag){
       stages += PipelineStage("RDA Building", false, RdaModule)
+    }
+    
+    if (this.shouldBuildPag){
+      stages += PipelineStage("PAG Preprocess", false, PagModule)
     }
     
     if (this.shouldPreprocessOfg){
@@ -139,6 +145,10 @@ class RdaModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends
     this.defRef(pst.symbolTable, alit),
     first2(iiopp),
     this.switchAsOrderedMatch))
+}
+
+class PagModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends PagModule {
+  this.pag_=(new IntraPointsToAnalysis().build(this.procedureSymbolTable, this.cfg, this.rda))
 }
 
 class OFAPreprocessModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends OFAPreprocessModule {

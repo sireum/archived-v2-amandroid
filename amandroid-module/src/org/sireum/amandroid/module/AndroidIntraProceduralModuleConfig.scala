@@ -15,6 +15,7 @@ import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidObjectFlowGraph
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet
 import org.sireum.amandroid.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
+import org.sireum.amandroid.pointsToAnalysis._
 
 
 /*
@@ -27,17 +28,18 @@ http://www.eclipse.org/legal/epl-v10.html
 
 object AndroidIntraProcedural {
   type VirtualLabel = String
-  type Node = OfaNode
   type CFG = ControlFlowGraph[VirtualLabel]
   type RDA = AndroidReachingDefinitionAnalysis.Result  //adding for rda building
   
   type CCFG = CompressedControlFlowGraph[VirtualLabel]
   type OFG = AndroidObjectFlowGraph[OfaNode, AndroidValueSet]
+  type PAG = PointerAssignmentGraph[PtaNode]
   
   final case class AndroidIntraAnalysisResult(
     pool : AlirIntraProceduralGraph.NodePool,
     cfg : AndroidIntraProcedural.CFG,
     rdaOpt : Option[AndroidIntraProcedural.RDA],
+    pagOpt : Option[AndroidIntraProcedural.PAG],
     ofgOpt : Option[AndroidIntraProcedural.OFG],
     cCfgOpt : Option[AndroidIntraProcedural.CCFG])
 
@@ -73,6 +75,9 @@ case class AndroidIntraProcedural(
 
   @Input 
   shouldBuildRda : Boolean = false,
+  
+  @Input
+  shouldBuildPag : Boolean = false,
   
   @Input
   shouldPreprocessOfg : Boolean = false,
@@ -163,6 +168,28 @@ case class cCfg(
   @Output
   @Produce
   cCfg : CompressedControlFlowGraph[String])
+  
+case class Pag(
+  title : String = "intra pointer assignment graph Build",
+  
+  @Input 
+  @Consume(Array(classOf[Cfg]))  
+  cfg : ControlFlowGraph[String],
+  
+  @Input
+  @Consume(Array(classOf[Rda]))
+  rda : AndroidIntraProcedural.RDA,
+  
+  @Input
+  procedureSymbolTable : ProcedureSymbolTable,
+
+  @Input
+  androidLibInfoTables : AndroidLibInfoTables,
+  
+  // for test now. Later will change it.
+  @Output
+  @Produce
+  pag : AndroidIntraProcedural.PAG)
 
 case class OFAPreprocess(
   title : String = "intra object flow graph Build",
@@ -199,6 +226,7 @@ object AndroidIntraProceduralModuleBuild {
         AndroidIntraProcedural.getClass().getName().dropRight(1),
         Cfg.getClass().getName().dropRight(1),
         Rda.getClass().getName().dropRight(1),
+        Pag.getClass().getName().dropRight(1),
         OFAPreprocess.getClass().getName().dropRight(1),
         cCfg.getClass().getName().dropRight(1)
         )

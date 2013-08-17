@@ -91,7 +91,7 @@ class CGModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends 
   var result : CallGraph[String] = null
   this.androidCache match{
     case Some(ac) =>
-      result = new CallGraphBuilder().apply(this.procedureSymbolTables, this.cfgs, this.rdas, this.androidLibInfoTables, this.appInfoOpt, ac)
+      result = new CallGraphBuilder().build(this.procedureSymbolTables, this.cfgs, this.rdas, this.androidLibInfoTables, this.appInfoOpt, ac)
     case None =>
   }
   this.callGraph_=(result)

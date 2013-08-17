@@ -36,6 +36,8 @@ import org.sireum.amandroid.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph
 import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet
 import java.io.File
+import org.sireum.amandroid.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
+import org.sireum.amandroid.module.AndroidIntraProceduralModule
 
 trait PreprocessLibraryFrameWork extends TestFramework { 
   
@@ -93,8 +95,7 @@ trait PreprocessLibraryFrameWork extends TestFramework {
         AndroidIntraProceduralModule.setAndroidCache(options, Some(aCache))
         AndroidIntraProceduralModule.setShouldBuildCfg(options, true)
         AndroidIntraProceduralModule.setShouldBuildRda(options, true)
-        AndroidIntraProceduralModule.setShouldPreprocessOfg(options, true)
-        AndroidIntraProceduralModule.setShouldBuildCCfg(options, true)
+        AndroidIntraProceduralModule.setShouldBuildPag(options, true)
         pipeline.compute(job)
 
         if (job.lastStageInfo.hasError) {
@@ -115,37 +116,15 @@ trait PreprocessLibraryFrameWork extends TestFramework {
         
         println("pipeline done!")
         
-        println("start convert cfgs, rdas, ofgs to xml!")
+        println("start convert cfg, pag to xml!")
         val intraResult = AndroidIntraProceduralModule.getIntraResult(options)
         intraResult.keys.foreach(
           key =>
           {
-//            val ofg = aCache.load[ObjectFlowGraph[OfaNode]](key, "ofg")
-//            val w = new java.io.PrintWriter(System.out, true)
-//            ofg.toDot(w)
-            
             aCache.save[AndroidIntraProcedural.CFG](key, "cfg", intraResult(key).cfg)
-            intraResult(key).rdaOpt match {
-              case Some(rda) =>
-                val cfg = intraResult(key).cfg
-                val es : MMap[org.sireum.alir.ControlFlowGraph.Node, ISet[(org.sireum.alir.Slot, org.sireum.alir.DefDesc)]] = mmapEmpty
-                cfg.nodes.foreach(
-                  node => {
-                    es(node) = rda.entrySet(node)
-                  }  
-                )
-                aCache.save[MMap[org.sireum.alir.ControlFlowGraph.Node, ISet[(org.sireum.alir.Slot, org.sireum.alir.DefDesc)]]](key, "rda", es)
-              case None =>
-            }
-            intraResult(key).ofgOpt match {
-              case Some(ofg) =>
-//                ofg.toDot(w)
-                aCache.save[AndroidObjectFlowGraph[OfaNode, AndroidValueSet]](key, "ofg", ofg)
-              case None =>
-            }
-            intraResult(key).cCfgOpt match {
-              case Some(cCfg) =>
-                aCache.save[AndroidIntraProcedural.CCFG](key, "cCfg", cCfg)
+            intraResult(key).pagOpt match {
+              case Some(pag) =>
+                aCache.save(key, "pag", pag)
               case None =>
             }
           }  

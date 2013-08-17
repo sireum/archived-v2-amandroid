@@ -49,6 +49,9 @@ case class AndroidFixIntraProcedural(
   shouldBuildRda : Boolean = false,
   
   @Input
+  shouldBuildPag : Boolean = false,
+  
+  @Input
   shouldPreprocessOfg : Boolean = false,
   
   @Input

@@ -17,6 +17,7 @@ import org.sireum.amandroid.instance._
 import org.sireum.amandroid.contextProvider.Context
 import org.sireum.amandroid.programPoints._
 import org.sireum.amandroid.objectFlowAnalysis.InvokePointNode
+import org.sireum.amandroid.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
 
 
 class PointsToMap {
@@ -117,6 +118,25 @@ class PointsToMap {
     pointsToSet(n1) != pointsToSet(n2)
   }
   
+  def isDiffForTransfer(n1 : PtaNode, n2 : PtaNode) : Boolean = {
+    n1 match{
+      case pan1 : PtaArrayNode =>
+        n2 match{
+          case pan2 : PtaArrayNode =>
+            pointsToSetOfArrayBaseNode(pan1) != pointsToSetOfArrayBaseNode(pan2)
+          case _ =>
+            pointsToSetOfArrayBaseNode(pan1) != pointsToSet(n2)
+        }
+      case _=>
+        n2 match{
+          case pan2 : PtaArrayNode =>
+            pointsToSet(n1) != pointsToSetOfArrayBaseNode(pan2)
+          case _ =>
+            pointsToSet(n1) != pointsToSet(n2)
+        }
+    }
+  }
+  
   def contained(n1 : PtaNode, n2 : PtaNode) : Boolean = {
     (pointsToSet(n1) -- pointsToSet(n2)).isEmpty
   }
@@ -174,11 +194,34 @@ class PointerAssignmentGraph[Node <: PtaNode]
   final val worklist : MList[Node] = mlistEmpty
     
   /**
+   * combine two pags into one.
+   */ 
+  def combineOfgs(pag2 : PointerAssignmentGraph[Node]) : PointProc = {
+    pl ++= pag2.pool
+    pag2.nodes.foreach(
+      node=>{
+        addNode(node)
+      }
+    )
+    pag2.edges.foreach(
+      edge=>{
+        addEdge(edge)
+      }  
+    )
+//    iFieldDefRepo ++= ofg2.iFieldDefRepo
+    worklist ++= pag2.worklist
+    points ++= pag2.points
+    val ps = pag2.points.filter(p => if(p.isInstanceOf[PointProc])true else false)
+    ps(0).asInstanceOf[PointProc]
+  }
+  
+  
+  /**
    * create the nodes and edges to reflect the constraints corresponding 
    * to the given program point. If a value is added to a node, then that 
    * node is added to the worklist.
    */
-  def constructGraph(pUri : ResourceUri, ps : MList[Point], callerContext : Context, cfg : ControlFlowGraph[String], rda : ReachingDefinitionAnalysis.Result) = {
+  def constructGraph(pUri : ResourceUri, ps : MList[Point], callerContext : Context, cfg : ControlFlowGraph[String], rda : AndroidReachingDefinitionAnalysis.Result) = {
 //    collectArrayVars(ps, cfg, rda)
 //    collectFieldVars(ps, cfg, rda)
     ps.foreach(
@@ -220,27 +263,6 @@ class PointerAssignmentGraph[Node <: PtaNode]
     ipN.setContext(callerContext)
 	  modelOperationTracker += (ipN)
     ipN
-  }
-  
-  /**
-   * combine two ofgs into one, and combine all repos inside two ofgs.
-   */ 
-  def combineOfgs(pag2 : PointerAssignmentGraph[Node]) : PointProc = {
-    pl ++= pag2.pool
-    pag2.nodes.foreach(
-      node=>{
-        addNode(node)
-      }
-    )
-    pag2.edges.foreach(
-      edge=>{
-        addEdge(edge)
-      }  
-    )
-    worklist ++= pag2.worklist
-    points ++= pag2.points
-    val ps = pag2.points.filter(p => if(p.isInstanceOf[PointProc])true else false)
-    ps(0).asInstanceOf[PointProc]
   }
   
 
