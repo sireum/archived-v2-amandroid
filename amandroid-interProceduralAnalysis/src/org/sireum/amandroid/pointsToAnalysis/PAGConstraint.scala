@@ -163,7 +163,7 @@ trait PAGConstraint{
               rda : AndroidReachingDefinitionAnalysis.Result,
               avoidMode : Boolean = true) : Set[Point] = {
     val slots = rda.entrySet(cfg.exitNode)
-    searchRda(p, slots, avoidMode)
+    searchRda(p, points, slots, avoidMode)
   }
   
 //  def untilFindUdChain(p : PointWithIndex,
@@ -181,10 +181,10 @@ trait PAGConstraint{
               rda : AndroidReachingDefinitionAnalysis.Result,
               avoidMode : Boolean = true) : Set[Point] = {
     val slots = rda.entrySet(cfg.getNode(Some(p.locationUri), p.locationIndex))
-    searchRda(p, slots, avoidMode)
+    searchRda(p, points, slots, avoidMode)
   }
   
-  def searchRda(p : PointWithUri, slots : ISet[(Slot, DefDesc)], avoidMode : Boolean) : Set[Point] = {
+  def searchRda(p : PointWithUri, points : MList[Point], slots : ISet[(Slot, DefDesc)], avoidMode : Boolean) : Set[Point] = {
     var ps : Set[Point] = Set()
     slots.foreach{
       case (slot, defDesc)=> 

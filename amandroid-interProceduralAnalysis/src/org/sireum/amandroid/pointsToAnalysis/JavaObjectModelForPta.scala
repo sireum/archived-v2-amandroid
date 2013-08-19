@@ -391,6 +391,13 @@ trait JavaObjectModelForPta[Node <: PtaNode] {
 	          pag.pointsToMap.addInstanceInternal(ins.toString + "[|java:lang:StringBuilder.value|]", sIns)
 	      }
 	      sbInsts
+	    case "[|Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder;|]" =>
+	      sbInsts.map{
+	        ins =>
+	          val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
+	          pag.pointsToMap.addInstanceInternal(ins.toString + "[|java:lang:StringBuilder.value|]", sIns)
+	      }
+	      sbInsts
 	    case "[|Ljava/lang/StringBuilder;.append:(Ljava/lang/CharSequence;II)Ljava/lang/Appendable;|]" =>
 	      sbInsts.map{
 	        ins =>
@@ -428,6 +435,7 @@ trait JavaObjectModelForPta[Node <: PtaNode] {
 	      val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
 	      insts += sIns
 	      insts
+	    case _ => msetEmpty
   	}
   }
 	
@@ -502,6 +510,8 @@ trait JavaObjectModelForPta[Node <: PtaNode] {
 //	      }
 	      None
 	    case "[|Ljava/util/HashSet;.size:()I|]" =>
+	      None
+	    case _ =>
 	      None
 	  }
 	}

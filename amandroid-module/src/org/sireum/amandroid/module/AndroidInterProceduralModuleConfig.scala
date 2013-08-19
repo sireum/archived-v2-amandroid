@@ -66,6 +66,8 @@ case class AndroidInterProcedural(
   
   @Input
   intraResult : MMap[ResourceUri, AndroidIntraProcedural.AndroidIntraAnalysisResult],
+  
+  @Input procedureMap : Map[String, String] = Map(),
     
   @Output interResult : AndroidInterProcedural.AndroidInterAnalysisResult
   
@@ -92,6 +94,8 @@ case class CG(
   
   @Input
   appInfoOpt : scala.Option[PrepareApp],
+  
+  @Input procedureMap : Map[String, String],
   
   // for test now. Later will change it.
   @Output

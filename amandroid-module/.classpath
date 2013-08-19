@@ -14,5 +14,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-module"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-util"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-cache"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-pilar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -15,6 +15,7 @@ import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.pilar.symbol.SymbolTable
 import scala.Option
 import scala.collection.Seq
+import scala.collection.immutable.Map
 import scala.collection.mutable.Map
 
 object CGModule extends PipelineModule {
@@ -23,6 +24,7 @@ object CGModule extends PipelineModule {
 
   val globalProcedureSymbolTablesKey = "Global.procedureSymbolTables"
   val globalAndroidCacheKey = "Global.androidCache"
+  val globalProcedureMapKey = "Global.procedureMap"
   val globalCfgsKey = "Global.cfgs"
   val globalAppInfoOptKey = "Global.appInfoOpt"
   val globalAndroidLibInfoTablesKey = "Global.androidLibInfoTables"
@@ -171,6 +173,33 @@ object CGModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'appInfoOpt'")       
     }
+    var _procedureMap : scala.Option[AnyRef] = None
+    var _procedureMapKey : scala.Option[String] = None
+
+    val keylistprocedureMap = List(CGModule.globalProcedureMapKey)
+    keylistprocedureMap.foreach(key => 
+      if(job ? key) { 
+        if(_procedureMap.isEmpty) {
+          _procedureMap = Some(job(key))
+          _procedureMapKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _procedureMap.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'procedureMap' keys '" + _procedureMapKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _procedureMap match{
+      case Some(x) =>
+        if(!x.isInstanceOf[scala.collection.immutable.Map[java.lang.String, java.lang.String]]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'procedureMap'.  Expecting 'scala.collection.immutable.Map[java.lang.String, java.lang.String]' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'procedureMap'")       
+    }
     var _procedureSymbolTables : scala.Option[AnyRef] = None
     var _procedureSymbolTablesKey : scala.Option[String] = None
 
@@ -309,6 +338,21 @@ object CGModule extends PipelineModule {
     return options
   }
 
+  def getProcedureMap (options : scala.collection.Map[Property.Key, Any]) : scala.collection.immutable.Map[java.lang.String, java.lang.String] = {
+    if (options.contains(CGModule.globalProcedureMapKey)) {
+       return options(CGModule.globalProcedureMapKey).asInstanceOf[scala.collection.immutable.Map[java.lang.String, java.lang.String]]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setProcedureMap (options : MMap[Property.Key, Any], procedureMap : scala.collection.immutable.Map[java.lang.String, java.lang.String]) : MMap[Property.Key, Any] = {
+
+    options(CGModule.globalProcedureMapKey) = procedureMap
+
+    return options
+  }
+
   def getProcedureSymbolTables (options : scala.collection.Map[Property.Key, Any]) : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = {
     if (options.contains(CGModule.globalProcedureSymbolTablesKey)) {
        return options(CGModule.globalProcedureSymbolTablesKey).asInstanceOf[scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable]]
@@ -364,6 +408,7 @@ object CGModule extends PipelineModule {
       def rdas : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]] = CGModule.getRdas(job.propertyMap)
       def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = CGModule.getAndroidCache(job.propertyMap)
       def appInfoOpt : scala.Option[org.sireum.amandroid.appInfo.PrepareApp] = CGModule.getAppInfoOpt(job.propertyMap)
+      def procedureMap : scala.collection.immutable.Map[java.lang.String, java.lang.String] = CGModule.getProcedureMap(job.propertyMap)
       def procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = CGModule.getProcedureSymbolTables(job.propertyMap)
       def androidLibInfoTables : org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables = CGModule.getAndroidLibInfoTables(job.propertyMap)
       def callGraph : org.sireum.amandroid.callGraph.CallGraph[java.lang.String] = CGModule.getCallGraph(job.propertyMap)
@@ -384,6 +429,9 @@ object CGModule extends PipelineModule {
 
       def appInfoOpt_=(appInfoOpt : scala.Option[org.sireum.amandroid.appInfo.PrepareApp]) { CGModule.setAppInfoOpt(job.propertyMap, appInfoOpt) }
       def appInfoOpt : scala.Option[org.sireum.amandroid.appInfo.PrepareApp] = CGModule.getAppInfoOpt(job.propertyMap)
+
+      def procedureMap_=(procedureMap : scala.collection.immutable.Map[java.lang.String, java.lang.String]) { CGModule.setProcedureMap(job.propertyMap, procedureMap) }
+      def procedureMap : scala.collection.immutable.Map[java.lang.String, java.lang.String] = CGModule.getProcedureMap(job.propertyMap)
 
       def procedureSymbolTables_=(procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable]) { CGModule.setProcedureSymbolTables(job.propertyMap, procedureSymbolTables) }
       def procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = CGModule.getProcedureSymbolTables(job.propertyMap)
@@ -407,6 +455,8 @@ trait CGModule {
   def androidCache : scala.Option[org.sireum.amandroid.cache.AndroidCacheFile[java.lang.String]] = CGModule.getAndroidCache(job.propertyMap)
 
   def appInfoOpt : scala.Option[org.sireum.amandroid.appInfo.PrepareApp] = CGModule.getAppInfoOpt(job.propertyMap)
+
+  def procedureMap : scala.collection.immutable.Map[java.lang.String, java.lang.String] = CGModule.getProcedureMap(job.propertyMap)
 
   def procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = CGModule.getProcedureSymbolTables(job.propertyMap)
 

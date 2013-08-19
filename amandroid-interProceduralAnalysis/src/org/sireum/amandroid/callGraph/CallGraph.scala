@@ -129,10 +129,9 @@ class CallGraph[VirtualLabel] extends SuperControlFlowGraph[VirtualLabel]
   override protected val vlabelProvider = new VertexNameProvider[Node]() {
     
 	def filterLabel(uri : String) = {
-	  var temp: String = null
 	  if(uri.startsWith("pilar:/procedure/default/%5B%7C"))
-		  temp = uri.replace("pilar:/procedure/default/%5B%7C", "")
-	  temp.filter(_.isUnicodeIdentifierPart)  // filters out the special characters like '/', '.', '%', etc.  
+		  uri.replace("pilar:/procedure/default/%5B%7C", "").filter(_.isUnicodeIdentifierPart)  // filters out the special characters like '/', '.', '%', etc.  
+	  else uri.filter(_.isUnicodeIdentifierPart)  // filters out the special characters like '/', '.', '%', etc.  
 	}
     
 	def getVertexName(v : Node) : String = {
@@ -231,41 +230,28 @@ class CallGraph[VirtualLabel] extends SuperControlFlowGraph[VirtualLabel]
   }
    
   def collectionCfgToBaseGraph(pUri : ResourceUri, cfg : ControlFlowGraph[VirtualLabel]) = {
-    for (n <- cfg.nodes) 
-    {
-      if(n.isInstanceOf[AlirVirtualNode[VirtualLabel]])
-        addVirtualNode((pUri + "." + n.toString()).asInstanceOf[VirtualLabel]) 
-      else if(n.isInstanceOf[AlirLocationUriNode]){
-        val node = addNode(pUri, n.asInstanceOf[AlirLocationUriNode].toString(), n.asInstanceOf[AlirLocationUriNode].locIndex)
-        if(n.propertyMap.contains("calleeSig"))
-        	node.propertyMap("calleeSig") = n.getProperty[String]("calleeSig")
-      }
-      // do we need to add another node type case here , i.e. AlirLocationIndexNode ????
+    
+    val newNodes = cfg.nodes map{
+      n =>
+	      n match{
+	        case vn : AlirVirtualNode[VirtualLabel] =>
+	          addVirtualNode((pUri + "." + vn.label).asInstanceOf[VirtualLabel]) 
+	        case n =>
+	          pool(n) = n
+	          addNode(n)
+	      }
     }
-    var tempEdge : Edge = null
     for (e <- cfg.edges) {
-     var tempNode = e.source
-     var sNode : Node = null
-     if(tempNode.isInstanceOf[AlirVirtualNode[VirtualLabel]])
-       sNode = getVirtualNode((pUri + "." + tempNode.toString()).asInstanceOf[VirtualLabel])
-     if(tempNode.isInstanceOf[AlirLocationUriNode])
-       sNode = getNode(pUri, tempNode.asInstanceOf[AlirLocationUriNode].toString(), tempNode.asInstanceOf[AlirLocationUriNode].locIndex)
-     tempNode = e.target
-     
-     var tNode : Node = null
-     if(tempNode.isInstanceOf[AlirVirtualNode[VirtualLabel]])
-       tNode = getVirtualNode((pUri + "." + tempNode.toString()).asInstanceOf[VirtualLabel])           
-     if(tempNode.isInstanceOf[AlirLocationUriNode])
-       tNode = getNode(pUri, tempNode.asInstanceOf[AlirLocationUriNode].toString(), tempNode.asInstanceOf[AlirLocationUriNode].locIndex)  
-       
-     if(!hasEdge(sNode, tNode))  
-        tempEdge = addEdge(sNode, tNode)  // note that even if cCfg has multi-edges, sCfg can only have single edge b/w any pair of nodes
-     
+      val entryNode = getVirtualNode((pUri + "." + "Entry").asInstanceOf[VirtualLabel])
+      val exitNode = getVirtualNode((pUri + "." + "Exit").asInstanceOf[VirtualLabel])
+      if(e.source.isInstanceOf[AlirVirtualNode[VirtualLabel]]) addEdge(entryNode, e.target)
+      else if(e.target.isInstanceOf[AlirVirtualNode[VirtualLabel]]) addEdge(e.source, exitNode)
+      else addEdge(e)
     }
   }
   
   def extendGraph(callee : ResourceUri, pUri : ResourceUri, lUri : ResourceUri, lIndex : Int) = {
-    val srcNode = getNode(pUri, lUri, lIndex)
+    val srcNode = getNode(Some(lUri), lIndex)
     val targetNode = getVirtualNode((callee + "." + "Entry").asInstanceOf[VirtualLabel])
     val retSrcNode = getVirtualNode((callee + "." + "Exit").asInstanceOf[VirtualLabel])
     successors(srcNode).foreach{

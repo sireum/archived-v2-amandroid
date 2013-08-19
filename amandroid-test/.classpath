@@ -21,5 +21,6 @@
 	<classpathentry kind="lib" path="/git-repo/lib/AXMLPrinter2.jar"/>
 	<classpathentry kind="lib" path="/git-repo/lib/polyglot.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-cache"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-pilar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

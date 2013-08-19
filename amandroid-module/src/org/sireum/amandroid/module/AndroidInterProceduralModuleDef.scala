@@ -57,6 +57,7 @@ extends AndroidInterProceduralModule with ImplicitLogging {
       CGModule.setProcedureSymbolTables(options, psts)
       CGModule.setRdas(options, rdas)
       CGModule.setAppInfoOpt(options, this.appInfoOpt)
+      CGModule.setProcedureMap(options, this.procedureMap)
       
       interPipeline.compute(j)
       info.hasError = j.hasError
@@ -91,7 +92,7 @@ class CGModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends 
   var result : CallGraph[String] = null
   this.androidCache match{
     case Some(ac) =>
-      result = new CallGraphBuilder().build(this.procedureSymbolTables, this.cfgs, this.rdas, this.androidLibInfoTables, this.appInfoOpt, ac)
+      result = new CallGraphBuilder().build(this.procedureSymbolTables, this.cfgs, this.rdas, this.androidLibInfoTables, this.procedureMap, this.appInfoOpt, ac)
     case None =>
   }
   this.callGraph_=(result)

@@ -17,28 +17,35 @@ import org.sireum.amandroid.instance.PTAInstance
 import org.sireum.amandroid.objectFlowAnalysis.InvokePointNode
 import org.sireum.amandroid.instance.PTAInstance
 import org.sireum.amandroid.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
+import org.sireum.amandroid.transform.Transform
 
 class CallGraphBuilder {
   var appInfo : PrepareApp = null
   var pstMap : Map[ResourceUri, ProcedureSymbolTable] = Map()
   var processed : Map[(ResourceUri, Context), PointProc] = Map()
-  var cfgs : MMap[ResourceUri, ControlFlowGraph[String]] = null
-  var rdas : MMap[ResourceUri, AndroidReachingDefinitionAnalysis.Result] = null
+  var processedProcedure : Set[ResourceUri] = Set()
+  var cfgs : Map[ResourceUri, ControlFlowGraph[String]] = Map()
+  var rdas : Map[ResourceUri, AndroidReachingDefinitionAnalysis.Result] = Map()
+  var pgPointsMap : Map[ResourceUri, MList[Point]] = Map()
   var androidLibInfoTables : AndroidLibInfoTables = null
   var androidCache : AndroidCacheFile[String] = null
   //a map from return node to its possible updated value set
   var modelOperationValueSetMap : Map[PtaNode, MSet[PTAInstance]] = Map()
+  // sig -> code
+  var procedureCodeMap : Map[String, String] = Map()
 
   def build(psts : Seq[ProcedureSymbolTable],
             cfgs : MMap[ResourceUri, ControlFlowGraph[String]],
             rdas : MMap[ResourceUri, AndroidReachingDefinitionAnalysis.Result],
             androidLibInfoTables : AndroidLibInfoTables,
+            procedureCodeMap : Map[String, String],
             appInfoOpt : Option[PrepareApp],
             androidCache : AndroidCacheFile[String])
    : CallGraph[String] = {
-    this.cfgs = cfgs
-    this.rdas = rdas
+    this.cfgs ++= cfgs
+    this.rdas ++= rdas
     this.androidLibInfoTables = androidLibInfoTables
+    this.procedureCodeMap = procedureCodeMap
     this.androidCache = androidCache
     this.pstMap =
       psts.map{
@@ -55,10 +62,11 @@ class CallGraphBuilder {
         pta(pag, cg)
     }
     val result = cg
-    pag.pointsToMap.pointsToMap.foreach{
-      item =>
-        println("item--->" + item)
-    }
+//    pag.pointsToMap.pointsToMap.foreach{
+//      item =>
+//        println("item--->" + item)
+//    }
+    println("processed-->" + processed.size)
     val f1 = new File(System.getProperty("user.home") + "/Desktop/CallGraph.dot")
     val o1 = new FileOutputStream(f1)
     val w1 = new OutputStreamWriter(o1)
@@ -118,6 +126,7 @@ class CallGraphBuilder {
             pag : PointerAssignmentGraph[PtaNode],
             sCfg : SuperControlFlowGraph[String]) : Unit = {
     val points = new PointsCollector().points(pst)
+    pgPointsMap += (pst.procedureUri -> points.clone)
     val context : Context = new Context(pag.K_CONTEXT)
     pag.points ++= points
     setProcessed(points, pst.procedureUri, context.copy)
@@ -148,7 +157,7 @@ class CallGraphBuilder {
       while (!pag.worklist.isEmpty) {
       	val srcNode = pag.worklist.remove(0)
       	srcNode match{
-      	  case ofbnr : PtaFieldBaseNodeR => // e.g. q = ofnl.f; edge is ofbnl.f -> q
+      	  case ofbnr : PtaFieldBaseNodeR => // e.g. q = ofbnr.f; edge is ofbnr.f -> q
       	    val f = ofbnr.fieldNode
       	    pag.successorEdges(f).foreach{
       	    	edge => //edge is FIELD_LOAD type
@@ -341,7 +350,6 @@ class CallGraphBuilder {
       															callerContext : Context,
       															pag : PointerAssignmentGraph[PtaNode], 
       															sCfg : SuperControlFlowGraph[String]) = {
-    val points : MList[Point] = mlistEmpty
     val calleeSig : String = androidLibInfoTables.getProcedureSignatureByUri(callee)
     if(pag.isModelOperation(calleeSig)){
       val ipN = pag.collectTrackerNodes(calleeSig, pi, callerContext.copy)
@@ -349,22 +357,37 @@ class CallGraphBuilder {
 //    } else if(pag.isIccOperation(calleeSig, androidLibInfoTables)) {
 //      pag.setIccOperationTracker(calleeSig, pi, callerContext.copy)
     } else if(!processed.contains((callee, callerContext))){
-//    if(!processed.contains((callee, callerContext))){
+    	
       if(pstMap.contains(callee)){
+        if(!processedProcedure.contains(callee)){
+	        val points = new PointsCollector().points(pstMap(callee))
+	        pag.points ++= points
+	        pgPointsMap += (callee -> points.clone)
+	        processedProcedure += callee
+	      }
         val cfg = cfgs(callee)
         val rda = rdas(callee)
-        points ++= new PointsCollector().points(pstMap(callee))
-        pag.points ++= points
+        val points = pgPointsMap(callee)
         setProcessed(points, callee, callerContext.copy)
         pag.constructGraph(callee, points, callerContext.copy, cfg, rda)        
         sCfg.collectionCfgToBaseGraph(callee, cfg)
-      } else {
-        //get rda cfg from file
-//      	val calleePag = androidCache.load[PointerAssignmentGraph[PtaNode]](callee, "pag")
-//        val calleeCfg = androidCache.load[CompressedControlFlowGraph[String]](callee, "cfg")
-//        calleePag.updateContext(callerContext)
-//        processed += ((callee, callerContext) -> pag.combineOfgs(calleePag))
-//        sCfg.collectionCfgToBaseGraph(callee, calleeCfg)
+      } else if(procedureCodeMap.contains(calleeSig)){
+        if(!processedProcedure.contains(callee)){
+	        val code = procedureCodeMap(calleeSig)
+	        val transRes = Transform.run(code, this.androidLibInfoTables)(callee)
+	        this.cfgs += (callee -> transRes.cfg)
+	        this.rdas += (callee -> transRes.rda)
+	        val points = new PointsCollector().points(transRes.pst)
+	        pag.points ++= points
+	        pgPointsMap += (callee -> points.clone)
+	        processedProcedure += callee
+	      }
+        val cfg = cfgs(callee)
+        val rda = rdas(callee)
+        val points = pgPointsMap(callee)
+        setProcessed(points, callee, callerContext.copy)
+        pag.constructGraph(callee, points, callerContext.copy, cfg, rda)        
+        sCfg.collectionCfgToBaseGraph(callee, cfg)
       }
     }
     if(processed.contains(callee, callerContext)){

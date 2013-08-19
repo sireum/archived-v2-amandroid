@@ -10,6 +10,7 @@ import java.util.zip.GZIPInputStream
 import java.io._
 import org.sireum.amandroid.cache.AndroidCacheFile
 import org.sireum.util._
+import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -38,9 +39,18 @@ class InterProceduralTest extends InterProceduralTestFramework {
   aCache.setCacheSize(100000)
   aCache.setRemovePercent(20)
   
+  val libFileDir = FileUtil.toUri(new File(System.getProperty("user.home") + "/AndroidLibData/libPilarFiles/"))
+  val fileUris = FileUtil.listFiles(libFileDir, ".pilar", true)
+  val procedureMap =(
+    fileUris.par.map{
+	    fileUri =>
+	      LightWeightPilarParser(Right(fileUri))
+	  }.reduce{(map1, map2) => map1 ++ map2}
+  )
+  
   InterproceduralExamples.ofgModelFiles.
-    filter { s => s.endsWith("/ImplicitLoopTest.pilar") }.
+//    filter { s => s.endsWith("/bigWfgNp.pilar") }.
     foreach { fileUri =>
-      Analyzing title fileUri file (fileUri, libInfoTables, aCache)
+      Analyzing title fileUri file (fileUri, libInfoTables, aCache, procedureMap)
     }
 }

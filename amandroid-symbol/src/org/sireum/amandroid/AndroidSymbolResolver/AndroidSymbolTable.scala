@@ -105,9 +105,9 @@ object AndroidSymbolTable {
   }
   
   private def doBuildPST(stp : SymbolTableProducer, procedures : Seq[ResourceUri], parallel : Boolean = true) : Unit = {
-    println("parallel=" + parallel)
+//    println("parallel=" + parallel)
     val col : GenSeq[ResourceUri] = if (false) procedures.par else procedures
-    println("col size=" + col.size)
+//    println("col size=" + col.size)
     col.map { procedureUri =>
       val pstp = stp.procedureSymbolTableProducer(procedureUri)
       val pd = stp.tables.procedureAbsTable(procedureUri)

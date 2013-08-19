@@ -10,6 +10,8 @@ import org.sireum.amandroid.module.AndroidIntraProceduralModule
 import org.sireum.amandroid.module.AndroidInterProceduralModule
 import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.cache.AndroidCacheFile
+import org.sireum.amandroid.module.PreloadLibModule
+import java.io.File
 
 	/**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -23,17 +25,18 @@ trait InterProceduralTestFramework extends TestFramework {
     this
   }
 
-  def model(code : String, libInfoTables : AndroidLibInfoTables, aCache : AndroidCacheFile[ResourceUri]) =
-    InterProceduralConfiguration(title, ivector(Left(code)), libInfoTables, aCache)
+  def model(code : String, libInfoTables : AndroidLibInfoTables, aCache : AndroidCacheFile[ResourceUri], procedureMap : Map[String, String]) =
+    InterProceduralConfiguration(title, ivector(Left(code)), libInfoTables, aCache, procedureMap)
 
-  def file(fileUri : FileResourceUri, libInfoTables : AndroidLibInfoTables, aCache : AndroidCacheFile[ResourceUri]) =
-    InterProceduralConfiguration(title, ivector(Right(fileUri)), libInfoTables, aCache)
+  def file(fileUri : FileResourceUri, libInfoTables : AndroidLibInfoTables, aCache : AndroidCacheFile[ResourceUri], procedureMap : Map[String, String]) =
+    InterProceduralConfiguration(title, ivector(Right(fileUri)), libInfoTables, aCache, procedureMap)
 
   case class InterProceduralConfiguration //
   (title : String,
    srcs : ISeq[Either[String, FileResourceUri]],
    libInfoTables : AndroidLibInfoTables,
-   aCache : AndroidCacheFile[ResourceUri]) {
+   aCache : AndroidCacheFile[ResourceUri],
+   procedureMap : Map[String, String]) {
 
     test(title) {
     	println("####" + title + "#####")
@@ -53,10 +56,15 @@ trait InterProceduralTestFramework extends TestFramework {
         job.shouldBuildCfg = true
         job.shouldBuildRda = true
         
+//        import PreloadLibModule.ProducerView._
+//        job.libFileDir = FileUtil.toUri(new File(System.getProperty("user.home") + "/AndroidLibData/libPilarFiles/"))
+          
+        
         import AndroidInterProceduralModule.ProducerView._
         
         job.shouldBuildOFAsCfg = true
         job.appInfoOpt = None
+        job.procedureMap = this.procedureMap
       }
       
       pilarPipeline.compute(job)
@@ -113,6 +121,12 @@ trait InterProceduralTestFramework extends TestFramework {
       AndroidIntraProceduralModule
       )
       ,
+//      PipelineStage(
+//        "preload library stage",
+//        false,
+//        PreloadLibModule
+//      )
+//      ,
       PipelineStage(
       "Android InterProcedural Analysis",
       false,

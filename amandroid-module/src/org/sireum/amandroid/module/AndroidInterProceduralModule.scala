@@ -12,6 +12,7 @@ import org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisRe
 import org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult
 import org.sireum.pilar.symbol.SymbolTable
 import scala.Option
+import scala.collection.immutable.Map
 import scala.collection.mutable.Map
 
 object AndroidInterProceduralModule extends PipelineModule {
@@ -24,6 +25,7 @@ object AndroidInterProceduralModule extends PipelineModule {
   val globalInterResultKey = "Global.interResult"
   val globalAPIpermOptKey = "Global.APIpermOpt"
   val globalAndroidCacheKey = "Global.androidCache"
+  val globalProcedureMapKey = "Global.procedureMap"
   val globalAppInfoOptKey = "Global.appInfoOpt"
   val globalIntraResultKey = "Global.intraResult"
   val globalSymbolTableKey = "Global.symbolTable"
@@ -62,6 +64,11 @@ object AndroidInterProceduralModule extends PipelineModule {
     if(!(job ? AndroidInterProceduralModule.globalAppInfoOptKey)) {
       val appInfoOpt = Class.forName("org.sireum.amandroid.module.AndroidInterProcedural").getDeclaredMethod("$lessinit$greater$default$8").invoke(null).asInstanceOf[scala.Option[org.sireum.amandroid.appInfo.PrepareApp]]
       setAppInfoOpt(job.propertyMap, appInfoOpt)
+    }
+
+    if(!(job ? AndroidInterProceduralModule.globalProcedureMapKey)) {
+      val procedureMap = Class.forName("org.sireum.amandroid.module.AndroidInterProcedural").getDeclaredMethod("$lessinit$greater$default$10").invoke(null).asInstanceOf[scala.collection.immutable.Map[java.lang.String, java.lang.String]]
+      setProcedureMap(job.propertyMap, procedureMap)
     }
   }
 
@@ -296,6 +303,33 @@ object AndroidInterProceduralModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'intraResult'")       
     }
+    var _procedureMap : scala.Option[AnyRef] = None
+    var _procedureMapKey : scala.Option[String] = None
+
+    val keylistprocedureMap = List(AndroidInterProceduralModule.globalProcedureMapKey)
+    keylistprocedureMap.foreach(key => 
+      if(job ? key) { 
+        if(_procedureMap.isEmpty) {
+          _procedureMap = Some(job(key))
+          _procedureMapKey = Some(key)
+        }
+        if(!(job(key).asInstanceOf[AnyRef] eq _procedureMap.get)) {
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': 'procedureMap' keys '" + _procedureMapKey.get + " and '" + key + "' point to different objects.")
+        }
+      }
+    )
+
+    _procedureMap match{
+      case Some(x) =>
+        if(!x.isInstanceOf[scala.collection.immutable.Map[java.lang.String, java.lang.String]]){
+          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+            "Input error for '" + this.title + "': Wrong type found for 'procedureMap'.  Expecting 'scala.collection.immutable.Map[java.lang.String, java.lang.String]' but found '" + x.getClass.toString + "'")
+        }
+      case None =>
+        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
+          "Input error for '" + this.title + "': No value found for 'procedureMap'")       
+    }
     return tags
   }
 
@@ -434,6 +468,21 @@ object AndroidInterProceduralModule extends PipelineModule {
     return options
   }
 
+  def getProcedureMap (options : scala.collection.Map[Property.Key, Any]) : scala.collection.immutable.Map[java.lang.String, java.lang.String] = {
+    if (options.contains(AndroidInterProceduralModule.globalProcedureMapKey)) {
+       return options(AndroidInterProceduralModule.globalProcedureMapKey).asInstanceOf[scala.collection.immutable.Map[java.lang.String, java.lang.String]]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setProcedureMap (options : MMap[Property.Key, Any], procedureMap : scala.collection.immutable.Map[java.lang.String, java.lang.String]) : MMap[Property.Key, Any] = {
+
+    options(AndroidInterProceduralModule.globalProcedureMapKey) = procedureMap
+
+    return options
+  }
+
   def getInterResult (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisResult = {
     if (options.contains(AndroidInterProceduralModule.globalInterResultKey)) {
        return options(AndroidInterProceduralModule.globalInterResultKey).asInstanceOf[org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisResult]
@@ -459,6 +508,7 @@ object AndroidInterProceduralModule extends PipelineModule {
       def APIpermOpt : scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]] = AndroidInterProceduralModule.getAPIpermOpt(job.propertyMap)
       def appInfoOpt : scala.Option[org.sireum.amandroid.appInfo.PrepareApp] = AndroidInterProceduralModule.getAppInfoOpt(job.propertyMap)
       def intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult] = AndroidInterProceduralModule.getIntraResult(job.propertyMap)
+      def procedureMap : scala.collection.immutable.Map[java.lang.String, java.lang.String] = AndroidInterProceduralModule.getProcedureMap(job.propertyMap)
       def interResult : org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisResult = AndroidInterProceduralModule.getInterResult(job.propertyMap)
     }
   }
@@ -490,6 +540,9 @@ object AndroidInterProceduralModule extends PipelineModule {
       def intraResult_=(intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult]) { AndroidInterProceduralModule.setIntraResult(job.propertyMap, intraResult) }
       def intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult] = AndroidInterProceduralModule.getIntraResult(job.propertyMap)
 
+      def procedureMap_=(procedureMap : scala.collection.immutable.Map[java.lang.String, java.lang.String]) { AndroidInterProceduralModule.setProcedureMap(job.propertyMap, procedureMap) }
+      def procedureMap : scala.collection.immutable.Map[java.lang.String, java.lang.String] = AndroidInterProceduralModule.getProcedureMap(job.propertyMap)
+
       def interResult_=(interResult : org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisResult) { AndroidInterProceduralModule.setInterResult(job.propertyMap, interResult) }
       def interResult : org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisResult = AndroidInterProceduralModule.getInterResult(job.propertyMap)
     }
@@ -514,6 +567,8 @@ trait AndroidInterProceduralModule {
   def appInfoOpt : scala.Option[org.sireum.amandroid.appInfo.PrepareApp] = AndroidInterProceduralModule.getAppInfoOpt(job.propertyMap)
 
   def intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult] = AndroidInterProceduralModule.getIntraResult(job.propertyMap)
+
+  def procedureMap : scala.collection.immutable.Map[java.lang.String, java.lang.String] = AndroidInterProceduralModule.getProcedureMap(job.propertyMap)
 
 
   def interResult_=(interResult : org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisResult) { AndroidInterProceduralModule.setInterResult(job.propertyMap, interResult) }

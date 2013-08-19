@@ -231,7 +231,7 @@ class PointerAssignmentGraph[Node <: PtaNode]
     )
     ps.foreach(
       p=>{
-        val constraintMap = applyConstraint(p, points, cfg, rda)
+        val constraintMap = applyConstraint(p, ps, cfg, rda)
         buildingEdges(constraintMap, pUri, callerContext.copy)
       }  
     )
