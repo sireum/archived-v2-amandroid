@@ -3,13 +3,13 @@ package org.sireum.analyseLibrary.amandroid
 import org.sireum.androidLibraryFile.amandroid.AmandroidAndroidLibraryXmlFiles
 import java.io.File
 import org.sireum.amandroid.xml.AndroidXStream
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import java.util.zip.GZIPInputStream
 import java.io.FileInputStream
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTablesProducer
 import java.util.zip.GZIPOutputStream
 import java.io.FileOutputStream
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoResolver
+import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
+import org.sireum.amandroid.symbolResolver.AndroidLibInfoResolver
+import org.sireum.amandroid.symbolResolver.AndroidLibInfoTablesProducer
 
 object CombineLibInfoTables{
   def main(args: Array[String]) {

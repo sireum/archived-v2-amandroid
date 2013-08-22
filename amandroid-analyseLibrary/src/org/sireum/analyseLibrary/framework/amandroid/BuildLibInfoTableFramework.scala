@@ -3,7 +3,6 @@ package org.sireum.analyseLibrary.framework.amandroid
 import org.sireum.test.framework.TestFramework
 import org.sireum.util._
 import java.io._
-import org.sireum.amandroid.AndroidSymbolResolver._
 import java.util.zip.GZIPOutputStream
 import java.util.zip.GZIPInputStream
 import java.util.zip.ZipFile
@@ -14,6 +13,7 @@ import org.sireum.pilar.symbol.SymbolTable
 import org.sireum.pipeline.PipelineConfiguration
 import org.sireum.pipeline.PipelineStage
 import org.sireum.amandroid.xml.AndroidXStream
+import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
 
 
 class BuildLibInfoTableFramework extends TestFramework { 

@@ -10,34 +10,19 @@ import org.sireum.pilar.ast._
 import org.sireum.pilar.parser._
 import org.sireum.util._
 import org.sireum.pipeline._
-import org.sireum.amandroid.module.Dex2PilarWrapperModule
 import org.sireum.core.module.AlirIntraProceduralModule
 import java.io.PrintWriter
 import java.util.zip.ZipFile
 import org.sireum.core.module.ChunkingPilarParserModule
-import org.sireum.amandroid.module.PilarAndroidSymbolResolverModule
 import org.sireum.pilar.symbol.SymbolTable
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
-import org.sireum.amandroid.xml.AndroidXStream
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTableProducer
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.pilar.symbol.ProcedureSymbolTableData
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidSymbolTableData
-import org.sireum.amandroid.module.AndroidIntraProcedural
-import org.sireum.amandroid.module.AndroidIntraProceduralModule
-import org.sireum.amandroid.scfg.CompressedControlFlowGraph
-import org.sireum.amandroid.cache.AndroidCacheFile
 import org.sireum.alir.ControlFlowGraph
-import org.sireum.amandroid.module.PilarAndroidSymbolResolverModule
 import java.util.zip.GZIPInputStream
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
-import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidObjectFlowGraph
-import org.sireum.amandroid.objectFlowAnalysis.OfaNode
-import org.sireum.amandroid.objectFlowAnalysis.ObjectFlowGraph
-import org.sireum.amandroid.androidObjectFlowAnalysis.AndroidValueSet
 import java.io.File
-import org.sireum.amandroid.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
-import org.sireum.amandroid.module.AndroidIntraProceduralModule
+import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
+import org.sireum.amandroid.android.cache.AndroidCacheFile
+import org.sireum.amandroid.module._
 
 trait PreprocessLibraryFrameWork extends TestFramework { 
   

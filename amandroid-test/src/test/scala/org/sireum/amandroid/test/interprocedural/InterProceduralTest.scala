@@ -4,12 +4,12 @@ import org.sireum.amandroid.test.framework.interprocedural.InterProceduralTestFr
 import org.junit.runner._
 import org.scalatest.junit.JUnitRunner
 import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
-import org.sireum.amandroid.xml.AndroidXStream
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import java.util.zip.GZIPInputStream
 import java.io._
-import org.sireum.amandroid.cache.AndroidCacheFile
 import org.sireum.util._
+import org.sireum.amandroid.xml.AndroidXStream
+import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
+import org.sireum.amandroid.android.cache.AndroidCacheFile
 import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
 
 /**

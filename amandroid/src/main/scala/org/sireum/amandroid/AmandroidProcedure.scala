@@ -1,0 +1,481 @@
+package org.sireum.amandroid
+
+/**
+ * This class is a amandroid represent of the pilar procedure. It can belong to AmandroidRecord.
+ * You can also construct it manually. 
+ * 
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
+class AmandroidProcedure {
+	val constructorName : String = "<init>"
+	val staticInitializerName : String = "<clinit>"
+	var DEBUG : Boolean = false
+	
+	/**
+	 * short name of the procedure. e.g. equals
+	 */
+	
+	protected var shortName : String = null
+	
+	/**
+	 * full name of the procedure. e.g. [|java:lang:Object.equals|]
+	 */
+	
+	protected var name : String = null
+	
+	/**
+	 * signature of the procedure. e.g. [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
+	 */
+	
+	protected var signature : String = null
+	
+	/**
+	 * sub-signature of the procedure. e.g. equals:(Ljava/lang/Object;)Z
+	 */
+	
+	protected var subSignature : String = null
+	
+	/**
+	 * list of parameter types. e.g. List([java:lang:Object], [java:lang:String])
+	 */
+	
+	protected var paramTyps : List[String] = List()
+	
+	/**
+	 * return type. e.g. [|boolean|]
+	 */
+	
+	protected var returnTyp : String = null
+	
+	/**
+	 * declaring record of this procedure
+	 */
+	
+	protected var declaringRecord : AmandroidRecord = null
+	
+	/**
+   * the access flags integer represent for this procedure
+   */
+  
+  protected var accessFlags : Int = 0
+  
+  /**
+   * exceptions thrown by this procedure
+   */
+  
+  protected var exceptions : Set[AmandroidRecord] = Set()
+  
+  /**
+   * hold the body code of this procedure
+   */
+  
+  protected var procBody : ProcedureBody = null
+  
+  /**
+	 * is it declared in some AmandroidRecord
+	 */
+	
+	def isDeclared : Boolean = declaringRecord != null
+  
+  /**
+   * return hash code to provide structural equality
+   */
+  
+  def strEquHashCode : Int = this.returnTyp.hashCode() * 101 + this.accessFlags * 17 + this.name.hashCode()
+  
+  /**
+   * when you construct a amandroid procedure instance please call this init function first
+   */
+  
+  def init(name : String, sig : String, paramTyps : List[String], returnTyp : String, accessFlags : Int, thrownExceptions : List[AmandroidRecord]) : AmandroidProcedure = {
+	  setName(name)
+	  setSignature(sig)
+	  this.paramTyps ++= paramTyps
+	  this.returnTyp = returnTyp
+	  this.accessFlags = accessFlags
+	  
+	  if(exceptions.isEmpty || !thrownExceptions.isEmpty){
+	    exceptions ++= thrownExceptions
+	  }
+	  
+	  
+	  this
+	}
+  
+  /**
+   * when you construct a amandroid procedure instance please call this init function first
+   */
+  
+  def init(name : String, sig : String, paramTyps : List[String], returnTyp : String, accessFlags : Int) : AmandroidProcedure = {
+	  init(name, sig, paramTyps, returnTyp, accessFlags, List())
+	}
+  
+  /**
+   * when you construct a amandroid procedure instance please call this init function first
+   */
+  
+  def init(name : String, sig : String, paramTyps : List[String], returnTyp : String) : AmandroidProcedure = {
+	  init(name, sig, paramTyps, returnTyp, 0, List())
+	}
+  
+  /**
+   * get short name of this procedure
+   */
+  
+  def getShortName : String = this.shortName
+  
+  def getShortName(name : String) : String = {
+    if(isFullName(name)) name.substring(name.lastIndexOf('.') + 1, name.length() - 2)
+    else throw new RuntimeException("procedure name not correct: " + name)
+  }
+
+  def isFullName(name : String) : Boolean = name.startsWith("[|") && name.lastIndexOf('.') > 0
+  
+  /**
+   * get name of this procedure
+   */
+  
+  def getName : String = this.name
+  
+  /**
+	 * set declaring record of this field
+	 */
+  
+  def setDeclaringRecord(declRecord : AmandroidRecord) = if(declRecord != null) this.declaringRecord = declRecord
+	
+  /**
+	 * clear declaring record of this field
+	 */
+  
+  def clearDeclaringRecord = this.declaringRecord = null
+  
+  /**
+   * return the record which declares the current procedure
+   */
+  
+  def getDeclaringRecord = {
+    if(!isDeclared) throw new RuntimeException("no declaring record: " + getName)
+    declaringRecord
+  }
+  
+  /**
+   * sets the name of this procedure
+   */
+  
+  def setName(name : String) = {
+    val wasDeclared = isDeclared
+    val oldDeclaringRecord = declaringRecord
+    if(wasDeclared) oldDeclaringRecord.removeProcedure(this)
+    this.name = name
+    this.shortName = getShortName(name)
+    if(wasDeclared) oldDeclaringRecord.addProcedure(this)
+  }
+  
+  /**
+   * set signature of this procedure
+   */
+  
+  def setSignature(sig : String) = {
+    if(checkSignature(sig)){
+	    this.signature = sig
+	    this.subSignature = getSubSignature
+    } else throw new RuntimeException("not a full-qualified signature: " + sig)
+  }
+  
+  protected def checkSignature(sig : String) = sig.startsWith("[|") && sig.lastIndexOf('.') > 0
+  
+  /**
+   * get signature of this procedure
+   */
+  
+  def getSignature : String = this.signature
+  
+  /**
+   * get sub-signature of this procedure
+   */
+  
+  def getSubSignature : String = {
+    if(this.signature != null) {
+      this.signature.substring(this.signature.lastIndexOf('.') + 1, this.signature.length() - 2)
+    } else {
+      generateSubSignature
+    }
+  }
+  
+  /**
+   * generate signature of this procedure
+   */
+  
+  def generateSignature : String = {
+    val sb : StringBuffer = new StringBuffer
+    if(this.declaringRecord != null){
+	    val dc = this.declaringRecord
+	    sb.append("[|" + formatTypeToSigForm(dc.getName))
+	    sb.append("." + generateSubSignature + "|]")
+	    sb.toString().intern()
+    } else throw new RuntimeException("not declared: " + this.name)
+  }
+  
+  /**
+   * generate sub-signature of this procedure
+   */
+  
+  def generateSubSignature : String = {
+    val sb : StringBuffer = new StringBuffer
+    val rt = getReturnType
+    val pts = getParamTypes
+    sb.append(this.shortName + ":(")
+    pts.foreach{
+      pt =>
+        sb.append(formatTypeToSigForm(pt))
+    }
+    sb.append(formatTypeToSigForm(rt))
+    sb.toString().intern()
+  }
+  
+  /**
+   * input looks like [|java:lang:String|], output is Ljava/lang/String;
+   * Note: 'B' | 'C' | 'D' | 'F' | 'I' | 'J' | 'S' | 'Z'
+   */
+  
+  protected def formatTypeToSigForm(typ : String) : String = {
+    /*
+     * TODO: make type as a class
+     */
+    val (tmp, d) = getDimensionsAndRemoveArray(typ)
+    tmp match{
+      case "[|byte|]" => 		getTypeSig("B", d)
+      case "[|char|]" => 		getTypeSig("C", d)
+      case "[|double|]" => 	getTypeSig("D", d)
+      case "[|float|]" => 	getTypeSig("F", d)
+      case "[|int|]" => 		getTypeSig("I", d)
+      case "[|long|]" => 		getTypeSig("J", d)
+      case "[|short|]" =>		getTypeSig("S", d)
+      case "[|boolean|]" =>	getTypeSig("Z", d)
+      case "[|void|]" =>		"V"
+      case _ =>
+        getTypeSig("L" + tmp.substring(2, tmp.length() - 2).replaceAll(":", "/") + ";", d)
+    }
+  }
+  
+  protected def getTypeSig(typ : String, dimension : Int) : String = {
+    val sb = new StringBuffer
+    for(d <- 0 to dimension) sb.append("[")
+    sb.append("typ")
+    sb.toString().intern()
+  }
+  
+  protected def getDimensionsAndRemoveArray(typ : String) : (String, Int) = {
+    var d : Int = 0
+    var tmp = typ
+    while(tmp.endsWith("[]")){
+      d += 1
+      tmp = tmp.substring(0, tmp.length() - 2)
+    }
+    (tmp, d)
+  }
+  
+  /**
+   * set return type of this procedure
+   */
+  
+  def setReturnType(typ : String) = {
+    val wasDeclared = isDeclared
+    val oldDeclaringRecord = declaringRecord
+    if(wasDeclared) oldDeclaringRecord.removeProcedure(this)
+    this.returnTyp = typ
+    this.signature = generateSignature
+    this.subSignature = generateSubSignature
+    if(wasDeclared) oldDeclaringRecord.addProcedure(this)
+  }
+  
+  /**
+   * set parameter types of this procedure
+   */
+  
+  def setParameterTypes(typs : List[String]) = {
+    val wasDeclared = isDeclared
+    val oldDeclaringRecord = declaringRecord
+    if(wasDeclared) oldDeclaringRecord.removeProcedure(this)
+    this.paramTyps = typs
+    this.signature = generateSignature
+    this.subSignature = generateSubSignature
+    if(wasDeclared) oldDeclaringRecord.addProcedure(this)
+  }
+  
+  /**
+   * get return type of this procedure
+   */
+  
+  def getReturnType = this.returnTyp
+  
+  /**
+   * get paramTypes of this procedure
+   */
+  
+  def getParamTypes = this.paramTyps
+  
+  /**
+   * get i'th parameter's type of this procedure
+   */
+  
+  def getParamType(i : Int) = this.paramTyps(i)
+  
+  /*
+   * TODO: need to add how to reterive procedure body and set procedure body
+   */
+  
+  /**
+   * get the body of this procedure
+   */
+  
+  def getProcBody = this.procBody
+  
+  /**
+   * check procedure body available or not
+   */
+  
+  def hasProcBody = this.procBody != null
+  
+  /**
+   * clear procedure body
+   */
+  
+  def clearProcBody = this.procBody = null
+  
+  /**
+   * Adds exception throwed by this procedure
+   */
+  
+  def addExceptionIfAbsent(exc : AmandroidRecord) = {
+    if(!throwsException(exc)) addException(exc)
+  }
+  
+  /**
+   * Adds exception throwed by this procedure
+   */
+  
+  def addException(exc : AmandroidRecord) = {
+    if(DEBUG) println("Adding Exception: " + exc)
+    if(throwsException(exc)) throw new RuntimeException("already throw exception: " + exc)
+    this.exceptions += exc
+  }
+  
+  /**
+   * removes exception from this procedure
+   */
+  
+  def removeException(exc : AmandroidRecord) = {
+    if(DEBUG) println("Removing Exception: " + exc)
+    if(!throwsException(exc)) throw new RuntimeException("does not throw exception: " + exc)
+    this.exceptions -= exc
+  }
+  
+  /**
+   * throw this exception or not
+   */
+  
+  def throwsException(exc : AmandroidRecord) = this.exceptions.contains(exc)
+  
+  /**
+   * set exceptions for this procedure
+   */
+  
+  def setExceptions(excs : Set[AmandroidRecord]) = this.exceptions = excs
+  
+  /**
+   * get exceptions
+   */
+  
+  def getExceptions = this.exceptions
+  
+  /**
+   * return true if this procedure is concrete which means not abstract nor native
+   */
+  
+  def isConcrete = !isAbstract && ! isNative
+    
+  /**
+   * return true if this procedure is abstract
+   */
+  
+  def isAbstract : Boolean = AccessFlag.isAbstract(this.accessFlags)
+  
+  /**
+   * return true if this procedure is native
+   */
+  
+  def isNative : Boolean = AccessFlag.isNative(this.accessFlags)
+  
+  /**
+   * return true if this procedure is static
+   */
+  
+  def isStatic : Boolean = AccessFlag.isStatic(this.accessFlags)
+  
+  /**
+   * return true if this procedure is private
+   */
+  
+  def isPrivate : Boolean = AccessFlag.isPrivate(this.accessFlags)
+  
+  /**
+   * return true if this procedure is public
+   */
+  
+  def isPublic : Boolean = AccessFlag.isPublic(this.accessFlags)
+  
+  /**
+   * return true if this procedure is protected
+   */
+  
+  def isProtected : Boolean = AccessFlag.isProtected(this.accessFlags)
+  
+  /**
+   * return true if this procedure is final
+   */
+  
+  def isFinal : Boolean = AccessFlag.isFinal(this.accessFlags)
+  
+  /**
+   * return true if this procedure is synchronized
+   */
+  
+  def isSynchronized : Boolean = AccessFlag.isSynchronized(this.accessFlags)
+  
+  /**
+   * return true if this procedure is synthetic
+   */
+  
+  def isSynthetic : Boolean = AccessFlag.isSynthetic(this.accessFlags)
+  
+  /**
+   * return true if this procedure is constructor
+   */
+  
+  def isConstructor : Boolean = AccessFlag.isConstructor(this.accessFlags)
+  
+  /**
+   * return true if this procedure is declared_synchronized
+   */
+  
+  def isDeclaredSynchronized : Boolean = AccessFlag.isDeclaredSynchronized(this.accessFlags)
+  
+  /**
+   * return true if this procedure is main procedure
+   */
+  
+  def isMain : Boolean = isPublic && isStatic && this.subSignature == "main:([Ljava/lang/string;)V"
+    
+  /**
+   * return true if this procedure is a record initializer or main function
+   */
+    
+  def isEntryProcedure = {
+    if(isStatic && name == this.staticInitializerName) true
+    else isMain
+  }
+  
+  override def toString : String = getSignature
+  
+}

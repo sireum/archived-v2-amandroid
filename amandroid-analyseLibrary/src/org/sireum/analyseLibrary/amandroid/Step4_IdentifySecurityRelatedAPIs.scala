@@ -1,17 +1,17 @@
 package org.sireum.analyseLibrary.amandroid
 
 import scala.collection.JavaConversions._
-import org.sireum.amandroid.cache.AndroidCacheFile
 import org.sireum.amandroid.xml.AndroidXStream
 import org.sireum.util._
 import java.io._
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import java.util.zip.GZIPInputStream
 import org.sireum.androidLibraryFile.amandroid.AmandroidAndroidLibraryXmlFiles
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTablesProducer
-import org.sireum.amandroid.scfg.CompressedControlFlowGraph
 import org.sireum.alir.AlirLocationNode
 import java.util.zip.GZIPOutputStream
+import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
+import org.sireum.amandroid.android.cache.AndroidCacheFile
+import org.sireum.amandroid.symbolResolver.AndroidLibInfoTablesProducer
+import org.sireum.amandroid.intraProcedural.compressedControlFlowGraph.CompressedControlFlowGraph
 
 
 // sankar comments: the main method takes a list of atomic security APIs S as input, and it finds the set of procedures which 

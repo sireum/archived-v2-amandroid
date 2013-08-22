@@ -28,6 +28,6 @@ object AmandroidAndroidLibrarySplitPilarFiles extends AndroidLibrarySplitPilarFi
 }
 
 object AmandroidAndroidLibraryXmlFiles extends AndroidLibraryXmlFiles{
-  val XML_MODEL_DIR_URI = sourceDirUri(this.getClass, "./library/pilar/result")
+  val XML_MODEL_DIR_URI = sourceDirUri(this.getClass, "./library/result")
   def xmlModelFiles = androidLibraryFiles(XML_MODEL_DIR_URI)
 }

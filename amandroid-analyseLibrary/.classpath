@@ -3,8 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-lib"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-symbol"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-interProceduralAnalysis"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-alir"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-core-test"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-module"/>
@@ -13,8 +11,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-pilar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-pipeline"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-tools"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-xml"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/sireum-cache"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-module"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/amandroid"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

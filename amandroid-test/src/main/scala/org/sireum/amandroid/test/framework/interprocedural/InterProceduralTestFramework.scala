@@ -8,10 +8,10 @@ import org.sireum.core.module.ChunkingPilarParserModule
 import org.sireum.amandroid.module.PilarAndroidSymbolResolverModule
 import org.sireum.amandroid.module.AndroidIntraProceduralModule
 import org.sireum.amandroid.module.AndroidInterProceduralModule
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
-import org.sireum.amandroid.cache.AndroidCacheFile
 import org.sireum.amandroid.module.PreloadLibModule
 import java.io.File
+import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
+import org.sireum.amandroid.android.cache.AndroidCacheFile
 
 	/**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

@@ -9,10 +9,9 @@ import java.io._
 import org.sireum.amandroid.xml.AndroidXStream
 import org.sireum.util._
 import org.sireum.alir.AlirIntraProceduralGraph
-import org.sireum.amandroid.scfg.CompressedControlFlowGraph
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
-import org.sireum.amandroid.cache.AndroidCacheFile
 import java.util.zip.GZIPInputStream
+import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
+import org.sireum.amandroid.android.cache.AndroidCacheFile
 
 
 @RunWith(classOf[JUnitRunner])

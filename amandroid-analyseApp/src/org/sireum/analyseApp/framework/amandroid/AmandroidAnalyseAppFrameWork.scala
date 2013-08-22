@@ -14,10 +14,9 @@ import org.sireum.core.module.ChunkingPilarParserModule
 import org.sireum.amandroid.module.PilarAndroidSymbolResolverModule
 import org.sireum.amandroid.module.AndroidIntraProceduralModule
 import org.sireum.amandroid.xml.AndroidXStream
-import org.sireum.amandroid.AndroidSymbolResolver.AndroidLibInfoTables
 import org.sireum.alir.AlirIntraProceduralGraph
-import org.sireum.amandroid.scfg.CompressedControlFlowGraph
-import org.sireum.amandroid.cache.AndroidCacheFile
+import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
+import org.sireum.amandroid.android.cache.AndroidCacheFile
 
 // sankar introduces the following framework which adds one stage on top of AmandroidParserTestFrameWork 
 
