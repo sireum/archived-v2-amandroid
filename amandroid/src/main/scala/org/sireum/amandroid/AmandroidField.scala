@@ -1,7 +1,9 @@
 package org.sireum.amandroid
 
+import org.sireum.amandroid.util.StringFormConverter
+
 /**
- * This class is a amandroid represent of the pilar field. It can belong to AmandroidRecord.
+ * This class is an amandroid represent of the pilar field. It can belong to AmandroidRecord.
  * You can also construct it manually. 
  * 
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -45,20 +47,13 @@ class AmandroidField {
 	def init(name : String, typ : String, accessFlags : Int) : AmandroidField = {
 	  if(isSignature(name)){
 	    this.signature = name
-	    this.name = getNameFromSignature(name)
+	    this.name = StringFormConverter.getFieldNameFromFieldSignature(name)
 	  } else {
 	  	this.name = name
-	  	this.signature = getSignature(this.declaringRecord, name)
 	  }
 	  this.typ = typ
 	  this.accessFlags = accessFlags
 	  this
-	}
-	
-	protected def getNameFromSignature(sig : String) : String = {
-	  if(isSignature(sig)){
-	    sig.substring(sig.lastIndexOf('.') + 1, sig.length() - 2)
-	  } else throw new RuntimeException("given field signature is not a valid form: " + sig)
 	}
 	
 	/**
@@ -142,6 +137,7 @@ class AmandroidField {
 	
 	def setDeclaringRecord(dr : AmandroidRecord) ={
 	  this.declaringRecord = dr
+	  if(this.signature == null) generateSignature(this.declaringRecord, this.name)
 	}
 	
 	/**
@@ -184,17 +180,13 @@ class AmandroidField {
 	 * check given string is field signature or not
 	 */
 	
-	def isSignature(str : String) = (name.startsWith("[|") && name.lastIndexOf('.') > 0)
+	def isSignature(str : String) = StringFormConverter.isValidFieldSig(str)
 	
 	/**
-	 * get signature of this field
+	 * generate signature of this field
 	 */
 	
-	def getSignature(ar : AmandroidRecord, name : String) : String = {
-	  val sb = new StringBuffer
-	  sb.append(ar.getName.substring(0, ar.getName.length() - 2) + "." + name + "|]")
-	  sb.toString().intern()
-	}
+	def generateSignature(ar : AmandroidRecord, name : String) : String = StringFormConverter.generateFieldSignature(ar.getName, name)
 	
 	/**
 	 * get signature of this field

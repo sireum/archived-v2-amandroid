@@ -66,7 +66,7 @@ class SignatureParser(sig : String) {
     def getReturnObjectType() : Option[String] = {
       if(isReturnObject){
         val retPart = getReturnTypeSignature
-        Some(convertSigRecordPartToRecordName(retPart))
+        Some(StringFormConverter.formatSigToTypeForm(retPart))
       } else None
     }
     
@@ -121,16 +121,18 @@ class SignatureParser(sig : String) {
       while(iterator.hasNext){
         val p = iterator.next()
         if(p.startsWith("L")){
-        	params(count) = convertSigRecordPartToRecordName(p)
+        	params(count) = StringFormConverter.formatSigToTypeForm(p)
         }
         count+=1
       }
       params
     }
     
-    private def convertSigRecordPartToRecordName(p : String) : String = "[|" + p.substring(1, p.length()).replaceAll("\\/", ":").replaceAll(";", "") + "|]"
+    /**
+		 * get record name from procedure signature. e.g. [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|] -> [|java:lang:Object|]
+		 */
     
-    def getRecordName : String = convertSigRecordPartToRecordName(signature.substring(2, signature.indexOf('.')))
+    def getRecordName : String = StringFormConverter.getRecordNameFromProcedureSignature(this.signature)
     
     //before cut: [|LSavings;.interest:(I)V|], after cut: (I)V
     def getParamSig = {

@@ -218,37 +218,3 @@ object AndroidSymbolTable {
     }
   }
 }
-
-trait AndroidSymbolTableProducer extends SymbolTableReporter {
-  def tables : AndroidSymbolTableData
-
-  def procedureSymbolTableProducer //
-  (procedureUri : ResourceUri) : AndroidProcedureSymbolTableProducer
-
-  def toSymbolTable : SymbolTable
-}
-
-trait AndroidProcedureSymbolTableProducer {
-  def tables : ProcedureSymbolTableData
-
-  def androidSymbolTableProducer : AndroidSymbolTableProducer
-}
-
-sealed case class AndroidSymbolTableData //
-(declaredSymbols : MMap[FileResourceUri, MSet[ResourceUri]] = mmapEmpty,
-// constTable : MMap[ResourceUri, MBuffer[ConstDecl]] = mmapEmpty,
-// constElementTable : MMap[ResourceUri, ConstElement] = mmapEmpty,
-// enumTable : MMap[ResourceUri, MBuffer[EnumDecl]] = mmapEmpty,
-// enumElementTable : MMap[ResourceUri, EnumElement] = mmapEmpty,
-// extensionTable : MMap[ResourceUri, MBuffer[ExtensionDecl]] = mmapEmpty,
-// extensionElementTable : MMap[ResourceUri, ExtElement] = mmapEmpty,
-// funTable : MMap[ResourceUri, FunDecl] = mmapEmpty,
- globalVarTable : MMap[ResourceUri, GlobalVarDecl] = mmapEmpty,
- procedureTable : MMap[ResourceUri, MBuffer[ResourceUri]] = mmapEmpty,
- procedureAbsTable : MMap[ResourceUri, ProcedureDecl] = mmapEmpty,
- recordTable : MMap[ResourceUri, RecordDecl] = mmapEmpty,
-// attributeTable : MMap[ResourceUri, AttributeDecl] = mmapEmpty,
-// typeVarTable : MMap[ResourceUri, NameDefinition] = mmapEmpty,
-// typeAliasTable : MMap[ResourceUri, TypeAliasDecl] = mmapEmpty,
-// vsetTable : MMap[ResourceUri, VSetDecl] = mmapEmpty,
- dependency : DependencyMap = mmapEmpty)

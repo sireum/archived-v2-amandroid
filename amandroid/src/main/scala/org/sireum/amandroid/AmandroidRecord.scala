@@ -173,7 +173,7 @@ class AmandroidRecord {
 	
 	def addField(field : AmandroidField) = {
 	  if(field.isDeclared) throw new RuntimeException("already declared: " + field.getName)
-	  if(declaredField(field.getSignature)) throw new RuntimeException("field already exists: " + field.getName)
+	  if(declaresField(field.getSignature)) throw new RuntimeException("field already exists: " + field.getName)
 	  this.fields += field
 	  field.setDeclaringRecord(this)
 	}
@@ -182,19 +182,19 @@ class AmandroidRecord {
    * return is the field declared in this record
    */
   
-	def declaredField(sig : String) : Boolean = !getFields.filter(_.getSignature == sig).isEmpty
+	def declaresField(sig : String) : Boolean = !getFields.filter(_.getSignature == sig).isEmpty
 	
 	/**
 	 * whether this record declare a field with the given name
 	 */
 	
-	def declaredFieldByName(name : String) = !getFields.filter(_.getName == name).isEmpty
+	def declaresFieldByName(name : String) = !getFields.filter(_.getName == name).isEmpty
 	
 	/**
 	 * whether this record declare a field with the given name and type
 	 */
 	
-	def declaredField(name : String, typ : String) = !getFields.filter(f => (f.getName == name && f.getType == typ)).isEmpty
+	def declaresField(name : String, typ : String) = !getFields.filter(f => (f.getName == name && f.getType == typ)).isEmpty
 	
 	/**
 	 * removes the given field from this record
@@ -210,16 +210,24 @@ class AmandroidRecord {
 	 * get field from this record by the given name
 	 */
 	
-	def getField(name : String) : Option[AmandroidField] = {
-	  getFields.find(_.getName == name)
+	def getFieldByName(name : String) : AmandroidField = {
+	  val fopt = getFields.find(_.getName == name)
+	  fopt match{
+	    case Some(f) => f
+	    case None => throw new RuntimeException("No field " + name + " in record " + getName)
+	  }
 	}
 	
 	/**
 	 * get field from this record by the given signature
 	 */
 	
-	def getFieldBySig(sig : String) : Option[AmandroidField] = {
-	  getFields.find(_.getSignature == sig)
+	def getField(sig : String) : AmandroidField = {
+	  val fopt = getFields.find(_.getSignature == sig)
+	  fopt match{
+	    case Some(f) => f
+	    case None => throw new RuntimeException("No field signature " + sig + " in record " + getName)
+	  }
 	}
 	
 	/**
@@ -481,7 +489,7 @@ class AmandroidRecord {
   def setApplicationRecord = {
 	  val c = Center.getContainingSet(this)
 	  if(c != null) Center.removeFromContainingSet(this)
-	  Center.addApplicationRecords(this)
+	  Center.addApplicationRecord(this)
 	}
 	
 	/**
@@ -497,7 +505,7 @@ class AmandroidRecord {
   def setLibraryRecord = {
 	  val c = Center.getContainingSet(this)
 	  if(c != null) Center.removeFromContainingSet(this)
-	  Center.addLibraryRecords(this)
+	  Center.addLibraryRecord(this)
 	}
   
   /**

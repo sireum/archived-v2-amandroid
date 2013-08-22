@@ -1,5 +1,7 @@
 package org.sireum.amandroid
 
+import org.sireum.amandroid.util.StringFormConverter
+
 /**
  * This class is a amandroid represent of the pilar procedure. It can belong to AmandroidRecord.
  * You can also construct it manually. 
@@ -210,7 +212,7 @@ class AmandroidProcedure {
     val sb : StringBuffer = new StringBuffer
     if(this.declaringRecord != null){
 	    val dc = this.declaringRecord
-	    sb.append("[|" + formatTypeToSigForm(dc.getName))
+	    sb.append("[|" + StringFormConverter.formatTypeToSigForm(dc.getName))
 	    sb.append("." + generateSubSignature + "|]")
 	    sb.toString().intern()
     } else throw new RuntimeException("not declared: " + this.name)
@@ -227,52 +229,10 @@ class AmandroidProcedure {
     sb.append(this.shortName + ":(")
     pts.foreach{
       pt =>
-        sb.append(formatTypeToSigForm(pt))
+        sb.append(StringFormConverter.formatTypeToSigForm(pt))
     }
-    sb.append(formatTypeToSigForm(rt))
+    sb.append(StringFormConverter.formatTypeToSigForm(rt))
     sb.toString().intern()
-  }
-  
-  /**
-   * input looks like [|java:lang:String|], output is Ljava/lang/String;
-   * Note: 'B' | 'C' | 'D' | 'F' | 'I' | 'J' | 'S' | 'Z'
-   */
-  
-  protected def formatTypeToSigForm(typ : String) : String = {
-    /*
-     * TODO: make type as a class
-     */
-    val (tmp, d) = getDimensionsAndRemoveArray(typ)
-    tmp match{
-      case "[|byte|]" => 		getTypeSig("B", d)
-      case "[|char|]" => 		getTypeSig("C", d)
-      case "[|double|]" => 	getTypeSig("D", d)
-      case "[|float|]" => 	getTypeSig("F", d)
-      case "[|int|]" => 		getTypeSig("I", d)
-      case "[|long|]" => 		getTypeSig("J", d)
-      case "[|short|]" =>		getTypeSig("S", d)
-      case "[|boolean|]" =>	getTypeSig("Z", d)
-      case "[|void|]" =>		"V"
-      case _ =>
-        getTypeSig("L" + tmp.substring(2, tmp.length() - 2).replaceAll(":", "/") + ";", d)
-    }
-  }
-  
-  protected def getTypeSig(typ : String, dimension : Int) : String = {
-    val sb = new StringBuffer
-    for(d <- 0 to dimension) sb.append("[")
-    sb.append("typ")
-    sb.toString().intern()
-  }
-  
-  protected def getDimensionsAndRemoveArray(typ : String) : (String, Int) = {
-    var d : Int = 0
-    var tmp = typ
-    while(tmp.endsWith("[]")){
-      d += 1
-      tmp = tmp.substring(0, tmp.length() - 2)
-    }
-    (tmp, d)
   }
   
   /**
