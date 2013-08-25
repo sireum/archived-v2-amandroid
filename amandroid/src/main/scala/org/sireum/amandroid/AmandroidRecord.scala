@@ -2,8 +2,8 @@ package org.sireum.amandroid
 
 
 /**
- * This class is a amandroid represent of the pilar record. They are usually created by Center.
- * You can also construct it manually. 
+ * This class is a amandroid represent of the pilar record. They are usually created by Amandroid Resolver.
+ * You can also construct it manually. Please call init() method first when you want to do any further things.
  * 
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
@@ -74,6 +74,24 @@ class AmandroidRecord {
    */
   
   protected var subSigToProcedures : Map[String, AmandroidProcedure] = Map()
+  
+  /**
+   * didn't resolved extend relation list. It's a set of record names.
+   */
+  
+  var needToResolveExtends : Set[String] = Set()
+  
+  /**
+   * add need to resolve extend record
+   */
+  
+  def addNeedToResolveExtend(recName : String) = this.needToResolveExtends += recName
+  
+  /**
+   * add need to resolve extend records
+   */
+  
+  def addNeedToResolveExtends(recNames : Set[String]) = this.needToResolveExtends ++= recNames
   
   /**
    * when you construct a amandroid record instance please call this init function first
@@ -363,6 +381,14 @@ class AmandroidRecord {
 	 */
 	
 	def addInterface(i : AmandroidRecord) = {
+	  this.interfaces += i
+	}
+	
+	/**
+	 * add interface which directly implement by this record
+	 */
+	
+	def addInterfaceCheck(i : AmandroidRecord) = {
 	  if(implementsInterface(i.getName)) throw new RuntimeException("already exist this interface: " + i.getName)
 	  this.interfaces += i
 	}
@@ -392,6 +418,15 @@ class AmandroidRecord {
 	}
 	
 	/**
+	 * try to get super class
+	 */
+	
+	def tryGetSuperClass : Option[AmandroidRecord] = {
+	  if(!hasSuperClass) None
+	  else Some(this.superClass)
+	}
+	
+	/**
 	 * set super class
 	 */
 	
@@ -412,6 +447,15 @@ class AmandroidRecord {
 	def getOuterClass : AmandroidRecord = {
 	  if(!hasOuterClass) throw new RuntimeException("no outer class for: " + getName)
 	  else this.outerClass
+	}
+	
+	/**
+	 * try to get outer class
+	 */
+	
+	def tryGetOuterClass : Option[AmandroidRecord] = {
+	  if(!hasOuterClass) None
+	  else Some(this.outerClass)
 	}
 	
 	/**
@@ -519,6 +563,27 @@ class AmandroidRecord {
     this.packageName.startsWith("com.sun.") ||
     this.packageName.startsWith("org.omg.") ||
     this.packageName.startsWith("org.xml.")
+    
+  /**
+	 * retrieve code belong to this record
+	 */
+	
+	def retrieveCode = AmandroidCodeSource.getProcedureCode(getName)
+	
+	def printDetail = {
+    println("++++++++++++++++AmandroidRecord++++++++++++++++")
+    println("recName: " + getName)
+    println("packageName: " + getPackageName)
+    println("shortName: " + getShortName)
+    println("superClass: " + tryGetSuperClass)
+    println("outerClass: " + tryGetOuterClass)
+    println("implInterfaces: " + getInterfaces)
+    println("accessFlags: " + AccessFlag.toString(getAccessFlags))
+    println("isInCenter: " + isInCenter)
+    println("fields: " + getFields)
+    println("procedures: " + getProcedures)
+    println("++++++++++++++++++++++++++++++++")
+  }
 	
   override def toString : String = getName
 }

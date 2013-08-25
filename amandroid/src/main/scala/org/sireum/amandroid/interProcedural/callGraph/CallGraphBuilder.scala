@@ -370,7 +370,7 @@ class CallGraphBuilder {
       } else if(procedureCodeMap.contains(calleeSig)){
         if(!processedProcedure.contains(callee)){
 	        val code = procedureCodeMap(calleeSig)
-	        val transRes = Transform.run(code, this.androidLibInfoTables)(callee)
+	        val transRes = Transform.getIntraProcedureResult(code, this.androidLibInfoTables)(callee)
 	        this.cfgs += (callee -> transRes.cfg)
 	        this.rdas += (callee -> transRes.rda)
 	        val points = new PointsCollector().points(transRes.pst)

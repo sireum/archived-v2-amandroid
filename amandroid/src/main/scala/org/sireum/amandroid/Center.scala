@@ -2,9 +2,12 @@ package org.sireum.amandroid
 
 import org.sireum.amandroid.interProcedural.callGraph.CallGraph
 import org.sireum.amandroid.util.StringFormConverter
+import org.sireum.util._
 
 object Center {
   type VirtualLabel = String
+  
+  val DEBUG = false
   
   /**
    * set of records contained by current Center
@@ -54,6 +57,59 @@ object Center {
 	
 	private var callGraph : CallGraph[VirtualLabel] = null
 	
+
+  /**
+   * resolve records relation
+   */
+  
+  def resolveRecordsRelation = {
+    getRecords.foreach{
+      record =>
+		    var resolved : Set[String] = Set()
+		    record.needToResolveExtends.foreach{
+		      recName =>
+		        tryGetRecord(recName) match{
+		          case Some(parent) =>
+		            resolved += recName
+		            if(parent.isInterface) record.addInterface(parent)
+		            else record.setSuperClass(parent)
+		          case None =>
+		        }
+		    }
+		    record.needToResolveExtends --= resolved
+    }
+  }
+  
+  /**
+   * resolve records relation whole program
+   */
+  
+  def resolveRecordsRelationWholeProgram = {
+    if(!GlobalConfig.wholeProgram) throw new RuntimeException("It is not whole program mode.")
+    val worklist : MList[AmandroidRecord] = mlistEmpty
+    worklist ++= getRecords
+    while(!worklist.isEmpty){
+      val record = worklist.remove(0)
+      while(!record.needToResolveExtends.isEmpty){
+        val parName = record.needToResolveExtends.head
+        record.needToResolveExtends -= parName
+        tryGetRecord(parName) match{
+          case Some(parent) =>
+            if(parent.isInterface) record.addInterface(parent)
+            else record.setSuperClass(parent)
+            if(!parent.needToResolveExtends.isEmpty) worklist += parent
+          case None =>
+            val code = AmandroidCodeSource.getRecordCode(parName)
+            Transform.getSymbolResolveResult(Set(code))
+            val p = getRecord(parName)
+            if(p.isInterface) record.addInterface(p)
+            else record.setSuperClass(p)
+            if(!p.needToResolveExtends.isEmpty) worklist += p
+        }
+      }
+    }
+  }
+	
 	/**
 	 * get all application records
 	 */
@@ -94,12 +150,15 @@ object Center {
 	 * get record by record name. e.g. [|java:lang:Object|]
 	 */
 	
-	def getRecord(name : String) : AmandroidRecord = {
-	  this.records.foreach{
-	    record =>
-	      if(record.getName == name) return record
-	  }
-	  throw new RuntimeException("record " + name + " does not exists in record set.")
+	def getRecord(name : String) : AmandroidRecord =
+	  this.nameToRecord.getOrElse(name, throw new RuntimeException("record " + name + " does not exists in record set."))
+	
+	/**
+	 * try to get record by name, if it is not exist return None
+	 */
+	
+	def tryGetRecord(name : String) : Option[AmandroidRecord] = {
+	  this.nameToRecord.get(name)
 	}
 	
 	/**
@@ -164,6 +223,15 @@ object Center {
 	}
 	
 	/**
+	 * get main record
+	 */
+	
+	def tryGetMainRecord : Option[AmandroidRecord] = {
+	  if(!hasMainRecord) None
+	  else Some(this.mainRecord)
+	}
+	
+	/**
 	 * get main procedure
 	 */
 	
@@ -181,9 +249,36 @@ object Center {
 	  /*
 	   * TODO: think about how to implement points to analysis with Center
 	   */
-	  this.hierarchy = null
+	  releaseRecordHierarchy
 	  
 	}
+	
+	/**
+	 * reterive the normal record hierarchy
+	 */
+	
+	def getRecordHierarchy : RecordHierarchy ={
+	  if(!hasRecordHierarchy) setRecordHierarchy(new RecordHierarchy().build)
+	  this.hierarchy
+	}
+	
+	/**
+	 * set normal record hierarchy
+	 */
+	
+	def setRecordHierarchy(h : RecordHierarchy) = this.hierarchy = h
+	
+	/**
+	 * check whether record hierarchy available or not
+	 */
+	
+	def hasRecordHierarchy : Boolean = this.hierarchy != null
+	
+	/**
+	 * release record hierarchy
+	 */
+	
+	def releaseRecordHierarchy = this.hierarchy = null
 	
 	/**
 	 * add record into Center
@@ -191,9 +286,11 @@ object Center {
 	
 	def addRecord(ar : AmandroidRecord) = {
     if(ar.isInCenter) throw new RuntimeException("already in center: " + ar.getName)
-    if(containsRecord(ar)) throw new RuntimeException("duplicate record: " + ar.getName)
     this.records += ar
-    ar.setLibraryRecord
+    GlobalConfig.applicationRecordNames.contains(ar.getName) match{
+      case true => ar.setApplicationRecord
+      case false => ar.setLibraryRecord
+    }
     this.nameToRecord += (ar.getName -> ar)
     ar.setInCenter(true)
     modifyHierarchy
@@ -322,5 +419,30 @@ object Center {
 	 */
 	
 	def setEntryPoints(entryPoints : Set[AmandroidProcedure]) = this.entryPoints ++= entryPoints
+	
+	/**
+	 * has entry points
+	 */
+	
+	def hasEntryPoints : Boolean = this.entryPoints.isEmpty
+	
+	def printDetails = {
+	  println("***************Center***************")
+	  println("applicationRecords: " + getApplicationRecords)
+	  println("libraryRecords: " + getLibraryRecords)
+	  println("noCategorizedRecords: " + (getRecords -- getLibraryRecords -- getApplicationRecords))
+	  println("mainRecord: " + tryGetMainRecord)
+	  println("entryPoints: " + getEntryPoints)
+	  println("hierarchy: " + getRecordHierarchy)
+	  if(DEBUG){
+	  	getRecords.foreach{
+	  	  case r=>
+	  	  	r.printDetail
+	  	  	r.getProcedures.foreach(_.printDetail)
+	  	}
+	  	getRecordHierarchy.printDetails
+	  }
+	  println("******************************")
+	}
 	
 }

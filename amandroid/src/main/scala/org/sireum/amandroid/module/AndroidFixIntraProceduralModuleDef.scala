@@ -1,7 +1,5 @@
 package org.sireum.amandroid.module
 
-import org.sireum.pipeline.PipelineJob
-import org.sireum.pipeline.PipelineJobModuleInfo
 import org.sireum.util._
 import org.sireum.core.module.PilarParserModuleDef
 import org.sireum.pilar.symbol._
@@ -9,7 +7,6 @@ import org.sireum.pilar.ast._
 import org.sireum.pilar.parser.ChunkingPilarParser
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.alir.AlirIntraProceduralGraph
-import org.sireum.amandroid.symbolResolver.AndroidSymbolTable
 import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
 import org.sireum.amandroid.intraProcedural.pointsToAnalysis.IntraPointsToAnalysis
 import org.sireum.amandroid.android.interProcedural.objectFlowAnalysis.AndroidOfgPreprocessor
@@ -19,7 +16,10 @@ import org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode
 import org.sireum.amandroid.android.interProcedural.objectFlowAnalysis.AndroidObjectFlowGraph
 import org.sireum.amandroid.interProcedural.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.android.interProcedural.objectFlowAnalysis.AndroidValueSet
-import org.sireum.amandroid.ST
+import org.sireum.pipeline.PipelineJob
+import org.sireum.pipeline.PipelineJobModuleInfo
+import org.sireum.amandroid.symbolResolver.AmandroidSymbolTableBuilder
+import org.sireum.amandroid.symbolResolver.AmandroidSymbolTable
 
 class AndroidFixIntraProceduralModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends AndroidFixIntraProceduralModule {
   val newProcedures = this.appInfoOpt.get.getDummyMainCodeMap
@@ -28,11 +28,11 @@ class AndroidFixIntraProceduralModuleDef (val job : PipelineJob, info : Pipeline
   val ms = this.models
   val par = this.parallel
   val stp = this.symbolTable.asInstanceOf[SymbolTableProducer]
-  val fst = { _ : Unit => new ST }
+  val fst = { _ : Unit => new AmandroidSymbolTable }
   val libInfoTable = this.androidLibInfoTablesOpt match{case Some(a) => a; case None => {info.hasError = true; null}}
-  val result = AndroidSymbolTable(stp, ms, Set(), newModels, fst, libInfoTable, par, shouldBuildLibInfoTables)
+  val result = AmandroidSymbolTableBuilder(stp, ms, Set(), newModels, fst, libInfoTable, par, shouldBuildLibInfoTables)
 
-  val st = result._1.asInstanceOf[ST]
+  val st = result._1.asInstanceOf[AmandroidSymbolTable]
   info.tags ++= st.tags
 
   if (st.hasErrors)

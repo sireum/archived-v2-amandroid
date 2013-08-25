@@ -61,10 +61,6 @@ class AndroidLibInfoResolver
     androidRecordFieldResolver(stp)
     androidRecordProcedureResolver(stp)
     androidVMResolver()
-//    AndroidVirtualMethodGraph(stp,
-//                              recordHierarchyTable,
-//                              virtualMethodTable,
-//                              recordProcedureTable)
   }
   
   def androidRecordHierarchyResolver(stp : SymbolTableProducer) : Unit =

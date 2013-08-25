@@ -1,13 +1,15 @@
 package org.sireum.amandroid
 
-import org.sireum.pilar.parser.ChunkingPilarParser
 import org.sireum.util._
-import org.sireum.pilar.symbol._
+import org.sireum.amandroid.symbolResolver.AmandroidSymbolTable
 import org.sireum.pilar.ast._
-import org.sireum.amandroid.symbolResolver.AndroidSymbolTable
 import org.sireum.alir._
+import org.sireum.pilar.symbol.SymbolTable
 import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
+import org.sireum.pilar.parser.ChunkingPilarParser
+import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis._
+import org.sireum.amandroid.symbolResolver.AmandroidSymbolTableBuilder
 
 
 object Transform {
@@ -29,9 +31,9 @@ object Transform {
   ilist(MarkerTagKind.Problem, MarkerTagKind.Text))
   
   //for building symbol table
-  var par : Boolean = true
+  var par : Boolean = false
   var shouldBuildLibInfoTables : Boolean = false
-  val fst = { _ : Unit => new ST }
+  val fst = { _ : Unit => new AmandroidSymbolTable }
   
   //for building cfg
   type VirtualLabel = String
@@ -48,24 +50,28 @@ object Transform {
   }
   val saom : Boolean = true
   
-	def run(code : String, libInfoTable : AndroidLibInfoTables) : Map[ResourceUri, TransformResult] = {
-	  val newModels = ChunkingPilarParser(Left(code), reporter) match{case Some(m) => List(m); case None => List()}
-	  doRun(newModels, libInfoTable)
+	def getIntraProcedureResult(code : String, libInfoTable : AndroidLibInfoTables) : Map[ResourceUri, TransformIntraProcedureResult] = {
+	  val newModels = parseCodes(Set(code))
+	  doGetIntraProcedureResult(newModels, libInfoTable)
 	}
 	
-	def run(codes : Set[String], libInfoTable : AndroidLibInfoTables) : Map[ResourceUri, TransformResult] = {
-	  val newModels = codes.map{v => ChunkingPilarParser(Left(v), reporter) match{case Some(m) => m; case None => null}}.filter(v => v != null).toList
-	  doRun(newModels, libInfoTable)
+	def getIntraProcedureResult(codes : Set[String], libInfoTable : AndroidLibInfoTables) : Map[ResourceUri, TransformIntraProcedureResult] = {
+	  val newModels = parseCodes(codes)
+	  doGetIntraProcedureResult(newModels, libInfoTable)
 	}
 	
-	private def doRun(models : List[Model], libInfoTable : AndroidLibInfoTables) : Map[ResourceUri, TransformResult] = {
-	  val result = AndroidSymbolTable(models, fst, par, shouldBuildLibInfoTables)
+	private def doGetIntraProcedureResult(models : List[Model], libInfoTable : AndroidLibInfoTables) : Map[ResourceUri, TransformIntraProcedureResult] = {
+	  val result = AmandroidSymbolTableBuilder(models, fst, par, shouldBuildLibInfoTables)
 	  result._1.procedureSymbolTables.map{
 	    pst=>
 	      val (pool, cfg) = buildCfg(pst)
 	      val rda = buildRda(pst, cfg, libInfoTable)
-	      (pst.procedureUri, new TransformResult(pst, cfg, rda))
+	      (pst.procedureUri, new TransformIntraProcedureResult(pst, cfg, rda))
 	  }.toMap
+	}
+	
+	def parseCodes(codes : Set[String]) : List[Model] = {
+	  codes.map{v => ChunkingPilarParser(Left(v), reporter) match{case Some(m) => m; case None => null}}.filter(v => v != null).toList
 	}
 	
 	def buildCfg(pst : ProcedureSymbolTable) = {
@@ -92,79 +98,12 @@ object Transform {
         System.err.println("source:" + source + ".line:" + line + ".column:" + column + "message" + message)
     }
 	}
+	
+	def getSymbolResolveResult(codes : Set[String]) = {
+	  val newModels = parseCodes(codes)
+	  val result = AmandroidSymbolTableBuilder(newModels, fst, par, shouldBuildLibInfoTables)
+	}
 }
 
-case class TransformResult(pst : ProcedureSymbolTable, cfg : ControlFlowGraph[String], rda : AndroidReachingDefinitionAnalysis.Result)
+case class TransformIntraProcedureResult(pst : ProcedureSymbolTable, cfg : ControlFlowGraph[String], rda : AndroidReachingDefinitionAnalysis.Result)
 
-class ST extends SymbolTable with SymbolTableProducer {
-    st =>
-      
-    import Transform.ERROR_TAG_TYPE
-    import Transform.WARNING_TAG_TYPE
-    
-    val tables = SymbolTableData()
-    val tags = marrayEmpty[LocationTag]
-    var hasErrors = false
-     
-    def reportError(source : Option[FileResourceUri], line : Int,
-                    column : Int, message : String) : Unit = {
-      tags += Tag.toTag(source, line, column, message, ERROR_TAG_TYPE)
-      hasErrors = true
-    }
-
-    def reportWarning(fileUri : Option[String], line : Int,
-                      column : Int, message : String) : Unit =
-      tags += Tag.toTag(fileUri, line, column, message, WARNING_TAG_TYPE)
-
-    val pdMap = mmapEmpty[ResourceUri, PST]
-
-    def globalVars = null
-    def globalVar(globalUri : ResourceUri) = null
-
-    def procedures = tables.procedureTable.keys
-
-    def procedures(procedureUri : ResourceUri) = tables.procedureTable(procedureUri)
-
-    def procedureSymbolTables = pdMap.values
-
-    def procedureSymbolTable(procedureAbsUri : ResourceUri) : ProcedureSymbolTable =
-      procedureSymbolTableProducer(procedureAbsUri)
-
-    def procedureSymbolTableProducer(procedureAbsUri : ResourceUri) = {
-      assert(tables.procedureAbsTable.contains(procedureAbsUri))
-      pdMap.getOrElseUpdate(procedureAbsUri, new PST(procedureAbsUri))
-    }
-
-class PST(val procedureUri : ResourceUri)
-      extends ProcedureSymbolTable with ProcedureSymbolTableProducer {
-    val tables = ProcedureSymbolTableData()
-    var nextLocTable : CMap[ResourceUri, ResourceUri] = null
-    def symbolTable = st
-    def symbolTableProducer = st
-    def procedure = st.tables.procedureAbsTable(procedureUri)
-    def typeVars : ISeq[ResourceUri] = tables.typeVarTable.keys.toList
-    def params : ISeq[ResourceUri] = tables.params.toList
-    def isParam(localUri : ResourceUri) = tables.params.contains(localUri)
-    def locals : Iterable[ResourceUri] = tables.localVarTable.keys
-    def nonParamLocals : Iterable[ResourceUri] = tables.localVarTable.keys.filterNot(isParam)
-    def locations =
-      tables.bodyTables match {
-        case Some(bt) => procedure.body.asInstanceOf[ImplementedBody].locations
-        case _        => ivectorEmpty
-      }
-    def typeVar(typeVarUri : ResourceUri) : NameDefinition =
-      tables.typeVarTable(typeVarUri)
-    def param(paramUri : ResourceUri) : ParamDecl =
-      tables.localVarTable(paramUri).asInstanceOf[ParamDecl]
-    def local(localUri : ResourceUri) : LocalVarDecl =
-      tables.localVarTable(localUri).asInstanceOf[LocalVarDecl]
-    def location(locationIndex : Int) = locations(locationIndex)
-    def location(locationUri : ResourceUri) =
-      tables.bodyTables.get.locationTable(locationUri)
-    def catchClauses(locationIndex : Int) : Iterable[CatchClause] =
-      tables.bodyTables.get.catchTable.getOrElse(locationIndex,
-        Array.empty[CatchClause] : Iterable[CatchClause])
-  }
-
-  def toSymbolTable : SymbolTable = this
-}

@@ -6,16 +6,8 @@ import org.sireum.util._
 import org.sireum.pilar.symbol._
 import com.google.common.collect.{HashMultimap, HashBiMap}
 import scala.collection.parallel._
-
-
-/**
- * @author <a href="mailto:robby@k-state.edu">Robby</a>
- * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
- * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
- */
-
-trait AndroidSymbolTable extends SymbolTable
-
+import org.sireum.amandroid.AmandroidResolver
+import org.sireum.amandroid.Center
 
 /**
  * @author <a href="mailto:robby@k-state.edu">Robby</a>
@@ -24,7 +16,7 @@ trait AndroidSymbolTable extends SymbolTable
  */
 
 
-object AndroidSymbolTable {
+object AmandroidSymbolTableBuilder {
   def apply(models : ISeq[Model],
             stpConstructor : Unit => SymbolTableProducer,
             parallel : Boolean,
@@ -103,7 +95,7 @@ object AndroidSymbolTable {
     doBuildPST(stp, newProcedures, parallel)
   }
   
-  private def doBuildPST(stp : SymbolTableProducer, procedures : Seq[ResourceUri], parallel : Boolean = true) : Unit = {
+  private def doBuildPST(stp : SymbolTableProducer, procedures : Seq[ResourceUri], parallel : Boolean) : Unit = {
 //    println("parallel=" + parallel)
     val col : GenSeq[ResourceUri] = if (false) procedures.par else procedures
 //    println("col size=" + col.size)
@@ -130,6 +122,7 @@ object AndroidSymbolTable {
     val tablesOpt = if(shouldBuildLibInfoTables) Some(resolveVirtualMethod(stp)) else None
     resolvePackageElements(models, stp, parallel)
     buildProcedureSymbolTables(stp, parallel)
+    AmandroidResolver.resolveFromSTP(stp, parallel)
     (stp.toSymbolTable, tablesOpt)
   }
   

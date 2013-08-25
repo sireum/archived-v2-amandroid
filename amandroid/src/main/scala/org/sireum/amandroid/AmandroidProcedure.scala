@@ -1,6 +1,6 @@
 package org.sireum.amandroid
 
-import org.sireum.amandroid.util.StringFormConverter
+import org.sireum.amandroid.util._
 
 /**
  * This class is a amandroid represent of the pilar procedure. It can belong to AmandroidRecord.
@@ -68,7 +68,7 @@ class AmandroidProcedure {
   protected var exceptions : Set[AmandroidRecord] = Set()
   
   /**
-   * hold the body code of this procedure
+   * hold the body symbol table of this procedure
    */
   
   protected var procBody : ProcedureBody = null
@@ -99,8 +99,6 @@ class AmandroidProcedure {
 	  if(exceptions.isEmpty || !thrownExceptions.isEmpty){
 	    exceptions ++= thrownExceptions
 	  }
-	  
-	  
 	  this
 	}
   
@@ -117,6 +115,17 @@ class AmandroidProcedure {
    */
   
   def init(name : String, sig : String, paramTyps : List[String], returnTyp : String) : AmandroidProcedure = {
+	  init(name, sig, paramTyps, returnTyp, 0, List())
+	}
+  
+  /**
+   * when you construct a amandroid procedure instance please call this init function first
+   */
+  
+  def init(name : String, sig : String) : AmandroidProcedure = {
+    val sigP = new SignatureParser(sig).getParamSig
+    val paramTyps = sigP.getParameterTypes
+    val returnTyp = sigP.getReturnType
 	  init(name, sig, paramTyps, returnTyp, 0, List())
 	}
   
@@ -281,27 +290,53 @@ class AmandroidProcedure {
   
   def getParamType(i : Int) = this.paramTyps(i)
   
-  /*
-   * TODO: need to add how to reterive procedure body and set procedure body
-   */
-  
   /**
-   * get the body of this procedure
-   */
-  
-  def getProcBody = this.procBody
+	 * return the access flags for this procedure
+	 */
+	
+	def getAccessFlags = accessFlags
+	
+	/**
+	 * sets the access flags for this procedure
+	 */
+	
+	def setAccessFlags(af : Int) = this.accessFlags = af
+	
+	/**
+	 * sets the access flags for this procedure
+	 */
+	
+	def setAccessFlags(str : String) = this.accessFlags = AccessFlag.getAccessFlags(str)
+	
+	/**
+	 * set procedure body
+	 */
+	
+	def setProcedureBody(pb : ProcedureBody) = this.procBody = pb
+	
+	/**
+	 * retrieve code belong to this procedure
+	 */
+	
+	def retrieveCode = AmandroidCodeSource.getProcedureCode(getSignature)
+	
+	/**
+	 * get procedure body
+	 */
+	
+	def getProcedureBody = this.procBody
   
   /**
    * check procedure body available or not
    */
   
-  def hasProcBody = this.procBody != null
+  def hasProcedureBody = this.procBody != null
   
   /**
    * clear procedure body
    */
   
-  def clearProcBody = this.procBody = null
+  def clearProcedureBody = this.procBody = null
   
   /**
    * Adds exception throwed by this procedure
@@ -434,6 +469,18 @@ class AmandroidProcedure {
   def isEntryProcedure = {
     if(isStatic && name == this.staticInitializerName) true
     else isMain
+  }
+  
+  def printDetail = {
+    println("--------------AmandroidProcedure--------------")
+    println("procName: " + getName)
+    println("shortName: " + getShortName)
+    println("signature: " + getSignature)
+    println("subSignature: " + getSubSignature)
+    println("declaringRecord: " + getDeclaringRecord)
+    println("paramTypes: " + getParamTypes)
+    println("accessFlags: " + AccessFlag.toString(getAccessFlags))
+    println("----------------------------")
   }
   
   override def toString : String = getSignature

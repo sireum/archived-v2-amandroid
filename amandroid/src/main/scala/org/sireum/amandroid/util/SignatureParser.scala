@@ -59,7 +59,14 @@ class SignatureParser(sig : String) {
     }
     
     /**
-     * Get the method return type.
+     * Get the method return type. 
+     * 
+     * @return the method return type signature
+     */
+    def getReturnType() : String = StringFormConverter.formatSigToTypeForm(getReturnTypeSignature)
+    
+    /**
+     * Get the method return type. 
      * 
      * @return the method return type signature
      */
@@ -104,6 +111,17 @@ class SignatureParser(sig : String) {
       params
     }
     
+    def getParameterTypes() : List[String] = {
+      var count = 0
+      var params : List[String] = List()
+      val iterator = new ParameterSignatureIterator()
+      while(iterator.hasNext){
+        val p = StringFormConverter.formatSigToTypeForm(iterator.next())
+        params ::= p
+      }
+      params
+    }
+    
     def getParameterNum() : Int = {
       var count = 0
       val iterator = new ParameterSignatureIterator()
@@ -134,11 +152,21 @@ class SignatureParser(sig : String) {
     
     def getRecordName : String = StringFormConverter.getRecordNameFromProcedureSignature(this.signature)
     
-    //before cut: [|LSavings;.interest:(I)V|], after cut: (I)V
+    /**
+     * before cut: [|LSavings;.interest:(I)V|], after cut: (I)V
+     */
     def getParamSig = {
       signature = signature.substring(signature.indexOf(':') + 1, signature.length()-2)
       this
     }
+    
+//    /**
+//     * before cut: [|LSavings;.interest:(I)V|], after cut: LSavings;.interest:(I)V
+//     */
+//    def cutSigToJavaForm = {
+//      signature = signature.substring(2, signature.length()-2)
+//      this
+//    }
 
     private var signature : String = sig
 }

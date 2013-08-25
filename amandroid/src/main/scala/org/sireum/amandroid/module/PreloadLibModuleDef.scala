@@ -7,10 +7,9 @@ import org.sireum.util.FileUtil
 
 class PreloadLibModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends PreloadLibModule {
   val fileUris = FileUtil.listFiles(libFileDir, ".pilar", true)
-  this.procedureMap_=(
-    fileUris.par.map{
-	    fileUri =>
-	      LightWeightPilarParser(Right(fileUri))
-	  }.reduce{(map1, map2) => map1 ++ map2}
-  )
+  fileUris.par.map{
+    fileUri =>
+      LightWeightPilarParser(Right(fileUri))
+  }
+  this.procedureMap_=(Map())
 }

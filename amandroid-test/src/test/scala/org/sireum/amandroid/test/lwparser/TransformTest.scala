@@ -50,7 +50,7 @@ object TransformTest extends ImplicitLogging {
     val res = job.procedureMap
     println("res-->" + res.size)
     
-    val transRes = Transform.run(res.values.toSet, libInfoTable)
+    val transRes = Transform.getIntraProcedureResult(res.values.toSet, libInfoTable)
     println(transRes)
   }
   

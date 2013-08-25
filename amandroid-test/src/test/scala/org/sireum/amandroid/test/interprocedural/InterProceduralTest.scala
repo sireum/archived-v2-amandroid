@@ -41,16 +41,14 @@ class InterProceduralTest extends InterProceduralTestFramework {
   
   val libFileDir = FileUtil.toUri(new File(System.getProperty("user.home") + "/AndroidLibData/libPilarFiles/"))
   val fileUris = FileUtil.listFiles(libFileDir, ".pilar", true)
-  val procedureMap =(
-    fileUris.par.map{
-	    fileUri =>
-	      LightWeightPilarParser(Right(fileUri))
-	  }.reduce{(map1, map2) => map1 ++ map2}
-  )
+  fileUris.par.map{
+    fileUri =>
+      LightWeightPilarParser(Right(fileUri))
+  }
   
   InterproceduralExamples.ofgModelFiles.
 //    filter { s => s.endsWith("/bigWfgNp.pilar") }.
     foreach { fileUri =>
-      Analyzing title fileUri file (fileUri, libInfoTables, aCache, procedureMap)
+      Analyzing title fileUri file (fileUri, libInfoTables, aCache, Map())
     }
 }
