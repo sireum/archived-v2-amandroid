@@ -13,7 +13,6 @@ import org.sireum.alir.MonotoneDataFlowAnalysisResult
 import org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph
 import org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode
 import org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
 import org.sireum.pilar.ast.LocationDecl
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.pilar.symbol.SymbolTable
@@ -31,7 +30,6 @@ object PagModule extends PipelineModule {
   val cfgKey = "Pag.cfg"
   val globalPagKey = "Global.pag"
   val rdaKey = "Pag.rda"
-  val globalAndroidLibInfoTablesKey = "Global.androidLibInfoTables"
   val pagKey = "Pag.pag"
   val globalCfgKey = "Global.cfg"
 
@@ -95,33 +93,6 @@ object PagModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'rda'")       
     }
-    var _cfg : scala.Option[AnyRef] = None
-    var _cfgKey : scala.Option[String] = None
-
-    val keylistcfg = List(PagModule.globalCfgKey, CfgModule.cfgKey)
-    keylistcfg.foreach(key => 
-      if(job ? key) { 
-        if(_cfg.isEmpty) {
-          _cfg = Some(job(key))
-          _cfgKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _cfg.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'cfg' keys '" + _cfgKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _cfg match{
-      case Some(x) =>
-        if(!x.isInstanceOf[org.sireum.alir.ControlFlowGraph[java.lang.String]]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'cfg'.  Expecting 'org.sireum.alir.ControlFlowGraph[java.lang.String]' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'cfg'")       
-    }
     var _procedureSymbolTable : scala.Option[AnyRef] = None
     var _procedureSymbolTableKey : scala.Option[String] = None
 
@@ -149,32 +120,32 @@ object PagModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'procedureSymbolTable'")       
     }
-    var _androidLibInfoTables : scala.Option[AnyRef] = None
-    var _androidLibInfoTablesKey : scala.Option[String] = None
+    var _cfg : scala.Option[AnyRef] = None
+    var _cfgKey : scala.Option[String] = None
 
-    val keylistandroidLibInfoTables = List(PagModule.globalAndroidLibInfoTablesKey)
-    keylistandroidLibInfoTables.foreach(key => 
+    val keylistcfg = List(PagModule.globalCfgKey, CfgModule.cfgKey)
+    keylistcfg.foreach(key => 
       if(job ? key) { 
-        if(_androidLibInfoTables.isEmpty) {
-          _androidLibInfoTables = Some(job(key))
-          _androidLibInfoTablesKey = Some(key)
+        if(_cfg.isEmpty) {
+          _cfg = Some(job(key))
+          _cfgKey = Some(key)
         }
-        if(!(job(key).asInstanceOf[AnyRef] eq _androidLibInfoTables.get)) {
+        if(!(job(key).asInstanceOf[AnyRef] eq _cfg.get)) {
           tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'androidLibInfoTables' keys '" + _androidLibInfoTablesKey.get + " and '" + key + "' point to different objects.")
+            "Input error for '" + this.title + "': 'cfg' keys '" + _cfgKey.get + " and '" + key + "' point to different objects.")
         }
       }
     )
 
-    _androidLibInfoTables match{
+    _cfg match{
       case Some(x) =>
-        if(!x.isInstanceOf[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]){
+        if(!x.isInstanceOf[org.sireum.alir.ControlFlowGraph[java.lang.String]]){
           tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'androidLibInfoTables'.  Expecting 'org.sireum.amandroid.symbolResolver.AndroidLibInfoTables' but found '" + x.getClass.toString + "'")
+            "Input error for '" + this.title + "': Wrong type found for 'cfg'.  Expecting 'org.sireum.alir.ControlFlowGraph[java.lang.String]' but found '" + x.getClass.toString + "'")
         }
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'androidLibInfoTables'")       
+          "Input error for '" + this.title + "': No value found for 'cfg'")       
     }
     return tags
   }
@@ -222,6 +193,21 @@ object PagModule extends PipelineModule {
     return options
   }
 
+  def getProcedureSymbolTable (options : scala.collection.Map[Property.Key, Any]) : org.sireum.pilar.symbol.ProcedureSymbolTable = {
+    if (options.contains(PagModule.globalProcedureSymbolTableKey)) {
+       return options(PagModule.globalProcedureSymbolTableKey).asInstanceOf[org.sireum.pilar.symbol.ProcedureSymbolTable]
+    }
+
+    throw new Exception("Pipeline checker should guarantee we never reach here")
+  }
+
+  def setProcedureSymbolTable (options : MMap[Property.Key, Any], procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable) : MMap[Property.Key, Any] = {
+
+    options(PagModule.globalProcedureSymbolTableKey) = procedureSymbolTable
+
+    return options
+  }
+
   def getCfg (options : scala.collection.Map[Property.Key, Any]) : org.sireum.alir.ControlFlowGraph[java.lang.String] = {
     if (options.contains(PagModule.globalCfgKey)) {
        return options(PagModule.globalCfgKey).asInstanceOf[org.sireum.alir.ControlFlowGraph[java.lang.String]]
@@ -240,36 +226,6 @@ object PagModule extends PipelineModule {
 
     options(PagModule.globalCfgKey) = cfg
     options(cfgKey) = cfg
-
-    return options
-  }
-
-  def getProcedureSymbolTable (options : scala.collection.Map[Property.Key, Any]) : org.sireum.pilar.symbol.ProcedureSymbolTable = {
-    if (options.contains(PagModule.globalProcedureSymbolTableKey)) {
-       return options(PagModule.globalProcedureSymbolTableKey).asInstanceOf[org.sireum.pilar.symbol.ProcedureSymbolTable]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setProcedureSymbolTable (options : MMap[Property.Key, Any], procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable) : MMap[Property.Key, Any] = {
-
-    options(PagModule.globalProcedureSymbolTableKey) = procedureSymbolTable
-
-    return options
-  }
-
-  def getAndroidLibInfoTables (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.symbolResolver.AndroidLibInfoTables = {
-    if (options.contains(PagModule.globalAndroidLibInfoTablesKey)) {
-       return options(PagModule.globalAndroidLibInfoTablesKey).asInstanceOf[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setAndroidLibInfoTables (options : MMap[Property.Key, Any], androidLibInfoTables : org.sireum.amandroid.symbolResolver.AndroidLibInfoTables) : MMap[Property.Key, Any] = {
-
-    options(PagModule.globalAndroidLibInfoTablesKey) = androidLibInfoTables
 
     return options
   }
@@ -296,9 +252,8 @@ object PagModule extends PipelineModule {
   object ConsumerView {
     implicit class PagModuleConsumerView (val job : PropertyProvider) extends AnyVal {
       def rda : org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]] = PagModule.getRda(job.propertyMap)
-      def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = PagModule.getCfg(job.propertyMap)
       def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = PagModule.getProcedureSymbolTable(job.propertyMap)
-      def androidLibInfoTables : org.sireum.amandroid.symbolResolver.AndroidLibInfoTables = PagModule.getAndroidLibInfoTables(job.propertyMap)
+      def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = PagModule.getCfg(job.propertyMap)
       def pag : org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode] = PagModule.getPag(job.propertyMap)
     }
   }
@@ -309,14 +264,11 @@ object PagModule extends PipelineModule {
       def rda_=(rda : org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]) { PagModule.setRda(job.propertyMap, rda) }
       def rda : org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]] = PagModule.getRda(job.propertyMap)
 
-      def cfg_=(cfg : org.sireum.alir.ControlFlowGraph[java.lang.String]) { PagModule.setCfg(job.propertyMap, cfg) }
-      def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = PagModule.getCfg(job.propertyMap)
-
       def procedureSymbolTable_=(procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable) { PagModule.setProcedureSymbolTable(job.propertyMap, procedureSymbolTable) }
       def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = PagModule.getProcedureSymbolTable(job.propertyMap)
 
-      def androidLibInfoTables_=(androidLibInfoTables : org.sireum.amandroid.symbolResolver.AndroidLibInfoTables) { PagModule.setAndroidLibInfoTables(job.propertyMap, androidLibInfoTables) }
-      def androidLibInfoTables : org.sireum.amandroid.symbolResolver.AndroidLibInfoTables = PagModule.getAndroidLibInfoTables(job.propertyMap)
+      def cfg_=(cfg : org.sireum.alir.ControlFlowGraph[java.lang.String]) { PagModule.setCfg(job.propertyMap, cfg) }
+      def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = PagModule.getCfg(job.propertyMap)
 
       def pag_=(pag : org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode]) { PagModule.setPag(job.propertyMap, pag) }
       def pag : org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode] = PagModule.getPag(job.propertyMap)
@@ -329,11 +281,9 @@ trait PagModule {
 
   def rda : org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]] = PagModule.getRda(job.propertyMap)
 
-  def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = PagModule.getCfg(job.propertyMap)
-
   def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = PagModule.getProcedureSymbolTable(job.propertyMap)
 
-  def androidLibInfoTables : org.sireum.amandroid.symbolResolver.AndroidLibInfoTables = PagModule.getAndroidLibInfoTables(job.propertyMap)
+  def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = PagModule.getCfg(job.propertyMap)
 
 
   def pag_=(pag : org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode]) { PagModule.setPag(job.propertyMap, pag) }

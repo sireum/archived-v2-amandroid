@@ -9,10 +9,8 @@ import java.lang.String
 import org.sireum.amandroid.android.appInfo.PrepareApp
 import org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisResult
 import org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
 import org.sireum.pilar.symbol.SymbolTable
 import scala.Option
-import scala.collection.immutable.Map
 import scala.collection.mutable.Map
 
 object AndroidInterProceduralModule extends PipelineModule {
@@ -20,12 +18,8 @@ object AndroidInterProceduralModule extends PipelineModule {
   def origin = classOf[AndroidInterProcedural]
 
   val globalParallelKey = "Global.parallel"
-  val globalAndroidLibInfoTablesOptKey = "Global.androidLibInfoTablesOpt"
   val globalShouldBuildOFAsCfgKey = "Global.shouldBuildOFAsCfg"
   val globalInterResultKey = "Global.interResult"
-  val globalAPIpermOptKey = "Global.APIpermOpt"
-  val globalAndroidCacheKey = "Global.androidCache"
-  val globalProcedureMapKey = "Global.procedureMap"
   val globalAppInfoOptKey = "Global.appInfoOpt"
   val globalIntraResultKey = "Global.intraResult"
   val globalSymbolTableKey = "Global.symbolTable"
@@ -46,29 +40,14 @@ object AndroidInterProceduralModule extends PipelineModule {
   }
 
   override def initialize(job : PipelineJob) {
-    if(!(job ? AndroidInterProceduralModule.globalAndroidCacheKey)) {
-      val androidCache = Class.forName("org.sireum.amandroid.module.AndroidInterProcedural").getDeclaredMethod("$lessinit$greater$default$5").invoke(null).asInstanceOf[scala.Option[org.sireum.amandroid.android.cache.AndroidCacheFile[java.lang.String]]]
-      setAndroidCache(job.propertyMap, androidCache)
-    }
-
     if(!(job ? AndroidInterProceduralModule.globalShouldBuildOFAsCfgKey)) {
-      val shouldBuildOFAsCfg = Class.forName("org.sireum.amandroid.module.AndroidInterProcedural").getDeclaredMethod("$lessinit$greater$default$6").invoke(null).asInstanceOf[scala.Boolean]
+      val shouldBuildOFAsCfg = Class.forName("org.sireum.amandroid.module.AndroidInterProcedural").getDeclaredMethod("$lessinit$greater$default$4").invoke(null).asInstanceOf[scala.Boolean]
       setShouldBuildOFAsCfg(job.propertyMap, shouldBuildOFAsCfg)
     }
 
-    if(!(job ? AndroidInterProceduralModule.globalAPIpermOptKey)) {
-      val APIpermOpt = Class.forName("org.sireum.amandroid.module.AndroidInterProcedural").getDeclaredMethod("$lessinit$greater$default$7").invoke(null).asInstanceOf[scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]]]
-      setAPIpermOpt(job.propertyMap, APIpermOpt)
-    }
-
     if(!(job ? AndroidInterProceduralModule.globalAppInfoOptKey)) {
-      val appInfoOpt = Class.forName("org.sireum.amandroid.module.AndroidInterProcedural").getDeclaredMethod("$lessinit$greater$default$8").invoke(null).asInstanceOf[scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp]]
+      val appInfoOpt = Class.forName("org.sireum.amandroid.module.AndroidInterProcedural").getDeclaredMethod("$lessinit$greater$default$5").invoke(null).asInstanceOf[scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp]]
       setAppInfoOpt(job.propertyMap, appInfoOpt)
-    }
-
-    if(!(job ? AndroidInterProceduralModule.globalProcedureMapKey)) {
-      val procedureMap = Class.forName("org.sireum.amandroid.module.AndroidInterProcedural").getDeclaredMethod("$lessinit$greater$default$10").invoke(null).asInstanceOf[scala.collection.immutable.Map[java.lang.String, java.lang.String]]
-      setProcedureMap(job.propertyMap, procedureMap)
     }
   }
 
@@ -141,60 +120,6 @@ object AndroidInterProceduralModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'symbolTable'")       
     }
-    var _androidLibInfoTablesOpt : scala.Option[AnyRef] = None
-    var _androidLibInfoTablesOptKey : scala.Option[String] = None
-
-    val keylistandroidLibInfoTablesOpt = List(AndroidInterProceduralModule.globalAndroidLibInfoTablesOptKey)
-    keylistandroidLibInfoTablesOpt.foreach(key => 
-      if(job ? key) { 
-        if(_androidLibInfoTablesOpt.isEmpty) {
-          _androidLibInfoTablesOpt = Some(job(key))
-          _androidLibInfoTablesOptKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _androidLibInfoTablesOpt.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'androidLibInfoTablesOpt' keys '" + _androidLibInfoTablesOptKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _androidLibInfoTablesOpt match{
-      case Some(x) =>
-        if(!x.isInstanceOf[scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'androidLibInfoTablesOpt'.  Expecting 'scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'androidLibInfoTablesOpt'")       
-    }
-    var _androidCache : scala.Option[AnyRef] = None
-    var _androidCacheKey : scala.Option[String] = None
-
-    val keylistandroidCache = List(AndroidInterProceduralModule.globalAndroidCacheKey)
-    keylistandroidCache.foreach(key => 
-      if(job ? key) { 
-        if(_androidCache.isEmpty) {
-          _androidCache = Some(job(key))
-          _androidCacheKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _androidCache.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'androidCache' keys '" + _androidCacheKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _androidCache match{
-      case Some(x) =>
-        if(!x.isInstanceOf[scala.Option[org.sireum.amandroid.android.cache.AndroidCacheFile[java.lang.String]]]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'androidCache'.  Expecting 'scala.Option[org.sireum.amandroid.android.cache.AndroidCacheFile[java.lang.String]]' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'androidCache'")       
-    }
     var _shouldBuildOFAsCfg : scala.Option[AnyRef] = None
     var _shouldBuildOFAsCfgKey : scala.Option[String] = None
 
@@ -221,33 +146,6 @@ object AndroidInterProceduralModule extends PipelineModule {
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'shouldBuildOFAsCfg'")       
-    }
-    var _APIpermOpt : scala.Option[AnyRef] = None
-    var _APIpermOptKey : scala.Option[String] = None
-
-    val keylistAPIpermOpt = List(AndroidInterProceduralModule.globalAPIpermOptKey)
-    keylistAPIpermOpt.foreach(key => 
-      if(job ? key) { 
-        if(_APIpermOpt.isEmpty) {
-          _APIpermOpt = Some(job(key))
-          _APIpermOptKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _APIpermOpt.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'APIpermOpt' keys '" + _APIpermOptKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _APIpermOpt match{
-      case Some(x) =>
-        if(!x.isInstanceOf[scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]]]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'APIpermOpt'.  Expecting 'scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]]' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'APIpermOpt'")       
     }
     var _appInfoOpt : scala.Option[AnyRef] = None
     var _appInfoOptKey : scala.Option[String] = None
@@ -303,33 +201,6 @@ object AndroidInterProceduralModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'intraResult'")       
     }
-    var _procedureMap : scala.Option[AnyRef] = None
-    var _procedureMapKey : scala.Option[String] = None
-
-    val keylistprocedureMap = List(AndroidInterProceduralModule.globalProcedureMapKey)
-    keylistprocedureMap.foreach(key => 
-      if(job ? key) { 
-        if(_procedureMap.isEmpty) {
-          _procedureMap = Some(job(key))
-          _procedureMapKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _procedureMap.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'procedureMap' keys '" + _procedureMapKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _procedureMap match{
-      case Some(x) =>
-        if(!x.isInstanceOf[scala.collection.immutable.Map[java.lang.String, java.lang.String]]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'procedureMap'.  Expecting 'scala.collection.immutable.Map[java.lang.String, java.lang.String]' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'procedureMap'")       
-    }
     return tags
   }
 
@@ -378,36 +249,6 @@ object AndroidInterProceduralModule extends PipelineModule {
     return options
   }
 
-  def getAndroidLibInfoTablesOpt (options : scala.collection.Map[Property.Key, Any]) : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables] = {
-    if (options.contains(AndroidInterProceduralModule.globalAndroidLibInfoTablesOptKey)) {
-       return options(AndroidInterProceduralModule.globalAndroidLibInfoTablesOptKey).asInstanceOf[scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setAndroidLibInfoTablesOpt (options : MMap[Property.Key, Any], androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]) : MMap[Property.Key, Any] = {
-
-    options(AndroidInterProceduralModule.globalAndroidLibInfoTablesOptKey) = androidLibInfoTablesOpt
-
-    return options
-  }
-
-  def getAndroidCache (options : scala.collection.Map[Property.Key, Any]) : scala.Option[org.sireum.amandroid.android.cache.AndroidCacheFile[java.lang.String]] = {
-    if (options.contains(AndroidInterProceduralModule.globalAndroidCacheKey)) {
-       return options(AndroidInterProceduralModule.globalAndroidCacheKey).asInstanceOf[scala.Option[org.sireum.amandroid.android.cache.AndroidCacheFile[java.lang.String]]]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setAndroidCache (options : MMap[Property.Key, Any], androidCache : scala.Option[org.sireum.amandroid.android.cache.AndroidCacheFile[java.lang.String]]) : MMap[Property.Key, Any] = {
-
-    options(AndroidInterProceduralModule.globalAndroidCacheKey) = androidCache
-
-    return options
-  }
-
   def getShouldBuildOFAsCfg (options : scala.collection.Map[Property.Key, Any]) : scala.Boolean = {
     if (options.contains(AndroidInterProceduralModule.globalShouldBuildOFAsCfgKey)) {
        return options(AndroidInterProceduralModule.globalShouldBuildOFAsCfgKey).asInstanceOf[scala.Boolean]
@@ -419,21 +260,6 @@ object AndroidInterProceduralModule extends PipelineModule {
   def setShouldBuildOFAsCfg (options : MMap[Property.Key, Any], shouldBuildOFAsCfg : scala.Boolean) : MMap[Property.Key, Any] = {
 
     options(AndroidInterProceduralModule.globalShouldBuildOFAsCfgKey) = shouldBuildOFAsCfg
-
-    return options
-  }
-
-  def getAPIpermOpt (options : scala.collection.Map[Property.Key, Any]) : scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]] = {
-    if (options.contains(AndroidInterProceduralModule.globalAPIpermOptKey)) {
-       return options(AndroidInterProceduralModule.globalAPIpermOptKey).asInstanceOf[scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]]]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setAPIpermOpt (options : MMap[Property.Key, Any], APIpermOpt : scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]]) : MMap[Property.Key, Any] = {
-
-    options(AndroidInterProceduralModule.globalAPIpermOptKey) = APIpermOpt
 
     return options
   }
@@ -468,21 +294,6 @@ object AndroidInterProceduralModule extends PipelineModule {
     return options
   }
 
-  def getProcedureMap (options : scala.collection.Map[Property.Key, Any]) : scala.collection.immutable.Map[java.lang.String, java.lang.String] = {
-    if (options.contains(AndroidInterProceduralModule.globalProcedureMapKey)) {
-       return options(AndroidInterProceduralModule.globalProcedureMapKey).asInstanceOf[scala.collection.immutable.Map[java.lang.String, java.lang.String]]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setProcedureMap (options : MMap[Property.Key, Any], procedureMap : scala.collection.immutable.Map[java.lang.String, java.lang.String]) : MMap[Property.Key, Any] = {
-
-    options(AndroidInterProceduralModule.globalProcedureMapKey) = procedureMap
-
-    return options
-  }
-
   def getInterResult (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisResult = {
     if (options.contains(AndroidInterProceduralModule.globalInterResultKey)) {
        return options(AndroidInterProceduralModule.globalInterResultKey).asInstanceOf[org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisResult]
@@ -502,13 +313,9 @@ object AndroidInterProceduralModule extends PipelineModule {
     implicit class AndroidInterProceduralModuleConsumerView (val job : PropertyProvider) extends AnyVal {
       def parallel : scala.Boolean = AndroidInterProceduralModule.getParallel(job.propertyMap)
       def symbolTable : org.sireum.pilar.symbol.SymbolTable = AndroidInterProceduralModule.getSymbolTable(job.propertyMap)
-      def androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables] = AndroidInterProceduralModule.getAndroidLibInfoTablesOpt(job.propertyMap)
-      def androidCache : scala.Option[org.sireum.amandroid.android.cache.AndroidCacheFile[java.lang.String]] = AndroidInterProceduralModule.getAndroidCache(job.propertyMap)
       def shouldBuildOFAsCfg : scala.Boolean = AndroidInterProceduralModule.getShouldBuildOFAsCfg(job.propertyMap)
-      def APIpermOpt : scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]] = AndroidInterProceduralModule.getAPIpermOpt(job.propertyMap)
       def appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp] = AndroidInterProceduralModule.getAppInfoOpt(job.propertyMap)
       def intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult] = AndroidInterProceduralModule.getIntraResult(job.propertyMap)
-      def procedureMap : scala.collection.immutable.Map[java.lang.String, java.lang.String] = AndroidInterProceduralModule.getProcedureMap(job.propertyMap)
       def interResult : org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisResult = AndroidInterProceduralModule.getInterResult(job.propertyMap)
     }
   }
@@ -522,26 +329,14 @@ object AndroidInterProceduralModule extends PipelineModule {
       def symbolTable_=(symbolTable : org.sireum.pilar.symbol.SymbolTable) { AndroidInterProceduralModule.setSymbolTable(job.propertyMap, symbolTable) }
       def symbolTable : org.sireum.pilar.symbol.SymbolTable = AndroidInterProceduralModule.getSymbolTable(job.propertyMap)
 
-      def androidLibInfoTablesOpt_=(androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]) { AndroidInterProceduralModule.setAndroidLibInfoTablesOpt(job.propertyMap, androidLibInfoTablesOpt) }
-      def androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables] = AndroidInterProceduralModule.getAndroidLibInfoTablesOpt(job.propertyMap)
-
-      def androidCache_=(androidCache : scala.Option[org.sireum.amandroid.android.cache.AndroidCacheFile[java.lang.String]]) { AndroidInterProceduralModule.setAndroidCache(job.propertyMap, androidCache) }
-      def androidCache : scala.Option[org.sireum.amandroid.android.cache.AndroidCacheFile[java.lang.String]] = AndroidInterProceduralModule.getAndroidCache(job.propertyMap)
-
       def shouldBuildOFAsCfg_=(shouldBuildOFAsCfg : scala.Boolean) { AndroidInterProceduralModule.setShouldBuildOFAsCfg(job.propertyMap, shouldBuildOFAsCfg) }
       def shouldBuildOFAsCfg : scala.Boolean = AndroidInterProceduralModule.getShouldBuildOFAsCfg(job.propertyMap)
-
-      def APIpermOpt_=(APIpermOpt : scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]]) { AndroidInterProceduralModule.setAPIpermOpt(job.propertyMap, APIpermOpt) }
-      def APIpermOpt : scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]] = AndroidInterProceduralModule.getAPIpermOpt(job.propertyMap)
 
       def appInfoOpt_=(appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp]) { AndroidInterProceduralModule.setAppInfoOpt(job.propertyMap, appInfoOpt) }
       def appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp] = AndroidInterProceduralModule.getAppInfoOpt(job.propertyMap)
 
       def intraResult_=(intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult]) { AndroidInterProceduralModule.setIntraResult(job.propertyMap, intraResult) }
       def intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult] = AndroidInterProceduralModule.getIntraResult(job.propertyMap)
-
-      def procedureMap_=(procedureMap : scala.collection.immutable.Map[java.lang.String, java.lang.String]) { AndroidInterProceduralModule.setProcedureMap(job.propertyMap, procedureMap) }
-      def procedureMap : scala.collection.immutable.Map[java.lang.String, java.lang.String] = AndroidInterProceduralModule.getProcedureMap(job.propertyMap)
 
       def interResult_=(interResult : org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisResult) { AndroidInterProceduralModule.setInterResult(job.propertyMap, interResult) }
       def interResult : org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisResult = AndroidInterProceduralModule.getInterResult(job.propertyMap)
@@ -556,19 +351,11 @@ trait AndroidInterProceduralModule {
 
   def symbolTable : org.sireum.pilar.symbol.SymbolTable = AndroidInterProceduralModule.getSymbolTable(job.propertyMap)
 
-  def androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables] = AndroidInterProceduralModule.getAndroidLibInfoTablesOpt(job.propertyMap)
-
-  def androidCache : scala.Option[org.sireum.amandroid.android.cache.AndroidCacheFile[java.lang.String]] = AndroidInterProceduralModule.getAndroidCache(job.propertyMap)
-
   def shouldBuildOFAsCfg : scala.Boolean = AndroidInterProceduralModule.getShouldBuildOFAsCfg(job.propertyMap)
-
-  def APIpermOpt : scala.Option[scala.collection.mutable.Map[java.lang.String, scala.collection.mutable.ListBuffer[java.lang.String]]] = AndroidInterProceduralModule.getAPIpermOpt(job.propertyMap)
 
   def appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp] = AndroidInterProceduralModule.getAppInfoOpt(job.propertyMap)
 
   def intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult] = AndroidInterProceduralModule.getIntraResult(job.propertyMap)
-
-  def procedureMap : scala.collection.immutable.Map[java.lang.String, java.lang.String] = AndroidInterProceduralModule.getProcedureMap(job.propertyMap)
 
 
   def interResult_=(interResult : org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisResult) { AndroidInterProceduralModule.setInterResult(job.propertyMap, interResult) }

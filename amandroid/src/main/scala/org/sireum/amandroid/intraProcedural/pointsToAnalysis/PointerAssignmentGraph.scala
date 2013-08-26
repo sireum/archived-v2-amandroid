@@ -16,7 +16,6 @@ import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid._
 import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
 import org.sireum.amandroid.interProcedural.objectFlowAnalysis.InvokePointNode
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
 
 
 class PointsToMap {
@@ -488,24 +487,16 @@ class PointerAssignmentGraph[Node <: PtaNode]
     }
   }
   
-  def getDirectCallee(pi : PointI,
-                      androidLibInfoTables : AndroidLibInfoTables) : ResourceUri = {
-    androidLibInfoTables.getProcedureUriBySignature(pi.varName)
-  }
+  def getDirectCallee(pi : PointI) : AmandroidProcedure = Center.getProcedure(pi.varName)
   
-  /**
-   * This is the beta method in original algo
-   */ 
+
   def getCalleeSet(diff : MSet[PTAInstance],
-	                 pi : PointI,
-	                 androidLibInfoTables : AndroidLibInfoTables) : MSet[ResourceUri] = {
-    val calleeSet : MSet[ResourceUri] = msetEmpty
+	                 pi : PointI) : MSet[AmandroidProcedure] = {
+    val calleeSet : MSet[AmandroidProcedure] = msetEmpty
     diff.foreach{
       d => 
-        val recordUri = androidLibInfoTables.getRecordUri(d.getClassName)
-        val procUri = androidLibInfoTables.findProcedureUri(recordUri, androidLibInfoTables.getSubSignature(pi.varName))
-        if(procUri != null)
-        	calleeSet += procUri
+        val p = Center.getProcedure(pi.varName)
+        calleeSet += p
     }
     calleeSet
   }

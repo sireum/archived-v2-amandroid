@@ -11,7 +11,6 @@ import org.sireum.pipeline.PipelineStage
 import org.sireum.core.module._
 import org.sireum.pipeline.PipelineJob
 import org.sireum.pilar.symbol.SymbolTable
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.android.appInfo.PrepareApp
 import org.sireum.pipeline.gen.ModuleGenerator
 
@@ -23,9 +22,6 @@ case class AndroidApplicationPrepare(
   
   @Input
   intraResult : MMap[ResourceUri, AndroidIntraProcedural.AndroidIntraAnalysisResult],
-  
-  @Input
-  androidLibInfoTablesOpt : Option[AndroidLibInfoTables],
   
   @Input
   symbolTable : SymbolTable,

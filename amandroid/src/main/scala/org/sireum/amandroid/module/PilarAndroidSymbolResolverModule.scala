@@ -5,10 +5,8 @@ package org.sireum.amandroid.module
 
 import org.sireum.util._
 import org.sireum.pipeline._
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
 import org.sireum.pilar.ast.Model
 import org.sireum.pilar.symbol.SymbolTable
-import scala.Option
 import scala.collection.immutable.Seq
 
 object PilarAndroidSymbolResolverModule extends PipelineModule {
@@ -16,11 +14,7 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
   def origin = classOf[PilarAndroidSymbolResolver]
 
   val globalParallelKey = "Global.parallel"
-  val globalAndroidLibInfoTablesOptKey = "Global.androidLibInfoTablesOpt"
-  val globalHasExistingAndroidLibInfoTablesKey = "Global.hasExistingAndroidLibInfoTables"
-  val globalBuildLibInfoTablesOnlyKey = "Global.buildLibInfoTablesOnly"
   val globalModelsKey = "Global.models"
-  val globalShouldBuildLibInfoTablesKey = "Global.shouldBuildLibInfoTables"
   val globalSymbolTableKey = "Global.symbolTable"
 
   def compute(job : PipelineJob, info : PipelineJobModuleInfo) : MBuffer[Tag] = {
@@ -39,15 +33,6 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
   }
 
   override def initialize(job : PipelineJob) {
-    if(!(job ? PilarAndroidSymbolResolverModule.globalShouldBuildLibInfoTablesKey)) {
-      val shouldBuildLibInfoTables = Class.forName("org.sireum.amandroid.module.PilarAndroidSymbolResolver").getDeclaredMethod("$lessinit$greater$default$4").invoke(null).asInstanceOf[scala.Boolean]
-      setShouldBuildLibInfoTables(job.propertyMap, shouldBuildLibInfoTables)
-    }
-
-    if(!(job ? PilarAndroidSymbolResolverModule.globalBuildLibInfoTablesOnlyKey)) {
-      val buildLibInfoTablesOnly = Class.forName("org.sireum.amandroid.module.PilarAndroidSymbolResolver").getDeclaredMethod("$lessinit$greater$default$5").invoke(null).asInstanceOf[scala.Boolean]
-      setBuildLibInfoTablesOnly(job.propertyMap, buildLibInfoTablesOnly)
-    }
   }
 
   override def validPipeline(stage : PipelineStage, job : PipelineJob) : MBuffer[Tag] = {
@@ -92,87 +77,6 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'parallel'")       
     }
-    var _hasExistingAndroidLibInfoTables : scala.Option[AnyRef] = None
-    var _hasExistingAndroidLibInfoTablesKey : scala.Option[String] = None
-
-    val keylisthasExistingAndroidLibInfoTables = List(PilarAndroidSymbolResolverModule.globalHasExistingAndroidLibInfoTablesKey)
-    keylisthasExistingAndroidLibInfoTables.foreach(key => 
-      if(job ? key) { 
-        if(_hasExistingAndroidLibInfoTables.isEmpty) {
-          _hasExistingAndroidLibInfoTables = Some(job(key))
-          _hasExistingAndroidLibInfoTablesKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _hasExistingAndroidLibInfoTables.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'hasExistingAndroidLibInfoTables' keys '" + _hasExistingAndroidLibInfoTablesKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _hasExistingAndroidLibInfoTables match{
-      case Some(x) =>
-        if(!x.isInstanceOf[scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'hasExistingAndroidLibInfoTables'.  Expecting 'scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'hasExistingAndroidLibInfoTables'")       
-    }
-    var _shouldBuildLibInfoTables : scala.Option[AnyRef] = None
-    var _shouldBuildLibInfoTablesKey : scala.Option[String] = None
-
-    val keylistshouldBuildLibInfoTables = List(PilarAndroidSymbolResolverModule.globalShouldBuildLibInfoTablesKey)
-    keylistshouldBuildLibInfoTables.foreach(key => 
-      if(job ? key) { 
-        if(_shouldBuildLibInfoTables.isEmpty) {
-          _shouldBuildLibInfoTables = Some(job(key))
-          _shouldBuildLibInfoTablesKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _shouldBuildLibInfoTables.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'shouldBuildLibInfoTables' keys '" + _shouldBuildLibInfoTablesKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _shouldBuildLibInfoTables match{
-      case Some(x) =>
-        if(!x.isInstanceOf[scala.Boolean]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'shouldBuildLibInfoTables'.  Expecting 'scala.Boolean' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'shouldBuildLibInfoTables'")       
-    }
-    var _buildLibInfoTablesOnly : scala.Option[AnyRef] = None
-    var _buildLibInfoTablesOnlyKey : scala.Option[String] = None
-
-    val keylistbuildLibInfoTablesOnly = List(PilarAndroidSymbolResolverModule.globalBuildLibInfoTablesOnlyKey)
-    keylistbuildLibInfoTablesOnly.foreach(key => 
-      if(job ? key) { 
-        if(_buildLibInfoTablesOnly.isEmpty) {
-          _buildLibInfoTablesOnly = Some(job(key))
-          _buildLibInfoTablesOnlyKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _buildLibInfoTablesOnly.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'buildLibInfoTablesOnly' keys '" + _buildLibInfoTablesOnlyKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _buildLibInfoTablesOnly match{
-      case Some(x) =>
-        if(!x.isInstanceOf[scala.Boolean]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'buildLibInfoTablesOnly'.  Expecting 'scala.Boolean' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'buildLibInfoTablesOnly'")       
-    }
     var _models : scala.Option[AnyRef] = None
     var _modelsKey : scala.Option[String] = None
 
@@ -205,17 +109,6 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
 
   def outputDefined (job : PipelineJob) : MBuffer[Tag] = {
     val tags = marrayEmpty[Tag]
-    if(!(job ? PilarAndroidSymbolResolverModule.globalAndroidLibInfoTablesOptKey)) {
-      tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-        "Output error for '" + this.title + "': No entry found for 'androidLibInfoTablesOpt'. Expecting (PilarAndroidSymbolResolverModule.globalAndroidLibInfoTablesOptKey)") 
-    }
-
-    if(job ? PilarAndroidSymbolResolverModule.globalAndroidLibInfoTablesOptKey && !job(PilarAndroidSymbolResolverModule.globalAndroidLibInfoTablesOptKey).isInstanceOf[scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]]) {
-      tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker, 
-        "Output error for '" + this.title + "': Wrong type found for PilarAndroidSymbolResolverModule.globalAndroidLibInfoTablesOptKey.  Expecting 'scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]' but found '" + 
-        job(PilarAndroidSymbolResolverModule.globalAndroidLibInfoTablesOptKey).getClass.toString + "'")
-    } 
-
     if(!(job ? PilarAndroidSymbolResolverModule.globalSymbolTableKey)) {
       tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
         "Output error for '" + this.title + "': No entry found for 'symbolTable'. Expecting (PilarAndroidSymbolResolverModule.globalSymbolTableKey)") 
@@ -244,51 +137,6 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
     return options
   }
 
-  def getHasExistingAndroidLibInfoTables (options : scala.collection.Map[Property.Key, Any]) : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables] = {
-    if (options.contains(PilarAndroidSymbolResolverModule.globalHasExistingAndroidLibInfoTablesKey)) {
-       return options(PilarAndroidSymbolResolverModule.globalHasExistingAndroidLibInfoTablesKey).asInstanceOf[scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setHasExistingAndroidLibInfoTables (options : MMap[Property.Key, Any], hasExistingAndroidLibInfoTables : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]) : MMap[Property.Key, Any] = {
-
-    options(PilarAndroidSymbolResolverModule.globalHasExistingAndroidLibInfoTablesKey) = hasExistingAndroidLibInfoTables
-
-    return options
-  }
-
-  def getShouldBuildLibInfoTables (options : scala.collection.Map[Property.Key, Any]) : scala.Boolean = {
-    if (options.contains(PilarAndroidSymbolResolverModule.globalShouldBuildLibInfoTablesKey)) {
-       return options(PilarAndroidSymbolResolverModule.globalShouldBuildLibInfoTablesKey).asInstanceOf[scala.Boolean]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setShouldBuildLibInfoTables (options : MMap[Property.Key, Any], shouldBuildLibInfoTables : scala.Boolean) : MMap[Property.Key, Any] = {
-
-    options(PilarAndroidSymbolResolverModule.globalShouldBuildLibInfoTablesKey) = shouldBuildLibInfoTables
-
-    return options
-  }
-
-  def getBuildLibInfoTablesOnly (options : scala.collection.Map[Property.Key, Any]) : scala.Boolean = {
-    if (options.contains(PilarAndroidSymbolResolverModule.globalBuildLibInfoTablesOnlyKey)) {
-       return options(PilarAndroidSymbolResolverModule.globalBuildLibInfoTablesOnlyKey).asInstanceOf[scala.Boolean]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setBuildLibInfoTablesOnly (options : MMap[Property.Key, Any], buildLibInfoTablesOnly : scala.Boolean) : MMap[Property.Key, Any] = {
-
-    options(PilarAndroidSymbolResolverModule.globalBuildLibInfoTablesOnlyKey) = buildLibInfoTablesOnly
-
-    return options
-  }
-
   def getModels (options : scala.collection.Map[Property.Key, Any]) : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model] = {
     if (options.contains(PilarAndroidSymbolResolverModule.globalModelsKey)) {
        return options(PilarAndroidSymbolResolverModule.globalModelsKey).asInstanceOf[scala.collection.immutable.Seq[org.sireum.pilar.ast.Model]]
@@ -300,21 +148,6 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
   def setModels (options : MMap[Property.Key, Any], models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model]) : MMap[Property.Key, Any] = {
 
     options(PilarAndroidSymbolResolverModule.globalModelsKey) = models
-
-    return options
-  }
-
-  def getAndroidLibInfoTablesOpt (options : scala.collection.Map[Property.Key, Any]) : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables] = {
-    if (options.contains(PilarAndroidSymbolResolverModule.globalAndroidLibInfoTablesOptKey)) {
-       return options(PilarAndroidSymbolResolverModule.globalAndroidLibInfoTablesOptKey).asInstanceOf[scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setAndroidLibInfoTablesOpt (options : MMap[Property.Key, Any], androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]) : MMap[Property.Key, Any] = {
-
-    options(PilarAndroidSymbolResolverModule.globalAndroidLibInfoTablesOptKey) = androidLibInfoTablesOpt
 
     return options
   }
@@ -337,11 +170,7 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
   object ConsumerView {
     implicit class PilarAndroidSymbolResolverModuleConsumerView (val job : PropertyProvider) extends AnyVal {
       def parallel : scala.Boolean = PilarAndroidSymbolResolverModule.getParallel(job.propertyMap)
-      def hasExistingAndroidLibInfoTables : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables] = PilarAndroidSymbolResolverModule.getHasExistingAndroidLibInfoTables(job.propertyMap)
-      def shouldBuildLibInfoTables : scala.Boolean = PilarAndroidSymbolResolverModule.getShouldBuildLibInfoTables(job.propertyMap)
-      def buildLibInfoTablesOnly : scala.Boolean = PilarAndroidSymbolResolverModule.getBuildLibInfoTablesOnly(job.propertyMap)
       def models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model] = PilarAndroidSymbolResolverModule.getModels(job.propertyMap)
-      def androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables] = PilarAndroidSymbolResolverModule.getAndroidLibInfoTablesOpt(job.propertyMap)
       def symbolTable : org.sireum.pilar.symbol.SymbolTable = PilarAndroidSymbolResolverModule.getSymbolTable(job.propertyMap)
     }
   }
@@ -352,20 +181,8 @@ object PilarAndroidSymbolResolverModule extends PipelineModule {
       def parallel_=(parallel : scala.Boolean) { PilarAndroidSymbolResolverModule.setParallel(job.propertyMap, parallel) }
       def parallel : scala.Boolean = PilarAndroidSymbolResolverModule.getParallel(job.propertyMap)
 
-      def hasExistingAndroidLibInfoTables_=(hasExistingAndroidLibInfoTables : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]) { PilarAndroidSymbolResolverModule.setHasExistingAndroidLibInfoTables(job.propertyMap, hasExistingAndroidLibInfoTables) }
-      def hasExistingAndroidLibInfoTables : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables] = PilarAndroidSymbolResolverModule.getHasExistingAndroidLibInfoTables(job.propertyMap)
-
-      def shouldBuildLibInfoTables_=(shouldBuildLibInfoTables : scala.Boolean) { PilarAndroidSymbolResolverModule.setShouldBuildLibInfoTables(job.propertyMap, shouldBuildLibInfoTables) }
-      def shouldBuildLibInfoTables : scala.Boolean = PilarAndroidSymbolResolverModule.getShouldBuildLibInfoTables(job.propertyMap)
-
-      def buildLibInfoTablesOnly_=(buildLibInfoTablesOnly : scala.Boolean) { PilarAndroidSymbolResolverModule.setBuildLibInfoTablesOnly(job.propertyMap, buildLibInfoTablesOnly) }
-      def buildLibInfoTablesOnly : scala.Boolean = PilarAndroidSymbolResolverModule.getBuildLibInfoTablesOnly(job.propertyMap)
-
       def models_=(models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model]) { PilarAndroidSymbolResolverModule.setModels(job.propertyMap, models) }
       def models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model] = PilarAndroidSymbolResolverModule.getModels(job.propertyMap)
-
-      def androidLibInfoTablesOpt_=(androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]) { PilarAndroidSymbolResolverModule.setAndroidLibInfoTablesOpt(job.propertyMap, androidLibInfoTablesOpt) }
-      def androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables] = PilarAndroidSymbolResolverModule.getAndroidLibInfoTablesOpt(job.propertyMap)
 
       def symbolTable_=(symbolTable : org.sireum.pilar.symbol.SymbolTable) { PilarAndroidSymbolResolverModule.setSymbolTable(job.propertyMap, symbolTable) }
       def symbolTable : org.sireum.pilar.symbol.SymbolTable = PilarAndroidSymbolResolverModule.getSymbolTable(job.propertyMap)
@@ -378,17 +195,7 @@ trait PilarAndroidSymbolResolverModule {
 
   def parallel : scala.Boolean = PilarAndroidSymbolResolverModule.getParallel(job.propertyMap)
 
-  def hasExistingAndroidLibInfoTables : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables] = PilarAndroidSymbolResolverModule.getHasExistingAndroidLibInfoTables(job.propertyMap)
-
-  def shouldBuildLibInfoTables : scala.Boolean = PilarAndroidSymbolResolverModule.getShouldBuildLibInfoTables(job.propertyMap)
-
-  def buildLibInfoTablesOnly : scala.Boolean = PilarAndroidSymbolResolverModule.getBuildLibInfoTablesOnly(job.propertyMap)
-
   def models : scala.collection.immutable.Seq[org.sireum.pilar.ast.Model] = PilarAndroidSymbolResolverModule.getModels(job.propertyMap)
-
-
-  def androidLibInfoTablesOpt_=(androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]) { PilarAndroidSymbolResolverModule.setAndroidLibInfoTablesOpt(job.propertyMap, androidLibInfoTablesOpt) }
-  def androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables] = PilarAndroidSymbolResolverModule.getAndroidLibInfoTablesOpt(job.propertyMap)
 
 
   def symbolTable_=(symbolTable : org.sireum.pilar.symbol.SymbolTable) { PilarAndroidSymbolResolverModule.setSymbolTable(job.propertyMap, symbolTable) }

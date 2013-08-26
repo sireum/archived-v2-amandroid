@@ -200,4 +200,14 @@ class AmandroidField {
 	
 	def isDeclared = declaringRecord != null
 	
+	def printDetail = {
+	  println("~~~~~~~~~~~~~AmandroidField~~~~~~~~~~~~~")
+	  println("name: " + getName)
+	  println("sig: " + getSignature)
+	  println("type: " + getType)
+	  println("accessFlags: " + AccessFlag.toString(getAccessFlags))
+	  println("declaringRecord: " + getDeclaringRecord)
+	  println("~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	}
+	
 }

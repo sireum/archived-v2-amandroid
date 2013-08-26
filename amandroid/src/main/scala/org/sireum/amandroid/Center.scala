@@ -355,11 +355,10 @@ object Center {
 	 */
 	def grabField(fieldSig : String) : Option[AmandroidField] = {
 	  val rName = StringFormConverter.getRecordNameFromFieldSignature(fieldSig)
-	  val fName = StringFormConverter.getFieldNameFromFieldSignature(fieldSig)
 	  if(!containsRecord(rName)) return None
 	  val r = getRecord(rName)
-	  if(!r.declaresFieldByName(fName)) return None
-	  Some(r.getFieldByName(fName))
+	  if(!r.declaresField(fieldSig)) return None
+	  Some(r.getField(fieldSig))
 	}
 	
 	/**
@@ -373,6 +372,17 @@ object Center {
 	 */
 	
 	def grabProcedure(procSig : String) : Option[AmandroidProcedure] = {
+	  val rName = StringFormConverter.getRecordNameFromProcedureSignature(procSig)
+	  if(!containsRecord(rName)) return None
+	  val r = getRecord(rName)
+	  getRecordHierarchy.resolveConcreteDispatch(r, procSig)
+	}
+	
+	/**
+	 * directly grab procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
+	 */
+	
+	def grabDirProcedure(procSig : String) : Option[AmandroidProcedure] = {
 	  val rName = StringFormConverter.getRecordNameFromProcedureSignature(procSig)
 	  val subSig = StringFormConverter.getSubSigFromProcSig(procSig)
 	  if(!containsRecord(rName)) return None
@@ -394,6 +404,17 @@ object Center {
 	  grabField(fieldSig) match{
 	    case Some(f) => f
 	    case None => throw new RuntimeException("Given field signature: " + fieldSig + " is not in the Center.")
+	  }
+	}
+	
+	/**
+	 * get procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
+	 */
+	
+	def getDirProcedure(procSig : String) : AmandroidProcedure = {
+	  grabDirProcedure(procSig) match{
+	    case Some(p) => p
+	    case None => throw new RuntimeException("Given procedure signature: " + procSig + " is not in the Center.")
 	  }
 	}
 	
@@ -426,6 +447,46 @@ object Center {
 	
 	def hasEntryPoints : Boolean = this.entryPoints.isEmpty
 	
+	/**
+	 * enum of all the valid resolve level
+	 */
+	
+	object ResolveLevel extends Enumeration {
+	  val NO, BODIES, INTRA_PROCEDURAL = Value
+	}
+	
+	/**
+	 * try to resolve given record and load all of the required support based on your desired resolve level.
+	 */
+	
+	def tryLoadRecord(recordName : String, desiredLevel : ResolveLevel.Value) : Option[AmandroidRecord] = {
+	  AmandroidResolver.tryResolveRecord(recordName, desiredLevel)
+	}
+	
+	/**
+	 * resolve given record and load all of the required support.
+	 */
+	
+	def loadRecordAndSupport(recordName : String) : AmandroidRecord = {
+	  AmandroidResolver.resolveRecord(recordName, ResolveLevel.BODIES)
+	}
+	
+	/**
+	 * resolve given record and load all of the required support.
+	 */
+	
+	def resolveRecord(recordName : String, desiredLevel : ResolveLevel.Value) : AmandroidRecord = {
+	  AmandroidResolver.resolveRecord(recordName, desiredLevel)
+	}
+	
+	/**
+	 * force resolve given record to given level
+	 */
+	
+	def forceResolveRecord(recordName : String, desiredLevel : ResolveLevel.Value) : AmandroidRecord = {
+	  AmandroidResolver.forceResolveRecord(recordName, desiredLevel)
+	}
+	
 	def printDetails = {
 	  println("***************Center***************")
 	  println("applicationRecords: " + getApplicationRecords)
@@ -438,6 +499,7 @@ object Center {
 	  	getRecords.foreach{
 	  	  case r=>
 	  	  	r.printDetail
+	  	  	r.getFields.foreach(_.printDetail)
 	  	  	r.getProcedures.foreach(_.printDetail)
 	  	}
 	  	getRecordHierarchy.printDetails

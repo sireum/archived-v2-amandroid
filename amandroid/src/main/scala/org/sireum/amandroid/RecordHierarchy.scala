@@ -1,6 +1,7 @@
 package org.sireum.amandroid
 
 import org.sireum.util._
+import org.sireum.amandroid.util.StringFormConverter
 
 class RecordHierarchy {
 	/**
@@ -315,7 +316,7 @@ class RecordHierarchy {
   }
   
   /**
-   * return true if the procedure is visible from code in the record from
+   * return true if the procedure is visible from record from
    */
   
   def isProcedureVisible(from : AmandroidRecord, p : AmandroidProcedure) : Boolean = {
@@ -340,6 +341,35 @@ class RecordHierarchy {
   }
   
   /**
+   * Given an object created by o = new R as type R, return the procedure which will be called by o.p()
+   */
+  
+  def resolveConcreteDispatchWithoutFailing(concreteType : AmandroidRecord, pSig : String) : AmandroidProcedure = {
+    resolveConcreteDispatch(concreteType, pSig) match{
+      case Some(p) => p
+      case None => throw new RuntimeException("Cannot resolve concrete dispatch!\n" + "Type:" + concreteType + "\nProcedure:" + pSig)
+    }
+  }
+  
+  /**
+   * Given an object created by o = new R as type R, return the procedure which will be called by o.p()
+   */
+  
+  def resolveConcreteDispatch(concreteType : AmandroidRecord, pSig : String) : Option[AmandroidProcedure] = {
+    if(concreteType.isInterface) throw new RuntimeException("concreteType need to be class type: " + concreteType)
+    val pSubSig = StringFormConverter.getSubSigFromProcSig(pSig)
+    getAllSuperClassesOfIncluding(concreteType).foreach{
+      suRecord=>
+        if(suRecord.declaresProcedure(pSubSig)){
+          val p = suRecord.getProcedure(pSubSig)
+          if(isProcedureVisible(concreteType, p))
+          	return Some(p)
+        }
+    }
+    None
+  }
+  
+  /**
    * Given an abstract dispatch to an object of type r and a procedure p, gives a list of possible receiver methods
    */
   
@@ -357,9 +387,11 @@ class RecordHierarchy {
   }
   
   def printDetails = {
+    println("==================hierarchy==================")
     println("interfaceToSubInterfaces:\n" + this.interfaceToSubInterfaces)
     println("classToSubClasses:\n" + this.classToSubClasses)
     println("interfaceToImplememters:\n" + this.interfaceToImplememters)
+    println("====================================")
   }
   
   override def toString() : String = {

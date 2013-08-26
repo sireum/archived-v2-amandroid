@@ -1,6 +1,5 @@
 package org.sireum.amandroid.interProcedural
 
-import org.sireum.util._
 
 class Context(var k : Int){
   def copy : Context = {
@@ -9,13 +8,13 @@ class Context(var k : Int){
     clone
   }
   def copy(c : Context) = this.callStack = c.getContext
-  private var callStack : List[(ResourceUri, String)] = List()
+  private var callStack : List[(String, String)] = List()
   def length : Int = this.callStack.size
-  def setContext(pUri : ResourceUri, loc : String) = {
+  def setContext(pSig : String, loc : String) = {
     if(length <= k){
-      callStack = (pUri, loc) :: callStack
+      callStack = (pSig, loc) :: callStack
     } else {
-      callStack = (pUri, loc) :: callStack.dropRight(1)
+      callStack = (pSig, loc) :: callStack.dropRight(1)
     }
   }
   def updateContext(context2 : Context) = {
@@ -29,7 +28,7 @@ class Context(var k : Int){
       callStack = callStack ::: callStack2.dropRight(size2 - (k + 1 - size))
     }
   }
-  def getContext : List[(ResourceUri, String)] = this.callStack
+  def getContext : List[(String, String)] = this.callStack
   def isDiff(c : Context) : Boolean = !this.callStack.equals(c.getContext)
   override def equals(a : Any) : Boolean = {
     if(a.isInstanceOf[Context]) this.callStack.equals(a.asInstanceOf[Context].getContext)
@@ -37,14 +36,11 @@ class Context(var k : Int){
   }
   override def hashCode() = if (this.callStack == null) 0 else this.callStack.hashCode
   override def toString = {
-    var string = ""
+    var sb = new StringBuilder
     this.callStack.foreach{
-      case(uri, str) =>
-        if(str.contains("%7C%5D"))
-          string += "(" + uri.substring(uri.lastIndexOf(".") + 1, uri.lastIndexOf("%7C%5D")) + "," + str.substring(str.lastIndexOf(".") + 1, str.lastIndexOf("%7C%5D")) + ")"
-        else
-          string += "(" + uri.substring(uri.lastIndexOf(".") + 1, uri.lastIndexOf("%7C%5D")) + "," + str + ")"
+      case(sig, str) =>
+        sb.append("(" + sig + "," + str + ")")
     }
-    string
+    sb.toString.intern()
   }
 }

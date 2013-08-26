@@ -5,7 +5,6 @@ import org.sireum.pilar.symbol._
 import org.sireum.util._
 import org.sireum.pipeline._
 import org.sireum.amandroid.symbolResolver.AmandroidSymbolTableBuilder
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.symbolResolver.AmandroidSymbolTable
 import org.sireum.amandroid.Center
 
@@ -33,30 +32,16 @@ class PilarAndroidSymbolResolverModuleDef (val job : PipelineJob, info : Pipelin
   val ms = this.models
   val par = this.parallel
   val fst = { _ : Unit => new AmandroidSymbolTable }
-  val result = 
-    if (this.buildLibInfoTablesOnly) {
-      require(this.hasExistingAndroidLibInfoTables.isDefined)
-      val eavmt = this.hasExistingAndroidLibInfoTables.get.asInstanceOf[AndroidLibInfoTables]
-      AmandroidSymbolTableBuilder(ms, fst, eavmt, par)
-    }
-    else if (this.hasExistingAndroidLibInfoTables.isDefined) {
-      require(this.hasExistingAndroidLibInfoTables.isDefined)
-      val eavmt = this.hasExistingAndroidLibInfoTables.get.asInstanceOf[AndroidLibInfoTables]
-      AmandroidSymbolTableBuilder(ms, fst, eavmt, par, shouldBuildLibInfoTables)
-    }
-    else AmandroidSymbolTableBuilder(ms, fst, par, shouldBuildLibInfoTables)
+  val result = AmandroidSymbolTableBuilder(ms, fst, par)
     
   Center.resolveRecordsRelationWholeProgram
     
-  val st = result._1.asInstanceOf[AmandroidSymbolTable]
+  val st = result.asInstanceOf[AmandroidSymbolTable]
   info.tags ++= st.tags
 
   if (st.hasErrors){
     info.hasError = true
   }
     
-  this.symbolTable_=(result._1)
-  
-  this.androidLibInfoTablesOpt=(result._2)
-  
+  this.symbolTable_=(result)
 }

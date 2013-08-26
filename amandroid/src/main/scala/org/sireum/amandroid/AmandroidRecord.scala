@@ -82,6 +82,47 @@ class AmandroidRecord {
   var needToResolveExtends : Set[String] = Set()
   
   /**
+   * resolving level of current record
+   */
+  
+  private var resolvingLevel : Center.ResolveLevel.Value = Center.ResolveLevel.NO
+  
+  /**
+   * format level to String
+   */
+  
+  private def levelToString(level : Center.ResolveLevel.Value) : String = {
+    level match{
+      case Center.ResolveLevel.NO => "NO"
+      case Center.ResolveLevel.BODIES => "BODIES"
+      case Center.ResolveLevel.INTRA_PROCEDURAL => "INTRA_PROCEDURAL"
+    }
+  }
+  
+  /**
+   * check whether we already resolved to desired level
+   */
+  
+  def checkLevel(level : Center.ResolveLevel.Value) = {
+    if(this.resolvingLevel < level) {
+      val msg = "desired level " + levelToString(level) + " is higher than resolving level " + levelToString(this.resolvingLevel)
+      throw new RuntimeException(msg)
+    }
+  }
+  
+  /**
+   * return resolving level
+   */
+  
+  def getResolvingLevel = this.resolvingLevel
+  
+  /**
+   * set resolving level
+   */
+  
+  def setResolvingLevel(level : Center.ResolveLevel.Value) = this.resolvingLevel = level
+  
+  /**
    * add need to resolve extend record
    */
   
@@ -191,7 +232,6 @@ class AmandroidRecord {
 	
 	def addField(field : AmandroidField) = {
 	  if(field.isDeclared) throw new RuntimeException("already declared: " + field.getName)
-	  if(declaresField(field.getSignature)) throw new RuntimeException("field already exists: " + field.getName)
 	  this.fields += field
 	  field.setDeclaringRecord(this)
 	}
@@ -255,6 +295,28 @@ class AmandroidRecord {
 	def getProcedure(subSig : String) : AmandroidProcedure = {
 	  if(!declaresProcedure(subSig)) throw new RuntimeException("No procedure " + subSig + " in record " + getName)
 	  else this.subSigToProcedures(subSig)
+	}
+	
+	/**
+	 * get procedure from this record by the given subsignature
+	 */
+	
+	def getProcedureByName(procName : String) : AmandroidProcedure = {
+	  if(!declaresProcedureByName(procName)) throw new RuntimeException("No procedure " + procName + " in record " + getName)
+	  var found = false
+	  var foundProcedure : AmandroidProcedure = null
+	  getProcedures.foreach{
+	    proc=>
+	      if(proc.getName == procName){
+	        if(found) throw new RuntimeException("ambiguous procedure" + procName)
+	        else {
+	          found = true
+	          foundProcedure = proc
+	        }
+	      }
+	  }
+	  if(found) foundProcedure
+	  else throw new RuntimeException("couldn/t find method " + procName + "(*) in " + this)
 	}
 	
 	/**
@@ -324,6 +386,19 @@ class AmandroidRecord {
 	  this.procedures.foreach{
 	    proc=>
 	      if(proc.getName == name) find = true
+	  }
+	  find
+	}
+	
+	/**
+	 * is procedure exists with the given short name
+	 */
+	
+	def declaresProcedureByShortName(name : String) : Boolean = {
+	  var find : Boolean = false
+	  this.procedures.foreach{
+	    proc=>
+	      if(proc.getShortName == name) find = true
 	  }
 	  find
 	}

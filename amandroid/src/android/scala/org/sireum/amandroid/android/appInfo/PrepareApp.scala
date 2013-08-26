@@ -6,25 +6,25 @@ import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.amandroid.android.parser.LayoutControl
 import org.sireum.amandroid.android.parser.ARSCFileParser
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.android.parser.IntentFilterDataBase
 import org.sireum.alir.ReachingDefinitionAnalysis
 import org.sireum.amandroid.pilarCodeGenerator.AndroidEntryPointConstants
 import org.sireum.amandroid.android.parser.ManifestParser
+import org.sireum.amandroid.AmandroidRecord
+import org.sireum.amandroid.Center
+import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.amandroid.dummyMainGen.DummyMainGenerator
 
 class PrepareApp(apkFileLocation : String) {  
   private val DEBUG = true
 //	private var sinks : Set[AndroidMethod] = Set()
 //	private var sources : Set[AndroidMethod] = Set()
-	private var callbackMethods : Map[ResourceUri, MSet[ResourceUri]] = Map()
-    private var mainComponent : String = null
-	private var entrypoints : Set[String] = Set()
+	private var callbackMethods : Map[String, MSet[AmandroidProcedure]] = Map()
+	private var entrypoints : Set[String] = null
 	private var layoutControls : Map[Int, LayoutControl] = Map()
 	private var resourcePackages : List[ARSCFileParser.ResPackage] = List()
 	private var appPackageName : String = ""
 	private var taintWrapperFile : String = ""
-	private var libInfoTables : AndroidLibInfoTables = null
 	private var psts : Seq[ProcedureSymbolTable] = Seq()
 	private var intentFdb : IntentFilterDataBase = null
 	private var cfgRdaMap : Map[String, (ControlFlowGraph[String], ReachingDefinitionAnalysis.Result)] = Map()
@@ -32,11 +32,7 @@ class PrepareApp(apkFileLocation : String) {
 	/**
 	 * Map from record name to it's dummyMain procedure code.
 	 */
-	private var dummyMainCodeMap : Map[String, String] = Map()
-	/**
-	 * Map from record name to it's dummyMain procedure signature.
-	 */
-	private var dummyMainSigMap : Map[String, String] = Map()
+	private var dummyMainMap : Map[AmandroidRecord, AmandroidProcedure] = Map()
 	
 //	def printSinks() = {
 //		println("Sinks:")
@@ -55,7 +51,7 @@ class PrepareApp(apkFileLocation : String) {
 //		println("End of Sources")
 //	}
 	def printDummyMains() =
-	  dummyMainCodeMap.foreach{case(k, v) => println("dummyMain for " + k + "\n" + v)}
+	  dummyMainMap.foreach{case(k, v) => println("dummyMain for " + k + "\n" + v)}
 	
 	def printEntrypoints() = {
 		if (this.entrypoints == null)
@@ -81,65 +77,65 @@ class PrepareApp(apkFileLocation : String) {
 	def setPSTs(psts : Seq[ProcedureSymbolTable]) = {
 	  this.psts = psts
 	}
-
-	def setLibInfoTables(libInfoTables : AndroidLibInfoTables) = {
-	  this.libInfoTables = libInfoTables
-	}
 	
 	def getIntentDB() = this.intentFdb
 	def getEntryPoints() = this.entrypoints
 		
-	def getMainComponent() = this.mainComponent
+//	def getMainComponent() = this.mainComponent
 	
-	def getDummyMainCodeMap() = this.dummyMainCodeMap
+	def getDummyMainMap() = this.dummyMainMap
 	
-	def getDummyMainSigMap() = this.dummyMainSigMap
+//	private def filterMainComponent(intentFDB : IntentFilterDataBase) : AmandroidRecord = {
+//	  this.entrypoints.foreach{
+//	    ep =>
+//	      val actions = intentFDB.getIntentFiltersActions(ep)
+//	      if(actions != null){
+//	        if(actions.contains(AndroidConstants.ACTION_MAIN)) mainComponent = ep
+//	      }
+//	  }
+//	  if(mainComponent == null){
+//	    this.entrypoints.foreach{
+//	    	ep =>
+//	        val ancestors = Center.getRecordHierarchy.getAllSuperClassesOfIncluding(ep)
+//	        ancestors.foreach{
+//	          ancestor =>
+//	            if(ancestor.getName.equals(AndroidEntryPointConstants.BROADCAST_RECEIVER_CLASS)) mainComponent = ep
+//	        }
+//	    }
+//	  }
+//	  if(mainComponent == null){
+//	    System.err.println("Not found any main component in app: " + apkFileLocation)
+//	  }
+//	  mainComponent
+//	}
 	
-	private def filterMainComponent(intentFDB : IntentFilterDataBase) : String = {
-	  var mainComponent : String = null
-	  this.entrypoints.foreach{
-	    ep =>
-	      val actions = intentFDB.getIntentFiltersActions(ep)
-	      if(actions != null){
-	        if(actions.contains(AndroidConstants.ACTION_MAIN)) mainComponent = ep
-	      }
-	  }
-	  if(mainComponent == null){
-	    this.entrypoints.foreach{
-	    	ep =>
-	        val ancestors = libInfoTables.getAncestors(libInfoTables.getRecordUri(ep))
-	        ancestors.foreach{
-	          ancestor =>
-	              if(ancestor.equals(AndroidEntryPointConstants.BROADCASTRECEIVERCLASS)) mainComponent = ep
-	        }
-	    }
-	  }
-	  if(mainComponent == null){
-	    System.err.println("Not found any main component in app: " + apkFileLocation)
-	  }
-	  mainComponent
-	}
-	
-	def getMainEntryName() : String = this.mainComponent.replaceAll("\\[\\|", "%5B%7C").replaceAll("\\|\\]", ".dummyMain%7C%5D")
+//	def getMainEntryName() : String = this.mainComponent.getName
 	/**
 	 * generates dummyMain code for a component like Activity, BroadcastReceiver, etc.
 	 * @param recordName component name
 	 * @param codeCtr code line number of the last generated dummyMain
 	 * @return codeCtr + newly generated number of lines
 	 */
-	def generateDummyMain(recordName : String, codeCtr: Int) : Int = {
-	  if(recordName == null) return 0
+	def generateDummyMain(record : AmandroidRecord, codeCtr: Int) : Int = {
+	  if(record == null) return 0
 		//generate dummy main method
 	  if(DEBUG)
-  	    println("Generate DummyMain for " + recordName)
+  	    println("Generate DummyMain for " + record)
 	  val dmGen = new DummyMainGenerator
-	  dmGen.setCurrentComponent(recordName)
+	  dmGen.setCurrentComponent(record.getName)
 	  dmGen.setCodeCounter(codeCtr)
-	  dmGen.setCallbackFunctions(this.callbackMethods)
-	  dmGen.setAndroidLibInfoTables(this.libInfoTables)
-      val (sig, code) = dmGen.generateWithParam(List(AndroidEntryPointConstants.INTENT_NAME))
-	  this.dummyMainSigMap += (recordName -> sig)
-	  this.dummyMainCodeMap += (recordName -> code)
+	  var callbackMethodSigs : Map[String, MSet[String]] = Map()
+	  this.callbackMethods.foreach{
+	    case (recordName, procs) =>
+	      procs.foreach{
+	        p =>
+	          if(!callbackMethodSigs.contains(recordName)) callbackMethodSigs += (recordName -> msetEmpty)
+	          callbackMethodSigs(recordName) += p.getSignature
+	      }
+	  }
+	  dmGen.setCallbackFunctions(callbackMethodSigs)
+    val proc = dmGen.generateWithParam(List(AndroidEntryPointConstants.INTENT_NAME))
+	  this.dummyMainMap += (record -> proc)
 	  dmGen.getCodeCounter
 	}
 	
@@ -237,12 +233,11 @@ class PrepareApp(apkFileLocation : String) {
 //		    }
 //		}
 //		println("Found " + this.callbackMethods.size + " callback methods")
-		// filter the main component of this app
-    this.mainComponent = filterMainComponent(ManifestParser.getIntentDB)
     var codeLineCounter : Int = 0
     this.entrypoints.foreach{
       f => 
-        val clCounter = generateDummyMain(f, codeLineCounter)
+        val record = Center.resolveRecord(f, Center.ResolveLevel.BODIES)
+        val clCounter = generateDummyMain(record, codeLineCounter)
         codeLineCounter = clCounter
     }
 //

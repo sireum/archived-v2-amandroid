@@ -8,8 +8,10 @@ import org.sireum.util._
 import org.sireum.alir.Slot
 import org.sireum.pilar.symbol.H
 import org.sireum.alir.VarSlot
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
 import org.sireum.pilar.symbol.Symbol.pp2r
+import org.sireum.amandroid.AmandroidCodeSource
+import org.sireum.amandroid.Transform
+import org.sireum.amandroid.Center
 
 
 final class AndroidVarAccesses(st: SymbolTable) extends VarAccesses {
@@ -86,7 +88,7 @@ final class AndroidVarAccesses(st: SymbolTable) extends VarAccesses {
 }
 
 
-final class AndroidDefRef(st: SymbolTable, val varAccesses: VarAccesses, alit : AndroidLibInfoTables)
+final class AndroidDefRef(st: SymbolTable, val varAccesses: VarAccesses)
   extends DefRef {
 
   def definitions(a: Assignment): ISet[Slot] = {
@@ -129,7 +131,12 @@ final class AndroidDefRef(st: SymbolTable, val varAccesses: VarAccesses, alit : 
       def resolveNameExp(ne : NameExp) = {
         var uri : ResourceUri = null
         if(!ne.name.hasResourceInfo){
-          uri = alit.getGlobalVarUriByName(ne.name.name)
+          val st = Transform.getSymbolResolveResult(Set(AmandroidCodeSource.getGlobalVarCode(ne.name.name)))
+          st.globalVars.foreach{
+            g =>
+            	if(st.globalVar(g).name.name == ne.name.name) uri = g
+          }
+          if(uri == null) throw new RuntimeException("global var " + ne.name.name + " cannot resolved.")
         } else {
           uri = ne.name.uri
         }

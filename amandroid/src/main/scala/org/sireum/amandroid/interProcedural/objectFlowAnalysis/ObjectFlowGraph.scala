@@ -14,7 +14,6 @@ import java.io.Writer
 import org.jgrapht.ext.DOTExporter
 import org.sireum.amandroid._
 import org.sireum.amandroid.interProcedural.Context
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
 
 abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val fac: () => ValueSet)
   extends AlirGraph[Node]
@@ -750,24 +749,18 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     }
   }
   
-  def getDirectCallee(pi : PointI,
-                      androidLibInfoTables : AndroidLibInfoTables) : ResourceUri = {
-    androidLibInfoTables.getProcedureUriBySignature(pi.varName)
-  }
+  def getDirectCallee(pi : PointI) : AmandroidProcedure = Center.getProcedure(pi.varName)
   
   /**
    * This is the beta method in original algo
    */ 
   def getCalleeSet(diff : ValueSet,
-	                 pi : PointI,
-	                 androidLibInfoTables : AndroidLibInfoTables) : MSet[ResourceUri] = {
-    val calleeSet : MSet[ResourceUri] = msetEmpty
+	                 pi : PointI) : MSet[AmandroidProcedure] = {
+    val calleeSet : MSet[AmandroidProcedure] = msetEmpty
     diff.instances.foreach{
       d => 
-        val recordUri = androidLibInfoTables.getRecordUri(d.getClassName)
-        val procUri = androidLibInfoTables.findProcedureUri(recordUri, androidLibInfoTables.getSubSignature(pi.varName))
-        if(procUri != null)
-        	calleeSet += procUri
+        val p = Center.getProcedure(pi.varName)
+        calleeSet += p
     }
     calleeSet
   }

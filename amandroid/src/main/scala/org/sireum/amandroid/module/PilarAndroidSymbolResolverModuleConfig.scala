@@ -7,7 +7,6 @@ import org.sireum.pilar.ast.Model
 import org.sireum.pilar.symbol.SymbolTable
 import org.sireum.option.PipelineMode
 import org.sireum.pipeline.gen.ModuleGenerator
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
 
 
 /*
@@ -31,25 +30,10 @@ case class PilarAndroidSymbolResolver(
   title : String = "Pilar Symbol Resolver for Android",
   
   @Input
-  parallel : Boolean,
-// Fengguo Wei put this three input as below.  
-  
-  @Input
-  hasExistingAndroidLibInfoTables : scala.Option[AndroidLibInfoTables],
-  
-  @Input
-  shouldBuildLibInfoTables : Boolean = true,
-  
-  @Input
-  buildLibInfoTablesOnly : Boolean = false,
+  parallel : Boolean, 
   
   @Input 
   models : ISeq[Model],
-  
-// Fengguo Wei put this output: androidRecordProcedureDependencyTables
-  @Output
-  androidLibInfoTablesOpt : Option[AndroidLibInfoTables],
- 
   
   @Output
   symbolTable : SymbolTable)

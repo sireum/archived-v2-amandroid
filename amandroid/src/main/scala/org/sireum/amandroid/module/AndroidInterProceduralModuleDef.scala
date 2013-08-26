@@ -17,8 +17,6 @@ extends AndroidInterProceduralModule with ImplicitLogging {
   val cfgs : MMap[ResourceUri, ControlFlowGraph[String]] = mmapEmpty
   val cCfgs : MMap[ResourceUri, CompressedControlFlowGraph[String]] = mmapEmpty
   val rdas : MMap[ResourceUri, ReachingDefinitionAnalysis.Result] = mmapEmpty
-  val aCache = this.androidCache
-  val alit = this.androidLibInfoTablesOpt.getOrElse(null)
   val st = this.symbolTable
   val psts = st.procedureSymbolTables.toSeq
     
@@ -46,13 +44,10 @@ extends AndroidInterProceduralModule with ImplicitLogging {
     val j = PipelineJob()
     val options = j.properties
     if(this.shouldBuildOFAsCfg) {
-      CGModule.setAndroidCache(options, aCache)
-      CGModule.setAndroidLibInfoTables(options, alit)
       CGModule.setCfgs(options, cfgs)
       CGModule.setProcedureSymbolTables(options, psts)
       CGModule.setRdas(options, rdas)
       CGModule.setAppInfoOpt(options, this.appInfoOpt)
-      CGModule.setProcedureMap(options, this.procedureMap)
       
       interPipeline.compute(j)
       info.hasError = j.hasError
@@ -84,11 +79,6 @@ extends AndroidInterProceduralModule with ImplicitLogging {
 }
 
 class CGModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends CGModule {
-  var result : CallGraph[String] = null
-  this.androidCache match{
-    case Some(ac) =>
-      result = new CallGraphBuilder().build(this.procedureSymbolTables, this.cfgs, this.rdas, this.androidLibInfoTables, this.procedureMap, this.appInfoOpt, ac)
-    case None =>
-  }
+  val result = new CallGraphBuilder().build(this.procedureSymbolTables, this.cfgs, this.rdas, this.appInfoOpt)
   this.callGraph_=(result)
 }

@@ -1,8 +1,5 @@
 package org.sireum.amandroid.android.parser
 
-import org.sireum.util.ResourceUri
-
-
 class IntentFilterDataBase {
   /**
    * Map from record name to it's intent filter information
@@ -15,11 +12,11 @@ class IntentFilterDataBase {
       intentFmap += (intentFilter.getHolder -> filters)
     } else intentFmap += (intentFilter.getHolder -> Set(intentFilter))
   }
-  def containsRecord(rName : String) : Boolean = intentFmap.contains(rName)
+  def containsRecord(r : String) : Boolean = intentFmap.contains(r)
   def getIntentFmap() = intentFmap
-  def getIntentFilters(rName : ResourceUri) = intentFmap.getOrElse(rName, null)
-  def getIntentFiltersActions(rName : ResourceUri) : Set[String] = {
-    val intentFilterS: Set[IntentFilter] = getIntentFilters(rName)
+  def getIntentFilters(r : String) = intentFmap.getOrElse(r, null)
+  def getIntentFiltersActions(r : String) : Set[String] = {
+    val intentFilterS: Set[IntentFilter] = getIntentFilters(r)
     var actions:Set[String] = null
     if(intentFilterS != null){     
       actions = Set()

@@ -42,8 +42,6 @@ trait AmandroidResolverTestFramework extends TestFramework {
 	
 	      job.sources = srcs
 	      job.parallel = false
-	      job.hasExistingAndroidLibInfoTables = None
-	      job.shouldBuildLibInfoTables = false
       }
     	
     	pilarPipeline.compute(job)

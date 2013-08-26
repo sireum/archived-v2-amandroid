@@ -18,7 +18,7 @@ object ManifestParser extends AbstractAndroidXMLParser{
 	private var packageName = ""
 	private var permissions : Set[String] = Set()
 	private val intentFdb : IntentFilterDataBase = new IntentFilterDataBase
-	private var currentComponent = ""
+	private var currentComponent : String = null
 	private var currentIntentFilter: IntentFilter = null
 	
 	private def buildIntentDB(intentFilter : IntentFilter) = {

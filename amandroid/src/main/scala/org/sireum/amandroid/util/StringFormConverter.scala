@@ -12,6 +12,15 @@ object StringFormConverter {
   }
   
   /**
+	 * get proc name from procedure signature. e.g. [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|] -> [|java:lang:Object.equals|]
+	 */
+  
+  def getProcedureNameFromProcedureSignature(sig : String) : String = {
+	  val strs = sig.substring(3, sig.indexOf(":"))
+	  "[|" + strs.replaceAll("\\/", ":").replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll(";", "") + "|]"
+	}
+  
+  /**
 	 * convert type string from signature style to type style. [Ljava/lang/Object; -> [|java:lang:Object|][]
 	 */
 	
@@ -69,7 +78,7 @@ object StringFormConverter {
   def isValidProcSig(sig : String) : Boolean = sig.startsWith("[|") && sig.endsWith("|]") && sig.lastIndexOf('.') > 0
   
   /**
-   * check whether it is a valid pilar proc signature e.g. [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
+   * check whether it is a valid type signature e.g. Ljava/lang/Object
    */
   
   def isValidTypeSig(sig : String) : Boolean = !sig.startsWith("[|") && !sig.endsWith("|]")
@@ -134,10 +143,10 @@ object StringFormConverter {
   }
   
   /**
-	 * signature of the field. e.g. [|java:lang:Throwable.stackState|]
+	 * signature of the field. e.g. [|java:lang:Throwable.stackState|] or @@[|java:lang:Enum.sharedConstantsCache|]
 	 */
   
-  def isValidFieldSig(sig : String) : Boolean = sig.startsWith("[|") && (sig.endsWith("|]") || sig.endsWith("[]")) && sig.lastIndexOf('.') > 0
+  def isValidFieldSig(sig : String) : Boolean = (sig.startsWith("[|") || sig.startsWith("@@[|")) && sig.endsWith("|]") && sig.lastIndexOf('.') > 0
   
   /**
    * get field name from field signature. e.g. [|java:lang:Throwable.stackState|] -> stackState
@@ -145,7 +154,7 @@ object StringFormConverter {
   
   def getFieldNameFromFieldSignature(sig : String) : String = {
     if(!isValidFieldSig(sig)) throw new RuntimeException("given field signature is not a valid form: " + sig)
-    else sig.substring(sig.lastIndexOf('.') + 1, sig.length() - 2)
+    else sig.substring(sig.lastIndexOf('.') + 1, sig.lastIndexOf("|]"))
   }
   
   /**
@@ -154,7 +163,7 @@ object StringFormConverter {
   
   def getRecordNameFromFieldSignature(sig : String) : String = {
     if(!isValidFieldSig(sig)) throw new RuntimeException("given field signature is not a valid form: " + sig)
-    else sig.substring(0, sig.lastIndexOf('.')) + "|]"
+    else sig.substring(sig.indexOf("[|"), sig.lastIndexOf('.')) + "|]"
   }
   
   /**

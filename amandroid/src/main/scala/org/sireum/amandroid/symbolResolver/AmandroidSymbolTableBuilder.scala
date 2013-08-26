@@ -19,33 +19,18 @@ import org.sireum.amandroid.Center
 object AmandroidSymbolTableBuilder {
   def apply(models : ISeq[Model],
             stpConstructor : Unit => SymbolTableProducer,
-            parallel : Boolean,
-            shouldBuildLibInfoTables : Boolean) =
-    buildSymbolTable(models, stpConstructor, parallel, shouldBuildLibInfoTables)
-    
-  def apply(models : ISeq[Model],
-            stpConstructor : Unit => SymbolTableProducer,
-            existingLibInfoTables : AndroidLibInfoTables,
-            parallel : Boolean,
-            shouldBuildLibInfoTables : Boolean) =
-    buildSymbolTable(models, stpConstructor, existingLibInfoTables, parallel, shouldBuildLibInfoTables)
-    
-  def apply(models : ISeq[Model],
-            stpConstructor : Unit => SymbolTableProducer,
-            existingLibInfoTables : AndroidLibInfoTables,
-            parallel : Boolean) = 
-    buildLibInfoTables(models, stpConstructor, existingLibInfoTables, parallel)
+            parallel : Boolean) =
+    buildSymbolTable(models, stpConstructor, parallel)
 
   def apply[P <: SymbolTableProducer] //
   (stp : SymbolTableProducer, stModels : ISeq[Model],
    changedOrDeletedModelFiles : Set[FileResourceUri],
    changedOrAddedModels : ISeq[Model],
    stpConstructor : Unit => P,
-   existingAndroidLibInfoTables : AndroidLibInfoTables,
    parallel : Boolean,
    shouldBuildLibInfoTables : Boolean) =
     fixSymbolTable(stp, stModels, changedOrDeletedModelFiles,
-      changedOrAddedModels, stpConstructor, existingAndroidLibInfoTables, parallel, shouldBuildLibInfoTables)
+      changedOrAddedModels, stpConstructor, parallel)
 
   def minePackageElements[P <: SymbolTableProducer] //
   (models : ISeq[Model], stpConstructor : Unit => P,
@@ -79,12 +64,6 @@ object AmandroidSymbolTableBuilder {
       stp
     }.toIterable.reduce(H.combine)
   }
-
-  def resolveVirtualMethod(stp : SymbolTableProducer) : AndroidLibInfoTables = {
-    val avmr = new AndroidLibInfoResolver
-    avmr.resolveAndroidLibInfo(stp)
-    avmr.toAndroidLibInfoTables
-  }
   
   def buildProcedureSymbolTables(stp : SymbolTableProducer, parallel : Boolean) : Unit = {
     val procedures = stp.tables.procedureAbsTable.keys.toSeq
@@ -116,14 +95,12 @@ object AmandroidSymbolTableBuilder {
   
   def buildSymbolTable(models : ISeq[Model],
                        stpConstructor : Unit => SymbolTableProducer,
-                       parallel : Boolean,
-                       shouldBuildLibInfoTables : Boolean) = {
+                       parallel : Boolean) = {
     val stp = minePackageElements(models, stpConstructor, parallel)
-    val tablesOpt = if(shouldBuildLibInfoTables) Some(resolveVirtualMethod(stp)) else None
     resolvePackageElements(models, stp, parallel)
     buildProcedureSymbolTables(stp, parallel)
     AmandroidResolver.resolveFromSTP(stp, parallel)
-    (stp.toSymbolTable, tablesOpt)
+    stp.toSymbolTable
   }
   
   def resolvePackageElements(models : ISeq[Model], stp : SymbolTableProducer,
@@ -140,47 +117,12 @@ object AmandroidSymbolTableBuilder {
     dependencies.foldLeft(stp.tables.dependency)(H.combineMap)
   }
   
-  def buildSymbolTable(models : ISeq[Model],
-                       stpConstructor : Unit => SymbolTableProducer,
-                       existingAndroidLibInfoTables : AndroidLibInfoTables,
-                       parallel : Boolean,
-                       shouldBuildLibInfoTables : Boolean) = {
-    val stp = minePackageElements(models, stpConstructor, parallel)
-    val tablesOpt = if(shouldBuildLibInfoTables) Some(resolveVirtualMethod(stp)) else None
-    resolvePackageElements(models, stp, parallel)
-    buildProcedureSymbolTables(stp, parallel)
-    tablesOpt match {
-      case Some(tables) =>
-        println("before merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
-	    tables.mergeWith(existingAndroidLibInfoTables)
-	    tables.asInstanceOf[AndroidLibInfoResolver].separateInterfaceImplementAndClassExtend
-	    println("after merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
-	    (stp.toSymbolTable, Some(tables))
-      case None =>
-        (stp.toSymbolTable, Some(existingAndroidLibInfoTables))
-    }
-  }
-  
-  def buildLibInfoTables(models : ISeq[Model],
-            stpConstructor : Unit => SymbolTableProducer,
-            existingLibInfoTables : AndroidLibInfoTables,
-            parallel : Boolean) = {
-    val stp = minePackageElements(models, stpConstructor, parallel)
-    val tables = resolveVirtualMethod(stp)
-    println("before merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
-    tables.mergeWith(existingLibInfoTables)
-    println("after merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
-    (stp.toSymbolTable, Some(tables))
-  }
-  
   def fixSymbolTable[P <: SymbolTableProducer] //
   (stp : SymbolTableProducer, stModels : ISeq[Model],
    changedOrDeletedModelFiles : Set[FileResourceUri],
    changedOrAddedModels : ISeq[Model],
    stpConstructor : Unit => P,
-   existingAndroidLibInfoTables : AndroidLibInfoTables,
-   parallel : Boolean,
-   shouldBuildLibInfoTables : Boolean) = {
+   parallel : Boolean) = {
 
     val models = mlistEmpty[Model]
     stModels.foreach { m =>
@@ -194,20 +136,11 @@ object AmandroidSymbolTableBuilder {
       }
     }
     val newStp = minePackageElements(changedOrAddedModels, stpConstructor, parallel)
-    val tablesOpt = if(shouldBuildLibInfoTables) Some(resolveVirtualMethod(newStp)) else None
     H.combine(stp, newStp)
     models ++= changedOrAddedModels
     resolvePackageElements(models.toList, stp, parallel)
     
     fixProcedureSymbolTables(stp, newStp.tables.procedureAbsTable.keySet.toSeq, parallel)
-    tablesOpt match {
-      case Some(tables) =>
-        println("before merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
-		    tables.mergeWith(existingAndroidLibInfoTables)
-		    println("after merge : " + tables.asInstanceOf[AndroidLibInfoTablesProducer].tables.cannotFindRecordTable)
-		    (stp.toSymbolTable, Some(tables), newStp.tables.procedureAbsTable.keySet)
-      case None =>
-        (stp.toSymbolTable, Some(existingAndroidLibInfoTables), newStp.tables.procedureAbsTable.keySet)
-    }
+    (stp.toSymbolTable, newStp.tables.procedureAbsTable.keySet)
   }
 }

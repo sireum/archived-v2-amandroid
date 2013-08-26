@@ -15,8 +15,6 @@ import org.sireum.amandroid.module.PilarAndroidSymbolResolverModule
 import org.sireum.amandroid.module.AndroidIntraProceduralModule
 import org.sireum.amandroid.xml.AndroidXStream
 import org.sireum.alir.AlirIntraProceduralGraph
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
-import org.sireum.amandroid.android.cache.AndroidCacheFile
 
 // sankar introduces the following framework which adds one stage on top of AmandroidParserTestFrameWork 
 
@@ -33,10 +31,8 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
     this
   }
 
-  def file(fileUri : FileResourceUri,
-           libInfoTables : AndroidLibInfoTables,
-           aCache : AndroidCacheFile[ResourceUri]) =
-    AmandroidConfiguration(title, fileUri, libInfoTables, aCache)
+  def file(fileUri : FileResourceUri) =
+    AmandroidConfiguration(title, fileUri)
 
   //////////////////////////////////////////////////////////////////////////////
   // Public Case Classes
@@ -47,9 +43,7 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
   
   case class AmandroidConfiguration //
   (title : String,
-   srcs : FileResourceUri,
-   libInfoTables : AndroidLibInfoTables,
-   aCache : AndroidCacheFile[ResourceUri]) {
+   srcs : FileResourceUri) {
 
     ////////////////////////////////////////////////////////////////////////////
     // Test Constructor
@@ -98,18 +92,16 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
 //        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d+dirName+"/classes.pilar"))))
         
         PilarAndroidSymbolResolverModule.setParallel(options, false)
-        PilarAndroidSymbolResolverModule.setHasExistingAndroidLibInfoTables(options, Option(libInfoTables))
-        AndroidIntraProceduralModule.setAndroidCache(options, Some(aCache))
         AndroidIntraProceduralModule.setShouldBuildCCfg(options, true)
         
         // experimental code starts which does not have any significant role now; later we will delete it after some related cleaning 
         
-        val apiPermission : MMap[ResourceUri, MList[String]] = mmapEmpty
-        val permList : MList[String] = mlistEmpty
-        permList+=("permission")   // put the permission strings e.g. "NETWORKS" here
-        val pUri : ResourceUri = "abc"  // replace "abc" by apiUri (e.g. pilar:/procedure/default/%5B%7Candroid::content::Context.startService%7C%5D/1/50/f9cb48df) later
-        apiPermission(pUri) = permList
-        AndroidIntraProceduralModule.setAPIpermOpt(options, Option(apiPermission)) 
+//        val apiPermission : MMap[ResourceUri, MList[String]] = mmapEmpty
+//        val permList : MList[String] = mlistEmpty
+//        permList+=("permission")   // put the permission strings e.g. "NETWORKS" here
+//        val pUri : ResourceUri = "abc"  // replace "abc" by apiUri (e.g. pilar:/procedure/default/%5B%7Candroid::content::Context.startService%7C%5D/1/50/f9cb48df) later
+//        apiPermission(pUri) = permList
+//        AndroidIntraProceduralModule.setAPIpermOpt(options, Option(apiPermission)) 
         
         // experimental code ends
         

@@ -41,66 +41,30 @@ object LightWeightPilarParser {
 
     var lineText = lnr.readLine
 
-    val keywords = Set("package", "const", "enum", "typealias", "record",
-      "global", "procedure", "vset", "fun", "extension")
+    val keyword = "record"
 
     var first = true
-    var id : String = null
-    object RecordFlag extends Enumeration {
-			val RECORD, PROCEDURE, GLOBAL, NO = Value
-		}
-    var recordFlag = RecordFlag.NO
+    var recName : String = null
     while (lineText != null) {
       val word = getFirstWord(lineText)
-      if (keywords.contains(word)) {
-        recordFlag match{
-          case RecordFlag.RECORD =>
-            AmandroidCodeSource.setRecordCode(id, sb.toString)
-            workNo += 1
-            recordFlag = RecordFlag.NO
-          case RecordFlag.PROCEDURE =>
-            AmandroidCodeSource.setProcedureCode(id, sb.toString)
-            workNo += 1
-            recordFlag = RecordFlag.NO
-          case RecordFlag.GLOBAL =>
-            AmandroidCodeSource.setGlobalVarCode(id, sb.toString)
-            workNo += 1
-            recordFlag = RecordFlag.NO
-          case RecordFlag.NO =>
-        }
-        if(word == "record"){
-          recordFlag = RecordFlag.RECORD
-          id = getRecordName(lineText)
-          sb = new StringBuilder
-          chunkLineNo = lineNo
-        } else if(word == "procedure"){
-          recordFlag = RecordFlag.PROCEDURE
-          id = getProcedureSignature(lineText)
-	        sb = new StringBuilder
-	        chunkLineNo = lineNo
-        } else if(word == "global"){
-          recordFlag = RecordFlag.GLOBAL
-          id = getGlobalVarName(lineText)
-	        sb = new StringBuilder
-	        chunkLineNo = lineNo
-        }
+
+      if (keyword == word) {
+        if(recName!=null)
+        	AmandroidCodeSource.setRecordCode(recName, sb.toString)
+        recName = getRecordName(lineText)
+        workNo += 1
+
+        sb = new StringBuilder
+        chunkLineNo = lineNo
       }
-      if(recordFlag != RecordFlag.NO){
-	      sb.append(lineText)
-	      sb.append('\n')
-      }
+
+      sb.append(lineText)
+      sb.append('\n')
       lineNo += 1
+
       lineText = lnr.readLine
     }
-    recordFlag match{
-      case RecordFlag.RECORD =>
-        AmandroidCodeSource.setRecordCode(id, sb.toString)
-      case RecordFlag.PROCEDURE =>
-        AmandroidCodeSource.setProcedureCode(id, sb.toString)
-      case RecordFlag.GLOBAL =>
-        AmandroidCodeSource.setGlobalVarCode(id, sb.toString)
-      case RecordFlag.NO =>
-    }
+    AmandroidCodeSource.setRecordCode(recName, sb.toString)
     workNo + 1
   }
 
@@ -132,32 +96,32 @@ object LightWeightPilarParser {
     else throw new RuntimeException("Doing " + TITLE + ". Cannot find name from record code: " + line)
   }
   
-  def getProcedureSignature(line : String) : String = {
-    val size = line.size
-    var i = if(line.contains("@signature")) (line.indexOf("@signature") + 10) else size
-    while (i < size && line.charAt(i).isWhitespace) {
-      i += 1
-    }
-    var j = i
-    while (j < size && !line.charAt(j).isWhitespace && !line.charAt(j).equals("@")) {
-      j += 1
-    }
-    if (i < size && j <= size) line.substring(i, j)
-    else throw new RuntimeException("Doing " + TITLE + ". Cannot find signature from procedure code: " + line)
-  }
-  
-  def getGlobalVarName(line : String) : String = {
-    val size = line.size
-    var i = if(line.contains("@@")) (line.indexOf("@@")) else size
-    while (i < size && line.charAt(i).isWhitespace) {
-      i += 1
-    }
-    var j = i
-    while (j < size && !line.charAt(j).isWhitespace && !line.charAt(j).equals("@")) {
-      j += 1
-    }
-    if (i < size && j <= size) line.substring(i, j)
-    else throw new RuntimeException("Doing " + TITLE + ". Cannot find global variable name from global code: " + line)
-  }
+//  def getProcedureSignature(line : String) : String = {
+//    val size = line.size
+//    var i = if(line.contains("@signature")) (line.indexOf("@signature") + 10) else size
+//    while (i < size && line.charAt(i).isWhitespace) {
+//      i += 1
+//    }
+//    var j = i
+//    while (j < size && !line.charAt(j).isWhitespace && !line.charAt(j).equals("@")) {
+//      j += 1
+//    }
+//    if (i < size && j <= size) line.substring(i, j)
+//    else throw new RuntimeException("Doing " + TITLE + ". Cannot find signature from procedure code: " + line)
+//  }
+//  
+//  def getGlobalVarName(line : String) : String = {
+//    val size = line.size
+//    var i = if(line.contains("@@")) (line.indexOf("@@")) else size
+//    while (i < size && line.charAt(i).isWhitespace) {
+//      i += 1
+//    }
+//    var j = i
+//    while (j < size && !line.charAt(j).isWhitespace && !line.charAt(j).equals("@")) {
+//      j += 1
+//    }
+//    if (i < size && j <= size) line.substring(i, j)
+//    else throw new RuntimeException("Doing " + TITLE + ". Cannot find global variable name from global code: " + line)
+//  }
   
 }

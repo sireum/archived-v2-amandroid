@@ -10,12 +10,10 @@ import org.sireum.amandroid.android.appInfo.PrepareApp
 import org.sireum.amandroid.interProcedural.callGraph.CallGraph
 import org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisResult
 import org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.pilar.symbol.SymbolTable
 import scala.Option
 import scala.collection.Seq
-import scala.collection.immutable.Map
 import scala.collection.mutable.Map
 
 object CGModule extends PipelineModule {
@@ -23,11 +21,8 @@ object CGModule extends PipelineModule {
   def origin = classOf[CG]
 
   val globalProcedureSymbolTablesKey = "Global.procedureSymbolTables"
-  val globalAndroidCacheKey = "Global.androidCache"
-  val globalProcedureMapKey = "Global.procedureMap"
   val globalCfgsKey = "Global.cfgs"
   val globalAppInfoOptKey = "Global.appInfoOpt"
-  val globalAndroidLibInfoTablesKey = "Global.androidLibInfoTables"
   val callGraphKey = "CG.callGraph"
   val globalRdasKey = "Global.rdas"
   val globalCallGraphKey = "Global.callGraph"
@@ -92,33 +87,6 @@ object CGModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'cfgs'")       
     }
-    var _androidCache : scala.Option[AnyRef] = None
-    var _androidCacheKey : scala.Option[String] = None
-
-    val keylistandroidCache = List(CGModule.globalAndroidCacheKey)
-    keylistandroidCache.foreach(key => 
-      if(job ? key) { 
-        if(_androidCache.isEmpty) {
-          _androidCache = Some(job(key))
-          _androidCacheKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _androidCache.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'androidCache' keys '" + _androidCacheKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _androidCache match{
-      case Some(x) =>
-        if(!x.isInstanceOf[scala.Option[org.sireum.amandroid.android.cache.AndroidCacheFile[java.lang.String]]]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'androidCache'.  Expecting 'scala.Option[org.sireum.amandroid.android.cache.AndroidCacheFile[java.lang.String]]' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'androidCache'")       
-    }
     var _appInfoOpt : scala.Option[AnyRef] = None
     var _appInfoOptKey : scala.Option[String] = None
 
@@ -145,33 +113,6 @@ object CGModule extends PipelineModule {
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'appInfoOpt'")       
-    }
-    var _procedureMap : scala.Option[AnyRef] = None
-    var _procedureMapKey : scala.Option[String] = None
-
-    val keylistprocedureMap = List(CGModule.globalProcedureMapKey)
-    keylistprocedureMap.foreach(key => 
-      if(job ? key) { 
-        if(_procedureMap.isEmpty) {
-          _procedureMap = Some(job(key))
-          _procedureMapKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _procedureMap.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'procedureMap' keys '" + _procedureMapKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _procedureMap match{
-      case Some(x) =>
-        if(!x.isInstanceOf[scala.collection.immutable.Map[java.lang.String, java.lang.String]]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'procedureMap'.  Expecting 'scala.collection.immutable.Map[java.lang.String, java.lang.String]' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'procedureMap'")       
     }
     var _rdas : scala.Option[AnyRef] = None
     var _rdasKey : scala.Option[String] = None
@@ -227,33 +168,6 @@ object CGModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'procedureSymbolTables'")       
     }
-    var _androidLibInfoTables : scala.Option[AnyRef] = None
-    var _androidLibInfoTablesKey : scala.Option[String] = None
-
-    val keylistandroidLibInfoTables = List(CGModule.globalAndroidLibInfoTablesKey)
-    keylistandroidLibInfoTables.foreach(key => 
-      if(job ? key) { 
-        if(_androidLibInfoTables.isEmpty) {
-          _androidLibInfoTables = Some(job(key))
-          _androidLibInfoTablesKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _androidLibInfoTables.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'androidLibInfoTables' keys '" + _androidLibInfoTablesKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _androidLibInfoTables match{
-      case Some(x) =>
-        if(!x.isInstanceOf[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'androidLibInfoTables'.  Expecting 'org.sireum.amandroid.symbolResolver.AndroidLibInfoTables' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'androidLibInfoTables'")       
-    }
     return tags
   }
 
@@ -293,21 +207,6 @@ object CGModule extends PipelineModule {
     return options
   }
 
-  def getAndroidCache (options : scala.collection.Map[Property.Key, Any]) : scala.Option[org.sireum.amandroid.android.cache.AndroidCacheFile[java.lang.String]] = {
-    if (options.contains(CGModule.globalAndroidCacheKey)) {
-       return options(CGModule.globalAndroidCacheKey).asInstanceOf[scala.Option[org.sireum.amandroid.android.cache.AndroidCacheFile[java.lang.String]]]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setAndroidCache (options : MMap[Property.Key, Any], androidCache : scala.Option[org.sireum.amandroid.android.cache.AndroidCacheFile[java.lang.String]]) : MMap[Property.Key, Any] = {
-
-    options(CGModule.globalAndroidCacheKey) = androidCache
-
-    return options
-  }
-
   def getAppInfoOpt (options : scala.collection.Map[Property.Key, Any]) : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp] = {
     if (options.contains(CGModule.globalAppInfoOptKey)) {
        return options(CGModule.globalAppInfoOptKey).asInstanceOf[scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp]]
@@ -319,21 +218,6 @@ object CGModule extends PipelineModule {
   def setAppInfoOpt (options : MMap[Property.Key, Any], appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp]) : MMap[Property.Key, Any] = {
 
     options(CGModule.globalAppInfoOptKey) = appInfoOpt
-
-    return options
-  }
-
-  def getProcedureMap (options : scala.collection.Map[Property.Key, Any]) : scala.collection.immutable.Map[java.lang.String, java.lang.String] = {
-    if (options.contains(CGModule.globalProcedureMapKey)) {
-       return options(CGModule.globalProcedureMapKey).asInstanceOf[scala.collection.immutable.Map[java.lang.String, java.lang.String]]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setProcedureMap (options : MMap[Property.Key, Any], procedureMap : scala.collection.immutable.Map[java.lang.String, java.lang.String]) : MMap[Property.Key, Any] = {
-
-    options(CGModule.globalProcedureMapKey) = procedureMap
 
     return options
   }
@@ -368,21 +252,6 @@ object CGModule extends PipelineModule {
     return options
   }
 
-  def getAndroidLibInfoTables (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.symbolResolver.AndroidLibInfoTables = {
-    if (options.contains(CGModule.globalAndroidLibInfoTablesKey)) {
-       return options(CGModule.globalAndroidLibInfoTablesKey).asInstanceOf[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setAndroidLibInfoTables (options : MMap[Property.Key, Any], androidLibInfoTables : org.sireum.amandroid.symbolResolver.AndroidLibInfoTables) : MMap[Property.Key, Any] = {
-
-    options(CGModule.globalAndroidLibInfoTablesKey) = androidLibInfoTables
-
-    return options
-  }
-
   def getCallGraph (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.interProcedural.callGraph.CallGraph[java.lang.String] = {
     if (options.contains(CGModule.globalCallGraphKey)) {
        return options(CGModule.globalCallGraphKey).asInstanceOf[org.sireum.amandroid.interProcedural.callGraph.CallGraph[java.lang.String]]
@@ -405,12 +274,9 @@ object CGModule extends PipelineModule {
   object ConsumerView {
     implicit class CGModuleConsumerView (val job : PropertyProvider) extends AnyVal {
       def cfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]] = CGModule.getCfgs(job.propertyMap)
-      def androidCache : scala.Option[org.sireum.amandroid.android.cache.AndroidCacheFile[java.lang.String]] = CGModule.getAndroidCache(job.propertyMap)
       def appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp] = CGModule.getAppInfoOpt(job.propertyMap)
-      def procedureMap : scala.collection.immutable.Map[java.lang.String, java.lang.String] = CGModule.getProcedureMap(job.propertyMap)
       def rdas : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]] = CGModule.getRdas(job.propertyMap)
       def procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = CGModule.getProcedureSymbolTables(job.propertyMap)
-      def androidLibInfoTables : org.sireum.amandroid.symbolResolver.AndroidLibInfoTables = CGModule.getAndroidLibInfoTables(job.propertyMap)
       def callGraph : org.sireum.amandroid.interProcedural.callGraph.CallGraph[java.lang.String] = CGModule.getCallGraph(job.propertyMap)
     }
   }
@@ -421,23 +287,14 @@ object CGModule extends PipelineModule {
       def cfgs_=(cfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]]) { CGModule.setCfgs(job.propertyMap, cfgs) }
       def cfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]] = CGModule.getCfgs(job.propertyMap)
 
-      def androidCache_=(androidCache : scala.Option[org.sireum.amandroid.android.cache.AndroidCacheFile[java.lang.String]]) { CGModule.setAndroidCache(job.propertyMap, androidCache) }
-      def androidCache : scala.Option[org.sireum.amandroid.android.cache.AndroidCacheFile[java.lang.String]] = CGModule.getAndroidCache(job.propertyMap)
-
       def appInfoOpt_=(appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp]) { CGModule.setAppInfoOpt(job.propertyMap, appInfoOpt) }
       def appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp] = CGModule.getAppInfoOpt(job.propertyMap)
-
-      def procedureMap_=(procedureMap : scala.collection.immutable.Map[java.lang.String, java.lang.String]) { CGModule.setProcedureMap(job.propertyMap, procedureMap) }
-      def procedureMap : scala.collection.immutable.Map[java.lang.String, java.lang.String] = CGModule.getProcedureMap(job.propertyMap)
 
       def rdas_=(rdas : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]]) { CGModule.setRdas(job.propertyMap, rdas) }
       def rdas : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]] = CGModule.getRdas(job.propertyMap)
 
       def procedureSymbolTables_=(procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable]) { CGModule.setProcedureSymbolTables(job.propertyMap, procedureSymbolTables) }
       def procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = CGModule.getProcedureSymbolTables(job.propertyMap)
-
-      def androidLibInfoTables_=(androidLibInfoTables : org.sireum.amandroid.symbolResolver.AndroidLibInfoTables) { CGModule.setAndroidLibInfoTables(job.propertyMap, androidLibInfoTables) }
-      def androidLibInfoTables : org.sireum.amandroid.symbolResolver.AndroidLibInfoTables = CGModule.getAndroidLibInfoTables(job.propertyMap)
 
       def callGraph_=(callGraph : org.sireum.amandroid.interProcedural.callGraph.CallGraph[java.lang.String]) { CGModule.setCallGraph(job.propertyMap, callGraph) }
       def callGraph : org.sireum.amandroid.interProcedural.callGraph.CallGraph[java.lang.String] = CGModule.getCallGraph(job.propertyMap)
@@ -450,17 +307,11 @@ trait CGModule {
 
   def cfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]] = CGModule.getCfgs(job.propertyMap)
 
-  def androidCache : scala.Option[org.sireum.amandroid.android.cache.AndroidCacheFile[java.lang.String]] = CGModule.getAndroidCache(job.propertyMap)
-
   def appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp] = CGModule.getAppInfoOpt(job.propertyMap)
-
-  def procedureMap : scala.collection.immutable.Map[java.lang.String, java.lang.String] = CGModule.getProcedureMap(job.propertyMap)
 
   def rdas : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]] = CGModule.getRdas(job.propertyMap)
 
   def procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = CGModule.getProcedureSymbolTables(job.propertyMap)
-
-  def androidLibInfoTables : org.sireum.amandroid.symbolResolver.AndroidLibInfoTables = CGModule.getAndroidLibInfoTables(job.propertyMap)
 
 
   def callGraph_=(callGraph : org.sireum.amandroid.interProcedural.callGraph.CallGraph[java.lang.String]) { CGModule.setCallGraph(job.propertyMap, callGraph) }

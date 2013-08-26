@@ -1,10 +1,10 @@
 package org.sireum.amandroid.pilarCodeGenerator
 
 object AndroidEntryPointConstants {
-	final val ACTIVITYCLASS = "pilar:/record/default/%5B%7Candroid:app:Activity%7C%5D"
-	final val SERVICECLASS = "pilar:/record/default/%5B%7Candroid:app:Service%7C%5D"
-	final val BROADCASTRECEIVERCLASS = "pilar:/record/default/%5B%7Candroid:content:BroadcastReceiver%7C%5D"
-	final val CONTENTPROVIDERCLASS = "pilar:/record/default/%5B%7Candroid:content:ContentProvider%7C%5D"
+	final val ACTIVITY_CLASS = "[|android:app:Activity|]"
+	final val SERVICE_CLASS = "[|android:app:Service|]"
+	final val BROADCAST_RECEIVER_CLASS = "[|android:content:BroadcastReceiver|]"
+	final val CONTENT_PROVIDER_CLASS = "[|android:content:ContentProvider|]"
 	
 	final val ACTIVITY_ONCREATE = ".onCreate:(Landroid/os/Bundle;)V"
 	final val ACTIVITY_ONSTART = ".onStart:()V"

@@ -8,7 +8,10 @@ import org.sireum.amandroid.interProcedural.objectFlowAnalysis.ObjectFlowGraph
 import org.sireum.amandroid.android.parser.IntentFilterDataBase
 import org.sireum.amandroid.PointI
 import org.sireum.amandroid.android.parser.UriData
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
+import org.sireum.amandroid.Center
+import org.sireum.amandroid.util.StringFormConverter
+import org.sireum.amandroid.AmandroidRecord
+import org.sireum.amandroid.AmandroidProcedure
 
 
 trait InterComponentCommunicationModel[Node <: OfaNode, ValueSet <: AndroidValueSet] extends ObjectFlowGraph[Node, ValueSet] {
@@ -37,7 +40,7 @@ trait InterComponentCommunicationModel[Node <: OfaNode, ValueSet <: AndroidValue
     flag
   }
   
-  def doIccOperation(dummyMainMap : Map[String, String]) : Set[(PointI, Context, Set[String])] = {
+  def doIccOperation(dummyMainMap : Map[AmandroidRecord, AmandroidProcedure]) : Set[(PointI, Context, Set[String])] = {
     var result : Set[(PointI, Context, Set[String])] = Set()
     iccOperationTracker.map{
       case (sig, pi, context) =>
@@ -45,19 +48,19 @@ trait InterComponentCommunicationModel[Node <: OfaNode, ValueSet <: AndroidValue
         if(checkIccOperation(sig, pi, context)){
           val intentNode = getNode(pi.args_Call(0), context.copy)
 	        val intentValueSet : ValueSet = intentNode.getProperty[ValueSet](VALUE_SET)
-	        hasExplicitTarget(intentValueSet) match {
-	          case Some(targets) =>
-	            //explicit case
-	            result += ((pi, context, targets.map{name => dummyMainMap.getOrElse(name, null)}.filter{item => if(item != null)true else false}.toSet))
-	          case None =>
-	            hasImplicitTarget(intentValueSet) match {
-	              case Some(targets) =>	                
-	            //implicit case
-	                result += ((pi, context, targets.map{name => dummyMainMap.getOrElse(name, null)}.filter{item => if(item != null)true else false}.toSet))
-	              case None =>
-	                System.err.println("problem: received Intent did not find an explicit or implicit match")
-	            }
-	        }
+//	        hasExplicitTarget(intentValueSet) match {
+//	          case Some(targets) =>
+//	            //explicit case
+//	            result += ((pi, context, targets.map{name => dummyMainMap.getOrElse(, null)}.filter{item => if(item != null)true else false}.toSet))
+//	          case None =>
+//	            hasImplicitTarget(intentValueSet) match {
+//	              case Some(targets) =>	                
+//	            //implicit case
+//	                result += ((pi, context, targets.map{name => dummyMainMap.getOrElse(name, null)}.filter{item => if(item != null)true else false}.toSet))
+//	              case None =>
+//	                System.err.println("problem: received Intent did not find an explicit or implicit match")
+//	            }
+//	        }
         } else {
           System.err.println("Inter-Component Communication connection failed for: " + sig + ", because of intent object flow error.")
         }
@@ -311,13 +314,15 @@ trait InterComponentCommunicationModel[Node <: OfaNode, ValueSet <: AndroidValue
 	  }
 	  components
   }
-  def isIccOperation(sig : String, androidLibInfoTables: AndroidLibInfoTables) : Boolean = {
+  def isIccOperation(sig : String) : Boolean = {
     var flag = false
     if(sig != null)
     {
       AndroidConstants.getIccMethods.foreach{
         item => 
-          if(androidLibInfoTables.matchSigInheritance(item, sig)) 
+          val r = Center.getRecord(StringFormConverter.getRecordNameFromProcedureSignature(sig))
+          val p = Center.getProcedure(sig)
+          if(Center.getRecordHierarchy.resolveConcreteDispatch(r, p).getSignature == item)
            flag = true
         }
     }

@@ -9,8 +9,9 @@ import java.io._
 import org.jgrapht.ext.DOTExporter
 import dk.brics.automaton._
 import org.sireum.amandroid.intraProcedural.compressedControlFlowGraph.AlirIntraProceduralGraphExtra
+import org.sireum.amandroid.AmandroidProcedure
 
-case class ReachableProcedure(callerProcedureUri : ResourceUri, sig : String, uri : ResourceUri, locUri: Option[org.sireum.util.ResourceUri], locIndex: Int, params : List[String], pst : ProcedureSymbolTable)
+case class ReachableProcedure(callerProcedure : AmandroidProcedure, calleeProcedure : AmandroidProcedure, locUri: Option[org.sireum.util.ResourceUri], locIndex: Int, params : List[String])
 
 
 class CallGraph[VirtualLabel] extends SuperControlFlowGraph[VirtualLabel]
@@ -30,13 +31,13 @@ class CallGraph[VirtualLabel] extends SuperControlFlowGraph[VirtualLabel]
 		 * @param procedureUris Initial procedure resource uri
 		 * @return Set of reachable procedure resource uris from initial procedure
 		 */
-		def getReachableProcedures(procedureUri : ResourceUri) : Set[ReachableProcedure] = Set()
+		def getReachableProcedures(procedureUri : AmandroidProcedure) : Set[ReachableProcedure] = Set()
 		/**
 		 * Get all reachable procedures of given procedure set. (Do not include transitive call)
 		 * @param procedureUris Initial procedure resource uri set
 		 * @return Set of reachable procedure resource uris from initial set
 		 */
-		def getReachableProcedures(procedureUris : Set[ResourceUri]) : Set[ReachableProcedure] = Set()
+		def getReachableProcedures(procedureUris : Set[AmandroidProcedure]) : Set[ReachableProcedure] = Set()
 
     def reverse : CallGraph[VirtualLabel] = {
       val result = new CallGraph[VirtualLabel]

@@ -4,15 +4,12 @@ import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.alir.ReachingDefinitionAnalysis
 import org.sireum.amandroid.interProcedural.objectFlowAnalysis.ObjectFlowGraphPreprocessor
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.interProcedural.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.interProcedural.objectFlowAnalysis.ObjectFlowGraph
 import org.sireum.amandroid.PointsCollector
 import org.sireum.amandroid.interProcedural.Context
 
 object AndroidOfgPreprocessor extends ObjectFlowGraphPreprocessor[OfaNode, AndroidValueSet] {  
-  private var androidLibInfoTables : AndroidLibInfoTables = null
-  def setAndroidLibInfoTables(alit : AndroidLibInfoTables) = this.androidLibInfoTables = alit
   
   def apply(pst : ProcedureSymbolTable,
             cfg : ControlFlowGraph[String],
@@ -23,7 +20,7 @@ object AndroidOfgPreprocessor extends ObjectFlowGraphPreprocessor[OfaNode, Andro
             cfg : ControlFlowGraph[String],
             rda : ReachingDefinitionAnalysis.Result) : AndroidObjectFlowGraph[OfaNode, AndroidValueSet] = {
     val result = new AndroidObjectFlowGraph[OfaNode, AndroidValueSet]({() => new AndroidValueSet})
-    doPreOfg(pst, cfg,rda, result)
+    doPreOfg(pst, cfg, rda, result)
     result
   }
   

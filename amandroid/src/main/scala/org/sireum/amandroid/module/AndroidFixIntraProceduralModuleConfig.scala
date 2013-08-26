@@ -19,7 +19,6 @@ import org.sireum.alir.DefRef
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.amandroid.android.appInfo.PrepareApp
 import org.sireum.amandroid.android.cache.AndroidCacheFile
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis._
 
 /**
@@ -32,16 +31,10 @@ case class AndroidFixIntraProcedural(
   parallel : Boolean,
   
   @Input
-  shouldBuildLibInfoTables : Boolean = true,
-  
-  @Input
   appInfoOpt : scala.Option[PrepareApp],
   
   @Input 
   models : ISeq[Model],
- 
-  @Input
-  androidCache : scala.Option[AndroidCacheFile[ResourceUri]] = None,
   
   @Input
   shouldBuildCfg : Boolean = true,
@@ -58,16 +51,13 @@ case class AndroidFixIntraProcedural(
   @Input
   shouldBuildCCfg : Boolean = false,
   
-  @Input
-  APIpermOpt : scala.Option[MMap[ResourceUri, MList[String]]] = None,
-  
   @Input 
   shouldIncludeFlowFunction : AndroidIntraProcedural.ShouldIncludeFlowFunction =
     // ControlFlowGraph.defaultSiff,
     { (_, _) => (Array.empty[CatchClause], false) },
     
 //modified for building RDA       
-  @Input defRef : (SymbolTable, AndroidLibInfoTables) => DefRef = { (st, alit) => new AndroidDefRef(st, new AndroidVarAccesses(st), alit) },
+  @Input defRef : SymbolTable => DefRef = { st => new AndroidDefRef(st, new AndroidVarAccesses(st))},
 
   @Input isInputOutputParamPredicate : ProcedureSymbolTable => (ResourceUri => java.lang.Boolean, ResourceUri => java.lang.Boolean) = { pst =>
     val params = pst.params.toSet[ResourceUri]
@@ -82,9 +72,6 @@ case class AndroidFixIntraProcedural(
   
   @Output
   symbolTable : SymbolTable,
-  
-  @Output
-  androidLibInfoTablesOpt : Option[AndroidLibInfoTables],
   
 	@Output 
 	intraResult : MMap[ResourceUri, AndroidIntraProcedural.AndroidIntraAnalysisResult])

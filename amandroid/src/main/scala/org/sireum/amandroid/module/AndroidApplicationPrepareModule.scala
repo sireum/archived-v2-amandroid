@@ -8,7 +8,6 @@ import org.sireum.pipeline._
 import java.lang.String
 import org.sireum.amandroid.android.appInfo.PrepareApp
 import org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
 import org.sireum.pilar.symbol.SymbolTable
 import scala.Option
 import scala.collection.mutable.Map
@@ -17,7 +16,6 @@ object AndroidApplicationPrepareModule extends PipelineModule {
   def title = "Android Application Preparation Module"
   def origin = classOf[AndroidApplicationPrepare]
 
-  val globalAndroidLibInfoTablesOptKey = "Global.androidLibInfoTablesOpt"
   val globalAppInfoOptKey = "Global.appInfoOpt"
   val appInfoOptKey = "AndroidApplicationPrepare.appInfoOpt"
   val globalIntraResultKey = "Global.intraResult"
@@ -111,33 +109,6 @@ object AndroidApplicationPrepareModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'intraResult'")       
     }
-    var _androidLibInfoTablesOpt : scala.Option[AnyRef] = None
-    var _androidLibInfoTablesOptKey : scala.Option[String] = None
-
-    val keylistandroidLibInfoTablesOpt = List(AndroidApplicationPrepareModule.globalAndroidLibInfoTablesOptKey)
-    keylistandroidLibInfoTablesOpt.foreach(key => 
-      if(job ? key) { 
-        if(_androidLibInfoTablesOpt.isEmpty) {
-          _androidLibInfoTablesOpt = Some(job(key))
-          _androidLibInfoTablesOptKey = Some(key)
-        }
-        if(!(job(key).asInstanceOf[AnyRef] eq _androidLibInfoTablesOpt.get)) {
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'androidLibInfoTablesOpt' keys '" + _androidLibInfoTablesOptKey.get + " and '" + key + "' point to different objects.")
-        }
-      }
-    )
-
-    _androidLibInfoTablesOpt match{
-      case Some(x) =>
-        if(!x.isInstanceOf[scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]]){
-          tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'androidLibInfoTablesOpt'.  Expecting 'scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]' but found '" + x.getClass.toString + "'")
-        }
-      case None =>
-        tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'androidLibInfoTablesOpt'")       
-    }
     var _symbolTable : scala.Option[AnyRef] = None
     var _symbolTableKey : scala.Option[String] = None
 
@@ -219,21 +190,6 @@ object AndroidApplicationPrepareModule extends PipelineModule {
     return options
   }
 
-  def getAndroidLibInfoTablesOpt (options : scala.collection.Map[Property.Key, Any]) : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables] = {
-    if (options.contains(AndroidApplicationPrepareModule.globalAndroidLibInfoTablesOptKey)) {
-       return options(AndroidApplicationPrepareModule.globalAndroidLibInfoTablesOptKey).asInstanceOf[scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]]
-    }
-
-    throw new Exception("Pipeline checker should guarantee we never reach here")
-  }
-
-  def setAndroidLibInfoTablesOpt (options : MMap[Property.Key, Any], androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]) : MMap[Property.Key, Any] = {
-
-    options(AndroidApplicationPrepareModule.globalAndroidLibInfoTablesOptKey) = androidLibInfoTablesOpt
-
-    return options
-  }
-
   def getSymbolTable (options : scala.collection.Map[Property.Key, Any]) : org.sireum.pilar.symbol.SymbolTable = {
     if (options.contains(AndroidApplicationPrepareModule.globalSymbolTableKey)) {
        return options(AndroidApplicationPrepareModule.globalSymbolTableKey).asInstanceOf[org.sireum.pilar.symbol.SymbolTable]
@@ -272,7 +228,6 @@ object AndroidApplicationPrepareModule extends PipelineModule {
     implicit class AndroidApplicationPrepareModuleConsumerView (val job : PropertyProvider) extends AnyVal {
       def apkFileLocation : java.lang.String = AndroidApplicationPrepareModule.getApkFileLocation(job.propertyMap)
       def intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult] = AndroidApplicationPrepareModule.getIntraResult(job.propertyMap)
-      def androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables] = AndroidApplicationPrepareModule.getAndroidLibInfoTablesOpt(job.propertyMap)
       def symbolTable : org.sireum.pilar.symbol.SymbolTable = AndroidApplicationPrepareModule.getSymbolTable(job.propertyMap)
       def appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp] = AndroidApplicationPrepareModule.getAppInfoOpt(job.propertyMap)
     }
@@ -286,9 +241,6 @@ object AndroidApplicationPrepareModule extends PipelineModule {
 
       def intraResult_=(intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult]) { AndroidApplicationPrepareModule.setIntraResult(job.propertyMap, intraResult) }
       def intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult] = AndroidApplicationPrepareModule.getIntraResult(job.propertyMap)
-
-      def androidLibInfoTablesOpt_=(androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables]) { AndroidApplicationPrepareModule.setAndroidLibInfoTablesOpt(job.propertyMap, androidLibInfoTablesOpt) }
-      def androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables] = AndroidApplicationPrepareModule.getAndroidLibInfoTablesOpt(job.propertyMap)
 
       def symbolTable_=(symbolTable : org.sireum.pilar.symbol.SymbolTable) { AndroidApplicationPrepareModule.setSymbolTable(job.propertyMap, symbolTable) }
       def symbolTable : org.sireum.pilar.symbol.SymbolTable = AndroidApplicationPrepareModule.getSymbolTable(job.propertyMap)
@@ -305,8 +257,6 @@ trait AndroidApplicationPrepareModule {
   def apkFileLocation : java.lang.String = AndroidApplicationPrepareModule.getApkFileLocation(job.propertyMap)
 
   def intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult] = AndroidApplicationPrepareModule.getIntraResult(job.propertyMap)
-
-  def androidLibInfoTablesOpt : scala.Option[org.sireum.amandroid.symbolResolver.AndroidLibInfoTables] = AndroidApplicationPrepareModule.getAndroidLibInfoTablesOpt(job.propertyMap)
 
   def symbolTable : org.sireum.pilar.symbol.SymbolTable = AndroidApplicationPrepareModule.getSymbolTable(job.propertyMap)
 

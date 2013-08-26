@@ -6,7 +6,8 @@ import pxb.android.axml.AxmlReader
 import pxb.android.axml.AxmlVisitor
 import pxb.android.axml.AxmlVisitor.NodeVisitor
 import org.sireum.util._
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
+import org.sireum.amandroid.Center
+import org.sireum.amandroid.AmandroidRecord
 
 /**
  * Parser for analyzing the layout XML files inside an android application
@@ -16,7 +17,6 @@ import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
  */
 object LayoutFileParser extends AbstractAndroidXMLParser {
 	
-  var androidLibInfoTables : AndroidLibInfoTables = null
 	private final val DEBUG = true
 	
 	private final var userControls : Map[Int, LayoutControl] = Map()
@@ -34,7 +34,7 @@ object LayoutFileParser extends AbstractAndroidXMLParser {
 	
 	def toPilarRecord(str : String) : String = "[|" + str.replaceAll("\\.", ":") + "|]"
 	
-	private def getLayoutClass(className : String) : String =
+	private def getLayoutClass(className : String) : AmandroidRecord = {
 //		SootClass sc = Scene.v().forceResolve(className, SootClass.BODIES);
 //		if ((sc == null || sc.isPhantom()) && !packageName.isEmpty())
 //			sc = Scene.v().forceResolve(packageName + "." + className, SootClass.BODIES);
@@ -45,49 +45,49 @@ object LayoutFileParser extends AbstractAndroidXMLParser {
 //		if (sc == null || sc.isPhantom())
 //   			System.err.println("Could not find layout class " + className);
 //		return sc;
-	  if(androidLibInfoTables.containsRecord(toPilarRecord(className)))
-	    toPilarRecord(className)
-	  else if(!packageName.isEmpty() && androidLibInfoTables.containsRecord(toPilarRecord(packageName + "." + className)))
-	    toPilarRecord(packageName + "." + className)
-	  else if(androidLibInfoTables.containsRecord(toPilarRecord("android.widget." + className)))
-	    toPilarRecord("android.widget." + className)
-	  else if(androidLibInfoTables.containsRecord(toPilarRecord("android.webkit." + className)))
-	    toPilarRecord("android.webkit." + className)
-	  else {
-	    System.err.println("Could not find layout class " + className)
-	    ""
-	  }
-	
-	private def isLayoutClass(theClass : String) : Boolean = {
-		if (theClass == null)
-			return false
-   		// To make sure that nothing all wonky is going on here, we
-   		// check the hierarchy to find the android view class
-   		val rUri = androidLibInfoTables.getRecordUri("[|android:view:ViewGroup|]")
-   		val found = androidLibInfoTables.getAncestors(theClass).contains(rUri)
-   		return found
+	  var ar : Option[AmandroidRecord] = Center.tryLoadRecord(toPilarRecord(className), Center.ResolveLevel.BODIES)
+	  if(!ar.isDefined || !this.packageName.isEmpty())
+	    ar = Center.tryLoadRecord(toPilarRecord(packageName + "." + className), Center.ResolveLevel.BODIES)
+	  if(!ar.isDefined)
+	    ar = Center.tryLoadRecord(toPilarRecord("android.widget." + className), Center.ResolveLevel.BODIES)
+	  if(!ar.isDefined)
+	    ar = Center.tryLoadRecord(toPilarRecord("android.webkit." + className), Center.ResolveLevel.BODIES)
+	  if(!ar.isDefined)
+	    throw new RuntimeException("Could not find layout class " + className)
+	  ar.get
 	}
 	
-	private def isViewClass(theClass : String) : Boolean = {
+	private def isLayoutClass(theClass : AmandroidRecord) : Boolean = {
+		if (theClass == null)
+			return false
+ 		// To make sure that nothing all wonky is going on here, we
+ 		// check the hierarchy to find the android view class
+ 		var found = false
+ 		Center.getRecordHierarchy.getAllSuperClassesOf(theClass).foreach{
+	  	su =>
+	  		if(su.getName == "[|android:view:ViewGroup|]")
+	  		  found = true
+		}
+ 		found
+	}
+	
+	private def isViewClass(theClass : AmandroidRecord) : Boolean = {
 		if (theClass == null)
 			return false
 
 		// To make sure that nothing all wonky is going on here, we
    		// check the hierarchy to find the android view class
-			val viewUri = androidLibInfoTables.getRecordUri("[|android:view:View|]")
-   		val webviewUri = androidLibInfoTables.getRecordUri("[|android:webkit:WebView|]")
-   		val ancestors = androidLibInfoTables.getAncestors(theClass)
-   		val found = (androidLibInfoTables.getAncestors(theClass).contains(viewUri) ||
-   		    				 androidLibInfoTables.getAncestors(theClass).contains(webviewUri))
-   		if (!found) {
-   			System.err.println("Layout class " + theClass + " is not derived from "
-   					+ "android.view.View");
-   			return false
-   		}
-   		return true
+ 		Center.getRecordHierarchy.getAllSuperClassesOf(theClass).foreach{
+	  	su =>
+	  		if(su.getName == "[|android:view:View|]" || su.getName == "[|android:webkit:WebView|]")
+	  		  return true
+		}
+		System.err.println("Layout class " + theClass + " is not derived from "
+				+ "android.view.View");
+		false
 	}
 	
-	private class LayoutParser(layoutFile : String, theClass : String) extends NodeVisitor {
+	private class LayoutParser(layoutFile : String, theClass : AmandroidRecord) extends NodeVisitor {
 
   	private var id = -1
   	private var isSensitive = false
@@ -99,7 +99,7 @@ object LayoutFileParser extends AbstractAndroidXMLParser {
 				return null
 			}
 	  			
-			val childClass = androidLibInfoTables.getRecordUri(getLayoutClass(name.trim()))
+			val childClass = getLayoutClass(name.trim())
 			if (isLayoutClass(childClass) || isViewClass(childClass))
 	      new LayoutParser(layoutFile, childClass);
 			else

@@ -5,10 +5,10 @@ import org.sireum.amandroid.symbolResolver.AmandroidSymbolTable
 import org.sireum.pilar.ast._
 import org.sireum.alir._
 import org.sireum.pilar.symbol.SymbolTable
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
 import org.sireum.pilar.parser.ChunkingPilarParser
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis._
+import org.sireum.amandroid.symbolResolver.AmandroidSymbolTableBuilder
 import org.sireum.amandroid.symbolResolver.AmandroidSymbolTableBuilder
 
 
@@ -32,7 +32,6 @@ object Transform {
   
   //for building symbol table
   var par : Boolean = false
-  var shouldBuildLibInfoTables : Boolean = false
   val fst = { _ : Unit => new AmandroidSymbolTable }
   
   //for building cfg
@@ -42,7 +41,7 @@ object Transform {
   val siff : ControlFlowGraph.ShouldIncludeFlowFunction =
     // ControlFlowGraph.defaultSiff,
     { (_, _) => (Array.empty[CatchClause], false) }   
-  val dr : (SymbolTable, AndroidLibInfoTables) => DefRef = { (st, alit) => new AndroidDefRef(st, new AndroidVarAccesses(st), alit) }
+  val dr : SymbolTable => DefRef = { st => new AndroidDefRef(st, new AndroidVarAccesses(st)) }
   val iopp : ProcedureSymbolTable => (ResourceUri => Boolean, ResourceUri => Boolean) = { pst =>
     val params = pst.params.toSet[ResourceUri]
     ({ localUri => params.contains(localUri) },
@@ -50,22 +49,22 @@ object Transform {
   }
   val saom : Boolean = true
   
-	def getIntraProcedureResult(code : String, libInfoTable : AndroidLibInfoTables) : Map[ResourceUri, TransformIntraProcedureResult] = {
+	def getIntraProcedureResult(code : String) : Map[ResourceUri, TransformIntraProcedureResult] = {
 	  val newModels = parseCodes(Set(code))
-	  doGetIntraProcedureResult(newModels, libInfoTable)
+	  doGetIntraProcedureResult(newModels)
 	}
 	
-	def getIntraProcedureResult(codes : Set[String], libInfoTable : AndroidLibInfoTables) : Map[ResourceUri, TransformIntraProcedureResult] = {
+	def getIntraProcedureResult(codes : Set[String]) : Map[ResourceUri, TransformIntraProcedureResult] = {
 	  val newModels = parseCodes(codes)
-	  doGetIntraProcedureResult(newModels, libInfoTable)
+	  doGetIntraProcedureResult(newModels)
 	}
 	
-	private def doGetIntraProcedureResult(models : List[Model], libInfoTable : AndroidLibInfoTables) : Map[ResourceUri, TransformIntraProcedureResult] = {
-	  val result = AmandroidSymbolTableBuilder(models, fst, par, shouldBuildLibInfoTables)
-	  result._1.procedureSymbolTables.map{
+	private def doGetIntraProcedureResult(models : List[Model]) : Map[ResourceUri, TransformIntraProcedureResult] = {
+	  val result = AmandroidSymbolTableBuilder(models, fst, par)
+	  result.procedureSymbolTables.map{
 	    pst=>
 	      val (pool, cfg) = buildCfg(pst)
-	      val rda = buildRda(pst, cfg, libInfoTable)
+	      val rda = buildRda(pst, cfg)
 	      (pst.procedureUri, new TransformIntraProcedureResult(pst, cfg, rda))
 	  }.toMap
 	}
@@ -82,11 +81,11 @@ object Transform {
 	  (pool, result)
 	}
 	
-	def buildRda (pst : ProcedureSymbolTable, cfg : ControlFlowGraph[VirtualLabel], libInfoTable : AndroidLibInfoTables) = {
+	def buildRda (pst : ProcedureSymbolTable, cfg : ControlFlowGraph[VirtualLabel]) = {
 	  val iiopp = iopp(pst)
 	  AndroidReachingDefinitionAnalysis[VirtualLabel](pst,
 	    cfg,
-	    dr(pst.symbolTable, libInfoTable),
+	    dr(pst.symbolTable),
 	    first2(iiopp),
 	    saom)
 	}
@@ -101,7 +100,7 @@ object Transform {
 	
 	def getSymbolResolveResult(codes : Set[String]) = {
 	  val newModels = parseCodes(codes)
-	  val result = AmandroidSymbolTableBuilder(newModels, fst, par, shouldBuildLibInfoTables)
+	  AmandroidSymbolTableBuilder(newModels, fst, par)
 	}
 }
 

@@ -8,10 +8,7 @@ import org.sireum.core.module.ChunkingPilarParserModule
 import org.sireum.amandroid.module.PilarAndroidSymbolResolverModule
 import org.sireum.amandroid.module.AndroidIntraProceduralModule
 import org.sireum.amandroid.module.AndroidInterProceduralModule
-import org.sireum.amandroid.module.PreloadLibModule
 import java.io.File
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
-import org.sireum.amandroid.android.cache.AndroidCacheFile
 
 	/**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -25,18 +22,15 @@ trait InterProceduralTestFramework extends TestFramework {
     this
   }
 
-  def model(code : String, libInfoTables : AndroidLibInfoTables, aCache : AndroidCacheFile[ResourceUri], procedureMap : Map[String, String]) =
-    InterProceduralConfiguration(title, ivector(Left(code)), libInfoTables, aCache, procedureMap)
+  def model(code : String) =
+    InterProceduralConfiguration(title, ivector(Left(code)))
 
-  def file(fileUri : FileResourceUri, libInfoTables : AndroidLibInfoTables, aCache : AndroidCacheFile[ResourceUri], procedureMap : Map[String, String]) =
-    InterProceduralConfiguration(title, ivector(Right(fileUri)), libInfoTables, aCache, procedureMap)
+  def file(fileUri : FileResourceUri) =
+    InterProceduralConfiguration(title, ivector(Right(fileUri)))
 
   case class InterProceduralConfiguration //
   (title : String,
-   srcs : ISeq[Either[String, FileResourceUri]],
-   libInfoTables : AndroidLibInfoTables,
-   aCache : AndroidCacheFile[ResourceUri],
-   procedureMap : Map[String, String]) {
+   srcs : ISeq[Either[String, FileResourceUri]]) {
 
     test(title) {
     	println("####" + title + "#####")
@@ -48,11 +42,9 @@ trait InterProceduralTestFramework extends TestFramework {
 
         job.sources = srcs
         job.parallel = false
-        job.hasExistingAndroidLibInfoTables = Some(libInfoTables)
         
         import AndroidIntraProceduralModule.ProducerView._
         
-        job.androidCache = Some(aCache)
         job.shouldBuildCfg = true
         job.shouldBuildRda = true
         
@@ -64,7 +56,6 @@ trait InterProceduralTestFramework extends TestFramework {
         
         job.shouldBuildOFAsCfg = true
         job.appInfoOpt = None
-        job.procedureMap = this.procedureMap
       }
       
       pilarPipeline.compute(job)

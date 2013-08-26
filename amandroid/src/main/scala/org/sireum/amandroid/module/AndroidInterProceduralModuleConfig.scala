@@ -9,7 +9,6 @@ import org.sireum.pilar.ast.{LocationDecl, CatchClause}
 import org.sireum.alir._
 import org.sireum.pilar.symbol._
 import org.sireum.amandroid.interProcedural.callGraph.CallGraph
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.android.cache.AndroidCacheFile
 import org.sireum.amandroid.android.appInfo.PrepareApp
 
@@ -46,24 +45,13 @@ case class AndroidInterProcedural(
   symbolTable : SymbolTable,
   
   @Input
-  androidLibInfoTablesOpt : Option[AndroidLibInfoTables],
-  
-  @Input
-  androidCache : scala.Option[AndroidCacheFile[ResourceUri]] = None,
-  
-  @Input
   shouldBuildOFAsCfg : Boolean = true,
-  
-  @Input
-  APIpermOpt : scala.Option[MMap[ResourceUri, MList[String]]] = None,
   
   @Input
   appInfoOpt : scala.Option[PrepareApp] = None,
   
   @Input
   intraResult : MMap[ResourceUri, AndroidIntraProcedural.AndroidIntraAnalysisResult],
-  
-  @Input procedureMap : Map[String, String] = Map(),
     
   @Output interResult : AndroidInterProcedural.AndroidInterAnalysisResult
   
@@ -72,9 +60,6 @@ case class AndroidInterProcedural(
 
 case class CG(
   title : String = "System Control Flow Graph with OFA Builder",
-
-  @Input
-  androidCache : scala.Option[AndroidCacheFile[ResourceUri]],
   
   @Input 
   cfgs : MMap[ResourceUri, ControlFlowGraph[String]],
@@ -84,14 +69,9 @@ case class CG(
     
   @Input
   procedureSymbolTables : Seq[ProcedureSymbolTable],
-
-  @Input
-  androidLibInfoTables : AndroidLibInfoTables,
   
   @Input
   appInfoOpt : scala.Option[PrepareApp],
-  
-  @Input procedureMap : Map[String, String],
   
   // for test now. Later will change it.
   @Output

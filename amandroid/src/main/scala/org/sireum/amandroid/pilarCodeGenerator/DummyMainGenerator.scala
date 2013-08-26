@@ -7,17 +7,22 @@ import java.util.ArrayList
 import org.sireum.amandroid.util.SignatureParser
 import java.util.Arrays
 import org.sireum.amandroid.pilarCodeGenerator.VariableGenerator
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.pilarCodeGenerator.AndroidEntryPointConstants
+import org.sireum.amandroid.AmandroidRecord
+import org.sireum.amandroid.AmandroidProcedure
+import org.sireum.amandroid.util.StringFormConverter
+import org.sireum.amandroid.Center
+import org.sireum.amandroid.AmandroidResolver
+import org.sireum.amandroid.util.SignatureParser
 
 class DummyMainGenerator {
   
   private var currentComponent : String = null
-  private var androidClasses : Set[ResourceUri] = Set()
+  private var androidClasses : Set[String] = Set()
   /**
-   * Map from record uri to list of callback procedure uri
+   * Map from record to list of callback procedure
    */
-  private var callbackFunctions : Map[ResourceUri, MSet[ResourceUri]] = Map()
+  private var callbackFunctions : Map[String, MSet[String]] = Map()
   private var intCounter : String = null
   private var conditionCounter : Int = 0
   private var codeCounter : Int = 0
@@ -28,19 +33,15 @@ class DummyMainGenerator {
   private val varGen = new VariableGenerator()
   private val localVars = new ArrayList[String]
   private val codeFragments = new ArrayList[CodeFragmentGenerator]
-  private var androidLibInfoTables : AndroidLibInfoTables = null
   /**
-   * Map from record name to it's local variable
+   * Map from record to it's local variable
    */
   private var localVarsForClasses : Map[String, String] = Map()
   /**
-   * Set of param's record uri
+   * Set of param's record name
    */
-  private var paramRecordUris : Set[ResourceUri] = Set()
-  
-  def setAndroidLibInfoTables(alit : AndroidLibInfoTables) = {
-    this.androidLibInfoTables = alit
-  }
+  private var paramRecords : Set[AmandroidRecord] = Set()
+
   /**
 	 * Registers a list of classes to be automatically scanned for Android
 	 * lifecycle methods
@@ -51,8 +52,8 @@ class DummyMainGenerator {
     this.androidClasses = androidClasses
   }
   
-  def setCurrentComponent(clazzName : String) = {
-    this.currentComponent = clazzName
+  def setCurrentComponent(clazz : String) = {
+    this.currentComponent = clazz
   }
   
     
@@ -72,39 +73,41 @@ class DummyMainGenerator {
 	 * class (activity, service, etc.) to the list of callback methods for that
 	 * element.
 	 */
-	def setCallbackFunctions(callbackFunctions : Map[String, MSet[ResourceUri]]) {
+	def setCallbackFunctions(callbackFunctions : Map[String, MSet[String]]) {
 		this.callbackFunctions = callbackFunctions
 	}
   
-	def generate() : (String, String) = {
+	def generate() : AmandroidProcedure = {
 	  generate(List())
 	}
   
 	/**
 	 * generate dummy main with predefined methods list
 	 */
-  def generate(methods : List[ResourceUri]) : (String, String) = {
-    val procedureName = this.currentComponent.substring(0, this.currentComponent.length() - 2) + ".dummyMain|]"
+  def generate(methods : List[String]) : AmandroidProcedure = {
+    val recordName = this.currentComponent
+    val procedureName = recordName.substring(0, recordName.length() - 2) + ".dummyMain|]"
 	  val annotations = new ArrayList[ST]
 	  val signature = procedureName.replaceAll("\\[\\|", "[|L").replaceAll("\\:", "/").replaceAll("\\.dummyMain", ";.dummyMain:()V")
-	  initProcedureHead("[|void|]", procedureName, this.currentComponent, signature, "STATIC")
-    (signature, generateInternal(methods))
+	  initProcedureHead("[|void|]", procedureName, recordName, signature, "STATIC")
+    AmandroidResolver.resolveProcedureCode(signature, generateInternal(methods))
   }
   
-  def generateWithParam(params : List[String]) : (String, String) = {
-    val procedureName = this.currentComponent.substring(0, this.currentComponent.length() - 2) + ".dummyMain|]"
+  def generateWithParam(params : List[String]) : AmandroidProcedure = {
+    val recordName = this.currentComponent
+    val procedureName = recordName.substring(0, recordName.length() - 2) + ".dummyMain|]"
 	  val annotations = new ArrayList[ST]
     var parSigStr : String = ""
     params.indices.foreach{i => parSigStr += params(i).replaceAll("\\[\\|", "L").replaceAll("\\:", "/").replaceAll("\\|\\]", ";")}
 	  val signature = procedureName.replaceAll("\\[\\|", "[|L").replaceAll("\\:", "/").replaceAll("\\.dummyMain", ";.dummyMain:("+parSigStr+")V")
-	  initProcedureHead("[|void|]", procedureName, this.currentComponent, signature, "STATIC")
+	  initProcedureHead("[|void|]", procedureName, recordName, signature, "STATIC")
     val paramArray = new ArrayList[ST]
     params.indices.foreach{
       i =>
         val paramVar = template.getInstanceOf("ParamVar")
 			  val p = varGen.generate(params(i))
-			  localVarsForClasses += (androidLibInfoTables.getRecordUri(params(i)) -> p)
-			  this.paramRecordUris += androidLibInfoTables.getRecordUri(params(i))
+			  localVarsForClasses += (params(i) -> p)
+			  this.paramRecords += Center.resolveRecord(params(i), Center.ResolveLevel.BODIES)
 			  paramVar.add("typ", params(i))
 			  paramVar.add("name", p)
 			  val annot = generateParamAnnotation("type", List("object"))
@@ -112,7 +115,7 @@ class DummyMainGenerator {
 			  paramArray.add(i, paramVar)
     }
     procDeclTemplate.add("params", paramArray)
-    (signature, generateInternal(List()))
+    AmandroidResolver.resolveProcedureCode(signature, generateInternal(List()))
   }
   
   private def generateParamAnnotation(flag : String, params : List[String]) : ST = {
@@ -141,17 +144,15 @@ class DummyMainGenerator {
 	  procDeclTemplate.add("annotations", annotations)
   }
 	
-	def generateInternal(procedureSigs : List[String]) : String = {
-	  var classMap : Map[String, MList[String]] = Map()
-	  procedureSigs.map{
-	    case(procedureSig) => 
-	      val recordName = androidLibInfoTables.getRecordNameFromProcedureSig(procedureSig)
-	      if(!classMap.contains(recordName))
-	          classMap += (recordName -> mlistEmpty)
-	      classMap(recordName) += classMap(recordName) + procedureSig
+	def generateInternal(procedures : List[String]) : String = {
+	  val classMap : MMap[String, MList[String]] = mmapEmpty
+	  procedures.map{
+	    procedure => 
+	      val record = StringFormConverter.getRecordNameFromProcedureSignature(procedure)
+	      classMap.getOrElseUpdate(record, mlistEmpty) += procedure
 	  }
 	  if(!classMap.contains(this.currentComponent))
-	  	classMap += (this.currentComponent -> mlistEmpty)
+	  	classMap.getOrElseUpdate(this.currentComponent, mlistEmpty)
 	  val intVar = template.getInstanceOf("LocalVar")
 	  intCounter = varGen.generate("int")
 	  intVar.add("typ", "[|int|]")
@@ -166,7 +167,6 @@ class DummyMainGenerator {
 	  codeFragments.add(outerStartFragment)
 	  classMap.foreach{
 	    item =>
-	      val rUri = androidLibInfoTables.getRecordUri(item._1)
 	      val classStartFragment = new CodeFragmentGenerator
 			  classStartFragment.addLabel
 			  codeFragments.add(classStartFragment)
@@ -179,45 +179,60 @@ class DummyMainGenerator {
 	        var broadcastReceiver = false
 	        var contentProvider = false
 	        var plain = false
-	        val ancestors = androidLibInfoTables.getAncestors(rUri)
+	        val currentRecord = Center.resolveRecord(item._1, Center.ResolveLevel.BODIES)
+	        val ancestors = Center.getRecordHierarchy.getAllSuperClassesOfIncluding(currentRecord)
 	        ancestors.foreach{
 	          ancestor =>
-	              if(ancestor.equals(AndroidEntryPointConstants.ACTIVITYCLASS)) activity = true
-	              if(ancestor.equals(AndroidEntryPointConstants.SERVICECLASS)) service = true
-	              if(ancestor.equals(AndroidEntryPointConstants.BROADCASTRECEIVERCLASS)) broadcastReceiver = true
-	              if(ancestor.equals(AndroidEntryPointConstants.CONTENTPROVIDERCLASS)) contentProvider = true
+	            val recName = ancestor.getName
+              if(recName.equals(AndroidEntryPointConstants.ACTIVITY_CLASS)) activity = true
+              if(recName.equals(AndroidEntryPointConstants.SERVICE_CLASS)) service = true
+              if(recName.equals(AndroidEntryPointConstants.BROADCAST_RECEIVER_CLASS)) broadcastReceiver = true
+              if(recName.equals(AndroidEntryPointConstants.CONTENT_PROVIDER_CLASS)) contentProvider = true
 	        }
 	        if(!activity && !service && !broadcastReceiver && !contentProvider) plain = true
 	        var instanceNeeded = activity || service || broadcastReceiver || contentProvider
 	        //How this part work? item._2 always empty!
-	        var plainMethods: Map[String, ResourceUri] = Map()
+	        var plainMethods: Map[String, AmandroidProcedure] = Map()
 	        if(!instanceNeeded || plain){
 	          item._2.foreach{
-	            methodSig =>
-	              val methodUri = androidLibInfoTables.getProcedureUriBySignature(methodSig)
-	              plainMethods += (methodSig -> methodUri)
-	              if(!androidLibInfoTables.isStaticProcedure(methodUri)) instanceNeeded = true
+	            procSig =>
+	              Center.grabProcedure(procSig) match{
+	                case Some(p) =>
+		                plainMethods += (procSig -> p)
+		                if(!p.isStatic) instanceNeeded = true
+	                case None =>
+	                  val recordName = StringFormConverter.getRecordNameFromProcedureSignature(procSig)
+	                  if(!Center.containsRecord(recordName)) System.err.println("Record for entry point " + recordName + " not found, skipping")
+	                  else{
+	                    Center.grabDirProcedure(procSig) match{
+	                      case Some(p) => 
+	                        plainMethods += (procSig -> p)
+	                        if(!p.isStatic) instanceNeeded = true
+	                      case None => System.err.println("Procedure for entry point " + procSig + " not found, skipping")
+	                    }
+	                  }
+	              }
 	          }
 	        }
 	        if(instanceNeeded){
-	          val va = generateInstanceCreation(item._1, classStartFragment)
-	          this.localVarsForClasses += (rUri -> va)
-	          generateRecordConstructor(rUri, msetEmpty, classStartFragment)
+	          val va = generateInstanceCreation(currentRecord.getName, classStartFragment)
+	          this.localVarsForClasses += (currentRecord.getName -> va)
+	          generateRecordConstructor(currentRecord, msetEmpty, classStartFragment)
 	        }
-	        val classLocalVar = localVarsForClasses(rUri)
+	        val classLocalVar = localVarsForClasses(currentRecord.getName)
 	        
 	        //now start to generate lifecycle for the four kinds of component
 	        if(activity){
-	          activityLifeCycleGenerator(item._2, rUri, endClassFragment, classLocalVar, classStartFragment)
+	          activityLifeCycleGenerator(item._2, currentRecord, endClassFragment, classLocalVar, classStartFragment)
 	        }
 	        if(service){
-	          serviceLifeCycleGenerator(item._2, rUri, endClassFragment, classLocalVar, classStartFragment)
+	          serviceLifeCycleGenerator(item._2, currentRecord, endClassFragment, classLocalVar, classStartFragment)
 	        }
 	        if(broadcastReceiver){
-	          broadcastReceiverLifeCycleGenerator(item._2, rUri, endClassFragment, classLocalVar, classStartFragment)
+	          broadcastReceiverLifeCycleGenerator(item._2, currentRecord, endClassFragment, classLocalVar, classStartFragment)
 	        }
 	        if(contentProvider){
-	          contentProviderLifeCycleGenerator(item._2, rUri, endClassFragment, classLocalVar, classStartFragment)
+	          contentProviderLifeCycleGenerator(item._2, currentRecord, endClassFragment, classLocalVar, classStartFragment)
 	        }
 	        if(plain){
 	          plainRecordGenerator(plainMethods, endClassFragment, classLocalVar, classStartFragment)
@@ -264,44 +279,42 @@ class DummyMainGenerator {
 	  va
 	}
 	
-	def generateRecordConstructor(rUri : ResourceUri, constructionStack : MSet[ResourceUri], codefg : CodeFragmentGenerator) : String = {
-	  constructionStack.add(rUri)
-	  val sigs = androidLibInfoTables.getProcedureSigsByRecordUri(rUri)
+	def generateRecordConstructor(r : AmandroidRecord, constructionStack : MSet[AmandroidRecord], codefg : CodeFragmentGenerator) : String = {
+	  constructionStack.add(r)
+	  val ps = r.getProcedures
 	  var cons : String = null
-	  sigs.foreach{
-	    sig =>
-	      val pUri = androidLibInfoTables.getProcedureUriBySignature(sig)
-	      if(androidLibInfoTables.isConstructor(pUri)) cons = sig
+	  ps.foreach{
+	    p =>
+	      if(p.isConstructor) cons = p.getSignature
 	  }
 	  if(cons != null){
-	    generateProcedureCall(cons, "direct", localVarsForClasses(rUri), constructionStack, codefg)
+	    generateProcedureCall(cons, "direct", localVarsForClasses(r.getName), constructionStack, codefg)
 	  } else {
-	    System.err.println("Warning, cannot find constructor for " + rUri)
+	    System.err.println("Warning, cannot find constructor for " + r)
 	  }
 	  cons
 	}
 	
-	private def generateProcedureCall(pSig : ResourceUri, typ : String, localClassVar : String, constructionStack : MSet[ResourceUri], codefg : CodeFragmentGenerator) : Unit = {
+	private def generateProcedureCall(pSig : String, typ : String, localClassVar : String, constructionStack : MSet[AmandroidRecord], codefg : CodeFragmentGenerator) : Unit = {
 	  val sigParser = new SignatureParser(pSig).getParamSig
     val paramNum = sigParser.getParameterNum
     val params = sigParser.getObjectParameters
-    val retTyp = sigParser.getReturnTypeSignature
-    var paramVars : Map[Int, ResourceUri] = Map()
+    var paramVars : Map[Int, String] = Map()
     params.foreach{
-      param =>
-        val paramUri = androidLibInfoTables.getRecordUri(param._2)
+	    case(i, param) =>
+        val r = Center.getRecord(param)
         // to protect go into dead constructor create loop
-        if(!constructionStack.contains(paramUri)){
-				  val va = generateInstanceCreation(param._2, codefg)
-				  localVarsForClasses += (paramUri -> va)
-          paramVars += (param._1 -> va)
-          generateRecordConstructor(paramUri, constructionStack, codefg)
+        if(!constructionStack.contains(r)){
+				  val va = generateInstanceCreation(param, codefg)
+				  localVarsForClasses += (r.getName -> va)
+          paramVars += (i -> va)
+          generateRecordConstructor(r, constructionStack, codefg)
         } else {
-          paramVars += (param._1 -> localVarsForClasses(paramUri))
+          paramVars += (i -> localVarsForClasses(r.getName))
         }
     }
     val invokeStmt = template.getInstanceOf("InvokeStmt")
-    invokeStmt.add("funcName", androidLibInfoTables.getProcedureNameFromProcedureSig(pSig))
+    invokeStmt.add("funcName", StringFormConverter.getProcedureNameFromProcedureSignature(pSig))
     val finalParamVars : ArrayList[String] = new ArrayList[String]
     finalParamVars.add(0, localClassVar)
     for(i <- 0 to paramNum - 1){
@@ -324,13 +337,13 @@ class DummyMainGenerator {
 	 * the order of the custom statements, we assume that it can loop arbitrarily.
 	 * 
 	 */
-	private def plainRecordGenerator(plainMethods: Map[String, ResourceUri], endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
+	private def plainRecordGenerator(plainMethods: Map[String, AmandroidProcedure], endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
 	  val beforeClassFragment = new CodeFragmentGenerator
 	  beforeClassFragment.addLabel
 	  codeFragments.add(beforeClassFragment)
 	  plainMethods.foreach{
-	    case (currentProcedureSig, currentProcedureUri) =>
-	      if(androidLibInfoTables.isStaticProcedure(currentProcedureUri) || classLocalVar != null){
+	    case (currentProcedureSig, currentProcedure) =>
+	      if(currentProcedure.isStatic || classLocalVar != null){
 	        val ifFragment = new CodeFragmentGenerator
 	        val thenFragment = new CodeFragmentGenerator
 	        ifFragment.addLabel
@@ -343,13 +356,13 @@ class DummyMainGenerator {
 	        codeFragments.add(elseGotoFragment)
 	        thenFragment.addLabel
 	        codeFragments.add(thenFragment)
-	        generateProcedureCall(currentProcedureSig, "virtual", classLocalVar, msetEmpty + currentProcedureUri, thenFragment)
+	        generateProcedureCall(currentProcedureSig, "virtual", classLocalVar, msetEmpty, thenFragment)
 	        createIfStmt(endClassFragment, thenFragment)
 	        elseFragment.addLabel
 	        codeFragments.add(elseFragment)
 	        createIfStmt(beforeClassFragment, elseFragment)
 	      } else {
-	        System.err.println("Skipping procedure " + currentProcedureUri + " because we have no instance")
+	        System.err.println("Skipping procedure " + currentProcedure + " because we have no instance")
 	      }
 	  }
 	}
@@ -362,8 +375,8 @@ class DummyMainGenerator {
 	 * @param classLocalVar Current record's local variable
 	 * @param codefg Current code fragment
 	 */
-	private def asyncTaskLifeCycleGenerator(entryPoints : MList[ResourceUri], rUri : ResourceUri, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
-	  val constructionStack : MSet[ResourceUri] = msetEmpty ++ this.paramRecordUris
+	private def asyncTaskLifeCycleGenerator(entryPoints : MList[ResourceUri], record : AmandroidRecord, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
+	  val constructionStack : MSet[AmandroidRecord] = msetEmpty ++ this.paramRecords
 		createIfStmt(endClassFragment, codefg)
 	}
 	
@@ -375,18 +388,18 @@ class DummyMainGenerator {
 	 * @param classLocalVar Current record's local variable
 	 * @param codefg Current code fragment
 	 */
-	private def contentProviderLifeCycleGenerator(entryPoints : MList[ResourceUri], rUri : ResourceUri, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
-	  val constructionStack : MSet[ResourceUri] = msetEmpty ++ this.paramRecordUris
+	private def contentProviderLifeCycleGenerator(entryPoints : MList[ResourceUri], record : AmandroidRecord, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
+	  val constructionStack : MSet[AmandroidRecord] = msetEmpty ++ this.paramRecords
 		createIfStmt(endClassFragment, codefg)
 		
 		// 1. onCreate:
 		val onCreateFragment = new CodeFragmentGenerator
 	  onCreateFragment.addLabel
 	  codeFragments.add(onCreateFragment)
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.CONTENTPROVIDER_ONCREATE, rUri, entryPoints, constructionStack, onCreateFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.CONTENTPROVIDER_ONCREATE, record, entryPoints, constructionStack, onCreateFragment)
 	  
 	  //all other entry points of this class can be called in arbitary order
-	  val endWhileFragment = generateAllCallbacks(entryPoints, rUri, classLocalVar)
+	  val endWhileFragment = generateAllCallbacks(entryPoints, record, classLocalVar)
 	  createIfStmt(onCreateFragment, endWhileFragment)
 	}
 	
@@ -398,18 +411,18 @@ class DummyMainGenerator {
 	 * @param classLocalVar Current record's local variable
 	 * @param codefg Current code fragment
 	 */
-	private def broadcastReceiverLifeCycleGenerator(entryPoints : MList[ResourceUri], rUri : ResourceUri, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
-	  val constructionStack : MSet[ResourceUri] = msetEmpty ++ this.paramRecordUris
+	private def broadcastReceiverLifeCycleGenerator(entryPoints : MList[ResourceUri], record : AmandroidRecord, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
+	  val constructionStack : MSet[AmandroidRecord] = msetEmpty ++ this.paramRecords
 		createIfStmt(endClassFragment, codefg)
 		
 		// 1. onReceive:
 		val onReceiveFragment = new CodeFragmentGenerator
 	  onReceiveFragment.addLabel
 	  codeFragments.add(onReceiveFragment)
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.BROADCAST_ONRECEIVE, rUri, entryPoints, constructionStack, onReceiveFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.BROADCAST_ONRECEIVE, record, entryPoints, constructionStack, onReceiveFragment)
 	  
 	  //all other entry points of this class can be called in arbitary order
-	  val endWhileFragment = generateAllCallbacks(entryPoints, rUri, classLocalVar)
+	  val endWhileFragment = generateAllCallbacks(entryPoints, record, classLocalVar)
 	  createIfStmt(onReceiveFragment, endWhileFragment)
 	}
 	
@@ -421,22 +434,22 @@ class DummyMainGenerator {
 	 * @param classLocalVar Current record's local variable
 	 * @param codefg Current code fragment
 	 */
-	private def serviceLifeCycleGenerator(entryPoints : MList[ResourceUri], rUri : ResourceUri, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
-	  val constructionStack : MSet[ResourceUri] = msetEmpty ++ this.paramRecordUris
+	private def serviceLifeCycleGenerator(entryPoints : MList[ResourceUri], record : AmandroidRecord, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
+	  val constructionStack : MSet[AmandroidRecord] = msetEmpty ++ this.paramRecords
 		createIfStmt(endClassFragment, codefg)
 		
 		// 1. onCreate:
 	  val onCreateFragment = new CodeFragmentGenerator
 	  onCreateFragment.addLabel
 	  codeFragments.add(onCreateFragment)
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.SERVICE_ONCREATE, rUri, entryPoints, constructionStack, onCreateFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.SERVICE_ONCREATE, record, entryPoints, constructionStack, onCreateFragment)
 	  // service has two different lifecycles:
 	  // lifecycle 1:
 	  // 2. onStart:
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.SERVICE_ONSTART1, rUri, entryPoints, constructionStack, onCreateFragment)
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.SERVICE_ONSTART2, rUri, entryPoints, constructionStack, onCreateFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.SERVICE_ONSTART1, record, entryPoints, constructionStack, onCreateFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.SERVICE_ONSTART2, record, entryPoints, constructionStack, onCreateFragment)
 	  //all other entry points of this class can be called in arbitary order
-	  generateAllCallbacks(entryPoints, rUri, classLocalVar)
+	  generateAllCallbacks(entryPoints, record, classLocalVar)
 	  // lifecycle 1 end.
 	  
 	  // lifecycle 2:
@@ -444,22 +457,22 @@ class DummyMainGenerator {
 	  val onBindFragment = new CodeFragmentGenerator
 	  onBindFragment.addLabel
 	  codeFragments.add(onBindFragment)
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.SERVICE_ONBIND, rUri, entryPoints, constructionStack, onBindFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.SERVICE_ONBIND, record, entryPoints, constructionStack, onBindFragment)
 	  val beforemethodsFragment = new CodeFragmentGenerator
 	  beforemethodsFragment.addLabel
 	  codeFragments.add(beforemethodsFragment)
 	  //all other entry points of this class can be called in arbitary order
-	  generateAllCallbacks(entryPoints, rUri, classLocalVar)
+	  generateAllCallbacks(entryPoints, record, classLocalVar)
 	  
 	  // 3. onRebind:
 	  val onRebindFragment = new CodeFragmentGenerator
 	  onRebindFragment.addLabel
 	  codeFragments.add(onRebindFragment)
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.SERVICE_ONREBIND, rUri, entryPoints, constructionStack, onRebindFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.SERVICE_ONREBIND, record, entryPoints, constructionStack, onRebindFragment)
 	  createIfStmt(beforemethodsFragment, onRebindFragment)
 	  
 	  // 4. onUnbind:
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.SERVICE_ONUNBIND, rUri, entryPoints, constructionStack, onRebindFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.SERVICE_ONUNBIND, record, entryPoints, constructionStack, onRebindFragment)
 	  createIfStmt(onBindFragment, onRebindFragment)
 	  // lifecycle 2 end.
 	  
@@ -467,7 +480,7 @@ class DummyMainGenerator {
 	  val onDestoryFragment = new CodeFragmentGenerator
 	  onDestoryFragment.addLabel
 	  codeFragments.add(onDestoryFragment)
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.SERVICE_ONDESTROY, rUri, entryPoints, constructionStack, onDestoryFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.SERVICE_ONDESTROY, record, entryPoints, constructionStack, onDestoryFragment)
 	  // either begin or end or next class:
 	  createIfStmt(onCreateFragment, onDestoryFragment)
 	  createIfStmt(endClassFragment, onDestoryFragment)
@@ -481,39 +494,39 @@ class DummyMainGenerator {
 	 * @param classLocalVar Current record's local variable
 	 * @param codefg Current code fragment
 	 */
-	private def activityLifeCycleGenerator(entryPoints : MList[ResourceUri], rUri : ResourceUri, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
-	  val constructionStack : MSet[ResourceUri] = msetEmpty ++ this.paramRecordUris
+	private def activityLifeCycleGenerator(entryPoints : MList[ResourceUri], record : AmandroidRecord, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
+	  val constructionStack : MSet[AmandroidRecord] = msetEmpty ++ this.paramRecords
 	  createIfStmt(endClassFragment, codefg)
-	  generateProcedureCall(AndroidEntryPointConstants.ACTIVITY_SETINTENT_SIG, "virtual", localVarsForClasses(rUri), constructionStack, codefg)
+	  generateProcedureCall(AndroidEntryPointConstants.ACTIVITY_SETINTENT_SIG, "virtual", localVarsForClasses(record.getName), constructionStack, codefg)
 	  
 	  // 1. onCreate:
 	  val onCreateFragment = new CodeFragmentGenerator
 	  onCreateFragment.addLabel
 	  codeFragments.add(onCreateFragment)
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONCREATE, rUri, entryPoints, constructionStack, onCreateFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONCREATE, record, entryPoints, constructionStack, onCreateFragment)
 	  // 2. onStart:
 	  val onStartFragment = new CodeFragmentGenerator
 	  onStartFragment.addLabel
 	  codeFragments.add(onStartFragment)
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONSTART, rUri, entryPoints, constructionStack, onStartFragment)
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONRESTOREINSTANCESTATE, rUri, entryPoints, constructionStack, onStartFragment)
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONPOSTCREATE, rUri, entryPoints, constructionStack, onStartFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONSTART, record, entryPoints, constructionStack, onStartFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONRESTOREINSTANCESTATE, record, entryPoints, constructionStack, onStartFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONPOSTCREATE, record, entryPoints, constructionStack, onStartFragment)
 	  // 3. onResume:
 	  val onResumeFragment = new CodeFragmentGenerator
 	  onResumeFragment.addLabel
 	  codeFragments.add(onResumeFragment)
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONRESUME, rUri, entryPoints, constructionStack, onResumeFragment)
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONPOSTRESUME, rUri, entryPoints, constructionStack, onResumeFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONRESUME, record, entryPoints, constructionStack, onResumeFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONPOSTRESUME, record, entryPoints, constructionStack, onResumeFragment)
 	  
 	  // all other entry points of this activity
-	  generateAllCallbacks(entryPoints, rUri, classLocalVar)
+	  generateAllCallbacks(entryPoints, record, classLocalVar)
 	  // 4. onPause:
 	  val onPauseFragment = new CodeFragmentGenerator
 	  onPauseFragment.addLabel
 	  codeFragments.add(onPauseFragment)
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONPAUSE, rUri, entryPoints, constructionStack, onPauseFragment)
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONCREATEDESCRIPTION, rUri, entryPoints, constructionStack, onPauseFragment)
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONSAVEINSTANCESTATE, rUri, entryPoints, constructionStack, onPauseFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONPAUSE, record, entryPoints, constructionStack, onPauseFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONCREATEDESCRIPTION, record, entryPoints, constructionStack, onPauseFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONSAVEINSTANCESTATE, record, entryPoints, constructionStack, onPauseFragment)
 	  // goto onDestory, onRestart or onCreate:
 	  val onStopFragment = new CodeFragmentGenerator
 	  createIfStmt(onStopFragment, onPauseFragment)
@@ -523,7 +536,7 @@ class DummyMainGenerator {
 	  // 5. onStop:
 	  onStopFragment.addLabel
 	  codeFragments.add(onStopFragment)
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONSTOP, rUri, entryPoints, constructionStack, onStopFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONSTOP, record, entryPoints, constructionStack, onStopFragment)
 	  //goto onDestory, onRestart or onCreate:
 	  val onDestoryFragment = new CodeFragmentGenerator
 	  val onRestartFragment = new CodeFragmentGenerator
@@ -534,7 +547,7 @@ class DummyMainGenerator {
 	  // 6. onRestart:
 	  onRestartFragment.addLabel
 	  codeFragments.add(onRestartFragment)
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONRESTART, rUri, entryPoints, constructionStack, onRestartFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONRESTART, record, entryPoints, constructionStack, onRestartFragment)
 	  if(onStartFragment != null){
 	    createGotoStmt(onStartFragment, onRestartFragment)
 	  }
@@ -542,29 +555,29 @@ class DummyMainGenerator {
 	  // 7. onDestory:
 	  onDestoryFragment.addLabel
 	  codeFragments.add(onDestoryFragment)
-	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONDESTROY, rUri, entryPoints, constructionStack, onDestoryFragment)
+	  searchAndBuildProcedureCall(AndroidEntryPointConstants.ACTIVITY_ONDESTROY, record, entryPoints, constructionStack, onDestoryFragment)
 	  
 	  createIfStmt(endClassFragment, onDestoryFragment)
 	}
 	
-	private def generateAllCallbacks(entryPoints : MList[ResourceUri], rUri : ResourceUri, classLocalVar : String) : CodeFragmentGenerator = {
+	private def generateAllCallbacks(entryPoints : MList[String], record : AmandroidRecord, classLocalVar : String) : CodeFragmentGenerator = {
 	  val startWhileFragment = new CodeFragmentGenerator
 	  startWhileFragment.addLabel
 	  codeFragments.add(startWhileFragment)
 	  val endWhileFragment = new CodeFragmentGenerator
-	  val procedureUris = androidLibInfoTables.getProcedureUrisByRecordUri(rUri)
+	  val procedures = record.getProcedures
 	  import scala.collection.JavaConversions._
-	  for(currentProcedureUri <- procedureUris){
-	    if(entryPoints.contains(currentProcedureUri)){ 
-	      val pSig = androidLibInfoTables.getProcedureSignatureByUri(currentProcedureUri)
-	      if(!AndroidEntryPointConstants.getActivityLifecycleMethods.contains(androidLibInfoTables.getSubSignature(pSig))){
+	  for(currentProcedure <- procedures){
+	    if(entryPoints.contains(currentProcedure.getSignature)){ 
+	      val pSig = currentProcedure.getSignature
+	      if(!AndroidEntryPointConstants.getActivityLifecycleMethods.contains(currentProcedure.getSubSignature)){
 		      val thenStmtFragment = new CodeFragmentGenerator
 		      createIfStmt(thenStmtFragment, startWhileFragment)
 		      val elseStmtFragment = new CodeFragmentGenerator
 		      createGotoStmt(elseStmtFragment, startWhileFragment)
 		      thenStmtFragment.addLabel
 		      codeFragments.add(thenStmtFragment)
-		      generateProcedureCall(pSig, "virtual", classLocalVar, msetEmpty + rUri, thenStmtFragment)
+		      generateProcedureCall(pSig, "virtual", classLocalVar, msetEmpty + record, thenStmtFragment)
 		      elseStmtFragment.addLabel
 		      codeFragments.add(elseStmtFragment)
 	      }
@@ -573,38 +586,39 @@ class DummyMainGenerator {
 	  val callBackFragment = new CodeFragmentGenerator
 	  callBackFragment.addLabel
 	  codeFragments.add(callBackFragment)
-	  addCallbackProcedures(rUri, classLocalVar, callBackFragment)
+	  addCallbackProcedures(record, classLocalVar, callBackFragment)
 	  endWhileFragment.addLabel
 	  codeFragments.add(endWhileFragment)
 	  createIfStmt(startWhileFragment, endWhileFragment)
 	  endWhileFragment
 	}
 	
-	private def generateCallToAllCallbacks(callbackRecordUri : ResourceUri, callbackProcedureUris : Set[ResourceUri], classLocalVar : String, codefg : CodeFragmentGenerator) = {
-	  callbackProcedureUris.foreach{
-	    callbackProcedureUri =>
-	      val pSig = androidLibInfoTables.getProcedureSignatureByUri(callbackProcedureUri)
+	private def generateCallToAllCallbacks(callbackRecord : AmandroidRecord, callbackProcedures : Set[AmandroidProcedure], classLocalVar : String, codefg : CodeFragmentGenerator) = {
+	  callbackProcedures.foreach{
+	    callbackProcedure =>
+	      val pSig = callbackProcedure.getSignature
 	      val thenStmtFragment = new CodeFragmentGenerator
 	      createIfStmt(thenStmtFragment, codefg)
 	      val elseStmtFragment = new CodeFragmentGenerator
 	      createGotoStmt(elseStmtFragment, codefg)
 	      thenStmtFragment.addLabel
 	      codeFragments.add(thenStmtFragment)
-	      generateProcedureCall(pSig, "virtual", classLocalVar, msetEmpty + callbackRecordUri, thenStmtFragment)
+	      generateProcedureCall(pSig, "virtual", classLocalVar, msetEmpty + callbackRecord, thenStmtFragment)
 	      elseStmtFragment.addLabel
 	      codeFragments.add(elseStmtFragment)
 	  }
 	}
 	
-	private def searchAndBuildProcedureCall(subsignature : String, rUri : ResourceUri, entryPoints : MList[String], constructionStack : MSet[ResourceUri], codefg : CodeFragmentGenerator) = {
-	  val pUri = androidLibInfoTables.findProcedureUri(rUri, subsignature)
-	  if(pUri != null){
-	    entryPoints -= pUri
-	    assert(androidLibInfoTables.isStaticProcedure(pUri) || localVarsForClasses(rUri) != null)
-	    generateProcedureCall(androidLibInfoTables.getProcedureSignatureByUri(pUri), "virtual", localVarsForClasses(rUri), constructionStack, codefg)
-	  } else {
-	    System.err.println("Could not find Android entry point procedure: " + subsignature)
-	    null
+	private def searchAndBuildProcedureCall(subsignature : String, record : AmandroidRecord, entryPoints : MList[String], constructionStack : MSet[AmandroidRecord], codefg : CodeFragmentGenerator) = {
+	  val apopt = findProcedure(record, subsignature)
+	  apopt match{
+	    case Some(ap) =>
+	      entryPoints -= ap.getSignature
+		    assert(ap.isStatic || localVarsForClasses(record.getName) != null)
+		    generateProcedureCall(ap.getSignature, "virtual", localVarsForClasses(record.getName), constructionStack, codefg)
+	    case None =>
+	      System.err.println("Could not find Android entry point procedure: " + subsignature)
+	      null
 	  }
 	}
 	
@@ -613,45 +627,45 @@ class DummyMainGenerator {
 	 * @param rUri Current record resource uri which under process
 	 * @param classLocalVar The local variable fro current record
 	 */
-	private def addCallbackProcedures(rUri : ResourceUri, parentClassLocalVar : String, codefg : CodeFragmentGenerator) : Unit = {
-	  if(!this.callbackFunctions.contains(rUri)) return
-	  var callbackRecords : Map[ResourceUri, MSet[ResourceUri]] = Map()
-    this.callbackFunctions(rUri).map{
-	    case (pUri) => 
-	      val pSig = androidLibInfoTables.getProcedureSignatureByUri(pUri)
-	      val theRecordUri = androidLibInfoTables.getRecordUri(new SignatureParser(pSig).getRecordName)
-	      if(!callbackRecords.contains(theRecordUri))
-	      	callbackRecords += (theRecordUri -> msetEmpty)
-	      val theProcedureUri = androidLibInfoTables.findProcedureUri(theRecordUri, androidLibInfoTables.getSubSignature(pSig))
-	      if(theProcedureUri == null){
-	        System.err.println("Could not find callback method " + pSig)
-	      } else {
-	        callbackRecords(theRecordUri) += theProcedureUri
+	private def addCallbackProcedures(record : AmandroidRecord, parentClassLocalVar : String, codefg : CodeFragmentGenerator) : Unit = {
+	  if(!this.callbackFunctions.contains(record.getName)) return
+	  var callbackRecords : Map[AmandroidRecord, MSet[AmandroidProcedure]] = Map()
+    this.callbackFunctions(record.getName).map{
+	    case (pSig) => 
+	      val theRecord = Center.resolveRecord(StringFormConverter.getRecordNameFromProcedureSignature(pSig), Center.ResolveLevel.BODIES)
+	      val theProcedure = findProcedure(theRecord, Center.getSubSigFromProcSig(pSig))
+	      theProcedure match {
+	        case Some(proc) =>
+	          if(!callbackRecords.contains(theRecord))
+			      	callbackRecords += (theRecord -> msetEmpty)
+			      callbackRecords(theRecord) += proc
+	        case None =>
+	          System.err.println("Could not find callback method " + pSig)
 	      }
+	      
 	  }
 		callbackRecords.foreach{
-		  case(callbackRUri, callbackPUris) =>
+		  case(callbackRecord, callbackProcedures) =>
 		    val classLocalVar : String =
-		      if(isCompatible(rUri, callbackRUri)) parentClassLocalVar
+		      if(isCompatible(record, callbackRecord)) parentClassLocalVar
 		      // create a new instance of this class
 		      else{
-		        val recordName = androidLibInfoTables.getRecordName(callbackRUri)
-			      val va = generateInstanceCreation(recordName, codefg)
-		        this.localVarsForClasses += (callbackRUri -> va)
-		        generateRecordConstructor(callbackRUri, msetEmpty + rUri, codefg)
+			      val va = generateInstanceCreation(callbackRecord.getName, codefg)
+		        this.localVarsForClasses += (callbackRecord.getName -> va)
+		        generateRecordConstructor(callbackRecord, msetEmpty + record, codefg)
 		        va
 		      }
 		    if(classLocalVar != null){
 		      // build the calls to all callback procedures in this record
-		      generateCallToAllCallbacks(callbackRUri, callbackPUris.toSet, classLocalVar, codefg)
+		      generateCallToAllCallbacks(callbackRecord, callbackProcedures.toSet, classLocalVar, codefg)
 		    } else {
-		      System.err.println("Constructor cannot be generated for callback class " + callbackRUri)
+		      System.err.println("Constructor cannot be generated for callback class " + callbackRecord)
 		    }
 		}
 	}
 	
-	private def isCompatible(actual : ResourceUri, expected : ResourceUri) : Boolean = {
-	  val allPossible = androidLibInfoTables.getAncestors(actual) + actual
+	private def isCompatible(actual : AmandroidRecord, expected : AmandroidRecord) : Boolean = {
+	  val allPossible = Center.getRecordHierarchy.getAllSuperClassesOfIncluding(actual)
 	  allPossible.filter(p => if(p.equals(expected))true else false)
 	  allPossible.isEmpty
 	}
@@ -711,6 +725,12 @@ class DummyMainGenerator {
 	    codeFragment.add("codes", finalCodes)
 	    codeFragment.render()
 	  }
+	}
+	
+	protected def findProcedure(currentRecord : AmandroidRecord, subSig : String) : Option[AmandroidProcedure] = {
+	  if(currentRecord.declaresProcedure(subSig)) Some(currentRecord.getProcedure(subSig))
+	  else if(currentRecord.hasSuperClass) findProcedure(currentRecord.getSuperClass, subSig)
+	  else None
 	}
 	
 }

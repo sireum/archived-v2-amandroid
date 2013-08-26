@@ -26,9 +26,6 @@ class AndroidIntraProceduralModuleDef (val job : PipelineJob, info : PipelineJob
   // add implementation here
   type VirtualLabel = String
   val par = this.parallel
-  val aCache = this.androidCache
-  val alitOpt = this.androidLibInfoTablesOpt
-  val alit = alitOpt match{case Some(n) => n; case None => null}
   val st = this.symbolTable
   val psts = st.procedureSymbolTables.toSeq
   val siff = this.shouldIncludeFlowFunction
@@ -48,8 +45,6 @@ class AndroidIntraProceduralModuleDef (val job : PipelineJob, info : PipelineJob
     AndroidIntraProceduralModule.setDefRef(options, dr)
     AndroidIntraProceduralModule.setIsInputOutputParamPredicate(options, iopp)
     AndroidIntraProceduralModule.setSwitchAsOrderedMatch(options, saom)
-    if(this.shouldBuildRda) RdaModule.setAndroidLibInfoTables(options, alit)
-    if(this.shouldPreprocessOfg) OFAPreprocessModule.setAndroidLibInfoTables(options, alit)
     intraPipeline.compute(j)
     info.hasError = j.hasError
     if (info.hasError) {
@@ -139,10 +134,9 @@ class CfgModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends
 class RdaModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends RdaModule {
   val pst = this.procedureSymbolTable
   val iiopp = this.isInputOutputParamPredicate(pst)
-  val alit = this.androidLibInfoTables
   this.rda_=(AndroidReachingDefinitionAnalysis[String](pst,
     this.cfg,
-    this.defRef(pst.symbolTable, alit),
+    this.defRef(pst.symbolTable),
     first2(iiopp),
     this.switchAsOrderedMatch))
 }
@@ -152,7 +146,6 @@ class PagModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends
 }
 
 class OFAPreprocessModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends OFAPreprocessModule {
-  AndroidOfgPreprocessor.setAndroidLibInfoTables(this.androidLibInfoTables)
   this.OFG_=(AndroidOfgPreprocessor(this.procedureSymbolTable, this.cfg, this.rda))
 }
 

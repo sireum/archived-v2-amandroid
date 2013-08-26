@@ -11,7 +11,6 @@ import org.sireum.amandroid.android.interProcedural.objectFlowAnalysis.AndroidOb
 import org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph
 import org.sireum.amandroid.android.interProcedural.objectFlowAnalysis.AndroidValueSet
 import org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
 import org.sireum.amandroid.android.cache.AndroidCacheFile
 import org.sireum.util._
 import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis._
@@ -67,12 +66,6 @@ case class AndroidIntraProcedural(
   symbolTable : SymbolTable,
   
   @Input
-  androidLibInfoTablesOpt : Option[AndroidLibInfoTables],
-  
-  @Input
-  androidCache : scala.Option[AndroidCacheFile[ResourceUri]] = None,
-  
-  @Input
   shouldBuildCfg : Boolean = true,
 
   @Input 
@@ -87,16 +80,13 @@ case class AndroidIntraProcedural(
   @Input
   shouldBuildCCfg : Boolean = false,
   
-  @Input
-  APIpermOpt : scala.Option[MMap[ResourceUri, MList[String]]] = None,
-  
   @Input 
   shouldIncludeFlowFunction : AndroidIntraProcedural.ShouldIncludeFlowFunction =
     // ControlFlowGraph.defaultSiff,
     { (_, _) => (Array.empty[CatchClause], false) },
     
 //modified for building RDA       
-  @Input defRef : (SymbolTable, AndroidLibInfoTables) => DefRef = { (st, alit) => new AndroidDefRef(st, new AndroidVarAccesses(st), alit) },
+  @Input defRef : SymbolTable => DefRef = { st => new AndroidDefRef(st, new AndroidVarAccesses(st)) },
 
   @Input isInputOutputParamPredicate : ProcedureSymbolTable => (ResourceUri => java.lang.Boolean, ResourceUri => java.lang.Boolean) = { pst =>
     val params = pst.params.toSet[ResourceUri]
@@ -141,11 +131,7 @@ case class Rda(
 
   @Input @Consume(Array(classOf[Cfg])) cfg : ControlFlowGraph[String],
 
-  @Input
-  androidLibInfoTables : AndroidLibInfoTables,
-  
-
-  @Input defRef : (SymbolTable, AndroidLibInfoTables) => DefRef = { (st, alit) => new AndroidDefRef(st, new AndroidVarAccesses(st), alit) },
+  @Input defRef : SymbolTable => DefRef = { st => new AndroidDefRef(st, new AndroidVarAccesses(st)) },
 
   @Input isInputOutputParamPredicate : ProcedureSymbolTable => (ResourceUri => java.lang.Boolean, ResourceUri => java.lang.Boolean),
 
@@ -184,9 +170,6 @@ case class Pag(
   
   @Input
   procedureSymbolTable : ProcedureSymbolTable,
-
-  @Input
-  androidLibInfoTables : AndroidLibInfoTables,
   
   // for test now. Later will change it.
   @Output
@@ -206,9 +189,6 @@ case class OFAPreprocess(
   
   @Input
   procedureSymbolTable : ProcedureSymbolTable,
-
-  @Input
-  androidLibInfoTables : AndroidLibInfoTables,
   
   // for test now. Later will change it.
   @Output

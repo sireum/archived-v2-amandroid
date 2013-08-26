@@ -3,6 +3,7 @@ package org.sireum.amandroid
 import org.sireum.util.FileResourceUri
 import org.sireum.util.FileUtil
 import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
+import org.sireum.amandroid.util.StringFormConverter
 
 object AmandroidCodeSource {
   
@@ -37,17 +38,23 @@ object AmandroidCodeSource {
   
 	protected var recordsCodes : Map[String, String] = Map()
 	
+//	/**
+//	 * map from procedure sig to container record name. sig e.g. [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
+//	 */
+//	
+//	protected var proceduresCodes : Map[String, String] = Map()
+//	
+//	/**
+//	 * map from global variable full-qualified name to container record name. e.g. @@[|java:lang:Enum.serialVersionUID|]
+//	 */
+//	
+//	protected var globalVarsCodes : Map[String, String] = Map()
+	
 	/**
-	 * map from procedure sig to pilar code. sig e.g. [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
+	 * get records codes
 	 */
 	
-	protected var proceduresCodes : Map[String, String] = Map()
-	
-	/**
-	 * map from global variable full-qualified name to code. e.g. @@[|java:lang:Enum.serialVersionUID|]
-	 */
-	
-	protected var globalVarsCodes : Map[String, String] = Map()
+	def getRecordsCodes = this.recordsCodes
 	
 	/**
 	 * set record code
@@ -62,55 +69,68 @@ object AmandroidCodeSource {
 	def getRecordCode(name : String) : String = this.recordsCodes.getOrElse(name, throw new RuntimeException("record " + name + " not exists in current code base."))
 	
 	/**
-	 * set procedure code
+	 * contains record or not
 	 */
 	
-	def setProcedureCode(sig : String, code : String) = this.proceduresCodes += (sig -> code)
+	def containsRecord(name : String) : Boolean = this.recordsCodes.contains(name)
 	
+	/**
+	 * contains record or not
+	 */
+	
+	def containsProcedure(sig : String) : Boolean = {
+    val name = StringFormConverter.getRecordNameFromProcedureSignature(sig)
+    containsRecord(name)
+  }
+	
+	/**
+	 * contains record or not
+	 */
+	
+	def containsGlobalVar(sig : String) : Boolean = {
+	  val name = StringFormConverter.getRecordNameFromFieldSignature(sig)
+	  containsRecord(name)
+	}
+//	/**
+//	 * set procedure container name
+//	 */
+//	
+//	def setProcedureContainer(sig : String, recName : String) = this.proceduresCodes += (sig -> recName)
+//	
 	/**
 	 * get procedure code
 	 */
 	
-	def getProcedureCode(sig : String) : String = this.proceduresCodes.getOrElse(sig, throw new RuntimeException("procedure " + sig + " not exists in current code base."))
-	
+	def getProcedureCode(sig : String) : String = {
+    val name = StringFormConverter.getRecordNameFromProcedureSignature(sig)
+    getRecordCode(name)
+  }
+//	
+//	/**
+//	 * set global variable container name
+//	 */
+//	
+//	def setGlobalVarContainer(name : String, recName : String) = this.globalVarsCodes += (name -> recName)
+//	
 	/**
-	 * set global variable code
+	 * get global variable code.
 	 */
 	
-	def setGlobalVarCode(name : String, code : String) = this.globalVarsCodes += (name -> code)
-	
-	/**
-	 * get global variable code
-	 */
-	
-	def getGlobalVarCode(name : String) : String = this.globalVarsCodes.getOrElse(name, throw new RuntimeException("global variable " + name + " not exists in current code base."))
+	def getGlobalVarCode(sig : String) : String = {
+	  val name = StringFormConverter.getRecordNameFromFieldSignature(sig)
+    getRecordCode(name)
+	}
 	
 	/**
 	 * print all content
 	 */
 	
 	def printContent = {
-	  println("records:")
+	  println("codes:")
 	  this.recordsCodes.foreach{
 	    case (k, v)=>
 	      println("recName: " + k)
 	      println(v)
-	  }
-	  println("globals:")
-	  this.globalVarsCodes.foreach{
-	    case (k, v)=>
-	      println("globalVarName: " + k)
-	      println(v)
-	  }
-	  println("procedures:")
-	  this.proceduresCodes.foreach{
-	    case (k, v)=>
-	      println("ProcSignature: " + k)
-	      if(v.size > 500){
-	        println(v.substring(0, 500) + "...")
-	      } else {
-	      	println(v)
-	      }
 	  }
 	}
 }

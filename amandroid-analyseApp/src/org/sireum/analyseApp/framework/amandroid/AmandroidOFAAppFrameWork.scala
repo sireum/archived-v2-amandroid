@@ -17,8 +17,6 @@ import org.sireum.alir.AlirIntraProceduralGraph
 import org.sireum.amandroid.module.AndroidInterProceduralModule
 import org.sireum.amandroid.module.AndroidApplicationPrepareModule
 import org.sireum.amandroid.module.AndroidFixIntraProceduralModule
-import org.sireum.amandroid.symbolResolver.AndroidLibInfoTables
-import org.sireum.amandroid.android.cache.AndroidCacheFile
 
 // sankar introduces the following framework which adds one stage on top of AmandroidParserTestFrameWork 
 
@@ -36,10 +34,8 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
   }
 
   def file(fileUri : FileResourceUri,
-           libInfoTables : AndroidLibInfoTables,
-           aCache : AndroidCacheFile[ResourceUri],
            startFromApk : Boolean) =
-    AmandroidConfiguration(title, fileUri, libInfoTables, aCache, startFromApk)
+    AmandroidConfiguration(title, fileUri, startFromApk)
 
   //////////////////////////////////////////////////////////////////////////////
   // Public Case Classes
@@ -50,8 +46,6 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
   case class AmandroidConfiguration //
   (title : String,
    srcs : FileResourceUri,
-   libInfoTables : AndroidLibInfoTables,
-   aCache : AndroidCacheFile[ResourceUri],
    startFromApk : Boolean) {
 
     ////////////////////////////////////////////////////////////////////////////
@@ -102,10 +96,8 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
         
         ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d + dirName + "/" + dirName + ".pilar"))))
         PilarAndroidSymbolResolverModule.setParallel(options, true)
-        PilarAndroidSymbolResolverModule.setHasExistingAndroidLibInfoTables(options, Some(libInfoTables))
         AndroidApplicationPrepareModule.setApkFileLocation(options, f.toString())
         AndroidIntraProceduralModule.setParallel(options, true)
-        AndroidIntraProceduralModule.setAndroidCache(options, Some(aCache))
         AndroidIntraProceduralModule.setShouldBuildCfg(options, true)
         AndroidIntraProceduralModule.setShouldBuildRda(options, true)
         AndroidIntraProceduralModule.setShouldBuildCCfg(options, true)
@@ -113,12 +105,12 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
         
         // experimental code starts which does not have any significant role now; later we will delete it after some related cleaning 
         
-        val apiPermission : MMap[ResourceUri, MList[String]] = mmapEmpty
-        val permList : MList[String] = mlistEmpty
-        permList+=("permission")   // put the permission strings e.g. "NETWORKS" here
-        val pUri : ResourceUri = "abc"  // replace "abc" by apiUri (e.g. pilar:/procedure/default/%5B%7Candroid::content::Context.startService%7C%5D/1/50/f9cb48df) later
-        apiPermission(pUri) = permList
-        AndroidIntraProceduralModule.setAPIpermOpt(options, Option(apiPermission)) 
+//        val apiPermission : MMap[ResourceUri, MList[String]] = mmapEmpty
+//        val permList : MList[String] = mlistEmpty
+//        permList+=("permission")   // put the permission strings e.g. "NETWORKS" here
+//        val pUri : ResourceUri = "abc"  // replace "abc" by apiUri (e.g. pilar:/procedure/default/%5B%7Candroid::content::Context.startService%7C%5D/1/50/f9cb48df) later
+//        apiPermission(pUri) = permList
+//        AndroidIntraProceduralModule.setAPIpermOpt(options, Option(apiPermission)) 
         
         // experimental code ends
         
@@ -150,10 +142,8 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
         
         ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d + "/" + dirName + ".pilar"))))
         PilarAndroidSymbolResolverModule.setParallel(options, false)
-        PilarAndroidSymbolResolverModule.setHasExistingAndroidLibInfoTables(options, Some(libInfoTables))
         AndroidApplicationPrepareModule.setApkFileLocation(options, apkFile.toString())
         AndroidIntraProceduralModule.setParallel(options, false)
-        AndroidIntraProceduralModule.setAndroidCache(options, Some(aCache))
         AndroidIntraProceduralModule.setShouldBuildCfg(options, true)
         AndroidIntraProceduralModule.setShouldBuildRda(options, true)
         AndroidIntraProceduralModule.setShouldBuildCCfg(options, true)
@@ -161,12 +151,12 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
         
         // experimental code starts which does not have any significant role now; later we will delete it after some related cleaning 
         
-        val apiPermission : MMap[ResourceUri, MList[String]] = mmapEmpty
-        val permList : MList[String] = mlistEmpty
-        permList+=("permission")   // put the permission strings e.g. "NETWORKS" here
-        val pUri : ResourceUri = "abc"  // replace "abc" by apiUri (e.g. pilar:/procedure/default/%5B%7Candroid::content::Context.startService%7C%5D/1/50/f9cb48df) later
-        apiPermission(pUri) = permList
-        AndroidIntraProceduralModule.setAPIpermOpt(options, Option(apiPermission)) 
+//        val apiPermission : MMap[ResourceUri, MList[String]] = mmapEmpty
+//        val permList : MList[String] = mlistEmpty
+//        permList+=("permission")   // put the permission strings e.g. "NETWORKS" here
+//        val pUri : ResourceUri = "abc"  // replace "abc" by apiUri (e.g. pilar:/procedure/default/%5B%7Candroid::content::Context.startService%7C%5D/1/50/f9cb48df) later
+//        apiPermission(pUri) = permList
+//        AndroidIntraProceduralModule.setAPIpermOpt(options, Option(apiPermission)) 
         
         // experimental code ends
         
