@@ -180,7 +180,8 @@ object AmandroidResolver {
 		              exp.name.name
 		            case _ => ""
 		          }
-	          val fieldType = field.typeSpec.asInstanceOf[TypeVarSpec].name.name
+	          require(field.typeSpec.isDefined)
+	          val fieldType = field.typeSpec.get.asInstanceOf[NamedTypeSpec].name.name
 	          val f : AmandroidField = new AmandroidField
 	          f.init(fieldSig, fieldType)
 	          f.setAccessFlags(fieldAccessFlag)
@@ -208,7 +209,8 @@ object AmandroidResolver {
 			        exp.name.name
 			      case _ => ""
 			    }
-	      val globalVarType = gvd.typeSpec.asInstanceOf[TypeVarSpec].name.name
+	      require(gvd.typeSpec.isDefined)
+	      val globalVarType = gvd.typeSpec.get.asInstanceOf[NamedTypeSpec].name.name
 	      val ownerName = StringFormConverter.getRecordNameFromFieldSignature(globalVarSig)
 	      
 	      val f : AmandroidField = new AmandroidField
