@@ -65,7 +65,13 @@ object Transform {
 	    pst=>
 	      val (pool, cfg) = buildCfg(pst)
 	      val rda = buildRda(pst, cfg)
-	      (pst.procedureUri, new TransformIntraProcedureResult(pst, cfg, rda))
+	      val procSig = 
+	        pst.procedure.getValueAnnotation("signature") match {
+			      case Some(exp : NameExp) =>
+			        exp.name.name
+			      case _ => throw new RuntimeException("Can not find signature")
+			    }
+	      (procSig, new TransformIntraProcedureResult(pst, cfg, rda))
 	  }.toMap
 	}
 	
@@ -98,7 +104,7 @@ object Transform {
     }
 	}
 	
-	def getSymbolResolveResult(codes : Set[String]) = {
+	def getSymbolResolveResult(codes : Set[String]) : SymbolTable = {
 	  val newModels = parseCodes(codes)
 	  AmandroidSymbolTableBuilder(newModels, fst, par)
 	}

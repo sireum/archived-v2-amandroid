@@ -7,7 +7,7 @@ import org.sireum.util._
 object Center {
   type VirtualLabel = String
   
-  val DEBUG = false
+  val DEBUG = true
   
   /**
    * set of records contained by current Center
@@ -65,6 +65,16 @@ object Center {
   def resolveRecordsRelation = {
     getRecords.foreach{
       record =>
+        record.needToResolveOuterName match{
+	        case Some(o) =>
+	          tryGetRecord(o) match{
+		          case Some(outer) =>
+		            record.needToResolveOuterName = None
+		            record.setOuterClass(outer)
+		          case None =>
+		        }
+	        case None =>
+	      }
 		    var resolved : Set[String] = Set()
 		    record.needToResolveExtends.foreach{
 		      recName =>
@@ -85,29 +95,51 @@ object Center {
    */
   
   def resolveRecordsRelationWholeProgram = {
-    if(!GlobalConfig.wholeProgram) throw new RuntimeException("It is not whole program mode.")
+    if(GlobalConfig.mode < Mode.WHOLE_PROGRAM_TEST) throw new RuntimeException("It is not a whole program mode.")
     val worklist : MList[AmandroidRecord] = mlistEmpty
+    var codes : Set[String] = null
     worklist ++= getRecords
-    while(!worklist.isEmpty){
-      val record = worklist.remove(0)
-      while(!record.needToResolveExtends.isEmpty){
-        val parName = record.needToResolveExtends.head
-        record.needToResolveExtends -= parName
-        tryGetRecord(parName) match{
-          case Some(parent) =>
-            if(parent.isInterface) record.addInterface(parent)
-            else record.setSuperClass(parent)
-            if(!parent.needToResolveExtends.isEmpty) worklist += parent
-          case None =>
-            val code = AmandroidCodeSource.getRecordCode(parName)
-            Transform.getSymbolResolveResult(Set(code))
-            val p = getRecord(parName)
-            if(p.isInterface) record.addInterface(p)
-            else record.setSuperClass(p)
-            if(!p.needToResolveExtends.isEmpty) worklist += p
-        }
-      }
-    }
+    do{
+      codes = Set()
+      var tmpList : List[AmandroidRecord] = List()
+	    while(!worklist.isEmpty){
+	      val record = worklist.remove(0)
+	      record.needToResolveOuterName match{
+	        case Some(o) =>
+	          println("ooooooooooo->" + o)
+	          tryGetRecord(o) match{
+		          case Some(outer) =>
+		            record.needToResolveOuterName = None
+		            record.setOuterClass(outer)
+		            if(!outer.needToResolveExtends.isEmpty || outer.needToResolveOuterName.isDefined) worklist += outer
+		          case None =>
+		            val code = AmandroidCodeSource.getRecordCode(o)
+		            codes += code
+		            tmpList ::= record
+		        }
+	        case None =>
+	      }
+	      var resolved : Set[String] = Set()
+        record.needToResolveExtends.foreach{
+	        parName =>
+		        tryGetRecord(parName) match{
+		          case Some(parent) =>
+		            resolved += parName
+		            if(parent.isInterface) record.addInterface(parent)
+		            else record.setSuperClass(parent)
+		            if(!parent.needToResolveExtends.isEmpty || parent.needToResolveOuterName.isDefined) worklist += parent
+		          case None =>
+		            val code = AmandroidCodeSource.getRecordCode(parName)
+		            codes += code
+		            tmpList ::= record
+		        }
+	      }
+	      record.needToResolveExtends --= resolved
+	    }
+      worklist ++= tmpList
+      if(!codes.isEmpty)
+      	Transform.getSymbolResolveResult(codes)
+    }while(!codes.isEmpty)
   }
 	
 	/**
@@ -310,6 +342,23 @@ object Center {
 	}
 	
 	/**
+	 * try to remove record from Center
+	 */
+	
+	def tryRemoveRecord(recordName : String) = {
+	  val aropt = tryGetRecord(recordName)
+	  aropt match{
+	    case Some(ar) =>
+			  this.records -= ar
+			  if(ar.isLibraryRecord) this.libraryRecords -= ar
+			  else if(ar.isApplicationRecord) this.applicationRecords -= ar
+			  ar.setInCenter(false)
+			  modifyHierarchy
+	    case None =>
+	  }
+	}
+	
+	/**
 	 * get record name from procedure name. e.g. [|java:lang:Object.equals|] -> [|java:lang:Object|]
 	 */
 	
@@ -337,6 +386,18 @@ object Center {
 	 */
 	
 	def getSubSigFromProcSig(sig : String) : String = StringFormConverter.getSubSigFromProcSig(sig)
+	
+	/**
+	 * get outer class name from inner class name
+	 */
+	
+	def getOuterNameFrom(innerName : String) : String = StringFormConverter.getOuterNameFrom(innerName)
+	
+	/**
+	 * return given name is a inner class name or not
+	 */
+	
+	def isInnerClassName(name : String) : Boolean = StringFormConverter.isValidType(name) && name.lastIndexOf("$") > 0
 	
 	/**
 	 * current Center contains the given record or not
@@ -373,9 +434,10 @@ object Center {
 	
 	def grabProcedure(procSig : String) : Option[AmandroidProcedure] = {
 	  val rName = StringFormConverter.getRecordNameFromProcedureSignature(procSig)
+	  val subSig = getSubSigFromProcSig(procSig)
 	  if(!containsRecord(rName)) return None
 	  val r = getRecord(rName)
-	  getRecordHierarchy.resolveConcreteDispatch(r, procSig)
+	  r.tryGetProcedure(subSig)
 	}
 	
 	/**
@@ -427,6 +489,32 @@ object Center {
 	    case Some(p) => p
 	    case None => throw new RuntimeException("Given procedure signature: " + procSig + " is not in the Center.")
 	  }
+	}
+	
+	/**
+	 * get callee procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
+	 */
+	
+	def getCalleeProcedure(from : AmandroidRecord, procSig : String) : AmandroidProcedure = {
+	  getRecordHierarchy.resolveConcreteDispatchWithoutFailing(from, procSig)
+	}
+	
+	/**
+	 * check and get virtual callee procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
+	 */
+	
+	def getVirtualCalleeProcedure(fromName : String, procSig : String) : AmandroidProcedure = {
+	  val from = resolveRecord(fromName, ResolveLevel.BODIES)
+	  getRecordHierarchy.resolveConcreteDispatchWithoutFailing(from, procSig)
+	}
+	
+	/**
+	 * check and get direct callee procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
+	 */
+	
+	def getDirectCalleeProcedure(procSig : String) : AmandroidProcedure = {
+	  val from = resolveRecord(signatureToRecordName(procSig), ResolveLevel.BODIES)
+	  getRecordHierarchy.resolveConcreteDispatchWithoutFailing(from, procSig)
 	}
 	
 	/**
@@ -485,6 +573,21 @@ object Center {
 	
 	def forceResolveRecord(recordName : String, desiredLevel : ResolveLevel.Value) : AmandroidRecord = {
 	  AmandroidResolver.forceResolveRecord(recordName, desiredLevel)
+	}
+	
+	/**
+	 * reset the current center
+	 */
+	
+	def reset = {
+	  this.records = Set()
+	  this.applicationRecords = Set()
+	  this.libraryRecords = Set()
+	  this.nameToRecord = Map()
+	  this.mainRecord = null
+	  this.entryPoints = null
+	  this.hierarchy = null
+	  this.callGraph = null
 	}
 	
 	def printDetails = {

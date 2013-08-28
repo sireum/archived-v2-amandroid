@@ -38,7 +38,7 @@ object StringFormConverter {
       case "Z" =>		getType("[|boolean|]", d)
       case "V" =>		"[|void|]"
       case _ =>
-        getTypeSig("[|" + tmp.substring(1, tmp.length() - 1).replaceAll("\\/", ":") + "|]", d)
+        getType("[|" + tmp.substring(1, tmp.length() - 1).replaceAll("\\/", ":") + "|]", d)
     }
 	}
 	
@@ -89,7 +89,7 @@ object StringFormConverter {
   
   protected def getTypeSig(sig : String, dimension : Int) : String = {
     val sb = new StringBuffer
-    for(d <- 0 to dimension) sb.append("[")
+    for(d <- 1 to dimension) sb.append("[")
     sb.append(sig)
     sb.toString().intern()
   }
@@ -101,7 +101,7 @@ object StringFormConverter {
   protected def getType(typ : String, dimension : Int) : String = {
     val sb = new StringBuffer
     sb.append(typ)
-    for(d <- 0 to dimension) sb.append("[]")
+    for(d <- 1 to dimension) sb.append("[]")
     sb.toString().intern()
   }
   
@@ -118,6 +118,15 @@ object StringFormConverter {
       tmp = tmp.substring(0, tmp.length() - 2)
     }
     (tmp, d)
+  }
+  
+  /**
+   * get outer class name from inner class name. e.g. [|android:os:Handler$Callback|] -> [|android:os:Handler|]
+   */
+  
+  def getOuterNameFrom(innerName : String) = {
+    if(!isValidType(innerName) && innerName.lastIndexOf("$") <= 0) throw new RuntimeException("wrong innerName: " + innerName)
+    innerName.substring(0, innerName.lastIndexOf("$")) + "|]"
   }
   
   /**

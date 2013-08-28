@@ -1,4 +1,4 @@
-package org.sireum.amandroid.dummyMainGen
+package org.sireum.amandroid.pilarCodeGenerator
 
 import org.sireum.util._
 import org.stringtemplate.v4.STGroupFile
@@ -6,8 +6,6 @@ import org.stringtemplate.v4.ST
 import java.util.ArrayList
 import org.sireum.amandroid.util.SignatureParser
 import java.util.Arrays
-import org.sireum.amandroid.pilarCodeGenerator.VariableGenerator
-import org.sireum.amandroid.pilarCodeGenerator.AndroidEntryPointConstants
 import org.sireum.amandroid.AmandroidRecord
 import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.amandroid.util.StringFormConverter

@@ -219,18 +219,18 @@ class PointerAssignmentGraph[Node <: PtaNode]
    * to the given program point. If a value is added to a node, then that 
    * node is added to the worklist.
    */
-  def constructGraph(pUri : ResourceUri, ps : MList[Point], callerContext : Context, cfg : ControlFlowGraph[String], rda : AndroidReachingDefinitionAnalysis.Result) = {
+  def constructGraph(pSig : String, ps : MList[Point], callerContext : Context, cfg : ControlFlowGraph[String], rda : AndroidReachingDefinitionAnalysis.Result) = {
 //    collectArrayVars(ps, cfg, rda)
 //    collectFieldVars(ps, cfg, rda)
     ps.foreach(
       p=>{
-        collectNodes(pUri, p, callerContext.copy)
+        collectNodes(pSig, p, callerContext.copy)
       }  
     )
     ps.foreach(
       p=>{
         val constraintMap = applyConstraint(p, ps, cfg, rda)
-        buildingEdges(constraintMap, pUri, callerContext.copy)
+        buildingEdges(constraintMap, pSig, callerContext.copy)
       }  
     )
   }
@@ -264,10 +264,10 @@ class PointerAssignmentGraph[Node <: PtaNode]
   }
   
 
-  def collectNodes(pUri : ResourceUri, p : Point, callerContext : Context) : Set[Node] = {
+  def collectNodes(pSig : String, p : Point, callerContext : Context) : Set[Node] = {
     var nodes : Set[Node] = Set()
     val context = callerContext.copy
-    context.setContext(pUri, p.getLoc)
+    context.setContext(pSig, p.getLoc)
     p match {
       case asmtP : PointAsmt =>
         val lhs = asmtP.lhs
@@ -373,18 +373,18 @@ class PointerAssignmentGraph[Node <: PtaNode]
     nodes
   }
   
-  def buildingEdges(map : MMap[EdgeType.Value, MMap[Point, MSet[Point]]], pUri : ResourceUri, context : Context) = {
+  def buildingEdges(map : MMap[EdgeType.Value, MMap[Point, MSet[Point]]], pSig : String, context : Context) = {
     map.foreach{
       case(typ, edgeMap) =>
         edgeMap.foreach{
           case(src, dsts) =>
             val s = context.copy
-		        s.setContext(pUri, src.getLoc)
+		        s.setContext(pSig, src.getLoc)
 		        val srcNode = getNode(src, s)
 		        dsts.foreach{
 		          dst => 
 		            val t = context.copy
-		            t.setContext(pUri, dst.getLoc)
+		            t.setContext(pSig, dst.getLoc)
 		            val targetNode = getNode(dst, t)
 		            if(!graph.containsEdge(srcNode, targetNode))
 		              addEdge(srcNode, targetNode, typ)
@@ -417,7 +417,7 @@ class PointerAssignmentGraph[Node <: PtaNode]
   
   private def connectCallEdges(met : PointProc, pi : PointI, srcContext : Context) ={
     val targetContext = srcContext.copy
-    targetContext.setContext(met.pUri, met.getLoc)
+    targetContext.setContext(met.pSig, met.getLoc)
     met.params_Entry.keys.foreach(
       i => {
         val srcNode = getNode(pi.args_Call(i), srcContext.copy)
@@ -487,15 +487,15 @@ class PointerAssignmentGraph[Node <: PtaNode]
     }
   }
   
-  def getDirectCallee(pi : PointI) : AmandroidProcedure = Center.getProcedure(pi.varName)
+  def getDirectCallee(pi : PointI) : AmandroidProcedure = Center.getDirectCalleeProcedure(pi.varName)
   
 
   def getCalleeSet(diff : MSet[PTAInstance],
 	                 pi : PointI) : MSet[AmandroidProcedure] = {
     val calleeSet : MSet[AmandroidProcedure] = msetEmpty
     diff.foreach{
-      d => 
-        val p = Center.getProcedure(pi.varName)
+      d =>
+        val p = Center.getVirtualCalleeProcedure(d.className, pi.varName)
         calleeSet += p
     }
     calleeSet
@@ -602,9 +602,9 @@ class PointerAssignmentGraph[Node <: PtaNode]
           addPointNode(pr.varName, pr.identifier, context)
         else getPointNode(pr.varName, pr.identifier, context)
       case pp : PointProc =>
-        if(!pointNodeExists(pp.pUri, pp.getLoc, context))
-          addPointNode(pp.pUri, pp.getLoc, context)
-        else getPointNode(pp.pUri, pp.getLoc, context)
+        if(!pointNodeExists(pp.pSig, pp.getLoc, context))
+          addPointNode(pp.pSig, pp.getLoc, context)
+        else getPointNode(pp.pSig, pp.getLoc, context)
     }
   }
   
@@ -917,7 +917,7 @@ class PointerAssignmentGraph[Node <: PtaNode]
       case pri : PointRNoIndex =>
         getPointNode(pri.varName, pri.identifier, context)
       case pp : PointProc =>
-        getPointNode(pp.pUri, pp.getLoc, context)
+        getPointNode(pp.pSig, pp.getLoc, context)
     }
   }
   

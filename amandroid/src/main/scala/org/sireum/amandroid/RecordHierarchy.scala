@@ -96,7 +96,7 @@ class RecordHierarchy {
   
   def getAllSuperClassesOfIncluding(r : AmandroidRecord) : Set[AmandroidRecord] = {
     if(r.isInterface) throw new RuntimeException("r need to be class type: " + r)
-    getAllSubClassesOf(r) + r
+    getAllSuperClassesOf(r) + r
   }
   
   /**
@@ -323,7 +323,10 @@ class RecordHierarchy {
     if(p.isPublic) true
     else if(p.isPrivate) p.getDeclaringRecord == from
     else if(p.isProtected) isRecordRecursivelySubClassOfIncluding(from, p.getDeclaringRecord)
-    else false
+    /* If none of these access control accesflag been set, means the method has default or package level access
+     * which means this method can be accessed within the class or other classes in the same package.
+     */
+    else p.getDeclaringRecord == from || p.getDeclaringRecord.getPackageName == from.getPackageName
   }
   
   /**
@@ -358,19 +361,22 @@ class RecordHierarchy {
   def resolveConcreteDispatch(concreteType : AmandroidRecord, pSig : String) : Option[AmandroidProcedure] = {
     if(concreteType.isInterface) throw new RuntimeException("concreteType need to be class type: " + concreteType)
     val pSubSig = StringFormConverter.getSubSigFromProcSig(pSig)
-    getAllSuperClassesOfIncluding(concreteType).foreach{
-      suRecord=>
-        if(suRecord.declaresProcedure(pSubSig)){
-          val p = suRecord.getProcedure(pSubSig)
-          if(isProcedureVisible(concreteType, p))
-          	return Some(p)
-        }
+    findProcedureThrowHierarchy(concreteType, pSubSig)
+  }
+  
+  private def findProcedureThrowHierarchy(record : AmandroidRecord, subSig : String) : Option[AmandroidProcedure] = {
+    record.tryGetProcedure(subSig) match{
+      case Some(p) =>
+        Some(p)
+      case None =>
+        if(record.hasSuperClass)
+        	findProcedureThrowHierarchy(record.getSuperClass, subSig)
+        else None
     }
-    None
   }
   
   /**
-   * Given an abstract dispatch to an object of type r and a procedure p, gives a list of possible receiver methods
+   * Given an abstract dispatch to an object of type r and a procedure p, gives a list of possible receiver's methods
    */
   
   def resolveAbstractDispatch(r : AmandroidRecord, p : AmandroidProcedure) : Set[AmandroidProcedure] = {

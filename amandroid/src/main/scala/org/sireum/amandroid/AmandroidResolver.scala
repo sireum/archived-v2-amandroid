@@ -33,27 +33,31 @@ object AmandroidResolver {
    * try resolve given procedure container to desired level. 
    */
     
-  def tryResolveProcedure(procSig : String, desiredLevel : Center.ResolveLevel.Value) : Option[AmandroidRecord] = {
+  def tryResolveProcedure(procSig : String, desiredLevel : Center.ResolveLevel.Value) : Option[AmandroidProcedure] = {
     val recordName = StringFormConverter.getRecordNameFromProcedureSignature(procSig)
     tryResolveRecord(recordName, desiredLevel)
+    Center.grabProcedure(procSig)
   }
     
   /**
    * resolve given procedure container to desired level. 
    */
     
-  def resolveProcedure(procSig : String, desiredLevel : Center.ResolveLevel.Value) : AmandroidRecord = {
+  def resolveProcedure(procSig : String, desiredLevel : Center.ResolveLevel.Value) : AmandroidProcedure = {
     val recordName = StringFormConverter.getRecordNameFromProcedureSignature(procSig)
     resolveRecord(recordName, desiredLevel)
+    Center.getRecord(Center.signatureToRecordName(procSig)).printDetail
+    Center.getProcedure(procSig)
   }
   
   /**
    * resolve given procedure container to desired level. 
    */
     
-  def forceResolveProcedure(procSig : String, desiredLevel : Center.ResolveLevel.Value) : AmandroidRecord = {
+  def forceResolveProcedure(procSig : String, desiredLevel : Center.ResolveLevel.Value) : AmandroidProcedure = {
     val recordName = StringFormConverter.getRecordNameFromProcedureSignature(procSig)
     forceResolveRecord(recordName, desiredLevel)
+    Center.getProcedure(procSig)
   }
     
   /**
@@ -122,6 +126,7 @@ object AmandroidResolver {
   def forceResolveToBodies(recordName : String) : AmandroidRecord = {
     val code = AmandroidCodeSource.getRecordCode(recordName)
     val st = Transform.getSymbolResolveResult(Set(code))
+    Center.tryRemoveRecord(recordName)
     resolveFromSTP(st.asInstanceOf[SymbolTableProducer], false)
     Center.getRecord(recordName)
   }
@@ -132,6 +137,7 @@ object AmandroidResolver {
   
   def forceResolveToIntraProcedural(recordName : String) : AmandroidRecord = {
     forceResolveToBodies(recordName)
+    /*TODO: resolve intra proc*/
     Center.getRecord(recordName)
   }
     
@@ -140,7 +146,7 @@ object AmandroidResolver {
    */
 	
 	def resolveFromSTP(stp : SymbolTableProducer, par : Boolean) = {
-    if(GlobalConfig.wholeProgram && !AmandroidCodeSource.isPreLoaded) throw new RuntimeException("In whole program mode but library code did not pre-loaded, call AmandroidCodeSource.preLoad first.")
+    if(GlobalConfig.mode >= Mode.WHOLE_PROGRAM_TEST && !AmandroidCodeSource.isPreLoaded) throw new RuntimeException("In whole program mode but library code did not pre-loaded, call AmandroidCodeSource.preLoad first.")
 	  resolveRecords(stp, par)
 	  resolveGlobalVars(stp, par)
 	  resolveProcedures(stp, par)
@@ -171,6 +177,7 @@ object AmandroidResolver {
 	      var exs = rd.extendsClauses.map {_.name.name}.toSet
 	      if((exs.isEmpty && recName != DEFAULT_TOPLEVEL_OBJECT) || rec.isInterface) exs += DEFAULT_TOPLEVEL_OBJECT
 	      rec.addNeedToResolveExtends(exs)
+	      if(Center.isInnerClassName(recName)) rec.needToResolveOuterName = Some(Center.getOuterNameFrom(recName))
 	      rd.attributes.foreach{
 	        field =>
 	          val fieldSig = field.name.name
@@ -181,7 +188,14 @@ object AmandroidResolver {
 		            case _ => ""
 		          }
 	          require(field.typeSpec.isDefined)
-	          val fieldType = field.typeSpec.get.asInstanceOf[NamedTypeSpec].name.name
+	          var d = 0
+			      var tmpTs = field.typeSpec.get
+			      while(tmpTs.isInstanceOf[ListTypeSpec]){
+		          d += 1
+		          tmpTs = tmpTs.asInstanceOf[ListTypeSpec].elementType
+		        }
+			      require(tmpTs.isInstanceOf[NamedTypeSpec])
+			      val fieldType : NormalType = new NormalType(tmpTs.asInstanceOf[NamedTypeSpec].name.name, d)
 	          val f : AmandroidField = new AmandroidField
 	          f.init(fieldSig, fieldType)
 	          f.setAccessFlags(fieldAccessFlag)
@@ -190,7 +204,8 @@ object AmandroidResolver {
 	      rec
 	  }
 	  records.foreach(Center.addRecord(_))
-	  Center.resolveRecordsRelation
+	  if(GlobalConfig.mode >= Mode.WHOLE_PROGRAM_TEST) Center.resolveRecordsRelationWholeProgram
+	  else Center.resolveRecordsRelation
 	}
 	
 	/**
@@ -210,7 +225,14 @@ object AmandroidResolver {
 			      case _ => ""
 			    }
 	      require(gvd.typeSpec.isDefined)
-	      val globalVarType = gvd.typeSpec.get.asInstanceOf[NamedTypeSpec].name.name
+	      var d = 0
+	      var tmpTs = gvd.typeSpec.get
+	      while(tmpTs.isInstanceOf[ListTypeSpec]){
+          d += 1
+          tmpTs = tmpTs.asInstanceOf[ListTypeSpec].elementType
+        }
+	      require(tmpTs.isInstanceOf[NamedTypeSpec])
+	      val globalVarType : NormalType = new NormalType(tmpTs.asInstanceOf[NamedTypeSpec].name.name, d)
 	      val ownerName = StringFormConverter.getRecordNameFromFieldSignature(globalVarSig)
 	      
 	      val f : AmandroidField = new AmandroidField

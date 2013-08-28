@@ -82,6 +82,12 @@ class AmandroidRecord {
   var needToResolveExtends : Set[String] = Set()
   
   /**
+   * didn't resolved outer class name. 
+   */
+  
+  var needToResolveOuterName : Option[String] = None
+  
+  /**
    * resolving level of current record
    */
   
@@ -252,7 +258,7 @@ class AmandroidRecord {
 	 * whether this record declare a field with the given name and type
 	 */
 	
-	def declaresField(name : String, typ : String) = !getFields.filter(f => (f.getName == name && f.getType == typ)).isEmpty
+	def declaresField(name : String, typ : Type) = !getFields.filter(f => (f.getName == name && f.getType == typ)).isEmpty
 	
 	/**
 	 * removes the given field from this record
@@ -295,6 +301,14 @@ class AmandroidRecord {
 	def getProcedure(subSig : String) : AmandroidProcedure = {
 	  if(!declaresProcedure(subSig)) throw new RuntimeException("No procedure " + subSig + " in record " + getName)
 	  else this.subSigToProcedures(subSig)
+	}
+	
+	/**
+	 * try to get procedure from this record by the given subsignature
+	 */
+	
+	def tryGetProcedure(subSig : String) : Option[AmandroidProcedure] = {
+	  this.subSigToProcedures.get(subSig)
 	}
 	
 	/**
@@ -652,7 +666,7 @@ class AmandroidRecord {
     println("shortName: " + getShortName)
     println("superClass: " + tryGetSuperClass)
     println("outerClass: " + tryGetOuterClass)
-    println("implInterfaces: " + getInterfaces)
+    println("interfaces: " + getInterfaces)
     println("accessFlags: " + AccessFlag.toString(getAccessFlags))
     println("isInCenter: " + isInCenter)
     println("fields: " + getFields)

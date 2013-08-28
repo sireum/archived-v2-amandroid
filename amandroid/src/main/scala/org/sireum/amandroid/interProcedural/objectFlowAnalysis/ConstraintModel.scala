@@ -409,7 +409,7 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
       p => {
         p match {
           case pp : PointProc =>
-            if(pp.pUri.equals(uri))
+            if(pp.pSig.equals(uri))
               point
           case _ =>
         }

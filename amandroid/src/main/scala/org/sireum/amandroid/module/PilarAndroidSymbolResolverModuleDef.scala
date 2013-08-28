@@ -32,10 +32,7 @@ class PilarAndroidSymbolResolverModuleDef (val job : PipelineJob, info : Pipelin
   val ms = this.models
   val par = this.parallel
   val fst = { _ : Unit => new AmandroidSymbolTable }
-  val result = AmandroidSymbolTableBuilder(ms, fst, par)
-    
-  Center.resolveRecordsRelationWholeProgram
-    
+  val result = AmandroidSymbolTableBuilder(ms, fst, par)    
   val st = result.asInstanceOf[AmandroidSymbolTable]
   info.tags ++= st.tags
 

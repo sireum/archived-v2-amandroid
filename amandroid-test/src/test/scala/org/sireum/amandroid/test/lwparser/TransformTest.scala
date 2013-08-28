@@ -11,6 +11,7 @@ import java.io.FileInputStream
 import org.sireum.amandroid.Transform
 import org.sireum.amandroid.AmandroidCodeSource
 import org.sireum.amandroid.GlobalConfig
+import org.sireum.amandroid.Mode
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -19,6 +20,7 @@ object TransformTest extends ImplicitLogging {
 
   def main(args: Array[String]) {
     GlobalConfig.libFileDir = LightWeightParserExamples.PILAR_MODEL_DIR_URI
+    GlobalConfig.mode = Mode.APP_ONLY
     AmandroidCodeSource.preLoad
     val codes = AmandroidCodeSource.getRecordsCodes.values.toSet
     val transRes = Transform.getIntraProcedureResult(codes)

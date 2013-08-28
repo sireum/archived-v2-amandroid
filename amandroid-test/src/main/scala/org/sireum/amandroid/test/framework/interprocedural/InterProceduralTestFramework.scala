@@ -54,7 +54,7 @@ trait InterProceduralTestFramework extends TestFramework {
         
         import AndroidInterProceduralModule.ProducerView._
         
-        job.shouldBuildOFAsCfg = true
+        job.shouldBuildCallGraph = true
         job.appInfoOpt = None
       }
       

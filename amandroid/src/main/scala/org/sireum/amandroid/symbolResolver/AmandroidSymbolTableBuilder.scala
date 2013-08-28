@@ -27,8 +27,7 @@ object AmandroidSymbolTableBuilder {
    changedOrDeletedModelFiles : Set[FileResourceUri],
    changedOrAddedModels : ISeq[Model],
    stpConstructor : Unit => P,
-   parallel : Boolean,
-   shouldBuildLibInfoTables : Boolean) =
+   parallel : Boolean) =
     fixSymbolTable(stp, stModels, changedOrDeletedModelFiles,
       changedOrAddedModels, stpConstructor, parallel)
 

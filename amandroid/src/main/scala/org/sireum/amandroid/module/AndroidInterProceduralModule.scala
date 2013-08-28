@@ -18,9 +18,9 @@ object AndroidInterProceduralModule extends PipelineModule {
   def origin = classOf[AndroidInterProcedural]
 
   val globalParallelKey = "Global.parallel"
-  val globalShouldBuildOFAsCfgKey = "Global.shouldBuildOFAsCfg"
   val globalInterResultKey = "Global.interResult"
   val globalAppInfoOptKey = "Global.appInfoOpt"
+  val globalShouldBuildCallGraphKey = "Global.shouldBuildCallGraph"
   val globalIntraResultKey = "Global.intraResult"
   val globalSymbolTableKey = "Global.symbolTable"
 
@@ -40,9 +40,9 @@ object AndroidInterProceduralModule extends PipelineModule {
   }
 
   override def initialize(job : PipelineJob) {
-    if(!(job ? AndroidInterProceduralModule.globalShouldBuildOFAsCfgKey)) {
-      val shouldBuildOFAsCfg = Class.forName("org.sireum.amandroid.module.AndroidInterProcedural").getDeclaredMethod("$lessinit$greater$default$4").invoke(null).asInstanceOf[scala.Boolean]
-      setShouldBuildOFAsCfg(job.propertyMap, shouldBuildOFAsCfg)
+    if(!(job ? AndroidInterProceduralModule.globalShouldBuildCallGraphKey)) {
+      val shouldBuildCallGraph = Class.forName("org.sireum.amandroid.module.AndroidInterProcedural").getDeclaredMethod("$lessinit$greater$default$4").invoke(null).asInstanceOf[scala.Boolean]
+      setShouldBuildCallGraph(job.propertyMap, shouldBuildCallGraph)
     }
 
     if(!(job ? AndroidInterProceduralModule.globalAppInfoOptKey)) {
@@ -120,32 +120,32 @@ object AndroidInterProceduralModule extends PipelineModule {
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
           "Input error for '" + this.title + "': No value found for 'symbolTable'")       
     }
-    var _shouldBuildOFAsCfg : scala.Option[AnyRef] = None
-    var _shouldBuildOFAsCfgKey : scala.Option[String] = None
+    var _shouldBuildCallGraph : scala.Option[AnyRef] = None
+    var _shouldBuildCallGraphKey : scala.Option[String] = None
 
-    val keylistshouldBuildOFAsCfg = List(AndroidInterProceduralModule.globalShouldBuildOFAsCfgKey)
-    keylistshouldBuildOFAsCfg.foreach(key => 
+    val keylistshouldBuildCallGraph = List(AndroidInterProceduralModule.globalShouldBuildCallGraphKey)
+    keylistshouldBuildCallGraph.foreach(key => 
       if(job ? key) { 
-        if(_shouldBuildOFAsCfg.isEmpty) {
-          _shouldBuildOFAsCfg = Some(job(key))
-          _shouldBuildOFAsCfgKey = Some(key)
+        if(_shouldBuildCallGraph.isEmpty) {
+          _shouldBuildCallGraph = Some(job(key))
+          _shouldBuildCallGraphKey = Some(key)
         }
-        if(!(job(key).asInstanceOf[AnyRef] eq _shouldBuildOFAsCfg.get)) {
+        if(!(job(key).asInstanceOf[AnyRef] eq _shouldBuildCallGraph.get)) {
           tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': 'shouldBuildOFAsCfg' keys '" + _shouldBuildOFAsCfgKey.get + " and '" + key + "' point to different objects.")
+            "Input error for '" + this.title + "': 'shouldBuildCallGraph' keys '" + _shouldBuildCallGraphKey.get + " and '" + key + "' point to different objects.")
         }
       }
     )
 
-    _shouldBuildOFAsCfg match{
+    _shouldBuildCallGraph match{
       case Some(x) =>
         if(!x.isInstanceOf[scala.Boolean]){
           tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'shouldBuildOFAsCfg'.  Expecting 'scala.Boolean' but found '" + x.getClass.toString + "'")
+            "Input error for '" + this.title + "': Wrong type found for 'shouldBuildCallGraph'.  Expecting 'scala.Boolean' but found '" + x.getClass.toString + "'")
         }
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-          "Input error for '" + this.title + "': No value found for 'shouldBuildOFAsCfg'")       
+          "Input error for '" + this.title + "': No value found for 'shouldBuildCallGraph'")       
     }
     var _appInfoOpt : scala.Option[AnyRef] = None
     var _appInfoOptKey : scala.Option[String] = None
@@ -249,17 +249,17 @@ object AndroidInterProceduralModule extends PipelineModule {
     return options
   }
 
-  def getShouldBuildOFAsCfg (options : scala.collection.Map[Property.Key, Any]) : scala.Boolean = {
-    if (options.contains(AndroidInterProceduralModule.globalShouldBuildOFAsCfgKey)) {
-       return options(AndroidInterProceduralModule.globalShouldBuildOFAsCfgKey).asInstanceOf[scala.Boolean]
+  def getShouldBuildCallGraph (options : scala.collection.Map[Property.Key, Any]) : scala.Boolean = {
+    if (options.contains(AndroidInterProceduralModule.globalShouldBuildCallGraphKey)) {
+       return options(AndroidInterProceduralModule.globalShouldBuildCallGraphKey).asInstanceOf[scala.Boolean]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def setShouldBuildOFAsCfg (options : MMap[Property.Key, Any], shouldBuildOFAsCfg : scala.Boolean) : MMap[Property.Key, Any] = {
+  def setShouldBuildCallGraph (options : MMap[Property.Key, Any], shouldBuildCallGraph : scala.Boolean) : MMap[Property.Key, Any] = {
 
-    options(AndroidInterProceduralModule.globalShouldBuildOFAsCfgKey) = shouldBuildOFAsCfg
+    options(AndroidInterProceduralModule.globalShouldBuildCallGraphKey) = shouldBuildCallGraph
 
     return options
   }
@@ -313,7 +313,7 @@ object AndroidInterProceduralModule extends PipelineModule {
     implicit class AndroidInterProceduralModuleConsumerView (val job : PropertyProvider) extends AnyVal {
       def parallel : scala.Boolean = AndroidInterProceduralModule.getParallel(job.propertyMap)
       def symbolTable : org.sireum.pilar.symbol.SymbolTable = AndroidInterProceduralModule.getSymbolTable(job.propertyMap)
-      def shouldBuildOFAsCfg : scala.Boolean = AndroidInterProceduralModule.getShouldBuildOFAsCfg(job.propertyMap)
+      def shouldBuildCallGraph : scala.Boolean = AndroidInterProceduralModule.getShouldBuildCallGraph(job.propertyMap)
       def appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp] = AndroidInterProceduralModule.getAppInfoOpt(job.propertyMap)
       def intraResult : scala.collection.mutable.Map[java.lang.String, org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult] = AndroidInterProceduralModule.getIntraResult(job.propertyMap)
       def interResult : org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisResult = AndroidInterProceduralModule.getInterResult(job.propertyMap)
@@ -329,8 +329,8 @@ object AndroidInterProceduralModule extends PipelineModule {
       def symbolTable_=(symbolTable : org.sireum.pilar.symbol.SymbolTable) { AndroidInterProceduralModule.setSymbolTable(job.propertyMap, symbolTable) }
       def symbolTable : org.sireum.pilar.symbol.SymbolTable = AndroidInterProceduralModule.getSymbolTable(job.propertyMap)
 
-      def shouldBuildOFAsCfg_=(shouldBuildOFAsCfg : scala.Boolean) { AndroidInterProceduralModule.setShouldBuildOFAsCfg(job.propertyMap, shouldBuildOFAsCfg) }
-      def shouldBuildOFAsCfg : scala.Boolean = AndroidInterProceduralModule.getShouldBuildOFAsCfg(job.propertyMap)
+      def shouldBuildCallGraph_=(shouldBuildCallGraph : scala.Boolean) { AndroidInterProceduralModule.setShouldBuildCallGraph(job.propertyMap, shouldBuildCallGraph) }
+      def shouldBuildCallGraph : scala.Boolean = AndroidInterProceduralModule.getShouldBuildCallGraph(job.propertyMap)
 
       def appInfoOpt_=(appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp]) { AndroidInterProceduralModule.setAppInfoOpt(job.propertyMap, appInfoOpt) }
       def appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp] = AndroidInterProceduralModule.getAppInfoOpt(job.propertyMap)
@@ -351,7 +351,7 @@ trait AndroidInterProceduralModule {
 
   def symbolTable : org.sireum.pilar.symbol.SymbolTable = AndroidInterProceduralModule.getSymbolTable(job.propertyMap)
 
-  def shouldBuildOFAsCfg : scala.Boolean = AndroidInterProceduralModule.getShouldBuildOFAsCfg(job.propertyMap)
+  def shouldBuildCallGraph : scala.Boolean = AndroidInterProceduralModule.getShouldBuildCallGraph(job.propertyMap)
 
   def appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp] = AndroidInterProceduralModule.getAppInfoOpt(job.propertyMap)
 

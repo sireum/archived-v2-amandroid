@@ -45,7 +45,7 @@ case class AndroidInterProcedural(
   symbolTable : SymbolTable,
   
   @Input
-  shouldBuildOFAsCfg : Boolean = true,
+  shouldBuildCallGraph : Boolean = true,
   
   @Input
   appInfoOpt : scala.Option[PrepareApp] = None,

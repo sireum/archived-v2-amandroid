@@ -26,7 +26,7 @@ class AmandroidField {
 	 * type of the field
 	 */
 	
-	protected var typ : String = null
+	protected var typ : Type = null
 	
 	/**
 	 * access flags of the field
@@ -44,7 +44,7 @@ class AmandroidField {
    * when you construct a amandroid field instance please call this init function first
    */
 	
-	def init(name : String, typ : String, accessFlags : Int) : AmandroidField = {
+	def init(name : String, typ : Type, accessFlags : Int) : AmandroidField = {
 	  if(isSignature(name)){
 	    this.signature = name
 	    this.name = StringFormConverter.getFieldNameFromFieldSignature(name)
@@ -60,19 +60,19 @@ class AmandroidField {
    * when you construct a amandroid field instance please call this init function first
    */
 	
-	def init(name : String, typ : String) : AmandroidField = init(name, typ, 0)
+	def init(name : String, typ : Type) : AmandroidField = init(name, typ, 0)
 	
 	/**
    * when you construct a amandroid field instance please call this init function first
    */
 	
-	def init(name : String, accessFlags : Int) : AmandroidField = init(name, "", accessFlags)
+	def init(name : String, accessFlags : Int) : AmandroidField = init(name, null, accessFlags)
 	
 	/**
    * when you construct a amandroid field instance please call this init function first
    */
 	
-	def init(name : String) : AmandroidField = init(name, "", 0)
+	def init(name : String) : AmandroidField = init(name, null, 0)
 	
 	/**
 	 * get this field's name
@@ -96,7 +96,7 @@ class AmandroidField {
 	 * set field type
 	 */
 	
-	def setType(typ : String) = this.typ = typ
+	def setType(typ : Type) = this.typ = typ
 	
 	/**
 	 * set field access flags
@@ -199,6 +199,8 @@ class AmandroidField {
 	 */
 	
 	def isDeclared = declaringRecord != null
+	
+	override def toString() : String = getName
 	
 	def printDetail = {
 	  println("~~~~~~~~~~~~~AmandroidField~~~~~~~~~~~~~")

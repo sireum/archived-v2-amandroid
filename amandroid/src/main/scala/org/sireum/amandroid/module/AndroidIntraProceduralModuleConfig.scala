@@ -99,7 +99,7 @@ case class AndroidIntraProcedural(
   @Input procedureAbsUriIterator : scala.Option[Iterator[ResourceUri]] = None,
 //////////////////end here
   
-  @Output intraResult : MMap[ResourceUri, AndroidIntraProcedural.AndroidIntraAnalysisResult]
+  @Output intraResult : MMap[String, AndroidIntraProcedural.AndroidIntraAnalysisResult]
    
 )
  

@@ -22,7 +22,7 @@ class AndroidObjectFlowGraph[Node <: OfaNode, ValueSet <: AndroidValueSet](fac: 
    */
   def extendGraphForIcc(met : PointProc, pi : PointI, srcContext : Context) = {
     val targetContext = srcContext.copy
-    targetContext.setContext(met.pUri, met.getLoc)
+    targetContext.setContext(met.pSig, met.getLoc)
     val sourceNode = getNode(pi.args_Call(0), srcContext.copy)
     val targetNode = getNode(met.params_Entry(0), targetContext.copy)
     worklist += targetNode

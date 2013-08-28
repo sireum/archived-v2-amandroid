@@ -22,12 +22,12 @@ trait AmandroidResolverTestFramework extends TestFramework {
   }
 
   def model(code : String) =
-    InterProceduralConfiguration(title, ivector(Left(code)))
+    Configuration(title, ivector(Left(code)))
 
   def file(fileUri : FileResourceUri) =
-    InterProceduralConfiguration(title, ivector(Right(fileUri)))
+    Configuration(title, ivector(Right(fileUri)))
 
-  case class InterProceduralConfiguration //
+  case class Configuration //
   (title : String,
    srcs : ISeq[Either[String, FileResourceUri]]) {
 

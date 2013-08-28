@@ -15,6 +15,7 @@ import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis.A
 import org.sireum.amandroid.intraProcedural.pointsToAnalysis.IntraPointsToAnalysis
 import org.sireum.amandroid.android.interProcedural.objectFlowAnalysis.AndroidOfgPreprocessor
 import org.sireum.amandroid.intraProcedural.compressedControlFlowGraph.CompressedControlFlowGraph
+import org.sireum.pilar.ast.NameExp
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -58,7 +59,13 @@ class AndroidIntraProceduralModuleDef (val job : PipelineJob, info : PipelineJob
     val pagOpt = if (this.shouldBuildPag) Some(PagModule.getPag(options)) else None
     val ofgOpt = if (this.shouldPreprocessOfg) Some(OFAPreprocessModule.getOFG(options)) else None
     val cCfgOpt = if (this.shouldBuildCCfg) Some(cCfgModule.getCCfg(options)) else None
-    Map(pst.procedureUri ->
+    val procSig = 
+      pst.procedure.getValueAnnotation("signature") match {
+	      case Some(exp : NameExp) =>
+	        exp.name.name
+	      case _ => throw new RuntimeException("Can not find signature")
+	    }
+    Map(procSig ->
       AndroidIntraProcedural.AndroidIntraAnalysisResult(
         pool, cfg, rdaOpt, pagOpt, ofgOpt, cCfgOpt
       ))

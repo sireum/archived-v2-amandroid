@@ -339,13 +339,13 @@ trait PAGConstraint{
     point
   }
   
-  def getProcPointOrElse(uri : ResourceUri) : PointProc = {
+  def getProcPointOrElse(pSig : String) : PointProc = {
     var point : PointProc = null
     points.foreach(
       p => {
         p match {
           case pp : PointProc =>
-            if(pp.pUri.equals(uri))
+            if(pp.pSig.equals(pSig))
               point
           case _ =>
         }

@@ -101,7 +101,7 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
         AndroidIntraProceduralModule.setShouldBuildCfg(options, true)
         AndroidIntraProceduralModule.setShouldBuildRda(options, true)
         AndroidIntraProceduralModule.setShouldBuildCCfg(options, true)
-        AndroidInterProceduralModule.setShouldBuildOFAsCfg(options, true)
+        AndroidInterProceduralModule.setShouldBuildCallGraph(options, true)
         
         // experimental code starts which does not have any significant role now; later we will delete it after some related cleaning 
         
@@ -147,7 +147,7 @@ trait AmandroidOFAAppFrameWork extends TestFramework {
         AndroidIntraProceduralModule.setShouldBuildCfg(options, true)
         AndroidIntraProceduralModule.setShouldBuildRda(options, true)
         AndroidIntraProceduralModule.setShouldBuildCCfg(options, true)
-        AndroidInterProceduralModule.setShouldBuildOFAsCfg(options, true)
+        AndroidInterProceduralModule.setShouldBuildCallGraph(options, true)
         
         // experimental code starts which does not have any significant role now; later we will delete it after some related cleaning 
         

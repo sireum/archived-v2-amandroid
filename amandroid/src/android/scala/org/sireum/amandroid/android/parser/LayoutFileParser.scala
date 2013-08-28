@@ -82,6 +82,9 @@ object LayoutFileParser extends AbstractAndroidXMLParser {
 	  		if(su.getName == "[|android:view:View|]" || su.getName == "[|android:webkit:WebView|]")
 	  		  return true
 		}
+		println("theclass-->" + theClass)
+		Center.printDetails
+		println("hierarchy-->" + Center.getRecordHierarchy)
 		System.err.println("Layout class " + theClass + " is not derived from "
 				+ "android.view.View");
 		false

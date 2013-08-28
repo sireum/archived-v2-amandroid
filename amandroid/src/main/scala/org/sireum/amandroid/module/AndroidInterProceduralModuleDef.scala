@@ -43,7 +43,7 @@ extends AndroidInterProceduralModule with ImplicitLogging {
   def compute() = {
     val j = PipelineJob()
     val options = j.properties
-    if(this.shouldBuildOFAsCfg) {
+    if(this.shouldBuildCallGraph) {
       CGModule.setCfgs(options, cfgs)
       CGModule.setProcedureSymbolTables(options, psts)
       CGModule.setRdas(options, rdas)
@@ -70,7 +70,7 @@ extends AndroidInterProceduralModule with ImplicitLogging {
   def buildInterPipeline(job : PipelineJob) = {
     val stages = marrayEmpty[PipelineStage]
     
-    if (this.shouldBuildOFAsCfg) 
+    if (this.shouldBuildCallGraph) 
       stages += PipelineStage("CallGraph Building", false, CGModule)
       
     PipelineConfiguration("Android Interprocedural Analysis Pipeline",

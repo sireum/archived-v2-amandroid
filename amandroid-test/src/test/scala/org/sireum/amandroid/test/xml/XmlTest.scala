@@ -8,9 +8,11 @@ import org.sireum.amandroid.xml.AndroidXStream
 import org.sireum.amandroid.android.parser.ManifestParser
 import org.sireum.amandroid.android.parser.ARSCFileParser
 import org.sireum.amandroid.android.parser.LayoutFileParser
+import org.sireum.amandroid.AmandroidCodeSource
 
 object XmlTest {
 	def main(args: Array[String]) {
+	  AmandroidCodeSource.preLoad
 	  ManifestParser.loadManifestFile("/Volumes/hd/fgwei/Desktop/apk/Callbacks_Button1.apk")
 	  println(ManifestParser.getEntryPointClasses)
 	  println(ManifestParser.getPackageName)

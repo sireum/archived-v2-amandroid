@@ -541,7 +541,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
   
   private def connectCallEdges(met : PointProc, pi : PointI, srcContext : Context) ={
     val targetContext = srcContext.copy
-    targetContext.setContext(met.pUri, met.getLoc)
+    targetContext.setContext(met.pSig, met.getLoc)
     met.params_Entry.keys.foreach(
       i => {
         val srcNode = getNode(pi.args_Call(i), srcContext.copy)
@@ -914,11 +914,11 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
           node
         } else getPointNode(pr.varName, pr.identifier, context)
       case pp : PointProc =>
-        if(!pointNodeExists(pp.pUri, pp.getLoc, context)){
-          val node = addPointNode(pp.pUri, pp.getLoc, context)
+        if(!pointNodeExists(pp.pSig, pp.getLoc, context)){
+          val node = addPointNode(pp.pSig, pp.getLoc, context)
           node.setProperty(VALUE_SET, fac())
           node
-        } else getPointNode(pp.pUri, pp.getLoc, context)
+        } else getPointNode(pp.pSig, pp.getLoc, context)
     }
   }
   
@@ -1193,7 +1193,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
       case pri : PointRNoIndex =>
         getPointNode(pri.varName, pri.identifier, context)
       case pp : PointProc =>
-        getPointNode(pp.pUri, pp.getLoc, context)
+        getPointNode(pp.pSig, pp.getLoc, context)
     }
   }
   

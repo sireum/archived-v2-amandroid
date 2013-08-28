@@ -38,8 +38,8 @@ class AmandroidSymbolTable extends SymbolTable with SymbolTableProducer {
 
   val pdMap = mmapEmpty[ResourceUri, ProcedureBody]
 
-  def globalVars = null
-  def globalVar(globalUri : ResourceUri) = null
+  def globalVars = tables.globalVarTable.keys
+  def globalVar(globalUri : ResourceUri) = tables.globalVarTable(globalUri)
 
   def procedures = tables.procedureTable.keys
 

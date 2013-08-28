@@ -13,7 +13,7 @@ import org.sireum.amandroid.android.parser.ManifestParser
 import org.sireum.amandroid.AmandroidRecord
 import org.sireum.amandroid.Center
 import org.sireum.amandroid.AmandroidProcedure
-import org.sireum.amandroid.dummyMainGen.DummyMainGenerator
+import org.sireum.amandroid.pilarCodeGenerator.DummyMainGenerator
 
 class PrepareApp(apkFileLocation : String) {  
   private val DEBUG = true

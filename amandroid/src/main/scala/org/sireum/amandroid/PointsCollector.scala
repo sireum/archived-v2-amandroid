@@ -8,8 +8,13 @@ import org.sireum.amandroid.util.SignatureParser
 class PointsCollector {
   
   def collectProcPoint(pst : ProcedureSymbolTable) : PointProc = {
-    val pUri = pst.procedureUri
-    val pProc : PointProc = new PointProc(pUri)
+    val procSig = 
+      pst.procedure.getValueAnnotation("signature") match {
+	      case Some(exp : NameExp) =>
+	        exp.name.name
+	      case _ => throw new RuntimeException("Can not find signature")
+	    }
+    val pProc : PointProc = new PointProc(procSig)
     val sig = pst.procedure.getValueAnnotation("signature") match {
       case Some(s) =>
         s match {
@@ -21,12 +26,12 @@ class PointsCollector {
     }
     val retTypSig = new SignatureParser(sig).getParamSig
     if(retTypSig.isReturnObject){
-      val retP = new PointRNoIndex("ret", pUri)
+      val retP = new PointRNoIndex("ret", procSig)
       pProc.retVar = Some(retP)
     } else if(retTypSig.isReturnArray
 //        && retTyp.charAt(retTyp.lastIndexOf('[')+1) == 'L'
           ){
-      val retP = new PointRNoIndex("ret", pUri)
+      val retP = new PointRNoIndex("ret", procSig)
       pProc.retVar = Some(retP)
       val dimensions = retTypSig.getReturnArrayDimension
 //      ofg.arrayRepo(retP.toString) = dimensions
@@ -47,19 +52,19 @@ class PointsCollector {
     pst.procedure.params.foreach(
       param => {
         if(is("this", param.annotations)){
-          val thisP = new PointThis(param.name.name, pUri)
+          val thisP = new PointThis(param.name.name, procSig)
           pProc.setThisParam(thisP)
           i-=1
         } else if(is("object", param.annotations)){
           if(types(i).startsWith("[") 
 //              && types(i).charAt(types(i).lastIndexOf('[')+1) == 'L'
                 ){
-            val pPoint = new PointParam(param.name.name, pUri)
+            val pPoint = new PointParam(param.name.name, procSig)
             pProc.setParam(i, pPoint)
             val dimensions = types(i).lastIndexOf('[') - types(i).indexOf('[') + 1
 //            ofg.arrayRepo(pPoint.toString) = dimensions
           } else if(types(i).startsWith("L")){
-            val pPoint = new PointParam(param.name.name, pUri)
+            val pPoint = new PointParam(param.name.name, procSig)
             pProc.setParam(i, pPoint)
           }
         }
@@ -716,7 +721,7 @@ class PointRNoIndex(uri : ResourceUri, loc : ResourceUri) extends PointWithUri(u
  * Set of program points corresponding to params. 
  */
 class PointProc(loc : ResourceUri) extends Point(loc){
-  val pUri = loc
+  val pSig = loc
   var accessTyp : String = null
   var thisParamOpt_Entry : Option[PointThis_Entry] = None
   var thisParamOpt_Exit : Option[PointThis_Exit] = None
