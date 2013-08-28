@@ -7,31 +7,26 @@ import java.io._
 import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
 import org.sireum.amandroid.PointsCollector
 import org.sireum.amandroid.interProcedural.Context
+import org.sireum.amandroid.AmandroidProcedure
 
 class IntraPointsToAnalysis {
 
-  def apply(pst : ProcedureSymbolTable,
-            cfg : ControlFlowGraph[String],
-            rda : AndroidReachingDefinitionAnalysis.Result)
-  = build(pst, cfg, rda)
+  def apply(ap : AmandroidProcedure)
+  = build(ap)
 
-  def build(pst : ProcedureSymbolTable,
-            cfg : ControlFlowGraph[String],
-            rda : AndroidReachingDefinitionAnalysis.Result)
+  def build(ap : AmandroidProcedure)
    : PointerAssignmentGraph[PtaNode] = {
     val pag = new PointerAssignmentGraph[PtaNode]()
-    doPTA(pst, cfg, rda, pag)
+    doPTA(ap, pag)
     pag
   }
   
-  def doPTA(pst : ProcedureSymbolTable,
-            cfg : ControlFlowGraph[String],
-            rda : AndroidReachingDefinitionAnalysis.Result,
+  def doPTA(ap : AmandroidProcedure,
             pag : PointerAssignmentGraph[PtaNode]) : Unit = {
-    val points = new PointsCollector().points(pst)
+    val points = new PointsCollector().points(ap.getProcedureBody)
     val context : Context = new Context(pag.K_CONTEXT)
     pag.points ++= points
-    pag.constructGraph(pst.procedureUri, points, context.copy, cfg, rda)
+    pag.constructGraph(ap, points, context.copy)
     workListPropagation(pag)
   }
   

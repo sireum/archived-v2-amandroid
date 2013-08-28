@@ -149,7 +149,8 @@ class RdaModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends
 }
 
 class PagModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends PagModule {
-  this.pag_=(new IntraPointsToAnalysis().build(this.procedureSymbolTable, this.cfg, this.rda))
+  /*TODO: change later*/
+//  this.pag_=(new IntraPointsToAnalysis().build())
 }
 
 class OFAPreprocessModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends OFAPreprocessModule {

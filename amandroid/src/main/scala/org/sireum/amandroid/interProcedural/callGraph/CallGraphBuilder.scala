@@ -17,36 +17,13 @@ import org.sireum.pilar.ast.NameExp
 
 class CallGraphBuilder {
   var appInfo : PrepareApp = null
-  var pstMap : Map[String, ProcedureSymbolTable] = Map()
   var processed : Map[(String, Context), PointProc] = Map()
-  var processedRecord : Set[String] = Set()
-  var processedProcedure : Set[String] = Set()
-  var cfgs : Map[String, ControlFlowGraph[String]] = Map()
-  var rdas : Map[String, AndroidReachingDefinitionAnalysis.Result] = Map()
   var pgPointsMap : Map[String, MList[Point]] = Map()
-  var androidCache : AndroidCacheFile[String] = null
   //a map from return node to its possible updated value set
   var modelOperationValueSetMap : Map[PtaNode, MSet[PTAInstance]] = Map()
 
-  def build(psts : Seq[ProcedureSymbolTable],
-            cfgs : MMap[String, ControlFlowGraph[String]],
-            rdas : MMap[String, AndroidReachingDefinitionAnalysis.Result],
-            appInfoOpt : Option[PrepareApp])
+  def build(appInfoOpt : Option[PrepareApp])
    : CallGraph[String] = {
-    this.cfgs ++= cfgs
-    this.rdas ++= rdas
-    this.androidCache = androidCache
-    this.pstMap =
-      psts.map{
-	      pst =>
-	        val procSig = 
-		        pst.procedure.getValueAnnotation("signature") match {
-				      case Some(exp : NameExp) =>
-				        exp.name.name
-				      case _ => throw new RuntimeException("Can not find signature")
-				    }
-	        (procSig, pst)
-    	}.toMap
     val pag = new PointerAssignmentGraph[PtaNode]()
     val cg = new CallGraph[String]
     appInfoOpt match{
@@ -77,14 +54,9 @@ class CallGraphBuilder {
   
   def pta(pag : PointerAssignmentGraph[PtaNode],
           sCfg : SuperControlFlowGraph[String]) = {
-    pstMap.keys.foreach{
-      sig =>
-        if(sig.contains(".main") || sig.contains(".dummyMain")){
-	        val cfg = cfgs(sig)
-			    val rda = rdas(sig)
-			    val pst = pstMap(sig)
-			    doPTA(sig, pst, cfg, rda, pag, sCfg)
-        }
+    Center.getEntryPoints.foreach{
+		  ep => 
+      	doPTA(ep, pag, sCfg)
     }
   }
   
@@ -103,19 +75,16 @@ class CallGraphBuilder {
 //    overallFix(pag, sCfg)
   }
   
-  def doPTA(pSig : String,
-      			pst : ProcedureSymbolTable,
-            cfg : ControlFlowGraph[String],
-            rda : AndroidReachingDefinitionAnalysis.Result,
+  def doPTA(ep : AmandroidProcedure,
             pag : PointerAssignmentGraph[PtaNode],
             sCfg : SuperControlFlowGraph[String]) : Unit = {
-    val points = new PointsCollector().points(pst)
-    pgPointsMap += (pSig -> points.clone)
+    val points = new PointsCollector().points(ep.getProcedureBody)
+    pgPointsMap += (ep.getSignature -> points.clone)
     val context : Context = new Context(pag.K_CONTEXT)
     pag.points ++= points
-    setProcessed(points, pSig, context.copy)
-    pag.constructGraph(pSig, points, context.copy, cfg, rda)
-    sCfg.collectionCfgToBaseGraph(pSig, cfg)
+    setProcessed(points, ep.getSignature, context.copy)
+    pag.constructGraph(ep, points, context.copy)
+    sCfg.collectionCfgToBaseGraph(ep.getSignature, ep.getCfg)
     workListPropagation(pag, sCfg)
   }
   
@@ -140,7 +109,6 @@ class CallGraphBuilder {
     while (!pag.worklist.isEmpty) {
       while (!pag.worklist.isEmpty) {
       	val srcNode = pag.worklist.remove(0)
-      	println("srcn-->" + srcNode)
       	srcNode match{
       	  case ofbnr : PtaFieldBaseNodeR => // e.g. q = ofbnr.f; edge is ofbnr.f -> q
       	    val f = ofbnr.fieldNode
@@ -258,10 +226,10 @@ class CallGraphBuilder {
         } else {
           calleeSet ++= pag.getCalleeSet(d, pi)
         }
-        println("calleeSet-->" + calleeSet)
+        
         calleeSet.foreach(
           callee => {
-            extendGraphWithConstructGraph(callee.getSignature, pi, callerContext.copy, pag, sCfg)
+            extendGraphWithConstructGraph(callee, pi, callerContext.copy, pag, sCfg)
           }  
         )
         pag.edges.foreach{
@@ -331,52 +299,22 @@ class CallGraphBuilder {
   }
   
   // callee is signature
-  def extendGraphWithConstructGraph(calleeSig : String, 
+  def extendGraphWithConstructGraph(calleeProc : AmandroidProcedure, 
       															pi : PointI, 
       															callerContext : Context,
       															pag : PointerAssignmentGraph[PtaNode], 
       															sCfg : SuperControlFlowGraph[String]) = {
+    val calleeSig = calleeProc.getSignature
     if(pag.isModelOperation(calleeSig)){
       val ipN = pag.collectTrackerNodes(calleeSig, pi, callerContext.copy)
       doSpecialOperation(ipN, pag)
 //    } else if(pag.isIccOperation(calleeSig, androidLibInfoTables)) {
 //      pag.setIccOperationTracker(calleeSig, pi, callerContext.copy)
     } else if(!processed.contains((calleeSig, callerContext))){
-    	val recordName = Center.signatureToRecordName(calleeSig)
-      if(pstMap.contains(calleeSig)){
-        if(!processedProcedure.contains(calleeSig)){
-	        val points = new PointsCollector().points(pstMap(calleeSig))
-	        pag.points ++= points
-	        pgPointsMap += (calleeSig -> points.clone)
-	        processedProcedure += calleeSig
-	      }
-        val cfg = cfgs(calleeSig)
-        val rda = rdas(calleeSig)
-        val points = pgPointsMap(calleeSig)
-        setProcessed(points, calleeSig, callerContext.copy)
-        pag.constructGraph(calleeSig, points, callerContext.copy, cfg, rda)        
-        sCfg.collectionCfgToBaseGraph(calleeSig, cfg)
-      } else {
-        println("calleeSig1-->" + calleeSig)
-        if(!processedProcedure.contains(calleeSig)){
-          println("calleeSig2-->" + calleeSig)
-//          if(processedRecord
-	        val code = AmandroidCodeSource.getProcedureCode(calleeSig)
-	        val transRes = Transform.getIntraProcedureResult(code)(calleeSig)
-	        this.cfgs += (calleeSig -> transRes.cfg)
-	        this.rdas += (calleeSig -> transRes.rda)
-	        val points = new PointsCollector().points(transRes.pst)
-	        pag.points ++= points
-	        pgPointsMap += (calleeSig -> points.clone)
-	        processedProcedure += calleeSig
-	      }
-        val cfg = cfgs(calleeSig)
-        val rda = rdas(calleeSig)
-        val points = pgPointsMap(calleeSig)
-        setProcessed(points, calleeSig, callerContext.copy)
-        pag.constructGraph(calleeSig, points, callerContext.copy, cfg, rda)        
-        sCfg.collectionCfgToBaseGraph(calleeSig, cfg)
-      }
+    	val points = new PointsCollector().points(calleeProc.getProcedureBody)
+    	setProcessed(points, calleeSig, callerContext.copy)
+      pag.constructGraph(calleeProc, points, callerContext.copy)        
+      sCfg.collectionCfgToBaseGraph(calleeSig, calleeProc.getCfg)
     }
     if(processed.contains(calleeSig, callerContext)){
       val procPoint = processed(calleeSig, callerContext)

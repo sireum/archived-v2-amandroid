@@ -361,16 +361,16 @@ class RecordHierarchy {
   def resolveConcreteDispatch(concreteType : AmandroidRecord, pSig : String) : Option[AmandroidProcedure] = {
     if(concreteType.isInterface) throw new RuntimeException("concreteType need to be class type: " + concreteType)
     val pSubSig = StringFormConverter.getSubSigFromProcSig(pSig)
-    findProcedureThrowHierarchy(concreteType, pSubSig)
+    findProcedureThroughHierarchy(concreteType, pSubSig)
   }
   
-  private def findProcedureThrowHierarchy(record : AmandroidRecord, subSig : String) : Option[AmandroidProcedure] = {
+  private def findProcedureThroughHierarchy(record : AmandroidRecord, subSig : String) : Option[AmandroidProcedure] = {
     record.tryGetProcedure(subSig) match{
       case Some(p) =>
         Some(p)
       case None =>
         if(record.hasSuperClass)
-        	findProcedureThrowHierarchy(record.getSuperClass, subSig)
+        	findProcedureThroughHierarchy(record.getSuperClass, subSig)
         else None
     }
   }

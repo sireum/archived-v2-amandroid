@@ -219,18 +219,16 @@ class PointerAssignmentGraph[Node <: PtaNode]
    * to the given program point. If a value is added to a node, then that 
    * node is added to the worklist.
    */
-  def constructGraph(pSig : String, ps : MList[Point], callerContext : Context, cfg : ControlFlowGraph[String], rda : AndroidReachingDefinitionAnalysis.Result) = {
-//    collectArrayVars(ps, cfg, rda)
-//    collectFieldVars(ps, cfg, rda)
+  def constructGraph(ap : AmandroidProcedure, ps : MList[Point], callerContext : Context) = {
     ps.foreach(
       p=>{
-        collectNodes(pSig, p, callerContext.copy)
+        collectNodes(ap.getSignature, p, callerContext.copy)
       }  
     )
     ps.foreach(
       p=>{
-        val constraintMap = applyConstraint(p, ps, cfg, rda)
-        buildingEdges(constraintMap, pSig, callerContext.copy)
+        val constraintMap = applyConstraint(p, ps, ap.getCfg, ap.getRda)
+        buildingEdges(constraintMap, ap.getSignature, callerContext.copy)
       }  
     )
   }
@@ -496,7 +494,10 @@ class PointerAssignmentGraph[Node <: PtaNode]
     diff.foreach{
       d =>
         val p = Center.getVirtualCalleeProcedure(d.className, pi.varName)
-        calleeSet += p
+        p match{
+          case Some(tar) => calleeSet += tar
+          case None =>
+        }
     }
     calleeSet
   }

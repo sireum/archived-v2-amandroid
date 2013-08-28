@@ -17,11 +17,6 @@ object GlobalConfig {
 	 * is whole program mode or not
 	 */
 	final var mode : Mode.Value = Mode.WHOLE_PROGRAM_TEST
-	
-	/**
-	 * hold all the application record names
-	 */
-	final var applicationRecordNames : Set[String] = Set()
 }
 
 /**

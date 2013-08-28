@@ -14,22 +14,22 @@ object LightWeightPilarParser {
     
   val DEBUG = false
   
-  def apply(source : Either[String, FileResourceUri]) =
-    parseModel(source)
+  def apply(source : Either[String, FileResourceUri], typ : AmandroidCodeSource.CodeType.Value) =
+    parseModel(source, typ)
 
-  def parseModel(source : Either[String, FileResourceUri]) = {
+  def parseModel(source : Either[String, FileResourceUri], typ : AmandroidCodeSource.CodeType.Value) = {
     source match {
       case Left(code) =>
-        readModelChunks(new StringReader(code))
+        readModelChunks(new StringReader(code), typ)
       case Right(fileResourceUri) =>
         val fr = new FileReader(new File(new URI(fileResourceUri)))
-        try readModelChunks(fr) finally fr.close
+        try readModelChunks(fr, typ) finally fr.close
     }
     if(DEBUG)
     	AmandroidCodeSource.printContent
   }
   
-  def readModelChunks(r : Reader) = {
+  def readModelChunks(r : Reader, typ : AmandroidCodeSource.CodeType.Value) = {
     var procedureMap : Map[String, String] = Map()
     val lnr = new LineNumberReader(r)
     var lineNo = 0
@@ -50,7 +50,7 @@ object LightWeightPilarParser {
 
       if (keyword == word) {
         if(recName!=null)
-        	AmandroidCodeSource.setRecordCode(recName, sb.toString)
+        	AmandroidCodeSource.setRecordCode(recName, sb.toString, typ)
         recName = getRecordName(lineText)
         workNo += 1
 
@@ -64,7 +64,7 @@ object LightWeightPilarParser {
 
       lineText = lnr.readLine
     }
-    AmandroidCodeSource.setRecordCode(recName, sb.toString)
+    AmandroidCodeSource.setRecordCode(recName, sb.toString, typ)
     workNo + 1
   }
 

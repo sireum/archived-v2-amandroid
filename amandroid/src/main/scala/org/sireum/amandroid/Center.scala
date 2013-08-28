@@ -7,7 +7,7 @@ import org.sireum.util._
 object Center {
   type VirtualLabel = String
   
-  val DEBUG = true
+  val DEBUG = false
   
   /**
    * set of records contained by current Center
@@ -57,6 +57,7 @@ object Center {
 	
 	private var callGraph : CallGraph[VirtualLabel] = null
 	
+	val DEFAULT_TOPLEVEL_OBJECT = "[|java:lang:Object|]"
 
   /**
    * resolve records relation
@@ -97,7 +98,7 @@ object Center {
   def resolveRecordsRelationWholeProgram = {
     if(GlobalConfig.mode < Mode.WHOLE_PROGRAM_TEST) throw new RuntimeException("It is not a whole program mode.")
     val worklist : MList[AmandroidRecord] = mlistEmpty
-    var codes : Set[String] = null
+    var codes : Set[String] = Set()
     worklist ++= getRecords
     do{
       codes = Set()
@@ -106,7 +107,6 @@ object Center {
 	      val record = worklist.remove(0)
 	      record.needToResolveOuterName match{
 	        case Some(o) =>
-	          println("ooooooooooo->" + o)
 	          tryGetRecord(o) match{
 		          case Some(outer) =>
 		            record.needToResolveOuterName = None
@@ -140,6 +140,14 @@ object Center {
       if(!codes.isEmpty)
       	Transform.getSymbolResolveResult(codes)
     }while(!codes.isEmpty)
+      
+    getRecords.foreach{
+      rec =>
+        if(!rec.hasSuperClass && rec.getName != DEFAULT_TOPLEVEL_OBJECT){
+          if(!hasRecord(DEFAULT_TOPLEVEL_OBJECT)) forceResolveRecord(DEFAULT_TOPLEVEL_OBJECT, ResolveLevel.BODIES)
+          rec.setSuperClass(getRecord(DEFAULT_TOPLEVEL_OBJECT))
+        }
+    }
   }
 	
 	/**
@@ -177,6 +185,12 @@ object Center {
 	 */
 	
 	def getRecords = this.records
+	
+	/**
+	 * return center has given record or not
+	 */
+	
+	def hasRecord(name : String) : Boolean = this.nameToRecord.contains(name)
 	
 	/**
 	 * get record by record name. e.g. [|java:lang:Object|]
@@ -319,9 +333,9 @@ object Center {
 	def addRecord(ar : AmandroidRecord) = {
     if(ar.isInCenter) throw new RuntimeException("already in center: " + ar.getName)
     this.records += ar
-    GlobalConfig.applicationRecordNames.contains(ar.getName) match{
-      case true => ar.setApplicationRecord
-      case false => ar.setLibraryRecord
+    AmandroidCodeSource.getCodeType(ar.getName) match{
+      case AmandroidCodeSource.CodeType.APP => ar.setApplicationRecord
+      case AmandroidCodeSource.CodeType.LIBRARY => ar.setLibraryRecord
     }
     this.nameToRecord += (ar.getName -> ar)
     ar.setInCenter(true)
@@ -503,9 +517,9 @@ object Center {
 	 * check and get virtual callee procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
 	 */
 	
-	def getVirtualCalleeProcedure(fromName : String, procSig : String) : AmandroidProcedure = {
+	def getVirtualCalleeProcedure(fromName : String, procSig : String) : Option[AmandroidProcedure] = {
 	  val from = resolveRecord(fromName, ResolveLevel.BODIES)
-	  getRecordHierarchy.resolveConcreteDispatchWithoutFailing(from, procSig)
+	  getRecordHierarchy.resolveConcreteDispatch(from, procSig)
 	}
 	
 	/**
@@ -521,8 +535,12 @@ object Center {
 	 * get entry points
 	 */
 	
-	def getEntryPoints = this.entryPoints
-	
+	def getEntryPoints = {
+	  if(!hasEntryPoints) findEntryPoints
+	  if(!hasEntryPoints) throw new RuntimeException("cannot get entry points from Center")
+	  this.entryPoints
+	}
+	  
 	/**
 	 * set entry points
 	 */
@@ -530,17 +548,31 @@ object Center {
 	def setEntryPoints(entryPoints : Set[AmandroidProcedure]) = this.entryPoints ++= entryPoints
 	
 	/**
+	 * find entry points from current app/test cases
+	 */
+	
+	def findEntryPoints = {
+	  getApplicationRecords.foreach{
+	    appRec =>
+	      if(appRec.declaresProcedureByShortName("main"))
+	        this.entryPoints += appRec.getProcedureByShortName("main")
+	      else if(appRec.declaresProcedureByShortName("dummyMain"))
+	        this.entryPoints += appRec.getProcedureByShortName("dummyMain")
+	  }
+	}
+	
+	/**
 	 * has entry points
 	 */
 	
-	def hasEntryPoints : Boolean = this.entryPoints.isEmpty
+	def hasEntryPoints : Boolean = !this.entryPoints.isEmpty
 	
 	/**
-	 * enum of all the valid resolve level
+	 * enum of all the valid resolve level of record
 	 */
 	
 	object ResolveLevel extends Enumeration {
-	  val NO, BODIES, INTRA_PROCEDURAL = Value
+	  val NO, BODIES = Value
 	}
 	
 	/**
@@ -585,7 +617,7 @@ object Center {
 	  this.libraryRecords = Set()
 	  this.nameToRecord = Map()
 	  this.mainRecord = null
-	  this.entryPoints = null
+	  this.entryPoints = Set()
 	  this.hierarchy = null
 	  this.callGraph = null
 	}

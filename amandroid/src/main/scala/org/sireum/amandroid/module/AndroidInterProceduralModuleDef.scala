@@ -79,6 +79,6 @@ extends AndroidInterProceduralModule with ImplicitLogging {
 }
 
 class CGModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends CGModule {
-  val result = new CallGraphBuilder().build(this.procedureSymbolTables, this.cfgs, this.rdas, this.appInfoOpt)
+  val result = new CallGraphBuilder().build(this.appInfoOpt)
   this.callGraph_=(result)
 }

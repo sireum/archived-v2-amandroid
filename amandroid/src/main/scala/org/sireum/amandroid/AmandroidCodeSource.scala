@@ -7,6 +7,10 @@ import org.sireum.amandroid.util.StringFormConverter
 
 object AmandroidCodeSource {
   
+  object CodeType extends Enumeration {
+    val LIBRARY, APP = Value
+  }
+  
   /**
    * pre-load all the codes of library
    */
@@ -15,10 +19,20 @@ object AmandroidCodeSource {
     val fileUris = FileUtil.listFiles(GlobalConfig.libFileDir, ".pilar", true)
 	  fileUris.map{
 	    fileUri =>
-	      LightWeightPilarParser(Right(fileUri))
+	      LightWeightPilarParser(Right(fileUri), CodeType.LIBRARY)
 	  }
     this.preLoaded = true
   }
+  
+  /**
+   * load code from given file resource
+   */
+  
+  def load(fileUri : FileResourceUri, typ : CodeType.Value) = {
+    LightWeightPilarParser(Right(fileUri), typ)
+  }
+  
+  
   
   /**
    * is preLoad happen or not
@@ -33,10 +47,16 @@ object AmandroidCodeSource {
   def isPreLoaded = this.preLoaded
   
   /**
-   * map from record name to pilar code. name e.g. [|java:lang:Object|]
+   * map from record name to pilar code of library. name e.g. [|java:lang:Object|]
    */
   
-	protected var recordsCodes : Map[String, String] = Map()
+	protected var libRecordsCodes : Map[String, String] = Map()
+	
+	/**
+   * map from record name to pilar code of app. name e.g. [|java:lang:Object|]
+   */
+  
+	protected var appRecordsCodes : Map[String, String] = Map()
 	
 //	/**
 //	 * map from procedure sig to container record name. sig e.g. [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
@@ -54,28 +74,74 @@ object AmandroidCodeSource {
 	 * get records codes
 	 */
 	
-	def getRecordsCodes = this.recordsCodes
+	def getLibraryRecordsCodes = this.libRecordsCodes
 	
 	/**
 	 * set record code
 	 */
 	
-	def setRecordCode(name : String, code : String) = this.recordsCodes += (name -> code)
+	def setLibraryRecordCode(name : String, code : String) = this.libRecordsCodes += (name -> code)
+	
+	/**
+	 * get records codes
+	 */
+	
+	def getAppRecordsCodes = this.appRecordsCodes
+	
+	/**
+	 * clear records codes
+	 */
+	
+	def clearAppRecordsCodes = this.appRecordsCodes = Map()
+	
+	/**
+	 * set record code
+	 */
+	
+	def setAppRecordCode(name : String, code : String) = this.appRecordsCodes += (name -> code)
+	
+	/**
+	 * set record code
+	 */
+	
+	def setRecordCode(name : String, code : String, typ : CodeType.Value) = {
+    typ match{
+      case CodeType.APP => setAppRecordCode(name, code)
+      case CodeType.LIBRARY => setLibraryRecordCode(name, code)
+    }
+  }
+	
 	
 	/**
 	 * get record code
 	 */
 	
-	def getRecordCode(name : String) : String = this.recordsCodes.getOrElse(name, throw new RuntimeException("record " + name + " not exists in current code base."))
+	def getRecordCode(name : String) : String = {
+    this.appRecordsCodes.get(name) match{
+      case Some(code) => code
+      case None =>
+    		this.libRecordsCodes.getOrElse(name, throw new RuntimeException("record " + name + " not exists in current code base."))
+    }
+  }
 	
 	/**
-	 * contains record or not
+	 * return record codes type
 	 */
 	
-	def containsRecord(name : String) : Boolean = this.recordsCodes.contains(name)
+	def getCodeType(name : String) : CodeType.Value = {
+	  if(this.appRecordsCodes.contains(name)) CodeType.APP
+	  else if(this.libRecordsCodes.contains(name)) CodeType.LIBRARY
+	  else throw new RuntimeException("record " + name + " not exists in current code base.")
+	}
 	
 	/**
-	 * contains record or not
+	 * contains given record or not
+	 */
+	
+	def containsRecord(name : String) : Boolean = this.appRecordsCodes.contains(name) || this.libRecordsCodes.contains(name)
+	
+	/**
+	 * contains given procedure or not
 	 */
 	
 	def containsProcedure(sig : String) : Boolean = {
@@ -84,7 +150,7 @@ object AmandroidCodeSource {
   }
 	
 	/**
-	 * contains record or not
+	 * contains given global var or not
 	 */
 	
 	def containsGlobalVar(sig : String) : Boolean = {
@@ -101,7 +167,7 @@ object AmandroidCodeSource {
 	 * get procedure code
 	 */
 	
-	def getProcedureCode(sig : String) : String = {
+	def getProcedureCode(sig : String) = {
     val name = StringFormConverter.getRecordNameFromProcedureSignature(sig)
     getRecordCode(name)
   }
@@ -116,7 +182,7 @@ object AmandroidCodeSource {
 	 * get global variable code.
 	 */
 	
-	def getGlobalVarCode(sig : String) : String = {
+	def getGlobalVarCode(sig : String) = {
 	  val name = StringFormConverter.getRecordNameFromFieldSignature(sig)
     getRecordCode(name)
 	}
@@ -127,7 +193,7 @@ object AmandroidCodeSource {
 	
 	def printContent = {
 	  println("codes:")
-	  this.recordsCodes.foreach{
+	  this.libRecordsCodes.foreach{
 	    case (k, v)=>
 	      println("recName: " + k)
 	      println(v)

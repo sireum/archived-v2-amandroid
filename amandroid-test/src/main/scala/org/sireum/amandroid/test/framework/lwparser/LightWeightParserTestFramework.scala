@@ -4,6 +4,7 @@ import org.sireum.test.framework.TestFramework
 import org.sireum.pipeline._
 import org.sireum.util._
 import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
+import org.sireum.amandroid.AmandroidCodeSource
 
 	/**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -25,11 +26,11 @@ trait LightWeightParserTestFramework extends TestFramework {
 
   case class InterProceduralConfiguration //
   (title : String,
-   srcs : Either[String, FileResourceUri]) {
+   src : Either[String, FileResourceUri]) {
 
     test(title) {
     	println("####" + title + "#####")
-      LightWeightPilarParser(srcs)
+      LightWeightPilarParser(src, AmandroidCodeSource.CodeType.APP)
     }
   }
 

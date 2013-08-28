@@ -1,6 +1,8 @@
 package org.sireum.amandroid
 
 import org.sireum.amandroid.util._
+import org.sireum.alir.ControlFlowGraph
+import org.sireum.alir.ReachingDefinitionAnalysis
 
 /**
  * This class is a amandroid represent of the pilar procedure. It can belong to AmandroidRecord.
@@ -72,6 +74,18 @@ class AmandroidProcedure {
    */
   
   protected var procBody : ProcedureBody = null
+  
+  /**
+   * hold the control flow graph of current procedure
+   */
+  
+  protected var cfg : ControlFlowGraph[String] = null
+  
+  /**
+   * hold the reaching definition result of current procedure
+   */
+  
+  protected var rda : ReachingDefinitionAnalysis.Result = null
   
   /**
 	 * is it declared in some AmandroidRecord
@@ -470,6 +484,50 @@ class AmandroidProcedure {
     if(isStatic && name == this.staticInitializerName) true
     else isMain
   }
+  
+  /**
+   * get cfg of current procedure
+   */
+  
+  def getCfg = {
+    getDeclaringRecord.checkLevel(Center.ResolveLevel.BODIES)
+    if(!hasCfg) this.cfg = Transform.buildCfg(getProcedureBody)._2
+    this.cfg
+  }
+  
+  /**
+   * return current procedure has cfg or not
+   */
+  
+  def hasCfg : Boolean = this.cfg != null
+  
+  /**
+   * release cfg from current procedure
+   */
+  
+  def releaseCfg = this.cfg = null
+  
+   /**
+   * get rda result of current procedure
+   */
+  
+  def getRda = {
+    if(!hasCfg) getCfg
+    if(!hasRda) this.rda = Transform.buildRda(getProcedureBody, getCfg)
+    this.rda
+  }
+  
+  /**
+   * return current procedure has rda or not
+   */
+  
+  def hasRda : Boolean = this.rda != null
+  
+  /**
+   * release rda from current procedure
+   */
+  
+  def releaseRda = this.rda = null
   
   def printDetail = {
     println("--------------AmandroidProcedure--------------")

@@ -14,10 +14,8 @@ import org.sireum.pilar.symbol.SymbolTable
 
 object AmandroidResolver {
   
-  val DEBUG : Boolean = true
+  val DEBUG : Boolean = false
   val TITLE : String = "AmandroidResolver"
-    
-  val DEFAULT_TOPLEVEL_OBJECT = "[|java:lang:Object|]"
   
   /**
    * resolve given procedure code. Normally for dummyMain
@@ -68,7 +66,6 @@ object AmandroidResolver {
     if(AmandroidCodeSource.containsRecord(recordName)){
 	    val r = desiredLevel match{
 	      case Center.ResolveLevel.BODIES => resolveToBodies(recordName)
-	      case Center.ResolveLevel.INTRA_PROCEDURAL => resolveToIntraProcedural(recordName)
 	      case Center.ResolveLevel.NO => new AmandroidRecord().init(recordName)
 	    }
 	    Some(r)
@@ -84,7 +81,6 @@ object AmandroidResolver {
   def resolveRecord(recordName : String, desiredLevel : Center.ResolveLevel.Value) : AmandroidRecord = {
     desiredLevel match{
       case Center.ResolveLevel.BODIES => resolveToBodies(recordName)
-      case Center.ResolveLevel.INTRA_PROCEDURAL => resolveToIntraProcedural(recordName)
       case Center.ResolveLevel.NO => new AmandroidRecord().init(recordName)
     }
   }
@@ -96,7 +92,6 @@ object AmandroidResolver {
   def forceResolveRecord(recordName : String, desiredLevel : Center.ResolveLevel.Value) : AmandroidRecord = {
     desiredLevel match{
       case Center.ResolveLevel.BODIES => forceResolveToBodies(recordName)
-      case Center.ResolveLevel.INTRA_PROCEDURAL => forceResolveToIntraProcedural(recordName)
       case Center.ResolveLevel.NO => new AmandroidRecord().init(recordName)
     }
   }
@@ -111,15 +106,6 @@ object AmandroidResolver {
   }
   
   /**
-   * resolve given record to intra-procedural level
-   */
-  
-  def resolveToIntraProcedural(recordName : String) : AmandroidRecord = {
-    if(!Center.containsRecord(recordName) || Center.getRecord(recordName).getResolvingLevel < Center.ResolveLevel.INTRA_PROCEDURAL) forceResolveToIntraProcedural(recordName)
-    Center.getRecord(recordName)
-  }
-  
-  /**
    * resolve given record to body level
    */
   
@@ -128,16 +114,6 @@ object AmandroidResolver {
     val st = Transform.getSymbolResolveResult(Set(code))
     Center.tryRemoveRecord(recordName)
     resolveFromSTP(st.asInstanceOf[SymbolTableProducer], false)
-    Center.getRecord(recordName)
-  }
-  
-  /**
-   * resolve given record to intra-procedural level
-   */
-  
-  def forceResolveToIntraProcedural(recordName : String) : AmandroidRecord = {
-    forceResolveToBodies(recordName)
-    /*TODO: resolve intra proc*/
     Center.getRecord(recordName)
   }
     
@@ -175,7 +151,6 @@ object AmandroidResolver {
 	      rec.init(recName)
 	      rec.setAccessFlags(recAccessFlag)
 	      var exs = rd.extendsClauses.map {_.name.name}.toSet
-	      if((exs.isEmpty && recName != DEFAULT_TOPLEVEL_OBJECT) || rec.isInterface) exs += DEFAULT_TOPLEVEL_OBJECT
 	      rec.addNeedToResolveExtends(exs)
 	      if(Center.isInnerClassName(recName)) rec.needToResolveOuterName = Some(Center.getOuterNameFrom(recName))
 	      rd.attributes.foreach{

@@ -101,7 +101,6 @@ class AmandroidRecord {
     level match{
       case Center.ResolveLevel.NO => "NO"
       case Center.ResolveLevel.BODIES => "BODIES"
-      case Center.ResolveLevel.INTRA_PROCEDURAL => "INTRA_PROCEDURAL"
     }
   }
   
@@ -330,7 +329,29 @@ class AmandroidRecord {
 	      }
 	  }
 	  if(found) foundProcedure
-	  else throw new RuntimeException("couldn/t find method " + procName + "(*) in " + this)
+	  else throw new RuntimeException("couldn't find method " + procName + "(*) in " + this)
+	}
+	
+	/**
+	 * get procedure from this record by the given subsignature
+	 */
+	
+	def getProcedureByShortName(procShortName : String) : AmandroidProcedure = {
+	  if(!declaresProcedureByShortName(procShortName)) throw new RuntimeException("No procedure " + procShortName + " in record " + getName)
+	  var found = false
+	  var foundProcedure : AmandroidProcedure = null
+	  getProcedures.foreach{
+	    proc=>
+	      if(proc.getShortName == procShortName){
+	        if(found) throw new RuntimeException("ambiguous procedure" + procShortName)
+	        else {
+	          found = true
+	          foundProcedure = proc
+	        }
+	      }
+	  }
+	  if(found) foundProcedure
+	  else throw new RuntimeException("couldn't find method " + procShortName + "(*) in " + this)
 	}
 	
 	/**

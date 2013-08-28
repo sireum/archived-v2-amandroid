@@ -22,7 +22,7 @@ object TransformTest extends ImplicitLogging {
     GlobalConfig.libFileDir = LightWeightParserExamples.PILAR_MODEL_DIR_URI
     GlobalConfig.mode = Mode.APP_ONLY
     AmandroidCodeSource.preLoad
-    val codes = AmandroidCodeSource.getRecordsCodes.values.toSet
+    val codes = AmandroidCodeSource.getLibraryRecordsCodes.values.toSet
     val transRes = Transform.getIntraProcedureResult(codes)
     println(transRes)
   }

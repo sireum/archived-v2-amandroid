@@ -18,18 +18,10 @@ import org.sireum.amandroid.Center
  */
 @RunWith(classOf[JUnitRunner])
 class InterProceduralTest extends InterProceduralTestFramework {
-
-  val libFileDir = FileUtil.toUri(new File(System.getProperty("user.home") + "/AndroidLibData/libPilarFiles/"))
-  val fileUris = FileUtil.listFiles(libFileDir, ".pilar", true)
-  fileUris.par.map{
-    fileUri =>
-      LightWeightPilarParser(Right(fileUri))
-  }
   AmandroidCodeSource.preLoad
   InterproceduralExamples.ofgModelFiles.
-    filter { s => s.endsWith("/smallWfgNP.pilar") }.
+//    filter { s => s.endsWith("/smallWfgNP.pilar") }.
     foreach { fileUri =>
-      Center.reset
       Analyzing title fileUri file fileUri
     }
 }
