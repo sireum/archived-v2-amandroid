@@ -14,8 +14,8 @@ import org.sireum.amandroid.android.interProcedural.objectFlowAnalysis.AndroidOb
 import org.sireum.amandroid.android.interProcedural.objectFlowAnalysis.AndroidValueSet
 import org.sireum.amandroid.interProcedural.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.intraProcedural.compressedControlFlowGraph.CompressedControlFlowGraph
-import org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph
-import org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode
+import org.sireum.amandroid.interProcedural.pointsToAnalysis.PointerAssignmentGraph
+import org.sireum.amandroid.interProcedural.pointsToAnalysis.PtaNode
 import org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult
 import org.sireum.pilar.ast.LocationDecl
 import org.sireum.pilar.symbol.ProcedureSymbolTable

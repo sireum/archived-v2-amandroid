@@ -1,4 +1,4 @@
-package org.sireum.amandroid.intraProcedural.pointsToAnalysis
+package org.sireum.amandroid.interProcedural.pointsToAnalysis
 
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.alir.ControlFlowGraph
@@ -23,9 +23,8 @@ class IntraPointsToAnalysis {
   
   def doPTA(ap : AmandroidProcedure,
             pag : PointerAssignmentGraph[PtaNode]) : Unit = {
-    val points = new PointsCollector().points(ap.getProcedureBody)
+    val points = new PointsCollector().points(ap.getSignature, ap.getProcedureBody)
     val context : Context = new Context(pag.K_CONTEXT)
-    pag.points ++= points
     pag.constructGraph(ap, points, context.copy)
     workListPropagation(pag)
   }

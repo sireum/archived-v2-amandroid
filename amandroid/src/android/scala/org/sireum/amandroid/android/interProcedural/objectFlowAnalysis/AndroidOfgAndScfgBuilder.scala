@@ -17,8 +17,8 @@ import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid._
 import org.sireum.amandroid.android.cache.AndroidCacheFile
 import org.sireum.amandroid.interProcedural.callGraph.CallGraph
-import org.sireum.amandroid.interProcedural.callGraph.SuperControlFlowGraph
 import org.sireum.amandroid.intraProcedural.compressedControlFlowGraph.CompressedControlFlowGraph
+import org.sireum.amandroid.interProcedural.callGraph.CGNode
 
 
 
@@ -44,7 +44,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
             cfgs : MMap[String, ControlFlowGraph[String]],
             rdas : MMap[String, ReachingDefinitionAnalysis.Result],
             appInfoOpt : Option[PrepareApp])
-   : (AndroidObjectFlowGraph[Node, ValueSet], SuperControlFlowGraph[String]) = {
+   : (AndroidObjectFlowGraph[Node, ValueSet], CallGraph[CGNode]) = {
     this.cfgs = cfgs
     this.rdas = rdas
     this.pstMap =
@@ -53,7 +53,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
 	        (pst.procedureUri, pst)
     	}.toMap
     val ofg = new AndroidObjectFlowGraph[Node, ValueSet](fac)
-    val cg = new CallGraph[String]
+    val cg = new CallGraph[CGNode]
     appInfoOpt match{
       case Some(appInfo) =>
         this.appInfo = appInfo
@@ -100,7 +100,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
   }
   
   def ofa(ofg : AndroidObjectFlowGraph[Node, ValueSet],
-          sCfg : SuperControlFlowGraph[String]) = {
+          sCfg : CallGraph[CGNode]) = {
     pstMap.keys.foreach{
       uri =>
         if(uri.contains(".main%7C%5D") || uri.contains(".dummyMain%7C%5D")){
@@ -113,7 +113,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
   }
   
   def ofaWithIcc(ofg : AndroidObjectFlowGraph[Node, ValueSet],
-          sCfg : SuperControlFlowGraph[String]) = {
+          sCfg : CallGraph[CGNode]) = {
     ofg.setIntentFdb(appInfo.getIntentDB)
     ofg.setEntryPoints(appInfo.getEntryPoints)
     appInfo.getDummyMainMap.values.foreach{
@@ -130,18 +130,19 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
             cfg : ControlFlowGraph[String],
             rda : ReachingDefinitionAnalysis.Result,
             ofg : AndroidObjectFlowGraph[Node, ValueSet],
-            sCfg : SuperControlFlowGraph[String]) : Unit = {
-    val points = new PointsCollector().points(pst)
+            sCfg : CallGraph[CGNode]) : Unit = {
+//    val points = new PointsCollector().points(pst)
+    val points = mlistEmpty[Point]
     val context : Context = new Context(ofg.K_CONTEXT)
     ofg.points ++= points
     setProcessed(points, pst.procedureUri, context.copy)
     ofg.constructGraph(pst.procedureUri, points, context.copy, cfg, rda)
-    sCfg.collectionCfgToBaseGraph(pst.procedureUri, cfg)
+    sCfg.collectCfgToBaseGraph(pst.procedureUri, context.copy, cfg)
     fix(ofg, sCfg)
   }
   
   def overallFix(ofg : AndroidObjectFlowGraph[Node, ValueSet],
-		  					 sCfg : SuperControlFlowGraph[String]) : Unit = {
+		  					 sCfg : CallGraph[CGNode]) : Unit = {
     while(checkAndDoIccOperation(ofg, sCfg)){
     	fix(ofg, sCfg)
     }
@@ -165,7 +166,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
   }
   
   def fix(ofg : AndroidObjectFlowGraph[Node, ValueSet],
-		  		sCfg : SuperControlFlowGraph[String]) : Unit = {
+		  		sCfg : CallGraph[CGNode]) : Unit = {
     while (!ofg.worklist.isEmpty) {
       val n = ofg.worklist.remove(0)
       val tmpworklist = mlistEmpty ++ ofg.worklist
@@ -236,7 +237,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
     }
   }
   
-  def checkAndDoIccOperation(ofg : AndroidObjectFlowGraph[Node, ValueSet], sCfg : SuperControlFlowGraph[String]) : Boolean = {
+  def checkAndDoIccOperation(ofg : AndroidObjectFlowGraph[Node, ValueSet], sCfg : CallGraph[CGNode]) : Boolean = {
     var flag = true
     val results = ofg.doIccOperation(this.appInfo.getDummyMainMap)
 
@@ -283,7 +284,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
       															pi : PointI, 
       															callerContext : Context,
       															ofg : AndroidObjectFlowGraph[Node, ValueSet], 
-      															sCfg : SuperControlFlowGraph[String]) = {
+      															sCfg : CallGraph[CGNode]) = {
     val points : MList[Point] = mlistEmpty
     if(ofg.isModelOperation(calleeSig)){
       val ipN = ofg.collectTrackerNodes(calleeSig, pi, callerContext.copy)
@@ -295,11 +296,11 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
       if(pstMap.contains(calleeSig)){
         val cfg = cfgs(calleeSig)
         val rda = rdas(calleeSig)
-        points ++= new PointsCollector().points(pstMap(calleeSig))
+//        points ++= new PointsCollector().points(pstMap(calleeSig))
         ofg.points ++= points
         setProcessed(points, calleeSig, callerContext.copy)
         ofg.constructGraph(calleeSig, points, callerContext.copy, cfg, rda)        
-        sCfg.collectionCfgToBaseGraph(calleeSig, cfg)
+        sCfg.collectCfgToBaseGraph(calleeSig, callerContext.copy, cfg)
       } else {
         //get ofg ccfg from file
 //        val calleeOfg = androidCache.load[ObjectFlowGraph[Node, ValueSet]](callee, "ofg")
@@ -315,7 +316,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
       ofg.extendGraph(procPoint, pi, callerContext.copy)
       if(!ofg.isModelOperation(calleeSig) &&
          !ofg.isIccOperation(calleeSig))
-      	sCfg.extendGraph(calleeSig, pi.owner, pi.locationUri, pi.locationIndex)
+      	sCfg.extendGraph(calleeSig, callerContext.copy)
     } else {
       //need to extend
     }
@@ -325,17 +326,17 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
                                     pi : PointI, 
                                     context : Context,
                                     ofg : AndroidObjectFlowGraph[Node, ValueSet], 
-                                    sCfg : SuperControlFlowGraph[String]) = {
+                                    sCfg : CallGraph[CGNode]) = {
     val points : MList[Point] = mlistEmpty
     if(!processed.contains(calleeSig)){
       if(pstMap.contains(calleeSig)){
         val cfg = cfgs(calleeSig)
         val rda = rdas(calleeSig)
-        points ++= new PointsCollector().points(pstMap(calleeSig))
+//        points ++= new PointsCollector().points(pstMap(calleeSig))
         ofg.points ++= points
         setProcessed(points, calleeSig, context)
         ofg.constructGraph(calleeSig, points, context, cfg, rda)
-        sCfg.collectionCfgToBaseGraph(calleeSig, cfg)
+        sCfg.collectCfgToBaseGraph(calleeSig, context, cfg)
       } else {
         //get ofg ccfg from file
 //        val calleeOfg = androidCache.load[ObjectFlowGraph[Node, ValueSet]](callee, "ofg")

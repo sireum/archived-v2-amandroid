@@ -111,11 +111,11 @@ class PointsCollector {
       return false
     }
   
-  def points(pst : ProcedureSymbolTable) : MList[Point] = {
+  def points(ownerSig : String, pst : ProcedureSymbolTable) : MList[Point] = {
     val points : MList[Point] = mlistEmpty
     var loc : ResourceUri = ""
     var locIndex = 0
-    val pUri : ResourceUri = pst.procedureUri
+
     val procPoint = collectProcPoint(pst)
     points += procPoint
     
@@ -133,17 +133,17 @@ class PointsCollector {
       e match {
         case n : NameExp =>
           if(isGlobal(n.name.name)){
-            new PointGlobalL(n.name.name, loc, locIndex, pUri)
+            new PointGlobalL(n.name.name, loc, locIndex, ownerSig)
           } else {
-            new PointL(n.name.name, loc, locIndex, pUri)
+            new PointL(n.name.name, loc, locIndex, ownerSig)
           }
         case ie : IndexingExp =>
           ie.exp match {
             case n : NameExp =>
               if(isGlobal(n.name.name)){
-                new PointGlobalArrayL(n.name.name, loc, locIndex, pUri)
+                new PointGlobalArrayL(n.name.name, loc, locIndex, ownerSig)
               } else {
-                val pal = new PointArrayL(n.name.name, loc, locIndex, pUri)
+                val pal = new PointArrayL(n.name.name, loc, locIndex, ownerSig)
                 pal.dimensions = ie.indices.size
                 pal
               }
@@ -157,14 +157,14 @@ class PointsCollector {
       e match {
         case n : NameExp =>
           if(isGlobal(n.name.name)){
-            new PointGlobalR(n.name.name, loc, locIndex, pUri)
+            new PointGlobalR(n.name.name, loc, locIndex, ownerSig)
           } else {
-            new PointR(n.name.name, loc, locIndex, pUri)
+            new PointR(n.name.name, loc, locIndex, ownerSig)
           }
         case ie : IndexingExp =>
           ie.exp match {
             case n : NameExp =>
-              val par = new PointArrayR(n.name.name, loc, locIndex, pUri)
+              val par = new PointArrayR(n.name.name, loc, locIndex, ownerSig)
               par.dimensions = ie.indices.size
               par
             case _ => null
@@ -184,8 +184,8 @@ class PointsCollector {
             case ne : NameExp => ne.name.name
             case _ => ""
           }
-          val pBase = new PointBaseL(baseName, loc, locIndex, pUri)
-          new PointFieldL(pBase, a.attributeName.name, loc, locIndex, pUri)
+          val pBase = new PointBaseL(baseName, loc, locIndex, ownerSig)
+          new PointFieldL(pBase, a.attributeName.name, loc, locIndex, ownerSig)
         case _ => null
       }
     }
@@ -204,7 +204,7 @@ class PointsCollector {
           case le : LiteralExp =>
             if(le.typ.name.equals("STRING")){
               pl = processLHS(as.lhs)
-              pr = new PointStringO(le.text, "[|java:lang:String|]", loc, locIndex, pUri)
+              pr = new PointStringO(le.text, "[|java:lang:String|]", loc, locIndex, ownerSig)
 //              ofg.iFieldDefRepo(pr.asInstanceOf[PointStringO]) = mmapEmpty
             }
           case n : NewExp =>
@@ -218,10 +218,10 @@ class PointsCollector {
               case _ =>
             }
             if(dimensions == 0){
-              pr = new PointO(name, loc, locIndex, pUri)
+              pr = new PointO(name, loc, locIndex, ownerSig)
 //              ofg.iFieldDefRepo(pr.asInstanceOf[PointO]) = mmapEmpty
             } else {
-              pr = new PointArrayO(name, loc, locIndex, pUri)
+              pr = new PointArrayO(name, loc, locIndex, ownerSig)
               pr.asInstanceOf[PointArrayO].dimensions = dimensions
 //              ofg.arrayRepo(pl.toString) = dimensions
             }
@@ -229,7 +229,7 @@ class PointsCollector {
             if(is("object", as.annotations)){
               pl = processLHS(as.lhs)
               if(is("array", as.annotations) && isGlobal(n.name.name)){
-                pr = new PointGlobalArrayR(n.name.name, loc, locIndex, pUri)
+                pr = new PointGlobalArrayR(n.name.name, loc, locIndex, ownerSig)
               } else {
                 pr = initExpPointR(n)
               }
@@ -241,8 +241,8 @@ class PointsCollector {
                 case ne : NameExp => ne.name.name
                 case _ => ""
               }
-              val pBase = new PointBaseR(baseName, loc, locIndex, pUri)
-              pr = new PointFieldR(pBase, ae.attributeName.name, loc, locIndex, pUri)
+              val pBase = new PointBaseR(baseName, loc, locIndex, ownerSig)
+              pr = new PointFieldR(pBase, ae.attributeName.name, loc, locIndex, ownerSig)
             }
           case ie : IndexingExp =>
             if(is("object", as.annotations)){
@@ -252,7 +252,7 @@ class PointsCollector {
           case _ =>
         }
         if(pl != null && pr != null){
-          val assignmentPoint : PointAsmt = new PointAsmt("[" + pl + "=" + pr + "]", loc, locIndex, pUri)
+          val assignmentPoint : PointAsmt = new PointAsmt("[" + pl + "=" + pr + "]", loc, locIndex, ownerSig)
           assignmentPoint.lhs = pl
           assignmentPoint.rhs = pr
           points += assignmentPoint
@@ -275,7 +275,7 @@ class PointsCollector {
           case None => ""
         }
         val types = new SignatureParser(sig).getParamSig.getParameters
-        val pi : PointI = new PointI(sig, loc, locIndex, pUri)
+        val pi : PointI = new PointI(sig, loc, locIndex, ownerSig)
         pi.typ = typ
         pi.retTyp = new SignatureParser(sig).getParamSig.getReturnTypeSignature
         
@@ -289,13 +289,13 @@ class PointsCollector {
                     if(types.size > i){
                       val typ = types(i)
                       if(typ.startsWith("L")){
-                        val arg = new PointArg(ne.name.name, loc, locIndex, pUri)
+                        val arg = new PointArg(ne.name.name, loc, locIndex, ownerSig)
                         arg.container = pi
                         pi.setArg(i, arg)
                       } else if(typ.startsWith("[") 
   //                        && typ.charAt(pi.retTyp.lastIndexOf('[')+1) == 'L'
                             ){
-                        val arg = new PointArg(ne.name.name, loc, locIndex, pUri)
+                        val arg = new PointArg(ne.name.name, loc, locIndex, ownerSig)
                         arg.container = pi
                         pi.setArg(i, arg)
                         val dimensions = typ.lastIndexOf('[') - typ.indexOf('[') + 1
@@ -309,7 +309,7 @@ class PointsCollector {
               if(exps.size > 0){
                 exps(0) match {
                   case ne : NameExp =>
-                    val recv = new PointRecv(ne.name.name, loc, locIndex, pUri)
+                    val recv = new PointRecv(ne.name.name, loc, locIndex, ownerSig)
                     recv.container = pi
                     pi.setRecv(recv)
                   case _ =>
@@ -320,13 +320,13 @@ class PointsCollector {
                       if(types.size > i-1){
                         val typ = types(i-1)
                         if(typ.startsWith("L")){
-                          val arg = new PointArg(ne.name.name, loc, locIndex, pUri)
+                          val arg = new PointArg(ne.name.name, loc, locIndex, ownerSig)
                           arg.container = pi
                           pi.setArg(i-1, arg)
                         } else if(typ.startsWith("[") 
   //                          && typ.charAt(pi.retTyp.lastIndexOf('[')+1) == 'L'
                               ){
-                          val arg = new PointArg(ne.name.name, loc, locIndex, pUri)
+                          val arg = new PointArg(ne.name.name, loc, locIndex, ownerSig)
                           arg.container = pi
                           pi.setArg(i-1, arg)
                           val dimensions = typ.lastIndexOf('[') - typ.indexOf('[') + 1
@@ -345,11 +345,11 @@ class PointsCollector {
         if(pi.retTyp.startsWith("L")){
           t.lhs match {
             case Some(nameExp) =>
-              pl = new PointL(nameExp.name.name, loc, locIndex, pUri)
+              pl = new PointL(nameExp.name.name, loc, locIndex, ownerSig)
             case None =>
           }
           //Note that we are considering "call temp = invoke" as an assignment
-          val assignmentPoint : PointAsmt = new PointAsmt("[" + pl + "=" + pi + "]", loc, locIndex, pUri)
+          val assignmentPoint : PointAsmt = new PointAsmt("[" + pl + "=" + pi + "]", loc, locIndex, ownerSig)
           assignmentPoint.lhs = pl
           assignmentPoint.rhs = pi
           points += assignmentPoint
@@ -357,12 +357,12 @@ class PointsCollector {
 //          if(pi.retTyp.charAt(pi.retTyp.lastIndexOf('[')+1) == 'L'){
             t.lhs match {
               case Some(nameExp) =>
-                pl = new PointL(nameExp.name.name, loc, locIndex, pUri)
+                pl = new PointL(nameExp.name.name, loc, locIndex, ownerSig)
               case None =>
             }
             val dimensions = pi.retTyp.lastIndexOf('[') - pi.retTyp.indexOf('[') + 1
 //            ofg.arrayRepo(pl.toString) = dimensions
-            val assignmentPoint : PointAsmt = new PointAsmt("[" + pl + "=" + pi + "]", loc, locIndex, pUri)
+            val assignmentPoint : PointAsmt = new PointAsmt("[" + pl + "=" + pi + "]", loc, locIndex, ownerSig)
             assignmentPoint.lhs = pl
             assignmentPoint.rhs = pi
             points += assignmentPoint
@@ -374,7 +374,7 @@ class PointsCollector {
           rj.exp match {
             case Some(ne) =>
               if(ne.isInstanceOf[NameExp]){
-                val p = new PointRet(ne.asInstanceOf[NameExp].name.name, loc, locIndex, pUri)
+                val p = new PointRet(ne.asInstanceOf[NameExp].name.name, loc, locIndex, ownerSig)
                 p.procPoint = procPoint
                 points += p
               }

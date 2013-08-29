@@ -10,8 +10,8 @@ import org.sireum.alir.AlirIntraProceduralNode
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.alir.DefRef
 import org.sireum.alir.MonotoneDataFlowAnalysisResult
-import org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph
-import org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode
+import org.sireum.amandroid.interProcedural.pointsToAnalysis.PointerAssignmentGraph
+import org.sireum.amandroid.interProcedural.pointsToAnalysis.PtaNode
 import org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult
 import org.sireum.pilar.ast.LocationDecl
 import org.sireum.pilar.symbol.ProcedureSymbolTable
@@ -157,13 +157,13 @@ object PagModule extends PipelineModule {
         "Output error for '" + this.title + "': No entry found for 'pag'. Expecting (PagModule.pagKey or PagModule.globalPagKey)") 
     }
 
-    if(job ? PagModule.pagKey && !job(PagModule.pagKey).isInstanceOf[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode]]) {
+    if(job ? PagModule.pagKey && !job(PagModule.pagKey).isInstanceOf[org.sireum.amandroid.interProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.interProcedural.pointsToAnalysis.PtaNode]]) {
       tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker, 
         "Output error for '" + this.title + "': Wrong type found for PagModule.pagKey.  Expecting 'org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode]' but found '" + 
         job(PagModule.pagKey).getClass.toString + "'")
     } 
 
-    if(job ? PagModule.globalPagKey && !job(PagModule.globalPagKey).isInstanceOf[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode]]) {
+    if(job ? PagModule.globalPagKey && !job(PagModule.globalPagKey).isInstanceOf[org.sireum.amandroid.interProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.interProcedural.pointsToAnalysis.PtaNode]]) {
       tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker, 
         "Output error for '" + this.title + "': Wrong type found for PagModule.globalPagKey.  Expecting 'org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode]' but found '" + 
         job(PagModule.globalPagKey).getClass.toString + "'")
@@ -230,18 +230,18 @@ object PagModule extends PipelineModule {
     return options
   }
 
-  def getPag (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode] = {
+  def getPag (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.interProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.interProcedural.pointsToAnalysis.PtaNode] = {
     if (options.contains(PagModule.globalPagKey)) {
-       return options(PagModule.globalPagKey).asInstanceOf[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode]]
+       return options(PagModule.globalPagKey).asInstanceOf[org.sireum.amandroid.interProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.interProcedural.pointsToAnalysis.PtaNode]]
     }
     if (options.contains(PagModule.pagKey)) {
-       return options(PagModule.pagKey).asInstanceOf[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode]]
+       return options(PagModule.pagKey).asInstanceOf[org.sireum.amandroid.interProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.interProcedural.pointsToAnalysis.PtaNode]]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def setPag (options : MMap[Property.Key, Any], pag : org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode]) : MMap[Property.Key, Any] = {
+  def setPag (options : MMap[Property.Key, Any], pag : org.sireum.amandroid.interProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.interProcedural.pointsToAnalysis.PtaNode]) : MMap[Property.Key, Any] = {
 
     options(PagModule.globalPagKey) = pag
     options(pagKey) = pag
@@ -254,7 +254,7 @@ object PagModule extends PipelineModule {
       def rda : org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]] = PagModule.getRda(job.propertyMap)
       def procedureSymbolTable : org.sireum.pilar.symbol.ProcedureSymbolTable = PagModule.getProcedureSymbolTable(job.propertyMap)
       def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = PagModule.getCfg(job.propertyMap)
-      def pag : org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode] = PagModule.getPag(job.propertyMap)
+      def pag : org.sireum.amandroid.interProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.interProcedural.pointsToAnalysis.PtaNode] = PagModule.getPag(job.propertyMap)
     }
   }
 
@@ -270,8 +270,8 @@ object PagModule extends PipelineModule {
       def cfg_=(cfg : org.sireum.alir.ControlFlowGraph[java.lang.String]) { PagModule.setCfg(job.propertyMap, cfg) }
       def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = PagModule.getCfg(job.propertyMap)
 
-      def pag_=(pag : org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode]) { PagModule.setPag(job.propertyMap, pag) }
-      def pag : org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode] = PagModule.getPag(job.propertyMap)
+      def pag_=(pag : org.sireum.amandroid.interProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.interProcedural.pointsToAnalysis.PtaNode]) { PagModule.setPag(job.propertyMap, pag) }
+      def pag : org.sireum.amandroid.interProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.interProcedural.pointsToAnalysis.PtaNode] = PagModule.getPag(job.propertyMap)
     }
   }
 }
@@ -286,6 +286,6 @@ trait PagModule {
   def cfg : org.sireum.alir.ControlFlowGraph[java.lang.String] = PagModule.getCfg(job.propertyMap)
 
 
-  def pag_=(pag : org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode]) { PagModule.setPag(job.propertyMap, pag) }
-  def pag : org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode] = PagModule.getPag(job.propertyMap)
+  def pag_=(pag : org.sireum.amandroid.interProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.interProcedural.pointsToAnalysis.PtaNode]) { PagModule.setPag(job.propertyMap, pag) }
+  def pag : org.sireum.amandroid.interProcedural.pointsToAnalysis.PointerAssignmentGraph[org.sireum.amandroid.interProcedural.pointsToAnalysis.PtaNode] = PagModule.getPag(job.propertyMap)
 }

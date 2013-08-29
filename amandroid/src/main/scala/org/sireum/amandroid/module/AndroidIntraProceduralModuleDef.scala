@@ -12,7 +12,7 @@ import org.sireum.pipeline.PipelineStage
 import org.sireum.pipeline.PipelineConfiguration
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
-import org.sireum.amandroid.intraProcedural.pointsToAnalysis.IntraPointsToAnalysis
+import org.sireum.amandroid.interProcedural.pointsToAnalysis.IntraPointsToAnalysis
 import org.sireum.amandroid.android.interProcedural.objectFlowAnalysis.AndroidOfgPreprocessor
 import org.sireum.amandroid.intraProcedural.compressedControlFlowGraph.CompressedControlFlowGraph
 import org.sireum.pilar.ast.NameExp

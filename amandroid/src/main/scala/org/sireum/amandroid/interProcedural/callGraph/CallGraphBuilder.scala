@@ -3,7 +3,7 @@ package org.sireum.amandroid.interProcedural.callGraph
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.util._
-import org.sireum.amandroid.intraProcedural.pointsToAnalysis._
+import org.sireum.amandroid.interProcedural.pointsToAnalysis._
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.util._
 import java.io._
@@ -21,17 +21,72 @@ class CallGraphBuilder {
   var pgPointsMap : Map[String, MList[Point]] = Map()
   //a map from return node to its possible updated value set
   var modelOperationValueSetMap : Map[PtaNode, MSet[PTAInstance]] = Map()
-
-  def build(appInfoOpt : Option[PrepareApp])
-   : CallGraph[String] = {
+  
+  /**
+	 * Get all reachable procedures of given procedure.
+	 * @param procedureUris Initial procedure resource uri
+	 * @return Set of reachable procedure resource uris from initial procedure
+	 */
+	def getReachableProcedures(procedure : AmandroidProcedure, wholeProgram : Boolean) : Set[ReachableProcedure] = {
     val pag = new PointerAssignmentGraph[PtaNode]()
-    val cg = new CallGraph[String]
+    val cg = new CallGraph[CGNode]
+    pta(pag, cg, Set(procedure), wholeProgram)
+    cg.getReachableProcedure(Set(procedure))
+  }
+  
+	/**
+	 * Get all reachable procedures of given procedure set.
+	 * @param procedureUris Initial procedure resource uri set
+	 * @return Set of reachable procedure resource uris from initial set
+	 */
+	def getReachableProcedures(procedures : Set[AmandroidProcedure], wholeProgram : Boolean) : Set[ReachableProcedure] = {
+	  val pag = new PointerAssignmentGraph[PtaNode]()
+    val cg = new CallGraph[CGNode]
+    pta(pag, cg, procedures, wholeProgram)
+    cg.getReachableProcedure(procedures)
+	}
+  
+  def buildAppOnly(appInfoOpt : Option[PrepareApp]) : CallGraph[CGNode] = {
+    val pag = new PointerAssignmentGraph[PtaNode]()
+    val cg = new CallGraph[CGNode]
+    val entryPoints = Center.getEntryPoints
     appInfoOpt match{
       case Some(appInfo) =>
         this.appInfo = appInfo
         ptaWithIcc(pag, cg)
       case None =>
-        pta(pag, cg)
+        pta(pag, cg, entryPoints, false)
+    }
+    val result = cg
+    pag.pointsToMap.pointsToMap.foreach{
+      item =>
+        println("item--->" + item)
+    }
+    println("processed-->" + processed.size)
+    val f1 = new File(System.getProperty("user.home") + "/Desktop/CallGraph.dot")
+    val o1 = new FileOutputStream(f1)
+    val w1 = new OutputStreamWriter(o1)
+    result.toDot(w1)
+    
+    val f2 = new File(System.getProperty("user.home") + "/Desktop/PointerAssignmentGraph.dot")
+    val o2 = new FileOutputStream(f2)
+    val w2 = new OutputStreamWriter(o2)
+    pag.toDot(w2)
+    result
+  }
+
+  def buildWholeProgram(appInfoOpt : Option[PrepareApp])
+   : CallGraph[CGNode] = {
+    if(GlobalConfig.mode < Mode.WHOLE_PROGRAM_TEST) throw new RuntimeException("Cannot get complete call graph, because not in whole program mode")
+    val pag = new PointerAssignmentGraph[PtaNode]()
+    val cg = new CallGraph[CGNode]
+    val entryPoints = Center.getEntryPoints
+    appInfoOpt match{
+      case Some(appInfo) =>
+        this.appInfo = appInfo
+        ptaWithIcc(pag, cg)
+      case None =>
+        pta(pag, cg, entryPoints, true)
     }
     val result = cg
     pag.pointsToMap.pointsToMap.foreach{
@@ -53,15 +108,18 @@ class CallGraphBuilder {
   }
   
   def pta(pag : PointerAssignmentGraph[PtaNode],
-          sCfg : SuperControlFlowGraph[String]) = {
-    Center.getEntryPoints.foreach{
-		  ep => 
-      	doPTA(ep, pag, sCfg)
+          cg : CallGraph[CGNode],
+          entryPoints : Set[AmandroidProcedure],
+          wholeProgram : Boolean) = {
+    entryPoints.foreach{
+		  ep =>
+		    println(ep)
+      	doPTA(ep, pag, cg, wholeProgram)
     }
   }
   
   def ptaWithIcc(pag : PointerAssignmentGraph[PtaNode],
-          sCfg : SuperControlFlowGraph[String]) = {
+          cg : CallGraph[CGNode]) = {
 //    pag.setIntentFdb(appInfo.getIntentDB)
 //    pag.setEntryPoints(appInfo.getEntryPoints)
 //    appInfo.getDummyMainSigMap.values.foreach{
@@ -77,26 +135,26 @@ class CallGraphBuilder {
   
   def doPTA(ep : AmandroidProcedure,
             pag : PointerAssignmentGraph[PtaNode],
-            sCfg : SuperControlFlowGraph[String]) : Unit = {
-    val points = new PointsCollector().points(ep.getProcedureBody)
+            cg : CallGraph[CGNode],
+            wholeProgram : Boolean) : Unit = {
+    val points = new PointsCollector().points(ep.getSignature, ep.getProcedureBody)
     pgPointsMap += (ep.getSignature -> points.clone)
     val context : Context = new Context(pag.K_CONTEXT)
-    pag.points ++= points
     setProcessed(points, ep.getSignature, context.copy)
     pag.constructGraph(ep, points, context.copy)
-    sCfg.collectionCfgToBaseGraph(ep.getSignature, ep.getCfg)
-    workListPropagation(pag, sCfg)
+    cg.collectCfgToBaseGraph(ep.getSignature, context.copy, ep.getCfg)
+    workListPropagation(pag, cg, wholeProgram)
   }
   
   def overallFix(pag : PointerAssignmentGraph[PtaNode],
-		  					 sCfg : SuperControlFlowGraph[String]) : Unit = {
+		  					 cg : CallGraph[CGNode]) : Unit = {
 //    while(checkAndDoIccOperation(ofg, sCfg)){
 ////    	fix(ofg, sCfg)
 //    }
   }
   
   def workListPropagation(pag : PointerAssignmentGraph[PtaNode],
-		  					 sCfg : SuperControlFlowGraph[String]) : Unit = {
+		  					 cg : CallGraph[CGNode], wholeProgram : Boolean) : Unit = {
     pag.edges.foreach{
       edge =>
         pag.getEdgeType(edge) match{
@@ -130,7 +188,7 @@ class CallGraphBuilder {
       	          val d = pag.pointsToMap.getDiff(srcNode, dstNode)
       	          pag.pointsToMap.transferPointsToSet(srcNode, dstNode)
       	          checkAndDoModelOperation(dstNode, pag)
-      	          checkAndDoCall(dstNode, d, pag, sCfg)
+      	          checkAndDoCall(dstNode, d, pag, cg, wholeProgram)
       	        }
       	      case pag.EdgeType.ASSIGNMENT => // e.g. q = p; Edge: p -> q
       	        val dstNode = pag.successor(edge)
@@ -215,7 +273,8 @@ class CallGraphBuilder {
   def checkAndDoCall(node : PtaNode,
       							d : MSet[PTAInstance],
       							pag : PointerAssignmentGraph[PtaNode],
-      							sCfg : SuperControlFlowGraph[String]) = {
+      							cg : CallGraph[CGNode],
+      							wholeProgram : Boolean) = {
     val piOpt = pag.recvInverse(node)
     piOpt match {
       case Some(pi) =>
@@ -229,7 +288,8 @@ class CallGraphBuilder {
         
         calleeSet.foreach(
           callee => {
-            extendGraphWithConstructGraph(callee, pi, callerContext.copy, pag, sCfg)
+            if(wholeProgram || callee.getDeclaringRecord.isApplicationRecord)
+            	extendGraphWithConstructGraph(callee, pi, callerContext.copy, pag, cg)
           }  
         )
         pag.edges.foreach{
@@ -303,7 +363,7 @@ class CallGraphBuilder {
       															pi : PointI, 
       															callerContext : Context,
       															pag : PointerAssignmentGraph[PtaNode], 
-      															sCfg : SuperControlFlowGraph[String]) = {
+      															cg : CallGraph[CGNode]) = {
     val calleeSig = calleeProc.getSignature
     if(pag.isModelOperation(calleeSig)){
       val ipN = pag.collectTrackerNodes(calleeSig, pi, callerContext.copy)
@@ -311,10 +371,10 @@ class CallGraphBuilder {
 //    } else if(pag.isIccOperation(calleeSig, androidLibInfoTables)) {
 //      pag.setIccOperationTracker(calleeSig, pi, callerContext.copy)
     } else if(!processed.contains((calleeSig, callerContext))){
-    	val points = new PointsCollector().points(calleeProc.getProcedureBody)
+    	val points = new PointsCollector().points(calleeProc.getSignature, calleeProc.getProcedureBody)
     	setProcessed(points, calleeSig, callerContext.copy)
       pag.constructGraph(calleeProc, points, callerContext.copy)        
-      sCfg.collectionCfgToBaseGraph(calleeSig, calleeProc.getCfg)
+      cg.collectCfgToBaseGraph(calleeSig, callerContext.copy, calleeProc.getCfg)
     }
     if(processed.contains(calleeSig, callerContext)){
       val procPoint = processed(calleeSig, callerContext)
@@ -322,7 +382,11 @@ class CallGraphBuilder {
       pag.extendGraph(procPoint, pi, callerContext.copy)
       if(!pag.isModelOperation(calleeSig))
 //         !ofg.isIccOperation(calleeSig, androidLibInfoTables))
-      	sCfg.extendGraph(calleeSig, pi.owner, pi.locationUri, pi.locationIndex)
+      {
+        val callerProc = Center.getProcedure(pi.owner)
+        cg.setCallMap(callerProc, ReachableProcedure(callerProc, calleeProc, Some(pi.locationUri), pi.locationIndex))
+      	cg.extendGraph(calleeSig, callerContext.copy)
+      }
     } else {
       //need to extend
     }

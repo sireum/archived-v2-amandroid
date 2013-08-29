@@ -1,4 +1,4 @@
-package org.sireum.amandroid.intraProcedural.pointsToAnalysis
+package org.sireum.amandroid.interProcedural.pointsToAnalysis
 
 import org.sireum.util._
 import org.sireum.amandroid.interProcedural.objectFlowAnalysis.InvokePointNode

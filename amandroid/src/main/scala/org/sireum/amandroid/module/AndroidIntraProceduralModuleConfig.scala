@@ -8,9 +8,9 @@ import org.sireum.pilar.symbol._
 import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
 import org.sireum.amandroid.intraProcedural.compressedControlFlowGraph.CompressedControlFlowGraph
 import org.sireum.amandroid.android.interProcedural.objectFlowAnalysis.AndroidObjectFlowGraph
-import org.sireum.amandroid.intraProcedural.pointsToAnalysis.PointerAssignmentGraph
+import org.sireum.amandroid.interProcedural.pointsToAnalysis.PointerAssignmentGraph
 import org.sireum.amandroid.android.interProcedural.objectFlowAnalysis.AndroidValueSet
-import org.sireum.amandroid.intraProcedural.pointsToAnalysis.PtaNode
+import org.sireum.amandroid.interProcedural.pointsToAnalysis.PtaNode
 import org.sireum.amandroid.android.cache.AndroidCacheFile
 import org.sireum.util._
 import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis._

@@ -22,8 +22,7 @@ object AmandroidResolver {
    */
     
   def resolveProcedureCode(procSig : String, code : String) : AmandroidProcedure = {
-    val st = Transform.getSymbolResolveResult(Set(code))
-    resolveFromSTP(st.asInstanceOf[SymbolTableProducer], false)
+    Transform.getSymbolResolveResult(Set(code))
     Center.getProcedure(procSig)
   }
   

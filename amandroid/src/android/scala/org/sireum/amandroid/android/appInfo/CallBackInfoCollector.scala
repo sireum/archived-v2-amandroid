@@ -14,6 +14,12 @@ import org.sireum.amandroid.pilarCodeGenerator.AndroidEntryPointConstants
 import org.sireum.amandroid.AmandroidRecord
 import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.amandroid.Center
+import org.sireum.amandroid.interProcedural.callGraph.CGNode
+import org.sireum.amandroid.interProcedural.callGraph.CallGraphBuilder
+import org.sireum.pilar.ast.CallJump
+import org.sireum.pilar.ast.JumpLocation
+import org.sireum.pilar.ast.TupleExp
+import org.sireum.pilar.ast.NameExp
 
 
 /**
@@ -23,9 +29,7 @@ import org.sireum.amandroid.Center
  * @author Sankardas Roy. Adapted Steven Arzt 's equivalent code
  *
  */
-class CallBackInfoCollector(entryPointClasses:Set[String], 
-                            callGraph: CallGraph[String],
-                            cfgRdaMap : Map[AmandroidProcedure, (ControlFlowGraph[String], ReachingDefinitionAnalysis.Result)]) {
+class CallBackInfoCollector(entryPointClasses:Set[String]) {
     
 	private final var callbackMethods : Map[String, MSet[AmandroidProcedure]] = Map()
 	private final var layoutClasses: Map[AmandroidRecord, MSet[Int]] = Map()
@@ -46,7 +50,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String],
 	    val methods : Set[AmandroidProcedure] = comp.getProcedures
 	    
 	    println("componentName = " + comp + " procs = " + methods)
-	    val reachableMethods = callGraph.getReachableProcedures(methods)
+	    val reachableMethods = new CallGraphBuilder().getReachableProcedures(methods, false)
 	    println("componentName = " + comp + " reachable procs = " + reachableMethods)
 	    val containerClasses = reachableMethods.map(item => item.calleeProcedure.getDeclaringRecord)
 	    containerClasses.map(item => analyzeClass(item, comp))
@@ -65,17 +69,35 @@ class CallBackInfoCollector(entryPointClasses:Set[String],
 	      val recUri = Center.resolveRecord(compName, Center.ResolveLevel.BODIES)
 	      procedures ++= recUri.getProcedures
 	  }
-	  callGraph.getReachableProcedures(procedures).foreach{
+	  new CallGraphBuilder().getReachableProcedures(procedures, false).foreach{
 	    reachableProcedure =>
 	      if(reachableProcedure.calleeProcedure.isConcrete){
 	        if(reachableProcedure.calleeProcedure.getName.equals(AndroidConstants.ACTIVITY_SETCONTENTVIEW)){
-	          val (cfg, rda) = cfgRdaMap(reachableProcedure.calleeProcedure)
+	          val cfg = reachableProcedure.calleeProcedure.getCfg
+	          val rda = reachableProcedure.calleeProcedure.getRda
 	          val slots = rda.entrySet(cfg.getNode(reachableProcedure.locUri, reachableProcedure.locIndex))
             slots.foreach(
               item => {
                 if(item.isInstanceOf[(Slot, DefDesc)]){
                   val (slot, defDesc) = item.asInstanceOf[(Slot, DefDesc)]
-                  val varName = reachableProcedure.params(1)
+                  val loc = reachableProcedure.callerProcedure.getProcedureBody.location(reachableProcedure.locIndex)
+                  val params = loc match{
+                    case j : JumpLocation =>
+                      j.jump match{
+                        case t : CallJump =>
+                          t.callExp.arg match {
+									          case te : TupleExp =>
+									            te.exps.map{exp=>exp.asInstanceOf[NameExp].name.name}
+									          case a =>
+									            throw new RuntimeException("wrong call exp type: " + a)
+									        }
+                        case a =>
+                          throw new RuntimeException("wrong jump type: " + a)
+                      }
+                    case a => throw new RuntimeException("wrong location type: " + a)
+                  }
+                  require(params.contains(1))
+                  val varName = params(1)
                   if(varName.equals(slot.toString())){
                     defDesc match {
                       case ldd : LocDefDesc => 

@@ -8,6 +8,8 @@ import org.sireum.amandroid.interProcedural.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.interProcedural.objectFlowAnalysis.ObjectFlowGraph
 import org.sireum.amandroid.PointsCollector
 import org.sireum.amandroid.interProcedural.Context
+import org.sireum.util._
+import org.sireum.amandroid.Point
 
 object AndroidOfgPreprocessor extends ObjectFlowGraphPreprocessor[OfaNode, AndroidValueSet] {  
   
@@ -28,7 +30,8 @@ object AndroidOfgPreprocessor extends ObjectFlowGraphPreprocessor[OfaNode, Andro
             cfg : ControlFlowGraph[String], 
             rda : ReachingDefinitionAnalysis.Result, 
             ofg : ObjectFlowGraph[OfaNode, AndroidValueSet]) = {
-    val points = new PointsCollector().points(pst)
+//    val points = new PointsCollector().points(pst)
+    val points = mlistEmpty[Point]
     val context = new Context(ofg.K_CONTEXT)
     ofg.points ++= points
     ofg.constructGraph(pst.procedureUri, points, context.copy, cfg, rda)

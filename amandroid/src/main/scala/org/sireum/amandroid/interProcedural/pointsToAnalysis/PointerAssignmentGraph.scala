@@ -1,4 +1,4 @@
-package org.sireum.amandroid.intraProcedural.pointsToAnalysis
+package org.sireum.amandroid.interProcedural.pointsToAnalysis
 
 import org.sireum.util._
 import org.sireum.alir.AlirGraph
@@ -16,6 +16,8 @@ import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid._
 import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
 import org.sireum.amandroid.interProcedural.objectFlowAnalysis.InvokePointNode
+import org.sireum.amandroid.interProcedural.InterProceduralGraph
+import org.sireum.amandroid.interProcedural.InterProceduralNode
 
 
 class PointsToMap {
@@ -145,20 +147,12 @@ class PointsToMap {
 }
 
 class PointerAssignmentGraph[Node <: PtaNode]
-  extends AlirGraph[Node]
-  with AlirEdgeAccesses[Node]
-  with AlirSuccPredAccesses[Node]
+  extends InterProceduralGraph[Node]
   with PAGConstraint
   with JavaObjectModelForPta[Node]{
   self=>
     
   final val pointsToMap = new PointsToMap
-  
-  protected val graph = new DirectedMultigraph(
-    new EdgeFactory[Node, Edge] {
-      def createEdge(source : Node, target : Node) =
-        new AlirEdge(self, source, target)
-    })
   
   def addEdge(source : Node, target : Node, typ : EdgeType.Value) : Edge = {
     val edge = graph.addEdge(getNode(source), getNode(target))
@@ -170,11 +164,6 @@ class PointerAssignmentGraph[Node <: PtaNode]
     assume(edge.propertyMap.contains(EDGE_TYPE))
     edge.getProperty[EdgeType.Value](EDGE_TYPE)
   }
-
-  def deleteEdge(source : Node, target : Node) : Edge =
-    graph.removeEdge(getNode(source), getNode(target))
-
-  def deleteEdge(e : Edge) = graph.removeEdge(e)
   
   final val EDGE_TYPE = "EdgeType"
   final val PARAM_NUM = "ParamNumber"
@@ -184,17 +173,13 @@ class PointerAssignmentGraph[Node <: PtaNode]
    */
   final val K_STRING : Int = 5
   
-  protected var pl : Map[PtaNode, Node] = Map()
   
-  protected def pool : Map[PtaNode, Node] = pl
-  
-  //
   final val worklist : MList[Node] = mlistEmpty
     
   /**
    * combine two pags into one.
    */ 
-  def combineOfgs(pag2 : PointerAssignmentGraph[Node]) : PointProc = {
+  def combinePags(pag2 : PointerAssignmentGraph[Node]) = {
     pl ++= pag2.pool
     pag2.nodes.foreach(
       node=>{
@@ -208,9 +193,6 @@ class PointerAssignmentGraph[Node <: PtaNode]
     )
 //    iFieldDefRepo ++= ofg2.iFieldDefRepo
     worklist ++= pag2.worklist
-    points ++= pag2.points
-    val ps = pag2.points.filter(p => if(p.isInstanceOf[PointProc])true else false)
-    ps(0).asInstanceOf[PointProc]
   }
   
   
@@ -660,12 +642,6 @@ class PointerAssignmentGraph[Node <: PtaNode]
   def pointNodeExists(uri : ResourceUri, loc : ResourceUri, context : Context) : Boolean = {
     graph.containsVertex(newPointNode(uri, loc, context).asInstanceOf[Node])
   }
-
-  def addNode(node : Node) : Node = {
-    require(pool(node) eq node)
-    graph.addVertex(node)
-    node
-  }
   
   def addArrayNodeL(uri : ResourceUri, loc : ResourceUri, context : Context, dimensions : Int) : Node = {
     val node = newArrayNodeL(uri, loc, context, dimensions).asInstanceOf[Node]
@@ -823,10 +799,6 @@ class PointerAssignmentGraph[Node <: PtaNode]
     n
   }
   
-
-
-  def getNode(n : Node) : Node =
-    pool(n)
     
   def getArrayNodeL(uri : ResourceUri, loc : ResourceUri, context : Context, dimensions : Int) : Node =
     pool(newArrayNodeL(uri, loc, context, dimensions))
@@ -968,7 +940,7 @@ class PointerAssignmentGraph[Node <: PtaNode]
     PtaPointNode(uri, loc, context)
     
   override def toString = {
-      val sb = new StringBuilder("OFG\n")
+      val sb = new StringBuilder("PAG\n")
 
       for (n <- nodes)
         for (m <- successors(n)) {
@@ -981,27 +953,9 @@ class PointerAssignmentGraph[Node <: PtaNode]
 
       sb.toString
   }
-  
-  def toDot(w : Writer) = {
-    val de = new DOTExporter[Node, Edge](vlabelProvider, vlabelProvider, null)
-    de.export(w, graph)
-  }
-
-  protected val vlabelProvider = new VertexNameProvider[Node]() {
-    def getVertexName(v : Node) : String = {
-      v match {
-        case n : PtaNode => {
-          n.toString().replaceAll("[^a-zA-Z0-9]+","")
-        }
-      }
-    }
-  }
 }
 
-sealed abstract class PtaNode(loc : ResourceUri, context : Context) extends PropertyProvider {
-  val propertyMap = mlinkedMapEmpty[Property.Key, Any]
-  def getContext = this.context
-}
+sealed abstract class PtaNode(loc : ResourceUri, context : Context) extends InterProceduralNode(context)
 
 final case class PtaProcNode(uri : ResourceUri, loc : ResourceUri, context : Context) extends PtaNode(loc, context) {
   override def toString = uri + "@" + context.toString()

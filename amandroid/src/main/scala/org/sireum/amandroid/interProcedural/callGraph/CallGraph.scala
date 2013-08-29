@@ -10,43 +10,45 @@ import org.jgrapht.ext.DOTExporter
 import dk.brics.automaton._
 import org.sireum.amandroid.intraProcedural.compressedControlFlowGraph.AlirIntraProceduralGraphExtra
 import org.sireum.amandroid.AmandroidProcedure
+import org.sireum.amandroid.interProcedural.InterProceduralGraph
+import org.sireum.amandroid.interProcedural.InterProceduralNode
+import org.sireum.amandroid.interProcedural.Context
 
-case class ReachableProcedure(callerProcedure : AmandroidProcedure, calleeProcedure : AmandroidProcedure, locUri: Option[org.sireum.util.ResourceUri], locIndex: Int, params : List[String])
+case class ReachableProcedure(callerProcedure : AmandroidProcedure, calleeProcedure : AmandroidProcedure, locUri: Option[org.sireum.util.ResourceUri], locIndex: Int)
 
 
-class CallGraph[VirtualLabel] extends SuperControlFlowGraph[VirtualLabel]
-		with AlirEdgeAccesses[AlirIntraProceduralNode]
-		with AlirIntraProceduralGraphExtra[AlirIntraProceduralNode, VirtualLabel]{
-    type Node = AlirIntraProceduralNode
-    private var succBranchMap : MMap[(Node, Option[Branch]), Node] = null
-    private var predBranchMap : MMap[(Node, Option[Branch]), Node] = null
-    val BRANCH_PROPERTY_KEY = ControlFlowGraph.BRANCH_PROPERTY_KEY
-    var entryNode : Node = null
-    var exitNode : Node = null
-    protected val pl : MMap[AlirIntraProceduralNode, Node] = mmapEmpty
-    protected def pool : MMap[AlirIntraProceduralNode, Node] = pl
-    
-	  /**
-		 * Get all reachable procedures of given procedure. (Do not include transitive call)
-		 * @param procedureUris Initial procedure resource uri
-		 * @return Set of reachable procedure resource uris from initial procedure
-		 */
-		def getReachableProcedures(procedureUri : AmandroidProcedure) : Set[ReachableProcedure] = Set()
-		/**
-		 * Get all reachable procedures of given procedure set. (Do not include transitive call)
-		 * @param procedureUris Initial procedure resource uri set
-		 * @return Set of reachable procedure resource uris from initial set
-		 */
-		def getReachableProcedures(procedureUris : Set[AmandroidProcedure]) : Set[ReachableProcedure] = Set()
+class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
+  private var succBranchMap : MMap[(Node, Option[Branch]), Node] = null
+  private var predBranchMap : MMap[(Node, Option[Branch]), Node] = null
+  val BRANCH_PROPERTY_KEY = ControlFlowGraph.BRANCH_PROPERTY_KEY
+  
+  final val K_CONTEXT = 1
+  
+  /**
+   * map from procedures to it's callee procedures
+   */
+  
+  private val callMap : MMap[AmandroidProcedure, MSet[ReachableProcedure]] = mmapEmpty
+  
+  def setCallMap(from : AmandroidProcedure, to : ReachableProcedure) = this.callMap.getOrElseUpdate(from, msetEmpty).add(to)
 
-    def reverse : CallGraph[VirtualLabel] = {
-      val result = new CallGraph[VirtualLabel]
-      for (n <- nodes) result.addNode(n)
-      for (e <- edges) result.addEdge(e.target, e.source)
-      result.entryNode = exitNode
-      result.exitNode = entryNode
-      result
-    }
+  def getReachableProcedure(procs : Set[AmandroidProcedure]) : Set[ReachableProcedure] = {
+    if(procs.isEmpty) Set()
+    else
+      procs.map{
+	      proc =>
+	        val callees = callMap.getOrElse(proc, msetEmpty).toSet
+	        val calleeProcs = callees.map{_.calleeProcedure}.toSet
+	        callees ++ getReachableProcedure(calleeProcs)
+	    }.reduce((s1, s2) => s1 ++ s2)
+  }
+
+  def reverse : CallGraph[Node] = {
+    val result = new CallGraph[Node]
+    for (n <- nodes) result.addNode(n)
+    for (e <- edges) result.addEdge(e.target, e.source)
+    result
+  }
     
   private def putBranchOnEdge(trans : Int, branch : Int, e : Edge) = {
     e(BRANCH_PROPERTY_KEY) = (trans, branch)
@@ -124,27 +126,6 @@ class CallGraph[VirtualLabel] extends SuperControlFlowGraph[VirtualLabel]
 
       sb.toString
     }
-   
-  override protected val vlabelProvider = new VertexNameProvider[Node]() {
-    
-	def filterLabel(uri : String) = {
-	  if(uri.startsWith("pilar:/procedure/default/%5B%7C"))
-		  uri.replace("pilar:/procedure/default/%5B%7C", "").filter(_.isUnicodeIdentifierPart)  // filters out the special characters like '/', '.', '%', etc.  
-	  else uri.filter(_.isUnicodeIdentifierPart)  // filters out the special characters like '/', '.', '%', etc.  
-	}
-    
-	def getVertexName(v : Node) : String = {
-	  v match {
-	    case n1: AlirLocationNode  => filterLabel(n1.toString())       
-	    case n2: AlirVirtualNode[VirtualLabel]   => filterLabel(n2.toString())
-	  }
-	}
-  }
-    
-  override def toDot(w : Writer) = {
-    val de = new DOTExporter[Node, Edge](vlabelProvider, vlabelProvider, null)
-    de.export(w, graph)
-  }
   
   /**
    * (We ASSUME that predecessors ???? and successors of n are within the same procedure as of n)
@@ -228,31 +209,52 @@ class CallGraph[VirtualLabel] extends SuperControlFlowGraph[VirtualLabel]
    automata
   }
    
-  def collectionCfgToBaseGraph(pUri : ResourceUri, cfg : ControlFlowGraph[VirtualLabel]) = {
-    
-    val newNodes = cfg.nodes map{
+  def collectCfgToBaseGraph[VirtualLabel](calleeSig : String, callerContext : Context, cfg : ControlFlowGraph[VirtualLabel]) = {
+    cfg.nodes map{
       n =>
 	      n match{
 	        case vn : AlirVirtualNode[VirtualLabel] =>
-	          addVirtualNode((pUri + "." + vn.label).asInstanceOf[VirtualLabel]) 
-	        case n =>
-	          pool(n) = n
-	          addNode(n)
+	          addCGVirtualNode(vn.label.toString, callerContext.copy.setContext(calleeSig, calleeSig)) 
+	        case ln : AlirLocationUriNode=>
+	          addCGLocNode(callerContext.copy.setContext(calleeSig, ln.locUri))
+	        case n => throw new RuntimeException("wrong node type: " + n)
 	      }
     }
     for (e <- cfg.edges) {
-      val entryNode = getVirtualNode((pUri + "." + "Entry").asInstanceOf[VirtualLabel])
-      val exitNode = getVirtualNode((pUri + "." + "Exit").asInstanceOf[VirtualLabel])
-      if(e.source.isInstanceOf[AlirVirtualNode[VirtualLabel]]) addEdge(entryNode, e.target)
-      else if(e.target.isInstanceOf[AlirVirtualNode[VirtualLabel]]) addEdge(e.source, exitNode)
-      else addEdge(e)
+      val entryNode = getCGVirtualNode("Entry", callerContext.copy.setContext(calleeSig, calleeSig))
+      val exitNode = getCGVirtualNode("Exit", callerContext.copy.setContext(calleeSig, calleeSig))
+      e.source match{
+        case vns : AlirVirtualNode[VirtualLabel] =>
+          e.target match{
+            case vnt : AlirVirtualNode[VirtualLabel] =>
+              addEdge(entryNode, exitNode)
+            case lnt : AlirLocationUriNode =>
+              val targetNode = getCGLocNode(callerContext.copy.setContext(calleeSig, lnt.locUri))
+              addEdge(entryNode, targetNode)
+            case nt => throw new RuntimeException("wrong node type: " + nt)
+          }
+        case lns : AlirLocationUriNode =>
+          e.target match{
+            case vnt : AlirVirtualNode[VirtualLabel] =>
+              val sourceNode = getCGLocNode(callerContext.copy.setContext(calleeSig, lns.locUri))
+              addEdge(sourceNode, exitNode)
+            case lnt : AlirLocationUriNode =>
+              val sourceNode = getCGLocNode(callerContext.copy.setContext(calleeSig, lns.locUri))
+              val targetNode = getCGLocNode(callerContext.copy.setContext(calleeSig, lnt.locUri))
+              addEdge(sourceNode, targetNode)
+            case nt => throw new RuntimeException("wrong node type: " + nt)
+          }
+        case ns => throw new RuntimeException("wrong node type: " + ns)
+      }
     }
   }
   
-  def extendGraph(callee : ResourceUri, pUri : ResourceUri, lUri : ResourceUri, lIndex : Int) = {
-    val srcNode = getNode(Some(lUri), lIndex)
-    val targetNode = getVirtualNode((callee + "." + "Entry").asInstanceOf[VirtualLabel])
-    val retSrcNode = getVirtualNode((callee + "." + "Exit").asInstanceOf[VirtualLabel])
+  def extendGraph(calleeSig  : String, callerContext : Context) = {
+    val srcNode = getCGLocNode(callerContext)
+    val calleeContext = callerContext.copy
+    calleeContext.setContext(calleeSig, calleeSig)
+    val targetNode = getCGVirtualNode("Entry", calleeContext)
+    val retSrcNode = getCGVirtualNode("Exit", calleeContext)
     successors(srcNode).foreach{
       retTargetnode =>
         deleteEdge(srcNode, retTargetnode)
@@ -261,4 +263,58 @@ class CallGraph[VirtualLabel] extends SuperControlFlowGraph[VirtualLabel]
     addEdge(srcNode, targetNode)
   }
   
+  def addCGLocNode(context : Context) : Node = {
+    val node = newCGLocNode(context).asInstanceOf[Node]
+    val n =
+      if (pool.contains(node)) pool(node)
+      else {
+        pl += (node -> node)
+        node
+      }
+    graph.addVertex(n)
+    n
+  }
+  
+  def cgLocNodeExists(context : Context) : Boolean = {
+    graph.containsVertex(newCGLocNode(context).asInstanceOf[Node])
+  }
+  
+  def getCGLocNode(context : Context) : Node =
+    pool(newCGLocNode(context))
+  
+  protected def newCGLocNode(context : Context) =
+    CGLocNode(context)
+    
+  def addCGVirtualNode(virtualLabel : String, context : Context) : Node = {
+    val node = newCGVirtualNode(virtualLabel, context).asInstanceOf[Node]
+    val n =
+      if (pool.contains(node)) pool(node)
+      else {
+        pl += (node -> node)
+        node
+      }
+    graph.addVertex(n)
+    n
+  }
+  
+  def cgVirtualNodeExists(virtualLabel : String, context : Context) : Boolean = {
+    graph.containsVertex(newCGVirtualNode(virtualLabel, context).asInstanceOf[Node])
+  }
+  
+  def getCGVirtualNode(virtualLabel : String, context : Context) : Node =
+    pool(newCGVirtualNode(virtualLabel, context))
+  
+  protected def newCGVirtualNode(virtualLabel : String, context : Context) =
+    CGVirtualNode(virtualLabel, context)
+  
+}
+
+sealed abstract class CGNode(context : Context) extends InterProceduralNode(context)
+
+final case class CGVirtualNode(virtualLabel : String, context : Context) extends CGNode(context) {
+  override def toString = virtualLabel + "@" + context.toString()
+}
+
+final case class CGLocNode(context : Context) extends CGNode(context) {
+  override def toString = context.toString()
 }

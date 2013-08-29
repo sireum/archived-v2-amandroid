@@ -444,6 +444,7 @@ class AmandroidRecord {
 	
 	def addProcedure(ap : AmandroidProcedure) = {
 	  if(ap.isDeclared) throw new RuntimeException(ap.getName + " already declared in record " + ap.getDeclaringRecord.getName)
+
 	  if(this.subSigToProcedures.contains(ap.getSubSignature)) throw new RuntimeException("The procedure " + ap.getName + " already declared in record " + getName)
 	  this.subSigToProcedures += (ap.getSubSignature -> ap)
 	  this.procedures += ap

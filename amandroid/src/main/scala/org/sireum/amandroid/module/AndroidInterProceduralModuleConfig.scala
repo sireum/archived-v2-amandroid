@@ -11,6 +11,7 @@ import org.sireum.pilar.symbol._
 import org.sireum.amandroid.interProcedural.callGraph.CallGraph
 import org.sireum.amandroid.android.cache.AndroidCacheFile
 import org.sireum.amandroid.android.appInfo.PrepareApp
+import org.sireum.amandroid.interProcedural.callGraph.CGNode
 
 /*
 Copyright (c) 2012-2013 Sankardas Roy & Fengguo Wei, Kansas State University.        
@@ -22,7 +23,7 @@ http://www.eclipse.org/legal/epl-v10.html
 
 object AndroidInterProcedural {
   type VirtualLabel = String
-  type CG = CallGraph[String]
+  type CG = CallGraph[CGNode]
     
   final case class AndroidInterAnalysisResult(
     callGraph : AndroidInterProcedural.CG)

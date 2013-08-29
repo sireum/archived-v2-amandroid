@@ -24,7 +24,7 @@ class DummyMainGenerator {
   private var intCounter : String = null
   private var conditionCounter : Int = 0
   private var codeCounter : Int = 0
-  private val template = new STGroupFile("org/sireum/amandroid/pilarCodeTemplate/PilarCode.stg")
+  private val template = new STGroupFile("org/sireum/amandroid/pilarCodeGenerator/PilarCode.stg")
   private val procDeclTemplate = template.getInstanceOf("ProcedureDecl")
   private val localVarsTemplate = template.getInstanceOf("LocalVars")
   private val bodyTemplate = template.getInstanceOf("Body")
@@ -300,7 +300,7 @@ class DummyMainGenerator {
     var paramVars : Map[Int, String] = Map()
     params.foreach{
 	    case(i, param) =>
-        val r = Center.getRecord(param)
+        val r = Center.resolveRecord(param, Center.ResolveLevel.BODIES)
         // to protect go into dead constructor create loop
         if(!constructionStack.contains(r)){
 				  val va = generateInstanceCreation(param, codefg)

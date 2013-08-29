@@ -47,7 +47,7 @@ trait InterProceduralTestFramework extends TestFramework {
     	    Center.resolveRecord(k, Center.ResolveLevel.BODIES)
     	}
     	
-    	val cg = new CallGraphBuilder().build(None)
+    	new CallGraphBuilder().buildWholeProgram(None)
     	
 //      val job = PipelineJob()
 //      

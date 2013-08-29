@@ -16,6 +16,7 @@ class Context(var k : Int){
     } else {
       callStack = (pSig, loc) :: callStack.dropRight(1)
     }
+    this
   }
   def updateContext(context2 : Context) = {
     this.k = context2.k

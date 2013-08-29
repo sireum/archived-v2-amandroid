@@ -1,4 +1,4 @@
-package org.sireum.amandroid.intraProcedural.pointsToAnalysis
+package org.sireum.amandroid.interProcedural.pointsToAnalysis
 
 import org.sireum.util._
 import org.sireum.alir._
@@ -6,7 +6,6 @@ import org.sireum.amandroid._
 import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
 
 trait PAGConstraint{
-  val points : MList[Point] = mlistEmpty
   
   object EdgeType extends Enumeration {
 		val ALLOCATION, ASSIGNMENT, FIELD_STORE, FIELD_LOAD, ARRAY_STORE, ARRAY_LOAD, GLOBAL_STORE, GLOBAL_LOAD, TRANSFER = Value
@@ -336,22 +335,6 @@ trait PAGConstraint{
     )
     if(!avoidMode)
       require(point != null)
-    point
-  }
-  
-  def getProcPointOrElse(pSig : String) : PointProc = {
-    var point : PointProc = null
-    points.foreach(
-      p => {
-        p match {
-          case pp : PointProc =>
-            if(pp.pSig.equals(pSig))
-              point
-          case _ =>
-        }
-      }  
-    )
-    require(point != null)
     point
   }
   
