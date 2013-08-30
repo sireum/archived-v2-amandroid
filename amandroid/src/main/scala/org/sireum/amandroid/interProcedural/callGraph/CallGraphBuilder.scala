@@ -27,7 +27,7 @@ class CallGraphBuilder {
 	 * @param procedureUris Initial procedure resource uri
 	 * @return Set of reachable procedure resource uris from initial procedure
 	 */
-	def getReachableProcedures(procedure : AmandroidProcedure, wholeProgram : Boolean) : Set[ReachableProcedure] = {
+	def getReachableProcedures(procedure : AmandroidProcedure, wholeProgram : Boolean) : Set[AmandroidProcedure] = {
     val pag = new PointerAssignmentGraph[PtaNode]()
     val cg = new CallGraph[CGNode]
     pta(pag, cg, Set(procedure), wholeProgram)
@@ -39,7 +39,7 @@ class CallGraphBuilder {
 	 * @param procedureUris Initial procedure resource uri set
 	 * @return Set of reachable procedure resource uris from initial set
 	 */
-	def getReachableProcedures(procedures : Set[AmandroidProcedure], wholeProgram : Boolean) : Set[ReachableProcedure] = {
+	def getReachableProcedures(procedures : Set[AmandroidProcedure], wholeProgram : Boolean) : Set[AmandroidProcedure] = {
 	  val pag = new PointerAssignmentGraph[PtaNode]()
     val cg = new CallGraph[CGNode]
     pta(pag, cg, procedures, wholeProgram)
@@ -53,7 +53,7 @@ class CallGraphBuilder {
     appInfoOpt match{
       case Some(appInfo) =>
         this.appInfo = appInfo
-        ptaWithIcc(pag, cg)
+        ptaWithIcc(pag, cg, false)
       case None =>
         pta(pag, cg, entryPoints, false)
     }
@@ -84,7 +84,7 @@ class CallGraphBuilder {
     appInfoOpt match{
       case Some(appInfo) =>
         this.appInfo = appInfo
-        ptaWithIcc(pag, cg)
+        ptaWithIcc(pag, cg, true)
       case None =>
         pta(pag, cg, entryPoints, true)
     }
@@ -113,24 +113,20 @@ class CallGraphBuilder {
           wholeProgram : Boolean) = {
     entryPoints.foreach{
 		  ep =>
-		    println(ep)
       	doPTA(ep, pag, cg, wholeProgram)
     }
   }
   
   def ptaWithIcc(pag : PointerAssignmentGraph[PtaNode],
-          cg : CallGraph[CGNode]) = {
+          cg : CallGraph[CGNode],
+          wholeProgram : Boolean) = {
 //    pag.setIntentFdb(appInfo.getIntentDB)
 //    pag.setEntryPoints(appInfo.getEntryPoints)
-//    appInfo.getDummyMainSigMap.values.foreach{
-//      dummySig =>
-//        val dummyUri = androidLibInfoTables.getProcedureUriBySignature(dummySig)
-//        val cfg = cfgs(dummyUri)
-//		    val rda = rdas(dummyUri)
-//		    val pst = pstMap(dummyUri)
-//		    doPTA(pst, cfg, rda, pag, sCfg)
-//    }
-//    overallFix(pag, sCfg)
+    appInfo.getDummyMainMap.values.foreach{
+      ep =>
+		  	doPTA(ep, pag, cg, wholeProgram)
+    }
+    overallFix(pag, cg)
   }
   
   def doPTA(ep : AmandroidProcedure,
@@ -384,7 +380,7 @@ class CallGraphBuilder {
 //         !ofg.isIccOperation(calleeSig, androidLibInfoTables))
       {
         val callerProc = Center.getProcedure(pi.owner)
-        cg.setCallMap(callerProc, ReachableProcedure(callerProc, calleeProc, Some(pi.locationUri), pi.locationIndex))
+        cg.setCallMap(callerProc, calleeProc)
       	cg.extendGraph(calleeSig, callerContext.copy)
       }
     } else {

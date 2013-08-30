@@ -387,10 +387,7 @@ object Center {
 	 * because of some records changes, we need to modify the hierarchy
 	 */
 	
-	def modifyHierarchy {
-	  /*
-	   * TODO: think about how to implement points to analysis with Center
-	   */
+	def modifyHierarchy = {
 	  releaseRecordHierarchy
 	  
 	}
@@ -602,6 +599,15 @@ object Center {
 	}
 	
 	/**
+	 * get procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
+	 */
+	
+	def getProcedureUsingSig(procSig : String) : AmandroidProcedure = {
+	  val from = resolveRecord(signatureToRecordName(procSig), ResolveLevel.BODIES)
+	  getRecordHierarchy.resolveConcreteDispatchWithoutFailing(from, procSig)
+	}
+	
+	/**
 	 * get callee procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
 	 */
 	
@@ -623,8 +629,7 @@ object Center {
 	 */
 	
 	def getDirectCalleeProcedure(procSig : String) : AmandroidProcedure = {
-	  val from = resolveRecord(signatureToRecordName(procSig), ResolveLevel.BODIES)
-	  getRecordHierarchy.resolveConcreteDispatchWithoutFailing(from, procSig)
+	  getProcedureUsingSig(procSig)
 	}
 	
 	/**

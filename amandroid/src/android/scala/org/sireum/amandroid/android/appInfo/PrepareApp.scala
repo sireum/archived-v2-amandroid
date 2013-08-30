@@ -15,11 +15,10 @@ import org.sireum.amandroid.Center
 import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.amandroid.pilarCodeGenerator.DummyMainGenerator
 import org.sireum.amandroid.android.parser.LayoutFileParser
+import scala.util.control.Breaks._
 
 class PrepareApp(apkFileLocation : String) {  
   private val DEBUG = true
-//	private var sinks : Set[AndroidMethod] = Set()
-//	private var sources : Set[AndroidMethod] = Set()
 	private var callbackMethods : Map[String, MSet[AmandroidProcedure]] = Map()
 	private var entrypoints : Set[String] = null
 	private var layoutControls : Map[Int, LayoutControl] = Map()
@@ -32,23 +31,7 @@ class PrepareApp(apkFileLocation : String) {
 	 * Map from record name to it's dummyMain procedure code.
 	 */
 	private var dummyMainMap : Map[AmandroidRecord, AmandroidProcedure] = Map()
-	
-//	def printSinks() = {
-//		println("Sinks:")
-//		for (am <- sinks) {
-//			println(am.toString())
-//		}
-//		println("End of Sinks")
-//	}
 
-	
-//	def printSources() = {
-//		println("Sources:")
-//		for (am <- sources) {
-//			println(am.toString())
-//		}
-//		println("End of Sources")
-//	}
 	def printDummyMains() =
 	  dummyMainMap.foreach{case(k, v) => println("dummyMain for " + k + "\n" + v)}
 	
@@ -69,36 +52,10 @@ class PrepareApp(apkFileLocation : String) {
 	
 	def getIntentDB() = this.intentFdb
 	def getEntryPoints() = this.entrypoints
-		
-//	def getMainComponent() = this.mainComponent
-	
+			
 	def getDummyMainMap() = this.dummyMainMap
 	
-//	private def filterMainComponent(intentFDB : IntentFilterDataBase) : AmandroidRecord = {
-//	  this.entrypoints.foreach{
-//	    ep =>
-//	      val actions = intentFDB.getIntentFiltersActions(ep)
-//	      if(actions != null){
-//	        if(actions.contains(AndroidConstants.ACTION_MAIN)) mainComponent = ep
-//	      }
-//	  }
-//	  if(mainComponent == null){
-//	    this.entrypoints.foreach{
-//	    	ep =>
-//	        val ancestors = Center.getRecordHierarchy.getAllSuperClassesOfIncluding(ep)
-//	        ancestors.foreach{
-//	          ancestor =>
-//	            if(ancestor.getName.equals(AndroidEntryPointConstants.BROADCAST_RECEIVER_CLASS)) mainComponent = ep
-//	        }
-//	    }
-//	  }
-//	  if(mainComponent == null){
-//	    System.err.println("Not found any main component in app: " + apkFileLocation)
-//	  }
-//	  mainComponent
-//	}
-	
-//	def getMainEntryName() : String = this.mainComponent.getName
+
 	/**
 	 * generates dummyMain code for a component like Activity, BroadcastReceiver, etc.
 	 * @param recordName component name
@@ -128,7 +85,7 @@ class PrepareApp(apkFileLocation : String) {
 	  dmGen.getCodeCounter
 	}
 	
-	def calculateSourcesSinksEntrypoints(sourceSinkFile : String) = {
+	def calculateEntrypoints(sourceSinkFile : String) = {
 		// To look for callbacks, we need to start somewhere. We use the Android
 		// lifecycle methods for this purpose.
 		ManifestParser.loadManifestFile(apkFileLocation)
@@ -148,12 +105,6 @@ class PrepareApp(apkFileLocation : String) {
 		  println("arscstring-->" + ARSCFileParser.getGlobalStringPool)
 		  println("arscpackage-->" + ARSCFileParser.getPackages)
 		}
-	
-		// Collect the callback interfaces implemented in the app's source code
-		val analysisHelper = new CallBackInfoCollector(this.entrypoints) 
-		analysisHelper.collectCallbackMethods()
-//		this.callbackMethods = analysisHelper.getCallbackMethods
-//		println("LayoutClasses --> " + analysisHelper.getLayoutClasses)
 		
 		// Find the user-defined sources in the layout XML files
 		LayoutFileParser.setPackageName(this.appPackageName)
@@ -162,8 +113,15 @@ class PrepareApp(apkFileLocation : String) {
 			println("layoutcalll--->" + LayoutFileParser.getCallbackMethods)
 		  println("layoutuser--->" + LayoutFileParser.getUserControls)
 		}
+		
+		// Collect the callback interfaces implemented in the app's source code
+		val analysisHelper = new CallBackInfoCollector(this.entrypoints) 
+		analysisHelper.collectCallbackMethods()
+		this.callbackMethods = analysisHelper.getCallbackMethods
+		if(DEBUG){
+			println("LayoutClasses --> " + analysisHelper.getLayoutClasses)
+		}
 
-		// Collect the results of the soot-based phases
 		analysisHelper.getCallbackMethods.foreach {
 	    case(k, v) =>
   			if (this.callbackMethods.contains(k))
@@ -172,14 +130,12 @@ class PrepareApp(apkFileLocation : String) {
   				this.callbackMethods += (k -> v)
 		}
 		this.layoutControls = LayoutFileParser.getUserControls
-//		
-//		// Collect the XML-based callback methods
+		// Collect the XML-based callback methods
 		analysisHelper.getLayoutClasses.foreach {
 		  case (k, v) =>
 		    v.foreach {
 		      i =>
 		        val resource = ARSCFileParser.findResource(i)
-		        println("i = " + i + "\nresource = " + resource + "\n")
 		        if(resource.isInstanceOf[ARSCFileParser.StringResource]){
 		          val strRes = resource.asInstanceOf[ARSCFileParser.StringResource]
 		          if(LayoutFileParser.getCallbackMethods.contains(strRes.value)){
@@ -193,19 +149,17 @@ class PrepareApp(apkFileLocation : String) {
 		                //The callback may be declared directly in the class or in one of the superclasses
 		                var callbackRecord = k
 		                var callbackProcedure : AmandroidProcedure = null
-		                while(callbackProcedure == null && callbackRecord.hasSuperClass){
-		                  val declProcedures = callbackRecord.getProcedures
-		                  declProcedures.foreach{
-		                    m =>
-		                      if(m.getName == methodName){
-		                        callbackProcedure = m
-		                      }
+		                breakable{ 
+		                  while(callbackProcedure == null){
+			                  if(callbackRecord.declaresProcedureByShortName(methodName))
+			                  	callbackProcedure = callbackRecord.getProcedureByShortName(methodName)
+			                  if(callbackRecord.hasSuperClass)
+			                    callbackRecord = callbackRecord.getSuperClass
+			                  else break
 		                  }
-		                  if(callbackProcedure == null) callbackRecord = callbackRecord.getSuperClass
 		                }
-		                if(callbackRecord != null){
+		                if(callbackProcedure != null){
 		                  methods += callbackProcedure
-		                  println("methods--->" + methods)
 		                } else {
 		                  System.err.println("Callback method " + methodName + " not found in class " + k);
 		                }
@@ -224,21 +178,7 @@ class PrepareApp(apkFileLocation : String) {
         val clCounter = generateDummyMain(record, codeLineCounter)
         codeLineCounter = clCounter
     }
-//
-//		PermissionMethodParser parser = PermissionMethodParser.fromFile(sourceSinkFile);
-//		for (AndroidMethod am : parser.parse()){
-//			if (am.isSource())
-//				sources.add(am);
-//			if(am.isSink())
-//				sinks.add(am);
-//		}
-//		
-//		//add sink for Intents:
-//		AndroidMethod setResult = new AndroidMethod(SootMethodRepresentationParser.v().parseSootMethodString
-//				("<android.app.Activity: void startActivity(android.content.Intent)>"));
-//		setResult.setSink(true);
-//		sinks.add(setResult);
-//		
+
 		println("Entry point calculation done.")
 	}
 }

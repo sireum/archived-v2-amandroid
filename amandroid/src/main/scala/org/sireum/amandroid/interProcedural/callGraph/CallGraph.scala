@@ -14,9 +14,6 @@ import org.sireum.amandroid.interProcedural.InterProceduralGraph
 import org.sireum.amandroid.interProcedural.InterProceduralNode
 import org.sireum.amandroid.interProcedural.Context
 
-case class ReachableProcedure(callerProcedure : AmandroidProcedure, calleeProcedure : AmandroidProcedure, locUri: Option[org.sireum.util.ResourceUri], locIndex: Int)
-
-
 class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
   private var succBranchMap : MMap[(Node, Option[Branch]), Node] = null
   private var predBranchMap : MMap[(Node, Option[Branch]), Node] = null
@@ -28,18 +25,21 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
    * map from procedures to it's callee procedures
    */
   
-  private val callMap : MMap[AmandroidProcedure, MSet[ReachableProcedure]] = mmapEmpty
+  private val callMap : MMap[AmandroidProcedure, MSet[AmandroidProcedure]] = mmapEmpty
   
-  def setCallMap(from : AmandroidProcedure, to : ReachableProcedure) = this.callMap.getOrElseUpdate(from, msetEmpty).add(to)
+  def setCallMap(from : AmandroidProcedure, to : AmandroidProcedure) = this.callMap.getOrElseUpdate(from, msetEmpty).add(to)
 
-  def getReachableProcedure(procs : Set[AmandroidProcedure]) : Set[ReachableProcedure] = {
+  def getReachableProcedure(procs : Set[AmandroidProcedure]) : Set[AmandroidProcedure] = {
+    caculateReachableProcedure(procs) ++ procs
+  }
+  
+  private def caculateReachableProcedure(procs : Set[AmandroidProcedure]) : Set[AmandroidProcedure] = {
     if(procs.isEmpty) Set()
     else
       procs.map{
 	      proc =>
 	        val callees = callMap.getOrElse(proc, msetEmpty).toSet
-	        val calleeProcs = callees.map{_.calleeProcedure}.toSet
-	        callees ++ getReachableProcedure(calleeProcs)
+	        callees ++ caculateReachableProcedure(callees)
 	    }.reduce((s1, s2) => s1 ++ s2)
   }
 

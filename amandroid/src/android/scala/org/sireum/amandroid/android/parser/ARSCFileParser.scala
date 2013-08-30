@@ -224,6 +224,11 @@ object ARSCFileParser extends AbstractAndroidXMLParser {
 		
 		def getDeclaredTypes : List[ResType] = this.types
 		
+		override def toString : String = {
+		  val sb = new StringBuilder
+		  sb.append("ResPackage(" + "id:" + packageId + ",name:" + packageName + ",types:" + types + ")")
+		  sb.toString.intern()
+		}
 	}
 	
 	/**
@@ -281,6 +286,12 @@ object ARSCFileParser extends AbstractAndroidXMLParser {
 						return res
 			return null
 		}
+		
+		override def toString : String = {
+		  val sb = new StringBuilder
+		  sb.append("ResType(" + "id:" + id + ",name:" + typeName + ",configs:" + configurations + ")")
+		  sb.toString.intern()
+		}
 	}
 	
 	/**
@@ -291,6 +302,12 @@ object ARSCFileParser extends AbstractAndroidXMLParser {
 		var resources : List[AbstractResource] = List()
 
 		def getResources : List[AbstractResource] = this.resources
+		
+		override def toString : String = {
+		  val sb = new StringBuilder
+		  sb.append("ResConfig(" + "ress:" + resources + ")")
+		  sb.toString.intern()
+		}
 	}
 		
 	/**
@@ -303,6 +320,12 @@ object ARSCFileParser extends AbstractAndroidXMLParser {
 		def getResourceName : String = this.resourceName
 		
 		def getResourceID : Int = this.resourceID
+		
+		override def toString : String = {
+		  val sb = new StringBuilder
+		  sb.append("AbstractResource(" + "name:" + resourceName + ",id:" + resourceID + ")")
+		  sb.toString.intern()
+		}
 	}
 	
 	/**
@@ -1364,7 +1387,6 @@ object ARSCFileParser extends AbstractAndroidXMLParser {
 	 */
 	def findResource(resourceId : Int) : AbstractResource = {
 		val id = parseResourceId(resourceId)
-		System.err.println("id-->" + id + " resourceId = " + resourceId)
 		for (resPackage <- this.packages)
 			if (resPackage.packageId == id.packageId) {
 				for (resType <- resPackage.types)

@@ -14,7 +14,7 @@ import org.sireum.amandroid.AmandroidResolver
 import org.sireum.amandroid.util.SignatureParser
 
 class DummyMainGenerator {
-  
+  val DEBUG : Boolean = true
   private var currentComponent : String = null
   private var androidClasses : Set[String] = Set()
   /**
@@ -88,7 +88,9 @@ class DummyMainGenerator {
 	  val annotations = new ArrayList[ST]
 	  val signature = procedureName.replaceAll("\\[\\|", "[|L").replaceAll("\\:", "/").replaceAll("\\.dummyMain", ";.dummyMain:()V")
 	  initProcedureHead("[|void|]", procedureName, recordName, signature, "STATIC")
-    AmandroidResolver.resolveProcedureCode(signature, generateInternal(methods))
+	  val code = generateInternal(List())
+    if(DEBUG) println("dummyMain code:\n" + code)
+    AmandroidResolver.resolveProcedureCode(signature, code)
   }
   
   def generateWithParam(params : List[String]) : AmandroidProcedure = {
@@ -113,7 +115,9 @@ class DummyMainGenerator {
 			  paramArray.add(i, paramVar)
     }
     procDeclTemplate.add("params", paramArray)
-    AmandroidResolver.resolveProcedureCode(signature, generateInternal(List()))
+    val code = generateInternal(List())
+    if(DEBUG) println("dummyMain code:\n" + code)
+    AmandroidResolver.resolveProcedureCode(signature, code)
   }
   
   private def generateParamAnnotation(flag : String, params : List[String]) : ST = {

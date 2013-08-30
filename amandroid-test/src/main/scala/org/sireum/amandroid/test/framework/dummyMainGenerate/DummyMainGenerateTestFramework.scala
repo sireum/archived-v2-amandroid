@@ -80,9 +80,10 @@ trait DummyMainGenerateTestFramework extends TestFramework {
     	    Center.resolveRecord(k, Center.ResolveLevel.BODIES)
     	}
     	val pre = new PrepareApp(f.toString)
-		  pre.calculateSourcesSinksEntrypoints("")
-		  pre.printDummyMains
+		  pre.calculateEntrypoints("")
     	
+		  val cg = new CallGraphBuilder().buildAppOnly(Some(pre))
+		  
     	println("####End####")
     }
   }

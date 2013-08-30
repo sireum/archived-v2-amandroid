@@ -49,10 +49,8 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	    val comp = Center.resolveRecord(compName, Center.ResolveLevel.BODIES)
 	    val methods : Set[AmandroidProcedure] = comp.getProcedures
 	    
-	    println("componentName = " + comp + " procs = " + methods)
 	    val reachableMethods = new CallGraphBuilder().getReachableProcedures(methods, false)
-	    println("componentName = " + comp + " reachable procs = " + reachableMethods)
-	    val containerClasses = reachableMethods.map(item => item.calleeProcedure.getDeclaringRecord)
+	    val containerClasses = reachableMethods.map(item => item.getDeclaringRecord)
 	    containerClasses.map(item => analyzeClass(item, comp))
 	  }
 	  println("current all callbacks = " + this.callbackMethods)
@@ -71,53 +69,103 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	  }
 	  new CallGraphBuilder().getReachableProcedures(procedures, false).foreach{
 	    reachableProcedure =>
-	      if(reachableProcedure.calleeProcedure.isConcrete){
-	        if(reachableProcedure.calleeProcedure.getName.equals(AndroidConstants.ACTIVITY_SETCONTENTVIEW)){
-	          val cfg = reachableProcedure.calleeProcedure.getCfg
-	          val rda = reachableProcedure.calleeProcedure.getRda
-	          val slots = rda.entrySet(cfg.getNode(reachableProcedure.locUri, reachableProcedure.locIndex))
-            slots.foreach(
-              item => {
-                if(item.isInstanceOf[(Slot, DefDesc)]){
-                  val (slot, defDesc) = item.asInstanceOf[(Slot, DefDesc)]
-                  val loc = reachableProcedure.callerProcedure.getProcedureBody.location(reachableProcedure.locIndex)
-                  val params = loc match{
-                    case j : JumpLocation =>
-                      j.jump match{
-                        case t : CallJump =>
-                          t.callExp.arg match {
-									          case te : TupleExp =>
-									            te.exps.map{exp=>exp.asInstanceOf[NameExp].name.name}
-									          case a =>
-									            throw new RuntimeException("wrong call exp type: " + a)
-									        }
-                        case a =>
-                          throw new RuntimeException("wrong jump type: " + a)
-                      }
-                    case a => throw new RuntimeException("wrong location type: " + a)
-                  }
-                  require(params.contains(1))
-                  val varName = params(1)
-                  if(varName.equals(slot.toString())){
-                    defDesc match {
-                      case ldd : LocDefDesc => 
-                        val node = cfg.getNode(ldd.locUri, ldd.locIndex)
-                        val locDecl = reachableProcedure.calleeProcedure.getProcedureBody.location(ldd.locIndex)
-                        val num = getIntegerFromLocationDecl(locDecl)
-                        if(num != -1){
-                          val declRecord = reachableProcedure.callerProcedure.getDeclaringRecord
-                          if(this.layoutClasses.contains(declRecord))
-                            this.layoutClasses(declRecord).add(num)
-                          else
-                            this.layoutClasses += (declRecord -> (msetEmpty + num))
+	      if(reachableProcedure.isConcrete){
+	        reachableProcedure.getProcedureBody.locations foreach{
+	          loc =>
+	            loc match{
+	              case j : JumpLocation =>
+                  j.jump match{
+                    case t : CallJump if t.jump.isEmpty =>
+                      val sig = t.getValueAnnotation("signature") match {
+							          case Some(s) => s match {
+							            case ne : NameExp => ne.name.name
+							            case a => throw new RuntimeException("wrong exp type: " + a)
+							          }
+							          case None => throw new RuntimeException("doesn't found annotation which name is 'signature'")
+							        }
+                      val calleeProc = Center.getProcedureUsingSig(sig)
+                      if(calleeProc.getName == AndroidConstants.ACTIVITY_SETCONTENTVIEW){
+                        val cfg = reachableProcedure.getCfg
+                        val rda = reachableProcedure.getRda
+                        val slots = rda.entrySet(cfg.getNode(Some(loc.name.get.uri), loc.index))
+                        val params = t.callExp.arg match {
+								          case te : TupleExp =>
+								            te.exps.map{exp=>exp.asInstanceOf[NameExp].name.name}
+								          case a =>
+								            throw new RuntimeException("wrong call exp type: " + a)
+								        }
+                        slots.foreach{
+                          case(slot, defDesc) =>
+//                            require(params.s)
+					                  val varName = params(1)
+					                  if(varName.equals(slot.toString())){
+					                    defDesc match {
+					                      case ldd : LocDefDesc => 
+					                        val node = cfg.getNode(ldd.locUri, ldd.locIndex)
+					                        val locDecl = reachableProcedure.getProcedureBody.location(ldd.locIndex)
+					                        val num = getIntegerFromLocationDecl(locDecl)
+					                        println("num---------->" + num)
+					                        if(num != -1){
+					                          val declRecord = reachableProcedure.getDeclaringRecord
+					                          if(this.layoutClasses.contains(declRecord))
+					                            this.layoutClasses(declRecord).add(num)
+					                          else
+					                            this.layoutClasses += (declRecord -> (msetEmpty + num))
+					                        }
+					                      case _ =>
+					                    }
+					                  }
                         }
-                      case _ =>
-                    }
+                      }
+                    case _ =>
                   }
-                }
-              }
-            )
+	              case _ =>
+	            }
 	        }
+//	          val cfg = reachableProcedure.getCfg
+//	          val rda = reachableProcedure.getRda
+//	          val slots = rda.entrySet(cfg.getNode(reachableProcedure.locUri, reachableProcedure.locIndex))
+//            slots.foreach(
+//              item => {
+//                if(item.isInstanceOf[(Slot, DefDesc)]){
+//                  val (slot, defDesc) = item.asInstanceOf[(Slot, DefDesc)]
+//                  val loc = reachableProcedure.callerProcedure.getProcedureBody.location(reachableProcedure.locIndex)
+//                  val params = loc match{
+//                    case j : JumpLocation =>
+//                      j.jump match{
+//                        case t : CallJump =>
+//                          t.callExp.arg match {
+//									          case te : TupleExp =>
+//									            te.exps.map{exp=>exp.asInstanceOf[NameExp].name.name}
+//									          case a =>
+//									            throw new RuntimeException("wrong call exp type: " + a)
+//									        }
+//                        case a =>
+//                          throw new RuntimeException("wrong jump type: " + a)
+//                      }
+//                    case a => throw new RuntimeException("wrong location type: " + a)
+//                  }
+//                  require(params.contains(1))
+//                  val varName = params(1)
+//                  if(varName.equals(slot.toString())){
+//                    defDesc match {
+//                      case ldd : LocDefDesc => 
+//                        val node = cfg.getNode(ldd.locUri, ldd.locIndex)
+//                        val locDecl = reachableProcedure.calleeProcedure.getProcedureBody.location(ldd.locIndex)
+//                        val num = getIntegerFromLocationDecl(locDecl)
+//                        if(num != -1){
+//                          val declRecord = reachableProcedure.callerProcedure.getDeclaringRecord
+//                          if(this.layoutClasses.contains(declRecord))
+//                            this.layoutClasses(declRecord).add(num)
+//                          else
+//                            this.layoutClasses += (declRecord -> (msetEmpty + num))
+//                        }
+//                      case _ =>
+//                    }
+//                  }
+//                }
+//              }
+//            )
 	      }
 	  }
 	}
@@ -175,7 +223,6 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 		var classType = ClassType.Plain;
 		val systemMethods: MSet[AmandroidProcedure] = msetEmpty
 		for (ancestorClass : AmandroidRecord <- Center.getRecordHierarchy.getAllSuperClassesOf(record)) {
-		  println("ancesterclss-->" + ancestorClass)
 			if (ancestorClass.getName.equals(AndroidEntryPointConstants.ACTIVITY_CLASS))
 				classType = ClassType.Activity; 
 			else if (ancestorClass.getName.equals(AndroidEntryPointConstants.SERVICE_CLASS))
