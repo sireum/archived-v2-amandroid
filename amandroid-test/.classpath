@@ -11,9 +11,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-core-test"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-lib"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-module"/>
-	<classpathentry kind="lib" path="/git-repo/lib/axml-1.0.jar"/>
-	<classpathentry kind="lib" path="/git-repo/lib/AXMLPrinter2.jar"/>
-	<classpathentry kind="lib" path="/git-repo/lib/polyglot.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

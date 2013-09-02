@@ -14,7 +14,7 @@ import org.sireum.amandroid.example.dummyMainGenerate.DummyMainGenerateExamples
 class DummyMainGenerateTest extends DummyMainGenerateTestFramework {
   AmandroidCodeSource.preLoad
 	DummyMainGenerateExamples.apkModelFiles.
-  filter { s => s.endsWith("2305.apk") }.
+  filter { s => s.endsWith("68ac.apk") }.
   foreach { fileUri =>
     Analyzing title fileUri file fileUri
   }

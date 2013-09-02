@@ -19,7 +19,7 @@ import org.sireum.amandroid.AmandroidCodeSource
 class InterProceduralTest extends InterProceduralTestFramework {
   AmandroidCodeSource.preLoad
   InterproceduralExamples.ofgModelFiles.
-    filter { s => s.endsWith("/StringLoopTest.pilar") }.
+//    filter { s => s.endsWith("/StringLoopTest.pilar") }.
     foreach { fileUri =>
       Analyzing title fileUri file fileUri
     }

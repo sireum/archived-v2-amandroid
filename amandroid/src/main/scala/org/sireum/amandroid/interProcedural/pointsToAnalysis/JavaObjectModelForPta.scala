@@ -39,8 +39,6 @@ trait JavaObjectModelForPta[Node <: PtaNode] {
   
   def doModelOperation(ipN : InvokePointNode[Node], pag : PointerAssignmentGraph[Node]) : Map[Node, MSet[PTAInstance]] = {
     if(checkModelOperation(ipN, pag.pointsToMap)){
-      if(ipN.getCalleeSig == "[|Ljava/lang/String;.concat:(Ljava/lang/String;)Ljava/lang/String;|]")
-        println(ipN.getCalleeSig)
       var valueSets : Map[Int, MSet[PTAInstance]] = Map()
       ipN.recvCallNodeOpt match {
       	case Some(thisEntryNode) => 
