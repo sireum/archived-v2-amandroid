@@ -21,6 +21,14 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
   
   final val K_CONTEXT = 1
   
+  private var entryN : CGNode = null
+
+  private var exitN : CGNode = null
+  
+  def entryNode : Node = this.entryN.asInstanceOf[Node]
+  
+  def exitNode : Node = this.exitN.asInstanceOf[Node]
+  
   /**
    * map from procedures to it's callee procedures
    */
@@ -47,6 +55,8 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
     val result = new CallGraph[Node]
     for (n <- nodes) result.addNode(n)
     for (e <- edges) result.addEdge(e.target, e.source)
+    result.entryN = this.exitNode
+    result.exitN = this.entryNode
     result
   }
     
@@ -209,62 +219,131 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
    automata
   }
    
-  def collectCfgToBaseGraph[VirtualLabel](calleeSig : String, callerContext : Context, cfg : ControlFlowGraph[VirtualLabel]) = {
+  def collectCfgToBaseGraph[VirtualLabel](calleeProc : AmandroidProcedure, callerContext : Context) = {
+    val calleeSig = calleeProc.getSignature
+    val body = calleeProc.getProcedureBody
+    val cfg = calleeProc.getCfg
+    def isCall(l : LocationDecl) : Boolean = l.isInstanceOf[JumpLocation] && l.asInstanceOf[JumpLocation].jump.isInstanceOf[CallJump]
     cfg.nodes map{
       n =>
 	      n match{
 	        case vn : AlirVirtualNode[VirtualLabel] =>
-	          addCGVirtualNode(vn.label.toString, callerContext.copy.setContext(calleeSig, calleeSig)) 
+	          vn.label.toString match{
+	            case "Entry" => 
+	              addCGEntryNode(callerContext.copy.setContext(calleeSig, calleeSig))
+	            case "Exit" => 
+	              addCGExitNode(callerContext.copy.setContext(calleeSig, calleeSig))
+	            case a => throw new RuntimeException("unexpected virtual label: " + a)
+	          }
 	        case ln : AlirLocationUriNode=>
-	          addCGLocNode(callerContext.copy.setContext(calleeSig, ln.locUri))
-	        case n => throw new RuntimeException("wrong node type: " + n)
+	          val l = body.location(ln.locIndex)
+	          if(isCall(l)){
+              val c = addCGCallNode(callerContext.copy.setContext(calleeSig, ln.locUri))
+              val r = addCGReturnNode(callerContext.copy.setContext(calleeSig, ln.locUri))
+              addEdge(c, r)
+	          } else addCGNormalNode(callerContext.copy.setContext(calleeSig, ln.locUri))
+	        case _ => addCGNormalNode(callerContext.copy.setContext(calleeSig, n.toString))
 	      }
     }
     for (e <- cfg.edges) {
-      val entryNode = getCGVirtualNode("Entry", callerContext.copy.setContext(calleeSig, calleeSig))
-      val exitNode = getCGVirtualNode("Exit", callerContext.copy.setContext(calleeSig, calleeSig))
+      val entryNode = getCGEntryNode(callerContext.copy.setContext(calleeSig, calleeSig))
+      val exitNode = getCGExitNode(callerContext.copy.setContext(calleeSig, calleeSig))
       e.source match{
         case vns : AlirVirtualNode[VirtualLabel] =>
           e.target match{
             case vnt : AlirVirtualNode[VirtualLabel] =>
               addEdge(entryNode, exitNode)
             case lnt : AlirLocationUriNode =>
-              val targetNode = getCGLocNode(callerContext.copy.setContext(calleeSig, lnt.locUri))
+              val lt = body.location(lnt.locIndex)
+		          if(isCall(lt)){
+                val callNodeTarget = getCGCallNode(callerContext.copy.setContext(calleeSig, lnt.locUri))
+                addEdge(entryNode, callNodeTarget)
+		          } else {
+	              val targetNode = getCGNormalNode(callerContext.copy.setContext(calleeSig, lnt.locUri))
+	              addEdge(entryNode, targetNode)
+		          }
+            case nt =>
+              val targetNode = getCGNormalNode(callerContext.copy.setContext(calleeSig, nt.toString))
               addEdge(entryNode, targetNode)
-            case nt => throw new RuntimeException("wrong node type: " + nt)
           }
         case lns : AlirLocationUriNode =>
+          val ls = body.location(lns.locIndex)
           e.target match{
             case vnt : AlirVirtualNode[VirtualLabel] =>
-              val sourceNode = getCGLocNode(callerContext.copy.setContext(calleeSig, lns.locUri))
+              if(isCall(ls)){
+                val returnNodeSource = getCGReturnNode(callerContext.copy.setContext(calleeSig, lns.locUri))
+                addEdge(returnNodeSource, exitNode)
+              } else {
+                val sourceNode = getCGNormalNode(callerContext.copy.setContext(calleeSig, lns.locUri))
+              	addEdge(sourceNode, exitNode)
+              }
+            case lnt : AlirLocationUriNode =>
+              val lt = body.location(lnt.locIndex)
+              if(isCall(ls)){
+                val returnNodeSource = getCGReturnNode(callerContext.copy.setContext(calleeSig, lns.locUri))
+                if(isCall(lt)){
+	                val callNodeTarget = getCGCallNode(callerContext.copy.setContext(calleeSig, lnt.locUri))
+	                addEdge(returnNodeSource, callNodeTarget)
+			          } else {
+		              val targetNode = getCGNormalNode(callerContext.copy.setContext(calleeSig, lnt.locUri))
+		              addEdge(returnNodeSource, targetNode)
+			          }
+              } else {
+                val sourceNode = getCGNormalNode(callerContext.copy.setContext(calleeSig, lns.locUri))
+                if(isCall(lt)){
+	                val callNodeTarget = getCGCallNode(callerContext.copy.setContext(calleeSig, lnt.locUri))
+	                addEdge(sourceNode, callNodeTarget)
+			          } else {
+		              val targetNode = getCGNormalNode(callerContext.copy.setContext(calleeSig, lnt.locUri))
+		              addEdge(sourceNode, targetNode)
+			          }
+              }
+            case nt =>
+              val targetNode = getCGNormalNode(callerContext.copy.setContext(calleeSig, nt.toString))
+              if(isCall(ls)){
+                val returnNodeSource = getCGReturnNode(callerContext.copy.setContext(calleeSig, lns.locUri))
+                addEdge(returnNodeSource, targetNode)
+              } else {
+                val sourceNode = getCGNormalNode(callerContext.copy.setContext(calleeSig, lns.locUri))
+                addEdge(sourceNode, targetNode)
+              }
+          }
+        case ns =>
+          val sourceNode = getCGNormalNode(callerContext.copy.setContext(calleeSig, ns.toString))
+          e.target match{
+            case vnt : AlirVirtualNode[VirtualLabel] =>
               addEdge(sourceNode, exitNode)
             case lnt : AlirLocationUriNode =>
-              val sourceNode = getCGLocNode(callerContext.copy.setContext(calleeSig, lns.locUri))
-              val targetNode = getCGLocNode(callerContext.copy.setContext(calleeSig, lnt.locUri))
+              val lt = body.location(lnt.locIndex)
+		          if(isCall(lt)){
+                val callNodeTarget = getCGCallNode(callerContext.copy.setContext(calleeSig, lnt.locUri))
+                val returnNodeTarget = getCGReturnNode(callerContext.copy.setContext(calleeSig, lnt.locUri))
+                addEdge(sourceNode, callNodeTarget)
+		          } else {
+	              val targetNode = getCGNormalNode(callerContext.copy.setContext(calleeSig, lnt.locUri))
+	              addEdge(sourceNode, targetNode)
+		          }
+            case nt =>
+              val targetNode = getCGNormalNode(callerContext.copy.setContext(calleeSig, nt.toString))
               addEdge(sourceNode, targetNode)
-            case nt => throw new RuntimeException("wrong node type: " + nt)
           }
-        case ns => throw new RuntimeException("wrong node type: " + ns)
       }
     }
   }
   
   def extendGraph(calleeSig  : String, callerContext : Context) = {
-    val srcNode = getCGLocNode(callerContext)
+    val callNode = getCGCallNode(callerContext)
+    val returnNode = getCGReturnNode(callerContext)
     val calleeContext = callerContext.copy
     calleeContext.setContext(calleeSig, calleeSig)
-    val targetNode = getCGVirtualNode("Entry", calleeContext)
-    val retSrcNode = getCGVirtualNode("Exit", calleeContext)
-    successors(srcNode).foreach{
-      retTargetnode =>
-        deleteEdge(srcNode, retTargetnode)
-        addEdge(retSrcNode, retTargetnode)
-    }
-    addEdge(srcNode, targetNode)
+    val targetNode = getCGEntryNode(calleeContext)
+    val retSrcNode = getCGExitNode(calleeContext)
+    addEdge(callNode, targetNode)
+    addEdge(retSrcNode, returnNode)
   }
   
-  def addCGLocNode(context : Context) : Node = {
-    val node = newCGLocNode(context).asInstanceOf[Node]
+  def addCGNormalNode(context : Context) : Node = {
+    val node = newCGNormalNode(context).asInstanceOf[Node]
     val n =
       if (pool.contains(node)) pool(node)
       else {
@@ -275,18 +354,18 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
     n
   }
   
-  def cgLocNodeExists(context : Context) : Boolean = {
-    graph.containsVertex(newCGLocNode(context).asInstanceOf[Node])
+  def cgNormalNodeExists(context : Context) : Boolean = {
+    graph.containsVertex(newCGNormalNode(context).asInstanceOf[Node])
   }
   
-  def getCGLocNode(context : Context) : Node =
-    pool(newCGLocNode(context))
+  def getCGNormalNode(context : Context) : Node =
+    pool(newCGNormalNode(context))
   
-  protected def newCGLocNode(context : Context) =
-    CGLocNode(context)
+  protected def newCGNormalNode(context : Context) =
+    CGNormalNode(context)
     
-  def addCGVirtualNode(virtualLabel : String, context : Context) : Node = {
-    val node = newCGVirtualNode(virtualLabel, context).asInstanceOf[Node]
+  def addCGCallNode(context : Context) : Node = {
+    val node = newCGCallNode(context).asInstanceOf[Node]
     val n =
       if (pool.contains(node)) pool(node)
       else {
@@ -297,24 +376,119 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
     n
   }
   
-  def cgVirtualNodeExists(virtualLabel : String, context : Context) : Boolean = {
-    graph.containsVertex(newCGVirtualNode(virtualLabel, context).asInstanceOf[Node])
+  def cgCallNodeExists(context : Context) : Boolean = {
+    graph.containsVertex(newCGCallNode(context).asInstanceOf[Node])
   }
   
-  def getCGVirtualNode(virtualLabel : String, context : Context) : Node =
-    pool(newCGVirtualNode(virtualLabel, context))
+  def getCGCallNode(context : Context) : Node =
+    pool(newCGCallNode(context))
   
-  protected def newCGVirtualNode(virtualLabel : String, context : Context) =
-    CGVirtualNode(virtualLabel, context)
+  protected def newCGCallNode(context : Context) =
+    CGCallNode(context)
+    
+  def addCGReturnNode(context : Context) : Node = {
+    val node = newCGReturnNode(context).asInstanceOf[Node]
+    val n =
+      if (pool.contains(node)) pool(node)
+      else {
+        pl += (node -> node)
+        node
+      }
+    graph.addVertex(n)
+    n
+  }
+  
+  def cgReturnNodeExists(context : Context) : Boolean = {
+    graph.containsVertex(newCGReturnNode(context).asInstanceOf[Node])
+  }
+  
+  def getCGReturnNode(context : Context) : Node =
+    pool(newCGReturnNode(context))
+  
+  protected def newCGReturnNode(context : Context) =
+    CGReturnNode(context)
+  
+    
+  def addCGEntryNode(context : Context) : Node = {
+    val node = newCGEntryNode(context).asInstanceOf[Node]
+    val n =
+      if (pool.contains(node)) pool(node)
+      else {
+        pl += (node -> node)
+        node
+      }
+    graph.addVertex(n)
+    n
+  }
+  
+  def cgEntryNodeExists(context : Context) : Boolean = {
+    graph.containsVertex(newCGEntryNode(context).asInstanceOf[Node])
+  }
+  
+  def getCGEntryNode(context : Context) : Node =
+    pool(newCGEntryNode(context))
+  
+  protected def newCGEntryNode(context : Context) =
+    CGEntryNode(context)
+    
+  def addCGExitNode(context : Context) : Node = {
+    val node = newCGExitNode(context).asInstanceOf[Node]
+    val n =
+      if (pool.contains(node)) pool(node)
+      else {
+        pl += (node -> node)
+        node
+      }
+    graph.addVertex(n)
+    n
+  }
+  
+  def cgExitNodeExists(context : Context) : Boolean = {
+    graph.containsVertex(newCGExitNode(context).asInstanceOf[Node])
+  }
+  
+  def getCGExitNode(context : Context) : Node =
+    pool(newCGExitNode(context))
+  
+  protected def newCGExitNode(context : Context) =
+    CGExitNode(context)
   
 }
 
 sealed abstract class CGNode(context : Context) extends InterProceduralNode(context)
 
-final case class CGVirtualNode(virtualLabel : String, context : Context) extends CGNode(context) {
-  override def toString = virtualLabel + "@" + context.toString()
+abstract class CGVirtualNode(context : Context) extends CGNode(context) {
+  def getVirtualLabel : String
 }
 
-final case class CGLocNode(context : Context) extends CGNode(context) {
-  override def toString = context.toString()
+final case class CGEntryNode(context : Context) extends CGVirtualNode(context){
+  def getVirtualLabel : String = "Entry"
+  override def toString : String = "Entry@" + context
+}
+
+final case class CGExitNode(context : Context) extends CGVirtualNode(context){
+  def getVirtualLabel : String = "Exit"
+  override def toString : String = "Exit@" + context
+}
+
+abstract class CGLocNode(context : Context) extends CGNode(context) {
+  def getLocUri : String = context.getLocUri
+}
+
+abstract class CGInvokeNode(context : Context) extends CGLocNode(context) {
+  def getInvokeLabel : String
+}
+
+final case class CGCallNode(context : Context) extends CGInvokeNode(context){
+  def getInvokeLabel : String = "Call"
+  override def toString : String = "Call@" + context
+}
+
+final case class CGReturnNode(context : Context) extends CGInvokeNode(context){
+  def getInvokeLabel : String = "Return"
+  override def toString : String = "Return@" + context
+}
+
+final case class CGNormalNode(context : Context) extends CGLocNode(context){
+  override def toString : String = context.toString
 }

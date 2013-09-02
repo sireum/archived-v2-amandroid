@@ -15,6 +15,10 @@ import org.sireum.amandroid.interProcedural.objectFlowAnalysis.InvokePointNode
 import org.sireum.amandroid.Transform
 import org.sireum.pilar.ast.NameExp
 
+
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 class CallGraphBuilder {
   var appInfo : PrepareApp = null
   var processed : Map[(String, Context), PointProc] = Map()
@@ -24,7 +28,8 @@ class CallGraphBuilder {
   
   /**
 	 * Get all reachable procedures of given procedure.
-	 * @param procedureUris Initial procedure resource uri
+	 * @param procedureUris Initial procedure
+	 * @param wholeProgram Building call graph in whole program mode or not
 	 * @return Set of reachable procedure resource uris from initial procedure
 	 */
 	def getReachableProcedures(procedure : AmandroidProcedure, wholeProgram : Boolean) : Set[AmandroidProcedure] = {
@@ -36,7 +41,8 @@ class CallGraphBuilder {
   
 	/**
 	 * Get all reachable procedures of given procedure set.
-	 * @param procedureUris Initial procedure resource uri set
+	 * @param procedureUris Initial procedures set
+	 * @param wholeProgram Building call graph in whole program mode or not
 	 * @return Set of reachable procedure resource uris from initial set
 	 */
 	def getReachableProcedures(procedures : Set[AmandroidProcedure], wholeProgram : Boolean) : Set[AmandroidProcedure] = {
@@ -58,20 +64,20 @@ class CallGraphBuilder {
         pta(pag, cg, entryPoints, false)
     }
     val result = cg
-    pag.pointsToMap.pointsToMap.foreach{
-      item =>
-        println("item--->" + item)
-    }
+//    pag.pointsToMap.pointsToMap.foreach{
+//      item =>
+//        println("item--->" + item)
+//    }
     println("processed-->" + processed.size)
-    val f1 = new File(System.getProperty("user.home") + "/Desktop/CallGraph.dot")
-    val o1 = new FileOutputStream(f1)
-    val w1 = new OutputStreamWriter(o1)
-    result.toDot(w1)
-    
-    val f2 = new File(System.getProperty("user.home") + "/Desktop/PointerAssignmentGraph.dot")
-    val o2 = new FileOutputStream(f2)
-    val w2 = new OutputStreamWriter(o2)
-    pag.toDot(w2)
+//    val f1 = new File(System.getProperty("user.home") + "/Desktop/CallGraph.dot")
+//    val o1 = new FileOutputStream(f1)
+//    val w1 = new OutputStreamWriter(o1)
+//    result.toDot(w1)
+//    
+//    val f2 = new File(System.getProperty("user.home") + "/Desktop/PointerAssignmentGraph.dot")
+//    val o2 = new FileOutputStream(f2)
+//    val w2 = new OutputStreamWriter(o2)
+//    pag.toDot(w2)
     result
   }
 
@@ -89,20 +95,20 @@ class CallGraphBuilder {
         pta(pag, cg, entryPoints, true)
     }
     val result = cg
-    pag.pointsToMap.pointsToMap.foreach{
-      item =>
-        println("item--->" + item)
-    }
+//    pag.pointsToMap.pointsToMap.foreach{
+//      item =>
+//        println("item--->" + item)
+//    }
     println("processed-->" + processed.size)
-    val f1 = new File(System.getProperty("user.home") + "/Desktop/CallGraph.dot")
-    val o1 = new FileOutputStream(f1)
-    val w1 = new OutputStreamWriter(o1)
-    result.toDot(w1)
-    
-    val f2 = new File(System.getProperty("user.home") + "/Desktop/PointerAssignmentGraph.dot")
-    val o2 = new FileOutputStream(f2)
-    val w2 = new OutputStreamWriter(o2)
-    pag.toDot(w2)
+//    val f1 = new File(System.getProperty("user.home") + "/Desktop/CallGraph.dot")
+//    val o1 = new FileOutputStream(f1)
+//    val w1 = new OutputStreamWriter(o1)
+//    result.toDot(w1)
+//    
+//    val f2 = new File(System.getProperty("user.home") + "/Desktop/PointerAssignmentGraph.dot")
+//    val o2 = new FileOutputStream(f2)
+//    val w2 = new OutputStreamWriter(o2)
+//    pag.toDot(w2)
 
     result
   }
@@ -138,7 +144,7 @@ class CallGraphBuilder {
     val context : Context = new Context(pag.K_CONTEXT)
     setProcessed(points, ep.getSignature, context.copy)
     pag.constructGraph(ep, points, context.copy)
-    cg.collectCfgToBaseGraph(ep.getSignature, context.copy, ep.getCfg)
+    cg.collectCfgToBaseGraph(ep, context.copy)
     workListPropagation(pag, cg, wholeProgram)
   }
   
@@ -369,8 +375,8 @@ class CallGraphBuilder {
     } else if(!processed.contains((calleeSig, callerContext))){
     	val points = new PointsCollector().points(calleeProc.getSignature, calleeProc.getProcedureBody)
     	setProcessed(points, calleeSig, callerContext.copy)
-      pag.constructGraph(calleeProc, points, callerContext.copy)        
-      cg.collectCfgToBaseGraph(calleeSig, callerContext.copy, calleeProc.getCfg)
+      pag.constructGraph(calleeProc, points, callerContext.copy)  
+      cg.collectCfgToBaseGraph(calleeProc, callerContext.copy)
     }
     if(processed.contains(calleeSig, callerContext)){
       val procPoint = processed(calleeSig, callerContext)

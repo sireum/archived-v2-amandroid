@@ -17,12 +17,15 @@ import org.sireum.amandroid.pilarCodeGenerator.DummyMainGenerator
 import org.sireum.amandroid.android.parser.LayoutFileParser
 import scala.util.control.Breaks._
 
+/**
+ * adapted from Steven Arzt
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 class PrepareApp(apkFileLocation : String) {  
   private val DEBUG = true
 	private var callbackMethods : Map[String, MSet[AmandroidProcedure]] = Map()
 	private var entrypoints : Set[String] = null
 	private var layoutControls : Map[Int, LayoutControl] = Map()
-	private var resourcePackages : List[ARSCFileParser.ResPackage] = List()
 	private var appPackageName : String = ""
 	private var taintWrapperFile : String = ""
 	private var intentFdb : IntentFilterDataBase = null
@@ -85,33 +88,35 @@ class PrepareApp(apkFileLocation : String) {
 	  dmGen.getCodeCounter
 	}
 	
-	def calculateEntrypoints(sourceSinkFile : String) = {
+	def calculateEntrypoints = {
 		// To look for callbacks, we need to start somewhere. We use the Android
 		// lifecycle methods for this purpose.
-		ManifestParser.loadManifestFile(apkFileLocation)
-		this.appPackageName = ManifestParser.getPackageName
-		this.entrypoints = ManifestParser.getEntryPointClasses
-		this.intentFdb = ManifestParser.getIntentDB
+	  val mfp = new ManifestParser
+		mfp.loadManifestFile(apkFileLocation)
+		this.appPackageName = mfp.getPackageName
+		this.entrypoints = mfp.getEntryPointClasses
+		this.intentFdb = mfp.getIntentDB
 		if(DEBUG){
-		  println("entrypoints--->" + ManifestParser.getEntryPointClasses)
-		  println("packagename--->" + ManifestParser.getPackageName)
-		  println("permissions--->" + ManifestParser.getPermissions)
-		  println("intentDB------>" + ManifestParser.getIntentDB)
+		  println("entrypoints--->" + mfp.getEntryPointClasses)
+		  println("packagename--->" + mfp.getPackageName)
+		  println("permissions--->" + mfp.getPermissions)
+		  println("intentDB------>" + mfp.getIntentDB)
 		}
 		// Parse the resource file
-		ARSCFileParser.parse(apkFileLocation);
-		this.resourcePackages = ARSCFileParser.getPackages
+	  val afp = new ARSCFileParser()
+		afp.parse(apkFileLocation)
 		if(DEBUG){
-		  println("arscstring-->" + ARSCFileParser.getGlobalStringPool)
-		  println("arscpackage-->" + ARSCFileParser.getPackages)
+		  println("arscstring-->" + afp.getGlobalStringPool)
+		  println("arscpackage-->" + afp.getPackages)
 		}
 		
 		// Find the user-defined sources in the layout XML files
-		LayoutFileParser.setPackageName(this.appPackageName)
-		LayoutFileParser.parseLayoutFile(apkFileLocation, this.entrypoints)
+	  val lfp = new LayoutFileParser
+		lfp.setPackageName(this.appPackageName)
+		lfp.parseLayoutFile(apkFileLocation, this.entrypoints)
 		if(DEBUG){
-			println("layoutcalll--->" + LayoutFileParser.getCallbackMethods)
-		  println("layoutuser--->" + LayoutFileParser.getUserControls)
+			println("layoutcalll--->" + lfp.getCallbackMethods)
+		  println("layoutuser--->" + lfp.getUserControls)
 		}
 		
 		// Collect the callback interfaces implemented in the app's source code
@@ -129,17 +134,17 @@ class PrepareApp(apkFileLocation : String) {
   			else
   				this.callbackMethods += (k -> v)
 		}
-		this.layoutControls = LayoutFileParser.getUserControls
+		this.layoutControls = new LayoutFileParser().getUserControls
 		// Collect the XML-based callback methods
 		analysisHelper.getLayoutClasses.foreach {
 		  case (k, v) =>
 		    v.foreach {
 		      i =>
-		        val resource = ARSCFileParser.findResource(i)
-		        if(resource.isInstanceOf[ARSCFileParser.StringResource]){
-		          val strRes = resource.asInstanceOf[ARSCFileParser.StringResource]
-		          if(LayoutFileParser.getCallbackMethods.contains(strRes.value)){
-		            LayoutFileParser.getCallbackMethods(strRes.value).foreach{
+		        val resource = afp.findResource(i)
+		        if(resource.isInstanceOf[afp.StringResource]){
+		          val strRes = resource.asInstanceOf[afp.StringResource]
+		          if(lfp.getCallbackMethods.contains(strRes.value)){
+		            lfp.getCallbackMethods(strRes.value).foreach{
 		              methodName =>
 		                val methods = this.callbackMethods.getOrElse(k.getName, msetEmpty)
 		                if(methods.isEmpty){

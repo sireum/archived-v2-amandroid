@@ -200,7 +200,7 @@ class AmandroidField {
 	
 	def isDeclared = declaringRecord != null
 	
-	override def toString() : String = getName
+	override def toString() : String = getSignature
 	
 	def printDetail = {
 	  println("~~~~~~~~~~~~~AmandroidField~~~~~~~~~~~~~")

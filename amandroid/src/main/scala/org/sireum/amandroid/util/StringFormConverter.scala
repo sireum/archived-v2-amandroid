@@ -1,5 +1,11 @@
 package org.sireum.amandroid.util
 
+import org.sireum.amandroid._
+
+
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 object StringFormConverter {
 
   /**
@@ -7,6 +13,15 @@ object StringFormConverter {
 	 */
   
   def getRecordNameFromProcedureSignature(sig : String) : String = {
+    val typ = getRecordTypeFromProcedureSignature(sig)
+    typ.typ
+  }
+  
+  /**
+	 * get record type from procedure signature. e.g. [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|] -> [|java:lang:Object|]
+	 */
+  
+  def getRecordTypeFromProcedureSignature(sig : String) : Type = {
     if(!isValidProcSig(sig)) throw new RuntimeException("wrong sig: " + sig)
     formatSigToTypeForm(sig.substring(2, sig.indexOf('.')))
   }
@@ -24,7 +39,7 @@ object StringFormConverter {
 	 * convert type string from signature style to type style. [Ljava/lang/Object; -> [|java:lang:Object|][]
 	 */
 	
-	def formatSigToTypeForm(sig : String) : String = {
+	def formatSigToTypeForm(sig : String) : Type = {
 	  if(!isValidTypeSig(sig)) throw new RuntimeException("wrong type sig: " + sig)
 	  val (tmp, d) = getDimensionsAndRemoveArrayFromSig(sig)
     tmp match{
@@ -36,7 +51,7 @@ object StringFormConverter {
       case "J" => 	getType("[|long|]", d)
       case "S" =>		getType("[|short|]", d)
       case "Z" =>		getType("[|boolean|]", d)
-      case "V" =>		"[|void|]"
+      case "V" =>		getType("[|void|]", d)
       case _ =>
         getType("[|" + tmp.substring(1, tmp.length() - 1).replaceAll("\\/", ":") + "|]", d)
     }
@@ -49,8 +64,9 @@ object StringFormConverter {
   
   def formatTypeToSigForm(typ : String) : String = {
     if(!isValidType(typ)) throw new RuntimeException("wrong type: " + typ)
-    val (tmp, d) = getDimensionsAndRemoveArrayFromType(typ)
-    tmp match{
+    val t = getDimensionsAndRemoveArrayFromType(typ)
+    val d = t.dimensions
+    t.typ match{
       case "[|byte|]" => 		getTypeSig("B", d)
       case "[|char|]" => 		getTypeSig("C", d)
       case "[|double|]" => 	getTypeSig("D", d)
@@ -61,7 +77,7 @@ object StringFormConverter {
       case "[|boolean|]" =>	getTypeSig("Z", d)
       case "[|void|]" =>		"V"
       case _ =>
-        getTypeSig("L" + tmp.substring(2, tmp.length() - 2).replaceAll(":", "/") + ";", d)
+        getTypeSig("L" + t.typ.substring(2, t.typ.length() - 2).replaceAll(":", "/") + ";", d)
     }
   }
   
@@ -95,21 +111,16 @@ object StringFormConverter {
   }
   
   /**
-   * input ("[|java:lang:String|]", 1) output "[|java:lang:String|][]"
+   * input ("[|java:lang:String|]", 1) output Type
    */
   
-  protected def getType(typ : String, dimension : Int) : String = {
-    val sb = new StringBuffer
-    sb.append(typ)
-    for(d <- 1 to dimension) sb.append("[]")
-    sb.toString().intern()
-  }
+  protected def getType(typ : String, dimension : Int) : Type = new NormalType(typ, dimension)
   
   /**
    * input: "[|java:lang:String|][]"  output: ("[|java:lang:String|]", 1)
    */
   
-  def getDimensionsAndRemoveArrayFromType(typ : String) : (String, Int) = {
+  def getDimensionsAndRemoveArrayFromType(typ : String) : Type = {
     if(!isValidType(typ)) throw new RuntimeException("wrong type: " + typ)
     var d : Int = 0
     var tmp = typ
@@ -117,7 +128,7 @@ object StringFormConverter {
       d += 1
       tmp = tmp.substring(0, tmp.length() - 2)
     }
-    (tmp, d)
+    new NormalType(tmp, d)
   }
   
   /**

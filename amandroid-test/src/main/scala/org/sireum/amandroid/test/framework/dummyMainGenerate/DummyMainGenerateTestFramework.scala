@@ -15,6 +15,9 @@ import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
 import org.sireum.amandroid.interProcedural.callGraph.CallGraphBuilder
 import org.sireum.amandroid.android.appInfo.PrepareApp
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 trait DummyMainGenerateTestFramework extends TestFramework {
 
   def Analyzing : this.type = this
@@ -33,7 +36,8 @@ trait DummyMainGenerateTestFramework extends TestFramework {
 
     test(title) {
     	println("####" + title + "#####")
-    	
+    	Center.reset
+    	AmandroidCodeSource.clearAppRecordsCodes
     	val f = new File(src.toString().substring(5))
       //create directory
       val dirName = f.getName().split("\\.")(0)
@@ -72,18 +76,17 @@ trait DummyMainGenerateTestFramework extends TestFramework {
       apkPipeline.compute(job)
     	
       val pilarFile = FileUtil.toUri(d + dirName + "/" + dirName + ".pilar")
-      Center.reset
-    	AmandroidCodeSource.clearAppRecordsCodes
     	LightWeightPilarParser(Right(pilarFile), AmandroidCodeSource.CodeType.APP)
     	AmandroidCodeSource.getAppRecordsCodes.keys foreach{
     	  k =>
     	    Center.resolveRecord(k, Center.ResolveLevel.BODIES)
     	}
     	val pre = new PrepareApp(f.toString)
-		  pre.calculateEntrypoints("")
+		  pre.calculateEntrypoints
     	
-		  val cg = new CallGraphBuilder().buildAppOnly(Some(pre))
-		  
+		  val cg = new CallGraphBuilder().buildWholeProgram(Some(pre))
+		  System.gc()
+		  System.gc()
     	println("####End####")
     }
   }

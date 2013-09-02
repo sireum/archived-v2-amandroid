@@ -5,6 +5,9 @@ import com.thoughtworks.xstream.io.xml.Xpp3Driver
 import org.sireum.util._
 import java.io._
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 object AndroidXStream {
   
   val xstream = {

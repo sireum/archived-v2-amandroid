@@ -43,13 +43,13 @@ class AmandroidProcedure {
 	 * list of parameter types. e.g. List([java:lang:Object], [java:lang:String])
 	 */
 	
-	protected var paramTyps : List[String] = List()
+	protected var paramTyps : List[Type] = List()
 	
 	/**
 	 * return type. e.g. [|boolean|]
 	 */
 	
-	protected var returnTyp : String = null
+	protected var returnTyp : Type = null
 	
 	/**
 	 * declaring record of this procedure
@@ -103,7 +103,7 @@ class AmandroidProcedure {
    * when you construct a amandroid procedure instance please call this init function first
    */
   
-  def init(name : String, sig : String, paramTyps : List[String], returnTyp : String, accessFlags : Int, thrownExceptions : List[AmandroidRecord]) : AmandroidProcedure = {
+  def init(name : String, sig : String, paramTyps : List[Type], returnTyp : Type, accessFlags : Int, thrownExceptions : List[AmandroidRecord]) : AmandroidProcedure = {
 	  setName(name)
 	  setSignature(sig)
 	  this.paramTyps ++= paramTyps
@@ -120,7 +120,7 @@ class AmandroidProcedure {
    * when you construct a amandroid procedure instance please call this init function first
    */
   
-  def init(name : String, sig : String, paramTyps : List[String], returnTyp : String, accessFlags : Int) : AmandroidProcedure = {
+  def init(name : String, sig : String, paramTyps : List[Type], returnTyp : Type, accessFlags : Int) : AmandroidProcedure = {
 	  init(name, sig, paramTyps, returnTyp, accessFlags, List())
 	}
   
@@ -128,7 +128,7 @@ class AmandroidProcedure {
    * when you construct a amandroid procedure instance please call this init function first
    */
   
-  def init(name : String, sig : String, paramTyps : List[String], returnTyp : String) : AmandroidProcedure = {
+  def init(name : String, sig : String, paramTyps : List[Type], returnTyp : Type) : AmandroidProcedure = {
 	  init(name, sig, paramTyps, returnTyp, 0, List())
 	}
   
@@ -252,9 +252,9 @@ class AmandroidProcedure {
     sb.append(this.shortName + ":(")
     pts.foreach{
       pt =>
-        sb.append(StringFormConverter.formatTypeToSigForm(pt))
+        sb.append(StringFormConverter.formatTypeToSigForm(pt.typ))
     }
-    sb.append(StringFormConverter.formatTypeToSigForm(rt))
+    sb.append(StringFormConverter.formatTypeToSigForm(rt.typ))
     sb.toString().intern()
   }
   
@@ -262,7 +262,7 @@ class AmandroidProcedure {
    * set return type of this procedure
    */
   
-  def setReturnType(typ : String) = {
+  def setReturnType(typ : Type) = {
     val wasDeclared = isDeclared
     val oldDeclaringRecord = declaringRecord
     if(wasDeclared) oldDeclaringRecord.removeProcedure(this)
@@ -276,7 +276,7 @@ class AmandroidProcedure {
    * set parameter types of this procedure
    */
   
-  def setParameterTypes(typs : List[String]) = {
+  def setParameterTypes(typs : List[Type]) = {
     val wasDeclared = isDeclared
     val oldDeclaringRecord = declaringRecord
     if(wasDeclared) oldDeclaringRecord.removeProcedure(this)

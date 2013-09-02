@@ -7,6 +7,9 @@ import java.util.zip.GZIPInputStream
 import org.sireum.amandroid.util.CacheProvider
 import org.sireum.amandroid.util.FileCaseFactory
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 final class AndroidCacheFile[K] extends CacheProvider[K] with FileCaseFactory[K]{
   
   val cacheMap : MMap[K, (Any, Int)] = mmapEmpty

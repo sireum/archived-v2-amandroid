@@ -1,5 +1,8 @@
 package org.sireum.amandroid.util
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 object CombinationIterator {
 	private def combination[T](xx: List[List[T]], i : Int) : List[T] = xx match {
     case Nil => Nil

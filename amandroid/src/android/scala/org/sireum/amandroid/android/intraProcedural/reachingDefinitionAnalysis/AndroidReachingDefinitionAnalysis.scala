@@ -5,6 +5,9 @@ import org.sireum.pilar.ast._
 import org.sireum.alir._
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 object AndroidReachingDefinitionAnalysis {
   type Result = MonotoneDataFlowAnalysisResult[RDFact]
 

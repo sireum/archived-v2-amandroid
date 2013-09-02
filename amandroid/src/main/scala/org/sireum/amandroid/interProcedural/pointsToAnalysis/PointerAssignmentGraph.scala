@@ -19,7 +19,9 @@ import org.sireum.amandroid.interProcedural.objectFlowAnalysis.InvokePointNode
 import org.sireum.amandroid.interProcedural.InterProceduralGraph
 import org.sireum.amandroid.interProcedural.InterProceduralNode
 
-
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 class PointsToMap {
   private val ptMap : MMap[String, MSet[PTAInstance]] = mmapEmpty
   def pointsToMap = ptMap
@@ -146,6 +148,9 @@ class PointsToMap {
   }
 }
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 class PointerAssignmentGraph[Node <: PtaNode]
   extends InterProceduralGraph[Node]
   with PAGConstraint

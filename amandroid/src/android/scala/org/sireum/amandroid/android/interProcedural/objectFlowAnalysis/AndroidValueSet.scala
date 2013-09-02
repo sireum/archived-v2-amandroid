@@ -2,6 +2,9 @@ package org.sireum.amandroid.android.interProcedural.objectFlowAnalysis
 
 import org.sireum.amandroid.interProcedural.objectFlowAnalysis.NormalValueSet
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 class AndroidValueSet extends NormalValueSet{
   override def copy : AndroidValueSet = {
     val clone = new AndroidValueSet

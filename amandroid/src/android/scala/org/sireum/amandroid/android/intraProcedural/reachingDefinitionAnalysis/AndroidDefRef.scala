@@ -12,8 +12,12 @@ import org.sireum.pilar.symbol.Symbol.pp2r
 import org.sireum.amandroid.AmandroidCodeSource
 import org.sireum.amandroid.Transform
 import org.sireum.amandroid.Center
+import org.sireum.amandroid.AmandroidResolver
+import org.sireum.amandroid.util.StringFormConverter
 
-
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 final class AndroidVarAccesses(st: SymbolTable) extends VarAccesses {
   def localVarAccesses(procedureUri: ResourceUri): CSet[Slot] =
     procedureLocalAccessCache(procedureUri)
@@ -87,7 +91,9 @@ final class AndroidVarAccesses(st: SymbolTable) extends VarAccesses {
   }
 }
 
-
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 final class AndroidDefRef(st: SymbolTable, val varAccesses: VarAccesses)
   extends DefRef {
 
@@ -131,10 +137,12 @@ final class AndroidDefRef(st: SymbolTable, val varAccesses: VarAccesses)
       def resolveNameExp(ne : NameExp) = {
         var uri : ResourceUri = null
         if(!ne.name.hasResourceInfo){
-          val st = Transform.getSymbolResolveResult(Set(AmandroidCodeSource.getGlobalVarCode(ne.name.name)))
-          st.globalVars.foreach{
-            g =>
-            	if(st.globalVar(g).name.name == ne.name.name) uri = g
+          val recName = StringFormConverter.getRecordNameFromFieldSignature(ne.name.name)
+          Center.resolveRecord(recName, Center.ResolveLevel.BODIES)
+          val gf = Center.findField(ne.name.name).getOrElse(throw new RuntimeException("cannot find field: " + ne.name.name))
+          Center.getGlobalVarUri(gf.getSignature) match{
+            case Some(u) => uri = u
+            case None =>
           }
           if(uri == null) throw new RuntimeException("global var " + ne.name.name + " cannot resolved.")
         } else {

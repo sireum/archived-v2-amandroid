@@ -15,7 +15,7 @@ import org.sireum.amandroid.AmandroidRecord
  * adapted from Steven Arzt
  * modified by: Fengguo Wei
  */
-object LayoutFileParser extends AbstractAndroidXMLParser {
+class LayoutFileParser extends AbstractAndroidXMLParser {
 	
 	private final val DEBUG = true
 	
@@ -53,8 +53,8 @@ object LayoutFileParser extends AbstractAndroidXMLParser {
 	  if(!ar.isDefined)
 	    ar = Center.tryLoadRecord(toPilarRecord("android.webkit." + className), Center.ResolveLevel.BODIES)
 	  if(!ar.isDefined)
-	    throw new RuntimeException("Could not find layout class " + className)
-	  ar.get
+	    System.err.println("Could not find layout class " + className)
+	  ar.getOrElse(null)
 	}
 	
 	private def isLayoutClass(theClass : AmandroidRecord) : Boolean = {
@@ -183,12 +183,10 @@ object LayoutFileParser extends AbstractAndroidXMLParser {
 							System.err.println("Skipping file " + fileName + " in layout folder...")
 							return
 						}
-						println("fname-->" + fileName + " " + classes)
 						// Get the fully-qualified class name
 						var entryClass = fileName.substring(0, fileName.lastIndexOf("."))
 						if (!packageName.isEmpty())
 							entryClass = packageName + "." + entryClass
-						println("enclass-->" + entryClass)
 						// We are dealing with resource files
 						if (!fileName.startsWith("res/layout"))
 							return;

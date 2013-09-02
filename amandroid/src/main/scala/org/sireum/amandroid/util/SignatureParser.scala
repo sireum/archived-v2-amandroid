@@ -1,7 +1,11 @@
 package org.sireum.amandroid.util
 
 import org.sireum.util._
+import org.sireum.amandroid.Type
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 class SignatureParser(sig : String) {
   
   private class ParameterSignatureIterator extends Iterator[String] {
@@ -63,14 +67,14 @@ class SignatureParser(sig : String) {
      * 
      * @return the method return type signature
      */
-    def getReturnType() : String = StringFormConverter.formatSigToTypeForm(getReturnTypeSignature)
+    def getReturnType() : Type = StringFormConverter.formatSigToTypeForm(getReturnTypeSignature)
     
     /**
      * Get the method return type. 
      * 
      * @return the method return type signature
      */
-    def getReturnObjectType() : Option[String] = {
+    def getReturnObjectType() : Option[Type] = {
       if(isReturnObject){
         val retPart = getReturnTypeSignature
         Some(StringFormConverter.formatSigToTypeForm(retPart))
@@ -111,9 +115,9 @@ class SignatureParser(sig : String) {
       params
     }
     
-    def getParameterTypes() : List[String] = {
+    def getParameterTypes() : List[Type] = {
       var count = 0
-      var params : List[String] = List()
+      var params : List[Type] = List()
       val iterator = new ParameterSignatureIterator()
       while(iterator.hasNext){
         val p = StringFormConverter.formatSigToTypeForm(iterator.next())
@@ -132,9 +136,9 @@ class SignatureParser(sig : String) {
       count
     }
     
-    def getObjectParameters() : MMap[Int, ResourceUri] = {
+    def getObjectParameters() : MMap[Int, Type] = {
       var count = 0
-      val params : MMap[Int, ResourceUri] = mmapEmpty
+      val params : MMap[Int, Type] = mmapEmpty
       val iterator = new ParameterSignatureIterator()
       while(iterator.hasNext){
         val p = iterator.next()

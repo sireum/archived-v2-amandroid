@@ -11,6 +11,9 @@ import org.sireum.amandroid.interProcedural.Context
 import org.sireum.util._
 import org.sireum.amandroid.Point
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 object AndroidOfgPreprocessor extends ObjectFlowGraphPreprocessor[OfaNode, AndroidValueSet] {  
   
   def apply(pst : ProcedureSymbolTable,

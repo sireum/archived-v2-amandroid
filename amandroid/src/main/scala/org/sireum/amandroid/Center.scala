@@ -7,6 +7,10 @@ import org.sireum.amandroid.interProcedural.callGraph.CGNode
 import org.sireum.amandroid.interProcedural.callGraph.CallGraphBuilder
 import org.sireum.amandroid.android.appInfo.PrepareApp
 
+
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 object Center {
   
   val DEBUG = false
@@ -72,7 +76,23 @@ object Center {
 	private var appInfoOpt : Option[PrepareApp] = None
 	
 	val DEFAULT_TOPLEVEL_OBJECT = "[|java:lang:Object|]"
+	  
+	val JAVA_PRIMITIVE_TYPES = Set("[|byte|]", "[|short|]", "[|int|]", "[|long|]", "[|float|]", "[|double|]", "[|boolean|]", "[|char|]")
 
+	/**
+	 * map from global variable signature to uri, it's just a temp map
+	 */
+	
+	private var globalVarSigToUri : Map[String, ResourceUri] = Map()
+	
+	def setGlobalVarSigToUri(sig : String, uri : ResourceUri) = {
+    this.globalVarSigToUri += (sig -> uri)
+  }
+  
+  def getGlobalVarUri(sig : String) = {
+    this.globalVarSigToUri.get(sig)
+  }
+	
 	/**
 	 * set application info
 	 */
@@ -233,14 +253,16 @@ object Center {
 	      record.needToResolveExtends --= resolved
 	    }
       worklist ++= tmpList
-      if(!codes.isEmpty)
-      	Transform.getSymbolResolveResult(codes)
+      if(!codes.isEmpty){
+      	val st = Transform.getSymbolResolveResult(codes)
+      	AmandroidResolver.resolveFromST(st, false)
+      }
     }while(!codes.isEmpty)
       
     getRecords.foreach{
       rec =>
         if(!rec.hasSuperClass && rec.getName != DEFAULT_TOPLEVEL_OBJECT){
-          if(!hasRecord(DEFAULT_TOPLEVEL_OBJECT)) forceResolveRecord(DEFAULT_TOPLEVEL_OBJECT, ResolveLevel.BODIES)
+          if(!hasRecord(DEFAULT_TOPLEVEL_OBJECT)) resolveRecord(DEFAULT_TOPLEVEL_OBJECT, ResolveLevel.BODIES)
           rec.setSuperClass(getRecord(DEFAULT_TOPLEVEL_OBJECT))
         }
     }
@@ -425,6 +447,7 @@ object Center {
 	
 	def addRecord(ar : AmandroidRecord) = {
     if(ar.isInCenter) throw new RuntimeException("already in center: " + ar.getName)
+    if(containsRecord(ar.getName)) throw new RuntimeException("duplicate record: " + ar.getName)
     this.records += ar
     AmandroidCodeSource.getCodeType(ar.getName) match{
       case AmandroidCodeSource.CodeType.APP => ar.setApplicationRecord
@@ -486,7 +509,7 @@ object Center {
 	 * convert type string from signature style to type style. Ljava/lang/Object; -> [|java:lang:Object|] 
 	 */
 	
-	def formatSigToTypeForm(sig : String) : String = StringFormConverter.formatSigToTypeForm(sig)
+	def formatSigToTypeForm(sig : String) : Type = StringFormConverter.formatSigToTypeForm(sig)
 	
 	/**
 	 * get sub-signature from signature. e.g. [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|] -> equals:(Ljava/lang/Object;)Z
@@ -548,19 +571,6 @@ object Center {
 	}
 	
 	/**
-	 * directly grab procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
-	 */
-	
-	def grabDirProcedure(procSig : String) : Option[AmandroidProcedure] = {
-	  val rName = StringFormConverter.getRecordNameFromProcedureSignature(procSig)
-	  val subSig = StringFormConverter.getSubSigFromProcSig(procSig)
-	  if(!containsRecord(rName)) return None
-	  val r = getRecord(rName)
-	  if(!r.declaresProcedure(subSig)) return None
-	  Some(r.getProcedure(subSig))
-	}
-	
-	/**
 	 * return whether contains the given procedure or not. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
 	 */
 	
@@ -577,14 +587,18 @@ object Center {
 	}
 	
 	/**
-	 * get procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
+	 * find field from Center. Input: [|java:lang:Throwable.stackState|]
 	 */
-	
-	def getDirProcedure(procSig : String) : AmandroidProcedure = {
-	  grabDirProcedure(procSig) match{
-	    case Some(p) => p
-	    case None => throw new RuntimeException("Given procedure signature: " + procSig + " is not in the Center.")
+	def findField(fieldSig : String) : Option[AmandroidField] = {
+	  val rName = StringFormConverter.getRecordNameFromFieldSignature(fieldSig)
+	  val fieldName = StringFormConverter.getFieldNameFromFieldSignature(fieldSig)
+	  if(!containsRecord(rName)) return None
+	  var r = getRecord(rName)
+	  while(!r.declaresFieldByName(fieldName) && r.hasSuperClass){
+	    r = r.getSuperClass
 	  }
+	  if(!r.declaresFieldByName(fieldName)) return None
+	  Some(r.getFieldByName(fieldName))
 	}
 	
 	/**
@@ -602,9 +616,13 @@ object Center {
 	 * get procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
 	 */
 	
-	def getProcedureUsingSig(procSig : String) : AmandroidProcedure = {
-	  val from = resolveRecord(signatureToRecordName(procSig), ResolveLevel.BODIES)
-	  getRecordHierarchy.resolveConcreteDispatchWithoutFailing(from, procSig)
+	def getProcedureUsingSig(procSig : String) : Option[AmandroidProcedure] = {
+	  var recordName = signatureToRecordName(procSig)
+	  if(JAVA_PRIMITIVE_TYPES.contains(recordName)) recordName = DEFAULT_TOPLEVEL_OBJECT
+	  val from = resolveRecord(recordName, ResolveLevel.BODIES)
+	  if(!from.isInterface)
+	  	Some(getRecordHierarchy.resolveConcreteDispatchWithoutFailing(from, procSig))
+	  else None
 	}
 	
 	/**
@@ -620,7 +638,9 @@ object Center {
 	 */
 	
 	def getVirtualCalleeProcedure(fromName : String, procSig : String) : Option[AmandroidProcedure] = {
-	  val from = resolveRecord(fromName, ResolveLevel.BODIES)
+	  var name = fromName
+	  if(JAVA_PRIMITIVE_TYPES.contains(fromName)) name = DEFAULT_TOPLEVEL_OBJECT  // any array in java is an Object, so primitive type array is an object, object's method can be called
+	  val from = resolveRecord(name, ResolveLevel.BODIES)
 	  getRecordHierarchy.resolveConcreteDispatch(from, procSig)
 	}
 	
@@ -629,7 +649,9 @@ object Center {
 	 */
 	
 	def getDirectCalleeProcedure(procSig : String) : AmandroidProcedure = {
-	  getProcedureUsingSig(procSig)
+	  var recName = signatureToRecordName(procSig)
+	  if(JAVA_PRIMITIVE_TYPES.contains(recName)) recName = DEFAULT_TOPLEVEL_OBJECT
+	  getProcedureUsingSig(procSig).get
 	}
 	
 	/**
@@ -638,7 +660,6 @@ object Center {
 	
 	def getEntryPoints = {
 	  if(!hasEntryPoints) findEntryPoints
-	  if(!hasEntryPoints) throw new RuntimeException("cannot get entry points from Center")
 	  this.entryPoints
 	}
 	  

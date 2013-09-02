@@ -206,7 +206,7 @@ class DummyMainGenerator {
 	                  val recordName = StringFormConverter.getRecordNameFromProcedureSignature(procSig)
 	                  if(!Center.containsRecord(recordName)) System.err.println("Record for entry point " + recordName + " not found, skipping")
 	                  else{
-	                    Center.grabDirProcedure(procSig) match{
+	                    Center.grabProcedure(procSig) match{
 	                      case Some(p) => 
 	                        plainMethods += (procSig -> p)
 	                        if(!p.isStatic) instanceNeeded = true
@@ -267,8 +267,15 @@ class DummyMainGenerator {
 	}
 	
 	private def generateInstanceCreation(recordName : String, codefg : CodeFragmentGenerator) : String = {
-	  val newExp = template.getInstanceOf("NewExp")
-	  newExp.add("name", recordName)
+	  val rhs =
+		  if(recordName == "[|java:lang:String|]"){
+		    val stringAnnot = generateParamAnnotation("type", List("object", "string"))
+		    "\"\" " + stringAnnot.render() 
+		  } else {
+			  val newExp = template.getInstanceOf("NewExp")
+			  newExp.add("name", recordName)
+			  newExp.render()
+		  }
 	  val va = varGen.generate(recordName)
 	  val variable = template.getInstanceOf("LocalVar")
 	  variable.add("typ", recordName)
@@ -276,7 +283,7 @@ class DummyMainGenerator {
 	  localVars.add(variable.render())
 	  val asmt = template.getInstanceOf("AssignmentStmt")
 	  asmt.add("lhs", va)
-	  asmt.add("rhs", newExp)
+	  asmt.add("rhs", rhs)
 	  codefg.setCode(asmt)
 	  va
 	}
@@ -304,10 +311,21 @@ class DummyMainGenerator {
     var paramVars : Map[Int, String] = Map()
     params.foreach{
 	    case(i, param) =>
-        val r = Center.resolveRecord(param, Center.ResolveLevel.BODIES)
+        var r = Center.resolveRecord(param.typ, Center.ResolveLevel.BODIES)
         // to protect go into dead constructor create loop
-        if(!constructionStack.contains(r)){
-				  val va = generateInstanceCreation(param, codefg)
+        if(r.isInterface){
+          Center.getRecordHierarchy.getAllImplementersOf(r).foreach{
+            imp =>
+              if(imp.isApplicationRecord) r = imp
+          }
+        }
+        if(r.isInterface){
+          val va = varGen.generate(r.getName)
+          localVarsForClasses += (r.getName -> va)
+          paramVars += (i -> va)
+        }
+        else if(!constructionStack.contains(r)){
+				  val va = generateInstanceCreation(r.getName, codefg)
 				  localVarsForClasses += (r.getName -> va)
           paramVars += (i -> va)
           generateRecordConstructor(r, constructionStack, codefg)
@@ -667,9 +685,17 @@ class DummyMainGenerator {
 	}
 	
 	private def isCompatible(actual : AmandroidRecord, expected : AmandroidRecord) : Boolean = {
-	  val allPossible = Center.getRecordHierarchy.getAllSuperClassesOfIncluding(actual)
-	  allPossible.filter(p => if(p.equals(expected))true else false)
-	  allPossible.isEmpty
+	  var act : AmandroidRecord = actual
+	  while(act != null){
+	    if(act.getName.equals(expected.getName))
+	      return true
+	    if(expected.isInterface)
+	      act.getInterfaces.foreach{int => if(int.getName.equals(expected.getName)) return true}
+	    if(!act.hasSuperClass)
+	      act = null
+	    else act = act.getSuperClass
+	  }
+	  false
 	}
 	
 	private def createIfStmt(targetfg : CodeFragmentGenerator, codefg : CodeFragmentGenerator) = {

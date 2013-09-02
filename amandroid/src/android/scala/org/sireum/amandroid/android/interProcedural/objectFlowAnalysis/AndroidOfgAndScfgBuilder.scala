@@ -21,7 +21,9 @@ import org.sireum.amandroid.intraProcedural.compressedControlFlowGraph.Compresse
 import org.sireum.amandroid.interProcedural.callGraph.CGNode
 
 
-
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, VirtualLabel](val fac: () => ValueSet) {
 
   type Edge = AlirEdge[Node]
@@ -137,7 +139,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
     ofg.points ++= points
     setProcessed(points, pst.procedureUri, context.copy)
     ofg.constructGraph(pst.procedureUri, points, context.copy, cfg, rda)
-    sCfg.collectCfgToBaseGraph(pst.procedureUri, context.copy, cfg)
+//    sCfg.collectCfgToBaseGraph(pst.procedureUri, context.copy, cfg)
     fix(ofg, sCfg)
   }
   
@@ -300,7 +302,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
         ofg.points ++= points
         setProcessed(points, calleeSig, callerContext.copy)
         ofg.constructGraph(calleeSig, points, callerContext.copy, cfg, rda)        
-        sCfg.collectCfgToBaseGraph(calleeSig, callerContext.copy, cfg)
+//        sCfg.collectCfgToBaseGraph(calleeSig, callerContext.copy, cfg)
       } else {
         //get ofg ccfg from file
 //        val calleeOfg = androidCache.load[ObjectFlowGraph[Node, ValueSet]](callee, "ofg")
@@ -336,7 +338,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
         ofg.points ++= points
         setProcessed(points, calleeSig, context)
         ofg.constructGraph(calleeSig, points, context, cfg, rda)
-        sCfg.collectCfgToBaseGraph(calleeSig, context, cfg)
+//        sCfg.collectCfgToBaseGraph(calleeSig, context, cfg)
       } else {
         //get ofg ccfg from file
 //        val calleeOfg = androidCache.load[ObjectFlowGraph[Node, ValueSet]](callee, "ofg")

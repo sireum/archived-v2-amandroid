@@ -12,7 +12,7 @@ import org.sireum.util._
  * adapted from Steven Arzt
  * modified by: Fengguo Wei
  */
-object ARSCFileParser extends AbstractAndroidXMLParser {
+class ARSCFileParser extends AbstractAndroidXMLParser {
 	
 	private final val DEBUG = false
 
@@ -386,27 +386,26 @@ object ARSCFileParser extends AbstractAndroidXMLParser {
 	/**
 	 * Android resource containing dimension data like "11pt".
 	 */
-	case class DimensionResource(value : Int) extends AbstractResource {
-		var unit : Dimension.Value = null
-		def DimensionResource(dimension : Int) = {
-			dimension match {
-			case COMPLEX_UNIT_PX =>
-				this.unit = Dimension.PX
-			case COMPLEX_UNIT_DIP =>
-				this.unit = Dimension.DIP
-			case COMPLEX_UNIT_SP =>
-				this.unit = Dimension.SP
-			case COMPLEX_UNIT_PT =>
-				this.unit = Dimension.PT
-			case COMPLEX_UNIT_IN =>
-				this.unit = Dimension.IN
-			case COMPLEX_UNIT_MM =>
-				this.unit = Dimension.MM
-			case _ =>
-				throw new RuntimeException("Invalid dimension: " + dimension)
-			}
-			this
-		}
+	case class DimensionResource(var value : Int, var unit : Dimension.Value) extends AbstractResource {
+		def this(dimension : Int, value : Int) = this(value, 
+		    {
+					dimension match {
+					case COMPLEX_UNIT_PX =>
+						Dimension.PX
+					case COMPLEX_UNIT_DIP =>
+						Dimension.DIP
+					case COMPLEX_UNIT_SP =>
+						Dimension.SP
+					case COMPLEX_UNIT_PT =>
+						Dimension.PT
+					case COMPLEX_UNIT_IN =>
+						Dimension.IN
+					case COMPLEX_UNIT_MM =>
+						Dimension.MM
+					case _ =>
+						throw new RuntimeException("Invalid dimension: " + dimension)
+					}
+				})
 		
 		def getUnit() : Dimension.Value = this.unit
 	}
@@ -757,7 +756,7 @@ object ARSCFileParser extends AbstractAndroidXMLParser {
 		readChunkHeader(stream, resourceHeader.header)
 		resourceHeader.packageCount = readUInt32(stream)
 		if (DEBUG)
-			System.out.println("Package Groups (" + resourceHeader.packageCount + ")")
+			println("Package Groups (" + resourceHeader.packageCount + ")")
 		
 		// Do we have any packages to read?
 		var remainingSize = resourceHeader.header.size - resourceHeader.header.headerSize
@@ -908,7 +907,7 @@ object ARSCFileParser extends AbstractAndroidXMLParser {
 						for (i <- 0 to typeTable.entryCount - 1) {
 							var entryOffset = readUInt32(remainingData, offset)
 							offset += 4
-							if (entryOffset == 0xFFFF){}	// NoEntry
+							if (entryOffset == 0xFFFFFFFF){}	// NoEntry
 							else {
 							  var flag = true
 								entryOffset += beforeInnerBlock + typeTable.entriesStart
@@ -1023,23 +1022,15 @@ object ARSCFileParser extends AbstractAndroidXMLParser {
 			case TYPE_INT_BOOLEAN =>
 				res = new BooleanResource(rval.data != 0)
 			case TYPE_INT_COLOR_ARGB8 =>
-				res = new ColorResource(rval.data & 0xFF000000 >> 3 * 8,
-						rval.data & 0x00FF0000 >> 2 * 8, rval.data & 0x0000FF00 >> 8,
-						rval.data & 0x000000FF)
+				res = new ColorResource(rval.data & 0xFF000000 >> 3 * 8, rval.data & 0x00FF0000 >> 2 * 8, rval.data & 0x0000FF00 >> 8, rval.data & 0x000000FF)
 			case TYPE_INT_COLOR_RGB8 =>
-				res = new ColorResource(0,
-						rval.data & 0xFF0000 >> 2 * 8, rval.data & 0x00FF00 >> 8,
-						rval.data & 0x0000FF)
+				res = new ColorResource(0, rval.data & 0xFF0000 >> 2 * 8, rval.data & 0x00FF00 >> 8, rval.data & 0x0000FF)
 			case TYPE_INT_COLOR_ARGB4 =>
-				res = new ColorResource(rval.data & 0xF000 >> 3 * 8,
-						rval.data & 0x0F00 >> 2 * 8, rval.data & 0x00F0 >> 8,
-						rval.data & 0x000F)
+				res = new ColorResource(rval.data & 0xF000 >> 3 * 8, rval.data & 0x0F00 >> 2 * 8, rval.data & 0x00F0 >> 8, rval.data & 0x000F)
 			case TYPE_INT_COLOR_RGB4 =>
-				res = new ColorResource(0,
-						rval.data & 0xF00 >> 2 * 8, rval.data & 0x0F0 >> 8,
-						rval.data & 0x00F)
+				res = new ColorResource(0, rval.data & 0xF00 >> 2 * 8, rval.data & 0x0F0 >> 8, rval.data & 0x00F)
 			case TYPE_DIMENSION =>
-				res = new DimensionResource(rval.data & COMPLEX_UNIT_MASK).DimensionResource(rval.data >> COMPLEX_UNIT_SHIFT)
+				res = new DimensionResource(rval.data & COMPLEX_UNIT_MASK, rval.data >> COMPLEX_UNIT_SHIFT)
 			case TYPE_FLOAT =>
 				res = new FloatResource(rval.data.toFloat)
 			case _ =>
@@ -1365,8 +1356,7 @@ object ARSCFileParser extends AbstractAndroidXMLParser {
 		val b1 = uint32(1 + offset) & 0x000000FF
 		val b2 = uint32(2 + offset) & 0x000000FF
 		val b3 = uint32(3 + offset) & 0x000000FF
-		(Math.abs(b3) << 24) + (Math.abs(b2) << 16)
-				+ (Math.abs(b1) << 8) + Math.abs(b0)
+		(Math.abs(b3) << 24) + (Math.abs(b2) << 16) + (Math.abs(b1) << 8) + Math.abs(b0)
 	}
 	
 	def getGlobalStringPool : Map[Int, String] = {
@@ -1403,7 +1393,6 @@ object ARSCFileParser extends AbstractAndroidXMLParser {
 	 * @return The data contained in the given Android resource ID
 	 */
 	def parseResourceId(resourceId : Int) : ResourceId = {
-		new ResourceId((resourceId & 0xFF000000) >> 24,
-				(resourceId & 0x00FF0000) >> 16, resourceId & 0x0000FFFF)
+		new ResourceId((resourceId & 0xFF000000) >> 24, (resourceId & 0x00FF0000) >> 16, resourceId & 0x0000FFFF)
 	}
 }

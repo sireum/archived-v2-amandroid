@@ -13,7 +13,7 @@ import java.io.IOException
 import javax.xml.parsers.ParserConfigurationException
 import org.xml.sax.SAXException
 
-object ManifestParser extends AbstractAndroidXMLParser{
+class ManifestParser extends AbstractAndroidXMLParser{
 	private var entryPointsClasses : Set[String] = Set()
 	private var packageName = ""
 	private var permissions : Set[String] = Set()

@@ -4,6 +4,9 @@ import org.sireum.pilar.symbol._
 import org.sireum.util._
 import org.sireum.amandroid.ProcedureBody
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 class AmandroidSymbolTable extends SymbolTable with SymbolTableProducer {
   st =>
   val tables = SymbolTableData()

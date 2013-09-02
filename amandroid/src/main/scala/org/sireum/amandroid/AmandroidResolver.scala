@@ -22,7 +22,8 @@ object AmandroidResolver {
    */
     
   def resolveProcedureCode(procSig : String, code : String) : AmandroidProcedure = {
-    Transform.getSymbolResolveResult(Set(code))
+    val st = Transform.getSymbolResolveResult(Set(code))
+    resolveFromST(st, false)
     Center.getProcedure(procSig)
   }
   
@@ -112,7 +113,7 @@ object AmandroidResolver {
     val code = AmandroidCodeSource.getRecordCode(recordName)
     val st = Transform.getSymbolResolveResult(Set(code))
     Center.tryRemoveRecord(recordName)
-    resolveFromSTP(st.asInstanceOf[SymbolTableProducer], false)
+    resolveFromST(st, false)
     Center.getRecord(recordName)
   }
     
@@ -120,8 +121,9 @@ object AmandroidResolver {
    * resolve all the records, fields and procedures from symbol table producer which provided from symbol table model
    */
 	
-	def resolveFromSTP(stp : SymbolTableProducer, par : Boolean) = {
+	def resolveFromST(st : SymbolTable, par : Boolean) : Unit = {
     if(GlobalConfig.mode >= Mode.WHOLE_PROGRAM_TEST && !AmandroidCodeSource.isPreLoaded) throw new RuntimeException("In whole program mode but library code did not pre-loaded, call AmandroidCodeSource.preLoad first.")
+    val stp = st.asInstanceOf[SymbolTableProducer]
 	  resolveRecords(stp, par)
 	  resolveGlobalVars(stp, par)
 	  resolveProcedures(stp, par)
@@ -175,6 +177,7 @@ object AmandroidResolver {
 	          f.setAccessFlags(fieldAccessFlag)
 	          f.setDeclaringRecord(rec)
 	      }
+	      rec.setResolvingLevel(Center.ResolveLevel.BODIES)
 	      rec
 	  }
 	  records.foreach(Center.addRecord(_))
@@ -192,6 +195,8 @@ object AmandroidResolver {
 	  val ownerRelation = col.map{
 	    case (uri, gvd) =>
 	      val globalVarSig = gvd.name.name // e.g. @@[|java:lang:Enum.serialVersionUID|]
+	      import org.sireum.pilar.symbol.Symbol.pp2r
+	      Center.setGlobalVarSigToUri(gvd.name.name, gvd.name.uri)
 	      val globalVarAccessFlag = 
 	        gvd.getValueAnnotation("AccessFlag") match {
 			      case Some(exp : NameExp) =>
@@ -262,20 +267,7 @@ object AmandroidResolver {
 	  ownerRelation.foreach{
 	    case (proc, own) =>
 	      own.addProcedure(proc)
-	      own.setResolvingLevel(Center.ResolveLevel.BODIES)
 	  }
 	}
-	
-//	/**
-//	 * resolve records relations include whole library
-//	 */
-//	
-//	def resolveRecordsRelationWholeProgram = {
-//	  
-//	}
-
-//	def resolveProcedureBody(pst : ProcedureSymbolTable, par : Boolean) = {
-//	  pst.locations
-//	}
 	
 }

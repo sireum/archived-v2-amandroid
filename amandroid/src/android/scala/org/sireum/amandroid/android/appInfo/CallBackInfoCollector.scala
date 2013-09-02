@@ -83,8 +83,9 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 							          }
 							          case None => throw new RuntimeException("doesn't found annotation which name is 'signature'")
 							        }
+                      
                       val calleeProc = Center.getProcedureUsingSig(sig)
-                      if(calleeProc.getName == AndroidConstants.ACTIVITY_SETCONTENTVIEW){
+                      if(calleeProc.isDefined && calleeProc.get.getName == AndroidConstants.ACTIVITY_SETCONTENTVIEW){
                         val cfg = reachableProcedure.getCfg
                         val rda = reachableProcedure.getRda
                         val slots = rda.entrySet(cfg.getNode(Some(loc.name.get.uri), loc.index))
@@ -104,7 +105,6 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 					                        val node = cfg.getNode(ldd.locUri, ldd.locIndex)
 					                        val locDecl = reachableProcedure.getProcedureBody.location(ldd.locIndex)
 					                        val num = getIntegerFromLocationDecl(locDecl)
-					                        println("num---------->" + num)
 					                        if(num != -1){
 					                          val declRecord = reachableProcedure.getDeclaringRecord
 					                          if(this.layoutClasses.contains(declRecord))
@@ -196,7 +196,6 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	private def analyzeClass(clazz: AmandroidRecord, lifecycleElement: AmandroidRecord) {
 		// Check for callback handlers implemented via interfaces
 		analyzeClassInterfaceCallbacks(clazz, clazz, lifecycleElement)
-
 		// Check for method overrides
 		analyzeMethodOverrideCallbacks(clazz)
 	}
@@ -213,7 +212,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	}
 	
 	private def analyzeMethodOverrideCallbacks(record : AmandroidRecord):Unit = {
-		if (record.isConcrete)
+		if (!record.isConcrete)
 			return;
 		
 	    // There are also some classes that implement interesting callback methods.
@@ -221,7 +220,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 		// Android OS class that is not a well-known lifecycle method, we treat
 		// it as a potential callback.
 		var classType = ClassType.Plain;
-		val systemMethods: MSet[AmandroidProcedure] = msetEmpty
+		val systemMethods: MSet[String] = msetEmpty
 		for (ancestorClass : AmandroidRecord <- Center.getRecordHierarchy.getAllSuperClassesOf(record)) {
 			if (ancestorClass.getName.equals(AndroidEntryPointConstants.ACTIVITY_CLASS))
 				classType = ClassType.Activity; 
@@ -231,19 +230,13 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 				classType = ClassType.BroadcastReceiver;
 			else if (ancestorClass.getName.equals(AndroidEntryPointConstants.CONTENT_PROVIDER_CLASS))
 				classType = ClassType.ContentProvider;
-		  
-//			if(rUri.contains("mobinauten:smsspy:EmergencyTask"))
-//			  println("systemMethods = " + systemMethods)
-		
+			
 			if (ancestorClass.getName.startsWith("[|android:"))
 				for (procedure <- ancestorClass.getProcedures)
 					if (!procedure.isConstructor){
-						systemMethods.add(procedure)
+						systemMethods.add(procedure.getSubSignature)
 					}
 		}
-		
-//		if(rUri.contains("mobinauten:smsspy:EmergencyTask"))
-//		  println("systemMethods = " + systemMethods)
 		
 		var lifecycleFlag = false // represents if a method is lifecycle method
 	    // Iterate over all user-implemented methods. If they are inherited
@@ -253,7 +246,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 			if (!rName.startsWith("[|android:") && !rName.startsWith("[|com:android:"))
 				for (procedure <- sClass.getProcedures) {
 				  lifecycleFlag = false
-					if (systemMethods.contains(procedure)){
+					if (systemMethods.contains(procedure.getSubSignature)){
 						// This is an overridden system method. Check that we don't have
 						// one of the lifecycle methods as they are treated separately.
 						if (classType == ClassType.Activity
@@ -269,8 +262,6 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 								&& AndroidEntryPointConstants.getContentproviderLifecycleMethods().contains(procedure.getSubSignature))
 							    lifecycleFlag = true
 						if(!lifecycleFlag){	    
-//						  println("override case: " + rUri)
-//						  println("sClass---->" + androidLibInfoTable.getRecordName(sClass) + " method--->" + method)
 						  checkAndAddMethod(procedure, record) // This is a real callback method
 						}
 					}
@@ -288,7 +279,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	  
 	    // We cannot create instances of abstract classes anyway, so there is no
 		// reason to look for interface implementations
-		if (baseClass.isAbstract)
+		if (!baseClass.isConcrete)
 			return;
 		
 		// For a first take, we consider all classes in the android.* packages
@@ -300,139 +291,137 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 		// interface
 		if (clazz.hasSuperClass)
 			analyzeClassInterfaceCallbacks(baseClass, clazz.getSuperClass, lifecycleElement) // recursion
-			
 		// Do we implement one of the well-known interfaces?
 		for (i <- collectAllInterfaces(clazz)) {
-		  
 		  // android.accounts
 			if (i.getName.equals(pilarify("android.accounts.OnAccountsUpdateListener"))) {
 				if (i.declaresProcedureByShortName("onAccountsUpdated"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onAccountsUpdated"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onAccountsUpdated"), lifecycleElement);
 			}
 
 		  // android.animation
 			else if (i.getName.equals(pilarify("android.animation.Animator$AnimatorListener"))) {
 				if (i.declaresProcedureByShortName("onAnimationCancel"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onAnimationCancel"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onAnimationCancel"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onAnimationEnd"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onAnimationEnd"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onAnimationEnd"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onAnimationRepeat"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onAnimationRepeat"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onAnimationRepeat"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onAnimationStart"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onAnimationStart"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onAnimationStart"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.animation.LayoutTransition$TransitionListener"))) {
 				if (i.declaresProcedureByShortName("endTransition"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "endTransition"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "endTransition"), lifecycleElement);
 				if (i.declaresProcedureByShortName("startTransition"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "startTransition"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "startTransition"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.animation.TimeAnimator$TimeListener"))) {
 				if (i.declaresProcedureByShortName("onTimeUpdate"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onTimeUpdate"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onTimeUpdate"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.animation.ValueAnimator$AnimatorUpdateListener"))) {
 				if (i.declaresProcedureByShortName("onAnimationUpdate"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onAnimationUpdate"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onAnimationUpdate"), lifecycleElement);
 			}
 			// android.app
 			else if (i.getName.equals(pilarify("android.app.ActionBar$OnMenuVisibilityListener"))) {
 				if (i.declaresProcedureByShortName("onMenuVisibilityChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onMenuVisibilityChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onMenuVisibilityChanged"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.app.ActionBar$OnNavigationListener"))) {
 				if (i.declaresProcedureByShortName("onNavigationItemSelected"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onNavigationItemSelected"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onNavigationItemSelected"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.app.ActionBar$TabListener"))) {
 				if (i.declaresProcedureByShortName("onTabReselected"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onTabReselected"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onTabReselected"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onTabSelected"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onTabSelected"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onTabSelected"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onTabUnselected"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onTabUnselected"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onTabUnselected"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.app.Application$ActivityLifecycleCallbacks"))) {
 				if (i.declaresProcedureByShortName("onActivityCreated"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onActivityCreated"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onActivityCreated"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onActivityDestroyed"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onActivityDestroyed"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onActivityDestroyed"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onActivityPaused"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onActivityPaused"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onActivityPaused"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onActivityResumed"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onActivityResumed"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onActivityResumed"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onActivitySaveInstanceState"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onActivitySaveInstanceState"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onActivitySaveInstanceState"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onActivityStarted"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onActivityStarted"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onActivityStarted"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onActivityStopped"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onActivityStopped"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onActivityStopped"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.app.DatePickerDialog$OnDateSetListener"))) {
 				if (i.declaresProcedureByShortName("onDateSet"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDateSet"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDateSet"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.app.FragmentBreadCrumbs$OnBreadCrumbClickListener"))) {
 				if (i.declaresProcedureByShortName("onBreadCrumbClick"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onBreadCrumbClick"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onBreadCrumbClick"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.app.FragmentManager$OnBackStackChangedListener"))) {
 				if (i.declaresProcedureByShortName("onBackStackChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onBackStackChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onBackStackChanged"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.app.KeyguardManager$OnKeyguardExitResult"))) {
 				if (i.declaresProcedureByShortName("onKeyguardExitResult"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onKeyguardExitResult"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onKeyguardExitResult"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.app.LoaderManager$LoaderCallbacks"))) {
 				if (i.declaresProcedureByShortName("onCreateLoader"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onCreateLoader"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onCreateLoader"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onLoadFinished"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onLoadFinished"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onLoadFinished"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onLoaderReset"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onLoaderReset"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onLoaderReset"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.app.PendingIntent$OnFinished"))) {
 				if (i.declaresProcedureByShortName("onSendFinished"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onSendFinished"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onSendFinished"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.app.SearchManager$OnCancelListener"))) {
 				if (i.declaresProcedureByShortName("onCancel"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onCancel"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onCancel"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.app.SearchManager$OnDismissListener"))) {
 				if (i.declaresProcedureByShortName("onDismiss"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDismiss"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDismiss"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.app.TimePickerDialog$OnTimeSetListener"))) {
 				if (i.declaresProcedureByShortName("onTimeSet"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onTimeSet"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onTimeSet"), lifecycleElement);
 			}
 			// android.bluetooth
 			else if (i.getName.equals(pilarify("android.bluetooth.BluetoothProfile$ServiceListener"))) {
 				if (i.declaresProcedureByShortName("onServiceConnected"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onServiceConnected"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onServiceConnected"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onServiceDisconnected"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onServiceDisconnected"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onServiceDisconnected"), lifecycleElement);
 			}
 			// android.content
 			else if (i.getName.equals(pilarify("android.content.ClipboardManager$OnPrimaryClipChangedListener"))) {
 				if (i.declaresProcedureByShortName("onPrimaryClipChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onPrimaryClipChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onPrimaryClipChanged"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.content.ComponentCallbacks"))) {
 				if (i.declaresProcedureByShortName("onConfigurationChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onConfigurationChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onConfigurationChanged"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onLowMemory"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onLowMemory"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onLowMemory"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.content.ComponentCallbacks2"))) {
 				if (i.declaresProcedureByShortName("onTrimMemory"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onTrimMemory"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onTrimMemory"), lifecycleElement);
 			}			
 			else if (i.getName.equals(pilarify("android.content.DialogInterface$OnCancelListener"))) {
 				if (i.declaresProcedureByShortName("onCancel"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onCancel"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onCancel"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.content.DialogInterface$OnClickListener"))) {
 				if (i.declaresProcedureByShortName("onClick"))
@@ -440,554 +429,554 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 			}
 			else if (i.getName.equals(pilarify("android.content.DialogInterface$OnDismissListener"))) {
 				if (i.declaresProcedureByShortName("onDismiss"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDismiss"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDismiss"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.content.DialogInterface$OnKeyListener"))) {
 				if (i.declaresProcedureByShortName("onKey"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onKey"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onKey"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.content.DialogInterface$OnMultiChoiceClickListener"))) {
 				if (i.declaresProcedureByShortName("onClick"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onClick"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onClick"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.content.DialogInterface$OnShowListener"))) {
 				if (i.declaresProcedureByShortName("onShow"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onShow"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onShow"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.content.IntentSender$OnFinished"))) {
 				if (i.declaresProcedureByShortName("onSendFinished"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onSendFinished"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onSendFinished"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.content.Loader$OnLoadCanceledListener"))) {
 				if (i.declaresProcedureByShortName("onLoadCanceled"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onLoadCanceled"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onLoadCanceled"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.content.Loader$OnLoadCompleteListener"))) {
 				if (i.declaresProcedureByShortName("onLoadComplete"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onLoadComplete"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onLoadComplete"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.content.SharedPreferences$OnSharedPreferenceChangeListener"))) {
 				if (i.declaresProcedureByShortName("onSharedPreferenceChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onSharedPreferenceChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onSharedPreferenceChanged"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.content.SyncStatusObserver"))) {
 				if (i.declaresProcedureByShortName("onStatusChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onStatusChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onStatusChanged"), lifecycleElement);
 			}
 			// android.database.sqlite
 			else if (i.getName.equals(pilarify("android.database.sqlite.SQLiteTransactionListener"))) {
 				if (i.declaresProcedureByShortName("onBegin"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onBegin"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onBegin"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onCommit"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onCommit"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onCommit"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onRollback"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onRollback"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onRollback"), lifecycleElement);
 			}
 			// android.drm
 			else if (i.getName.equals(pilarify("android.drm.DrmManagerClient$OnErrorListener"))) {
 				if (i.declaresProcedureByShortName("onError"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onError"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onError"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.drm.DrmManagerClient$OnEventListener"))) {
 				if (i.declaresProcedureByShortName("onEvent"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onEvent"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onEvent"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.drm.DrmManagerClient$OnInfoListener"))) {
 				if (i.declaresProcedureByShortName("onInfo"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onInfo"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onInfo"), lifecycleElement);
 			}
 			// android.gesture			
 			else if (i.getName.equals(pilarify("android.gesture.GestureOverlayView$OnGestureListener"))) {
 				if (i.declaresProcedureByShortName("onGesture"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onGesture"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onGesture"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onGestureCancelled"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onGestureCancelled"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onGestureCancelled"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onGestureEnded"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onGestureEnded"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onGestureEnded"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onGestureStarted"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onGestureStarted"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onGestureStarted"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.gesture.GestureOverlayView$OnGesturePerformedListener"))) {
 				if (i.declaresProcedureByShortName("onGesturePerformed"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onGesturePerformed"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onGesturePerformed"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.gesture.GestureOverlayView$OnGesturingListener"))) {
 				if (i.declaresProcedureByShortName("onGesturingEnded"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onGesturingEnded"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onGesturingEnded"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onGesturingStarted"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onGesturingStarted"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onGesturingStarted"), lifecycleElement);
 			}
 			// android.graphics
 			else if (i.getName.equals(pilarify("android.graphics.SurfaceTexture%OnFrameAvailableListener"))) {
 				if (i.declaresProcedureByShortName("onFrameAvailable"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onFrameAvailable"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onFrameAvailable"), lifecycleElement);
 			}
 			// android.hardware
 			else if (i.getName.equals(pilarify("android.hardware.Camera$AutoFocusCallback"))) {
 				if (i.declaresProcedureByShortName("onAutoFocus"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onAutoFocus"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onAutoFocus"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.hardware.Camera$AutoFocusMoveCallback"))) {
 				if (i.declaresProcedureByShortName("onAutoFocusMoving"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onAutoFocusMoving"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onAutoFocusMoving"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.hardware.Camera$ErrorCallback"))) {
 				if (i.declaresProcedureByShortName("onError"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onError"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onError"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.hardware.Camera$FaceDetectionListener"))) {
 				if (i.declaresProcedureByShortName("onFaceDetection"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onFaceDetection"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onFaceDetection"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.hardware.Camera$OnZoomChangeListener"))) {
 				if (i.declaresProcedureByShortName("onZoomChange"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onZoomChange"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onZoomChange"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.hardware.Camera$PictureCallback"))) {
 				if (i.declaresProcedureByShortName("onPictureTaken"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onPictureTaken"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onPictureTaken"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.hardware.Camera$PreviewCallback"))) {
 				if (i.declaresProcedureByShortName("onPreviewFrame"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onPreviewFrame"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onPreviewFrame"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.hardware.Camera$ShutterCallback"))) {
 				if (i.declaresProcedureByShortName("onShutter"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onShutter"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onShutter"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.hardware.SensorEventListener"))) {
 				if (i.declaresProcedureByShortName("onAccuracyChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onAccuracyChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onAccuracyChanged"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onSensorChanged"))
 					checkAndAddMethod(getProcedureFromHierarchy(baseClass, "onSensorChanged:(Landroid/hardware/SensorEvent;)V"), lifecycleElement);
 			}
 			// android.hardware.display
 			else if (i.getName.equals(pilarify("android.hardware.display.DisplayManager$DisplayListener"))) {
 				if (i.declaresProcedureByShortName("onDisplayAdded"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDisplayAdded"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDisplayAdded"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onDisplayChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDisplayChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDisplayChanged"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onDisplayRemoved"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDisplayRemoved"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDisplayRemoved"), lifecycleElement);
 			}
 			// android.hardware.input
 			else if (i.getName.equals(pilarify("android.hardware.input.InputManager$InputDeviceListener"))) {
 				if (i.declaresProcedureByShortName("onInputDeviceAdded"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onInputDeviceAdded"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onInputDeviceAdded"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onInputDeviceChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onInputDeviceChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onInputDeviceChanged"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onInputDeviceRemoved"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onInputDeviceRemoved"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onInputDeviceRemoved"), lifecycleElement);
 			}
 			// android.inputmethodservice
 			else if (i.getName.equals(pilarify("android.inputmethodservice.KeyboardView$OnKeyboardActionListener"))) {
 				if (i.declaresProcedureByShortName("onKey"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onKey"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onKey"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onPress"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onPress"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onPress"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onRelease"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onRelease"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onRelease"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onText"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onText"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onText"), lifecycleElement);
 				if (i.declaresProcedureByShortName("swipeDown"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "swipeDown"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "swipeDown"), lifecycleElement);
 				if (i.declaresProcedureByShortName("swipeLeft"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "swipeLeft"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "swipeLeft"), lifecycleElement);
 				if (i.declaresProcedureByShortName("swipeRight"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "swipeRight"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "swipeRight"), lifecycleElement);
 				if (i.declaresProcedureByShortName("swipeUp"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "swipeUp"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "swipeUp"), lifecycleElement);
 			}
 			// android.location
 			else if (i.getName.equals(pilarify("android.location.GpsStatus$Listener"))) {
 				if (i.declaresProcedureByShortName("onGpsStatusChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onGpsStatusChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onGpsStatusChanged"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.location.GpsStatus$NmeaListener"))) {
 				if (i.declaresProcedureByShortName("onNmeaReceived"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onNmeaReceived"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onNmeaReceived"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.location.LocationListener"))) {
 				if (i.declaresProcedureByShortName("onLocationChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onLocationChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onLocationChanged"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onProviderDisabled"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onProviderDisabled"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onProviderDisabled"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onProviderEnabled"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onProviderEnabled"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onProviderEnabled"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onStatusChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onStatusChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onStatusChanged"), lifecycleElement);
 			}
 			// android.media
 			else if (i.getName.equals(pilarify("android.media.AudioManager$OnAudioFocusChangeListener"))) {
 				if (i.declaresProcedureByShortName("onAudioFocusChange"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onAudioFocusChange"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onAudioFocusChange"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.AudioRecord$OnRecordPositionUpdateListener"))
 					|| i.getName.equals(pilarify("android.media.AudioRecord$OnPlaybackPositionUpdateListener"))) {
 				if (i.declaresProcedureByShortName("onMarkerReached"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onMarkerReached"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onMarkerReached"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onPeriodicNotification"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onPeriodicNotification"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onPeriodicNotification"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.JetPlayer$OnJetEventListener"))) {
 				if (i.declaresProcedureByShortName("onJetEvent"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onJetEvent"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onJetEvent"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onJetNumQueuedSegmentUpdate"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onJetNumQueuedSegmentUpdate"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onJetNumQueuedSegmentUpdate"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onJetPauseUpdate"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onJetPauseUpdate"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onJetPauseUpdate"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onJetUserIdUpdate"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onJetUserIdUpdate"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onJetUserIdUpdate"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.MediaPlayer$OnBufferingUpdateListener"))) {
 				if (i.declaresProcedureByShortName("onBufferingUpdate"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onBufferingUpdate"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onBufferingUpdate"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.MediaPlayer$OnCompletionListener"))) {
 				if (i.declaresProcedureByShortName("onCompletion"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onCompletion"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onCompletion"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.MediaPlayer$OnErrorListener"))) {
 				if (i.declaresProcedureByShortName("onError"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onError"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onError"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.MediaPlayer$OnInfoListener"))) {
 				if (i.declaresProcedureByShortName("onInfo"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onInfo"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onInfo"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.MediaPlayer$OnPreparedListener"))) {
 				if (i.declaresProcedureByShortName("onPrepared"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onPrepared"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onPrepared"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.MediaPlayer$OnSeekCompleteListener"))) {
 				if (i.declaresProcedureByShortName("onSeekComplete"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onSeekComplete"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onSeekComplete"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.MediaPlayer$OnTimedTextListener"))) {
 				if (i.declaresProcedureByShortName("onTimedText"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onTimedText"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onTimedText"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.MediaPlayer$OnVideoSizeChangedListener"))) {
 				if (i.declaresProcedureByShortName("onVideoSizeChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onVideoSizeChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onVideoSizeChanged"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.MediaRecorder$OnErrorListener"))) {
 				if (i.declaresProcedureByShortName("onError"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onError"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onError"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.MediaRecorder$OnInfoListener"))) {
 				if (i.declaresProcedureByShortName("onInfo"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onInfo"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onInfo"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.MediaScannerConnection$MediaScannerConnectionClient"))) {
 				if (i.declaresProcedureByShortName("onMediaScannerConnected"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onMediaScannerConnected"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onMediaScannerConnected"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onScanCompleted"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onScanCompleted"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onScanCompleted"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.MediaScannerConnection$OnScanCompletedListener"))) {
 				if (i.declaresProcedureByShortName("onScanCompleted"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onScanCompleted"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onScanCompleted"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.SoundPool$OnLoadCompleteListener"))) {
 				if (i.declaresProcedureByShortName("onLoadComplete"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onLoadComplete"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onLoadComplete"), lifecycleElement);
 			}
 			// android.media.audiofx
 			else if (i.getName.equals(pilarify("android.media.audiofx.AudioEffect$OnControlStatusChangeListener"))) {
 				if (i.declaresProcedureByShortName("onControlStatusChange"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onControlStatusChange"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onControlStatusChange"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.audiofx.AudioEffect$OnEnableStatusChangeListener"))) {
 				if (i.declaresProcedureByShortName("onEnableStatusChange"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onEnableStatusChange"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onEnableStatusChange"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.audiofx.BassBoost$OnParameterChangeListener"))) {
 				if (i.declaresProcedureByShortName("onParameterChange"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onParameterChange"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onParameterChange"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.audiofx.EnvironmentalReverb$OnParameterChangeListener"))) {
 				if (i.declaresProcedureByShortName("onParameterChange"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onParameterChange"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onParameterChange"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.audiofx.Equalizer$OnParameterChangeListener"))) {
 				if (i.declaresProcedureByShortName("onParameterChange"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onParameterChange"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onParameterChange"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.audiofx.PresetReverb$OnParameterChangeListener"))) {
 				if (i.declaresProcedureByShortName("onParameterChange"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onParameterChange"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onParameterChange"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.audiofx.Virtualizer$OnParameterChangeListener"))) {
 				if (i.declaresProcedureByShortName("onParameterChange"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onParameterChange"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onParameterChange"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.audiofx.Visualizer$OnDataCaptureListener"))) {
 				if (i.declaresProcedureByShortName("onFftDataCapture"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onFftDataCapture"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onFftDataCapture"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onWaveFormDataCapture"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onWaveFormDataCapture"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onWaveFormDataCapture"), lifecycleElement);
 			}
 			// android.media.effect
 			else if (i.getName.equals(pilarify("android.media.effect$EffectUpdateListener"))) {
 				if (i.declaresProcedureByShortName("onEffectUpdated"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onEffectUpdated"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onEffectUpdated"), lifecycleElement);
 			}
 			// android.net.nsd
 			else if (i.getName.equals(pilarify("android.net.nsd.NsdManager$DiscoveryListener"))) {
 				if (i.declaresProcedureByShortName("onDiscoveryStarted"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDiscoveryStarted"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDiscoveryStarted"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onDiscoveryStopped"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDiscoveryStopped"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDiscoveryStopped"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onServiceFound"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onServiceFound"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onServiceFound"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onServiceLost"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onServiceLost"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onServiceLost"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onStartDiscoveryFailed"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onStartDiscoveryFailed"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onStartDiscoveryFailed"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onStopDiscoveryFailed"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onStopDiscoveryFailed"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onStopDiscoveryFailed"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.net.nsd.NsdManager$RegistrationListener"))) {
 				if (i.declaresProcedureByShortName("onRegistrationFailed"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onRegistrationFailed"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onRegistrationFailed"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onServiceRegistered"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onServiceRegistered"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onServiceRegistered"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onServiceUnregistered"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onServiceUnregistered"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onServiceUnregistered"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onUnregistrationFailed"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onUnregistrationFailed"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onUnregistrationFailed"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.net.nsd.NsdManager$ResolveListener"))) {
 				if (i.declaresProcedureByShortName("onResolveFailed"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onResolveFailed"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onResolveFailed"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onServiceResolved"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onServiceResolved"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onServiceResolved"), lifecycleElement);
 			}
 			// android.net.sip
 			else if (i.getName.equals(pilarify("android.net.sip.SipRegistrationListener"))) {
 				if (i.declaresProcedureByShortName("onRegistering"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onRegistering"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onRegistering"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onRegistrationDone"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onRegistrationDone"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onRegistrationDone"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onRegistrationFailed"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onRegistrationFailed"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onRegistrationFailed"), lifecycleElement);
 			}
 			// android.net.wifi.p2p
 			else if (i.getName.equals(pilarify("android.net.wifi.p2p.WifiP2pManager$ActionListener"))) {
 				if (i.declaresProcedureByShortName("onFailure"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onFailure"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onFailure"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onSuccess"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onSuccess"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onSuccess"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.net.wifi.p2p.WifiP2pManager$ChannelListener"))) {
 				if (i.declaresProcedureByShortName("onChannelDisconnected"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onChannelDisconnected"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onChannelDisconnected"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.net.wifi.p2p.WifiP2pManager$ConnectionInfoListener"))) {
 				if (i.declaresProcedureByShortName("onConnectionInfoAvailable"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onConnectionInfoAvailable"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onConnectionInfoAvailable"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.net.wifi.p2p.WifiP2pManager$DnsSdServiceResponseListener"))) {
 				if (i.declaresProcedureByShortName("onDnsSdServiceAvailable"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDnsSdServiceAvailable"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDnsSdServiceAvailable"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.net.wifi.p2p.WifiP2pManager$DnsSdTxtRecordListener"))) {
 				if (i.declaresProcedureByShortName("onDnsSdTxtRecordAvailable"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDnsSdTxtRecordAvailable"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDnsSdTxtRecordAvailable"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.net.wifi.p2p.WifiP2pManager$GroupInfoListener"))) {
 				if (i.declaresProcedureByShortName("onGroupInfoAvailable"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onGroupInfoAvailable"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onGroupInfoAvailable"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.net.wifi.p2p.WifiP2pManager$PeerListListener"))) {
 				if (i.declaresProcedureByShortName("onPeersAvailable"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onPeersAvailable"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onPeersAvailable"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.net.wifi.p2p.WifiP2pManager$ServiceResponseListener"))) {
 				if (i.declaresProcedureByShortName("onServiceAvailable"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onServiceAvailable"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onServiceAvailable"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.net.wifi.p2p.WifiP2pManager$UpnpServiceResponseListener"))) {
 				if (i.declaresProcedureByShortName("onUpnpServiceAvailable"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onUpnpServiceAvailable"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onUpnpServiceAvailable"), lifecycleElement);
 			}
 			// android.os
 			else if (i.getName.equals(pilarify("android.os.CancellationSignal$OnCancelListener"))) {
 				if (i.declaresProcedureByShortName("onCancel"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onCancel"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onCancel"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.os.IBinder$DeathRecipient"))) {
 				if (i.declaresProcedureByShortName("binderDied"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "binderDied"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "binderDied"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.os.MessageQueue$IdleHandler"))) {
 				if (i.declaresProcedureByShortName("queueIdle"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "queueIdle"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "queueIdle"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.os.RecoverySystem$ProgressListener"))) {
 				if (i.declaresProcedureByShortName("onProgress"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onProgress"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onProgress"), lifecycleElement);
 			}
 			// android.preference
 			else if (i.getName.equals(pilarify("android.preference.Preference$OnPreferenceChangeListener"))) {
 				if (i.declaresProcedureByShortName("onPreferenceChange"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onPreferenceChange"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onPreferenceChange"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.preference.Preference$OnPreferenceClickListener"))) {
 				if (i.declaresProcedureByShortName("onPreferenceClick"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onPreferenceClick"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onPreferenceClick"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.preference.PreferenceFragment$OnPreferenceStartFragmentCallback"))) {
 				if (i.declaresProcedureByShortName("onPreferenceStartFragment"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onPreferenceStartFragment"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onPreferenceStartFragment"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.preference.PreferenceManager$OnActivityDestroyListener"))) {
 				if (i.declaresProcedureByShortName("onActivityDestroy"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onActivityDestroy"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onActivityDestroy"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.preference.PreferenceManager$OnActivityResultListener"))) {
 				if (i.declaresProcedureByShortName("onActivityResult"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onActivityResult"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onActivityResult"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.preference.PreferenceManager$OnActivityStopListener"))) {
 				if (i.declaresProcedureByShortName("onActivityStop"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onActivityStop"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onActivityStop"), lifecycleElement);
 			}
 			// android.security
 			else if (i.getName.equals(pilarify("android.security.KeyChainAliasCallback"))) {
 				if (i.declaresProcedureByShortName("alias"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "alias"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "alias"), lifecycleElement);
 			}
 			// android.speech
 			else if (i.getName.equals(pilarify("android.speech.RecognitionListener"))) {
 				if (i.declaresProcedureByShortName("onBeginningOfSpeech"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onBeginningOfSpeech"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onBeginningOfSpeech"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onBufferReceived"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onBufferReceived"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onBufferReceived"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onEndOfSpeech"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onEndOfSpeech"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onEndOfSpeech"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onError"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onError"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onError"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onEvent"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onEvent"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onEvent"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onPartialResults"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onPartialResults"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onPartialResults"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onReadyForSpeech"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onReadyForSpeech"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onReadyForSpeech"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onResults"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onResults"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onResults"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onRmsChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onRmsChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onRmsChanged"), lifecycleElement);
 			}
 			// android.speech.tts
 			else if (i.getName.equals(pilarify("android.speech.tts.TextToSpeech$OnInitListener"))) {
 				if (i.declaresProcedureByShortName("onInit"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onInit"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onInit"), lifecycleElement);
 			}			
 			else if (i.getName.equals(pilarify("android.speech.tts.TextToSpeech$OnUtteranceCompletedListener"))) {
 				if (i.declaresProcedureByShortName("onUtteranceCompleted"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onUtteranceCompleted"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onUtteranceCompleted"), lifecycleElement);
 			}			
 			// android.support - omitted
 			// android.view
 			else if (i.getName.equals(pilarify("android.view.ActionMode$Callback"))) {
 				if (i.declaresProcedureByShortName("onActionItemClicked"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onActionItemClicked"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onActionItemClicked"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onCreateActionMode"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onCreateActionMode"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onCreateActionMode"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onDestroyActionMode"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDestroyActionMode"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDestroyActionMode"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onPrepareActionMode"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onPrepareActionMode"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onPrepareActionMode"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.ActionProvider$VisibilityListener"))) {
 				if (i.declaresProcedureByShortName("onActionProviderVisibilityChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onActionProviderVisibilityChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onActionProviderVisibilityChanged"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.GestureDetector$OnDoubleTapListener"))) {
 				if (i.declaresProcedureByShortName("onDoubleTap"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDoubleTap"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDoubleTap"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onDoubleTapEvent"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDoubleTapEvent"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDoubleTapEvent"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onSingleTapConfirmed"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onSingleTapConfirmed"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onSingleTapConfirmed"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.GestureDetector$OnGestureListener"))) {
 				if (i.declaresProcedureByShortName("onDown"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDown"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDown"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onFling"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onFling"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onFling"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onLongPress"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onLongPress"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onLongPress"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onScroll"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onScroll"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onScroll"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onShowPress"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onShowPress"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onShowPress"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onSingleTapUp"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onSingleTapUp"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onSingleTapUp"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.InputQueue$Callback"))) {
 				if (i.declaresProcedureByShortName("onInputQueueCreated"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onInputQueueCreated"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onInputQueueCreated"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onInputQueueDestroyed"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onInputQueueDestroyed"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onInputQueueDestroyed"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.KeyEvent$Callback"))) {
 				if (i.declaresProcedureByShortName("onKeyDown"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onKeyDown"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onKeyDown"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onKeyLongPress"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onKeyLongPress"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onKeyLongPress"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onKeyMultiple"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onKeyMultiple"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onKeyMultiple"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onKeyUp"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onKeyUp"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onKeyUp"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.MenuItem$OnActionExpandListener"))) {
 				if (i.declaresProcedureByShortName("onMenuItemActionCollapse"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onMenuItemActionCollapse"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onMenuItemActionCollapse"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onMenuItemActionExpand"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onMenuItemActionExpand"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onMenuItemActionExpand"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.MenuItem$OnMenuItemClickListener"))) {
 				if (i.declaresProcedureByShortName("onMenuItemClick"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onMenuItemClick"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onMenuItemClick"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.ScaleGestureDetector$OnScaleGestureListener"))) {
 				if (i.declaresProcedureByShortName("onScale"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onScale"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onScale"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onScaleBegin"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onScaleBegin"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onScaleBegin"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onScaleEnd"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onScaleEnd"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onScaleEnd"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.SurfaceHolder$Callback"))) {
 				if (i.declaresProcedureByShortName("surfaceChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "surfaceChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "surfaceChanged"), lifecycleElement);
 				if (i.declaresProcedureByShortName("surfaceCreated"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "surfaceCreated"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "surfaceCreated"), lifecycleElement);
 				if (i.declaresProcedureByShortName("surfaceDestroyed"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "surfaceDestroyed"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "surfaceDestroyed"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.SurfaceHolder$Callback2"))) {
 				if (i.declaresProcedureByShortName("surfaceRedrawNeeded"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "surfaceRedrawNeeded"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "surfaceRedrawNeeded"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.TextureView$SurfaceTextureListener"))) {
 				if (i.declaresProcedureByShortName("onSurfaceTextureAvailable"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onSurfaceTextureAvailable"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onSurfaceTextureAvailable"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onSurfaceTextureDestroyed"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onSurfaceTextureDestroyed"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onSurfaceTextureDestroyed"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onSurfaceTextureSizeChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onSurfaceTextureSizeChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onSurfaceTextureSizeChanged"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onSurfaceTextureUpdated"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onSurfaceTextureUpdated"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onSurfaceTextureUpdated"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.View$OnAttachStateChangeListener"))) {
 				if (i.declaresProcedureByShortName("onViewAttachedToWindow"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onViewAttachedToWindow"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onViewAttachedToWindow"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onViewDetachedFromWindow"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onViewDetachedFromWindow"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onViewDetachedFromWindow"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.View$OnClickListener"))) {
 				if (i.declaresProcedureByShortName("onClick"))
@@ -995,269 +984,269 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 			}
 			else if (i.getName.equals(pilarify("android.view.View$OnCreateContextMenuListener"))) {
 				if (i.declaresProcedureByShortName("onCreateContextMenu"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onCreateContextMenu"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onCreateContextMenu"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.View$OnDragListener"))) {
 				if (i.declaresProcedureByShortName("onDrag"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDrag"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDrag"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.View$OnFocusChangeListener"))) {
 				if (i.declaresProcedureByShortName("onFocusChange"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onFocusChange"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onFocusChange"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.View$OnGenericMotionListener"))) {
 				if (i.declaresProcedureByShortName("onGenericMotion"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onGenericMotion"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onGenericMotion"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.View$OnHoverListener"))) {
 				if (i.declaresProcedureByShortName("onHover"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onHover"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onHover"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.View$OnKeyListener"))) {
 				if (i.declaresProcedureByShortName("onKey"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onKey"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onKey"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.View$OnLayoutChangeListener"))) {
 				if (i.declaresProcedureByShortName("onLayoutChange"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onLayoutChange"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onLayoutChange"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.View$OnLongClickListener"))) {
 				if (i.declaresProcedureByShortName("onLongClick"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onLongClick"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onLongClick"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.View$OnSystemUiVisibilityChangeListener"))) {
 				if (i.declaresProcedureByShortName("onSystemUiVisibilityChange"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onSystemUiVisibilityChange"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onSystemUiVisibilityChange"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.View$OnTouchListener"))) {
 				if (i.declaresProcedureByShortName("onTouch"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onTouch"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onTouch"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.ViewGroup$OnHierarchyChangeListener"))) {
 				if (i.declaresProcedureByShortName("onChildViewAdded"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onChildViewAdded"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onChildViewAdded"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onChildViewRemoved"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onChildViewRemoved"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onChildViewRemoved"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.ViewStub$OnInflateListener"))) {
 				if (i.declaresProcedureByShortName("onInflate"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onInflate"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onInflate"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.ViewTreeObserver$OnDrawListener"))) {
 				if (i.declaresProcedureByShortName("onDraw"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDraw"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDraw"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.ViewTreeObserver$OnGlobalFocusChangeListener"))) {
 				if (i.declaresProcedureByShortName("onGlobalFocusChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onGlobalFocusChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onGlobalFocusChanged"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.ViewTreeObserver$OnGlobalLayoutListener"))) {
 				if (i.declaresProcedureByShortName("onGlobalLayout"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onGlobalLayout"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onGlobalLayout"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.ViewTreeObserver$OnPreDrawListener"))) {
 				if (i.declaresProcedureByShortName("onPreDraw"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onPreDraw"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onPreDraw"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.ViewTreeObserver$OnScrollChangedListener"))) {
 				if (i.declaresProcedureByShortName("onScrollChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onScrollChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onScrollChanged"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.ViewTreeObserver$OnTouchModeChangeListener"))) {
 				if (i.declaresProcedureByShortName("onTouchModeChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onTouchModeChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onTouchModeChanged"), lifecycleElement);
 			}
 			// android.view.accessibility
 			else if (i.getName.equals(pilarify("android.view.accessibility.AccessibilityManager$AccessibilityStateChangeListener"))) {
 				if (i.declaresProcedureByShortName("onAccessibilityStateChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onAccessibilityStateChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onAccessibilityStateChanged"), lifecycleElement);
 			}
 			// android.view.animation
 			else if (i.getName.equals(pilarify("android.view.animation.Animation$AnimationListener"))) {
 				if (i.declaresProcedureByShortName("onAnimationEnd"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onAnimationEnd"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onAnimationEnd"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onAnimationRepeat"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onAnimationRepeat"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onAnimationRepeat"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onAnimationStart"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onAnimationStart"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onAnimationStart"), lifecycleElement);
 			}
 			// android.view.inputmethod
 			else if (i.getName.equals(pilarify("android.view.inputmethod.InputMethod$SessionCallback"))) {
 				if (i.declaresProcedureByShortName("sessionCreated"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "sessionCreated"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "sessionCreated"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.view.inputmethod.InputMethodSession$EventCallback"))) {
 				if (i.declaresProcedureByShortName("finishedEvent"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "finishedEvent"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "finishedEvent"), lifecycleElement);
 			}
 			// android.view.textservice
 			else if (i.getName.equals(pilarify("android.view.textservice.SpellCheckerSession$SpellCheckerSessionListener"))) {
 				if (i.declaresProcedureByShortName("onGetSentenceSuggestions"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onGetSentenceSuggestions"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onGetSentenceSuggestions"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onGetSuggestions"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onGetSuggestions"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onGetSuggestions"), lifecycleElement);
 			}
 			// android.webkit
 			else if (i.getName.equals(pilarify("android.webkit.DownloadListener"))) {
 				if (i.declaresProcedureByShortName("onDownloadStart"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDownloadStart"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDownloadStart"), lifecycleElement);
 			}
 			// android.widget
 			else if (i.getName.equals(pilarify("android.widget.AbsListView$MultiChoiceModeListener"))) {
 				if (i.declaresProcedureByShortName("onItemCheckedStateChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onItemCheckedStateChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onItemCheckedStateChanged"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.AbsListView$OnScrollListener"))) {
 				if (i.declaresProcedureByShortName("onScroll"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onScroll"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onScroll"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onScrollStateChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onScrollStateChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onScrollStateChanged"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.AbsListView$RecyclerListener"))) {
 				if (i.declaresProcedureByShortName("onMovedToScrapHeap"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onMovedToScrapHeap"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onMovedToScrapHeap"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.AdapterView$OnItemClickListener"))) {
 				if (i.declaresProcedureByShortName("onItemClick"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onItemClick"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onItemClick"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.AdapterView$OnItemLongClickListener"))) {
 				if (i.declaresProcedureByShortName("onItemLongClick"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onItemLongClick"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onItemLongClick"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.AdapterView.OnItemSelectedListener"))) {
 				if (i.declaresProcedureByShortName("onItemSelected"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onItemSelected"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onItemSelected"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onNothingSelected"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onNothingSelected"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onNothingSelected"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.AutoCompleteTextView$OnDismissListener"))) {
 				if (i.declaresProcedureByShortName("onDismiss"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDismiss"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDismiss"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.CalendarView$OnDateChangeListener"))) {
 				if (i.declaresProcedureByShortName("onSelectedDayChange"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onSelectedDayChange"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onSelectedDayChange"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.Chronometer$OnChronometerTickListener"))) {
 				if (i.declaresProcedureByShortName("onChronometerTick"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onChronometerTick"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onChronometerTick"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.CompoundButton$OnCheckedChangeListener"))) {
 				if (i.declaresProcedureByShortName("onCheckedChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onCheckedChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onCheckedChanged"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.DatePicker$OnDateChangedListener"))) {
 				if (i.declaresProcedureByShortName("onDateChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDateChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDateChanged"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.ExpandableListView$OnChildClickListener"))) {
 				if (i.declaresProcedureByShortName("onChildClick"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onChildClick"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onChildClick"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.ExpandableListView$OnGroupClickListener"))) {
 				if (i.declaresProcedureByShortName("onGroupClick"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onGroupClick"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onGroupClick"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.ExpandableListView$OnGroupCollapseListener"))) {
 				if (i.declaresProcedureByShortName("onGroupCollapse"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onGroupCollapse"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onGroupCollapse"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.ExpandableListView$OnGroupExpandListener"))) {
 				if (i.declaresProcedureByShortName("onGroupExpand"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onGroupExpand"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onGroupExpand"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.Filter$FilterListener"))) {
 				if (i.declaresProcedureByShortName("onFilterComplete"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onFilterComplete"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onFilterComplete"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.NumberPicker$OnScrollListener"))) {
 				if (i.declaresProcedureByShortName("onScrollStateChange"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onScrollStateChange"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onScrollStateChange"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.NumberPicker$OnValueChangeListener"))) {
 				if (i.declaresProcedureByShortName("onValueChange"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onValueChange"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onValueChange"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.NumberPicker$OnDismissListener"))) {
 				if (i.declaresProcedureByShortName("onDismiss"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDismiss"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDismiss"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.PopupMenu$OnMenuItemClickListener"))) {
 				if (i.declaresProcedureByShortName("onMenuItemClick"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onMenuItemClick"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onMenuItemClick"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.PopupWindow$OnDismissListener"))) {
 				if (i.declaresProcedureByShortName("onDismiss"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDismiss"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDismiss"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.RadioGroup$OnCheckedChangeListener"))) {
 				if (i.declaresProcedureByShortName("onCheckedChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onCheckedChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onCheckedChanged"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.RatingBar$OnRatingBarChangeListener"))) {
 				if (i.declaresProcedureByShortName("onRatingChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onRatingChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onRatingChanged"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.SearchView$OnCloseListener"))) {
 				if (i.declaresProcedureByShortName("onClose"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onClose"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onClose"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.SearchView$OnQueryTextListener"))) {
 				if (i.declaresProcedureByShortName("onQueryTextChange"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onQueryTextChange"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onQueryTextChange"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onQueryTextSubmit"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onQueryTextSubmit"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onQueryTextSubmit"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.SearchView$OnSuggestionListener"))) {
 				if (i.declaresProcedureByShortName("onSuggestionClick"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onSuggestionClick"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onSuggestionClick"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onSuggestionSelect"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onSuggestionSelect"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onSuggestionSelect"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.SeekBar$OnSeekBarChangeListener"))) {
 				if (i.declaresProcedureByShortName("onProgressChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onProgressChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onProgressChanged"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onStartTrackingTouch"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onStartTrackingTouch"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onStartTrackingTouch"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onStopTrackingTouch"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onStopTrackingTouch"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onStopTrackingTouch"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.ShareActionProvider$OnShareTargetSelectedListener"))) {
 				if (i.declaresProcedureByShortName("onShareTargetSelected"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onShareTargetSelected"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onShareTargetSelected"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.SlidingDrawer$OnDrawerCloseListener"))) {
 				if (i.declaresProcedureByShortName("onShareTargetSelected"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onShareTargetSelected"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onShareTargetSelected"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.SlidingDrawer$OnDrawerOpenListener"))) {
 				if (i.declaresProcedureByShortName("onDrawerOpened"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onDrawerOpened"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onDrawerOpened"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.SlidingDrawer$OnDrawerScrollListener"))) {
 				if (i.declaresProcedureByShortName("onScrollEnded"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onScrollEnded"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onScrollEnded"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onScrollStarted"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onScrollStarted"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onScrollStarted"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.TabHost$OnTabChangeListener"))) {
 				if (i.declaresProcedureByShortName("onTabChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onTabChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onTabChanged"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.TextView$OnEditorActionListener"))) {
 				if (i.declaresProcedureByShortName("onEditorAction"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onEditorAction"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onEditorAction"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.TimePicker$OnTimeChangedListener"))) {
 				if (i.declaresProcedureByShortName("onTimeChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onTimeChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onTimeChanged"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.widget.ZoomButtonsController$OnZoomListener"))) {
 				if (i.declaresProcedureByShortName("onVisibilityChanged"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onVisibilityChanged"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onVisibilityChanged"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onZoom"))
-					checkAndAddMethod(getProcedureFromHierarchyByName(baseClass, "onZoom"), lifecycleElement);
+					checkAndAddMethod(getProcedureFromHierarchyByShortName(baseClass, "onZoom"), lifecycleElement);
 			}
 		  
 		}
@@ -1279,24 +1268,28 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 				this.callbackMethods += (baseClass.getName -> (msetEmpty + proc))
 			
 		}
-//		println("added one callback whose sig is =" + pSig)
-//		println("current all callbacks = " + this.callbackMethods)
 	}
 	
 	private def collectAllInterfaces(ar : AmandroidRecord) : Set[AmandroidRecord] = {
 	  if(ar.getInterfaceSize == 0) Set()
-    else ar.getInterfaces.map{collectAllInterfaces(_)}.reduce((s1, s2) => s1 ++ s2)
+    else ar.getInterfaces ++ ar.getInterfaces.map{collectAllInterfaces(_)}.reduce((s1, s2) => s1 ++ s2)
   }
+	
+	private def getProcedureFromHierarchyByShortName(r :AmandroidRecord, procShortName : String) : AmandroidProcedure = {
+	  if(r.declaresProcedureByShortName(procShortName)) r.getProcedureByShortName(procShortName)
+	  else if(r.hasSuperClass) getProcedureFromHierarchyByShortName(r.getSuperClass, procShortName)
+	  else throw new RuntimeException("Could not find procedure: " + procShortName)
+	}
 	
 	private def getProcedureFromHierarchyByName(r :AmandroidRecord, procName : String) : AmandroidProcedure = {
 	  if(r.declaresProcedureByName(procName)) r.getProcedureByName(procName)
 	  else if(r.hasSuperClass) getProcedureFromHierarchyByName(r.getSuperClass, procName)
-	  else throw new RuntimeException("Could not find procedure")
+	  else throw new RuntimeException("Could not find procedure: " + procName)
 	}
 	
 	private def getProcedureFromHierarchy(r :AmandroidRecord, subSig : String) : AmandroidProcedure = {
 	  if(r.declaresProcedure(subSig)) r.getProcedure(subSig)
 	  else if(r.hasSuperClass) getProcedureFromHierarchy(r.getSuperClass, subSig)
-	  else throw new RuntimeException("Could not find procedure")
+	  else throw new RuntimeException("Could not find procedure: " + subSig)
 	}
 }

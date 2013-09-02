@@ -11,7 +11,6 @@ import org.sireum.amandroid.xml.AndroidXStream
 import org.sireum.amandroid.android.cache.AndroidCacheFile
 import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
 import org.sireum.amandroid.AmandroidCodeSource
-import org.sireum.amandroid.Center
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -20,7 +19,7 @@ import org.sireum.amandroid.Center
 class InterProceduralTest extends InterProceduralTestFramework {
   AmandroidCodeSource.preLoad
   InterproceduralExamples.ofgModelFiles.
-//    filter { s => s.endsWith("/smallWfgNP.pilar") }.
+    filter { s => s.endsWith("/StringLoopTest.pilar") }.
     foreach { fileUri =>
       Analyzing title fileUri file fileUri
     }

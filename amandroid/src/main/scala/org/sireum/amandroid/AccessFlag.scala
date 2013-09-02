@@ -31,9 +31,9 @@ object AccessFlag{
     if(str.contains("INTERFACE")) af = af | INTERFACE
     if(str.contains("NATIVE")) af = af | NATIVE
     if(str.contains("PRIVATE")) af = af | PRIVATE
-    if(str.contains("PROTECTED")) af = af | PROTECTED
+    else if(str.contains("PROTECTED")) af = af | PROTECTED
     else if(str.contains("PUBLIC")) af = af | PUBLIC
-    else if(str.contains("STATIC")) af = af | STATIC
+    if(str.contains("STATIC")) af = af | STATIC
     if(str.contains("TRANSIENT")) af = af | TRANSIENT
     if(str.contains("VOLATILE")) af = af | VOLATILE
     if(str.contains("STRICTFP")) af = af | STRICTFP

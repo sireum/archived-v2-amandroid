@@ -13,17 +13,20 @@ import org.sireum.amandroid.AmandroidCodeSource
 object XmlTest {
 	def main(args: Array[String]) {
 	  AmandroidCodeSource.preLoad
-	  ManifestParser.loadManifestFile("/Volumes/hd/fgwei/Desktop/apk/Callbacks_Button1.apk")
-	  println(ManifestParser.getEntryPointClasses)
-	  println(ManifestParser.getPackageName)
-	  println(ManifestParser.getPermissions)
-	  println(ManifestParser.getIntentDB)
-	  ARSCFileParser.parse("/Volumes/hd/fgwei/Desktop/apk/Callbacks_Button1.apk")
-	  println("arscstring-->" + ARSCFileParser.getGlobalStringPool)
-	  println("arscpackage-->" + ARSCFileParser.getPackages)
-	  LayoutFileParser.setPackageName(ManifestParser.getPackageName)
-	  LayoutFileParser.parseLayoutFile("/Volumes/hd/fgwei/Desktop/apk/Callbacks_Button1.apk", ManifestParser.getEntryPointClasses)
-	  println("layoutcalll--->" + LayoutFileParser.getCallbackMethods)
-	  println("layoutuser--->" + LayoutFileParser.getUserControls)
+	  val mfp = new ManifestParser
+	  mfp.loadManifestFile("/Volumes/hd/fgwei/Desktop/apk/Callbacks_Button1.apk")
+	  println(mfp.getEntryPointClasses)
+	  println(mfp.getPackageName)
+	  println(mfp.getPermissions)
+	  println(mfp.getIntentDB)
+	  val afp = new ARSCFileParser
+	  afp.parse("/Volumes/hd/fgwei/Desktop/apk/Callbacks_Button1.apk")
+	  println("arscstring-->" + afp.getGlobalStringPool)
+	  println("arscpackage-->" + afp.getPackages)
+	  val lfp = new LayoutFileParser
+	  lfp.setPackageName(mfp.getPackageName)
+	  lfp.parseLayoutFile("/Volumes/hd/fgwei/Desktop/apk/Callbacks_Button1.apk", mfp.getEntryPointClasses)
+	  println("layoutcalll--->" + lfp.getCallbackMethods)
+	  println("layoutuser--->" + lfp.getUserControls)
 	}
 }

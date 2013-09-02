@@ -30,6 +30,7 @@ class Context(var k : Int){
     }
   }
   def getContext : List[(String, String)] = this.callStack
+  def getLocUri : String = getContext(0)._2
   def isDiff(c : Context) : Boolean = !this.callStack.equals(c.getContext)
   override def equals(a : Any) : Boolean = {
     if(a.isInstanceOf[Context]) this.callStack.equals(a.asInstanceOf[Context].getContext)

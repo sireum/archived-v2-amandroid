@@ -10,6 +10,9 @@ import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.interProcedural.objectFlowAnalysis.OfaNode
 import org.sireum.amandroid.interProcedural.objectFlowAnalysis.ObjectFlowGraph
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 class AndroidObjectFlowGraph[Node <: OfaNode, ValueSet <: AndroidValueSet](fac: () => ValueSet) 
   extends ObjectFlowGraph[Node, ValueSet](fac)
   with InterComponentCommunicationModel[Node, ValueSet]{

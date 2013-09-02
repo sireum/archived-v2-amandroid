@@ -1,5 +1,8 @@
 package org.sireum.amandroid.android
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 object AndroidConstants {
 	final val ACTION_MAIN = "android.intent.action.MAIN"
 	  

@@ -15,7 +15,9 @@ import org.sireum.amandroid.Center
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 
-
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */
 object AmandroidSymbolTableBuilder {
   def apply(models : ISeq[Model],
             stpConstructor : Unit => SymbolTableProducer,
@@ -98,7 +100,6 @@ object AmandroidSymbolTableBuilder {
     val stp = minePackageElements(models, stpConstructor, parallel)
     resolvePackageElements(models, stp, parallel)
     buildProcedureSymbolTables(stp, parallel)
-    AmandroidResolver.resolveFromSTP(stp, parallel)
     stp.toSymbolTable
   }
   
