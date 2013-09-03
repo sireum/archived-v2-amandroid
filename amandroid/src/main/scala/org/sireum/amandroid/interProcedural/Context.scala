@@ -18,6 +18,10 @@ class Context(var k : Int){
     }
     this
   }
+  
+  /**
+   * update current context using another context.
+   */
   def updateContext(context2 : Context) = {
     this.k = context2.k
     val size2 = context2.length
@@ -29,6 +33,14 @@ class Context(var k : Int){
       callStack = callStack ::: callStack2.dropRight(size2 - (k + 1 - size))
     }
   }
+  
+  /**
+   * remove current top context
+   */
+  def removeTopContext : (String, String) = {
+    callStack.drop(0)(0)
+  }
+  
   def getContext : List[(String, String)] = this.callStack
   def getLocUri : String = getContext(0)._2
   def isDiff(c : Context) : Boolean = !this.callStack.equals(c.getContext)

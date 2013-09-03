@@ -1,6 +1,7 @@
 package org.sireum.amandroid.example.interprocedural
 
-import org.sireum.example.Examples
+import org.sireum.amandroid.example.Examples
+
 
 
 /**

@@ -1,6 +1,5 @@
 package org.sireum.amandroid.test.framework.amandroidResolver
 
-import org.sireum.test.framework.TestFramework
 import org.sireum.pipeline._
 import org.sireum.util._
 import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
@@ -8,6 +7,10 @@ import org.sireum.core.module.ChunkingPilarParserModule
 import org.sireum.amandroid.module.PilarAndroidSymbolResolverModule
 import java.io.PrintWriter
 import org.sireum.amandroid.AmandroidCodeSource
+import org.sireum.amandroid.AmandroidResolver
+import org.sireum.amandroid.Center
+import org.sireum.amandroid.Transform
+import org.sireum.amandroid.test.framework.TestFramework
 
 	/**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -35,6 +38,7 @@ trait AmandroidResolverTestFramework extends TestFramework {
     	println("####" + title + "#####")
     	
     	val job = PipelineJob()
+    	val options = job.properties
     	
       {
 	      import ChunkingPilarParserModule.ProducerView._
@@ -46,7 +50,15 @@ trait AmandroidResolverTestFramework extends TestFramework {
     	
     	pilarPipeline.compute(job)
 
-    	printError(job)
+//    	printError(job)
+    	
+    	val result = PilarAndroidSymbolResolverModule.getSymbolTable(options)
+    	
+    	result.procedureSymbolTables.foreach{
+    	  pst =>
+    	    Transform.buildRda(pst, Transform.buildCfg(pst)._2)
+    	}
+    	
     	
     	println("####" + "End" + "#####")
     	

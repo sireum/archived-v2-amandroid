@@ -1,6 +1,7 @@
 package org.sireum.amandroid.example.dummyMainGenerate
 
-import org.sireum.example.Examples
+import org.sireum.amandroid.example.Examples
+
 
 
 /**

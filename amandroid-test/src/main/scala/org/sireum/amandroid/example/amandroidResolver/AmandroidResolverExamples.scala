@@ -1,6 +1,6 @@
 package org.sireum.amandroid.example.amandroidResolver
 
-import org.sireum.example.Examples
+import org.sireum.amandroid.example.Examples
 
 
 /**

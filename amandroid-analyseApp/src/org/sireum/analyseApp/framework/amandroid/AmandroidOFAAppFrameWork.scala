@@ -1,6 +1,5 @@
 package org.sireum.analyseApp.framework.amandroid
 
-import org.sireum.test.framework._
 import org.sireum.pilar.ast._
 import org.sireum.pilar.parser._
 import org.sireum.util._
@@ -17,6 +16,7 @@ import org.sireum.alir.AlirIntraProceduralGraph
 import org.sireum.amandroid.module.AndroidInterProceduralModule
 import org.sireum.amandroid.module.AndroidApplicationPrepareModule
 import org.sireum.amandroid.module.AndroidFixIntraProceduralModule
+import org.sireum.amandroid.test.framework.TestFramework
 
 // sankar introduces the following framework which adds one stage on top of AmandroidParserTestFrameWork 
 

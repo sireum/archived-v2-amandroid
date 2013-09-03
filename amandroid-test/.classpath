@@ -8,7 +8,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-pilar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-pipeline"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-util"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/sireum-core-test"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-lib"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-module"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/amandroid"/>

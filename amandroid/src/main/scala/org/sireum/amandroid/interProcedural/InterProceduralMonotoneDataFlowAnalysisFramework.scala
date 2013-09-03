@@ -21,6 +21,9 @@
 //}
 //
 //object InterProceduralMonotoneDataFlowAnalysisFramework {
+//  
+//  final val TITLE = "InterProceduralMonotoneDataFlowAnalysisFramework"
+//  
 //	def apply[LatticeElement, Node <: CGNode] = build[LatticeElement, Node] _
 //
 //  def build[LatticeElement, Node <: CGNode] //
@@ -57,10 +60,27 @@
 //
 //        sb.toString
 //      }
+//      
+//      protected def next(l : LocationDecl, pst : ProcedureSymbolTable, context : Context) = {
+//        val newLoc = pst.location(l.index + 1)
+//        val newContext = context.copy
+//        val (pSig, oldLocUri) = newContext.removeTopContext
+//        if(!newLoc.name.isDefined)
+//        	newContext.setContext(pSig, newLoc.index.toString)
+//        else 
+//          newContext.setContext(pSig, newLoc.name.get.uri)
+//        if(cg.isCall(l))
+//          cg.getCGCallNode(newContext)
+//        else
+//        	cg.getCGNormalNode(newContext)
+//      }
 //
-//      protected def next(pst : ProcedureSymbolTable, l : LocationDecl) = cg.getNode(pst.location(l.index + 1))
-//
-//      protected def node(pst : ProcedureSymbolTable, locUri : ResourceUri) = cg.getNode(pst.location(locUri))
+//      protected def node(l : LocationDecl, context : Context) = {
+//        if(cg.isCall(l))
+//          cg.getCGCallNode(context)
+//        else
+//        	cg.getCGNormalNode(context)
+//      }
 //
 //      protected def fA(a : Assignment, in : DFF) : DFF =
 //        kill(in, a).union(gen(in, a))
@@ -227,7 +247,19 @@
 //
 //      protected def visitForward(
 //        l : LocationDecl,
+//        pst : ProcedureSymbolTable,
+//        callerContext : Context,
 //        esl : Option[EntrySetListener[LatticeElement]]) : Boolean = {
+//        val pSig = l.getValueAnnotation("signature") match {
+//			      case Some(exp : NameExp) =>
+//			        exp.name.name
+//			      case _ => throw new RuntimeException("Doing " + TITLE + ": Can not find signature from: " + l)
+//			    }
+//        val currentContext = callerContext.copy
+//        if(!l.name.isDefined)
+//        	currentContext.setContext(pSig, l.index.toString)
+//        else
+//          currentContext.setContext(pSig, l.name.get.uri)
 //        val eslb = esl.getOrElse(null)
 //          def jumpF(s : DFF, j : Jump) : Boolean =
 //            j match {
@@ -237,7 +269,10 @@
 //                var updated = false
 //                for (ifThen <- j.ifThens) {
 //                  r = fE(ifThen.cond, r)
-//                  val sn = node(ifThen.target.uri)
+//                  val ifThenContext = callerContext.copy
+//                  ifThenContext.setContext(pSig, ifThen.target.uri)
+//                  val ifThenLoc = pst.location(ifThen.target.uri)
+//                  val sn = node(ifThenLoc, ifThenContext)
 //                  if (esl.isDefined) {
 //                    eslb.ifThen(ifThen, r)
 //                    eslb.exitSet(Some(ifThen), r)
@@ -245,12 +280,15 @@
 //                  updated = update(confluence(r, getEntrySet(sn)), sn) || updated
 //                }
 //                if (j.ifElse.isEmpty) {
-//                  val sn = next(l)
+//                  val sn = next(l, pst, currentContext)
 //                  if (esl.isDefined) eslb.exitSet(None, r)
 //                  update(confluence(r, getEntrySet(sn)), sn) || updated
 //                } else {
 //                  val ifElse = j.ifElse.get
-//                  val sn = node(ifElse.target.uri)
+//                  val ifElseContext = callerContext.copy
+//                  ifElseContext.setContext(pSig, ifElse.target.uri)
+//                  val ifElseLoc = pst.location(ifElse.target.uri)
+//                  val sn = node(ifElseLoc, ifElseContext)
 //                  if (esl.isDefined) {
 //                    eslb.ifElse(ifElse, r)
 //                    eslb.exitSet(Some(ifElse), r)
@@ -362,11 +400,37 @@
 //
 //      def visit(l : LocationDecl,
 //                esl : Option[EntrySetListener[LatticeElement]] = None) : Boolean =
-//        if (forward) visitForward(l, esl)
-//        else visitBackward(l, esl)
+////        if (forward) visitForward(l, esl)
+////        else visitBackward(l, esl)
+//        visitForward(l, esl)
+//        
+//      def passRequiredFactsToAllCaller(xn : CGExitNode) : Boolean = {
+//        cg.successors(xn.asInstanceOf[Node]).foreach{
+//          n =>
+//            n match{
+//              case rn : CGReturnNode =>
+//                true
+//              case a => throw new RuntimeException("unexpected node type: " + a)
+//            }
+//        }
+//        true
+//      }
+//      
+//      def getFactsForCalleeAndReturn(cn : CGCallNode) : (ISet[LatticeElement], ISet[LatticeElement]) = {
+//        val set = getEntrySet(cn.asInstanceOf[Node])
+//        var calleeSet = set
+//        var returnSet = set
+//        (calleeSet, returnSet)
+//      }
+//      
+//      def mapFactsToCallee(factsForCallee : ISet[LatticeElement], en : CGEntryNode) : Boolean = {
+//        factsForCallee.map{fact=> }
+//        update(factsForCallee, en.asInstanceOf[Node])
+//      }
 //
 //    }
-//
+//    
+//    val locationTable = entryPoint.getProcedureBody.tables.bodyTables.get.locationTable
 //    val imdaf = new IMdaf(getEntrySet _, initial)
 //
 //    val workList = mlistEmpty[Node]
@@ -375,14 +439,37 @@
 //    while (!workList.isEmpty) {
 //      val n = workList.remove(0)
 //      n match {
-//        case ln : CGLocNode =>
-//          if (imdaf.visit(pst.location(n.locIndex)))
-//            workList ++= cg.successors(n)
-//        case n =>
+//        case en : CGEntryNode =>
 //          for (succ <- cg.successors(n)) {
 //            imdaf.update(getEntrySet(n), succ)
 //            workList += succ
 //          }
+//        case xn : CGExitNode =>
+//          if (imdaf.passRequiredFactsToAllCaller(xn))
+//            workList ++= cg.successors(n)
+//        case cn : CGCallNode =>
+//          /*TODO: extend graph*/
+//          val (factsForCallee, factsForReturn) = imdaf.getFactsForCalleeAndReturn(cn)
+//          for (succ <- cg.successors(n)) {
+//            succ match{
+//              case n : CGEntryNode =>
+//                if(imdaf.mapFactsToCallee(factsForCallee, n))
+//                	workList += succ
+//              case n : CGReturnNode =>
+//                if(imdaf.update(factsForReturn, n.asInstanceOf[Node]))
+//                	workList += succ
+//              case a => throw new RuntimeException("unexpected node type: " + a)
+//            }
+//          }
+//        case rn : CGReturnNode =>
+//          for (succ <- cg.successors(n)) {
+//            imdaf.update(getEntrySet(n), succ)
+//            workList += succ
+//          }
+//        case nn : CGNormalNode =>
+//          if (imdaf.visit(locationTable(nn.getLocUri)))
+//            workList ++= cg.successors(n)
+//        case a => throw new RuntimeException("unexpected node type: " + a)
 //      }
 //    }
 //

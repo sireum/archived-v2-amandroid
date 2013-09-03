@@ -1,6 +1,5 @@
 package org.sireum.amandroid.test.framework.dummyMainGenerate
 
-import org.sireum.test.framework.TestFramework
 import org.sireum.util._
 import java.io.File
 import java.util.zip.ZipFile
@@ -14,6 +13,7 @@ import org.sireum.amandroid.AmandroidCodeSource
 import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
 import org.sireum.amandroid.interProcedural.callGraph.CallGraphBuilder
 import org.sireum.amandroid.android.appInfo.PrepareApp
+import org.sireum.amandroid.test.framework.TestFramework
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

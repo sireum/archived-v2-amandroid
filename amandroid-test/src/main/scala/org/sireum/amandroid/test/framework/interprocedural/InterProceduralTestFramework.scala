@@ -1,6 +1,5 @@
 package org.sireum.amandroid.test.framework.interprocedural
 
-import org.sireum.test.framework.TestFramework
 import org.sireum.pipeline._
 import org.sireum.util._
 import java.io.PrintWriter
@@ -14,6 +13,7 @@ import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
 import org.sireum.amandroid.Center
 import org.sireum.amandroid.AmandroidResolver
 import org.sireum.amandroid.interProcedural.callGraph.CallGraphBuilder
+import org.sireum.amandroid.test.framework.TestFramework
 
 	/**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

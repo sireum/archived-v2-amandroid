@@ -1,6 +1,7 @@
 package org.sireum.amandroid.example.lwparser
 
-import org.sireum.example.Examples
+import org.sireum.amandroid.example.Examples
+
 
 
 /**

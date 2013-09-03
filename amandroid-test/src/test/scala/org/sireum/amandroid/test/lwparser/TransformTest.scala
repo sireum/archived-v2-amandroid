@@ -2,7 +2,6 @@ package org.sireum.amandroid.test.lwparser
 
 import org.sireum.util._
 import org.sireum.amandroid.example.lwparser.LightWeightParserExamples
-import org.sireum.test.framework.TestFramework
 import org.sireum.pipeline._
 import java.io.PrintWriter
 import java.util.zip.GZIPInputStream

@@ -1,10 +1,10 @@
 package org.sireum.amandroid.test.framework.lwparser
 
-import org.sireum.test.framework.TestFramework
 import org.sireum.pipeline._
 import org.sireum.util._
 import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
 import org.sireum.amandroid.AmandroidCodeSource
+import org.sireum.amandroid.test.framework.TestFramework
 
 	/**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

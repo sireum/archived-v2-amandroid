@@ -50,7 +50,7 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
 	        callees ++ caculateReachableProcedure(callees)
 	    }.reduce((s1, s2) => s1 ++ s2)
   }
-
+  
   def reverse : CallGraph[Node] = {
     val result = new CallGraph[Node]
     for (n <- nodes) result.addNode(n)
@@ -219,11 +219,13 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
    automata
   }
    
+  def isCall(l : LocationDecl) : Boolean = l.isInstanceOf[JumpLocation] && l.asInstanceOf[JumpLocation].jump.isInstanceOf[CallJump]
+   
   def collectCfgToBaseGraph[VirtualLabel](calleeProc : AmandroidProcedure, callerContext : Context) = {
     val calleeSig = calleeProc.getSignature
     val body = calleeProc.getProcedureBody
     val cfg = calleeProc.getCfg
-    def isCall(l : LocationDecl) : Boolean = l.isInstanceOf[JumpLocation] && l.asInstanceOf[JumpLocation].jump.isInstanceOf[CallJump]
+    
     cfg.nodes map{
       n =>
 	      n match{
@@ -239,10 +241,12 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
 	          val l = body.location(ln.locIndex)
 	          if(isCall(l)){
               val c = addCGCallNode(callerContext.copy.setContext(calleeSig, ln.locUri))
+              c.asInstanceOf[CGLocNode].setLocIndex(ln.locIndex)
               val r = addCGReturnNode(callerContext.copy.setContext(calleeSig, ln.locUri))
+              r.asInstanceOf[CGLocNode].setLocIndex(ln.locIndex)
               addEdge(c, r)
-	          } else addCGNormalNode(callerContext.copy.setContext(calleeSig, ln.locUri))
-	        case _ => addCGNormalNode(callerContext.copy.setContext(calleeSig, n.toString))
+	          } else addCGNormalNode(callerContext.copy.setContext(calleeSig, ln.locUri)).asInstanceOf[CGLocNode].setLocIndex(ln.locIndex)
+	        case a : AlirLocationNode => addCGNormalNode(callerContext.copy.setContext(calleeSig, a.locIndex.toString)).asInstanceOf[CGLocNode].setLocIndex(a.locIndex)
 	      }
     }
     for (e <- cfg.edges) {
@@ -473,6 +477,9 @@ final case class CGExitNode(context : Context) extends CGVirtualNode(context){
 
 abstract class CGLocNode(context : Context) extends CGNode(context) {
   def getLocUri : String = context.getLocUri
+  protected val LOC_INDEX = "LocIndex"
+  def setLocIndex(i : Int) = setProperty(LOC_INDEX, i)
+  def getLocIndex : Int = getPropertyOrElse[Int](LOC_INDEX, throw new RuntimeException("did not have loc index"))
 }
 
 abstract class CGInvokeNode(context : Context) extends CGLocNode(context) {
