@@ -9,39 +9,13 @@ abstract class Instance(className : String, defSite : Context){
   override def toString : String = "Instance(name:" + this.className + ". defsite:" + this.defSite + ")"
 }
 
+final case class RFAInstance(className : String, dimensions : Int, defSite : Context) extends Instance(className, defSite){
+  override def toString : String = "<" + this.className.substring(className.lastIndexOf(":") + 1, className.length() - 2) + "." + this.dimensions + "." + this.defSite.getCurrentLocUri + ">"
+}
+
 final case class PTAInstance(className : String, defSite : Context) extends Instance(className, defSite){
   override def toString : String = "PTAInst(name:" + this.className + ".defsite:" + this.defSite + ")"
 }
-
-//final case class PTARegClassInstance(className : String, defSite : Context) extends PTAInstance(className, defSite){
-//  override def toString : String = "PTARegClassInstance(name:" + this.className + ". defsite:" + this.defSite + ")"
-//}
-//
-//final case class PTAStringInstance(className : String, var defSite : Context, var k : Int) extends PTAInstance(className, defSite){
-//  def setK(i : Int) = k = i
-//  private var strings : Set[String] = Set()
-//  def getStrings = strings
-//  def addString(str : String) = strings += str
-//  def addStrings(strs : Set[String], operation : Context) = 
-//    if(checkOperation(operation)){
-//      updateOperation(operation)
-//      strs foreach{str => addString(str)}
-//    }
-//  def setStrings(strs : Set[String], operation : Context) = 
-//    if(checkOperation(operation)){
-//      updateOperation(operation)
-//      this.strings = strs
-//    }
-//  private var operationCalculator : Map[Int, Int] = Map()
-//  def updateOperation(operation : Context) = {
-//    this.operationCalculator += (operation.hashCode -> (this.operationCalculator.getOrElse(operation.hashCode, 0) + 1))
-//  }
-//  def checkOperation(operation : Context) : Boolean = {
-//    if(this.operationCalculator.getOrElse(operation.hashCode, 0) < k) true
-//    else false
-//  }
-//  override def toString : String = "PTAStringInstance(string:" + this.strings + ". name:" + this.className + ". defsite:" + this.defSite + ")"
-//}
 
 abstract class OFAInstance(className : String, defSite : Context) extends Instance(className, defSite){
   def copy : OFAInstance

@@ -19,6 +19,10 @@ class Context(var k : Int){
     this
   }
   
+  def getCurrentLocUri : String = {
+    callStack.head._2
+  }
+  
   /**
    * update current context using another context.
    */
@@ -37,8 +41,9 @@ class Context(var k : Int){
   /**
    * remove current top context
    */
-  def removeTopContext : (String, String) = {
-    callStack.drop(0)(0)
+  def removeTopContext = {
+    if(!callStack.isEmpty)
+    	callStack = callStack.tail
   }
   
   def getContext : List[(String, String)] = this.callStack

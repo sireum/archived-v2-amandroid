@@ -213,7 +213,7 @@ class PointsCollector {
             var dimensions = 0
             n.typeSpec match {
               case nt : NamedTypeSpec => 
-                if(!n.dims.isEmpty){dimensions = n.dims.size + n.typeFragments.size}
+                dimensions = n.dims.size + n.typeFragments.size
                 name = nt.name.name
               case _ =>
             }

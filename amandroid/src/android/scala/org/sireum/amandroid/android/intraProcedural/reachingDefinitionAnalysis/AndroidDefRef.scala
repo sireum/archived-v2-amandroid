@@ -195,13 +195,6 @@ final class AndroidDefRef(st: SymbolTable, val varAccesses: VarAccesses)
   }
 
   def callDefinitions(j: CallJump): ISeq[ISet[Slot]] = {
-//    val arg = j.callExp.arg
-//    arg match {
-//      case e: TupleExp =>
-//        e.exps.map { exp => isetEmpty[Slot] }
-//      case e =>
-//        ivector(isetEmpty[Slot])
-//    }
     callReferences(j)
   }
 
