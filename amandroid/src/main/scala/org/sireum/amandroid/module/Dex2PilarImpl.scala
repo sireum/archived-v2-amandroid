@@ -8,6 +8,11 @@ import java.net.URI
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */
+
 object Util {
   val base = new File("/Volumes/android/WORKING_DIRECTORY/out/host/darwin-x86/bin")
   val dexdump = new File(base, "dexdump")

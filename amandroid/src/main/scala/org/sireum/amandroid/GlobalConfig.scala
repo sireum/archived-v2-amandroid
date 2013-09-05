@@ -5,12 +5,12 @@ import java.io.File
 import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
 
 /**
- * All the global config's set at the beginning
+ * All the global config's settings at the beginning
  */
 
 object GlobalConfig {
   /**
-   * record where is the dir for library code
+   * record where the dir for library code is
    */
 	final var libFileDir = AndroidLibPilarFiles.PILAR_MODEL_DIR_URI
 	
@@ -22,9 +22,9 @@ object GlobalConfig {
 
 /**
  * APP_ONLY_TEST mode: processes app but doesn't go inside library, doesn't require code to be complete
- * APP_ONLY: processes app but doesn't go inside library, require code to be complete
+ * APP_ONLY: processes app but doesn't go inside library, requires code to be complete
  * WHOLE_PROGRAM_TEST mode: processes app and go inside library, doesn't require code to be complete
- * WHOLE_PROGRAM mode: processes app and go inside library, require code to be complete
+ * WHOLE_PROGRAM mode: processes app and go inside library, requires code to be complete
  */
 
 object Mode extends Enumeration {

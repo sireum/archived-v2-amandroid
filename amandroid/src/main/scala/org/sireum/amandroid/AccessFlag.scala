@@ -1,7 +1,7 @@
 package org.sireum.amandroid
 
 /**
- * This object provide constants and methods to represent pilar access flag.
+ * This object provides constants which represent pilar access flag; Some helper methods are also present.
  *
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */

@@ -14,7 +14,9 @@ import org.sireum.amandroid.AmandroidCodeSource
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
+
 @RunWith(classOf[JUnitRunner])
 class InterProceduralTest extends InterProceduralTestFramework {
   AmandroidCodeSource.preLoad

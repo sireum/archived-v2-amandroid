@@ -9,7 +9,7 @@ import org.sireum.amandroid.util.StringFormConverter
 import org.sireum.pilar.symbol.SymbolTable
 
 /**
- * collect info from symbol table and build Center, AmandroidRecord, and AmandroidProcedure
+ * this object collects info from the symbol table and builds Center, AmandroidRecord, and AmandroidProcedure
  */
 
 object AmandroidResolver {
@@ -18,7 +18,7 @@ object AmandroidResolver {
   val TITLE : String = "AmandroidResolver"
   
   /**
-   * resolve given procedure code. Normally for dummyMain
+   * resolve the given procedure code. Normally for dummyMain
    */
     
   def resolveProcedureCode(procSig : String, code : String) : AmandroidProcedure = {
@@ -28,7 +28,7 @@ object AmandroidResolver {
   }
   
   /**
-   * try resolve given procedure container to desired level. 
+   * try to resolve the given procedure container to desired level. 
    */
     
   def tryResolveProcedure(procSig : String, desiredLevel : Center.ResolveLevel.Value) : Option[AmandroidProcedure] = {
@@ -38,7 +38,7 @@ object AmandroidResolver {
   }
     
   /**
-   * resolve given procedure container to desired level. 
+   * resolve the given procedure's container to desired level. 
    */
     
   def resolveProcedure(procSig : String, desiredLevel : Center.ResolveLevel.Value) : AmandroidProcedure = {
@@ -49,7 +49,7 @@ object AmandroidResolver {
   }
   
   /**
-   * resolve given procedure container to desired level. 
+   * resolve the given procedure's container to desired level. 
    */
     
   def forceResolveProcedure(procSig : String, desiredLevel : Center.ResolveLevel.Value) : AmandroidProcedure = {
@@ -59,7 +59,7 @@ object AmandroidResolver {
   }
     
   /**
-   * resolve given records to desired level. 
+   * resolve the given records to desired level. 
    */
     
   def tryResolveRecord(recordName : String, desiredLevel : Center.ResolveLevel.Value) : Option[AmandroidRecord] = {
@@ -75,7 +75,7 @@ object AmandroidResolver {
   }
     
   /**
-   * resolve given records to desired level. 
+   * resolve the given records to desired level. 
    */
     
   def resolveRecord(recordName : String, desiredLevel : Center.ResolveLevel.Value) : AmandroidRecord = {
@@ -86,7 +86,7 @@ object AmandroidResolver {
   }
   
   /**
-   * resolve given records to desired level. 
+   * resolve the given records to desired level. 
    */
     
   def forceResolveRecord(recordName : String, desiredLevel : Center.ResolveLevel.Value) : AmandroidRecord = {
@@ -97,7 +97,7 @@ object AmandroidResolver {
   }
   
   /**
-   * resolve given record to body level
+   * resolve the given record to body level
    */
   
   def resolveToBodies(recordName : String) : AmandroidRecord = {
@@ -106,7 +106,7 @@ object AmandroidResolver {
   }
   
   /**
-   * resolve given record to body level
+   * resolve the given record to body level
    */
   
   def forceResolveToBodies(recordName : String) : AmandroidRecord = {
@@ -118,11 +118,11 @@ object AmandroidResolver {
   }
     
   /**
-   * resolve all the records, fields and procedures from symbol table producer which provided from symbol table model
+   * resolve all the records, fields and procedures from symbol table producer which are provided from symbol table model
    */
 	
 	def resolveFromST(st : SymbolTable, par : Boolean) : Unit = {
-    if(GlobalConfig.mode >= Mode.WHOLE_PROGRAM_TEST && !AmandroidCodeSource.isPreLoaded) throw new RuntimeException("In whole program mode but library code did not pre-loaded, call AmandroidCodeSource.preLoad first.")
+    if(GlobalConfig.mode >= Mode.WHOLE_PROGRAM_TEST && !AmandroidCodeSource.isPreLoaded) throw new RuntimeException("In whole program mode but library code did not be pre-loaded, call AmandroidCodeSource.preLoad first.")
     val stp = st.asInstanceOf[SymbolTableProducer]
 	  resolveRecords(stp, par)
 	  resolveGlobalVars(stp, par)
@@ -186,7 +186,7 @@ object AmandroidResolver {
 	}
 	
 	/**
-	 * collect global variables info from symbol table
+	 * collect global variables info from the symbol table
 	 */
 	
 	def resolveGlobalVars(stp : SymbolTableProducer, par : Boolean) = {
@@ -220,7 +220,7 @@ object AmandroidResolver {
 	      val ownerRecord = Center.getRecord(ownerName)
 	      (f, ownerRecord)
 	  }
-	  if(ownerRelation.isParallel) throw new RuntimeException("Doing " + TITLE + ": ownerRelation is parallel, but we are try to adding things to AmandroidRecord.")
+	  if(ownerRelation.isParallel) throw new RuntimeException("Doing " + TITLE + ": ownerRelation is parallel, but we are trying to add things to AmandroidRecord.")
 	  ownerRelation.foreach{
 	    case (f, own) =>
 	      own.addField(f)
@@ -263,7 +263,7 @@ object AmandroidResolver {
 	      proc.setProcedureBody(stp.procedureSymbolTableProducer(uri).asInstanceOf[ProcedureBody])
 	      (proc, ownerRecord)
 	  }
-	  if(ownerRelation.isParallel) throw new RuntimeException("Doing " + TITLE + ": ownerRelation is parallel, but we are try to adding things to AmandroidRecord.")
+	  if(ownerRelation.isParallel) throw new RuntimeException("Doing " + TITLE + ": ownerRelation is parallel, but we are trying to add things to AmandroidRecord.")
 	  ownerRelation.foreach{
 	    case (proc, own) =>
 	      own.addProcedure(proc)

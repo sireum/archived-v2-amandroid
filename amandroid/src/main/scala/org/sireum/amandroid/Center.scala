@@ -16,19 +16,19 @@ object Center {
   val DEBUG = false
   
   /**
-   * set of records contained by current Center
+   * set of records contained by the current Center
    */
   
 	private var records : Set[AmandroidRecord] = Set()
 	
 	/**
-   * set of application records contained by current Center
+   * set of application records contained by the current Center
    */
 	
 	private var applicationRecords : Set[AmandroidRecord] = Set()
 	
 	/**
-   * set of library records contained by current Center
+   * set of library records contained by the current Center
    */
 	
 	private var libraryRecords : Set[AmandroidRecord] = Set()
@@ -40,19 +40,19 @@ object Center {
 	private var nameToRecord : Map[String, AmandroidRecord] = Map()
 	
 	/**
-   * main records of current Center
+   * main records of the current Center
    */
 	
 	private var mainRecord : AmandroidRecord = null
 	
 	/**
-   * set of entry points of current Center
+   * set of entry points of the current Center
    */
 	
 	private var entryPoints : Set[AmandroidProcedure] = Set()
 	
 	/**
-	 * record hierarchy of all record in current Center
+	 * record hierarchy of all records in the current Center
 	 */
 	
 	private var hierarchy : RecordHierarchy = null
@@ -80,7 +80,7 @@ object Center {
 	val JAVA_PRIMITIVE_TYPES = Set("[|byte|]", "[|short|]", "[|int|]", "[|long|]", "[|float|]", "[|double|]", "[|boolean|]", "[|char|]")
 
 	/**
-	 * map from global variable signature to uri, it's just a temp map
+	 * map from global variable signature to uri; it's just a temp map
 	 */
 	
 	private var globalVarSigToUri : Map[String, ResourceUri] = Map()
@@ -110,7 +110,7 @@ object Center {
   	}
   
   /**
-   * return has app info or not
+   * return true if it has app info
    */
   
   def hasAppInfo : Boolean = this.appInfoOpt.isDefined
@@ -122,13 +122,13 @@ object Center {
   def releaseAppInfo = this.appInfoOpt = None
 	  
 	/**
-	 * set call graph for current center
+	 * set call graph for the current center
 	 */
 	  
 	def setAppOnlyCallGraph(cg : CallGraph[CGNode]) = this.appOnlyCallGraph = cg
 	
 	/**
-	 * get call graph of current center
+	 * get call graph of the current center
 	 */
 	
 	def getAppOnlyCallGraph : CallGraph[CGNode] = {
@@ -137,7 +137,7 @@ object Center {
   }
   
   /**
-   * return current center has call graph or not
+   * return true if current center has call graph
    */
   
   def hasAppOnlyCallGraph : Boolean = this.appOnlyCallGraph != null
@@ -149,13 +149,13 @@ object Center {
   def releaseAppOnlyCallGraph = this.appOnlyCallGraph = null
   
   /**
-	 * set call graph for current center
+	 * set call graph for the current center
 	 */
 	  
 	def setWholeProgramCallGraph(cg : CallGraph[CGNode]) = this.wholeProgramCallGraph = cg
 	
 	/**
-	 * get call graph of current center
+	 * get call graph of the current center
 	 */
 	
 	def getWholeProgramCallGraph : CallGraph[CGNode] = {
@@ -164,7 +164,7 @@ object Center {
   }
   
   /**
-   * return current center has call graph or not
+   * return true if the current center has call graph
    */
   
   def hasWholeProgramCallGraph : Boolean = this.wholeProgramCallGraph != null
@@ -208,7 +208,7 @@ object Center {
   }
   
   /**
-   * resolve records relation whole program
+   * resolve records relation of the whole program
    */
   
   def resolveRecordsRelationWholeProgram = {
@@ -269,19 +269,19 @@ object Center {
   }
 	
 	/**
-	 * get all application records
+	 * get all the application records
 	 */
 	
 	def getApplicationRecords = this.applicationRecords
 	
 	/**
-	 * get all library records
+	 * get all the library records
 	 */
 	
 	def getLibraryRecords = this.libraryRecords
 	
 	/**
-	 * add application record
+	 * add an application record
 	 */
 	
 	def addApplicationRecord(ar : AmandroidRecord) = {
@@ -290,7 +290,7 @@ object Center {
   }
 	
 	/**
-	 * add library record
+	 * add a library record
 	 */
 	
 	def addLibraryRecord(l : AmandroidRecord) = {
@@ -305,20 +305,20 @@ object Center {
 	def getRecords = this.records
 	
 	/**
-	 * return center has given record or not
+	 * return true if the center has given record
 	 */
 	
 	def hasRecord(name : String) : Boolean = this.nameToRecord.contains(name)
 	
 	/**
-	 * get record by record name. e.g. [|java:lang:Object|]
+	 * get record by a record name. e.g. [|java:lang:Object|]
 	 */
 	
 	def getRecord(name : String) : AmandroidRecord =
-	  this.nameToRecord.getOrElse(name, throw new RuntimeException("record " + name + " does not exists in record set."))
+	  this.nameToRecord.getOrElse(name, throw new RuntimeException("record " + name + " does not exist in record set."))
 	
 	/**
-	 * try to get record by name, if it is not exist return None
+	 * try to get record by name; if it does not exist, return None
 	 */
 	
 	def tryGetRecord(name : String) : Option[AmandroidRecord] = {
@@ -330,7 +330,7 @@ object Center {
 	 */
 	
 	def removeApplicationRecords(ar : AmandroidRecord) = {
-    if(!this.applicationRecords.contains(ar)) throw new RuntimeException("record " + ar.getName + " does not exists in application record set.")
+    if(!this.applicationRecords.contains(ar)) throw new RuntimeException("record " + ar.getName + " does not exist in application record set.")
     else this.applicationRecords -= ar
   }
 	
@@ -339,7 +339,7 @@ object Center {
 	 */
 	
 	def removeLibraryRecords(l : AmandroidRecord) = {
-    if(!this.libraryRecords.contains(l)) throw new RuntimeException("record " + l.getName + " does not exists in library record set.")
+    if(!this.libraryRecords.contains(l)) throw new RuntimeException("record " + l.getName + " does not exist in library record set.")
     else this.libraryRecords -= l
 	}
 	
@@ -382,7 +382,7 @@ object Center {
 	 */
 	
 	def getMainRecord : AmandroidRecord = {
-	  if(!hasMainRecord) throw new RuntimeException("No main record has been setted!")
+	  if(!hasMainRecord) throw new RuntimeException("No main record has been set!")
 	  this.mainRecord
 	}
 	
@@ -400,13 +400,13 @@ object Center {
 	 */
 	
 	def getMainProcedure : AmandroidProcedure = {
-	  if(!hasMainRecord) throw new RuntimeException("No main record has been setted!")
+	  if(!hasMainRecord) throw new RuntimeException("No main record has been set!")
 	  if(!this.mainRecord.declaresProcedure("main([Ljava/lang/String;)V")) throw new RuntimeException("Main record does not have Main procedure")
 	  this.mainRecord.getProcedure("main([Ljava/lang/String;)V")
 	}
 	
 	/**
-	 * because of some records changes, we need to modify the hierarchy
+	 * because of some records' changes we need to modify the hierarchy
 	 */
 	
 	def modifyHierarchy = {
@@ -415,7 +415,7 @@ object Center {
 	}
 	
 	/**
-	 * reterive the normal record hierarchy
+	 * retrieve the normal record hierarchy
 	 */
 	
 	def getRecordHierarchy : RecordHierarchy ={
@@ -524,7 +524,7 @@ object Center {
 	def getOuterNameFrom(innerName : String) : String = StringFormConverter.getOuterNameFrom(innerName)
 	
 	/**
-	 * return given name is a inner class name or not
+	 * return true if the given name is a inner class name or not
 	 */
 	
 	def isInnerClassName(name : String) : Boolean = StringFormConverter.isValidType(name) && name.lastIndexOf("$") > 0
@@ -542,7 +542,7 @@ object Center {
 	def containsRecord(name : String) = this.nameToRecord.contains(name)
 	
 	/**
-	 * grab field from Center. Input: [|java:lang:Throwable.stackState|]
+	 * grab field from Center. Input example is [|java:lang:Throwable.stackState|]
 	 */
 	def grabField(fieldSig : String) : Option[AmandroidField] = {
 	  val rName = StringFormConverter.getRecordNameFromFieldSignature(fieldSig)
@@ -553,13 +553,13 @@ object Center {
 	}
 	
 	/**
-	 * return whether contains the given field or not. Input: [|java:lang:Throwable.stackState|]
+	 * return true if contains the given field. Input example is [|java:lang:Throwable.stackState|]
 	 */
 	
 	def containsField(fieldSig : String) : Boolean = grabField(fieldSig).isDefined
 	
 	/**
-	 * grab procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
+	 * grab procedure from Center. Input example is [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
 	 */
 	
 	def grabProcedure(procSig : String) : Option[AmandroidProcedure] = {
@@ -571,13 +571,13 @@ object Center {
 	}
 	
 	/**
-	 * return whether contains the given procedure or not. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
+	 * return true if contains the given procedure. Input example is [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
 	 */
 	
 	def containsProcedure(procSig : String) : Boolean = grabProcedure(procSig).isDefined
 	
 	/**
-	 * get field from Center. Input: [|java:lang:Throwable.stackState|]
+	 * get field from Center. Input example is [|java:lang:Throwable.stackState|]
 	 */
 	def getField(fieldSig : String) : AmandroidField = {
 	  grabField(fieldSig) match{

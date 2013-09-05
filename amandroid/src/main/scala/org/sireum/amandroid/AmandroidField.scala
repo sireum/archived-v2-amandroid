@@ -3,7 +3,7 @@ package org.sireum.amandroid
 import org.sireum.amandroid.util.StringFormConverter
 
 /**
- * This class is an amandroid represent of the pilar field. It can belong to AmandroidRecord.
+ * This class is an amandroid representation of a pilar field. It can belong to AmandroidRecord.
  * You can also construct it manually. 
  * 
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -40,8 +40,8 @@ class AmandroidField {
 	
 	protected var declaringRecord : AmandroidRecord = null
 	
-	/**
-   * when you construct a amandroid field instance please call this init function first
+   /**
+   * when you construct an amandroid field instance, call this init function first
    */
 	
 	def init(name : String, typ : Type, accessFlags : Int) : AmandroidField = {
@@ -57,19 +57,19 @@ class AmandroidField {
 	}
 	
 	/**
-   * when you construct a amandroid field instance please call this init function first
+   * when you construct an amandroid field instance, call this init function first
    */
 	
 	def init(name : String, typ : Type) : AmandroidField = init(name, typ, 0)
 	
 	/**
-   * when you construct a amandroid field instance please call this init function first
+   * when you construct an amandroid field instance, please call this init function first
    */
 	
 	def init(name : String, accessFlags : Int) : AmandroidField = init(name, null, accessFlags)
 	
 	/**
-   * when you construct a amandroid field instance please call this init function first
+   * when you construct an amandroid field instance, call this init function first
    */
 	
 	def init(name : String) : AmandroidField = init(name, null, 0)
@@ -147,37 +147,37 @@ class AmandroidField {
 	def clearDeclaringRecord = this.declaringRecord = null
 	
 	/**
-	 * returning thue if the field is public
+	 * return true if the field is public
 	 */
 	
 	def isPublic = AccessFlag.isPublic(this.accessFlags)
 	
 	/**
-	 * returning thue if the field is protected
+	 * return true if the field is protected
 	 */
 	
 	def isProtected = AccessFlag.isProtected(this.accessFlags)
 	
 	/**
-	 * returning thue if the field is private
+	 * return true if the field is private
 	 */
 	
 	def isPrivate = AccessFlag.isPrivate(this.accessFlags)
 	
 	/**
-	 * returning thue if the field is static
+	 * return true if the field is static
 	 */
 	
 	def isStatic = AccessFlag.isStatic(this.accessFlags)
 	
 	/**
-	 * returning thue if the field is final
+	 * return true if the field is final
 	 */
 	
 	def isFinal = AccessFlag.isFinal(this.accessFlags)
 	
 	/**
-	 * check given string is field signature or not
+	 * check if given string is field signature or not
 	 */
 	
 	def isSignature(str : String) = StringFormConverter.isValidFieldSig(str)

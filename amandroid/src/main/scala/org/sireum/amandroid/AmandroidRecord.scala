@@ -2,10 +2,13 @@ package org.sireum.amandroid
 
 
 /**
- * This class is a amandroid represent of the pilar record. They are usually created by Amandroid Resolver.
- * You can also construct it manually. Please call init() method first when you want to do any further things.
+ * This class is an amandroid representation of a pilar record. A record corresponds to a class or an interface of the source code. They are usually created by Amandroid Resolver.
+ * You can also construct it manually. Call init() method first when you want to do any further things.
+ * 
  * 
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ *
  */
 class AmandroidRecord {
   
@@ -28,31 +31,31 @@ class AmandroidRecord {
   protected var packageName : String = null
   
   /**
-   * the access flags integer represent for this record
+   * the access flags integer representation for this record
    */
   
   protected var accessFlags : Int = 0
   
   /**
-   * is this record in amandroid Center or not
+   * is this record in amandroid Center or not?
    */
   
   protected var inCenter : Boolean = false
   
   /**
-   * set of fields belong to this record
+   * set of fields which belong to this record
    */
   
   protected var fields : Set[AmandroidField] = Set()
   
   /**
-   * set of procedures belong to this record
+   * set of procedures which belong to this record
    */
   
   protected var procedures : Set[AmandroidProcedure] = Set()
   
   /**
-   * set of interfaces extends or implement by this record
+   * set of interfaces which this record extends or implements 
    */
   
   protected var interfaces : Set[AmandroidRecord] = Set()
@@ -76,13 +79,13 @@ class AmandroidRecord {
   protected var subSigToProcedures : Map[String, AmandroidProcedure] = Map()
   
   /**
-   * didn't resolved extend relation list. It's a set of record names.
+   * didn't resolve this extends-relation list. It's a set of record names.
    */
   
   var needToResolveExtends : Set[String] = Set()
   
   /**
-   * didn't resolved outer class name. 
+   * didn't resolve this outer class name. 
    */
   
   var needToResolveOuterName : Option[String] = None
@@ -128,19 +131,19 @@ class AmandroidRecord {
   def setResolvingLevel(level : Center.ResolveLevel.Value) = this.resolvingLevel = level
   
   /**
-   * add need to resolve extend record
+   * add need-to-resolve-extend-record
    */
   
   def addNeedToResolveExtend(recName : String) = this.needToResolveExtends += recName
   
   /**
-   * add need to resolve extend records
+   * add need-to-resolve-extend-records
    */
   
   def addNeedToResolveExtends(recNames : Set[String]) = this.needToResolveExtends ++= recNames
   
   /**
-   * when you construct a amandroid record instance please call this init function first
+   * when you construct a amandroid record instance, call this init function first
    */
   
   def init(name : String, accessFlags : Int) : AmandroidRecord = {
@@ -150,13 +153,13 @@ class AmandroidRecord {
   }
   
   /**
-   * when you construct a amandroid record instance please call this init function first
+   * when you construct a amandroid record instance, call this init function first
    */
   
   def init(name : String) : AmandroidRecord = init(name, 0)
   
   /**
-   * parser the given record name to get short name and package name.
+   * parse the given record name to get the short name and the package name.
    */
   
   def setName(name : String) = {
@@ -242,19 +245,19 @@ class AmandroidRecord {
 	}
 	
   /**
-   * return is the field declared in this record
+   * return true if the field is declared in this record
    */
   
 	def declaresField(sig : String) : Boolean = !getFields.filter(_.getSignature == sig).isEmpty
 	
 	/**
-	 * whether this record declare a field with the given name
+	 * whether this record declares a field with the given name
 	 */
 	
 	def declaresFieldByName(name : String) = !getFields.filter(_.getName == name).isEmpty
 	
 	/**
-	 * whether this record declare a field with the given name and type
+	 * whether this record declares a field with the given name and type
 	 */
 	
 	def declaresField(name : String, typ : Type) = !getFields.filter(f => (f.getName == name && f.getType == typ)).isEmpty
@@ -355,7 +358,7 @@ class AmandroidRecord {
 	}
 	
 	/**
-	 * whether this procedure exist in the record or not
+	 * whether this procedure exists in the record or not
 	 */
 	
 	def declaresProcedure(subSig : String) : Boolean = this.subSigToProcedures.contains(subSig)
@@ -387,7 +390,7 @@ class AmandroidRecord {
 	}
 	
 	/**
-	 * is procedure exists with the given name, parameter types and return type
+	 * does procedure exist with the given name, parameter types and return type?
 	 */
 	
 	def declaresProcedure(name : String, paramTyps : List[String], returnTyp : String) : Boolean = {
@@ -400,7 +403,7 @@ class AmandroidRecord {
 	}
 	
 	/**
-	 * is procedure exists with the given name and parameter types
+	 * does procedure exist with the given name and parameter types?
 	 */
 	
 	def declaresProcedure(name : String, paramTyps : List[String]) : Boolean = {
@@ -413,7 +416,7 @@ class AmandroidRecord {
 	}
 	
 	/**
-	 * is procedure exists with the given name
+	 * does procedure exists with the given name?
 	 */
 	
 	def declaresProcedureByName(name : String) : Boolean = {
@@ -426,7 +429,7 @@ class AmandroidRecord {
 	}
 	
 	/**
-	 * is procedure exists with the given short name
+	 * does procedure exists with the given short name?
 	 */
 	
 	def declaresProcedureByShortName(name : String) : Boolean = {
@@ -443,9 +446,9 @@ class AmandroidRecord {
 	 */
 	
 	def addProcedure(ap : AmandroidProcedure) = {
-	  if(ap.isDeclared) throw new RuntimeException(ap.getName + " already declared in record " + ap.getDeclaringRecord.getName)
+	  if(ap.isDeclared) throw new RuntimeException(ap.getName + " is already declared in record " + ap.getDeclaringRecord.getName)
 
-	  if(this.subSigToProcedures.contains(ap.getSubSignature)) throw new RuntimeException("The procedure " + ap.getName + " already declared in record " + getName)
+	  if(this.subSigToProcedures.contains(ap.getSubSignature)) throw new RuntimeException("The procedure " + ap.getName + " is already declared in record " + getName)
 	  this.subSigToProcedures += (ap.getSubSignature -> ap)
 	  this.procedures += ap
 	  ap.setDeclaringRecord(this)
@@ -476,7 +479,7 @@ class AmandroidRecord {
 	def getInterfaces = this.interfaces
 	
 	/**
-	 * whether this reocrd implement the given interface
+	 * whether this record implements the given interface
 	 */
 	
 	def implementsInterface(name : String) : Boolean = {
@@ -488,7 +491,7 @@ class AmandroidRecord {
 	}
 	
 	/**
-	 * add interface which directly implement by this record
+	 * add an interface which is directly implemented by this record
 	 */
 	
 	def addInterface(i : AmandroidRecord) = {
@@ -496,16 +499,16 @@ class AmandroidRecord {
 	}
 	
 	/**
-	 * add interface which directly implement by this record
+	 * add an interface which is directly implemented by this record
 	 */
 	
 	def addInterfaceCheck(i : AmandroidRecord) = {
-	  if(implementsInterface(i.getName)) throw new RuntimeException("already exist this interface: " + i.getName)
+	  if(implementsInterface(i.getName)) throw new RuntimeException("already implements this interface: " + i.getName)
 	  this.interfaces += i
 	}
 	
 	/**
-	 * remove interface from this record
+	 * remove an interface from this record
 	 */
 	
 	def removeInterface(i : AmandroidRecord) = {
@@ -514,13 +517,13 @@ class AmandroidRecord {
 	}
 	
 	/**
-	 * whether current record has super class or not
+	 * whether the current record has a super class or not
 	 */
 	
 	def hasSuperClass = this.superClass != null
 	
 	/**
-	 * get super class
+	 * get the super class
 	 */
 	
 	def getSuperClass : AmandroidRecord = {
@@ -529,7 +532,7 @@ class AmandroidRecord {
 	}
 	
 	/**
-	 * try to get super class
+	 * try to get the super class
 	 */
 	
 	def tryGetSuperClass : Option[AmandroidRecord] = {
@@ -538,7 +541,7 @@ class AmandroidRecord {
 	}
 	
 	/**
-	 * set super class
+	 * set the super class
 	 */
 	
 	def setSuperClass(sc : AmandroidRecord) = {
@@ -546,13 +549,13 @@ class AmandroidRecord {
 	}
 	
 	/**
-	 * whether current record has outer class or not
+	 * whether the current record has an outer class or not
 	 */
 	
 	def hasOuterClass = this.outerClass != null
 	
 	/**
-	 * get outer class
+	 * get the outer class
 	 */
 	
 	def getOuterClass : AmandroidRecord = {
@@ -561,7 +564,7 @@ class AmandroidRecord {
 	}
 	
 	/**
-	 * try to get outer class
+	 * try to get the outer class
 	 */
 	
 	def tryGetOuterClass : Option[AmandroidRecord] = {
@@ -578,13 +581,13 @@ class AmandroidRecord {
 	}
 	
 	/**
-	 * whether current record is inner class or not
+	 * whether current record is an inner class or not
 	 */
 	
 	def isInnerClass : Boolean = hasOuterClass
 	
 	/**
-   * return true if this record is interface
+   * return true if this record is an interface
    */
   
   def isInterface : Boolean = AccessFlag.isInterface(this.accessFlags)
@@ -632,13 +635,13 @@ class AmandroidRecord {
   def isStatic : Boolean = AccessFlag.isStatic(this.accessFlags)
   
   /**
-   * does this record is an application record
+   * is this record an application record
    */
   
   def isApplicationRecord : Boolean = Center.getApplicationRecords.contains(this)
   
   /**
-   * set this record as application record
+   * set this record as an application record
    */
   
   def setApplicationRecord = {
@@ -648,13 +651,13 @@ class AmandroidRecord {
 	}
 	
 	/**
-   * does this record is a library record
+   * is this record  a library record
    */
   
   def isLibraryRecord : Boolean = Center.getLibraryRecords.contains(this)
   
   /**
-   * set this record as library record
+   * set this record as a library record
    */
   
   def setLibraryRecord = {

@@ -9,12 +9,15 @@ import org.sireum.amandroid.example.dummyMainGenerate.DummyMainGenerateExamples
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
+
 @RunWith(classOf[JUnitRunner])
 class DummyMainGenerateTest extends DummyMainGenerateTestFramework {
   AmandroidCodeSource.preLoad
+  //println(DummyMainGenerateExamples.apkModelFiles)
 	DummyMainGenerateExamples.apkModelFiles.
-  filter { s => s.endsWith("68ac.apk") }.
+  //filter { s => s.startsWith("0eb") }.
   foreach { fileUri =>
     Analyzing title fileUri file fileUri
   }

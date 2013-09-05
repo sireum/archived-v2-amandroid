@@ -5,10 +5,12 @@ import org.sireum.alir.ControlFlowGraph
 import org.sireum.alir.ReachingDefinitionAnalysis
 
 /**
- * This class is a amandroid represent of the pilar procedure. It can belong to AmandroidRecord.
+ * This class is an amandroid representation of a pilar procedure. It can belong to AmandroidRecord.
  * You can also construct it manually. 
  * 
+ * 
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
 class AmandroidProcedure {
 	val constructorName : String = "<init>"
@@ -88,7 +90,7 @@ class AmandroidProcedure {
   protected var rda : ReachingDefinitionAnalysis.Result = null
   
   /**
-	 * is it declared in some AmandroidRecord
+	 * is it declared in some AmandroidRecord?
 	 */
 	
 	def isDeclared : Boolean = declaringRecord != null
@@ -100,7 +102,7 @@ class AmandroidProcedure {
   def strEquHashCode : Int = this.returnTyp.hashCode() * 101 + this.accessFlags * 17 + this.name.hashCode()
   
   /**
-   * when you construct a amandroid procedure instance please call this init function first
+   * when you construct an amandroid procedure instance, call this init function first
    */
   
   def init(name : String, sig : String, paramTyps : List[Type], returnTyp : Type, accessFlags : Int, thrownExceptions : List[AmandroidRecord]) : AmandroidProcedure = {
@@ -117,7 +119,7 @@ class AmandroidProcedure {
 	}
   
   /**
-   * when you construct a amandroid procedure instance please call this init function first
+   * when you construct a amandroid procedure instance, call this init function first
    */
   
   def init(name : String, sig : String, paramTyps : List[Type], returnTyp : Type, accessFlags : Int) : AmandroidProcedure = {
@@ -125,7 +127,7 @@ class AmandroidProcedure {
 	}
   
   /**
-   * when you construct a amandroid procedure instance please call this init function first
+   * when you construct a amandroid procedure instance, call this init function first
    */
   
   def init(name : String, sig : String, paramTyps : List[Type], returnTyp : Type) : AmandroidProcedure = {
@@ -133,7 +135,7 @@ class AmandroidProcedure {
 	}
   
   /**
-   * when you construct a amandroid procedure instance please call this init function first
+   * when you construct a amandroid procedure instance, call this init function first
    */
   
   def init(name : String, sig : String) : AmandroidProcedure = {
@@ -184,7 +186,7 @@ class AmandroidProcedure {
   }
   
   /**
-   * sets the name of this procedure
+   * set the name of this procedure
    */
   
   def setName(name : String) = {
@@ -353,7 +355,7 @@ class AmandroidProcedure {
   def clearProcedureBody = this.procBody = null
   
   /**
-   * Adds exception throwed by this procedure
+   * Adds exception which can be thrown by this procedure
    */
   
   def addExceptionIfAbsent(exc : AmandroidRecord) = {
@@ -361,12 +363,12 @@ class AmandroidProcedure {
   }
   
   /**
-   * Adds exception throwed by this procedure
+   * Adds exception thrown by this procedure
    */
   
   def addException(exc : AmandroidRecord) = {
     if(DEBUG) println("Adding Exception: " + exc)
-    if(throwsException(exc)) throw new RuntimeException("already throw exception: " + exc)
+    if(throwsException(exc)) throw new RuntimeException("already throwing exception: " + exc)
     this.exceptions += exc
   }
   
@@ -381,7 +383,7 @@ class AmandroidProcedure {
   }
   
   /**
-   * throw this exception or not
+   * throws this exception or not?
    */
   
   def throwsException(exc : AmandroidRecord) = this.exceptions.contains(exc)
@@ -399,7 +401,7 @@ class AmandroidProcedure {
   def getExceptions = this.exceptions
   
   /**
-   * return true if this procedure is concrete which means not abstract nor native
+   * return true if this procedure is concrete which means it is not abstract nor native
    */
   
   def isConcrete = !isAbstract && ! isNative
@@ -496,7 +498,7 @@ class AmandroidProcedure {
   }
   
   /**
-   * return current procedure has cfg or not
+   * return true if current procedure has cfg
    */
   
   def hasCfg : Boolean = this.cfg != null

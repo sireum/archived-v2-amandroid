@@ -12,7 +12,7 @@ object AmandroidCodeSource {
   }
   
   /**
-   * pre-load all the codes of library
+   * pre-load all the code of the library
    */
   
   def preLoad = {
@@ -35,25 +35,25 @@ object AmandroidCodeSource {
   
   
   /**
-   * is preLoad happen or not
+   * did preLoad happen or not?
    */
   
   protected var preLoaded = false
   
   /**
-   * is preLoad happen or not
+   * did preLoad happen or not?
    */
   
   def isPreLoaded = this.preLoaded
   
   /**
-   * map from record name to pilar code of library. name e.g. [|java:lang:Object|]
+   * map from record name to pilar code of library. E.g. record name [|java:lang:Object|] to its pilar code 
    */
   
 	protected var libRecordsCodes : Map[String, String] = Map()
 	
 	/**
-   * map from record name to pilar code of app. name e.g. [|java:lang:Object|]
+   * map from record name to pilar code of app. E.g. record name [|java:lang:MyObject|] to its pilar code 
    */
   
 	protected var appRecordsCodes : Map[String, String] = Map()
@@ -71,31 +71,31 @@ object AmandroidCodeSource {
 //	protected var globalVarsCodes : Map[String, String] = Map()
 	
 	/**
-	 * get records codes
+	 * get lib records' code
 	 */
 	
 	def getLibraryRecordsCodes = this.libRecordsCodes
 	
 	/**
-	 * set record code
+	 * set lib record code
 	 */
 	
 	def setLibraryRecordCode(name : String, code : String) = this.libRecordsCodes += (name -> code)
 	
 	/**
-	 * get records codes
+	 * get app records codes
 	 */
 	
 	def getAppRecordsCodes = this.appRecordsCodes
 	
 	/**
-	 * clear records codes
+	 * clear app records codes
 	 */
 	
 	def clearAppRecordsCodes = this.appRecordsCodes = Map()
 	
 	/**
-	 * set record code
+	 * set app record code
 	 */
 	
 	def setAppRecordCode(name : String, code : String) = this.appRecordsCodes += (name -> code)
@@ -120,7 +120,7 @@ object AmandroidCodeSource {
     this.appRecordsCodes.get(name) match{
       case Some(code) => code
       case None =>
-    		this.libRecordsCodes.getOrElse(name, throw new RuntimeException("record " + name + " not exists in current code base."))
+    		this.libRecordsCodes.getOrElse(name, throw new RuntimeException("record " + name + " does not exist in the current code base."))
     }
   }
 	
@@ -131,17 +131,17 @@ object AmandroidCodeSource {
 	def getCodeType(name : String) : CodeType.Value = {
 	  if(this.appRecordsCodes.contains(name)) CodeType.APP
 	  else if(this.libRecordsCodes.contains(name)) CodeType.LIBRARY
-	  else throw new RuntimeException("record " + name + " not exists in current code base.")
+	  else throw new RuntimeException("record " + name + " does not exist in the current code base.")
 	}
 	
 	/**
-	 * contains given record or not
+	 * contains given record or not?
 	 */
 	
 	def containsRecord(name : String) : Boolean = this.appRecordsCodes.contains(name) || this.libRecordsCodes.contains(name)
 	
 	/**
-	 * contains given procedure or not
+	 * contains given procedure's container record or not?
 	 */
 	
 	def containsProcedure(sig : String) : Boolean = {
@@ -150,7 +150,7 @@ object AmandroidCodeSource {
   }
 	
 	/**
-	 * contains given global var or not
+	 * contains given global var's container record or not?
 	 */
 	
 	def containsGlobalVar(sig : String) : Boolean = {
@@ -164,7 +164,7 @@ object AmandroidCodeSource {
 //	def setProcedureContainer(sig : String, recName : String) = this.proceduresCodes += (sig -> recName)
 //	
 	/**
-	 * get procedure code
+	 * get procedure's containing record's code
 	 */
 	
 	def getProcedureCode(sig : String) = {
@@ -179,7 +179,7 @@ object AmandroidCodeSource {
 //	def setGlobalVarContainer(name : String, recName : String) = this.globalVarsCodes += (name -> recName)
 //	
 	/**
-	 * get global variable code.
+	 * get global variable's containing record's code.
 	 */
 	
 	def getGlobalVarCode(sig : String) = {

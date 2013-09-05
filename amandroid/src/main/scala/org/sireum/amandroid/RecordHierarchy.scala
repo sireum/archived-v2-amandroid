@@ -17,13 +17,13 @@ class RecordHierarchy {
   protected val interfaceToSubInterfaces : MMap[AmandroidRecord, MSet[AmandroidRecord]] = mmapEmpty
   
   /**
-   * this map is from class to all sub-classes.  Not filled in in the build()
+   * this map is from class to all sub-classes.  Not filled in inside the build()
    */
   
   protected val classToAllSubClasses : MMap[AmandroidRecord, MSet[AmandroidRecord]] = mmapEmpty
   
   /**
-   * this map is from interface to all sub-interfaces. Not filled in in the build()
+   * this map is from interface to all sub-interfaces. Not filled in inside the build()
    */
   
   protected val interfaceToAllSubInterfaces : MMap[AmandroidRecord, MSet[AmandroidRecord]] = mmapEmpty
@@ -35,7 +35,7 @@ class RecordHierarchy {
   protected val interfaceToImplememters : MMap[AmandroidRecord, MSet[AmandroidRecord]] = mmapEmpty
   
   /**
-   * construct a hierarchy from the current scene
+   * construct a hierarchy from the current scene i.e. Center
    */
   
   def build : RecordHierarchy = {
