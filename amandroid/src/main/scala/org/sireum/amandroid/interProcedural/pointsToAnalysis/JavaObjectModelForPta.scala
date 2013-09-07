@@ -3,6 +3,7 @@ package org.sireum.amandroid.interProcedural.pointsToAnalysis
 import org.sireum.util._
 import org.sireum.amandroid.interProcedural.objectFlowAnalysis.InvokePointNode
 import org.sireum.amandroid.PTAInstance
+import org.sireum.amandroid._
 
 trait JavaObjectModelForPta[Node <: PtaNode] {
 	/**
@@ -63,7 +64,7 @@ trait JavaObjectModelForPta[Node <: PtaNode] {
 //    					               else Set()				             
 //      println("strs-->" + strs)
       result += (ipN.piNodeOpt.get -> msetEmpty)
-      val ins = PTAInstance("[|java:lang:String|]", ipN.piNodeOpt.get.getContext.copy)
+      val ins = PTAInstance(new NormalType("[|java:lang:String|]"), ipN.piNodeOpt.get.getContext.copy)
 //      ins.addStrings(strs, ipN.getContext)
       result(ipN.piNodeOpt.get).add(ins)
   	}
@@ -267,56 +268,56 @@ trait JavaObjectModelForPta[Node <: PtaNode] {
 	    case "[|Ljava/lang/StringBuilder;.<init>:()V|]" =>
 	      sbInsts.map{
 	        ins =>
-	          val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
+	          val sIns = PTAInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy)
 	          pag.pointsToMap.addInstanceInternal(ins.toString + "[|java:lang:StringBuilder.value|]", sIns)
 	      }
 	      msetEmpty
 	    case "[|Ljava/lang/StringBuilder;.<init>:(I)V|]" =>
 	      sbInsts.map{
 	        ins =>
-	          val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
+	          val sIns = PTAInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy)
 	          pag.pointsToMap.addInstanceInternal(ins.toString + "[|java:lang:StringBuilder.value|]", sIns)
 	      }
 	      msetEmpty
 	    case "[|Ljava/lang/StringBuilder;.<init>:(Ljava/lang/CharSequence;)V|]" =>
 	      sbInsts.map{
 	        ins =>
-	          val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
+	          val sIns = PTAInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy)
 	          pag.pointsToMap.addInstanceInternal(ins.toString + "[|java:lang:StringBuilder.value|]", sIns)
 	      }
 	      msetEmpty
 	    case "[|Ljava/lang/StringBuilder;.<init>:(Ljava/lang/String;)V|]" =>
 	      sbInsts.map{
 	        ins =>
-	          val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
+	          val sIns = PTAInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy)
 	          pag.pointsToMap.addInstanceInternal(ins.toString + "[|java:lang:StringBuilder.value|]", sIns)
 	      }
 	      msetEmpty
 	    case "[|Ljava/lang/StringBuilder;.append:([C)Ljava/lang/StringBuilder;|]" =>
 	      sbInsts.map{
 	        ins =>
-	          val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
+	          val sIns = PTAInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy)
 	          pag.pointsToMap.addInstanceInternal(ins.toString + "[|java:lang:StringBuilder.value|]", sIns)
 	      }
 	      sbInsts
 	    case "[|Ljava/lang/StringBuilder;.append:(C)Ljava/lang/Appendable;|]" =>
 	      sbInsts.map{
 	        ins =>
-	          val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
+	          val sIns = PTAInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy)
 	          pag.pointsToMap.addInstanceInternal(ins.toString + "[|java:lang:StringBuilder.value|]", sIns)
 	      }
 	      sbInsts
 	    case "[|Ljava/lang/StringBuilder;.append:(Ljava/lang/CharSequence;II)Ljava/lang/StringBuilder;|]" =>
 	      sbInsts.map{
 	        ins =>
-	          val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
+	          val sIns = PTAInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy)
 	          pag.pointsToMap.addInstanceInternal(ins.toString + "[|java:lang:StringBuilder.value|]", sIns)
 	      }
 	      sbInsts
 	    case "[|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|]" =>
 	      sbInsts.map{
 	        ins =>
-	          val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
+	          val sIns = PTAInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy)
 	          pag.pointsToMap.addInstanceInternal(ins.toString + "[|java:lang:StringBuilder.value|]", sIns)
 	      }
 //	      sbInsts.map{
@@ -342,63 +343,63 @@ trait JavaObjectModelForPta[Node <: PtaNode] {
 	    case "[|Ljava/lang/StringBuilder;.append:(Z)Ljava/lang/StringBuilder;|]" =>
 	      sbInsts.map{
 	        ins =>
-	          val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
+	          val sIns = PTAInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy)
 	          pag.pointsToMap.addInstanceInternal(ins.toString + "[|java:lang:StringBuilder.value|]", sIns)
 	      }
 	      sbInsts
 	    case "[|Ljava/lang/StringBuilder;.append:(Ljava/lang/CharSequence;)Ljava/lang/StringBuilder;|]" =>
 	      sbInsts.map{
 	        ins =>
-	          val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
+	          val sIns = PTAInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy)
 	          pag.pointsToMap.addInstanceInternal(ins.toString + "[|java:lang:StringBuilder.value|]", sIns)
 	      }
 	      sbInsts
 	    case "[|Ljava/lang/StringBuilder;.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;|]" =>
 	      sbInsts.map{
 	        ins =>
-	          val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
+	          val sIns = PTAInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy)
 	          pag.pointsToMap.addInstanceInternal(ins.toString + "[|java:lang:StringBuilder.value|]", sIns)
 	      }
 	      sbInsts
 	    case "[|Ljava/lang/StringBuilder;.append:(D)Ljava/lang/StringBuilder;|]" =>
 	      sbInsts.map{
 	        ins =>
-	          val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
+	          val sIns = PTAInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy)
 	          pag.pointsToMap.addInstanceInternal(ins.toString + "[|java:lang:StringBuilder.value|]", sIns)
 	      }
 	      sbInsts
 	    case "[|Ljava/lang/StringBuilder;.append:(J)Ljava/lang/StringBuilder;|]" =>
 	      sbInsts.map{
 	        ins =>
-	          val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
+	          val sIns = PTAInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy)
 	          pag.pointsToMap.addInstanceInternal(ins.toString + "[|java:lang:StringBuilder.value|]", sIns)
 	      }
 	      sbInsts
 	    case "[|Ljava/lang/StringBuilder;.append:(Ljava/lang/CharSequence;)Ljava/lang/Appendable;|]" =>
 	      sbInsts.map{
 	        ins =>
-	          val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
+	          val sIns = PTAInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy)
 	          pag.pointsToMap.addInstanceInternal(ins.toString + "[|java:lang:StringBuilder.value|]", sIns)
 	      }
 	      sbInsts
 	    case "[|Ljava/lang/StringBuilder;.append:(C)Ljava/lang/StringBuilder;|]" =>
 	      sbInsts.map{
 	        ins =>
-	          val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
+	          val sIns = PTAInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy)
 	          pag.pointsToMap.addInstanceInternal(ins.toString + "[|java:lang:StringBuilder.value|]", sIns)
 	      }
 	      sbInsts
 	    case "[|Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder;|]" =>
 	      sbInsts.map{
 	        ins =>
-	          val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
+	          val sIns = PTAInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy)
 	          pag.pointsToMap.addInstanceInternal(ins.toString + "[|java:lang:StringBuilder.value|]", sIns)
 	      }
 	      sbInsts
 	    case "[|Ljava/lang/StringBuilder;.append:(Ljava/lang/CharSequence;II)Ljava/lang/Appendable;|]" =>
 	      sbInsts.map{
 	        ins =>
-	          val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
+	          val sIns = PTAInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy)
 	          pag.pointsToMap.addInstanceInternal(ins.toString + "[|java:lang:StringBuilder.value|]", sIns)
 	      }
 	      sbInsts
@@ -423,13 +424,13 @@ trait JavaObjectModelForPta[Node <: PtaNode] {
 ////            require(isStringInstanceType(strInsts))
 //            strInsts.foreach{
 //			        strIns =>
-//			          val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
+//			          val sIns = PTAInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy)
 ////			          val strs = strIns.asInstanceOf[PTAStringInstance].getStrings
 ////			          sIns.setStrings(strs, ipN.getContext)
 //			          insts += sIns
 //	          }
 //	      }
-	      val sIns = PTAInstance("[|java:lang:String|]", ipN.getContext.copy)
+	      val sIns = PTAInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy)
 	      insts += sIns
 	      insts
 	    case _ => msetEmpty
@@ -483,7 +484,7 @@ trait JavaObjectModelForPta[Node <: PtaNode] {
 //	      }
 	      Some(hsInsts)
 	    case "[|Ljava/util/HashSet;.clone:()Ljava/lang/Object;|]" =>
-	      val newHs = PTAInstance("[|java:util:HashSet|]", ipN.getContext)
+	      val newHs = PTAInstance(new NormalType("[|java:util:HashSet|]"), ipN.getContext)
 	       hsInsts.map{
 	        ins =>
 	          val insts = pag.pointsToMap.pointsToSet(ins.toString + "[|java:util:HashSet.items|]")

@@ -3,21 +3,17 @@ package org.sireum.amandroid
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.interProcedural.objectFlowAnalysis.NormalValueSet
 
-abstract class Instance(className : String, defSite : Context){
-  def getClassName = className
+abstract class Instance(typ : Type, defSite : Context){
+  def getType = typ
   def getDefSite = defSite
-  override def toString : String = "Instance(name:" + this.className + ". defsite:" + this.defSite + ")"
+  override def toString : String = "Instance(name:" + this.typ + ". defsite:" + this.defSite + ")"
 }
 
-final case class RFAInstance(className : String, dimensions : Int, defSite : Context) extends Instance(className, defSite){
-  override def toString : String = "<" + this.className.substring(className.lastIndexOf(":") + 1, className.length() - 2) + "." + this.dimensions + "." + this.defSite.getCurrentLocUri + ">"
+final case class PTAInstance(typ : Type, defSite : Context) extends Instance(typ, defSite){
+  override def toString : String = "PTAInst(name:" + this.typ + ".defsite:" + this.defSite + ")"
 }
 
-final case class PTAInstance(className : String, defSite : Context) extends Instance(className, defSite){
-  override def toString : String = "PTAInst(name:" + this.className + ".defsite:" + this.defSite + ")"
-}
-
-abstract class OFAInstance(className : String, defSite : Context) extends Instance(className, defSite){
+abstract class OFAInstance(typ : Type, defSite : Context) extends Instance(typ, defSite){
   def copy : OFAInstance
   var fieldDefSiteRepo : Map[String, Map[Context, NormalValueSet]] = Map()
   var fieldLastDefSite : Map[String, Context] = Map()
@@ -58,21 +54,21 @@ abstract class OFAInstance(className : String, defSite : Context) extends Instan
     d
   }
   
-  def isSameInstance(ins : OFAInstance) : Boolean = this.className == ins.getClassName && this.defSite == ins.getDefSite
+  def isSameInstance(ins : OFAInstance) : Boolean = this.typ == ins.getType && this.defSite == ins.getDefSite
   override def equals(a : Any) : Boolean = {
     a match{
-      case ins : OFAInstance => this.className == ins.getClassName && this.defSite == ins.getDefSite && this.fieldDefSiteRepo == ins.fieldDefSiteRepo
+      case ins : OFAInstance => this.typ == ins.getType && this.defSite == ins.getDefSite && this.fieldDefSiteRepo == ins.fieldDefSiteRepo
       case _ => false
     }
   }
-  override def hashCode() : Int = (this.className + this.defSite + this.fieldDefSiteRepo).hashCode
-  override def toString : String = "\n+++++++++++++++++++++\nInstance(\nname:" + this.className + ". \ndefsite:" + this.defSite + ". \nfieldLastDefSite:" + this.fieldLastDefSite + ". \nfieldDefRepo:" + this.fieldDefSiteRepo + ") \n-----------------------\n"
+  override def hashCode() : Int = (this.typ.toString + this.defSite + this.fieldDefSiteRepo).hashCode
+  override def toString : String = "\n+++++++++++++++++++++\nInstance(\nname:" + this.typ + ". \ndefsite:" + this.defSite + ". \nfieldLastDefSite:" + this.fieldLastDefSite + ". \nfieldDefRepo:" + this.fieldDefSiteRepo + ") \n-----------------------\n"
 
 }
 
-final case class OFAStringInstance(className : String, var defSite : Context, var k : Int) extends OFAInstance(className, defSite){
+final case class OFAStringInstance(typ : Type, var defSite : Context, var k : Int) extends OFAInstance(typ, defSite){
   override def copy : OFAStringInstance  = {
-    val clone = new OFAStringInstance(className, defSite, k)
+    val clone = new OFAStringInstance(typ, defSite, k)
     this.fieldDefSiteRepo foreach{
   	  case (fieldName, map) =>
   	    clone.fieldDefSiteRepo += (fieldName -> copyMap(map))
@@ -121,17 +117,17 @@ final case class OFAStringInstance(className : String, var defSite : Context, va
   }
   override def equals(a : Any) : Boolean = {
     a match{
-      case ins : OFAStringInstance => this.className == ins.getClassName && this.defSite == ins.getDefSite && this.fieldDefSiteRepo == ins.fieldDefSiteRepo && this.strings == ins.strings
+      case ins : OFAStringInstance => this.typ == ins.getType && this.defSite == ins.getDefSite && this.fieldDefSiteRepo == ins.fieldDefSiteRepo && this.strings == ins.strings
       case _ => false
     }
   }
-  override def hashCode() : Int = (this.className + this.defSite + this.fieldDefSiteRepo + this.strings).hashCode
-  override def toString : String = "\n***********************\nStringInstance(\nstrings:" + this.strings + ". \nname:" + this.className + ". \ndefsite:" + this.defSite + ". \nfieldLastDefSite:" + this.fieldLastDefSite + ". \nfieldDefRepo:" + this.fieldDefSiteRepo + ") \n.............................\n"
+  override def hashCode() : Int = (this.typ.toString + this.defSite + this.fieldDefSiteRepo + this.strings).hashCode
+  override def toString : String = "\n***********************\nStringInstance(\nstrings:" + this.strings + ". \nname:" + this.typ + ". \ndefsite:" + this.defSite + ". \nfieldLastDefSite:" + this.fieldLastDefSite + ". \nfieldDefRepo:" + this.fieldDefSiteRepo + ") \n.............................\n"
 }
 
-final case class OFARegClassInstance(className : String, defSite : Context) extends OFAInstance(className, defSite){
+final case class OFARegClassInstance(typ : Type, defSite : Context) extends OFAInstance(typ, defSite){
   override def copy : OFARegClassInstance  = {
-    val clone = new OFARegClassInstance(className, defSite)
+    val clone = new OFARegClassInstance(typ, defSite)
     this.fieldDefSiteRepo foreach{
   	  case (fieldName, map) =>
   	    clone.fieldDefSiteRepo += (fieldName -> copyMap(map))
@@ -144,11 +140,11 @@ final case class OFARegClassInstance(className : String, defSite : Context) exte
   }
   
   def getDiff(ins : OFAInstance) : OFAInstance = {
-  	var className : String = null
+  	var typ : Type = null
   	var defSite : Context = null
-    if(this.className != ins.getClassName) className = this.className
+    if(this.typ != ins.getType) typ = this.typ
     if(this.defSite != ins.getDefSite) defSite = this.defSite
-    val d = OFARegClassInstance(className, defSite)
+    val d = OFARegClassInstance(typ, defSite)
     if(this.fieldDefSiteRepo != ins.fieldDefSiteRepo) d.fieldDefSiteRepo = getMapDiff(this.fieldDefSiteRepo, ins.fieldDefSiteRepo)
     if(this.fieldLastDefSite != ins.fieldLastDefSite) d.fieldLastDefSite = getMapDiff(this.fieldLastDefSite, ins.fieldLastDefSite)
     d

@@ -379,7 +379,7 @@ class AmandroidRecord {
 	 * get procedure by the given name, parameter types and return type
 	 */
 	
-	def getProcedure(name : String, paramTyps : List[String], returnTyp : String) : AmandroidProcedure = {
+	def getProcedure(name : String, paramTyps : List[String], returnTyp : Type) : AmandroidProcedure = {
 	  var ap : AmandroidProcedure = null
 	  this.procedures.foreach{
 	    proc=>
@@ -393,7 +393,7 @@ class AmandroidRecord {
 	 * does procedure exist with the given name, parameter types and return type?
 	 */
 	
-	def declaresProcedure(name : String, paramTyps : List[String], returnTyp : String) : Boolean = {
+	def declaresProcedure(name : String, paramTyps : List[String], returnTyp : Type) : Boolean = {
 	  var find : Boolean = false
 	  this.procedures.foreach{
 	    proc=>

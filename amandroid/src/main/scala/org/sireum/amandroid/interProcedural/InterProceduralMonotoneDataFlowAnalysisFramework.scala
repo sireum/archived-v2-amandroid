@@ -33,6 +33,8 @@ trait CallResolver[LatticeElement] {
   def getFactsForCalleeAndReturn(s : ISet[LatticeElement], cj : CallJump) : (ISet[LatticeElement], ISet[LatticeElement])
   def mapFactsToCallee(factsToCallee : ISet[LatticeElement], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[LatticeElement]
   def getAndMapFactsForCaller(s : ISet[LatticeElement], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[LatticeElement]
+  def isModelCall(calleeProc : AmandroidProcedure) : Boolean
+  def doModelCall(s : ISet[LatticeElement], calleeProc : AmandroidProcedure, retVarOpt : Option[String], currentContext : Context) : ISet[LatticeElement]
 }
 
 /**
@@ -63,7 +65,7 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
 
     val flow = if (forward) cg else cg.reverse
     val entrySetMap = idmapEmpty[N, ISet[LatticeElement]]
-    entrySetMap(flow.entryNode) = latticeUpdate(iota)
+    
     def getEntrySet(n : N) = entrySetMap.getOrElse(n, latticeUpdate(initial))
     
     class IMdaf(val entrySet : N => ISet[LatticeElement],
@@ -436,12 +438,6 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
               }
             }
             bs.exists(_ == true)
-//          case l : ActionLocation =>
-//            val sn = next(l)
-//            if (esl.isDefined) eslb.action(l.action, s)
-//            val r = actionF(s, l.action)
-//            if (esl.isDefined) eslb.exitSet(None, r)
-//            update(confluence(r, getEntrySet(sn)), sn)
           case l : ActionLocation =>
              if(esl.isDefined) eslb.action(l.action, s)
              val r = actionF(s, l.action, currentContext)
@@ -472,17 +468,17 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
 //        else visitBackward(l, esl)
         visitForward(l, pst, callerContext, esl)
       
-      def resolveCall(cn : CGCallNode, cj : CallJump) : (ISet[LatticeElement], ISet[LatticeElement]) = {
-        val locUri = cn.getLocUri
-        val callerContext = cn.getContext
-        val s = getEntrySet(cn)
+      def resolveCall(s : ISet[LatticeElement], callerContext : Context, cj : CallJump) : ISet[AmandroidProcedure] = {
         val calleeSet = callr.getCalleeSet(s, cj)
         calleeSet.foreach{
           case callee =>
-            cg.collectCfgToBaseGraph(callee, callerContext, false)
-            cg.extendGraph(callee.getSignature, callerContext)
+            if(!callr.isModelCall(callee)){
+	            cg.collectCfgToBaseGraph[String](callee, callerContext, false)
+	            val en = cg.extendGraph(callee.getSignature, callerContext)
+	            entrySetMap.put(en, latticeUpdate(iota))
+            }
         }
-        callr.getFactsForCalleeAndReturn(s, cj)
+        calleeSet
       }
 
     }
@@ -491,8 +487,8 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
     var pst = entryPoint.getProcedureBody
     val initContext = new Context(cg.K_CONTEXT)
     cg.collectCfgToBaseGraph(entryPoint, initContext, true)
+    entrySetMap.put(flow.entryNode, latticeUpdate(iota))
     val workList = mlistEmpty[N]
-
     workList += flow.entryNode
     while (!workList.isEmpty) {
       val n = workList.remove(0)
@@ -500,33 +496,46 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
       callerContext.removeTopContext
       n match {
         case en : CGEntryNode =>
-          for (succ <- cg.successors(n)) {
-            imdaf.update(getEntrySet(n), succ)
+          for (succ <- cg.successors(en)) {
+            imdaf.update(getEntrySet(en), succ)
             workList += succ
           }
         case xn : CGExitNode =>
           for (succ <- cg.successors(xn)){
             require(succ.isInstanceOf[CGReturnNode])
-            val l = succ.getOwnerPST.location(succ.asInstanceOf[CGReturnNode].getLocUri)
+            val l = succ.getOwnerPST.location(succ.asInstanceOf[CGReturnNode].getLocIndex)
 	          require(cg.isCall(l))
 	          val cj = l.asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump]
             val factsForCaller = callr.getAndMapFactsForCaller(getEntrySet(xn), cj, xn.getOwnerPST.procedure)
-            if (imdaf.update(factsForCaller, succ))
+            //below is the kill/gen for caller return node
+            if (imdaf.update(confluence(getEntrySet(succ), factsForCaller), succ))
             	workList += succ
           }
         case cn : CGCallNode =>
-          val l = cn.getOwnerPST.location(cn.getLocUri)
+          val l = cn.getOwnerPST.location(cn.getLocIndex)
           require(cg.isCall(l))
           val cj = l.asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump]
-          val (factsForCallee, factsForReturn) = imdaf.resolveCall(cn, cj)
+          val s = getEntrySet(cn)
+          val callerContext = cn.getContext
+          val calleeSet = imdaf.resolveCall(s, callerContext, cj)
+          val (factsForCallee, factsForReturn) = callr.getFactsForCalleeAndReturn(s, cj)
+          calleeSet foreach{
+            callee=>
+              if(callr.isModelCall(callee)){
+                val newReturnFacts = callr.doModelCall(factsForCallee, callee, cj.lhs match{case Some(exp) => Some(exp.name.name) case None => None}, callerContext)
+                val rn = cg.getCGReturnNode(callerContext)
+                if(imdaf.update(confluence(getEntrySet(rn), newReturnFacts), rn))
+                	workList += rn
+              }
+          }
           for (succ <- cg.successors(n)) {
             succ match{
-              case n : CGEntryNode =>
-                val newCalleeFacts = callr.mapFactsToCallee(factsForCallee, cj, n.getOwnerPST.procedure)
-                if(imdaf.update(newCalleeFacts, n))
+              case en : CGEntryNode =>
+                val newCalleeFacts = callr.mapFactsToCallee(factsForCallee, cj, en.getOwnerPST.procedure)
+                if(imdaf.update(confluence(getEntrySet(en),newCalleeFacts), en))
                 	workList += succ
-              case n : CGReturnNode =>
-                if(imdaf.update(factsForReturn, n))
+              case rn : CGReturnNode =>
+                if(imdaf.update(kill(factsForReturn, cj, rn.getContext).union(getEntrySet(rn)), rn))
                 	workList += succ
               case a => throw new RuntimeException("unexpected node type: " + a)
             }
@@ -537,7 +546,7 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
             workList += succ
           }
         case nn : CGNormalNode =>
-          if (imdaf.visit(nn.getOwnerPST.location(nn.getLocUri), nn.getOwnerPST, callerContext))
+          if (imdaf.visit(nn.getOwnerPST.location(nn.getLocIndex), nn.getOwnerPST, callerContext))
             workList ++= cg.successors(n)
         case a => throw new RuntimeException("unexpected node type: " + a)
       }

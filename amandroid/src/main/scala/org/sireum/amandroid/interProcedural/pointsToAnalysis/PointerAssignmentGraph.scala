@@ -290,7 +290,7 @@ class PointerAssignmentGraph[Node <: PtaNode]
 //            val ins = PTAInstance(pao.typ, pao.dimensions, context.copy)
 //            pointsToMap.addInstance(rhsNode, ins)
           case po : PointO =>
-            val ins = PTAInstance(po.typ, context.copy)
+            val ins = PTAInstance(new NormalType(po.typ), context.copy)
             pointsToMap.addInstance(rhsNode, ins)
           case pi : PointI =>
             if(pi.typ.equals("static")) worklist += rhsNode
@@ -480,7 +480,7 @@ class PointerAssignmentGraph[Node <: PtaNode]
     val calleeSet : MSet[AmandroidProcedure] = msetEmpty
     diff.foreach{
       d =>
-        val p = Center.getVirtualCalleeProcedure(d.className, pi.varName)
+        val p = Center.getVirtualCalleeProcedure(d.typ, pi.varName)
         p match{
           case Some(tar) => calleeSet += tar
           case None =>

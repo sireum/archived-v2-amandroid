@@ -424,12 +424,16 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
             baseNode.asInstanceOf[OfaFieldBaseNode].fieldNode = fieldNode.asInstanceOf[OfaFieldNode]
             fieldNode.asInstanceOf[OfaFieldNode].baseNode = baseNode.asInstanceOf[OfaFieldBaseNode]
           case pso : PointStringO =>
-            val ins = OFAStringInstance(pso.typ, context.copy, K_STRING)
+            val ins = OFAStringInstance(new NormalType(pso.typ), context.copy, K_STRING)
             ins.addString(pso.str)
             rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].addInstance(ins)
             worklist += rhsNode
+          case pao : PointArrayO =>
+            val ins = OFARegClassInstance(new NormalType(pao.typ, pao.dimensions), context.copy)
+            rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].addInstance(ins)
+            worklist += rhsNode
           case po : PointO =>
-            val ins = OFARegClassInstance(po.typ, context.copy)
+            val ins = OFARegClassInstance(new NormalType(po.typ), context.copy)
             rhsNode.propertyMap(VALUE_SET).asInstanceOf[ValueSet].addInstance(ins)
             worklist += rhsNode
           case pi : PointI =>

@@ -63,7 +63,7 @@ trait JavaObjectModelForOfa[Node <: OfaNode, ValueSet <: NormalValueSet] {
     					               else Set()				             
 //      println("strs-->" + strs)
       result += (ipN.piNodeOpt.get -> fac())
-      val ins = OFAStringInstance("[|java:lang:String|]", ipN.piNodeOpt.get.getContext.copy, k_string)
+      val ins = OFAStringInstance(new NormalType("[|java:lang:String|]"), ipN.piNodeOpt.get.getContext.copy, k_string)
       ins.addStrings(strs, ipN.getContext)
       result(ipN.piNodeOpt.get).addInstance(ins)
   	}
@@ -267,7 +267,7 @@ trait JavaObjectModelForOfa[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	    case "[|Ljava/lang/StringBuilder;.<init>:()V|]" =>
 	      sbValueSet.instances.map{
 	        ins =>
-	          val sIns = OFAStringInstance("[|java:lang:String|]", ipN.getContext.copy, k_string)
+	          val sIns = OFAStringInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy, k_string)
 	          sIns.setStrings(Set(""), ipN.getContext)
 	          val strVs = fac()
 	          strVs.addInstance(sIns)
@@ -279,7 +279,7 @@ trait JavaObjectModelForOfa[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	    case "[|Ljava/lang/StringBuilder;.<init>:(I)V|]" =>
 	      sbValueSet.instances.map{
 	        ins =>
-	          val sIns = OFAStringInstance("[|java:lang:String|]", ipN.getContext.copy, k_string)
+	          val sIns = OFAStringInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy, k_string)
 	          sIns.setStrings(Set(""), ipN.getContext)
 	          val strVs = fac()
 	          strVs.addInstance(sIns)
@@ -291,7 +291,7 @@ trait JavaObjectModelForOfa[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	    case "[|Ljava/lang/StringBuilder;.<init>:(Ljava/lang/CharSequence;)V|]" =>
 	      sbValueSet.instances.map{
 	        ins =>
-	          val sIns = OFAStringInstance("[|java:lang:String|]", ipN.getContext.copy, k_string)
+	          val sIns = OFAStringInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy, k_string)
 	          sIns.setStrings(Set(""), ipN.getContext)
 	          val strVs = fac()
 	          strVs.addInstance(sIns)
@@ -303,7 +303,7 @@ trait JavaObjectModelForOfa[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	    case "[|Ljava/lang/StringBuilder;.<init>:(Ljava/lang/String;)V|]" =>
 	      sbValueSet.instances.map{
 	        ins =>
-	          val sIns = OFAStringInstance("[|java:lang:String|]", ipN.getContext.copy, k_string)
+	          val sIns = OFAStringInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy, k_string)
 	          sIns.setStrings(strings, ipN.getContext)
 	          val strVs = fac()
 	          strVs.addInstance(sIns)
@@ -390,7 +390,7 @@ trait JavaObjectModelForOfa[Node <: OfaNode, ValueSet <: NormalValueSet] {
 	              require(vs.isStringInstanceType)
 	              vs.instances.foreach{
 					        strIns =>
-					          val sIns = OFAStringInstance("[|java:lang:String|]", ipN.getContext.copy, k_string)
+					          val sIns = OFAStringInstance(new NormalType("[|java:lang:String|]"), ipN.getContext.copy, k_string)
 					          val strs = strIns.asInstanceOf[OFAStringInstance].getStrings
 					          sIns.setStrings(strs, ipN.getContext)
 					          insts += sIns

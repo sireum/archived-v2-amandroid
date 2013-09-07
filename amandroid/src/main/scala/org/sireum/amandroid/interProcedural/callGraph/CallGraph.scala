@@ -348,7 +348,7 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
     }
   }
   
-  def extendGraph(calleeSig  : String, callerContext : Context) = {
+  def extendGraph(calleeSig  : String, callerContext : Context) : Node = {
     val callNode = getCGCallNode(callerContext)
     val returnNode = getCGReturnNode(callerContext)
     val calleeContext = callerContext.copy
@@ -357,6 +357,7 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
     val retSrcNode = getCGExitNode(calleeContext)
     addEdge(callNode, targetNode)
     addEdge(retSrcNode, returnNode)
+    targetNode
   }
   
   def addCGNormalNode(context : Context) : Node = {

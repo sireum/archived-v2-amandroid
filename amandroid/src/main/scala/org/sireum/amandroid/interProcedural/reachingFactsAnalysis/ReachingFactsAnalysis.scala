@@ -10,11 +10,11 @@ import org.sireum.amandroid.interProcedural.callGraph.CallGraph
 import org.sireum.alir.MonotonicFunction
 import org.sireum.pilar.ast._
 import org.sireum.amandroid.interProcedural.InterProceduralMonotonicFunction
-import org.sireum.amandroid.RFAInstance
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.interProcedural.CallResolver
 import org.sireum.amandroid.Center
 import org.sireum.amandroid.Instance
+import org.sireum.amandroid.NormalType
 
 /**
  * @author Fengguo Wei & Sankardas Roy
@@ -34,11 +34,12 @@ object ReachingFactsAnalysis {
     val gen = new Gen
     val kill = new Kill
     val callr = new Callr
+    // latUpdate ensure all values of a VarSlot are together
     val latUpdate : (ISet[RFAFact] => ISet[RFAFact]) = 
     	{facts => 
     	  facts.groupBy(_._1).mapValues(_.map(_._2).reduce((v1, v2) => v1.update(v2))).toSet
     	}
-    val iota : ISet[RFAFact] = isetEmpty
+    val iota : ISet[RFAFact] = isetEmpty + ((VarSlot("0"), new Value))
     val initial : ISet[RFAFact] = isetEmpty
     val cg = new CallGraph[CGNode]
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](cg,
@@ -131,6 +132,13 @@ object ReachingFactsAnalysis {
             val value = factMap.getOrElse(slot, null)
             if(value != null)
             	result(i) = value
+          case le : LiteralExp =>
+            if(le.typ.name.equals("STRING")){
+              val ins = RFAStringInstance(new NormalType("[|java:lang:String|]"), le.text, currentContext.copy)
+              val value = new Value
+              value.setInstance(ins)
+              result(i) = value
+            }
           case ne : NewExp =>
             var name : ResourceUri = ""
             var dimensions = 0
@@ -140,7 +148,7 @@ object ReachingFactsAnalysis {
                 name = nt.name.name
               case _ =>
             }
-            val ins = new RFAInstance(name, dimensions, currentContext.copy)
+            val ins = RFAInstance(new NormalType(name, dimensions), currentContext.copy)
             val value = new Value
             value.setInstance(ins)
             result(i) = value
@@ -275,7 +283,7 @@ object ReachingFactsAnalysis {
           case None => throw new RuntimeException("cannot found annotation 'type' from: " + cj)
         }
       var calleeSet = isetEmpty[AmandroidProcedure]
-      if(typ == "virtual"){
+      if(typ == "virtual" || typ == "interface" || typ == "super"){
         cj.callExp.arg match{
           case te : TupleExp => 
             val recvSlot = te.exps(0) match{
@@ -286,7 +294,9 @@ object ReachingFactsAnalysis {
             if(recvValue != null)
 	            recvValue.getInstances.foreach{
 					      ins =>
-					        val p = Center.getVirtualCalleeProcedure(ins.getClassName, sig)
+					        val p = 
+					          if(typ == "super") Center.getSuperCalleeProcedure(ins.getType, sig)
+					        	else Center.getVirtualCalleeProcedure(ins.getType, sig)
 					        p match{
 					          case Some(tar) => calleeSet += tar
 					          case None =>
@@ -308,14 +318,13 @@ object ReachingFactsAnalysis {
         case te : TupleExp => 
           te.exps.foreach{
             exp =>
-              val slot = exp match{
-		            case ne : NameExp => VarSlot(ne.name.name)
-		            case _ => throw new RuntimeException("wrong exp type: " + te.exps(0))
-		          }
-              val value = factMap.getOrElse(slot, null)
-              if(value != null){
-                calleeFacts += ((slot, value))
-			          calleeFacts ++= getRelatedHeapFacts(value.getInstances, heapFacts)
+              if(exp.isInstanceOf[NameExp]){
+	              val slot = VarSlot(exp.asInstanceOf[NameExp].name.name)
+	              val value = factMap.getOrElse(slot, null)
+	              if(value != null){
+	                calleeFacts += ((slot, value))
+				          calleeFacts ++= getRelatedHeapFacts(value.getInstances, heapFacts)
+	              }
               }
           }
           (calleeFacts, s -- calleeFacts)
@@ -347,7 +356,7 @@ object ReachingFactsAnalysis {
             exp =>
               exp match{
 		            case ne : NameExp => VarSlot(ne.name.name)
-		            case _ => throw new RuntimeException("wrong exp type: " + te.exps(0))
+		            case _ => VarSlot(exp.toString())
 		          }
           }
           val paramSlots = calleeProcedure.params.map{
@@ -355,6 +364,7 @@ object ReachingFactsAnalysis {
               VarSlot(param.name.name)
           }
           var result = isetEmpty[RFAFact]
+          
           for(i <- 0 to argSlots.size - 1){
             val argSlot = argSlots(i)
             val paramSlot = paramSlots(i)
@@ -414,7 +424,7 @@ object ReachingFactsAnalysis {
             exp =>
               exp match{
 		            case ne : NameExp => VarSlot(ne.name.name)
-		            case _ => throw new RuntimeException("wrong exp type: " + te.exps(0))
+		            case _ => VarSlot(exp.toString)
 		          }
           }
           val paramSlots = calleeProcedure.params.map{
@@ -434,5 +444,14 @@ object ReachingFactsAnalysis {
         case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
       }
     }
+    
+    def isModelCall(calleeProc : AmandroidProcedure) : Boolean = {
+      ModelCallHandler.isModelCall(calleeProc)
+    }
+    
+    def doModelCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
+      ModelCallHandler.doModelCall(s, calleeProc, retVarOpt, currentContext)
+    }
+    
   }
 }

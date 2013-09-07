@@ -92,6 +92,12 @@ object Center {
   def getGlobalVarUri(sig : String) = {
     this.globalVarSigToUri.get(sig)
   }
+  
+  /**
+   * return whether given type is java primitive type
+   */
+  
+  def isJavaPrimitiveType(typ : Type) : Boolean = this.JAVA_PRIMITIVE_TYPES.contains(typ.typ)
 	
 	/**
 	 * set application info
@@ -637,11 +643,26 @@ object Center {
 	 * check and get virtual callee procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
 	 */
 	
-	def getVirtualCalleeProcedure(fromName : String, procSig : String) : Option[AmandroidProcedure] = {
-	  var name = fromName
-	  if(JAVA_PRIMITIVE_TYPES.contains(fromName)) name = DEFAULT_TOPLEVEL_OBJECT  // any array in java is an Object, so primitive type array is an object, object's method can be called
+	def getVirtualCalleeProcedure(fromType : Type, procSig : String) : Option[AmandroidProcedure] = {
+	  val name =
+	  	if(isJavaPrimitiveType(fromType) || fromType.isArray) DEFAULT_TOPLEVEL_OBJECT  // any array in java is an Object, so primitive type array is an object, object's method can be called
+	  	else fromType.typ	
 	  val from = resolveRecord(name, ResolveLevel.BODIES)
 	  getRecordHierarchy.resolveConcreteDispatch(from, procSig)
+	}
+	
+	/**
+	 * check and get super callee procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
+	 */
+	
+	def getSuperCalleeProcedure(fromType : Type, procSig : String) : Option[AmandroidProcedure] = {
+	  val sup =
+	    if(fromType.isArray) resolveRecord(DEFAULT_TOPLEVEL_OBJECT, ResolveLevel.BODIES)
+	    else {
+	      val from = resolveRecord(fromType.typ, ResolveLevel.BODIES)
+	      from.getSuperClass
+	    }
+	  getRecordHierarchy.resolveConcreteDispatch(sup, procSig)
 	}
 	
 	/**
