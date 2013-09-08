@@ -7,6 +7,7 @@ import org.sireum.pilar.ast._
 import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.amandroid.Center
+import scala.util.control.Breaks._
 
 /**
  * @author Fengguo Wei & Sankardas Roy
@@ -75,9 +76,14 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
 
       override def toString = {
         val sb = new StringBuilder
-
-        for (n <- cg.nodes) {
-          sb.append("%s = %s\n".format(n, entrySet(n).toString))
+        var i = 1
+        breakable{
+	        for (n <- cg.nodes) {
+	          i += 1
+	          if(i < 1000){
+	          	sb.append("%s = %s\n".format(n, entrySet(n).toString))
+	          } else break
+	        }
         }
         sb.append("\n")
 
@@ -485,83 +491,102 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
     }
     
     val imdaf = new IMdaf(getEntrySet _, initial)
-    var pst = entryPoint.getProcedureBody
+    
     val initContext = new Context(cg.K_CONTEXT)
     cg.collectCfgToBaseGraph(entryPoint, initContext, true)
     entrySetMap.put(flow.entryNode, latticeUpdate(iota))
     val workList = mlistEmpty[N]
     workList += flow.entryNode
-    while (!workList.isEmpty) {
-      val n = workList.remove(0)
-      val callerContext = n.getContext.copy
-      callerContext.removeTopContext
-      n match {
-        case en : CGEntryNode =>
-          for (succ <- cg.successors(en)) {
-            imdaf.update(getEntrySet(en), succ)
-            workList += succ
-          }
-        case xn : CGExitNode =>
-          for (succ <- cg.successors(xn)){
-            require(succ.isInstanceOf[CGReturnNode])
-            val l = succ.getOwnerPST.location(succ.asInstanceOf[CGReturnNode].getLocIndex)
+    while(!workList.isEmpty){
+	    while (!workList.isEmpty) {
+	      val n = workList.remove(0)
+	      val callerContext = n.getContext.copy
+	      callerContext.removeTopContext
+	      n match {
+	        case en : CGEntryNode =>
+	          for (succ <- cg.successors(en)) {
+	            imdaf.update(getEntrySet(en), succ)
+	            workList += succ
+	          }
+	        case xn : CGExitNode =>
+	          for (succ <- cg.successors(xn)){
+	            require(succ.isInstanceOf[CGReturnNode])
+	            val l = succ.getOwnerPST.location(succ.asInstanceOf[CGReturnNode].getLocIndex)
+		          require(cg.isCall(l))
+		          val cj = l.asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump]
+	            val factsForCaller = callr.getAndMapFactsForCaller(getEntrySet(xn), cj, xn.getOwnerPST.procedure)
+	            //below is the kill/gen for caller return node
+	            if (imdaf.update(confluence(getEntrySet(succ), factsForCaller), succ))
+	            	workList += succ
+	          }
+	        case cn : CGCallNode =>
+	          val l = cn.getOwnerPST.location(cn.getLocIndex)
 	          require(cg.isCall(l))
 	          val cj = l.asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump]
-            val factsForCaller = callr.getAndMapFactsForCaller(getEntrySet(xn), cj, xn.getOwnerPST.procedure)
-            //below is the kill/gen for caller return node
-            if (imdaf.update(confluence(getEntrySet(succ), factsForCaller), succ))
-            	workList += succ
-          }
-        case cn : CGCallNode =>
-          val l = cn.getOwnerPST.location(cn.getLocIndex)
-          require(cg.isCall(l))
-          val cj = l.asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump]
-          val s = getEntrySet(cn)
-          val callerContext = cn.getContext
-          val calleeSet = imdaf.resolveCall(s, callerContext, cj)
-          val (factsForCallee, factsForReturn) = callr.getFactsForCalleeAndReturn(s, cj)
-          calleeSet foreach{
-            callee=>
-              if(callr.isModelCall(callee)){
-                val args = cj.callExp.arg match{
-                  case te : TupleExp =>
-                    te.exps.map{
-					            exp =>
-					              exp match{
-							            case ne : NameExp => ne.name.name
-							            case _ => exp.toString()
-							          }
-					          }.toList
-                  case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
-                }
-                val newReturnFacts = callr.doModelCall(factsForCallee, callee, args, cj.lhs match{case Some(exp) => Some(exp.name.name) case None => None}, callerContext)
-                val rn = cg.getCGReturnNode(callerContext)
-                if(imdaf.update(confluence(getEntrySet(rn), newReturnFacts), rn))
-                	workList += rn
-              }
-          }
-          for (succ <- cg.successors(n)) {
-            succ match{
-              case en : CGEntryNode =>
-                val newCalleeFacts = callr.mapFactsToCallee(factsForCallee, cj, en.getOwnerPST.procedure)
-                if(imdaf.update(confluence(getEntrySet(en),newCalleeFacts), en))
-                	workList += succ
-              case rn : CGReturnNode =>
-                if(imdaf.update(kill(factsForReturn, cj, rn.getContext).union(getEntrySet(rn)), rn))
-                	workList += succ
-              case a => throw new RuntimeException("unexpected node type: " + a)
-            }
-          }
-        case rn : CGReturnNode =>
-          for (succ <- cg.successors(n)) {
-            imdaf.update(getEntrySet(n), succ)
-            workList += succ
-          }
-        case nn : CGNormalNode =>
-          if (imdaf.visit(nn.getOwnerPST.location(nn.getLocIndex), nn.getOwnerPST, callerContext))
-            workList ++= cg.successors(n)
-        case a => throw new RuntimeException("unexpected node type: " + a)
-      }
+	          val s = getEntrySet(cn)
+	          val callerContext = cn.getContext
+	          val calleeSet = imdaf.resolveCall(s, callerContext, cj)
+	          val (factsForCallee, factsForReturn) = callr.getFactsForCalleeAndReturn(s, cj)
+	          calleeSet foreach{
+	            callee=>
+	              if(callr.isModelCall(callee)){
+	                val args = cj.callExp.arg match{
+	                  case te : TupleExp =>
+	                    te.exps.map{
+						            exp =>
+						              exp match{
+								            case ne : NameExp => ne.name.name
+								            case _ => exp.toString()
+								          }
+						          }.toList
+	                  case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
+	                }
+	                val newReturnFacts = callr.doModelCall(factsForCallee, callee, args, cj.lhs match{case Some(exp) => Some(exp.name.name) case None => None}, callerContext)
+	                val rn = cg.getCGReturnNode(callerContext)
+	                if(imdaf.update(confluence(getEntrySet(rn), newReturnFacts), rn))
+	                	workList += rn
+	              }
+	          }
+	          for (succ <- cg.successors(n)) {
+	            succ match{
+	              case en : CGEntryNode =>
+	                val newCalleeFacts = callr.mapFactsToCallee(factsForCallee, cj, en.getOwnerPST.procedure)
+	                if(imdaf.update(confluence(getEntrySet(en),newCalleeFacts), en))
+	                	workList += succ
+	              case rn : CGReturnNode =>
+	                if(imdaf.update(kill(factsForReturn, cj, rn.getContext).union(getEntrySet(rn)), rn))
+	                	workList += succ
+	              case a => throw new RuntimeException("unexpected node type: " + a)
+	            }
+	          }
+	        case rn : CGReturnNode =>
+	          for (succ <- cg.successors(n)) {
+	            imdaf.update(getEntrySet(n), succ)
+	            workList += succ
+	          }
+	        case nn : CGNormalNode =>
+	          if (imdaf.visit(nn.getOwnerPST.location(nn.getLocIndex), nn.getOwnerPST, callerContext))
+	            workList ++= cg.successors(n)
+	        case a => throw new RuntimeException("unexpected node type: " + a)
+	      }
+	    }
+	    cg.nodes.foreach{
+	      node =>
+	        node match{
+	          case xn : CGExitNode =>
+		          for (succ <- cg.successors(xn)){
+		            require(succ.isInstanceOf[CGReturnNode])
+		            val l = succ.getOwnerPST.location(succ.asInstanceOf[CGReturnNode].getLocIndex)
+			          require(cg.isCall(l))
+			          val cj = l.asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump]
+		            val factsForCaller = callr.getAndMapFactsForCaller(getEntrySet(xn), cj, xn.getOwnerPST.procedure)
+		            //below is the kill/gen for caller return node
+		            if (imdaf.update(confluence(getEntrySet(succ), factsForCaller), succ))
+		            	workList += succ
+		          }
+	          case _ =>
+	        }
+	    }
     }
 
     imdaf

@@ -36,7 +36,7 @@ object ModelCallHandler {
 	def doModelCall(s : ISet[ReachingFactsAnalysis.RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] = {
 	  val r = calleeProc.getDeclaringRecord
 	  if(isString(r)) doStringCall(s, calleeProc, args, retVarOpt, currentContext)
-	  else if(isStringBuilder(r)) doStringBuilderCall(s, calleeProc, retVarOpt, currentContext)
+	  else if(isStringBuilder(r)) doStringBuilderCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(isNativeCall(calleeProc)) doNativeCall(s, calleeProc, retVarOpt, currentContext)
 	  else throw new RuntimeException("given callee is not a model call: " + calleeProc)
 	}
@@ -292,14 +292,14 @@ object ModelCallHandler {
 	    case "[|Ljava/lang/String;.copyValueOf:([C)Ljava/lang/String;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
 	    case "[|Ljava/lang/String;.copyValueOf:([CII)Ljava/lang/String;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
@@ -314,14 +314,14 @@ object ModelCallHandler {
 	    case "[|Ljava/lang/String;.format:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
 	    case "[|Ljava/lang/String;.format:(Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
@@ -343,63 +343,63 @@ object ModelCallHandler {
 	    case "[|Ljava/lang/String;.valueOf:(C)Ljava/lang/String;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
 	    case "[|Ljava/lang/String;.valueOf:(D)Ljava/lang/String;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
 	    case "[|Ljava/lang/String;.valueOf:(F)Ljava/lang/String;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
 	    case "[|Ljava/lang/String;.valueOf:(I)Ljava/lang/String;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
 	    case "[|Ljava/lang/String;.valueOf:(J)Ljava/lang/String;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
 	    case "[|Ljava/lang/String;.valueOf:(Ljava/lang/Object;)Ljava/lang/String;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
 	    case "[|Ljava/lang/String;.valueOf:(Z)Ljava/lang/String;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
 	    case "[|Ljava/lang/String;.valueOf:([C)Ljava/lang/String;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
 	    case "[|Ljava/lang/String;.valueOf:([CII)Ljava/lang/String;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
@@ -419,19 +419,20 @@ object ModelCallHandler {
 			      val paramSlot = VarSlot(args(1))
 			      val paramValue = factMap.getOrElse(paramSlot, null)
 			      if(thisValue != null && paramValue != null){
-			        var sb = new StringBuilder
-			        thisValue.foreach{
-			          ins => 
-			            val pInsts = paramValue
-			            var i = 0
-			            pInsts.foreach{
-			              pIns => 
-			                i += 1
-			                if(i > 1) sb.append("|")
-			                sb.append(ins.asInstanceOf[RFAStringInstance].string + pIns.asInstanceOf[RFAStringInstance].string)
-			            }
-			        }
-			        fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += sb.toString}
+//			        var sb = new StringBuilder
+//			        thisValue.foreach{
+//			          ins => 
+//			            val pInsts = paramValue
+//			            var i = 0
+//			            pInsts.foreach{
+//			              pIns => 
+//			                i += 1
+//			                if(i > 1) sb.append("|")
+//			                sb.append(ins.asInstanceOf[RFAStringInstance].string + pIns.asInstanceOf[RFAStringInstance].string)
+//			                println("sb-->" + sb)
+//			            }
+//			        }
+			        fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 			      }
 	          newFacts += fact
 	        case None =>
@@ -458,14 +459,15 @@ object ModelCallHandler {
 	          val thisSlot = VarSlot(args(0))
 			      val thisValue = factMap.getOrElse(thisSlot, null)
 			      if(thisValue != null){
-			        var string = ""
+			        val sb = new StringBuilder
 			        var i = 0
 			        thisValue.foreach{
 			          ins => 
 			            i += 1
-			            string += ((if(i > 1) "|") + ins.asInstanceOf[RFAStringInstance].string)
+			            if(i > 1) sb.append("|")
+			            sb.append(ins.asInstanceOf[RFAStringInstance].string)
 			        }
-			        fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += string}
+			        fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += sb.toString}
 			      }
 	          newFacts += fact
 	        case None =>
@@ -483,14 +485,14 @@ object ModelCallHandler {
 	    case "[|Ljava/lang/String;.replace:(CC)Ljava/lang/String;|]" =>
 	    	getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
 	    case "[|Ljava/lang/String;.replace:(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Ljava/lang/String;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
@@ -498,28 +500,28 @@ object ModelCallHandler {
 	    case "[|Ljava/lang/String;.replaceAll:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
 	    case "[|Ljava/lang/String;.replaceFirst:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
 	    case "[|Ljava/lang/String;.split:(Ljava/lang/String;)[Ljava/lang/String;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
 	    case "[|Ljava/lang/String;.split:(Ljava/lang/String;I)[Ljava/lang/String;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
@@ -528,21 +530,21 @@ object ModelCallHandler {
 	    case "[|Ljava/lang/String;.subSequence:(II)Ljava/lang/CharSequence;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
 	    case "[|Ljava/lang/String;.substring:(I)Ljava/lang/String;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
 	    case "[|Ljava/lang/String;.substring:(II)Ljava/lang/String;|]" =>
 	      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
-	          fact._2.asInstanceOf[RFAStringInstance].string += "*"
+	          fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += "*"}
 	          newFacts += fact
 	        case None =>
 	      }
@@ -553,14 +555,15 @@ object ModelCallHandler {
 	          val thisSlot = VarSlot(args(0))
 			      val thisValue = factMap.getOrElse(thisSlot, null)
 			      if(thisValue != null){
-			        var string = ""
+			        val sb = new StringBuilder
 			        var i = 0
 			        thisValue.foreach{
 			          ins => 
 			            i += 1
-			            string += ((if(i > 1) "|") + ins.asInstanceOf[RFAStringInstance].string)
+			            if(i > 1) sb.append("|")
+			            sb.append(ins.asInstanceOf[RFAStringInstance].string)
 			        }
-			        fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += string.toLowerCase()}
+			        fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += sb.toString.toLowerCase()}
 			      }
 	          newFacts += fact
 	        case None =>
@@ -571,14 +574,15 @@ object ModelCallHandler {
 	          val thisSlot = VarSlot(args(0))
 			      val thisValue = factMap.getOrElse(thisSlot, null)
 			      if(thisValue != null){
-			        var string = ""
+			        val sb = new StringBuilder
 			        var i = 0
 			        thisValue.foreach{
 			          ins => 
 			            i += 1
-			            string += ((if(i > 1) "|") + ins.asInstanceOf[RFAStringInstance].string)
+			            if(i > 1) sb.append("|")
+			            sb.append(ins.asInstanceOf[RFAStringInstance].string)
 			        }
-			        fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += string.toLowerCase()}
+			        fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += sb.toString.toLowerCase()}
 			      }
 	          newFacts += fact
 	        case None =>
@@ -589,14 +593,15 @@ object ModelCallHandler {
 	          val thisSlot = VarSlot(args(0))
 			      val thisValue = factMap.getOrElse(thisSlot, null)
 			      if(thisValue != null){
-			        var string = ""
+			        val sb = new StringBuilder
 			        var i = 0
 			        thisValue.foreach{
 			          ins => 
 			            i += 1
-			            string += ((if(i > 1) "|") + ins.asInstanceOf[RFAStringInstance].string)
+			            if(i > 1) sb.append("|")
+			            sb.append(ins.asInstanceOf[RFAStringInstance].string)
 			        }
-			        fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += string}
+			        fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += sb.toString}
 			      }
 	          newFacts += fact
 	        case None =>
@@ -607,14 +612,15 @@ object ModelCallHandler {
 	          val thisSlot = VarSlot(args(0))
 			      val thisValue = factMap.getOrElse(thisSlot, null)
 			      if(thisValue != null){
-			        var string = ""
+			        val sb = new StringBuilder
 			        var i = 0
 			        thisValue.foreach{
 			          ins => 
 			            i += 1
-			            string += ((if(i > 1) "|") + ins.asInstanceOf[RFAStringInstance].string)
+			            if(i > 1) sb.append("|")
+			            sb.append(ins.asInstanceOf[RFAStringInstance].string)
 			        }
-			        fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += string.toUpperCase()}
+			        fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += sb.toString.toUpperCase()}
 			      }
 	          newFacts += fact
 	        case None =>
@@ -625,14 +631,15 @@ object ModelCallHandler {
 	          val thisSlot = VarSlot(args(0))
 			      val thisValue = factMap.getOrElse(thisSlot, null)
 			      if(thisValue != null){
-			        var string = ""
+			        val sb = new StringBuilder
 			        var i = 0
 			        thisValue.foreach{
 			          ins => 
 			            i += 1
-			            string += ((if(i > 1) "|") + ins.asInstanceOf[RFAStringInstance].string)
+			            if(i > 1) sb.append("|")
+			            sb.append(ins.asInstanceOf[RFAStringInstance].string)
 			        }
-			        fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += string.toUpperCase()}
+			        fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += sb.toString.toUpperCase()}
 			      }
 	          newFacts += fact
 	        case None =>
@@ -643,14 +650,15 @@ object ModelCallHandler {
 	          val thisSlot = VarSlot(args(0))
 			      val thisValue = factMap.getOrElse(thisSlot, null)
 			      if(thisValue != null){
-			        var string = ""
+			        val sb = new StringBuilder
 			        var i = 0
 			        thisValue.foreach{
 			          ins => 
 			            i += 1
-			            string += ((if(i > 1) "|") + ins.asInstanceOf[RFAStringInstance].string)
+			            if(i > 1) sb.append("|")
+			            sb.append(ins.asInstanceOf[RFAStringInstance].string)
 			        }
-			        fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += string}
+			        fact._2.foreach{ins => ins.asInstanceOf[RFAStringInstance].string += sb.toString}
 			      }
 	          newFacts += fact
 	        case None =>
@@ -660,11 +668,557 @@ object ModelCallHandler {
 	  s ++ newFacts
 	}
 	
-	private def doStringBuilderCall(s : ISet[ReachingFactsAnalysis.RFAFact], p : AmandroidProcedure, retVarOpt : Option[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] = {
-//	  val rType = p.getReturnType
+	private def doStringBuilderCall(s : ISet[ReachingFactsAnalysis.RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] = {
+	  val factMap = s.toMap
 	  var newFacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
-//	  if(retVarOpt.isDefined) getReturnFact(rType, retVarOpt.get, currentContext) match{case Some(f) => newFacts += f case None =>}
-	  
+	  p.getSignature match{
+	    case "[|Ljava/lang/StringBuilder;.<init>:()V|]" =>
+	      val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      thisValue.foreach{
+		      ins =>
+		        newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "", currentContext)))
+		    }
+		  case "[|Ljava/lang/StringBuilder;.<init>:(I)V|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      thisValue.foreach{
+		      ins =>
+		        newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		    }
+		  case "[|Ljava/lang/StringBuilder;.<init>:(Ljava/lang/CharSequence;)V|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      thisValue.foreach{
+		      ins =>
+		        newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		    }
+		  case "[|Ljava/lang/StringBuilder;.<init>:(Ljava/lang/String;)V|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      val paramSlot = VarSlot(args(1))
+	      val paramValue = factMap.getOrElse(paramSlot, isetEmpty)
+	      thisValue.foreach{
+		      ins =>
+		        newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), paramValue))
+		    }
+		  case "[|Ljava/lang/StringBuilder;.append:(C)Ljava/lang/Appendable;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.append:(C)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.append:(D)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.append:(F)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.append:(J)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.append:(Ljava/lang/CharSequence;)Ljava/lang/Appendable;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.append:(Ljava/lang/CharSequence;)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.append:(Ljava/lang/CharSequence;II)Ljava/lang/Appendable;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.append:(Ljava/lang/CharSequence;II)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.append:(Ljava/lang/StringBuffer;)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.append:(Z)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.append:([C)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.append:([CII)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.appendCodePoint:(I)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.capacity:()I|]" =>
+		  case "[|Ljava/lang/StringBuilder;.charAt:(I)C|]" =>
+		  case "[|Ljava/lang/StringBuilder;.codePointAt:(I)I|]" =>
+		  case "[|Ljava/lang/StringBuilder;.codePointBefore:(I)I|]" =>
+		  case "[|Ljava/lang/StringBuilder;.codePointCount:(II)I|]" =>
+		  case "[|Ljava/lang/StringBuilder;.delete:(II)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.deleteCharAt:(I)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.ensureCapacity:(I)V|]" =>
+		  case "[|Ljava/lang/StringBuilder;.getChars:(II[CI)V|]" =>
+		  case "[|Ljava/lang/StringBuilder;.indexOf:(Ljava/lang/String;)I|]" =>
+		  case "[|Ljava/lang/StringBuilder;.indexOf:(Ljava/lang/String;I)I|]" =>
+		  case "[|Ljava/lang/StringBuilder;.insert:(IC)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.insert:(ID)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.insert:(IF)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.insert:(II)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.insert:(IJ)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.insert:(ILjava/lang/CharSequence;)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.insert:(ILjava/lang/CharSequence;II)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.insert:(ILjava/lang/Object;)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.insert:(ILjava/lang/String;)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.insert:(IZ)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.insert:(I[C)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.insert:(I[CII)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.lastIndexOf:(Ljava/lang/String;)I|]" =>
+		  case "[|Ljava/lang/StringBuilder;.lastIndexOf:(Ljava/lang/String;I)I|]" =>
+		  case "[|Ljava/lang/StringBuilder;.length:()I|]" =>
+		  case "[|Ljava/lang/StringBuilder;.offsetByCodePoints:(II)I|]" =>
+		  case "[|Ljava/lang/StringBuilder;.readObject:(Ljava/io/ObjectInputStream;)V|]" =>
+		  case "[|Ljava/lang/StringBuilder;.replace:(IILjava/lang/String;)Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.reverse:()Ljava/lang/StringBuilder;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      if(!thisValue.isEmpty){
+		      val strValue = thisValue.map{
+		        ins =>
+		        	newFacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty + RFAStringInstance(new NormalType("[|java:lang:String|]"), "*", currentContext)))
+		      }
+	      }
+		    getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVarOpt.get, currentContext, Some(thisValue)) match{
+	        case Some(fact) => 
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.setCharAt:(IC)V|]" =>
+		  case "[|Ljava/lang/StringBuilder;.setLength:(I)V|]" =>
+		  case "[|Ljava/lang/StringBuilder;.subSequence:(II)Ljava/lang/CharSequence;|]" =>
+		    getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
+	        case Some(fact) => 
+	          fact._2.foreach{
+	            ins =>
+	              ins.asInstanceOf[RFAStringInstance].string = "*"
+	          }
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.substring:(I)Ljava/lang/String;|]" =>
+		    getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
+	        case Some(fact) => 
+	          fact._2.foreach{
+	            ins =>
+	              ins.asInstanceOf[RFAStringInstance].string = "*"
+	          }
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.substring:(II)Ljava/lang/String;|]" =>
+		    getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
+	        case Some(fact) => 
+	          fact._2.foreach{
+	            ins =>
+	              ins.asInstanceOf[RFAStringInstance].string = "*"
+	          }
+	          newFacts += fact
+	        case None =>
+	      }
+		  case "[|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|]" =>
+		    val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      val strValue = thisValue.map{ins => factMap(FieldSlot(ins, "[|java:lang:StringBuilder.value|]"))}.reduce(iunion[Instance])
+		    newFacts += ((VarSlot(retVarOpt.get), strValue))
+		  case "[|Ljava/lang/StringBuilder;.trimToSize:()V|]" =>
+		  case "[|Ljava/lang/StringBuilder;.writeObject:(Ljava/io/ObjectOutputStream;)V|]" =>
+		  case _ =>
+	  }
 	  s ++ newFacts
 	}
 	

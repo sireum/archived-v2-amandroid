@@ -53,6 +53,12 @@ trait ReachingFactsAnalysisTestFramework extends TestFramework {
     	  ep =>
     	    ReachingFactsAnalysis(ep)
     	}
+    	
+//    	val r = Center.resolveRecord("[|java:lang:StringBuilder|]", Center.ResolveLevel.BODIES)
+//    	r.getProcedures.toSeq.sortBy(f => f.getSignature).foreach{
+//    	  p =>
+//    	    println("  case \"" + p.getSignature + "\" =>")
+//    	}
     }
   }
 

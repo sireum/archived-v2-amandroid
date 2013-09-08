@@ -260,6 +260,7 @@ object ReachingFactsAnalysis {
       val lhss = getLHSs(a)
       val slots = processLHSs(lhss, s).values.toSet
       for (rdf @ (slot, _) <- s) {
+        //if it is a strong definition, we can kill the existing definition
         if (slot.isInstanceOf[VarSlot] && slots.contains(slot)) {
           result = result - rdf
         }
@@ -320,6 +321,12 @@ object ReachingFactsAnalysis {
       val factMap = s.toMap
       val heapFacts = factMap.filter(_._1.isInstanceOf[HeapSlot]).map{_.asInstanceOf[(HeapSlot, Value)]}.toSet
       var calleeFacts = isetEmpty[RFAFact]
+      factMap.foreach{case (s, v) => 
+        if(s.isInstanceOf[VarSlot] && s.asInstanceOf[VarSlot].isGlobal){
+          calleeFacts += ((s, v))
+          calleeFacts ++= getRelatedHeapFacts(v, heapFacts)
+        }
+      }
       cj.callExp.arg match{
         case te : TupleExp => 
           te.exps.foreach{
@@ -396,6 +403,13 @@ object ReachingFactsAnalysis {
         case None => 
       }
       var result = isetEmpty[RFAFact]
+      varFacts.foreach{
+        case (s, v) =>
+          if(s.isGlobal){
+            result += ((s, v))
+            result ++= getRelatedHeapFacts(v, heapFacts)
+          }
+      }
       calleeProcedure.body match{
         case ib : ImplementedBody =>
           ib.locations.foreach{

@@ -6,6 +6,7 @@ import org.sireum.amandroid.Instance
 import org.sireum.util._
 
 final case class VarSlot(varName : String) extends Slot{
+  def isGlobal : Boolean = varName.startsWith("@@")
   override def toString = varName
 }
 
