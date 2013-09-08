@@ -255,10 +255,11 @@ object AmandroidResolver {
               exp.name.name
             case _ => throw new RuntimeException("Doing " + TITLE + ": Can not find owner from: " + procName)
           }
-	      
+	      val paramNames = pd.params.map{_.name.name}.toList
 	      val proc : AmandroidProcedure = new AmandroidProcedure
 	      proc.init(procName, procSig)
 	      proc.setAccessFlags(procAccessFlag)
+	      proc.setParameterNames(paramNames)
 	      val ownerRecord = Center.getRecord(ownerName)
 	      proc.setProcedureBody(stp.procedureSymbolTableProducer(uri).asInstanceOf[ProcedureBody])
 	      (proc, ownerRecord)

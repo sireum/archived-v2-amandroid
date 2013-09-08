@@ -21,6 +21,7 @@ import org.sireum.amandroid.NormalType
  */
 object ReachingFactsAnalysis {
   type Node = CGNode
+  type Value = ISet[Instance]
 	type Result = InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]
 
   type RFAFact = (Slot, Value)
@@ -37,9 +38,9 @@ object ReachingFactsAnalysis {
     // latUpdate ensure all values of a VarSlot are together
     val latUpdate : (ISet[RFAFact] => ISet[RFAFact]) = 
     	{facts => 
-    	  facts.groupBy(_._1).mapValues(_.map(_._2).reduce((v1, v2) => v1.update(v2))).toSet
+    	  facts.groupBy(_._1).mapValues(_.map(_._2).reduce((v1, v2) => v1 ++ v2)).toSet
     	}
-    val iota : ISet[RFAFact] = isetEmpty + ((VarSlot("0"), new Value))
+    val iota : ISet[RFAFact] = isetEmpty + ((VarSlot("0"), isetEmpty))
     val initial : ISet[RFAFact] = isetEmpty
     val cg = new CallGraph[CGNode]
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](cg,
@@ -95,7 +96,7 @@ object ReachingFactsAnalysis {
             }
             val baseValue = factMap.getOrElse(baseSlot, null)
             if(baseValue != null){
-              baseValue.getInstances.map{
+              baseValue.map{
                 ins =>
                   result(i) = FieldSlot(ins, fieldName)
               }
@@ -108,7 +109,7 @@ object ReachingFactsAnalysis {
             }
             val baseValue = factMap.getOrElse(baseSlot, null)
             if(baseValue != null){
-              baseValue.getInstances.map{
+              baseValue.map{
                 ins =>
                   result(i) = ArraySlot(ins)
               }
@@ -135,8 +136,8 @@ object ReachingFactsAnalysis {
           case le : LiteralExp =>
             if(le.typ.name.equals("STRING")){
               val ins = RFAStringInstance(new NormalType("[|java:lang:String|]"), le.text, currentContext.copy)
-              val value = new Value
-              value.setInstance(ins)
+              var value = isetEmpty[Instance]
+              value += ins
               result(i) = value
             }
           case ne : NewExp =>
@@ -148,9 +149,14 @@ object ReachingFactsAnalysis {
                 name = nt.name.name
               case _ =>
             }
-            val ins = RFAInstance(new NormalType(name, dimensions), currentContext.copy)
-            val value = new Value
-            value.setInstance(ins)
+            val ins = 
+	            if(name == "[|java:lang:String|]" && dimensions == 0){
+	              RFAStringInstance(new NormalType(name, dimensions), "", currentContext.copy)
+	            } else {
+	              RFAInstance(new NormalType(name, dimensions), currentContext.copy)
+	            }
+            var value = isetEmpty[Instance]
+            value += ins
             result(i) = value
           case ae : AccessExp =>
             val fieldName = ae.attributeName.name
@@ -160,7 +166,7 @@ object ReachingFactsAnalysis {
             }
             val baseValue = factMap.getOrElse(baseSlot, null)
             if(baseValue != null){
-              baseValue.getInstances.map{
+              baseValue.map{
                 ins =>
                   val fieldSlot = FieldSlot(ins, fieldName)
                   val fieldValue = factMap.getOrElse(fieldSlot, null)
@@ -176,7 +182,7 @@ object ReachingFactsAnalysis {
             }
             val baseValue = factMap.getOrElse(baseSlot, null)
             if(baseValue != null){
-              baseValue.getInstances.map{
+              baseValue.map{
                 ins =>
                   val arraySlot = ArraySlot(ins)
                   val arrayValue = factMap.getOrElse(arraySlot, null)
@@ -292,7 +298,7 @@ object ReachingFactsAnalysis {
             }
             val recvValue = factMap.getOrElse(recvSlot, null)
             if(recvValue != null)
-	            recvValue.getInstances.foreach{
+	            recvValue.foreach{
 					      ins =>
 					        val p = 
 					          if(typ == "super") Center.getSuperCalleeProcedure(ins.getType, sig)
@@ -323,7 +329,7 @@ object ReachingFactsAnalysis {
 	              val value = factMap.getOrElse(slot, null)
 	              if(value != null){
 	                calleeFacts += ((slot, value))
-				          calleeFacts ++= getRelatedHeapFacts(value.getInstances, heapFacts)
+				          calleeFacts ++= getRelatedHeapFacts(value, heapFacts)
 	              }
               }
           }
@@ -342,7 +348,7 @@ object ReachingFactsAnalysis {
         val facts = s.filter(_._1.matchWithInstance(ins))
         result ++= facts
         if(!facts.isEmpty){
-        	worklist ++= facts.map(_._2.getInstances).reduce(iunion[Instance]).filter{i => !processed.contains(i)}
+        	worklist ++= facts.map(_._2).reduce(iunion[Instance]).filter{i => !processed.contains(i)}
         }
       }
       result
@@ -414,7 +420,7 @@ object ReachingFactsAnalysis {
             val value = varFacts.getOrElse(retSlot, null)
 		        if(value != null){
 		          result += ((lhsSlot, value))
-		          result ++= getRelatedHeapFacts(value.getInstances, heapFacts)
+		          result ++= getRelatedHeapFacts(value, heapFacts)
 		        }
         }
       }
@@ -437,7 +443,7 @@ object ReachingFactsAnalysis {
             val value = varFacts.getOrElse(paramSlot, null)
             if(value != null){
               result += ((argSlot, value))
-              result ++= getRelatedHeapFacts(value.getInstances, heapFacts)
+              result ++= getRelatedHeapFacts(value, heapFacts)
             }
           }
           result
@@ -449,8 +455,8 @@ object ReachingFactsAnalysis {
       ModelCallHandler.isModelCall(calleeProc)
     }
     
-    def doModelCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
-      ModelCallHandler.doModelCall(s, calleeProc, retVarOpt, currentContext)
+    def doModelCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
+      ModelCallHandler.doModelCall(s, calleeProc, args, retVarOpt, currentContext)
     }
     
   }

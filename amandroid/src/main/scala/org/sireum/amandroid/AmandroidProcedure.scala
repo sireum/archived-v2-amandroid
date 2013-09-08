@@ -48,6 +48,12 @@ class AmandroidProcedure {
 	protected var paramTyps : List[Type] = List()
 	
 	/**
+	 * list of parameter names
+	 */
+	
+	protected var paramNames : List[String] = List()
+	
+	/**
 	 * return type. e.g. [|boolean|]
 	 */
 	
@@ -305,6 +311,26 @@ class AmandroidProcedure {
    */
   
   def getParamType(i : Int) = this.paramTyps(i)
+  
+  /**
+   * set parameter names of this procedure
+   */
+  
+  def setParameterNames(names : List[String]) = {
+    this.paramNames = names
+  }
+  
+  /**
+   * get paramTypes of this procedure
+   */
+  
+  def getParamNames = this.paramNames
+  
+  /**
+   * get i'th parameter's type of this procedure
+   */
+  
+  def getParamName(i : Int) = this.paramNames(i)
   
   /**
 	 * return the access flags for this procedure

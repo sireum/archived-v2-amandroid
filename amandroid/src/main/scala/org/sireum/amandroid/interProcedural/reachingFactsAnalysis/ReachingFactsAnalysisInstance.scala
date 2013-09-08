@@ -15,7 +15,7 @@ final case class RFAInstance(typ : Type, defSite : Context) extends Instance(typ
   }
 }
 
-final case class RFAStringInstance(typ : Type, string : String, defSite : Context) extends Instance(typ, defSite){
+final case class RFAStringInstance(typ : Type, var string : String, defSite : Context) extends Instance(typ, defSite){
   override def toString : String = {
     val sb = new StringBuilder
     sb.append("<")

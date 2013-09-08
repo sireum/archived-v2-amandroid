@@ -34,7 +34,7 @@ trait CallResolver[LatticeElement] {
   def mapFactsToCallee(factsToCallee : ISet[LatticeElement], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[LatticeElement]
   def getAndMapFactsForCaller(s : ISet[LatticeElement], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[LatticeElement]
   def isModelCall(calleeProc : AmandroidProcedure) : Boolean
-  def doModelCall(s : ISet[LatticeElement], calleeProc : AmandroidProcedure, retVarOpt : Option[String], currentContext : Context) : ISet[LatticeElement]
+  def doModelCall(s : ISet[LatticeElement], calleeProc : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[LatticeElement]
 }
 
 /**
@@ -130,6 +130,7 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
       def update(s : DFF, n : N) : Boolean = {
         val oldS = getEntrySet(n)
         val newS = latticeUpdate(s)
+        
         if (oldS != newS) {
           entrySetMap.update(n, newS)
           true
@@ -522,7 +523,18 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
           calleeSet foreach{
             callee=>
               if(callr.isModelCall(callee)){
-                val newReturnFacts = callr.doModelCall(factsForCallee, callee, cj.lhs match{case Some(exp) => Some(exp.name.name) case None => None}, callerContext)
+                val args = cj.callExp.arg match{
+                  case te : TupleExp =>
+                    te.exps.map{
+					            exp =>
+					              exp match{
+							            case ne : NameExp => ne.name.name
+							            case _ => exp.toString()
+							          }
+					          }.toList
+                  case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
+                }
+                val newReturnFacts = callr.doModelCall(factsForCallee, callee, args, cj.lhs match{case Some(exp) => Some(exp.name.name) case None => None}, callerContext)
                 val rn = cg.getCGReturnNode(callerContext)
                 if(imdaf.update(confluence(getEntrySet(rn), newReturnFacts), rn))
                 	workList += rn
