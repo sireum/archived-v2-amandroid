@@ -78,16 +78,16 @@ object ReachingFactsAnalysis {
       return false
     }
   
-  protected def processLHSs(lhss : List[Exp], s : ISet[RFAFact]) : Map[Int, Slot] = {
+  protected def processLHSs(lhss : List[Exp], s : ISet[RFAFact]) : Map[Int, (Slot, Boolean)] = {
     val factMap = s.toMap
-    val result = mmapEmpty[Int, Slot]
+    val result = mmapEmpty[Int, (Slot, Boolean)]
     var i = -1
     lhss.foreach{
       key=>
         i += 1
         key match{
           case ne : NameExp =>
-            result(i) = VarSlot(ne.name.name)
+            result(i) = (VarSlot(ne.name.name), true)
           case ae : AccessExp =>
             val fieldName = ae.attributeName.name
             val baseSlot = ae.exp match {
@@ -98,7 +98,8 @@ object ReachingFactsAnalysis {
             if(baseValue != null){
               baseValue.map{
                 ins =>
-                  result(i) = FieldSlot(ins, fieldName)
+                  if(baseValue.size>1) result(i) = (FieldSlot(ins, fieldName), false)
+                  else result(i) = (FieldSlot(ins, fieldName), true)
               }
             }
           case ie : IndexingExp =>
@@ -111,7 +112,7 @@ object ReachingFactsAnalysis {
             if(baseValue != null){
               baseValue.map{
                 ins =>
-                  result(i) = ArraySlot(ins)
+                  result(i) = (ArraySlot(ins), false)
               }
             }
           case _=>
@@ -135,7 +136,7 @@ object ReachingFactsAnalysis {
             	result(i) = value
           case le : LiteralExp =>
             if(le.typ.name.equals("STRING")){
-              val ins = RFAStringInstance(new NormalType("[|java:lang:String|]"), le.text, currentContext.copy)
+              val ins = RFAConcreteStringInstance(new NormalType("[|java:lang:String|]"), le.text, currentContext.copy)
               var value = isetEmpty[Instance]
               value += ins
               result(i) = value
@@ -151,7 +152,7 @@ object ReachingFactsAnalysis {
             }
             val ins = 
 	            if(name == "[|java:lang:String|]" && dimensions == 0){
-	              RFAStringInstance(new NormalType(name, dimensions), "", currentContext.copy)
+	              RFAConcreteStringInstance(new NormalType(name, dimensions), "", currentContext.copy)
 	            } else {
 	              RFAInstance(new NormalType(name, dimensions), currentContext.copy)
 	            }
@@ -242,7 +243,7 @@ object ReachingFactsAnalysis {
       val values = processRHSs(rhss, s, currentContext)
       var result : ISet[RFAFact] = isetEmpty
       slots.foreach{
-        case(i, slot) =>
+        case(i, (slot, isStrong)) =>
           if(values.contains(i))
           	result += ((slot, values(i)))
       }
@@ -258,10 +259,10 @@ object ReachingFactsAnalysis {
     def apply(s : ISet[RFAFact], a : Assignment, currentContext : Context) : ISet[RFAFact] = {
       var result = s
       val lhss = getLHSs(a)
-      val slots = processLHSs(lhss, s).values.toSet
+      val slotsWithMark = processLHSs(lhss, s).values.toSet
       for (rdf @ (slot, _) <- s) {
         //if it is a strong definition, we can kill the existing definition
-        if (slot.isInstanceOf[VarSlot] && slots.contains(slot)) {
+        if (slotsWithMark.contains(slot, true)) {
           result = result - rdf
         }
       }

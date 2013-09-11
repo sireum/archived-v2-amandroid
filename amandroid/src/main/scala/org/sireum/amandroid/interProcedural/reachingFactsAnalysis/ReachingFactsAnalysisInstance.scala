@@ -15,7 +15,16 @@ final case class RFAInstance(typ : Type, defSite : Context) extends Instance(typ
   }
 }
 
-final case class RFAStringInstance(typ : Type, var string : String, defSite : Context) extends Instance(typ, defSite){
+abstract class RFAAbstractStringInstance(typ : Type, defSite : Context) extends Instance(typ, defSite){
+ override def toString : String = "AbstractStringInstance(name:" + this.typ + ". defsite:" + this.defSite + ")"   
+}
+
+// RFAPointStringInstance represents a general String instance whose content can be any string i.e. reg expression "*"
+final case class RFAPointStringInstance(typ : Type, defSite : Context) extends RFAAbstractStringInstance(typ, defSite){
+  override def toString : String = "PointStringInstance(name:" + this.typ + ". defsite:" + this.defSite + ")" 
+}
+
+final case class RFAConcreteStringInstance(typ : Type, var string : String, defSite : Context) extends RFAAbstractStringInstance(typ, defSite){
   override def toString : String = {
     val sb = new StringBuilder
     sb.append("<")
@@ -26,3 +35,4 @@ final case class RFAStringInstance(typ : Type, var string : String, defSite : Co
     sb.toString.intern()
   }
 }
+
