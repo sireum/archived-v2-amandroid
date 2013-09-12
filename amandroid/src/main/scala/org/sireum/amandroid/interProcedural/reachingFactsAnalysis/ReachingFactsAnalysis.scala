@@ -22,7 +22,7 @@ import org.sireum.amandroid.NormalType
 object ReachingFactsAnalysis {
   type Node = CGNode
   type Value = ISet[Instance]
-	type Result = InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]
+  type Result = InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]
 
   type RFAFact = (Slot, Value)
   

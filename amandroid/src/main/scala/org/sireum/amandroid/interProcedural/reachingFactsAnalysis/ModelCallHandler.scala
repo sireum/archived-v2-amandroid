@@ -37,7 +37,7 @@ object ModelCallHandler {
 	  val r = calleeProc.getDeclaringRecord
 	  if(isString(r)) doStringCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(isStringBuilder(r)) doStringBuilderCall(s, calleeProc, args, retVarOpt, currentContext)
-	  else if(isNativeCall(calleeProc)) doNativeCall(s, calleeProc, retVarOpt, currentContext)
+	  else if(isNativeCall(calleeProc)) doNativeCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else throw new RuntimeException("given callee is not a model call: " + calleeProc)
 	}
 	
@@ -536,10 +536,44 @@ object ModelCallHandler {
 	  s ++ newFacts 
 	}
 	
-	private def doNativeCall(s : ISet[ReachingFactsAnalysis.RFAFact], p : AmandroidProcedure, retVarOpt : Option[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] = {
-//	  val rType = p.getReturnType
+	private def doNativeCall(s : ISet[ReachingFactsAnalysis.RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] = {
 	  var newFacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
-//	  if(retVarOpt.isDefined) getReturnFact(rType, retVarOpt.get, currentContext) match{case Some(f) => newFacts += f case None =>}
+	  val factMap = s.toMap
+	  	  
+	  p.getSignature match{
+	    case "[|Ljava/lang/Object;.getClass:()Ljava/lang/Class;|]" =>
+	      println("native ---->" + p)
+	      // algo:thisvalue.foreach {ins => create a java:lang:Class instance cIns with defSite same as that of ins
+	               // above action gives us instance cIns
+	               // then, create two facts (a) (retVarSlot, Set(cIns)), (b) ([cIns, "[|java:lang:Class.name|]"], concreteString(ins.typ))}
+	      
+	      require(args.size > 0)
+          val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      thisValue.foreach{
+	        ins =>
+	          val cIns = RFAInstance(new NormalType("[|java:lang:Class|]"), ins.getDefSite)
+	          newFacts += ((VarSlot(retVarOpt.get), Set(cIns)))
+	          val strIns = RFAConcreteStringInstance(new NormalType("[|java:lang:String|]"), ins.getType.typ, ins.getDefSite)
+	          newFacts += ((FieldSlot(cIns, "[|java:lang:Class.name|]"), Set(strIns)))
+	      }
+	      
+	      
+	    case "[|Ljava/lang/Class;.getNameNative:()Ljava/lang/String;|]" =>
+	      println("native ---->" + p)
+	      // algo:thisValue.foreach.{ cIns => get value of fieldSlot(cIns,"[|java:lang:Class.name|]") and create fact (retVar, value)}
+	      require(args.size > 0)
+          val thisSlot = VarSlot(args(0))
+	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	      thisValue.foreach{
+	        cIns =>
+	          val fieldValue = factMap.getOrElse(FieldSlot(cIns, "[|java:lang:Class.name|]"), isetEmpty)
+              if(!fieldValue.isEmpty) 
+               newFacts += ((VarSlot(retVarOpt.get), fieldValue))
+	      }
+	    case _ =>
+	      println("other native ---->" + p)
+	  }
 	  s ++ newFacts
 	}
 	
