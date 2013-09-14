@@ -14,6 +14,7 @@ import scala.util.control.Breaks._
  */
 trait InterProceduralMonotoneDataFlowAnalysisResult[LatticeElement] {
   def entrySet : CGNode => ISet[LatticeElement]
+  def entries(n : CGNode, callerContext : Context, esl : EntrySetListener[LatticeElement])
 }
 
 /**
@@ -486,6 +487,14 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
             }
         }
         calleeSet
+      }
+      
+      def entries(n : N, callerContext : Context, esl : EntrySetListener[LatticeElement]) = {
+        n match {
+          case cn @ (_:CGNormalNode | _:CGCallNode | _:CGReturnNode)  =>
+            visit(cn.getOwnerPST.location(cn.asInstanceOf[CGLocNode].getLocIndex), n.getOwnerPST, callerContext, Some(esl))
+          case _ =>
+        }
       }
 
     }
