@@ -8,6 +8,7 @@ import org.sireum.amandroid.Instance
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.Center
 import org.sireum.amandroid.NormalType
+import org.sireum.amandroid.android.interProcedural.InterComponentCommunicationModel
 
 /**
  * @author Fengguo Wei & Sankardas Roy
@@ -19,7 +20,7 @@ object ModelCallHandler {
    */
   def isModelCall(calleeProc : AmandroidProcedure) : Boolean = {
 	  val r = calleeProc.getDeclaringRecord
-	  isStringBuilder(r) || isString(r) || isNativeCall(calleeProc)
+	  isStringBuilder(r) || isString(r) || isNativeCall(calleeProc) || InterComponentCommunicationModel.isIccOperation(calleeProc)
   }
 	
   private def isStringBuilder(r : AmandroidRecord) : Boolean = r.getName == "[|java:lang:StringBuilder|]"
@@ -38,6 +39,7 @@ object ModelCallHandler {
 	  if(isString(r)) doStringCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(isStringBuilder(r)) doStringBuilderCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(isNativeCall(calleeProc)) doNativeCall(s, calleeProc, args, retVarOpt, currentContext)
+	  else if(InterComponentCommunicationModel.isIccOperation(calleeProc)) InterComponentCommunicationModel.doIccCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else throw new RuntimeException("given callee is not a model call: " + calleeProc)
 	}
 	
@@ -66,54 +68,54 @@ object ModelCallHandler {
 	private def getFactFromArgForThis(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], currentContext : Context): ISet[ReachingFactsAnalysis.RFAFact] = {
 	  require(args.size > 1)
 	  val factMap = s.toMap
-  	  val thisSlot = VarSlot(args(0))
-  	  val paramSlot = VarSlot(args(1))
-  	  if(factMap.contains(paramSlot))
-  	    Set((thisSlot, factMap(paramSlot)))
-  	  else
-        isetEmpty	 
+	  val thisSlot = VarSlot(args(0))
+	  val paramSlot = VarSlot(args(1))
+	  if(factMap.contains(paramSlot))
+	    Set((thisSlot, factMap(paramSlot)))
+	  else
+      isetEmpty	 
 	}
 	
 	
-    private def getOldFactForThis(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], currentContext : Context): ISet[ReachingFactsAnalysis.RFAFact] = {
-	  require(args.size > 0)
-      val factMap = s.toMap
-      val thisSlot = VarSlot(args(0))
-      if(factMap.contains(thisSlot))
-        Set((thisSlot, factMap(thisSlot)))
-      else
-        isetEmpty	  
+  private def getOldFactForThis(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], currentContext : Context): ISet[ReachingFactsAnalysis.RFAFact] = {
+		require(args.size > 0)
+    val factMap = s.toMap
+    val thisSlot = VarSlot(args(0))
+    if(factMap.contains(thisSlot))
+      Set((thisSlot, factMap(thisSlot)))
+    else
+      isetEmpty	  
 	}
 	
-    private def getPointStringForRet(retVar : String, currentContext : Context) :ISet[ReachingFactsAnalysis.RFAFact] ={
-      
-	  getReturnFact(new NormalType("[|java:lang:String|]"), retVar, currentContext) match{
-	  case Some(fact) =>           
-	      //deleteFacts += fact
-	      val ins = new RFAPointStringInstance(new NormalType("[|java:lang:String|]"), currentContext.copy)
-	      var value = isetEmpty[Instance] 
-	      value +=ins          
-	      Set((fact._1, value))
-	  case None => isetEmpty
-	  }
-     
-    }
+  private def getPointStringForRet(retVar : String, currentContext : Context) :ISet[ReachingFactsAnalysis.RFAFact] ={
     
-    private def getFactFromThisForRet(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], retVarOpt : Option[String], currentContext : Context) :ISet[ReachingFactsAnalysis.RFAFact] ={
-      	require(args.size > 0)
-        val factMap = s.toMap      
-        getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
-        case Some(fact) => 
-          val thisSlot = VarSlot(args(0))
-	      if(factMap.contains(thisSlot)){  
-            Set((fact._1, factMap(thisSlot)))
-	      }
-	      else
-	        isetEmpty
-        case None =>  isetEmpty
-	      }
-     
-    }
+	  getReturnFact(new NormalType("[|java:lang:String|]"), retVar, currentContext) match{
+		  case Some(fact) =>           
+		      //deleteFacts += fact
+		      val ins = new RFAPointStringInstance(new NormalType("[|java:lang:String|]"), currentContext.copy)
+		      var value = isetEmpty[Instance] 
+		      value +=ins          
+		      Set((fact._1, value))
+		  case None => isetEmpty
+	  }
+   
+  }
+  
+  private def getFactFromThisForRet(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], retVarOpt : Option[String], currentContext : Context) :ISet[ReachingFactsAnalysis.RFAFact] ={
+    	require(args.size > 0)
+      val factMap = s.toMap      
+      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
+      case Some(fact) => 
+        val thisSlot = VarSlot(args(0))
+      if(factMap.contains(thisSlot)){  
+          Set((fact._1, factMap(thisSlot)))
+      }
+      else
+        isetEmpty
+      case None =>  isetEmpty
+      }
+   
+  }
     
 	private def doStringCall(s : ISet[ReachingFactsAnalysis.RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] = {
 	  val factMap = s.toMap
@@ -228,7 +230,21 @@ object ModelCallHandler {
 	    case "[|Ljava/lang/String;.valueOf:(J)Ljava/lang/String;|]" =>
           newFacts ++= getPointStringForRet(retVarOpt.get, currentContext)
 	    case "[|Ljava/lang/String;.valueOf:(Ljava/lang/Object;)Ljava/lang/String;|]" =>
-          newFacts ++= getPointStringForRet(retVarOpt.get, currentContext)
+	      require(args.size > 0)
+	      val paramSlot = VarSlot(args(0))
+	      if(factMap.contains(paramSlot)){
+	        var value : ISet[Instance] = isetEmpty
+	        factMap(paramSlot).foreach{
+	          ins=>
+	            if(ins.isInstanceOf[RFAAbstractStringInstance]) value += ins
+	            else value += RFAPointStringInstance(NormalType("[|java:lang:String|]", 0), currentContext)
+	        }
+	        getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
+					  case Some(fact) =>
+					    newFacts += ((fact._1, value))
+					  case None =>
+	        }
+	      }
 	    case "[|Ljava/lang/String;.valueOf:(Z)Ljava/lang/String;|]" =>
           newFacts ++= getPointStringForRet(retVarOpt.get, currentContext)
 	    case "[|Ljava/lang/String;.valueOf:([C)Ljava/lang/String;|]" =>
@@ -542,7 +558,6 @@ object ModelCallHandler {
 	  	  
 	  p.getSignature match{
 	    case "[|Ljava/lang/Object;.getClass:()Ljava/lang/Class;|]" =>
-	      println("native ---->" + p)
 	      // algo:thisvalue.foreach {ins => create a java:lang:Class instance cIns with defSite same as that of ins
 	               // above action gives us instance cIns
 	               // then, create two facts (a) (retVarSlot, Set(cIns)), (b) ([cIns, "[|java:lang:Class.name|]"], concreteString(ins.typ))}
@@ -560,10 +575,9 @@ object ModelCallHandler {
 	      
 	      
 	    case "[|Ljava/lang/Class;.getNameNative:()Ljava/lang/String;|]" =>
-	      println("native ---->" + p)
 	      // algo:thisValue.foreach.{ cIns => get value of fieldSlot(cIns,"[|java:lang:Class.name|]") and create fact (retVar, value)}
 	      require(args.size > 0)
-          val thisSlot = VarSlot(args(0))
+        val thisSlot = VarSlot(args(0))
 	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
 	      thisValue.foreach{
 	        cIns =>
@@ -572,7 +586,6 @@ object ModelCallHandler {
                newFacts += ((VarSlot(retVarOpt.get), fieldValue))
 	      }
 	    case _ =>
-	      println("other native ---->" + p)
 	  }
 	  s ++ newFacts
 	}

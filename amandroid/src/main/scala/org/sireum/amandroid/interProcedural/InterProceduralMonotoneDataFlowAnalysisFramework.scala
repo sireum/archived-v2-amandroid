@@ -34,7 +34,7 @@ trait CallResolver[LatticeElement] {
   def getCalleeSet(s : ISet[LatticeElement], cj : CallJump) : ISet[AmandroidProcedure]
   def getFactsForCalleeAndReturn(s : ISet[LatticeElement], cj : CallJump) : (ISet[LatticeElement], ISet[LatticeElement])
   def mapFactsToCallee(factsToCallee : ISet[LatticeElement], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[LatticeElement]
-  def getAndMapFactsForCaller(s : ISet[LatticeElement], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[LatticeElement]
+  def getAndMapFactsForCaller(callerS : ISet[LatticeElement], calleeS : ISet[LatticeElement], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[LatticeElement]
   def isModelCall(calleeProc : AmandroidProcedure) : Boolean
   def doModelCall(s : ISet[LatticeElement], calleeProc : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[LatticeElement]
 }
@@ -478,14 +478,6 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
       
       def resolveCall(s : ISet[LatticeElement], callerContext : Context, cj : CallJump) : ISet[AmandroidProcedure] = {
         val calleeSet = callr.getCalleeSet(s, cj)
-        calleeSet.foreach{
-          case callee =>
-            if(!callr.isModelCall(callee)){
-	            cg.collectCfgToBaseGraph[String](callee, callerContext, false)
-	            val en = cg.extendGraph(callee.getSignature, callerContext)
-	            entrySetMap.put(en, latticeUpdate(iota))
-            }
-        }
         calleeSet
       }
       
@@ -523,7 +515,7 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
 	            val l = succ.getOwnerPST.location(succ.asInstanceOf[CGReturnNode].getLocIndex)
 		          require(cg.isCall(l))
 		          val cj = l.asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump]
-	            val factsForCaller = callr.getAndMapFactsForCaller(getEntrySet(xn), cj, xn.getOwnerPST.procedure)
+	            val factsForCaller = callr.getAndMapFactsForCaller(getEntrySet(succ), getEntrySet(xn), cj, xn.getOwnerPST.procedure)
 	            //below is the kill/gen for caller return node
 	            if (imdaf.update(confluence(getEntrySet(succ), factsForCaller), succ))
 	            	workList += succ
@@ -554,6 +546,11 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
 	                val rn = cg.getCGReturnNode(callerContext)
 	                if(imdaf.update(confluence(getEntrySet(rn), newReturnFacts), rn))
 	                	workList += rn
+	              } else {
+	                cg.collectCfgToBaseGraph[String](callee, callerContext, false)
+			            val en = cg.extendGraph(callee.getSignature, callerContext)
+			            entrySetMap.put(en, latticeUpdate(iota))
+			            workList += en
 	              }
 	          }
 	          for (succ <- cg.successors(n)) {
@@ -588,7 +585,7 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
 		            val l = succ.getOwnerPST.location(succ.asInstanceOf[CGReturnNode].getLocIndex)
 			          require(cg.isCall(l))
 			          val cj = l.asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump]
-		            val factsForCaller = callr.getAndMapFactsForCaller(getEntrySet(xn), cj, xn.getOwnerPST.procedure)
+		            val factsForCaller = callr.getAndMapFactsForCaller(getEntrySet(succ), getEntrySet(xn), cj, xn.getOwnerPST.procedure)
 		            //below is the kill/gen for caller return node
 		            if (imdaf.update(confluence(getEntrySet(succ), factsForCaller), succ))
 		            	workList += succ

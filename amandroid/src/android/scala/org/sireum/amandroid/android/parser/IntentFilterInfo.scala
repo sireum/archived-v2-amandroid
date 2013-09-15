@@ -1,21 +1,25 @@
 package org.sireum.amandroid.android.parser
 
+import org.sireum.amandroid.AmandroidRecord
+import org.sireum.amandroid.Center
+
 class IntentFilterDataBase {
   /**
    * Map from record name to it's intent filter information
    */
-  private var intentFmap : Map[String, Set[IntentFilter]] = Map()
+  private var intentFmap : Map[AmandroidRecord, Set[IntentFilter]] = Map()
   def updateIntentFmap(intentFilter : IntentFilter) = {
-    if(containsRecord(intentFilter.getHolder)){
-      var filters = intentFmap(intentFilter.getHolder)
+    val rec = Center.resolveRecord(intentFilter.getHolder, Center.ResolveLevel.BODIES)
+    if(containsRecord(rec)){
+      var filters = intentFmap(rec)
       filters += intentFilter
-      intentFmap += (intentFilter.getHolder -> filters)
-    } else intentFmap += (intentFilter.getHolder -> Set(intentFilter))
+      intentFmap += (rec -> filters)
+    } else intentFmap += (rec -> Set(intentFilter))
   }
-  def containsRecord(r : String) : Boolean = intentFmap.contains(r)
+  def containsRecord(r : AmandroidRecord) : Boolean = intentFmap.contains(r)
   def getIntentFmap() = intentFmap
-  def getIntentFilters(r : String) = intentFmap.getOrElse(r, null)
-  def getIntentFiltersActions(r : String) : Set[String] = {
+  def getIntentFilters(r : AmandroidRecord) = intentFmap.getOrElse(r, throw new RuntimeException("Didn't find given component: " + r))
+  def getIntentFiltersActions(r : AmandroidRecord) : Set[String] = {
     val intentFilterS: Set[IntentFilter] = getIntentFilters(r)
     var actions:Set[String] = null
     if(intentFilterS != null){     

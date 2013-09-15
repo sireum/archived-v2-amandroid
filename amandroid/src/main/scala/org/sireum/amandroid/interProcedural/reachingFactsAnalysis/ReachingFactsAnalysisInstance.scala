@@ -3,6 +3,7 @@ package org.sireum.amandroid.interProcedural.reachingFactsAnalysis
 import org.sireum.amandroid.Instance
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.Type
+import org.sireum.amandroid.NormalType
 
 final case class RFAInstance(typ : Type, defSite : Context) extends Instance(typ, defSite){
   override def toString : String = {
@@ -16,7 +17,7 @@ final case class RFAInstance(typ : Type, defSite : Context) extends Instance(typ
 }
 
 abstract class RFAAbstractStringInstance(typ : Type, defSite : Context) extends Instance(typ, defSite){
- override def toString : String = "AbstractStringInstance(name:" + this.typ + ". defsite:" + this.defSite + ")"   
+  override def toString : String = "AbstractStringInstance(name:" + this.typ + ". defsite:" + this.defSite + ")"   
 }
 
 // RFAPointStringInstance represents a general String instance whose content can be any string i.e. reg expression "*"

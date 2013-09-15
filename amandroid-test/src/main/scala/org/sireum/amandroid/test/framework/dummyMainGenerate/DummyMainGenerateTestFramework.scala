@@ -86,7 +86,7 @@ trait DummyMainGenerateTestFramework extends TestFramework {
     	val pre = new PrepareApp(f.toString)
 		  pre.calculateEntrypoints
     	
-		  val cg = new CallGraphBuilder().buildWholeProgram(Some(pre))
+//		  val cg = new CallGraphBuilder().buildWholeProgram(Some(pre))
 		  System.gc()
 		  System.gc()
     	println("####End####")

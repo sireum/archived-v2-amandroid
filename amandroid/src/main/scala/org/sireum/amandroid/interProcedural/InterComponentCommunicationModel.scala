@@ -287,33 +287,16 @@ trait InterComponentCommunicationModel[Node <: OfaNode, ValueSet <: AndroidValue
     var components : Set[String] = Set()
     entryPoints.foreach{
 	    ep =>
-	      val iFilters = intentFdb.getIntentFilters(ep)
-	      if(iFilters != null){
-	        val matchedFilters = iFilters.filter(iFilter => iFilter.isMatchWith(action, categories, data, mType))
-	        if(!matchedFilters.isEmpty)
-	          components += ep
-	      }
+//	      val iFilters = intentFdb.getIntentFilters(ep)
+//	      if(iFilters != null){
+//	        val matchedFilters = iFilters.filter(iFilter => iFilter.isMatchWith(action, categories, data, mType))
+//	        if(!matchedFilters.isEmpty)
+//	          components += ep
+//	      }
     }
     components
   }
   
-  // we currently do not use findComponentsByAction(action : String) which is below
-  private def findComponentsByAction(action : String) : Set[String] = {
-	  var components : Set[String] = Set()
-	 
-	  entryPoints.foreach{
-	    ep =>
-	      val actions = intentFdb.getIntentFiltersActions(ep)
-	      if(actions != null){
-	        if(actions.contains(action)) components += ep
-	      }
-	  }
-
-	  if(components.isEmpty){
-	    System.err.println("No matching component in app found for action " + action)
-	  }
-	  components
-  }
   def isIccOperation(sig : String) : Boolean = {
     var flag = false
     if(sig != null)
