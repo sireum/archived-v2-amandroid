@@ -1,0 +1,38 @@
+group recodrProcedureDependencyGraph;
+
+delimiters "$", "$"
+
+Graph(nodes, edges) ::= <<
+digraph G{
+  graph [
+    rankdir = "LR"
+  ];
+  node [
+    fontsize = "16"
+    shape = "elipse"
+  ];
+  edge [
+  ];
+  $nodes; separator="\n"$
+  $edges; separator="\n"$
+}
+>>
+
+Node(recordName, labels) ::= <<
+"$recordName$" [
+  label = "$labels; separator=" | "$"
+  shape = "record"
+];
+>>
+
+Label(shortName, name) ::= <<
+<$shortName$> $name$
+>>
+
+EdgeNode(name, shortName) ::= <<
+"$name$" : $shortName$
+>>
+
+Edge(from, to) ::= <<
+$from$ -> $to$;
+>>

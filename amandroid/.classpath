@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/main/scala"/>
-	<classpathentry kind="src" path="src/test/scala"/>
-	<classpathentry kind="src" path="src/test/resources"/>
+	<classpathentry kind="src" path="src/android/scala"/>
+	<classpathentry kind="src" path="src/android/dex2pilar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sireum-lib"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sireum-util"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-alir"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-pilar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-pipeline"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/sireum-util"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/sireum-lib"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sireum-option"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-module"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/amandroid"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sireum-tools"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
