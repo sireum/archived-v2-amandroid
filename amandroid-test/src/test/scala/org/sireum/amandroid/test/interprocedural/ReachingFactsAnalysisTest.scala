@@ -13,7 +13,7 @@ import org.sireum.amandroid.AmandroidCodeSource
 class ReachingFactsAnalysisTest extends ReachingFactsAnalysisTestFramework {
   AmandroidCodeSource.preLoad
   InterproceduralExamples.ofgModelFiles.
-    filter { s => s.endsWith("myIntentWithHashSetTest_sample.pilar") }.
+    filter { s => s.endsWith("smallWfgNP.pilar") }.
     foreach { fileUri =>
       Analyzing title fileUri file fileUri
     }

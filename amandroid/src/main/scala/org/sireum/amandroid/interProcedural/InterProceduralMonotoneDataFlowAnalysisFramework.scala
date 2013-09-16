@@ -133,11 +133,10 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
               fOE(a.count, fOE(a.arg, in, currentContext), currentContext)
           case a : ExtCallAction => fA(a, in, currentContext)
         }
-
+      
       def update(s : DFF, n : N) : Boolean = {
-        val oldS = getEntrySet(n)
+        val oldS = latticeUpdate(getEntrySet(n))
         val newS = latticeUpdate(s)
-        
         if (oldS != newS) {
           entrySetMap.update(n, newS)
           true
@@ -494,6 +493,7 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
     val imdaf = new IMdaf(getEntrySet _, initial)
     
     val initContext = new Context(cg.K_CONTEXT)
+    var processed : ISet[(AmandroidProcedure, Context)] = isetEmpty
     cg.collectCfgToBaseGraph(entryPoint, initContext, true)
     entrySetMap.put(flow.entryNode, latticeUpdate(iota))
     val workList = mlistEmpty[N]
@@ -506,8 +506,10 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
 	      n match {
 	        case en : CGEntryNode =>
 	          for (succ <- cg.successors(en)) {
-	            imdaf.update(getEntrySet(en), succ)
-	            workList += succ
+	            if(imdaf.update(getEntrySet(en), succ)){
+		            workList += succ
+		            //println("from cgentrynode!")
+	            }
 	          }
 	        case xn : CGExitNode =>
 	          for (succ <- cg.successors(xn)){
@@ -517,8 +519,10 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
 		          val cj = l.asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump]
 	            val factsForCaller = callr.getAndMapFactsForCaller(getEntrySet(succ), getEntrySet(xn), cj, xn.getOwnerPST.procedure)
 	            //below is the kill/gen for caller return node
-	            if (imdaf.update(confluence(getEntrySet(succ), factsForCaller), succ))
+	            if (imdaf.update(confluence(getEntrySet(succ), factsForCaller), succ)){
 	            	workList += succ
+	            	//println("from cgexitnode!")
+	            }
 	          }
 	        case cn : CGCallNode =>
 	          val l = cn.getOwnerPST.location(cn.getLocIndex)
@@ -544,35 +548,46 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
 	                }
 	                val newReturnFacts = callr.doModelCall(factsForCallee, callee, args, cj.lhs match{case Some(exp) => Some(exp.name.name) case None => None}, callerContext)
 	                val rn = cg.getCGReturnNode(callerContext)
-	                if(imdaf.update(confluence(getEntrySet(rn), newReturnFacts), rn))
+	                if(imdaf.update(confluence(getEntrySet(rn), newReturnFacts), rn)){
 	                	workList += rn
-	              } else {
+	                	//println("from model call!")
+	                }
+	              } else if(!processed.contains(callee, callerContext)) {
 	                cg.collectCfgToBaseGraph[String](callee, callerContext, false)
-			            val en = cg.extendGraph(callee.getSignature, callerContext)
-			            entrySetMap.put(en, latticeUpdate(iota))
-			            workList += en
+			            cg.extendGraph(callee.getSignature, callerContext)
+			            processed += ((callee, callerContext))
+			            println("callee-->" + callee + "    " + callerContext)
+			            println("processed-->" + processed.size)
 	              }
 	          }
 	          for (succ <- cg.successors(n)) {
 	            succ match{
 	              case en : CGEntryNode =>
 	                val newCalleeFacts = callr.mapFactsToCallee(factsForCallee, cj, en.getOwnerPST.procedure)
-	                if(imdaf.update(confluence(getEntrySet(en),newCalleeFacts), en))
+	                if(imdaf.update(confluence(getEntrySet(en),newCalleeFacts ++ latticeUpdate(iota)), en)){
 	                	workList += succ
+	                	//println("from cgcallnode to cgentrynode!")
+	                }
 	              case rn : CGReturnNode =>
-	                if(imdaf.update(kill(factsForReturn, cj, rn.getContext).union(getEntrySet(rn)), rn))
+	                if(imdaf.update(kill(factsForReturn, cj, rn.getContext).union(getEntrySet(rn)), rn)){
 	                	workList += succ
+	                	//println("from cgcallnode to cgreturnnode!")
+	                }
 	              case a => throw new RuntimeException("unexpected node type: " + a)
 	            }
 	          }
 	        case rn : CGReturnNode =>
 	          for (succ <- cg.successors(n)) {
-	            imdaf.update(getEntrySet(n), succ)
-	            workList += succ
+	            if(imdaf.update(getEntrySet(n), succ)){
+		            workList += succ
+		            //println("from cgReturnnode!")
+	            }
 	          }
 	        case nn : CGNormalNode =>
-	          if (imdaf.visit(nn.getOwnerPST.location(nn.getLocIndex), nn.getOwnerPST, callerContext))
+	          if (imdaf.visit(nn.getOwnerPST.location(nn.getLocIndex), nn.getOwnerPST, callerContext)){
 	            workList ++= cg.successors(n)
+	            //println("from cgnormalnode!")
+	          }
 	        case a => throw new RuntimeException("unexpected node type: " + a)
 	      }
 	    }

@@ -20,14 +20,18 @@ object ModelCallHandler {
    */
   def isModelCall(calleeProc : AmandroidProcedure) : Boolean = {
 	  val r = calleeProc.getDeclaringRecord
-	  isStringBuilder(r) || isString(r) || isNativeCall(calleeProc) || InterComponentCommunicationModel.isIccOperation(calleeProc)
+	  isStringBuilder(r) ||
+	  isString(r) || 
+	  isHashSet(r) || 
+	  isNativeCall(calleeProc) || 
+	  InterComponentCommunicationModel.isIccOperation(calleeProc)
   }
 	
   private def isStringBuilder(r : AmandroidRecord) : Boolean = r.getName == "[|java:lang:StringBuilder|]"
 	  
   private def isString(r : AmandroidRecord) : Boolean = r.getName == "[|java:lang:String|]"
   
-//  private def isHashSet(r : AmandroidRecord) : Boolean = r.getName == "[|java:util:HashSet|]"
+  private def isHashSet(r : AmandroidRecord) : Boolean = r.getName == "[|java:util:HashSet|]"
     
   private def isNativeCall(p : AmandroidProcedure) : Boolean = p.isNative
 	
@@ -38,10 +42,81 @@ object ModelCallHandler {
 	  val r = calleeProc.getDeclaringRecord
 	  if(isString(r)) doStringCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(isStringBuilder(r)) doStringBuilderCall(s, calleeProc, args, retVarOpt, currentContext)
+	  else if(isHashSet(r)) doHashSetCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(isNativeCall(calleeProc)) doNativeCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(InterComponentCommunicationModel.isIccOperation(calleeProc)) InterComponentCommunicationModel.doIccCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else throw new RuntimeException("given callee is not a model call: " + calleeProc)
 	}
+  
+  private def initializeHashSetField(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] ={
+	  val factMap = s.toMap
+	  require(args.size > 0)
+	  var newfacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
+    val thisSlot = VarSlot(args(0))
+	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  thisValue.foreach{
+      ins =>
+        newfacts += ((FieldSlot(ins, "[|java:util:HashSet.items|]"), isetEmpty))
+    }
+	  newfacts
+	}
+  
+  private def addItemToHashSetField(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] ={
+	  val factMap = s.toMap
+	  require(args.size > 1)
+	  var newfacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
+    val thisSlot = VarSlot(args(0))
+	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val paramSlot = VarSlot(args(1))
+	  val paramValue = factMap.getOrElse(paramSlot, isetEmpty)
+	  thisValue.foreach{
+		      ins =>
+		        newfacts += ((FieldSlot(ins, "[|java:util:HashSet.items|]"), paramValue))
+      }
+	  newfacts
+	}
+  
+  private def getHashSetFieldFactToRet(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] ={
+    val factMap = s.toMap
+    require(args.size >0)
+    val thisSlot = VarSlot(args(0))
+	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val strValue = thisValue.map{ins => factMap(FieldSlot(ins, "[|java:util:HashSet.items|]"))}.reduce(iunion[Instance])
+	  Set((VarSlot(retVar), strValue))	 
+  }
+  
+  private def doHashSetCall(s : ISet[ReachingFactsAnalysis.RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] = {
+    val factMap = s.toMap
+	  var newFacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
+	  p.getSignature match{
+      case "[|Ljava/util/HashSet;.<init>:()V|]" =>
+        newFacts ++= initializeHashSetField(s, args, currentContext)
+		  case "[|Ljava/util/HashSet;.<init>:(I)V|]" =>
+		    newFacts ++= initializeHashSetField(s, args, currentContext)
+		  case "[|Ljava/util/HashSet;.<init>:(IF)V|]" =>
+		    newFacts ++= initializeHashSetField(s, args, currentContext)
+		  case "[|Ljava/util/HashSet;.<init>:(Ljava/util/Collection;)V|]" =>
+		    newFacts ++= initializeHashSetField(s, args, currentContext)
+		  case "[|Ljava/util/HashSet;.<init>:(Ljava/util/HashMap;)V|]" =>
+		    newFacts ++= initializeHashSetField(s, args, currentContext)
+		  case "[|Ljava/util/HashSet;.add:(Ljava/lang/Object;)Z|]" =>
+		    newFacts ++= addItemToHashSetField(s, args, currentContext)
+		  case "[|Ljava/util/HashSet;.clear:()V|]" =>
+		  case "[|Ljava/util/HashSet;.clone:()Ljava/lang/Object;|]" =>
+		    require(retVarOpt.isDefined)
+		    newFacts ++= getHashSetFieldFactToRet(s, args, retVarOpt.get, currentContext)
+		  case "[|Ljava/util/HashSet;.contains:(Ljava/lang/Object;)Z|]" =>
+		  case "[|Ljava/util/HashSet;.createBackingMap:(IF)Ljava/util/HashMap;|]" =>
+		  case "[|Ljava/util/HashSet;.isEmpty:()Z|]" =>
+		  case "[|Ljava/util/HashSet;.iterator:()Ljava/util/Iterator;|]" =>
+		  case "[|Ljava/util/HashSet;.readObject:(Ljava/io/ObjectInputStream;)V|]" =>
+		  case "[|Ljava/util/HashSet;.remove:(Ljava/lang/Object;)Z|]" =>
+		  case "[|Ljava/util/HashSet;.size:()I|]" =>
+		  case "[|Ljava/util/HashSet;.writeObject:(Ljava/io/ObjectOutputStream;)V|]" =>
+		  case _ =>
+    }
+    s ++ newFacts
+  }
 	
 	private def getReturnFact(rType : Type, retVar : String, currentContext : Context, alias : Option[ReachingFactsAnalysis.Value] = None) : Option[ReachingFactsAnalysis.RFAFact] = {
 	  val insOpt = getInstanceFromType(rType, currentContext)
@@ -394,13 +469,13 @@ object ModelCallHandler {
       newfacts
     }
     
-    private def getFieldFactToRet(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] ={
+    private def getStringBuilderFieldFactToRet(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] ={
       val factMap = s.toMap
       require(args.size >0)
       val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
-	  val strValue = thisValue.map{ins => factMap(FieldSlot(ins, "[|java:lang:StringBuilder.value|]"))}.reduce(iunion[Instance])
-	  Set((VarSlot(retVar), strValue))	 
+		  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+		  val strValue = thisValue.map{ins => factMap(FieldSlot(ins, "[|java:lang:StringBuilder.value|]"))}.reduce(iunion[Instance])
+		  Set((VarSlot(retVar), strValue))	 
     }
     
     private def getNewAndOldFieldFact(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], currentContext : Context) : (ISet[ReachingFactsAnalysis.RFAFact], ISet[ReachingFactsAnalysis.RFAFact]) ={
@@ -543,7 +618,7 @@ object ModelCallHandler {
 		case "[|Ljava/lang/StringBuilder;.substring:(II)Ljava/lang/String;|]" =>
 	      newFacts ++= getPointStringForRet(retVarOpt.get, currentContext)
 		case "[|Ljava/lang/StringBuilder;.toString:()Ljava/lang/String;|]" =>
-          newFacts ++= getFieldFactToRet(s, args, retVarOpt.get, currentContext)
+          newFacts ++= getStringBuilderFieldFactToRet(s, args, retVarOpt.get, currentContext)
 		case "[|Ljava/lang/StringBuilder;.trimToSize:()V|]" =>
 		case "[|Ljava/lang/StringBuilder;.writeObject:(Ljava/io/ObjectOutputStream;)V|]" =>
 		case _ =>

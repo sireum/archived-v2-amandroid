@@ -5,7 +5,9 @@ import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.Type
 import org.sireum.amandroid.NormalType
 
-final case class RFAInstance(typ : Type, defSite : Context) extends Instance(typ, defSite){
+abstract class RFAAbstractInstance(typ : Type, defSite : Context) extends Instance(typ, defSite)
+
+final case class RFAInstance(typ : Type, defSite : Context) extends RFAAbstractInstance(typ, defSite){
   override def toString : String = {
     val sb = new StringBuilder
     sb.append("<")
@@ -16,7 +18,7 @@ final case class RFAInstance(typ : Type, defSite : Context) extends Instance(typ
   }
 }
 
-abstract class RFAAbstractStringInstance(typ : Type, defSite : Context) extends Instance(typ, defSite){
+abstract class RFAAbstractStringInstance(typ : Type, defSite : Context) extends RFAAbstractInstance(typ, defSite){
   override def toString : String = "AbstractStringInstance(name:" + this.typ + ". defsite:" + this.defSite + ")"   
 }
 

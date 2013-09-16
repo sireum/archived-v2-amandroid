@@ -51,41 +51,23 @@ object ReachingFactsAnalysis {
 
 //    print("RFA\n")
 //    print(result)
-    val f1 = new File(System.getProperty("user.home") + "/Desktop/rfa.txt")
-    val o1 = new FileOutputStream(f1)
-    val w1 = new OutputStreamWriter(o1)
-    w1.write(result.toString())
+//    val f1 = new File(System.getProperty("user.home") + "/Desktop/rfa.txt")
+//    val o1 = new FileOutputStream(f1)
+//    val w1 = new OutputStreamWriter(o1)
+//    w1.write(result.toString())
 
     result
   }
   
-  protected def is(typ : String, annots : ISeq[Annotation]) : Boolean = {
-      annots.foreach(
-        annot => {
-          if(annot.name.name.equals(typ)){
-            return true
-          } else {
-            annot.params.foreach(
-              param =>{
-                if(param.isInstanceOf[ExpAnnotationParam]){
-                  param.asInstanceOf[ExpAnnotationParam].exp match {
-                    case exp : NameExp =>
-                      if(exp.name.name.equals(typ)){
-                        return true
-                      }
-                    case _ => 
-                  }
-                }
-              }
-            )
-          }
-          
-        }
-      )
-      return false
-    }
+  def isKeyUnique(s : ISet[RFAFact]) : Boolean = {
+    var result = true
+    var ks = isetEmpty[Slot]
+    s.foreach{case (k,v) => if(ks.contains(k)) result = false else ks += k}
+    result
+  }
   
   protected def processLHSs(lhss : List[Exp], s : ISet[RFAFact]) : Map[Int, (Slot, Boolean)] = {
+    if(!isKeyUnique(s)) throw new RuntimeException("Key not unique:" + s)
     val factMap = s.toMap
     val result = mmapEmpty[Int, (Slot, Boolean)]
     var i = -1
@@ -129,6 +111,7 @@ object ReachingFactsAnalysis {
   }
   
   protected def processRHSs(rhss : List[Exp], s : ISet[RFAFact], currentContext : Context) : Map[Int, Value] = {
+    if(!isKeyUnique(s)) throw new RuntimeException("Key not unique:" + s)
     val factMap = s.toMap
     val result = mmapEmpty[Int, Value]
     var i = -1
@@ -281,6 +264,7 @@ object ReachingFactsAnalysis {
               }
           }
       }
+      //println("gen-->" + result)
       result
     }
 
@@ -309,6 +293,7 @@ object ReachingFactsAnalysis {
   protected class Callr
   		extends CallResolver[RFAFact] {
     def getCalleeSet(s : ISet[RFAFact], cj : CallJump) : ISet[AmandroidProcedure] = {
+      if(!isKeyUnique(s)) throw new RuntimeException("Key not unique:" + s)
       val factMap = s.toMap
       val sig = cj.getValueAnnotation("signature") match {
           case Some(s) => s match {
@@ -353,6 +338,7 @@ object ReachingFactsAnalysis {
     }
     
     def getFactsForCalleeAndReturn(s : ISet[RFAFact], cj : CallJump) : (ISet[RFAFact], ISet[RFAFact]) ={
+      if(!isKeyUnique(s)) throw new RuntimeException("Key not unique:" + s)
       val factMap = s.toMap
       val heapFacts = factMap.filter(_._1.isInstanceOf[HeapSlot]).map{_.asInstanceOf[(HeapSlot, Value)]}.toSet
       var calleeFacts = isetEmpty[RFAFact]
@@ -400,7 +386,7 @@ object ReachingFactsAnalysis {
     def mapFactsToCallee(factsToCallee : ISet[RFAFact], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[RFAFact] = {
       val varFacts = factsToCallee.filter(f=>f._1.isInstanceOf[VarSlot] && !f._1.asInstanceOf[VarSlot].isGlobal).map{f=>(f._1.asInstanceOf[VarSlot], f._2)}.toMap
       cj.callExp.arg match{
-        case te : TupleExp => 
+        case te : TupleExp =>
           val argSlots = te.exps.map{
             exp =>
               exp match{
@@ -408,14 +394,25 @@ object ReachingFactsAnalysis {
 		            case _ => VarSlot(exp.toString())
 		          }
           }
-          val paramSlots = calleeProcedure.params.map{
+          var paramSlots : List[VarSlot] = List()
+          calleeProcedure.params.foreach{
             param =>
-              VarSlot(param.name.name)
+              require(param.typeSpec.isDefined)
+              param.typeSpec.get match{
+	              case nt : NamedTypeSpec => 
+	                val name = nt.name.name
+	                if(name=="[|long|]" || name=="[|double|]")
+	                  paramSlots ::= VarSlot(param.name.name)
+	              case _ =>
+              }
+              paramSlots ::= VarSlot(param.name.name)
           }
+          paramSlots = paramSlots.reverse
           var result = isetEmpty[RFAFact]
           
           for(i <- 0 to argSlots.size - 1){
             val argSlot = argSlots(i)
+            if(paramSlots.size < argSlots.size) println("cj-->" + cj + "\ncalleeProcedure-->" +calleeProcedure )
             val paramSlot = paramSlots(i)
             val value = varFacts.getOrElse(argSlot, null)
             if(value != null) result += ((paramSlot, value))
