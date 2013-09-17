@@ -55,8 +55,7 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
    gen : InterProceduralMonotonicFunction[LatticeElement],
    kill : InterProceduralMonotonicFunction[LatticeElement],
    callr : CallResolver[LatticeElement],
-   latticeUpdate : (ISet[LatticeElement] => ISet[LatticeElement]),
-   iota : ISet[LatticeElement],
+   iota : Context => ISet[LatticeElement],
    initial : ISet[LatticeElement],
    switchAsOrderedMatch : Boolean = false) : //
    InterProceduralMonotoneDataFlowAnalysisResult[LatticeElement] = {
@@ -68,7 +67,7 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
     val flow = if (forward) cg else cg.reverse
     val entrySetMap = idmapEmpty[N, ISet[LatticeElement]]
     
-    def getEntrySet(n : N) = entrySetMap.getOrElse(n, latticeUpdate(initial))
+    def getEntrySet(n : N) = entrySetMap.getOrElse(n, initial)
     
     class IMdaf(val entrySet : N => ISet[LatticeElement],
                initial : ISet[LatticeElement])
@@ -135,8 +134,8 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
         }
       
       def update(s : DFF, n : N) : Boolean = {
-        val oldS = latticeUpdate(getEntrySet(n))
-        val newS = latticeUpdate(s)
+        val oldS = getEntrySet(n)
+        val newS = s
         if (oldS != newS) {
           entrySetMap.update(n, newS)
           true
@@ -495,7 +494,8 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
     val initContext = new Context(cg.K_CONTEXT)
     var processed : ISet[(AmandroidProcedure, Context)] = isetEmpty
     cg.collectCfgToBaseGraph(entryPoint, initContext, true)
-    entrySetMap.put(flow.entryNode, latticeUpdate(iota))
+    processed += ((entryPoint, initContext))
+    entrySetMap.put(flow.entryNode, iota(initContext))
     val workList = mlistEmpty[N]
     workList += flow.entryNode
     while(!workList.isEmpty){
@@ -556,15 +556,13 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
 	                cg.collectCfgToBaseGraph[String](callee, callerContext, false)
 			            cg.extendGraph(callee.getSignature, callerContext)
 			            processed += ((callee, callerContext))
-			            println("callee-->" + callee + "    " + callerContext)
-			            println("processed-->" + processed.size)
 	              }
 	          }
 	          for (succ <- cg.successors(n)) {
 	            succ match{
 	              case en : CGEntryNode =>
 	                val newCalleeFacts = callr.mapFactsToCallee(factsForCallee, cj, en.getOwnerPST.procedure)
-	                if(imdaf.update(confluence(getEntrySet(en),newCalleeFacts ++ latticeUpdate(iota)), en)){
+	                if(imdaf.update(confluence(getEntrySet(en),newCalleeFacts ++ iota(callerContext)), en)){
 	                	workList += succ
 	                	//println("from cgcallnode to cgentrynode!")
 	                }
@@ -609,7 +607,7 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
 	        }
 	    }
     }
-
+    println("processed-->" + processed.size)
     imdaf
     
 	}

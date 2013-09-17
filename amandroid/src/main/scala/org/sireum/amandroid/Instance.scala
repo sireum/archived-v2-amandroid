@@ -3,17 +3,18 @@ package org.sireum.amandroid
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.interProcedural.objectFlowAnalysis.NormalValueSet
 
-abstract class Instance(typ : Type, defSite : Context){
+abstract class Instance{
+  def typ : Type
   def getType = typ
+  def defSite : Context
   def getDefSite = defSite
-  override def toString : String = "Instance(name:" + this.typ + ". defsite:" + this.defSite + ")"
 }
 
-final case class PTAInstance(typ : Type, defSite : Context) extends Instance(typ, defSite){
+final case class PTAInstance(typ : Type, defSite : Context) extends Instance{
   override def toString : String = "PTAInst(name:" + this.typ + ".defsite:" + this.defSite + ")"
 }
 
-abstract class OFAInstance(typ : Type, defSite : Context) extends Instance(typ, defSite){
+abstract class OFAInstance(typ : Type, defSite : Context) extends Instance{
   def copy : OFAInstance
   var fieldDefSiteRepo : Map[String, Map[Context, NormalValueSet]] = Map()
   var fieldLastDefSite : Map[String, Context] = Map()

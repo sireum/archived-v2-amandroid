@@ -21,22 +21,3 @@ final case class FieldSlot(ins : Instance, fieldName : String) extends HeapSlot(
 final case class ArraySlot(ins : Instance) extends HeapSlot(ins){
   override def toString = ins.toString
 }
-
-//class Value{
-//  protected var insts : ISet[Instance] = isetEmpty
-//  def setInstance(ins : Instance) = this.insts += ins
-//  def setInstances(insts : Set[Instance]) = this.insts ++= insts
-//  def getInstances = this.insts
-//  def update(v2 : Value) : Value = {
-//    setInstances(v2.getInstances)
-//    this
-//  }
-//  override def toString : String = {
-//    val sb = new StringBuilder
-//    insts.foreach{
-//      ins=>
-//        sb.append(ins)
-//    }
-//    sb.toString.intern()
-//  }
-//}

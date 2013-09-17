@@ -4,11 +4,12 @@ import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.util._
 import org.sireum.amandroid.AmandroidRecord
 import org.sireum.amandroid.Type
-import org.sireum.amandroid.Instance
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.Center
 import org.sireum.amandroid.NormalType
 import org.sireum.amandroid.android.interProcedural.InterComponentCommunicationModel
+import org.sireum.alir.Slot
+import org.sireum.amandroid.Instance
 
 /**
  * @author Fengguo Wei & Sankardas Roy
@@ -48,57 +49,56 @@ object ModelCallHandler {
 	  else throw new RuntimeException("given callee is not a model call: " + calleeProc)
 	}
   
-  private def initializeHashSetField(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] ={
-	  val factMap = s.toMap
-	  require(args.size > 0)
-	  var newfacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
-    val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
-	  thisValue.foreach{
-      ins =>
-        newfacts += ((FieldSlot(ins, "[|java:util:HashSet.items|]"), isetEmpty))
-    }
-	  newfacts
-	}
+//  private def initializeHashSetField(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] ={
+//	  val factMap = ReachingFactsAnalysis.getFactMap(s)
+//	  require(args.size > 0)
+//	  var newfacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
+//    val thisSlot = VarSlot(args(0))
+//	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+//	  thisValue.foreach{
+//      ins =>
+//        newfacts += ((FieldSlot(ins, "[|java:util:HashSet.items|]"), isetEmpty))
+//    }
+//	  newfacts
+//	}
   
   private def addItemToHashSetField(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] ={
-	  val factMap = s.toMap
+	  val factMap = ReachingFactsAnalysis.getFactMap(s)
 	  require(args.size > 1)
 	  var newfacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValues = factMap.getOrElse(thisSlot, isetEmpty)
 	  val paramSlot = VarSlot(args(1))
-	  val paramValue = factMap.getOrElse(paramSlot, isetEmpty)
-	  thisValue.foreach{
+	  val paramValues = factMap.getOrElse(paramSlot, isetEmpty)
+	  thisValues.foreach{
 		      ins =>
-		        newfacts += ((FieldSlot(ins, "[|java:util:HashSet.items|]"), paramValue))
+		        newfacts ++= paramValues.map{p=>(FieldSlot(ins, "[|java:util:HashSet.items|]"), p)}
       }
 	  newfacts
 	}
   
   private def getHashSetFieldFactToRet(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] ={
-    val factMap = s.toMap
+    val factMap = ReachingFactsAnalysis.getFactMap(s)
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
 	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
 	  val strValue = thisValue.map{ins => factMap(FieldSlot(ins, "[|java:util:HashSet.items|]"))}.reduce(iunion[Instance])
-	  Set((VarSlot(retVar), strValue))	 
+	  strValue.map{s => (VarSlot(retVar), s)}
   }
   
   private def doHashSetCall(s : ISet[ReachingFactsAnalysis.RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] = {
-    val factMap = s.toMap
 	  var newFacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
 	  p.getSignature match{
       case "[|Ljava/util/HashSet;.<init>:()V|]" =>
-        newFacts ++= initializeHashSetField(s, args, currentContext)
+//        newFacts ++= initializeHashSetField(s, args, currentContext)
 		  case "[|Ljava/util/HashSet;.<init>:(I)V|]" =>
-		    newFacts ++= initializeHashSetField(s, args, currentContext)
+//		    newFacts ++= initializeHashSetField(s, args, currentContext)
 		  case "[|Ljava/util/HashSet;.<init>:(IF)V|]" =>
-		    newFacts ++= initializeHashSetField(s, args, currentContext)
+//		    newFacts ++= initializeHashSetField(s, args, currentContext)
 		  case "[|Ljava/util/HashSet;.<init>:(Ljava/util/Collection;)V|]" =>
-		    newFacts ++= initializeHashSetField(s, args, currentContext)
+//		    newFacts ++= initializeHashSetField(s, args, currentContext)
 		  case "[|Ljava/util/HashSet;.<init>:(Ljava/util/HashMap;)V|]" =>
-		    newFacts ++= initializeHashSetField(s, args, currentContext)
+//		    newFacts ++= initializeHashSetField(s, args, currentContext)
 		  case "[|Ljava/util/HashSet;.add:(Ljava/lang/Object;)Z|]" =>
 		    newFacts ++= addItemToHashSetField(s, args, currentContext)
 		  case "[|Ljava/util/HashSet;.clear:()V|]" =>
@@ -118,35 +118,30 @@ object ModelCallHandler {
     s ++ newFacts
   }
 	
-	private def getReturnFact(rType : Type, retVar : String, currentContext : Context, alias : Option[ReachingFactsAnalysis.Value] = None) : Option[ReachingFactsAnalysis.RFAFact] = {
+	private def getReturnFact(rType : Type, retVar : String, currentContext : Context) : Option[ReachingFactsAnalysis.RFAFact] = {
 	  val insOpt = getInstanceFromType(rType, currentContext)
 	  if(insOpt.isDefined){
-	    if(alias.isDefined) 
-	      Some((VarSlot(retVar), alias.get))
-	    else {
-	      var value = isetEmpty[Instance]
-	      value += insOpt.get
-	      Some((VarSlot(retVar), value))
-	    }
+	    Some((VarSlot(retVar), insOpt.get))
 	  } else None
 	}
+	
+	private def getReturnFactsWithAlias(rType : Type, retVar : String, currentContext : Context, alias : ISet[ReachingFactsAnalysis.Value]) : ISet[ReachingFactsAnalysis.RFAFact] = 
+    alias.map{a=>(VarSlot(retVar), a)}
 	
 	private def getPointStringForThis(args : List[String], currentContext : Context): ISet[ReachingFactsAnalysis.RFAFact] = {
   	  require(args.size > 0)
 	  val thisSlot = VarSlot(args(0))
-      var newThisValue = isetEmpty[Instance]
-      val ins = new RFAPointStringInstance(new NormalType("[|java:lang:String|]"), currentContext.copy)
-      newThisValue +=ins
+      val newThisValue = RFAPointStringInstance(currentContext.copy)
       Set((thisSlot, newThisValue))	 
 	}
 	
 	private def getFactFromArgForThis(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], currentContext : Context): ISet[ReachingFactsAnalysis.RFAFact] = {
 	  require(args.size > 1)
-	  val factMap = s.toMap
+	  val factMap = ReachingFactsAnalysis.getFactMap(s)
 	  val thisSlot = VarSlot(args(0))
 	  val paramSlot = VarSlot(args(1))
 	  if(factMap.contains(paramSlot))
-	    Set((thisSlot, factMap(paramSlot)))
+	    factMap(paramSlot).map(v => (thisSlot, v))
 	  else
       isetEmpty	 
 	}
@@ -154,10 +149,10 @@ object ModelCallHandler {
 	
   private def getOldFactForThis(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], currentContext : Context): ISet[ReachingFactsAnalysis.RFAFact] = {
 		require(args.size > 0)
-    val factMap = s.toMap
+    val factMap = ReachingFactsAnalysis.getFactMap(s)
     val thisSlot = VarSlot(args(0))
     if(factMap.contains(thisSlot))
-      Set((thisSlot, factMap(thisSlot)))
+      factMap(thisSlot).map(v => (thisSlot, v))
     else
       isetEmpty	  
 	}
@@ -167,9 +162,7 @@ object ModelCallHandler {
 	  getReturnFact(new NormalType("[|java:lang:String|]"), retVar, currentContext) match{
 		  case Some(fact) =>           
 		      //deleteFacts += fact
-		      val ins = new RFAPointStringInstance(new NormalType("[|java:lang:String|]"), currentContext.copy)
-		      var value = isetEmpty[Instance] 
-		      value +=ins          
+		      val value = RFAPointStringInstance(currentContext.copy)
 		      Set((fact._1, value))
 		  case None => isetEmpty
 	  }
@@ -177,23 +170,23 @@ object ModelCallHandler {
   }
   
   private def getFactFromThisForRet(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], retVarOpt : Option[String], currentContext : Context) :ISet[ReachingFactsAnalysis.RFAFact] ={
-    	require(args.size > 0)
-      val factMap = s.toMap      
-      getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
+  	require(args.size > 0)
+    val factMap = ReachingFactsAnalysis.getFactMap(s)      
+    getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
       case Some(fact) => 
         val thisSlot = VarSlot(args(0))
-      if(factMap.contains(thisSlot)){  
-          Set((fact._1, factMap(thisSlot)))
-      }
-      else
-        isetEmpty
+		    if(factMap.contains(thisSlot)){
+	        factMap(thisSlot).map(v => (fact._1, v))
+		    }
+		    else
+		      isetEmpty
       case None =>  isetEmpty
-      }
+    }
    
   }
     
 	private def doStringCall(s : ISet[ReachingFactsAnalysis.RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] = {
-	  val factMap = s.toMap
+	  val factMap = ReachingFactsAnalysis.getFactMap(s)
 	  var newFacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
 	  var deleteFacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
 	  p.getSignature match{
@@ -308,15 +301,15 @@ object ModelCallHandler {
 	      require(args.size > 0)
 	      val paramSlot = VarSlot(args(0))
 	      if(factMap.contains(paramSlot)){
-	        var value : ISet[Instance] = isetEmpty
+	        var values : ISet[Instance] = isetEmpty
 	        factMap(paramSlot).foreach{
 	          ins=>
-	            if(ins.isInstanceOf[RFAAbstractStringInstance]) value += ins
-	            else value += RFAPointStringInstance(NormalType("[|java:lang:String|]", 0), currentContext)
+	            if(ins.isInstanceOf[Instance]) values += ins
+	            else values += RFAPointStringInstance(currentContext)
 	        }
 	        getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 					  case Some(fact) =>
-					    newFacts += ((fact._1, value))
+					    newFacts ++= values.map{v=>(fact._1, v)}
 					  case None =>
 	        }
 	      }
@@ -408,78 +401,75 @@ object ModelCallHandler {
 	}
 	
 	private def getPointStringToField(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] ={
-	  val factMap = s.toMap
+	  val factMap = ReachingFactsAnalysis.getFactMap(s)
 	  require(args.size > 0)
 	  var newfacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
       val thisSlot = VarSlot(args(0))
 	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
-	  val newStringIns = RFAPointStringInstance(new NormalType("[|java:lang:String|]"), currentContext)
+	  val newStringIns = RFAPointStringInstance(currentContext)
 	  thisValue.foreach{
-		      ins =>
-		        newfacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), Set(newStringIns)))
-      }
+      ins =>
+        newfacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), newStringIns))
+    }
 	  newfacts
 	}
 	
     private def getConcreteStringToField(str:String, s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] ={
-	  val factMap = s.toMap
+	  val factMap = ReachingFactsAnalysis.getFactMap(s)
 	  require(args.size > 0)
 	  var newfacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
       val thisSlot = VarSlot(args(0))
 	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
-	  val newStringIns = RFAConcreteStringInstance(new NormalType("[|java:lang:String|]"), str, currentContext)
+	  val newStringIns = RFAConcreteStringInstance(str, currentContext)
 	  thisValue.foreach{
 		      ins =>
-		        newfacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), Set(newStringIns)))
+		        newfacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), newStringIns))
       }
 	  newfacts
 	}
 	
     private def getFactFromArgToField(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] ={
-	  val factMap = s.toMap
+	  val factMap = ReachingFactsAnalysis.getFactMap(s)
 	  require(args.size > 1)
 	  var newfacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
       val thisSlot = VarSlot(args(0))
 	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
 	  val paramSlot = VarSlot(args(1))
-	  val paramValue = factMap.getOrElse(paramSlot, isetEmpty)
+	  val paramValues = factMap.getOrElse(paramSlot, isetEmpty)
 	  thisValue.foreach{
-		      ins =>
-		        newfacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), paramValue))
-      }
+      ins =>
+        newfacts ++= paramValues.map{v => (FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), v)}
+    }
 	  newfacts
 	}
  
     private def getPointStringToFieldAndThisToRet(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] = {
-    	  val factMap = s.toMap
+    	  val factMap = ReachingFactsAnalysis.getFactMap(s)
     	  require(args.size >0)
 	      var newfacts = isetEmpty[ReachingFactsAnalysis.RFAFact]	 
           val thisSlot = VarSlot(args(0))
 	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)	      
- 	      val newStringIns = RFAPointStringInstance(new NormalType("[|java:lang:String|]"), currentContext)
+ 	      val newStringIns = RFAPointStringInstance(currentContext)
 	      thisValue.foreach{
 		      ins =>
-		        newfacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), Set(newStringIns)))
+		        newfacts += ((FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), newStringIns))
             }
-		  getReturnFact(new NormalType("[|java:lang:StringBuilder|]"), retVar, currentContext, Some(thisValue)) match{
-	        case Some(fact) => 
-	          newfacts += fact
-	        case None =>
-	      }	
+		  val facts = getReturnFactsWithAlias(new NormalType("[|java:lang:StringBuilder|]"), retVar, currentContext, thisValue)
+		  newfacts ++= facts
       newfacts
     }
     
     private def getStringBuilderFieldFactToRet(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] ={
-      val factMap = s.toMap
+      val factMap = ReachingFactsAnalysis.getFactMap(s)
       require(args.size >0)
       val thisSlot = VarSlot(args(0))
-		  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
-		  val strValue = thisValue.map{ins => factMap(FieldSlot(ins, "[|java:lang:StringBuilder.value|]"))}.reduce(iunion[Instance])
-		  Set((VarSlot(retVar), strValue))	 
+		  val thisValues = factMap.getOrElse(thisSlot, isetEmpty)
+		  val strValues = thisValues.map{ins => factMap(FieldSlot(ins, "[|java:lang:StringBuilder.value|]"))}.reduce(iunion[Instance])
+		  strValues.map(v => (VarSlot(retVar), v))	 
     }
     
     private def getNewAndOldFieldFact(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], currentContext : Context) : (ISet[ReachingFactsAnalysis.RFAFact], ISet[ReachingFactsAnalysis.RFAFact]) ={
-      val factMap = s.toMap
+      val factMap = ReachingFactsAnalysis.getFactMap(s)
       var newfacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
       var deletefacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
       require(args.size > 0)
@@ -493,17 +483,17 @@ object ModelCallHandler {
             fIns => 
               if(fIns.isInstanceOf[RFAConcreteStringInstance]){
                val newstr = fIns.asInstanceOf[RFAConcreteStringInstance].string.reverse
-               val newStringIns = RFAConcreteStringInstance(new NormalType("[|java:lang:String|]"), newstr, currentContext)
-               newFieldValue +=newStringIns
+               val newStringIns = RFAConcreteStringInstance(newstr, currentContext)
+               newFieldValue += newStringIns
                
               }
               else
                newFieldValue += fIns
             
           }
-          newfacts += ((FieldSlot(sbIns, "[|java:lang:StringBuilder.value|]"), newFieldValue))
+          newfacts ++= newFieldValue.map(v => (FieldSlot(sbIns, "[|java:lang:StringBuilder.value|]"), v))
           if(!fieldValue.isEmpty)
-           deletefacts += ((FieldSlot(sbIns, "[|java:lang:StringBuilder.value|]"), fieldValue))
+           deletefacts ++= fieldValue.map(v => (FieldSlot(sbIns, "[|java:lang:StringBuilder.value|]"), v))
         }
 	  (newfacts	, deletefacts) 
     }
@@ -511,7 +501,6 @@ object ModelCallHandler {
 
      
 	private def doStringBuilderCall(s : ISet[ReachingFactsAnalysis.RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] = {
-	  val factMap = s.toMap
 	  var newFacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
 	  //var deleteFacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
 	  p.getSignature match{
@@ -629,7 +618,7 @@ object ModelCallHandler {
 	
 	private def doNativeCall(s : ISet[ReachingFactsAnalysis.RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] = {
 	  var newFacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
-	  val factMap = s.toMap
+	  val factMap = ReachingFactsAnalysis.getFactMap(s)
 	  	  
 	  p.getSignature match{
 	    case "[|Ljava/lang/Object;.getClass:()Ljava/lang/Class;|]" =>
@@ -638,14 +627,14 @@ object ModelCallHandler {
 	               // then, create two facts (a) (retVarSlot, Set(cIns)), (b) ([cIns, "[|java:lang:Class.name|]"], concreteString(ins.typ))}
 	      
 	      require(args.size > 0)
-          val thisSlot = VarSlot(args(0))
+        val thisSlot = VarSlot(args(0))
 	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
 	      thisValue.foreach{
 	        ins =>
 	          val cIns = RFAInstance(new NormalType("[|java:lang:Class|]"), ins.getDefSite)
-	          newFacts += ((VarSlot(retVarOpt.get), Set(cIns)))
-	          val strIns = RFAConcreteStringInstance(new NormalType("[|java:lang:String|]"), ins.getType.typ, ins.getDefSite)
-	          newFacts += ((FieldSlot(cIns, "[|java:lang:Class.name|]"), Set(strIns)))
+	          newFacts += ((VarSlot(retVarOpt.get), cIns))
+	          val strIns = RFAConcreteStringInstance(ins.typ.typ, ins.getDefSite)
+	          newFacts += ((FieldSlot(cIns, "[|java:lang:Class.name|]"), strIns))
 	      }
 	      
 	      
@@ -658,7 +647,7 @@ object ModelCallHandler {
 	        cIns =>
 	          val fieldValue = factMap.getOrElse(FieldSlot(cIns, "[|java:lang:Class.name|]"), isetEmpty)
               if(!fieldValue.isEmpty) 
-               newFacts += ((VarSlot(retVarOpt.get), fieldValue))
+               newFacts ++= fieldValue.map(v => (VarSlot(retVarOpt.get), v))
 	      }
 	    case _ =>
 	  }
@@ -667,7 +656,7 @@ object ModelCallHandler {
 	
 	private def getInstanceFromType(typ : Type, currentContext : Context) : Option[Instance] = {
 	  if(Center.isJavaPrimitiveType(typ) || typ.typ == "[|void|]") None
-	  else if(typ.typ == "[|java:lang:String|]") Some(RFAPointStringInstance(typ, currentContext))
+	  else if(typ.typ == "[|java:lang:String|]") Some(RFAPointStringInstance(currentContext))
 	  else Some(RFAInstance(typ, currentContext))
 	}
 }

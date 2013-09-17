@@ -13,18 +13,18 @@ import org.sireum.amandroid.interProcedural.InterProceduralMonotonicFunction
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.interProcedural.CallResolver
 import org.sireum.amandroid.Center
-import org.sireum.amandroid.Instance
 import org.sireum.amandroid.NormalType
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
+import org.sireum.amandroid.Instance
 
 /**
  * @author Fengguo Wei & Sankardas Roy
  */
 object ReachingFactsAnalysis {
   type Node = CGNode
-  type Value = ISet[Instance]
+  type Value = Instance
   type Result = InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]
 
   type RFAFact = (Slot, Value)
@@ -38,16 +38,11 @@ object ReachingFactsAnalysis {
     val gen = new Gen
     val kill = new Kill
     val callr = new Callr
-    // latUpdate ensure all values of a VarSlot are together
-    val latUpdate : (ISet[RFAFact] => ISet[RFAFact]) = 
-    	{facts => 
-    	  facts.groupBy(_._1).mapValues(_.map(_._2).reduce((v1, v2) => v1 ++ v2)).toSet
-    	}
-    val iota : ISet[RFAFact] = isetEmpty + ((VarSlot("0"), isetEmpty))
+    def iota(context : Context) : ISet[RFAFact] = isetEmpty + ((VarSlot("0"), RFANullInstance(context)))
     val initial : ISet[RFAFact] = isetEmpty
     val cg = new CallGraph[CGNode]
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](cg,
-      entryPointProc, true, true, false, gen, kill, callr, latUpdate, iota, initial, switchAsOrderedMatch)
+      entryPointProc, true, true, false, gen, kill, callr, iota, initial, switchAsOrderedMatch)
 
 //    print("RFA\n")
 //    print(result)
@@ -59,16 +54,10 @@ object ReachingFactsAnalysis {
     result
   }
   
-  def isKeyUnique(s : ISet[RFAFact]) : Boolean = {
-    var result = true
-    var ks = isetEmpty[Slot]
-    s.foreach{case (k,v) => if(ks.contains(k)) result = false else ks += k}
-    result
-  }
+  def getFactMap(s : ISet[RFAFact]) : Map[Slot, Set[Value]] = s.groupBy(_._1).mapValues(_.map(_._2))
   
   protected def processLHSs(lhss : List[Exp], s : ISet[RFAFact]) : Map[Int, (Slot, Boolean)] = {
-    if(!isKeyUnique(s)) throw new RuntimeException("Key not unique:" + s)
-    val factMap = s.toMap
+    val factMap = getFactMap(s)
     val result = mmapEmpty[Int, (Slot, Boolean)]
     var i = -1
     lhss.foreach{
@@ -110,10 +99,9 @@ object ReachingFactsAnalysis {
     result.toMap
   }
   
-  protected def processRHSs(rhss : List[Exp], s : ISet[RFAFact], currentContext : Context) : Map[Int, Value] = {
-    if(!isKeyUnique(s)) throw new RuntimeException("Key not unique:" + s)
-    val factMap = s.toMap
-    val result = mmapEmpty[Int, Value]
+  protected def processRHSs(rhss : List[Exp], s : ISet[RFAFact], currentContext : Context) : Map[Int, Set[Value]] = {
+    val factMap = getFactMap(s)
+    val result = mmapEmpty[Int, Set[Value]]
     var i = -1
     rhss.foreach{
       key=>
@@ -126,8 +114,8 @@ object ReachingFactsAnalysis {
             	result(i) = value
           case le : LiteralExp =>
             if(le.typ.name.equals("STRING")){
-              val ins = RFAConcreteStringInstance(new NormalType("[|java:lang:String|]"), le.text, currentContext.copy)
-              var value = isetEmpty[Instance]
+              val ins = RFAConcreteStringInstance(le.text, currentContext.copy)
+              var value = isetEmpty[Value]
               value += ins
               result(i) = value
             }
@@ -143,11 +131,11 @@ object ReachingFactsAnalysis {
             
             val ins = 
 	            if(name == "[|java:lang:String|]" && dimensions == 0){
-	              RFAConcreteStringInstance(new NormalType(name, dimensions), "", currentContext.copy)
+	              RFAConcreteStringInstance("", currentContext.copy)
 	            } else {
 	              RFAInstance(new NormalType(name, dimensions), currentContext.copy)
 	            }
-            var value = isetEmpty[Instance]
+            var value = isetEmpty[Value]
             value += ins
             result(i) = value
           case ae : AccessExp =>
@@ -245,18 +233,18 @@ object ReachingFactsAnalysis {
       slots.foreach{
         case(i, (slot, isStrong)) =>
           if(values.contains(i))
-          	result += ((slot, values(i)))
+            result ++= values(i).map{v => (slot, v)}
       }
       values.foreach{
         case(i, value) =>
           value.foreach{
             ins=>
-              if(ins.getType == NormalType("[|java:lang:Class|]", 0)){
+              if(ins.typ == NormalType("[|java:lang:Class|]", 0)){
                 a.getValueAnnotation("classname") match{
                   case Some(exp) =>
                     require(exp.isInstanceOf[LiteralExp])
                     val nameStr = exp.asInstanceOf[LiteralExp].text
-                    val newValue = isetEmpty[Instance] + RFAConcreteStringInstance(NormalType("[|java:lang:String|]", 0), nameStr, currentContext)
+                    val newValue = RFAConcreteStringInstance(nameStr, currentContext)
                     val fieldSlot = FieldSlot(ins, "[|java:lang:Class.name|]")
                     result += ((fieldSlot, newValue))
                   case None =>
@@ -293,8 +281,7 @@ object ReachingFactsAnalysis {
   protected class Callr
   		extends CallResolver[RFAFact] {
     def getCalleeSet(s : ISet[RFAFact], cj : CallJump) : ISet[AmandroidProcedure] = {
-      if(!isKeyUnique(s)) throw new RuntimeException("Key not unique:" + s)
-      val factMap = s.toMap
+      val factMap = getFactMap(s)
       val sig = cj.getValueAnnotation("signature") match {
           case Some(s) => s match {
             case ne : NameExp => ne.name.name
@@ -322,8 +309,8 @@ object ReachingFactsAnalysis {
 	            recvValue.foreach{
 					      ins =>
 					        val p = 
-					          if(typ == "super") Center.getSuperCalleeProcedure(ins.getType, sig)
-					        	else Center.getVirtualCalleeProcedure(ins.getType, sig)
+					          if(typ == "super") Center.getSuperCalleeProcedure(ins.typ, sig)
+					        	else Center.getVirtualCalleeProcedure(ins.typ, sig)
 					        p match{
 					          case Some(tar) => calleeSet += tar
 					          case None =>
@@ -338,14 +325,13 @@ object ReachingFactsAnalysis {
     }
     
     def getFactsForCalleeAndReturn(s : ISet[RFAFact], cj : CallJump) : (ISet[RFAFact], ISet[RFAFact]) ={
-      if(!isKeyUnique(s)) throw new RuntimeException("Key not unique:" + s)
-      val factMap = s.toMap
-      val heapFacts = factMap.filter(_._1.isInstanceOf[HeapSlot]).map{_.asInstanceOf[(HeapSlot, Value)]}.toSet
+      val factMap = getFactMap(s)
+      val heapFacts = s.filter(_._1.isInstanceOf[HeapSlot]).map{_.asInstanceOf[(HeapSlot, Value)]}.toSet
       var calleeFacts = isetEmpty[RFAFact]
       
       factMap.foreach{case (s, v) => 
         if(s.isInstanceOf[VarSlot] && s.asInstanceOf[VarSlot].isGlobal){
-          calleeFacts += ((s, v))
+          calleeFacts ++= v.map{r => (s, r)}
           calleeFacts ++= getRelatedHeapFacts(v, heapFacts)
         }
       }
@@ -357,7 +343,7 @@ object ReachingFactsAnalysis {
 	              val slot = VarSlot(exp.asInstanceOf[NameExp].name.name)
 	              val value = factMap.getOrElse(slot, null)
 	              if(value != null){
-	                calleeFacts += ((slot, value))
+	                calleeFacts ++= value.map{r => (slot, r)}
 				          calleeFacts ++= getRelatedHeapFacts(value, heapFacts)
 	              }
               }
@@ -367,18 +353,16 @@ object ReachingFactsAnalysis {
       }
     }
     
-    private def getRelatedHeapFacts(insts : Set[Instance], s : ISet[(HeapSlot, Value)]) : ISet[RFAFact] ={
-      val worklist : MList[Instance] = mlistEmpty ++ insts
-      var processed : ISet[Instance] = isetEmpty
+    private def getRelatedHeapFacts(insts : Set[Value], s : ISet[(HeapSlot, Value)]) : ISet[RFAFact] ={
+      val worklist : MList[Value] = mlistEmpty ++ insts
+      var processed : ISet[Value] = isetEmpty
       var result : ISet[RFAFact] = isetEmpty
       while(!worklist.isEmpty){
         val ins = worklist.remove(0)
         processed += ins
         val facts = s.filter(_._1.matchWithInstance(ins))
         result ++= facts
-        if(!facts.isEmpty){
-        	worklist ++= facts.map(_._2).reduce(iunion[Instance]).filter{i => !processed.contains(i)}
-        }
+        worklist ++= facts.map{case (k, v) => v}.filter{i => !processed.contains(i)}
       }
       result
     }
@@ -441,7 +425,7 @@ object ReachingFactsAnalysis {
         case (s, v) =>
           if(s.isGlobal){
             result += ((s, v))
-            result ++= getRelatedHeapFacts(v, calleeHeapFacts)
+            result ++= getRelatedHeapFacts(Set(v), calleeHeapFacts)
           }
       }
       calleeProcedure.body match{
@@ -468,7 +452,7 @@ object ReachingFactsAnalysis {
             val value = calleeVarFacts.getOrElse(retSlot, null)
 		        if(value != null){
 		          result += ((lhsSlot, value))
-		          result ++= getRelatedHeapFacts(value, calleeHeapFacts)
+		          result ++= getRelatedHeapFacts(Set(value), calleeHeapFacts)
 		        }
         }
       }
@@ -485,7 +469,7 @@ object ReachingFactsAnalysis {
             argSlot =>
 	            val value = callerVarFacts.getOrElse(argSlot, null)
 	            if(value != null){
-	              result ++= getRelatedHeapFacts(value, calleeHeapFacts)
+	              result ++= getRelatedHeapFacts(Set(value), calleeHeapFacts)
 	            }
           }
           result

@@ -4,10 +4,11 @@ import org.sireum.amandroid.Instance
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.Type
 import org.sireum.amandroid.NormalType
+import org.sireum.amandroid.NullType
 
-abstract class RFAAbstractInstance(typ : Type, defSite : Context) extends Instance(typ, defSite)
+abstract class RFAAbstractInstance extends Instance
 
-final case class RFAInstance(typ : Type, defSite : Context) extends RFAAbstractInstance(typ, defSite){
+final case class RFAInstance(typ : Type, defSite : Context) extends RFAAbstractInstance{
   override def toString : String = {
     val sb = new StringBuilder
     sb.append("<")
@@ -18,16 +19,22 @@ final case class RFAInstance(typ : Type, defSite : Context) extends RFAAbstractI
   }
 }
 
-abstract class RFAAbstractStringInstance(typ : Type, defSite : Context) extends RFAAbstractInstance(typ, defSite){
+final case class RFANullInstance(defSite : Context) extends RFAAbstractInstance{
+  def typ : Type = NullType.asInstanceOf[Type]
+  override def toString : String = "NullInstance(name:" + this.typ + ". defsite:" + this.defSite + ")"
+}
+
+abstract class RFAAbstractStringInstance(defSite : Context) extends RFAAbstractInstance{
+  def typ : Type = NormalType("[|java:lang:String|]", 0) 
   override def toString : String = "AbstractStringInstance(name:" + this.typ + ". defsite:" + this.defSite + ")"   
 }
 
 // RFAPointStringInstance represents a general String instance whose content can be any string i.e. reg expression "*"
-final case class RFAPointStringInstance(typ : Type, defSite : Context) extends RFAAbstractStringInstance(typ, defSite){
+final case class RFAPointStringInstance(defSite : Context) extends RFAAbstractStringInstance(defSite){
   override def toString : String = "PointStringInstance(name:" + this.typ + ". defsite:" + this.defSite + ")" 
 }
 
-final case class RFAConcreteStringInstance(typ : Type, var string : String, defSite : Context) extends RFAAbstractStringInstance(typ, defSite){
+final case class RFAConcreteStringInstance(string : String, defSite : Context) extends RFAAbstractStringInstance(defSite){
   override def toString : String = {
     val sb = new StringBuilder
     sb.append("<")

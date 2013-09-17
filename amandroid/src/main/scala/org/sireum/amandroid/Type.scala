@@ -17,3 +17,9 @@ final case class NormalType(val typ : String, val dimensions : Int) extends Type
     sb.toString.intern()
   }
 }
+
+final case class NullType extends Type {
+  def typ = "Null"
+  def dimensions = 0
+  def isArray = false
+}

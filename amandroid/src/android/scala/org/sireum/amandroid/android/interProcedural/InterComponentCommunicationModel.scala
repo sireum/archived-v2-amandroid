@@ -29,23 +29,23 @@ object InterComponentCommunicationModel {
   }
 	
 	def doIccCall(s : ISet[ReachingFactsAnalysis.RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] = {
-	  val factMap = s.toMap
+	  val factMap = ReachingFactsAnalysis.getFactMap(s)
 	  require(args.size > 1)
 	  val intentSlot = VarSlot(args(1))
-	  val intentValue = factMap.getOrElse(intentSlot, isetEmpty)
-	  val explicitTargets = getExplicitTargets(s, intentValue)
+	  val intentValues = factMap.getOrElse(intentSlot, isetEmpty)
+	  val explicitTargets = getExplicitTargets(s, intentValues)
 	  println("explicitTargets-->" + explicitTargets)
 	  if(explicitTargets.isEmpty){
-	    val implicitTargets = getImplicitTargets(s, intentValue)
+	    val implicitTargets = getImplicitTargets(s, intentValues)
 	    println("implicitTargets-->" + implicitTargets)
 	  }
 	  s
 	}
 	
-	def getExplicitTargets(s : ISet[ReachingFactsAnalysis.RFAFact], intentValue : ReachingFactsAnalysis.Value) : ISet[AmandroidProcedure] = {
-	  val factMap = s.toMap
+	def getExplicitTargets(s : ISet[ReachingFactsAnalysis.RFAFact], intentValues : ISet[ReachingFactsAnalysis.Value]) : ISet[AmandroidProcedure] = {
+	  val factMap = ReachingFactsAnalysis.getFactMap(s)
 	  var result : ISet[AmandroidProcedure] = isetEmpty
-    intentValue.foreach{
+    intentValues.foreach{
       intentIns =>
         val iFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_COMPONENT)
         factMap.getOrElse(iFieldSlot, isetEmpty).foreach{
@@ -68,10 +68,10 @@ object InterComponentCommunicationModel {
     result
   }
   
-  def getImplicitTargets(s : ISet[ReachingFactsAnalysis.RFAFact], intentValue : ReachingFactsAnalysis.Value) : ISet[AmandroidProcedure] = {
-    val factMap = s.toMap
+  def getImplicitTargets(s : ISet[ReachingFactsAnalysis.RFAFact], intentValues : ISet[ReachingFactsAnalysis.Value]) : ISet[AmandroidProcedure] = {
+    val factMap = ReachingFactsAnalysis.getFactMap(s)
     var components : ISet[AmandroidRecord] = isetEmpty
-    intentValue.foreach{
+    intentValues.foreach{
       intentIns =>
         var compsForThisIntent:Set[AmandroidRecord] = Set()    
         println("intentIns = " + intentIns)
