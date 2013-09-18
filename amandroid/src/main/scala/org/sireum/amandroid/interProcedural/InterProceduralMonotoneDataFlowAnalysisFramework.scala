@@ -31,7 +31,7 @@ trait InterProceduralMonotonicFunction[LatticeElement] {
  * @author Fengguo Wei & Sankardas Roy
  */
 trait CallResolver[LatticeElement] {
-  def getCalleeSet(s : ISet[LatticeElement], cj : CallJump) : ISet[AmandroidProcedure]
+  def getCalleeSet(s : ISet[LatticeElement], cj : CallJump, callerContext : Context) : ISet[AmandroidProcedure]
   def getFactsForCalleeAndReturn(s : ISet[LatticeElement], cj : CallJump) : (ISet[LatticeElement], ISet[LatticeElement])
   def mapFactsToCallee(factsToCallee : ISet[LatticeElement], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[LatticeElement]
   def getAndMapFactsForCaller(callerS : ISet[LatticeElement], calleeS : ISet[LatticeElement], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[LatticeElement]
@@ -474,11 +474,6 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
 //        else visitBackward(l, esl)
         visitForward(l, pst, callerContext, esl)
       
-      def resolveCall(s : ISet[LatticeElement], callerContext : Context, cj : CallJump) : ISet[AmandroidProcedure] = {
-        val calleeSet = callr.getCalleeSet(s, cj)
-        calleeSet
-      }
-      
       def entries(n : N, callerContext : Context, esl : EntrySetListener[LatticeElement]) = {
         n match {
           case cn @ (_:CGNormalNode | _:CGCallNode | _:CGReturnNode)  =>
@@ -514,12 +509,13 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
 	        case xn : CGExitNode =>
 	          for (succ <- cg.successors(xn)){
 	            require(succ.isInstanceOf[CGReturnNode])
-	            val l = succ.getOwnerPST.location(succ.asInstanceOf[CGReturnNode].getLocIndex)
+	            val rn = succ.asInstanceOf[CGReturnNode]
+	            val l = succ.getOwnerPST.location(rn.getLocIndex)
 		          require(cg.isCall(l))
 		          val cj = l.asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump]
-	            val factsForCaller = callr.getAndMapFactsForCaller(getEntrySet(succ), getEntrySet(xn), cj, xn.getOwnerPST.procedure)
+	            val factsForCaller = callr.getAndMapFactsForCaller(getEntrySet(cg.getNode(CGCallNode(rn.context))), getEntrySet(xn), cj, xn.getOwnerPST.procedure)
 	            //below is the kill/gen for caller return node
-	            if (imdaf.update(confluence(getEntrySet(succ), factsForCaller), succ)){
+	            if (imdaf.update(confluence(getEntrySet(rn), factsForCaller), rn)){
 	            	workList += succ
 	            	//println("from cgexitnode!")
 	            }
@@ -530,7 +526,7 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
 	          val cj = l.asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump]
 	          val s = getEntrySet(cn)
 	          val callerContext = cn.getContext
-	          val calleeSet = imdaf.resolveCall(s, callerContext, cj)
+	          val calleeSet = callr.getCalleeSet(s, cj, callerContext)
 	          val (factsForCallee, factsForReturn) = callr.getFactsForCalleeAndReturn(s, cj)
 	          calleeSet foreach{
 	            callee=>
@@ -567,10 +563,7 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
 	                	//println("from cgcallnode to cgentrynode!")
 	                }
 	              case rn : CGReturnNode =>
-	                if(imdaf.update(kill(factsForReturn, cj, rn.getContext).union(getEntrySet(rn)), rn)){
-	                	workList += succ
-	                	//println("from cgcallnode to cgreturnnode!")
-	                }
+	                imdaf.update(kill(factsForReturn, cj, rn.getContext).union(getEntrySet(rn)), rn)
 	              case a => throw new RuntimeException("unexpected node type: " + a)
 	            }
 	          }

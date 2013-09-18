@@ -513,12 +513,12 @@ abstract class CGInvokeNode(context : Context) extends CGLocNode(context) {
 
 final case class CGCallNode(context : Context) extends CGInvokeNode(context){
   def getInvokeLabel : String = "Call"
-  override def toString : String = "Call@" + context
+  override def toString : String = getInvokeLabel + "@" + context
 }
 
 final case class CGReturnNode(context : Context) extends CGInvokeNode(context){
   def getInvokeLabel : String = "Return"
-  override def toString : String = "Return@" + context
+  override def toString : String = getInvokeLabel + "@" + context
 }
 
 final case class CGNormalNode(context : Context) extends CGLocNode(context){

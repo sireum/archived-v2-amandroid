@@ -71,9 +71,9 @@ object ModelCallHandler {
 	  val paramSlot = VarSlot(args(1))
 	  val paramValues = factMap.getOrElse(paramSlot, isetEmpty)
 	  thisValues.foreach{
-		      ins =>
-		        newfacts ++= paramValues.map{p=>(FieldSlot(ins, "[|java:util:HashSet.items|]"), p)}
-      }
+      ins =>
+        newfacts ++= paramValues.map{p=>(FieldSlot(ins, "[|java:util:HashSet.items|]"), p)}
+    }
 	  newfacts
 	}
   

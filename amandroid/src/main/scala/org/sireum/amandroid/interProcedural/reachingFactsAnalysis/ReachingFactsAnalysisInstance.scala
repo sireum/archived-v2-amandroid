@@ -20,8 +20,8 @@ final case class RFAInstance(typ : Type, defSite : Context) extends RFAAbstractI
 }
 
 final case class RFANullInstance(defSite : Context) extends RFAAbstractInstance{
-  def typ : Type = NullType.asInstanceOf[Type]
-  override def toString : String = "NullInstance(name:" + this.typ + ". defsite:" + this.defSite + ")"
+  def typ : Type = new NullType
+  override def toString : String = "Null" + "@" + defSite
 }
 
 abstract class RFAAbstractStringInstance(defSite : Context) extends RFAAbstractInstance{

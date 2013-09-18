@@ -109,14 +109,19 @@ object ReachingFactsAnalysis {
         key match{
           case ne : NameExp =>
             val slot = VarSlot(ne.name.name)
-            val value = factMap.getOrElse(slot, null)
-            if(value != null)
-            	result(i) = value
+            val value : ISet[Instance] = factMap.getOrElse(slot, Set(RFANullInstance(currentContext.copy)))
+            if(slot.isGlobal){ 
+              value.foreach{
+                ins =>
+                  if(ins.isInstanceOf[RFANullInstance])
+                    System.err.println("Access global var: " + slot + "@" + currentContext + "\nget Null pointer: " + ins)
+              }
+            }
+            result(i) = value
           case le : LiteralExp =>
             if(le.typ.name.equals("STRING")){
               val ins = RFAConcreteStringInstance(le.text, currentContext.copy)
-              var value = isetEmpty[Value]
-              value += ins
+              val value : ISet[Instance] = Set(ins)
               result(i) = value
             }
           case ne : NewExp =>
@@ -144,15 +149,15 @@ object ReachingFactsAnalysis {
               case ne : NameExp => VarSlot(ne.name.name)
               case _ => throw new RuntimeException("Wrong exp: " + ae.exp)
             }
-            val baseValue = factMap.getOrElse(baseSlot, null)
-            if(baseValue != null){
-              baseValue.map{
-                ins =>
+            val baseValue : ISet[Instance] = factMap.getOrElse(baseSlot, Set(RFANullInstance(currentContext.copy)))
+            baseValue.map{
+              ins =>
+                if(ins.isInstanceOf[RFANullInstance]) System.err.println("Access field: " + baseSlot + "." + fieldName + "@" + currentContext + "\nwith Null pointer: " + ins)
+                else{
                   val fieldSlot = FieldSlot(ins, fieldName)
-                  val fieldValue = factMap.getOrElse(fieldSlot, null)
-			            if(fieldValue != null)
-			            	result(i) = fieldValue
-              }
+	                val fieldValue : ISet[Instance] = factMap.getOrElse(fieldSlot, Set(RFANullInstance(currentContext.copy)))
+			            result(i) = fieldValue
+                }
             }
           case ie : IndexingExp =>
             val baseSlot = ie.exp match {
@@ -160,23 +165,23 @@ object ReachingFactsAnalysis {
                 VarSlot(ine.name.name)
               case _ => throw new RuntimeException("Wrong exp: " + ie.exp)
             }
-            val baseValue = factMap.getOrElse(baseSlot, null)
-            if(baseValue != null){
-              baseValue.map{
-                ins =>
+            val baseValue : ISet[Instance] = factMap.getOrElse(baseSlot, Set(RFANullInstance(currentContext.copy)))
+            baseValue.map{
+              ins =>
+                if(ins.isInstanceOf[RFANullInstance]) System.err.println("Access array: " + baseSlot + "@" + currentContext + "\nwith Null pointer: " + ins)
+                else{
                   val arraySlot = ArraySlot(ins)
-                  val arrayValue = factMap.getOrElse(arraySlot, null)
+                  val arrayValue : ISet[Instance] = factMap.getOrElse(arraySlot, Set(RFANullInstance(currentContext.copy)))
 			            if(arrayValue != null)
 			            	result(i) = arrayValue
-              }
+                }
             }
           case ce : CastExp =>
             ce.exp match{
               case ice : NameExp =>
                 val slot = VarSlot(ice.name.name)
-                val value = factMap.getOrElse(slot, null)
-		            if(value != null)
-		            	result(i) = value
+                val value : ISet[Instance] = factMap.getOrElse(slot, Set(RFANullInstance(currentContext.copy)))
+		            result(i) = value
               case _ => throw new RuntimeException("Wrong exp: " + ce.exp)
             }
           case _=>
@@ -188,11 +193,11 @@ object ReachingFactsAnalysis {
   protected def getLHSs(a : PilarAstNode) : List[Exp] = {
     var result = List[Exp]()
 
-      def getLHSRec(e : Exp) : Unit =
-        e match {
-          case te : TupleExp => te.exps.foreach(getLHSRec)
-          case _             => result ::= e
-        }
+    def getLHSRec(e : Exp) : Unit =
+      e match {
+        case te : TupleExp => te.exps.foreach(getLHSRec)
+        case _             => result ::= e
+      }
 
     a match {
       case aa : AssignAction => getLHSRec(aa.lhs)
@@ -280,7 +285,7 @@ object ReachingFactsAnalysis {
   
   protected class Callr
   		extends CallResolver[RFAFact] {
-    def getCalleeSet(s : ISet[RFAFact], cj : CallJump) : ISet[AmandroidProcedure] = {
+    def getCalleeSet(s : ISet[RFAFact], cj : CallJump, callerContext : Context) : ISet[AmandroidProcedure] = {
       val factMap = getFactMap(s)
       val sig = cj.getValueAnnotation("signature") match {
           case Some(s) => s match {
@@ -304,10 +309,11 @@ object ReachingFactsAnalysis {
               case ne : NameExp => VarSlot(ne.name.name)
               case _ => throw new RuntimeException("wrong exp type: " + te.exps(0))
             }
-            val recvValue = factMap.getOrElse(recvSlot, null)
-            if(recvValue != null)
-	            recvValue.foreach{
-					      ins =>
+            val recvValue : ISet[Instance] = factMap.getOrElse(recvSlot, Set(RFANullInstance(callerContext)))
+            recvValue.foreach{
+				      ins =>
+				        if(ins.isInstanceOf[RFANullInstance]) System.err.println("Try to invoke method: " + sig + "@" + callerContext + "\nwith Null pointer:" + ins)
+                else{
 					        val p = 
 					          if(typ == "super") Center.getSuperCalleeProcedure(ins.typ, sig)
 					        	else Center.getVirtualCalleeProcedure(ins.typ, sig)
@@ -315,7 +321,8 @@ object ReachingFactsAnalysis {
 					          case Some(tar) => calleeSet += tar
 					          case None =>
 					        }
-					    }
+                }
+				    }
           case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
         }
       } else {
@@ -328,7 +335,13 @@ object ReachingFactsAnalysis {
       val factMap = getFactMap(s)
       val heapFacts = s.filter(_._1.isInstanceOf[HeapSlot]).map{_.asInstanceOf[(HeapSlot, Value)]}.toSet
       var calleeFacts = isetEmpty[RFAFact]
-      
+      val typ = cj.getValueAnnotation("type") match {
+          case Some(s) => s match {
+            case ne : NameExp => ne.name.name
+            case _ => ""
+          }
+          case None => throw new RuntimeException("cannot found annotation 'type' from: " + cj)
+        }
       factMap.foreach{case (s, v) => 
         if(s.isInstanceOf[VarSlot] && s.asInstanceOf[VarSlot].isGlobal){
           calleeFacts ++= v.map{r => (s, r)}
@@ -337,18 +350,19 @@ object ReachingFactsAnalysis {
       }
       cj.callExp.arg match{
         case te : TupleExp => 
-          te.exps.foreach{
-            exp =>
-              if(exp.isInstanceOf[NameExp]){
-	              val slot = VarSlot(exp.asInstanceOf[NameExp].name.name)
-	              val value = factMap.getOrElse(slot, null)
-	              if(value != null){
-	                calleeFacts ++= value.map{r => (slot, r)}
-				          calleeFacts ++= getRelatedHeapFacts(value, heapFacts)
-	              }
-              }
+          for(i <- 0 to te.exps.size){
+            val exp = te.exps(i)
+            if(exp.isInstanceOf[NameExp]){
+              val slot = VarSlot(exp.asInstanceOf[NameExp].name.name)
+              var value = factMap.getOrElse(slot, isetEmpty)
+              if(typ != "static" && i == 0){
+                value = value.filter(r => !r.isInstanceOf[RFANullInstance])
+              } 
+              calleeFacts ++= value.map{r => (slot, r)}
+		          calleeFacts ++= getRelatedHeapFacts(value, heapFacts)
+            }
           }
-          (calleeFacts, s)
+          (calleeFacts, s -- calleeFacts)
         case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
       }
     }
@@ -411,8 +425,8 @@ object ReachingFactsAnalysis {
     }
     
     def getAndMapFactsForCaller(callerS : ISet[RFAFact], calleeS : ISet[RFAFact], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[RFAFact] ={
-      val callerVarFacts = callerS.filter(f=>f._1.isInstanceOf[VarSlot]).map{f=>(f._1.asInstanceOf[VarSlot], f._2)}.toMap
-      val calleeVarFacts = calleeS.filter(f=>f._1.isInstanceOf[VarSlot]).map{f=>(f._1.asInstanceOf[VarSlot], f._2)}.toMap
+      val callerVarFacts = callerS.filter(_._1.isInstanceOf[VarSlot]).map{f=>(f._1.asInstanceOf[VarSlot], f._2)}.toSet
+      val calleeVarFacts = calleeS.filter(_._1.isInstanceOf[VarSlot]).map{f=>(f._1.asInstanceOf[VarSlot], f._2)}.toSet
       val calleeHeapFacts = calleeS.filter(_._1.isInstanceOf[HeapSlot]).map{_.asInstanceOf[(HeapSlot, Value)]}.toSet
       var lhsSlot : VarSlot = null
       var retSlots : ISet[VarSlot] = isetEmpty
@@ -447,14 +461,18 @@ object ReachingFactsAnalysis {
         case _ =>
       }
       if(lhsSlot != null){
+        var values : ISet[Value] = isetEmpty
         retSlots.foreach{
           retSlot =>
-            val value = calleeVarFacts.getOrElse(retSlot, null)
-		        if(value != null){
-		          result += ((lhsSlot, value))
-		          result ++= getRelatedHeapFacts(Set(value), calleeHeapFacts)
-		        }
+            calleeVarFacts.foreach{
+              case (s, v) =>
+                if(s == retSlot){
+                  values += v
+                }
+            }
         }
+        result ++= values.map(v => (lhsSlot, v))
+        result ++= getRelatedHeapFacts(values, calleeHeapFacts)
       }
       cj.callExp.arg match{
         case te : TupleExp => 
@@ -467,10 +485,14 @@ object ReachingFactsAnalysis {
           }
           argSlots.foreach{
             argSlot =>
-	            val value = callerVarFacts.getOrElse(argSlot, null)
-	            if(value != null){
-	              result ++= getRelatedHeapFacts(Set(value), calleeHeapFacts)
+              var values : ISet[Value] = isetEmpty
+	            callerVarFacts.foreach{
+	              case (s, v) =>
+	                if(s == argSlot)
+	              	 values += v
 	            }
+              result ++= values.map(v=>(argSlot, v))
+              result ++= getRelatedHeapFacts(values, calleeHeapFacts)
           }
           result
         case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)

@@ -22,4 +22,10 @@ final case class NullType extends Type {
   def typ = "Null"
   def dimensions = 0
   def isArray = false
+  override def toString : String = {
+    val sb = new StringBuilder
+    sb.append("(" + typ)
+    sb.append(")")
+    sb.toString.intern()
+  }
 }
