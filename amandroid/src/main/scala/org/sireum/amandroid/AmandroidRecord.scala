@@ -1,5 +1,7 @@
 package org.sireum.amandroid
 
+import org.sireum.amandroid.interProcedural.Context
+
 
 /**
  * This class is an amandroid representation of a pilar record. A record corresponds to a class or an interface of the source code. They are usually created by Amandroid Resolver.
@@ -59,6 +61,12 @@ class AmandroidRecord {
    */
   
   protected var interfaces : Set[AmandroidRecord] = Set()
+  
+  /**
+   *  .class component of this record
+   */
+  
+  protected var classObj : ClassInstance = null
   
   /**
    * super class of this record
@@ -148,6 +156,10 @@ class AmandroidRecord {
   
   def init(name : String, accessFlags : Int) : AmandroidRecord = {
     setName(name)
+    val mainContext = new Context(0)
+    mainContext.setContext("Center", "L0000")
+    val cIns = ClassInstance(name, mainContext)
+    setClassObj(cIns)
     this.accessFlags = accessFlags
     this
   }
@@ -517,6 +529,23 @@ class AmandroidRecord {
 	}
 	
 	/**
+	 * get the .class object of this record
+	 */
+	
+	def getClassObj : ClassInstance = {
+	  if(this.classObj == null) throw new RuntimeException("no class object available for: " + getName)
+	  else this.classObj
+	}
+	
+	/**
+	 * set the .class object
+	 */
+	
+	def setClassObj(c : ClassInstance) = {
+	  this.classObj = c
+	}
+	
+	/**
 	 * whether the current record has a super class or not
 	 */
 	
@@ -689,6 +718,7 @@ class AmandroidRecord {
     println("recName: " + getName)
     println("packageName: " + getPackageName)
     println("shortName: " + getShortName)
+    println("class object: " + getClassObj)
     println("superClass: " + tryGetSuperClass)
     println("outerClass: " + tryGetOuterClass)
     println("interfaces: " + getInterfaces)

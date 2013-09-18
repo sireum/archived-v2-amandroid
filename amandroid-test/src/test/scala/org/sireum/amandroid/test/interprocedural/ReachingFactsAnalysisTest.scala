@@ -5,6 +5,7 @@ import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
 import org.scalatest.junit.JUnitRunner
 import org.sireum.amandroid.test.framework.interprocedural.ReachingFactsAnalysisTestFramework
 import org.sireum.amandroid.AmandroidCodeSource
+import org.sireum.amandroid.Center
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -13,7 +14,7 @@ import org.sireum.amandroid.AmandroidCodeSource
 class ReachingFactsAnalysisTest extends ReachingFactsAnalysisTestFramework {
   AmandroidCodeSource.preLoad
   InterproceduralExamples.ofgModelFiles.
-    filter { s => s.endsWith("ActivityOncreate.pilar") }.
+    filter { s => s.endsWith("NativeCallTest.pilar") }.
     foreach { fileUri =>
       Analyzing title fileUri file fileUri
     }

@@ -50,7 +50,7 @@ object ReachingFactsAnalysis {
 //    val o1 = new FileOutputStream(f1)
 //    val w1 = new OutputStreamWriter(o1)
 //    w1.write(result.toString())
-
+      Center.getRecords.map(r => println ( r + " .class= " + r.getClassObj))
     result
   }
   
