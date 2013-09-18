@@ -44,8 +44,8 @@ object ReachingFactsAnalysis {
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](cg,
       entryPointProc, true, true, false, gen, kill, callr, iota, initial, switchAsOrderedMatch)
 
-//    print("RFA\n")
-//    print(result)
+    print("RFA\n")
+    print(result)
 //    val f1 = new File(System.getProperty("user.home") + "/Desktop/rfa.txt")
 //    val o1 = new FileOutputStream(f1)
 //    val w1 = new OutputStreamWriter(o1)
