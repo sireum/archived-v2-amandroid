@@ -18,6 +18,31 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 import org.sireum.amandroid.Instance
+import org.sireum.amandroid.util.StringFormConverter
+
+class ReachingFactsAnalysisBuilder{
+  def build //
+  (entryPointProc : AmandroidProcedure,
+   switchAsOrderedMatch : Boolean) : (CallGraph[CGNode], ReachingFactsAnalysis.Result) = {
+    val gen = new ReachingFactsAnalysis.Gen
+    val kill = new ReachingFactsAnalysis.Kill
+    val callr = new ReachingFactsAnalysis.Callr
+    def iota(context : Context) : ISet[ReachingFactsAnalysis.RFAFact] = isetEmpty + ((VarSlot("0"), RFANullInstance(context)))
+    val initial : ISet[ReachingFactsAnalysis.RFAFact] = isetEmpty
+    val cg = new CallGraph[CGNode]
+    val result = new InterProceduralMonotoneDataFlowAnalysisFramework().apply[ReachingFactsAnalysis.RFAFact](cg,
+      entryPointProc, true, true, false, gen, kill, callr, iota, initial, switchAsOrderedMatch)
+
+//    print("RFA\n")
+//    print(result)
+//    val f1 = new File(System.getProperty("user.home") + "/Desktop/rfa.txt")
+//    val o1 = new FileOutputStream(f1)
+//    val w1 = new OutputStreamWriter(o1)
+//    w1.write(result.toString())
+
+    (cg, result)
+  }
+}
 
 /**
  * @author Fengguo Wei & Sankardas Roy
@@ -30,29 +55,7 @@ object ReachingFactsAnalysis {
   type RFAFact = (Slot, Value)
   
   def apply(entryPointProc : AmandroidProcedure,
-   switchAsOrderedMatch : Boolean = false) = build(entryPointProc, switchAsOrderedMatch)
-
-  def build //
-  (entryPointProc : AmandroidProcedure,
-   switchAsOrderedMatch : Boolean) : Result = {
-    val gen = new Gen
-    val kill = new Kill
-    val callr = new Callr
-    def iota(context : Context) : ISet[RFAFact] = isetEmpty + ((VarSlot("0"), RFANullInstance(context)))
-    val initial : ISet[RFAFact] = isetEmpty
-    val cg = new CallGraph[CGNode]
-    val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](cg,
-      entryPointProc, true, true, false, gen, kill, callr, iota, initial, switchAsOrderedMatch)
-
-//    print("RFA\n")
-//    print(result)
-//    val f1 = new File(System.getProperty("user.home") + "/Desktop/rfa.txt")
-//    val o1 = new FileOutputStream(f1)
-//    val w1 = new OutputStreamWriter(o1)
-//    w1.write(result.toString())
-
-    result
-  }
+   switchAsOrderedMatch : Boolean = false) = new ReachingFactsAnalysisBuilder().build(entryPointProc, switchAsOrderedMatch)
   
   def getFactMap(s : ISet[RFAFact]) : Map[Slot, Set[Value]] = s.groupBy(_._1).mapValues(_.map(_._2))
   
@@ -99,6 +102,48 @@ object ReachingFactsAnalysis {
     result.toMap
   }
   
+  protected def checkRHSForGlobalFacts(rhss : List[Exp], s : ISet[RFAFact], currentContext : Context) : ISet[RFAFact] = {
+    var result = isetEmpty[RFAFact]
+    val factMap = getFactMap(s)
+    rhss.foreach{
+      key=>
+      	key match{
+          case ne : NameExp =>
+            val slot = VarSlot(ne.name.name)
+            if(slot.isGlobal){ 
+              println("slot-->" + slot)
+              val glVal = factMap.getOrElse(slot, null)
+              println("glval-->" + glVal)
+              if(glVal == null){
+              	val recName = StringFormConverter.getRecordNameFromFieldSignature(ne.name.name)
+              	val rec = Center.resolveRecord(recName, Center.ResolveLevel.BODIES)
+              	println("rec-->" + rec)
+              	if(rec.declaresProcedureByShortName("<clinit>")){
+                  val p = rec.getProcedureByShortName("<clinit>")
+                  println("p-->" + p)
+                  val (cg, facts) = ReachingFactsAnalysis(p)
+                  val exFacts = facts.entrySet(cg.exitNode)
+                  val heapFacts = exFacts.filter(_._1.isInstanceOf[HeapSlot]).map{_.asInstanceOf[(HeapSlot, Value)]}.toSet
+                  exFacts.foreach{
+                    fact =>
+                      fact._1 match{
+                        case vs : VarSlot => 
+                          if(vs.isGlobal){
+                            result += fact
+                            result ++= getRelatedHeapFacts(Set(fact._2), heapFacts)
+                          }
+                        case _ =>
+                      }
+                  }
+                }
+              }
+            }
+          case _ =>
+      	}
+    }
+    result
+  }
+  
   protected def processRHSs(rhss : List[Exp], s : ISet[RFAFact], currentContext : Context) : Map[Int, Set[Value]] = {
     val factMap = getFactMap(s)
     val result = mmapEmpty[Int, Set[Value]]
@@ -109,14 +154,8 @@ object ReachingFactsAnalysis {
         key match{
           case ne : NameExp =>
             val slot = VarSlot(ne.name.name)
-            val value : ISet[Instance] = factMap.getOrElse(slot, Set(RFANullInstance(currentContext.copy)))
-            if(slot.isGlobal){ 
-              value.foreach{
-                ins =>
-                  if(ins.isInstanceOf[RFANullInstance])
-                    System.err.println("Access global var: " + slot + "@" + currentContext + "\nget Null pointer: " + ins)
-              }
-            }
+            var value : ISet[Instance] = isetEmpty
+            value ++= factMap.getOrElse(slot, Set(RFANullInstance(currentContext.copy)))
             result(i) = value
           case le : LiteralExp =>
             if(le.typ.name.equals("STRING")){
@@ -212,11 +251,11 @@ object ReachingFactsAnalysis {
   protected def getRHSs(a : PilarAstNode) : List[Exp] = {
     var result = List[Exp]()
 
-      def getRHSRec(e : Exp) : Unit =
-        e match {
-          case te : TupleExp => te.exps.foreach(getRHSRec)
-          case _             => result ::= e
-        }
+    def getRHSRec(e : Exp) : Unit =
+      e match {
+        case te : TupleExp => te.exps.foreach(getRHSRec)
+        case _             => result ::= e
+      }
 
     a match {
       case aa : AssignAction => getRHSRec(aa.rhs)
@@ -227,44 +266,71 @@ object ReachingFactsAnalysis {
     result
   }
 
-  protected class Gen
+  class Gen
       extends InterProceduralMonotonicFunction[RFAFact] {
-    def apply(s : ISet[RFAFact], a : Assignment, currentContext : Context) : ISet[RFAFact] = {
-      val lhss = getLHSs(a)		      
-      val slots = processLHSs(lhss, s)
-      val rhss = getRHSs(a)
-      val values = processRHSs(rhss, s, currentContext)
-      var result : ISet[RFAFact] = isetEmpty
-      slots.foreach{
-        case(i, (slot, isStrong)) =>
-          if(values.contains(i))
-            result ++= values(i).map{v => (slot, v)}
-      }
-      values.foreach{
-        case(i, value) =>
-          value.foreach{
-            ins=>
-              if(ins.typ == NormalType("[|java:lang:Class|]", 0)){
-                a.getValueAnnotation("classname") match{
-                  case Some(exp) =>
-                    require(exp.isInstanceOf[LiteralExp])
-                    val nameStr = exp.asInstanceOf[LiteralExp].text
-                    val newValue = RFAConcreteStringInstance(nameStr, currentContext)
-                    val fieldSlot = FieldSlot(ins, "[|java:lang:Class.name|]")
-                    result += ((fieldSlot, newValue))
-                  case None =>
-                }
-              }
+    
+    protected def isInterestingAssignment(a : Assignment) : Boolean = {
+      var result = false
+      a match{
+        case aa : AssignAction => 
+          aa.rhs match{
+            case ne : NewExp => result = true
+            case ce : CastExp => result = true
+            case _ =>
           }
+          a.getValueAnnotation("type") match{
+            case Some(e) => 
+              e match{
+                case ne : NameExp => result = (ne.name.name == "object")
+                case _ =>
+              }
+            case None => 
+          }
+	      case cj : CallJump => result = true
+	      case _ =>
       }
-      //println("gen-->" + result)
+      result
+    }
+    
+    def apply(s : ISet[RFAFact], a : Assignment, currentContext : Context) : ISet[RFAFact] = {
+      var result : ISet[RFAFact] = isetEmpty
+      if(isInterestingAssignment(a)){
+	      val lhss = getLHSs(a)		      
+	      val slots = processLHSs(lhss, s)
+	      val rhss = getRHSs(a)
+	      val newFacts = checkRHSForGlobalFacts(rhss, s, currentContext)
+	      result ++= newFacts
+	      val values = processRHSs(rhss, s ++ newFacts, currentContext)
+	      slots.foreach{
+	        case(i, (slot, isStrong)) =>
+	          if(values.contains(i))
+	            result ++= values(i).map{v => (slot, v)}
+	      }
+	      values.foreach{
+	        case(i, value) =>
+	          value.foreach{
+	            ins=>
+	              if(ins.typ == NormalType("[|java:lang:Class|]", 0)){
+	                a.getValueAnnotation("classname") match{
+	                  case Some(exp) =>
+	                    require(exp.isInstanceOf[LiteralExp])
+	                    val nameStr = exp.asInstanceOf[LiteralExp].text
+	                    val newValue = RFAConcreteStringInstance(nameStr, currentContext)
+	                    val fieldSlot = FieldSlot(ins, "[|java:lang:Class.name|]")
+	                    result += ((fieldSlot, newValue))
+	                  case None =>
+	                }
+	              }
+	          }
+	      }
+      }
       result
     }
 
     def apply(s : ISet[RFAFact], e : Exp, currentContext : Context) : ISet[RFAFact] = isetEmpty
   }
 
-  protected class Kill
+  class Kill
       extends InterProceduralMonotonicFunction[RFAFact] {
     
     def apply(s : ISet[RFAFact], a : Assignment, currentContext : Context) : ISet[RFAFact] = {
@@ -283,7 +349,21 @@ object ReachingFactsAnalysis {
     def apply(s : ISet[RFAFact], e : Exp, currentContext : Context) : ISet[RFAFact] = s
   }
   
-  protected class Callr
+  private def getRelatedHeapFacts(insts : Set[Value], s : ISet[(HeapSlot, Value)]) : ISet[RFAFact] ={
+      val worklist : MList[Value] = mlistEmpty ++ insts
+      var processed : ISet[Value] = isetEmpty
+      var result : ISet[RFAFact] = isetEmpty
+      while(!worklist.isEmpty){
+        val ins = worklist.remove(0)
+        processed += ins
+        val facts = s.filter(_._1.matchWithInstance(ins))
+        result ++= facts
+        worklist ++= facts.map{case (k, v) => v}.filter{i => !processed.contains(i)}
+      }
+      result
+    }
+  
+  class Callr
   		extends CallResolver[RFAFact] {
     def getCalleeSet(s : ISet[RFAFact], cj : CallJump, callerContext : Context) : ISet[AmandroidProcedure] = {
       val factMap = getFactMap(s)
@@ -348,37 +428,28 @@ object ReachingFactsAnalysis {
           calleeFacts ++= getRelatedHeapFacts(v, heapFacts)
         }
       }
+      var delFacts = isetEmpty[RFAFact]
       cj.callExp.arg match{
         case te : TupleExp => 
-          for(i <- 0 to te.exps.size){
+          for(i <- 0 to te.exps.size -1){
             val exp = te.exps(i)
             if(exp.isInstanceOf[NameExp]){
               val slot = VarSlot(exp.asInstanceOf[NameExp].name.name)
               var value = factMap.getOrElse(slot, isetEmpty)
               if(typ != "static" && i == 0){
-                value = value.filter(r => !r.isInstanceOf[RFANullInstance])
+                value = value.map{
+                  r=>
+                    if(r.isInstanceOf[RFANullInstance]) delFacts += ((slot, r))
+                    r
+                }.filter(r => !r.isInstanceOf[RFANullInstance])
               } 
               calleeFacts ++= value.map{r => (slot, r)}
 		          calleeFacts ++= getRelatedHeapFacts(value, heapFacts)
             }
           }
-          (calleeFacts, s -- calleeFacts)
+          (calleeFacts, s -- calleeFacts -- delFacts)
         case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
       }
-    }
-    
-    private def getRelatedHeapFacts(insts : Set[Value], s : ISet[(HeapSlot, Value)]) : ISet[RFAFact] ={
-      val worklist : MList[Value] = mlistEmpty ++ insts
-      var processed : ISet[Value] = isetEmpty
-      var result : ISet[RFAFact] = isetEmpty
-      while(!worklist.isEmpty){
-        val ins = worklist.remove(0)
-        processed += ins
-        val facts = s.filter(_._1.matchWithInstance(ins))
-        result ++= facts
-        worklist ++= facts.map{case (k, v) => v}.filter{i => !processed.contains(i)}
-      }
-      result
     }
     
     def mapFactsToCallee(factsToCallee : ISet[RFAFact], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[RFAFact] = {

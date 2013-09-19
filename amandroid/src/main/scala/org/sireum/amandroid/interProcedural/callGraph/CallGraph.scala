@@ -14,6 +14,9 @@ import org.sireum.amandroid.interProcedural.InterProceduralGraph
 import org.sireum.amandroid.interProcedural.InterProceduralNode
 import org.sireum.amandroid.interProcedural.Context
 
+/**
+ * @author Fengguo Wei & Sankardas Roy
+ */
 class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
   private var succBranchMap : MMap[(Node, Option[Branch]), Node] = null
   private var predBranchMap : MMap[(Node, Option[Branch]), Node] = null

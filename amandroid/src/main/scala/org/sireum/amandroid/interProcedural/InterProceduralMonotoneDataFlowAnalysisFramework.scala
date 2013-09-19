@@ -42,7 +42,7 @@ trait CallResolver[LatticeElement] {
 /**
  * @author Fengguo Wei & Sankardas Roy
  */
-object InterProceduralMonotoneDataFlowAnalysisFramework {
+class InterProceduralMonotoneDataFlowAnalysisFramework {
   
   final val TITLE = "InterProceduralMonotoneDataFlowAnalysisFramework"
   

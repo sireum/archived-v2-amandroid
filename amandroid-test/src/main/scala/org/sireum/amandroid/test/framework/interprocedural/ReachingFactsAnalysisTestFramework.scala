@@ -15,6 +15,7 @@ import org.sireum.amandroid.AmandroidResolver
 import org.sireum.amandroid.interProcedural.callGraph.CallGraphBuilder
 import org.sireum.amandroid.test.framework.TestFramework
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysis
+import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysis
 
 	/**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
