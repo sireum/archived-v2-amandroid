@@ -17,6 +17,7 @@ final case class PTAInstance(typ : Type, defSite : Context) extends Instance{
 
 final case class ClassInstance(name: String, defSite : Context) extends Instance{
   def typ = NormalType("[|java:lang:Class|]", 0)
+  def getName = name
   override def toString : String = "ClassInst(classname:" + this.name + ".defsite:" + this.defSite + ")"
 }
 

@@ -350,7 +350,7 @@ object ReachingFactsAnalysis {
       }
       cj.callExp.arg match{
         case te : TupleExp => 
-          for(i <- 0 to te.exps.size){
+          for(i <- 0 to te.exps.size -1){
             val exp = te.exps(i)
             if(exp.isInstanceOf[NameExp]){
               val slot = VarSlot(exp.asInstanceOf[NameExp].name.name)

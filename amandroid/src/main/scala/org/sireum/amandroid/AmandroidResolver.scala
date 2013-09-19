@@ -8,6 +8,7 @@ import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.amandroid.util.StringFormConverter
 import org.sireum.pilar.symbol.SymbolTable
 
+
 /**
  * this object collects info from the symbol table and builds Center, AmandroidRecord, and AmandroidProcedure
  */
@@ -18,7 +19,7 @@ object AmandroidResolver {
   val TITLE : String = "AmandroidResolver"
   
   /**
-   * resolve the given procedure code. Normally for dummyMain
+   * resolve the given procedure code. Normally for dummyMain 
    */
     
   def resolveProcedureCode(procSig : String, code : String) : AmandroidProcedure = {
@@ -183,6 +184,18 @@ object AmandroidResolver {
 	  records.foreach(Center.addRecord(_))
 	  if(GlobalConfig.mode >= Mode.WHOLE_PROGRAM_TEST) Center.resolveRecordsRelationWholeProgram
 	  else Center.resolveRecordsRelation
+	  // now we generate a special Amandroid Procedure for each record; this proc would represent the const-class operation
+	  records.foreach{
+	    rec =>
+	      val proc : AmandroidProcedure = new AmandroidProcedure
+	      val procName = StringFormConverter.generateProcName(rec.getName, "class")
+	      val procSubSig = "class:()Ljava/lang/Class;"
+	      val procSig = StringFormConverter.getSigFromOwnerAndProcSubSig(rec.getName, procSubSig)
+	      proc.init(procName, procSig)
+	      proc.setAccessFlags("STATIC")
+	      val ownerRecord = rec
+	      rec.addProcedure(proc)
+	  }
 	}
 	
 	/**

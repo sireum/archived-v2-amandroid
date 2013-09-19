@@ -10,6 +10,7 @@ import org.sireum.amandroid.NormalType
 import org.sireum.amandroid.android.interProcedural.InterComponentCommunicationModel
 import org.sireum.alir.Slot
 import org.sireum.amandroid.Instance
+import org.sireum.amandroid.ClassInstance
 
 /**
  * @author Fengguo Wei & Sankardas Roy
@@ -24,6 +25,7 @@ object ModelCallHandler {
 	  isStringBuilder(r) ||
 	  isString(r) || 
 	  isHashSet(r) || 
+	  isSpecial(calleeProc) ||
 	  isNativeCall(calleeProc) || 
 	  InterComponentCommunicationModel.isIccOperation(calleeProc)
   }
@@ -33,6 +35,8 @@ object ModelCallHandler {
   private def isString(r : AmandroidRecord) : Boolean = r.getName == "[|java:lang:String|]"
   
   private def isHashSet(r : AmandroidRecord) : Boolean = r.getName == "[|java:util:HashSet|]"
+  
+  private def isSpecial(p : AmandroidProcedure) : Boolean = p.getShortName == "class"
     
   private def isNativeCall(p : AmandroidProcedure) : Boolean = p.isNative
 	
@@ -44,6 +48,7 @@ object ModelCallHandler {
 	  if(isString(r)) doStringCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(isStringBuilder(r)) doStringBuilderCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(isHashSet(r)) doHashSetCall(s, calleeProc, args, retVarOpt, currentContext)
+	  else if(isSpecial(calleeProc)) doSpecialCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(isNativeCall(calleeProc)) doNativeCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(InterComponentCommunicationModel.isIccOperation(calleeProc)) InterComponentCommunicationModel.doIccCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else throw new RuntimeException("given callee is not a model call: " + calleeProc)
@@ -74,7 +79,7 @@ object ModelCallHandler {
       ins =>
         newfacts ++= paramValues.map{p=>(FieldSlot(ins, "[|java:util:HashSet.items|]"), p)}
     }
-	  newfacts
+	  newfacts 
 	}
   
   private def getHashSetFieldFactToRet(s : ISet[ReachingFactsAnalysis.RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] ={
@@ -622,35 +627,46 @@ object ModelCallHandler {
 	  	  
 	  p.getSignature match{
 	    case "[|Ljava/lang/Object;.getClass:()Ljava/lang/Class;|]" =>
-	      // algo:thisvalue.foreach {ins => create a java:lang:Class instance cIns with defSite same as that of ins
-	               // above action gives us instance cIns
-	               // then, create two facts (a) (retVarSlot, Set(cIns)), (b) ([cIns, "[|java:lang:Class.name|]"], concreteString(ins.typ))}
+	      // algo:thisvalue.foreach {ins => set insRec's classObj field with a classIns whose type is java:lang:Class and name is same as ins's type
+	               // then, create two facts (a) (retVarSlot, insRec.classObj), (b) ([insRec.classObj, "[|java:lang:Class.name|]"], concreteString(ins.typ))}
 	      
 	      require(args.size > 0)
-        val thisSlot = VarSlot(args(0))
+          val thisSlot = VarSlot(args(0))
 	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
 	      thisValue.foreach{
 	        ins =>
-	          val cIns = RFAInstance(new NormalType("[|java:lang:Class|]"), ins.getDefSite)
-	          newFacts += ((VarSlot(retVarOpt.get), cIns))
-	          val strIns = RFAConcreteStringInstance(ins.typ.typ, ins.getDefSite)
-	          newFacts += ((FieldSlot(cIns, "[|java:lang:Class.name|]"), strIns))
+	          require(Center.hasRecord(ins.getType.typ))
+	          val insRec = Center.getRecord(ins.getType.typ)
+	          newFacts += ((VarSlot(retVarOpt.get), insRec.getClassObj))
+	          val strIns = RFAConcreteStringInstance(insRec.getClassObj.getName, insRec.getClassObj.getDefSite)
+	          newFacts += ((FieldSlot(insRec.getClassObj, "[|java:lang:Class.name|]"), strIns))
 	      }
 	      
 	      
 	    case "[|Ljava/lang/Class;.getNameNative:()Ljava/lang/String;|]" =>
-	      // algo:thisValue.foreach.{ cIns => get value of fieldSlot(cIns,"[|java:lang:Class.name|]") and create fact (retVar, value)}
+	      // algo:thisValue.foreach.{ cIns => get value of (cIns.name|]") and create fact (retVar, value)}
 	      require(args.size > 0)
-        val thisSlot = VarSlot(args(0))
+          val thisSlot = VarSlot(args(0))
 	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
 	      thisValue.foreach{
 	        cIns =>
-	          val fieldValue = factMap.getOrElse(FieldSlot(cIns, "[|java:lang:Class.name|]"), isetEmpty)
-              if(!fieldValue.isEmpty) 
-               newFacts ++= fieldValue.map(v => (VarSlot(retVarOpt.get), v))
+	          require(cIns.isInstanceOf[ClassInstance])
+	          val name = cIns.asInstanceOf[ClassInstance].getName
+	          val strIns = RFAConcreteStringInstance(name, cIns.getDefSite)
+              newFacts += ((VarSlot(retVarOpt.get), strIns))
 	      }
 	    case _ =>
 	  }
+	  s ++ newFacts
+	}
+	
+  private def doSpecialCall(s : ISet[ReachingFactsAnalysis.RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] = {
+	  var newFacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
+      val rec = p.getDeclaringRecord   
+      require(Center.hasRecord(rec.getName))     
+      newFacts += ((VarSlot(retVarOpt.get), rec.getClassObj))
+      val strIns = RFAConcreteStringInstance(rec.getClassObj.getName, rec.getClassObj.getDefSite)
+      newFacts += ((FieldSlot(rec.getClassObj, "[|java:lang:Class.name|]"), strIns))	      
 	  s ++ newFacts
 	}
 	
