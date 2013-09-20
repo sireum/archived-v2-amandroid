@@ -16,7 +16,7 @@ import org.sireum.amandroid.xml.AndroidXStream
 import org.sireum.alir.AlirIntraProceduralGraph
 import org.sireum.amandroid.test.framework.TestFramework
 
-// sankar introduces the following framework which adds one stage on top of AmandroidParserTestFrameWork 
+// sankar introduces the following framework which adds one stage on top of  AmandroidParserTestFrameWork 
 
 trait AmandroidAnalyseAppFrameWork extends TestFramework { 
   

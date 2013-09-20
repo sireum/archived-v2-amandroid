@@ -33,13 +33,12 @@ class ReachingFactsAnalysisBuilder{
     val result = new InterProceduralMonotoneDataFlowAnalysisFramework().apply[ReachingFactsAnalysis.RFAFact](cg,
       entryPointProc, true, true, false, gen, kill, callr, iota, initial, switchAsOrderedMatch)
 
-//    print("RFA\n")
-//    print(result)
+    print("RFA\n")
+    print(result)
 //    val f1 = new File(System.getProperty("user.home") + "/Desktop/rfa.txt")
 //    val o1 = new FileOutputStream(f1)
 //    val w1 = new OutputStreamWriter(o1)
 //    w1.write(result.toString())
-
     (cg, result)
   }
 }
@@ -306,23 +305,23 @@ object ReachingFactsAnalysis {
 	          if(values.contains(i))
 	            result ++= values(i).map{v => (slot, v)}
 	      }
-	      values.foreach{
-	        case(i, value) =>
-	          value.foreach{
-	            ins=>
-	              if(ins.typ == NormalType("[|java:lang:Class|]", 0)){
-	                a.getValueAnnotation("classname") match{
-	                  case Some(exp) =>
-	                    require(exp.isInstanceOf[LiteralExp])
-	                    val nameStr = exp.asInstanceOf[LiteralExp].text
-	                    val newValue = RFAConcreteStringInstance(nameStr, currentContext)
-	                    val fieldSlot = FieldSlot(ins, "[|java:lang:Class.name|]")
-	                    result += ((fieldSlot, newValue))
-	                  case None =>
-	                }
-	              }
-	          }
-	      }
+//	      values.foreach{
+//	        case(i, value) =>
+//	          value.foreach{
+//	            ins=>
+//	              if(ins.typ == NormalType("[|java:lang:Class|]", 0)){
+//	                a.getValueAnnotation("classname") match{
+//	                  case Some(exp) =>
+//	                    require(exp.isInstanceOf[LiteralExp])
+//	                    val nameStr = exp.asInstanceOf[LiteralExp].text
+//	                    val newValue = RFAConcreteStringInstance(nameStr, currentContext)
+//	                    val fieldSlot = FieldSlot(ins, "[|java:lang:Class.name|]")
+//	                    result += ((fieldSlot, newValue))
+//	                  case None =>
+//	                }
+//	              }
+//	          }
+//	      }
       }
       result
     }

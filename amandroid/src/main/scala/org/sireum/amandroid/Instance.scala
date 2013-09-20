@@ -14,7 +14,15 @@ final case class PTAInstance(typ : Type, defSite : Context) extends Instance{
   override def toString : String = "PTAInst(name:" + this.typ + ".defsite:" + this.defSite + ")"
 }
 
+
+final case class ClassInstance(name: String, defSite : Context) extends Instance{
+  def typ = NormalType("[|java:lang:Class|]", 0)
+  def getName = name
+  override def toString : String = "ClassInst(classname:" + this.name + ".defsite:" + this.defSite + ")"
+}
+
 abstract class OFAInstance(typ : Type, defSite : Context) extends Instance{
+
   def copy : OFAInstance
   var fieldDefSiteRepo : Map[String, Map[Context, NormalValueSet]] = Map()
   var fieldLastDefSite : Map[String, Context] = Map()

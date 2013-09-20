@@ -162,6 +162,19 @@ object StringFormConverter {
     sig.substring(sig.lastIndexOf('.') + 1, sig.length() - 2)
   }
   
+   /**
+	 * get procedure signature from the owner record name and the procedure sub-signature. e.g. ( [|java:lang:Object|], equals:(Ljava/lang/Object;)Z ) -> [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|] 
+	 */
+  
+  def getSigFromOwnerAndProcSubSig(recordName: String, subSig : String) : String = {
+      if(!isValidType(recordName)) throw new RuntimeException("given type is not a valid form: " + recordName)
+      val recSig =  formatTypeToSigForm(recordName)
+	  val sb = new StringBuffer
+	  sb.append("[|" + recSig + "." + subSig + "|]")
+	  sb.toString().intern()
+  }
+  
+  
   /**
 	 * signature of the field. e.g. [|java:lang:Throwable.stackState|] or @@[|java:lang:Enum.sharedConstantsCache|]
 	 */
@@ -191,6 +204,18 @@ object StringFormConverter {
 	 */
 	
 	def generateFieldSignature(recordName : String, name : String) : String = {
+	  if(!isValidType(recordName)) throw new RuntimeException("given type is not a valid form: " + recordName)
+	  val sb = new StringBuffer
+	  sb.append(recordName.substring(0, recordName.length() - 2) + "." + name + "|]")
+	  sb.toString().intern()
+	}
+  
+	
+	  /**
+	 * generate a procedure full name from a record name and proc short name. input: ("[|java:lang:Throwable|]", "foo") output: "[|java:lang:Throwable.foo|]"
+	 */
+	
+	def generateProcName(recordName : String, name : String) : String = {
 	  if(!isValidType(recordName)) throw new RuntimeException("given type is not a valid form: " + recordName)
 	  val sb = new StringBuffer
 	  sb.append(recordName.substring(0, recordName.length() - 2) + "." + name + "|]")

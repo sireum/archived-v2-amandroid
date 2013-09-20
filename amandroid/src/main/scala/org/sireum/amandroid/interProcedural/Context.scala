@@ -58,7 +58,11 @@ class Context(var k : Int){
     var sb = new StringBuilder
     this.callStack.foreach{
       case(sig, str) =>
-        sb.append("(" + sig.substring(sig.lastIndexOf('.') + 1, sig.lastIndexOf(':')))
+        if(sig.lastIndexOf('.') > 0 && sig.lastIndexOf(':') > 0)
+          sb.append("(" + sig.substring(sig.lastIndexOf('.') + 1, sig.lastIndexOf(':')))
+        else
+          sb.append("(" + sig)
+          
         if(str.lastIndexOf('.') > 0)
         	sb.append("," + str.substring(sig.lastIndexOf('.') + 1, sig.lastIndexOf(':')) + ")")
         else sb.append("," + str + ")")
