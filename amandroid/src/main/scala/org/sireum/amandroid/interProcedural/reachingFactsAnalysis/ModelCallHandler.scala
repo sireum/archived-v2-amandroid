@@ -36,7 +36,7 @@ object ModelCallHandler {
   
   private def isHashSet(r : AmandroidRecord) : Boolean = r.getName == "[|java:util:HashSet|]"
   
-  private def isSpecial(p : AmandroidProcedure) : Boolean = p.getShortName == "class"
+  private def isSpecial(p : AmandroidProcedure) : Boolean = p.getShortName == "class" // this represents const-class bytecode operation
     
   private def isNativeCall(p : AmandroidProcedure) : Boolean = p.isNative
 	
@@ -48,7 +48,7 @@ object ModelCallHandler {
 	  if(isString(r)) doStringCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(isStringBuilder(r)) doStringBuilderCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(isHashSet(r)) doHashSetCall(s, calleeProc, args, retVarOpt, currentContext)
-	  else if(isSpecial(calleeProc)) doSpecialCall(s, calleeProc, args, retVarOpt, currentContext)
+	  else if(isSpecial(calleeProc)) doSpecialCall(s, calleeProc, retVarOpt)
 	  else if(isNativeCall(calleeProc)) doNativeCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(InterComponentCommunicationModel.isIccOperation(calleeProc)) InterComponentCommunicationModel.doIccCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else throw new RuntimeException("given callee is not a model call: " + calleeProc)
@@ -660,7 +660,7 @@ object ModelCallHandler {
 	  s ++ newFacts
 	}
 	
-  private def doSpecialCall(s : ISet[ReachingFactsAnalysis.RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] = {
+  private def doSpecialCall(s : ISet[ReachingFactsAnalysis.RFAFact], p : AmandroidProcedure, retVarOpt : Option[String]) : ISet[ReachingFactsAnalysis.RFAFact] = {
 	  var newFacts = isetEmpty[ReachingFactsAnalysis.RFAFact]
       val rec = p.getDeclaringRecord   
       require(Center.hasRecord(rec.getName))     

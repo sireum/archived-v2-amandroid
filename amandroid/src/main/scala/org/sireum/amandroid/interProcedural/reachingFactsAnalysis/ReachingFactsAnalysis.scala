@@ -240,23 +240,23 @@ object ReachingFactsAnalysis {
           if(values.contains(i))
             result ++= values(i).map{v => (slot, v)}
       }
-      values.foreach{
-        case(i, value) =>
-          value.foreach{
-            ins=>
-              if(ins.typ == NormalType("[|java:lang:Class|]", 0)){
-                a.getValueAnnotation("classname") match{
-                  case Some(exp) =>
-                    require(exp.isInstanceOf[LiteralExp])
-                    val nameStr = exp.asInstanceOf[LiteralExp].text
-                    val newValue = RFAConcreteStringInstance(nameStr, currentContext)
-                    val fieldSlot = FieldSlot(ins, "[|java:lang:Class.name|]")
-                    result += ((fieldSlot, newValue))
-                  case None =>
-                }
-              }
-          }
-      }
+//      values.foreach{
+//        case(i, value) =>
+//          value.foreach{
+//            ins=>
+//              if(ins.typ == NormalType("[|java:lang:Class|]", 0)){
+//                a.getValueAnnotation("classname") match{
+//                  case Some(exp) =>
+//                    require(exp.isInstanceOf[LiteralExp])
+//                    val nameStr = exp.asInstanceOf[LiteralExp].text
+//                    val newValue = RFAConcreteStringInstance(nameStr, currentContext)
+//                    val fieldSlot = FieldSlot(ins, "[|java:lang:Class.name|]")
+//                    result += ((fieldSlot, newValue))
+//                  case None =>
+//                }
+//              }
+//          }
+//      }
       //println("gen-->" + result)
       result
     }
