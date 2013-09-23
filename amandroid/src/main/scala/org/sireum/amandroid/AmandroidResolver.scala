@@ -193,7 +193,6 @@ object AmandroidResolver {
 	      val procSig = StringFormConverter.getSigFromOwnerAndProcSubSig(rec.getName, procSubSig)
 	      proc.init(procName, procSig)
 	      proc.setAccessFlags("STATIC")
-	      val ownerRecord = rec
 	      rec.addProcedure(proc)
 	  }
 	}

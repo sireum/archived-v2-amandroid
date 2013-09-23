@@ -1,10 +1,7 @@
 package org.sireum.amandroid.interProcedural.reachingFactsAnalysis
 
-import org.sireum.amandroid.Instance
 import org.sireum.amandroid.interProcedural.Context
-import org.sireum.amandroid.Type
-import org.sireum.amandroid.NormalType
-import org.sireum.amandroid.NullType
+import org.sireum.amandroid._
 
 abstract class RFAAbstractInstance extends Instance
 
@@ -19,9 +16,26 @@ final case class RFAInstance(typ : Type, defSite : Context) extends RFAAbstractI
   }
 }
 
+final case class RFATupleInstance(left : Instance, right : Instance, defSite : Context) extends RFAAbstractInstance{
+  def typ : Type = TupleType(left.typ, right.typ)
+  override def toString : String = {
+    val sb = new StringBuilder
+    sb.append("<")
+    sb.append(this.typ + ".")
+    sb.append(this.defSite.getCurrentLocUri)
+    sb.append(">")
+    sb.toString.intern()
+  }
+}
+
 final case class RFANullInstance(defSite : Context) extends RFAAbstractInstance{
   def typ : Type = new NullType
   override def toString : String = "Null" + "@" + defSite
+}
+
+final case class RFANativeInstance(defSite : Context) extends RFAAbstractInstance{
+  def typ : Type = new NullType
+  override def toString : String = "Native" + "@" + defSite
 }
 
 abstract class RFAAbstractStringInstance(defSite : Context) extends RFAAbstractInstance{

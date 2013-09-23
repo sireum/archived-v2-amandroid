@@ -21,3 +21,5 @@ final case class FieldSlot(ins : Instance, fieldName : String) extends HeapSlot(
 final case class ArraySlot(ins : Instance) extends HeapSlot(ins){
   override def toString = ins.toString
 }
+
+final case class RFAFact(s : Slot, v : Instance)

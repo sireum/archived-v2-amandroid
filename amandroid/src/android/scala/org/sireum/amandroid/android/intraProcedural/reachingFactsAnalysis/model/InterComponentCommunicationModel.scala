@@ -1,10 +1,8 @@
-package org.sireum.amandroid.android.interProcedural
+package org.sireum.amandroid.android.intraProcedural.reachingFactsAnalysis.model
 
 import org.sireum.amandroid.android.AndroidConstants
 import org.sireum.amandroid.Center
-import org.sireum.amandroid.util.StringFormConverter
 import org.sireum.util._
-import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysis
 import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.FieldSlot
@@ -13,6 +11,9 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.VarSlot
 import org.sireum.amandroid.android.parser.UriData
 import org.sireum.amandroid.android.AppCenter
 import org.sireum.amandroid.AmandroidRecord
+import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
+import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAFact
+import org.sireum.amandroid.Instance
 
 object InterComponentCommunicationModel {
 	def isIccOperation(proc : AmandroidProcedure) : Boolean = {
@@ -28,8 +29,8 @@ object InterComponentCommunicationModel {
     flag
   }
 	
-	def doIccCall(s : ISet[ReachingFactsAnalysis.RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[ReachingFactsAnalysis.RFAFact] = {
-	  val factMap = ReachingFactsAnalysis.getFactMap(s)
+	def doIccCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
+	  val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
 	  require(args.size > 1)
 	  val intentSlot = VarSlot(args(1))
 	  val intentValues = factMap.getOrElse(intentSlot, isetEmpty)
@@ -42,8 +43,8 @@ object InterComponentCommunicationModel {
 	  s
 	}
 	
-	def getExplicitTargets(s : ISet[ReachingFactsAnalysis.RFAFact], intentValues : ISet[ReachingFactsAnalysis.Value]) : ISet[AmandroidProcedure] = {
-	  val factMap = ReachingFactsAnalysis.getFactMap(s)
+	def getExplicitTargets(s : ISet[RFAFact], intentValues : ISet[Instance]) : ISet[AmandroidProcedure] = {
+	  val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
 	  var result : ISet[AmandroidProcedure] = isetEmpty
     intentValues.foreach{
       intentIns =>
@@ -68,8 +69,8 @@ object InterComponentCommunicationModel {
     result
   }
   
-  def getImplicitTargets(s : ISet[ReachingFactsAnalysis.RFAFact], intentValues : ISet[ReachingFactsAnalysis.Value]) : ISet[AmandroidProcedure] = {
-    val factMap = ReachingFactsAnalysis.getFactMap(s)
+  def getImplicitTargets(s : ISet[RFAFact], intentValues : ISet[Instance]) : ISet[AmandroidProcedure] = {
+    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
     var components : ISet[AmandroidRecord] = isetEmpty
     intentValues.foreach{
       intentIns =>

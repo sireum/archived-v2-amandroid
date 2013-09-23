@@ -14,8 +14,7 @@ import org.sireum.amandroid.Center
 import org.sireum.amandroid.AmandroidResolver
 import org.sireum.amandroid.interProcedural.callGraph.CallGraphBuilder
 import org.sireum.amandroid.test.framework.TestFramework
-import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysis
-import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysis
+import org.sireum.amandroid.android.intraProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 
 	/**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -52,13 +51,13 @@ trait ReachingFactsAnalysisTestFramework extends TestFramework {
     	val entryPoints = Center.getEntryPoints
     	entryPoints.foreach{
     	  ep =>
-    	    ReachingFactsAnalysis(ep)
+    	    AndroidReachingFactsAnalysis(ep)
     	}
     	
-//    	val r = Center.resolveRecord("[|java:util:HashSet|]", Center.ResolveLevel.BODIES)
+//    	val r = Center.resolveRecord("[|android:os:Parcel|]", Center.ResolveLevel.BODIES)
 //    	r.getProcedures.toSeq.sortBy(f => f.getSignature).foreach{
 //    	  p =>
-//    	    println("  case \"" + p.getSignature + "\" =>")
+//    	    println("  case \"" + p.getSignature + "\" =>  //" + p.getAccessFlagString)
 //    	}
     }
   }

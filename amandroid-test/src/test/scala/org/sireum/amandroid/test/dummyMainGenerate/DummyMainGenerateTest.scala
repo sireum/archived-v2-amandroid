@@ -17,7 +17,7 @@ class DummyMainGenerateTest extends DummyMainGenerateTestFramework {
   AmandroidCodeSource.preLoad
   //println(DummyMainGenerateExamples.apkModelFiles)
 	DummyMainGenerateExamples.apkModelFiles.
-  filter { s => s.endsWith("ExplicitTargetICC.apk") }.
+  filter { s => s.endsWith("68ac.apk") }.
   foreach { fileUri =>
     Analyzing title fileUri file fileUri
   }

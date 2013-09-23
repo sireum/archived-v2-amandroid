@@ -119,7 +119,8 @@ class CallGraphBuilder {
           wholeProgram : Boolean) = {
     entryPoints.foreach{
 		  ep =>
-      	doPTA(ep, pag, cg, wholeProgram)
+		    if(ep.getProcedureBody != null)
+		    	doPTA(ep, pag, cg, wholeProgram)
     }
   }
   

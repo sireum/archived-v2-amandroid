@@ -14,7 +14,7 @@ import org.sireum.amandroid.Center
 class ReachingFactsAnalysisTest extends ReachingFactsAnalysisTestFramework {
   AmandroidCodeSource.preLoad
   InterproceduralExamples.ofgModelFiles.
-    filter { s => s.endsWith("nativeModelTest4.pilar") }.
+    filter { s => s.endsWith("WfgNpAction.pilar") }.
     foreach { fileUri =>
       Analyzing title fileUri file fileUri
     }

@@ -339,6 +339,12 @@ class AmandroidProcedure {
 	def getAccessFlags = accessFlags
 	
 	/**
+	 * get access flag string
+	 */
+	
+	def getAccessFlagString = AccessFlag.toString(getAccessFlags)
+	
+	/**
 	 * sets the access flags for this procedure
 	 */
 	
@@ -565,7 +571,7 @@ class AmandroidProcedure {
     println("subSignature: " + getSubSignature)
     println("declaringRecord: " + getDeclaringRecord)
     println("paramTypes: " + getParamTypes)
-    println("accessFlags: " + AccessFlag.toString(getAccessFlags))
+    println("accessFlags: " + getAccessFlagString)
     println("----------------------------")
   }
   
