@@ -54,7 +54,7 @@ trait ModelCallHandler {
     require(Center.hasRecord(rec.getName))     
     newFacts += (RFAFact(VarSlot(retVarOpt.get), rec.getClassObj))
     val strIns = RFAConcreteStringInstance(rec.getClassObj.getName, rec.getClassObj.getDefSite)
-    newFacts += (RFAFact(FieldSlot(rec.getClassObj, "[|java:lang:Class.name|]"), strIns))	      
+    newFacts += (RFAFact(FieldSlot(rec.getClassObj, "[|java:lang:Class.name|]"), strIns))	 
 	  s ++ newFacts
 	}
 }

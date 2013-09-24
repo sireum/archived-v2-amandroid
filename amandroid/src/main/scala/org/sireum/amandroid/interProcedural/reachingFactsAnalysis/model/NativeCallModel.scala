@@ -39,6 +39,7 @@ object NativeCallModel {
 	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
 	      thisValue.foreach{
 	        cIns =>
+	          println(cIns + " " + cIns.getClass())
 	          require(cIns.isInstanceOf[ClassInstance])
 	          val name = cIns.asInstanceOf[ClassInstance].getName
 	          val strIns = RFAConcreteStringInstance(name, cIns.getDefSite)

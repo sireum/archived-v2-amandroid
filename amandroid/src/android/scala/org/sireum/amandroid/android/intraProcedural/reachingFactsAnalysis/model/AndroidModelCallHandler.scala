@@ -24,7 +24,10 @@ object AndroidModelCallHandler extends ModelCallHandler{
 	  val r = calleeProc.getDeclaringRecord
 	  FragmentManagerImplModel.isFragmentManagerImpl(r) ||
 	  BundleModel.isBundle(r) ||
+	  HandlerModel.isHandler(r) ||
+	  LifecycleMethodModel.isLifecycleMethod(calleeProc) ||
 	  InterComponentCommunicationModel.isIccOperation(calleeProc) ||
+	  BypassedMethodsModel.isBypassedMethods(calleeProc) ||
 	  super.isModelCall(calleeProc)
   }
   
@@ -35,7 +38,10 @@ object AndroidModelCallHandler extends ModelCallHandler{
 	  val r = calleeProc.getDeclaringRecord
 	  if(FragmentManagerImplModel.isFragmentManagerImpl(r)) FragmentManagerImplModel.doFragmentManagerImplCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(BundleModel.isBundle(r)) BundleModel.doBundleCall(s, calleeProc, args, retVarOpt, currentContext)
+	  else if(HandlerModel.isHandler(r)) HandlerModel.doHandlerCall(s, calleeProc, args, retVarOpt, currentContext)
+	  else if(LifecycleMethodModel.isLifecycleMethod(calleeProc)) LifecycleMethodModel.doLifecycleMethodCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(InterComponentCommunicationModel.isIccOperation(calleeProc)) InterComponentCommunicationModel.doIccCall(s, calleeProc, args, retVarOpt, currentContext)
+	  else if(BypassedMethodsModel.isBypassedMethods(calleeProc)) BypassedMethodsModel.doBypass(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(super.isModelCall(calleeProc)) super.doModelCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else throw new RuntimeException("given callee is not a model call: " + calleeProc)
 	}
