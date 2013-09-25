@@ -54,7 +54,7 @@ trait ReachingFactsAnalysisTestFramework extends TestFramework {
     	    AndroidReachingFactsAnalysis(ep)
     	}
     	
-//    	val r = Center.resolveRecord("[|android:os:Handler|]", Center.ResolveLevel.BODIES)
+//    	val r = Center.resolveRecord("[|android:content:ComponentName|]", Center.ResolveLevel.BODIES)
 //    	r.getProcedures.toSeq.sortBy(f => f.getSignature).foreach{
 //    	  p =>
 //    	    println("  case \"" + p.getSignature + "\" =>  //" + p.getAccessFlagString)

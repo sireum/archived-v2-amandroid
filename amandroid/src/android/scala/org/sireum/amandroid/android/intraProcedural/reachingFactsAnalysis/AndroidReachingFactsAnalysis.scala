@@ -165,6 +165,34 @@ object AndroidReachingFactsAnalysis {
     result
   }
   
+  protected def checkRHSs(rhss : List[Exp], s : ISet[RFAFact]) : Boolean = {
+    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+    var result = true
+    rhss.foreach{
+      key=>
+        key match{
+          case ae : AccessExp =>
+            val fieldName = ae.attributeName.name
+            val baseSlot = ae.exp match {
+              case ne : NameExp => VarSlot(ne.name.name)
+              case _ => throw new RuntimeException("Wrong exp: " + ae.exp)
+            }
+            val baseValue : ISet[Instance] = factMap.getOrElse(baseSlot, null)
+            if(baseValue != null) result = false
+          case ie : IndexingExp =>
+            val baseSlot = ie.exp match {
+              case ine : NameExp =>
+                VarSlot(ine.name.name)
+              case _ => throw new RuntimeException("Wrong exp: " + ie.exp)
+            }
+            val baseValue : ISet[Instance] = factMap.getOrElse(baseSlot, null)
+            if(baseValue != null) result = false
+          case _ => result = false
+        }
+    }
+    result
+  }
+  
   protected def processRHSs(rhss : List[Exp], s : ISet[RFAFact], currentContext : Context) : Map[Int, Set[Instance]] = {
     val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
     val result = mmapEmpty[Int, Set[Instance]]
@@ -366,11 +394,17 @@ object AndroidReachingFactsAnalysis {
       var result = s
       val lhss = getLHSs(a)
       val slotsWithMark = processLHSs(lhss, s).values.toSet
-      for (rdf @ RFAFact(slot, _) <- s) {
-        //if it is a strong definition, we can kill the existing definition
-        if (slotsWithMark.contains(slot, true)) {
-          result = result - rdf
-        }
+      val rhss = getRHSs(a)
+      val stop = checkRHSs(rhss, s)
+      if(stop){
+        result = isetEmpty
+      } else {
+	      for (rdf @ RFAFact(slot, _) <- s) {
+	        //if it is a strong definition, we can kill the existing definition
+	        if (slotsWithMark.contains(slot, true)) {
+	          result = result - rdf
+	        }
+	      }
       }
       result
     }

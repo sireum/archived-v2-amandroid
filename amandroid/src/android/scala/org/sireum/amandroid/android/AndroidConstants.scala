@@ -14,7 +14,8 @@ object AndroidConstants {
 	final val INTENT_ACTION  = "[|android:content:Intent.mAction|]"
 	final val INTENT_MTYPE  = "[|android:content:Intent.mType|]"
 	final val INTENT_URI_DATA = "[|android:content:Intent.mData|]"
-	final val INTENT_CATEGORY = "[|android:content:Intent.mCategory|]"
+	final val INTENT_CATEGORY = "[|android:content:Intent.mCategories|]"
+	final val COMPONENTNAME_PACKAGE = "[|android:content:ComponentName.mPackage|]"
 	final val COMPONENTNAME_CLASS = "[|android:content:ComponentName.mClass|]"
 	final val URI_STRING_URI = "[|android:net:Uri$StringUri|]"
 	final val URI_STRING_URI_URI_STRING = "[|android:net:Uri$StringUri.uriString|]"  
@@ -24,4 +25,21 @@ object AndroidConstants {
 	final val CONTEXT_WRAPPER = "[|android:content:ContextWrapper|]"
 	private final val iccMethods = List(START_SERVICE, SEND_BROADCAST, START_ACTIVITY)
 	def getIccMethods() : List[String] = iccMethods
+	
+	final val WINDOW_SERVICE = "window"
+	final val LAYOUT_INFLATER_SERVICE = "layout_inflater"
+	final val ACTIVITY_SERVICE = "activity"
+	final val POWER_SERVICE = "power"
+	final val ALARM_SERVICE = "alarm"
+	final val NOTIFICATION_SERVICE = "notification"
+	final val KEYGUARD_SERVICE = "keyguard"
+	final val LOCATION_SERVICE = "location"
+	final val SEARCH_SERVICE = "search"
+	final val VIBRATOR_SERVICE = "vibrator"
+	final val CONNECTIVITY_SERVICE = "connection"
+	final val WIFI_SERVICE = "wifi"
+	final val INPUT_METHOD_SERVICE = "input_method"
+	final val UI_MODE_SERVICE = "uimode"
+	final val DOWNLOAD_SERVICE = "download"
+	
 }

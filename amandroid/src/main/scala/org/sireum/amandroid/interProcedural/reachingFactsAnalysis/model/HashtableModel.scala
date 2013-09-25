@@ -36,8 +36,7 @@ object HashtableModel {
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
 	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
-	  val strValue = thisValue.map{ins => factMap(FieldSlot(ins, "[|java:util:Hashtable.entrys|]"))}.reduce(iunion[Instance])
-	  strValue.map{s => RFAFact(VarSlot(retVar), s)}
+	  thisValue.map{s => RFAFact(VarSlot(retVar), s.clone(currentContext))}
   }
 	
 	private def getHashTableEntrySetFactToRet(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={

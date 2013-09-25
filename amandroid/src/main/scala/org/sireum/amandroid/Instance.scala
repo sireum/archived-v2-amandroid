@@ -8,14 +8,17 @@ abstract class Instance{
   def getType = typ
   def defSite : Context
   def getDefSite = defSite
+  def clone(newDefSite : Context) : Instance
 }
 
 final case class PTAInstance(typ : Type, defSite : Context) extends Instance{
+  override def clone(newDefSite : Context) : Instance = PTAInstance(typ, newDefSite)
   override def toString : String = "PTAInst(name:" + this.typ + ".defsite:" + this.defSite + ")"
 }
 
 
 final case class ClassInstance(name: String, defSite : Context) extends Instance{
+  override def clone(newDefSite : Context) : Instance = ClassInstance(name, newDefSite)
   def typ = NormalType("[|java:lang:Class|]", 0)
   def getName = name
   override def toString : String = "ClassInst(classname:" + this.name + ".defsite:" + this.defSite + ")"
@@ -76,6 +79,7 @@ abstract class OFAInstance(typ : Type, defSite : Context) extends Instance{
 }
 
 final case class OFAStringInstance(typ : Type, var defSite : Context, var k : Int) extends OFAInstance(typ, defSite){
+  override def clone(newDefSite : Context) : Instance = OFAStringInstance(typ, newDefSite, k)
   override def copy : OFAStringInstance  = {
     val clone = new OFAStringInstance(typ, defSite, k)
     this.fieldDefSiteRepo foreach{
@@ -135,6 +139,7 @@ final case class OFAStringInstance(typ : Type, var defSite : Context, var k : In
 }
 
 final case class OFARegClassInstance(typ : Type, defSite : Context) extends OFAInstance(typ, defSite){
+  override def clone(newDefSite : Context) : Instance = OFARegClassInstance(typ, newDefSite)
   override def copy : OFARegClassInstance  = {
     val clone = new OFARegClassInstance(typ, defSite)
     this.fieldDefSiteRepo foreach{

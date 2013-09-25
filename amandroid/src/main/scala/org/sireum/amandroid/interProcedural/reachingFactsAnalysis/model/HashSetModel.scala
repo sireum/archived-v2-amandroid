@@ -46,7 +46,7 @@ object HashSetModel {
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
 	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
-	  thisValue.map{s => RFAFact(VarSlot(retVar), s)}
+	  thisValue.map{s => RFAFact(VarSlot(retVar), s.clone(currentContext))}
   }
   
   def doHashSetCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {

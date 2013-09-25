@@ -25,9 +25,10 @@ object AndroidModelCallHandler extends ModelCallHandler{
 	  FragmentManagerImplModel.isFragmentManagerImpl(r) ||
 	  BundleModel.isBundle(r) ||
 	  HandlerModel.isHandler(r) ||
+	  ComponentNameModel.isComponentName(r) ||
 	  LifecycleMethodModel.isLifecycleMethod(calleeProc) ||
 	  InterComponentCommunicationModel.isIccOperation(calleeProc) ||
-	  BypassedMethodsModel.isBypassedMethods(calleeProc) ||
+	  FrameworkMethodsModel.isFrameworkMethods(calleeProc) ||
 	  super.isModelCall(calleeProc)
   }
   
@@ -39,9 +40,10 @@ object AndroidModelCallHandler extends ModelCallHandler{
 	  if(FragmentManagerImplModel.isFragmentManagerImpl(r)) FragmentManagerImplModel.doFragmentManagerImplCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(BundleModel.isBundle(r)) BundleModel.doBundleCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(HandlerModel.isHandler(r)) HandlerModel.doHandlerCall(s, calleeProc, args, retVarOpt, currentContext)
+	  else if(ComponentNameModel.isComponentName(r)) ComponentNameModel.doComponentNameCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(LifecycleMethodModel.isLifecycleMethod(calleeProc)) LifecycleMethodModel.doLifecycleMethodCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(InterComponentCommunicationModel.isIccOperation(calleeProc)) InterComponentCommunicationModel.doIccCall(s, calleeProc, args, retVarOpt, currentContext)
-	  else if(BypassedMethodsModel.isBypassedMethods(calleeProc)) BypassedMethodsModel.doBypass(s, calleeProc, args, retVarOpt, currentContext)
+	  else if(FrameworkMethodsModel.isFrameworkMethods(calleeProc)) FrameworkMethodsModel.doFrameworkMethodsModelCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(super.isModelCall(calleeProc)) super.doModelCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else throw new RuntimeException("given callee is not a model call: " + calleeProc)
 	}
