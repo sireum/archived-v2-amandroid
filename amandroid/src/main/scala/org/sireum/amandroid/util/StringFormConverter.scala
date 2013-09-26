@@ -14,7 +14,7 @@ object StringFormConverter {
   
   def getRecordNameFromProcedureSignature(sig : String) : String = {
     val typ = getRecordTypeFromProcedureSignature(sig)
-    typ.typ
+    typ.name
   }
   
   /**
@@ -64,7 +64,7 @@ object StringFormConverter {
   
   def formatTypeToSigForm(typ : String) : String = {
     if(!isValidType(typ)) throw new RuntimeException("wrong type: " + typ)
-    val t = getDimensionsAndRemoveArrayFromType(typ)
+    val t = getTypeFromName(typ)
     val d = t.dimensions
     t.typ match{
       case "[|byte|]" => 		getTypeSig("B", d)
@@ -120,10 +120,10 @@ object StringFormConverter {
    * input: "[|java:lang:String|][]"  output: ("[|java:lang:String|]", 1)
    */
   
-  def getDimensionsAndRemoveArrayFromType(typ : String) : Type = {
-    if(!isValidType(typ)) throw new RuntimeException("wrong type: " + typ)
+  def getTypeFromName(name : String) : Type = {
+    if(!isValidType(name)) throw new RuntimeException("wrong type: " + name)
     var d : Int = 0
-    var tmp = typ
+    var tmp = name
     while(tmp.endsWith("[]")){
       d += 1
       tmp = tmp.substring(0, tmp.length() - 2)

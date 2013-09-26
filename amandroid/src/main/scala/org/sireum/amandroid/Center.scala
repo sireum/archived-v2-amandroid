@@ -97,7 +97,13 @@ object Center {
    * return whether given type is java primitive type
    */
   
-  def isJavaPrimitiveType(typ : Type) : Boolean = this.JAVA_PRIMITIVE_TYPES.contains(typ.typ)
+  def isJavaPrimitiveType(typ : Type) : Boolean = !typ.isArray && this.JAVA_PRIMITIVE_TYPES.contains(typ.typ)
+  
+  /**
+   * return whether given type is java primitive type
+   */
+  
+  def isJavaPrimitiveType(name : String) : Boolean = this.JAVA_PRIMITIVE_TYPES.contains(name)
 	
 	/**
 	 * set application info
@@ -455,9 +461,13 @@ object Center {
     if(ar.isInCenter) throw new RuntimeException("already in center: " + ar.getName)
     if(containsRecord(ar.getName)) throw new RuntimeException("duplicate record: " + ar.getName)
     this.records += ar
-    AmandroidCodeSource.getCodeType(ar.getName) match{
-      case AmandroidCodeSource.CodeType.APP => ar.setApplicationRecord
-      case AmandroidCodeSource.CodeType.LIBRARY => ar.setLibraryRecord
+    if(ar.isArray){
+      ar.setLibraryRecord
+    } else {
+	    AmandroidCodeSource.getCodeType(ar.getName) match{
+	      case AmandroidCodeSource.CodeType.APP => ar.setApplicationRecord
+	      case AmandroidCodeSource.CodeType.LIBRARY => ar.setLibraryRecord
+	    }
     }
     this.nameToRecord += (ar.getName -> ar)
     ar.setInCenter(true)

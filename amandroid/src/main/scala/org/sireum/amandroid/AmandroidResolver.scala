@@ -111,11 +111,41 @@ object AmandroidResolver {
    */
   
   def forceResolveToBodies(recordName : String) : AmandroidRecord = {
-    val code = AmandroidCodeSource.getRecordCode(recordName)
-    val st = Transform.getSymbolResolveResult(Set(code))
-    Center.tryRemoveRecord(recordName)
-    resolveFromST(st, false)
+    val typ = StringFormConverter.getTypeFromName(recordName)
+    if(typ.isArray){
+      resolveArrayRecord(typ)
+    } else {
+	    val code = AmandroidCodeSource.getRecordCode(recordName)
+	    val st = Transform.getSymbolResolveResult(Set(code))
+	    Center.tryRemoveRecord(recordName)
+	    resolveFromST(st, false)
+    }
     Center.getRecord(recordName)
+  }
+  
+  /**
+   * resolve array record
+   */
+  
+  def resolveArrayRecord(typ : Type) : Unit = {
+    val recName = typ.name
+    val recAccessFlag =	
+      if(Center.isJavaPrimitiveType(typ.typ)){
+      	"FINAL_PUBLIC"
+	    } else {
+	      val base = Center.resolveRecord(typ.typ, Center.ResolveLevel.BODIES)
+	      val baseaf = base.getAccessFlagString
+	      if(baseaf.contains("FINAL")) baseaf else "FINAL_" + baseaf
+	    }
+    val rec : AmandroidRecord = new AmandroidRecord
+    rec.init(recName)
+    rec.setAccessFlags(recAccessFlag)
+    rec.addNeedToResolveExtends(Set(Center.DEFAULT_TOPLEVEL_OBJECT))
+    if(Center.isInnerClassName(recName)) rec.needToResolveOuterName = Some(Center.getOuterNameFrom(recName))
+    rec.setResolvingLevel(Center.ResolveLevel.BODIES)
+    Center.addRecord(rec)
+	  if(GlobalConfig.mode >= Mode.WHOLE_PROGRAM_TEST) Center.resolveRecordsRelationWholeProgram
+	  else Center.resolveRecordsRelation
   }
     
   /**

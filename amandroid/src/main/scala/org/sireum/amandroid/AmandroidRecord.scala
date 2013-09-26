@@ -15,13 +15,13 @@ import org.sireum.amandroid.interProcedural.Context
 class AmandroidRecord {
   
   /**
-   * name is with this style: [|java:lang:Object|]
+   * name is with this style: [|java:lang:Object|] or [|java:lang:Object|][]
    */
   
   protected var name : String = null
   
   /**
-   * shortName is with this style: Object
+   * shortName is with this style: Object or Object[]
    */
   
   protected var shortName : String = null
@@ -171,6 +171,12 @@ class AmandroidRecord {
   def init(name : String) : AmandroidRecord = init(name, 0)
   
   /**
+   * if the amandroidrecord is array type return true
+   */
+  
+  def isArray : Boolean = getName.contains("[]")
+  
+  /**
    * parse the given record name to get the short name and the package name.
    */
   
@@ -178,11 +184,21 @@ class AmandroidRecord {
     this.name = name
     val index = name.lastIndexOf(':')
     if(index > 0){
-      this.shortName = name.substring(index + 1, name.length() - 2)
-      this.packageName = name.substring(2, index)
+      if(isArray){
+        this.shortName = name.substring(index + 1, name.lastIndexOf("|]")) + name.substring(name.indexOf("[]"), name.length())
+        this.packageName = null
+      } else {
+	      this.shortName = name.substring(index + 1, name.length() - 2)
+	      this.packageName = name.substring(2, index)
+      }
     } else {
-      this.shortName = name.substring(2, name.length() - 2)
-      this.packageName = ""
+      if(isArray){
+        this.shortName = name.substring(2, name.lastIndexOf("|]")) + name.substring(name.indexOf("[]"), name.length())
+        this.packageName = null
+      } else {
+	      this.shortName = name.substring(2, name.length() - 2)
+	      this.packageName = ""
+      }
     }
   }
   
@@ -221,6 +237,12 @@ class AmandroidRecord {
 	 */
 	
 	def getAccessFlags = accessFlags
+	
+	/**
+	 * return the access flags for this record
+	 */
+	
+	def getAccessFlagString = AccessFlag.toString(getAccessFlags)
 	
 	/**
 	 * sets the access flags for this record
@@ -722,7 +744,7 @@ class AmandroidRecord {
     println("superClass: " + tryGetSuperClass)
     println("outerClass: " + tryGetOuterClass)
     println("interfaces: " + getInterfaces)
-    println("accessFlags: " + AccessFlag.toString(getAccessFlags))
+    println("accessFlags: " + getAccessFlagString)
     println("isInCenter: " + isInCenter)
     println("fields: " + getFields)
     println("procedures: " + getProcedures)

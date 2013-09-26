@@ -306,6 +306,7 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
 //            false
 //        }
 //      }
+      
 
       protected def visitForward(
         l : LocationDecl,
@@ -471,6 +472,7 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
 //        if (forward) visitForward(l, esl)
 //        else visitBackward(l, esl)
         visitForward(l, pst, callerContext, esl)
+
       
       def entries(n : N, callerContext : Context, esl : EntrySetListener[LatticeElement]) = {
         n match {
@@ -521,8 +523,8 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
 	          val l = cn.getOwnerPST.location(cn.getLocIndex)
 	          require(cg.isCall(l))
 	          val cj = l.asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump]
-	          val s = getEntrySet(cn)
 	          val callerContext = cn.getContext
+	          val s = getEntrySet(cn) ++ gen(getEntrySet(cn), cj, callerContext)
 	          val (calleeSet, ignore_mode) = callr.getCalleeSet(s, cj, callerContext)
 	          val (factsForCallee, factsForReturn) = callr.getFactsForCalleeAndReturn(s, cj)
 	          calleeSet foreach{
@@ -550,35 +552,20 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
 			            processed += ((callee, callerContext))
 	              }
 	          }
-	          if(ignore_mode){
-		          for (succ <- cg.successors(n)) {
-		            succ match{
-		              case en : CGEntryNode =>
-		                val newCalleeFacts = callr.mapFactsToCallee(factsForCallee, cj, en.getOwnerPST.procedure)
-		                if(imdaf.update(confluence(getEntrySet(en),newCalleeFacts), en)){
-		                	workList += succ
-		                	//println("from cgcallnode to cgentrynode!")
-		                }
-		              case rn : CGReturnNode =>
-		                imdaf.update(kill(s, cj, rn.getContext).union(getEntrySet(rn)), rn)
-		                workList += succ
-		              case a => throw new RuntimeException("unexpected node type: " + a)
-		            }
-		          }
-	          } else {
-	            for (succ <- cg.successors(n)) {
-		            succ match{
-		              case en : CGEntryNode =>
-		                val newCalleeFacts = callr.mapFactsToCallee(factsForCallee, cj, en.getOwnerPST.procedure)
-		                if(imdaf.update(confluence(getEntrySet(en),newCalleeFacts), en)){
-		                	workList += succ
-		                	//println("from cgcallnode to cgentrynode!")
-		                }
-		              case rn : CGReturnNode =>
-		                imdaf.update(kill(factsForReturn, cj, rn.getContext).union(getEntrySet(rn)), rn)
-		              case a => throw new RuntimeException("unexpected node type: " + a)
-		            }
-		          }
+	          for (succ <- cg.successors(n)) {
+	            succ match{
+	              case en : CGEntryNode =>
+	                val newCalleeFacts = callr.mapFactsToCallee(factsForCallee, cj, en.getOwnerPST.procedure)
+	                if(imdaf.update(confluence(getEntrySet(en),newCalleeFacts), en)){
+	                	workList += succ
+	                	//println("from cgcallnode to cgentrynode!")
+	                }
+	              case rn : CGReturnNode =>
+	                imdaf.update(kill(s, cj, rn.getContext).union(getEntrySet(rn)), rn)
+	                if(ignore_mode)
+	                	workList += succ
+	              case a => throw new RuntimeException("unexpected node type: " + a)
+	            }
 	          }
 	        case rn : CGReturnNode =>
 	          for (succ <- cg.successors(n)) {
