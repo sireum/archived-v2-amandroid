@@ -160,6 +160,36 @@ object AndroidReachingFactsAnalysis {
     processHierarchy(rec, s)
   }
   
+  protected def getFieldsFacts(rhss : List[Exp], s : ISet[RFAFact], currentContext : Context) : ISet[RFAFact] = {
+    var result = isetEmpty[RFAFact]
+    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+    rhss.foreach{
+      rhs =>
+        rhs match{
+      	  case ne : NewExp =>
+      	    var recName : ResourceUri = ""
+            var dimensions = 0
+            ne.typeSpec match {
+              case nt : NamedTypeSpec => 
+                dimensions = ne.dims.size + ne.typeFragments.size
+                recName = nt.name.name
+              case _ =>
+            }
+      	    val typ = NormalType(recName, dimensions)
+      	    val rec = Center.resolveRecord(typ.name, Center.ResolveLevel.BODIES)
+      	    val ins = 
+	            if(recName == "[|java:lang:String|]" && dimensions == 0){
+	              RFAConcreteStringInstance("", currentContext.copy)
+	            } else {
+	              RFAInstance(typ, currentContext.copy)
+	            }
+      	    result ++= rec.getFields.map(f=>RFAFact(FieldSlot(ins, f.getSignature), RFANullInstance(currentContext)))
+      	  case _ =>
+        }
+    }
+    result
+  }
+  
   /**
    * A.<clinit>() will be called under four kinds of situation: v0 = new A, A.f = v1, v2 = A.f, and A.foo()>
    * v0 = new B, and B is descendant of A.
@@ -414,11 +444,13 @@ object AndroidReachingFactsAnalysis {
 	      val lhss = getLHSs(a)		      
 	      val slots = processLHSs(lhss, s, currentContext)
 	      val rhss = getRHSs(a)
-	      val newFacts = getClinitCallFacts(lhss, rhss, a, s, currentContext)
-	      result ++= newFacts
-	      val values = processRHSs(rhss, s ++ newFacts, currentContext)
+	      val fieldsFacts = getFieldsFacts(rhss, s, currentContext)
+	      result ++= fieldsFacts
+	      val clinitFacts = getClinitCallFacts(lhss, rhss, a, s, currentContext)
+	      result ++= clinitFacts
+	      val values = processRHSs(rhss, s ++ clinitFacts, currentContext) 
 	      slots.foreach{
-	        case(i, (slot, isStrong)) =>
+	        case(i, (slot, _)) =>
 	          if(values.contains(i))
 	            result ++= values(i).map{v => RFAFact(slot, v)}
 	      }
