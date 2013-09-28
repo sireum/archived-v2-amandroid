@@ -119,7 +119,7 @@ class CallGraphBuilder {
           wholeProgram : Boolean) = {
     entryPoints.foreach{
 		  ep =>
-		    if(ep.getProcedureBody != null)
+		    if(ep.hasProcedureBody)
 		    	doPTA(ep, pag, cg, wholeProgram)
     }
   }
@@ -283,10 +283,14 @@ class CallGraphBuilder {
       case Some(pi) =>
         val callerContext : Context = node.getContext
         val calleeSet : MSet[AmandroidProcedure] = msetEmpty
-        if(pi.typ.equals("direct") || pi.typ.equals("super")){
+        if(pi.typ.equals("direct")){
           calleeSet += pag.getDirectCallee(pi)
+        } else if(pi.typ.equals("super")){
+          calleeSet ++= pag.getSuperCalleeSet(d, pi)
+        } else if(pi.typ.equals("static")){
+          calleeSet += pag.getStaticCallee(pi)
         } else {
-          calleeSet ++= pag.getCalleeSet(d, pi)
+          calleeSet ++= pag.getVirtualCalleeSet(d, pi)
         }
         
         calleeSet.foreach(
@@ -386,7 +390,7 @@ class CallGraphBuilder {
       if(!pag.isModelOperation(calleeSig))
 //         !ofg.isIccOperation(calleeSig, androidLibInfoTables))
       {
-        val callerProc = Center.getProcedure(pi.owner)
+        val callerProc = Center.getProcedureWithoutFailing(pi.owner)
         cg.setCallMap(callerProc, calleeProc)
       	cg.extendGraph(calleeSig, callerContext.copy)
       }

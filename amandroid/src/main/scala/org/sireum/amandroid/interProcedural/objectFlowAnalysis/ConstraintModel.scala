@@ -74,7 +74,6 @@ trait ConstraintModel[ValueSet <: NormalValueSet] extends ObjectFlowRepo[ValueSe
             )
             flowMap.getOrElseUpdate(lhs, msetEmpty) += par
           case po : PointO =>
-          case pao : PointArrayO =>
           case pi : PointI =>
           case pr : PointR =>
             if(arrayRepo.contains(pr.toString) || fieldVarRepo.contains(pr.toString)){

@@ -213,7 +213,7 @@ object BundleModel {
 	  val paramSlot = VarSlot(args(1))
 	  val paramValue = factMap.getOrElse(paramSlot, isetEmpty)
 	  if(!paramValue.isEmpty && !thisValue.isEmpty){
-	    val pvs = paramValue.map{ins => factMap(FieldSlot(ins, "[|android:os:Bundle.entries|]"))}.reduce(iunion[Instance])
+	    val pvs = paramValue.map{ins => factMap.getOrElse(FieldSlot(ins, "[|android:os:Bundle.entries|]"), isetEmpty)}.reduce(iunion[Instance])
 	    thisValue.map{
 	      tv =>
 	        pvs.map{s => RFAFact(FieldSlot(tv, "[|android:os:Bundle.entries|]"), s)}
@@ -256,7 +256,7 @@ object BundleModel {
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
 	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
-	  val strValue = thisValue.map{ins => factMap(FieldSlot(ins, "[|android:os:Bundle.entries|]"))}.reduce(iunion[Instance])
+	  val strValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, "[|android:os:Bundle.entries|]"), isetEmpty)}.reduce(iunion[Instance])
 	  val rf = getReturnFact(NormalType("[|java:util:HashSet|]", 0), retVar, currentContext).get
 	  result += rf
 	  result ++= strValue.map{

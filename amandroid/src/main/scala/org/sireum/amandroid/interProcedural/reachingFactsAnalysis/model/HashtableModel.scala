@@ -45,7 +45,7 @@ object HashtableModel {
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
 	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
-	  val strValue = thisValue.map{ins => factMap(FieldSlot(ins, "[|java:util:Hashtable.entrys|]"))}.reduce(iunion[Instance])
+	  val strValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, "[|java:util:Hashtable.entrys|]"), isetEmpty)}.reduce(iunion[Instance])
 	  val rf = getReturnFact(NormalType("[|java:util:HashSet|]", 0), retVar, currentContext).get
 	  result += rf
 	  result ++= strValue.map{s => RFAFact(FieldSlot(rf.v, "[|java:util:HashSet.items|]"), s)}
@@ -58,7 +58,7 @@ object HashtableModel {
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
 	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
-	  val strValue = thisValue.map{ins => factMap(FieldSlot(ins, "[|java:util:Hashtable.entrys|]"))}.reduce(iunion[Instance])
+	  val strValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, "[|java:util:Hashtable.entrys|]"), isetEmpty)}.reduce(iunion[Instance])
 	  val rf = getReturnFact(NormalType("[|java:util:HashSet|]", 0), retVar, currentContext).get
 	  result += rf
 	  result ++= strValue.map{
@@ -75,7 +75,7 @@ object HashtableModel {
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
 	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
-	  val strValue = thisValue.map{ins => factMap(FieldSlot(ins, "[|java:util:Hashtable.entrys|]"))}.reduce(iunion[Instance])
+	  val strValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, "[|java:util:Hashtable.entrys|]"), isetEmpty)}.reduce(iunion[Instance])
 	  val rf = getReturnFact(NormalType("[|java:util:HashSet|]", 0), retVar, currentContext).get
 	  result += rf
 	  result ++= strValue.map{

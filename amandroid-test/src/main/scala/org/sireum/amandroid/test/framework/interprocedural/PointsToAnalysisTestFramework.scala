@@ -18,7 +18,7 @@ import org.sireum.amandroid.test.framework.TestFramework
 	/**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
-trait InterProceduralTestFramework extends TestFramework {
+trait PointsToAnalysisTestFramework extends TestFramework {
 
   def Analyzing : this.type = this
 

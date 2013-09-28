@@ -38,15 +38,6 @@ class AndroidReachingFactsAnalysisBuilder{
 
 //    print("RFA\n")
 //    print(result)
-    val f1 = new File(System.getProperty("user.home") + "/Desktop/rfa.txt")
-    val o1 = new FileOutputStream(f1)
-    val w1 = new OutputStreamWriter(o1)
-    cg.nodes.foreach{
-      node =>
-        w1.write(node + ":" + result.entrySet(node).toString + "\n")
-    }
-    
-    println(result.entrySet(cg.exitNode))
     (cg, result)
   }
 }
@@ -57,7 +48,7 @@ class AndroidReachingFactsAnalysisBuilder{
  * @author Fengguo Wei & Sankardas Roy
  */
 object AndroidReachingFactsAnalysis {
-  val DEBUG = true;
+  val DEBUG = false;
   type Node = CGNode
   type Result = InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]
   
@@ -79,7 +70,8 @@ object AndroidReachingFactsAnalysis {
           case ne : NameExp =>
             result(i) = (VarSlot(ne.name.name), true)
           case ae : AccessExp =>
-            val fieldName = ae.attributeName.name
+            val fieldSig = ae.attributeName.name
+            val af = Center.findFieldWithoutFailing(fieldSig)
             val baseSlot = ae.exp match {
               case ne : NameExp => VarSlot(ne.name.name)
               case _ => throw new RuntimeException("Wrong exp: " + ae.exp)
@@ -87,12 +79,10 @@ object AndroidReachingFactsAnalysis {
             val baseValue = factMap.getOrElse(baseSlot, Set(RFANullInstance(currentContext)))
             baseValue.map{
               ins =>
-                if(ins.isInstanceOf[RFANullInstance]){
-                  if(DEBUG)
-                  	System.err.println("Access field: " + baseSlot + "." + fieldName + "@" + currentContext + "\nwith Null pointer: " + ins)
-                }
-                if(baseValue.size>1) result(i) = (FieldSlot(ins, fieldName), false)
-                else result(i) = (FieldSlot(ins, fieldName), true)
+                if(ins.isInstanceOf[RFANullInstance])
+                  System.err.println("Access field: " + baseSlot + "." + af.getSignature + "@" + currentContext + "\nwith Null pointer: " + ins)
+                if(baseValue.size>1) result(i) = (FieldSlot(ins, af.getSignature), false)
+                else result(i) = (FieldSlot(ins, af.getSignature), true)
             }
           case ie : IndexingExp =>
             val baseSlot = ie.exp match {
@@ -103,10 +93,8 @@ object AndroidReachingFactsAnalysis {
             val baseValue = factMap.getOrElse(baseSlot, Set(RFANullInstance(currentContext)))
             baseValue.map{
               ins =>
-                if(ins.isInstanceOf[RFANullInstance]){
-                  if(DEBUG)
-                  	System.err.println("Access array: " + baseSlot + "@" + currentContext + "\nwith Null pointer: " + ins)
-                }
+                if(ins.isInstanceOf[RFANullInstance])
+                  System.err.println("Access array: " + baseSlot + "@" + currentContext + "\nwith Null pointer: " + ins)
                 result(i) = (ArraySlot(ins), false)
             }
           case _=>
@@ -192,7 +180,7 @@ object AndroidReachingFactsAnalysis {
   
   /**
    * A.<clinit>() will be called under four kinds of situation: v0 = new A, A.f = v1, v2 = A.f, and A.foo()>
-   * v0 = new B, and B is descendant of A.
+   * also for v0 = new B where B is descendant of A, first we call A.<clinit>, later B.<clinit>.
    */
   protected def getClinitCallFacts(lhss : List[Exp], rhss : List[Exp], a : Assignment, s : ISet[RFAFact], currentContext : Context) : ISet[RFAFact] = {
     var result = isetEmpty[RFAFact]
@@ -321,7 +309,8 @@ object AndroidReachingFactsAnalysis {
             value += ins
             result(i) = value
           case ae : AccessExp =>
-            val fieldName = ae.attributeName.name
+            val fieldSig = ae.attributeName.name
+            val af = Center.findFieldWithoutFailing(fieldSig)
             val baseSlot = ae.exp match {
               case ne : NameExp => VarSlot(ne.name.name)
               case _ => throw new RuntimeException("Wrong exp: " + ae.exp)
@@ -329,13 +318,10 @@ object AndroidReachingFactsAnalysis {
             val baseValue : ISet[Instance] = factMap.getOrElse(baseSlot, Set(RFANullInstance(currentContext.copy)))
             baseValue.map{
               ins =>
-                if(ins.isInstanceOf[RFANullInstance]){
-                  if(DEBUG){
-                    System.err.println("Access field: " + baseSlot + "." + fieldName + "@" + currentContext + "\nwith Null pointer: " + ins)
-                  }
-                }
+                if(ins.isInstanceOf[RFANullInstance])
+                  System.err.println("Access field: " + baseSlot + "." + af.getSignature + "@" + currentContext + "\nwith Null pointer: " + ins)
                 else{
-                  val fieldSlot = FieldSlot(ins, fieldName)
+                  val fieldSlot = FieldSlot(ins, af.getSignature)
 	                val fieldValue : ISet[Instance] = factMap.getOrElse(fieldSlot, Set(RFANullInstance(currentContext.copy)))
 			            result(i) = fieldValue
                 }
@@ -349,11 +335,8 @@ object AndroidReachingFactsAnalysis {
             val baseValue : ISet[Instance] = factMap.getOrElse(baseSlot, Set(RFANullInstance(currentContext.copy)))
             baseValue.map{
               ins =>
-                if(ins.isInstanceOf[RFANullInstance]){
-                  if(DEBUG){
-                    System.err.println("Access array: " + baseSlot + "@" + currentContext + "\nwith Null pointer: " + ins)
-                  }
-                }
+                if(ins.isInstanceOf[RFANullInstance])
+                  System.err.println("Access array: " + baseSlot + "@" + currentContext + "\nwith Null pointer: " + ins)
                 else{
                   val arraySlot = ArraySlot(ins)
                   val arrayValue : ISet[Instance] = factMap.getOrElse(arraySlot, Set(RFANullInstance(currentContext.copy)))
@@ -515,6 +498,7 @@ object AndroidReachingFactsAnalysis {
           }
           case None => throw new RuntimeException("cannot found annotation 'signature' from: " + cj)
         }
+      val subSig = Center.getSubSigFromProcSig(sig)
       val typ = cj.getValueAnnotation("type") match {
           case Some(s) => s match {
             case ne : NameExp => ne.name.name
@@ -533,31 +517,26 @@ object AndroidReachingFactsAnalysis {
             val recvValue : ISet[Instance] = factMap.getOrElse(recvSlot, Set(RFANullInstance(callerContext)))
             recvValue.foreach{
 				      ins =>
-				        if(ins.isInstanceOf[RFANullInstance]){
-				          if(DEBUG){
-				          	System.err.println("Try to invoke method: " + sig + "@" + callerContext + "\nwith Null pointer:" + ins)
-				          }
-				        }
+				        if(ins.isInstanceOf[RFANullInstance])
+				          System.err.println("Try to invoke method: " + sig + "@" + callerContext + "\nwith Null pointer:" + ins)
 				        else if(ins.isInstanceOf[RFANativeInstance]){
 				          mode = true
-				          if(DEBUG){
-				          	System.err.println("Invoke method: " + sig + "@" + callerContext + "\n with Native Instance: " + ins)
-				          }
+				          System.err.println("Invoke method: " + sig + "@" + callerContext + "\n with Native Instance: " + ins)
 				        }
                 else{
 					        val p = 
-					          if(typ == "super") Center.getSuperCalleeProcedure(ins.typ, sig)
-					        	else Center.getVirtualCalleeProcedure(ins.typ, sig)
-					        p match{
-					          case Some(tar) => calleeSet += tar
-					          case None =>
-					        }
+					          if(typ == "super") Center.getSuperCalleeProcedureWithoutFailing(ins.typ, subSig)
+					        	else Center.getVirtualCalleeProcedureWithoutFailing(ins.typ, subSig)
+					        calleeSet += p
                 }
 				    }
           case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
         }
       } else {
-        calleeSet += Center.getDirectCalleeProcedure(sig)
+        val p =
+	        if(typ == "static") Center.getStaticCalleeProcedureWithoutFailing(sig)
+	        else Center.getDirectCalleeProcedureWithoutFailing(sig)
+	      calleeSet += p
       }
       (calleeSet, mode)
     }

@@ -560,7 +560,7 @@ object Center {
 	/**
 	 * grab field from Center. Input example is [|java:lang:Throwable.stackState|]
 	 */
-	def grabField(fieldSig : String) : Option[AmandroidField] = {
+	def getField(fieldSig : String) : Option[AmandroidField] = {
 	  val rName = StringFormConverter.getRecordNameFromFieldSignature(fieldSig)
 	  if(!containsRecord(rName)) return None
 	  val r = getRecord(rName)
@@ -572,13 +572,13 @@ object Center {
 	 * return true if contains the given field. Input example is [|java:lang:Throwable.stackState|]
 	 */
 	
-	def containsField(fieldSig : String) : Boolean = grabField(fieldSig).isDefined
+	def containsField(fieldSig : String) : Boolean = getField(fieldSig).isDefined
 	
 	/**
-	 * grab procedure from Center. Input example is [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
+	 * get procedure from Center. Input example is [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
 	 */
 	
-	def grabProcedure(procSig : String) : Option[AmandroidProcedure] = {
+	def getProcedure(procSig : String) : Option[AmandroidProcedure] = {
 	  val rName = StringFormConverter.getRecordNameFromProcedureSignature(procSig)
 	  val subSig = getSubSigFromProcSig(procSig)
 	  if(!containsRecord(rName)) return None
@@ -590,13 +590,13 @@ object Center {
 	 * return true if contains the given procedure. Input example is [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
 	 */
 	
-	def containsProcedure(procSig : String) : Boolean = grabProcedure(procSig).isDefined
+	def containsProcedure(procSig : String) : Boolean = getProcedure(procSig).isDefined
 	
 	/**
 	 * get field from Center. Input example is [|java:lang:Throwable.stackState|]
 	 */
-	def getField(fieldSig : String) : AmandroidField = {
-	  grabField(fieldSig) match{
+	def getFieldWithoutFailing(fieldSig : String) : AmandroidField = {
+	  getField(fieldSig) match{
 	    case Some(f) => f
 	    case None => throw new RuntimeException("Given field signature: " + fieldSig + " is not in the Center.")
 	  }
@@ -608,6 +608,7 @@ object Center {
 	def findField(fieldSig : String) : Option[AmandroidField] = {
 	  val rName = StringFormConverter.getRecordNameFromFieldSignature(fieldSig)
 	  val fieldName = StringFormConverter.getFieldNameFromFieldSignature(fieldSig)
+	  resolveRecord(rName, ResolveLevel.BODIES)
 	  if(!containsRecord(rName)) return None
 	  var r = getRecord(rName)
 	  while(!r.declaresFieldByName(fieldName) && r.hasSuperClass){
@@ -618,71 +619,108 @@ object Center {
 	}
 	
 	/**
+	 * find field from Center. Input: [|java:lang:Throwable.stackState|]
+	 */
+	def findFieldWithoutFailing(fieldSig : String) : AmandroidField = {
+	  findField(fieldSig).getOrElse(throw new RuntimeException("Given field signature: " + fieldSig + " is not in the Center."))
+	}
+	
+	/**
 	 * get procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
 	 */
 	
-	def getProcedure(procSig : String) : AmandroidProcedure = {
-	  grabProcedure(procSig) match{
+	def getProcedureWithoutFailing(procSig : String) : AmandroidProcedure = {
+	  getProcedure(procSig) match{
 	    case Some(p) => p
 	    case None => throw new RuntimeException("Given procedure signature: " + procSig + " is not in the Center.")
 	  }
 	}
 	
 	/**
-	 * get procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
+	 * get callee procedure from Center. Input: .equals:(Ljava/lang/Object;)Z
 	 */
 	
-	def getProcedureUsingSig(procSig : String) : Option[AmandroidProcedure] = {
-	  var recordName = signatureToRecordName(procSig)
-	  if(JAVA_PRIMITIVE_TYPES.contains(recordName)) recordName = DEFAULT_TOPLEVEL_OBJECT
-	  val from = resolveRecord(recordName, ResolveLevel.BODIES)
-	  if(!from.isInterface)
-	  	Some(getRecordHierarchy.resolveConcreteDispatchWithoutFailing(from, procSig))
-	  else None
+	def getCalleeProcedure(from : AmandroidRecord, pSubSig : String) : AmandroidProcedure = {
+	  getRecordHierarchy.resolveConcreteDispatchWithoutFailing(from, pSubSig)
 	}
 	
 	/**
-	 * get callee procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
+	 * check and get virtual callee procedure from Center. Input: .equals:(Ljava/lang/Object;)Z
 	 */
 	
-	def getCalleeProcedure(from : AmandroidRecord, procSig : String) : AmandroidProcedure = {
-	  getRecordHierarchy.resolveConcreteDispatchWithoutFailing(from, procSig)
-	}
-	
-	/**
-	 * check and get virtual callee procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
-	 */
-	
-	def getVirtualCalleeProcedure(fromType : Type, procSig : String) : Option[AmandroidProcedure] = {
+	def getVirtualCalleeProcedure(fromType : Type, pSubSig : String) : Option[AmandroidProcedure] = {
 	  val name =
-	  	if(isJavaPrimitiveType(fromType) || fromType.isArray) DEFAULT_TOPLEVEL_OBJECT  // any array in java is an Object, so primitive type array is an object, object's method can be called
-	  	else fromType.typ	
+	  	if(isJavaPrimitiveType(fromType)) DEFAULT_TOPLEVEL_OBJECT  // any array in java is an Object, so primitive type array is an object, object's method can be called
+	  	else fromType.name	
 	  val from = resolveRecord(name, ResolveLevel.BODIES)
-	  getRecordHierarchy.resolveConcreteDispatch(from, procSig)
+	  getRecordHierarchy.resolveConcreteDispatch(from, pSubSig)
+	}
+	
+	/**
+	 * check and get virtual callee procedure from Center. Input: .equals:(Ljava/lang/Object;)Z
+	 */
+	
+	def getVirtualCalleeProcedureWithoutFailing(fromType : Type, pSubSig : String) : AmandroidProcedure = {
+	  getVirtualCalleeProcedure(fromType, pSubSig).getOrElse(throw new RuntimeException("Fail to resolve virtual call: from:" + fromType + ". subsig:" + pSubSig))
+	}
+	
+	/**
+	 * check and get super callee procedure from Center. Input: .equals:(Ljava/lang/Object;)Z
+	 */
+	
+	def getSuperCalleeProcedureWithoutFailing(fromType : Type, pSubSig : String) : AmandroidProcedure = {
+	  getSuperCalleeProcedure(fromType, pSubSig).getOrElse(throw new RuntimeException("Fail to resolve super call: from:" + fromType + ". subsig:" + pSubSig))
+	}
+	
+	/**
+	 * check and get static callee procedure from Center. Input: .equals:(Ljava/lang/Object;)Z
+	 */
+	
+	def getStaticCalleeProcedureWithoutFailing(procSig : String) : AmandroidProcedure = {
+	  getStaticCalleeProcedure(procSig).getOrElse(throw new RuntimeException("Fail to resolve static call:" + procSig))
 	}
 	
 	/**
 	 * check and get super callee procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
 	 */
 	
-	def getSuperCalleeProcedure(fromType : Type, procSig : String) : Option[AmandroidProcedure] = {
+	def getSuperCalleeProcedure(fromType : Type, pSubSig : String) : Option[AmandroidProcedure] = {
 	  val sup =
 	    if(fromType.isArray) resolveRecord(DEFAULT_TOPLEVEL_OBJECT, ResolveLevel.BODIES)
 	    else {
 	      val from = resolveRecord(fromType.typ, ResolveLevel.BODIES)
 	      from.getSuperClass
 	    }
-	  getRecordHierarchy.resolveConcreteDispatch(sup, procSig)
+	  getRecordHierarchy.resolveConcreteDispatch(sup, pSubSig)
+	}
+	
+	/**
+	 * check and get static callee procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
+	 */
+	
+	def getStaticCalleeProcedure(procSig : String) : Option[AmandroidProcedure] = {
+	  val recType = StringFormConverter.getRecordTypeFromProcedureSignature(procSig)
+	  val pSubSig = getSubSigFromProcSig(procSig)
+	  val from = resolveRecord(recType.name, ResolveLevel.BODIES)
+	  getRecordHierarchy.resolveConcreteDispatch(from, pSubSig)
 	}
 	
 	/**
 	 * check and get direct callee procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
 	 */
 	
-	def getDirectCalleeProcedure(procSig : String) : AmandroidProcedure = {
-	  var recName = signatureToRecordName(procSig)
-	  if(JAVA_PRIMITIVE_TYPES.contains(recName)) recName = DEFAULT_TOPLEVEL_OBJECT
-	  getProcedureUsingSig(procSig).get
+	def getDirectCalleeProcedure(procSig : String) : Option[AmandroidProcedure] = {
+	  val recType = StringFormConverter.getRecordTypeFromProcedureSignature(procSig)
+	  resolveRecord(recType.name, ResolveLevel.BODIES)
+	  getProcedure(procSig)
+	}
+	
+	/**
+	 * check and get direct callee procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
+	 */
+	
+	def getDirectCalleeProcedureWithoutFailing(procSig : String) : AmandroidProcedure = {
+	  getDirectCalleeProcedure(procSig).getOrElse(throw new RuntimeException("Fail to resolve direct call:" + procSig))
 	}
 	
 	/**

@@ -753,7 +753,9 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     }
   }
   
-  def getDirectCallee(pi : PointI) : AmandroidProcedure = Center.getProcedure(pi.varName)
+  def getDirectCallee(pi : PointI) : AmandroidProcedure = Center.getDirectCalleeProcedureWithoutFailing(pi.varName)
+  
+  def getStaticCallee(pi : PointI) : AmandroidProcedure = Center.getStaticCalleeProcedureWithoutFailing(pi.varName)
   
   /**
    * This is the beta method in original algo
@@ -763,7 +765,7 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     val calleeSet : MSet[AmandroidProcedure] = msetEmpty
     diff.instances.foreach{
       d => 
-        val p = Center.getProcedure(pi.varName)
+        val p = Center.getProcedureWithoutFailing(pi.varName)
         calleeSet += p
     }
     calleeSet

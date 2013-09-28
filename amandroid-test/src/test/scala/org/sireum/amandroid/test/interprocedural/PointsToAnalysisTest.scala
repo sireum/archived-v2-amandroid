@@ -1,6 +1,5 @@
 package org.sireum.amandroid.test.interprocedural
 
-import org.sireum.amandroid.test.framework.interprocedural.InterProceduralTestFramework
 import org.junit.runner._
 import org.scalatest.junit.JUnitRunner
 import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
@@ -11,6 +10,7 @@ import org.sireum.amandroid.xml.AndroidXStream
 import org.sireum.amandroid.android.cache.AndroidCacheFile
 import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
 import org.sireum.amandroid.AmandroidCodeSource
+import org.sireum.amandroid.test.framework.interprocedural.PointsToAnalysisTestFramework
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -18,7 +18,7 @@ import org.sireum.amandroid.AmandroidCodeSource
  */
 
 @RunWith(classOf[JUnitRunner])
-class InterProceduralTest extends InterProceduralTestFramework {
+class PointsToAnalysisTest extends PointsToAnalysisTestFramework {
   AmandroidCodeSource.preLoad
   InterproceduralExamples.ofgModelFiles.
 //    filter { s => s.endsWith("/StringLoopTest.pilar") }.

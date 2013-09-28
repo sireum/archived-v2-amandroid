@@ -78,6 +78,12 @@ class AmandroidProcedure {
   protected var exceptions : Set[AmandroidRecord] = Set()
   
   /**
+   * represents if the procedure is a special one with empty body.
+   */
+  
+  protected var reality : Boolean = true
+  
+  /**
    * hold the body symbol table of this procedure
    */
   
@@ -366,13 +372,13 @@ class AmandroidProcedure {
 	 * retrieve code belong to this procedure
 	 */
 	
-	def retrieveCode = AmandroidCodeSource.getProcedureCode(getSignature)
+	def retrieveCode = if(isReal) AmandroidCodeSource.getProcedureCode(getSignature) else throw new RuntimeException("Trying to retreive body code for a phantom procedure: " + this)
 	
 	/**
 	 * get procedure body
 	 */
 	
-	def getProcedureBody = this.procBody
+	def getProcedureBody = if(isReal) this.procBody else throw new RuntimeException("Trying to get the body for a phantom procedure: " + this)
   
   /**
    * check procedure body available or not
@@ -433,10 +439,10 @@ class AmandroidProcedure {
   def getExceptions = this.exceptions
   
   /**
-   * return true if this procedure is concrete which means it is not abstract nor native
+   * return true if this procedure is concrete which means it is not abstract nor native nor phantom
    */
   
-  def isConcrete = !isAbstract && ! isNative
+  def isConcrete = !isAbstract && !isNative && isReal
     
   /**
    * return true if this procedure is abstract
@@ -509,6 +515,18 @@ class AmandroidProcedure {
    */
   
   def isMain : Boolean = isPublic && isStatic && this.subSignature == "main:([Ljava/lang/string;)V"
+    
+  /**
+   * return false if this procedure is a special one with empty body. e.g. [|A.class|]
+   */
+    
+  def isReal : Boolean = this.reality
+  
+  /**
+   * set the reality of the procedure. e.g. for [|A.class|] we set the reality as false
+   */
+  
+  def setReality(r : Boolean) = this.reality = r
     
   /**
    * return true if this procedure is a record initializer or main function

@@ -25,7 +25,7 @@ object AmandroidResolver {
   def resolveProcedureCode(procSig : String, code : String) : AmandroidProcedure = {
     val st = Transform.getSymbolResolveResult(Set(code))
     resolveFromST(st, false)
-    Center.getProcedure(procSig)
+    Center.getProcedureWithoutFailing(procSig)
   }
   
   /**
@@ -35,17 +35,16 @@ object AmandroidResolver {
   def tryResolveProcedure(procSig : String, desiredLevel : Center.ResolveLevel.Value) : Option[AmandroidProcedure] = {
     val recordName = StringFormConverter.getRecordNameFromProcedureSignature(procSig)
     tryResolveRecord(recordName, desiredLevel)
-    Center.grabProcedure(procSig)
+    Center.getProcedure(procSig)
   }
     
   /**
    * resolve the given procedure's container to desired level. 
    */
     
-  def resolveProcedure(procSig : String, desiredLevel : Center.ResolveLevel.Value) : AmandroidProcedure = {
+  def resolveProcedure(procSig : String, desiredLevel : Center.ResolveLevel.Value) : Option[AmandroidProcedure] = {
     val recordName = StringFormConverter.getRecordNameFromProcedureSignature(procSig)
     resolveRecord(recordName, desiredLevel)
-    Center.getRecord(Center.signatureToRecordName(procSig)).printDetail
     Center.getProcedure(procSig)
   }
   
@@ -56,7 +55,7 @@ object AmandroidResolver {
   def forceResolveProcedure(procSig : String, desiredLevel : Center.ResolveLevel.Value) : AmandroidProcedure = {
     val recordName = StringFormConverter.getRecordNameFromProcedureSignature(procSig)
     forceResolveRecord(recordName, desiredLevel)
-    Center.getProcedure(procSig)
+    Center.getProcedureWithoutFailing(procSig)
   }
     
   /**
@@ -144,6 +143,7 @@ object AmandroidResolver {
     if(Center.isInnerClassName(recName)) rec.needToResolveOuterName = Some(Center.getOuterNameFrom(recName))
     rec.setResolvingLevel(Center.ResolveLevel.BODIES)
     Center.addRecord(rec)
+    rec.addProcedure(createClassProcedure(rec))
 	  if(GlobalConfig.mode >= Mode.WHOLE_PROGRAM_TEST) Center.resolveRecordsRelationWholeProgram
 	  else Center.resolveRecordsRelation
   }
@@ -218,14 +218,19 @@ object AmandroidResolver {
 	  // now we generate a special Amandroid Procedure for each record; this proc would represent the const-class operation
 	  records.foreach{
 	    rec =>
-	      val proc : AmandroidProcedure = new AmandroidProcedure
-	      val procName = StringFormConverter.generateProcName(rec.getName, "class")
-	      val procSubSig = "class:()Ljava/lang/Class;"
-	      val procSig = StringFormConverter.getSigFromOwnerAndProcSubSig(rec.getName, procSubSig)
-	      proc.init(procName, procSig)
-	      proc.setAccessFlags("STATIC")
-	      rec.addProcedure(proc)
+	      rec.addProcedure(createClassProcedure(rec))
 	  }
+	}
+	
+	private def createClassProcedure(rec : AmandroidRecord) : AmandroidProcedure = {
+	  val proc : AmandroidProcedure = new AmandroidProcedure
+    val procName = StringFormConverter.generateProcName(rec.getName, "class")
+    val procSubSig = "class:()Ljava/lang/Class;"
+    val procSig = StringFormConverter.getSigFromOwnerAndProcSubSig(rec.getName, procSubSig)
+    proc.init(procName, procSig)
+    proc.setAccessFlags("STATIC")
+    proc.setReality(false)
+    proc
 	}
 	
 	/**

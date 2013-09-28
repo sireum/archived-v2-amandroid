@@ -10,11 +10,15 @@ object LifecycleMethodModel {
 	  p.getSignature match{
 	    case "[|Landroid/app/Activity;.onCreate:(Landroid/os/Bundle;)V|]" |
 	    		 "[|Landroid/app/Activity;.onStart:()V|]" |
+	    		 "[|Landroid/app/Activity;.onPostCreate:(Landroid/os/Bundle;)V|]" |
 	    		 "[|Landroid/app/Activity;.onRestart:()V|]" |
 	    		 "[|Landroid/app/Activity;.onPause:()V|]" |
 	    		 "[|Landroid/app/Activity;.onStop:()V|]" |
 	    		 "[|Landroid/app/Activity;.onResume:()V|]" |
+	    		 "[|Landroid/app/Activity;.onPostResume:()V|]" |
 	    		 "[|Landroid/app/Activity;.onDestroy:()V|]" |
+	    		 "[|Landroid/app/Activity;.onSaveInstanceState:(Landroid/os/Bundle;)V|]" |
+	    		 "[|Landroid/app/Activity;.onRestoreInstanceState:(Landroid/os/Bundle;)V|]" |
 	    		 "[|Landroid/app/Service;.onCreate:()V|]" |
 	    		 "[|Landroid/app/Service;.onStart:(Landroid/content/Intent;I)V|]" |
 	    		 "[|Landroid/app/Service;.onStartCommand:(Landroid/content/Intent;II)I|]" |

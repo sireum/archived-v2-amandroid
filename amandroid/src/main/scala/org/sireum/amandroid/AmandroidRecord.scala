@@ -707,6 +707,7 @@ class AmandroidRecord {
   
   def isLibraryRecord : Boolean = Center.getLibraryRecords.contains(this)
   
+  
   /**
    * set this record as a library record
    */

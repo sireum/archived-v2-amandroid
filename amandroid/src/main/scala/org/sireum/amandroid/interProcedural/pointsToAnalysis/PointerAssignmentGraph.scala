@@ -57,9 +57,10 @@ class PointsToMap {
    * n1 -> n2.f
    */
   def propagateFieldStorePointsToSet(n1 : PtaNode, n2 : PtaFieldNode) = {
+    val af = Center.findFieldWithoutFailing(n2.fieldName)
     pointsToSet(n2.baseNode) foreach{
       ins =>
-        addInstancesInternal(ins.toString + n2.fieldName.toString, pointsToSet(n1))
+        addInstancesInternal(ins.toString + af.getSignature, pointsToSet(n1))
     }
   }
   
@@ -92,11 +93,13 @@ class PointsToMap {
   def pointsToSet(n : PtaNode) : MSet[PTAInstance] = {
     n match{
       case pfn : PtaFieldNode =>
-        if(!pointsToSet(pfn.baseNode).isEmpty)
+        if(!pointsToSet(pfn.baseNode).isEmpty){
+          val af = Center.findFieldWithoutFailing(pfn.fieldName)
           pointsToSet(pfn.baseNode).map{
 		        ins =>
-		          ptMap.getOrElse(ins.toString + pfn.fieldName, msetEmpty)
+		          ptMap.getOrElse(ins.toString + af.getSignature, msetEmpty)
 		      }.reduce((set1, set2) => set1 ++ set2)
+        }
 		    else msetEmpty
       case pan : PtaArrayNode =>
         if(!pointsToSetOfArrayBaseNode(pan).isEmpty)
@@ -472,19 +475,30 @@ class PointerAssignmentGraph[Node <: PtaNode]
     }
   }
   
-  def getDirectCallee(pi : PointI) : AmandroidProcedure = Center.getDirectCalleeProcedure(pi.varName)
+  def getDirectCallee(pi : PointI) : AmandroidProcedure = Center.getDirectCalleeProcedureWithoutFailing(pi.varName)
   
-
-  def getCalleeSet(diff : MSet[PTAInstance],
+  def getStaticCallee(pi : PointI) : AmandroidProcedure = Center.getStaticCalleeProcedureWithoutFailing(pi.varName)
+  
+  def getSuperCalleeSet(diff : MSet[PTAInstance],
 	                 pi : PointI) : MSet[AmandroidProcedure] = {
     val calleeSet : MSet[AmandroidProcedure] = msetEmpty
+    val subSig = Center.getSubSigFromProcSig(pi.varName)
     diff.foreach{
       d =>
-        val p = Center.getVirtualCalleeProcedure(d.typ, pi.varName)
-        p match{
-          case Some(tar) => calleeSet += tar
-          case None =>
-        }
+        val p = Center.getSuperCalleeProcedureWithoutFailing(d.typ, subSig)
+        calleeSet += p
+    }
+    calleeSet
+  }
+
+  def getVirtualCalleeSet(diff : MSet[PTAInstance],
+	                 pi : PointI) : MSet[AmandroidProcedure] = {
+    val calleeSet : MSet[AmandroidProcedure] = msetEmpty
+    val subSig = Center.getSubSigFromProcSig(pi.varName)
+    diff.foreach{
+      d =>
+        val p = Center.getVirtualCalleeProcedureWithoutFailing(d.typ, subSig)
+        calleeSet += p
     }
     calleeSet
   }

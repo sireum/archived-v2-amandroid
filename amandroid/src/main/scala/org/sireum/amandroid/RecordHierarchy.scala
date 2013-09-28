@@ -347,10 +347,10 @@ class RecordHierarchy {
    * Given an object created by o = new R as type R, return the procedure which will be called by o.p()
    */
   
-  def resolveConcreteDispatchWithoutFailing(concreteType : AmandroidRecord, pSig : String) : AmandroidProcedure = {
-    resolveConcreteDispatch(concreteType, pSig) match{
+  def resolveConcreteDispatchWithoutFailing(concreteType : AmandroidRecord, pSubSig : String) : AmandroidProcedure = {
+    resolveConcreteDispatch(concreteType, pSubSig) match{
       case Some(p) => p
-      case None => throw new RuntimeException("Cannot resolve concrete dispatch!\n" + "Type:" + concreteType + "\nProcedure:" + pSig)
+      case None => throw new RuntimeException("Cannot resolve concrete dispatch!\n" + "Type:" + concreteType + "\nProcedure:" + pSubSig)
     }
   }
   
@@ -358,9 +358,8 @@ class RecordHierarchy {
    * Given an object created by o = new R as type R, return the procedure which will be called by o.p()
    */
   
-  def resolveConcreteDispatch(concreteType : AmandroidRecord, pSig : String) : Option[AmandroidProcedure] = {
+  def resolveConcreteDispatch(concreteType : AmandroidRecord, pSubSig : String) : Option[AmandroidProcedure] = {
     if(concreteType.isInterface) throw new RuntimeException("concreteType need to be class type: " + concreteType)
-    val pSubSig = StringFormConverter.getSubSigFromProcSig(pSig)
     findProcedureThroughHierarchy(concreteType, pSubSig)
   }
   

@@ -149,7 +149,7 @@ object StringBuilderModel {
       require(args.size >0)
       val thisSlot = VarSlot(args(0))
 		  val thisValues = factMap.getOrElse(thisSlot, isetEmpty)
-		  val strValues = thisValues.map{ins => factMap(FieldSlot(ins, "[|java:lang:StringBuilder.value|]"))}.reduce(iunion[Instance])
+		  val strValues = thisValues.map{ins => factMap.getOrElse(FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), isetEmpty)}.reduce(iunion[Instance])
 		  strValues.map(v => RFAFact(VarSlot(retVar), v))	 
     }
     

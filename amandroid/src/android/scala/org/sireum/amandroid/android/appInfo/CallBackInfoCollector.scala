@@ -84,7 +84,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 							          case None => throw new RuntimeException("doesn't found annotation which name is 'signature'")
 							        }
                       
-                      val calleeProc = Center.getProcedureUsingSig(sig)
+                      val calleeProc = Center.getProcedure(sig)
                       if(calleeProc.isDefined && calleeProc.get.getName == AndroidConstants.ACTIVITY_SETCONTENTVIEW){
                         val cfg = reachableProcedure.getCfg
                         val rda = reachableProcedure.getRda
@@ -240,31 +240,33 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 		
 		var lifecycleFlag = false // represents if a method is lifecycle method
 	    // Iterate over all user-implemented methods. If they are inherited
-		// from a system class, they are callback candidates. NOTE that DroidFlow code has "getSubClassesOfIncluding" below. 
+		// from a system class, they are callback candidates.
 		for (sClass : AmandroidRecord <- Center.getRecordHierarchy.getAllSubClassesOfIncluding(record)) {
 		  val rName = sClass.getName
 			if (!rName.startsWith("[|android:") && !rName.startsWith("[|com:android:"))
 				for (procedure <- sClass.getProcedures) {
-				  lifecycleFlag = false
-					if (systemMethods.contains(procedure.getSubSignature)){
-						// This is an overridden system method. Check that we don't have
-						// one of the lifecycle methods as they are treated separately.
-						if (classType == ClassType.Activity
-									&& AndroidEntryPointConstants.getActivityLifecycleMethods().contains(procedure.getSubSignature))
-								lifecycleFlag = true
-						if (classType == ClassType.Service
-								&& AndroidEntryPointConstants.getServiceLifecycleMethods().contains(procedure.getSubSignature))
-							    lifecycleFlag = true
-						if (classType == ClassType.BroadcastReceiver
-								&& AndroidEntryPointConstants.getBroadcastLifecycleMethods().contains(procedure.getSubSignature))
-							   lifecycleFlag = true
-						if (classType == ClassType.ContentProvider
-								&& AndroidEntryPointConstants.getContentproviderLifecycleMethods().contains(procedure.getSubSignature))
-							    lifecycleFlag = true
-						if(!lifecycleFlag){	    
-						  checkAndAddMethod(procedure, record) // This is a real callback method
+				  if(!procedure.isStatic){ // static method cannot be overriden
+					  lifecycleFlag = false
+						if (systemMethods.contains(procedure.getSubSignature)){
+							// This is an overridden system method. Check that we don't have
+							// one of the lifecycle methods as they are treated separately.
+							if (classType == ClassType.Activity
+										&& AndroidEntryPointConstants.getActivityLifecycleMethods().contains(procedure.getSubSignature))
+									lifecycleFlag = true
+							if (classType == ClassType.Service
+									&& AndroidEntryPointConstants.getServiceLifecycleMethods().contains(procedure.getSubSignature))
+								    lifecycleFlag = true
+							if (classType == ClassType.BroadcastReceiver
+									&& AndroidEntryPointConstants.getBroadcastLifecycleMethods().contains(procedure.getSubSignature))
+								   lifecycleFlag = true
+							if (classType == ClassType.ContentProvider
+									&& AndroidEntryPointConstants.getContentproviderLifecycleMethods().contains(procedure.getSubSignature))
+								    lifecycleFlag = true
+							if(!lifecycleFlag){	    
+							  checkAndAddMethod(procedure, record) // This is a real callback method
+							}
 						}
-					}
+				  }
 				}
 		}
 		

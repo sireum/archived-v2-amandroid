@@ -110,7 +110,7 @@ class DummyMainGenerator {
 			  this.paramRecords += Center.resolveRecord(params(i), Center.ResolveLevel.BODIES)
 			  paramVar.add("typ", params(i))
 			  paramVar.add("name", p)
-			  val annot = generateParamAnnotation("type", List("object"))
+			  val annot = generateExpAnnotation("type", List("object"))
 			  paramVar.add("annotations", new ArrayList[ST](Arrays.asList(annot)))
 			  paramArray.add(i, paramVar)
     }
@@ -198,7 +198,7 @@ class DummyMainGenerator {
 	        if(!instanceNeeded || plain){
 	          item._2.foreach{
 	            procSig =>
-	              Center.grabProcedure(procSig) match{
+	              Center.getProcedure(procSig) match{
 	                case Some(p) =>
 		                plainMethods += (procSig -> p)
 		                if(!p.isStatic) instanceNeeded = true
@@ -206,7 +206,7 @@ class DummyMainGenerator {
 	                  val recordName = StringFormConverter.getRecordNameFromProcedureSignature(procSig)
 	                  if(!Center.containsRecord(recordName)) System.err.println("Record for entry point " + recordName + " not found, skipping")
 	                  else{
-	                    Center.grabProcedure(procSig) match{
+	                    Center.getProcedure(procSig) match{
 	                      case Some(p) => 
 	                        plainMethods += (procSig -> p)
 	                        if(!p.isStatic) instanceNeeded = true
@@ -269,7 +269,7 @@ class DummyMainGenerator {
 	private def generateInstanceCreation(recordName : String, codefg : CodeFragmentGenerator) : String = {
 	  val rhs =
 		  if(recordName == "[|java:lang:String|]"){
-		    val stringAnnot = generateParamAnnotation("type", List("object", "string"))
+		    val stringAnnot = generateExpAnnotation("type", List("object"))
 		    "\"\" " + stringAnnot.render() 
 		  } else {
 			  val newExp = template.getInstanceOf("NewExp")
@@ -294,7 +294,7 @@ class DummyMainGenerator {
 	  var cons : String = null
 	  ps.foreach{
 	    p =>
-	      if(p.isConstructor) cons = p.getSignature
+	      if(p.isConstructor && !p.isStatic) cons = p.getSignature
 	  }
 	  if(cons != null){
 	    generateProcedureCall(cons, "direct", localVarsForClasses(r.getName), constructionStack, codefg)

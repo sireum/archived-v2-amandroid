@@ -304,7 +304,7 @@ trait InterComponentCommunicationModel[Node <: OfaNode, ValueSet <: AndroidValue
       AndroidConstants.getIccMethods.foreach{
         item => 
           val r = Center.getRecord(StringFormConverter.getRecordNameFromProcedureSignature(sig))
-          val p = Center.getProcedure(sig)
+          val p = Center.getProcedureWithoutFailing(sig)
           if(Center.getRecordHierarchy.resolveConcreteDispatch(r, p).getSignature == item)
            flag = true
         }

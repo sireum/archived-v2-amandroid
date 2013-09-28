@@ -106,7 +106,7 @@ object ComponentNameModel {
     val thisSlot = VarSlot(args(0))
     require(factMap.contains(thisSlot))
 	  val thisValue = factMap(thisSlot)
-	  val cValue = thisValue.map(tv=>factMap(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS))).reduce(iunion[Instance])
+	  val cValue = thisValue.map(tv=>factMap.getOrElse(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), isetEmpty)).reduce(iunion[Instance])
 	  cValue.map(cv=> RFAFact(VarSlot(retVar), cv))
 	}
 	
@@ -116,7 +116,7 @@ object ComponentNameModel {
     val thisSlot = VarSlot(args(0))
     require(factMap.contains(thisSlot))
 	  val thisValue = factMap(thisSlot)
-	  val cValue = thisValue.map(tv=>factMap(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS))).reduce(iunion[Instance])
+	  val cValue = thisValue.map(tv=>factMap.getOrElse(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), isetEmpty)).reduce(iunion[Instance])
 	  getShortNameFromClassName(cValue, currentContext).map(cv=> RFAFact(VarSlot(retVar), cv))
 	}
 	
@@ -140,7 +140,7 @@ object ComponentNameModel {
     val thisSlot = VarSlot(args(0))
     require(factMap.contains(thisSlot))
 	  val thisValue = factMap(thisSlot)
-	  val cValue = thisValue.map(tv=>factMap(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE))).reduce(iunion[Instance])
+	  val cValue = thisValue.map(tv=>factMap.getOrElse(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), isetEmpty)).reduce(iunion[Instance])
 	  cValue.map(cv=> RFAFact(VarSlot(retVar), cv))
 	}
 	
