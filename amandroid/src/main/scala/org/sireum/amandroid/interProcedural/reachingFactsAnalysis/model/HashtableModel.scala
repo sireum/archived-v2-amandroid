@@ -18,19 +18,6 @@ object HashtableModel {
     RFAFact(VarSlot(retVar), newThisValue)	 
 	}
 	  
-	private def getInstanceFromType(typ : Type, currentContext : Context) : Option[Instance] = {
-	  if(Center.isJavaPrimitiveType(typ) || typ.typ == "[|void|]") None
-	  else if(typ.typ == "[|java:lang:String|]") Some(RFAPointStringInstance(currentContext))
-	  else Some(RFAInstance(typ, currentContext))
-	}
-	  
-	private def getReturnFact(rType : Type, retVar : String, currentContext : Context) : Option[RFAFact] = {
-	  val insOpt = getInstanceFromType(rType, currentContext)
-	  if(insOpt.isDefined){
-	    Some(RFAFact(VarSlot(retVar), insOpt.get))
-	  } else None
-	}
-	  
 	private def cloneHashTable(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
     val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
     require(args.size >0)
@@ -46,7 +33,7 @@ object HashtableModel {
     val thisSlot = VarSlot(args(0))
 	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
 	  val strValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, "[|java:util:Hashtable.entrys|]"), isetEmpty)}.reduce(iunion[Instance])
-	  val rf = getReturnFact(NormalType("[|java:util:HashSet|]", 0), retVar, currentContext).get
+	  val rf = ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|java:util:HashSet|]", 0), retVar, currentContext).get
 	  result += rf
 	  result ++= strValue.map{s => RFAFact(FieldSlot(rf.v, "[|java:util:HashSet.items|]"), s)}
 	  result
@@ -59,7 +46,7 @@ object HashtableModel {
     val thisSlot = VarSlot(args(0))
 	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
 	  val strValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, "[|java:util:Hashtable.entrys|]"), isetEmpty)}.reduce(iunion[Instance])
-	  val rf = getReturnFact(NormalType("[|java:util:HashSet|]", 0), retVar, currentContext).get
+	  val rf = ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|java:util:HashSet|]", 0), retVar, currentContext).get
 	  result += rf
 	  result ++= strValue.map{
 	    s => 
@@ -76,7 +63,7 @@ object HashtableModel {
     val thisSlot = VarSlot(args(0))
 	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
 	  val strValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, "[|java:util:Hashtable.entrys|]"), isetEmpty)}.reduce(iunion[Instance])
-	  val rf = getReturnFact(NormalType("[|java:util:HashSet|]", 0), retVar, currentContext).get
+	  val rf = ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|java:util:HashSet|]", 0), retVar, currentContext).get
 	  result += rf
 	  result ++= strValue.map{
 	    s => 

@@ -16,6 +16,8 @@ import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.amandroid.pilarCodeGenerator.DummyMainGenerator
 import org.sireum.amandroid.android.parser.LayoutFileParser
 import scala.util.control.Breaks._
+import org.sireum.amandroid.pilarCodeGenerator.AndroidSubstituteRecordMap
+import org.sireum.amandroid.android.AppCenter
 
 /**
  * adapted from Steven Arzt
@@ -71,6 +73,7 @@ class PrepareApp(apkFileLocation : String) {
 	  if(DEBUG)
   	    println("Generate DummyMain for " + record)
 	  val dmGen = new DummyMainGenerator
+	  dmGen.setSubstituteRecordMap(AndroidSubstituteRecordMap.getSubstituteRecordMap)
 	  dmGen.setCurrentComponent(record.getName)
 	  dmGen.setCodeCounter(codeCtr)
 	  var callbackMethodSigs : Map[String, MSet[String]] = Map()
@@ -177,12 +180,16 @@ class PrepareApp(apkFileLocation : String) {
 		}
 		println("Found " + this.callbackMethods.size + " callback methods")
     var codeLineCounter : Int = 0
+    var components = isetEmpty[AmandroidRecord]
     this.entrypoints.foreach{
       f => 
         val record = Center.resolveRecord(f, Center.ResolveLevel.BODIES)
+        components += record
         val clCounter = generateDummyMain(record, codeLineCounter)
         codeLineCounter = clCounter
     }
+		AppCenter.setComponents(apkFileLocation, components)
+		AppCenter.updateIntentFilterDB(this.intentFdb)
 
 		println("Entry point calculation done.")
 	}

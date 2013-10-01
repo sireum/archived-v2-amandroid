@@ -32,6 +32,10 @@ class DummyMainGenerator {
   private val localVars = new ArrayList[String]
   private val codeFragments = new ArrayList[CodeFragmentGenerator]
   /**
+   * map from a record to it's substitute record
+   */
+  private var substituteRecordMap : IMap[String, String] = imapEmpty
+  /**
    * Map from record to it's local variable
    */
   private var localVarsForClasses : Map[String, String] = Map()
@@ -40,6 +44,11 @@ class DummyMainGenerator {
    */
   private var paramRecords : Set[AmandroidRecord] = Set()
 
+  /**
+   * set the substituteRecordMap
+   */
+  def setSubstituteRecordMap(map : IMap[String, String]) = this.substituteRecordMap = map
+  
   /**
 	 * Registers a list of classes to be automatically scanned for Android
 	 * lifecycle methods
@@ -287,6 +296,7 @@ class DummyMainGenerator {
 	  codefg.setCode(asmt)
 	  va
 	}
+
 	
 	def generateRecordConstructor(r : AmandroidRecord, constructionStack : MSet[AmandroidRecord], codefg : CodeFragmentGenerator) : String = {
 	  constructionStack.add(r)
@@ -304,6 +314,7 @@ class DummyMainGenerator {
 	  cons
 	}
 	
+	
 	private def generateProcedureCall(pSig : String, typ : String, localClassVar : String, constructionStack : MSet[AmandroidRecord], codefg : CodeFragmentGenerator) : Unit = {
 	  val sigParser = new SignatureParser(pSig).getParamSig
     val paramNum = sigParser.getParameterNum
@@ -312,19 +323,18 @@ class DummyMainGenerator {
     params.foreach{
 	    case(i, param) =>
         var r = Center.resolveRecord(param.typ, Center.ResolveLevel.BODIES)
-        // to protect go into dead constructor create loop
-        if(r.isInterface){
-          Center.getRecordHierarchy.getAllImplementersOf(r).foreach{
-            imp =>
-              if(imp.isApplicationRecord) r = imp
-          }
+        val outterClassOpt = if(r.isInnerClass) Some(r.getOuterClass) else None
+        if(!r.isConcrete){
+          var substRecordName = this.substituteRecordMap.getOrElse(r.getName, null)
+          if(substRecordName != null) r = Center.resolveRecord(substRecordName, Center.ResolveLevel.BODIES)
         }
-        if(r.isInterface){
+        // to protect from going into dead constructor create loop
+        if(!r.isConcrete){
           val va = varGen.generate(r.getName)
           localVarsForClasses += (r.getName -> va)
           paramVars += (i -> va)
-        }
-        else if(!constructionStack.contains(r)){
+          System.err.println("Cannot create valid constructer for " + r + ", because it is " + r.getAccessFlagString + " and cannot find substitute.")
+        } else if(!constructionStack.contains(r)){
 				  val va = generateInstanceCreation(r.getName, codefg)
 				  localVarsForClasses += (r.getName -> va)
           paramVars += (i -> va)
@@ -458,6 +468,13 @@ class DummyMainGenerator {
 	  val constructionStack : MSet[AmandroidRecord] = msetEmpty ++ this.paramRecords
 		createIfStmt(endClassFragment, codefg)
 		
+	  val r = Center.resolveRecord("[|android:app:ContextImpl|]", Center.ResolveLevel.BODIES)
+	  val va = generateInstanceCreation(r.getName, codefg)
+	  localVarsForClasses += (r.getName -> va)
+    generateRecordConstructor(r, constructionStack, codefg)
+    createFieldSetStmt(localVarsForClasses(record.getName), "[|android:content:ContextWrapper.mBase|]", va, List("object"), codefg)
+	  
+	  
 		// 1. onCreate:
 	  val onCreateFragment = new CodeFragmentGenerator
 	  onCreateFragment.addLabel
@@ -517,6 +534,12 @@ class DummyMainGenerator {
 	private def activityLifeCycleGenerator(entryPoints : MList[ResourceUri], record : AmandroidRecord, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
 	  val constructionStack : MSet[AmandroidRecord] = msetEmpty ++ this.paramRecords
 	  createIfStmt(endClassFragment, codefg)
+	  val r = Center.resolveRecord("[|android:app:ContextImpl|]", Center.ResolveLevel.BODIES)
+	  val va = generateInstanceCreation(r.getName, codefg)
+	  localVarsForClasses += (r.getName -> va)
+    generateRecordConstructor(r, constructionStack, codefg)
+    createFieldSetStmt(localVarsForClasses(record.getName), "[|android:view:ContextThemeWrapper.mBase|]", va, List("object"), codefg)
+    
 	  generateProcedureCall(AndroidEntryPointConstants.ACTIVITY_SETINTENT_SIG, "virtual", localVarsForClasses(record.getName), constructionStack, codefg)
 	  
 	  // 1. onCreate:
@@ -725,6 +748,18 @@ class DummyMainGenerator {
 	  val returnStmt = template.getInstanceOf("ReturnStmt")
       returnStmt.add("variable", variable)
       codefg.setCode(returnStmt)
+	}
+	
+	private def createFieldSetStmt(base : String, field : String, rhs : String, annoTyps : List[String], codefg : CodeFragmentGenerator) = {
+    val mBaseField = template.getInstanceOf("FieldAccessExp")
+	  mBaseField.add("base", base)
+	  mBaseField.add("field", field)
+	  val asmt = template.getInstanceOf("AssignmentStmt")
+	  asmt.add("lhs", mBaseField)
+	  asmt.add("rhs", rhs)
+	  val annos = generateExpAnnotation("type", annoTyps)
+	  asmt.add("annotations", annos)
+	  codefg.setCode(asmt)
 	}
 	
 	private class CodeFragmentGenerator {

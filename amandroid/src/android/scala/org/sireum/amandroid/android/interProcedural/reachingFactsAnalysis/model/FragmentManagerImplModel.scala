@@ -1,4 +1,4 @@
-package org.sireum.amandroid.android.intraProcedural.reachingFactsAnalysis.model
+package org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.model
 
 import org.sireum.amandroid._
 import org.sireum.util._

@@ -143,7 +143,7 @@ object AmandroidResolver {
     if(Center.isInnerClassName(recName)) rec.needToResolveOuterName = Some(Center.getOuterNameFrom(recName))
     rec.setResolvingLevel(Center.ResolveLevel.BODIES)
     Center.addRecord(rec)
-    rec.addProcedure(createClassProcedure(rec))
+    rec.addField(createClassField(rec))
 	  if(GlobalConfig.mode >= Mode.WHOLE_PROGRAM_TEST) Center.resolveRecordsRelationWholeProgram
 	  else Center.resolveRecordsRelation
   }
@@ -218,19 +218,16 @@ object AmandroidResolver {
 	  // now we generate a special Amandroid Procedure for each record; this proc would represent the const-class operation
 	  records.foreach{
 	    rec =>
-	      rec.addProcedure(createClassProcedure(rec))
+	      rec.addField(createClassField(rec))
 	  }
 	}
 	
-	private def createClassProcedure(rec : AmandroidRecord) : AmandroidProcedure = {
-	  val proc : AmandroidProcedure = new AmandroidProcedure
-    val procName = StringFormConverter.generateProcName(rec.getName, "class")
-    val procSubSig = "class:()Ljava/lang/Class;"
-    val procSig = StringFormConverter.getSigFromOwnerAndProcSubSig(rec.getName, procSubSig)
-    proc.init(procName, procSig)
-    proc.setAccessFlags("STATIC")
-    proc.setReality(false)
-    proc
+	private def createClassField(rec : AmandroidRecord) : AmandroidField = {
+	  val field : AmandroidField = new AmandroidField
+    val fSig = StringFormConverter.generateFieldSignature(rec.getName, "class")
+    field.init(fSig, NormalType("[|java:lang:Class|]", 0))
+    field.setAccessFlags("FINAL_STATIC")
+    field
 	}
 	
 	/**

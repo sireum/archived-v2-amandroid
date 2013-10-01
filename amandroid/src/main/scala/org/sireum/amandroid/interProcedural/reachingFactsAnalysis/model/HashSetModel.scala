@@ -13,19 +13,6 @@ import org.sireum.amandroid.NormalType
 object HashSetModel {
 	def isHashSet(r : AmandroidRecord) : Boolean = r.getName == "[|java:util:HashSet|]"
 	  
-	private def getInstanceFromType(typ : Type, currentContext : Context) : Option[Instance] = {
-	  if(Center.isJavaPrimitiveType(typ) || typ.typ == "[|void|]") None
-	  else if(typ.typ == "[|java:lang:String|]") Some(RFAPointStringInstance(currentContext))
-	  else Some(RFAInstance(typ, currentContext))
-	}
-	  
-	private def getReturnFact(rType : Type, retVar : String, currentContext : Context) : Option[RFAFact] = {
-	  val insOpt = getInstanceFromType(rType, currentContext)
-	  if(insOpt.isDefined){
-	    Some(RFAFact(VarSlot(retVar), insOpt.get))
-	  } else None
-	}
-	  
   private def addItemToHashSetField(s : ISet[RFAFact], args : List[String], currentContext : Context) : ISet[RFAFact] ={
 	  val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
 	  require(args.size > 1)
@@ -71,7 +58,7 @@ object HashSetModel {
 		  case "[|Ljava/util/HashSet;.contains:(Ljava/lang/Object;)Z|]" =>
 		  case "[|Ljava/util/HashSet;.createBackingMap:(IF)Ljava/util/HashMap;|]" =>
 		    require(retVarOpt.isDefined)
-		    getReturnFact(NormalType("[|java:util:HashMap|]", 0), retVarOpt.get, currentContext) match{
+		    ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|java:util:HashMap|]", 0), retVarOpt.get, currentContext) match{
 		      case Some(fact) => newFacts += fact
 		      case None =>
 		    }

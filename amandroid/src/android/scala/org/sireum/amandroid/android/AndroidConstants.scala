@@ -4,12 +4,22 @@ package org.sireum.amandroid.android
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 object AndroidConstants {
+  //following is standard intent actions
 	final val ACTION_MAIN = "android.intent.action.MAIN"
+	final val ACTION_MANAGE_NETWORK_USAGE = "android.intent.action.MANAGE_NETWORK_USAGE"
+	  
+	//following is standard intent categories
+	final val CATEGORY_LAUNCHER = "android.intent.category.LAUNCHER"
 	  
 	final val START_SERVICE = "startService:(Landroid/content/Intent;)Landroid/content/ComponentName;"
 	final val START_ACTIVITY = "startActivity:(Landroid/content/Intent;)V"
 	final val SEND_BROADCAST = "sendBroadcast:(Landroid/content/Intent;)V"
 	final val SEND_BROADCAST_PERM = "sendBroadcast:(Landroid/content/Intent;Ljava/lang/String;)V"
+	  
+	private final val iccMethods = List(START_SERVICE, SEND_BROADCAST, START_ACTIVITY)
+	def getIccMethods() : List[String] = iccMethods
+	  
+	final val INTENT = "[|android:content:Intent|]"
 	final val INTENT_COMPONENT = "[|android:content:Intent.mComponent|]"
 	final val INTENT_ACTION  = "[|android:content:Intent.mAction|]"
 	final val INTENT_MTYPE  = "[|android:content:Intent.mType|]"
@@ -22,9 +32,8 @@ object AndroidConstants {
 	final val ACTIVITY_SETCONTENTVIEW = "[|android:app:Activity.setContentView|]"
 	final val DUMMY_MAIN = "dummyMain:(Landroid/content/Intent;)V"
 	final val ACTIVITY = "[|android:app:Activity|]"
+	final val CONTEXT = "[|android:content:Context|]"
 	final val CONTEXT_WRAPPER = "[|android:content:ContextWrapper|]"
-	private final val iccMethods = List(START_SERVICE, SEND_BROADCAST, START_ACTIVITY)
-	def getIccMethods() : List[String] = iccMethods
 	
 	final val WINDOW_SERVICE = "window"
 	final val LAYOUT_INFLATER_SERVICE = "layout_inflater"

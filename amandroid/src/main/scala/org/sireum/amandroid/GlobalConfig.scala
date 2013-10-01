@@ -18,6 +18,12 @@ object GlobalConfig {
 	 * is whole program mode or not
 	 */
 	final var mode : Mode.Value = Mode.WHOLE_PROGRAM_TEST
+	
+	/**
+	 * call graph context length
+	 */
+	
+	final var CG_CONTEXT_K = 1
 }
 
 /**

@@ -1,4 +1,4 @@
-package org.sireum.amandroid.android.intraProcedural.reachingFactsAnalysis.model
+package org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.model
 
 import org.sireum.amandroid.android.AndroidConstants
 import org.sireum.amandroid.Center
@@ -19,7 +19,7 @@ object InterComponentCommunicationModel {
 	def isIccOperation(proc : AmandroidProcedure) : Boolean = {
     var flag = false
     val childRecord = proc.getDeclaringRecord
-    val parentRecord = Center.resolveRecord(AndroidConstants.CONTEXT_WRAPPER, Center.ResolveLevel.BODIES)
+    val parentRecord = Center.resolveRecord(AndroidConstants.CONTEXT, Center.ResolveLevel.BODIES)
     if(Center.getRecordHierarchy.isRecordRecursivelySubClassOfIncluding(childRecord, parentRecord))
 	    AndroidConstants.getIccMethods.foreach{
 	      item =>
@@ -56,12 +56,17 @@ object InterComponentCommunicationModel {
               ins =>
                 if(ins.isInstanceOf[RFAConcreteStringInstance]){
                   val targetRecName = ins.asInstanceOf[RFAConcreteStringInstance].string
-                  val targetRec = Center.resolveRecord(targetRecName, Center.ResolveLevel.BODIES)
-                  targetRec.tryGetProcedure(AndroidConstants.DUMMY_MAIN) match{
-                    case Some(r) => 
-                      result += r
-                    case None =>
+                  val targetRecOpt = Center.softlyResolveRecord(targetRecName, Center.ResolveLevel.BODIES)
+                  targetRecOpt match{
+                    case Some(targetRec) =>
+                      targetRec.tryGetProcedure(AndroidConstants.DUMMY_MAIN) match{
+		                    case Some(r) => 
+		                      result += r
+		                    case None => System.err.println("Target component " + targetRec + " does not have dummymain.")
+		                  }
+                    case None => System.err.println("Cannot find target component " + targetRecName + " in current code base.")
                   }
+                  
                 }
             }
         }
@@ -130,8 +135,6 @@ object InterComponentCommunicationModel {
         compsForThisIntent = findComponents(actions, categories, datas, mTypes)
         components ++= compsForThisIntent
     }
-    
-    components
     println("components-->" + components)
     var result = isetEmpty[AmandroidProcedure]
     components.foreach{
@@ -234,17 +237,17 @@ object InterComponentCommunicationModel {
 	    actions.foreach{
 	      action =>
 	        if(datas.isEmpty){
-		             if(mTypes.isEmpty){
-		               val comps = findComps(action, categories, null, null) 
-			           components ++= comps
-		             }
-		             else{
-			             mTypes.foreach{
-			               mType =>
-			                 val comps = findComps(action, categories, null, mType) 
-			                 components ++= comps
-			            }
-		             }
+             if(mTypes.isEmpty){
+               val comps = findComps(action, categories, null, null) 
+               components ++= comps
+             }
+             else{
+	             mTypes.foreach{
+	               mType =>
+	                 val comps = findComps(action, categories, null, mType) 
+	                 components ++= comps
+	            }
+             }
 	        }
 	        else{
 		        datas.foreach{

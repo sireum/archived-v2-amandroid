@@ -16,6 +16,9 @@ class IntentFilterDataBase {
       intentFmap += (rec -> filters)
     } else intentFmap += (rec -> Set(intentFilter))
   }
+  def updateIntentFmap(intentFilterDB : IntentFilterDataBase) = {
+    this.intentFmap ++= intentFilterDB.getIntentFmap
+  }
   def containsRecord(r : AmandroidRecord) : Boolean = intentFmap.contains(r)
   def getIntentFmap() = intentFmap
   def getIntentFilters(r : AmandroidRecord) = intentFmap.getOrElse(r, throw new RuntimeException("Didn't find given component: " + r))
@@ -59,7 +62,7 @@ class IntentFilter(holder : String) {
 	  // note that in android there is some discrepancy regarding data and mType on the Intent side and the Intent Filter side
 	  if(this.data.matchWith(uriData, mType))
 	    dataTest = true
-	  
+//	  println("actionTest:" + actionTest + "  categoryTest:" + categoryTest + "  dataTest:" + dataTest)
 	  actionTest && categoryTest && dataTest
 	}
 	

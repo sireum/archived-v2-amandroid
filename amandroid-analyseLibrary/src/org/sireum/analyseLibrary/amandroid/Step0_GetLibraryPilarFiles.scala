@@ -2,11 +2,12 @@ package org.sireum.analyseLibrary.amandroid
 
 import java.net.URI
 import org.sireum.util._
-import org.sireum.amandroid.module.Util
 import org.sireum.androidLibraryFile.amandroid.AmandroidAndroidLibraryFiles
 import java.io.File
 import java.util.zip.ZipFile
 import java.io.FileOutputStream
+import org.sireum.amandroid.util.Util
+import org.sireum.amandroid.util.Dex2PilarConverter
 
 object Step0_GetLibraryPilarFiles {
   def main(args: Array[String]) {
@@ -52,12 +53,7 @@ object Step0_GetLibraryPilarFiles {
         srcFiles += FileUtil.toUri(d + "pilar/" + dirName + ".dex")
   	}
 		srcFiles.foreach(s => {
-	    if (s.endsWith("dex") || s.endsWith("odex")) {
-	      val uri = new URI(s)
-	        val args = ilist("/bin/bash", "-c",
-	          Util.dexdump.getAbsolutePath() + " -d -f -h -p " + uri.getPath())
-	        val clOutput = new Exec().run(waittime, args, None, None)  // check last argument
-	    }
+	    Dex2PilarConverter.convert(s)
 	  })
 	  println("DONE!")
   }

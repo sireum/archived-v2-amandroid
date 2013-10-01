@@ -1,4 +1,4 @@
-package org.sireum.amandroid.android.intraProcedural.reachingFactsAnalysis.model
+package org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.model
 
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.util._
@@ -14,38 +14,41 @@ import org.sireum.amandroid.android.AndroidConstants
 
 object FrameworkMethodsModel {
 	def isFrameworkMethods(p : AmandroidProcedure) : Boolean = {
-	  p.getSignature match{
-	    case "[|Landroid/app/Activity;.setContentView:(I)V|]" |
-	         "[|Landroid/app/Activity;.getApplication:()Landroid/app/Application;|]" |
-	         "[|Landroid/app/Activity;.getSystemService:(Ljava/lang/String;)Ljava/lang/Object;|]" |
-	         "[|Landroid/content/ContextWrapper;.getBaseContext:()Landroid/content/Context;|]" |
-	         "[|Landroid/content/ContextWrapper;.getApplicationContext:()Landroid/content/Context;|]"=> true
-	    case _ => false
-	  }
+	  val contextRec = Center.resolveRecord("[|android:content:Context|]", Center.ResolveLevel.BODIES)
+	  if(Center.getRecordHierarchy.isRecordRecursivelySubClassOfIncluding(p.getDeclaringRecord, contextRec))
+		  p.getSubSignature match{
+		    case "setContentView:(I)V" |
+		         "getApplication:()Landroid/app/Application;" |
+		         "getSystemService:(Ljava/lang/String;)Ljava/lang/Object;" |
+		         "getBaseContext:()Landroid/content/Context;" |
+		         "getApplicationContext:()Landroid/content/Context;"=> true
+		    case _ => false
+		  }
+	  else false
 	}
 	
 	def doFrameworkMethodsModelCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
 	  var newFacts = isetEmpty[RFAFact]
-	  p.getSignature match{
-	    case "[|Landroid/app/Activity;.setContentView:(I)V|]" =>
-	    case "[|Landroid/app/Activity;.getApplication:()Landroid/app/Application;|]" =>
+	  p.getSubSignature match{
+	    case "setContentView:(I)V" =>
+	    case "getApplication:()Landroid/app/Application;" =>
 	      require(retVarOpt.isDefined)
-	      getReturnFact(NormalType("[|android:app:Application|]", 0), retVarOpt.get, currentContext) match{
+	      ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|android:app:Application|]", 0), retVarOpt.get, currentContext) match{
 	        case Some(f) => newFacts += f
 	        case None =>
 	      }
-	    case "[|Landroid/app/Activity;.getSystemService:(Ljava/lang/String;)Ljava/lang/Object;|]" =>
+	    case "getSystemService:(Ljava/lang/String;)Ljava/lang/Object;" =>
 	      require(retVarOpt.isDefined)
-	      newFacts ++= activityGetSystemService(s, args, retVarOpt.get, currentContext)
-	    case "[|Landroid/content/ContextWrapper;.getBaseContext:()Landroid/content/Context;|]" =>
+	      newFacts ++= getSystemService(s, args, retVarOpt.get, currentContext)
+	    case "getBaseContext:()Landroid/content/Context;" =>
 	      require(retVarOpt.isDefined)
-	      getReturnFact(NormalType("[|android:app:ContextImpl|]", 0), retVarOpt.get, currentContext) match{
+	      ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|android:app:ContextImpl|]", 0), retVarOpt.get, currentContext) match{
 	        case Some(f) => newFacts += f
 	        case None =>
 	      }
-	    case "[|Landroid/content/ContextWrapper;.getApplicationContext:()Landroid/content/Context;|]"=>
+	    case "getApplicationContext:()Landroid/content/Context;"=>
 	      require(retVarOpt.isDefined)
-	      getReturnFact(NormalType("[|android:app:Application|]", 0), retVarOpt.get, currentContext) match{
+	      ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|android:app:Application|]", 0), retVarOpt.get, currentContext) match{
 	        case Some(f) => newFacts += f
 	        case None =>
 	      }
@@ -54,24 +57,11 @@ object FrameworkMethodsModel {
 	  s ++ newFacts
 	}
 	
-	private def getInstanceFromType(typ : Type, currentContext : Context) : Option[Instance] = {
-	  if(Center.isJavaPrimitiveType(typ) || typ.typ == "[|void|]") None
-	  else if(typ.typ == "[|java:lang:String|]") Some(RFAPointStringInstance(currentContext))
-	  else Some(RFAInstance(typ, currentContext))
-	}
-	  
-	private def getReturnFact(rType : Type, retVar : String, currentContext : Context) : Option[RFAFact] = {
-	  val insOpt = getInstanceFromType(rType, currentContext)
-	  if(insOpt.isDefined){
-	    Some(RFAFact(VarSlot(retVar), insOpt.get))
-	  } else None
-	}
-	
-	private def activityGetSystemService(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
+	private def getSystemService(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
 	  var result = isetEmpty[RFAFact]
 	  val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
-    require(args.size >0)
-    val paramSlot = VarSlot(args(0))
+    require(args.size >1)
+    val paramSlot = VarSlot(args(1))
 	  val paramValue = factMap.getOrElse(paramSlot, isetEmpty)
 	  paramValue.foreach{
 	    str =>

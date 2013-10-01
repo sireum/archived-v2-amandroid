@@ -4,13 +4,14 @@ import org.sireum.amandroid.test.framework.TestFramework
 import org.sireum.util._
 import org.sireum.amandroid._
 import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
-import org.sireum.amandroid.android.intraProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.amandroid.util.APKFileResolver
 import org.sireum.amandroid.util.Dex2PilarConverter
 import org.sireum.amandroid.android.appInfo.PrepareApp
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
+import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.PrepareInitialFacts
+import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 
 trait CompleteRFATestFramework extends TestFramework {
 
@@ -49,8 +50,9 @@ trait CompleteRFATestFramework extends TestFramework {
     	val entryPoints = Center.getEntryPoints
     	entryPoints.foreach{
     	  ep =>
+    	    val initialfacts = PrepareInitialFacts.getInitialFactsForDummyMain(ep)
     	    AndroidReachingFactsAnalysis.processedClinit = isetEmpty
-    	    val (cg, result) = AndroidReachingFactsAnalysis(ep)
+    	    val (cg, result) = AndroidReachingFactsAnalysis(ep, initialfacts)
     	    println("exit facts: " + result.entrySet(cg.exitNode))
     	    val f1 = new File(System.getProperty("user.home") + "/Desktop/" + ep.getShortName + "rfa.txt")
 			    val o1 = new FileOutputStream(f1)

@@ -1,4 +1,4 @@
-package org.sireum.amandroid.android.intraProcedural.reachingFactsAnalysis.model
+package org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.model
 
 import org.sireum.util._
 import org.sireum.amandroid._
@@ -11,6 +11,7 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAConcreteStr
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAPointStringInstance
 import org.sireum.amandroid.android.AndroidConstants
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAPointStringInstance
+import org.sireum.amandroid.util.StringFormConverter
 
 object ComponentNameModel {
   final val DEBUG = true
@@ -204,11 +205,13 @@ object ComponentNameModel {
 		        cn =>
 		          cn match{
 		            case cstr @ RFAConcreteStringInstance(text, c) =>
-		              val rec = Center.resolveRecord(text, Center.ResolveLevel.BODIES)
+		              val recordType = StringFormConverter.formatClassNameToType(text)
+		              val rec = Center.resolveRecord(recordType.name, Center.ResolveLevel.BODIES)
+		              val claStr = RFAConcreteStringInstance(recordType.name, c)
 		              val pakStr = RFAConcreteStringInstance(rec.getPackageName, c)
 		              var facts = isetEmpty[RFAFact]
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
-		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), cstr)
+		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), claStr)
 		              facts
 		            case pstr @ RFAPointStringInstance(c) => 
 		              if(DEBUG)
@@ -250,9 +253,11 @@ object ComponentNameModel {
 							        pv2 =>
 							          pv2 match{
 							            case cstr2 @ RFAConcreteStringInstance(text, c) =>
+							              val recordType = StringFormConverter.formatClassNameToType(text)
+							              val claStr = RFAConcreteStringInstance(recordType.name, c)
 							              var facts = isetEmpty[RFAFact]
 							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pv1)
-							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pv2)
+							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), claStr)
 							              facts
 							            case pstr2 @ RFAPointStringInstance(c) => 
 							              if(DEBUG)

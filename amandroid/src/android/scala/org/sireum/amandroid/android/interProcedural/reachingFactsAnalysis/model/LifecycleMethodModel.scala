@@ -1,4 +1,4 @@
-package org.sireum.amandroid.android.intraProcedural.reachingFactsAnalysis.model
+package org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.model
 
 import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.util._
@@ -17,8 +17,10 @@ object LifecycleMethodModel {
 	    		 "[|Landroid/app/Activity;.onResume:()V|]" |
 	    		 "[|Landroid/app/Activity;.onPostResume:()V|]" |
 	    		 "[|Landroid/app/Activity;.onDestroy:()V|]" |
+	    		 "[|Landroid/app/Activity;.onCreateDescription:()Ljava/lang/CharSequence;|]" |
 	    		 "[|Landroid/app/Activity;.onSaveInstanceState:(Landroid/os/Bundle;)V|]" |
 	    		 "[|Landroid/app/Activity;.onRestoreInstanceState:(Landroid/os/Bundle;)V|]" |
+	    		 "[|Landroid/app/Activity;.finish:()V|]" |
 	    		 "[|Landroid/app/Service;.onCreate:()V|]" |
 	    		 "[|Landroid/app/Service;.onStart:(Landroid/content/Intent;I)V|]" |
 	    		 "[|Landroid/app/Service;.onStartCommand:(Landroid/content/Intent;II)I|]" |
@@ -27,7 +29,8 @@ object LifecycleMethodModel {
 	    		 "[|Landroid/app/Service;.onUnbind:(Landroid/content/Intent;)Z|]" |
 	    		 "[|Landroid/app/Service;.onDestroy:()V|]" |
 	    		 "[|Landroid/content/BroadcastReceiver;.onReceive:(Landroid/content/Context;Landroid/content/Intent;)V|]" |
-	    		 "[|Landroid/content/ContentProvider;.onCreate:()Z|]"=> true
+	    		 "[|Landroid/content/ContentProvider;.onCreate:()Z|]" |
+	    		 "[|Landroid/os/AsyncTask;.execute:([Ljava/lang/Object;)Landroid/os/AsyncTask;|]"=> true
 	    case _ => false
 	  }
 	}
@@ -51,6 +54,7 @@ object LifecycleMethodModel {
 	    case "[|Landroid/app/Service;.onDestroy:()V|]" =>
 	    case "[|Landroid/content/BroadcastReceiver;.onReceive:(Landroid/content/Context;Landroid/content/Intent;)V|]" =>
 	    case "[|Landroid/content/ContentProvider;.onCreate:()Z|]"=>
+	    case "[|Landroid/os/AsyncTask;.execute:([Ljava/lang/Object;)Landroid/os/AsyncTask;|]" =>
 	    case _ =>
 	  }
 	  s ++ newFacts

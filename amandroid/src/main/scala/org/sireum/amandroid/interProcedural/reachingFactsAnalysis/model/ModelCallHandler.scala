@@ -26,13 +26,10 @@ trait ModelCallHandler {
 	  HashSetModel.isHashSet(r) || 
 	  HashtableModel.isHashtable(r) ||
 	  HashMapModel.isHashMap(r) ||
-	  isSpecial(calleeProc) ||
 	  NativeCallModel.isNativeCall(calleeProc)
 	  
   }
-  
-  private def isSpecial(p : AmandroidProcedure) : Boolean = p.getShortName == "class" // this represents const-class bytecode operation
-    
+      
   /**
    * instead of doing operation inside callee procedure's real code, we do it manually and return the result. 
    */
@@ -43,19 +40,8 @@ trait ModelCallHandler {
 	  else if(HashSetModel.isHashSet(r)) HashSetModel.doHashSetCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(HashtableModel.isHashtable(r)) HashtableModel.doHashtableCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(HashMapModel.isHashMap(r)) HashMapModel.doHashMapCall(s, calleeProc, args, retVarOpt, currentContext)
-	  else if(isSpecial(calleeProc)) doSpecialCall(s, calleeProc, retVarOpt)
 	  else if(NativeCallModel.isNativeCall(calleeProc)) NativeCallModel.doNativeCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else throw new RuntimeException("given callee is not a model call: " + calleeProc)
-	}
-
-  private def doSpecialCall(s : ISet[RFAFact], p : AmandroidProcedure, retVarOpt : Option[String]) : ISet[RFAFact] = {
-	  var newFacts = isetEmpty[RFAFact]
-    val rec = p.getDeclaringRecord   
-    require(Center.hasRecord(rec.getName))     
-    newFacts += (RFAFact(VarSlot(retVarOpt.get), rec.getClassObj))
-    val strIns = RFAConcreteStringInstance(rec.getClassObj.getName, rec.getClassObj.getDefSite)
-    newFacts += (RFAFact(FieldSlot(rec.getClassObj, "[|java:lang:Class.name|]"), strIns))	 
-	  s ++ newFacts
 	}
 }
 

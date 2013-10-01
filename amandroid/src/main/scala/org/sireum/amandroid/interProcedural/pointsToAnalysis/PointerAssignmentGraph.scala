@@ -57,9 +57,9 @@ class PointsToMap {
    * n1 -> n2.f
    */
   def propagateFieldStorePointsToSet(n1 : PtaNode, n2 : PtaFieldNode) = {
-    val af = Center.findFieldWithoutFailing(n2.fieldName)
     pointsToSet(n2.baseNode) foreach{
       ins =>
+        val af = Center.findFieldWithoutFailing(ins.getType, n2.fieldName)
         addInstancesInternal(ins.toString + af.getSignature, pointsToSet(n1))
     }
   }
@@ -93,10 +93,11 @@ class PointsToMap {
   def pointsToSet(n : PtaNode) : MSet[PTAInstance] = {
     n match{
       case pfn : PtaFieldNode =>
-        if(!pointsToSet(pfn.baseNode).isEmpty){
-          val af = Center.findFieldWithoutFailing(pfn.fieldName)
-          pointsToSet(pfn.baseNode).map{
+        val bInss = pointsToSet(pfn.baseNode)
+        if(!bInss.isEmpty){
+          bInss.map{
 		        ins =>
+		          val af = Center.findFieldWithoutFailing(ins.getType, pfn.fieldName)
 		          ptMap.getOrElse(ins.toString + af.getSignature, msetEmpty)
 		      }.reduce((set1, set2) => set1 ++ set2)
         }

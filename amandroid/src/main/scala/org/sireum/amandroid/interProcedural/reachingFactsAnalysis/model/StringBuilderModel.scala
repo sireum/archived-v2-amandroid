@@ -11,19 +11,6 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis._
 object StringBuilderModel {
   
   def isStringBuilder(r : AmandroidRecord) : Boolean = r.getName == "[|java:lang:StringBuilder|]"
-  
-  private def getInstanceFromType(typ : Type, currentContext : Context) : Option[Instance] = {
-	  if(Center.isJavaPrimitiveType(typ) || typ.typ == "[|void|]") None
-	  else if(typ.typ == "[|java:lang:String|]") Some(RFAPointStringInstance(currentContext))
-	  else Some(RFAInstance(typ, currentContext))
-	}
-  
-	private def getReturnFact(rType : Type, retVar : String, currentContext : Context) : Option[RFAFact] = {
-	  val insOpt = getInstanceFromType(rType, currentContext)
-	  if(insOpt.isDefined){
-	    Some(RFAFact(VarSlot(retVar), insOpt.get))
-	  } else None
-	}
 	
 	private def getReturnFactsWithAlias(rType : Type, retVar : String, currentContext : Context, alias : ISet[Instance]) : ISet[RFAFact] = 
     alias.map{a=>RFAFact(VarSlot(retVar), a)}
@@ -59,7 +46,7 @@ object StringBuilderModel {
 	
   private def getPointStringForRet(retVar : String, currentContext : Context) :ISet[RFAFact] ={
     
-	  getReturnFact(new NormalType("[|java:lang:String|]"), retVar, currentContext) match{
+	  ReachingFactsAnalysisHelper.getReturnFact(new NormalType("[|java:lang:String|]"), retVar, currentContext) match{
 		  case Some(fact) =>           
 		      //deleteFacts += fact
 		      val value = RFAPointStringInstance(currentContext.copy)
@@ -72,7 +59,7 @@ object StringBuilderModel {
   private def getFactFromThisForRet(s : ISet[RFAFact], args : List[String], retVarOpt : Option[String], currentContext : Context) :ISet[RFAFact] ={
   	require(args.size > 0)
     val factMap = ReachingFactsAnalysisHelper.getFactMap(s)      
-    getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
+    ReachingFactsAnalysisHelper.getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
       case Some(fact) => 
         val thisSlot = VarSlot(args(0))
 		    if(factMap.contains(thisSlot)){

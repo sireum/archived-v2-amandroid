@@ -38,8 +38,6 @@ trait InterProceduralGraph[Node <: InterProceduralNode]
 
   def deleteEdge(e : Edge) = graph.removeEdge(e)
   
-  def K_CONTEXT : Int
-  
   protected var pl : Map[InterProceduralNode, Node] = Map()
   
   protected def pool : Map[InterProceduralNode, Node] = pl

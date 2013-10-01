@@ -61,8 +61,8 @@ ReturnStmt(variable) ::= <<
 return $variable$
 >>
 
-AssignmentStmt(lhs, rhs) ::= <<
-$lhs$:= $rhs$
+AssignmentStmt(lhs, rhs, annotations) ::= <<
+$lhs$:= $rhs$ $annotations ; separator=" "$
 >>
 
 CondExp(lhs, rhs) ::= <<
@@ -75,4 +75,8 @@ new $name$
 
 InvokeStmt(funcName, params, annotations) ::= <<
 call temp:= $funcName$($params ; separator=", "$) $annotations ; separator=" "$
+>>
+
+FieldAccessExp(base, field) ::= <<
+$base$.$field$
 >>

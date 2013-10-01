@@ -8,6 +8,7 @@ import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.amandroid.Center
 import scala.util.control.Breaks._
+import org.sireum.amandroid.GlobalConfig
 
 /**
  * @author Fengguo Wei & Sankardas Roy
@@ -486,7 +487,7 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
     
     val imdaf = new IMdaf(getEntrySet _, initial)
     
-    val initContext = new Context(cg.K_CONTEXT)
+    val initContext = new Context(GlobalConfig.CG_CONTEXT_K)
     var processed : ISet[(AmandroidProcedure, Context)] = isetEmpty
     cg.collectCfgToBaseGraph(entryPoint, initContext, true)
     processed += ((entryPoint, initContext))

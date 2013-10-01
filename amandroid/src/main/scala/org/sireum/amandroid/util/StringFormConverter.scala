@@ -196,7 +196,22 @@ object StringFormConverter {
   
   def getRecordNameFromFieldSignature(sig : String) : String = {
     if(!isValidFieldSig(sig)) throw new RuntimeException("given field signature is not a valid form: " + sig)
-    else sig.substring(sig.indexOf("[|"), sig.lastIndexOf('.')) + "|]"
+    else{
+      if(sig.indexOf("[]") > 0){
+        sig.substring(sig.indexOf("[|"), sig.indexOf("[]")) + "|]" + sig.substring(sig.indexOf("[]"), sig.lastIndexOf('.'))
+      } else {
+      	sig.substring(sig.indexOf("[|"), sig.lastIndexOf('.')) + "|]"
+      }
+    }
+  }
+  
+  /**
+   * get record name from field signature. e.g. [|java:lang:Throwable.stackState|] -> [|java:lang:Throwable|]
+   */
+  
+  def getRecordTypeFromFieldSignature(sig : String) : Type = {
+    val recName = getRecordNameFromFieldSignature(sig)
+    getTypeFromName(recName)
   }
   
   /**
@@ -220,6 +235,55 @@ object StringFormConverter {
 	  val sb = new StringBuffer
 	  sb.append(recordName.substring(0, recordName.length() - 2) + "." + name + "|]")
 	  sb.toString().intern()
+	}
+	
+	def isValidClassName(str : String) : Boolean = !str.startsWith("[|") && !str.contains(":")
+	
+	/**
+   * input: "[Ljava.lang.String;"  output: ("[|java:lang:String|]", 1)
+   * input: "[[I" output: ("[|int|]", 2)
+   */
+  
+  def getDimensionsAndTypeFromClassName(name : String) : (String, Int) = {
+    val d =
+      if(name.startsWith("["))
+      	name.lastIndexOf('[') - name.indexOf('[') + 1
+      else 0
+    val tmp =
+	    if(d>0){
+	      if(name.endsWith(";")){
+	        "[|" + name.substring(name.lastIndexOf('[') + 2, name.lastIndexOf(';')).replaceAll("\\.", ":") + "|]"
+	      }
+	      else{
+	        name.substring(name.lastIndexOf('[') + 1) match{
+	          case "B" => 	"[|byte|]"
+			      case "C" => 	"[|char|]"
+			      case "D" => 	"[|double|]"
+			      case "F" => 	"[|float|]"
+			      case "I" => 	"[|int|]"
+			      case "J" => 	"[|long|]"
+			      case "S" =>		"[|short|]"
+			      case "Z" =>		"[|boolean|]"
+			      case "V" =>		"[|void|]"
+	        }
+	      }
+	    } else {
+	      "[|" + name.replaceAll("\\.", ":") + "|]"
+	    }
+    (tmp, d)
+  }
+	
+	/**
+	 * format java class name to amandriod type. 
+	 * input: "com.example.activity.XActivity" 
+	 * output: "[|com:example:acitivity:XActivity|]"
+	 * input: "[[Lwfg.test.A;"
+	 * output: "[|wfg:test:A|][][]"
+	 */
+	def formatClassNameToType(cName : String) : Type = {
+	  if(!isValidClassName(cName)) throw new RuntimeException("given class name is not a valid form: " + cName)
+	  val (tmp, d) = getDimensionsAndTypeFromClassName(cName)
+    getType(tmp, d)
 	}
   
 }

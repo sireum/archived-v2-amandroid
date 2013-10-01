@@ -22,8 +22,6 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
   private var predBranchMap : MMap[(Node, Option[Branch]), Node] = null
   val BRANCH_PROPERTY_KEY = ControlFlowGraph.BRANCH_PROPERTY_KEY
   
-  final val K_CONTEXT = 1
-  
   private var entryN : CGNode = null
 
   private var exitN : CGNode = null

@@ -1914,7 +1914,7 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
              break;
 
              case 0x1c:
-              outConstClass(pDecInsn->vA, descriptorToDot(getClassDescriptor(pDexFile, pDecInsn->vB)), getClassDescriptor(pDexFile, pDecInsn->vB), "static"); // printf("v%d:=[|%s|];", pDecInsn->vA,descriptorToDot(getClassDescriptor(pDexFile, pDecInsn->vB)));
+              outConstClass(pDecInsn->vA, descriptorToDot(getClassDescriptor(pDexFile, pDecInsn->vB))); // printf("v%d:=[|%s|];", pDecInsn->vA,descriptorToDot(getClassDescriptor(pDexFile, pDecInsn->vB)));
               break;
 
              case 0x1f:

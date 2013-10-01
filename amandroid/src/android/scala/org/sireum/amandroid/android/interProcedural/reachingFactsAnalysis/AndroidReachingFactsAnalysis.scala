@@ -1,4 +1,4 @@
-package org.sireum.amandroid.android.intraProcedural.reachingFactsAnalysis
+package org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis
 
 import org.sireum.amandroid.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
 import org.sireum.alir.Slot
@@ -19,7 +19,7 @@ import java.io.OutputStreamWriter
 import org.sireum.amandroid.Instance
 import org.sireum.amandroid.util.StringFormConverter
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis._
-import org.sireum.amandroid.android.intraProcedural.reachingFactsAnalysis.model.AndroidModelCallHandler
+import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.model.AndroidModelCallHandler
 import org.sireum.amandroid.AmandroidRecord
 
 class AndroidReachingFactsAnalysisBuilder{
@@ -71,7 +71,6 @@ object AndroidReachingFactsAnalysis {
             result(i) = (VarSlot(ne.name.name), true)
           case ae : AccessExp =>
             val fieldSig = ae.attributeName.name
-            val af = Center.findFieldWithoutFailing(fieldSig)
             val baseSlot = ae.exp match {
               case ne : NameExp => VarSlot(ne.name.name)
               case _ => throw new RuntimeException("Wrong exp: " + ae.exp)
@@ -80,9 +79,14 @@ object AndroidReachingFactsAnalysis {
             baseValue.map{
               ins =>
                 if(ins.isInstanceOf[RFANullInstance])
-                  System.err.println("Access field: " + baseSlot + "." + af.getSignature + "@" + currentContext + "\nwith Null pointer: " + ins)
-                if(baseValue.size>1) result(i) = (FieldSlot(ins, af.getSignature), false)
-                else result(i) = (FieldSlot(ins, af.getSignature), true)
+                  System.err.println("Access field: " + baseSlot + "." + fieldSig + "@" + currentContext + "\nwith Null pointer: " + ins)
+                else if(ins.isInstanceOf[RFANativeInstance])
+                  System.err.println("Access field: " + baseSlot + "." + fieldSig + "@" + currentContext + "\nwith Native pointer: " + ins)
+                else{
+                  val af = Center.findFieldWithoutFailing(ins.getType, fieldSig)
+	                if(baseValue.size>1) result(i) = (FieldSlot(ins, af.getSignature), false)
+	                else result(i) = (FieldSlot(ins, af.getSignature), true)
+                }
             }
           case ie : IndexingExp =>
             val baseSlot = ie.exp match {
@@ -281,11 +285,15 @@ object AndroidReachingFactsAnalysis {
           case ne : NameExp =>
             val slot = VarSlot(ne.name.name)
             var value : ISet[Instance] = isetEmpty
-            value ++= factMap.getOrElse(slot, Set(RFANullInstance(currentContext.copy)))
+            if(slot.isGlobal && StringFormConverter.getFieldNameFromFieldSignature(slot.varName) == "class"){
+              val baseName = StringFormConverter.getRecordNameFromFieldSignature(slot.varName)
+              val rec = Center.resolveRecord(baseName, Center.ResolveLevel.BODIES)
+              value += rec.getClassObj
+            } else value ++= factMap.getOrElse(slot, Set(RFANullInstance(currentContext)))
             result(i) = value
           case le : LiteralExp =>
             if(le.typ.name.equals("STRING")){
-              val ins = RFAConcreteStringInstance(le.text, currentContext.copy)
+              val ins = RFAConcreteStringInstance(le.text, currentContext)
               val value : ISet[Instance] = Set(ins)
               result(i) = value
             }
@@ -310,7 +318,6 @@ object AndroidReachingFactsAnalysis {
             result(i) = value
           case ae : AccessExp =>
             val fieldSig = ae.attributeName.name
-            val af = Center.findFieldWithoutFailing(fieldSig)
             val baseSlot = ae.exp match {
               case ne : NameExp => VarSlot(ne.name.name)
               case _ => throw new RuntimeException("Wrong exp: " + ae.exp)
@@ -319,8 +326,11 @@ object AndroidReachingFactsAnalysis {
             baseValue.map{
               ins =>
                 if(ins.isInstanceOf[RFANullInstance])
-                  System.err.println("Access field: " + baseSlot + "." + af.getSignature + "@" + currentContext + "\nwith Null pointer: " + ins)
+                  System.err.println("Access field: " + baseSlot + "." + fieldSig + "@" + currentContext + "\nwith Null pointer: " + ins)
+                else if(ins.isInstanceOf[RFANativeInstance])
+                  System.err.println("Access field: " + baseSlot + "." + fieldSig + "@" + currentContext + "\nwith Native pointer: " + ins)
                 else{
+                  val af = Center.findFieldWithoutFailing(ins.getType, fieldSig)
                   val fieldSlot = FieldSlot(ins, af.getSignature)
 	                val fieldValue : ISet[Instance] = factMap.getOrElse(fieldSlot, Set(RFANullInstance(currentContext.copy)))
 			            result(i) = fieldValue
@@ -522,8 +532,8 @@ object AndroidReachingFactsAnalysis {
 				        else if(ins.isInstanceOf[RFANativeInstance]){
 				          mode = true
 				          System.err.println("Invoke method: " + sig + "@" + callerContext + "\n with Native Instance: " + ins)
-				        }
-                else{
+				        } else{
+				          println("ins->" + ins)
 					        val p = 
 					          if(typ == "super") Center.getSuperCalleeProcedureWithoutFailing(ins.typ, subSig)
 					        	else Center.getVirtualCalleeProcedureWithoutFailing(ins.typ, subSig)

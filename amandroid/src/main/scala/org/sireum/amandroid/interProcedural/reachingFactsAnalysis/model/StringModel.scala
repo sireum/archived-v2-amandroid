@@ -14,19 +14,6 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAFact
  */
 object StringModel {
 	def isString(r : AmandroidRecord) : Boolean = r.getName == "[|java:lang:String|]"
-	  
-	private def getInstanceFromType(typ : Type, currentContext : Context) : Option[Instance] = {
-	  if(Center.isJavaPrimitiveType(typ) || typ.typ == "[|void|]") None
-	  else if(typ.typ == "[|java:lang:String|]") Some(RFAPointStringInstance(currentContext))
-	  else Some(RFAInstance(typ, currentContext))
-	}
-	  
-	private def getReturnFact(rType : Type, retVar : String, currentContext : Context) : Option[RFAFact] = {
-	  val insOpt = getInstanceFromType(rType, currentContext)
-	  if(insOpt.isDefined){
-	    Some(RFAFact(VarSlot(retVar), insOpt.get))
-	  } else None
-	}
 	
 	private def getReturnFactsWithAlias(rType : Type, retVar : String, currentContext : Context, alias : ISet[Instance]) : ISet[RFAFact] = 
     alias.map{a=>RFAFact(VarSlot(retVar), a)}
@@ -62,7 +49,7 @@ object StringModel {
 	
   private def getPointStringForRet(retVar : String, currentContext : Context) :ISet[RFAFact] ={
     
-	  getReturnFact(new NormalType("[|java:lang:String|]"), retVar, currentContext) match{
+	  ReachingFactsAnalysisHelper.getReturnFact(new NormalType("[|java:lang:String|]"), retVar, currentContext) match{
 		  case Some(fact) =>           
 		      //deleteFacts += fact
 		      val value = RFAPointStringInstance(currentContext.copy)
@@ -75,7 +62,7 @@ object StringModel {
   private def getFactFromThisForRet(s : ISet[RFAFact], args : List[String], retVarOpt : Option[String], currentContext : Context) :ISet[RFAFact] ={
   	require(args.size > 0)
     val factMap = ReachingFactsAnalysisHelper.getFactMap(s)      
-    getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
+    ReachingFactsAnalysisHelper.getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
       case Some(fact) => 
         val thisSlot = VarSlot(args(0))
 		    if(factMap.contains(thisSlot)){
@@ -164,7 +151,7 @@ object StringModel {
 	    case "[|Ljava/lang/String;.copyValueOf:([CII)Ljava/lang/String;|]" =>
           newFacts ++= getPointStringForRet(retVarOpt.get, currentContext)
 	    case "[|Ljava/lang/String;.failedBoundsCheck:(III)Ljava/lang/StringIndexOutOfBoundsException;|]" =>
-	      getReturnFact(new NormalType("[|java:lang:StringIndexOutOfBoundsException|]"), retVarOpt.get, currentContext) match{
+	      ReachingFactsAnalysisHelper.getReturnFact(new NormalType("[|java:lang:StringIndexOutOfBoundsException|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
 	          newFacts += fact
 	        case None =>
@@ -176,7 +163,7 @@ object StringModel {
 	    case "[|Ljava/lang/String;.format:(Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;|]" =>
           newFacts ++= getPointStringForRet(retVarOpt.get, currentContext)
 	    case "[|Ljava/lang/String;.indexAndLength:(I)Ljava/lang/StringIndexOutOfBoundsException;|]" =>
-	      getReturnFact(new NormalType("[|java:lang:StringIndexOutOfBoundsException|]"), retVarOpt.get, currentContext) match{
+	      ReachingFactsAnalysisHelper.getReturnFact(new NormalType("[|java:lang:StringIndexOutOfBoundsException|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
 	          newFacts += fact
 	        case None =>
@@ -185,7 +172,7 @@ object StringModel {
 	    case "[|Ljava/lang/String;.indexOfSupplementary:(II)I|]" =>
 	    case "[|Ljava/lang/String;.lastIndexOfSupplementary:(II)I|]" =>
 	    case "[|Ljava/lang/String;.startEndAndLength:(II)Ljava/lang/StringIndexOutOfBoundsException;|]" =>
-	      getReturnFact(new NormalType("[|java:lang:StringIndexOutOfBoundsException|]"), retVarOpt.get, currentContext) match{
+	      ReachingFactsAnalysisHelper.getReturnFact(new NormalType("[|java:lang:StringIndexOutOfBoundsException|]"), retVarOpt.get, currentContext) match{
 	        case Some(fact) => 
 	          newFacts += fact
 	        case None =>
@@ -210,7 +197,7 @@ object StringModel {
 	            if(ins.isInstanceOf[Instance]) values += ins
 	            else values += RFAPointStringInstance(currentContext)
 	        }
-	        getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
+	        ReachingFactsAnalysisHelper.getReturnFact(new NormalType("[|java:lang:String|]"), retVarOpt.get, currentContext) match{
 					  case Some(fact) =>
 					    newFacts ++= values.map{v=>RFAFact(fact.s, v)}
 					  case None =>

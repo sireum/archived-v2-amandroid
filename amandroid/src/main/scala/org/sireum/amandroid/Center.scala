@@ -605,8 +605,8 @@ object Center {
 	/**
 	 * find field from Center. Input: [|java:lang:Throwable.stackState|]
 	 */
-	def findField(fieldSig : String) : Option[AmandroidField] = {
-	  val rName = StringFormConverter.getRecordNameFromFieldSignature(fieldSig)
+	def findField(baseType : Type, fieldSig : String) : Option[AmandroidField] = {
+	  val rName = baseType.name
 	  val fieldName = StringFormConverter.getFieldNameFromFieldSignature(fieldSig)
 	  resolveRecord(rName, ResolveLevel.BODIES)
 	  if(!containsRecord(rName)) return None
@@ -621,8 +621,8 @@ object Center {
 	/**
 	 * find field from Center. Input: [|java:lang:Throwable.stackState|]
 	 */
-	def findFieldWithoutFailing(fieldSig : String) : AmandroidField = {
-	  findField(fieldSig).getOrElse(throw new RuntimeException("Given field signature: " + fieldSig + " is not in the Center."))
+	def findFieldWithoutFailing(baseType : Type, fieldSig : String) : AmandroidField = {
+	  findField(baseType, fieldSig).getOrElse(throw new RuntimeException("Given baseType " + baseType + " and field signature " + fieldSig + " is not in the Center."))
 	}
 	
 	/**
@@ -788,6 +788,16 @@ object Center {
 	
 	def resolveRecord(recordName : String, desiredLevel : ResolveLevel.Value) : AmandroidRecord = {
 	  AmandroidResolver.resolveRecord(recordName, desiredLevel)
+	}
+	
+	/**
+	 * softly resolve given record and load all of the required support.
+	 */
+	
+	def softlyResolveRecord(recordName : String, desiredLevel : ResolveLevel.Value) : Option[AmandroidRecord] = {
+	  if(AmandroidCodeSource.containsRecord(recordName))
+	  	Some(AmandroidResolver.resolveRecord(recordName, desiredLevel))
+	  else None
 	}
 	
 	/**

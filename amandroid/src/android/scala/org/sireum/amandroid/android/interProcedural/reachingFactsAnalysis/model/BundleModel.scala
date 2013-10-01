@@ -1,4 +1,4 @@
-package org.sireum.amandroid.android.intraProcedural.reachingFactsAnalysis.model
+package org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.model
 
 import org.sireum.amandroid._
 import org.sireum.util._
@@ -191,19 +191,6 @@ object BundleModel {
     val newThisValue = RFAPointStringInstance(currentContext.copy)
     RFAFact(VarSlot(retVar), newThisValue)	 
 	}
-	
-	private def getInstanceFromType(typ : Type, currentContext : Context) : Option[Instance] = {
-	  if(Center.isJavaPrimitiveType(typ) || typ.typ == "[|void|]") None
-	  else if(typ.typ == "[|java:lang:String|]") Some(RFAPointStringInstance(currentContext))
-	  else Some(RFAInstance(typ, currentContext))
-	}
-	  
-	private def getReturnFact(rType : Type, retVar : String, currentContext : Context) : Option[RFAFact] = {
-	  val insOpt = getInstanceFromType(rType, currentContext)
-	  if(insOpt.isDefined){
-	    Some(RFAFact(VarSlot(retVar), insOpt.get))
-	  } else None
-	}
 	  
 	private def initBundleFromBundle(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
     val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
@@ -233,7 +220,7 @@ object BundleModel {
 	
 	private def forPair(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
     val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
-    val rf = getReturnFact(NormalType("[|android:os:Bundle|]", 0), retVar, currentContext).get
+    val rf = ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|android:os:Bundle|]", 0), retVar, currentContext).get
     require(args.size >1)
     val param1Slot = VarSlot(args(0))
 	  val param1Value = factMap.getOrElse(param1Slot, isetEmpty)
@@ -257,7 +244,7 @@ object BundleModel {
     val thisSlot = VarSlot(args(0))
 	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
 	  val strValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, "[|android:os:Bundle.entries|]"), isetEmpty)}.reduce(iunion[Instance])
-	  val rf = getReturnFact(NormalType("[|java:util:HashSet|]", 0), retVar, currentContext).get
+	  val rf = ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|java:util:HashSet|]", 0), retVar, currentContext).get
 	  result += rf
 	  result ++= strValue.map{
 	    s => 
