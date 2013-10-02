@@ -23,18 +23,15 @@ object ComponentNameModel {
 	  p.getSignature match{
 	    case "[|Landroid/content/ComponentName;.<clinit>:()V|]" =>  //static constructor
 		  case "[|Landroid/content/ComponentName;.<init>:(Landroid/content/Context;Ljava/lang/Class;)V|]" =>  //public constructor
-		    require(retVarOpt.isDefined)
-		    newFacts ++= initComponentNameWithCC(s, args, retVarOpt.get, currentContext)
+		    newFacts ++= initComponentNameWithCC(s, args, currentContext)
 		  case "[|Landroid/content/ComponentName;.<init>:(Landroid/content/Context;Ljava/lang/String;)V|]" =>  //public constructor
-		    require(retVarOpt.isDefined)
-		    newFacts ++= initComponentNameWithCS(s, args, retVarOpt.get, currentContext)
+		    newFacts ++= initComponentNameWithCS(s, args, currentContext)
 		  case "[|Landroid/content/ComponentName;.<init>:(Landroid/os/Parcel;)V|]" =>  //public constructor
 		    //TODO: How to handle parcel
 		  case "[|Landroid/content/ComponentName;.<init>:(Ljava/lang/String;Landroid/os/Parcel;)V|]" =>  //private constructor
 		    //TODO: How to handle parcel
 		  case "[|Landroid/content/ComponentName;.<init>:(Ljava/lang/String;Ljava/lang/String;)V|]" =>  //public constructor
-		    require(retVarOpt.isDefined)
-		    newFacts ++= initComponentNameWithSS(s, args, retVarOpt.get, currentContext)
+		    newFacts ++= initComponentNameWithSS(s, args, currentContext)
 		  case "[|Landroid/content/ComponentName;.clone:()Landroid/content/ComponentName;|]" =>  //public
 		    require(retVarOpt.isDefined)
 		    newFacts ++= cloneComponentName(s, args, retVarOpt.get, currentContext)
@@ -145,7 +142,7 @@ object ComponentNameModel {
 	  cValue.map(cv=> RFAFact(VarSlot(retVar), cv))
 	}
 	
-	private def initComponentNameWithCC(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
+	private def initComponentNameWithCC(s : ISet[RFAFact], args : List[String], currentContext : Context) : ISet[RFAFact] ={
     val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
@@ -188,7 +185,7 @@ object ComponentNameModel {
 	  }.reduce(iunion[RFAFact])
 	}
 	
-	private def initComponentNameWithCS(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
+	private def initComponentNameWithCS(s : ISet[RFAFact], args : List[String], currentContext : Context) : ISet[RFAFact] ={
     val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
@@ -227,7 +224,7 @@ object ComponentNameModel {
 	  }.reduce(iunion[RFAFact])
 	}
 	
-	private def initComponentNameWithSS(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
+	private def initComponentNameWithSS(s : ISet[RFAFact], args : List[String], currentContext : Context) : ISet[RFAFact] ={
     val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
     require(args.size >2)
     val thisSlot = VarSlot(args(0))

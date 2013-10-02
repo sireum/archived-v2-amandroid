@@ -49,7 +49,7 @@ object NativeCallModel {
 	      retVarOpt match{
 	        case Some(retVar) =>
 	          val slot = VarSlot(retVar)
-	          val value = RFANativeInstance(currentContext)
+	          val value = RFAUnknownInstance(currentContext)
 	          newFacts += (RFAFact(slot, value))
 	        case None =>
 	      }

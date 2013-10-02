@@ -36,10 +36,10 @@ final case class RFANullInstance(defSite : Context) extends RFAAbstractInstance{
   override def toString : String = "Null" + "@" + defSite
 }
 
-final case class RFANativeInstance(defSite : Context) extends RFAAbstractInstance{
-  override def clone(newDefSite : Context) : Instance = RFANativeInstance(newDefSite)
-  def typ : Type = new NullType
-  override def toString : String = "Native" + "@" + defSite
+final case class RFAUnknownInstance(defSite : Context) extends RFAAbstractInstance{
+  override def clone(newDefSite : Context) : Instance = RFAUnknownInstance(newDefSite)
+  def typ : Type = new UnknownType
+  override def toString : String = "Unknown" + "@" + defSite
 }
 
 abstract class RFAAbstractStringInstance(defSite : Context) extends RFAAbstractInstance{

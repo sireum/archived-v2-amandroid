@@ -24,7 +24,14 @@ object AndroidConstants {
 	final val INTENT_ACTION  = "[|android:content:Intent.mAction|]"
 	final val INTENT_MTYPE  = "[|android:content:Intent.mType|]"
 	final val INTENT_URI_DATA = "[|android:content:Intent.mData|]"
-	final val INTENT_CATEGORY = "[|android:content:Intent.mCategories|]"
+	final val INTENT_CATEGORIES = "[|android:content:Intent.mCategories|]"
+	final val INTENT_EXTRAS = "[|android:content:Intent.mExtras|]"
+	  
+	final val INTENTFILTER = "[|android:content:IntentFilter|]"
+	final val INTENTFILTER_ACTIONS  = "[|android:content:IntentFilter.mActions|]"
+	final val INTENTFILTER_CATEGORIES = "[|android:content:IntentFilter.mCategories|]"
+	  
+	final val COMPONENTNAME = "[|android:content:ComponentName|]"
 	final val COMPONENTNAME_PACKAGE = "[|android:content:ComponentName.mPackage|]"
 	final val COMPONENTNAME_CLASS = "[|android:content:ComponentName.mClass|]"
 	final val URI_STRING_URI = "[|android:net:Uri$StringUri|]"
@@ -32,8 +39,13 @@ object AndroidConstants {
 	final val ACTIVITY_SETCONTENTVIEW = "[|android:app:Activity.setContentView|]"
 	final val DUMMY_MAIN = "dummyMain:(Landroid/content/Intent;)V"
 	final val ACTIVITY = "[|android:app:Activity|]"
+	final val ACTIVITY_INTENT = "[|android:app:Activity.mIntent|]"
+	  
 	final val CONTEXT = "[|android:content:Context|]"
 	final val CONTEXT_WRAPPER = "[|android:content:ContextWrapper|]"
+	  
+	final val UNKNOWN_RECORD = "[|Center:Unknown|]"
+	final val UNKNOWN_PROCEDURE_SIG = "[|LCenter/Unknown;.unknown:()LCenter/Unknown;|]"
 	
 	final val WINDOW_SERVICE = "window"
 	final val LAYOUT_INFLATER_SERVICE = "layout_inflater"

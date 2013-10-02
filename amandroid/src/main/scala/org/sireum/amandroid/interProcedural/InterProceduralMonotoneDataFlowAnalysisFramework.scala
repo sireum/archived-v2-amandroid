@@ -32,7 +32,7 @@ trait InterProceduralMonotonicFunction[LatticeElement] {
  * @author Fengguo Wei & Sankardas Roy
  */
 trait CallResolver[LatticeElement] {
-  def getCalleeSet(s : ISet[LatticeElement], cj : CallJump, callerContext : Context) : (ISet[AmandroidProcedure], Boolean)
+  def getCalleeSet(s : ISet[LatticeElement], cj : CallJump, callerContext : Context) : ISet[AmandroidProcedure]
   def getFactsForCalleeAndReturn(s : ISet[LatticeElement], cj : CallJump) : (ISet[LatticeElement], ISet[LatticeElement])
   def mapFactsToCallee(factsToCallee : ISet[LatticeElement], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[LatticeElement]
   def getAndMapFactsForCaller(callerS : ISet[LatticeElement], calleeS : ISet[LatticeElement], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[LatticeElement]
@@ -526,7 +526,7 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
 	          val cj = l.asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump]
 	          val callerContext = cn.getContext
 	          val s = getEntrySet(cn) ++ gen(getEntrySet(cn), cj, callerContext)
-	          val (calleeSet, ignore_mode) = callr.getCalleeSet(s, cj, callerContext)
+	          val calleeSet = callr.getCalleeSet(s, cj, callerContext)
 	          val (factsForCallee, factsForReturn) = callr.getFactsForCalleeAndReturn(s, cj)
 	          calleeSet foreach{
 	            callee=>
@@ -562,9 +562,7 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
 	                	//println("from cgcallnode to cgentrynode!")
 	                }
 	              case rn : CGReturnNode =>
-	                imdaf.update(kill(s, cj, rn.getContext).union(getEntrySet(rn)), rn)
-	                if(ignore_mode)
-	                	workList += succ
+	                imdaf.update(confluence(factsForReturn, getEntrySet(rn)), rn)
 	              case a => throw new RuntimeException("unexpected node type: " + a)
 	            }
 	          }

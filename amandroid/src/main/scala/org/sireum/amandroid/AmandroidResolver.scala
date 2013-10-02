@@ -207,7 +207,6 @@ object AmandroidResolver {
 	          f.init(fieldSig, fieldType)
 	          f.setAccessFlags(fieldAccessFlag)
 	          rec.addField(f)
-	          f.setDeclaringRecord(rec)
 	      }
 	      rec.setResolvingLevel(Center.ResolveLevel.BODIES)
 	      rec

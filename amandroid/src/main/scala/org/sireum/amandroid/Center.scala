@@ -298,7 +298,7 @@ object Center {
 	
 	def addApplicationRecord(ar : AmandroidRecord) = {
     if(this.applicationRecords.contains(ar)) throw new RuntimeException("record " + ar.getName + " already exists in application record set.")
-    else this.applicationRecords += ar
+    this.applicationRecords += ar
   }
 	
 	/**
@@ -463,11 +463,13 @@ object Center {
     this.records += ar
     if(ar.isArray){
       ar.setLibraryRecord
-    } else {
+    } else if (AmandroidCodeSource.containsRecord(ar.getName)){
 	    AmandroidCodeSource.getCodeType(ar.getName) match{
 	      case AmandroidCodeSource.CodeType.APP => ar.setApplicationRecord
 	      case AmandroidCodeSource.CodeType.LIBRARY => ar.setLibraryRecord
 	    }
+    } else {
+      ar.setLibraryRecord
     }
     this.nameToRecord += (ar.getName -> ar)
     ar.setInCenter(true)

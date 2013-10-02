@@ -64,3 +64,21 @@ final case class NullType extends Type {
     sb.toString.intern()
   }
 }
+
+final case class UnknownType extends Type {
+  def typ = "Unknown"
+  def dimensions = 0
+  def isArray = false
+  def name : String = {
+    val sb = new StringBuilder
+    sb.append(typ)
+    for(i <- 0 to dimensions - 1) sb.append("[]")
+    sb.toString.intern()
+  }
+  override def toString : String = {
+    val sb = new StringBuilder
+    sb.append("(" + typ)
+    sb.append(")")
+    sb.toString.intern()
+  }
+}

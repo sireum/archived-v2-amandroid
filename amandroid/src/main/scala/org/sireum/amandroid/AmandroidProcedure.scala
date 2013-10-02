@@ -150,6 +150,18 @@ class AmandroidProcedure {
    * when you construct a amandroid procedure instance, call this init function first
    */
   
+  def init(sig : String) : AmandroidProcedure = {
+    val name = StringFormConverter.getProcedureNameFromProcedureSignature(sig)
+    val sigP = new SignatureParser(sig).getParamSig
+    val paramTyps = sigP.getParameterTypes
+    val returnTyp = sigP.getReturnType
+	  init(name, sig, paramTyps, returnTyp, 0, List())
+	}
+  
+  /**
+   * when you construct a amandroid procedure instance, call this init function first
+   */
+  
   def init(name : String, sig : String) : AmandroidProcedure = {
     val sigP = new SignatureParser(sig).getParamSig
     val paramTyps = sigP.getParameterTypes

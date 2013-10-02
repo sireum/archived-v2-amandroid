@@ -91,7 +91,7 @@ object InterComponentCommunicationModel {
         println("actions = " + actions)
         
         var categories:Set[String] = Set() // the code to get the valueSet of categories is to be added below
-        val categoryFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_CATEGORY)
+        val categoryFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_CATEGORIES)
         factMap.getOrElse(categoryFieldSlot, isetEmpty).foreach{
           cateIns =>
             val hashSetFieldSlot = FieldSlot(cateIns, "[|java:util:HashSet.items|]")

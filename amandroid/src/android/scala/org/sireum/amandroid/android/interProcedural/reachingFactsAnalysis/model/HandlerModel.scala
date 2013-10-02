@@ -5,6 +5,8 @@ import org.sireum.util._
 import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAFact
+import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.VarSlot
+import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAUnknownInstance
 
 object HandlerModel {
 	def isHandler(r : AmandroidRecord) : Boolean = r.getName == "[|android:os:Handler|]"
@@ -57,6 +59,13 @@ object HandlerModel {
 		  case "[|Landroid/os/Handler;.toString:()Ljava/lang/String;|]" =>  //public
 		  case _ =>
 	  }
+	  retVarOpt match{
+      case Some(retVar) =>
+        val slot = VarSlot(retVar)
+        val value = RFAUnknownInstance(currentContext)
+        newFacts += RFAFact(slot, value)
+      case None => s
+    }
 	  s ++ newFacts
 	}
 }

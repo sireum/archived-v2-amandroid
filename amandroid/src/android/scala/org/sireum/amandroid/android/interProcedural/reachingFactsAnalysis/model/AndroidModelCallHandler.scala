@@ -11,6 +11,7 @@ import org.sireum.alir.Slot
 import org.sireum.amandroid.Instance
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis._
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.model._
+import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.AndroidRFAScopeManager
 
 /**
  * @author Fengguo Wei & Sankardas Roy
@@ -22,14 +23,16 @@ object AndroidModelCallHandler extends ModelCallHandler{
    */
   override def isModelCall(calleeProc : AmandroidProcedure) : Boolean = {
 	  val r = calleeProc.getDeclaringRecord
-	  FragmentManagerImplModel.isFragmentManagerImpl(r) ||
 	  BundleModel.isBundle(r) ||
 	  HandlerModel.isHandler(r) ||
 	  ComponentNameModel.isComponentName(r) ||
-	  LifecycleMethodModel.isLifecycleMethod(calleeProc) ||
+	  IntentFilterModel.isIntentFilter(r) ||
+	  IntentModel.isIntent(r) ||
 	  InterComponentCommunicationModel.isIccOperation(calleeProc) ||
 	  FrameworkMethodsModel.isFrameworkMethods(calleeProc) ||
-	  super.isModelCall(calleeProc)
+	  ActivityModel.isActivity(r) ||
+	  super.isModelCall(calleeProc) ||
+	  AndroidRFAScopeManager.shouldBypass(r)
   }
   
   /**
@@ -37,14 +40,16 @@ object AndroidModelCallHandler extends ModelCallHandler{
    */
 	override def doModelCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
 	  val r = calleeProc.getDeclaringRecord
-	  if(FragmentManagerImplModel.isFragmentManagerImpl(r)) FragmentManagerImplModel.doFragmentManagerImplCall(s, calleeProc, args, retVarOpt, currentContext)
-	  else if(BundleModel.isBundle(r)) BundleModel.doBundleCall(s, calleeProc, args, retVarOpt, currentContext)
+	  if(BundleModel.isBundle(r)) BundleModel.doBundleCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(HandlerModel.isHandler(r)) HandlerModel.doHandlerCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(ComponentNameModel.isComponentName(r)) ComponentNameModel.doComponentNameCall(s, calleeProc, args, retVarOpt, currentContext)
-	  else if(LifecycleMethodModel.isLifecycleMethod(calleeProc)) LifecycleMethodModel.doLifecycleMethodCall(s, calleeProc, args, retVarOpt, currentContext)
+	  else if(IntentFilterModel.isIntentFilter(r)) IntentFilterModel.doIntentFilterCall(s, calleeProc, args, retVarOpt, currentContext)
+	  else if(IntentModel.isIntent(r)) IntentModel.doIntentCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(InterComponentCommunicationModel.isIccOperation(calleeProc)) InterComponentCommunicationModel.doIccCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(FrameworkMethodsModel.isFrameworkMethods(calleeProc)) FrameworkMethodsModel.doFrameworkMethodsModelCall(s, calleeProc, args, retVarOpt, currentContext)
+	  else if(ActivityModel.isActivity(r)) ActivityModel.doActivityCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(super.isModelCall(calleeProc)) super.doModelCall(s, calleeProc, args, retVarOpt, currentContext)
+	  else if(AndroidRFAScopeManager.shouldBypass(r)) AndroidRFAScopeManager.handleBypass(s, calleeProc, args, retVarOpt, currentContext)
 	  else throw new RuntimeException("given callee is not a model call: " + calleeProc)
 	}
 

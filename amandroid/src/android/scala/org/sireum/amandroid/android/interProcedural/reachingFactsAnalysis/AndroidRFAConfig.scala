@@ -13,8 +13,21 @@ import org.sireum.amandroid.interProcedural.callGraph.CGNode
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.FieldSlot
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAConcreteStringInstance
 import org.sireum.amandroid.GlobalConfig
+import org.sireum.amandroid.AmandroidRecord
+import org.sireum.amandroid.Center
 
-object PrepareInitialFacts {
+object AndroidRFAConfig {
+  
+  def setupCenter = {
+    val rec = new AmandroidRecord
+    rec.init(AndroidConstants.UNKNOWN_RECORD)
+    val p = new AmandroidProcedure
+    p.init(AndroidConstants.UNKNOWN_PROCEDURE_SIG)
+    p.setReality(false)
+    rec.addProcedure(p)
+    Center.addRecord(rec)
+  }
+  
 	def getInitialFactsForDummyMain(dm : AmandroidProcedure) : ISet[RFAFact] = {
 	  require(dm.getShortName == "dummyMain")
 	  var result = isetEmpty[RFAFact]
@@ -26,7 +39,7 @@ object PrepareInitialFacts {
 	  val mActionSlot = FieldSlot(intentValue, AndroidConstants.INTENT_ACTION)
 	  val mActionValue = RFAConcreteStringInstance(AndroidConstants.ACTION_MAIN, context.copy)
 	  result += RFAFact(mActionSlot, mActionValue)
-	  val mCategoriesSlot = FieldSlot(intentValue, AndroidConstants.INTENT_CATEGORY)
+	  val mCategoriesSlot = FieldSlot(intentValue, AndroidConstants.INTENT_CATEGORIES)
 	  val mCategoriesValue = RFAConcreteStringInstance(AndroidConstants.CATEGORY_LAUNCHER, context.copy)
 	  result += RFAFact(mCategoriesSlot, mCategoriesValue)
 	  result

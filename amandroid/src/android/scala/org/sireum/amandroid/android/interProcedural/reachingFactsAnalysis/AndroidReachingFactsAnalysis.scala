@@ -21,6 +21,7 @@ import org.sireum.amandroid.util.StringFormConverter
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis._
 import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.model.AndroidModelCallHandler
 import org.sireum.amandroid.AmandroidRecord
+import org.sireum.amandroid.android.AndroidConstants
 
 class AndroidReachingFactsAnalysisBuilder{
   def build //
@@ -48,7 +49,7 @@ class AndroidReachingFactsAnalysisBuilder{
  * @author Fengguo Wei & Sankardas Roy
  */
 object AndroidReachingFactsAnalysis {
-  val DEBUG = false;
+  val DEBUG = true
   type Node = CGNode
   type Result = InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]
   
@@ -80,8 +81,11 @@ object AndroidReachingFactsAnalysis {
               ins =>
                 if(ins.isInstanceOf[RFANullInstance])
                   System.err.println("Access field: " + baseSlot + "." + fieldSig + "@" + currentContext + "\nwith Null pointer: " + ins)
-                else if(ins.isInstanceOf[RFANativeInstance])
-                  System.err.println("Access field: " + baseSlot + "." + fieldSig + "@" + currentContext + "\nwith Native pointer: " + ins)
+                else if(ins.isInstanceOf[RFAUnknownInstance]) {
+                  if(DEBUG){
+                  	System.err.println("Access field: " + baseSlot + "." + fieldSig + "@" + currentContext + "\nwith Unknown pointer: " + ins)
+                  }
+                }
                 else{
                   val af = Center.findFieldWithoutFailing(ins.getType, fieldSig)
 	                if(baseValue.size>1) result(i) = (FieldSlot(ins, af.getSignature), false)
@@ -135,10 +139,6 @@ object AndroidReachingFactsAnalysis {
         processedClinit += p
         val (cg, facts) = AndroidReachingFactsAnalysis(p, getGlobalFacts(s ++ result))
         val exFacts = facts.entrySet(cg.exitNode)
-        if(DEBUG){
-          println("p-->" + p)
-          println("exFacts-->" + exFacts)
-        }
         val newFacts = getGlobalFacts(exFacts)
         result ++ newFacts
       } else {
@@ -327,8 +327,11 @@ object AndroidReachingFactsAnalysis {
               ins =>
                 if(ins.isInstanceOf[RFANullInstance])
                   System.err.println("Access field: " + baseSlot + "." + fieldSig + "@" + currentContext + "\nwith Null pointer: " + ins)
-                else if(ins.isInstanceOf[RFANativeInstance])
-                  System.err.println("Access field: " + baseSlot + "." + fieldSig + "@" + currentContext + "\nwith Native pointer: " + ins)
+                else if(ins.isInstanceOf[RFAUnknownInstance]) {
+                  if(DEBUG){
+                  	System.err.println("Access field: " + baseSlot + "." + fieldSig + "@" + currentContext + "\nwith Unknown pointer: " + ins)
+                  }
+                }
                 else{
                   val af = Center.findFieldWithoutFailing(ins.getType, fieldSig)
                   val fieldSlot = FieldSlot(ins, af.getSignature)
@@ -495,12 +498,9 @@ object AndroidReachingFactsAnalysis {
   
   class Callr
   		extends CallResolver[RFAFact] {
-    /**
-     * Boolean here means mode
-     */
-    def getCalleeSet(s : ISet[RFAFact], cj : CallJump, callerContext : Context) : (ISet[AmandroidProcedure], Boolean) = {
+
+    def getCalleeSet(s : ISet[RFAFact], cj : CallJump, callerContext : Context) : ISet[AmandroidProcedure] = {
       val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
-      var mode = false;
       val sig = cj.getValueAnnotation("signature") match {
           case Some(s) => s match {
             case ne : NameExp => ne.name.name
@@ -517,7 +517,7 @@ object AndroidReachingFactsAnalysis {
           case None => throw new RuntimeException("cannot found annotation 'type' from: " + cj)
         }
       var calleeSet = isetEmpty[AmandroidProcedure]
-      if(typ == "virtual" || typ == "interface" || typ == "super"){
+      if(typ == "virtual" || typ == "interface" || typ == "super" || typ == "direct"){
         cj.callExp.arg match{
           case te : TupleExp => 
             val recvSlot = te.exps(0) match{
@@ -529,13 +529,15 @@ object AndroidReachingFactsAnalysis {
 				      ins =>
 				        if(ins.isInstanceOf[RFANullInstance])
 				          System.err.println("Try to invoke method: " + sig + "@" + callerContext + "\nwith Null pointer:" + ins)
-				        else if(ins.isInstanceOf[RFANativeInstance]){
-				          mode = true
-				          System.err.println("Invoke method: " + sig + "@" + callerContext + "\n with Native Instance: " + ins)
-				        } else{
-				          println("ins->" + ins)
+				        else if(ins.isInstanceOf[RFAUnknownInstance]) {
+				          if(DEBUG){
+				          	System.err.println("Invoke method: " + sig + "@" + callerContext + "\n with Unknown Instance: " + ins)
+				          }
+				          calleeSet += Center.getProcedureWithoutFailing(AndroidConstants.UNKNOWN_PROCEDURE_SIG)
+				        } else {
 					        val p = 
 					          if(typ == "super") Center.getSuperCalleeProcedureWithoutFailing(ins.typ, subSig)
+					          else if(typ == "direct") Center.getDirectCalleeProcedureWithoutFailing(sig)
 					        	else Center.getVirtualCalleeProcedureWithoutFailing(ins.typ, subSig)
 					        calleeSet += p
                 }
@@ -543,12 +545,10 @@ object AndroidReachingFactsAnalysis {
           case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
         }
       } else {
-        val p =
-	        if(typ == "static") Center.getStaticCalleeProcedureWithoutFailing(sig)
-	        else Center.getDirectCalleeProcedureWithoutFailing(sig)
+        val p = Center.getStaticCalleeProcedureWithoutFailing(sig)
 	      calleeSet += p
       }
-      (calleeSet, mode)
+      calleeSet
     }
     
     def getFactsForCalleeAndReturn(s : ISet[RFAFact], cj : CallJump) : (ISet[RFAFact], ISet[RFAFact]) ={

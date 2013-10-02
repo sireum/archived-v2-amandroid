@@ -10,8 +10,8 @@ import org.sireum.amandroid.android.appInfo.PrepareApp
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
-import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.PrepareInitialFacts
 import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
+import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.AndroidRFAConfig
 
 trait CompleteRFATestFramework extends TestFramework {
 
@@ -47,10 +47,11 @@ trait CompleteRFATestFramework extends TestFramework {
     	val pre = new PrepareApp(new File(src.toString().substring(5)).toString())
 		  pre.calculateEntrypoints
     	
+		  AndroidRFAConfig.setupCenter
     	val entryPoints = Center.getEntryPoints
     	entryPoints.foreach{
     	  ep =>
-    	    val initialfacts = PrepareInitialFacts.getInitialFactsForDummyMain(ep)
+    	    val initialfacts = AndroidRFAConfig.getInitialFactsForDummyMain(ep)
     	    AndroidReachingFactsAnalysis.processedClinit = isetEmpty
     	    val (cg, result) = AndroidReachingFactsAnalysis(ep, initialfacts)
     	    println("exit facts: " + result.entrySet(cg.exitNode))
@@ -61,13 +62,13 @@ trait CompleteRFATestFramework extends TestFramework {
 			      node =>
 			        w1.write(node + ":" + result.entrySet(node).toString + "\n")
 			    }
-    	    val f2 = new File(System.getProperty("user.home") + "/Desktop/" + ep.getShortName + "CG.txt")
+    	    val f2 = new File(System.getProperty("user.home") + "/Desktop/" + ep.getShortName + "CG.dot")
 			    val o2 = new FileOutputStream(f2)
 			    val w2 = new OutputStreamWriter(o2)
 			    cg.toDot(w2)
     	}
     	
-//    	val r = Center.resolveRecord("[|android:content:ComponentName|]", Center.ResolveLevel.BODIES)
+//    	val r = Center.resolveRecord("[|android:app:Activity|]", Center.ResolveLevel.BODIES)
 //    	r.getProcedures.toSeq.sortBy(f => f.getSignature).foreach{
 //    	  p =>
 //    	    println("  case \"" + p.getSignature + "\" =>  //" + p.getAccessFlagString)
