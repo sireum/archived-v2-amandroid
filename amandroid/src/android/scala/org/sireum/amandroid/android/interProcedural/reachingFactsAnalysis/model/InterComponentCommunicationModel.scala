@@ -35,10 +35,10 @@ object InterComponentCommunicationModel {
 	  val intentSlot = VarSlot(args(1))
 	  val intentValues = factMap.getOrElse(intentSlot, isetEmpty)
 	  val explicitTargets = getExplicitTargets(s, intentValues)
-	  println("explicitTargets-->" + explicitTargets)
+//	  println("explicitTargets-->" + explicitTargets)
 	  if(explicitTargets.isEmpty){
 	    val implicitTargets = getImplicitTargets(s, intentValues)
-	    println("implicitTargets-->" + implicitTargets)
+//	    println("implicitTargets-->" + implicitTargets)
 	  }
 	  s
 	}
@@ -59,6 +59,7 @@ object InterComponentCommunicationModel {
                   val targetRecOpt = Center.softlyResolveRecord(targetRecName, Center.ResolveLevel.BODIES)
                   targetRecOpt match{
                     case Some(targetRec) =>
+                      println("explicit target component: " + targetRec)
                       targetRec.tryGetProcedure(AndroidConstants.DUMMY_MAIN) match{
 		                    case Some(r) => 
 		                      result += r
@@ -135,7 +136,7 @@ object InterComponentCommunicationModel {
         compsForThisIntent = findComponents(actions, categories, datas, mTypes)
         components ++= compsForThisIntent
     }
-    println("components-->" + components)
+    println("implicit target components-->" + components)
     var result = isetEmpty[AmandroidProcedure]
     components.foreach{
       comp =>

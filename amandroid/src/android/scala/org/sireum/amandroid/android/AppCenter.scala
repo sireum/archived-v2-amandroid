@@ -8,11 +8,12 @@ import org.sireum.amandroid.android.parser.IntentFilterDataBase
  * this is an object, which hold information of apps. e.g. components, intent-filter database, etc.
  */
 object AppCenter {
-	private var componentMap : IMap[String, ISet[AmandroidRecord]] = imapEmpty
+	private var components : ISet[AmandroidRecord] = isetEmpty
 	private var intentFdb : IntentFilterDataBase = new IntentFilterDataBase()
-	def setComponents(appName : String, comps : ISet[AmandroidRecord]) = this.componentMap += (appName -> comps)
-	def getComponents = if(!this.componentMap.isEmpty)this.componentMap.values.reduce(iunion[AmandroidRecord]) else isetEmpty
-	def getComponents(appName : String) = this.componentMap.getOrElse(appName, throw new RuntimeException("Didn't find given appName: "+ appName))
+	def setComponent(comp : AmandroidRecord) = this.components += comp
+	def setComponents(comps : ISet[AmandroidRecord]) = this.components ++= comps
+	def getComponents = this.components
+//	def getComponents(appName : String) = this.componentMap.getOrElse(appName, throw new RuntimeException("Didn't find given appName: "+ appName))
 	def setIntentFilterDB(i : IntentFilterDataBase) = this.intentFdb = i
 	def updateIntentFilterDB(i : IntentFilterDataBase) = this.intentFdb.updateIntentFmap(i)
 	def getIntentFilterDB ={

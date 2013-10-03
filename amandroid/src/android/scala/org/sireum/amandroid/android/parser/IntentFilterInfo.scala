@@ -17,7 +17,14 @@ class IntentFilterDataBase {
     } else intentFmap += (rec -> Set(intentFilter))
   }
   def updateIntentFmap(intentFilterDB : IntentFilterDataBase) = {
-    this.intentFmap ++= intentFilterDB.getIntentFmap
+    intentFilterDB.getIntentFmap.foreach{
+      case (rec, filters) =>
+        if(this.intentFmap.contains(rec)){
+          this.intentFmap += (rec -> (this.intentFmap(rec) ++ filters))
+        } else {
+          this.intentFmap += (rec -> filters)
+        }
+    }
   }
   def containsRecord(r : AmandroidRecord) : Boolean = intentFmap.contains(r)
   def getIntentFmap() = intentFmap

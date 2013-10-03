@@ -188,7 +188,7 @@ class PrepareApp(apkFileLocation : String) {
         val clCounter = generateDummyMain(record, codeLineCounter)
         codeLineCounter = clCounter
     }
-		AppCenter.setComponents(apkFileLocation, components)
+		AppCenter.setComponents(components)
 		AppCenter.updateIntentFilterDB(this.intentFdb)
 
 		println("Entry point calculation done.")

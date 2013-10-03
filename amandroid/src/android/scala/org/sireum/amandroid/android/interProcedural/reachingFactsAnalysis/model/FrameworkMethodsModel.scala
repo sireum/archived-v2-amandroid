@@ -93,10 +93,10 @@ object FrameworkMethodsModel {
 	  receiverValue.foreach{
 	    rv =>
 	      val intentF = new IntentFilter(rv.getType.name)
+	      val comRec = Center.resolveRecord(rv.getType.name, Center.ResolveLevel.BODIES)
 	      filterValue.foreach{
 	        fv =>
 	          val mActionsSlot = FieldSlot(fv, AndroidConstants.INTENTFILTER_ACTIONS)
-	          println(factMap)
 	          val mActionsValue = factMap.getOrElse(mActionsSlot, isetEmpty)
 	          mActionsValue.foreach{
 	            mav =>
@@ -125,6 +125,7 @@ object FrameworkMethodsModel {
 			          }
 	          }
 	      }
+	      AppCenter.setComponent(comRec)
 	      iDB.updateIntentFmap(intentF)
 	  }
 	  AppCenter.updateIntentFilterDB(iDB)
