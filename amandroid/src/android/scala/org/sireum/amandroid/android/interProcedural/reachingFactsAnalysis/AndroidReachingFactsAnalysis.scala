@@ -499,7 +499,66 @@ object AndroidReachingFactsAnalysis {
   class Callr
   		extends CallResolver[RFAFact] {
 
-    def getCalleeSet(s : ISet[RFAFact], cj : CallJump, callerContext : Context) : ISet[AmandroidProcedure] = {
+    /**
+     * It returns the facts for each callee entry node and caller return node
+     */
+    def resolveCall(s : ISet[RFAFact], cj : CallJump, callerContext : Context, cg : CallGraph[CGNode]) : (IMap[CGNode, ISet[RFAFact]], ISet[RFAFact]) = {
+      val calleeSet = getCalleeSet(s, cj, callerContext)
+      var calleeFactsMap : IMap[CGNode, ISet[RFAFact]] = imapEmpty
+      var returnFacts : ISet[RFAFact] = s
+      var pureNormalFlag = true
+      calleeSet.foreach{
+        callee =>
+          if(isICCCall(callee) || isModelCall(callee)){
+            pureNormalFlag = false
+            val args = cj.callExp.arg match{
+              case te : TupleExp =>
+                te.exps.map{
+			            exp =>
+			              exp match{
+					            case ne : NameExp => ne.name.name
+					            case _ => exp.toString()
+					          }
+			          }.toList
+              case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
+            }
+            if(isICCCall(callee)){
+              val factsForCallee = getFactsForICCTarget(s, cj, callee)
+              returnFacts --= factsForCallee
+              val (retFacts, targets) = doICCCall(factsForCallee, callee, args, cj.lhs match{case Some(exp) => Some(exp.name.name) case None => None}, callerContext)
+              returnFacts ++= retFacts
+              targets.foreach{
+                target =>
+                  if(!cg.isProcessed(target, callerContext)){
+				            cg.collectCfgToBaseGraph[String](target, callerContext, false)
+									  cg.extendGraphOneWay(target.getSignature, callerContext)
+			            }
+                  calleeFactsMap += (cg.entryNode(target, callerContext) -> mapFactsToICCTarget(factsForCallee, cj, target.getProcedureBody.procedure))
+              }
+            } else {
+              val factsForCallee = getFactsForCallee(s, cj, callee)
+              returnFacts --= factsForCallee
+            	returnFacts ++= doModelCall(factsForCallee, callee, args, cj.lhs match{case Some(exp) => Some(exp.name.name) case None => None}, callerContext)
+            }
+          } else {
+            if(!cg.isProcessed(callee, callerContext)){
+	            cg.collectCfgToBaseGraph[String](callee, callerContext, false)
+						  cg.extendGraph(callee.getSignature, callerContext)
+            }
+            val factsForCallee = getFactsForCallee(s, cj, callee)
+            returnFacts --= factsForCallee
+            calleeFactsMap += (cg.entryNode(callee, callerContext) -> mapFactsToCallee(factsForCallee, cj, callee.getProcedureBody.procedure))
+          }
+      }
+      if(pureNormalFlag){
+        val cn = cg.getCGCallNode(callerContext)
+        val rn = cg.getCGReturnNode(callerContext)
+        cg.deleteEdge(cn, rn)
+      }
+	    (calleeFactsMap, returnFacts)
+    }
+    
+    private def getCalleeSet(s : ISet[RFAFact], cj : CallJump, callerContext : Context) : ISet[AmandroidProcedure] = {
       val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
       val sig = cj.getValueAnnotation("signature") match {
           case Some(s) => s match {
@@ -551,7 +610,31 @@ object AndroidReachingFactsAnalysis {
       calleeSet
     }
     
-    def getFactsForCalleeAndReturn(s : ISet[RFAFact], cj : CallJump) : (ISet[RFAFact], ISet[RFAFact]) ={
+    private def getFactsForICCTarget(s : ISet[RFAFact], cj : CallJump, callee : AmandroidProcedure) : ISet[RFAFact] = {
+      val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+      val heapFacts = s.filter(_.s.isInstanceOf[HeapSlot]).map{f=>(f.s, f.v).asInstanceOf[(HeapSlot, Instance)]}.toSet
+      var calleeFacts = isetEmpty[RFAFact]
+      factMap.foreach{case (s, v) => 
+        if(s.isInstanceOf[VarSlot] && s.asInstanceOf[VarSlot].isGlobal){
+          calleeFacts ++= v.map{r => RFAFact(s, r)}
+          calleeFacts ++= getRelatedHeapFacts(v, heapFacts)
+        }
+      }
+      cj.callExp.arg match{
+        case te : TupleExp => 
+          val exp = te.exps(1)
+          if(exp.isInstanceOf[NameExp]){
+            val slot = VarSlot(exp.asInstanceOf[NameExp].name.name)
+            var value = factMap.getOrElse(slot, isetEmpty)
+            calleeFacts ++= value.map{r => RFAFact(slot, r)}
+	          calleeFacts ++= getRelatedHeapFacts(value, heapFacts)
+          }
+          calleeFacts
+        case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
+      }
+    }
+    
+    private def getFactsForCallee(s : ISet[RFAFact], cj : CallJump, callee : AmandroidProcedure) : ISet[RFAFact] = {
       val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
       val heapFacts = s.filter(_.s.isInstanceOf[HeapSlot]).map{f=>(f.s, f.v).asInstanceOf[(HeapSlot, Instance)]}.toSet
       var calleeFacts = isetEmpty[RFAFact]
@@ -568,7 +651,6 @@ object AndroidReachingFactsAnalysis {
           calleeFacts ++= getRelatedHeapFacts(v, heapFacts)
         }
       }
-      var delFacts = isetEmpty[RFAFact]
       cj.callExp.arg match{
         case te : TupleExp => 
           for(i <- 0 to te.exps.size -1){
@@ -577,19 +659,30 @@ object AndroidReachingFactsAnalysis {
               val slot = VarSlot(exp.asInstanceOf[NameExp].name.name)
               var value = factMap.getOrElse(slot, isetEmpty)
               if(typ != "static" && i == 0){
-                value = value.map{
-                  r=>
-                    if(r.isInstanceOf[RFANullInstance]) delFacts += (RFAFact(slot, r))
-                    r
-                }.filter(r => !r.isInstanceOf[RFANullInstance])
+                value = value.filter(r => !r.isInstanceOf[RFANullInstance] && !r.isInstanceOf[RFAUnknownInstance] && shouldPass(r, callee))
               } 
               calleeFacts ++= value.map{r => RFAFact(slot, r)}
 		          calleeFacts ++= getRelatedHeapFacts(value, heapFacts)
             }
           }
-          (calleeFacts, s -- calleeFacts -- delFacts)
+          calleeFacts
         case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
       }
+    }
+    
+    /**
+     * return true if the given recv Instance should pass to the given callee
+     */
+    private def shouldPass(recvIns : Instance, calleeProc : AmandroidProcedure) : Boolean = {
+      val recRecv = Center.resolveRecord(recvIns.getType.name, Center.ResolveLevel.BODIES)
+      val recCallee = calleeProc.getDeclaringRecord
+      var tmpRec = recRecv
+      while(tmpRec.hasSuperClass){
+	      if(tmpRec == recCallee) return true
+	      else if(tmpRec.declaresProcedure(calleeProc.getSubSignature)) return false
+	      else tmpRec = tmpRec.getSuperClass
+      }
+      throw new RuntimeException("Given recvIns: " + recvIns + " and calleeProc: " + calleeProc + " is not in the Same hierachy.")
     }
     
     def mapFactsToCallee(factsToCallee : ISet[RFAFact], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[RFAFact] = {
@@ -627,6 +720,39 @@ object AndroidReachingFactsAnalysis {
               fact =>
                 if(fact.s == argSlot) result += (RFAFact(paramSlot, fact.v))
             }
+          }
+          factsToCallee -- varFacts ++ result
+        case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
+      }
+    }
+    
+    def mapFactsToICCTarget(factsToCallee : ISet[RFAFact], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[RFAFact] = {
+      val varFacts = factsToCallee.filter(f=>f.s.isInstanceOf[VarSlot] && !f.s.asInstanceOf[VarSlot].isGlobal).map{f=>RFAFact(f.s.asInstanceOf[VarSlot], f.v)}
+      cj.callExp.arg match{
+        case te : TupleExp =>
+          val argSlot = te.exps(1) match{
+            case ne : NameExp => VarSlot(ne.name.name)
+            case exp => VarSlot(exp.toString())
+          }
+          var paramSlots : List[VarSlot] = List()
+          calleeProcedure.params.foreach{
+            param =>
+              require(param.typeSpec.isDefined)
+              param.typeSpec.get match{
+	              case nt : NamedTypeSpec => 
+	                val name = nt.name.name
+	                if(name=="[|long|]" || name=="[|double|]")
+	                  paramSlots ::= VarSlot(param.name.name)
+	              case _ =>
+              }
+              paramSlots ::= VarSlot(param.name.name)
+          }
+          paramSlots = paramSlots.reverse
+          var result = isetEmpty[RFAFact]
+          val paramSlot = paramSlots(0)
+          varFacts.foreach{
+            fact =>
+              if(fact.s == argSlot) result += (RFAFact(paramSlot, fact.v))
           }
           factsToCallee -- varFacts ++ result
         case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
@@ -712,12 +838,20 @@ object AndroidReachingFactsAnalysis {
       }
     }
     
-    def isModelCall(calleeProc : AmandroidProcedure) : Boolean = {
+    private def isModelCall(calleeProc : AmandroidProcedure) : Boolean = {
       AndroidModelCallHandler.isModelCall(calleeProc)
     }
     
-    def doModelCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
+    private def doModelCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
       AndroidModelCallHandler.doModelCall(s, calleeProc, args, retVarOpt, currentContext)
+    }
+    
+    private def isICCCall(calleeProc : AmandroidProcedure) : Boolean = {
+      AndroidModelCallHandler.isICCCall(calleeProc)
+    }
+    
+    private def doICCCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : (ISet[RFAFact], ISet[AmandroidProcedure]) = {
+      AndroidModelCallHandler.doICCCall(s, calleeProc, args, retVarOpt, currentContext)
     }
     
   }

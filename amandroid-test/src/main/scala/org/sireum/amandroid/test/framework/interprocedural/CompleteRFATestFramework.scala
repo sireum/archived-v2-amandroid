@@ -6,7 +6,7 @@ import org.sireum.amandroid._
 import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
 import org.sireum.amandroid.util.APKFileResolver
 import org.sireum.amandroid.util.Dex2PilarConverter
-import org.sireum.amandroid.android.appInfo.PrepareApp
+import org.sireum.amandroid.android.appInfo.AppInfoCollector
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
@@ -44,7 +44,7 @@ trait CompleteRFATestFramework extends TestFramework {
     	    Center.resolveRecord(k, Center.ResolveLevel.BODIES)
     	}
     	
-    	val pre = new PrepareApp(new File(src.toString().substring(5)).toString())
+    	val pre = new AppInfoCollector(new File(src.toString().substring(5)).toString())
 		  pre.calculateEntrypoints
     	
 		  AndroidRFAConfig.setupCenter

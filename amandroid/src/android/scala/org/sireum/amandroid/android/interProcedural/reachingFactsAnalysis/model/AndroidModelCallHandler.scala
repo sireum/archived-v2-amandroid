@@ -28,11 +28,14 @@ object AndroidModelCallHandler extends ModelCallHandler{
 	  ComponentNameModel.isComponentName(r) ||
 	  IntentFilterModel.isIntentFilter(r) ||
 	  IntentModel.isIntent(r) ||
-	  InterComponentCommunicationModel.isIccOperation(calleeProc) ||
 	  FrameworkMethodsModel.isFrameworkMethods(calleeProc) ||
 	  ActivityModel.isActivity(r) ||
 	  super.isModelCall(calleeProc) ||
 	  AndroidRFAScopeManager.shouldBypass(r)
+  }
+  
+  def isICCCall(calleeProc : AmandroidProcedure) : Boolean = {
+    InterComponentCommunicationModel.isIccOperation(calleeProc)
   }
   
   /**
@@ -45,12 +48,16 @@ object AndroidModelCallHandler extends ModelCallHandler{
 	  else if(ComponentNameModel.isComponentName(r)) ComponentNameModel.doComponentNameCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(IntentFilterModel.isIntentFilter(r)) IntentFilterModel.doIntentFilterCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(IntentModel.isIntent(r)) IntentModel.doIntentCall(s, calleeProc, args, retVarOpt, currentContext)
-	  else if(InterComponentCommunicationModel.isIccOperation(calleeProc)) InterComponentCommunicationModel.doIccCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(FrameworkMethodsModel.isFrameworkMethods(calleeProc)) FrameworkMethodsModel.doFrameworkMethodsModelCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(ActivityModel.isActivity(r)) ActivityModel.doActivityCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(super.isModelCall(calleeProc)) super.doModelCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(AndroidRFAScopeManager.shouldBypass(r)) AndroidRFAScopeManager.handleBypass(s, calleeProc, args, retVarOpt, currentContext)
 	  else throw new RuntimeException("given callee is not a model call: " + calleeProc)
+	}
+	
+	def doICCCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : (ISet[RFAFact], ISet[AmandroidProcedure]) = {
+	  if(InterComponentCommunicationModel.isIccOperation(calleeProc)) InterComponentCommunicationModel.doIccCall(s, calleeProc, args, retVarOpt, currentContext)
+	  else throw new RuntimeException("given callee is not an ICC call: " + calleeProc)
 	}
 
 }

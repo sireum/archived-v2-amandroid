@@ -12,7 +12,7 @@ import org.sireum.amandroid.Center
 import org.sireum.amandroid.AmandroidCodeSource
 import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
 import org.sireum.amandroid.interProcedural.callGraph.CallGraphBuilder
-import org.sireum.amandroid.android.appInfo.PrepareApp
+import org.sireum.amandroid.android.appInfo.AppInfoCollector
 import org.sireum.amandroid.test.framework.TestFramework
 
 /**
@@ -83,7 +83,7 @@ trait DummyMainGenerateTestFramework extends TestFramework {
     	  k =>
     	    Center.resolveRecord(k, Center.ResolveLevel.BODIES)
     	}
-    	val pre = new PrepareApp(f.toString)
+    	val pre = new AppInfoCollector(f.toString)
 		  pre.calculateEntrypoints
     	
 //		  val cg = new CallGraphBuilder().buildWholeProgram(Some(pre))

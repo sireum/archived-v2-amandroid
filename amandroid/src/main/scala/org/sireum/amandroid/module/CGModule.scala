@@ -6,7 +6,7 @@ package org.sireum.amandroid.module
 import org.sireum.util._
 import org.sireum.pipeline._
 import java.lang.String
-import org.sireum.amandroid.android.appInfo.PrepareApp
+import org.sireum.amandroid.android.appInfo.AppInfoCollector
 import org.sireum.amandroid.interProcedural.callGraph.CGNode
 import org.sireum.amandroid.interProcedural.callGraph.CallGraph
 import org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisResult
@@ -107,9 +107,9 @@ object CGModule extends PipelineModule {
 
     _appInfoOpt match{
       case Some(x) =>
-        if(!x.isInstanceOf[scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp]]){
+        if(!x.isInstanceOf[scala.Option[org.sireum.amandroid.android.appInfo.AppInfoCollector]]){
           tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
-            "Input error for '" + this.title + "': Wrong type found for 'appInfoOpt'.  Expecting 'scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp]' but found '" + x.getClass.toString + "'")
+            "Input error for '" + this.title + "': Wrong type found for 'appInfoOpt'.  Expecting 'scala.Option[org.sireum.amandroid.android.appInfo.AppInfoCollector]' but found '" + x.getClass.toString + "'")
         }
       case None =>
         tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker,
@@ -208,15 +208,15 @@ object CGModule extends PipelineModule {
     return options
   }
 
-  def getAppInfoOpt (options : scala.collection.Map[Property.Key, Any]) : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp] = {
+  def getAppInfoOpt (options : scala.collection.Map[Property.Key, Any]) : scala.Option[org.sireum.amandroid.android.appInfo.AppInfoCollector] = {
     if (options.contains(CGModule.globalAppInfoOptKey)) {
-       return options(CGModule.globalAppInfoOptKey).asInstanceOf[scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp]]
+       return options(CGModule.globalAppInfoOptKey).asInstanceOf[scala.Option[org.sireum.amandroid.android.appInfo.AppInfoCollector]]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def setAppInfoOpt (options : MMap[Property.Key, Any], appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp]) : MMap[Property.Key, Any] = {
+  def setAppInfoOpt (options : MMap[Property.Key, Any], appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.AppInfoCollector]) : MMap[Property.Key, Any] = {
 
     options(CGModule.globalAppInfoOptKey) = appInfoOpt
 
@@ -275,7 +275,7 @@ object CGModule extends PipelineModule {
   object ConsumerView {
     implicit class CGModuleConsumerView (val job : PropertyProvider) extends AnyVal {
       def cfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]] = CGModule.getCfgs(job.propertyMap)
-      def appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp] = CGModule.getAppInfoOpt(job.propertyMap)
+      def appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.AppInfoCollector] = CGModule.getAppInfoOpt(job.propertyMap)
       def rdas : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]] = CGModule.getRdas(job.propertyMap)
       def procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = CGModule.getProcedureSymbolTables(job.propertyMap)
       def callGraph : org.sireum.amandroid.interProcedural.callGraph.CallGraph[org.sireum.amandroid.interProcedural.callGraph.CGNode] = CGModule.getCallGraph(job.propertyMap)
@@ -288,8 +288,8 @@ object CGModule extends PipelineModule {
       def cfgs_=(cfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]]) { CGModule.setCfgs(job.propertyMap, cfgs) }
       def cfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]] = CGModule.getCfgs(job.propertyMap)
 
-      def appInfoOpt_=(appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp]) { CGModule.setAppInfoOpt(job.propertyMap, appInfoOpt) }
-      def appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp] = CGModule.getAppInfoOpt(job.propertyMap)
+      def appInfoOpt_=(appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.AppInfoCollector]) { CGModule.setAppInfoOpt(job.propertyMap, appInfoOpt) }
+      def appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.AppInfoCollector] = CGModule.getAppInfoOpt(job.propertyMap)
 
       def rdas_=(rdas : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]]) { CGModule.setRdas(job.propertyMap, rdas) }
       def rdas : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]] = CGModule.getRdas(job.propertyMap)
@@ -308,7 +308,7 @@ trait CGModule {
 
   def cfgs : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.ControlFlowGraph[java.lang.String]] = CGModule.getCfgs(job.propertyMap)
 
-  def appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.PrepareApp] = CGModule.getAppInfoOpt(job.propertyMap)
+  def appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.AppInfoCollector] = CGModule.getAppInfoOpt(job.propertyMap)
 
   def rdas : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]] = CGModule.getRdas(job.propertyMap)
 

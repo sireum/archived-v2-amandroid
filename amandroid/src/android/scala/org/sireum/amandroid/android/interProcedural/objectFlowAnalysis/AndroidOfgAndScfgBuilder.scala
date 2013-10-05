@@ -12,7 +12,7 @@ import java.io.OutputStreamWriter
 import scala.collection.JavaConversions._
 import org.sireum.amandroid.util.SignatureParser
 import org.sireum.amandroid.interProcedural.objectFlowAnalysis._
-import org.sireum.amandroid.android.appInfo.PrepareApp
+import org.sireum.amandroid.android.appInfo.AppInfoCollector
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid._
 import org.sireum.amandroid.android.cache.AndroidCacheFile
@@ -28,7 +28,7 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
 
   type Edge = AlirEdge[Node]
   
-  var appInfo : PrepareApp = null
+  var appInfo : AppInfoCollector = null
   var pstMap : Map[String, ProcedureSymbolTable] = Map()
   var processed : Map[(String, Context), PointProc] = Map()
   var cfgs : MMap[String, ControlFlowGraph[String]] = null
@@ -39,13 +39,13 @@ class AndroidOfgAndScfgBuilder[Node <: OfaNode, ValueSet <: AndroidValueSet, Vir
   def apply(psts : Seq[ProcedureSymbolTable],
             cfgs : MMap[String, ControlFlowGraph[String]],
             rdas : MMap[String, ReachingDefinitionAnalysis.Result],
-            appInfoOpt : Option[PrepareApp]) 
+            appInfoOpt : Option[AppInfoCollector]) 
             = build(psts, cfgs, rdas, appInfoOpt)
 
   def build(psts : Seq[ProcedureSymbolTable],
             cfgs : MMap[String, ControlFlowGraph[String]],
             rdas : MMap[String, ReachingDefinitionAnalysis.Result],
-            appInfoOpt : Option[PrepareApp])
+            appInfoOpt : Option[AppInfoCollector])
    : (AndroidObjectFlowGraph[Node, ValueSet], CallGraph[CGNode]) = {
     this.cfgs = cfgs
     this.rdas = rdas

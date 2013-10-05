@@ -29,18 +29,26 @@ object InterComponentCommunicationModel {
     flag
   }
 	
-	def doIccCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
+	def doIccCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : (ISet[RFAFact], ISet[AmandroidProcedure]) = {
 	  val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
 	  require(args.size > 1)
 	  val intentSlot = VarSlot(args(1))
 	  val intentValues = factMap.getOrElse(intentSlot, isetEmpty)
+	  var targets : ISet[AmandroidProcedure] = isetEmpty
 	  val explicitTargets = getExplicitTargets(s, intentValues)
-//	  println("explicitTargets-->" + explicitTargets)
+	  targets ++= explicitTargets
 	  if(explicitTargets.isEmpty){
 	    val implicitTargets = getImplicitTargets(s, intentValues)
-//	    println("implicitTargets-->" + implicitTargets)
+	    targets ++= implicitTargets
+	    if(implicitTargets.isEmpty){
+	      System.err.println("Cannot find any icc targets for: " + calleeProc + "@" + currentContext)
+	    } else {
+	    	println("implicitTargets-->" + implicitTargets)
+	    }
+	  } else {
+	    println("explicitTargets-->" + explicitTargets)
 	  }
-	  s
+	  (s, targets)
 	}
 	
 	def getExplicitTargets(s : ISet[RFAFact], intentValues : ISet[Instance]) : ISet[AmandroidProcedure] = {

@@ -23,7 +23,7 @@ import org.sireum.amandroid.android.AppCenter
  * adapted from Steven Arzt
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
-class PrepareApp(apkFileLocation : String) {  
+class AppInfoCollector(apkFileLocation : String) {  
   private val DEBUG = true
 	private var callbackMethods : Map[String, MSet[AmandroidProcedure]] = Map()
 	private var entrypoints : Set[String] = null
@@ -31,7 +31,7 @@ class PrepareApp(apkFileLocation : String) {
 	private var appPackageName : String = ""
 	private var taintWrapperFile : String = ""
 	private var intentFdb : IntentFilterDataBase = null
-
+	private var codeLineCounter : Int = 0
 	/**
 	 * Map from record name to it's dummyMain procedure code.
 	 */
@@ -59,6 +59,8 @@ class PrepareApp(apkFileLocation : String) {
 	def getEntryPoints() = this.entrypoints
 			
 	def getDummyMainMap() = this.dummyMainMap
+	
+	def hasDummyMain(rec : AmandroidRecord) : Boolean = this.dummyMainMap.contains(rec)
 	
 
 	/**
@@ -89,6 +91,27 @@ class PrepareApp(apkFileLocation : String) {
     val proc = dmGen.generateWithParam(List(AndroidEntryPointConstants.INTENT_NAME))
 	  this.dummyMainMap += (record -> proc)
 	  dmGen.getCodeCounter
+	}
+	
+	def dynamicRegisterComponent(comRec : AmandroidRecord) = {
+	  println("*************Dynamic Register Component**************")
+	  println("Component name: " + comRec)
+	  val analysisHelper = new CallBackInfoCollector(Set(comRec.getName)) 
+		analysisHelper.collectCallbackMethods()
+		this.callbackMethods = analysisHelper.getCallbackMethods
+
+		analysisHelper.getCallbackMethods.foreach {
+	    case(k, v) =>
+  			if (this.callbackMethods.contains(k))
+  				this.callbackMethods(k) ++= (v)
+  			else
+  				this.callbackMethods += (k -> v)
+		}
+	  
+	  println("Found " + this.callbackMethods.size + " callback methods")
+    val clCounter = generateDummyMain(comRec, codeLineCounter)
+    codeLineCounter = clCounter
+    println("~~~~~~~~~~~~~~~~~~~~~~~~~Done~~~~~~~~~~~~~~~~~~~~~~~~~~")
 	}
 	
 	def calculateEntrypoints = {
@@ -179,7 +202,6 @@ class PrepareApp(apkFileLocation : String) {
 		    }
 		}
 		println("Found " + this.callbackMethods.size + " callback methods")
-    var codeLineCounter : Int = 0
     var components = isetEmpty[AmandroidRecord]
     this.entrypoints.foreach{
       f => 
@@ -190,7 +212,7 @@ class PrepareApp(apkFileLocation : String) {
     }
 		AppCenter.setComponents(components)
 		AppCenter.updateIntentFilterDB(this.intentFdb)
-
+		AppCenter.setAppInfo(this)
 		println("Entry point calculation done.")
 	}
 }

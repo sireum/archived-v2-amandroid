@@ -7,7 +7,7 @@ import org.sireum.amandroid.interProcedural.pointsToAnalysis._
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.util._
 import java.io._
-import org.sireum.amandroid.android.appInfo.PrepareApp
+import org.sireum.amandroid.android.appInfo.AppInfoCollector
 import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
 import org.sireum.amandroid._
 import org.sireum.amandroid.android.cache.AndroidCacheFile
@@ -20,7 +20,7 @@ import org.sireum.pilar.ast.NameExp
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 class CallGraphBuilder {
-  var appInfo : PrepareApp = null
+  var appInfo : AppInfoCollector = null
   var processed : Map[(String, Context), PointProc] = Map()
   var pgPointsMap : Map[String, MList[Point]] = Map()
   //a map from return node to its possible updated value set
@@ -52,7 +52,7 @@ class CallGraphBuilder {
     cg.getReachableProcedure(procedures)
 	}
   
-  def buildAppOnly(appInfoOpt : Option[PrepareApp]) : CallGraph[CGNode] = {
+  def buildAppOnly(appInfoOpt : Option[AppInfoCollector]) : CallGraph[CGNode] = {
     val pag = new PointerAssignmentGraph[PtaNode]()
     val cg = new CallGraph[CGNode]
     val entryPoints = Center.getEntryPoints
@@ -81,7 +81,7 @@ class CallGraphBuilder {
     result
   }
 
-  def buildWholeProgram(appInfoOpt : Option[PrepareApp])
+  def buildWholeProgram(appInfoOpt : Option[AppInfoCollector])
    : CallGraph[CGNode] = {
     if(GlobalConfig.mode < Mode.WHOLE_PROGRAM_TEST) throw new RuntimeException("Cannot get complete call graph, because not in whole program mode")
     val pag = new PointerAssignmentGraph[PtaNode]()

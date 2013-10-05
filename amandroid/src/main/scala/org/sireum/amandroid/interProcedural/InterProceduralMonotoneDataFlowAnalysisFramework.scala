@@ -32,12 +32,11 @@ trait InterProceduralMonotonicFunction[LatticeElement] {
  * @author Fengguo Wei & Sankardas Roy
  */
 trait CallResolver[LatticeElement] {
-  def getCalleeSet(s : ISet[LatticeElement], cj : CallJump, callerContext : Context) : ISet[AmandroidProcedure]
-  def getFactsForCalleeAndReturn(s : ISet[LatticeElement], cj : CallJump) : (ISet[LatticeElement], ISet[LatticeElement])
-  def mapFactsToCallee(factsToCallee : ISet[LatticeElement], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[LatticeElement]
+  /**
+	 * It returns the facts for each callee entry node and caller return node
+	 */
+  def resolveCall(s : ISet[LatticeElement], cj : CallJump, callerContext : Context, cg : CallGraph[CGNode]) : (IMap[CGNode, ISet[LatticeElement]], ISet[LatticeElement])
   def getAndMapFactsForCaller(callerS : ISet[LatticeElement], calleeS : ISet[LatticeElement], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[LatticeElement]
-  def isModelCall(calleeProc : AmandroidProcedure) : Boolean
-  def doModelCall(s : ISet[LatticeElement], calleeProc : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[LatticeElement]
 }
 
 /**
@@ -418,11 +417,17 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
                 update(confluence(r, getEntrySet(sn)), sn)
               case j : CallJump =>
                 if (esl.isDefined) eslb.callJump(j, s)
+                var updated = false
                 if (j.jump.isEmpty) {
-                  val sn = next(l, pst, pSig, callerContext)
-                  val r = fA(j, s, currentContext)
-                  if (esl.isDefined) eslb.exitSet(None, r)
-                  update(confluence(r, getEntrySet(sn)), sn)
+                  val (calleeFactsMap, retFacts) = callr.resolveCall(s, j, currentContext, cg)
+                  calleeFactsMap.foreach{
+                    case (calleeNode, calleeFacts) =>
+			                updated = update(confluence(calleeFacts, getEntrySet(calleeNode)), calleeNode) || updated
+                  }
+                  val rn = cg.getCGReturnNode(currentContext)
+                  updated = update(confluence(retFacts, getEntrySet(rn)), rn) || updated
+                  if (esl.isDefined) eslb.exitSet(None, getEntrySet(rn))
+                  updated
                 } else
                   jumpF(fA(j, s, currentContext), j.jump.get)
             }
@@ -488,9 +493,7 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
     val imdaf = new IMdaf(getEntrySet _, initial)
     
     val initContext = new Context(GlobalConfig.CG_CONTEXT_K)
-    var processed : ISet[(AmandroidProcedure, Context)] = isetEmpty
     cg.collectCfgToBaseGraph(entryPoint, initContext, true)
-    processed += ((entryPoint, initContext))
     entrySetMap.put(flow.entryNode, iota)
     val workList = mlistEmpty[N]
     workList += flow.entryNode
@@ -521,62 +524,18 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
 	            	//println("from cgexitnode!")
 	          }
 	        case cn : CGCallNode =>
-	          val l = cn.getOwnerPST.location(cn.getLocIndex)
-	          require(cg.isCall(l))
-	          val cj = l.asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump]
-	          val callerContext = cn.getContext
-	          val s = getEntrySet(cn) ++ gen(getEntrySet(cn), cj, callerContext)
-	          val calleeSet = callr.getCalleeSet(s, cj, callerContext)
-	          val (factsForCallee, factsForReturn) = callr.getFactsForCalleeAndReturn(s, cj)
-	          calleeSet foreach{
-	            callee=>
-	              if(callr.isModelCall(callee)){
-	                val args = cj.callExp.arg match{
-	                  case te : TupleExp =>
-	                    te.exps.map{
-						            exp =>
-						              exp match{
-								            case ne : NameExp => ne.name.name
-								            case _ => exp.toString()
-								          }
-						          }.toList
-	                  case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
-	                }
-	                val newReturnFacts = callr.doModelCall(factsForCallee, callee, args, cj.lhs match{case Some(exp) => Some(exp.name.name) case None => None}, callerContext)
-	                val rn = cg.getCGReturnNode(callerContext)
-	                imdaf.update(confluence(getEntrySet(rn), newReturnFacts), rn)
-	                workList += rn
-	                	//println("from model call!")
-	              } else if(!processed.contains(callee, callerContext)) {
-	                cg.collectCfgToBaseGraph[String](callee, callerContext, false)
-			            cg.extendGraph(callee.getSignature, callerContext)
-			            processed += ((callee, callerContext))
-	              }
-	          }
-	          for (succ <- cg.successors(n)) {
-	            succ match{
-	              case en : CGEntryNode =>
-	                val newCalleeFacts = callr.mapFactsToCallee(factsForCallee, cj, en.getOwnerPST.procedure)
-	                if(imdaf.update(confluence(getEntrySet(en),newCalleeFacts), en)){
-	                	workList += succ
-	                	//println("from cgcallnode to cgentrynode!")
-	                }
-	              case rn : CGReturnNode =>
-	                imdaf.update(confluence(factsForReturn, getEntrySet(rn)), rn)
-	              case a => throw new RuntimeException("unexpected node type: " + a)
-	            }
+	          if (imdaf.visit(cn.getOwnerPST.location(cn.getLocIndex), cn.getOwnerPST, callerContext)){
+	            workList ++= cg.successors(n)
 	          }
 	        case rn : CGReturnNode =>
 	          for (succ <- cg.successors(n)) {
 	            if(imdaf.update(getEntrySet(n), succ)){
 		            workList += succ
-		            //println("from cgReturnnode!")
 	            }
 	          }
 	        case nn : CGNormalNode =>
 	          if (imdaf.visit(nn.getOwnerPST.location(nn.getLocIndex), nn.getOwnerPST, callerContext)){
 	            workList ++= cg.successors(n)
-	            //println("from cgnormalnode!")
 	          }
 	        case a => throw new RuntimeException("unexpected node type: " + a)
 	      }
@@ -599,7 +558,7 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
 	        }
 	    }
     }
-    println("processed-->" + processed.size)
+    println("processed-->" + cg.getProcessed.size)
     imdaf
     
 	}

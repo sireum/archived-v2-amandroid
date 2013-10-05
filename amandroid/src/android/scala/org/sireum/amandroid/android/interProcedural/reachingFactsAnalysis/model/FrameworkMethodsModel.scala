@@ -127,6 +127,10 @@ object FrameworkMethodsModel {
 	      }
 	      AppCenter.setComponent(comRec)
 	      iDB.updateIntentFmap(intentF)
+	      val appinfo = AppCenter.getAppInfo
+	      if(!appinfo.hasDummyMain(comRec)){
+	        appinfo.dynamicRegisterComponent(comRec)
+	      }
 	  }
 	  AppCenter.updateIntentFilterDB(iDB)
 	  println("intentfilter database: " + AppCenter.getIntentFilterDB)
@@ -152,10 +156,10 @@ object FrameworkMethodsModel {
 							case AndroidConstants.NOTIFICATION_SERVICE => println("Get notification service in " + currentContext)
 							case AndroidConstants.KEYGUARD_SERVICE => println("Get keyguard service in " + currentContext)
 							case AndroidConstants.LOCATION_SERVICE => println("Get location service in " + currentContext)
-							case AndroidConstants.SEARCH_SERVICE => println("Get search service")
+							case AndroidConstants.SEARCH_SERVICE => println("Get search service" + currentContext)
 							case AndroidConstants.VIBRATOR_SERVICE => println("Get vibrator service in " + currentContext)
 							case AndroidConstants.CONNECTIVITY_SERVICE => println("Get connection service in " + currentContext)
-							case AndroidConstants.WIFI_SERVICE => println("Get wifi service")
+							case AndroidConstants.WIFI_SERVICE => println("Get wifi service" + currentContext)
 							case AndroidConstants.INPUT_METHOD_SERVICE => println("Get input_method service in " + currentContext)
 							case AndroidConstants.UI_MODE_SERVICE => println("Get uimode service in " + currentContext)
 							case AndroidConstants.DOWNLOAD_SERVICE => println("Get download service in " + currentContext)

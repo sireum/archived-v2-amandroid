@@ -5,7 +5,6 @@ import org.sireum.amandroid.util.StringFormConverter
 import org.sireum.util._
 import org.sireum.amandroid.interProcedural.callGraph.CGNode
 import org.sireum.amandroid.interProcedural.callGraph.CallGraphBuilder
-import org.sireum.amandroid.android.appInfo.PrepareApp
 
 
 /**
@@ -57,24 +56,6 @@ object Center {
 	
 	private var hierarchy : RecordHierarchy = null
 	
-	/**
-	 * call graph of all procedures (app only)
-	 */
-	
-	private var appOnlyCallGraph : CallGraph[CGNode] = null
-	
-	/**
-	 * call graph of all procedures (whole program)
-	 */
-	
-	private var wholeProgramCallGraph : CallGraph[CGNode] = null
-	
-	/**
-	 * hold application information (current only used for android app)
-	 */
-	
-	private var appInfoOpt : Option[PrepareApp] = None
-	
 	val DEFAULT_TOPLEVEL_OBJECT = "[|java:lang:Object|]"
 	  
 	val JAVA_PRIMITIVE_TYPES = Set("[|byte|]", "[|short|]", "[|int|]", "[|long|]", "[|float|]", "[|double|]", "[|boolean|]", "[|char|]")
@@ -104,88 +85,8 @@ object Center {
    */
   
   def isJavaPrimitiveType(name : String) : Boolean = this.JAVA_PRIMITIVE_TYPES.contains(name)
-	
-	/**
-	 * set application info
-	 */
 	  
-	def setAppInfo(info : PrepareApp) = this.appInfoOpt = Some(info)
 	
-	/**
-	 * get application info
-	 */
-	  
-	def getAppInfo : PrepareApp = 
-	  this.appInfoOpt match{
-	    case Some(info) => info
-	    case None => throw new RuntimeException("doesn't have appinfo")
-  	}
-  
-  /**
-   * return true if it has app info
-   */
-  
-  def hasAppInfo : Boolean = this.appInfoOpt.isDefined
-  
-  /**
-   * release app info
-   */
-  
-  def releaseAppInfo = this.appInfoOpt = None
-	  
-	/**
-	 * set call graph for the current center
-	 */
-	  
-	def setAppOnlyCallGraph(cg : CallGraph[CGNode]) = this.appOnlyCallGraph = cg
-	
-	/**
-	 * get call graph of the current center
-	 */
-	
-	def getAppOnlyCallGraph : CallGraph[CGNode] = {
-    if(!hasAppOnlyCallGraph) setAppOnlyCallGraph(new CallGraphBuilder().buildAppOnly(this.appInfoOpt))
-    this.appOnlyCallGraph
-  }
-  
-  /**
-   * return true if current center has call graph
-   */
-  
-  def hasAppOnlyCallGraph : Boolean = this.appOnlyCallGraph != null
-  
-  /**
-   * release call graph
-   */
-  
-  def releaseAppOnlyCallGraph = this.appOnlyCallGraph = null
-  
-  /**
-	 * set call graph for the current center
-	 */
-	  
-	def setWholeProgramCallGraph(cg : CallGraph[CGNode]) = this.wholeProgramCallGraph = cg
-	
-	/**
-	 * get call graph of the current center
-	 */
-	
-	def getWholeProgramCallGraph : CallGraph[CGNode] = {
-    if(!hasWholeProgramCallGraph) setWholeProgramCallGraph(new CallGraphBuilder().buildWholeProgram(appInfoOpt))
-    this.wholeProgramCallGraph
-  }
-  
-  /**
-   * return true if the current center has call graph
-   */
-  
-  def hasWholeProgramCallGraph : Boolean = this.wholeProgramCallGraph != null
-  
-  /**
-   * release call graph
-   */
-  
-  def releaseWholeProgramCallGraph = this.wholeProgramCallGraph = null
 	  
   /**
    * resolve records relation
@@ -822,9 +723,6 @@ object Center {
 	  this.mainRecord = null
 	  this.entryPoints = Set()
 	  this.hierarchy = null
-	  this.appOnlyCallGraph = null
-	  this.wholeProgramCallGraph = null
-	  this.appInfoOpt = None
 	}
 	
 	def printDetails = {

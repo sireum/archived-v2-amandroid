@@ -10,8 +10,8 @@ import org.sireum.alir._
 import org.sireum.pilar.symbol._
 import org.sireum.amandroid.interProcedural.callGraph.CallGraph
 import org.sireum.amandroid.android.cache.AndroidCacheFile
-import org.sireum.amandroid.android.appInfo.PrepareApp
 import org.sireum.amandroid.interProcedural.callGraph.CGNode
+import org.sireum.amandroid.android.appInfo.AppInfoCollector
 
 /*
 Copyright (c) 2012-2013 Sankardas Roy & Fengguo Wei, Kansas State University.        
@@ -49,7 +49,7 @@ case class AndroidInterProcedural(
   shouldBuildCallGraph : Boolean = true,
   
   @Input
-  appInfoOpt : scala.Option[PrepareApp] = None,
+  appInfoOpt : scala.Option[AppInfoCollector] = None,
   
   @Input
   intraResult : MMap[ResourceUri, AndroidIntraProcedural.AndroidIntraAnalysisResult],
@@ -72,7 +72,7 @@ case class CG(
   procedureSymbolTables : Seq[ProcedureSymbolTable],
   
   @Input
-  appInfoOpt : scala.Option[PrepareApp],
+  appInfoOpt : scala.Option[AppInfoCollector],
   
   // for test now. Later will change it.
   @Output

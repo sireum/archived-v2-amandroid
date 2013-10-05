@@ -17,7 +17,7 @@ import org.sireum.pipeline.gen.ModuleGenerator
 import org.sireum.pilar.ast.CatchClause
 import org.sireum.alir.DefRef
 import org.sireum.pilar.symbol.ProcedureSymbolTable
-import org.sireum.amandroid.android.appInfo.PrepareApp
+import org.sireum.amandroid.android.appInfo.AppInfoCollector
 import org.sireum.amandroid.android.cache.AndroidCacheFile
 import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis._
 
@@ -31,7 +31,7 @@ case class AndroidFixIntraProcedural(
   parallel : Boolean,
   
   @Input
-  appInfoOpt : scala.Option[PrepareApp],
+  appInfoOpt : scala.Option[AppInfoCollector],
   
   @Input 
   models : ISeq[Model],

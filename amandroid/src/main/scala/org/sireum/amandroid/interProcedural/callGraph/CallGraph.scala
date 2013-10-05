@@ -21,6 +21,10 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
   private var succBranchMap : MMap[(Node, Option[Branch]), Node] = null
   private var predBranchMap : MMap[(Node, Option[Branch]), Node] = null
   val BRANCH_PROPERTY_KEY = ControlFlowGraph.BRANCH_PROPERTY_KEY
+  final val EDGE_TYPE = "EdgeType"
+  object EdgeType extends Enumeration {
+		val CONCRETE, ABSTRACT, SPECIAL = Value
+	}
   
   private var entryN : CGNode = null
 
@@ -29,6 +33,21 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
   def entryNode : Node = this.entryN.asInstanceOf[Node]
   
   def exitNode : Node = this.exitN.asInstanceOf[Node]
+  
+  
+  private var processed : IMap[(AmandroidProcedure, Context), ISet[Node]] = imapEmpty
+  
+  def isProcessed(proc : AmandroidProcedure, callerContext : Context) : Boolean = processed.contains(proc, callerContext)
+  
+  def getProcessed = this.processed
+  
+  def entryNode(proc : AmandroidProcedure, callerContext : Context) : Node = {
+    require(isProcessed(proc, callerContext))
+    processed(proc, callerContext).foreach{
+      n => if(n.isInstanceOf[CGEntryNode]) return n
+    }
+    throw new RuntimeException("Cannot find entry node for: " + proc)
+  }
   
   /**
    * map from procedures to it's callee procedures
@@ -353,6 +372,7 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
           }
       }
     }
+    this.processed += ((calleeProc, callerContext) -> nodes)
     nodes
   }
   
@@ -365,6 +385,16 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
     val retSrcNode = getCGExitNode(calleeContext)
     addEdge(callNode, targetNode)
     addEdge(retSrcNode, returnNode)
+    targetNode
+  }
+  
+  def extendGraphOneWay(calleeSig  : String, callerContext : Context) : Node = {
+    val callNode = getCGCallNode(callerContext)
+    val calleeContext = callerContext.copy
+    calleeContext.setContext(calleeSig, calleeSig)
+    val targetNode = getCGEntryNode(calleeContext)
+    println(callNode + " --> " + targetNode)
+    addEdge(callNode, targetNode)
     targetNode
   }
   

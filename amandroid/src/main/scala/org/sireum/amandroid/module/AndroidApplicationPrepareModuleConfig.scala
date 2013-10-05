@@ -11,7 +11,7 @@ import org.sireum.pipeline.PipelineStage
 import org.sireum.core.module._
 import org.sireum.pipeline.PipelineJob
 import org.sireum.pilar.symbol.SymbolTable
-import org.sireum.amandroid.android.appInfo.PrepareApp
+import org.sireum.amandroid.android.appInfo.AppInfoCollector
 import org.sireum.pipeline.gen.ModuleGenerator
 
 case class AndroidApplicationPrepare(
@@ -28,7 +28,7 @@ case class AndroidApplicationPrepare(
   
   @Produce
   @Output
-  appInfoOpt : scala.Option[PrepareApp]
+  appInfoOpt : scala.Option[AppInfoCollector]
 )
 
 object prepare {
