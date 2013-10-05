@@ -393,7 +393,6 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
     val calleeContext = callerContext.copy
     calleeContext.setContext(calleeSig, calleeSig)
     val targetNode = getCGEntryNode(calleeContext)
-    println(callNode + " --> " + targetNode)
     addEdge(callNode, targetNode)
     targetNode
   }

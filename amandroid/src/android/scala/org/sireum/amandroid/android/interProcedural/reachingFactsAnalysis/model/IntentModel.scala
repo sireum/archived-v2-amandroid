@@ -158,18 +158,31 @@ object IntentModel {
 		  case "[|Landroid/content/Intent;.setClassName:(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;|]" =>  //public
 		  case "[|Landroid/content/Intent;.setClipData:(Landroid/content/ClipData;)V|]" =>  //public
 		  case "[|Landroid/content/Intent;.setComponent:(Landroid/content/ComponentName;)Landroid/content/Intent;|]" =>  //public
+		    require(retVarOpt.isDefined)
+		    intentSetComponent(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.setData:(Landroid/net/Uri;)Landroid/content/Intent;|]" =>  //public
+		    require(retVarOpt.isDefined)
+		    intentSetData(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.setDataAndNormalize:(Landroid/net/Uri;)Landroid/content/Intent;|]" =>  //public
+		    require(retVarOpt.isDefined)
+		    intentSetData(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.setDataAndType:(Landroid/net/Uri;Ljava/lang/String;)Landroid/content/Intent;|]" =>  //public
-		    
+		    require(retVarOpt.isDefined)
+		    intentSetDataAndType(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.setDataAndTypeAndNormalize:(Landroid/net/Uri;Ljava/lang/String;)Landroid/content/Intent;|]" =>  //public
+		    require(retVarOpt.isDefined)
+		    intentSetDataAndType(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.setExtrasClassLoader:(Ljava/lang/ClassLoader;)V|]" =>  //public
 		  case "[|Landroid/content/Intent;.setFlags:(I)Landroid/content/Intent;|]" =>  //public
 		  case "[|Landroid/content/Intent;.setPackage:(Ljava/lang/String;)Landroid/content/Intent;|]" =>  //public
 		  case "[|Landroid/content/Intent;.setSelector:(Landroid/content/Intent;)V|]" =>  //public
 		  case "[|Landroid/content/Intent;.setSourceBounds:(Landroid/graphics/Rect;)V|]" =>  //public
 		  case "[|Landroid/content/Intent;.setType:(Ljava/lang/String;)Landroid/content/Intent;|]" =>  //public
+		    require(retVarOpt.isDefined)
+		    intentSetType(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.setTypeAndNormalize:(Ljava/lang/String;)Landroid/content/Intent;|]" =>  //public
+		    require(retVarOpt.isDefined)
+		    intentSetType(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.toInsecureString:()Ljava/lang/String;|]" =>  //public
 		  case "[|Landroid/content/Intent;.toInsecureStringWithClip:()Ljava/lang/String;|]" =>  //public
 		  case "[|Landroid/content/Intent;.toShortString:(Ljava/lang/StringBuilder;ZZZZ)V|]" =>  //public
@@ -535,4 +548,153 @@ object IntentModel {
 	  }
     (newfacts, delfacts)
   }
+  
+  
+  
+  /**
+   * [|Landroid/content/Intent;.setComponent:(Landroid/content/ComponentName;)Landroid/content/Intent;|]
+   */
+  private def intentSetComponent(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+    require(args.size >1)
+    val thisSlot = VarSlot(args(0))
+	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val componentSlot = VarSlot(args(1))
+	  val componentValue = factMap.getOrElse(componentSlot, isetEmpty)
+	  var newfacts = isetEmpty[RFAFact]
+    var delfacts = isetEmpty[RFAFact]
+	  thisValue.foreach{
+	    tv =>
+	      if(thisValue.size == 1){
+	        for (rdf @ RFAFact(slot, _) <- s) {
+		        //if it is a strong definition, we can kill the existing definition
+		        if (FieldSlot(tv, AndroidConstants.INTENT_COMPONENT) == slot) {
+		          delfacts += rdf
+		        }
+		      }
+	      }
+	      componentValue.foreach{
+		      component =>
+	          thisValue.foreach{
+	            tv =>
+	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_COMPONENT), component)
+	          }
+		    }
+	      newfacts += RFAFact(VarSlot(retVar), tv)
+	  }
+    (newfacts, delfacts)
+  }
+  
+  /**
+   * [|Landroid/content/Intent;.setData:(Landroid/net/Uri;)Landroid/content/Intent;|]
+   */
+  private def intentSetData(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+    require(args.size >1)
+    val thisSlot = VarSlot(args(0))
+	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val dataSlot = VarSlot(args(1))
+	  val dataValue = factMap.getOrElse(dataSlot, isetEmpty)
+	  var newfacts = isetEmpty[RFAFact]
+    var delfacts = isetEmpty[RFAFact]
+	  thisValue.foreach{
+	    tv =>
+	      if(thisValue.size == 1){
+	        for (rdf @ RFAFact(slot, _) <- s) {
+		        //if it is a strong definition, we can kill the existing definition
+		        if (FieldSlot(tv, AndroidConstants.INTENT_URI_DATA) == slot) {
+		          delfacts += rdf
+		        }
+		      }
+	      }
+	      dataValue.foreach{
+		      data =>
+	          thisValue.foreach{
+	            tv =>
+	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_URI_DATA), data)
+	          }
+		    }
+	      newfacts += RFAFact(VarSlot(retVar), tv)
+	  }
+    (newfacts, delfacts)
+  }
+  
+  /**
+   * [|Landroid/content/Intent;.setDataAndType:(Landroid/net/Uri;Ljava/lang/String;)Landroid/content/Intent;|]
+   */
+  private def intentSetDataAndType(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+    require(args.size >2)
+    val thisSlot = VarSlot(args(0))
+	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val dataSlot = VarSlot(args(1))
+	  val dataValue = factMap.getOrElse(dataSlot, isetEmpty)
+	  val typeSlot = VarSlot(args(2))
+	  val typeValue = factMap.getOrElse(typeSlot, isetEmpty)
+	  var newfacts = isetEmpty[RFAFact]
+    var delfacts = isetEmpty[RFAFact]
+	  thisValue.foreach{
+	    tv =>
+	      if(thisValue.size == 1){
+	        for (rdf @ RFAFact(slot, _) <- s) {
+	          val fieldsSlot : ISet[Slot] = Set(FieldSlot(tv, AndroidConstants.INTENT_URI_DATA), FieldSlot(tv, AndroidConstants.INTENT_MTYPE))
+		        //if it is a strong definition, we can kill the existing definition
+		        if (fieldsSlot.contains(slot)) {
+		          delfacts += rdf
+		        }
+		      }
+	      }
+	      dataValue.foreach{
+		      data =>
+	          thisValue.foreach{
+	            tv =>
+	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_URI_DATA), data)
+	          }
+		    }
+	      typeValue.foreach{
+		      typ =>
+	          thisValue.foreach{
+	            tv =>
+	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_MTYPE), typ)
+	          }
+		    }
+	      newfacts += RFAFact(VarSlot(retVar), tv)
+	  }
+    (newfacts, delfacts)
+  }
+  
+  /**
+   * [|Landroid/content/Intent;.setType:(Ljava/lang/String;)Landroid/content/Intent;|]
+   */
+  private def intentSetType(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+    require(args.size >1)
+    val thisSlot = VarSlot(args(0))
+	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val typeSlot = VarSlot(args(1))
+	  val typeValue = factMap.getOrElse(typeSlot, isetEmpty)
+	  var newfacts = isetEmpty[RFAFact]
+    var delfacts = isetEmpty[RFAFact]
+	  thisValue.foreach{
+	    tv =>
+	      if(thisValue.size == 1){
+	        for (rdf @ RFAFact(slot, _) <- s) {
+		        //if it is a strong definition, we can kill the existing definition
+		        if (FieldSlot(tv, AndroidConstants.INTENT_URI_DATA) == slot) {
+		          delfacts += rdf
+		        }
+		      }
+	      }
+	      typeValue.foreach{
+		      typ =>
+	          thisValue.foreach{
+	            tv =>
+	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_MTYPE), typ)
+	          }
+		    }
+	      newfacts += RFAFact(VarSlot(retVar), tv)
+	  }
+    (newfacts, delfacts)
+  }
+  
 }

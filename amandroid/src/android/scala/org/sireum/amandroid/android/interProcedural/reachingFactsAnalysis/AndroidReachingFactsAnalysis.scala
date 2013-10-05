@@ -506,7 +506,7 @@ object AndroidReachingFactsAnalysis {
       val calleeSet = getCalleeSet(s, cj, callerContext)
       var calleeFactsMap : IMap[CGNode, ISet[RFAFact]] = imapEmpty
       var returnFacts : ISet[RFAFact] = s
-      var pureNormalFlag = true
+      var pureNormalFlag = true  //no mix of normal and model callee
       calleeSet.foreach{
         callee =>
           if(isICCCall(callee) || isModelCall(callee)){
@@ -535,12 +535,12 @@ object AndroidReachingFactsAnalysis {
 			            }
                   calleeFactsMap += (cg.entryNode(target, callerContext) -> mapFactsToICCTarget(factsForCallee, cj, target.getProcedureBody.procedure))
               }
-            } else {
+            } else { // for non-ICC model call
               val factsForCallee = getFactsForCallee(s, cj, callee)
               returnFacts --= factsForCallee
             	returnFacts ++= doModelCall(factsForCallee, callee, args, cj.lhs match{case Some(exp) => Some(exp.name.name) case None => None}, callerContext)
             }
-          } else {
+          } else { // for normal call
             if(!cg.isProcessed(callee, callerContext)){
 	            cg.collectCfgToBaseGraph[String](callee, callerContext, false)
 						  cg.extendGraph(callee.getSignature, callerContext)
@@ -682,7 +682,9 @@ object AndroidReachingFactsAnalysis {
 	      else if(tmpRec.declaresProcedure(calleeProc.getSubSignature)) return false
 	      else tmpRec = tmpRec.getSuperClass
       }
-      throw new RuntimeException("Given recvIns: " + recvIns + " and calleeProc: " + calleeProc + " is not in the Same hierachy.")
+      if(tmpRec == recCallee) return true
+	    else if(tmpRec.declaresProcedure(calleeProc.getSubSignature)) return false
+	    else throw new RuntimeException("Given recvIns: " + recvIns + " and calleeProc: " + calleeProc + " is not in the Same hierachy.")
     }
     
     def mapFactsToCallee(factsToCallee : ISet[RFAFact], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[RFAFact] = {

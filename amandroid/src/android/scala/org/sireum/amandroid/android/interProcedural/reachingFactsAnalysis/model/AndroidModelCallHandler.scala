@@ -28,6 +28,7 @@ object AndroidModelCallHandler extends ModelCallHandler{
 	  ComponentNameModel.isComponentName(r) ||
 	  IntentFilterModel.isIntentFilter(r) ||
 	  IntentModel.isIntent(r) ||
+	  UriModel.isUri(r) ||
 	  FrameworkMethodsModel.isFrameworkMethods(calleeProc) ||
 	  ActivityModel.isActivity(r) ||
 	  super.isModelCall(calleeProc) ||
@@ -48,6 +49,7 @@ object AndroidModelCallHandler extends ModelCallHandler{
 	  else if(ComponentNameModel.isComponentName(r)) ComponentNameModel.doComponentNameCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(IntentFilterModel.isIntentFilter(r)) IntentFilterModel.doIntentFilterCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(IntentModel.isIntent(r)) IntentModel.doIntentCall(s, calleeProc, args, retVarOpt, currentContext)
+	  else if(UriModel.isUri(r)) UriModel.doUriCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(FrameworkMethodsModel.isFrameworkMethods(calleeProc)) FrameworkMethodsModel.doFrameworkMethodsModelCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(ActivityModel.isActivity(r)) ActivityModel.doActivityCall(s, calleeProc, args, retVarOpt, currentContext)
 	  else if(super.isModelCall(calleeProc)) super.doModelCall(s, calleeProc, args, retVarOpt, currentContext)

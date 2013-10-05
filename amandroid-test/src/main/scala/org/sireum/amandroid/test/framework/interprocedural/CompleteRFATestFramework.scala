@@ -33,7 +33,9 @@ trait CompleteRFATestFramework extends TestFramework {
     	println("####" + title + "#####")
     	Center.reset
     	AmandroidCodeSource.clearAppRecordsCodes
-    	
+    	val apkName = src.substring(src.lastIndexOf("/") + 1, src.lastIndexOf("."))
+    	val apkfile = new File(System.getProperty("user.home") + "/Desktop/graphs/" + apkName)
+    	if(!apkfile.exists()) apkfile.mkdir()
     	val dexFile = APKFileResolver.getDexFile(src)
     	
     	val pilarFile = Dex2PilarConverter.convert(dexFile)
@@ -55,20 +57,21 @@ trait CompleteRFATestFramework extends TestFramework {
     	    AndroidReachingFactsAnalysis.processedClinit = isetEmpty
     	    val (cg, result) = AndroidReachingFactsAnalysis(ep, initialfacts)
     	    println("exit facts: " + result.entrySet(cg.exitNode))
-    	    val f1 = new File(System.getProperty("user.home") + "/Desktop/" + ep.getShortName + "rfa.txt")
+    	    val f1 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "rfa.txt")
 			    val o1 = new FileOutputStream(f1)
 			    val w1 = new OutputStreamWriter(o1)
 			    cg.nodes.foreach{
 			      node =>
 			        w1.write(node + ":" + result.entrySet(node).toString + "\n")
 			    }
-    	    val f2 = new File(System.getProperty("user.home") + "/Desktop/" + ep.getShortName + "CG.dot")
+    	    
+    	    val f2 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "CG.dot")
 			    val o2 = new FileOutputStream(f2)
 			    val w2 = new OutputStreamWriter(o2)
 			    cg.toDot(w2)
     	}
     	
-//    	val r = Center.resolveRecord("[|android:app:Activity|]", Center.ResolveLevel.BODIES)
+//    	val r = Center.resolveRecord("[|android:net:Uri|]", Center.ResolveLevel.BODIES)
 //    	r.getProcedures.toSeq.sortBy(f => f.getSignature).foreach{
 //    	  p =>
 //    	    println("  case \"" + p.getSignature + "\" =>  //" + p.getAccessFlagString)

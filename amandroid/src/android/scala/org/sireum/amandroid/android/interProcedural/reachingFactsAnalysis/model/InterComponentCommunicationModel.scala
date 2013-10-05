@@ -180,6 +180,8 @@ object InterComponentCommunicationModel {
 	              if(temp1 != null && temp1.contains("/")){
 		              port = temp1.split("/")(0)
 		              path = temp1.split("/")(1)
+	              } else if(temp1 != null){
+	                port = temp1
 	              }
               }
               else{
