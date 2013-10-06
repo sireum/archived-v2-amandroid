@@ -417,9 +417,10 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
                 update(confluence(r, getEntrySet(sn)), sn)
               case j : CallJump =>
                 if (esl.isDefined) eslb.callJump(j, s)
+                val r = fA(j, s, currentContext)
                 var updated = false
                 if (j.jump.isEmpty) {
-                  val (calleeFactsMap, retFacts) = callr.resolveCall(s, j, currentContext, cg)
+                  val (calleeFactsMap, retFacts) = callr.resolveCall(r, j, currentContext, cg)
                   calleeFactsMap.foreach{
                     case (calleeNode, calleeFacts) =>
 			                updated = update(confluence(calleeFacts, getEntrySet(calleeNode)), calleeNode) || updated
@@ -429,7 +430,7 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
                   if (esl.isDefined) eslb.exitSet(None, getEntrySet(rn))
                   updated
                 } else
-                  jumpF(fA(j, s, currentContext), j.jump.get)
+                  jumpF(r, j.jump.get)
             }
 
         val ln = node(l, currentContext)

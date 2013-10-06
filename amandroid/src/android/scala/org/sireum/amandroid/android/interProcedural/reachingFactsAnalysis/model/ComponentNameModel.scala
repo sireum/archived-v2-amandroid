@@ -75,6 +75,10 @@ object ComponentNameModel {
 		    //TODO: How to handle parcel
 		  case _ =>
 	  }
+	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
+	    case Some(f) => newFacts += f
+	    case None =>
+	  }
 	  s ++ newFacts
 	}
 	

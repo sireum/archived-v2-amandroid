@@ -69,12 +69,9 @@ object FrameworkMethodsModel {
 	      }
 	    case _ =>
 	  }
-	  if(newFacts.isEmpty){
-	    if(retVarOpt.isDefined){
-	      val slot = VarSlot(retVarOpt.get)
-        val value = RFAUnknownInstance(currentContext)
-        newFacts += RFAFact(slot, value)
-	    }
+	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
+	    case Some(f) => newFacts += f
+	    case None =>
 	  }
 	  s ++ newFacts
 	}
@@ -147,23 +144,10 @@ object FrameworkMethodsModel {
 	    str =>
 	      str match{
 			    case cstr @ RFAConcreteStringInstance(text, c) =>
-			      text match{
-			        case AndroidConstants.WINDOW_SERVICE => println("Get window service in " + currentContext)
-							case AndroidConstants.LAYOUT_INFLATER_SERVICE => println("Get layout_inflater service in " + currentContext)
-							case AndroidConstants.ACTIVITY_SERVICE => println("Get activity service in " + currentContext)
-							case AndroidConstants.POWER_SERVICE => println("Get power service in " + currentContext)
-							case AndroidConstants.ALARM_SERVICE => println("Get alarm service in " + currentContext)
-							case AndroidConstants.NOTIFICATION_SERVICE => println("Get notification service in " + currentContext)
-							case AndroidConstants.KEYGUARD_SERVICE => println("Get keyguard service in " + currentContext)
-							case AndroidConstants.LOCATION_SERVICE => println("Get location service in " + currentContext)
-							case AndroidConstants.SEARCH_SERVICE => println("Get search service" + currentContext)
-							case AndroidConstants.VIBRATOR_SERVICE => println("Get vibrator service in " + currentContext)
-							case AndroidConstants.CONNECTIVITY_SERVICE => println("Get connection service in " + currentContext)
-							case AndroidConstants.WIFI_SERVICE => println("Get wifi service" + currentContext)
-							case AndroidConstants.INPUT_METHOD_SERVICE => println("Get input_method service in " + currentContext)
-							case AndroidConstants.UI_MODE_SERVICE => println("Get uimode service in " + currentContext)
-							case AndroidConstants.DOWNLOAD_SERVICE => println("Get download service in " + currentContext)
-							case _ => System.err.println("Given service does not exist: " + cstr)
+			      if(AndroidConstants.getSystemServiceStrings.contains(text)){
+			        println("Get " + text + " service in " + currentContext)
+			      } else {
+			        System.err.println("Given service does not exist: " + cstr)
 			      }
 			    case pstr @ RFAPointStringInstance(c) => System.err.println("Get system service use point string: " + pstr)
 			    case _ => throw new RuntimeException("unexpected instance type: " + str)

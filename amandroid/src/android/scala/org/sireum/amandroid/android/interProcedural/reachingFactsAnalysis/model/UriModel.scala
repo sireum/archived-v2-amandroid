@@ -65,12 +65,9 @@ object UriModel {
 		  case "[|Landroid/net/Uri;.withAppendedPath:(Landroid/net/Uri;Ljava/lang/String;)Landroid/net/Uri;|]" =>  //public static
 		  case "[|Landroid/net/Uri;.writeToParcel:(Landroid/os/Parcel;Landroid/net/Uri;)V|]" =>  //public static
 	  }
-	  if(newFacts.isEmpty){
-	    if(retVarOpt.isDefined){
-	      val slot = VarSlot(retVarOpt.get)
-        val value = RFAUnknownInstance(currentContext)
-        newFacts += RFAFact(slot, value)
-	    }
+	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
+	    case Some(f) => newFacts += f
+	    case None =>
 	  }
 	  s ++ newFacts -- delFacts
 	}

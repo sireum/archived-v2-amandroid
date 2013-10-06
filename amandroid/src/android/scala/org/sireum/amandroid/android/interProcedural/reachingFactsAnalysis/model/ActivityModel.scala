@@ -243,14 +243,10 @@ object ActivityModel {
 		  case "[|Landroid/app/Activity;.triggerSearch:(Ljava/lang/String;Landroid/os/Bundle;)V|]" =>  //public
 		  case "[|Landroid/app/Activity;.unregisterForContextMenu:(Landroid/view/View;)V|]" =>  //public
 	  }
-	  
-	  retVarOpt match{
-      case Some(retVar) =>
-        val slot = VarSlot(retVar)
-        val value = RFAUnknownInstance(currentContext)
-        newFacts += RFAFact(slot, value)
-      case None => s
-    }
+	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
+	    case Some(f) => newFacts += f
+	    case None =>
+	  }
 	  s ++ newFacts -- delFacts
 	}
 	

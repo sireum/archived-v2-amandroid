@@ -14,6 +14,7 @@ import org.sireum.amandroid.AmandroidRecord
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAFact
 import org.sireum.amandroid.Instance
+import java.net.URI
 
 object InterComponentCommunicationModel {
 	def isIccOperation(proc : AmandroidProcedure) : Boolean = {
@@ -157,57 +158,24 @@ object InterComponentCommunicationModel {
   }
   
   private def populateByUri(data: UriData, uriData: String) = {
-    
-    
     var scheme:String = null
     var host:String = null
     var port:String = null
     var path:String = null
-    
-    
-    var temp:String = null
     if(uriData != null){
-        if(uriData.contains("://")){
-            scheme = uriData.split("://")(0)
-            temp = uriData.split("://")(1)
-            // println("scheme = " + scheme + " , rest = " + temp)
-            var temp1:String = null
-            if(temp != null){
-              if(temp.contains(":")){
-	              host = temp.split(":")(0)
-	              temp1 = temp.split(":")(1)
-	              
-	              if(temp1 != null && temp1.contains("/")){
-		              port = temp1.split("/")(0)
-		              path = temp1.split("/")(1)
-	              } else if(temp1 != null){
-	                port = temp1
-	              }
-              }
-              else{
-	              if(temp.contains("/")){
-		              host = temp.split("/")(0)
-		              path = temp.split("/")(1)
-	              }
-              }
-              
-              if(scheme !=null)
-                data.setScheme(scheme)
-              if(host !=null)
-                data.setHost(host)
-              if(port != null)
-                data.setPort(port)
-              
-            }
-            
-        }
-       else if(uriData.contains(":")){  // because e.g. app code can have intent.setdata("http:") instead of intent.setdata("http://xyz:200/pqr/abc")
-         scheme = uriData.split(":")(0)
-         if(scheme != null)
-            data.setScheme(scheme)
-       }
-     } 
-
+      if(uriData.contains("://") && uriData.indexOf("://") < uriData.length()){
+        val uri = URI.create(uriData)
+        scheme = uri.getScheme()
+        host = uri.getHost()
+        port = if(uri.getPort() != -1) uri.getPort().toString else null
+        path = if(uri.getPath() != "") uri.getPath() else null
+        data.set(scheme, host, port, path, null, null)
+      } else if(uriData.contains(":")){  // because e.g. app code can have intent.setdata("http:") instead of intent.setdata("http://xyz:200/pqr/abc")
+        scheme = uriData.split(":")(0)
+        if(scheme != null)
+          data.setScheme(scheme)
+      }
+    }
   }
   
   

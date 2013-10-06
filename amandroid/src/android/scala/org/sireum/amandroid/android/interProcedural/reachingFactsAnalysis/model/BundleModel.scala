@@ -184,6 +184,10 @@ object BundleModel {
 		  case "[|Landroid/os/Bundle;.writeToParcel:(Landroid/os/Parcel;I)V|]" =>  //public
 		  case _ =>
 	  }
+	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
+	    case Some(f) => newFacts += f
+	    case None =>
+	  }
 	  s ++ newFacts
 	}
 	

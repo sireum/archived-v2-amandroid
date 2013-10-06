@@ -105,12 +105,14 @@ class IntentFilter(holder : String) {
 
 class Data{
   private var schemes: Set[String] = Set()
-  private var hosts: Set[String] = Set()  
-  private var ports: Set[String] = Set()
+  private var authorities : Set[Authority] = Set()
   private var paths: Set[String] = Set()
   private var pathPrefixs: Set[String] = Set()
   private var pathPatterns: Set[String] = Set()
   private var mimeTypes: Set[String] = Set()
+  
+  case class Authority(host : String, port : String)
+  
   // note that in android there is some discrepancy regarding data and mType on the Intent side compared to that on the Intent Filter side
   def matchWith(uriData:UriData, mType:String):Boolean = {
     var dataTest = false
@@ -119,10 +121,31 @@ class Data{
       dataTest = true
     if(uriData != null && matchWith(uriData))  // **** re-check this logic
       dataTest = true
+    if(uriData != null && (uriData.getScheme == "content" || uriData.getScheme == "file")){
+      if(this.schemes.isEmpty) dataTest = true
+    }
     if(this.mimeTypes.isEmpty && mType == null)
       typeTest = true
-    else if(this.mimeTypes.contains(mType))
-      typeTest = true
+    else {
+      this.mimeTypes.foreach{
+        ifType =>
+          if(ifType.matches("([^\\*]*|\\*)/([^\\*]*|\\*)") && mType.matches("([^\\*]*|\\*)/([^\\*]*|\\*)")){ // four cases can match: test/type, test/*, */type, */*
+            val ifTypeFront = ifType.split("\\/")(0)
+            val ifTypeTail = ifType.split("\\/")(1)
+            val mTypeFront = mType.split("\\/")(0)
+            val mTypeTail = mType.split("\\/")(1)
+            var frontTest = false
+            var tailTest = false
+            if(ifTypeFront == mTypeFront || (ifTypeFront == "*" && mTypeFront == "*")){
+              frontTest = true
+            }
+            if(ifTypeTail == mTypeTail || ifTypeTail == "*" || mTypeTail == "*"){
+              tailTest = true
+            }
+            typeTest = frontTest && tailTest
+          }
+      }
+    }
       
     dataTest && typeTest
   }
@@ -132,34 +155,48 @@ class Data{
     val port = uriData.getPort()
     val path = uriData.getPath()
     var schemeTest = false
-    var hostTest = false 
-    var portTest = false 
+    var authorityTest = false
     var pathTest = false
-    
-    if(this.schemes.isEmpty && scheme == null) // we need to extend the matching logic to include many cases
-      return true
-    if(this.schemes.contains(scheme)){
+    var pathPrefixTest = false
+    var pathPatternTest = false
+    if(this.schemes.isEmpty){ // we need to extend the matching logic to include many cases
+      if(scheme == null){
         schemeTest = true
-        if(this.hosts.isEmpty && host == null)
-          return true
-	    if(this.hosts.contains(host)){
-	      hostTest = true
-	      if(this.ports.isEmpty && port == null)
-	        portTest = true
-	      else if(this.ports.contains(port))
-		    portTest = true
-		  if(this.paths.isEmpty && path == null)
-	        pathTest = true
-	      else if(this.paths.contains(path))
-		    pathTest = true
-		  portTest && pathTest
+        authorityTest = true
+        pathTest = true
+      }
+    } else if(scheme != null && this.schemes.contains(scheme)){
+      schemeTest = true
+	    if(this.authorities.isEmpty || this.authorities.filter(a => a.host != null).isEmpty){
+	      authorityTest = true
+	      pathTest = true
+	    } else {
+	      this.authorities.foreach{
+	        case Authority(if_host, if_port) =>
+	          if(if_host == host){
+	            if(if_port == null || if_port == port){
+	              authorityTest = true
+	              if(this.paths.isEmpty && this.pathPrefixs.isEmpty && this.pathPatterns.isEmpty){
+	                pathTest = true
+	              } else if(path != null){
+	                pathTest = this.paths.contains(path)
+	                this.pathPrefixs.foreach{
+	                  pre =>
+	                    if(path.startsWith(pre)) pathPrefixTest = true
+	                }
+	                this.pathPatterns.foreach{
+	                  pattern =>
+	                    if(path.matches(pattern)) pathPatternTest = true
+	                }
+	              }
+	            }
+	          }
+	      }
 	    }
-	    else
-	      false
-	 }
-    else
-        false
+    }
+    schemeTest && authorityTest && (pathTest || pathPrefixTest || pathPatternTest)
   }
+  
   def add(scheme : String, 
 	    				host : String, 
 	    				port : String, 
@@ -170,11 +207,8 @@ class Data{
     if(scheme!= null){
       this.schemes +=scheme
     }
-    if(host!= null){
-      this.hosts +=host
-    }
-    if(port!= null){
-      this.ports +=port
+    if(host != null || port != null){
+      this.authorities += Authority(host, port)
     }
     if(path!= null){
       this.paths +=path
@@ -196,18 +230,19 @@ class Data{
     }
   }
   
-  def addHost(host : String) ={
-    if(host!= null){
-      this.hosts +=host
-    }
+  def addAuthority(host : String, port : String) = {
+    this.authorities += Authority(host, port)
   }
   
-  def addPort(port : String) ={
-    if(port!= null){
-      this.ports +=port
-    }
+  def addAuthorityHostOnly(host : String) = {
+    this.authorities += Authority(host, null)
   }
-   def addPath(path : String) ={
+  
+  def addAuthorityPortOnly(port : String) = {
+    this.authorities += Authority(null, port)
+  }
+  
+  def addPath(path : String) ={
     if(path!= null){
       this.paths +=path
     }
@@ -217,7 +252,7 @@ class Data{
       this.mimeTypes +=mimeType
     }
   }
-  override def toString() = {"schemes= " + schemes + " host= " + hosts + " port= " + ports + " path= " + paths + " pathPrefix= " + pathPrefixs + " pathPattern= " + pathPatterns + " mimeType= " + mimeTypes}
+  override def toString() = {"schemes= " + schemes + " authorities= " + authorities + " path= " + paths + " pathPrefix= " + pathPrefixs + " pathPattern= " + pathPatterns + " mimeType= " + mimeTypes}
 }
 
 // A UriData class represents all pieces of info associated with the mData field of a particular Intent instance
@@ -252,10 +287,10 @@ class UriData{
     }
     if(pathPrefix != null){
 	    this.pathPrefix = pathPrefix
-	}
-	if(pathPattern != null){
-	    this.pathPattern = pathPattern
-	}
+		}
+		if(pathPattern != null){
+		    this.pathPattern = pathPattern
+		}
 	
   }
   
@@ -284,5 +319,20 @@ class UriData{
     }
   }
   def getPath() = this.path
+  
+  def setPathPrefix(pathPrefix : String) ={
+    if(pathPrefix!= null){
+      this.pathPrefix = pathPrefix
+    }
+  }
+  def getPathPrefix() = this.pathPrefix
+  
+  def setPathPattern(pathPattern : String) ={
+    if(pathPattern!= null){
+      this.pathPattern = pathPattern
+    }
+  }
+  def getPathPattern() = this.pathPattern
+  
   override def toString() = {"schemes= " + scheme + " host= " + host + " port= " + port + " path= " + path + " pathPrefix= " + pathPrefix + " pathPattern= " + pathPattern }
 }

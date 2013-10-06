@@ -536,6 +536,7 @@ object AndroidReachingFactsAnalysis {
                   calleeFactsMap += (cg.entryNode(target, callerContext) -> mapFactsToICCTarget(factsForCallee, cj, target.getProcedureBody.procedure))
               }
             } else { // for non-ICC model call
+//              if(callee.getSubSignature == "unknown:()LCenter/Unknown;") println("callees-->" + calleeSet + "\ncontext-->" + callerContext + "\nfacts-->" + s)
               val factsForCallee = getFactsForCallee(s, cj, callee)
               returnFacts --= factsForCallee
             	returnFacts ++= doModelCall(factsForCallee, callee, args, cj.lhs match{case Some(exp) => Some(exp.name.name) case None => None}, callerContext)
@@ -659,7 +660,16 @@ object AndroidReachingFactsAnalysis {
               val slot = VarSlot(exp.asInstanceOf[NameExp].name.name)
               var value = factMap.getOrElse(slot, isetEmpty)
               if(typ != "static" && i == 0){
-                value = value.filter(r => !r.isInstanceOf[RFANullInstance] && !r.isInstanceOf[RFAUnknownInstance] && shouldPass(r, callee))
+                value = 
+                  value.filter{
+                  	r => 
+                  	  if(callee.getSignature == AndroidConstants.UNKNOWN_PROCEDURE_SIG){
+                  	    if(r.isInstanceOf[RFAUnknownInstance]) true
+                  	    else false
+                  	  } else{
+                  	  	!r.isInstanceOf[RFANullInstance] && !r.isInstanceOf[RFAUnknownInstance] && shouldPass(r, callee)
+                  	  }
+                  }
               } 
               calleeFacts ++= value.map{r => RFAFact(slot, r)}
 		          calleeFacts ++= getRelatedHeapFacts(value, heapFacts)

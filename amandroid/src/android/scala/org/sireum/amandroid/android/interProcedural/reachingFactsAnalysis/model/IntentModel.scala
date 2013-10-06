@@ -174,6 +174,8 @@ object IntentModel {
 		    intentSetDataAndType(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.setExtrasClassLoader:(Ljava/lang/ClassLoader;)V|]" =>  //public
 		  case "[|Landroid/content/Intent;.setFlags:(I)Landroid/content/Intent;|]" =>  //public
+		    require(retVarOpt.isDefined)
+		    intentSetFlags(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.setPackage:(Ljava/lang/String;)Landroid/content/Intent;|]" =>  //public
 		  case "[|Landroid/content/Intent;.setSelector:(Landroid/content/Intent;)V|]" =>  //public
 		  case "[|Landroid/content/Intent;.setSourceBounds:(Landroid/graphics/Rect;)V|]" =>  //public
@@ -193,12 +195,9 @@ object IntentModel {
 		  case "[|Landroid/content/Intent;.toUriInner:(Ljava/lang/StringBuilder;Ljava/lang/String;I)V|]" =>  //private
 		  case "[|Landroid/content/Intent;.writeToParcel:(Landroid/os/Parcel;I)V|]" =>  //public
 	  }
-	  if(newFacts.isEmpty){
-	    if(retVarOpt.isDefined){
-	      val slot = VarSlot(retVarOpt.get)
-        val value = RFAUnknownInstance(currentContext)
-        newFacts += RFAFact(slot, value)
-	    }
+	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
+	    case Some(f) => newFacts += f
+	    case None =>
 	  }
 	  s ++ newFacts -- delFacts
 	}
@@ -305,7 +304,7 @@ object IntentModel {
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
 	            case pstr @ RFAPointStringInstance(c) => 
 	              if(DEBUG)
-	              	System.err.println("Init ComponentName use point string: " + pstr)
+	              	System.err.println("Init action use point string: " + pstr)
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), pstr)
 	            case _ => throw new RuntimeException("unexpected instance type: " + acStr)
 	          }
@@ -349,7 +348,7 @@ object IntentModel {
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
 	            case pstr @ RFAPointStringInstance(c) => 
 	              if(DEBUG)
-	              	System.err.println("Init ComponentName use point string: " + pstr)
+	              	System.err.println("Init action use point string: " + pstr)
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), pstr)
 	            case _ => throw new RuntimeException("unexpected instance type: " + acStr)
 	          }
@@ -407,7 +406,7 @@ object IntentModel {
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
 	            case pstr @ RFAPointStringInstance(c) => 
 	              if(DEBUG)
-	              	System.err.println("Init ComponentName use point string: " + pstr)
+	              	System.err.println("Init action use point string: " + pstr)
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), pstr)
 	            case _ => throw new RuntimeException("unexpected instance type: " + acStr)
 	          }
@@ -680,7 +679,7 @@ object IntentModel {
 	      if(thisValue.size == 1){
 	        for (rdf @ RFAFact(slot, _) <- s) {
 		        //if it is a strong definition, we can kill the existing definition
-		        if (FieldSlot(tv, AndroidConstants.INTENT_URI_DATA) == slot) {
+		        if (FieldSlot(tv, AndroidConstants.INTENT_MTYPE) == slot) {
 		          delfacts += rdf
 		        }
 		      }
@@ -692,6 +691,65 @@ object IntentModel {
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_MTYPE), typ)
 	          }
 		    }
+	      newfacts += RFAFact(VarSlot(retVar), tv)
+	  }
+    (newfacts, delfacts)
+  }
+  
+  /**
+   * [|Landroid/content/Intent;.setPackage:(Ljava/lang/String;)Landroid/content/Intent;|]
+   */
+  private def intentSetPackage(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+    require(args.size >1)
+    val thisSlot = VarSlot(args(0))
+	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val packageSlot = VarSlot(args(1))
+	  val packageValue = factMap.getOrElse(packageSlot, isetEmpty)
+	  var newfacts = isetEmpty[RFAFact]
+    var delfacts = isetEmpty[RFAFact]
+	  thisValue.foreach{
+	    tv =>
+	      if(thisValue.size == 1){
+	        for (rdf @ RFAFact(slot, _) <- s) {
+		        //if it is a strong definition, we can kill the existing definition
+		        if (FieldSlot(tv, AndroidConstants.INTENT_PACKAGE) == slot) {
+		          delfacts += rdf
+		        }
+		      }
+	      }
+	      packageValue.foreach{
+		      str =>
+	          thisValue.foreach{
+	            tv =>
+	              str match{
+			            case cstr @ RFAConcreteStringInstance(text, c) =>
+			              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_PACKAGE), cstr)
+			            case pstr @ RFAPointStringInstance(c) => 
+			              if(DEBUG)
+			              	System.err.println("Init package use point string: " + pstr)
+			              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_PACKAGE), pstr)
+			            case _ => throw new RuntimeException("unexpected instance type: " + str)
+			          }
+	          }
+		    }
+	      newfacts += RFAFact(VarSlot(retVar), tv)
+	  }
+    (newfacts, delfacts)
+  }
+  
+  /**
+   * [|Landroid/content/Intent;.setFlags:(I)Landroid/content/Intent;|]
+   */
+  private def intentSetFlags(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+    require(args.size >1)
+    val thisSlot = VarSlot(args(0))
+	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  var newfacts = isetEmpty[RFAFact]
+    var delfacts = isetEmpty[RFAFact]
+	  thisValue.foreach{
+	    tv =>
 	      newfacts += RFAFact(VarSlot(retVar), tv)
 	  }
     (newfacts, delfacts)

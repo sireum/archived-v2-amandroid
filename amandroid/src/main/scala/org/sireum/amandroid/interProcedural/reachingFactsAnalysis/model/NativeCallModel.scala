@@ -46,13 +46,10 @@ object NativeCallModel {
               newFacts += (RFAFact(VarSlot(retVarOpt.get), strIns))
 	      }
 	    case _ =>
-	      retVarOpt match{
-	        case Some(retVar) =>
-	          val slot = VarSlot(retVar)
-	          val value = RFAUnknownInstance(currentContext)
-	          newFacts += (RFAFact(slot, value))
-	        case None =>
-	      }
+	  }
+	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
+	    case Some(f) => newFacts += f
+	    case None =>
 	  }
 	  s ++ newFacts
 	}

@@ -70,6 +70,10 @@ object HashSetModel {
 		  case "[|Ljava/util/HashSet;.writeObject:(Ljava/io/ObjectOutputStream;)V|]" =>
 		  case _ =>
     }
+	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
+	    case Some(f) => newFacts += f
+	    case None =>
+	  }
     s ++ newFacts
   }
 }

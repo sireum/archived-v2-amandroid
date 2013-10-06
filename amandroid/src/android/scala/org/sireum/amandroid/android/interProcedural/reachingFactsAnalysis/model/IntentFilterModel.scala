@@ -73,12 +73,9 @@ object IntentFilterModel {
 		  case "[|Landroid/content/IntentFilter;.writeToParcel:(Landroid/os/Parcel;I)V|]" =>  //public final
 		  case "[|Landroid/content/IntentFilter;.writeToXml:(Lorg/xmlpull/v1/XmlSerializer;)V|]" =>  //public
 	  }
-	  if(newFacts.isEmpty){
-	    if(retVarOpt.isDefined){
-	      val slot = VarSlot(retVarOpt.get)
-        val value = RFAUnknownInstance(currentContext)
-        newFacts += RFAFact(slot, value)
-	    }
+	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
+	    case Some(f) => newFacts += f
+	    case None =>
 	  }
 	  s ++ newFacts -- delFacts
 	}

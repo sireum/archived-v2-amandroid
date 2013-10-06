@@ -192,6 +192,10 @@ object HashtableModel {
 		    newFacts ++= getHashTableValuesToRet(s, args, retVarOpt.get, currentContext)
 		  case "[|Ljava/util/Hashtable;.writeObject:(Ljava/io/ObjectOutputStream;)V|]" =>
 	  }
+	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
+	    case Some(f) => newFacts += f
+	    case None =>
+	  }
 	  s ++ newFacts
 	}
 }

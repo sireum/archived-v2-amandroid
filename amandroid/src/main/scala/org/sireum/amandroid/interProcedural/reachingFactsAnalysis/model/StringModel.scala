@@ -285,7 +285,10 @@ object StringModel {
 	      newFacts ++=getFactFromThisForRet(s, args, retVarOpt, currentContext)
 	    case _ =>
 	  }
-	  
+	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
+	    case Some(f) => newFacts += f
+	    case None =>
+	  }
 	  val s1 = s -- deleteFacts
 	  s1 ++ newFacts
 	}

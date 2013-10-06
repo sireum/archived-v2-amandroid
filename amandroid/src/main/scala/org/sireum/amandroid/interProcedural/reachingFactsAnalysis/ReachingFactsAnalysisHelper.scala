@@ -23,4 +23,16 @@ object ReachingFactsAnalysisHelper {
 	    Some(RFAFact(VarSlot(retVar), insOpt.get))
 	  } else None
 	}
+	
+	def checkAndGetUnknownObjectForRetVar(s : ISet[RFAFact], retVarOpt : Option[String], currentContext : Context) : Option[RFAFact] = {
+	  var result : Option[RFAFact] = None
+	  if(s.isEmpty){
+	    if(retVarOpt.isDefined){
+	      val slot = VarSlot(retVarOpt.get)
+        val value = RFAUnknownInstance(currentContext)
+        result = Some(RFAFact(slot, value))
+	    }
+	  }
+	  result
+	}
 }
