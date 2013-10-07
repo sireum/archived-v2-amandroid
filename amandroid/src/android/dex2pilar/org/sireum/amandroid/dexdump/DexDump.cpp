@@ -3162,9 +3162,20 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 							   }
 						   }
 					 }
-
-
-                   // now print other params 
+                  
+				  // sometimes populating locVarList in localsCb() method is not working, so no locVar e.g. "this" in locVarList. Below we forcefully add "this" to paraThis in that case
+                  
+				  if((thisFlag == 0) && (pDexMethod->accessFlags & ACC_STATIC) ==0) // i.e. non-static method but still "this" is not added 
+                     { 
+				      strcpy(paraThis,""); // initializing with null string
+				      strcat(paraThis, toPilar(descriptorToDot(backDescriptor)));
+					  char regNamebuff[20];
+					  sprintf(regNamebuff, " v%d", startReg - 1); // note that startReg was alrady increased by 1 above 
+					  strcat(paraThis, regNamebuff);
+					  strcat(paraThis, " @type (this)");
+					  thisFlag = 1;
+                     }
+                  // now print other params 
 
                    while (*base != ')') {
                      char* cp = tmpBuf;    
