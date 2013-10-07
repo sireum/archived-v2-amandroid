@@ -7,7 +7,7 @@ import org.sireum.amandroid._
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 object StringFormConverter {
-
+  
   /**
 	 * get record name from procedure signature. e.g. [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|] -> [|java:lang:Object|]
 	 */
@@ -107,6 +107,18 @@ object StringFormConverter {
     val sb = new StringBuffer
     for(d <- 1 to dimension) sb.append("[")
     sb.append(sig)
+    sb.toString().intern()
+  }
+  
+  
+  /**
+   * input ("java.lang.Class", 1) output "[Ljava.lang.Class"
+   */
+  
+  protected def getClassName(name : String, dimension : Int) : String = {
+    val sb = new StringBuffer
+    for(d <- 1 to dimension) sb.append("[")
+    sb.append(name)
     sb.toString().intern()
   }
   
@@ -273,6 +285,7 @@ object StringFormConverter {
     (tmp, d)
   }
 	
+	
 	/**
 	 * format java class name to amandriod type. 
 	 * input: "com.example.activity.XActivity" 
@@ -285,5 +298,47 @@ object StringFormConverter {
 	  val (tmp, d) = getDimensionsAndTypeFromClassName(cName)
     getType(tmp, d)
 	}
+	
+	def formatClassNameToRecordName(cName : String) : String = {
+	  formatClassNameToType(cName).name
+	}
+	
+	/**
+   * convert amandroid record name to java class name.
+   *  e.g. [|java:lang:String|][] -> [Ljava.lang.String;   [|java:lang:String|] -> java.lang.String
+   */
+  def formatRecordNameToClassName(name : String) : String = {
+    require(isValidType(name))
+    val t = getTypeFromName(name)
+    val d = t.dimensions
+    if(d > 0){
+	    t.typ match{
+	      case "[|byte|]" => 		getClassName("B", d)
+	      case "[|char|]" => 		getClassName("C", d)
+	      case "[|double|]" => 	getClassName("D", d)
+	      case "[|float|]" => 	getClassName("F", d)
+	      case "[|int|]" => 		getClassName("I", d)
+	      case "[|long|]" => 		getClassName("J", d)
+	      case "[|short|]" =>		getClassName("S", d)
+	      case "[|boolean|]" =>	getClassName("Z", d)
+	      case _ =>
+	        getClassName("L" + t.typ.substring(2, t.typ.length() - 2).replaceAll(":", ".") + ";", d)
+	    }
+    } else {
+      t.typ match{
+	      case "[|byte|]" => 		"byte"
+	      case "[|char|]" => 		"char"
+	      case "[|double|]" => 	"double"
+	      case "[|float|]" => 	"float"
+	      case "[|int|]" => 		"int"
+	      case "[|long|]" => 		"long"
+	      case "[|short|]" =>		"short"
+	      case "[|boolean|]" =>	"boolean"
+	      case "[|void|]" =>		"void"
+	      case _ =>
+	        t.typ.substring(2, t.typ.length() - 2).replaceAll(":", ".")
+	    }
+    }
+  }
   
 }

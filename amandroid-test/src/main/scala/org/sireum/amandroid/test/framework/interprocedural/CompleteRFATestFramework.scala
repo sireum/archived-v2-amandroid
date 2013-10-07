@@ -71,7 +71,7 @@ trait CompleteRFATestFramework extends TestFramework {
 			    cg.toDot(w2)
     	}
     	
-//    	val r = Center.resolveRecord("[|android:net:Uri|]", Center.ResolveLevel.BODIES)
+//    	val r = Center.resolveRecord("[|java:lang:Class|]", Center.ResolveLevel.BODIES)
 //    	r.getProcedures.toSeq.sortBy(f => f.getSignature).foreach{
 //    	  p =>
 //    	    println("  case \"" + p.getSignature + "\" =>  //" + p.getAccessFlagString)

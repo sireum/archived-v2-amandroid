@@ -137,6 +137,7 @@ final class AndroidDefRef(st: SymbolTable, val varAccesses: VarAccesses)
       def resolveNameExp(ne : NameExp) = {
         var uri : ResourceUri = null
         if(!ne.name.hasResourceInfo){
+          println("assignment-->" + a)
           val recType = StringFormConverter.getRecordTypeFromFieldSignature(ne.name.name)
           val rec = Center.resolveRecord(recType.name, Center.ResolveLevel.BODIES)
           val gf = Center.findField(recType, ne.name.name).getOrElse(throw new RuntimeException("cannot find field: " + ne.name.name))

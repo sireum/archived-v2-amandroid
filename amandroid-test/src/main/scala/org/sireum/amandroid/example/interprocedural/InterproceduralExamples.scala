@@ -13,7 +13,10 @@ object InterproceduralExamples extends Examples{
   val ANDROID_PILAR_FILE_EXT = ".pilar"
   def ofgModelFiles = exampleFiles(OFG_MODEL_DIR_URI, ANDROID_PILAR_FILE_EXT)
   
-  val OFG_APK_DIR_URI = sourceDirUri(this.getClass, "./ofg/apk/") 
+  val OFG_TEST_APK_DIR_URI = sourceDirUri(this.getClass, "./ofg/testapk/") 
   val ANDROID_APK_FILE_EXT = ".apk"
-  def ofgAPKFiles = exampleFiles(OFG_APK_DIR_URI, ANDROID_APK_FILE_EXT)
+  def ofgTestAPKFiles = exampleFiles(OFG_TEST_APK_DIR_URI, ANDROID_APK_FILE_EXT)
+  
+  val OFG_REAL_APK_DIR_URI = sourceDirUri(this.getClass, "./ofg/realapk/") 
+  def ofgRealAPKFiles = exampleFiles(OFG_REAL_APK_DIR_URI, ANDROID_APK_FILE_EXT)
 }

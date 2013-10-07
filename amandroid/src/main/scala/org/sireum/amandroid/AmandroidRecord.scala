@@ -1,6 +1,7 @@
 package org.sireum.amandroid
 
 import org.sireum.amandroid.interProcedural.Context
+import org.sireum.amandroid.util.StringFormConverter
 
 
 /**
@@ -158,7 +159,8 @@ class AmandroidRecord {
     setName(name)
     val mainContext = new Context(0)
     mainContext.setContext("Center", "L0000")
-    val cIns = ClassInstance(name, mainContext)
+    val className = StringFormConverter.formatRecordNameToClassName(name)
+    val cIns = ClassInstance(className, mainContext)
     setClassObj(cIns)
     this.accessFlags = accessFlags
     this

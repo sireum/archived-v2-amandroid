@@ -533,6 +533,7 @@ object AndroidReachingFactsAnalysis {
 				            cg.collectCfgToBaseGraph[String](target, callerContext, false)
 									  cg.extendGraphOneWay(target.getSignature, callerContext)
 			            }
+                  if(DEBUG) System.err.println(target.getDeclaringRecord + " started!")
                   calleeFactsMap += (cg.entryNode(target, callerContext) -> mapFactsToICCTarget(factsForCallee, cj, target.getProcedureBody.procedure))
               }
             } else { // for non-ICC model call

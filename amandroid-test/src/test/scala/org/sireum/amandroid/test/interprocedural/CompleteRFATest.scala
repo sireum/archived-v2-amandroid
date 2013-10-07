@@ -12,9 +12,14 @@ import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
 @RunWith(classOf[JUnitRunner])
 class CompleteRFATest extends CompleteRFATestFramework {
 	AmandroidCodeSource.preLoad
-  InterproceduralExamples.ofgAPKFiles.
+  InterproceduralExamples.ofgTestAPKFiles.
   filter { s => s.endsWith("BiggerWfgNP.apk") }.
   foreach { fileUri =>
     Analyzing title fileUri file fileUri
   }
+//  InterproceduralExamples.ofgRealAPKFiles.
+//  filter { s => s.endsWith("276d.apk") }.
+//  foreach { fileUri =>
+//    Analyzing title fileUri file fileUri
+//  }
 }

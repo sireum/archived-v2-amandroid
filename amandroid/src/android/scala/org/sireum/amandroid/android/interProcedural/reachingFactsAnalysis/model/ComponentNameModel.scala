@@ -127,7 +127,8 @@ object ComponentNameModel {
 	    i =>
 	      i match{
 	        case cstr @ RFAConcreteStringInstance(text, c) =>
-	          val rec = Center.resolveRecord(text, Center.ResolveLevel.BODIES)
+	          val recordName = StringFormConverter.formatClassNameToRecordName(text)
+	          val rec = Center.resolveRecord(recordName, Center.ResolveLevel.BODIES)
 	        	RFAConcreteStringInstance(rec.getShortName, currentContext)
           case pstr @ RFAPointStringInstance(c) => 
           	RFAPointStringInstance(currentContext)
@@ -169,7 +170,8 @@ object ComponentNameModel {
 		        cn =>
 		          cn match{
 		            case cstr @ RFAConcreteStringInstance(text, c) =>
-		              val rec = Center.resolveRecord(text, Center.ResolveLevel.BODIES)
+		              val recordName = StringFormConverter.formatClassNameToRecordName(text)
+		              val rec = Center.resolveRecord(recordName, Center.ResolveLevel.BODIES)
 		              val pakStr = RFAConcreteStringInstance(rec.getPackageName, c)
 		              var facts = isetEmpty[RFAFact]
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)

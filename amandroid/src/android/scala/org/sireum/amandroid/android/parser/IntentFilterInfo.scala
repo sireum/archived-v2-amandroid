@@ -28,7 +28,7 @@ class IntentFilterDataBase {
   }
   def containsRecord(r : AmandroidRecord) : Boolean = intentFmap.contains(r)
   def getIntentFmap() = intentFmap
-  def getIntentFilters(r : AmandroidRecord) = intentFmap.getOrElse(r, throw new RuntimeException("Didn't find given component: " + r))
+  def getIntentFilters(r : AmandroidRecord) = intentFmap.getOrElse(r, Set())
   def getIntentFiltersActions(r : AmandroidRecord) : Set[String] = {
     val intentFilterS: Set[IntentFilter] = getIntentFilters(r)
     var actions:Set[String] = null
@@ -58,11 +58,20 @@ class IntentFilter(holder : String) {
 	  var actionTest = false
 	  var categoryTest = false
 	  var dataTest = false
+	  if(action == null && categories.isEmpty && uriData == null && mType == null) return false
 	  if(action == null || hasAction(action)){
 	    actionTest = true
 	  }
 	  
-	  if(categories == null || categories.isEmpty || hasCategories(categories)){
+//	  if(hasCategories(categories)){
+//	    categoryTest = true
+//	  }
+	  
+	  //note that in path-insensitive static analysis we had to change the category match subset rule,
+	  //we ensure no false-negative (which means no match is ignored)
+	  if(categories.isEmpty){
+	    categoryTest = true
+	  } else if(!categories.filter(c => this.categorys.contains(c)).isEmpty){
 	    categoryTest = true
 	  }
 	  
@@ -129,7 +138,7 @@ class Data{
     else {
       this.mimeTypes.foreach{
         ifType =>
-          if(ifType.matches("([^\\*]*|\\*)/([^\\*]*|\\*)") && mType.matches("([^\\*]*|\\*)/([^\\*]*|\\*)")){ // four cases can match: test/type, test/*, */type, */*
+          if(mType != null && ifType.matches("([^\\*]*|\\*)/([^\\*]*|\\*)") && mType.matches("([^\\*]*|\\*)/([^\\*]*|\\*)")){ // four cases can match: test/type, test/*, */type, */*
             val ifTypeFront = ifType.split("\\/")(0)
             val ifTypeTail = ifType.split("\\/")(1)
             val mTypeFront = mType.split("\\/")(0)
@@ -178,6 +187,8 @@ class Data{
 	              authorityTest = true
 	              if(this.paths.isEmpty && this.pathPrefixs.isEmpty && this.pathPatterns.isEmpty){
 	                pathTest = true
+	                pathPrefixTest = true
+	                pathPatternTest = true
 	              } else if(path != null){
 	                pathTest = this.paths.contains(path)
 	                this.pathPrefixs.foreach{
@@ -194,6 +205,7 @@ class Data{
 	      }
 	    }
     }
+//    println("schemeTest-->" + schemeTest + " authorityTest-->" + authorityTest + "(pathTest || pathPrefixTest || pathPatternTest)" + (pathTest || pathPrefixTest || pathPatternTest))
     schemeTest && authorityTest && (pathTest || pathPrefixTest || pathPatternTest)
   }
   

@@ -15,6 +15,7 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsA
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAFact
 import org.sireum.amandroid.Instance
 import java.net.URI
+import org.sireum.amandroid.util.StringFormConverter
 
 object InterComponentCommunicationModel {
 	def isIccOperation(proc : AmandroidProcedure) : Boolean = {
@@ -64,7 +65,7 @@ object InterComponentCommunicationModel {
             factMap.getOrElse(cFieldSlot, isetEmpty).foreach{
               ins =>
                 if(ins.isInstanceOf[RFAConcreteStringInstance]){
-                  val targetRecName = ins.asInstanceOf[RFAConcreteStringInstance].string
+                  val targetRecName = StringFormConverter.formatClassNameToRecordName(ins.asInstanceOf[RFAConcreteStringInstance].string)
                   val targetRecOpt = Center.softlyResolveRecord(targetRecName, Center.ResolveLevel.BODIES)
                   targetRecOpt match{
                     case Some(targetRec) =>
@@ -254,7 +255,7 @@ object InterComponentCommunicationModel {
     AppCenter.getComponents.foreach{
 	    ep =>
 	      val iFilters = AppCenter.getIntentFilterDB.getIntentFilters(ep)
-	      if(iFilters != null){
+	      if(!iFilters.isEmpty){
 	        val matchedFilters = iFilters.filter(iFilter => iFilter.isMatchWith(action, categories, data, mType))
 	        if(!matchedFilters.isEmpty)
 	          components += ep
