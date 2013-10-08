@@ -3098,7 +3098,6 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
                  if( pDexMethod->codeOff != 0)
                   { const DexCode* pCode = dexGetCode(pDexFile, pDexMethod);
                     startReg =pCode->registersSize-pCode->insSize;
-                    if((pDexMethod->accessFlags & ACC_STATIC) ==0)startReg++;
                   }
                   // find return type
                   const char* returnType = strrchr(typeDescriptor, ')');
@@ -3165,18 +3164,19 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
                   
 				  // sometimes populating locVarList in localsCb() method is not working, so no locVar e.g. "this" in locVarList. Below we forcefully add "this" to paraThis in that case
                   
-				  if((thisFlag == 0) && (pDexMethod->accessFlags & ACC_STATIC) ==0) // i.e. non-static method but still "this" is not added 
+				  if((thisFlag == 0) && (pDexMethod->accessFlags & (ACC_STATIC | ACC_ABSTRACT | ACC_NATIVE)) ==0) // i.e. non-static method but still "this" is not added
                      { 
 				      strcpy(paraThis,""); // initializing with null string
 				      strcat(paraThis, toPilar(descriptorToDot(backDescriptor)));
 					  char regNamebuff[20];
-					  sprintf(regNamebuff, " v%d", startReg - 1); // note that startReg was alrady increased by 1 above 
+					  sprintf(regNamebuff, " v%d", startReg);
 					  strcat(paraThis, regNamebuff);
 					  strcat(paraThis, " @type (this)");
 					  thisFlag = 1;
                      }
                   // now print other params 
-
+                   if((pDexMethod->accessFlags & ACC_STATIC) ==0)
+                       startReg++;
                    while (*base != ')') {
                      char* cp = tmpBuf;    
                      int flag=0;

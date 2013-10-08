@@ -93,7 +93,10 @@ object UriModel {
             if(DEBUG)
             	System.err.println("Init uri string use point string: " + pstr)
             newfacts += RFAFact(FieldSlot(stringUriIns, AndroidConstants.URI_STRING_URI_URI_STRING), pstr)
-          case _ => throw new RuntimeException("unexpected instance type: " + sv)
+          case _ => 
+            if(DEBUG)
+            	System.err.println("Init uri use unknown instance: " + sv)
+            newfacts += RFAFact(FieldSlot(stringUriIns, AndroidConstants.URI_STRING_URI_URI_STRING), sv)
         }
     }
     (newfacts, delfacts)

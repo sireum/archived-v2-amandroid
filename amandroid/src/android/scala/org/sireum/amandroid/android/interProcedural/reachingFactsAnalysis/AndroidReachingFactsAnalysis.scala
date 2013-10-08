@@ -49,7 +49,7 @@ class AndroidReachingFactsAnalysisBuilder{
  * @author Fengguo Wei & Sankardas Roy
  */
 object AndroidReachingFactsAnalysis {
-  val DEBUG = true
+  val DEBUG = false
   type Node = CGNode
   type Result = InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]
   

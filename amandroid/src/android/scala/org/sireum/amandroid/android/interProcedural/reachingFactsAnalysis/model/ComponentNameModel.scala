@@ -12,6 +12,7 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAPointString
 import org.sireum.amandroid.android.AndroidConstants
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAPointStringInstance
 import org.sireum.amandroid.util.StringFormConverter
+import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAUnknownInstance
 
 object ComponentNameModel {
   final val DEBUG = true
@@ -128,11 +129,20 @@ object ComponentNameModel {
 	      i match{
 	        case cstr @ RFAConcreteStringInstance(text, c) =>
 	          val recordName = StringFormConverter.formatClassNameToRecordName(text)
-	          val rec = Center.resolveRecord(recordName, Center.ResolveLevel.BODIES)
-	        	RFAConcreteStringInstance(rec.getShortName, currentContext)
+	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.BODIES)
+	          recOpt match{
+	            case Some(rec) =>
+	              RFAConcreteStringInstance(rec.getShortName, currentContext)
+	            case None =>
+	              System.err.println("Given class name probably come from another app: " + i)
+	              RFAUnknownInstance(currentContext)
+	          }
           case pstr @ RFAPointStringInstance(c) => 
           	RFAPointStringInstance(currentContext)
-          case _ => throw new RuntimeException("unexpected instance type: " + i)
+          case _ =>
+            if(DEBUG)
+            	System.err.println("Get short name use unknown instance: " + i)
+            RFAUnknownInstance(currentContext)
 	      }
 	  }
 	}
@@ -171,11 +181,19 @@ object ComponentNameModel {
 		          cn match{
 		            case cstr @ RFAConcreteStringInstance(text, c) =>
 		              val recordName = StringFormConverter.formatClassNameToRecordName(text)
-		              val rec = Center.resolveRecord(recordName, Center.ResolveLevel.BODIES)
-		              val pakStr = RFAConcreteStringInstance(rec.getPackageName, c)
+		              val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.BODIES)
 		              var facts = isetEmpty[RFAFact]
-		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
-		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), cstr)
+		              recOpt match{
+		                case Some(rec) =>
+				              val pakStr = RFAConcreteStringInstance(rec.getPackageName, c)
+				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
+				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), cstr)
+		                case None =>
+		                  System.err.println("Given class name probably come from another app: " + cn)
+				              val unknownIns = RFAUnknownInstance(currentContext)
+				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
+				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
+		              }
 		              facts
 		            case pstr @ RFAPointStringInstance(c) => 
 		              if(DEBUG)
@@ -184,7 +202,13 @@ object ComponentNameModel {
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pstr)
 		              facts
-		            case _ => throw new RuntimeException("unexpected instance type: " + cn)
+		            case _ => 
+		              if(DEBUG)
+		              	System.err.println("Init ComponentName use Unknown instance: " + cn)
+		              var facts = isetEmpty[RFAFact]
+		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), cn)
+		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), cn)
+		              facts
 		          }
 		      }.reduce(iunion[RFAFact])
 	      }
@@ -223,7 +247,13 @@ object ComponentNameModel {
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pstr)
 		              facts
-		            case _ => throw new RuntimeException("unexpected instance type: " + cn)
+		            case _ =>
+		              if(DEBUG)
+		              	System.err.println("Init ComponentName use unknown instance: " + cn)
+		              var facts = isetEmpty[RFAFact]
+		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), cn)
+		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), cn)
+		              facts
 		          }
 		      }.reduce(iunion[RFAFact])
 	      }
@@ -269,7 +299,13 @@ object ComponentNameModel {
 							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pstr2)
 							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pstr2)
 							              facts
-							            case _ => throw new RuntimeException("unexpected instance type: " + pv2)
+							            case _ =>
+							              if(DEBUG)
+							              	System.err.println("Init ComponentName.mClass use Unknown instance: " + pv2)
+							              var facts = isetEmpty[RFAFact]
+							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pv2)
+							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pv2)
+							              facts
 							          }
 							      }.reduce(iunion[RFAFact])
 						      }
@@ -280,7 +316,13 @@ object ComponentNameModel {
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pstr1)
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pstr1)
 		              facts
-		            case _ => throw new RuntimeException("unexpected instance type: " + pv1)
+		            case _ =>
+		              if(DEBUG)
+		              	System.err.println("Init ComponentName.mPackage use Unknown instance: " + pv1)
+		              var facts = isetEmpty[RFAFact]
+		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pv1)
+		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pv1)
+		              facts
 		          }
 		      }.reduce(iunion[RFAFact])
 	      }

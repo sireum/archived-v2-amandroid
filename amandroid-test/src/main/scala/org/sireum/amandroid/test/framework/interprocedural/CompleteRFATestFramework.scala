@@ -50,12 +50,14 @@ trait CompleteRFATestFramework extends TestFramework {
 		  pre.calculateEntrypoints
     	
 		  AndroidRFAConfig.setupCenter
-    	val entryPoints = Center.getEntryPoints
+    	val entryPoints = Center.getEntryPoints("dummyMain")
     	entryPoints.foreach{
     	  ep =>
+    	    println("--------------Component " + ep + "--------------")
     	    val initialfacts = AndroidRFAConfig.getInitialFactsForDummyMain(ep)
     	    AndroidReachingFactsAnalysis.processedClinit = isetEmpty
     	    val (cg, result) = AndroidReachingFactsAnalysis(ep, initialfacts)
+    	    println("processed-->" + cg.getProcessed.size)
     	    println("exit facts: " + result.entrySet(cg.exitNode))
     	    val f1 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "rfa.txt")
 			    val o1 = new FileOutputStream(f1)

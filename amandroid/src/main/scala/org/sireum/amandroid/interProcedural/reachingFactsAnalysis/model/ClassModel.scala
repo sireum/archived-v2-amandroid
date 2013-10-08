@@ -174,12 +174,19 @@ object ClassModel {
         cIns match{
           case cstr @ RFAConcreteStringInstance(text, c) =>
             val recordName = StringFormConverter.formatClassNameToRecordName(text)
-            val record = Center.resolveRecord(recordName, Center.ResolveLevel.BODIES)
-            newfacts += RFAFact(VarSlot(retVar), record.getClassObj)
+            val recordOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.BODIES)
+            recordOpt match{
+              case Some(record) =>
+            		newfacts += RFAFact(VarSlot(retVar), record.getClassObj)
+              case None =>
+                System.err.println("Given class name probably come from another app: " + cIns)
+            }
           case pstr @ RFAPointStringInstance(c) => 
             if(DEBUG)
             	System.err.println("Get class use point string: " + pstr)
-          case _ => throw new RuntimeException("unexpected instance type: " + cIns)
+          case _ =>
+            if(DEBUG)
+            	System.err.println("Get class use unknown instance: " + cIns)
         }
     }
     (newfacts, delfacts)

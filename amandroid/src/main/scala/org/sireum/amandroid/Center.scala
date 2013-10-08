@@ -158,9 +158,13 @@ object Center {
 		            else record.setSuperClass(parent)
 		            if(!parent.needToResolveExtends.isEmpty || parent.needToResolveOuterName.isDefined) worklist += parent
 		          case None =>
-		            val code = AmandroidCodeSource.getRecordCode(parName)
-		            codes += code
-		            tmpList ::= record
+		            if(AmandroidCodeSource.containsRecord(parName)){
+			            val code = AmandroidCodeSource.getRecordCode(parName)
+			            codes += code
+			            tmpList ::= record
+		            } else {
+		              System.err.println("Given parent name does not exist in current code base: " + parName)
+		            }
 		        }
 	      }
 	      record.needToResolveExtends --= resolved
@@ -631,7 +635,17 @@ object Center {
 	 */
 	
 	def getEntryPoints = {
-	  if(!hasEntryPoints) findEntryPoints
+	  if(!hasEntryPoints) findEntryPoints("main")
+	  this.entryPoints
+	}
+	
+	/**
+	 * get entry points
+	 */
+	
+	def getEntryPoints(entryProcedureName : String) = {
+	  if(hasEntryPoints) this.entryPoints == Set()
+	  findEntryPoints(entryProcedureName)
 	  this.entryPoints
 	}
 	  
@@ -645,13 +659,11 @@ object Center {
 	 * find entry points from current app/test cases
 	 */
 	
-	def findEntryPoints = {
+	def findEntryPoints(entryProcedureName : String) = {
 	  getApplicationRecords.foreach{
 	    appRec =>
-	      if(appRec.declaresProcedureByShortName("main"))
-	        this.entryPoints += appRec.getProcedureByShortName("main")
-	      else if(appRec.declaresProcedureByShortName("dummyMain"))
-	        this.entryPoints += appRec.getProcedureByShortName("dummyMain")
+	      if(appRec.declaresProcedureByShortName(entryProcedureName))
+	        this.entryPoints += appRec.getProcedureByShortName(entryProcedureName)
 	  }
 	}
 	
