@@ -21,7 +21,6 @@ class DummyMainGenerator {
    * Map from record to list of callback procedure
    */
   private var callbackFunctions : Map[String, MSet[String]] = Map()
-  private var intCounter : String = null
   private var conditionCounter : Int = 0
   private var codeCounter : Int = 0
   private val template = new STGroupFile("org/sireum/amandroid/pilarCodeGenerator/PilarCode.stg")
@@ -165,16 +164,8 @@ class DummyMainGenerator {
 	  if(!classMap.contains(this.currentComponent))
 	  	classMap.getOrElseUpdate(this.currentComponent, mlistEmpty)
 	  val intVar = template.getInstanceOf("LocalVar")
-	  intCounter = varGen.generate("int")
-	  intVar.add("typ", "[|int|]")
-	  intVar.add("name", intCounter)
-	  localVars.add(intVar.render())
-	  val assignment = template.getInstanceOf("AssignmentStmt")
-	  assignment.add("lhs", intCounter)
-	  assignment.add("rhs", conditionCounter)
 	  val outerStartFragment = new CodeFragmentGenerator
 	  outerStartFragment.addLabel
-	  outerStartFragment.setCode(assignment)
 	  codeFragments.add(outerStartFragment)
 	  classMap.foreach{
 	    item =>
@@ -725,9 +716,8 @@ class DummyMainGenerator {
 	  val target = targetfg.getLabel
 	  if(target != null){
 	    val condExp = template.getInstanceOf("CondExp")
-      condExp.add("lhs", intCounter)
-      condExp.add("rhs", conditionCounter)
-//      conditionCounter += 1
+      condExp.add("lhs", "RandomCoinToss")
+      condExp.add("rhs", "head")
       val ifStmt = template.getInstanceOf("IfStmt")
       ifStmt.add("cond", condExp)
       ifStmt.add("label", target)

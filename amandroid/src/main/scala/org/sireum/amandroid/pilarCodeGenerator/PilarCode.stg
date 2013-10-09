@@ -11,8 +11,9 @@ procedure $retTyp$ $procedureName$($params ; separator=", "$) $annotations ; sep
 >>
 
 LocalVars(locals) ::= <<
-local nop;
-	temp;
+local temp;
+  RandomCoinToss;
+  head;
   $locals ; separator="\n"$
 >>
 
@@ -37,7 +38,7 @@ $codeFragments ; separator="\n"$
 >>
 
 CodeFragment(label, codes) ::= <<
-#$label$. nop:= 0;
+#$label$.
 $codes ; separator="\n"$
 >>
 
