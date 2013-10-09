@@ -24,7 +24,7 @@ import org.sireum.amandroid.android.AppCenter
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 class AppInfoCollector(apkFileLocation : String) {  
-  private val DEBUG = true
+    private val DEBUG = true
 	private var callbackMethods : Map[String, MSet[AmandroidProcedure]] = Map()
 	private var entrypoints : Set[String] = null
 	private var layoutControls : Map[Int, LayoutControl] = Map()

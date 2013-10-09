@@ -24,23 +24,34 @@ trait CompleteRFATestFramework extends TestFramework {
 
   def file(fileUri : FileResourceUri) =
     InterProceduralConfiguration(title, fileUri)
-
+/**
+ * does inter procedural analysis of an app
+ * @param src is the uri of the apk file
+ */
   case class InterProceduralConfiguration //
   (title : String,
    src : FileResourceUri) {
 
     test(title) {
     	println("####" + title + "#####")
+    	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
     	Center.reset
+    	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
     	AmandroidCodeSource.clearAppRecordsCodes
+    	
+    	// now get the dex file from the source apk file 
     	val apkName = src.substring(src.lastIndexOf("/") + 1, src.lastIndexOf("."))
     	val apkfile = new File(System.getProperty("user.home") + "/Desktop/graphs/" + apkName)
     	if(!apkfile.exists()) apkfile.mkdir()
     	val dexFile = APKFileResolver.getDexFile(src)
     	
+    	// convert the dex file to the "pilar" form
     	val pilarFile = Dex2PilarConverter.convert(dexFile)
     	
+    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
     	LightWeightPilarParser(Right(pilarFile), AmandroidCodeSource.CodeType.APP)
+    	
+    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
     	AmandroidCodeSource.getAppRecordsCodes.keys foreach{
     	  k =>
     	    Center.resolveRecord(k, Center.ResolveLevel.BODIES)
