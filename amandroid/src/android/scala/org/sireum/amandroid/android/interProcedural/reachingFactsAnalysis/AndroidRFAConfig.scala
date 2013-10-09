@@ -17,7 +17,11 @@ import org.sireum.amandroid.AmandroidRecord
 import org.sireum.amandroid.Center
 
 object AndroidRFAConfig {
-  
+  /**
+   * before starting the analysis, prepares the Center with some additional info
+   * a record named "Unknown" with a procedure called "unknown()" is added to the Center
+   * this special record is used to handle out-of-scope calls 
+   */
   def setupCenter = {
     val rec = new AmandroidRecord
     rec.init(AndroidConstants.UNKNOWN_RECORD)
@@ -28,6 +32,10 @@ object AndroidRFAConfig {
     Center.addRecord(rec)
   }
   
+  /**
+   * generates and returns the initial facts corresponding to the "Intent" parameter of a dummyMain 
+   * the generated fact says that the param Intent is generated at the Center.
+   */
 	def getInitialFactsForDummyMain(dm : AmandroidProcedure) : ISet[RFAFact] = {
 	  require(dm.getShortName == "dummyMain")
 	  var result = isetEmpty[RFAFact]

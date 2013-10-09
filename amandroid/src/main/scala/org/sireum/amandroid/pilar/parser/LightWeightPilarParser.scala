@@ -29,6 +29,11 @@ object LightWeightPilarParser {
     	AmandroidCodeSource.printContent
   }
   
+  /**
+   * read the code of each "record" and stores it in AmandroidCodeSource as a map: (recordName -> code). 
+   * Note that each record block in pilar source starts with keyword "record"; 
+   * so, the searching starts with keyword "record" and goes on until find another "record". The procs inside a record x are included in the code of x.
+   */
   def readModelChunks(r : Reader, typ : AmandroidCodeSource.CodeType.Value) = {
     var procedureMap : Map[String, String] = Map()
     val lnr = new LineNumberReader(r)

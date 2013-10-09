@@ -9,7 +9,7 @@ import java.io.FileOutputStream
 object APKFileResolver {
   
   /**
-   * given an APK file uri return the dex file uri
+   * given an APK file uri, the following method returns the uri of the inner dex file
    */
 	def getDexFile(src : FileResourceUri) : FileResourceUri = {
 	  val f = new File(src.toString().substring(5))
