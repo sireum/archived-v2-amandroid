@@ -15,28 +15,28 @@ object ClassModel {
   val DEBUG = true
 	def isClass(r : AmandroidRecord) : Boolean = r.getName == "[|java:lang:Class|]"
 	  
-	def doClassCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
+	def doClassCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
 	    case "[|Ljava/lang/Class;.<init>:()V|]" =>  //private constructor
 		  case "[|Ljava/lang/Class;.arraycopy:([Ljava/lang/Object;[Ljava/lang/Object;[Ljava/lang/Object;)[Ljava/lang/Object;|]" =>  //private static
 		  case "[|Ljava/lang/Class;.asSubclass:(Ljava/lang/Class;)Ljava/lang/Class;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    classAsSubClass(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    classAsSubClass(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Ljava/lang/Class;.cast:(Ljava/lang/Object;)Ljava/lang/Object;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    classAsSubClass(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    classAsSubClass(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Ljava/lang/Class;.classForName:(Ljava/lang/String;ZLjava/lang/ClassLoader;)Ljava/lang/Class;|]" =>  //private static native
-		    require(retVarOpt.isDefined)
-		    classForName(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    classForName(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Ljava/lang/Class;.desiredAssertionStatus:()Z|]" =>  //public native
 		  case "[|Ljava/lang/Class;.forName:(Ljava/lang/String;)Ljava/lang/Class;|]" =>  //public static
-		    require(retVarOpt.isDefined)
-		    classForName(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    classForName(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Ljava/lang/Class;.forName:(Ljava/lang/String;ZLjava/lang/ClassLoader;)Ljava/lang/Class;|]" =>  //public static
-		    require(retVarOpt.isDefined)
-		    classForName(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    classForName(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Ljava/lang/Class;.getAnnotation:(Ljava/lang/Class;)Ljava/lang/annotation/Annotation;|]" =>  //public
 		  case "[|Ljava/lang/Class;.getAnnotations:()[Ljava/lang/annotation/Annotation;|]" =>  //public
 		  case "[|Ljava/lang/Class;.getCanonicalName:()Ljava/lang/String;|]" =>  //public
@@ -80,11 +80,11 @@ object ClassModel {
 		  case "[|Ljava/lang/Class;.getModifiers:()I|]" =>  //public
 		  case "[|Ljava/lang/Class;.getModifiers:(Ljava/lang/Class;Z)I|]" =>  //private static native
 		  case "[|Ljava/lang/Class;.getName:()Ljava/lang/String;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    classGetName(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    classGetName(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Ljava/lang/Class;.getNameNative:()Ljava/lang/String;|]" =>  //private native
-		    require(retVarOpt.isDefined)
-		    classGetName(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    classGetName(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Ljava/lang/Class;.getPackage:()Ljava/lang/Package;|]" =>  //public
 		  case "[|Ljava/lang/Class;.getProtectionDomain:()Ljava/security/ProtectionDomain;|]" =>  //public
 		  case "[|Ljava/lang/Class;.getPublicConstructorOrMethodRecursive:(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Member;|]" =>  //private
@@ -116,10 +116,7 @@ object ClassModel {
 		  case "[|Ljava/lang/Class;.newInstanceImpl:()Ljava/lang/Object;|]" =>  //private native
 		  case "[|Ljava/lang/Class;.toString:()Ljava/lang/String;|]" =>  //public
 	  }
-	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
-	    case Some(f) => newFacts += f
-	    case None =>
-	  }
+	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
 	  s ++ newFacts -- delFacts
 	}
 	

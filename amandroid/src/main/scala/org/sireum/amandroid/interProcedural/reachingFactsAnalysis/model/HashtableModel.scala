@@ -132,7 +132,7 @@ object HashtableModel {
 	  result
   }
 	  
-	def doHashtableCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
+	def doHashtableCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
 	  var newFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
 	    case "[|Ljava/util/Hashtable;.<clinit>:()V|]" =>
@@ -148,8 +148,8 @@ object HashtableModel {
 		  case "[|Ljava/util/Hashtable;.capacityForInitSize:(I)I|]" =>
 		  case "[|Ljava/util/Hashtable;.clear:()V|]" =>
 		  case "[|Ljava/util/Hashtable;.clone:()Ljava/lang/Object;|]" =>
-		    require(retVarOpt.isDefined)
-		    newFacts ++= cloneHashTable(s, args, retVarOpt.get, currentContext)
+		    require(retVars.size == 1)
+		    newFacts ++= cloneHashTable(s, args, retVars(0), currentContext)
 		  case "[|Ljava/util/Hashtable;.constructorPut:(Ljava/lang/Object;Ljava/lang/Object;)V|]" =>
 		  case "[|Ljava/util/Hashtable;.constructorPutAll:(Ljava/util/Map;)V|]" =>
 		  case "[|Ljava/util/Hashtable;.contains:(Ljava/lang/Object;)Z|]" =>
@@ -160,17 +160,17 @@ object HashtableModel {
 		  case "[|Ljava/util/Hashtable;.elements:()Ljava/util/Enumeration;|]" =>
 		  case "[|Ljava/util/Hashtable;.ensureCapacity:(I)V|]" =>
 		  case "[|Ljava/util/Hashtable;.entrySet:()Ljava/util/Set;|]" =>
-		    require(retVarOpt.isDefined)
-		    newFacts ++= getHashTableEntrySetFactToRet(s, args, retVarOpt.get, currentContext)
+		    require(retVars.size == 1)
+		    newFacts ++= getHashTableEntrySetFactToRet(s, args, retVars(0), currentContext)
 		  case "[|Ljava/util/Hashtable;.equals:(Ljava/lang/Object;)Z|]" =>
 		  case "[|Ljava/util/Hashtable;.get:(Ljava/lang/Object;)Ljava/lang/Object;|]" =>
-		    require(retVarOpt.isDefined)
-		    newFacts ++= getHashTableValue(s, args, retVarOpt.get, currentContext)
+		    require(retVars.size == 1)
+		    newFacts ++= getHashTableValue(s, args, retVars(0), currentContext)
 		  case "[|Ljava/util/Hashtable;.hashCode:()I|]" =>
 		  case "[|Ljava/util/Hashtable;.isEmpty:()Z|]" =>
 		  case "[|Ljava/util/Hashtable;.keySet:()Ljava/util/Set;|]" =>
-		    require(retVarOpt.isDefined)
-		    newFacts ++= getHashTableKeySetToRet(s, args, retVarOpt.get, currentContext)
+		    require(retVars.size == 1)
+		    newFacts ++= getHashTableKeySetToRet(s, args, retVars(0), currentContext)
 		  case "[|Ljava/util/Hashtable;.keys:()Ljava/util/Enumeration;|]" =>
 		  case "[|Ljava/util/Hashtable;.makeTable:(I)[Ljava/util/Hashtable$HashtableEntry;|]" =>
 		  case "[|Ljava/util/Hashtable;.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;|]" =>
@@ -180,22 +180,19 @@ object HashtableModel {
 		  case "[|Ljava/util/Hashtable;.readObject:(Ljava/io/ObjectInputStream;)V|]" =>
 		  case "[|Ljava/util/Hashtable;.rehash:()V|]" =>
 		  case "[|Ljava/util/Hashtable;.remove:(Ljava/lang/Object;)Ljava/lang/Object;|]" =>
-		    require(retVarOpt.isDefined)
-		    newFacts ++= getHashTableValue(s, args, retVarOpt.get, currentContext)
+		    require(retVars.size == 1)
+		    newFacts ++= getHashTableValue(s, args, retVars(0), currentContext)
 		  case "[|Ljava/util/Hashtable;.removeMapping:(Ljava/lang/Object;Ljava/lang/Object;)Z|]" =>
 		  case "[|Ljava/util/Hashtable;.size:()I|]" =>
 		  case "[|Ljava/util/Hashtable;.toString:()Ljava/lang/String;|]" =>
-		    require(retVarOpt.isDefined)
-		    newFacts += getPointStringToRet(retVarOpt.get, currentContext)
+		    require(retVars.size == 1)
+		    newFacts += getPointStringToRet(retVars(0), currentContext)
 		  case "[|Ljava/util/Hashtable;.values:()Ljava/util/Collection;|]" =>
-		    require(retVarOpt.isDefined)
-		    newFacts ++= getHashTableValuesToRet(s, args, retVarOpt.get, currentContext)
+		    require(retVars.size == 1)
+		    newFacts ++= getHashTableValuesToRet(s, args, retVars(0), currentContext)
 		  case "[|Ljava/util/Hashtable;.writeObject:(Ljava/io/ObjectOutputStream;)V|]" =>
 	  }
-	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
-	    case Some(f) => newFacts += f
-	    case None =>
-	  }
+	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
 	  s ++ newFacts
 	}
 }

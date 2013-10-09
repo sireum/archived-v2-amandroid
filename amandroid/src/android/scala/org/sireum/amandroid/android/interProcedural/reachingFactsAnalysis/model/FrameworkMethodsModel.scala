@@ -11,12 +11,10 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsA
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAConcreteStringInstance
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAPointStringInstance
 import org.sireum.amandroid.android.AndroidConstants
-import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAUnknownInstance
 import org.sireum.amandroid.android.AppCenter
 import org.sireum.amandroid.android.parser.IntentFilterDataBase
 import org.sireum.amandroid.android.parser.IntentFilter
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.FieldSlot
-import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFANullInstance
 
 object FrameworkMethodsModel {
   val DEBUG = true
@@ -36,43 +34,40 @@ object FrameworkMethodsModel {
 	  else false
 	}
 	
-	def doFrameworkMethodsModelCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
+	def doFrameworkMethodsModelCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
 	  var newFacts = isetEmpty[RFAFact]
 	  p.getSubSignature match{
 	    case "setContentView:(I)V" =>
 	    case "registerReceiver:(Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;)Landroid/content/Intent;" =>
-	      require(retVarOpt.isDefined)
-	      newFacts ++= registerReceiver(s, args, retVarOpt.get, currentContext)
+	      require(retVars.size == 1)
+	      newFacts ++= registerReceiver(s, args, retVars(0), currentContext)
 	    case "registerReceiver:(Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;)Landroid/content/Intent;" => 
-	      require(retVarOpt.isDefined)
-	      newFacts ++= registerReceiver(s, args, retVarOpt.get, currentContext)
+	      require(retVars.size == 1)
+	      newFacts ++= registerReceiver(s, args, retVars(0), currentContext)
 	    case "getApplication:()Landroid/app/Application;" =>
-	      require(retVarOpt.isDefined)
-	      ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|android:app:Application|]", 0), retVarOpt.get, currentContext) match{
+	      require(retVars.size == 1)
+	      ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|android:app:Application|]", 0), retVars(0), currentContext) match{
 	        case Some(f) => newFacts += f
 	        case None =>
 	      }
 	    case "getSystemService:(Ljava/lang/String;)Ljava/lang/Object;" =>
-	      require(retVarOpt.isDefined)
-	      newFacts ++= getSystemService(s, args, retVarOpt.get, currentContext)
+	      require(retVars.size == 1)
+	      newFacts ++= getSystemService(s, args, retVars(0), currentContext)
 	    case "getBaseContext:()Landroid/content/Context;" =>
-	      require(retVarOpt.isDefined)
-	      ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|android:app:ContextImpl|]", 0), retVarOpt.get, currentContext) match{
+	      require(retVars.size == 1)
+	      ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|android:app:ContextImpl|]", 0), retVars(0), currentContext) match{
 	        case Some(f) => newFacts += f
 	        case None =>
 	      }
 	    case "getApplicationContext:()Landroid/content/Context;"=>
-	      require(retVarOpt.isDefined)
-	      ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|android:app:Application|]", 0), retVarOpt.get, currentContext) match{
+	      require(retVars.size == 1)
+	      ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|android:app:Application|]", 0), retVars(0), currentContext) match{
 	        case Some(f) => newFacts += f
 	        case None =>
 	      }
 	    case _ =>
 	  }
-	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
-	    case Some(f) => newFacts += f
-	    case None =>
-	  }
+	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
 	  s ++ newFacts
 	}
 	
@@ -103,7 +98,12 @@ object FrameworkMethodsModel {
 			            case pstr @ RFAPointStringInstance(c) => 
 			              if(DEBUG)
 			              	System.err.println("Register IntentFilter actions use point string: " + pstr)
-			            case n @ RFANullInstance(c) =>
+			            case un @ UnknownInstance(c) =>
+			              if(DEBUG)
+			              	System.err.println("Register IntentFilter actions use Unknown Instance: " + un)
+			            case n @ NullInstance(c) =>
+			              if(DEBUG)
+			              	System.err.println("Register IntentFilter actions use Null pointer: " + n)
 			            case _ => throw new RuntimeException("unexpected instance type: " + mav)
 			          }
 	          }
@@ -117,7 +117,12 @@ object FrameworkMethodsModel {
 			            case pstr @ RFAPointStringInstance(c) => 
 			              if(DEBUG)
 			              	System.err.println("Register IntentFilter categories use point string: " + pstr)
-			            case n @ RFANullInstance(c) =>
+			            case un @ UnknownInstance(c) =>
+			              if(DEBUG)
+			              	System.err.println("Register IntentFilter categories use Unknown Instance: " + un)
+			            case n @ NullInstance(c) =>
+			              if(DEBUG)
+			                System.err.println("Register IntentFilter categories use Null pointer: " + n)
 			            case _ => throw new RuntimeException("unexpected instance type: " + mav)
 			          }
 	          }

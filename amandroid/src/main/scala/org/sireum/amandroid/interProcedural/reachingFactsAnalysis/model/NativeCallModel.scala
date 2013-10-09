@@ -13,7 +13,7 @@ import org.sireum.amandroid.ClassInstance
 object NativeCallModel {
 	 def isNativeCall(p : AmandroidProcedure) : Boolean = p.isNative
 	 
-	 def doNativeCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
+	 def doNativeCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
 	  var newFacts = isetEmpty[RFAFact]
 	  val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
 	  	  
@@ -28,7 +28,7 @@ object NativeCallModel {
 	        ins =>
 	          require(Center.hasRecord(ins.getType.typ))
 	          val insRec = Center.getRecord(ins.getType.typ)
-	          newFacts += (RFAFact(VarSlot(retVarOpt.get), insRec.getClassObj))
+	          newFacts += (RFAFact(VarSlot(retVars(0)), insRec.getClassObj))
 	          val strIns = RFAConcreteStringInstance(insRec.getClassObj.getName, insRec.getClassObj.getDefSite)
 	          newFacts += (RFAFact(FieldSlot(insRec.getClassObj, "[|java:lang:Class.name|]"), strIns))
 	      }
@@ -43,14 +43,11 @@ object NativeCallModel {
 	          require(cIns.isInstanceOf[ClassInstance])
 	          val name = cIns.asInstanceOf[ClassInstance].getName
 	          val strIns = RFAConcreteStringInstance(name, cIns.getDefSite)
-              newFacts += (RFAFact(VarSlot(retVarOpt.get), strIns))
+              newFacts += (RFAFact(VarSlot(retVars(0)), strIns))
 	      }
 	    case _ =>
 	  }
-	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
-	    case Some(f) => newFacts += f
-	    case None =>
-	  }
+	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
 	  s ++ newFacts
 	}
 }

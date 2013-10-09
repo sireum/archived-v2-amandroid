@@ -127,7 +127,7 @@ object HashMapModel {
 	  result
   }
 	
-	def doHashMapCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
+	def doHashMapCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
 	  var newFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
 	    case "[|Ljava/util/HashMap;.<clinit>:()V|]" =>
@@ -142,8 +142,8 @@ object HashMapModel {
 		  case "[|Ljava/util/HashMap;.capacityForInitSize:(I)I|]" =>
 		  case "[|Ljava/util/HashMap;.clear:()V|]" =>
 		  case "[|Ljava/util/HashMap;.clone:()Ljava/lang/Object;|]" =>
-		    require(retVarOpt.isDefined)
-		    newFacts ++= cloneHashMap(s, args, retVarOpt.get, currentContext)
+		    require(retVars.size == 1)
+		    newFacts ++= cloneHashMap(s, args, retVars(0), currentContext)
 		  case "[|Ljava/util/HashMap;.constructorNewEntry:(Ljava/lang/Object;Ljava/lang/Object;ILjava/util/HashMap$HashMapEntry;)Ljava/util/HashMap$HashMapEntry;|]" =>
 		  case "[|Ljava/util/HashMap;.constructorPut:(Ljava/lang/Object;Ljava/lang/Object;)V|]" =>
 		  case "[|Ljava/util/HashMap;.constructorPutAll:(Ljava/util/Map;)V|]" =>
@@ -153,16 +153,16 @@ object HashMapModel {
 		  case "[|Ljava/util/HashMap;.doubleCapacity:()[Ljava/util/HashMap$HashMapEntry;|]" =>
 		  case "[|Ljava/util/HashMap;.ensureCapacity:(I)V|]" =>
 		  case "[|Ljava/util/HashMap;.entrySet:()Ljava/util/Set;|]" =>
-		    require(retVarOpt.isDefined)
-		    newFacts ++= getHashMapEntrySetFactToRet(s, args, retVarOpt.get, currentContext)
+		    require(retVars.size == 1)
+		    newFacts ++= getHashMapEntrySetFactToRet(s, args, retVars(0), currentContext)
 		  case "[|Ljava/util/HashMap;.get:(Ljava/lang/Object;)Ljava/lang/Object;|]" =>
-		    require(retVarOpt.isDefined)
-		    newFacts ++= getHashMapValue(s, args, retVarOpt.get, currentContext)
+		    require(retVars.size == 1)
+		    newFacts ++= getHashMapValue(s, args, retVars(0), currentContext)
 		  case "[|Ljava/util/HashMap;.init:()V|]" =>
 		  case "[|Ljava/util/HashMap;.isEmpty:()Z|]" =>
 		  case "[|Ljava/util/HashMap;.keySet:()Ljava/util/Set;|]" =>
-		    require(retVarOpt.isDefined)
-		    newFacts ++= getHashMapKeySetToRet(s, args, retVarOpt.get, currentContext)
+		    require(retVars.size == 1)
+		    newFacts ++= getHashMapKeySetToRet(s, args, retVars(0), currentContext)
 		  case "[|Ljava/util/HashMap;.makeTable:(I)[Ljava/util/HashMap$HashMapEntry;|]" =>
 		  case "[|Ljava/util/HashMap;.newEntryIterator:()Ljava/util/Iterator;|]" =>
 		  case "[|Ljava/util/HashMap;.newKeyIterator:()Ljava/util/Iterator;|]" =>
@@ -176,21 +176,18 @@ object HashMapModel {
 		  case "[|Ljava/util/HashMap;.putValueForNullKey:(Ljava/lang/Object;)Ljava/lang/Object;|]" =>
 		  case "[|Ljava/util/HashMap;.readObject:(Ljava/io/ObjectInputStream;)V|]" =>
 		  case "[|Ljava/util/HashMap;.remove:(Ljava/lang/Object;)Ljava/lang/Object;|]" =>
-		    require(retVarOpt.isDefined)
-		    newFacts ++= getHashMapValue(s, args, retVarOpt.get, currentContext)
+		    require(retVars.size == 1)
+		    newFacts ++= getHashMapValue(s, args, retVars(0), currentContext)
 		  case "[|Ljava/util/HashMap;.removeMapping:(Ljava/lang/Object;Ljava/lang/Object;)Z|]" =>
 		  case "[|Ljava/util/HashMap;.removeNullKey:()Ljava/lang/Object;|]" =>
 		  case "[|Ljava/util/HashMap;.secondaryHash:(Ljava/lang/Object;)I|]" =>
 		  case "[|Ljava/util/HashMap;.size:()I|]" =>
 		  case "[|Ljava/util/HashMap;.values:()Ljava/util/Collection;|]" =>
-		    require(retVarOpt.isDefined)
-		    newFacts ++= getHashMapValuesToRet(s, args, retVarOpt.get, currentContext)
+		    require(retVars.size == 1)
+		    newFacts ++= getHashMapValuesToRet(s, args, retVars(0), currentContext)
 		  case "[|Ljava/util/HashMap;.writeObject:(Ljava/io/ObjectOutputStream;)V|]" =>
 	  }
-	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
-	    case Some(f) => newFacts += f
-	    case None =>
-	  }
+	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
 	  s ++ newFacts
 	}
 }

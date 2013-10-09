@@ -12,14 +12,13 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAPointString
 import org.sireum.amandroid.android.AndroidConstants
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAPointStringInstance
 import org.sireum.amandroid.util.StringFormConverter
-import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAUnknownInstance
 
 object ComponentNameModel {
   final val DEBUG = true
   
 	def isComponentName(r : AmandroidRecord) : Boolean = r.getName == "[|android:content:ComponentName|]"
 	  
-	def doComponentNameCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
+	def doComponentNameCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
 	  var newFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
 	    case "[|Landroid/content/ComponentName;.<clinit>:()V|]" =>  //static constructor
@@ -34,52 +33,49 @@ object ComponentNameModel {
 		  case "[|Landroid/content/ComponentName;.<init>:(Ljava/lang/String;Ljava/lang/String;)V|]" =>  //public constructor
 		    newFacts ++= initComponentNameWithSS(s, args, currentContext)
 		  case "[|Landroid/content/ComponentName;.clone:()Landroid/content/ComponentName;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    newFacts ++= cloneComponentName(s, args, retVarOpt.get, currentContext)
+		    require(retVars.size == 1)
+		    newFacts ++= cloneComponentName(s, args, retVars(0), currentContext)
 		  case "[|Landroid/content/ComponentName;.clone:()Ljava/lang/Object;|]" =>  //public synthetic
-		    require(retVarOpt.isDefined)
-		    newFacts ++= cloneComponentName(s, args, retVarOpt.get, currentContext)
+		    require(retVars.size == 1)
+		    newFacts ++= cloneComponentName(s, args, retVars(0), currentContext)
 		  case "[|Landroid/content/ComponentName;.compareTo:(Landroid/content/ComponentName;)I|]" =>  //public
 		  case "[|Landroid/content/ComponentName;.compareTo:(Ljava/lang/Object;)I|]" =>  //public synthetic
 		  case "[|Landroid/content/ComponentName;.describeContents:()I|]" =>  //public
 		  case "[|Landroid/content/ComponentName;.equals:(Ljava/lang/Object;)Z|]" =>  //public
 		  case "[|Landroid/content/ComponentName;.flattenToShortString:()Ljava/lang/String;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    newFacts += RFAFact(VarSlot(retVarOpt.get), RFAPointStringInstance(currentContext))
+		    require(retVars.size == 1)
+		    newFacts += RFAFact(VarSlot(retVars(0)), RFAPointStringInstance(currentContext))
 		  case "[|Landroid/content/ComponentName;.flattenToString:()Ljava/lang/String;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    newFacts += RFAFact(VarSlot(retVarOpt.get), RFAPointStringInstance(currentContext))
+		    require(retVars.size == 1)
+		    newFacts += RFAFact(VarSlot(retVars(0)), RFAPointStringInstance(currentContext))
 		  case "[|Landroid/content/ComponentName;.getClassName:()Ljava/lang/String;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    newFacts ++=  getClassNameFromComponentName(s, args, retVarOpt.get, currentContext)
+		    require(retVars.size == 1)
+		    newFacts ++=  getClassNameFromComponentName(s, args, retVars(0), currentContext)
 		  case "[|Landroid/content/ComponentName;.getPackageName:()Ljava/lang/String;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    newFacts ++=  getPackageNameFromComponentName(s, args, retVarOpt.get, currentContext)
+		    require(retVars.size == 1)
+		    newFacts ++=  getPackageNameFromComponentName(s, args, retVars(0), currentContext)
 		  case "[|Landroid/content/ComponentName;.getShortClassName:()Ljava/lang/String;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    newFacts ++=  getShortClassNameFromComponentName(s, args, retVarOpt.get, currentContext)
+		    require(retVars.size == 1)
+		    newFacts ++=  getShortClassNameFromComponentName(s, args, retVars(0), currentContext)
 		  case "[|Landroid/content/ComponentName;.hashCode:()I|]" =>  //public
 		  case "[|Landroid/content/ComponentName;.readFromParcel:(Landroid/os/Parcel;)Landroid/content/ComponentName;|]" =>  //public static
 		    //TODO: How to handle parcel
 		  case "[|Landroid/content/ComponentName;.toShortString:()Ljava/lang/String;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    newFacts += RFAFact(VarSlot(retVarOpt.get), RFAPointStringInstance(currentContext))
+		    require(retVars.size == 1)
+		    newFacts += RFAFact(VarSlot(retVars(0)), RFAPointStringInstance(currentContext))
 		  case "[|Landroid/content/ComponentName;.toString:()Ljava/lang/String;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    newFacts += RFAFact(VarSlot(retVarOpt.get), RFAPointStringInstance(currentContext))
+		    require(retVars.size == 1)
+		    newFacts += RFAFact(VarSlot(retVars(0)), RFAPointStringInstance(currentContext))
 		  case "[|Landroid/content/ComponentName;.unflattenFromString:(Ljava/lang/String;)Landroid/content/ComponentName;|]" =>  //public static
-		    require(retVarOpt.isDefined)
-		    newFacts += RFAFact(VarSlot(retVarOpt.get), RFAPointStringInstance(currentContext))
+		    require(retVars.size == 1)
+		    newFacts += RFAFact(VarSlot(retVars(0)), RFAPointStringInstance(currentContext))
 		  case "[|Landroid/content/ComponentName;.writeToParcel:(Landroid/content/ComponentName;Landroid/os/Parcel;)V|]" =>  //public static
 		    //TODO: How to handle parcel
 		  case "[|Landroid/content/ComponentName;.writeToParcel:(Landroid/os/Parcel;I)V|]" =>  //public
 		    //TODO: How to handle parcel
 		  case _ =>
 	  }
-	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
-	    case Some(f) => newFacts += f
-	    case None =>
-	  }
+	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
 	  s ++ newFacts
 	}
 	
@@ -135,14 +131,14 @@ object ComponentNameModel {
 	              RFAConcreteStringInstance(rec.getShortName, currentContext)
 	            case None =>
 	              System.err.println("Given class name probably come from another app: " + i)
-	              RFAUnknownInstance(currentContext)
+	              UnknownInstance(currentContext)
 	          }
           case pstr @ RFAPointStringInstance(c) => 
           	RFAPointStringInstance(currentContext)
           case _ =>
             if(DEBUG)
             	System.err.println("Get short name use unknown instance: " + i)
-            RFAUnknownInstance(currentContext)
+            UnknownInstance(currentContext)
 	      }
 	  }
 	}
@@ -190,7 +186,7 @@ object ComponentNameModel {
 				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), cstr)
 		                case None =>
 		                  System.err.println("Given class name probably come from another app: " + cn)
-				              val unknownIns = RFAUnknownInstance(currentContext)
+				              val unknownIns = UnknownInstance(currentContext)
 				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
 		              }

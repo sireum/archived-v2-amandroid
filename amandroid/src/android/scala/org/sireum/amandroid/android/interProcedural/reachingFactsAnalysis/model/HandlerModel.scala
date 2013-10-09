@@ -6,12 +6,11 @@ import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAFact
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.VarSlot
-import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAUnknownInstance
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 
 object HandlerModel {
 	def isHandler(r : AmandroidRecord) : Boolean = r.getName == "[|android:os:Handler|]"
-	def doHandlerCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
+	def doHandlerCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
 	  var newFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
 	    case "[|Landroid/os/Handler;.<init>:()V|]" =>  //public constructor
@@ -60,10 +59,7 @@ object HandlerModel {
 		  case "[|Landroid/os/Handler;.toString:()Ljava/lang/String;|]" =>  //public
 		  case _ =>
 	  }
-	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
-	    case Some(f) => newFacts += f
-	    case None =>
-	  }
+	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
 	  s ++ newFacts
 	}
 }

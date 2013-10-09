@@ -7,6 +7,7 @@ import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.amandroid.Type
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.Center
+import org.sireum.amandroid.UnknownInstance
 
 object ReachingFactsAnalysisHelper {
 	def getFactMap(s : ISet[RFAFact]) : Map[Slot, Set[Instance]] = s.groupBy(_.s).mapValues(_.map(_.v))
@@ -24,13 +25,14 @@ object ReachingFactsAnalysisHelper {
 	  } else None
 	}
 	
-	def checkAndGetUnknownObjectForRetVar(s : ISet[RFAFact], retVarOpt : Option[String], currentContext : Context) : Option[RFAFact] = {
-	  var result : Option[RFAFact] = None
+	def checkAndGetUnknownObjectForRetVar(s : ISet[RFAFact], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+	  var result : ISet[RFAFact] = isetEmpty
 	  if(s.isEmpty){
-	    if(retVarOpt.isDefined){
-	      val slot = VarSlot(retVarOpt.get)
-        val value = RFAUnknownInstance(currentContext)
-        result = Some(RFAFact(slot, value))
+	    retVars.foreach{
+	      retVar =>
+		      val slot = VarSlot(retVar)
+	        val value = UnknownInstance(currentContext)
+	        result += RFAFact(slot, value)
 	    }
 	  }
 	  result

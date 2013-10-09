@@ -31,7 +31,7 @@ object InterComponentCommunicationModel {
     flag
   }
 	
-	def doIccCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : (ISet[RFAFact], ISet[AmandroidProcedure]) = {
+	def doIccCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[AmandroidProcedure]) = {
 	  val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
 	  require(args.size > 1)
 	  val intentSlot = VarSlot(args(1))

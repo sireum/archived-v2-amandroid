@@ -11,7 +11,7 @@ object IntentFilterModel {
   val DEBUG = true
 	def isIntentFilter(r : AmandroidRecord) : Boolean = r.getName == AndroidConstants.INTENTFILTER
 	  
-	def doIntentFilterCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
+	def doIntentFilterCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
@@ -73,10 +73,7 @@ object IntentFilterModel {
 		  case "[|Landroid/content/IntentFilter;.writeToParcel:(Landroid/os/Parcel;I)V|]" =>  //public final
 		  case "[|Landroid/content/IntentFilter;.writeToXml:(Lorg/xmlpull/v1/XmlSerializer;)V|]" =>  //public
 	  }
-	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
-	    case Some(f) => newFacts += f
-	    case None =>
-	  }
+	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
 	  s ++ newFacts -- delFacts
 	}
   

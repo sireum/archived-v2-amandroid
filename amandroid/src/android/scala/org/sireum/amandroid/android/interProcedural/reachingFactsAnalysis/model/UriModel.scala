@@ -10,7 +10,7 @@ object UriModel {
   val DEBUG = true
 	def isUri(r : AmandroidRecord) : Boolean = r.getName == "[|android:net:Uri|]"
 	  
-	def doUriCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
+	def doUriCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
@@ -58,17 +58,14 @@ object UriModel {
 		  case "[|Landroid/net/Uri;.isRelative:()Z|]" =>  //public abstract
 		  case "[|Landroid/net/Uri;.normalizeScheme:()Landroid/net/Uri;|]" =>  //public
 		  case "[|Landroid/net/Uri;.parse:(Ljava/lang/String;)Landroid/net/Uri;|]" =>  //public static
-		    require(retVarOpt.isDefined)
-		    uriParse(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    uriParse(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/net/Uri;.toSafeString:()Ljava/lang/String;|]" =>  //public
 		  case "[|Landroid/net/Uri;.toString:()Ljava/lang/String;|]" =>  //public abstract
 		  case "[|Landroid/net/Uri;.withAppendedPath:(Landroid/net/Uri;Ljava/lang/String;)Landroid/net/Uri;|]" =>  //public static
 		  case "[|Landroid/net/Uri;.writeToParcel:(Landroid/os/Parcel;Landroid/net/Uri;)V|]" =>  //public static
 	  }
-	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
-	    case Some(f) => newFacts += f
-	    case None =>
-	  }
+	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
 	  s ++ newFacts -- delFacts
 	}
 	

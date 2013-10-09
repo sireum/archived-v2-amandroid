@@ -2,8 +2,6 @@ package org.sireum.amandroid.interProcedural.objectFlowAnalysis
 
 import org.sireum.util._
 import org.sireum.amandroid.interProcedural._
-import org.sireum.amandroid.OFAInstance
-import org.sireum.amandroid.OFAStringInstance
 
 class NormalValueSet{
   def copy : NormalValueSet = {

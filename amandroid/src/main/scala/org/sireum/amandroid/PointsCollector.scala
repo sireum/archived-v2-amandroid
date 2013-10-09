@@ -343,10 +343,9 @@ class PointsCollector {
         }
         points += pi
         if(pi.retTyp.startsWith("L")){
-          t.lhs match {
-            case Some(nameExp) =>
-              pl = new PointL(nameExp.name.name, loc, locIndex, ownerSig)
-            case None =>
+          require(t.lhss.size<=1)
+          if(t.lhss.size == 1){
+           pl = new PointL(t.lhss(0).name.name, loc, locIndex, ownerSig)
           }
           //Note that we are considering "call temp = invoke" as an assignment
           val assignmentPoint : PointAsmt = new PointAsmt("[" + pl + "=" + pi + "]", loc, locIndex, ownerSig)
@@ -355,17 +354,16 @@ class PointsCollector {
           points += assignmentPoint
         } else if(pi.retTyp.startsWith("[")){
 //          if(pi.retTyp.charAt(pi.retTyp.lastIndexOf('[')+1) == 'L'){
-            t.lhs match {
-              case Some(nameExp) =>
-                pl = new PointL(nameExp.name.name, loc, locIndex, ownerSig)
-              case None =>
-            }
-            val dimensions = pi.retTyp.lastIndexOf('[') - pi.retTyp.indexOf('[') + 1
+          require(t.lhss.size<=1)
+          if(t.lhss.size == 1){
+           pl = new PointL(t.lhss(0).name.name, loc, locIndex, ownerSig)
+          }
+          val dimensions = pi.retTyp.lastIndexOf('[') - pi.retTyp.indexOf('[') + 1
 //            ofg.arrayRepo(pl.toString) = dimensions
-            val assignmentPoint : PointAsmt = new PointAsmt("[" + pl + "=" + pi + "]", loc, locIndex, ownerSig)
-            assignmentPoint.lhs = pl
-            assignmentPoint.rhs = pi
-            points += assignmentPoint
+          val assignmentPoint : PointAsmt = new PointAsmt("[" + pl + "=" + pi + "]", loc, locIndex, ownerSig)
+          assignmentPoint.lhs = pl
+          assignmentPoint.rhs = pi
+          points += assignmentPoint
 //          }
         }
         false

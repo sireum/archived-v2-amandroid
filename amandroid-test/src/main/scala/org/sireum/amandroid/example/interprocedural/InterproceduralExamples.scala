@@ -17,6 +17,9 @@ object InterproceduralExamples extends Examples{
   val ANDROID_APK_FILE_EXT = ".apk"
   def ofgTestAPKFiles = exampleFiles(OFG_TEST_APK_DIR_URI, ANDROID_APK_FILE_EXT)
   
-  val OFG_REAL_APK_DIR_URI = sourceDirUri(this.getClass, "./ofg/realapk/") 
-  def ofgRealAPKFiles = exampleFiles(OFG_REAL_APK_DIR_URI, ANDROID_APK_FILE_EXT)
+  val OFG_NORMAL_APK_DIR_URI = sourceDirUri(this.getClass, "./ofg/normalapk/") 
+  def ofgNormalAPKFiles = exampleFiles(OFG_NORMAL_APK_DIR_URI, ANDROID_APK_FILE_EXT)
+  
+  val OFG_MALICIOUS_APK_DIR_URI = sourceDirUri(this.getClass, "./ofg/maliciousapk/") 
+  def ofgMaliciousAPKFiles = exampleFiles(OFG_MALICIOUS_APK_DIR_URI, ANDROID_APK_FILE_EXT)
 }

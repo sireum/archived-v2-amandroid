@@ -7,8 +7,9 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAFact
 import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.VarSlot
-import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAUnknownInstance
 import org.sireum.amandroid.android.AndroidConstants
+import org.sireum.amandroid.UnknownInstance
+import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 
 object AndroidRFAScopeManager extends ScopeManager{
   private var packages : ISet[String] = isetEmpty
@@ -46,13 +47,7 @@ object AndroidRFAScopeManager extends ScopeManager{
     }
   }
   
-  def handleBypass(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
-    retVarOpt match{
-      case Some(retVar) =>
-        val slot = VarSlot(retVar)
-        val value = RFAUnknownInstance(currentContext)
-        s + RFAFact(slot, value)
-      case None => s
-    }
+  def handleBypass(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+    s ++ ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(isetEmpty, retVars, currentContext)
   }
 }

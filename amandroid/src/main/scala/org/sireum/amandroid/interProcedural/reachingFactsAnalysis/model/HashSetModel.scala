@@ -36,7 +36,7 @@ object HashSetModel {
 	  thisValue.map{s => RFAFact(VarSlot(retVar), s.clone(currentContext))}
   }
   
-  def doHashSetCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
+  def doHashSetCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
 	  var newFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
       case "[|Ljava/util/HashSet;.<init>:()V|]" =>
@@ -53,12 +53,12 @@ object HashSetModel {
 		    newFacts ++= addItemToHashSetField(s, args, currentContext)
 		  case "[|Ljava/util/HashSet;.clear:()V|]" =>
 		  case "[|Ljava/util/HashSet;.clone:()Ljava/lang/Object;|]" =>
-		    require(retVarOpt.isDefined)
-		    newFacts ++= cloneHashSetToRet(s, args, retVarOpt.get, currentContext)
+		    require(retVars.size == 1)
+		    newFacts ++= cloneHashSetToRet(s, args, retVars(0), currentContext)
 		  case "[|Ljava/util/HashSet;.contains:(Ljava/lang/Object;)Z|]" =>
 		  case "[|Ljava/util/HashSet;.createBackingMap:(IF)Ljava/util/HashMap;|]" =>
-		    require(retVarOpt.isDefined)
-		    ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|java:util:HashMap|]", 0), retVarOpt.get, currentContext) match{
+		    require(retVars.size == 1)
+		    ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|java:util:HashMap|]", 0), retVars(0), currentContext) match{
 		      case Some(fact) => newFacts += fact
 		      case None =>
 		    }
@@ -70,10 +70,7 @@ object HashSetModel {
 		  case "[|Ljava/util/HashSet;.writeObject:(Ljava/io/ObjectOutputStream;)V|]" =>
 		  case _ =>
     }
-	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
-	    case Some(f) => newFacts += f
-	    case None =>
-	  }
+	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
     s ++ newFacts
   }
 }

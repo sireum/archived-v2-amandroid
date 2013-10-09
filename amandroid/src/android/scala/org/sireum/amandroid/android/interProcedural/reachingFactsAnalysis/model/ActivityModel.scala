@@ -5,7 +5,6 @@ import org.sireum.util._
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAFact
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.VarSlot
-import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAUnknownInstance
 import org.sireum.amandroid.android.AndroidConstants
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.FieldSlot
@@ -13,7 +12,7 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.FieldSlot
 object ActivityModel {
 	def isActivity(r : AmandroidRecord) : Boolean = r.getName == AndroidConstants.ACTIVITY
 	
-	def doActivityCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
+	def doActivityCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVar : Seq[String], currentContext : Context) : ISet[RFAFact] = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
@@ -54,8 +53,8 @@ object ActivityModel {
 		  case "[|Landroid/app/Activity;.getCurrentFocus:()Landroid/view/View;|]" =>  //public
 		  case "[|Landroid/app/Activity;.getFragmentManager:()Landroid/app/FragmentManager;|]" =>  //public
 		  case "[|Landroid/app/Activity;.getIntent:()Landroid/content/Intent;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    getIntent(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVar.size == 1)
+		    getIntent(s, args, retVar(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/app/Activity;.getLastNonConfigurationChildInstances:()Ljava/util/HashMap;|]" =>  //
 		  case "[|Landroid/app/Activity;.getLastNonConfigurationInstance:()Ljava/lang/Object;|]" =>  //public
 		  case "[|Landroid/app/Activity;.getLayoutInflater:()Landroid/view/LayoutInflater;|]" =>  //public
@@ -243,10 +242,7 @@ object ActivityModel {
 		  case "[|Landroid/app/Activity;.triggerSearch:(Ljava/lang/String;Landroid/os/Bundle;)V|]" =>  //public
 		  case "[|Landroid/app/Activity;.unregisterForContextMenu:(Landroid/view/View;)V|]" =>  //public
 	  }
-	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
-	    case Some(f) => newFacts += f
-	    case None =>
-	  }
+	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVar, currentContext)
 	  s ++ newFacts -- delFacts
 	}
 	

@@ -12,16 +12,13 @@ import org.sireum.amandroid.android.AndroidConstants
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAPointStringInstance
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAInstance
 import org.sireum.alir.Slot
-import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFANullInstance
-import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAUnknownInstance
 import org.sireum.amandroid.util.StringFormConverter
-import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAUnknownInstance
 
 object IntentModel {
   final val DEBUG = true
 	def isIntent(r : AmandroidRecord) : Boolean = r.getName == "[|android:content:Intent|]"
 	  
-	def doIntentCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVarOpt : Option[String], currentContext : Context) : ISet[RFAFact] = {
+	def doIntentCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
@@ -42,12 +39,12 @@ object IntentModel {
 		  case "[|Landroid/content/Intent;.<init>:(Ljava/lang/String;Landroid/net/Uri;Landroid/content/Context;Ljava/lang/Class;)V|]" =>  //public constructor
 		    intentInitWithActionDataAndComponent(s, args, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.addCategory:(Ljava/lang/String;)Landroid/content/Intent;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    intentAddCategory(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    intentAddCategory(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.addFlags:(I)Landroid/content/Intent;|]" =>  //public
 		  case "[|Landroid/content/Intent;.clone:()Ljava/lang/Object;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    intentClone(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    intentClone(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.cloneFilter:()Landroid/content/Intent;|]" =>  //public
 		  case "[|Landroid/content/Intent;.createChooser:(Landroid/content/Intent;Ljava/lang/CharSequence;)Landroid/content/Intent;|]" =>  //public static
 		  case "[|Landroid/content/Intent;.describeContents:()I|]" =>  //public
@@ -154,47 +151,47 @@ object IntentModel {
 		  case "[|Landroid/content/Intent;.resolveType:(Landroid/content/Context;)Ljava/lang/String;|]" =>  //public
 		  case "[|Landroid/content/Intent;.resolveTypeIfNeeded:(Landroid/content/ContentResolver;)Ljava/lang/String;|]" =>  //public
 		  case "[|Landroid/content/Intent;.setAction:(Ljava/lang/String;)Landroid/content/Intent;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    intentSetAction(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    intentSetAction(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.setAllowFds:(Z)V|]" =>  //public
 		  case "[|Landroid/content/Intent;.setClass:(Landroid/content/Context;Ljava/lang/Class;)Landroid/content/Intent;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    intentSetClass(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    intentSetClass(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.setClassName:(Landroid/content/Context;Ljava/lang/String;)Landroid/content/Intent;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    intentSetClassName(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    intentSetClassName(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.setClassName:(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    intentSetClassName(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    intentSetClassName(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.setClipData:(Landroid/content/ClipData;)V|]" =>  //public
 		  case "[|Landroid/content/Intent;.setComponent:(Landroid/content/ComponentName;)Landroid/content/Intent;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    intentSetComponent(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    intentSetComponent(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.setData:(Landroid/net/Uri;)Landroid/content/Intent;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    intentSetData(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    intentSetData(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.setDataAndNormalize:(Landroid/net/Uri;)Landroid/content/Intent;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    intentSetData(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    intentSetData(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.setDataAndType:(Landroid/net/Uri;Ljava/lang/String;)Landroid/content/Intent;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    intentSetDataAndType(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    intentSetDataAndType(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.setDataAndTypeAndNormalize:(Landroid/net/Uri;Ljava/lang/String;)Landroid/content/Intent;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    intentSetDataAndType(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    intentSetDataAndType(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.setExtrasClassLoader:(Ljava/lang/ClassLoader;)V|]" =>  //public
 		  case "[|Landroid/content/Intent;.setFlags:(I)Landroid/content/Intent;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    intentSetFlags(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    intentSetFlags(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.setPackage:(Ljava/lang/String;)Landroid/content/Intent;|]" =>  //public
 		  case "[|Landroid/content/Intent;.setSelector:(Landroid/content/Intent;)V|]" =>  //public
 		  case "[|Landroid/content/Intent;.setSourceBounds:(Landroid/graphics/Rect;)V|]" =>  //public
 		  case "[|Landroid/content/Intent;.setType:(Ljava/lang/String;)Landroid/content/Intent;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    intentSetType(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    intentSetType(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.setTypeAndNormalize:(Ljava/lang/String;)Landroid/content/Intent;|]" =>  //public
-		    require(retVarOpt.isDefined)
-		    intentSetType(s, args, retVarOpt.get, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    require(retVars.size == 1)
+		    intentSetType(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.toInsecureString:()Ljava/lang/String;|]" =>  //public
 		  case "[|Landroid/content/Intent;.toInsecureStringWithClip:()Ljava/lang/String;|]" =>  //public
 		  case "[|Landroid/content/Intent;.toShortString:(Ljava/lang/StringBuilder;ZZZZ)V|]" =>  //public
@@ -205,10 +202,7 @@ object IntentModel {
 		  case "[|Landroid/content/Intent;.toUriInner:(Ljava/lang/StringBuilder;Ljava/lang/String;I)V|]" =>  //private
 		  case "[|Landroid/content/Intent;.writeToParcel:(Landroid/os/Parcel;I)V|]" =>  //public
 	  }
-	  ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVarOpt, currentContext) match{
-	    case Some(f) => newFacts += f
-	    case None =>
-	  }
+	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
 	  s ++ newFacts -- delFacts
 	}
   
@@ -397,7 +391,7 @@ object IntentModel {
       	value => 
       	  if(value.isInstanceOf[ClassInstance]){
       	  	RFAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
-      	  } else if(value.isInstanceOf[RFAUnknownInstance]){
+      	  } else if(value.isInstanceOf[UnknownInstance] && value.isInstanceOf[NullInstance]){
       	    value
       	  } else throw new RuntimeException("Unexpected instance type: " + value)
       }
@@ -453,7 +447,7 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
                 System.err.println("Cannot find Given class: " + cstr)
-                val unknownIns = RFAUnknownInstance(c)
+                val unknownIns = UnknownInstance(c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }
@@ -488,7 +482,7 @@ object IntentModel {
       	value => 
       	  if(value.isInstanceOf[ClassInstance]){
       	  	RFAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
-      	  } else if(value.isInstanceOf[RFAUnknownInstance]){
+      	  } else if(value.isInstanceOf[UnknownInstance] && value.isInstanceOf[NullInstance]){
       	    value
       	  } else throw new RuntimeException("Unexpected instance type: " + value)
       }
@@ -521,7 +515,7 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
                 System.err.println("Cannot find Given class: " + cstr)
-                val unknownIns = RFAUnknownInstance(c)
+                val unknownIns = UnknownInstance(c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }
@@ -559,7 +553,7 @@ object IntentModel {
 	      mCategoryValue.foreach{
 	        cv => 
 	          var hashsetIns = cv
-	          if(cv.isInstanceOf[RFANullInstance]){
+	          if(cv.isInstanceOf[NullInstance]){
 	            hashsetIns = RFAInstance(NormalType("[|java:util:HashSet|]", 0), currentContext)
 	            newfacts += RFAFact(mCategorySlot, hashsetIns)
 	            delfacts += RFAFact(mCategorySlot, cv)
@@ -667,7 +661,7 @@ object IntentModel {
       	value => 
       	  if(value.isInstanceOf[ClassInstance]){
       	  	RFAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
-      	  } else if(value.isInstanceOf[RFAUnknownInstance]){
+      	  } else if(value.isInstanceOf[UnknownInstance] && value.isInstanceOf[NullInstance]){
       	    value
       	  } else throw new RuntimeException("Unexpected instance type: " + value)
       }
@@ -701,7 +695,7 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
                 System.err.println("Cannot find Given class: " + cstr)
-                val unknownIns = RFAUnknownInstance(c)
+                val unknownIns = UnknownInstance(c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }
@@ -761,7 +755,7 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
                 System.err.println("Cannot find Given class: " + cstr)
-                val unknownIns = RFAUnknownInstance(c)
+                val unknownIns = UnknownInstance(c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }
