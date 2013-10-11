@@ -12,9 +12,9 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAPointString
 import org.sireum.amandroid.android.AndroidConstants
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAPointStringInstance
 import org.sireum.amandroid.util.StringFormConverter
+import org.sireum.amandroid.MessageCenter._
 
 object ComponentNameModel {
-  final val DEBUG = true
   
 	def isComponentName(r : AmandroidRecord) : Boolean = r.getName == "[|android:content:ComponentName|]"
 	  
@@ -130,14 +130,13 @@ object ComponentNameModel {
 	            case Some(rec) =>
 	              RFAConcreteStringInstance(rec.getShortName, currentContext)
 	            case None =>
-	              System.err.println("Given class name probably come from another app: " + i)
+	              err_msg_normal("Given class name probably come from another app: " + i)
 	              UnknownInstance(currentContext)
 	          }
           case pstr @ RFAPointStringInstance(c) => 
           	RFAPointStringInstance(currentContext)
           case _ =>
-            if(DEBUG)
-            	System.err.println("Get short name use unknown instance: " + i)
+            err_msg_normal("Get short name use unknown instance: " + i)
             UnknownInstance(currentContext)
 	      }
 	  }
@@ -185,22 +184,20 @@ object ComponentNameModel {
 				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
 				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), cstr)
 		                case None =>
-		                  System.err.println("Given class name probably come from another app: " + cn)
+		                  err_msg_normal("Given class name probably come from another app: " + cn)
 				              val unknownIns = UnknownInstance(currentContext)
 				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
 		              }
 		              facts
 		            case pstr @ RFAPointStringInstance(c) => 
-		              if(DEBUG)
-		              	System.err.println("Init ComponentName use point string: " + pstr)
+		              err_msg_detail("Init ComponentName use point string: " + pstr)
 		              var facts = isetEmpty[RFAFact]
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pstr)
 		              facts
 		            case _ => 
-		              if(DEBUG)
-		              	System.err.println("Init ComponentName use Unknown instance: " + cn)
+		              err_msg_detail("Init ComponentName use Unknown instance: " + cn)
 		              var facts = isetEmpty[RFAFact]
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), cn)
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), cn)
@@ -237,15 +234,13 @@ object ComponentNameModel {
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), claStr)
 		              facts
 		            case pstr @ RFAPointStringInstance(c) => 
-		              if(DEBUG)
-		              	System.err.println("Init ComponentName use point string: " + pstr)
+		              err_msg_detail("Init ComponentName use point string: " + pstr)
 		              var facts = isetEmpty[RFAFact]
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pstr)
 		              facts
 		            case _ =>
-		              if(DEBUG)
-		              	System.err.println("Init ComponentName use unknown instance: " + cn)
+		              err_msg_detail("Init ComponentName use unknown instance: " + cn)
 		              var facts = isetEmpty[RFAFact]
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), cn)
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), cn)
@@ -289,15 +284,13 @@ object ComponentNameModel {
 							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), claStr)
 							              facts
 							            case pstr2 @ RFAPointStringInstance(c) => 
-							              if(DEBUG)
-							              	System.err.println("Init ComponentName.mClass use point string: " + pv2)
+							              err_msg_detail("Init ComponentName.mClass use point string: " + pv2)
 							              var facts = isetEmpty[RFAFact]
 							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pstr2)
 							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pstr2)
 							              facts
 							            case _ =>
-							              if(DEBUG)
-							              	System.err.println("Init ComponentName.mClass use Unknown instance: " + pv2)
+							              err_msg_detail("Init ComponentName.mClass use Unknown instance: " + pv2)
 							              var facts = isetEmpty[RFAFact]
 							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pv2)
 							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pv2)
@@ -306,15 +299,13 @@ object ComponentNameModel {
 							      }.reduce(iunion[RFAFact])
 						      }
 		            case pstr1 @ RFAPointStringInstance(c) => 
-		              if(DEBUG)
-		              	System.err.println("Init ComponentName.mPackage use point string: " + pv1)
+		              err_msg_detail("Init ComponentName.mPackage use point string: " + pv1)
 		              var facts = isetEmpty[RFAFact]
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pstr1)
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pstr1)
 		              facts
 		            case _ =>
-		              if(DEBUG)
-		              	System.err.println("Init ComponentName.mPackage use Unknown instance: " + pv1)
+		              err_msg_detail("Init ComponentName.mPackage use Unknown instance: " + pv1)
 		              var facts = isetEmpty[RFAFact]
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pv1)
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pv1)

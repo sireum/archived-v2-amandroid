@@ -20,6 +20,7 @@ import org.sireum.pilar.ast.CallJump
 import org.sireum.pilar.ast.JumpLocation
 import org.sireum.pilar.ast.TupleExp
 import org.sireum.pilar.ast.NameExp
+import org.sireum.amandroid.MessageCenter._
 
 
 /**
@@ -53,7 +54,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	    val containerClasses = reachableMethods.map(item => item.getDeclaringRecord)
 	    containerClasses.map(item => analyzeClass(item, comp))
 	  }
-	  println("current all callbacks = " + this.callbackMethods)
+	  msg_detail("current all callbacks = " + this.callbackMethods)
 	  
 	}
 	

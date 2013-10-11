@@ -93,7 +93,7 @@ trait CompleteRFATestFramework extends TestFramework {
     	System.gc()
 		  System.gc()
     	
-    	println("************************************\n\n")
+    	println("************************************\n")
     }
   }
 

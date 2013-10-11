@@ -15,9 +15,9 @@ import org.sireum.amandroid.android.AppCenter
 import org.sireum.amandroid.android.parser.IntentFilterDataBase
 import org.sireum.amandroid.android.parser.IntentFilter
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.FieldSlot
+import org.sireum.amandroid.MessageCenter._
 
 object FrameworkMethodsModel {
-  val DEBUG = true
 	def isFrameworkMethods(p : AmandroidProcedure) : Boolean = {
 	  val contextRec = Center.resolveRecord("[|android:content:Context|]", Center.ResolveLevel.BODIES)
 	  if(Center.getRecordHierarchy.isRecordRecursivelySubClassOfIncluding(p.getDeclaringRecord, contextRec))
@@ -96,14 +96,10 @@ object FrameworkMethodsModel {
 			            case cstr @ RFAConcreteStringInstance(text, c) =>
 			              intentF.addAction(text)
 			            case pstr @ RFAPointStringInstance(c) => 
-			              if(DEBUG)
-			              	System.err.println("Register IntentFilter actions use point string: " + pstr)
+			              err_msg_detail("Register IntentFilter actions use point string: " + pstr)
 			            case un @ UnknownInstance(c) =>
-			              if(DEBUG)
-			              	System.err.println("Register IntentFilter actions use Unknown Instance: " + un)
+			              err_msg_detail("Register IntentFilter actions use Unknown Instance: " + un)
 			            case n @ NullInstance(c) =>
-			              if(DEBUG)
-			              	System.err.println("Register IntentFilter actions use Null pointer: " + n)
 			            case _ => throw new RuntimeException("unexpected instance type: " + mav)
 			          }
 	          }
@@ -115,14 +111,10 @@ object FrameworkMethodsModel {
 			            case cstr @ RFAConcreteStringInstance(text, c) =>
 			              intentF.addCategory(text)
 			            case pstr @ RFAPointStringInstance(c) => 
-			              if(DEBUG)
-			              	System.err.println("Register IntentFilter categories use point string: " + pstr)
+			              err_msg_detail("Register IntentFilter categories use point string: " + pstr)
 			            case un @ UnknownInstance(c) =>
-			              if(DEBUG)
-			              	System.err.println("Register IntentFilter categories use Unknown Instance: " + un)
+			              err_msg_detail("Register IntentFilter categories use Unknown Instance: " + un)
 			            case n @ NullInstance(c) =>
-			              if(DEBUG)
-			                System.err.println("Register IntentFilter categories use Null pointer: " + n)
 			            case _ => throw new RuntimeException("unexpected instance type: " + mav)
 			          }
 	          }
@@ -135,7 +127,7 @@ object FrameworkMethodsModel {
 	      }
 	  }
 	  AppCenter.updateIntentFilterDB(iDB)
-	  println("intentfilter database: " + AppCenter.getIntentFilterDB)
+	  err_msg_normal("intentfilter database: " + AppCenter.getIntentFilterDB)
 	  isetEmpty
 	}
 	
@@ -150,11 +142,11 @@ object FrameworkMethodsModel {
 	      str match{
 			    case cstr @ RFAConcreteStringInstance(text, c) =>
 			      if(AndroidConstants.getSystemServiceStrings.contains(text)){
-			        println("Get " + text + " service in " + currentContext)
+			        msg_normal("Get " + text + " service in " + currentContext)
 			      } else {
-			        System.err.println("Given service does not exist: " + cstr)
+			        err_msg_normal("Given service does not exist: " + cstr)
 			      }
-			    case pstr @ RFAPointStringInstance(c) => System.err.println("Get system service use point string: " + pstr)
+			    case pstr @ RFAPointStringInstance(c) => err_msg_normal("Get system service use point string: " + pstr)
 			    case _ => throw new RuntimeException("unexpected instance type: " + str)
 	      }
 	  }

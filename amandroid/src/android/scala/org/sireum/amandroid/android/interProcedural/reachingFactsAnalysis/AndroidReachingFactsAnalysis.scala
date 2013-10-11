@@ -24,6 +24,7 @@ import org.sireum.amandroid.AmandroidRecord
 import org.sireum.amandroid.android.AndroidConstants
 import org.sireum.amandroid.NullInstance
 import org.sireum.amandroid.UnknownInstance
+import org.sireum.amandroid.MessageCenter._
 
 class AndroidReachingFactsAnalysisBuilder{
   def build //
@@ -51,7 +52,6 @@ class AndroidReachingFactsAnalysisBuilder{
  * @author Fengguo Wei & Sankardas Roy
  */
 object AndroidReachingFactsAnalysis {
-  val DEBUG = false
   type Node = CGNode
   type Result = InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]
   
@@ -82,11 +82,9 @@ object AndroidReachingFactsAnalysis {
             baseValue.map{
               ins =>
                 if(ins.isInstanceOf[NullInstance])
-                  System.err.println("Access field: " + baseSlot + "." + fieldSig + "@" + currentContext + "\nwith Null pointer: " + ins)
+                  err_msg_normal("Access field: " + baseSlot + "." + fieldSig + "@" + currentContext + "\nwith Null pointer: " + ins)
                 else if(ins.isInstanceOf[UnknownInstance]) {
-                  if(DEBUG){
-                  	System.err.println("Access field: " + baseSlot + "." + fieldSig + "@" + currentContext + "\nwith Unknown pointer: " + ins)
-                  }
+                  err_msg_detail("Access field: " + baseSlot + "." + fieldSig + "@" + currentContext + "\nwith Unknown pointer: " + ins)
                 }
                 else{
                   Center.findField(ins.getType, fieldSig) match{
@@ -94,8 +92,7 @@ object AndroidReachingFactsAnalysis {
 			                if(baseValue.size>1) result(i) = (FieldSlot(ins, af.getSignature), false)
 			                else result(i) = (FieldSlot(ins, af.getSignature), true)
                     case None =>
-                      if(DEBUG)
-                      	System.err.println("Given field may be in other library: " + fieldSig)
+                      err_msg_detail("Given field may be in other library: " + fieldSig)
                   }
                 }
             }
@@ -109,7 +106,7 @@ object AndroidReachingFactsAnalysis {
             baseValue.map{
               ins =>
                 if(ins.isInstanceOf[NullInstance])
-                  System.err.println("Access array: " + baseSlot + "@" + currentContext + "\nwith Null pointer: " + ins)
+                  err_msg_simple("Access array: " + baseSlot + "@" + currentContext + "\nwith Null pointer: " + ins)
                 result(i) = (ArraySlot(ins), false)
             }
           case _=>
@@ -333,11 +330,9 @@ object AndroidReachingFactsAnalysis {
             baseValue.map{
               ins =>
                 if(ins.isInstanceOf[NullInstance])
-                  System.err.println("Access field: " + baseSlot + "." + fieldSig + "@" + currentContext + "\nwith Null pointer: " + ins)
+                  err_msg_normal("Access field: " + baseSlot + "." + fieldSig + "@" + currentContext + "\nwith Null pointer: " + ins)
                 else if(ins.isInstanceOf[UnknownInstance]) {
-                  if(DEBUG){
-                  	System.err.println("Access field: " + baseSlot + "." + fieldSig + "@" + currentContext + "\nwith Unknown pointer: " + ins)
-                  }
+                  err_msg_detail("Access field: " + baseSlot + "." + fieldSig + "@" + currentContext + "\nwith Unknown pointer: " + ins)
                 }
                 else{
                   Center.findField(ins.getType, fieldSig) match{
@@ -346,8 +341,7 @@ object AndroidReachingFactsAnalysis {
 			                val fieldValue : ISet[Instance] = factMap.getOrElse(fieldSlot, Set(NullInstance(currentContext.copy)))
 					            result(i) = fieldValue
                     case None =>
-                      if(DEBUG)
-                      	System.err.println("Given field may be in other library: " + fieldSig)
+                      err_msg_detail("Given field may be in other library: " + fieldSig)
                   }
                 }
             }
@@ -361,7 +355,7 @@ object AndroidReachingFactsAnalysis {
             baseValue.map{
               ins =>
                 if(ins.isInstanceOf[NullInstance])
-                  System.err.println("Access array: " + baseSlot + "@" + currentContext + "\nwith Null pointer: " + ins)
+                  err_msg_normal("Access array: " + baseSlot + "@" + currentContext + "\nwith Null pointer: " + ins)
                 else{
                   val arraySlot = ArraySlot(ins)
                   val arrayValue : ISet[Instance] = factMap.getOrElse(arraySlot, Set(NullInstance(currentContext.copy)))
@@ -544,7 +538,7 @@ object AndroidReachingFactsAnalysis {
 				            cg.collectCfgToBaseGraph[String](target, callerContext, false)
 									  cg.extendGraphOneWay(target.getSignature, callerContext)
 			            }
-                  if(DEBUG) System.err.println(target.getDeclaringRecord + " started!")
+                  msg_normal(target.getDeclaringRecord + " started!")
                   calleeFactsMap += (cg.entryNode(target, callerContext) -> mapFactsToICCTarget(factsForCallee, cj, target.getProcedureBody.procedure))
               }
             } else { // for non-ICC model call
@@ -600,11 +594,9 @@ object AndroidReachingFactsAnalysis {
             recvValue.foreach{
 				      ins =>
 				        if(ins.isInstanceOf[NullInstance])
-				          System.err.println("Try to invoke method: " + sig + "@" + callerContext + "\nwith Null pointer:" + ins)
+				          err_msg_normal("Try to invoke method: " + sig + "@" + callerContext + "\nwith Null pointer:" + ins)
 				        else if(ins.isInstanceOf[UnknownInstance]) {
-				          if(DEBUG){
-				          	System.err.println("Invoke method: " + sig + "@" + callerContext + "\n with Unknown Instance: " + ins)
-				          }
+				          err_msg_detail("Invoke method: " + sig + "@" + callerContext + "\n with Unknown Instance: " + ins)
 				          calleeSet += Center.getProcedureWithoutFailing(AndroidConstants.UNKNOWN_PROCEDURE_SIG)
 				        } else {
 					        val p = 
@@ -738,7 +730,7 @@ object AndroidReachingFactsAnalysis {
           
           for(i <- 0 to argSlots.size - 1){
             val argSlot = argSlots(i)
-            if(paramSlots.size < argSlots.size) println("cj-->" + cj + "\ncalleeProcedure-->" +calleeProcedure )
+            if(paramSlots.size < argSlots.size) err_msg_simple("cj-->" + cj + "\ncalleeProcedure-->" +calleeProcedure )
             val paramSlot = paramSlots(i)
             varFacts.foreach{
               fact =>

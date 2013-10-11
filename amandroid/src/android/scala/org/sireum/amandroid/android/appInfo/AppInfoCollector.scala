@@ -18,13 +18,14 @@ import org.sireum.amandroid.android.parser.LayoutFileParser
 import scala.util.control.Breaks._
 import org.sireum.amandroid.pilarCodeGenerator.AndroidSubstituteRecordMap
 import org.sireum.amandroid.android.AppCenter
+import org.sireum.amandroid.GlobalConfig
+import org.sireum.amandroid.MessageCenter._
 
 /**
  * adapted from Steven Arzt
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 class AppInfoCollector(apkFileLocation : String) {  
-    private val DEBUG = true
 	private var callbackMethods : Map[String, MSet[AmandroidProcedure]] = Map()
 	private var entrypoints : Set[String] = null
 	private var layoutControls : Map[Int, LayoutControl] = Map()
@@ -72,8 +73,7 @@ class AppInfoCollector(apkFileLocation : String) {
 	def generateDummyMain(record : AmandroidRecord, codeCtr: Int) : Int = {
 	  if(record == null) return 0
 		//generate dummy main method
-	  if(DEBUG)
-  	    println("Generate DummyMain for " + record)
+  	msg_normal("Generate DummyMain for " + record)
 	  val dmGen = new DummyMainGenerator
 	  dmGen.setSubstituteRecordMap(AndroidSubstituteRecordMap.getSubstituteRecordMap)
 	  dmGen.setCurrentComponent(record.getName)
@@ -94,8 +94,8 @@ class AppInfoCollector(apkFileLocation : String) {
 	}
 	
 	def dynamicRegisterComponent(comRec : AmandroidRecord) = {
-	  println("*************Dynamic Register Component**************")
-	  println("Component name: " + comRec)
+	  msg_normal("*************Dynamic Register Component**************")
+	  msg_normal("Component name: " + comRec)
 	  val analysisHelper = new CallBackInfoCollector(Set(comRec.getName)) 
 		analysisHelper.collectCallbackMethods()
 		this.callbackMethods = analysisHelper.getCallbackMethods
@@ -108,10 +108,10 @@ class AppInfoCollector(apkFileLocation : String) {
   				this.callbackMethods += (k -> v)
 		}
 	  
-	  println("Found " + this.callbackMethods.size + " callback methods")
+	  msg_normal("Found " + this.callbackMethods.size + " callback methods")
     val clCounter = generateDummyMain(comRec, codeLineCounter)
     codeLineCounter = clCounter
-    println("~~~~~~~~~~~~~~~~~~~~~~~~~Done~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    msg_normal("~~~~~~~~~~~~~~~~~~~~~~~~~Done~~~~~~~~~~~~~~~~~~~~~~~~~~")
 	}
 	
 	def calculateEntrypoints = {
@@ -122,36 +122,28 @@ class AppInfoCollector(apkFileLocation : String) {
 		this.appPackageName = mfp.getPackageName
 		this.entrypoints = mfp.getEntryPointClasses
 		this.intentFdb = mfp.getIntentDB
-		if(DEBUG){
-		  println("entrypoints--->" + mfp.getEntryPointClasses)
-		  println("packagename--->" + mfp.getPackageName)
-		  println("permissions--->" + mfp.getPermissions)
-		  println("intentDB------>" + mfp.getIntentDB)
-		}
+	  msg_normal("entrypoints--->" + mfp.getEntryPointClasses)
+	  msg_normal("packagename--->" + mfp.getPackageName)
+	  msg_normal("permissions--->" + mfp.getPermissions)
+	  msg_normal("intentDB------>" + mfp.getIntentDB)
 		// Parse the resource file
 	  val afp = new ARSCFileParser()
 		afp.parse(apkFileLocation)
-		if(DEBUG){
-		  println("arscstring-->" + afp.getGlobalStringPool)
-		  println("arscpackage-->" + afp.getPackages)
-		}
+	  msg_detail("arscstring-->" + afp.getGlobalStringPool)
+	  msg_detail("arscpackage-->" + afp.getPackages)
 		
 		// Find the user-defined sources in the layout XML files
 	  val lfp = new LayoutFileParser
 		lfp.setPackageName(this.appPackageName)
 		lfp.parseLayoutFile(apkFileLocation, this.entrypoints)
-		if(DEBUG){
-			println("layoutcalll--->" + lfp.getCallbackMethods)
-		  println("layoutuser--->" + lfp.getUserControls)
-		}
+		msg_detail("layoutcallback--->" + lfp.getCallbackMethods)
+	  msg_detail("layoutuser--->" + lfp.getUserControls)
 		
 		// Collect the callback interfaces implemented in the app's source code
 		val analysisHelper = new CallBackInfoCollector(this.entrypoints) 
 		analysisHelper.collectCallbackMethods()
 		this.callbackMethods = analysisHelper.getCallbackMethods
-		if(DEBUG){
-			println("LayoutClasses --> " + analysisHelper.getLayoutClasses)
-		}
+		msg_detail("LayoutClasses --> " + analysisHelper.getLayoutClasses)
 
 		analysisHelper.getCallbackMethods.foreach {
 	    case(k, v) =>
@@ -192,16 +184,16 @@ class AppInfoCollector(apkFileLocation : String) {
 		                if(callbackProcedure != null){
 		                  methods += callbackProcedure
 		                } else {
-		                  System.err.println("Callback method " + methodName + " not found in class " + k);
+		                  err_msg_normal("Callback method " + methodName + " not found in class " + k);
 		                }
 		            }
 		          }
 		        } else {
-		          System.err.println("Unexpected resource type for layout class")
+		          err_msg_simple("Unexpected resource type for layout class")
 		        }
 		    }
 		}
-		println("Found " + this.callbackMethods.size + " callback methods")
+		msg_normal("Found " + this.callbackMethods.size + " callback methods")
     var components = isetEmpty[AmandroidRecord]
     this.entrypoints.foreach{
       f => 
@@ -213,6 +205,6 @@ class AppInfoCollector(apkFileLocation : String) {
 		AppCenter.setComponents(components)
 		AppCenter.updateIntentFilterDB(this.intentFdb)
 		AppCenter.setAppInfo(this)
-		println("Entry point calculation done.")
+		msg_normal("Entry point calculation done.")
 	}
 }

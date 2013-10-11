@@ -153,7 +153,7 @@ object AmandroidResolver {
    */
 	
 	def resolveFromST(st : SymbolTable, par : Boolean) : Unit = {
-    if(GlobalConfig.mode >= Mode.WHOLE_PROGRAM_TEST && !AmandroidCodeSource.isPreLoaded) throw new RuntimeException("In whole program mode but library code did not be pre-loaded, call AmandroidCodeSource.preLoad first.")
+    if(GlobalConfig.mode >= Mode.WHOLE_PROGRAM_TEST && !AmandroidCodeSource.isPreLoaded) throw new RuntimeException("In whole program mode but library code did not been pre-loaded, call AmandroidCodeSource.preLoad first.")
     val stp = st.asInstanceOf[SymbolTableProducer]
 	  resolveRecords(stp, par)
 	  resolveGlobalVars(stp, par)

@@ -13,9 +13,9 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAPointString
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAInstance
 import org.sireum.alir.Slot
 import org.sireum.amandroid.util.StringFormConverter
+import org.sireum.amandroid.MessageCenter._
 
 object IntentModel {
-  final val DEBUG = true
 	def isIntent(r : AmandroidRecord) : Boolean = r.getName == "[|android:content:Intent|]"
 	  
 	def doIntentCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
@@ -307,12 +307,10 @@ object IntentModel {
 	            case cstr @ RFAConcreteStringInstance(text, c) =>
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
 	            case pstr @ RFAPointStringInstance(c) => 
-	              if(DEBUG)
-	              	System.err.println("Init action use point string: " + pstr)
+	              err_msg_detail("Init action use point string: " + pstr)
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), pstr)
 	            case _ =>
-		            if(DEBUG)
-		            	System.err.println("Init action use Unknown instance: " + acStr)
+		            err_msg_detail("Init action use Unknown instance: " + acStr)
 		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), acStr)
 	          }
 		    }
@@ -354,12 +352,10 @@ object IntentModel {
 	            case cstr @ RFAConcreteStringInstance(text, c) =>
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
 	            case pstr @ RFAPointStringInstance(c) => 
-	              if(DEBUG)
-	              	System.err.println("Init action use point string: " + pstr)
+	              err_msg_detail("Init action use point string: " + pstr)
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), pstr)
 	            case _ =>
-	              if(DEBUG)
-	              	System.err.println("Init action use unknown instance: " + acStr)
+	              err_msg_detail("Init action use unknown instance: " + acStr)
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), acStr)
 	          }
 		    }
@@ -420,12 +416,10 @@ object IntentModel {
 	            case cstr @ RFAConcreteStringInstance(text, c) =>
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
 	            case pstr @ RFAPointStringInstance(c) => 
-	              if(DEBUG)
-	              	System.err.println("Init action use point string: " + pstr)
+	              err_msg_detail("Init action use point string: " + pstr)
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), pstr)
 	            case _ =>
-	              if(DEBUG)
-	              	System.err.println("Init action use unknown instance: " + acStr)
+	              err_msg_detail("Init action use unknown instance: " + acStr)
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), acStr)
 	          }
 		    }
@@ -446,19 +440,17 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
-                System.err.println("Cannot find Given class: " + cstr)
+                err_msg_normal("Cannot find Given class: " + cstr)
                 val unknownIns = UnknownInstance(c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }
           case pstr @ RFAPointStringInstance(c) => 
-            if(DEBUG)
-            	System.err.println("Init ComponentName use point string: " + pstr)
+            err_msg_detail("Init ComponentName use point string: " + pstr)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), pstr)
           case a =>
-            if(DEBUG)
-            	System.err.println("Init ComponentName use Unknown instance: " + a)
+            err_msg_detail("Init ComponentName use Unknown instance: " + a)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), a)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), a)
 	        }
@@ -514,19 +506,17 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
-                System.err.println("Cannot find Given class: " + cstr)
+                err_msg_normal("Cannot find Given class: " + cstr)
                 val unknownIns = UnknownInstance(c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }
           case pstr @ RFAPointStringInstance(c) => 
-            if(DEBUG)
-            	System.err.println("Init ComponentName use point string: " + pstr)
+            err_msg_detail("Init ComponentName use point string: " + pstr)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), pstr)
           case a =>
-            if(DEBUG)
-            	System.err.println("Init ComponentName use Unknown instance: " + a)
+            err_msg_detail("Init ComponentName use Unknown instance: " + a)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), a)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), a)
         }
@@ -564,12 +554,10 @@ object IntentModel {
 				          case cstr @ RFAConcreteStringInstance(text, c) =>
 				            newfacts += RFAFact(FieldSlot(hashsetIns, "[|java:util:HashSet.items|]"), cstr)
 				          case pstr @ RFAPointStringInstance(c) => 
-				            if(DEBUG)
-				            	System.err.println("add category use point string: " + pstr)
+				            err_msg_detail("add category use point string: " + pstr)
 				            newfacts += RFAFact(FieldSlot(hashsetIns, "[|java:util:HashSet.items|]"), pstr)
 				          case _ =>
-				            if(DEBUG)
-				            	System.err.println("Init category use Unknown instance: " + cn)
+				            err_msg_detail("Init category use Unknown instance: " + cn)
 				            newfacts += RFAFact(FieldSlot(hashsetIns, "[|java:util:HashSet.items|]"), cn)
 				        }
 				    }
@@ -630,12 +618,10 @@ object IntentModel {
 			            case cstr @ RFAConcreteStringInstance(text, c) =>
 			              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
 			            case pstr @ RFAPointStringInstance(c) => 
-			              if(DEBUG)
-			              	System.err.println("Init package use point string: " + pstr)
+			              err_msg_detail("Init package use point string: " + pstr)
 			              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), pstr)
 			            case _ =>
-				            if(DEBUG)
-				            	System.err.println("Init package use Unknown instance: " + str)
+				            err_msg_detail("Init package use Unknown instance: " + str)
 				            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), str)
 			          }
 	          }
@@ -694,19 +680,17 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
-                System.err.println("Cannot find Given class: " + cstr)
+                err_msg_normal("Cannot find Given class: " + cstr)
                 val unknownIns = UnknownInstance(c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }
           case pstr @ RFAPointStringInstance(c) => 
-            if(DEBUG)
-            	System.err.println("Init ComponentName use point string: " + pstr)
+            err_msg_detail("Init ComponentName use point string: " + pstr)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), pstr)
           case a =>
-            if(DEBUG)
-            	System.err.println("Init ComponentName use Unknown instance: " + a)
+            err_msg_detail("Init ComponentName use Unknown instance: " + a)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), a)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), a)
         }
@@ -754,19 +738,17 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
-                System.err.println("Cannot find Given class: " + cstr)
+                err_msg_normal("Cannot find Given class: " + cstr)
                 val unknownIns = UnknownInstance(c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }
           case pstr @ RFAPointStringInstance(c) => 
-            if(DEBUG)
-            	System.err.println("Init ComponentName use point string: " + pstr)
+            err_msg_detail("Init ComponentName use point string: " + pstr)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), pstr)
           case a =>
-            if(DEBUG)
-            	System.err.println("Init ComponentName use Unknown instance: " + name)
+            err_msg_detail("Init ComponentName use Unknown instance: " + name)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), a)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), a)
         }
@@ -951,12 +933,10 @@ object IntentModel {
 			            case cstr @ RFAConcreteStringInstance(text, c) =>
 			              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_PACKAGE), cstr)
 			            case pstr @ RFAPointStringInstance(c) => 
-			              if(DEBUG)
-			              	System.err.println("Init package use point string: " + pstr)
+			              err_msg_detail("Init package use point string: " + pstr)
 			              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_PACKAGE), pstr)
 			            case _ =>
-				            if(DEBUG)
-				            	System.err.println("Init package use Unknown instance: " + str)
+				            err_msg_detail("Init package use Unknown instance: " + str)
 				            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_PACKAGE), str)
 			          }
 	          }

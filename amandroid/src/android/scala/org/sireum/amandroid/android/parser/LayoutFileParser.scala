@@ -8,6 +8,7 @@ import pxb.android.axml.AxmlVisitor.NodeVisitor
 import org.sireum.util._
 import org.sireum.amandroid.Center
 import org.sireum.amandroid.AmandroidRecord
+import org.sireum.amandroid.MessageCenter._
 
 /**
  * Parser for analyzing the layout XML files inside an android application
@@ -35,16 +36,6 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 	def toPilarRecord(str : String) : String = "[|" + str.replaceAll("\\.", ":") + "|]"
 	
 	private def getLayoutClass(className : String) : AmandroidRecord = {
-//		SootClass sc = Scene.v().forceResolve(className, SootClass.BODIES);
-//		if ((sc == null || sc.isPhantom()) && !packageName.isEmpty())
-//			sc = Scene.v().forceResolve(packageName + "." + className, SootClass.BODIES);
-//		if (sc == null || sc.isPhantom())
-//			sc = Scene.v().forceResolve("android.widget." + className, SootClass.BODIES);
-//		if (sc == null || sc.isPhantom())
-//			sc = Scene.v().forceResolve("android.webkit." + className, SootClass.BODIES);
-//		if (sc == null || sc.isPhantom())
-//   			System.err.println("Could not find layout class " + className);
-//		return sc;
 	  var ar : Option[AmandroidRecord] = Center.tryLoadRecord(toPilarRecord(className), Center.ResolveLevel.BODIES)
 	  if(!ar.isDefined || !this.packageName.isEmpty())
 	    ar = Center.tryLoadRecord(toPilarRecord(packageName + "." + className), Center.ResolveLevel.BODIES)
@@ -53,7 +44,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 	  if(!ar.isDefined)
 	    ar = Center.tryLoadRecord(toPilarRecord("android.webkit." + className), Center.ResolveLevel.BODIES)
 	  if(!ar.isDefined)
-	    System.err.println("Could not find layout class " + className)
+	    err_msg_simple("Could not find layout class " + className)
 	  ar.getOrElse(null)
 	}
 	
@@ -82,10 +73,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 	  		if(su.getName == "[|android:view:View|]" || su.getName == "[|android:webkit:WebView|]")
 	  		  return true
 		}
-		println("theclass-->" + theClass)
-		Center.printDetails
-		println("hierarchy-->" + Center.getRecordHierarchy)
-		System.err.println("Layout class " + theClass + " is not derived from "
+		err_msg_simple("Layout class " + theClass + " is not derived from "
 				+ "android.view.View");
 		false
 	}
@@ -97,7 +85,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 
   	override def child(ns : String, name : String) : NodeVisitor = {
 			if (name == null) {
-				System.err.println("Encountered a null node name "
+				err_msg_simple("Encountered a null node name "
 						+ "in file " + layoutFile + ", skipping node...")
 				return null
 			}
@@ -146,7 +134,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
   		}
   		else {
   			if (DEBUG && typ == AxmlVisitor.TYPE_STRING)
-  				System.out.println("Found unrecognized XML attribute:  " + tempName)
+  				err_msg_simple("Found unrecognized XML attribute:  " + tempName)
   		}
   	}
   	
@@ -180,7 +168,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 						if (!fileName.startsWith("res/layout"))
 							return
 						if (!fileName.endsWith(".xml")) {
-							System.err.println("Skipping file " + fileName + " in layout folder...")
+							err_msg_normal("Skipping file " + fileName + " in layout folder...")
 							return
 						}
 						// Get the fully-qualified class name
@@ -225,12 +213,12 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 								}
 							})
 							
-							System.out.println("Found " + userControls.size + " layout controls in file "
+							err_msg_normal("Found " + userControls.size + " layout controls in file "
 									+ fileName);
 						}
 						catch {
 						  case ex : Exception =>
-							  System.err.println("Could not read binary XML file: " + ex.getMessage())
+							  err_msg_simple("Could not read binary XML file: " + ex.getMessage())
 								ex.printStackTrace()
 						}
 					}

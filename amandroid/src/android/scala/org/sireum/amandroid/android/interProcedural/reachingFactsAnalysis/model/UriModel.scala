@@ -5,9 +5,9 @@ import org.sireum.util._
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis._
 import org.sireum.amandroid.android.AndroidConstants
+import org.sireum.amandroid.MessageCenter._
 
 object UriModel {
-  val DEBUG = true
 	def isUri(r : AmandroidRecord) : Boolean = r.getName == "[|android:net:Uri|]"
 	  
 	def doUriCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
@@ -87,12 +87,10 @@ object UriModel {
           case cstr @ RFAConcreteStringInstance(text, c) =>
             newfacts += RFAFact(FieldSlot(stringUriIns, AndroidConstants.URI_STRING_URI_URI_STRING), cstr)
           case pstr @ RFAPointStringInstance(c) => 
-            if(DEBUG)
-            	System.err.println("Init uri string use point string: " + pstr)
+            err_msg_detail("Init uri string use point string: " + pstr)
             newfacts += RFAFact(FieldSlot(stringUriIns, AndroidConstants.URI_STRING_URI_URI_STRING), pstr)
           case _ => 
-            if(DEBUG)
-            	System.err.println("Init uri use unknown instance: " + sv)
+            err_msg_detail("Init uri use unknown instance: " + sv)
             newfacts += RFAFact(FieldSlot(stringUriIns, AndroidConstants.URI_STRING_URI_URI_STRING), sv)
         }
     }

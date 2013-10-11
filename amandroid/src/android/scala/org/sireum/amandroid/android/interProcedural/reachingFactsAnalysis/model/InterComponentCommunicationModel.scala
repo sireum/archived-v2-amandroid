@@ -16,6 +16,7 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAFact
 import org.sireum.amandroid.Instance
 import java.net.URI
 import org.sireum.amandroid.util.StringFormConverter
+import org.sireum.amandroid.MessageCenter._
 
 object InterComponentCommunicationModel {
 	def isIccOperation(proc : AmandroidProcedure) : Boolean = {
@@ -43,12 +44,12 @@ object InterComponentCommunicationModel {
 	    val implicitTargets = getImplicitTargets(s, intentValues)
 	    targets ++= implicitTargets
 	    if(implicitTargets.isEmpty){
-	      System.err.println("Cannot find any icc targets for: " + calleeProc + "@" + currentContext)
+	      err_msg_simple("Cannot find any icc targets for: " + calleeProc + "@" + currentContext)
 	    } else {
-	    	println("implicitTargets-->" + implicitTargets)
+	    	msg_simple("context: " + currentContext + " implicitTargets: " + implicitTargets)
 	    }
 	  } else {
-	    println("explicitTargets-->" + explicitTargets)
+	    msg_simple("context: " + currentContext + " explicitTargets: " + explicitTargets)
 	  }
 	  (s, targets)
 	}
@@ -69,13 +70,13 @@ object InterComponentCommunicationModel {
                   val targetRecOpt = Center.softlyResolveRecord(targetRecName, Center.ResolveLevel.BODIES)
                   targetRecOpt match{
                     case Some(targetRec) =>
-                      println("explicit target component: " + targetRec)
+                      msg_normal("explicit target component: " + targetRec)
                       targetRec.tryGetProcedure(AndroidConstants.DUMMY_MAIN) match{
 		                    case Some(r) => 
 		                      result += r
-		                    case None => System.err.println("Target component " + targetRec + " does not have dummymain.")
+		                    case None => err_msg_simple("Target component " + targetRec + " does not have dummymain.")
 		                  }
-                    case None => System.err.println("Cannot find target component " + targetRecName + " in current code base.")
+                    case None => err_msg_simple("Cannot find target component " + targetRecName + " in current code base.")
                   }
                   
                 }
@@ -91,7 +92,7 @@ object InterComponentCommunicationModel {
     intentValues.foreach{
       intentIns =>
         var compsForThisIntent:Set[AmandroidRecord] = Set()    
-        println("intentIns = " + intentIns)
+        msg_normal("intentIns = " + intentIns)
         var actions:Set[String] = Set()
         val acFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_ACTION)
         factMap.getOrElse(acFieldSlot, isetEmpty).foreach{
@@ -99,7 +100,7 @@ object InterComponentCommunicationModel {
             if(acIns.isInstanceOf[RFAConcreteStringInstance])
               actions += acIns.asInstanceOf[RFAConcreteStringInstance].string
         }
-        println("actions = " + actions)
+        msg_normal("actions = " + actions)
         
         var categories:Set[String] = Set() // the code to get the valueSet of categories is to be added below
         val categoryFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_CATEGORIES)
@@ -114,7 +115,7 @@ object InterComponentCommunicationModel {
                 }
             }
         }
-        println("categories = " + categories)
+        msg_normal("categories = " + categories)
         
         var datas:Set[UriData] = Set()
         val dataFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_URI_DATA)
@@ -127,12 +128,12 @@ object InterComponentCommunicationModel {
                   val uriString = usIns.asInstanceOf[RFAConcreteStringInstance].string
                   var uriData = new UriData
                   populateByUri(uriData, uriString)
-                  println("uriString: " + uriString + " , populated data: (" + uriData +")")
+                  msg_normal("uriString: " + uriString + " , populated data: (" + uriData +")")
                   datas +=uriData
                 }
             }
         }
-        println("datas = " + datas)
+        msg_normal("datas = " + datas)
         var mTypes:Set[String] = Set()
         val mtypFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_MTYPE)
         factMap.getOrElse(mtypFieldSlot, isetEmpty).foreach{
@@ -141,12 +142,12 @@ object InterComponentCommunicationModel {
               mTypes += mtypIns.asInstanceOf[RFAConcreteStringInstance].string
             }
         }
-        println("mTypes = " + mTypes)
+        msg_normal("mTypes = " + mTypes)
         
         compsForThisIntent = findComponents(actions, categories, datas, mTypes)
         components ++= compsForThisIntent
     }
-    println("implicit target components-->" + components)
+    msg_simple("implicit target components-->" + components)
     var result = isetEmpty[AmandroidProcedure]
     components.foreach{
       comp =>
@@ -263,24 +264,5 @@ object InterComponentCommunicationModel {
     }
     components
   }
-  
-  // we currently do not use findComponentsByAction(action : String) which is below
-  private def findComponentsByAction(action : String) : ISet[AmandroidRecord] = {
-	  var components : ISet[AmandroidRecord] = isetEmpty
-	 
-	  AppCenter.getComponents.foreach{
-	    ep =>
-	      val actions = AppCenter.getIntentFilterDB.getIntentFiltersActions(ep)
-	      if(actions != null){
-	        if(actions.contains(action)) components += ep
-	      }
-	  }
-
-	  if(components.isEmpty){
-	    System.err.println("No matching component in app found for action " + action)
-	  }
-	  components
-  }
-  
   
 }

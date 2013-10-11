@@ -6,9 +6,9 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAFact
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis._
 import org.sireum.amandroid.android.AndroidConstants
+import org.sireum.amandroid.MessageCenter._
 
 object IntentFilterModel {
-  val DEBUG = true
 	def isIntentFilter(r : AmandroidRecord) : Boolean = r.getName == AndroidConstants.INTENTFILTER
 	  
 	def doIntentFilterCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
@@ -106,8 +106,7 @@ object IntentFilterModel {
 	            case cstr @ RFAConcreteStringInstance(text, c) =>
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENTFILTER_ACTIONS), cstr)
 	            case pstr @ RFAPointStringInstance(c) => 
-	              if(DEBUG)
-	              	System.err.println("Init IntentFilter use point string: " + pstr)
+	              err_msg_detail("Init IntentFilter use point string: " + pstr)
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENTFILTER_ACTIONS), pstr)
 	            case _ => throw new RuntimeException("unexpected instance type: " + acStr)
 	          }

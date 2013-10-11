@@ -12,9 +12,9 @@ import org.sireum.amandroid.util.StringFormConverter
 import org.sireum.amandroid.Center
 import org.sireum.amandroid.AmandroidResolver
 import org.sireum.amandroid.util.SignatureParser
+import org.sireum.amandroid.MessageCenter._
 
 class DummyMainGenerator {
-  val DEBUG : Boolean = true
   private var currentComponent : String = null
   private var androidClasses : Set[String] = Set()
   /**
@@ -97,7 +97,7 @@ class DummyMainGenerator {
 	  val signature = procedureName.replaceAll("\\[\\|", "[|L").replaceAll("\\:", "/").replaceAll("\\.dummyMain", ";.dummyMain:()V")
 	  initProcedureHead("[|void|]", procedureName, recordName, signature, "STATIC")
 	  val code = generateInternal(List())
-    if(DEBUG) println("dummyMain code:\n" + code)
+    msg_normal("dummyMain code:\n" + code)
     AmandroidResolver.resolveProcedureCode(signature, code)
   }
   
@@ -124,7 +124,7 @@ class DummyMainGenerator {
     }
     procDeclTemplate.add("params", paramArray)
     val code = generateInternal(List())
-    if(DEBUG) println("dummyMain code:\n" + code)
+    msg_normal("dummyMain code:\n" + code)
     AmandroidResolver.resolveProcedureCode(signature, code)
   }
   
@@ -204,13 +204,13 @@ class DummyMainGenerator {
 		                if(!p.isStatic) instanceNeeded = true
 	                case None =>
 	                  val recordName = StringFormConverter.getRecordNameFromProcedureSignature(procSig)
-	                  if(!Center.containsRecord(recordName)) System.err.println("Record for entry point " + recordName + " not found, skipping")
+	                  if(!Center.containsRecord(recordName)) err_msg_normal("Record for entry point " + recordName + " not found, skipping")
 	                  else{
 	                    Center.getProcedure(procSig) match{
 	                      case Some(p) => 
 	                        plainMethods += (procSig -> p)
 	                        if(!p.isStatic) instanceNeeded = true
-	                      case None => System.err.println("Procedure for entry point " + procSig + " not found, skipping")
+	                      case None => err_msg_normal("Procedure for entry point " + procSig + " not found, skipping")
 	                    }
 	                  }
 	              }
@@ -300,7 +300,7 @@ class DummyMainGenerator {
 	  if(cons != null){
 	    generateProcedureCall(cons, "direct", localVarsForClasses(r.getName), constructionStack, codefg)
 	  } else {
-	    System.err.println("Warning, cannot find constructor for " + r)
+	    err_msg_normal("Warning, cannot find constructor for " + r)
 	  }
 	  cons
 	}
@@ -324,7 +324,7 @@ class DummyMainGenerator {
           val va = varGen.generate(r.getName)
           localVarsForClasses += (r.getName -> va)
           paramVars += (i -> va)
-          System.err.println("Cannot create valid constructer for " + r + ", because it is " + r.getAccessFlagString + " and cannot find substitute.")
+          err_msg_normal("Cannot create valid constructer for " + r + ", because it is " + r.getAccessFlagString + " and cannot find substitute.")
         } else if(!constructionStack.contains(r)){
 				  val va = generateInstanceCreation(r.getName, codefg)
 				  localVarsForClasses += (r.getName -> va)
@@ -383,7 +383,7 @@ class DummyMainGenerator {
 	        codeFragments.add(elseFragment)
 	        createIfStmt(beforeClassFragment, elseFragment)
 	      } else {
-	        System.err.println("Skipping procedure " + currentProcedure + " because we have no instance")
+	        err_msg_normal("Skipping procedure " + currentProcedure + " because we have no instance")
 	      }
 	  }
 	}
@@ -651,7 +651,7 @@ class DummyMainGenerator {
 		    assert(ap.isStatic || localVarsForClasses(record.getName) != null)
 		    generateProcedureCall(ap.getSignature, "virtual", localVarsForClasses(record.getName), constructionStack, codefg)
 	    case None =>
-	      System.err.println("Could not find Android entry point procedure: " + subsignature)
+	      err_msg_normal("Could not find Android entry point procedure: " + subsignature)
 	      null
 	  }
 	}
@@ -674,7 +674,7 @@ class DummyMainGenerator {
 			      	callbackRecords += (theRecord -> msetEmpty)
 			      callbackRecords(theRecord) += proc
 	        case None =>
-	          System.err.println("Could not find callback method " + pSig)
+	          err_msg_normal("Could not find callback method " + pSig)
 	      }
 	      
 	  }
@@ -693,7 +693,7 @@ class DummyMainGenerator {
 		      // build the calls to all callback procedures in this record
 		      generateCallToAllCallbacks(callbackRecord, callbackProcedures.toSet, classLocalVar, codefg)
 		    } else {
-		      System.err.println("Constructor cannot be generated for callback class " + callbackRecord)
+		      err_msg_normal("Constructor cannot be generated for callback class " + callbackRecord)
 		    }
 		}
 	}
