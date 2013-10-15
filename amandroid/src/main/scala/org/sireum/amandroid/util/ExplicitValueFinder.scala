@@ -29,7 +29,7 @@ object ExplicitValueFinder {
 		              val locDecl = procedure.getProcedureBody.location(ldd.locIndex)
 		              getIntegerFromLocationDecl(locDecl) match{
 		                case Some(num) => nums += num
-		                case None => throw new RuntimeException("Cannot find intgerNumber for: " + varName + ".in:" + loc.name.get.uri)
+		                case None => throw new RuntimeException("Cannot find intgerNumber for: " + varName + ".in:" + loc.name.get.uri + ".from:" + ldd.locUri)
 		              }
 		            case _ =>
 		          }
@@ -49,7 +49,8 @@ object ExplicitValueFinder {
 	          assignAction.rhs match{
 	            case lExp : LiteralExp =>
 	              if(lExp.typ == LiteralType.INT) return Some(Integer.parseInt(lExp.text))
-	            case _ =>
+	              else if(lExp.typ == LiteralType.DOUBLE) return Some(2130903042)
+	            case a =>
 	          }
 	        case _ =>
 	      }

@@ -71,7 +71,7 @@ trait CompleteRFATestFramework extends TestFramework {
     	    val (cg, rfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts)
     	    println("processed-->" + cg.getProcessed.size)
     	    println("exit facts: " + rfaResult.entrySet(cg.exitNode).size)
-    	    val taResult = AndroidTaintAnalysis(ep, cg, rfaResult)
+    	    val taResult = AndroidTaintAnalysis(cg, rfaResult)
     	    val f1 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "rfa.txt")
 			    val o1 = new FileOutputStream(f1)
 			    val w1 = new OutputStreamWriter(o1)

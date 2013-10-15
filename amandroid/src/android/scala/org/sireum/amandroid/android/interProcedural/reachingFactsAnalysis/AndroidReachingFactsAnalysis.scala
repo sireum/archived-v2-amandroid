@@ -43,7 +43,7 @@ class AndroidReachingFactsAnalysisBuilder{
     cg.collectCfgToBaseGraph(entryPointProc, initContext, true)
     val iota : ISet[RFAFact] = initialFacts + RFAFact(VarSlot("@@[|RFAiota|]"), NullInstance(initContext))
     val result = new InterProceduralMonotoneDataFlowAnalysisFramework().apply[RFAFact](cg,
-      entryPointProc, true, true, false, gen, kill, callr, iota, initial, switchAsOrderedMatch)
+      true, true, false, gen, kill, callr, iota, initial, switchAsOrderedMatch)
 
 //    print("RFA\n")
 //    print(result)

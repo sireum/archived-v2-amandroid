@@ -15,6 +15,7 @@ import org.sireum.amandroid.module.AndroidIntraProceduralModule
 import org.sireum.amandroid.xml.AndroidXStream
 import org.sireum.alir.AlirIntraProceduralGraph
 import org.sireum.amandroid.test.framework.TestFramework
+import scala.Console
 
 // sankar introduces the following framework which adds one stage on top of  AmandroidParserTestFrameWork 
 
@@ -51,48 +52,49 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
 
     test(title) {
       println("####" + title + "#####")
-        val f = new File(srcs.toString().substring(5))
-        //create directory
-        val dirName = f.getName().split("\\.")(0)
-        val d = srcs.substring(srcs.indexOf("/"), srcs.lastIndexOf("/")+1)
-        val dirc = new File(d + dirName)
-        val srcFiles = mlistEmpty[FileResourceUri]
-        val graDir = new File(d+dirName+"/graphs")
-        if(!dirc.exists()){
-          dirc.mkdir()
-          graDir.mkdir()
-        }
-        //deal with apk file
-        val apkName = f.getName()
-        val apkFile = new ZipFile(f, ZipFile.OPEN_READ)
-        val entries = apkFile.entries()
-        while(entries.hasMoreElements()){
-          val ze = entries.nextElement()
-          if(ze.toString().endsWith(".dex")){
-            val loadFile = new File(d+ze.getName())
-            val ops = new FileOutputStream(d + dirName + "/classes.dex")
-            val ips = apkFile.getInputStream(ze)
-            var reading = true
-            while(reading){
-              ips.read() match {
-                case -1 => reading = false
-                case c => ops.write(c)
-              }
-            }
-            ops.flush()
-            ips.close()
-          }
-        }
-        srcFiles += FileUtil.toUri(d + dirName + "/classes.dex")
-        
+//      ChunkingPilarParser(Right(srcs), Str)
+//        val f = new File(srcs.toString().substring(5))
+//        //create directory
+//        val dirName = f.getName().split("\\.")(0)
+//        val d = srcs.substring(srcs.indexOf("/"), srcs.lastIndexOf("/")+1)
+//        val dirc = new File(d + dirName)
+//        val srcFiles = mlistEmpty[FileResourceUri]
+//        val graDir = new File(d+dirName+"/graphs")
+//        if(!dirc.exists()){
+//          dirc.mkdir()
+//          graDir.mkdir()
+//        }
+//        //deal with apk file
+//        val apkName = f.getName()
+//        val apkFile = new ZipFile(f, ZipFile.OPEN_READ)
+//        val entries = apkFile.entries()
+//        while(entries.hasMoreElements()){
+//          val ze = entries.nextElement()
+//          if(ze.toString().endsWith(".dex")){
+//            val loadFile = new File(d+ze.getName())
+//            val ops = new FileOutputStream(d + dirName + "/classes.dex")
+//            val ips = apkFile.getInputStream(ze)
+//            var reading = true
+//            while(reading){
+//              ips.read() match {
+//                case -1 => reading = false
+//                case c => ops.write(c)
+//              }
+//            }
+//            ops.flush()
+//            ips.close()
+//          }
+//        }
+//        srcFiles += FileUtil.toUri(d + dirName + "/classes.dex")
+//        
         val job = PipelineJob()
         val options = job.properties
-        Dex2PilarWrapperModule.setSrcFiles(options, srcFiles)
-        
-//        ChunkingPilarParserModule.setSources(options, ilist(Right(FileUtil.toUri(d+dirName+"/classes.pilar"))))
-        
-        PilarAndroidSymbolResolverModule.setParallel(options, false)
-        AndroidIntraProceduralModule.setShouldBuildCCfg(options, true)
+//        Dex2PilarWrapperModule.setSrcFiles(options, srcFiles)
+//        
+        ChunkingPilarParserModule.setSources(options, ilist(Right(srcs)))
+//        
+//        PilarAndroidSymbolResolverModule.setParallel(options, false)
+//        AndroidIntraProceduralModule.setShouldBuildCCfg(options, true)
         
         // experimental code starts which does not have any significant role now; later we will delete it after some related cleaning 
         
@@ -106,11 +108,21 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
         // experimental code ends
         
         pipeline.compute(job)
-        if(job.hasError){
-          println("Error present: " + job.hasError)
-          job.tags.foreach(f => println(f))
-          job.lastStageInfo.tags.foreach(f => println(f))
-        }
+		    if (job.lastStageInfo.hasError) {
+		      val pwOut = new PrintWriter(Console.out)
+		      val pwErr = new PrintWriter(Console.err)
+		      println("Errors from stage: " + job.lastStageInfo.title)
+		      val stageTags = job.lastStageInfo.tags.toList
+		      PipelineUtil.printTags(stageTags, pwOut, pwErr)
+		      pwErr.println(Tag.collateAsString(job.lastStageInfo.tags.toList))
+		      pwErr.flush
+		      for (m <- job.lastStageInfo.info) {
+		        val mTags = m.tags.toList
+		        PipelineUtil.printTags(mTags, pwOut, pwErr)
+		        pwErr.println(Tag.collateAsString(mTags))
+		        pwErr.flush
+		      }
+		    }
 //        val r = AndroidInterIntraProceduralModule.getInterResult(options)
         
  
@@ -157,25 +169,26 @@ trait AmandroidAnalyseAppFrameWork extends TestFramework {
     PipelineConfiguration(
       "dex2PilarAndParseAndProcedureLocationList test pipeline",
       false,
-      PipelineStage(
-        "dex2pilar stage",
-        false,
-        Dex2PilarWrapperModule
-      ),
+//      PipelineStage(
+//        "dex2pilar stage",
+//        false,
+//        Dex2PilarWrapperModule
+//      ),
       PipelineStage(
         "Chunking pilar parsing stage",
         false,
         ChunkingPilarParserModule
-      ),
-      PipelineStage(
-        "PilarAndroidSymbolResolverModule stage",
-        false,
-        PilarAndroidSymbolResolverModule
-      ),
-      PipelineStage(
-      "Android InterIntraProcedural Analysis",
-      false,
-      AndroidIntraProceduralModule
       )
+//      ,
+//      PipelineStage(
+//        "PilarAndroidSymbolResolverModule stage",
+//        false,
+//        PilarAndroidSymbolResolverModule
+//      ),
+//      PipelineStage(
+//      "Android InterIntraProcedural Analysis",
+//      false,
+//      AndroidIntraProceduralModule
+//      )
     )
 }

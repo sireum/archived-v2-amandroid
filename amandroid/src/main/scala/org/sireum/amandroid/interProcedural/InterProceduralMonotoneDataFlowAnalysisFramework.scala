@@ -51,7 +51,6 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
 
   def build[LatticeElement] //
   (cg : CallGraph[CGNode],
-   entryPoint : AmandroidProcedure,
    forward : Boolean, lub : Boolean, rapid : Boolean,
    gen : InterProceduralMonotonicFunction[LatticeElement],
    kill : InterProceduralMonotonicFunction[LatticeElement],

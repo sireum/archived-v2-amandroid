@@ -13,7 +13,7 @@ import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
 class CompleteRFATest extends CompleteRFATestFramework {
 	AmandroidCodeSource.preLoad
   InterproceduralExamples.ofgTestAPKFiles.
-  filter { s => s.endsWith("LocationFlow2.apk") }.
+  filter { s => s.endsWith("InfoPassICCTest_Epicc.apk") }.
   foreach { fileUri =>
     Analyzing title fileUri file fileUri
   }

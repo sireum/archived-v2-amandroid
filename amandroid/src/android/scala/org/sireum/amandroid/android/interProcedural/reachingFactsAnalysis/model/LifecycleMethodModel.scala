@@ -39,7 +39,6 @@ object LifecycleMethodModel {
 	    case "[|Landroid/os/AsyncTask;.execute:([Ljava/lang/Object;)Landroid/os/AsyncTask;|]" =>
 	    case _ =>
 	  }
-	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
 	  s ++ newFacts
 	}
 	

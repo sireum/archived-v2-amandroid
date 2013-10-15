@@ -127,15 +127,27 @@ object ReachingFactsAnalysisHelper {
 	  } else None
 	}
 	
-	def checkAndGetUnknownObjectForRetVar(s : ISet[RFAFact], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+	def checkAndGetUnknownObject(s : ISet[RFAFact], args : Seq[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
 	  var result : ISet[RFAFact] = isetEmpty
 	  if(s.isEmpty){
+	    val argSlots = args.map(arg=>VarSlot(arg))
+	    val argValues = s.filter{f=>argSlots.contains(f.s)}.map(_.v)
+	    argValues.map{
+	      argIns =>
+	        val recName = argIns.getType.name
+	        val rec = Center.resolveRecord(recName, Center.ResolveLevel.BODIES)
+	        rec.getFields.foreach{
+	          field =>
+	            result += RFAFact(FieldSlot(argIns, field.getSignature), UnknownInstance(currentContext))
+	        }
+	    }
 	    retVars.foreach{
 	      retVar =>
 		      val slot = VarSlot(retVar)
 	        val value = UnknownInstance(currentContext)
 	        result += RFAFact(slot, value)
 	    }
+	    
 	  }
 	  result
 	}

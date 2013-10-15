@@ -25,8 +25,7 @@ class AndroidTaintAnalysisBuilder{
   var cg : CallGraph[AndroidReachingFactsAnalysis.Node] = null
   
   def build //
-  (entryPointProc : AmandroidProcedure,
-   cg : CallGraph[AndroidReachingFactsAnalysis.Node],
+  (cg : CallGraph[AndroidReachingFactsAnalysis.Node],
    rfaFacts : AndroidReachingFactsAnalysis.Result,
    initialFacts : ISet[TaintFact] = isetEmpty,
    switchAsOrderedMatch : Boolean = false
@@ -41,7 +40,7 @@ class AndroidTaintAnalysisBuilder{
     val iota : ISet[TaintFact] = initialFacts + TaintFact(initRFAFact, "TaintAnalysis")
     val initial : ISet[TaintFact] = isetEmpty
     val result = new InterProceduralMonotoneDataFlowAnalysisFramework().apply[TaintFact](cg,
-      entryPointProc, true, true, false, gen, kill, callr, iota, initial, switchAsOrderedMatch)
+      true, true, false, gen, kill, callr, iota, initial, switchAsOrderedMatch)
 
 //    print("TA\n")
 //    print(result)
@@ -638,11 +637,10 @@ object AndroidTaintAnalysis {
   type Node = AndroidReachingFactsAnalysis.Node
   type Result = InterProceduralMonotoneDataFlowAnalysisResult[TaintFact]
    
-  def apply(entryPointProc : AmandroidProcedure,
-				   cg : CallGraph[AndroidReachingFactsAnalysis.Node],
+  def apply(cg : CallGraph[AndroidReachingFactsAnalysis.Node],
 				   rfaFacts : AndroidReachingFactsAnalysis.Result,
 				   initialFacts : ISet[TaintFact] = isetEmpty,
 				   switchAsOrderedMatch : Boolean = false)
-    = new AndroidTaintAnalysisBuilder().build(entryPointProc, cg, rfaFacts, initialFacts, switchAsOrderedMatch)
+    = new AndroidTaintAnalysisBuilder().build(cg, rfaFacts, initialFacts, switchAsOrderedMatch)
 
 }

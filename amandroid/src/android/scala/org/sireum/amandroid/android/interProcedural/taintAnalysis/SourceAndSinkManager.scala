@@ -90,10 +90,7 @@ object SourceAndSinkCenter {
 	  }
 	  false
 	}
-	
-//	private def findLastStringAssignment() : String = {
-//	  
-//	}
+
 	
 	def addSource(source : String, category : Category.Value) = {
 	  this.sources += (source -> category)

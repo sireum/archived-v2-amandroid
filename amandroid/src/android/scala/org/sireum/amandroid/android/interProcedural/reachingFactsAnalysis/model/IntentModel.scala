@@ -1163,7 +1163,11 @@ object IntentModel {
 	  val keySlot = VarSlot(args(1))
 	  val keyValue = factMap.getOrElse(keySlot, isetEmpty)
 	  val mExtraValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, AndroidConstants.INTENT_EXTRAS), isetEmpty)}.reduce(iunion[Instance])
-	  val entValue = mExtraValue.map{ins => factMap.getOrElse(FieldSlot(ins, "[|android:os:Bundle.entries|]"), isetEmpty)}.reduce(iunion[Instance])
+	  val entValue = 
+	    if(mExtraValue.isEmpty)
+	      isetEmpty
+	    else
+	    	mExtraValue.map{ins => factMap.getOrElse(FieldSlot(ins, "[|android:os:Bundle.entries|]"), isetEmpty)}.reduce(iunion[Instance])
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  if(keyValue.filter(_.isInstanceOf[RFAPointStringInstance]).isEmpty){
@@ -1197,7 +1201,11 @@ object IntentModel {
 	  val defaultSlot = VarSlot(args(2))
 	  val defaultValue = factMap.getOrElse(defaultSlot, isetEmpty)
 	  val mExtraValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, AndroidConstants.INTENT_EXTRAS), isetEmpty)}.reduce(iunion[Instance])
-	  val entValue = mExtraValue.map{ins => factMap.getOrElse(FieldSlot(ins, "[|android:os:Bundle.entries|]"), isetEmpty)}.reduce(iunion[Instance])
+	  val entValue = 
+	    if(mExtraValue.isEmpty)
+	      isetEmpty
+	    else
+	    	mExtraValue.map{ins => factMap.getOrElse(FieldSlot(ins, "[|android:os:Bundle.entries|]"), isetEmpty)}.reduce(iunion[Instance])
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  if(keyValue.filter(_.isInstanceOf[RFAPointStringInstance]).isEmpty){
