@@ -10,8 +10,9 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsA
 
 object HandlerModel {
 	def isHandler(r : AmandroidRecord) : Boolean = r.getName == "[|android:os:Handler|]"
-	def doHandlerCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+	def doHandlerCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
 	  var newFacts = isetEmpty[RFAFact]
+	  var delFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
 	    case "[|Landroid/os/Handler;.<init>:()V|]" =>  //public constructor
 		  case "[|Landroid/os/Handler;.<init>:(Landroid/os/Handler$Callback;)V|]" =>  //public constructor
@@ -59,7 +60,6 @@ object HandlerModel {
 		  case "[|Landroid/os/Handler;.toString:()Ljava/lang/String;|]" =>  //public
 		  case _ =>
 	  }
-	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
-	  s ++ newFacts
+	  (newFacts, delFacts)
 	}
 }

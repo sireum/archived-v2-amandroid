@@ -21,6 +21,8 @@ import org.sireum.pilar.ast.JumpLocation
 import org.sireum.pilar.ast.TupleExp
 import org.sireum.pilar.ast.NameExp
 import org.sireum.amandroid.MessageCenter._
+import org.sireum.amandroid.util.StringFormConverter
+import org.sireum.amandroid.util.ExplicitValueFinder
 
 
 /**
@@ -32,8 +34,8 @@ import org.sireum.amandroid.MessageCenter._
  */
 class CallBackInfoCollector(entryPointClasses:Set[String]) {
     
-	private final var callbackMethods : Map[String, MSet[AmandroidProcedure]] = Map()
-	private final var layoutClasses: Map[AmandroidRecord, MSet[Int]] = Map()
+	private final var callbackMethods : Map[AmandroidRecord, Set[AmandroidProcedure]] = Map()
+	private final var layoutClasses: Map[AmandroidRecord, Set[Int]] = Map()
 	
 	def getCallbackMethods() = this.callbackMethods
 	def getLayoutClasses() = this.layoutClasses
@@ -84,107 +86,24 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 							          }
 							          case None => throw new RuntimeException("doesn't found annotation which name is 'signature'")
 							        }
-                      
-                      val calleeProc = Center.getProcedure(sig)
-                      if(calleeProc.isDefined && calleeProc.get.getName == AndroidConstants.ACTIVITY_SETCONTENTVIEW){
-                        val cfg = reachableProcedure.getCfg
-                        val rda = reachableProcedure.getRda
-                        val slots = rda.entrySet(cfg.getNode(Some(loc.name.get.uri), loc.index))
-                        val params = t.callExp.arg match {
-								          case te : TupleExp =>
-								            te.exps.map{exp=>exp.asInstanceOf[NameExp].name.name}
-								          case a =>
-								            throw new RuntimeException("wrong call exp type: " + a)
-								        }
-                        slots.foreach{
-                          case(slot, defDesc) =>
-//                            require(params.s)
-					                  val varName = params(1)
-					                  if(varName.equals(slot.toString())){
-					                    defDesc match {
-					                      case ldd : LocDefDesc => 
-					                        val node = cfg.getNode(ldd.locUri, ldd.locIndex)
-					                        val locDecl = reachableProcedure.getProcedureBody.location(ldd.locIndex)
-					                        val num = getIntegerFromLocationDecl(locDecl)
-					                        if(num != -1){
-					                          val declRecord = reachableProcedure.getDeclaringRecord
-					                          if(this.layoutClasses.contains(declRecord))
-					                            this.layoutClasses(declRecord).add(num)
-					                          else
-					                            this.layoutClasses += (declRecord -> (msetEmpty + num))
-					                        }
-					                      case _ =>
-					                    }
-					                  }
-                        }
+                      val typ = t.getValueAnnotation("type") match {
+							          case Some(s) => s match {
+							            case ne : NameExp => ne.name.name
+							            case a => throw new RuntimeException("wrong exp type: " + a)
+							          }
+							          case None => throw new RuntimeException("doesn't found annotation which name is 'type'")
+							        }
+                      if(StringFormConverter.getSubSigFromProcSig(sig) == AndroidConstants.SETCONTENTVIEW){
+                        val nums = ExplicitValueFinder.findExplicitIntValueForArgs(reachableProcedure, j, 1)
+	                      val declRecord = reachableProcedure.getDeclaringRecord
+	                      this.layoutClasses += (declRecord -> (this.layoutClasses.getOrElse(declRecord, isetEmpty) ++ nums))
                       }
                     case _ =>
                   }
 	              case _ =>
 	            }
 	        }
-//	          val cfg = reachableProcedure.getCfg
-//	          val rda = reachableProcedure.getRda
-//	          val slots = rda.entrySet(cfg.getNode(reachableProcedure.locUri, reachableProcedure.locIndex))
-//            slots.foreach(
-//              item => {
-//                if(item.isInstanceOf[(Slot, DefDesc)]){
-//                  val (slot, defDesc) = item.asInstanceOf[(Slot, DefDesc)]
-//                  val loc = reachableProcedure.callerProcedure.getProcedureBody.location(reachableProcedure.locIndex)
-//                  val params = loc match{
-//                    case j : JumpLocation =>
-//                      j.jump match{
-//                        case t : CallJump =>
-//                          t.callExp.arg match {
-//									          case te : TupleExp =>
-//									            te.exps.map{exp=>exp.asInstanceOf[NameExp].name.name}
-//									          case a =>
-//									            throw new RuntimeException("wrong call exp type: " + a)
-//									        }
-//                        case a =>
-//                          throw new RuntimeException("wrong jump type: " + a)
-//                      }
-//                    case a => throw new RuntimeException("wrong location type: " + a)
-//                  }
-//                  require(params.contains(1))
-//                  val varName = params(1)
-//                  if(varName.equals(slot.toString())){
-//                    defDesc match {
-//                      case ldd : LocDefDesc => 
-//                        val node = cfg.getNode(ldd.locUri, ldd.locIndex)
-//                        val locDecl = reachableProcedure.calleeProcedure.getProcedureBody.location(ldd.locIndex)
-//                        val num = getIntegerFromLocationDecl(locDecl)
-//                        if(num != -1){
-//                          val declRecord = reachableProcedure.callerProcedure.getDeclaringRecord
-//                          if(this.layoutClasses.contains(declRecord))
-//                            this.layoutClasses(declRecord).add(num)
-//                          else
-//                            this.layoutClasses += (declRecord -> (msetEmpty + num))
-//                        }
-//                      case _ =>
-//                    }
-//                  }
-//                }
-//              }
-//            )
 	      }
-	  }
-	}
-	
-	def getIntegerFromLocationDecl(locDecl : LocationDecl) : Int = {
-	  locDecl match{
-	    case aLoc : ActionLocation =>
-	      aLoc.action match{
-	        case assignAction : AssignAction =>
-	          assignAction.rhs match{
-	            case lExp : LiteralExp =>
-	              if(lExp.typ == LiteralType.INT) Integer.parseInt(lExp.text)
-	              else -1
-	            case _ => -1
-	          }
-	        case _ => -1
-	      }
-	    case _ => -1
 	  }
 	}
 	
@@ -1265,11 +1184,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	 */
 	private def checkAndAddMethod(proc: AmandroidProcedure, baseClass: AmandroidRecord) {
 		if (!proc.getName.startsWith("[|android:")) {
-			if (this.callbackMethods.contains(baseClass.getName))
-				this.callbackMethods(baseClass.getName).add(proc)
-			else 
-				this.callbackMethods += (baseClass.getName -> (msetEmpty + proc))
-			
+			this.callbackMethods += (baseClass -> (this.callbackMethods.getOrElse(baseClass, isetEmpty) + proc))
 		}
 	}
 	

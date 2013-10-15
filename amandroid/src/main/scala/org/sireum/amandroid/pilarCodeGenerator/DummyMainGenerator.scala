@@ -20,7 +20,7 @@ class DummyMainGenerator {
   /**
    * Map from record to list of callback procedure
    */
-  private var callbackFunctions : Map[String, MSet[String]] = Map()
+  private var callbackFunctions : Map[String, Set[String]] = Map()
   private var conditionCounter : Int = 0
   private var codeCounter : Int = 0
   private val template = new STGroupFile("org/sireum/amandroid/pilarCodeGenerator/PilarCode.stg")
@@ -79,7 +79,7 @@ class DummyMainGenerator {
 	 * class (activity, service, etc.) to the list of callback methods for that
 	 * element.
 	 */
-	def setCallbackFunctions(callbackFunctions : Map[String, MSet[String]]) {
+	def setCallbackFunctions(callbackFunctions : Map[String, Set[String]]) {
 		this.callbackFunctions = callbackFunctions
 	}
   

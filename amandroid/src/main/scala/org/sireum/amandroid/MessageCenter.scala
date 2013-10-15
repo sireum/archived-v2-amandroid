@@ -2,21 +2,21 @@ package org.sireum.amandroid
 
 object MessageCenter {
 	/**
-	 * SIMPLE: Only print critical message
+	 * CRITICAL: Only print critical message
 	 * NORMAL: Print some useful debug message
 	 * DETAIL: Print all message
 	 */
 	object MSG_LEVEL extends Enumeration {
-	  val SIMPLE, NORMAL, DETAIL = Value
+	  val CRITICAL, NORMAL, DETAIL = Value
 	}
 	var msglevel : MSG_LEVEL.Value = MSG_LEVEL.NORMAL
-	implicit def msg_simple(msg : String) = {
-	  if(msglevel >= MSG_LEVEL.SIMPLE)
-	  	println("[SIMPLE]" + msg)
+	implicit def msg_critical(msg : String) = {
+	  if(msglevel >= MSG_LEVEL.CRITICAL)
+	  	println("[critical]" + msg)
 	}
-	implicit def err_msg_simple(msg : String) = {
-	  if(msglevel >= MSG_LEVEL.SIMPLE)
-	  	System.err.println("[ERROR_SIMPLE]" + msg)
+	implicit def err_msg_critical(msg : String) = {
+	  if(msglevel >= MSG_LEVEL.CRITICAL)
+	  	System.err.println("[ERROR_CRITICAL]" + msg)
 	}
 	implicit def msg_normal(msg : String) = {
 	  if(msglevel >= MSG_LEVEL.NORMAL)

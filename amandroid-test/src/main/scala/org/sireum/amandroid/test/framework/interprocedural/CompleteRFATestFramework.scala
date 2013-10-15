@@ -10,8 +10,10 @@ import org.sireum.amandroid.android.appInfo.AppInfoCollector
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
-import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
-import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.AndroidRFAConfig
+import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis._
+import org.sireum.amandroid.android.interProcedural.taintAnalysis.AndroidTaintAnalysis
+import org.sireum.amandroid.android.interProcedural.taintAnalysis.SourceAndSinkCenter
+import org.sireum.amandroid.util.StringFormConverter
 
 trait CompleteRFATestFramework extends TestFramework {
 
@@ -59,23 +61,23 @@ trait CompleteRFATestFramework extends TestFramework {
     	
     	val pre = new AppInfoCollector(new File(src.toString().substring(5)).toString())
 		  pre.calculateEntrypoints
-    	
+		  
 		  AndroidRFAConfig.setupCenter
     	val entryPoints = Center.getEntryPoints("dummyMain")
     	entryPoints.foreach{
     	  ep =>
     	    println("--------------Component " + ep + "--------------")
     	    val initialfacts = AndroidRFAConfig.getInitialFactsForDummyMain(ep)
-    	    AndroidReachingFactsAnalysis.processedClinit = isetEmpty
-    	    val (cg, result) = AndroidReachingFactsAnalysis(ep, initialfacts)
+    	    val (cg, rfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts)
     	    println("processed-->" + cg.getProcessed.size)
-    	    println("exit facts: " + result.entrySet(cg.exitNode))
+    	    println("exit facts: " + rfaResult.entrySet(cg.exitNode).size)
+    	    val taResult = AndroidTaintAnalysis(ep, cg, rfaResult)
     	    val f1 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "rfa.txt")
 			    val o1 = new FileOutputStream(f1)
 			    val w1 = new OutputStreamWriter(o1)
 			    cg.nodes.foreach{
 			      node =>
-			        w1.write(node + ":" + result.entrySet(node).toString + "\n")
+			        w1.write(node + ":" + rfaResult.entrySet(node).toString + "\n")
 			    }
     	    
     	    val f2 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "CG.dot")

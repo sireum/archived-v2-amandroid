@@ -75,7 +75,7 @@ object StringModel {
    
   }
 	  
-	def doStringCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+	def doStringCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
 	  val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
 	  var newFacts = isetEmpty[RFAFact]
 	  var deleteFacts = isetEmpty[RFAFact]
@@ -314,8 +314,6 @@ object StringModel {
 	      newFacts ++=getFactFromThisForRet(s, args, retVars(0), currentContext)
 	    case _ =>
 	  }
-	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
-	  val s1 = s -- deleteFacts
-	  s1 ++ newFacts
+	  (newFacts, deleteFacts)
 	}
 }

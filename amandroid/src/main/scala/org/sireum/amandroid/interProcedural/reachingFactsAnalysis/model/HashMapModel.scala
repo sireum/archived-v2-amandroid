@@ -127,8 +127,9 @@ object HashMapModel {
 	  result
   }
 	
-	def doHashMapCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+	def doHashMapCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
 	  var newFacts = isetEmpty[RFAFact]
+	  var delFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
 	    case "[|Ljava/util/HashMap;.<clinit>:()V|]" =>
 		  case "[|Ljava/util/HashMap;.<init>:()V|]" =>
@@ -187,7 +188,6 @@ object HashMapModel {
 		    newFacts ++= getHashMapValuesToRet(s, args, retVars(0), currentContext)
 		  case "[|Ljava/util/HashMap;.writeObject:(Ljava/io/ObjectOutputStream;)V|]" =>
 	  }
-	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
-	  s ++ newFacts
+	  (newFacts, delFacts)
 	}
 }

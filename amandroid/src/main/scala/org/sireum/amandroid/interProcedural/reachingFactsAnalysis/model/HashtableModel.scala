@@ -132,8 +132,9 @@ object HashtableModel {
 	  result
   }
 	  
-	def doHashtableCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+	def doHashtableCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
 	  var newFacts = isetEmpty[RFAFact]
+	  var delFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
 	    case "[|Ljava/util/Hashtable;.<clinit>:()V|]" =>
 		  case "[|Ljava/util/Hashtable;.<init>:()V|]" =>
@@ -192,7 +193,6 @@ object HashtableModel {
 		    newFacts ++= getHashTableValuesToRet(s, args, retVars(0), currentContext)
 		  case "[|Ljava/util/Hashtable;.writeObject:(Ljava/io/ObjectOutputStream;)V|]" =>
 	  }
-	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
-	  s ++ newFacts
+	  (newFacts, delFacts)
 	}
 }

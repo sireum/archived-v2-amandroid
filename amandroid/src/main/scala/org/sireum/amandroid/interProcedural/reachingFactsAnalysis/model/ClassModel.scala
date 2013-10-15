@@ -10,12 +10,12 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAConcreteStr
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.FieldSlot
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAPointStringInstance
 import org.sireum.amandroid.util.StringFormConverter
+import org.sireum.amandroid.MessageCenter._
 
 object ClassModel {
-  val DEBUG = true
 	def isClass(r : AmandroidRecord) : Boolean = r.getName == "[|java:lang:Class|]"
 	  
-	def doClassCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+	def doClassCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
@@ -116,8 +116,7 @@ object ClassModel {
 		  case "[|Ljava/lang/Class;.newInstanceImpl:()Ljava/lang/Object;|]" =>  //private native
 		  case "[|Ljava/lang/Class;.toString:()Ljava/lang/String;|]" =>  //public
 	  }
-	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
-	  s ++ newFacts -- delFacts
+	  (newFacts, delFacts)
 	}
 	
 	
@@ -179,11 +178,9 @@ object ClassModel {
                 System.err.println("Given class name probably come from another app: " + cIns)
             }
           case pstr @ RFAPointStringInstance(c) => 
-            if(DEBUG)
-            	System.err.println("Get class use point string: " + pstr)
+            err_msg_normal("Get class use point string: " + pstr)
           case _ =>
-            if(DEBUG)
-            	System.err.println("Get class use unknown instance: " + cIns)
+            err_msg_normal("Get class use unknown instance: " + cIns)
         }
     }
     (newfacts, delfacts)

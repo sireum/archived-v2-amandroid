@@ -13,8 +13,9 @@ import org.sireum.amandroid.ClassInstance
 object NativeCallModel {
 	 def isNativeCall(p : AmandroidProcedure) : Boolean = p.isNative
 	 
-	 def doNativeCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+	 def doNativeCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
 	  var newFacts = isetEmpty[RFAFact]
+	  var delFacts = isetEmpty[RFAFact]
 	  val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
 	  	  
 	  p.getSignature match{
@@ -47,7 +48,6 @@ object NativeCallModel {
 	      }
 	    case _ =>
 	  }
-	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
-	  s ++ newFacts
+	  (newFacts, delFacts)
 	}
 }

@@ -34,8 +34,9 @@ object FrameworkMethodsModel {
 	  else false
 	}
 	
-	def doFrameworkMethodsModelCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+	def doFrameworkMethodsModelCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
 	  var newFacts = isetEmpty[RFAFact]
+	  var delFacts = isetEmpty[RFAFact]
 	  p.getSubSignature match{
 	    case "setContentView:(I)V" =>
 	    case "registerReceiver:(Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;)Landroid/content/Intent;" =>
@@ -67,8 +68,7 @@ object FrameworkMethodsModel {
 	      }
 	    case _ =>
 	  }
-	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
-	  s ++ newFacts
+	  (newFacts, delFacts)
 	}
 	
 	private def registerReceiver(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
@@ -127,7 +127,7 @@ object FrameworkMethodsModel {
 	      }
 	  }
 	  AppCenter.updateIntentFilterDB(iDB)
-	  err_msg_normal("intentfilter database: " + AppCenter.getIntentFilterDB)
+	  msg_normal("intentfilter database: " + AppCenter.getIntentFilterDB)
 	  isetEmpty
 	}
 	

@@ -257,12 +257,12 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
 	          vn.label.toString match{
 	            case "Entry" => 
 	              val entryNode = addCGEntryNode(callerContext.copy.setContext(calleeSig, calleeSig))
-	              entryNode.setOwnerPST(body)
+	              entryNode.setOwner(calleeProc)
 	              nodes += entryNode
 	              if(isFirst) this.entryN = entryNode
 	            case "Exit" => 
 	              val exitNode = addCGExitNode(callerContext.copy.setContext(calleeSig, calleeSig))
-	              exitNode.setOwnerPST(body)
+	              exitNode.setOwner(calleeProc)
 	              nodes += exitNode
 	              if(isFirst) this.exitN = exitNode
 	            case a => throw new RuntimeException("unexpected virtual label: " + a)
@@ -271,23 +271,23 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
 	          val l = body.location(ln.locIndex)
 	          if(isCall(l)){
               val c = addCGCallNode(callerContext.copy.setContext(calleeSig, ln.locUri))
-              c.setOwnerPST(body)
+              c.setOwner(calleeProc)
               c.asInstanceOf[CGLocNode].setLocIndex(ln.locIndex)
               nodes += c
               val r = addCGReturnNode(callerContext.copy.setContext(calleeSig, ln.locUri))
-              r.setOwnerPST(body)
+              r.setOwner(calleeProc)
               r.asInstanceOf[CGLocNode].setLocIndex(ln.locIndex)
               nodes += r
               addEdge(c, r)
 	          } else {
 	            val node = addCGNormalNode(callerContext.copy.setContext(calleeSig, ln.locUri))
-	            node.setOwnerPST(body)
+	            node.setOwner(calleeProc)
 	            node.asInstanceOf[CGLocNode].setLocIndex(ln.locIndex)
 	            nodes += node
 	          }
 	        case a : AlirLocationNode => 
 	          val node = addCGNormalNode(callerContext.copy.setContext(calleeSig, a.locIndex.toString))
-	          node.setOwnerPST(body)
+	          node.setOwner(calleeProc)
 	          node.asInstanceOf[CGLocNode].setLocIndex(a.locIndex)
 	          nodes += node
 	      }
@@ -515,9 +515,9 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
 }
 
 sealed abstract class CGNode(context : Context) extends InterProceduralNode(context){
-  protected var ownerPST : ProcedureSymbolTable = null
-  def setOwnerPST(pst : ProcedureSymbolTable)  = this.ownerPST = pst
-  def getOwnerPST = this.ownerPST
+  protected var owner : AmandroidProcedure = null
+  def setOwner(owner : AmandroidProcedure)  = this.owner = owner
+  def getOwner = this.owner
 }
 
 abstract class CGVirtualNode(context : Context) extends CGNode(context) {

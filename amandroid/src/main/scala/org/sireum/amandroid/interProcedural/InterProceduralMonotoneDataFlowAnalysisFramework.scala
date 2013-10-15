@@ -15,6 +15,7 @@ import org.sireum.amandroid.GlobalConfig
  */
 trait InterProceduralMonotoneDataFlowAnalysisResult[LatticeElement] {
   def entrySet : CGNode => ISet[LatticeElement]
+  def exitSet : CGNode => ISet[LatticeElement]
   def entries(n : CGNode, callerContext : Context, esl : EntrySetListener[LatticeElement])
 }
 
@@ -36,7 +37,7 @@ trait CallResolver[LatticeElement] {
 	 * It returns the facts for each callee entry node and caller return node
 	 */
   def resolveCall(s : ISet[LatticeElement], cj : CallJump, callerContext : Context, cg : CallGraph[CGNode]) : (IMap[CGNode, ISet[LatticeElement]], ISet[LatticeElement])
-  def getAndMapFactsForCaller(callerS : ISet[LatticeElement], calleeS : ISet[LatticeElement], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[LatticeElement]
+  def getAndMapFactsForCaller(callerS : ISet[LatticeElement], calleeS : ISet[LatticeElement], cj : CallJump, calleeProcedure : ProcedureDecl, calleeContext : Context) : ISet[LatticeElement]
 }
 
 /**
@@ -89,6 +90,25 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
 
         sb.toString
       }
+      
+      def exitSet : N => DFF = {
+	      _ match{
+	        case en : CGEntryNode =>
+	          getEntrySet(en)
+	        case xn : CGExitNode =>
+	          getEntrySet(xn)
+	        case cn : CGCallNode =>
+	          val r = caculateResult(cn.getOwner.getProcedureBody.location(cn.getLocIndex), cn.getOwner.getProcedureBody, cn.getContext.copy.removeTopContext)
+	          r.map(_._2).reduce(iunion[LatticeElement])
+	        case rn : CGReturnNode =>
+	          getEntrySet(rn)
+	        case nn : CGNormalNode =>
+	          val r = caculateResult(nn.getOwner.getProcedureBody.location(nn.getLocIndex), nn.getOwner.getProcedureBody, nn.getContext.copy.removeTopContext)
+	          r.map(_._2).reduce(iunion[LatticeElement])
+	        case a => throw new RuntimeException("unexpected node type: " + a)
+	      }
+	    }
+
       
       protected def next(l : LocationDecl, pst : ProcedureSymbolTable, pSig : String, callerContext : Context) = {
         val newLoc = pst.location(l.index + 1)
@@ -312,132 +332,128 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
         l : LocationDecl,
         pst : ProcedureSymbolTable,
         callerContext : Context,
-        esl : Option[EntrySetListener[LatticeElement]]) : Boolean = {
+        esl : Option[EntrySetListener[LatticeElement]]) : IMap[N, DFF] = {
         val pSig = pst.procedure.getValueAnnotation("signature") match {
 			      case Some(exp : NameExp) =>
 			        exp.name.name
 			      case _ => throw new RuntimeException("Doing " + TITLE + ": Can not find signature from: " + l)
 			    }
         val currentContext = callerContext.copy
-        
+        var latticeMap : IMap[N, DFF] = imapEmpty 
         if(!l.name.isDefined)
         	currentContext.setContext(pSig, l.index.toString)
         else
           currentContext.setContext(pSig, l.name.get.uri)
         val eslb = esl.getOrElse(null)
-          def jumpF(s : DFF, j : Jump) : Boolean =
-            j match {
-              case j : IfJump =>
-                var r = s
-                if (esl.isDefined) eslb.ifJump(j, s)
-                var updated = false
-                for (ifThen <- j.ifThens) {
-                  r = fE(ifThen.cond, r, currentContext)
-                  val ifThenContext = callerContext.copy
-                  ifThenContext.setContext(pSig, ifThen.target.uri)
-                  val ifThenLoc = pst.location(ifThen.target.uri)
-                  val sn = node(ifThenLoc, ifThenContext)
-                  if (esl.isDefined) {
-                    eslb.ifThen(ifThen, r)
-                    eslb.exitSet(Some(ifThen), r)
-                  }
-                  updated = update(confluence(r, getEntrySet(sn)), sn) || updated
-                }
-                if (j.ifElse.isEmpty) {
-                  val sn = next(l, pst, pSig, callerContext)
-                  if (esl.isDefined) eslb.exitSet(None, r)
-                  update(confluence(r, getEntrySet(sn)), sn) || updated
-                } else {
-                  val ifElse = j.ifElse.get
-                  val ifElseContext = callerContext.copy
-                  ifElseContext.setContext(pSig, ifElse.target.uri)
-                  val ifElseLoc = pst.location(ifElse.target.uri)
-                  val sn = node(ifElseLoc, ifElseContext)
-                  if (esl.isDefined) {
-                    eslb.ifElse(ifElse, r)
-                    eslb.exitSet(Some(ifElse), r)
-                  }
-                  update(confluence(r, getEntrySet(sn)), sn) || updated
-                }
-              case j : SwitchJump =>
-                var r = s
-                if (esl.isDefined) eslb.switchJump(j, s)
-                var updated = false
-                for (switchCase <- j.cases) {
-                  r =
-                    if (switchAsOrderedMatch)
-                      fE(switchCase.cond, r, currentContext)
-                    else
-                      fE(switchCase.cond, s, currentContext)
-                  val switchCaseContext = callerContext.copy
-                  switchCaseContext.setContext(pSig, switchCase.target.uri)
-                  val switchCaseLoc = pst.location(switchCase.target.uri)
-                  val sn = node(switchCaseLoc, switchCaseContext)
-                  if (esl.isDefined) {
-                    eslb.switchCase(switchCase, r)
-                    eslb.exitSet(Some(switchCase), r)
-                  }
-                  updated = update(confluence(r, getEntrySet(sn)), sn) || updated
-                }
-                if (j.defaultCase.isEmpty) {
-                  val sn = next(l,pst, pSig, callerContext)
-                  if (esl.isDefined) eslb.exitSet(None, r)
-                  update(confluence(r, getEntrySet(sn)), sn) || updated
-                } else {
-                  val switchDefault = j.defaultCase.get
-                  val switchDefaultContext = callerContext.copy
-                  switchDefaultContext.setContext(pSig, switchDefault.target.uri)
-                  val switchDefaultLoc = pst.location(switchDefault.target.uri)
-                  val sn = node(switchDefaultLoc, switchDefaultContext)
-                  if (esl.isDefined) {
-                    eslb.switchDefault(switchDefault, r)
-                    eslb.exitSet(Some(switchDefault), r)
-                  }
-                  update(confluence(r, getEntrySet(sn)), sn) || updated
-                }
-              case j : GotoJump =>
-                val gotoContext = callerContext.copy
-                gotoContext.setContext(pSig, j.target.uri)
-                val gotoLoc = pst.location(j.target.uri)
-                val sn = node(gotoLoc, gotoContext)
+        def jumpF(s : DFF, j : Jump) : Unit =
+          j match {
+            case j : IfJump =>
+              var r = s
+              if (esl.isDefined) eslb.ifJump(j, s)
+              for (ifThen <- j.ifThens) {
+                r = fE(ifThen.cond, r, currentContext)
+                val ifThenContext = callerContext.copy
+                ifThenContext.setContext(pSig, ifThen.target.uri)
+                val ifThenLoc = pst.location(ifThen.target.uri)
+                val sn = node(ifThenLoc, ifThenContext)
                 if (esl.isDefined) {
-                  eslb.gotoJump(j, s)
-                  eslb.exitSet(Some(j), s)
+                  eslb.ifThen(ifThen, r)
+                  eslb.exitSet(Some(ifThen), r)
                 }
-                update(confluence(s, getEntrySet(sn)), sn)
-              case j : ReturnJump =>
-                val exitContext = callerContext.copy
-                exitContext.setContext(pSig, pSig)
-                val sn = cg.getCGExitNode(exitContext)
-                val r = if (j.exp.isEmpty) s else fE(j.exp.get, s, currentContext)
+                latticeMap += (sn -> r)
+              }
+              if (j.ifElse.isEmpty) {
+                val sn = next(l, pst, pSig, callerContext)
+                if (esl.isDefined) eslb.exitSet(None, r)
+                latticeMap += (sn -> r)
+              } else {
+                val ifElse = j.ifElse.get
+                val ifElseContext = callerContext.copy
+                ifElseContext.setContext(pSig, ifElse.target.uri)
+                val ifElseLoc = pst.location(ifElse.target.uri)
+                val sn = node(ifElseLoc, ifElseContext)
                 if (esl.isDefined) {
-                  eslb.returnJump(j, r)
-                  eslb.exitSet(Some(j), r)
+                  eslb.ifElse(ifElse, r)
+                  eslb.exitSet(Some(ifElse), r)
                 }
-                update(confluence(r, getEntrySet(sn)), sn)
-              case j : CallJump =>
-                if (esl.isDefined) eslb.callJump(j, s)
-                val r = fA(j, s, currentContext)
-                var updated = false
-                if (j.jump.isEmpty) {
-                  val (calleeFactsMap, retFacts) = callr.resolveCall(r, j, currentContext, cg)
-                  calleeFactsMap.foreach{
-                    case (calleeNode, calleeFacts) =>
-			                updated = update(confluence(calleeFacts, getEntrySet(calleeNode)), calleeNode) || updated
-                  }
-                  val rn = cg.getCGReturnNode(currentContext)
-                  updated = update(confluence(retFacts, getEntrySet(rn)), rn) || updated
-                  if (esl.isDefined) eslb.exitSet(None, getEntrySet(rn))
-                  updated
-                } else
-                  jumpF(r, j.jump.get)
-            }
+                latticeMap += (sn -> r)
+              }
+            case j : SwitchJump =>
+              var r = s
+              if (esl.isDefined) eslb.switchJump(j, s)
+              for (switchCase <- j.cases) {
+                r =
+                  if (switchAsOrderedMatch)
+                    fE(switchCase.cond, r, currentContext)
+                  else
+                    fE(switchCase.cond, s, currentContext)
+                val switchCaseContext = callerContext.copy
+                switchCaseContext.setContext(pSig, switchCase.target.uri)
+                val switchCaseLoc = pst.location(switchCase.target.uri)
+                val sn = node(switchCaseLoc, switchCaseContext)
+                if (esl.isDefined) {
+                  eslb.switchCase(switchCase, r)
+                  eslb.exitSet(Some(switchCase), r)
+                }
+                latticeMap += (sn -> r)
+              }
+              if (j.defaultCase.isEmpty) {
+                val sn = next(l,pst, pSig, callerContext)
+                if (esl.isDefined) eslb.exitSet(None, r)
+                latticeMap += (sn -> r)
+              } else {
+                val switchDefault = j.defaultCase.get
+                val switchDefaultContext = callerContext.copy
+                switchDefaultContext.setContext(pSig, switchDefault.target.uri)
+                val switchDefaultLoc = pst.location(switchDefault.target.uri)
+                val sn = node(switchDefaultLoc, switchDefaultContext)
+                if (esl.isDefined) {
+                  eslb.switchDefault(switchDefault, r)
+                  eslb.exitSet(Some(switchDefault), r)
+                }
+                latticeMap += (sn -> r)
+              }
+            case j : GotoJump =>
+              val gotoContext = callerContext.copy
+              gotoContext.setContext(pSig, j.target.uri)
+              val gotoLoc = pst.location(j.target.uri)
+              val sn = node(gotoLoc, gotoContext)
+              if (esl.isDefined) {
+                eslb.gotoJump(j, s)
+                eslb.exitSet(Some(j), s)
+              }
+              latticeMap += (sn -> s)
+            case j : ReturnJump =>
+              val exitContext = callerContext.copy
+              exitContext.setContext(pSig, pSig)
+              val sn = cg.getCGExitNode(exitContext)
+              val r = if (j.exp.isEmpty) s else fE(j.exp.get, s, currentContext)
+              if (esl.isDefined) {
+                eslb.returnJump(j, r)
+                eslb.exitSet(Some(j), r)
+              }
+              latticeMap += (sn -> r)
+            case j : CallJump =>
+              if (esl.isDefined) eslb.callJump(j, s)
+              val r = fA(j, s, currentContext)
+              if (j.jump.isEmpty) {
+                val (calleeFactsMap, retFacts) = callr.resolveCall(r, j, currentContext, cg)
+                calleeFactsMap.foreach{
+                  case (calleeNode, calleeFacts) =>
+		                latticeMap += (calleeNode -> calleeFacts)
+                }
+                val rn = cg.getCGReturnNode(currentContext)
+                latticeMap += (rn -> retFacts)
+                if (esl.isDefined) eslb.exitSet(None, getEntrySet(rn))
+              } else
+                jumpF(r, j.jump.get)
+        }
 
         val ln = node(l, currentContext)
         var s = getEntrySet(ln)
         l match {
           case l : ComplexLocation =>
-            val bs = l.transformations.map { t =>
+            l.transformations.foreach { t =>
               var r = s
               t.actions.foreach { a =>
                 if (esl.isDefined) eslb.action(a, r)
@@ -448,19 +464,21 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
               else {
                 val sn = next(l, pst, pSig, callerContext)
                 if (esl.isDefined) eslb.exitSet(None, r)
-                update(confluence(r, getEntrySet(sn)), sn)
+                latticeMap += (sn -> r)
               }
             }
-            bs.exists(_ == true)
           case l : ActionLocation =>
              if(esl.isDefined) eslb.action(l.action, s)
              val r = actionF(s, l.action, currentContext)
              if(esl.isDefined) eslb.exitSet(None, r)
              if(l.index < pst.locations.size - 1){
                val sn =next(l, pst, pSig, callerContext)
-               update(confluence(r, getEntrySet(sn)), sn)
+               latticeMap += (sn -> r)
              } else {
-               true
+               val newContext = callerContext.copy
+               newContext.setContext(pSig, pSig)
+               val sn = cg.getCGExitNode(newContext)
+               latticeMap += (sn -> r)
              }
           case l : JumpLocation =>
             jumpF(s, l.jump)
@@ -468,23 +486,32 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
             if (esl.isDefined)
               eslb.exitSet(None, s)
             val sn = next(l, pst, pSig, callerContext)
-            update(confluence(s, getEntrySet(sn)), sn)
+            latticeMap += (sn -> s)
         }
+        latticeMap
+      }
+      
+      def caculateResult(l : LocationDecl,
+          			pst : ProcedureSymbolTable,
+          			callerContext : Context,
+                esl : Option[EntrySetListener[LatticeElement]] = None) : IMap[N, DFF] = {
+//        if (forward) visitForward(l, esl)
+//        else visitBackward(l, esl)
+        visitForward(l, pst, callerContext, esl)
       }
 
       def visit(l : LocationDecl,
           			pst : ProcedureSymbolTable,
           			callerContext : Context,
-                esl : Option[EntrySetListener[LatticeElement]] = None) : Boolean =
-//        if (forward) visitForward(l, esl)
-//        else visitBackward(l, esl)
-        visitForward(l, pst, callerContext, esl)
+                esl : Option[EntrySetListener[LatticeElement]] = None) : Boolean = {
+        caculateResult(l, pst, callerContext, esl).map{case (n, facts) => update(confluence(facts, getEntrySet(n)), n)}.exists(_ == true)
+      }
 
       
       def entries(n : N, callerContext : Context, esl : EntrySetListener[LatticeElement]) = {
         n match {
           case cn @ (_:CGNormalNode | _:CGCallNode | _:CGReturnNode)  =>
-            visit(cn.getOwnerPST.location(cn.asInstanceOf[CGLocNode].getLocIndex), n.getOwnerPST, callerContext, Some(esl))
+            visit(cn.getOwner.getProcedureBody.location(cn.asInstanceOf[CGLocNode].getLocIndex), n.getOwner.getProcedureBody, callerContext, Some(esl))
           case _ =>
         }
       }
@@ -492,9 +519,7 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
     }
     
     val imdaf = new IMdaf(getEntrySet _, initial)
-    
-    val initContext = new Context(GlobalConfig.CG_CONTEXT_K)
-    cg.collectCfgToBaseGraph(entryPoint, initContext, true)
+
     entrySetMap.put(flow.entryNode, iota)
     val workList = mlistEmpty[N]
     workList += flow.entryNode
@@ -508,24 +533,22 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
 	          for (succ <- cg.successors(en)) {
 	            if(imdaf.update(getEntrySet(en), succ)){
 		            workList += succ
-		            //println("from cgentrynode!")
 	            }
 	          }
 	        case xn : CGExitNode =>
 	          for (succ <- cg.successors(xn)){
 	            require(succ.isInstanceOf[CGReturnNode])
 	            val rn = succ.asInstanceOf[CGReturnNode]
-	            val l = succ.getOwnerPST.location(rn.getLocIndex)
+	            val l = succ.getOwner.getProcedureBody.location(rn.getLocIndex)
 		          require(cg.isCall(l))
 		          val cj = l.asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump]
-	            val factsForCaller = callr.getAndMapFactsForCaller(getEntrySet(cg.getNode(CGCallNode(rn.context))), getEntrySet(xn), cj, xn.getOwnerPST.procedure)
+	            val factsForCaller = callr.getAndMapFactsForCaller(getEntrySet(cg.getNode(CGCallNode(rn.context))), getEntrySet(xn), cj, xn.getOwner.getProcedureBody.procedure, xn.context)
 	            //below is the kill/gen for caller return node
 	            imdaf.update(confluence(getEntrySet(rn), factsForCaller), rn)
 	            workList += succ
-	            	//println("from cgexitnode!")
 	          }
 	        case cn : CGCallNode =>
-	          if (imdaf.visit(cn.getOwnerPST.location(cn.getLocIndex), cn.getOwnerPST, callerContext)){
+	          if (imdaf.visit(cn.getOwner.getProcedureBody.location(cn.getLocIndex), cn.getOwner.getProcedureBody, callerContext)){
 	            workList ++= cg.successors(n)
 	          }
 	        case rn : CGReturnNode =>
@@ -535,7 +558,7 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
 	            }
 	          }
 	        case nn : CGNormalNode =>
-	          if (imdaf.visit(nn.getOwnerPST.location(nn.getLocIndex), nn.getOwnerPST, callerContext)){
+	          if (imdaf.visit(nn.getOwner.getProcedureBody.location(nn.getLocIndex), nn.getOwner.getProcedureBody, callerContext)){
 	            workList ++= cg.successors(n)
 	          }
 	        case a => throw new RuntimeException("unexpected node type: " + a)
@@ -547,10 +570,10 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
 	          case xn : CGExitNode =>
 		          for (succ <- cg.successors(xn)){
 		            require(succ.isInstanceOf[CGReturnNode])
-		            val l = succ.getOwnerPST.location(succ.asInstanceOf[CGReturnNode].getLocIndex)
+		            val l = succ.getOwner.getProcedureBody.location(succ.asInstanceOf[CGReturnNode].getLocIndex)
 			          require(cg.isCall(l))
 			          val cj = l.asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump]
-		            val factsForCaller = callr.getAndMapFactsForCaller(getEntrySet(succ), getEntrySet(xn), cj, xn.getOwnerPST.procedure)
+		            val factsForCaller = callr.getAndMapFactsForCaller(getEntrySet(succ), getEntrySet(xn), cj, xn.getOwner.getProcedureBody.procedure, xn.context)
 		            //below is the kill/gen for caller return node
 		            if (imdaf.update(confluence(getEntrySet(succ), factsForCaller), succ))
 		            	workList += succ

@@ -37,16 +37,19 @@ object AndroidConstants {
 	final val COMPONENTNAME_CLASS = "[|android:content:ComponentName.mClass|]"
 	final val URI_STRING_URI = "[|android:net:Uri$StringUri|]"
 	final val URI_STRING_URI_URI_STRING = "[|android:net:Uri$StringUri.uriString|]"  
-	final val ACTIVITY_SETCONTENTVIEW = "[|android:app:Activity.setContentView|]"
+	  
+	final val ACTIVITY_FINDVIEWBYID = "[|Landroid/app/Activity;.findViewById:(I)Landroid/view/View;|]"
+	final val VIEW_FINDVIEWBYID = "[|Landroid/view/View;.findViewById:(I)Landroid/view/View;|]"
+	  
+	final val SETCONTENTVIEW = "setContentView:(I)V"
 	final val DUMMY_MAIN = "dummyMain:(Landroid/content/Intent;)V"
 	final val ACTIVITY = "[|android:app:Activity|]"
 	final val ACTIVITY_INTENT = "[|android:app:Activity.mIntent|]"
 	  
+	final val BUNDLE = "[|android:os:Bundle|]"
+	  
 	final val CONTEXT = "[|android:content:Context|]"
 	final val CONTEXT_WRAPPER = "[|android:content:ContextWrapper|]"
-	  
-	final val UNKNOWN_RECORD = "[|Center:Unknown|]"
-	final val UNKNOWN_PROCEDURE_SIG = "[|LCenter/Unknown;.unknown:()LCenter/Unknown;|]"
 	  
 	final val ACCESSIBILITY_SERVICE = "accessibility"
   final val ACCOUNT_SERVICE = "account"

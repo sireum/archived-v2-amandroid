@@ -384,7 +384,7 @@ class RecordHierarchy {
     if(r.isInterface){
       val imps = getAllImplementersOf(r)
       if(!imps.isEmpty)
-      records = imps.map{getSubClassesOfIncluding(_)}.reduce((s1, s2) => s1 ++ s2)
+      	records = imps.map{getSubClassesOfIncluding(_)}.reduce((s1, s2) => s1 ++ s2)
       else records = Set()
     } else {
       records = getAllSubClassesOfIncluding(r)

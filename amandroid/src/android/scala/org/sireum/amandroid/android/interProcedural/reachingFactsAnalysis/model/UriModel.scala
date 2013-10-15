@@ -10,7 +10,7 @@ import org.sireum.amandroid.MessageCenter._
 object UriModel {
 	def isUri(r : AmandroidRecord) : Boolean = r.getName == "[|android:net:Uri|]"
 	  
-	def doUriCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+	def doUriCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
@@ -65,8 +65,7 @@ object UriModel {
 		  case "[|Landroid/net/Uri;.withAppendedPath:(Landroid/net/Uri;Ljava/lang/String;)Landroid/net/Uri;|]" =>  //public static
 		  case "[|Landroid/net/Uri;.writeToParcel:(Landroid/os/Parcel;Landroid/net/Uri;)V|]" =>  //public static
 	  }
-	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
-	  s ++ newFacts -- delFacts
+	  (newFacts, delFacts)
 	}
 	
 	/**

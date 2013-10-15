@@ -18,8 +18,9 @@ object ComponentNameModel {
   
 	def isComponentName(r : AmandroidRecord) : Boolean = r.getName == "[|android:content:ComponentName|]"
 	  
-	def doComponentNameCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+	def doComponentNameCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
 	  var newFacts = isetEmpty[RFAFact]
+	  var delFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
 	    case "[|Landroid/content/ComponentName;.<clinit>:()V|]" =>  //static constructor
 		  case "[|Landroid/content/ComponentName;.<init>:(Landroid/content/Context;Ljava/lang/Class;)V|]" =>  //public constructor
@@ -75,8 +76,7 @@ object ComponentNameModel {
 		    //TODO: How to handle parcel
 		  case _ =>
 	  }
-	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
-	  s ++ newFacts
+	  (newFacts, delFacts)
 	}
 	
 //	private def componentNameToString(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={

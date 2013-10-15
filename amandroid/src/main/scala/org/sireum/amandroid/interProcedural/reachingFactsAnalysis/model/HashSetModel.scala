@@ -36,8 +36,9 @@ object HashSetModel {
 	  thisValue.map{s => RFAFact(VarSlot(retVar), s.clone(currentContext))}
   }
   
-  def doHashSetCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+  def doHashSetCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
 	  var newFacts = isetEmpty[RFAFact]
+	  var delFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
       case "[|Ljava/util/HashSet;.<init>:()V|]" =>
 //        newFacts ++= initializeHashSetField(s, args, currentContext)
@@ -70,7 +71,6 @@ object HashSetModel {
 		  case "[|Ljava/util/HashSet;.writeObject:(Ljava/io/ObjectOutputStream;)V|]" =>
 		  case _ =>
     }
-	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
-    s ++ newFacts
+    (newFacts, delFacts)
   }
 }

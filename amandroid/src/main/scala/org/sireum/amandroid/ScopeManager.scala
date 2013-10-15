@@ -12,6 +12,8 @@ trait ScopeManager {
 	
 	def addPackage(packageName : String)
 	def addPackages(packageNames : ISet[String])
+  def removePackage(packageName : String)
+	def removePackages(packageNames : ISet[String])
 	
 	/**
 	 * return true if given package name contained in the scope manager

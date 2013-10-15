@@ -44,7 +44,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 	  if(!ar.isDefined)
 	    ar = Center.tryLoadRecord(toPilarRecord("android.webkit." + className), Center.ResolveLevel.BODIES)
 	  if(!ar.isDefined)
-	    err_msg_simple("Could not find layout class " + className)
+	    err_msg_critical("Could not find layout class " + className)
 	  ar.getOrElse(null)
 	}
 	
@@ -73,7 +73,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 	  		if(su.getName == "[|android:view:View|]" || su.getName == "[|android:webkit:WebView|]")
 	  		  return true
 		}
-		err_msg_simple("Layout class " + theClass + " is not derived from "
+		err_msg_critical("Layout class " + theClass + " is not derived from "
 				+ "android.view.View");
 		false
 	}
@@ -85,7 +85,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 
   	override def child(ns : String, name : String) : NodeVisitor = {
 			if (name == null) {
-				err_msg_simple("Encountered a null node name "
+				err_msg_critical("Encountered a null node name "
 						+ "in file " + layoutFile + ", skipping node...")
 				return null
 			}
@@ -134,7 +134,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
   		}
   		else {
   			if (DEBUG && typ == AxmlVisitor.TYPE_STRING)
-  				err_msg_simple("Found unrecognized XML attribute:  " + tempName)
+  				err_msg_critical("Found unrecognized XML attribute:  " + tempName)
   		}
   	}
   	
@@ -218,7 +218,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 						}
 						catch {
 						  case ex : Exception =>
-							  err_msg_simple("Could not read binary XML file: " + ex.getMessage())
+							  err_msg_critical("Could not read binary XML file: " + ex.getMessage())
 								ex.printStackTrace()
 						}
 					}

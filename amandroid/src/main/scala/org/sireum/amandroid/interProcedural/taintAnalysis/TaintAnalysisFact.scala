@@ -1,10 +1,10 @@
 package org.sireum.amandroid.interProcedural.taintAnalysis
 
 import org.sireum.alir.Slot
+import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAFact
 
-final case class VarSlot(varName : String) extends Slot{
-  def isGlobal : Boolean = varName.startsWith("@@")
-  override def toString = varName
+final case class TaintFact(fact : RFAFact, source : String){
+  override def toString : String = {
+    "TaintFact" + "(" + fact + "->" + source + ")"
+  }
 }
-
-final case class TAFact(s : Slot, v : Boolean)

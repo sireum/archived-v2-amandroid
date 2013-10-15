@@ -12,7 +12,7 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.FieldSlot
 object ActivityModel {
 	def isActivity(r : AmandroidRecord) : Boolean = r.getName == AndroidConstants.ACTIVITY
 	
-	def doActivityCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVar : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+	def doActivityCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVar : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
@@ -242,8 +242,7 @@ object ActivityModel {
 		  case "[|Landroid/app/Activity;.triggerSearch:(Ljava/lang/String;Landroid/os/Bundle;)V|]" =>  //public
 		  case "[|Landroid/app/Activity;.unregisterForContextMenu:(Landroid/view/View;)V|]" =>  //public
 	  }
-	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVar, currentContext)
-	  s ++ newFacts -- delFacts
+	  (newFacts, delFacts)
 	}
 	
 	private def setIntent(s : ISet[RFAFact], args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {

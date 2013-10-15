@@ -42,7 +42,7 @@ object AndroidModelCallHandler extends ModelCallHandler{
   /**
    * instead of doing operation inside callee procedure's real code, we do it manually and return the result. 
    */
-	override def doModelCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+	override def caculateResult(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
 	  val r = calleeProc.getDeclaringRecord
 	  if(BundleModel.isBundle(r)) BundleModel.doBundleCall(s, calleeProc, args, retVars, currentContext)
 	  else if(HandlerModel.isHandler(r)) HandlerModel.doHandlerCall(s, calleeProc, args, retVars, currentContext)
@@ -52,7 +52,7 @@ object AndroidModelCallHandler extends ModelCallHandler{
 	  else if(UriModel.isUri(r)) UriModel.doUriCall(s, calleeProc, args, retVars, currentContext)
 	  else if(FrameworkMethodsModel.isFrameworkMethods(calleeProc)) FrameworkMethodsModel.doFrameworkMethodsModelCall(s, calleeProc, args, retVars, currentContext)
 	  else if(ActivityModel.isActivity(r)) ActivityModel.doActivityCall(s, calleeProc, args, retVars, currentContext)
-	  else if(super.isModelCall(calleeProc)) super.doModelCall(s, calleeProc, args, retVars, currentContext)
+	  else if(super.isModelCall(calleeProc)) super.caculateResult(s, calleeProc, args, retVars, currentContext)
 	  else if(AndroidRFAScopeManager.shouldBypass(r)) AndroidRFAScopeManager.handleBypass(s, calleeProc, args, retVars, currentContext)
 	  else throw new RuntimeException("given callee is not a model call: " + calleeProc)
 	}

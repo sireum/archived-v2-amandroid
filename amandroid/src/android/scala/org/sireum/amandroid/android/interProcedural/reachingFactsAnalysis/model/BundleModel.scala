@@ -12,15 +12,17 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAPointString
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAInstance
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAConcreteStringInstance
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAPointStringInstance
+import org.sireum.amandroid.android.AndroidConstants
 
 /**
  * @author Fengguo Wei & Sankardas Roy
  */
 object BundleModel {
-	def isBundle(r : AmandroidRecord) : Boolean = r.getName == "[|android:os:Bundle|]"
+	def isBundle(r : AmandroidRecord) : Boolean = r.getName == AndroidConstants.BUNDLE
 	  
-	def doBundleCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+	def doBundleCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
 	  var newFacts = isetEmpty[RFAFact]
+	  var delFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
 	    case "[|Landroid/os/Bundle;.<clinit>:()V|]" =>  //static constructor
 		  case "[|Landroid/os/Bundle;.<init>:()V|]" =>  //public constructor
@@ -184,8 +186,7 @@ object BundleModel {
 		  case "[|Landroid/os/Bundle;.writeToParcel:(Landroid/os/Parcel;I)V|]" =>  //public
 		  case _ =>
 	  }
-	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
-	  s ++ newFacts
+	  (newFacts, delFacts)
 	}
 	
 	private def getPointStringToRet(retVar : String, currentContext : Context): RFAFact = {
@@ -290,7 +291,7 @@ object BundleModel {
 	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
 	  val keySlot = VarSlot(args(1))
 	  val keyValue = factMap.getOrElse(keySlot, isetEmpty)
-	  val defaultSlot = VarSlot(args(1))
+	  val defaultSlot = VarSlot(args(2))
 	  val defaultValue = factMap.getOrElse(defaultSlot, isetEmpty)
 	  val entValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, "[|android:os:Bundle.entries|]"), isetEmpty)}.reduce(iunion[Instance])
 	  if(keyValue.filter(_.isInstanceOf[RFAPointStringInstance]).isEmpty){

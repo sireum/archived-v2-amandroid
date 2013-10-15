@@ -51,7 +51,6 @@ trait ReachingFactsAnalysisTestFramework extends TestFramework {
     	val entryPoints = Center.getEntryPoints
     	entryPoints.foreach{
     	  ep =>
-    	    AndroidReachingFactsAnalysis.processedClinit = isetEmpty
     	    AndroidReachingFactsAnalysis(ep)
     	}
     	

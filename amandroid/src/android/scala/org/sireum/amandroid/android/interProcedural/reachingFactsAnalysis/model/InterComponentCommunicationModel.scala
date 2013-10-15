@@ -44,12 +44,12 @@ object InterComponentCommunicationModel {
 	    val implicitTargets = getImplicitTargets(s, intentValues)
 	    targets ++= implicitTargets
 	    if(implicitTargets.isEmpty){
-	      err_msg_simple("Cannot find any icc targets for: " + calleeProc + "@" + currentContext)
+	      err_msg_critical("Cannot find any icc targets for: " + calleeProc + "@" + currentContext)
 	    } else {
-	    	msg_simple("context: " + currentContext + " implicitTargets: " + implicitTargets)
+	    	msg_critical("context: " + currentContext + " implicitTargets: " + implicitTargets)
 	    }
 	  } else {
-	    msg_simple("context: " + currentContext + " explicitTargets: " + explicitTargets)
+	    msg_critical("context: " + currentContext + " explicitTargets: " + explicitTargets)
 	  }
 	  (s, targets)
 	}
@@ -74,9 +74,9 @@ object InterComponentCommunicationModel {
                       targetRec.tryGetProcedure(AndroidConstants.DUMMY_MAIN) match{
 		                    case Some(r) => 
 		                      result += r
-		                    case None => err_msg_simple("Target component " + targetRec + " does not have dummymain.")
+		                    case None => err_msg_critical("Target component " + targetRec + " does not have dummymain.")
 		                  }
-                    case None => err_msg_simple("Cannot find target component " + targetRecName + " in current code base.")
+                    case None => err_msg_critical("Cannot find target component " + targetRecName + " in current code base.")
                   }
                   
                 }
@@ -147,7 +147,7 @@ object InterComponentCommunicationModel {
         compsForThisIntent = findComponents(actions, categories, datas, mTypes)
         components ++= compsForThisIntent
     }
-    msg_simple("implicit target components-->" + components)
+    msg_critical("implicit target components-->" + components)
     var result = isetEmpty[AmandroidProcedure]
     components.foreach{
       comp =>

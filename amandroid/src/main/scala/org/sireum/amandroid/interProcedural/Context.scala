@@ -44,6 +44,7 @@ class Context(var k : Int){
   def removeTopContext = {
     if(!callStack.isEmpty)
     	callStack = callStack.tail
+    this
   }
   
   def getContext : List[(String, String)] = this.callStack

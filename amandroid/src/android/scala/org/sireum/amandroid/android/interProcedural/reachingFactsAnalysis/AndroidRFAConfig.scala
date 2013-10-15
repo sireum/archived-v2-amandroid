@@ -24,9 +24,9 @@ object AndroidRFAConfig {
    */
   def setupCenter = {
     val rec = new AmandroidRecord
-    rec.init(AndroidConstants.UNKNOWN_RECORD)
+    rec.init(Center.UNKNOWN_RECORD)
     val p = new AmandroidProcedure
-    p.init(AndroidConstants.UNKNOWN_PROCEDURE_SIG)
+    p.init(Center.UNKNOWN_PROCEDURE_SIG)
     p.setReality(false)
     rec.addProcedure(p)
     Center.addRecord(rec)

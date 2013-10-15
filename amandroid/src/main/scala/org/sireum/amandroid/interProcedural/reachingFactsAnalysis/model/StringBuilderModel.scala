@@ -172,9 +172,9 @@ object StringBuilderModel {
     
 
      
-	def doStringBuilderCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+	def doStringBuilderCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
 	  var newFacts = isetEmpty[RFAFact]
-	  //var deleteFacts = isetEmpty[RFAFact]
+	  var deleteFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
     case "[|Ljava/lang/StringBuilder;.<init>:()V|]" =>
       newFacts ++= getConcreteStringToField("", s, args, currentContext)
@@ -321,8 +321,7 @@ object StringBuilderModel {
 		case _ =>
 	  }
 	  //val s1 = s -- deleteFacts
-	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
-	  s ++ newFacts 
+	  (newFacts, deleteFacts) 
 	}
 	
 	

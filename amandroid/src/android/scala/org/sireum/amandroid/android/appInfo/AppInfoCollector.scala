@@ -20,13 +20,14 @@ import org.sireum.amandroid.pilarCodeGenerator.AndroidSubstituteRecordMap
 import org.sireum.amandroid.android.AppCenter
 import org.sireum.amandroid.GlobalConfig
 import org.sireum.amandroid.MessageCenter._
+import org.sireum.amandroid.android.interProcedural.taintAnalysis.SourceAndSinkCenter
 
 /**
  * adapted from Steven Arzt
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 class AppInfoCollector(apkFileLocation : String) {  
-	private var callbackMethods : Map[String, MSet[AmandroidProcedure]] = Map()
+	private var callbackMethods : Map[AmandroidRecord, Set[AmandroidProcedure]] = Map()
 	private var entrypoints : Set[String] = null
 	private var layoutControls : Map[Int, LayoutControl] = Map()
 	private var appPackageName : String = ""
@@ -78,13 +79,12 @@ class AppInfoCollector(apkFileLocation : String) {
 	  dmGen.setSubstituteRecordMap(AndroidSubstituteRecordMap.getSubstituteRecordMap)
 	  dmGen.setCurrentComponent(record.getName)
 	  dmGen.setCodeCounter(codeCtr)
-	  var callbackMethodSigs : Map[String, MSet[String]] = Map()
+	  var callbackMethodSigs : Map[String, Set[String]] = Map()
 	  this.callbackMethods.foreach{
-	    case (recordName, procs) =>
+	    case (record, procs) =>
 	      procs.foreach{
 	        p =>
-	          if(!callbackMethodSigs.contains(recordName)) callbackMethodSigs += (recordName -> msetEmpty)
-	          callbackMethodSigs(recordName) += p.getSignature
+	          callbackMethodSigs += (record.getName -> (callbackMethodSigs.getOrElse(record.getName, isetEmpty) + p.getSignature))
 	      }
 	  }
 	  dmGen.setCallbackFunctions(callbackMethodSigs)
@@ -102,10 +102,7 @@ class AppInfoCollector(apkFileLocation : String) {
 
 		analysisHelper.getCallbackMethods.foreach {
 	    case(k, v) =>
-  			if (this.callbackMethods.contains(k))
-  				this.callbackMethods(k) ++= (v)
-  			else
-  				this.callbackMethods += (k -> v)
+  			this.callbackMethods += (k -> (this.callbackMethods.getOrElse(k, isetEmpty) ++ v))
 		}
 	  
 	  msg_normal("Found " + this.callbackMethods.size + " callback methods")
@@ -147,10 +144,7 @@ class AppInfoCollector(apkFileLocation : String) {
 
 		analysisHelper.getCallbackMethods.foreach {
 	    case(k, v) =>
-  			if (this.callbackMethods.contains(k))
-  				this.callbackMethods(k) ++= (v)
-  			else
-  				this.callbackMethods += (k -> v)
+  			this.callbackMethods += (k -> (this.callbackMethods.getOrElse(k, isetEmpty) ++ v))
 		}
 		this.layoutControls = new LayoutFileParser().getUserControls
 		// Collect the XML-based callback methods
@@ -164,9 +158,9 @@ class AppInfoCollector(apkFileLocation : String) {
 		          if(lfp.getCallbackMethods.contains(strRes.value)){
 		            lfp.getCallbackMethods(strRes.value).foreach{
 		              methodName =>
-		                val methods = this.callbackMethods.getOrElse(k.getName, msetEmpty)
+		                var methods = this.callbackMethods.getOrElse(k, isetEmpty)
 		                if(methods.isEmpty){
-		                  this.callbackMethods += (k.getName -> methods)
+		                  this.callbackMethods += (k -> methods)
 		                }
 		                
 		                //The callback may be declared directly in the class or in one of the superclasses
@@ -189,7 +183,7 @@ class AppInfoCollector(apkFileLocation : String) {
 		            }
 		          }
 		        } else {
-		          err_msg_simple("Unexpected resource type for layout class")
+		          err_msg_critical("Unexpected resource type for layout class")
 		        }
 		    }
 		}
@@ -202,6 +196,7 @@ class AppInfoCollector(apkFileLocation : String) {
         val clCounter = generateDummyMain(record, codeLineCounter)
         codeLineCounter = clCounter
     }
+		SourceAndSinkCenter.init(appPackageName, afp, layoutControls)
 		AppCenter.setComponents(components)
 		AppCenter.updateIntentFilterDB(this.intentFdb)
 		AppCenter.setAppInfo(this)

@@ -10,6 +10,7 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.VarSlot
 import org.sireum.amandroid.android.AndroidConstants
 import org.sireum.amandroid.UnknownInstance
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
+import org.sireum.amandroid.Center
 
 object AndroidRFAScopeManager extends ScopeManager{
   private var packages : ISet[String] = isetEmpty
@@ -23,6 +24,8 @@ object AndroidRFAScopeManager extends ScopeManager{
 	
 	def addPackage(packageName : String) = this.packages += packageName
 	def addPackages(packageNames : ISet[String]) = this.packages ++= packageNames
+	def removePackage(packageName : String) = this.packages -= packageName
+	def removePackages(packageNames : ISet[String]) = this.packages --= packageNames
 	
 	/**
 	 * return true if given package name contained in the scope manager
@@ -34,9 +37,9 @@ object AndroidRFAScopeManager extends ScopeManager{
 	 * return true if given record needs to be bypassed
 	 */
 	def shouldBypass(rec : AmandroidRecord) : Boolean = {
-    rec.getName == AndroidConstants.UNKNOWN_RECORD ||
+    rec.getName == Center.UNKNOWN_RECORD ||
     {
-    rec.isLibraryRecord &&
+	    rec.isLibraryRecord &&
 	    {
 		    if(isIncludeMode){
 		    	if(rec.getPackageName != null) !contains(rec.getPackageName) else true
@@ -47,7 +50,7 @@ object AndroidRFAScopeManager extends ScopeManager{
     }
   }
   
-  def handleBypass(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
-    s ++ ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(isetEmpty, retVars, currentContext)
+  def handleBypass(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+    (isetEmpty, isetEmpty)
   }
 }

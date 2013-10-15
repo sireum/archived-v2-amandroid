@@ -58,6 +58,9 @@ object Center {
 	
 	val DEFAULT_TOPLEVEL_OBJECT = "[|java:lang:Object|]"
 	  
+	final val UNKNOWN_RECORD = "[|Center:Unknown|]"
+	final val UNKNOWN_PROCEDURE_SIG = "[|LCenter/Unknown;.unknown:()LCenter/Unknown;|]"
+	  
 	val JAVA_PRIMITIVE_TYPES = Set("[|byte|]", "[|short|]", "[|int|]", "[|long|]", "[|float|]", "[|double|]", "[|boolean|]", "[|char|]")
 
 	/**
@@ -491,6 +494,25 @@ object Center {
 	  if(!containsRecord(rName)) return None
 	  val r = getRecord(rName)
 	  r.tryGetProcedure(subSig)
+	}
+	
+	def getProcedureDeclaration(procSig : String) : AmandroidProcedure = {
+	  val rName = StringFormConverter.getRecordNameFromProcedureSignature(procSig)
+	  val subSig = getSubSigFromProcSig(procSig)
+	  if(!containsRecord(rName)) resolveRecord(rName, ResolveLevel.BODIES)
+	  val r = getRecord(rName)
+	  val worklist : MList[AmandroidRecord] = mlistEmpty
+	  worklist += r
+	  while(!worklist.isEmpty){
+	    val rec = worklist.remove(0)
+	    rec.tryGetProcedure(subSig) match{
+	      case Some(proc) => return proc
+	      case None =>
+	        if(rec.hasSuperClass) worklist += rec.getSuperClass
+	        worklist ++= rec.getInterfaces
+	    }
+	  }
+	  throw new RuntimeException("Cannot find procedure declaration for: " + procSig)
 	}
 	
 	/**

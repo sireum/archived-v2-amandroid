@@ -26,20 +26,27 @@ trait ModelCallHandler {
 	  HashSetModel.isHashSet(r) || 
 	  HashtableModel.isHashtable(r) ||
 	  HashMapModel.isHashMap(r) ||
+	  ClassModel.isClass(r) ||
 	  NativeCallModel.isNativeCall(calleeProc)
-	  
   }
       
   /**
    * instead of doing operation inside callee procedure's real code, we do it manually and return the result. 
    */
 	def doModelCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+	  var (newFacts, delFacts) = caculateResult(s, calleeProc, args, retVars, currentContext)
+	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForRetVar(newFacts, retVars, currentContext)
+	  s ++ newFacts -- delFacts
+	}
+	
+	def caculateResult(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
 	  val r = calleeProc.getDeclaringRecord
 	  if(StringModel.isString(r)) StringModel.doStringCall(s, calleeProc, args, retVars, currentContext)
 	  else if(StringBuilderModel.isStringBuilder(r)) StringBuilderModel.doStringBuilderCall(s, calleeProc, args, retVars, currentContext)
 	  else if(HashSetModel.isHashSet(r)) HashSetModel.doHashSetCall(s, calleeProc, args, retVars, currentContext)
 	  else if(HashtableModel.isHashtable(r)) HashtableModel.doHashtableCall(s, calleeProc, args, retVars, currentContext)
 	  else if(HashMapModel.isHashMap(r)) HashMapModel.doHashMapCall(s, calleeProc, args, retVars, currentContext)
+	  else if(ClassModel.isClass(r)) ClassModel.doClassCall(s, calleeProc, args, retVars, currentContext)
 	  else if(NativeCallModel.isNativeCall(calleeProc)) NativeCallModel.doNativeCall(s, calleeProc, args, retVars, currentContext)
 	  else throw new RuntimeException("given callee is not a model call: " + calleeProc)
 	}
