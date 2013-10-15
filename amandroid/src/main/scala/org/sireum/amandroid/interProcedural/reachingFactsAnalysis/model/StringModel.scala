@@ -8,6 +8,7 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAPointString
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAInstance
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAFact
+import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAConcreteStringInstance
 
 /**
  * @author Fengguo Wei & Sankardas Roy
@@ -203,24 +204,21 @@ object StringModel {
 	        var values : ISet[Instance] = isetEmpty
 	        factMap(paramSlot).foreach{
 	          ins=>
-	            if(ins.isInstanceOf[Instance]) values += ins
+	            if(ins.isInstanceOf[RFAConcreteStringInstance]) values += ins
 	            else values += RFAPointStringInstance(currentContext)
 	        }
-	        ReachingFactsAnalysisHelper.getReturnFact(new NormalType("[|java:lang:String|]"), retVars(0), currentContext) match{
-					  case Some(fact) =>
-					    newFacts ++= values.map{v=>RFAFact(fact.s, v)}
-					  case None =>
-	        }
+	        require(retVars.size == 1)
+			newFacts ++= values.map{v=>RFAFact(VarSlot(retVars(0)), v)}
 	      }
 	    case "[|Ljava/lang/String;.valueOf:(Z)Ljava/lang/String;|]" =>
 	      require(retVars.size == 1)
-        newFacts ++= getPointStringForRet(retVars(0), currentContext)
+          newFacts ++= getPointStringForRet(retVars(0), currentContext)
 	    case "[|Ljava/lang/String;.valueOf:([C)Ljava/lang/String;|]" =>
 	      require(retVars.size == 1)
-        newFacts ++= getPointStringForRet(retVars(0), currentContext)
+          newFacts ++= getPointStringForRet(retVars(0), currentContext)
 	    case "[|Ljava/lang/String;.valueOf:([CII)Ljava/lang/String;|]" =>
 	      require(retVars.size == 1)
-        newFacts ++= getPointStringForRet(retVars(0), currentContext)
+          newFacts ++= getPointStringForRet(retVars(0), currentContext)
 	    case "[|Ljava/lang/String;._getChars:(II[CI)V|]" =>
 	    case "[|Ljava/lang/String;.charAt:(I)C|]" =>
 	    case "[|Ljava/lang/String;.codePointAt:(I)I|]" =>
@@ -231,7 +229,7 @@ object StringModel {
 	    case "[|Ljava/lang/String;.compareToIgnoreCase:(Ljava/lang/String;)I|]" =>
 	    case "[|Ljava/lang/String;.concat:(Ljava/lang/String;)Ljava/lang/String;|]" =>
 	      require(retVars.size == 1)
-        newFacts ++= getPointStringForRet(retVars(0), currentContext)
+          newFacts ++= getPointStringForRet(retVars(0), currentContext)
 	    case "[|Ljava/lang/String;.contains:(Ljava/lang/CharSequence;)Z|]" =>
 	    case "[|Ljava/lang/String;.contentEquals:(Ljava/lang/CharSequence;)Z|]" =>
 	    case "[|Ljava/lang/String;.contentEquals:(Ljava/lang/StringBuffer;)Z|]" =>
@@ -263,28 +261,28 @@ object StringModel {
 	    case "[|Ljava/lang/String;.regionMatches:(ZILjava/lang/String;II)Z|]" =>
 	    case "[|Ljava/lang/String;.replace:(CC)Ljava/lang/String;|]" =>
 	      require(retVars.size == 1)
-        newFacts ++= getPointStringForRet(retVars(0), currentContext)
+          newFacts ++= getPointStringForRet(retVars(0), currentContext)
 	    case "[|Ljava/lang/String;.replace:(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Ljava/lang/String;|]" =>
 	      require(retVars.size == 1)
-        newFacts ++= getPointStringForRet(retVars(0), currentContext)
+          newFacts ++= getPointStringForRet(retVars(0), currentContext)
 	    /*TODO: */
 	    case "[|Ljava/lang/String;.replaceAll:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;|]" =>
 	      require(retVars.size == 1)
-        newFacts ++= getPointStringForRet(retVars(0), currentContext)
+          newFacts ++= getPointStringForRet(retVars(0), currentContext)
 	    case "[|Ljava/lang/String;.replaceFirst:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;|]" =>
 	      require(retVars.size == 1)
-        newFacts ++= getPointStringForRet(retVars(0), currentContext)
+          newFacts ++= getPointStringForRet(retVars(0), currentContext)
 	    case "[|Ljava/lang/String;.split:(Ljava/lang/String;)[Ljava/lang/String;|]" =>
 	      require(retVars.size == 1)
-        newFacts ++= getPointStringForRet(retVars(0), currentContext)
+          newFacts ++= getPointStringForRet(retVars(0), currentContext)
 	    case "[|Ljava/lang/String;.split:(Ljava/lang/String;I)[Ljava/lang/String;|]" =>
 	      require(retVars.size == 1)
-        newFacts ++= getPointStringForRet(retVars(0), currentContext)
+          newFacts ++= getPointStringForRet(retVars(0), currentContext)
 	    case "[|Ljava/lang/String;.startsWith:(Ljava/lang/String;)Z|]" =>
 	    case "[|Ljava/lang/String;.startsWith:(Ljava/lang/String;I)Z|]" =>
 	    case "[|Ljava/lang/String;.subSequence:(II)Ljava/lang/CharSequence;|]" =>
 	      require(retVars.size == 1)
-        newFacts ++= getPointStringForRet(retVars(0), currentContext)
+          newFacts ++= getPointStringForRet(retVars(0), currentContext)
 	    case "[|Ljava/lang/String;.substring:(I)Ljava/lang/String;|]" =>
 	      require(retVars.size == 1)
         newFacts ++= getPointStringForRet(retVars(0), currentContext)
@@ -309,6 +307,7 @@ object StringModel {
 	    case "[|Ljava/lang/String;.toUpperCase:(Ljava/util/Locale;)Ljava/lang/String;|]" =>
 	      require(retVars.size == 1)
 	      newFacts ++=getFactFromThisForRet(s, args, retVars(0), currentContext)
+	      /*TODO:*/
 	    case "[|Ljava/lang/String;.trim:()Ljava/lang/String;|]" =>
 	      require(retVars.size == 1)
 	      newFacts ++=getFactFromThisForRet(s, args, retVars(0), currentContext)

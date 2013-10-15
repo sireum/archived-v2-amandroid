@@ -15,6 +15,8 @@ import org.sireum.amandroid.AmandroidResolver
 import org.sireum.amandroid.interProcedural.callGraph.CallGraphBuilder
 import org.sireum.amandroid.test.framework.TestFramework
 import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
+import java.io.FileOutputStream
+import java.io.OutputStreamWriter
 
 	/**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -48,10 +50,33 @@ trait ReachingFactsAnalysisTestFramework extends TestFramework {
     	    Center.resolveRecord(k, Center.ResolveLevel.BODIES)
     	}
     	
-    	val entryPoints = Center.getEntryPoints
+    	val entryPoints = Center.getEntryPoints("dummyMain")
     	entryPoints.foreach{
     	  ep =>
-    	    AndroidReachingFactsAnalysis(ep)
+
+    	    AndroidReachingFactsAnalysis.processedClinit = isetEmpty
+    	    AndroidReachingFactsAnalysis(ep) match{
+    	      case (cg, result) =>
+    	                    val resdir = new File(System.getProperty("user.home") + "/Desktop/RFAmodelResults/")
+    	            	    println("processed-->" + cg.getProcessed.size)
+				    	    println("exit facts: " + result.entrySet(cg.exitNode))
+				    	    val f1 = new File(resdir + "/" + ep.getDeclaringRecord.getShortName + "rfa.txt")
+							    val o1 = new FileOutputStream(f1)
+							    val w1 = new OutputStreamWriter(o1)
+							    cg.nodes.foreach{
+							      node =>
+							        w1.write(node + ":" + result.entrySet(node).toString + "\n")
+							    }
+				    	    
+				    	    val f2 = new File(resdir + "/" + ep.getDeclaringRecord.getShortName + "CG.dot")
+							    val o2 = new FileOutputStream(f2)
+							    val w2 = new OutputStreamWriter(o2)
+							    cg.toDot(w2)
+			  				    
+    	    }
+    	    
+
+
     	}
     	
 //    	val r = Center.resolveRecord("[|android:content:ComponentName|]", Center.ResolveLevel.BODIES)
