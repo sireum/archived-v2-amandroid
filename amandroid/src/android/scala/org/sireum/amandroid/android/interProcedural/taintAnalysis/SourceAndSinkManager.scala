@@ -109,7 +109,7 @@ object SourceAndSinkCenter {
 
 object SSParser{
   private val ssFile = new File(this.getClass().getResource("AmandroidSourcesAndSinks.txt").toURI())
-	private val regex = "(\\[\\|.+\\|\\])\\s+(.+)?\\s+->\\s+(.+)"
+	private val regex = "(\\[\\|.+\\|\\])\\s*(.+)?\\s+->\\s+(.+)"
   def readFile : BufferedReader = new BufferedReader(new FileReader(ssFile))
   def parse : (IMap[String, ISet[String]], IMap[String, ISet[String]]) = {
     var sources : IMap[String, ISet[String]] = imapEmpty

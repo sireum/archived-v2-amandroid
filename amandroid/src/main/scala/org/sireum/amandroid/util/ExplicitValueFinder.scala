@@ -49,7 +49,6 @@ object ExplicitValueFinder {
 	          assignAction.rhs match{
 	            case lExp : LiteralExp =>
 	              if(lExp.typ == LiteralType.INT) return Some(Integer.parseInt(lExp.text))
-	              else if(lExp.typ == LiteralType.DOUBLE) return Some(2130903042)
 	            case a =>
 	          }
 	        case _ =>

@@ -137,7 +137,7 @@ class AmandroidField {
 	
 	def setDeclaringRecord(dr : AmandroidRecord) ={
 	  this.declaringRecord = dr
-	  if(this.signature == null) generateSignature(this.declaringRecord, this.name)
+	  if(this.signature == null) generateSignature(this.declaringRecord, this.name, isStatic)
 	}
 	
 	/**
@@ -186,7 +186,7 @@ class AmandroidField {
 	 * generate signature of this field
 	 */
 	
-	def generateSignature(ar : AmandroidRecord, name : String) : String = StringFormConverter.generateFieldSignature(ar.getName, name)
+	def generateSignature(ar : AmandroidRecord, name : String, isStatic : Boolean) : String = StringFormConverter.generateFieldSignature(ar.getName, name, isStatic)
 	
 	/**
 	 * get signature of this field

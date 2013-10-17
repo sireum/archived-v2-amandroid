@@ -330,7 +330,7 @@ class AndroidTaintAnalysisBuilder{
           val cj = a.asInstanceOf[CallJump]
           val callNode = cg.getCGCallNode(currentContext).asInstanceOf[CGCallNode]
           val cFacts = rfaFacts.exitSet(callNode)
-          val calleeSet = ReachingFactsAnalysisHelper.getCalleeSet(cFacts, cj, currentContext)
+          val calleeSet = callNode.getCalleeSet
           calleeSet.foreach{
             callee =>
               val (srcs, taintset) = getSourceAndHandleSink(s, cFacts, callee, callNode, cj, lhssFacts, currentContext)

@@ -230,9 +230,10 @@ object StringFormConverter {
 	 * generate signature of this field. input: ("[|java:lang:Throwable|]", "stackState") output: "[|java:lang:Throwable.stackState|]"
 	 */
 	
-	def generateFieldSignature(recordName : String, name : String) : String = {
+	def generateFieldSignature(recordName : String, name : String, isStatic : Boolean) : String = {
 	  if(!isValidType(recordName)) throw new RuntimeException("given type is not a valid form: " + recordName)
 	  val sb = new StringBuffer
+	  if(isStatic) sb.append("@@")
 	  sb.append(recordName.substring(0, recordName.length() - 2) + "." + name + "|]")
 	  sb.toString().intern()
 	}

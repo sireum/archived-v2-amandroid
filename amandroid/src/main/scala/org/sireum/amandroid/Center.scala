@@ -537,7 +537,7 @@ object Center {
 	def findField(baseType : Type, fieldSig : String) : Option[AmandroidField] = {
 	  val rName = baseType.name
 	  val fieldName = StringFormConverter.getFieldNameFromFieldSignature(fieldSig)
-	  resolveRecord(rName, ResolveLevel.BODIES)
+	  tryLoadRecord(rName, ResolveLevel.BODIES)
 	  if(!containsRecord(rName)) return None
 	  var r = getRecord(rName)
 	  while(!r.declaresFieldByName(fieldName) && r.hasSuperClass){

@@ -13,7 +13,7 @@ import org.sireum.amandroid.Center
 @RunWith(classOf[JUnitRunner])
 class ReachingFactsAnalysisTest extends ReachingFactsAnalysisTestFramework {
   AmandroidCodeSource.preLoad
-  InterproceduralExamples.ofgModelFiles.
+  InterproceduralExamples.modelFiles.
     filter { s => s.endsWith("bigWfgNP.pilar") }.
     foreach { fileUri =>
       Analyzing title fileUri file fileUri

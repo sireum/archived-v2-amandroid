@@ -14,6 +14,8 @@ import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis._
 import org.sireum.amandroid.android.interProcedural.taintAnalysis.AndroidTaintAnalysis
 import org.sireum.amandroid.android.interProcedural.taintAnalysis.SourceAndSinkCenter
 import org.sireum.amandroid.util.StringFormConverter
+import org.sireum.amandroid.interProcedural.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
+import org.sireum.amandroid.android.interProcedural.taintAnalysis.AndroidDataDependentTaintAnalysis
 
 trait CompleteRFATestFramework extends TestFramework {
 
@@ -71,7 +73,9 @@ trait CompleteRFATestFramework extends TestFramework {
     	    val (cg, rfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts)
     	    println("processed-->" + cg.getProcessed.size)
     	    println("exit facts: " + rfaResult.entrySet(cg.exitNode).size)
-    	    val taResult = AndroidTaintAnalysis(cg, rfaResult)
+//    	    val taResult = AndroidTaintAnalysis(cg, rfaResult)
+    	    val iddg = InterproceduralDataDependenceAnalysis(cg, rfaResult)
+    	    AndroidDataDependentTaintAnalysis(iddg, rfaResult)
     	    val f1 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "rfa.txt")
 			    val o1 = new FileOutputStream(f1)
 			    val w1 = new OutputStreamWriter(o1)
@@ -84,6 +88,11 @@ trait CompleteRFATestFramework extends TestFramework {
 			    val o2 = new FileOutputStream(f2)
 			    val w2 = new OutputStreamWriter(o2)
 			    cg.toDot(w2)
+			    
+			    val f3 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "IDDG.dot")
+			    val o3 = new FileOutputStream(f3)
+			    val w3 = new OutputStreamWriter(o3)
+			    iddg.toDot(w3)
     	}
     	
 //    	val r = Center.resolveRecord("[|java:lang:Class|]", Center.ResolveLevel.BODIES)

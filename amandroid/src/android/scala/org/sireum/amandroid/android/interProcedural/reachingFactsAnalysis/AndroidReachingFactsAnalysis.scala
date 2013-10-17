@@ -26,6 +26,7 @@ import org.sireum.amandroid.NullInstance
 import org.sireum.amandroid.UnknownInstance
 import org.sireum.amandroid.MessageCenter._
 import org.sireum.amandroid.GlobalConfig
+import org.sireum.amandroid.interProcedural.callGraph.CGCallNode
 
 class AndroidReachingFactsAnalysisBuilder{
   def build //
@@ -164,7 +165,7 @@ class AndroidReachingFactsAnalysisBuilder{
 	            } else {
 	              RFAInstance(typ, currentContext.copy)
 	            }
-      	    result ++= rec.getFields.map(f=>RFAFact(FieldSlot(ins, f.getSignature), NullInstance(currentContext)))
+      	    result ++= rec.getNonStaticFields.map(f=>RFAFact(FieldSlot(ins, f.getSignature), NullInstance(currentContext)))
       	  case _ =>
         }
     }
@@ -253,6 +254,7 @@ class AndroidReachingFactsAnalysisBuilder{
      */
     def resolveCall(s : ISet[RFAFact], cj : CallJump, callerContext : Context, cg : CallGraph[CGNode]) : (IMap[CGNode, ISet[RFAFact]], ISet[RFAFact]) = {
       val calleeSet = ReachingFactsAnalysisHelper.getCalleeSet(s, cj, callerContext)
+      cg.getCGCallNode(callerContext).asInstanceOf[CGCallNode].setCalleeSet(calleeSet)
       var calleeFactsMap : IMap[CGNode, ISet[RFAFact]] = imapEmpty
       var returnFacts : ISet[RFAFact] = s
       var pureNormalFlag = true  //no mix of normal and model callee

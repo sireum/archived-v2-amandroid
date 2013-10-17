@@ -40,7 +40,7 @@ trait InterProceduralGraph[Node <: InterProceduralNode]
   
   protected var pl : Map[InterProceduralNode, Node] = Map()
   
-  protected def pool : Map[InterProceduralNode, Node] = pl
+  def pool : Map[InterProceduralNode, Node] = pl
   
   protected val vlabelProvider = new VertexNameProvider[Node]() {
     

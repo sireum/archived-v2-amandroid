@@ -2503,7 +2503,8 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
 	     switch(pDecInsn->opcode){
 
               case 0x14:
-               outConst32(pDecInsn->vA, conv.f); // printf(" v%d:=%f;",pDecInsn->vA, conv.f);
+            	  // we saw original dexdump is using conv.f which gives wrong result for 0x14
+               outConst32(pDecInsn->vA, conv.i); // printf(" v%d:=%f;",pDecInsn->vA, conv.f);
                break;
     
 

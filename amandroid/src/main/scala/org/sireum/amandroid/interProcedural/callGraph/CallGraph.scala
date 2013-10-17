@@ -26,9 +26,9 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
 		val CONCRETE, ABSTRACT, SPECIAL = Value
 	}
   
-  private var entryN : CGNode = null
+  protected var entryN : CGNode = null
 
-  private var exitN : CGNode = null
+  protected var exitN : CGNode = null
   
   def entryNode : Node = this.entryN.asInstanceOf[Node]
   
@@ -83,6 +83,13 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
     result.exitN = this.entryNode
     result
   }
+  
+//  def merge(cg : CallGraph[Node]) = {
+//    this.pl ++= cg.pool
+//    cg.nodes.foreach(n => addNode(n))
+//    cg.edges.foreach(e => addEdge(e))
+//    this.processed ++= cg.getProcessed
+//  }
     
   private def putBranchOnEdge(trans : Int, branch : Int, e : Edge) = {
     e(BRANCH_PROPERTY_KEY) = (trans, branch)
@@ -542,7 +549,10 @@ abstract class CGLocNode(context : Context) extends CGNode(context) {
 }
 
 abstract class CGInvokeNode(context : Context) extends CGLocNode(context) {
+  final val CALLEES = "callee_set"
   def getInvokeLabel : String
+  def setCalleeSet(calleeSet : ISet[AmandroidProcedure]) = this.setProperty(CALLEES, calleeSet)
+  def getCalleeSet : ISet[AmandroidProcedure] = this.getPropertyOrElse(CALLEES, isetEmpty)
 }
 
 final case class CGCallNode(context : Context) extends CGInvokeNode(context){

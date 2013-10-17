@@ -271,6 +271,18 @@ class AmandroidRecord {
 	def getFields = this.fields
 	
 	/**
+	 * get all non-static fields of the record
+	 */
+	
+	def getNonStaticFields = this.fields.filter(f => !f.isStatic)
+	
+	/**
+	 * get all static fields of the record
+	 */
+	
+	def getStaticFields = this.fields.filter(f => f.isStatic)
+	
+	/**
 	 * add one field into the record
 	 */
 	

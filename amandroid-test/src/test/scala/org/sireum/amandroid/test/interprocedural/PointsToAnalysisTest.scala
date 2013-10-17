@@ -20,7 +20,7 @@ import org.sireum.amandroid.test.framework.interprocedural.PointsToAnalysisTestF
 @RunWith(classOf[JUnitRunner])
 class PointsToAnalysisTest extends PointsToAnalysisTestFramework {
   AmandroidCodeSource.preLoad
-  InterproceduralExamples.ofgModelFiles.
+  InterproceduralExamples.modelFiles.
 //    filter { s => s.endsWith("/StringLoopTest.pilar") }.
     foreach { fileUri =>
       Analyzing title fileUri file fileUri

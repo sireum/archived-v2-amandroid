@@ -223,7 +223,7 @@ object AmandroidResolver {
 	
 	private def createClassField(rec : AmandroidRecord) : AmandroidField = {
 	  val field : AmandroidField = new AmandroidField
-    val fSig = StringFormConverter.generateFieldSignature(rec.getName, "class")
+    val fSig = StringFormConverter.generateFieldSignature(rec.getName, "class", false)
     field.init(fSig, NormalType("[|java:lang:Class|]", 0))
     field.setAccessFlags("FINAL_STATIC")
     field

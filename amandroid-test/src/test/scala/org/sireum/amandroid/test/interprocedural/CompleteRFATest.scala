@@ -12,11 +12,11 @@ import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
 @RunWith(classOf[JUnitRunner])
 class CompleteRFATest extends CompleteRFATestFramework {
 	AmandroidCodeSource.preLoad
-  InterproceduralExamples.ofgTestAPKFiles.
-  filter { s => s.endsWith("InfoPassICCTest_Epicc.apk") }.
-  foreach { fileUri =>
-    Analyzing title fileUri file fileUri
-  }
+//  InterproceduralExamples.testAPKFiles.
+//  filter { s => s.endsWith("InfoPassICCTest_Epicc.apk") }.
+//  foreach { fileUri =>
+//    Analyzing title fileUri file fileUri
+//  }
 //  InterproceduralExamples.ofgNormalAPKFiles.
 ////  filter { s => s.endsWith("BiggerWfgNP.apk") }.
 //  foreach { fileUri =>
@@ -27,4 +27,9 @@ class CompleteRFATest extends CompleteRFATestFramework {
 //  foreach { fileUri =>
 //    Analyzing title fileUri file fileUri
 //  }
+  InterproceduralExamples.benchAPKFiles.
+  filter { s => s.endsWith("StaticInitialization1.apk") }.
+  foreach { fileUri =>
+    Analyzing title fileUri file fileUri
+  }
 }

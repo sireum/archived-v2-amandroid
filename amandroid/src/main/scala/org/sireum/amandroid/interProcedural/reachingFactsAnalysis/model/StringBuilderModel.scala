@@ -116,16 +116,16 @@ object StringBuilderModel {
 	}
  
     private def getPointStringToFieldAndThisToRet(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] = {
-    	  val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
-    	  require(args.size >0)
-	      var newfacts = isetEmpty[RFAFact]	 
-          val thisSlot = VarSlot(args(0))
-	      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)	      
- 	      val newStringIns = RFAPointStringInstance(currentContext)
-	      thisValue.foreach{
-		      ins =>
-		        newfacts += (RFAFact(FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), newStringIns))
-            }
+  	  val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  	  require(args.size >0)
+      var newfacts = isetEmpty[RFAFact]	 
+      val thisSlot = VarSlot(args(0))
+      val thisValue = factMap.getOrElse(thisSlot, isetEmpty)	      
+      val newStringIns = RFAPointStringInstance(currentContext)
+      thisValue.foreach{
+	      ins =>
+	        newfacts += (RFAFact(FieldSlot(ins, "[|java:lang:StringBuilder.value|]"), newStringIns))
+      }
 		  val facts = getReturnFactsWithAlias(new NormalType("[|java:lang:StringBuilder|]"), retVar, currentContext, thisValue)
 		  newfacts ++= facts
       newfacts
