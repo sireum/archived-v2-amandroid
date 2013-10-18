@@ -663,38 +663,40 @@ class DummyMainGenerator {
 	 */
 	private def addCallbackProcedures(record : AmandroidRecord, parentClassLocalVar : String, codefg : CodeFragmentGenerator) : Unit = {
 	  if(!this.callbackFunctions.contains(record.getName)) return
-	  var callbackRecords : Map[AmandroidRecord, MSet[AmandroidProcedure]] = Map()
+	  var callbackRecords : Map[AmandroidRecord, ISet[AmandroidProcedure]] = Map()
     this.callbackFunctions(record.getName).map{
 	    case (pSig) => 
 	      val theRecord = Center.resolveRecord(StringFormConverter.getRecordNameFromProcedureSignature(pSig), Center.ResolveLevel.BODIES)
 	      val theProcedure = findProcedure(theRecord, Center.getSubSigFromProcSig(pSig))
 	      theProcedure match {
 	        case Some(proc) =>
-	          if(!callbackRecords.contains(theRecord))
-			      	callbackRecords += (theRecord -> msetEmpty)
-			      callbackRecords(theRecord) += proc
+			      callbackRecords += (theRecord -> (callbackRecords.getOrElse(theRecord, isetEmpty) + proc))
 	        case None =>
 	          err_msg_normal("Could not find callback method " + pSig)
 	      }
 	      
 	  }
+	  var oneCallBackFragment = codefg
 		callbackRecords.foreach{
 		  case(callbackRecord, callbackProcedures) =>
 		    val classLocalVar : String =
 		      if(isCompatible(record, callbackRecord)) parentClassLocalVar
 		      // create a new instance of this class
 		      else{
-			      val va = generateInstanceCreation(callbackRecord.getName, codefg)
+			      val va = generateInstanceCreation(callbackRecord.getName, oneCallBackFragment)
 		        this.localVarsForClasses += (callbackRecord.getName -> va)
-		        generateRecordConstructor(callbackRecord, msetEmpty + record, codefg)
+		        generateRecordConstructor(callbackRecord, msetEmpty + record, oneCallBackFragment)
 		        va
 		      }
 		    if(classLocalVar != null){
 		      // build the calls to all callback procedures in this record
-		      generateCallToAllCallbacks(callbackRecord, callbackProcedures.toSet, classLocalVar, codefg)
+		      generateCallToAllCallbacks(callbackRecord, callbackProcedures, classLocalVar, oneCallBackFragment)
 		    } else {
 		      err_msg_normal("Constructor cannot be generated for callback class " + callbackRecord)
 		    }
+		    oneCallBackFragment = new CodeFragmentGenerator
+		    oneCallBackFragment.addLabel
+		    codeFragments.add(oneCallBackFragment)
 		}
 	}
 	

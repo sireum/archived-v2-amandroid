@@ -53,12 +53,12 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
    * map from procedures to it's callee procedures
    */
   
-  private val callMap : MMap[AmandroidProcedure, MSet[AmandroidProcedure]] = mmapEmpty
+  private var callMap : IMap[AmandroidProcedure, ISet[AmandroidProcedure]] = imapEmpty
   
-  def setCallMap(from : AmandroidProcedure, to : AmandroidProcedure) = this.callMap.getOrElseUpdate(from, msetEmpty).add(to)
+  def setCallMap(from : AmandroidProcedure, to : AmandroidProcedure) = this.callMap += (from -> (this.callMap.getOrElse(from, isetEmpty) + to))
 
   def getReachableProcedure(procs : Set[AmandroidProcedure]) : Set[AmandroidProcedure] = {
-    caculateReachableProcedure(procs, procs) ++ procs
+    caculateReachableProcedure(procs, isetEmpty) ++ procs
   }
   
   private def caculateReachableProcedure(procs : Set[AmandroidProcedure], processed : Set[AmandroidProcedure]) : Set[AmandroidProcedure] = {
@@ -69,7 +69,7 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
 	        if(processed.contains(proc)){
 	          Set[AmandroidProcedure]()
 	        } else {
-		        val callees = callMap.getOrElse(proc, msetEmpty).toSet
+		        val callees = this.callMap.getOrElse(proc, isetEmpty)
 		        callees ++ caculateReachableProcedure(callees, processed ++ callees)
 	        }
 	    }.reduce((s1, s2) => s1 ++ s2)

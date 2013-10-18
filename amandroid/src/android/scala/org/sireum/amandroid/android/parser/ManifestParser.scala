@@ -95,30 +95,37 @@ class ManifestParser extends AbstractAndroidXMLParser{
 							}
 						}
 						else if (tagName.equals("intent-filter")){
-						  this.currentIntentFilter = new IntentFilter(this.currentComponent)
-						  buildIntentDB(this.currentIntentFilter)
+						  if (this.currentComponent != null){
+							  this.currentIntentFilter = new IntentFilter(this.currentComponent)
+							  buildIntentDB(this.currentIntentFilter)
+						  }
 						}
 						else if (tagName.equals("action")){
-						  val value = getAttributeValue(parser, "name")
-						  val intentF = this.currentIntentFilter
-						  intentF.addAction(value)						  
+						  if (this.currentIntentFilter != null){
+							  val value = getAttributeValue(parser, "name")
+							  val intentF = this.currentIntentFilter
+							  intentF.addAction(value)						  
+						  }
 						}
 						else if (tagName.equals("category")){
-						  val value = getAttributeValue(parser, "name")
-						  val intentF = this.currentIntentFilter
-						  intentF.addCategory(value)						  
+						  if (this.currentIntentFilter != null){
+							  val value = getAttributeValue(parser, "name")
+							  val intentF = this.currentIntentFilter
+							  intentF.addCategory(value)						  
+						  }
 						}
 						else if (tagName.equals("data")){
-						  val scheme = getAttributeValue(parser, "scheme")
-						  val host = getAttributeValue(parser, "host")
-						  val port = getAttributeValue(parser, "port")
-						  val path = getAttributeValue(parser, "path")
-						  val pathPrefix = getAttributeValue(parser, "pathPrefix")
-						  val pathPattern = getAttributeValue(parser, "pathPattern")
-						  val mimeType = getAttributeValue(parser, "mimeType")
-						  val intentF = this.currentIntentFilter
-						  intentF.modData(scheme, host, port, path, pathPrefix, pathPattern, mimeType)
-						  
+						  if (this.currentIntentFilter != null){
+							  val scheme = getAttributeValue(parser, "scheme")
+							  val host = getAttributeValue(parser, "host")
+							  val port = getAttributeValue(parser, "port")
+							  val path = getAttributeValue(parser, "path")
+							  val pathPrefix = getAttributeValue(parser, "pathPrefix")
+							  val pathPattern = getAttributeValue(parser, "pathPattern")
+							  val mimeType = getAttributeValue(parser, "mimeType")
+							  val intentF = this.currentIntentFilter
+							  intentF.modData(scheme, host, port, path, pathPrefix, pathPattern, mimeType)
+						  }
 						}
 						else if (tagName.equals("uses-permission")) {
 							var permissionName = getAttributeValue(parser, "name")

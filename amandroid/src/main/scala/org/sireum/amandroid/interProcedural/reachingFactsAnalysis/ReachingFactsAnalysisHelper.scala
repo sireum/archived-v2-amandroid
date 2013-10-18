@@ -127,18 +127,21 @@ object ReachingFactsAnalysisHelper {
 	  } else None
 	}
 	
-	def checkAndGetUnknownObject(s : ISet[RFAFact], args : Seq[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+	def checkAndGetUnknownObject(s : ISet[RFAFact], newFacts : ISet[RFAFact], args : Seq[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
 	  var result : ISet[RFAFact] = isetEmpty
-	  if(s.isEmpty){
+	  if(newFacts.isEmpty){
 	    val argSlots = args.map(arg=>VarSlot(arg))
 	    val argValues = s.filter{f=>argSlots.contains(f.s)}.map(_.v)
-	    argValues.map{
+	    argValues.foreach{
 	      argIns =>
 	        val recName = argIns.getType.name
-	        val rec = Center.resolveRecord(recName, Center.ResolveLevel.BODIES)
-	        rec.getFields.foreach{
-	          field =>
-	            result += RFAFact(FieldSlot(argIns, field.getSignature), UnknownInstance(currentContext))
+	        Center.tryLoadRecord(recName, Center.ResolveLevel.BODIES) match{
+	          case Some(rec) =>
+	            rec.getNonStaticFields.foreach{
+			          field =>
+			            result += RFAFact(FieldSlot(argIns, field.getSignature), UnknownInstance(currentContext))
+			        }
+	          case None =>
 	        }
 	    }
 	    retVars.foreach{
@@ -147,7 +150,11 @@ object ReachingFactsAnalysisHelper {
 	        val value = UnknownInstance(currentContext)
 	        result += RFAFact(slot, value)
 	    }
-	    
+//	    val globSlots = s.filter(f=>if(f.s.isInstanceOf[VarSlot])f.s.asInstanceOf[VarSlot].isGlobal else false).map(f=>f.s)
+//	    globSlots.foreach{
+//	      globSlot =>
+//	        result += RFAFact(globSlot, UnknownInstance(currentContext))
+//	    }
 	  }
 	  result
 	}

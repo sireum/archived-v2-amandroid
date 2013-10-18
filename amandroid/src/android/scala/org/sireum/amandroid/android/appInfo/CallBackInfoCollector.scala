@@ -208,7 +208,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 		// to be part of the operating system
 		if (baseClass.getName.startsWith("[|android:"))
 		  return
-		  
+		
 		// If we are a class, one of our superclasses might implement an Android
 		// interface
 		if (clazz.hasSuperClass)

@@ -32,6 +32,7 @@ object InterproceduralDataDependenceAnalysis {
 		      targetNodes.foreach(tn=>ddg.addEdge(node, tn))
 	      }
 	  }
+	  msg_normal("[IDDG building done!]")
 	  ddg
 	}
 	

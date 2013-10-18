@@ -133,6 +133,7 @@ class AppInfoCollector(apkFileLocation : String) {
 	  val lfp = new LayoutFileParser
 		lfp.setPackageName(this.appPackageName)
 		lfp.parseLayoutFile(apkFileLocation, this.entrypoints)
+		this.layoutControls = lfp.getUserControls
 		msg_detail("layoutcallback--->" + lfp.getCallbackMethods)
 	  msg_detail("layoutuser--->" + lfp.getUserControls)
 		
@@ -146,7 +147,7 @@ class AppInfoCollector(apkFileLocation : String) {
 	    case(k, v) =>
   			this.callbackMethods += (k -> (this.callbackMethods.getOrElse(k, isetEmpty) ++ v))
 		}
-		this.layoutControls = new LayoutFileParser().getUserControls
+	  
 		// Collect the XML-based callback methods
 		analysisHelper.getLayoutClasses.foreach {
 		  case (k, v) =>
@@ -158,10 +159,6 @@ class AppInfoCollector(apkFileLocation : String) {
 		          if(lfp.getCallbackMethods.contains(strRes.value)){
 		            lfp.getCallbackMethods(strRes.value).foreach{
 		              methodName =>
-		                var methods = this.callbackMethods.getOrElse(k, isetEmpty)
-		                if(methods.isEmpty){
-		                  this.callbackMethods += (k -> methods)
-		                }
 		                
 		                //The callback may be declared directly in the class or in one of the superclasses
 		                var callbackRecord = k
@@ -176,10 +173,11 @@ class AppInfoCollector(apkFileLocation : String) {
 		                  }
 		                }
 		                if(callbackProcedure != null){
-		                  methods += callbackProcedure
+		                  this.callbackMethods += (k -> (this.callbackMethods.getOrElse(k, isetEmpty) + callbackProcedure))
 		                } else {
 		                  err_msg_normal("Callback method " + methodName + " not found in class " + k);
 		                }
+		                
 		            }
 		          }
 		        } else {
@@ -187,7 +185,9 @@ class AppInfoCollector(apkFileLocation : String) {
 		        }
 		    }
 		}
-		msg_normal("Found " + this.callbackMethods.size + " callback methods")
+		val callbacks = if(!this.callbackMethods.isEmpty)this.callbackMethods.map(_._2).reduce(iunion[AmandroidProcedure]) else isetEmpty[AmandroidProcedure]
+		msg_normal("Found " + callbacks.size + " callback methods")
+		msg_detail("Which are: " + this.callbackMethods)
     var components = isetEmpty[AmandroidRecord]
     this.entrypoints.foreach{
       f => 
@@ -196,7 +196,7 @@ class AppInfoCollector(apkFileLocation : String) {
         val clCounter = generateDummyMain(record, codeLineCounter)
         codeLineCounter = clCounter
     }
-		SourceAndSinkCenter.init(appPackageName, afp, layoutControls)
+		SourceAndSinkCenter.init(appPackageName, afp, layoutControls, callbacks)
 		AppCenter.setComponents(components)
 		AppCenter.updateIntentFilterDB(this.intentFdb)
 		AppCenter.setAppInfo(this)

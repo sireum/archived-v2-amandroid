@@ -36,13 +36,15 @@ object SourceAndSinkCenter {
    */
 	private var apiPermissions : IMap[String, ISet[String]] = imapEmpty
 	private var layoutControls : Map[Int, LayoutControl] = Map()
+	private var callbackMethods : ISet[AmandroidProcedure] = isetEmpty
 	private var resourceRepo : ARSCFileParser = null
 	private var appPackageName : String = null
 	
-	def init(appPackageName : String, resourceRepo : ARSCFileParser, layoutControls : Map[Int, LayoutControl]) = {
+	def init(appPackageName : String, resourceRepo : ARSCFileParser, layoutControls : Map[Int, LayoutControl], callbackMethods : ISet[AmandroidProcedure]) = {
 	  this.appPackageName = appPackageName
 	  this.resourceRepo = resourceRepo
 	  this.layoutControls = layoutControls
+	  this.callbackMethods = callbackMethods
 	  SSParser.parse match{
 	    case (sources, sinks) => 
 	      sources.foreach{
@@ -72,6 +74,7 @@ object SourceAndSinkCenter {
 	def isSource(calleeProcedure : AmandroidProcedure, callerProcedure : AmandroidProcedure, callerLoc : JumpLocation) : Boolean = {
 	  if(isSourceProcedure(calleeProcedure)) return true
 	  if(isUISource(calleeProcedure, callerProcedure, callerLoc)) return true
+	  if(this.callbackMethods.contains(calleeProcedure)) return true
 	  false
 	}
 	

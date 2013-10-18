@@ -68,7 +68,6 @@ class CallGraphBuilder {
 //      item =>
 //        println("item--->" + item)
 //    }
-    println("processed-->" + processed.size)
 //    val f1 = new File(System.getProperty("user.home") + "/Desktop/CallGraph.dot")
 //    val o1 = new FileOutputStream(f1)
 //    val w1 = new OutputStreamWriter(o1)
@@ -99,7 +98,6 @@ class CallGraphBuilder {
 //      item =>
 //        println("item--->" + item)
 //    }
-    println("processed-->" + processed.size)
 //    val f1 = new File(System.getProperty("user.home") + "/Desktop/CallGraph.dot")
 //    val o1 = new FileOutputStream(f1)
 //    val w1 = new OutputStreamWriter(o1)
