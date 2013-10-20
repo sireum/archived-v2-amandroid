@@ -28,7 +28,7 @@ class CompleteRFATest extends CompleteRFATestFramework {
 //    Analyzing title fileUri file fileUri
 //  }
   InterproceduralExamples.benchAPKFiles.
-  filter { s => s.endsWith("ServiceLifecycle1.apk") }.
+  filter { s => s.endsWith("AnonymousClass1.apk") }.
   foreach { fileUri =>
     Analyzing title fileUri file fileUri
   }

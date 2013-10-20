@@ -89,10 +89,15 @@ object AndroidReachingDefinitionAnalysis {
         case j : CallJump =>
           val strongDefs = defRef.strongDefinitions(j)
           val callDefs = defRef.callDefinitions(j)
+          for (rdf @ (slot, _) <- s) {
+            if (strongDefs.contains(slot)) {
+              result = result - rdf
+            }
+          }
           callDefs.map { 
             cd =>
               for (rdf @ (slot, _) <- s) {
-                if (cd.contains(slot) || strongDefs.contains(slot)) {
+                if (cd.contains(slot)) {
                   result = result - rdf
                 }
               }

@@ -628,18 +628,22 @@ class DummyMainGenerator {
 	}
 	
 	private def generateCallToAllCallbacks(callbackRecord : AmandroidRecord, callbackProcedures : Set[AmandroidProcedure], classLocalVar : String, codefg : CodeFragmentGenerator) = {
+	  var oneCallBackFragment = codefg
 	  callbackProcedures.foreach{
 	    callbackProcedure =>
 	      val pSig = callbackProcedure.getSignature
 	      val thenStmtFragment = new CodeFragmentGenerator
-	      createIfStmt(thenStmtFragment, codefg)
+	      createIfStmt(thenStmtFragment, oneCallBackFragment)
 	      val elseStmtFragment = new CodeFragmentGenerator
-	      createGotoStmt(elseStmtFragment, codefg)
+	      createGotoStmt(elseStmtFragment, oneCallBackFragment)
 	      thenStmtFragment.addLabel
 	      codeFragments.add(thenStmtFragment)
 	      generateProcedureCall(pSig, "virtual", classLocalVar, msetEmpty + callbackRecord, thenStmtFragment)
 	      elseStmtFragment.addLabel
 	      codeFragments.add(elseStmtFragment)
+	      oneCallBackFragment = new CodeFragmentGenerator
+		    oneCallBackFragment.addLabel
+		    codeFragments.add(oneCallBackFragment)
 	  }
 	}
 	

@@ -27,6 +27,7 @@ import org.sireum.amandroid.UnknownInstance
 import org.sireum.amandroid.MessageCenter._
 import org.sireum.amandroid.GlobalConfig
 import org.sireum.amandroid.interProcedural.callGraph.CGCallNode
+import org.sireum.amandroid.interProcedural.callGraph.CGReturnNode
 
 class AndroidReachingFactsAnalysisBuilder{
   def build //
@@ -255,6 +256,7 @@ class AndroidReachingFactsAnalysisBuilder{
     def resolveCall(s : ISet[RFAFact], cj : CallJump, callerContext : Context, cg : CallGraph[CGNode]) : (IMap[CGNode, ISet[RFAFact]], ISet[RFAFact]) = {
       val calleeSet = ReachingFactsAnalysisHelper.getCalleeSet(s, cj, callerContext)
       cg.getCGCallNode(callerContext).asInstanceOf[CGCallNode].setCalleeSet(calleeSet)
+      cg.getCGReturnNode(callerContext).asInstanceOf[CGReturnNode].setCalleeSet(calleeSet)
       var calleeFactsMap : IMap[CGNode, ISet[RFAFact]] = imapEmpty
       var returnFacts : ISet[RFAFact] = s
       var pureNormalFlag = true  //no mix of normal and model callee
@@ -273,7 +275,7 @@ class AndroidReachingFactsAnalysisBuilder{
 			          }.toList
               case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
             }
-            if(isICCCall(callee)){
+            if(isICCCall(callee)) {
               val factsForCallee = getFactsForICCTarget(s, cj, callee)
               returnFacts --= factsForCallee
               val (retFacts, targets) = doICCCall(factsForCallee, callee, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)
@@ -307,6 +309,10 @@ class AndroidReachingFactsAnalysisBuilder{
         val cn = cg.getCGCallNode(callerContext)
         val rn = cg.getCGReturnNode(callerContext)
         cg.deleteEdge(cn, rn)
+      } else {
+        val cn = cg.getCGCallNode(callerContext)
+        val rn = cg.getCGReturnNode(callerContext)
+        if(!cg.hasEdge(cn, rn)) cg.addEdge(cn, rn)
       }
 	    (calleeFactsMap, returnFacts)
     }

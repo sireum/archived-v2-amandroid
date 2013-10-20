@@ -12,6 +12,8 @@ import org.sireum.amandroid.interProcedural.callGraph.CGCallNode
 import org.sireum.pilar.ast._
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAFact
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
+import org.sireum.amandroid.interProcedural.callGraph.CGInvokeNode
+import org.sireum.amandroid.interProcedural.callGraph.CGReturnNode
 
 object AndroidDataDependentTaintAnalysis {
   type Node = InterproceduralDataDependenceAnalysis.Node
@@ -28,9 +30,9 @@ object AndroidDataDependentTaintAnalysis {
     iddg.nodes.foreach{
       node =>
         node match{
-          case callNode : CGCallNode =>
-            val rfaFacts = rfaResult.entrySet(callNode)
-            val (src, sin) = getSourceAndSinkNode(callNode, rfaFacts)
+          case invNode : CGInvokeNode =>
+            val rfaFacts = rfaResult.entrySet(invNode)
+            val (src, sin) = getSourceAndSinkNode(invNode, rfaFacts)
             sourceNodes ++= src
             sinkNodes ++= sin
           case _ =>
@@ -57,15 +59,15 @@ object AndroidDataDependentTaintAnalysis {
     }
   }
   
-  def getSourceAndSinkNode(callNode : CGCallNode, rfaFacts : ISet[RFAFact]) = {
-    val calleeSet = callNode.getCalleeSet
+  def getSourceAndSinkNode(invNode : CGInvokeNode, rfaFacts : ISet[RFAFact]) = {
+    val calleeSet = invNode.getCalleeSet
     var sources = isetEmpty[Node]
     var sinks = isetEmpty[Node]
     calleeSet.foreach{
       callee =>
         var soundCallee = callee
-		    val caller = callNode.getOwner
-		    val jumpLoc = caller.getProcedureBody.location(callNode.getLocIndex).asInstanceOf[JumpLocation]
+		    val caller = invNode.getOwner
+		    val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
 		    val cj = jumpLoc.jump.asInstanceOf[CallJump]
 		    if(callee.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
 		      val calleeSignature = cj.getValueAnnotation("signature") match {
@@ -78,17 +80,17 @@ object AndroidDataDependentTaintAnalysis {
 		      // source and sink APIs can only come from given app's parents.
 		      soundCallee = Center.getProcedureDeclaration(calleeSignature)
 		    }
-		    if(SourceAndSinkCenter.isSource(soundCallee, caller, jumpLoc)){
-		      msg_normal("find source: " + soundCallee + "@" + callNode.getContext)
-		      val s = callNode.getPropertyOrElse[ISet[String]](SOURCE, isetEmpty[String])
-		      callNode.setProperty(SOURCE, s + soundCallee.getSignature)
-		      sources += callNode
+		    if(invNode.isInstanceOf[CGReturnNode] && SourceAndSinkCenter.isSource(soundCallee, caller, jumpLoc)){
+		      msg_normal("find source: " + soundCallee + "@" + invNode.getContext)
+		      val s = invNode.getPropertyOrElse[ISet[String]](SOURCE, isetEmpty[String])
+		      invNode.setProperty(SOURCE, s + soundCallee.getSignature)
+		      sources += invNode
 		    }
-		    if(SourceAndSinkCenter.isSinkProcedure(soundCallee)){
-		      msg_normal("find sink: " + soundCallee + "@" + callNode.getContext)
-		      val r = callNode.getPropertyOrElse[ISet[String]](SINK, isetEmpty[String])
-		      callNode.setProperty(SINK, r + soundCallee.getSignature)
-		      sinks += callNode
+		    if(invNode.isInstanceOf[CGCallNode] && SourceAndSinkCenter.isSinkProcedure(soundCallee)){
+		      msg_normal("find sink: " + soundCallee + "@" + invNode.getContext)
+		      val r = invNode.getPropertyOrElse[ISet[String]](SINK, isetEmpty[String])
+		      invNode.setProperty(SINK, r + soundCallee.getSignature)
+		      sinks += invNode
 		    }
     }
     (sources, sinks)
