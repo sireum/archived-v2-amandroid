@@ -81,7 +81,7 @@ trait CompleteRFATestFramework extends TestFramework {
 			    val w1 = new OutputStreamWriter(o1)
 			    cg.nodes.foreach{
 			      node =>
-			        w1.write(node + ":" + rfaResult.entrySet(node).toString + "\n")
+			        w1.write(node + ":" + rfaResult.entrySet(node).toString + "\n\n\n")
 			    }
     	    
     	    val f2 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "CG.dot")

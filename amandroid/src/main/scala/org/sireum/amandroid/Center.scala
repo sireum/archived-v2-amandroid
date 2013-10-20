@@ -555,6 +555,33 @@ object Center {
 	}
 	
 	/**
+	 * find field from Center. Input: @@[|java:lang:Throwable.stackState|]
+	 */
+	def findStaticField(fieldSig : String) : Option[AmandroidField] = {
+	  val baseType = StringFormConverter.getRecordTypeFromFieldSignature(fieldSig)
+	  val rName = baseType.name
+	  val fieldName = StringFormConverter.getFieldNameFromFieldSignature(fieldSig)
+	  tryLoadRecord(rName, ResolveLevel.BODIES)
+	  if(!containsRecord(rName)) return None
+	  var r = getRecord(rName)
+	  while(!r.declaresFieldByName(fieldName) && r.hasSuperClass){
+	    r = r.getSuperClass
+	  }
+	  if(!r.declaresFieldByName(fieldName)) return None
+	  val f = r.getFieldByName(fieldName)
+	  if(f.isStatic)
+	  	Some(f)
+	  else throw new RuntimeException("Given field " + f + " is not a static field")
+	}
+	
+	/**
+	 * find field from Center. Input: @@[|java:lang:Throwable.stackState|]
+	 */
+	def findStaticFieldWithoutFailing(fieldSig : String) : AmandroidField = {
+	  findStaticField(fieldSig).getOrElse(throw new RuntimeException("Given static field signature " + fieldSig + " is not in the Center."))
+	}
+	
+	/**
 	 * get procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
 	 */
 	
@@ -597,8 +624,8 @@ object Center {
 	 * check and get super callee procedure from Center. Input: .equals:(Ljava/lang/Object;)Z
 	 */
 	
-	def getSuperCalleeProcedureWithoutFailing(fromType : Type, pSubSig : String) : AmandroidProcedure = {
-	  getSuperCalleeProcedure(fromType, pSubSig).getOrElse(throw new RuntimeException("Fail to resolve super call: from:" + fromType + ". subsig:" + pSubSig))
+	def getSuperCalleeProcedureWithoutFailing(pSig : String) : AmandroidProcedure = {
+	  getSuperCalleeProcedure(pSig).getOrElse(throw new RuntimeException("Fail to resolve super call sig:" + pSig))
 	}
 	
 	/**
@@ -613,14 +640,11 @@ object Center {
 	 * check and get super callee procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
 	 */
 	
-	def getSuperCalleeProcedure(fromType : Type, pSubSig : String) : Option[AmandroidProcedure] = {
-	  val sup =
-	    if(fromType.isArray) resolveRecord(DEFAULT_TOPLEVEL_OBJECT, ResolveLevel.BODIES)
-	    else {
-	      val from = resolveRecord(fromType.typ, ResolveLevel.BODIES)
-	      from.getSuperClass
-	    }
-	  getRecordHierarchy.resolveConcreteDispatch(sup, pSubSig)
+	def getSuperCalleeProcedure(pSig : String) : Option[AmandroidProcedure] = {
+	  val fromType = StringFormConverter.getRecordTypeFromProcedureSignature(pSig)
+	  val pSubSig = StringFormConverter.getSubSigFromProcSig(pSig)
+	  val from = resolveRecord(fromType.name, ResolveLevel.BODIES)
+	  getRecordHierarchy.resolveConcreteDispatch(from, pSubSig)
 	}
 	
 	/**

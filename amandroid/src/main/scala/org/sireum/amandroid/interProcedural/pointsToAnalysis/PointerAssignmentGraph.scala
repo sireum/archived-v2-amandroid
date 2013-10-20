@@ -483,10 +483,9 @@ class PointerAssignmentGraph[Node <: PtaNode]
   def getSuperCalleeSet(diff : MSet[PTAInstance],
 	                 pi : PointI) : MSet[AmandroidProcedure] = {
     val calleeSet : MSet[AmandroidProcedure] = msetEmpty
-    val subSig = Center.getSubSigFromProcSig(pi.varName)
     diff.foreach{
       d =>
-        val p = Center.getSuperCalleeProcedureWithoutFailing(d.typ, subSig)
+        val p = Center.getSuperCalleeProcedureWithoutFailing(pi.varName)
         calleeSet += p
     }
     calleeSet

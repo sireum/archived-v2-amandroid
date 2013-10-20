@@ -10,6 +10,8 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsA
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis._
 import org.sireum.amandroid.Center
 import org.sireum.amandroid.MessageCenter._
+import org.sireum.amandroid.NullInstance
+import org.sireum.amandroid.UnknownInstance
 
 object InterproceduralDataDependenceAnalysis {
   
@@ -143,14 +145,15 @@ object InterproceduralDataDependenceAnalysis {
         baseValue.foreach{
           ins =>
             result += ddg.findDefSite(ins.getDefSite)
-            Center.findField(ins.getType, fieldSig) match{
-              case Some(af) =>
-                val fieldSlot = FieldSlot(ins, af.getSignature)
-                val fieldValue = rfaFacts.filter(f => f.s == fieldSlot).map(f => f.v)
-                fieldValue.foreach(fIns => result += ddg.findDefSite(fIns.getDefSite))
-              case None =>
-                err_msg_detail("Given field may be in other library: " + fieldSig)
-            }
+            if(!ins.isInstanceOf[NullInstance] && !ins.isInstanceOf[UnknownInstance])
+	            Center.findField(ins.getType, fieldSig) match{
+	              case Some(af) =>
+	                val fieldSlot = FieldSlot(ins, af.getSignature)
+	                val fieldValue = rfaFacts.filter(f => f.s == fieldSlot).map(f => f.v)
+	                fieldValue.foreach(fIns => result += ddg.findDefSite(fIns.getDefSite))
+	              case None =>
+	                err_msg_detail("Given field may be in other library: " + fieldSig)
+	            }
         }
       case ie : IndexingExp =>
         val baseSlot = ie.exp match {
@@ -210,7 +213,7 @@ object InterproceduralDataDependenceAnalysis {
 	    case be : BinaryExp =>
 	      result ++= processExp(be.left, rfaFacts, ddg)
 	      result ++= processExp(be.right, rfaFacts, ddg)
-	    case _ => throw new RuntimeException("unexpected cond type:" + cond)
+	    case _ =>
 	  }
 	  result
 	}

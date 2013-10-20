@@ -45,14 +45,15 @@ class AmandroidField {
    */
 	
 	def init(name : String, typ : Type, accessFlags : Int) : AmandroidField = {
+	  this.accessFlags = accessFlags
 	  if(isSignature(name)){
-	    this.signature = name
+	    if(isStatic) this.signature = "@@" + name
+	    else this.signature = name
 	    this.name = StringFormConverter.getFieldNameFromFieldSignature(name)
 	  } else {
 	  	this.name = name
 	  }
 	  this.typ = typ
-	  this.accessFlags = accessFlags
 	  this
 	}
 	
@@ -137,7 +138,7 @@ class AmandroidField {
 	
 	def setDeclaringRecord(dr : AmandroidRecord) ={
 	  this.declaringRecord = dr
-	  if(this.signature == null) generateSignature(this.declaringRecord, this.name, isStatic)
+	  if(this.signature == null) this.signature = generateSignature(this.declaringRecord, this.name, isStatic)
 	}
 	
 	/**
@@ -192,7 +193,10 @@ class AmandroidField {
 	 * get signature of this field
 	 */
 	
-	def getSignature = this.signature
+	def getSignature = {
+	  if(this.signature == null) this.signature = generateSignature(this.declaringRecord, this.name, isStatic)
+	  this.signature
+	}
 	
 	/**
 	 * this field is declared or not

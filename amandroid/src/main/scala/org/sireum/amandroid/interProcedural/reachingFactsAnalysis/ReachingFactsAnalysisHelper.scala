@@ -99,7 +99,7 @@ object ReachingFactsAnalysisHelper {
 				          calleeSet += Center.getProcedureWithoutFailing(Center.UNKNOWN_PROCEDURE_SIG)
 				        } else {
 					        val p = 
-					          if(typ == "super") Center.getSuperCalleeProcedureWithoutFailing(ins.typ, subSig)
+					          if(typ == "super") Center.getSuperCalleeProcedureWithoutFailing(sig)
 					          else if(typ == "direct") Center.getDirectCalleeProcedureWithoutFailing(sig)
 					        	else Center.getVirtualCalleeProcedureWithoutFailing(ins.typ, subSig)
 					        calleeSet += p
@@ -168,7 +168,17 @@ object ReachingFactsAnalysisHelper {
         i += 1
         key match{
           case ne : NameExp =>
-            result(i) = (VarSlot(ne.name.name), true)
+            val vs = VarSlot(ne.name.name)
+            if(vs.isGlobal){
+              Center.findStaticField(ne.name.name) match{
+                case Some(af) =>
+                  result(i) = (VarSlot(af.getSignature), true)
+                case None =>
+                  err_msg_detail("Given field may be in other library: " + ne.name.name)
+              }
+            } else {
+            	result(i) = (vs, true)
+            }
           case ae : AccessExp =>
             val fieldSig = ae.attributeName.name
             val baseSlot = ae.exp match {
@@ -255,6 +265,13 @@ object ReachingFactsAnalysisHelper {
               val baseName = StringFormConverter.getRecordNameFromFieldSignature(slot.varName)
               val rec = Center.resolveRecord(baseName, Center.ResolveLevel.BODIES)
               value += rec.getClassObj
+            } else if(slot.isGlobal){
+              Center.findStaticField(ne.name.name) match{
+                case Some(af) =>
+                  value ++= factMap.getOrElse(VarSlot(af.getSignature), Set(NullInstance(currentContext)))
+                case None =>
+                  err_msg_detail("Given field may be in other library: " + ne.name.name)
+              }
             } else value ++= factMap.getOrElse(slot, Set(NullInstance(currentContext)))
             result(i) = value
           case le : LiteralExp =>

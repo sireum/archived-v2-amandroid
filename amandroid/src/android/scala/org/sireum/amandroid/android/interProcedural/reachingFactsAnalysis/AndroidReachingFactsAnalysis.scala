@@ -360,7 +360,7 @@ class AndroidReachingFactsAnalysisBuilder{
                   	    if(r.isInstanceOf[UnknownInstance]) true
                   	    else false
                   	  } else{
-                  	  	!r.isInstanceOf[NullInstance] && !r.isInstanceOf[UnknownInstance] && shouldPass(r, callee)
+                  	  	!r.isInstanceOf[NullInstance] && !r.isInstanceOf[UnknownInstance] && shouldPass(r, callee, typ)
                   	  }
                   }
               } 
@@ -376,18 +376,26 @@ class AndroidReachingFactsAnalysisBuilder{
     /**
      * return true if the given recv Instance should pass to the given callee
      */
-    private def shouldPass(recvIns : Instance, calleeProc : AmandroidProcedure) : Boolean = {
+    private def shouldPass(recvIns : Instance, calleeProc : AmandroidProcedure, typ : String) : Boolean = {
       val recRecv = Center.resolveRecord(recvIns.getType.name, Center.ResolveLevel.BODIES)
       val recCallee = calleeProc.getDeclaringRecord
       var tmpRec = recRecv
-      while(tmpRec.hasSuperClass){
+      if(typ == "direct" || typ == "super" ){
+        while(tmpRec.hasSuperClass){
+		      if(tmpRec == recCallee) return true
+		      else tmpRec = tmpRec.getSuperClass
+	      }
+        if(tmpRec == recCallee) return true
+        throw new RuntimeException("Given recvIns: " + recvIns + " and calleeProc: " + calleeProc + " is not in the Same hierachy.")
+      } else {
+	      while(tmpRec.hasSuperClass){
+		      if(tmpRec == recCallee) return true
+		      else if(tmpRec.declaresProcedure(calleeProc.getSubSignature)) return false
+		      else tmpRec = tmpRec.getSuperClass
+	      }
 	      if(tmpRec == recCallee) return true
-	      else if(tmpRec.declaresProcedure(calleeProc.getSubSignature)) return false
-	      else tmpRec = tmpRec.getSuperClass
+		    else throw new RuntimeException("Given recvIns: " + recvIns + " and calleeProc: " + calleeProc + " is not in the Same hierachy.")
       }
-      if(tmpRec == recCallee) return true
-	    else if(tmpRec.declaresProcedure(calleeProc.getSubSignature)) return false
-	    else throw new RuntimeException("Given recvIns: " + recvIns + " and calleeProc: " + calleeProc + " is not in the Same hierachy.")
     }
     
     def mapFactsToCallee(factsToCallee : ISet[RFAFact], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[RFAFact] = {
