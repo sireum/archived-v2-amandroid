@@ -44,8 +44,6 @@ object InterproceduralDataDependenceAnalysis {
 	            val ownerProc = en.getOwner
 	            val cfg = ownerProc.getCfg
 				      val rda = ownerProc.getRda
-				      println(ownerProc)
-				      println(rda)
 				      val rdaFacts = rda.entrySet(cfg.exitNode)
 	            ownerProc.getParamNames.foreach{
 	          	  name =>
