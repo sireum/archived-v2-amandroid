@@ -3,6 +3,8 @@ package org.sireum.amandroid
 import org.sireum.amandroid.util._
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.alir.ReachingDefinitionAnalysis
+import org.sireum.amandroid.MessageCenter._
+import org.sireum.util._
 
 /**
  * This class is an amandroid representation of a pilar procedure. It can belong to AmandroidRecord.
@@ -76,6 +78,30 @@ class AmandroidProcedure {
    */
   
   protected var exceptions : Set[AmandroidRecord] = Set()
+  
+  /**
+   * Data structure to store all information about a catch clause
+   * LocUri should always looks like "L?[0-9a-f]+"
+   */
+  
+  case class ExceptionHandler(exception : AmandroidRecord, fromTarget : String, toTarget : String, jumpTo : String){
+	  def handleException(exc : AmandroidRecord, locUri : String) : Boolean = {
+	    (exception == exc || exception.isChildOf(exc)) && withInScope(locUri)
+	  }
+	  def withInScope(locUri : String) : Boolean = {
+	    getLocation(fromTarget) <= getLocation(locUri) && getLocation(locUri) <= getLocation(toTarget)
+	  }
+	  def getLocation(locUri : String) : Int = {
+	    val loc = locUri.substring(locUri.lastIndexOf("L") + 1)
+    	Integer.getInteger(loc, 16)
+	  }
+	}
+  
+  /**
+   * exception handlers
+   */
+  
+  protected var exceptionHandlers : IList[ExceptionHandler] = ilistEmpty
   
   /**
    * represents if the procedure is a special one with empty body.
@@ -423,6 +449,20 @@ class AmandroidProcedure {
   }
   
   /**
+   * set exception with details
+   */
+  
+  def addExceptionHandler(excName : String, fromTarget : String, toTarget : String, jumpTo : String) = {
+    val recName = if(excName == "[|any|]") Center.DEFAULT_TOPLEVEL_OBJECT else excName
+    val exc = Center.resolveRecord(recName, Center.ResolveLevel.BODIES)
+    val handler = ExceptionHandler(exc, fromTarget, toTarget, jumpTo)
+    if(DEBUG) println("Adding Exception Handler: " + handler)
+    if(this.exceptionHandlers.contains(handler)) throw new RuntimeException("already have exception handler: " + handler)
+    addExceptionIfAbsent(exc)
+    this.exceptionHandlers ::= handler
+  }
+  
+  /**
    * removes exception from this procedure
    */
   
@@ -430,6 +470,7 @@ class AmandroidProcedure {
     if(DEBUG) println("Removing Exception: " + exc)
     if(!throwsException(exc)) throw new RuntimeException("does not throw exception: " + exc)
     this.exceptions -= exc
+    this.exceptionHandlers = this.exceptionHandlers.filter(_.exception != exc)
   }
   
   /**
@@ -437,6 +478,19 @@ class AmandroidProcedure {
    */
   
   def throwsException(exc : AmandroidRecord) = this.exceptions.contains(exc)
+  
+  /**
+   * get thrown exception target location
+   */
+  
+  def getThrownExcetpionTarget(exc : AmandroidRecord, locUri : String) : Option[String] = {
+    this.exceptionHandlers.foreach{
+      han =>
+        if(han.handleException(exc, locUri)) return Some(han.jumpTo)
+    }
+    err_msg_detail("Given exception " + exc + " throw from " + locUri + ", cannot find a handler to handle it.")
+    None
+  }
   
   /**
    * set exceptions for this procedure

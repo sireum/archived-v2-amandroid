@@ -124,7 +124,7 @@ class DummyMainGenerator {
     }
     procDeclTemplate.add("params", paramArray)
     val code = generateInternal(List())
-    msg_normal("dummyMain code:\n" + code)
+    msg_critical("dummyMain code:\n" + code)
     AmandroidResolver.resolveProcedureCode(signature, code)
   }
   

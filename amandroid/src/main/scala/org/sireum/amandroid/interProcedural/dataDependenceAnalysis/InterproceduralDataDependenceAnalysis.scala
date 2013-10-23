@@ -38,21 +38,20 @@ object InterproceduralDataDependenceAnalysis {
 	            val cgTarN = cg.predecessors(cgN)
 	            targetNodes ++= cgTarN.map(iddg.getNode(_))
 	          case en : CGExitNode =>
-	          	val cgN = cg.getCGExitNode(en.getContext)
-	            val cgTarN = cg.predecessors(cgN)
-	            targetNodes ++= cgTarN.map(iddg.getNode(_))
-	            val ownerProc = en.getOwner
-	            val cfg = ownerProc.getCfg
-				      val rda = ownerProc.getRda
-				      val rdaFacts = rda.entrySet(cfg.exitNode)
-	            ownerProc.getParamNames.foreach{
-	          	  name =>
-	          	    targetNodes ++= searchRda(ownerProc, name, rdaFacts, iddg, en.getContext)
-	          	}
+//	          	val cgN = cg.getCGExitNode(en.getContext)
+//	            val cgTarN = cg.predecessors(cgN)
+//	            targetNodes ++= cgTarN.map(iddg.getNode(_))
+//	            val ownerProc = en.getOwner
+//	            val cfg = ownerProc.getCfg
+//				      val rda = ownerProc.getRda
+//				      val rdaFacts = rda.entrySet(cfg.exitNode)
+//	            ownerProc.getParamNames.foreach{
+//	          	  name =>
+//	          	    targetNodes ++= searchRda(ownerProc, name, rdaFacts, iddg, en.getContext)
+//	          	}
 	          case rn : CGReturnNode =>
-	            val cgN = cg.getCGReturnNode(rn.getContext)
-	            val cgTarN = cg.predecessors(cgN)
-	            targetNodes ++= cgTarN.map(iddg.getNode(_))
+	            val tarN = cg.getCGCallNode(rn.getContext)
+	            targetNodes += iddg.getNode(tarN)
 	          case ln : CGLocNode =>
 	            val ownerProc = ln.getOwner
 				      val loc = ownerProc.getProcedureBody.location(ln.getLocIndex)

@@ -74,7 +74,7 @@ class AppInfoCollector(apkFileLocation : String) {
 	def generateDummyMain(record : AmandroidRecord, codeCtr: Int) : Int = {
 	  if(record == null) return 0
 		//generate dummy main method
-  	msg_normal("Generate DummyMain for " + record)
+  	msg_critical("Generate environment for " + record)
 	  val dmGen = new DummyMainGenerator
 	  dmGen.setSubstituteRecordMap(AndroidSubstituteRecordMap.getSubstituteRecordMap)
 	  dmGen.setCurrentComponent(record.getName)
@@ -94,7 +94,7 @@ class AppInfoCollector(apkFileLocation : String) {
 	}
 	
 	def dynamicRegisterComponent(comRec : AmandroidRecord) = {
-	  msg_normal("*************Dynamic Register Component**************")
+	  msg_critical("*************Dynamic Register Component**************")
 	  msg_normal("Component name: " + comRec)
 	  val analysisHelper = new CallBackInfoCollector(Set(comRec.getName)) 
 		analysisHelper.collectCallbackMethods()

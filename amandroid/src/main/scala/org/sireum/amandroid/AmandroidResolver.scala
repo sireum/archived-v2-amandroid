@@ -306,6 +306,17 @@ object AmandroidResolver {
 	      proc.setParameterNames(paramNames)
 	      val ownerRecord = Center.getRecord(ownerName)
 	      proc.setProcedureBody(stp.procedureSymbolTableProducer(uri).asInstanceOf[ProcedureBody])
+	      if(pd.body.isInstanceOf[ImplementedBody]){
+	        val body = pd.body.asInstanceOf[ImplementedBody]
+	        val catchclauses = body.catchClauses
+	        catchclauses.foreach{
+	          catchclause =>
+	            require(catchclause.typeSpec.isDefined)
+	            require(catchclause.typeSpec.get.isInstanceOf[NamedTypeSpec])
+	            val excName = catchclause.typeSpec.get.asInstanceOf[NamedTypeSpec].name.name
+		          proc.addExceptionHandler(excName, catchclause.fromTarget.name, catchclause.toTarget.name, catchclause.jump.target.name)
+	        }
+	      }
 	      (proc, ownerRecord)
 	  }
 	  if(ownerRelation.isParallel) throw new RuntimeException("Doing " + TITLE + ": ownerRelation is parallel, but we are trying to add things to AmandroidRecord.")

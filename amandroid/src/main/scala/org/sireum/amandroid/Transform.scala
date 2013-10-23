@@ -9,7 +9,6 @@ import org.sireum.pilar.parser.ChunkingPilarParser
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis._
 import org.sireum.amandroid.symbolResolver.AmandroidSymbolTableBuilder
-import org.sireum.amandroid.symbolResolver.AmandroidSymbolTableBuilder
 
 
 object Transform {
@@ -37,10 +36,55 @@ object Transform {
   //for building cfg
   type VirtualLabel = String
   
-  //for building rda
+  def getExceptionName(cc : CatchClause) : String = {
+    require(cc.typeSpec.isDefined)
+    require(cc.typeSpec.get.isInstanceOf[NamedTypeSpec])
+    cc.typeSpec.get.asInstanceOf[NamedTypeSpec].name.name
+  }
+  
+  //for building cfg and rda
   val siff : ControlFlowGraph.ShouldIncludeFlowFunction =
-    // ControlFlowGraph.defaultSiff,
-    { (_, _) => (Array.empty[CatchClause], false) }   
+    { (loc, catchclauses) => 
+      	loc match{
+      	  case l : ComplexLocation =>
+      	    (Array.empty[CatchClause], false)
+          case l : ActionLocation =>
+            l.action match {
+		          case a : AssignAction => 
+		            a.op match{
+		              case "%" | "/" =>
+		                val results = catchclauses.filter(getExceptionName(_) == "[|java:lang:ArithmeticException|]")
+		                if(results.isEmpty) (results, true)
+		                else (results, false)
+		              case _ =>
+		                (Array.empty[CatchClause], false)
+		            }
+		          case a : AssertAction => 
+		            (Array.empty[CatchClause], false)
+		          case a : AssumeAction => 
+		            (Array.empty[CatchClause], false)
+		          case a : ThrowAction  => 
+		            val results = catchclauses.filter(getExceptionName(_) == "[|any|]")
+            	  if(results.isEmpty) (catchclauses, true)
+            	  else (catchclauses, false)
+		          case a : StartAction =>
+		            (Array.empty[CatchClause], false)
+		          case a : ExtCallAction =>
+		            (Array.empty[CatchClause], false)
+		        }
+          case l : JumpLocation =>
+            l.jump match{
+            	case j : CallJump =>
+            	  val results = catchclauses.filter(getExceptionName(_) == "[|any|]")
+            	  if(results.isEmpty) (catchclauses, true)
+            	  else (catchclauses, false)
+            	case _ =>
+            	  (Array.empty[CatchClause], false)
+            }
+          case l : EmptyLocation =>
+            (Array.empty[CatchClause], false)
+       }
+    }   
   val dr : SymbolTable => DefRef = { st => new AndroidDefRef(st, new AndroidVarAccesses(st)) }
   val iopp : ProcedureSymbolTable => (ResourceUri => Boolean, ResourceUri => Boolean) = { pst =>
     val params = pst.params.toSet[ResourceUri]

@@ -147,7 +147,7 @@ object FrameworkMethodsModel {
 			        err_msg_normal("Given service does not exist: " + cstr)
 			      }
 			    case pstr @ RFAPointStringInstance(c) => err_msg_normal("Get system service use point string: " + pstr)
-			    case _ => throw new RuntimeException("unexpected instance type: " + str)
+			    case _ => err_msg_normal("Get system service use unexpected instance type: " + str)
 	      }
 	  }
 	  result

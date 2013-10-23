@@ -700,6 +700,14 @@ class AmandroidRecord {
   def isStatic : Boolean = AccessFlag.isStatic(this.accessFlags)
   
   /**
+   * return true if it's a child of given record
+   */
+  
+  def isChildOf(rec : AmandroidRecord) : Boolean = {
+	  Center.getRecordHierarchy.getAllSuperClassesOf(this).contains(rec)
+	}
+  
+  /**
    * is this record an application record
    */
   

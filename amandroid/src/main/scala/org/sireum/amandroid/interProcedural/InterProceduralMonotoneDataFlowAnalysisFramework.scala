@@ -470,15 +470,24 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
              if(esl.isDefined) eslb.action(l.action, s)
              val r = actionF(s, l.action, currentContext)
              if(esl.isDefined) eslb.exitSet(None, r)
-             if(l.index < pst.locations.size - 1){
-               val sn =next(l, pst, pSig, callerContext)
-               latticeMap += (sn -> r)
-             } else {
-               val newContext = callerContext.copy
-               newContext.setContext(pSig, pSig)
-               val sn = cg.getCGExitNode(newContext)
-               latticeMap += (sn -> r)
+             l.action match{
+              case ta : ThrowAction =>
+                val node = cg.getCGNormalNode(currentContext)
+                val succs = cg.successors(node)
+                succs.map(succ=>latticeMap += (succ -> r))
+              case _ =>
+                val sn =next(l, pst, pSig, callerContext)
+                latticeMap += (sn -> r)
              }
+//             if(l.index < pst.locations.size - 1){
+//               val sn =next(l, pst, pSig, callerContext)
+//               latticeMap += (sn -> r)
+//             } else {
+//               val newContext = callerContext.copy
+//               newContext.setContext(pSig, pSig)
+//               val sn = cg.getCGExitNode(newContext)
+//               latticeMap += (sn -> r)
+//             }
           case l : JumpLocation =>
             jumpF(s, l.jump)
           case l : EmptyLocation =>
