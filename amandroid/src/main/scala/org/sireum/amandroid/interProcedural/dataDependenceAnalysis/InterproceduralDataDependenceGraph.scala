@@ -16,7 +16,7 @@ class InterProceduralDataDependenceGraph[Node <: CGNode] extends CallGraph[Node]
 	
 	def findDefSite(defSite : Context) : Node = {
 	  if(cgNormalNodeExists(defSite)) getCGNormalNode(defSite)
-	  else if(cgCallNodeExists(defSite)) getCGCallNode(defSite)
+	  else if(cgReturnNodeExists(defSite)) getCGReturnNode(defSite)
 	  else this.entryNode
 	}
 	

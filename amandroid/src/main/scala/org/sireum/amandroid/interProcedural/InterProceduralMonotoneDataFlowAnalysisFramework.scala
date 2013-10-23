@@ -27,6 +27,7 @@ trait InterProceduralMonotonicFunction[LatticeElement] {
 
   def apply(s : ISet[LatticeElement], a : Assignment, currentContext : Context) : ISet[LatticeElement]
   def apply(s : ISet[LatticeElement], e : Exp, currentContext : Context) : ISet[LatticeElement]
+	def apply(s : ISet[LatticeElement], a : Action, currentContext : Context) : ISet[LatticeElement]
 }
 
 /**
@@ -131,6 +132,9 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
 
       protected def fA(a : Assignment, in : DFF, currentContext : Context) : DFF =
         kill(in, a, currentContext).union(gen(in, a, currentContext))
+        
+      protected def fC(a : Action, in : DFF, currentContext : Context) : DFF =
+        kill(in, a, currentContext).union(gen(in, a, currentContext))
 
       protected def fE(e : Exp, in : DFF, currentContext : Context) : DFF =
         kill(in, e, currentContext).union(gen(in, e, currentContext))
@@ -141,9 +145,9 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
       protected def actionF(in : DFF, a : Action, currentContext : Context) =
         a match {
           case a : AssignAction => fA(a, in, currentContext)
-          case a : AssertAction => fE(a.cond, in, currentContext)
-          case a : AssumeAction => fE(a.cond, in, currentContext)
-          case a : ThrowAction  => fE(a.exp, in, currentContext)
+          case a : AssertAction => fC(a, in, currentContext)
+          case a : AssumeAction => fC(a, in, currentContext)
+          case a : ThrowAction  => fC(a, in, currentContext)
           case a : StartAction =>
             if (forward)
               fOE(a.arg, fOE(a.count, in, currentContext), currentContext)
@@ -470,15 +474,9 @@ class InterProceduralMonotoneDataFlowAnalysisFramework {
              if(esl.isDefined) eslb.action(l.action, s)
              val r = actionF(s, l.action, currentContext)
              if(esl.isDefined) eslb.exitSet(None, r)
-             l.action match{
-              case ta : ThrowAction =>
-                val node = cg.getCGNormalNode(currentContext)
-                val succs = cg.successors(node)
-                succs.map(succ=>latticeMap += (succ -> r))
-              case _ =>
-                val sn =next(l, pst, pSig, callerContext)
-                latticeMap += (sn -> r)
-             }
+             val node = cg.getCGNormalNode(currentContext)
+             val succs = cg.successors(node)
+             succs.foreach(succ=>latticeMap += (succ -> r))
 //             if(l.index < pst.locations.size - 1){
 //               val sn =next(l, pst, pSig, callerContext)
 //               latticeMap += (sn -> r)

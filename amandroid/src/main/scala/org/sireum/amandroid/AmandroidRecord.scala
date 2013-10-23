@@ -277,6 +277,18 @@ class AmandroidRecord {
 	def getNonStaticFields = this.fields.filter(f => !f.isStatic)
 	
 	/**
+	 * get all object type field
+	 */
+	
+	def getObjectTypeFields = this.fields.filter(f => f.isObject)
+	
+	/**
+	 * get all non static and object type field
+	 */
+	
+	def getNonStaticObjectTypeFields = getNonStaticFields.intersect(getObjectTypeFields)
+	
+	/**
 	 * get all static fields of the record
 	 */
 	

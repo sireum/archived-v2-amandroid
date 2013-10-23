@@ -352,6 +352,8 @@ class AndroidTaintAnalysisBuilder{
     }
 
     def apply(s : ISet[TaintFact], e : Exp, currentContext : Context) : ISet[TaintFact] = isetEmpty
+    
+    def apply(s : ISet[TaintFact], a : Action, currentContext : Context) : ISet[TaintFact] = isetEmpty
   }
 
   class Kill
@@ -374,6 +376,7 @@ class AndroidTaintAnalysisBuilder{
     }
 
     def apply(s : ISet[TaintFact], e : Exp, currentContext : Context) : ISet[TaintFact] = s
+    def apply(s : ISet[TaintFact], a : Action, currentContext : Context) : ISet[TaintFact] = s
   }
   
   class Callr

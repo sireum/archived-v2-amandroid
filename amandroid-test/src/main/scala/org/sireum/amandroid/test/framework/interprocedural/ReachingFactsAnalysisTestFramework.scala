@@ -53,8 +53,6 @@ trait ReachingFactsAnalysisTestFramework extends TestFramework {
     	val entryPoints = Center.getEntryPoints("dummyMain")
     	entryPoints.foreach{
     	  ep =>
-
-    	    AndroidReachingFactsAnalysis.processedClinit = isetEmpty
     	    AndroidReachingFactsAnalysis(ep) match{
     	      case (cg, result) =>
     	                    val resdir = new File(System.getProperty("user.home") + "/Desktop/RFAmodelResults/")

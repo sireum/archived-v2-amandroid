@@ -178,6 +178,12 @@ class AmandroidField {
 	def isFinal = AccessFlag.isFinal(this.accessFlags)
 	
 	/**
+	 * return true if the field is object type
+	 */
+	
+	def isObject = !Center.isJavaPrimitiveType(typ)
+	
+	/**
 	 * check if given string is field signature or not
 	 */
 	

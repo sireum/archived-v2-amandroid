@@ -18,6 +18,7 @@ import org.sireum.alir.InitDefDesc
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.alir.DefDesc
 import org.sireum.amandroid.interProcedural.callGraph._
+import org.sireum.amandroid.PilarAstHelper
 
 object InterproceduralDataDependenceAnalysis {
   
@@ -76,8 +77,8 @@ object InterproceduralDataDependenceAnalysis {
 		  case al : ActionLocation =>
 	      al.action match {
 	        case aa : AssignAction =>
-	          val lhss = ReachingFactsAnalysisHelper.getLHSs(aa)
-			      val rhss = ReachingFactsAnalysisHelper.getRHSs(aa)
+	          val lhss = PilarAstHelper.getLHSs(aa)
+			      val rhss = PilarAstHelper.getRHSs(aa)
 			      result ++= processLHSs(procedure, lhss, rfaFacts, rdaFacts, iddg, srcContext)
 			      result ++= processRHSs(procedure, rhss, rfaFacts, rdaFacts, iddg, srcContext)
 	        case _ =>
@@ -85,8 +86,8 @@ object InterproceduralDataDependenceAnalysis {
 	    case jl : JumpLocation =>
 	      jl.jump match{
 	        case t : CallJump if t.jump.isEmpty =>
-			      val lhss = ReachingFactsAnalysisHelper.getLHSs(t)
-			      val rhss = ReachingFactsAnalysisHelper.getRHSs(t)
+			      val lhss = PilarAstHelper.getLHSs(t)
+			      val rhss = PilarAstHelper.getRHSs(t)
 			      result ++= processLHSs(procedure, lhss, rfaFacts, rdaFacts, iddg, srcContext)
 			      result ++= processRHSs(procedure, rhss, rfaFacts, rdaFacts, iddg, srcContext)
 			    case gj : GotoJump =>

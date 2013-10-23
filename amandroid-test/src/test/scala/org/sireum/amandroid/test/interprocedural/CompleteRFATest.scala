@@ -28,7 +28,7 @@ class CompleteRFATest extends CompleteRFATestFramework {
 //    Analyzing title fileUri file fileUri
 //  }
   InterproceduralExamples.benchAPKFiles.
-  filter { s => s.endsWith("Exceptions2.apk") }.
+  filter { s => s.endsWith("Exceptions3.apk") }.
   foreach { fileUri =>
     Analyzing title fileUri file fileUri
   }

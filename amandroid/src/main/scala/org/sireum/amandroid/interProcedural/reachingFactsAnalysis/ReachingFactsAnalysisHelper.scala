@@ -255,9 +255,9 @@ object ReachingFactsAnalysisHelper {
     val result = mmapEmpty[Int, Set[Instance]]
     var i = -1
     rhss.foreach{
-      key=>
+      rhs=>
         i += 1
-        key match{
+        rhs match{
           case ne : NameExp =>
             val slot = VarSlot(ne.name.name)
             var value : ISet[Instance] = isetEmpty
@@ -354,41 +354,5 @@ object ReachingFactsAnalysisHelper {
         }
     }
     result.toMap
-  }
-  
-  def getLHSs(a : PilarAstNode) : List[Exp] = {
-    var result = List[Exp]()
-
-    def getLHSRec(e : Exp) : Unit =
-      e match {
-        case te : TupleExp => te.exps.foreach(getLHSRec)
-        case _             => result ::= e
-      }
-
-    a match {
-      case aa : AssignAction => getLHSRec(aa.lhs)
-      case cj : CallJump =>
-        cj.lhss.foreach{lhs => getLHSRec(lhs)}
-      case _ =>
-    }
-    result
-  }
-  
-  def getRHSs(a : PilarAstNode) : List[Exp] = {
-    var result = List[Exp]()
-
-    def getRHSRec(e : Exp) : Unit =
-      e match {
-        case te : TupleExp => te.exps.foreach(getRHSRec)
-        case _             => result ::= e
-      }
-
-    a match {
-      case aa : AssignAction => getRHSRec(aa.rhs)
-      case cj : CallJump =>
-          getRHSRec(cj.callExp)
-      case _ =>
-    }
-    result
   }
 }

@@ -28,6 +28,8 @@ import org.sireum.amandroid.MessageCenter._
 import org.sireum.amandroid.GlobalConfig
 import org.sireum.amandroid.interProcedural.callGraph.CGCallNode
 import org.sireum.amandroid.interProcedural.callGraph.CGReturnNode
+import org.sireum.amandroid.PilarAstHelper
+import org.sireum.amandroid.ExceptionCenter
 
 class AndroidReachingFactsAnalysisBuilder{
   def build //
@@ -166,9 +168,26 @@ class AndroidReachingFactsAnalysisBuilder{
 	            } else {
 	              RFAInstance(typ, currentContext.copy)
 	            }
-      	    result ++= rec.getNonStaticFields.map(f=>RFAFact(FieldSlot(ins, f.getSignature), NullInstance(currentContext)))
+      	    result ++= rec.getNonStaticObjectTypeFields.map(f=>RFAFact(FieldSlot(ins, f.getSignature), NullInstance(currentContext)))
       	  case _ =>
         }
+    }
+    result
+  }
+  
+  def getExceptionFacts(a : Assignment, s : ISet[RFAFact], currentContext : Context) : ISet[RFAFact] = {
+    var result = isetEmpty[RFAFact]
+    a match{
+      case aa : AssignAction =>
+        val thrownExcNames = ExceptionCenter.getExceptionMayThrowFromAssignment(a)
+		    thrownExcNames.foreach{
+		      excName =>
+		        if(excName != ExceptionCenter.ANY_EXCEPTION){
+		          val ins = RFAInstance(NormalType(excName, 0), currentContext.copy)
+		          result += RFAFact(VarSlot(ExceptionCenter.EXCEPTION_VAR_NAME), ins)
+		        }
+		    }
+      case _ =>
     }
     result
   }
@@ -202,9 +221,9 @@ class AndroidReachingFactsAnalysisBuilder{
     def apply(s : ISet[RFAFact], a : Assignment, currentContext : Context) : ISet[RFAFact] = {
       var result : ISet[RFAFact] = isetEmpty
       if(isInterestingAssignment(a)){
-	      val lhss = ReachingFactsAnalysisHelper.getLHSs(a)		      
+        val lhss = PilarAstHelper.getLHSs(a)
+        val rhss = PilarAstHelper.getRHSs(a)
 	      val slots = ReachingFactsAnalysisHelper.processLHSs(lhss, s, currentContext)
-	      val rhss = ReachingFactsAnalysisHelper.getRHSs(a)
 	      val fieldsFacts = getFieldsFacts(rhss, s, currentContext)
 	      result ++= fieldsFacts
 	      val clinitFacts = getClinitCallFacts(lhss, rhss, a, s, currentContext)
@@ -216,10 +235,25 @@ class AndroidReachingFactsAnalysisBuilder{
 	            result ++= values(i).map{v => RFAFact(slot, v)}
 	      }
       }
+      val exceptionFacts = getExceptionFacts(a, s, currentContext)
+      result ++= exceptionFacts
       result
     }
 
     def apply(s : ISet[RFAFact], e : Exp, currentContext : Context) : ISet[RFAFact] = isetEmpty
+    
+    def apply(s : ISet[RFAFact], a : Action, currentContext : Context) : ISet[RFAFact] = {
+      var result : ISet[RFAFact] = isetEmpty
+      a match{
+        case ta : ThrowAction =>
+          require(ta.exp.isInstanceOf[NameExp])
+          val slot = VarSlot(ta.exp.asInstanceOf[NameExp].name.name)
+          val value = s.filter(_.s == slot).map(_.v)
+          result ++= value.map(RFAFact(VarSlot(ExceptionCenter.EXCEPTION_VAR_NAME), _))
+        case _ =>
+      }
+      result
+    }
   }
 
   class Kill
@@ -227,9 +261,9 @@ class AndroidReachingFactsAnalysisBuilder{
     
     def apply(s : ISet[RFAFact], a : Assignment, currentContext : Context) : ISet[RFAFact] = {
       var result = s
-      val lhss = ReachingFactsAnalysisHelper.getLHSs(a)
+      val lhss = PilarAstHelper.getLHSs(a)
       val slotsWithMark = ReachingFactsAnalysisHelper.processLHSs(lhss, s, currentContext).values.toSet
-      val rhss = ReachingFactsAnalysisHelper.getRHSs(a)
+      val rhss = PilarAstHelper.getRHSs(a)
       val stop = ReachingFactsAnalysisHelper.checkRHSs(rhss, s)
       if(stop){
         result = isetEmpty
@@ -245,6 +279,7 @@ class AndroidReachingFactsAnalysisBuilder{
     }
 
     def apply(s : ISet[RFAFact], e : Exp, currentContext : Context) : ISet[RFAFact] = s
+    def apply(s : ISet[RFAFact], a : Action, currentContext : Context) : ISet[RFAFact] = s
   }
   
   class Callr
