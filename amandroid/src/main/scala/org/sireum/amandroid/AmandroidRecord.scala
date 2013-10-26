@@ -265,22 +265,51 @@ class AmandroidRecord {
 	def fieldSize = this.fields.size
 	
 	/**
-	 * get all the fields of the record
+	 * get all the fields accessible from the record
 	 */
 	
-	def getFields = this.fields
+	def getFields = {
+    var results = getDeclaredFields
+    var record = this
+    this.getInterfaces.foreach{
+      int =>
+        Center.getRecordHierarchy.getAllSuperInterfacesOfIncluding(int).foreach{
+          sint =>
+            results ++= sint.getDeclaredFields.filter(!_.isPrivate)
+        }
+    }
+    if(!this.isInterface){
+	    Center.getRecordHierarchy.getAllSuperClassesOf(this).foreach{
+	      sc =>
+	        results ++= sc.getDeclaredFields.filter(!_.isPrivate)
+	    }
+    }
+    results
+  }
+	
+	/**
+	 * get all the fields declared in this record
+	 */
+	
+	def getDeclaredFields = this.fields
+	
+	/**
+	 * get all static fields of the record
+	 */
+	
+	def getStaticFields = getFields.filter(f => f.isStatic)
 	
 	/**
 	 * get all non-static fields of the record
 	 */
 	
-	def getNonStaticFields = this.fields.filter(f => !f.isStatic)
+	def getNonStaticFields = getFields.filter(f => !f.isStatic)
 	
 	/**
 	 * get all object type field
 	 */
 	
-	def getObjectTypeFields = this.fields.filter(f => f.isObject)
+	def getObjectTypeFields = getFields.filter(f => f.isObject)
 	
 	/**
 	 * get all non static and object type field
@@ -292,7 +321,25 @@ class AmandroidRecord {
 	 * get all static fields of the record
 	 */
 	
-	def getStaticFields = this.fields.filter(f => f.isStatic)
+	def getDeclaredStaticFields = getDeclaredFields.filter(f => f.isStatic)
+	
+	/**
+	 * get all non-static fields of the record
+	 */
+	
+	def getDeclaredNonStaticFields = getDeclaredFields.filter(f => !f.isStatic)
+	
+	/**
+	 * get all object type field
+	 */
+	
+	def getDeclaredObjectTypeFields = getDeclaredFields.filter(f => f.isObject)
+	
+	/**
+	 * get all non static and object type field
+	 */
+	
+	def getDeclaredNonStaticObjectTypeFields = getDeclaredNonStaticFields.intersect(getObjectTypeFields)
 	
 	/**
 	 * add one field into the record
@@ -308,19 +355,19 @@ class AmandroidRecord {
    * return true if the field is declared in this record
    */
   
-	def declaresField(sig : String) : Boolean = !getFields.filter(_.getSignature == sig).isEmpty
+	def declaresField(sig : String) : Boolean = !getDeclaredFields.filter(_.getSignature == sig).isEmpty
 	
 	/**
 	 * whether this record declares a field with the given name
 	 */
 	
-	def declaresFieldByName(name : String) = !getFields.filter(_.getName == name).isEmpty
+	def declaresFieldByName(name : String) = !getDeclaredFields.filter(_.getName == name).isEmpty
 	
 	/**
 	 * whether this record declares a field with the given name and type
 	 */
 	
-	def declaresField(name : String, typ : Type) = !getFields.filter(f => (f.getName == name && f.getType == typ)).isEmpty
+	def declaresField(name : String, typ : Type) = !getDeclaredFields.filter(f => (f.getName == name && f.getType == typ)).isEmpty
 	
 	/**
 	 * removes the given field from this record

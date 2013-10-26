@@ -14,6 +14,7 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAFact
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.amandroid.interProcedural.callGraph.CGInvokeNode
 import org.sireum.amandroid.interProcedural.callGraph.CGReturnNode
+import org.sireum.amandroid.interProcedural.callGraph.CGEntryNode
 
 object AndroidDataDependentTaintAnalysis {
   type Node = InterproceduralDataDependenceAnalysis.Node
@@ -35,6 +36,13 @@ object AndroidDataDependentTaintAnalysis {
             val (src, sin) = getSourceAndSinkNode(invNode, rfaFacts)
             sourceNodes ++= src
             sinkNodes ++= sin
+          case entNode : CGEntryNode =>
+            if(isCallBackSource(entNode)){
+              msg_normal("find callback source: " + entNode)
+              val s = entNode.getPropertyOrElse[ISet[String]](SOURCE, isetEmpty[String])
+              entNode.setProperty(SOURCE, s + entNode.getOwner.getSignature)
+              sourceNodes += entNode
+            }
           case _ =>
         }
     }
@@ -57,6 +65,11 @@ object AndroidDataDependentTaintAnalysis {
             }
         }
     }
+  }
+  
+  def isCallBackSource(entNode : CGEntryNode) = {
+    val owner = entNode.getOwner
+    SourceAndSinkCenter.isCallbackMethod(owner)
   }
   
   def getSourceAndSinkNode(invNode : CGInvokeNode, rfaFacts : ISet[RFAFact]) = {

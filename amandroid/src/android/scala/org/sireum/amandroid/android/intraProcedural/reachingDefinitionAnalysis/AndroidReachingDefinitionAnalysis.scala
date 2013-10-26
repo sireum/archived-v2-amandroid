@@ -20,7 +20,8 @@ object AndroidReachingDefinitionAnalysis {
    cfg : ControlFlowGraph[VirtualLabel],
    defRef : DefRef,
    isInputParam : ResourceUri => Boolean,
-   switchAsOrderedMatch : Boolean = false) : Result = {
+   switchAsOrderedMatch : Boolean = false,
+   initialFacts : ISet[RDFact] = isetEmpty) : Result = {
     val gen = new Gen(defRef)
     val kill = new Kill(defRef)
     val isInputParamSlot = { slot : Slot =>
@@ -39,6 +40,7 @@ object AndroidReachingDefinitionAnalysis {
           result += ((slot, UnDefDesc))
       for (slot <- varAccesses.globalVarReads(pst.procedureUri))
         result += ((slot, InitDefDesc))
+      result ++= initialFacts
       result.toSet
     }
     val initial : ISet[RDFact] = isetEmpty

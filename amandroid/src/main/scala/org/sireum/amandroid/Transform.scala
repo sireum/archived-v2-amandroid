@@ -115,13 +115,14 @@ object Transform {
 	  (pool, result)
 	}
 	
-	def buildRda (pst : ProcedureSymbolTable, cfg : ControlFlowGraph[VirtualLabel]) = {
+	def buildRda (pst : ProcedureSymbolTable, cfg : ControlFlowGraph[VirtualLabel], initialFacts : ISet[AndroidReachingDefinitionAnalysis.RDFact] = isetEmpty) = {
 	  val iiopp = iopp(pst)
 	  AndroidReachingDefinitionAnalysis[VirtualLabel](pst,
 	    cfg,
 	    dr(pst.symbolTable),
 	    first2(iiopp),
-	    saom)
+	    saom,
+	    initialFacts)
 	}
 	
 	def reporter = {

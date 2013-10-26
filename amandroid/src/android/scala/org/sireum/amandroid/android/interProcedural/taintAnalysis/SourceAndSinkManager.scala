@@ -74,8 +74,12 @@ object SourceAndSinkCenter {
 	def isSource(calleeProcedure : AmandroidProcedure, callerProcedure : AmandroidProcedure, callerLoc : JumpLocation) : Boolean = {
 	  if(isSourceProcedure(calleeProcedure)) return true
 	  if(isUISource(calleeProcedure, callerProcedure, callerLoc)) return true
-	  if(this.callbackMethods.contains(calleeProcedure)) return true
 	  false
+	}
+	
+	def isCallbackMethod(proc : AmandroidProcedure) : Boolean = {
+	  if(this.callbackMethods.contains(proc)) true
+	  else false
 	}
 	
 	def isUISource(calleeProcedure : AmandroidProcedure, callerProcedure : AmandroidProcedure, callerLoc : JumpLocation) : Boolean = {

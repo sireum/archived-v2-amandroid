@@ -1,4 +1,4 @@
-package org.sireum.amandroid.interProcedural
+package org.sireum.amandroid.interProcedural.objectFlowAnalysis
 
 import org.sireum.util._
 import org.sireum.amandroid.android.AndroidConstants
@@ -12,6 +12,7 @@ import org.sireum.amandroid.Center
 import org.sireum.amandroid.util.StringFormConverter
 import org.sireum.amandroid.AmandroidRecord
 import org.sireum.amandroid.AmandroidProcedure
+import org.sireum.amandroid.interProcedural.Context
 
 
 trait InterComponentCommunicationModel[Node <: OfaNode, ValueSet <: AndroidValueSet] extends ObjectFlowGraph[Node, ValueSet] {

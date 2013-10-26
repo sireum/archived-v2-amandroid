@@ -145,7 +145,8 @@ class RdaModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends
     this.cfg,
     this.defRef(pst.symbolTable),
     first2(iiopp),
-    this.switchAsOrderedMatch))
+    this.switchAsOrderedMatch,
+    isetEmpty))
 }
 
 class PagModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends PagModule {

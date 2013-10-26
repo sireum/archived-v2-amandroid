@@ -5,7 +5,11 @@ object AndroidEntryPointConstants {
 	final val SERVICE_CLASS = "[|android:app:Service|]"
 	final val BROADCAST_RECEIVER_CLASS = "[|android:content:BroadcastReceiver|]"
 	final val CONTENT_PROVIDER_CLASS = "[|android:content:ContentProvider|]"
+	final val APPLICATION_CLASS = "[|android:app:Application|]"
 	
+	final val APPLICATION_ONCREATE = "onCreate:()V"
+	final val APPLICATION_ONTERMINATE = "onTerminate()V"
+	  
 	final val ACTIVITY_ONCREATE = "onCreate:(Landroid/os/Bundle;)V"
 	final val ACTIVITY_ONSTART = "onStart:()V"
 	final val ACTIVITY_ONRESTOREINSTANCESTATE = "onRestoreInstanceState:(Landroid/os/Bundle;)V"
@@ -33,7 +37,8 @@ object AndroidEntryPointConstants {
 	
 	final val INTENT_NAME = "[|android:content:Intent|]"
 	final val ACTIVITY_SETINTENT_SIG = "[|Landroid/app/Activity;.setIntent:(Landroid/content/Intent;)V|]"
-	  
+	
+	private final val applicationMethods = List(APPLICATION_ONCREATE, APPLICATION_ONTERMINATE)
 	private final val activityMethods = List(ACTIVITY_ONCREATE, ACTIVITY_ONDESTROY, ACTIVITY_ONPAUSE,
 		ACTIVITY_ONRESTART, ACTIVITY_ONRESUME, ACTIVITY_ONSTART, ACTIVITY_ONSTOP,
 		ACTIVITY_ONSAVEINSTANCESTATE, ACTIVITY_ONRESTOREINSTANCESTATE,
@@ -42,6 +47,8 @@ object AndroidEntryPointConstants {
 		SERVICE_ONSTART2, SERVICE_ONBIND, SERVICE_ONREBIND, SERVICE_ONUNBIND)
 	private final val broadcastMethods = List(BROADCAST_ONRECEIVE)
 	private final val contentproviderMethods = List(CONTENTPROVIDER_ONCREATE)
+	
+	def getApplicationLifecycleMethods() : List[String] = applicationMethods
 	
 	def getActivityLifecycleMethods() : List[String] = activityMethods
 	

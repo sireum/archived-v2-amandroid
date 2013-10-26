@@ -137,7 +137,7 @@ object ReachingFactsAnalysisHelper {
 	        val recName = argIns.getType.name
 	        Center.tryLoadRecord(recName, Center.ResolveLevel.BODIES) match{
 	          case Some(rec) =>
-	            rec.getNonStaticFields.foreach{
+	            rec.getNonStaticObjectTypeFields.foreach{
 			          field =>
 			            result += RFAFact(FieldSlot(argIns, field.getSignature), UnknownInstance(currentContext))
 			        }

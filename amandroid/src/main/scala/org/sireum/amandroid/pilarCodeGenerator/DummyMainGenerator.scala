@@ -30,14 +30,17 @@ class DummyMainGenerator {
   private val varGen = new VariableGenerator()
   private val localVars = new ArrayList[String]
   private val codeFragments = new ArrayList[CodeFragmentGenerator]
+  
   /**
    * map from a record to it's substitute record
    */
   private var substituteRecordMap : IMap[String, String] = imapEmpty
+  
   /**
    * Map from record to it's local variable
    */
   private var localVarsForClasses : Map[String, String] = Map()
+  
   /**
    * Set of param's record name
    */

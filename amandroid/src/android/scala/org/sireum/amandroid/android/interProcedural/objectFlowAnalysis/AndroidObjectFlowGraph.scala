@@ -3,7 +3,7 @@ package org.sireum.amandroid.android.interProcedural.objectFlowAnalysis
 import org.sireum.util._
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.alir.ReachingDefinitionAnalysis
-import org.sireum.amandroid.interProcedural.InterComponentCommunicationModel
+import org.sireum.amandroid.interProcedural.objectFlowAnalysis.InterComponentCommunicationModel
 import org.sireum.amandroid.PointProc
 import org.sireum.amandroid.PointI
 import org.sireum.amandroid.interProcedural.Context
