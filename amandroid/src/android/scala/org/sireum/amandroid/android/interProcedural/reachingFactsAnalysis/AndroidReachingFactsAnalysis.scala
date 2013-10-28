@@ -30,62 +30,73 @@ import org.sireum.amandroid.interProcedural.callGraph.CGCallNode
 import org.sireum.amandroid.interProcedural.callGraph.CGReturnNode
 import org.sireum.amandroid.PilarAstHelper
 import org.sireum.amandroid.ExceptionCenter
+import org.sireum.amandroid.ClassLoadManager
+import org.sireum.amandroid.interProcedural.NodeListener
+import org.sireum.amandroid.interProcedural.callGraph.CGLocNode
+import org.sireum.amandroid.interProcedural.callGraph.CGVirtualNode
+import org.sireum.amandroid.interProcedural.callGraph.CGNormalNode
 
 class AndroidReachingFactsAnalysisBuilder{
+  
+  var callGraph : CallGraph[CGNode] = null
+  
   def build //
   (entryPointProc : AmandroidProcedure,
    initialFacts : ISet[RFAFact] = isetEmpty,
-   processedClinit : ISet[AmandroidProcedure] = isetEmpty,
-   switchAsOrderedMatch : Boolean = false) : (CallGraph[CGNode], AndroidReachingFactsAnalysis.Result) = {
+   initContext : Context,
+   switchAsOrderedMatch : Boolean) : (CallGraph[CGNode], AndroidReachingFactsAnalysis.Result) = {
     val gen = new Gen
     val kill = new Kill
     val callr = new Callr
+    val nl = new NodeL
     val initial : ISet[RFAFact] = isetEmpty
-    this.processedClinit = processedClinit
     val cg = new CallGraph[CGNode]
-    val initContext = new Context(GlobalConfig.CG_CONTEXT_K)
+    this.callGraph = cg
     cg.collectCfgToBaseGraph(entryPointProc, initContext, true)
     val iota : ISet[RFAFact] = initialFacts + RFAFact(VarSlot("@@[|RFAiota|]"), NullInstance(initContext))
-    val result = new InterProceduralMonotoneDataFlowAnalysisFramework().apply[RFAFact](cg,
-      true, true, false, gen, kill, callr, iota, initial, switchAsOrderedMatch)
+    val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](cg,
+      true, true, false, gen, kill, callr, iota, initial, switchAsOrderedMatch, Some(nl))
 
 //    print("RFA\n")
 //    print(result)
     (cg, result)
   }
   
-  
-  var processedClinit : ISet[AmandroidProcedure] = isetEmpty
-  
-  private def processHierarchy(me : AmandroidRecord, s : ISet[RFAFact]) : ISet[RFAFact] = {
+  private def checkAndLoadClassFromHierarchy(me : AmandroidRecord, s : ISet[RFAFact], currentNode : CGLocNode) : ISet[RFAFact] = {
     var result = isetEmpty[RFAFact]
     if(me.hasSuperClass){
-      result ++= processHierarchy(me.getSuperClass, s)
+      checkAndLoadClassFromHierarchy(me.getSuperClass, s, currentNode)
     }
-    if(me.declaresProcedureByShortName("<clinit>")){
-      val p = me.getProcedureByShortName("<clinit>")
-      if(!processedClinit.contains(p)){
-        processedClinit += p
-        val (cg, facts) = new AndroidReachingFactsAnalysisBuilder().build(p, ReachingFactsAnalysisHelper.getGlobalFacts(s ++ result), processedClinit)
-        val exFacts = facts.entrySet(cg.exitNode)
-        val newFacts = ReachingFactsAnalysisHelper.getGlobalFacts(exFacts)
-        result ++ newFacts
-      } else {
-        result
-      }
-    } else result
+    val bitset = currentNode.getLoadedClassBitSet
+    if(!ClassLoadManager.isLoaded(me, bitset)){
+      currentNode.setLoadedClassBitSet(ClassLoadManager.loadClass(me, bitset))
+	    if(me.declaresStaticInitializer){
+	      val p = me.getStaticInitializer
+	      if(ReachingFactsAnalysisHelper.isModelCall(p)){
+          result ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForClinit(p, currentNode.getContext)
+        } else { // for normal call
+          this.callGraph.collectCfgToBaseGraph(p, currentNode.getContext, false)
+	        val clinitVirContext = currentNode.getContext.copy.setContext(p.getSignature, p.getSignature)
+	        val clinitEntry = this.callGraph.getCGEntryNode(clinitVirContext)
+	        val clinitExit = this.callGraph.getCGExitNode(clinitVirContext)
+	        this.callGraph.addEdge(currentNode, clinitEntry)
+	        this.callGraph.addEdge(clinitExit, currentNode)
+        }
+	    }
+    }
+    result
   }
   
-  private def processClinit(recName : String, s : ISet[RFAFact]) : ISet[RFAFact] = {
+  private def checkClass(recName : String, s : ISet[RFAFact], currentNode : CGLocNode) : ISet[RFAFact] = {
     val rec = Center.resolveRecord(recName, Center.ResolveLevel.BODIES)
-    processHierarchy(rec, s)
+    checkAndLoadClassFromHierarchy(rec, s, currentNode)
   }
   
-   /**
-   * A.<clinit>() will be called under four kinds of situation: v0 = new A, A.f = v1, v2 = A.f, and A.foo()>
+  /**
+   * A.<clinit>() will be called under four kinds of situation: v0 = new A, A.f = v1, v2 = A.f, and A.foo()
    * also for v0 = new B where B is descendant of A, first we call A.<clinit>, later B.<clinit>.
    */
-  protected def getClinitCallFacts(lhss : List[Exp], rhss : List[Exp], a : Assignment, s : ISet[RFAFact], currentContext : Context) : ISet[RFAFact] = {
+  protected def checkAndLoadClasses(lhss : List[Exp], rhss : List[Exp], a : Assignment, s : ISet[RFAFact], currentNode : CGLocNode) : ISet[RFAFact] = {
     var result = isetEmpty[RFAFact]
     val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
     lhss.foreach{
@@ -95,7 +106,7 @@ class AndroidReachingFactsAnalysisBuilder{
             val slot = VarSlot(ne.name.name)
             if(slot.isGlobal){ 
             	val recName = StringFormConverter.getRecordNameFromFieldSignature(ne.name.name)
-            	result ++= processClinit(recName, s)
+            	checkClass(recName, s, currentNode)
             }
           case _ =>
         }
@@ -113,12 +124,12 @@ class AndroidReachingFactsAnalysisBuilder{
               case _ =>
             }
       	    val typ = NormalType(recName, dimensions)
-      	    result ++= processClinit(typ.name, s)
+      	    result ++= checkClass(typ.name, s, currentNode)
           case ne : NameExp =>
             val slot = VarSlot(ne.name.name)
             if(slot.isGlobal){ 
             	val recName = StringFormConverter.getRecordNameFromFieldSignature(ne.name.name)
-            	result ++= processClinit(recName, s)
+            	result ++= checkClass(recName, s, currentNode)
             }
           case ce : CallExp =>
             val typ = a.getValueAnnotation("type") match {
@@ -137,7 +148,7 @@ class AndroidReachingFactsAnalysisBuilder{
 		        }
             val recName = StringFormConverter.getRecordNameFromProcedureSignature(signature)
             if(typ == "static"){
-            	result ++= processClinit(recName, s)
+            	result ++= checkClass(recName, s, currentNode)
             }
           case _ =>
       	}
@@ -218,31 +229,31 @@ class AndroidReachingFactsAnalysisBuilder{
       result
     }
     
-    def apply(s : ISet[RFAFact], a : Assignment, currentContext : Context) : ISet[RFAFact] = {
+    def apply(s : ISet[RFAFact], a : Assignment, currentNode : CGLocNode) : ISet[RFAFact] = {
       var result : ISet[RFAFact] = isetEmpty
       if(isInterestingAssignment(a)){
         val lhss = PilarAstHelper.getLHSs(a)
         val rhss = PilarAstHelper.getRHSs(a)
-	      val slots = ReachingFactsAnalysisHelper.processLHSs(lhss, s, currentContext)
-	      val fieldsFacts = getFieldsFacts(rhss, s, currentContext)
+	      val slots = ReachingFactsAnalysisHelper.processLHSs(lhss, s, currentNode.getContext)
+	      val fieldsFacts = getFieldsFacts(rhss, s, currentNode.getContext)
 	      result ++= fieldsFacts
-	      val clinitFacts = getClinitCallFacts(lhss, rhss, a, s, currentContext)
-	      result ++= clinitFacts
-	      val values = ReachingFactsAnalysisHelper.processRHSs(rhss, s ++ clinitFacts, currentContext) 
+	      val classLoadingFacts = checkAndLoadClasses(lhss, rhss, a, s, currentNode)
+	      result ++= classLoadingFacts
+	      val values = ReachingFactsAnalysisHelper.processRHSs(rhss, s ++ classLoadingFacts, currentNode.getContext) 
 	      slots.foreach{
 	        case(i, (slot, _)) =>
 	          if(values.contains(i))
 	            result ++= values(i).map{v => RFAFact(slot, v)}
 	      }
       }
-      val exceptionFacts = getExceptionFacts(a, s, currentContext)
+      val exceptionFacts = getExceptionFacts(a, s, currentNode.getContext)
       result ++= exceptionFacts
       result
     }
 
-    def apply(s : ISet[RFAFact], e : Exp, currentContext : Context) : ISet[RFAFact] = isetEmpty
+    def apply(s : ISet[RFAFact], e : Exp, currentNode : CGLocNode) : ISet[RFAFact] = isetEmpty
     
-    def apply(s : ISet[RFAFact], a : Action, currentContext : Context) : ISet[RFAFact] = {
+    def apply(s : ISet[RFAFact], a : Action, currentNode : CGLocNode) : ISet[RFAFact] = {
       var result : ISet[RFAFact] = isetEmpty
       a match{
         case ta : ThrowAction =>
@@ -259,10 +270,10 @@ class AndroidReachingFactsAnalysisBuilder{
   class Kill
       extends InterProceduralMonotonicFunction[RFAFact] {
     
-    def apply(s : ISet[RFAFact], a : Assignment, currentContext : Context) : ISet[RFAFact] = {
+    def apply(s : ISet[RFAFact], a : Assignment, currentNode : CGLocNode) : ISet[RFAFact] = {
       var result = s
       val lhss = PilarAstHelper.getLHSs(a)
-      val slotsWithMark = ReachingFactsAnalysisHelper.processLHSs(lhss, s, currentContext).values.toSet
+      val slotsWithMark = ReachingFactsAnalysisHelper.processLHSs(lhss, s, currentNode.getContext).values.toSet
       val rhss = PilarAstHelper.getRHSs(a)
       val stop = ReachingFactsAnalysisHelper.checkRHSs(rhss, s)
       if(stop){
@@ -278,8 +289,8 @@ class AndroidReachingFactsAnalysisBuilder{
       result
     }
 
-    def apply(s : ISet[RFAFact], e : Exp, currentContext : Context) : ISet[RFAFact] = s
-    def apply(s : ISet[RFAFact], a : Action, currentContext : Context) : ISet[RFAFact] = s
+    def apply(s : ISet[RFAFact], e : Exp, currentNode : CGLocNode) : ISet[RFAFact] = s
+    def apply(s : ISet[RFAFact], a : Action, currentNode : CGLocNode) : ISet[RFAFact] = s
   }
   
   class Callr
@@ -294,10 +305,11 @@ class AndroidReachingFactsAnalysisBuilder{
       cg.getCGReturnNode(callerContext).asInstanceOf[CGReturnNode].setCalleeSet(calleeSet)
       var calleeFactsMap : IMap[CGNode, ISet[RFAFact]] = imapEmpty
       var returnFacts : ISet[RFAFact] = s
+      var tmpReturnFacts : ISet[RFAFact] = isetEmpty
       var pureNormalFlag = true  //no mix of normal and model callee
       calleeSet.foreach{
         callee =>
-          if(isICCCall(callee) || isModelCall(callee)){
+          if(ReachingFactsAnalysisHelper.isICCCall(callee) || ReachingFactsAnalysisHelper.isModelCall(callee)){
             pureNormalFlag = false
             val args = cj.callExp.arg match{
               case te : TupleExp =>
@@ -310,11 +322,11 @@ class AndroidReachingFactsAnalysisBuilder{
 			          }.toList
               case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
             }
-            if(isICCCall(callee)) {
+            if(ReachingFactsAnalysisHelper.isICCCall(callee)) {
               val factsForCallee = getFactsForICCTarget(s, cj, callee)
               returnFacts --= factsForCallee
-              val (retFacts, targets) = doICCCall(factsForCallee, callee, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)
-              returnFacts ++= retFacts
+              val (retFacts, targets) = ReachingFactsAnalysisHelper.doICCCall(factsForCallee, callee, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)
+              tmpReturnFacts ++= retFacts
               targets.foreach{
                 target =>
                   if(!cg.isProcessed(target, callerContext)){
@@ -328,7 +340,7 @@ class AndroidReachingFactsAnalysisBuilder{
 //              if(callee.getSubSignature == "unknown:()LCenter/Unknown;") println("callees-->" + calleeSet + "\ncontext-->" + callerContext + "\nfacts-->" + s)
               val factsForCallee = getFactsForCallee(s, cj, callee)
               returnFacts --= factsForCallee
-            	returnFacts ++= doModelCall(factsForCallee, callee, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)
+            	tmpReturnFacts ++= ReachingFactsAnalysisHelper.doModelCall(factsForCallee, callee, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)
             }
           } else { // for normal call
             if(!cg.isProcessed(callee, callerContext)){
@@ -340,6 +352,7 @@ class AndroidReachingFactsAnalysisBuilder{
             calleeFactsMap += (cg.entryNode(callee, callerContext) -> mapFactsToCallee(factsForCallee, cj, callee.getProcedureBody.procedure))
           }
       }
+      returnFacts ++= tmpReturnFacts
       if(pureNormalFlag){
         val cn = cg.getCGCallNode(callerContext)
         val rn = cg.getCGReturnNode(callerContext)
@@ -458,12 +471,11 @@ class AndroidReachingFactsAnalysisBuilder{
 	              case nt : NamedTypeSpec => 
 	                val name = nt.name.name
 	                if(name=="[|long|]" || name=="[|double|]")
-	                  paramSlots ::= VarSlot(param.name.name)
+	                  paramSlots :+= VarSlot(param.name.name)
 	              case _ =>
               }
-              paramSlots ::= VarSlot(param.name.name)
+              paramSlots :+= VarSlot(param.name.name)
           }
-          paramSlots = paramSlots.reverse
           var result = isetEmpty[RFAFact]
           
           for(i <- 0 to argSlots.size - 1){
@@ -496,12 +508,11 @@ class AndroidReachingFactsAnalysisBuilder{
 	              case nt : NamedTypeSpec => 
 	                val name = nt.name.name
 	                if(name=="[|long|]" || name=="[|double|]")
-	                  paramSlots ::= VarSlot(param.name.name)
+	                  paramSlots :+= VarSlot(param.name.name)
 	              case _ =>
               }
-              paramSlots ::= VarSlot(param.name.name)
+              paramSlots :+= VarSlot(param.name.name)
           }
-          paramSlots = paramSlots.reverse
           var result = isetEmpty[RFAFact]
           val paramSlot = paramSlots(0)
           varFacts.foreach{
@@ -517,88 +528,96 @@ class AndroidReachingFactsAnalysisBuilder{
       loc.isInstanceOf[JumpLocation] && loc.asInstanceOf[JumpLocation].jump.isInstanceOf[ReturnJump]
     }
     
-    def getAndMapFactsForCaller(callerS : ISet[RFAFact], calleeS : ISet[RFAFact], cj : CallJump, calleeProcedure : ProcedureDecl, calleeContext : Context) : ISet[RFAFact] ={
-      val callerVarFacts = callerS.filter(_.s.isInstanceOf[VarSlot]).map{f=>(f.s.asInstanceOf[VarSlot], f.v)}.toSet
-      val calleeVarFacts = calleeS.filter(_.s.isInstanceOf[VarSlot]).map{f=>(f.s.asInstanceOf[VarSlot], f.v)}.toSet
-      var lhsSlots : Seq[VarSlot] = cj.lhss.map{lhs=>VarSlot(lhs.name.name)}
-      var retSlots : ISet[VarSlot] = isetEmpty
+    def getAndMapFactsForCaller(calleeS : ISet[RFAFact], callerNode : CGNode, calleeExitNode : CGVirtualNode) : ISet[RFAFact] ={
       var result = isetEmpty[RFAFact]
       result ++= ReachingFactsAnalysisHelper.getGlobalFacts(calleeS)
-      calleeProcedure.body match{
-        case ib : ImplementedBody =>
-          ib.locations.foreach{
-            loc=>
-              if(isReturnJump(loc)){
-                val rj = loc.asInstanceOf[JumpLocation].jump.asInstanceOf[ReturnJump]
-                rj.exp match{
-                  case Some(n) => 
-                    n match{
-                      case ne : NameExp => retSlots += VarSlot(ne.name.name)
-                      case _ =>
-                    }
-                  case None =>
-                }
+      callerNode match{
+        case crn : CGReturnNode =>
+          val calleeVarFacts = calleeS.filter(_.s.isInstanceOf[VarSlot]).map{f=>(f.s.asInstanceOf[VarSlot], f.v)}.toSet
+          val calleeProcedure = calleeExitNode.getOwner.getProcedureBody.procedure
+          val cj = crn.getOwner.getProcedureBody.location(crn.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump]
+          val lhsSlots : ISeq[VarSlot] = cj.lhss.map{lhs=>VarSlot(lhs.name.name)}
+          var paramSlots : List[VarSlot] = List()
+          calleeProcedure.params.foreach{
+            param =>
+              require(param.typeSpec.isDefined)
+              param.typeSpec.get match{
+	              case nt : NamedTypeSpec => 
+	                val name = nt.name.name
+	                if(name=="[|long|]" || name=="[|double|]")
+	                  paramSlots :+= VarSlot(param.name.name)
+	              case _ =>
               }
+              paramSlots :+= VarSlot(param.name.name)
           }
-        case _ =>
-      }
-      // following maybe incorrect
-      lhsSlots.foreach{
-        lhsSlot =>
-	        var values : ISet[Instance] = isetEmpty
-	        retSlots.foreach{
-	          retSlot =>
-	            calleeVarFacts.foreach{
-	              case (s, v) =>
-	                if(s == retSlot){
-	                  values += v
-	                }
-	            }
-	        }
-	        result ++= values.map(v => RFAFact(lhsSlot, v))
-	        result ++= ReachingFactsAnalysisHelper.getRelatedHeapFacts(values, calleeS)
-      }
-      cj.callExp.arg match{
-        case te : TupleExp => 
-          val argSlots = te.exps.map{
-            exp =>
-              exp match{
-		            case ne : NameExp => VarSlot(ne.name.name)
-		            case _ => VarSlot(exp.toString)
+          var retSlots : ISet[VarSlot] = isetEmpty
+          calleeProcedure.body match{
+		        case ib : ImplementedBody =>
+		          ib.locations.foreach{
+		            loc=>
+		              if(isReturnJump(loc)){
+		                val rj = loc.asInstanceOf[JumpLocation].jump.asInstanceOf[ReturnJump]
+		                rj.exp match{
+		                  case Some(n) => 
+		                    n match{
+		                      case ne : NameExp => retSlots += VarSlot(ne.name.name)
+		                      case _ =>
+		                    }
+		                  case None =>
+		                }
+		              }
 		          }
-          }
-          argSlots.foreach{
-            argSlot =>
-              var values : ISet[Instance] = isetEmpty
-	            callerVarFacts.foreach{
-	              case (s, v) =>
-	                if(s == argSlot)
-	              	 values += v
-	            }
-              result ++= values.map(v=>RFAFact(argSlot, v))
-              result ++= ReachingFactsAnalysisHelper.getRelatedHeapFacts(values, calleeS)
-          }
-          result
-        case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
+		        case _ =>
+		      }
+		      lhsSlots.foreach{
+		        lhsSlot =>
+			        var values : ISet[Instance] = isetEmpty
+			        retSlots.foreach{
+			          retSlot =>
+			            calleeVarFacts.foreach{
+			              case (s, v) =>
+			                if(s == retSlot){
+			                  values += v
+			                }
+			            }
+			        }
+			        result ++= values.map(v => RFAFact(lhsSlot, v))
+			        result ++= ReachingFactsAnalysisHelper.getRelatedHeapFacts(values, calleeS)
+		      }
+		      cj.callExp.arg match{
+		        case te : TupleExp => 
+		          val argSlots = te.exps.map{
+		            exp =>
+		              exp match{
+				            case ne : NameExp => VarSlot(ne.name.name)
+				            case _ => VarSlot(exp.toString)
+				          }
+		          }
+		          argSlots.foreach{
+		            argSlot =>
+		              var values : ISet[Instance] = isetEmpty
+			            calleeVarFacts.foreach{
+			              case (s, v) =>
+			                if(paramSlots(argSlots.indexOf(argSlot)) == s)
+			              	  values += v
+			            }
+		              result ++= values.map(v=>RFAFact(argSlot, v))
+		              result ++= ReachingFactsAnalysisHelper.getRelatedHeapFacts(values, calleeS)
+		          }
+		        case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
+		      }
+        case cnn : CGNode =>
       }
+      result
     }
     
-    private def isModelCall(calleeProc : AmandroidProcedure) : Boolean = {
-      AndroidModelCallHandler.isModelCall(calleeProc)
+  }
+
+  class NodeL extends NodeListener{
+    def onPostVisitNode(node : CGNode, succs : CSet[CGNode]) : Unit = {
+      val bitset = node.getLoadedClassBitSet
+      succs.foreach(succ=>succ.updateLoadedClassBitSet(bitset))
     }
-    
-    private def doModelCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
-      AndroidModelCallHandler.doModelCall(s, calleeProc, args, retVars, currentContext)
-    }
-    
-    private def isICCCall(calleeProc : AmandroidProcedure) : Boolean = {
-      AndroidModelCallHandler.isICCCall(calleeProc)
-    }
-    
-    private def doICCCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[AmandroidProcedure]) = {
-      AndroidModelCallHandler.doICCCall(s, calleeProc, args, retVars, currentContext)
-    }
-    
   }
   
 }
@@ -612,8 +631,8 @@ object AndroidReachingFactsAnalysis {
   type Node = CGNode
   type Result = InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]
   def apply(entryPointProc : AmandroidProcedure,
-				   initialFacts : ISet[RFAFact] = isetEmpty,
-				   processedClinit : ISet[AmandroidProcedure] = isetEmpty,
-				   switchAsOrderedMatch : Boolean = false) : (CallGraph[Node], Result)
-				   = new AndroidReachingFactsAnalysisBuilder().build(entryPointProc, initialFacts, processedClinit, switchAsOrderedMatch)
+   initialFacts : ISet[RFAFact] = isetEmpty,
+   initContext : Context = new Context(GlobalConfig.CG_CONTEXT_K),
+   switchAsOrderedMatch : Boolean = false) : (CallGraph[Node], Result)
+				   = new AndroidReachingFactsAnalysisBuilder().build(entryPointProc, initialFacts, initContext, switchAsOrderedMatch)
 }

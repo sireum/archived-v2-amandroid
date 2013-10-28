@@ -15,8 +15,7 @@ import org.sireum.util._
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
 class AmandroidProcedure {
-	val constructorName : String = "<init>"
-	val staticInitializerName : String = "<clinit>"
+
 	var DEBUG : Boolean = false
 	
 	/**
@@ -599,7 +598,7 @@ class AmandroidProcedure {
    */
     
   def isEntryProcedure = {
-    if(isStatic && name == this.staticInitializerName) true
+    if(isStatic && name == getDeclaringRecord.staticInitializerName) true
     else isMain
   }
   

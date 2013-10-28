@@ -39,8 +39,8 @@ class AndroidTaintAnalysisBuilder{
     val initRFAFact = RFAFact(VarSlot("@@[|RFAiota|]"), NullInstance(initContext))
     val iota : ISet[TaintFact] = initialFacts + TaintFact(initRFAFact, "TaintAnalysis")
     val initial : ISet[TaintFact] = isetEmpty
-    val result = new InterProceduralMonotoneDataFlowAnalysisFramework().apply[TaintFact](cg,
-      true, true, false, gen, kill, callr, iota, initial, switchAsOrderedMatch)
+    val result = InterProceduralMonotoneDataFlowAnalysisFramework[TaintFact](cg,
+      true, true, false, gen, kill, callr, iota, initial, switchAsOrderedMatch, None)
 
 //    print("TA\n")
 //    print(result)
@@ -320,26 +320,26 @@ class AndroidTaintAnalysisBuilder{
   class Gen
       extends InterProceduralMonotonicFunction[TaintFact] {
     
-    def apply(s : ISet[TaintFact], a : Assignment, currentContext : Context) : ISet[TaintFact] = {
+    def apply(s : ISet[TaintFact], a : Assignment, currentNode : CGLocNode) : ISet[TaintFact] = {
       var result : ISet[TaintFact] = isetEmpty
       if(isInterestingAssignment(a)){
         val lhss = getLHSs(a)
-	      val lhssFacts = processLHSs(lhss, s, currentContext)
+	      val lhssFacts = processLHSs(lhss, s, currentNode.getContext)
 	      var sources : IMap[Int, ISet[String]] = imapEmpty
         if(a.isInstanceOf[CallJump]){
           val cj = a.asInstanceOf[CallJump]
-          val callNode = cg.getCGCallNode(currentContext).asInstanceOf[CGCallNode]
+          val callNode = cg.getCGCallNode(currentNode.getContext).asInstanceOf[CGCallNode]
           val cFacts = rfaFacts.exitSet(callNode)
           val calleeSet = callNode.getCalleeSet
           calleeSet.foreach{
             callee =>
-              val (srcs, taintset) = getSourceAndHandleSink(s, cFacts, callee, callNode, cj, lhssFacts, currentContext)
+              val (srcs, taintset) = getSourceAndHandleSink(s, cFacts, callee, callNode, cj, lhssFacts, currentNode.getContext)
               sources ++= srcs
               result ++= taintset
           }
         } else {
 		      val rhss = getRHSs(a)
-		      sources ++= processRHSs(rhss, s, currentContext) 
+		      sources ++= processRHSs(rhss, s, currentNode.getContext) 
         }
         lhssFacts.foreach{
 	        case(i, (facts, _)) =>
@@ -351,19 +351,19 @@ class AndroidTaintAnalysisBuilder{
       result
     }
 
-    def apply(s : ISet[TaintFact], e : Exp, currentContext : Context) : ISet[TaintFact] = isetEmpty
+    def apply(s : ISet[TaintFact], e : Exp, currentNode : CGLocNode) : ISet[TaintFact] = isetEmpty
     
-    def apply(s : ISet[TaintFact], a : Action, currentContext : Context) : ISet[TaintFact] = isetEmpty
+    def apply(s : ISet[TaintFact], a : Action, currentNode : CGLocNode) : ISet[TaintFact] = isetEmpty
   }
 
   class Kill
       extends InterProceduralMonotonicFunction[TaintFact] {
     
-    def apply(s : ISet[TaintFact], a : Assignment, currentContext : Context) : ISet[TaintFact] = {
+    def apply(s : ISet[TaintFact], a : Assignment, currentNode : CGLocNode) : ISet[TaintFact] = {
       var result = s
       if(isInterestingAssignment(a)){
 	      val lhss = getLHSs(a)
-	      val rfaFactsWithMark = processLHSs(lhss, s, currentContext).values.toSet
+	      val rfaFactsWithMark = processLHSs(lhss, s, currentNode.getContext).values.toSet
 	      for (rdf @ TaintFact(fact, _) <- s) {
 	        //if it is a strong definition, we can kill the existing definition
 	        rfaFactsWithMark.foreach{
@@ -375,8 +375,8 @@ class AndroidTaintAnalysisBuilder{
       result
     }
 
-    def apply(s : ISet[TaintFact], e : Exp, currentContext : Context) : ISet[TaintFact] = s
-    def apply(s : ISet[TaintFact], a : Action, currentContext : Context) : ISet[TaintFact] = s
+    def apply(s : ISet[TaintFact], e : Exp, currentNode : CGLocNode) : ISet[TaintFact] = s
+    def apply(s : ISet[TaintFact], a : Action, currentNode : CGLocNode) : ISet[TaintFact] = s
   }
   
   class Callr
@@ -414,8 +414,8 @@ class AndroidTaintAnalysisBuilder{
 	    (calleeFactsMap, returnFacts)
     }
     
-    def getAndMapFactsForCaller(callerS : ISet[TaintFact], calleeS : ISet[TaintFact], cj : CallJump, calleeProcedure : ProcedureDecl, calleeContext : Context) : ISet[TaintFact] ={
-      doGetAndMapFactsForCaller(callerS, calleeS, cj, calleeProcedure, calleeContext)
+    def getAndMapFactsForCaller(calleeS : ISet[TaintFact], callerNode : CGNode, calleeExitNode : CGVirtualNode) : ISet[TaintFact] ={
+      doGetAndMapFactsForCaller(calleeS, callerNode, calleeExitNode)
     }
   }
   
@@ -551,71 +551,88 @@ class AndroidTaintAnalysisBuilder{
     }
   }
   
-  def doGetAndMapFactsForCaller(callerS : ISet[TaintFact], calleeS : ISet[TaintFact], cj : CallJump, calleeProcedure : ProcedureDecl, calleeContext : Context) : ISet[TaintFact] ={
-    val callerVarFacts = callerS.filter(_.fact.s.isInstanceOf[VarSlot])
-    val calleeVarFacts = calleeS.filter(_.fact.s.isInstanceOf[VarSlot])
-    var lhsSlots : Seq[VarSlot] = cj.lhss.map{lhs=>VarSlot(lhs.name.name)}
-    var retSlots : ISet[VarSlot] = isetEmpty
+  def doGetAndMapFactsForCaller(calleeS : ISet[TaintFact], callerNode : CGNode, calleeExitNode : CGVirtualNode) : ISet[TaintFact] ={
     var result = isetEmpty[TaintFact]
-    val rfacts = this.rfaFacts.entrySet(this.cg.getCGExitNode(calleeContext))
-    val globalFacts = ReachingFactsAnalysisHelper.getGlobalFacts(rfacts)
-    result ++= calleeS.filter(taFact => globalFacts.contains(taFact.fact))
-    calleeProcedure.body match{
-      case ib : ImplementedBody =>
-        ib.locations.foreach{
-          loc=>
-            if(isReturnJump(loc)){
-              val rj = loc.asInstanceOf[JumpLocation].jump.asInstanceOf[ReturnJump]
-              rj.exp match{
-                case Some(n) => 
-                  n match{
-                    case ne : NameExp => retSlots += VarSlot(ne.name.name)
-                    case _ =>
-                  }
-                case None =>
-              }
-            }
-        }
-      case _ =>
-    }
-    // following maybe not correct
-    lhsSlots.foreach{
-      lhsSlot =>
-        var values : ISet[TaintFact] = isetEmpty
-        retSlots.foreach{
-          retSlot =>
-            calleeVarFacts.foreach{
-              case TaintFact(fact, source) =>
-                if(fact.s == retSlot){
-                  val rfaFacts = ReachingFactsAnalysisHelper.getRelatedFacts(retSlot, rfacts)
-                  result ++= rfaFacts.map(f => TaintFact(f, source))
-                }
-            }
-        }
-    }
-    cj.callExp.arg match{
-      case te : TupleExp => 
-        val argSlots = te.exps.map{
-          exp =>
-            exp match{
-	            case ne : NameExp => VarSlot(ne.name.name)
-	            case _ => VarSlot(exp.toString)
-	          }
-        }
-        argSlots.foreach{
-          argSlot =>
-            var values : ISet[TaintFact] = isetEmpty
-            callerVarFacts.foreach{
-              case TaintFact(fact, source) =>
-                if(fact.s == argSlot){
-              	  val rfaFacts = ReachingFactsAnalysisHelper.getRelatedFacts(argSlot, rfacts)
-                  result ++= rfaFacts.map(f => TaintFact(f, source))
-                }
-            }
-        }
-        result
-      case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
-    }
+//    result ++= ReachingFactsAnalysisHelper.getGlobalFacts(calleeS)
+//    callerNode match{
+//      case crn : CGReturnNode =>
+//        val calleeVarFacts = calleeS.filter(_.s.isInstanceOf[VarSlot]).map{f=>(f.s.asInstanceOf[VarSlot], f.v)}.toSet
+//        val callee = calleeExitNode.getOwner
+//        val calleeProcedure = callee.getProcedureBody.procedure
+//        val cj = callee.getProcedureBody.location(crn.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump]
+//        val lhsSlots : ISeq[VarSlot] = cj.lhss.map{lhs=>VarSlot(lhs.name.name)}
+//        var paramSlots : List[VarSlot] = List()
+//        calleeProcedure.params.foreach{
+//          param =>
+//            require(param.typeSpec.isDefined)
+//            param.typeSpec.get match{
+//              case nt : NamedTypeSpec => 
+//                val name = nt.name.name
+//                if(name=="[|long|]" || name=="[|double|]")
+//                  paramSlots :+= VarSlot(param.name.name)
+//              case _ =>
+//            }
+//            paramSlots :+= VarSlot(param.name.name)
+//        }
+//        var retSlots : ISet[VarSlot] = isetEmpty
+//        calleeProcedure.body match{
+//	        case ib : ImplementedBody =>
+//	          ib.locations.foreach{
+//	            loc=>
+//	              if(isReturnJump(loc)){
+//	                val rj = loc.asInstanceOf[JumpLocation].jump.asInstanceOf[ReturnJump]
+//	                rj.exp match{
+//	                  case Some(n) => 
+//	                    n match{
+//	                      case ne : NameExp => retSlots += VarSlot(ne.name.name)
+//	                      case _ =>
+//	                    }
+//	                  case None =>
+//	                }
+//	              }
+//	          }
+//	        case _ =>
+//	      }
+//	      lhsSlots.foreach{
+//	        lhsSlot =>
+//		        var values : ISet[Instance] = isetEmpty
+//		        retSlots.foreach{
+//		          retSlot =>
+//		            calleeVarFacts.foreach{
+//		              case (s, v) =>
+//		                if(s == retSlot){
+//		                  values += v
+//		                }
+//		            }
+//		        }
+//		        result ++= values.map(v => TaintFact(lhsSlot, v))
+//		        result ++= ReachingFactsAnalysisHelper.getRelatedHeapFacts(values, calleeS)
+//	      }
+//	      cj.callExp.arg match{
+//	        case te : TupleExp => 
+//	          val argSlots = te.exps.map{
+//	            exp =>
+//	              exp match{
+//			            case ne : NameExp => VarSlot(ne.name.name)
+//			            case _ => VarSlot(exp.toString)
+//			          }
+//	          }
+//	          argSlots.foreach{
+//	            argSlot =>
+//	              var values : ISet[Instance] = isetEmpty
+//		            calleeVarFacts.foreach{
+//		              case (s, v) =>
+//		                if(paramSlots.contains(s))
+//		              	 values += v
+//		            }
+//	              result ++= values.map(v=>RFAFact(argSlot, v))
+//	              result ++= ReachingFactsAnalysisHelper.getRelatedHeapFacts(values, calleeS)
+//	          }
+//	        case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
+//	      }
+//      case cnn : CGNode =>
+//    }
+    result
   }
   
   private def isReturnJump(loc : LocationDecl) : Boolean = {

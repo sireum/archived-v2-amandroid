@@ -17,6 +17,7 @@ import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.amandroid.PilarAstHelper
 import org.sireum.alir._
+import org.sireum.amandroid.interProcedural.NodeListener
 
 object InterproceduralReachingDefinitionAnalysis {
   type RDFact = AndroidReachingDefinitionAnalysis.RDFact
@@ -65,8 +66,8 @@ class InterproceduralReachingDefinitionAnalysis {
 	  val initialContext : Context = new Context(GlobalConfig.CG_CONTEXT_K)
     val iota : ISet[IRDFact] = isetEmpty + (((VarSlot("@@IRDA"), InitDefDesc), initialContext))
     val initial : ISet[IRDFact] = isetEmpty
-    val result = new InterProceduralMonotoneDataFlowAnalysisFramework().apply[IRDFact](cg,
-      true, true, false, gen, kill, callr, iota, initial, switchAsOrderedMatch)
+    val result = InterProceduralMonotoneDataFlowAnalysisFramework[IRDFact](cg,
+      true, true, false, gen, kill, callr, iota, initial, switchAsOrderedMatch, None)
 
 //    print("IRD\n")
 //    print(result)
@@ -118,17 +119,19 @@ class InterproceduralReachingDefinitionAnalysis {
 	class Gen extends InterProceduralMonotonicFunction[IRDFact] {
 		import org.sireum.pilar.ast._
 	
-	  def apply(s : ISet[IRDFact], a : Assignment, currentContext : Context) : ISet[IRDFact] = {
-		  val node = if(cg.cgCallNodeExists(currentContext)) cg.getCGCallNode(currentContext) else cg.getCGNormalNode(currentContext)
+	  def apply(s : ISet[IRDFact], a : Assignment, currentNode : CGLocNode) : ISet[IRDFact] = {
+		  val node = currentNode
 		  val succs = cg.successors(node)
-		  val globFacts = succs.map(node => factSet(node).filter(fact => isGlobal(fact._1._1))).reduce(iunion[IRDFact])
+		  val globFacts = 
+		    if(succs.isEmpty) isetEmpty[IRDFact]
+		    else succs.map(node => factSet(node).filter(fact => isGlobal(fact._1._1) && isDef(fact._1._2))).reduce(iunion[IRDFact])
 		  val globDefFacts = globFacts.filter(fact => isDef(fact._1._2))
 		  val flowingGlobFacts = s.filter(fact => isGlobal(fact._1._1) && isDef(fact._1._2))
 		  factSet += (node -> (factSet(node) -- globFacts ++ flowingGlobFacts ++ globDefFacts))
 		  globDefFacts
 		}
-	  def apply(s : ISet[IRDFact], e : Exp, currentContext : Context) : ISet[IRDFact] = isetEmpty
-		def apply(s : ISet[IRDFact], a : Action, currentContext : Context) : ISet[IRDFact] = isetEmpty
+	  def apply(s : ISet[IRDFact], e : Exp, currentNode : CGLocNode) : ISet[IRDFact] = isetEmpty
+		def apply(s : ISet[IRDFact], a : Action, currentNode : CGLocNode) : ISet[IRDFact] = isetEmpty
 	}
 	
 	/**
@@ -136,15 +139,17 @@ class InterproceduralReachingDefinitionAnalysis {
 	 */
 	class Kill extends InterProceduralMonotonicFunction[IRDFact] {
 		import org.sireum.pilar.ast._
-	  def apply(s : ISet[IRDFact], a : Assignment, currentContext : Context) : ISet[IRDFact] = {
-		  val node = if(cg.cgCallNodeExists(currentContext)) cg.getCGCallNode(currentContext) else cg.getCGNormalNode(currentContext)
+	  def apply(s : ISet[IRDFact], a : Assignment, currentNode : CGLocNode) : ISet[IRDFact] = {
+		  val node = currentNode
 		  val succs = cg.successors(node)
-		  val globDefFacts = succs.map(node => factSet(node).filter(fact => isGlobal(fact._1._1) && isDef(fact._1._2))).reduce(iunion[IRDFact])
+		  val globDefFacts = 
+		    if(succs.isEmpty) isetEmpty[IRDFact]
+		    else succs.map(node => factSet(node).filter(fact => isGlobal(fact._1._1) && isDef(fact._1._2))).reduce(iunion[IRDFact])
 		  val redefGlobSlots = globDefFacts.filter(fact => s.map(_._1._1).contains(fact._1._1)).map(_._1._1)
 		  s.filter(f => !redefGlobSlots.contains(f._1._1))
 		}
-	  def apply(s : ISet[IRDFact], e : Exp, currentContext : Context) : ISet[IRDFact] = s
-		def apply(s : ISet[IRDFact], a : Action, currentContext : Context) : ISet[IRDFact] = s
+	  def apply(s : ISet[IRDFact], e : Exp, currentNode : CGLocNode) : ISet[IRDFact] = s
+		def apply(s : ISet[IRDFact], a : Action, currentNode : CGLocNode) : ISet[IRDFact] = s
 	}
 	
 	/**
@@ -169,7 +174,7 @@ class InterproceduralReachingDefinitionAnalysis {
 	    (calleeFactsMap, returnFacts)
 	  }
 	  
-	  def getAndMapFactsForCaller(callerS : ISet[IRDFact], calleeS : ISet[IRDFact], cj : CallJump, calleeProcedure : ProcedureDecl, calleeContext : Context) : ISet[IRDFact] = {
+	  def getAndMapFactsForCaller(calleeS : ISet[IRDFact], callerNode : CGNode, calleeExitNode : CGVirtualNode) : ISet[IRDFact] = {
 	    calleeS
 	  }
 	  

@@ -14,6 +14,7 @@ import org.sireum.amandroid.android.AndroidConstants
 import org.sireum.amandroid.MessageCenter._
 import org.sireum.amandroid.NormalType
 import org.sireum.amandroid.util.StringFormConverter
+import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.model.AndroidModelCallHandler
 
 object ReachingFactsAnalysisHelper {
 	def getFactMap(s : ISet[RFAFact]) : Map[Slot, Set[Instance]] = s.groupBy(_.s).mapValues(_.map(_.v))
@@ -65,54 +66,70 @@ object ReachingFactsAnalysisHelper {
   }
 	
 	def getCalleeSet(s : ISet[RFAFact], cj : CallJump, callerContext : Context) : ISet[AmandroidProcedure] = {
-      val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
-      val sig = cj.getValueAnnotation("signature") match {
-          case Some(s) => s match {
-            case ne : NameExp => ne.name.name
-            case _ => ""
-          }
-          case None => throw new RuntimeException("cannot found annotation 'signature' from: " + cj)
+    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+    val sig = cj.getValueAnnotation("signature") match {
+        case Some(s) => s match {
+          case ne : NameExp => ne.name.name
+          case _ => ""
         }
-      val subSig = Center.getSubSigFromProcSig(sig)
-      val typ = cj.getValueAnnotation("type") match {
-          case Some(s) => s match {
-            case ne : NameExp => ne.name.name
-            case _ => ""
-          }
-          case None => throw new RuntimeException("cannot found annotation 'type' from: " + cj)
-        }
-      var calleeSet = isetEmpty[AmandroidProcedure]
-      if(typ == "virtual" || typ == "interface" || typ == "super" || typ == "direct"){
-        cj.callExp.arg match{
-          case te : TupleExp => 
-            val recvSlot = te.exps(0) match{
-              case ne : NameExp => VarSlot(ne.name.name)
-              case _ => throw new RuntimeException("wrong exp type: " + te.exps(0))
-            }
-            val recvValue : ISet[Instance] = factMap.getOrElse(recvSlot, Set(NullInstance(callerContext)))
-            recvValue.foreach{
-				      ins =>
-				        if(ins.isInstanceOf[NullInstance])
-				          err_msg_normal("Try to invoke method: " + sig + "@" + callerContext + "\nwith Null pointer:" + ins)
-				        else if(ins.isInstanceOf[UnknownInstance]) {
-				          err_msg_detail("Invoke method: " + sig + "@" + callerContext + "\n with Unknown Instance: " + ins)
-				          calleeSet += Center.getProcedureWithoutFailing(Center.UNKNOWN_PROCEDURE_SIG)
-				        } else {
-					        val p = 
-					          if(typ == "super") Center.getSuperCalleeProcedureWithoutFailing(sig)
-					          else if(typ == "direct") Center.getDirectCalleeProcedureWithoutFailing(sig)
-					        	else Center.getVirtualCalleeProcedureWithoutFailing(ins.typ, subSig)
-					        calleeSet += p
-                }
-				    }
-          case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
-        }
-      } else {
-        val p = Center.getStaticCalleeProcedureWithoutFailing(sig)
-	      calleeSet += p
+        case None => throw new RuntimeException("cannot found annotation 'signature' from: " + cj)
       }
-      calleeSet
+    val subSig = Center.getSubSigFromProcSig(sig)
+    val typ = cj.getValueAnnotation("type") match {
+        case Some(s) => s match {
+          case ne : NameExp => ne.name.name
+          case _ => ""
+        }
+        case None => throw new RuntimeException("cannot found annotation 'type' from: " + cj)
+      }
+    var calleeSet = isetEmpty[AmandroidProcedure]
+    if(typ == "virtual" || typ == "interface" || typ == "super" || typ == "direct"){
+      cj.callExp.arg match{
+        case te : TupleExp => 
+          val recvSlot = te.exps(0) match{
+            case ne : NameExp => VarSlot(ne.name.name)
+            case _ => throw new RuntimeException("wrong exp type: " + te.exps(0))
+          }
+          val recvValue : ISet[Instance] = factMap.getOrElse(recvSlot, isetEmpty)
+          recvValue.foreach{
+			      ins =>
+			        if(ins.isInstanceOf[NullInstance])
+			          err_msg_normal("Try to invoke method: " + sig + "@" + callerContext + "\nwith Null pointer:" + ins)
+			        else if(ins.isInstanceOf[UnknownInstance]) {
+			          err_msg_detail("Invoke method: " + sig + "@" + callerContext + "\n with Unknown Instance: " + ins)
+			          calleeSet += Center.getProcedureWithoutFailing(Center.UNKNOWN_PROCEDURE_SIG)
+			        } else {
+				        val p = 
+				          if(typ == "super") Center.getSuperCalleeProcedureWithoutFailing(sig)
+				          else if(typ == "direct") Center.getDirectCalleeProcedureWithoutFailing(sig)
+				        	else Center.getVirtualCalleeProcedureWithoutFailing(ins.typ, subSig)
+				        calleeSet += p
+              }
+			    }
+        case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
+      }
+    } else {
+      val p = Center.getStaticCalleeProcedureWithoutFailing(sig)
+      calleeSet += p
     }
+    calleeSet
+  }
+	
+	def isModelCall(calleeProc : AmandroidProcedure) : Boolean = {
+    AndroidModelCallHandler.isModelCall(calleeProc)
+  }
+  
+  def doModelCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+    AndroidModelCallHandler.doModelCall(s, calleeProc, args, retVars, currentContext)
+  }
+  
+  def isICCCall(calleeProc : AmandroidProcedure) : Boolean = {
+    AndroidModelCallHandler.isICCCall(calleeProc)
+  }
+  
+  def doICCCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[AmandroidProcedure]) = {
+    AndroidModelCallHandler.doICCCall(s, calleeProc, args, retVars, currentContext)
+  }
 	
 	def getInstanceFromType(typ : Type, currentContext : Context) : Option[Instance] = {
 	  if(Center.isJavaPrimitiveType(typ) || typ.typ == "[|void|]") None
@@ -127,7 +144,7 @@ object ReachingFactsAnalysisHelper {
 	  } else None
 	}
 	
-	def checkAndGetUnknownObject(s : ISet[RFAFact], newFacts : ISet[RFAFact], args : Seq[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+	def checkAndGetUnknownObject(calleeProc : AmandroidProcedure, s : ISet[RFAFact], newFacts : ISet[RFAFact], args : Seq[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
 	  var result : ISet[RFAFact] = isetEmpty
 	  if(newFacts.isEmpty){
 	    val argSlots = args.map(arg=>VarSlot(arg))
@@ -144,18 +161,29 @@ object ReachingFactsAnalysisHelper {
 	          case None =>
 	        }
 	    }
-	    retVars.foreach{
-	      retVar =>
-		      val slot = VarSlot(retVar)
-	        val value = UnknownInstance(currentContext)
-	        result += RFAFact(slot, value)
-	    }
+	    if(!Center.isJavaPrimitiveType(calleeProc.getReturnType))
+		    retVars.foreach{
+		      retVar =>
+			      val slot = VarSlot(retVar)
+		        val value = UnknownInstance(currentContext)
+		        result += RFAFact(slot, value)
+		    }
 //	    val globSlots = s.filter(f=>if(f.s.isInstanceOf[VarSlot])f.s.asInstanceOf[VarSlot].isGlobal else false).map(f=>f.s)
 //	    globSlots.foreach{
 //	      globSlot =>
 //	        result += RFAFact(globSlot, UnknownInstance(currentContext))
 //	    }
 	  }
+	  result
+	}
+	
+	def checkAndGetUnknownObjectForClinit(calleeProc : AmandroidProcedure, currentContext : Context) : ISet[RFAFact] = {
+	  var result : ISet[RFAFact] = isetEmpty
+	  val record = calleeProc.getDeclaringRecord
+    record.getStaticObjectTypeFields.foreach{
+      field =>
+        result += RFAFact(VarSlot(field.getSignature), UnknownInstance(currentContext))
+    }
 	  result
 	}
 	
@@ -185,7 +213,7 @@ object ReachingFactsAnalysisHelper {
               case ne : NameExp => VarSlot(ne.name.name)
               case _ => throw new RuntimeException("Wrong exp: " + ae.exp)
             }
-            val baseValue = factMap.getOrElse(baseSlot, Set(NullInstance(currentContext)))
+            val baseValue = factMap.getOrElse(baseSlot, isetEmpty)
             baseValue.map{
               ins =>
                 if(ins.isInstanceOf[NullInstance])
@@ -209,7 +237,7 @@ object ReachingFactsAnalysisHelper {
                 VarSlot(ine.name.name)
               case _ => throw new RuntimeException("Wrong exp: " + ie.exp)
             }
-            val baseValue = factMap.getOrElse(baseSlot, Set(NullInstance(currentContext)))
+            val baseValue = factMap.getOrElse(baseSlot, isetEmpty[Instance])
             baseValue.map{
               ins =>
                 if(ins.isInstanceOf[NullInstance])
@@ -268,11 +296,11 @@ object ReachingFactsAnalysisHelper {
             } else if(slot.isGlobal){
               Center.findStaticField(ne.name.name) match{
                 case Some(af) =>
-                  value ++= factMap.getOrElse(VarSlot(af.getSignature), Set(NullInstance(currentContext)))
+                  value ++= factMap.getOrElse(VarSlot(af.getSignature), isetEmpty[Instance])
                 case None =>
                   err_msg_detail("Given field may be in other library: " + ne.name.name)
               }
-            } else value ++= factMap.getOrElse(slot, Set(NullInstance(currentContext)))
+            } else value ++= factMap.getOrElse(slot, isetEmpty[Instance])
             result(i) = value
           case le : LiteralExp =>
             if(le.typ.name.equals("STRING")){
@@ -305,7 +333,7 @@ object ReachingFactsAnalysisHelper {
               case ne : NameExp => VarSlot(ne.name.name)
               case _ => throw new RuntimeException("Wrong exp: " + ae.exp)
             }
-            val baseValue : ISet[Instance] = factMap.getOrElse(baseSlot, Set(NullInstance(currentContext.copy)))
+            val baseValue : ISet[Instance] = factMap.getOrElse(baseSlot, isetEmpty[Instance])
             baseValue.map{
               ins =>
                 if(ins.isInstanceOf[NullInstance])
@@ -317,7 +345,7 @@ object ReachingFactsAnalysisHelper {
                   Center.findField(ins.getType, fieldSig) match{
                     case Some(af) =>
 		                  val fieldSlot = FieldSlot(ins, af.getSignature)
-			                val fieldValue : ISet[Instance] = factMap.getOrElse(fieldSlot, Set(NullInstance(currentContext.copy)))
+			                val fieldValue : ISet[Instance] = factMap.getOrElse(fieldSlot, isetEmpty[Instance])
 					            result(i) = fieldValue
                     case None =>
                       err_msg_detail("Given field may be in other library: " + fieldSig)
@@ -330,14 +358,14 @@ object ReachingFactsAnalysisHelper {
                 VarSlot(ine.name.name)
               case _ => throw new RuntimeException("Wrong exp: " + ie.exp)
             }
-            val baseValue : ISet[Instance] = factMap.getOrElse(baseSlot, Set(NullInstance(currentContext.copy)))
+            val baseValue : ISet[Instance] = factMap.getOrElse(baseSlot, isetEmpty[Instance])
             baseValue.map{
               ins =>
                 if(ins.isInstanceOf[NullInstance])
                   err_msg_normal("Access array: " + baseSlot + "@" + currentContext + "\nwith Null pointer: " + ins)
                 else{
                   val arraySlot = ArraySlot(ins)
-                  val arrayValue : ISet[Instance] = factMap.getOrElse(arraySlot, Set(NullInstance(currentContext.copy)))
+                  val arrayValue : ISet[Instance] = factMap.getOrElse(arraySlot, isetEmpty[Instance])
 			            if(arrayValue != null)
 			            	result(i) = arrayValue
                 }
@@ -346,7 +374,7 @@ object ReachingFactsAnalysisHelper {
             ce.exp match{
               case ice : NameExp =>
                 val slot = VarSlot(ice.name.name)
-                val value : ISet[Instance] = factMap.getOrElse(slot, Set(NullInstance(currentContext.copy)))
+                val value : ISet[Instance] = factMap.getOrElse(slot, isetEmpty[Instance])
 		            result(i) = value
               case _ => throw new RuntimeException("Wrong exp: " + ce.exp)
             }

@@ -35,7 +35,7 @@ trait ModelCallHandler {
    */
 	def doModelCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
 	  var (newFacts, delFacts) = caculateResult(s, calleeProc, args, retVars, currentContext)
-	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObject(s, newFacts, args, retVars, currentContext)
+	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObject(calleeProc, s, newFacts, args, retVars, currentContext)
 	  s ++ newFacts -- delFacts
 	}
 	

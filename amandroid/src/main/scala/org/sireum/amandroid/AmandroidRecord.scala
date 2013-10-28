@@ -15,6 +15,9 @@ import org.sireum.amandroid.util.StringFormConverter
  */
 class AmandroidRecord {
   
+  val constructorName : String = "<init>"
+	val staticInitializerName : String = "<clinit>"
+  
   /**
    * name is with this style: [|java:lang:Object|] or [|java:lang:Object|][]
    */
@@ -318,6 +321,12 @@ class AmandroidRecord {
 	def getNonStaticObjectTypeFields = getNonStaticFields.intersect(getObjectTypeFields)
 	
 	/**
+	 * get all static and object type field
+	 */
+	
+	def getStaticObjectTypeFields = getStaticFields.intersect(getObjectTypeFields)
+	
+	/**
 	 * get all static fields of the record
 	 */
 	
@@ -340,6 +349,12 @@ class AmandroidRecord {
 	 */
 	
 	def getDeclaredNonStaticObjectTypeFields = getDeclaredNonStaticFields.intersect(getObjectTypeFields)
+	
+	/**
+	 * get all static and object type field
+	 */
+	
+	def getDeclaredStaticObjectTypeFields = getDeclaredStaticFields.intersect(getObjectTypeFields)
 	
 	/**
 	 * add one field into the record
@@ -465,6 +480,12 @@ class AmandroidRecord {
 	}
 	
 	/**
+	 * get static initializer of this record
+	 */
+	
+	def getStaticInitializer : AmandroidProcedure = getProcedureByShortName(this.staticInitializerName)
+	
+	/**
 	 * whether this procedure exists in the record or not
 	 */
 	
@@ -547,6 +568,12 @@ class AmandroidRecord {
 	  }
 	  find
 	}
+	
+	/**
+	 * return true if this record has static initializer
+	 */
+	
+	def declaresStaticInitializer : Boolean = declaresProcedureByShortName(this.staticInitializerName)
 	
 	/**
 	 * add the given procedure to this record

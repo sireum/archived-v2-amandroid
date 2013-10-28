@@ -13,6 +13,7 @@ import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.amandroid.interProcedural.InterProceduralGraph
 import org.sireum.amandroid.interProcedural.InterProceduralNode
 import org.sireum.amandroid.interProcedural.Context
+import scala.collection.immutable.BitSet
 
 /**
  * @author Fengguo Wei & Sankardas Roy
@@ -252,6 +253,19 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
    
   def isCall(l : LocationDecl) : Boolean = l.isInstanceOf[JumpLocation] && l.asInstanceOf[JumpLocation].jump.isInstanceOf[CallJump]
    
+  def merge(cg : CallGraph[Node]) = {
+    this.pl ++= cg.pool
+    cg.nodes.foreach(addNode(_))
+    cg.edges.foreach(addEdge(_))
+    cg.callMap.foreach{
+      case (src, dsts) =>
+        this.callMap += (src -> (this.callMap.getOrElse(src, isetEmpty) ++ dsts))
+    }
+    this.processed ++= cg.processed
+    this.predBranchMap ++= cg.predBranchMap
+    this.succBranchMap ++= cg.succBranchMap
+  }
+  
   def collectCfgToBaseGraph[VirtualLabel](calleeProc : AmandroidProcedure, callerContext : Context, isFirst : Boolean = false) = {
     val calleeSig = calleeProc.getSignature
     val body = calleeProc.getProcedureBody
@@ -523,22 +537,29 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
 
 sealed abstract class CGNode(context : Context) extends InterProceduralNode(context){
   protected var owner : AmandroidProcedure = null
+  protected var loadedClassBitSet : BitSet = BitSet.empty
   def setOwner(owner : AmandroidProcedure)  = this.owner = owner
   def getOwner = this.owner
+  def setLoadedClassBitSet(bitset : BitSet) = this.loadedClassBitSet = bitset
+  def getLoadedClassBitSet = this.loadedClassBitSet
+  def updateLoadedClassBitSet(bitset : BitSet) = {
+    if(getLoadedClassBitSet == null) setLoadedClassBitSet(bitset)
+    else setLoadedClassBitSet(bitset.intersect(getLoadedClassBitSet))
+  }
 }
 
 abstract class CGVirtualNode(context : Context) extends CGNode(context) {
   def getVirtualLabel : String
+  override def toString : String = getVirtualLabel + "@" + context
 }
 
 final case class CGEntryNode(context : Context) extends CGVirtualNode(context){
   def getVirtualLabel : String = "Entry"
-  override def toString : String = "Entry@" + context
+  
 }
 
 final case class CGExitNode(context : Context) extends CGVirtualNode(context){
   def getVirtualLabel : String = "Exit"
-  override def toString : String = "Exit@" + context
 }
 
 abstract class CGLocNode(context : Context) extends CGNode(context) {
@@ -553,16 +574,15 @@ abstract class CGInvokeNode(context : Context) extends CGLocNode(context) {
   def getInvokeLabel : String
   def setCalleeSet(calleeSet : ISet[AmandroidProcedure]) = this.setProperty(CALLEES, calleeSet)
   def getCalleeSet : ISet[AmandroidProcedure] = this.getPropertyOrElse(CALLEES, isetEmpty)
+  override def toString : String = getInvokeLabel + "@" + context
 }
 
 final case class CGCallNode(context : Context) extends CGInvokeNode(context){
   def getInvokeLabel : String = "Call"
-  override def toString : String = getInvokeLabel + "@" + context
 }
 
 final case class CGReturnNode(context : Context) extends CGInvokeNode(context){
   def getInvokeLabel : String = "Return"
-  override def toString : String = getInvokeLabel + "@" + context
 }
 
 final case class CGNormalNode(context : Context) extends CGLocNode(context){
