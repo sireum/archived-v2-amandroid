@@ -35,6 +35,7 @@ import org.sireum.amandroid.interProcedural.NodeListener
 import org.sireum.amandroid.interProcedural.callGraph.CGLocNode
 import org.sireum.amandroid.interProcedural.callGraph.CGVirtualNode
 import org.sireum.amandroid.interProcedural.callGraph.CGNormalNode
+import org.sireum.amandroid.Mode
 
 class AndroidReachingFactsAnalysisBuilder{
   
@@ -43,6 +44,7 @@ class AndroidReachingFactsAnalysisBuilder{
   def build //
   (entryPointProc : AmandroidProcedure,
    initialFacts : ISet[RFAFact] = isetEmpty,
+   parallel : Boolean,
    initContext : Context,
    switchAsOrderedMatch : Boolean) : (CallGraph[CGNode], AndroidReachingFactsAnalysis.Result) = {
     val gen = new Gen
@@ -55,7 +57,7 @@ class AndroidReachingFactsAnalysisBuilder{
     cg.collectCfgToBaseGraph(entryPointProc, initContext, true)
     val iota : ISet[RFAFact] = initialFacts + RFAFact(VarSlot("@@[|RFAiota|]"), NullInstance(initContext))
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](cg,
-      true, true, false, gen, kill, callr, iota, initial, switchAsOrderedMatch, Some(nl))
+      true, true, false, parallel, gen, kill, callr, iota, initial, switchAsOrderedMatch, Some(nl))
 
 //    print("RFA\n")
 //    print(result)
@@ -65,7 +67,7 @@ class AndroidReachingFactsAnalysisBuilder{
   private def checkAndLoadClassFromHierarchy(me : AmandroidRecord, s : ISet[RFAFact], currentNode : CGLocNode) : ISet[RFAFact] = {
     var result = isetEmpty[RFAFact]
     if(me.hasSuperClass){
-      checkAndLoadClassFromHierarchy(me.getSuperClass, s, currentNode)
+      result ++= checkAndLoadClassFromHierarchy(me.getSuperClass, s, currentNode)
     }
     val bitset = currentNode.getLoadedClassBitSet
     if(!ClassLoadManager.isLoaded(me, bitset)){
@@ -73,7 +75,8 @@ class AndroidReachingFactsAnalysisBuilder{
 	    if(me.declaresStaticInitializer){
 	      val p = me.getStaticInitializer
 	      if(ReachingFactsAnalysisHelper.isModelCall(p)){
-          result ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForClinit(p, currentNode.getContext)
+          if(GlobalConfig.mode > Mode.APP_ONLY)
+            result ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForClinit(p, currentNode.getContext)
         } else { // for normal call
           this.callGraph.collectCfgToBaseGraph(p, currentNode.getContext, false)
 	        val clinitVirContext = currentNode.getContext.copy.setContext(p.getSignature, p.getSignature)
@@ -89,6 +92,7 @@ class AndroidReachingFactsAnalysisBuilder{
   
   private def checkClass(recName : String, s : ISet[RFAFact], currentNode : CGLocNode) : ISet[RFAFact] = {
     val rec = Center.resolveRecord(recName, Center.ResolveLevel.BODIES)
+    
     checkAndLoadClassFromHierarchy(rec, s, currentNode)
   }
   
@@ -106,7 +110,7 @@ class AndroidReachingFactsAnalysisBuilder{
             val slot = VarSlot(ne.name.name)
             if(slot.isGlobal){ 
             	val recName = StringFormConverter.getRecordNameFromFieldSignature(ne.name.name)
-            	checkClass(recName, s, currentNode)
+            	result ++= checkClass(recName, s, currentNode)
             }
           case _ =>
         }
@@ -239,7 +243,7 @@ class AndroidReachingFactsAnalysisBuilder{
 	      result ++= fieldsFacts
 	      val classLoadingFacts = checkAndLoadClasses(lhss, rhss, a, s, currentNode)
 	      result ++= classLoadingFacts
-	      val values = ReachingFactsAnalysisHelper.processRHSs(rhss, s ++ classLoadingFacts, currentNode.getContext) 
+	      val values = ReachingFactsAnalysisHelper.processRHSs(rhss, s , currentNode.getContext) 
 	      slots.foreach{
 	        case(i, (slot, _)) =>
 	          if(values.contains(i))
@@ -301,8 +305,10 @@ class AndroidReachingFactsAnalysisBuilder{
      */
     def resolveCall(s : ISet[RFAFact], cj : CallJump, callerContext : Context, cg : CallGraph[CGNode]) : (IMap[CGNode, ISet[RFAFact]], ISet[RFAFact]) = {
       val calleeSet = ReachingFactsAnalysisHelper.getCalleeSet(s, cj, callerContext)
-      cg.getCGCallNode(callerContext).asInstanceOf[CGCallNode].setCalleeSet(calleeSet)
-      cg.getCGReturnNode(callerContext).asInstanceOf[CGReturnNode].setCalleeSet(calleeSet)
+      val cgCallnode = cg.getCGCallNode(callerContext)
+      cgCallnode.asInstanceOf[CGCallNode].setCalleeSet(calleeSet)
+      val cgReturnnode = cg.getCGReturnNode(callerContext)
+      cgReturnnode.asInstanceOf[CGReturnNode].setCalleeSet(calleeSet)
       var calleeFactsMap : IMap[CGNode, ISet[RFAFact]] = imapEmpty
       var returnFacts : ISet[RFAFact] = s
       var tmpReturnFacts : ISet[RFAFact] = isetEmpty
@@ -344,8 +350,10 @@ class AndroidReachingFactsAnalysisBuilder{
             }
           } else { // for normal call
             if(!cg.isProcessed(callee, callerContext)){
-	            cg.collectCfgToBaseGraph[String](callee, callerContext, false)
-						  cg.extendGraph(callee.getSignature, callerContext)
+	            this.synchronized{
+	              cg.collectCfgToBaseGraph[String](callee, callerContext, false)
+	            	cg.extendGraph(callee.getSignature, callerContext)
+	            }
             }
             val factsForCallee = getFactsForCallee(s, cj, callee)
             returnFacts --= factsForCallee
@@ -353,14 +361,9 @@ class AndroidReachingFactsAnalysisBuilder{
           }
       }
       returnFacts ++= tmpReturnFacts
-      if(pureNormalFlag){
-        val cn = cg.getCGCallNode(callerContext)
-        val rn = cg.getCGReturnNode(callerContext)
-        cg.deleteEdge(cn, rn)
-      } else {
-        val cn = cg.getCGCallNode(callerContext)
-        val rn = cg.getCGReturnNode(callerContext)
-        if(!cg.hasEdge(cn, rn)) cg.addEdge(cn, rn)
+      if(!pureNormalFlag){
+        if(!cg.hasEdge(cgCallnode, cgReturnnode))
+        	this.synchronized(cg.addEdge(cgCallnode, cgReturnnode))
       }
 	    (calleeFactsMap, returnFacts)
     }
@@ -435,12 +438,7 @@ class AndroidReachingFactsAnalysisBuilder{
       val recCallee = calleeProc.getDeclaringRecord
       var tmpRec = recRecv
       if(typ == "direct" || typ == "super" ){
-        while(tmpRec.hasSuperClass){
-		      if(tmpRec == recCallee) return true
-		      else tmpRec = tmpRec.getSuperClass
-	      }
-        if(tmpRec == recCallee) return true
-        throw new RuntimeException("Given recvIns: " + recvIns + " and calleeProc: " + calleeProc + " is not in the Same hierachy.")
+        true
       } else {
 	      while(tmpRec.hasSuperClass){
 		      if(tmpRec == recCallee) return true
@@ -632,7 +630,8 @@ object AndroidReachingFactsAnalysis {
   type Result = InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]
   def apply(entryPointProc : AmandroidProcedure,
    initialFacts : ISet[RFAFact] = isetEmpty,
+   parallel : Boolean = false,
    initContext : Context = new Context(GlobalConfig.CG_CONTEXT_K),
    switchAsOrderedMatch : Boolean = false) : (CallGraph[Node], Result)
-				   = new AndroidReachingFactsAnalysisBuilder().build(entryPointProc, initialFacts, initContext, switchAsOrderedMatch)
+				   = new AndroidReachingFactsAnalysisBuilder().build(entryPointProc, initialFacts, parallel, initContext, switchAsOrderedMatch)
 }

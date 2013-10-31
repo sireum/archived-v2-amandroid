@@ -7,6 +7,8 @@ import org.jgrapht.EdgeFactory
 import java.io.Writer
 import org.jgrapht.ext.DOTExporter
 import org.jgrapht.ext.VertexNameProvider
+import scala.collection.mutable.SynchronizedMap
+import scala.collection.mutable.HashMap
 
 trait InterProceduralGraph[Node <: InterProceduralNode]
   extends AlirGraph[Node]
@@ -38,9 +40,9 @@ trait InterProceduralGraph[Node <: InterProceduralNode]
 
   def deleteEdge(e : Edge) = graph.removeEdge(e)
   
-  protected var pl : Map[InterProceduralNode, Node] = Map()
+  protected val pl : MMap[InterProceduralNode, Node] = new HashMap[InterProceduralNode, Node] with SynchronizedMap[InterProceduralNode, Node]
   
-  def pool : Map[InterProceduralNode, Node] = pl
+  def pool : MMap[InterProceduralNode, Node] = pl
   
   protected val vlabelProvider = new VertexNameProvider[Node]() {
     

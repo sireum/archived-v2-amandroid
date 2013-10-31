@@ -14,7 +14,7 @@ object APKFileResolver {
 	def getDexFile(src : FileResourceUri) : FileResourceUri = {
 	  val f = new File(src.toString().substring(5))
       //create directory
-      val dirName = f.getName().split("\\.")(0)
+      val dirName = f.getName().substring(0, f.getName().lastIndexOf("."))
       val d = src.substring(src.indexOf("/"), src.lastIndexOf("/")+1)
       val dirc = new File(d + dirName)
       if(!dirc.exists()){

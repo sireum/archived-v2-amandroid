@@ -753,9 +753,9 @@ abstract class ObjectFlowGraph[Node <: OfaNode, ValueSet <: NormalValueSet](val 
     }
   }
   
-  def getDirectCallee(pi : PointI) : AmandroidProcedure = Center.getDirectCalleeProcedureWithoutFailing(pi.varName)
+  def getDirectCallee(pi : PointI) : AmandroidProcedure = Center.getDirectCalleeProcedure(pi.varName)
   
-  def getStaticCallee(pi : PointI) : AmandroidProcedure = Center.getStaticCalleeProcedureWithoutFailing(pi.varName)
+  def getStaticCallee(pi : PointI) : AmandroidProcedure = Center.getStaticCalleeProcedure(pi.varName)
   
   /**
    * This is the beta method in original algo

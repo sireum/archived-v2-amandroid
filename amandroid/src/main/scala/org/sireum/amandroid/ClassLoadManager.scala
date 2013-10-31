@@ -7,7 +7,9 @@ object ClassLoadManager {
   /**
    * set of classes can be loaded by the program
    */
-	var classes : IList[AmandroidRecord] = ilistEmpty
+	private var classes : IList[AmandroidRecord] = ilistEmpty
+	
+	def reset = classes = ilistEmpty
 	
 	protected def addClass(clazz : AmandroidRecord) = {
 	  this.classes :+= clazz

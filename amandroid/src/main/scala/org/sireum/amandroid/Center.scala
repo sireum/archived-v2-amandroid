@@ -5,7 +5,7 @@ import org.sireum.amandroid.util.StringFormConverter
 import org.sireum.util._
 import org.sireum.amandroid.interProcedural.callGraph.CGNode
 import org.sireum.amandroid.interProcedural.callGraph.CallGraphBuilder
-
+import org.sireum.amandroid.MessageCenter._
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -128,7 +128,7 @@ object Center {
    */
   
   def resolveRecordsRelationWholeProgram = {
-    if(GlobalConfig.mode < Mode.WHOLE_PROGRAM_TEST) throw new RuntimeException("It is not a whole program mode.")
+//    if(GlobalConfig.mode < Mode.WHOLE_PROGRAM_TEST) throw new RuntimeException("It is not a whole program mode.")
     val worklist : MList[AmandroidRecord] = mlistEmpty
     var codes : Set[String] = Set()
     worklist ++= getRecords
@@ -166,7 +166,8 @@ object Center {
 			            codes += code
 			            tmpList ::= record
 		            } else {
-		              System.err.println("Given parent name does not exist in current code base: " + parName)
+		              resolveRecord(parName, ResolveLevel.BODIES)
+		              tmpList ::= record
 		            }
 		        }
 	      }
@@ -181,7 +182,7 @@ object Center {
       
     getRecords.foreach{
       rec =>
-        if(!rec.hasSuperClass && rec.getName != DEFAULT_TOPLEVEL_OBJECT){
+        if(!rec.isPhantom && !rec.hasSuperClass && rec.getName != DEFAULT_TOPLEVEL_OBJECT){
           if(!hasRecord(DEFAULT_TOPLEVEL_OBJECT)) resolveRecord(DEFAULT_TOPLEVEL_OBJECT, ResolveLevel.BODIES)
           rec.setSuperClass(getRecord(DEFAULT_TOPLEVEL_OBJECT))
         }
@@ -597,83 +598,76 @@ object Center {
 	 */
 	
 	def getCalleeProcedure(from : AmandroidRecord, pSubSig : String) : AmandroidProcedure = {
-	  getRecordHierarchy.resolveConcreteDispatchWithoutFailing(from, pSubSig)
+	  getRecordHierarchy.resolveConcreteDispatch(from, pSubSig) match{
+  	  case Some(ap) => ap
+  	  case None => Center.getProcedureWithoutFailing(Center.UNKNOWN_PROCEDURE_SIG)
+  	}
 	}
 	
 	/**
 	 * check and get virtual callee procedure from Center. Input: .equals:(Ljava/lang/Object;)Z
 	 */
 	
-	def getVirtualCalleeProcedure(fromType : Type, pSubSig : String) : Option[AmandroidProcedure] = {
+	def getVirtualCalleeProcedure(fromType : Type, pSubSig : String) : AmandroidProcedure = {
 	  val name =
 	  	if(isJavaPrimitiveType(fromType)) DEFAULT_TOPLEVEL_OBJECT  // any array in java is an Object, so primitive type array is an object, object's method can be called
 	  	else fromType.name	
 	  val from = resolveRecord(name, ResolveLevel.BODIES)
-	  getRecordHierarchy.resolveConcreteDispatch(from, pSubSig)
-	}
-	
-	/**
-	 * check and get virtual callee procedure from Center. Input: .equals:(Ljava/lang/Object;)Z
-	 */
-	
-	def getVirtualCalleeProcedureWithoutFailing(fromType : Type, pSubSig : String) : AmandroidProcedure = {
-	  getVirtualCalleeProcedure(fromType, pSubSig).getOrElse(throw new RuntimeException("Fail to resolve virtual call: from:" + fromType + ". subsig:" + pSubSig))
-	}
-	
-	/**
-	 * check and get super callee procedure from Center. Input: .equals:(Ljava/lang/Object;)Z
-	 */
-	
-	def getSuperCalleeProcedureWithoutFailing(pSig : String) : AmandroidProcedure = {
-	  getSuperCalleeProcedure(pSig).getOrElse(throw new RuntimeException("Fail to resolve super call sig:" + pSig))
-	}
-	
-	/**
-	 * check and get static callee procedure from Center. Input: .equals:(Ljava/lang/Object;)Z
-	 */
-	
-	def getStaticCalleeProcedureWithoutFailing(procSig : String) : AmandroidProcedure = {
-	  getStaticCalleeProcedure(procSig).getOrElse(throw new RuntimeException("Fail to resolve static call:" + procSig))
+	  getRecordHierarchy.resolveConcreteDispatch(from, pSubSig) match{
+  	  case Some(ap) => ap
+  	  case None => Center.getProcedureWithoutFailing(Center.UNKNOWN_PROCEDURE_SIG)
+  	}
 	}
 	
 	/**
 	 * check and get super callee procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
 	 */
 	
-	def getSuperCalleeProcedure(pSig : String) : Option[AmandroidProcedure] = {
+	def getSuperCalleeProcedure(pSig : String) : AmandroidProcedure = {
 	  val fromType = StringFormConverter.getRecordTypeFromProcedureSignature(pSig)
 	  val pSubSig = StringFormConverter.getSubSigFromProcSig(pSig)
 	  val from = resolveRecord(fromType.name, ResolveLevel.BODIES)
-	  getRecordHierarchy.resolveConcreteDispatch(from, pSubSig)
+	  getRecordHierarchy.resolveConcreteDispatch(from, pSubSig) match{
+  	  case Some(ap) => ap
+  	  case None => Center.getProcedureWithoutFailing(Center.UNKNOWN_PROCEDURE_SIG)
+  	}
 	}
 	
 	/**
 	 * check and get static callee procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
 	 */
 	
-	def getStaticCalleeProcedure(procSig : String) : Option[AmandroidProcedure] = {
+	def getStaticCalleeProcedure(procSig : String) : AmandroidProcedure = {
 	  val recType = StringFormConverter.getRecordTypeFromProcedureSignature(procSig)
 	  val pSubSig = getSubSigFromProcSig(procSig)
 	  val from = resolveRecord(recType.name, ResolveLevel.BODIES)
-	  getRecordHierarchy.resolveConcreteDispatch(from, pSubSig)
+	  getRecordHierarchy.resolveConcreteDispatch(from, pSubSig) match{
+  	  case Some(ap) => ap
+  	  case None => Center.getProcedureWithoutFailing(Center.UNKNOWN_PROCEDURE_SIG)
+  	}
 	}
 	
 	/**
 	 * check and get direct callee procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
 	 */
 	
-	def getDirectCalleeProcedure(procSig : String) : Option[AmandroidProcedure] = {
+	def getDirectCalleeProcedure(procSig : String) : AmandroidProcedure = {
 	  val recType = StringFormConverter.getRecordTypeFromProcedureSignature(procSig)
-	  resolveRecord(recType.name, ResolveLevel.BODIES)
-	  getProcedure(procSig)
-	}
-	
-	/**
-	 * check and get direct callee procedure from Center. Input: [|Ljava/lang/Object;.equals:(Ljava/lang/Object;)Z|]
-	 */
-	
-	def getDirectCalleeProcedureWithoutFailing(procSig : String) : AmandroidProcedure = {
-	  getDirectCalleeProcedure(procSig).getOrElse(throw new RuntimeException("Fail to resolve direct call:" + procSig))
+	  val rec = resolveRecord(recType.name, ResolveLevel.BODIES)
+	  if(rec.isPhantom){
+	    getProcedure(procSig) match {
+		    case Some(ap) => ap
+		    case None => 
+		      val ap = new AmandroidProcedure
+		      ap.init(procSig)
+		      ap.setPhantom
+		      rec.addProcedure(ap)
+		      ap
+		  }
+	  } else {
+	    getProcedureWithoutFailing(procSig)
+	  }
+	  
 	}
 	
 	/**
@@ -782,6 +776,8 @@ object Center {
 	  this.entryPoints = Set()
 	  this.hierarchy = null
 	}
+	
+	
 	
 	def printDetails = {
 	  println("***************Center***************")

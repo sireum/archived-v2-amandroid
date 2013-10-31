@@ -219,6 +219,7 @@ object InterproceduralDataDependenceAnalysis {
                 val defSite = ins.getDefSite
                 result += iddg.findDefSite(defSite)
             }
+          case nle : NewListExp => 
           case _ => throw new RuntimeException("Wrong exp: " + ce.exp)
         }
       case ce : CallExp =>

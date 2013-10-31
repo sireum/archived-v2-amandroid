@@ -40,17 +40,8 @@ object InterComponentCommunicationModel {
 	  var targets : ISet[AmandroidProcedure] = isetEmpty
 	  val explicitTargets = getExplicitTargets(s, intentValues)
 	  targets ++= explicitTargets
-	  if(explicitTargets.isEmpty){
-	    val implicitTargets = getImplicitTargets(s, intentValues)
-	    targets ++= implicitTargets
-	    if(implicitTargets.isEmpty){
-	      err_msg_critical("Cannot find any icc targets for: " + calleeProc + "@" + currentContext)
-	    } else {
-	    	msg_critical("context: " + currentContext + " implicitTargets: " + implicitTargets)
-	    }
-	  } else {
-	    msg_critical("context: " + currentContext + " explicitTargets: " + explicitTargets)
-	  }
+    val implicitTargets = getImplicitTargets(s, intentValues)
+    targets ++= implicitTargets
 	  (s, targets)
 	}
 	
@@ -78,7 +69,6 @@ object InterComponentCommunicationModel {
 		                  }
                     case None => err_msg_critical("Cannot find target component " + targetRecName + " in current code base.")
                   }
-                  
                 }
             }
         }

@@ -7,6 +7,7 @@ import scala.collection.GenMap
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.amandroid.util.StringFormConverter
 import org.sireum.pilar.symbol.SymbolTable
+import org.sireum.amandroid.MessageCenter._
 
 
 /**
@@ -79,9 +80,26 @@ object AmandroidResolver {
    */
     
   def resolveRecord(recordName : String, desiredLevel : Center.ResolveLevel.Value) : AmandroidRecord = {
-    desiredLevel match{
-      case Center.ResolveLevel.BODIES => resolveToBodies(recordName)
-      case Center.ResolveLevel.NO => new AmandroidRecord().init(recordName)
+    if(!AmandroidCodeSource.containsRecord(recordName)){
+      if(!Center.containsRecord(recordName) || Center.getRecord(recordName).getResolvingLevel < desiredLevel){
+        Center.tryRemoveRecord(recordName)
+	      val rec = new AmandroidRecord().init(recordName)
+	      rec.setPhantom
+	      rec.setResolvingLevel(desiredLevel)
+	      Center.tryRemoveRecord(recordName)
+	      Center.addRecord(rec)
+	      msg_detail("add phantom record " + rec)
+	      rec
+      } else Center.getRecord(recordName)
+    } else {
+	    desiredLevel match{
+	      case Center.ResolveLevel.BODIES => resolveToBodies(recordName)
+	      case Center.ResolveLevel.NO => 
+	        val rec = new AmandroidRecord().init(recordName)
+	        Center.tryRemoveRecord(recordName)
+	        Center.addRecord(rec)
+	        rec
+	    }
     }
   }
   
@@ -92,7 +110,11 @@ object AmandroidResolver {
   def forceResolveRecord(recordName : String, desiredLevel : Center.ResolveLevel.Value) : AmandroidRecord = {
     desiredLevel match{
       case Center.ResolveLevel.BODIES => forceResolveToBodies(recordName)
-      case Center.ResolveLevel.NO => new AmandroidRecord().init(recordName)
+      case Center.ResolveLevel.NO =>
+        val rec = new AmandroidRecord().init(recordName)
+        Center.tryRemoveRecord(recordName)
+        Center.addRecord(rec)
+        rec
     }
   }
   
@@ -144,8 +166,8 @@ object AmandroidResolver {
     rec.setResolvingLevel(Center.ResolveLevel.BODIES)
     Center.addRecord(rec)
     rec.addField(createClassField(rec))
-	  if(GlobalConfig.mode >= Mode.WHOLE_PROGRAM_TEST) Center.resolveRecordsRelationWholeProgram
-	  else Center.resolveRecordsRelation
+	  Center.resolveRecordsRelationWholeProgram
+//	  else Center.resolveRecordsRelation
   }
     
   /**
@@ -153,7 +175,7 @@ object AmandroidResolver {
    */
 	
 	def resolveFromST(st : SymbolTable, par : Boolean) : Unit = {
-    if(GlobalConfig.mode >= Mode.WHOLE_PROGRAM_TEST && !AmandroidCodeSource.isPreLoaded) throw new RuntimeException("In whole program mode but library code did not been pre-loaded, call AmandroidCodeSource.preLoad first.")
+    if(!AmandroidCodeSource.isPreLoaded) throw new RuntimeException("In whole program mode but library code did not been pre-loaded, call AmandroidCodeSource.preLoad first.")
     val stp = st.asInstanceOf[SymbolTableProducer]
 	  resolveRecords(stp, par)
 	  resolveGlobalVars(stp, par)
@@ -212,8 +234,8 @@ object AmandroidResolver {
 	      rec
 	  }
 	  records.foreach(Center.addRecord(_))
-	  if(GlobalConfig.mode >= Mode.WHOLE_PROGRAM_TEST) Center.resolveRecordsRelationWholeProgram
-	  else Center.resolveRecordsRelation
+	  Center.resolveRecordsRelationWholeProgram
+//	  else Center.resolveRecordsRelation
 	  // now we generate a special Amandroid Procedure for each record; this proc would represent the const-class operation
 	  records.foreach{
 	    rec =>

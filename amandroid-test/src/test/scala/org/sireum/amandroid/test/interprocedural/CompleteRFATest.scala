@@ -11,25 +11,28 @@ import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
  */
 @RunWith(classOf[JUnitRunner])
 class CompleteRFATest extends CompleteRFATestFramework {
+  var i = 0
 	AmandroidCodeSource.preLoad
 //  InterproceduralExamples.testAPKFiles.
-//  filter { s => s.endsWith("GlobalRDATest.apk") }.
+//  filter { s => s.endsWith("BiggerWfgNP.apk") }.
 //  foreach { fileUri =>
 //    Analyzing title fileUri file fileUri
 //  }
-//  InterproceduralExamples.ofgNormalAPKFiles.
-////  filter { s => s.endsWith("BiggerWfgNP.apk") }.
-//  foreach { fileUri =>
-//    Analyzing title fileUri file fileUri
-//  }
-//  InterproceduralExamples.maliciousAPKFiles.
-//  filter { s => !s.endsWith("b90b.apk") || !s.endsWith("2fdc.apk")}.
-//  foreach { fileUri =>
-//    Analyzing title fileUri file fileUri
-//  }
-  InterproceduralExamples.benchAPKFiles.
-//  filter { s => s.endsWith("ActivityLifecycle1.apk") }.
+  InterproceduralExamples.normalAPKFiles.
+//  filter { s => s.endsWith("v1-1.apk") }.
   foreach { fileUri =>
+//    if(i < 10) i += 1
     Analyzing title fileUri file fileUri
   }
+//  InterproceduralExamples.maliciousAPKFiles.
+//  filter { s => s.endsWith("0fbf.apk")}.
+//  foreach { fileUri =>
+////    if(i < 7) i += 1
+//    Analyzing title fileUri file fileUri
+//  }
+//  InterproceduralExamples.benchAPKFiles.
+//  filter { s => s.endsWith("ActivityLifecycle1.apk") }.
+//  foreach { fileUri =>
+//    Analyzing title fileUri file fileUri
+//  }
 }

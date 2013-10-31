@@ -18,6 +18,7 @@ import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis.A
 import org.sireum.amandroid.interProcedural.objectFlowAnalysis.InvokePointNode
 import org.sireum.amandroid.interProcedural.InterProceduralGraph
 import org.sireum.amandroid.interProcedural.InterProceduralNode
+import org.sireum.amandroid.util.StringFormConverter
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -59,8 +60,8 @@ class PointsToMap {
   def propagateFieldStorePointsToSet(n1 : PtaNode, n2 : PtaFieldNode) = {
     pointsToSet(n2.baseNode) foreach{
       ins =>
-        val af = Center.findFieldWithoutFailing(ins.getType, n2.fieldName)
-        addInstancesInternal(ins.toString + af.getSignature, pointsToSet(n1))
+        val fieldName = StringFormConverter.getFieldNameFromFieldSignature(n2.fieldName)
+        addInstancesInternal(ins.toString + fieldName, pointsToSet(n1))
     }
   }
   
@@ -97,8 +98,8 @@ class PointsToMap {
         if(!bInss.isEmpty){
           bInss.map{
 		        ins =>
-		          val af = Center.findFieldWithoutFailing(ins.getType, pfn.fieldName)
-		          ptMap.getOrElse(ins.toString + af.getSignature, msetEmpty)
+		          val fieldName = StringFormConverter.getFieldNameFromFieldSignature(pfn.fieldName)
+		          ptMap.getOrElse(ins.toString + fieldName, msetEmpty)
 		      }.reduce((set1, set2) => set1 ++ set2)
         }
 		    else msetEmpty
@@ -476,16 +477,16 @@ class PointerAssignmentGraph[Node <: PtaNode]
     }
   }
   
-  def getDirectCallee(pi : PointI) : AmandroidProcedure = Center.getDirectCalleeProcedureWithoutFailing(pi.varName)
+  def getDirectCallee(pi : PointI) : AmandroidProcedure = Center.getDirectCalleeProcedure(pi.varName)
   
-  def getStaticCallee(pi : PointI) : AmandroidProcedure = Center.getStaticCalleeProcedureWithoutFailing(pi.varName)
+  def getStaticCallee(pi : PointI) : AmandroidProcedure = Center.getStaticCalleeProcedure(pi.varName)
   
   def getSuperCalleeSet(diff : MSet[PTAInstance],
 	                 pi : PointI) : MSet[AmandroidProcedure] = {
     val calleeSet : MSet[AmandroidProcedure] = msetEmpty
     diff.foreach{
       d =>
-        val p = Center.getSuperCalleeProcedureWithoutFailing(pi.varName)
+        val p = Center.getSuperCalleeProcedure(pi.varName)
         calleeSet += p
     }
     calleeSet
@@ -497,7 +498,7 @@ class PointerAssignmentGraph[Node <: PtaNode]
     val subSig = Center.getSubSigFromProcSig(pi.varName)
     diff.foreach{
       d =>
-        val p = Center.getVirtualCalleeProcedureWithoutFailing(d.typ, subSig)
+        val p = Center.getVirtualCalleeProcedure(d.typ, subSig)
         calleeSet += p
     }
     calleeSet

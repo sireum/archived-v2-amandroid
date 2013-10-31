@@ -64,25 +64,12 @@ class CallGraphBuilder {
         pta(pag, cg, entryPoints, false)
     }
     val result = cg
-//    pag.pointsToMap.pointsToMap.foreach{
-//      item =>
-//        println("item--->" + item)
-//    }
-//    val f1 = new File(System.getProperty("user.home") + "/Desktop/CallGraph.dot")
-//    val o1 = new FileOutputStream(f1)
-//    val w1 = new OutputStreamWriter(o1)
-//    result.toDot(w1)
-//    
-//    val f2 = new File(System.getProperty("user.home") + "/Desktop/PointerAssignmentGraph.dot")
-//    val o2 = new FileOutputStream(f2)
-//    val w2 = new OutputStreamWriter(o2)
-//    pag.toDot(w2)
     result
   }
 
   def buildWholeProgram(appInfoOpt : Option[AppInfoCollector])
    : CallGraph[CGNode] = {
-    if(GlobalConfig.mode < Mode.WHOLE_PROGRAM_TEST) throw new RuntimeException("Cannot get complete call graph, because not in whole program mode")
+//    if(GlobalConfig.mode < Mode.WHOLE_PROGRAM_TEST) throw new RuntimeException("Cannot get complete call graph, because not in whole program mode")
     val pag = new PointerAssignmentGraph[PtaNode]()
     val cg = new CallGraph[CGNode]
     val entryPoints = Center.getEntryPoints
@@ -94,20 +81,6 @@ class CallGraphBuilder {
         pta(pag, cg, entryPoints, true)
     }
     val result = cg
-//    pag.pointsToMap.pointsToMap.foreach{
-//      item =>
-//        println("item--->" + item)
-//    }
-//    val f1 = new File(System.getProperty("user.home") + "/Desktop/CallGraph.dot")
-//    val o1 = new FileOutputStream(f1)
-//    val w1 = new OutputStreamWriter(o1)
-//    result.toDot(w1)
-//    
-//    val f2 = new File(System.getProperty("user.home") + "/Desktop/PointerAssignmentGraph.dot")
-//    val o2 = new FileOutputStream(f2)
-//    val w2 = new OutputStreamWriter(o2)
-//    pag.toDot(w2)
-
     result
   }
   

@@ -14,6 +14,8 @@ import org.sireum.amandroid.interProcedural.InterProceduralGraph
 import org.sireum.amandroid.interProcedural.InterProceduralNode
 import org.sireum.amandroid.interProcedural.Context
 import scala.collection.immutable.BitSet
+import scala.collection.mutable.SynchronizedMap
+import scala.collection.mutable.HashMap
 
 /**
  * @author Fengguo Wei & Sankardas Roy
@@ -36,7 +38,7 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
   def exitNode : Node = this.exitN.asInstanceOf[Node]
   
   
-  private var processed : IMap[(AmandroidProcedure, Context), ISet[Node]] = imapEmpty
+  private val processed : MMap[(AmandroidProcedure, Context), ISet[Node]] = new HashMap[(AmandroidProcedure, Context), ISet[Node]] with SynchronizedMap[(AmandroidProcedure, Context), ISet[Node]]
   
   def isProcessed(proc : AmandroidProcedure, callerContext : Context) : Boolean = processed.contains(proc, callerContext)
   
@@ -299,7 +301,7 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
               r.setOwner(calleeProc)
               r.asInstanceOf[CGLocNode].setLocIndex(ln.locIndex)
               nodes += r
-              addEdge(c, r)
+//              addEdge(c, r)
 	          } else {
 	            val node = addCGNormalNode(callerContext.copy.setContext(calleeSig, ln.locUri))
 	            node.setOwner(calleeProc)
@@ -543,7 +545,7 @@ sealed abstract class CGNode(context : Context) extends InterProceduralNode(cont
   def setLoadedClassBitSet(bitset : BitSet) = this.loadedClassBitSet = bitset
   def getLoadedClassBitSet = this.loadedClassBitSet
   def updateLoadedClassBitSet(bitset : BitSet) = {
-    if(getLoadedClassBitSet == null) setLoadedClassBitSet(bitset)
+    if(getLoadedClassBitSet == BitSet.empty) setLoadedClassBitSet(bitset)
     else setLoadedClassBitSet(bitset.intersect(getLoadedClassBitSet))
   }
 }

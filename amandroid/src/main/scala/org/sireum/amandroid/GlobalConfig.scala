@@ -17,7 +17,7 @@ object GlobalConfig {
 	/**
 	 * is whole program mode or not
 	 */
-	final var mode : Mode.Value = Mode.WHOLE_PROGRAM_TEST
+	final var mode : Mode.Value = Mode.APP_ONLY
 	
 	/**
 	 * call graph context length
@@ -34,5 +34,5 @@ object GlobalConfig {
  */
 
 object Mode extends Enumeration {
-  val APP_ONLY_TEST, APP_ONLY, WHOLE_PROGRAM_TEST,WHOLE_PROGRAM = Value
+  val APP_ONLY, WHOLE_PROGRAM = Value
 }

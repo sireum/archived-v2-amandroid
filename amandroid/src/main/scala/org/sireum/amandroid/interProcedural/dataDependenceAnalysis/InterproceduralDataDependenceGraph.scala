@@ -8,7 +8,8 @@ import org.jgrapht.alg.DijkstraShortestPath
 class InterProceduralDataDependenceGraph[Node <: CGNode] extends CallGraph[Node]{
 	def addNodes(nodes : Set[Node]) = nodes.foreach(addNode(_))
 	def initGraph(cg : CallGraph[Node]) = {
-	  this.pl = cg.pool
+	  this.pl.clear
+	  this.pl ++= cg.pool
 	  addNodes(cg.nodes.toSet)
 	  this.entryN = getNode(cg.entryNode)
 	  this.exitN = getNode(cg.exitNode)

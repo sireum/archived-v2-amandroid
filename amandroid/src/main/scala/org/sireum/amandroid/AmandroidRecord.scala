@@ -91,6 +91,12 @@ class AmandroidRecord {
   protected var subSigToProcedures : Map[String, AmandroidProcedure] = Map()
   
   /**
+   * true: is phantom, which means it's not available in our code repo
+   */
+  
+  protected var phantom : Boolean = false
+  
+  /**
    * didn't resolve this extends-relation list. It's a set of record names.
    */
   
@@ -153,6 +159,14 @@ class AmandroidRecord {
    */
   
   def addNeedToResolveExtends(recNames : Set[String]) = this.needToResolveExtends ++= recNames
+  
+  def setPhantom = this.phantom = true
+  
+  /**
+   * return true if this record is phantom record
+   */
+  
+  def isPhantom = this.phantom
   
   /**
    * when you construct a amandroid record instance, call this init function first
@@ -348,13 +362,13 @@ class AmandroidRecord {
 	 * get all non static and object type field
 	 */
 	
-	def getDeclaredNonStaticObjectTypeFields = getDeclaredNonStaticFields.intersect(getObjectTypeFields)
+	def getDeclaredNonStaticObjectTypeFields = getDeclaredNonStaticFields.intersect(getDeclaredObjectTypeFields)
 	
 	/**
 	 * get all static and object type field
 	 */
 	
-	def getDeclaredStaticObjectTypeFields = getDeclaredStaticFields.intersect(getObjectTypeFields)
+	def getDeclaredStaticObjectTypeFields = getDeclaredStaticFields.intersect(getDeclaredObjectTypeFields)
 	
 	/**
 	 * add one field into the record

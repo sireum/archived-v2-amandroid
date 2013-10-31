@@ -13,7 +13,7 @@ object MessageCenter {
 
 	implicit def msg_critical(msg : String) = {
 	  if(msglevel >= MSG_LEVEL.CRITICAL)
-	  	println("[critical]" + msg)
+	  	println("[CRITICAL]" + msg)
 	}
 	implicit def err_msg_critical(msg : String) = {
 	  if(msglevel >= MSG_LEVEL.CRITICAL)

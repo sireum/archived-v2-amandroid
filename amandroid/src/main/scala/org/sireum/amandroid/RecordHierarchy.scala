@@ -347,31 +347,32 @@ class RecordHierarchy {
    * Given an object created by o = new R as type R, return the procedure which will be called by o.p()
    */
   
-  def resolveConcreteDispatchWithoutFailing(concreteType : AmandroidRecord, pSubSig : String) : AmandroidProcedure = {
-    resolveConcreteDispatch(concreteType, pSubSig) match{
-      case Some(p) => p
-      case None => throw new RuntimeException("Cannot resolve concrete dispatch!\n" + "Type:" + concreteType + "\nProcedure:" + pSubSig)
-    }
-  }
-  
-  /**
-   * Given an object created by o = new R as type R, return the procedure which will be called by o.p()
-   */
-  
   def resolveConcreteDispatch(concreteType : AmandroidRecord, pSubSig : String) : Option[AmandroidProcedure] = {
     if(concreteType.isInterface) throw new RuntimeException("Receiver need to be class type: " + concreteType)
     findProcedureThroughHierarchy(concreteType, pSubSig)
   }
   
   private def findProcedureThroughHierarchy(record : AmandroidRecord, subSig : String) : Option[AmandroidProcedure] = {
-    record.tryGetProcedure(subSig) match{
-      case Some(p) =>
-        if(p.isAbstract) throw new RuntimeException("Target procedure needs to be non-abstract method type: " + p)
-        Some(p)
-      case None =>
-        if(record.hasSuperClass)
-        	findProcedureThroughHierarchy(record.getSuperClass, subSig)
-        else None
+    if(record.isPhantom){
+      record.tryGetProcedure(subSig) match{
+        case Some(p) => Some(p)
+        case None =>
+          val ap = new AmandroidProcedure
+          ap.init(StringFormConverter.getSigFromOwnerAndProcSubSig(record.getName, subSig))
+          ap.setPhantom
+          record.addProcedure(ap)
+          Some(ap)
+      }
+    } else {
+	    record.tryGetProcedure(subSig) match{
+	      case Some(p) =>
+	        if(p.isAbstract) throw new RuntimeException("Target procedure needs to be non-abstract method type: " + p)
+	        Some(p)
+	      case None =>
+	        if(record.hasSuperClass)
+	        	findProcedureThroughHierarchy(record.getSuperClass, subSig)
+	        else None
+	    }
     }
   }
   

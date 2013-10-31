@@ -28,6 +28,7 @@ class AndroidTaintAnalysisBuilder{
   (cg : CallGraph[AndroidReachingFactsAnalysis.Node],
    rfaFacts : AndroidReachingFactsAnalysis.Result,
    initialFacts : ISet[TaintFact] = isetEmpty,
+   parallel : Boolean,
    switchAsOrderedMatch : Boolean = false
    ) : AndroidTaintAnalysis.Result = {
     val gen = new Gen
@@ -40,7 +41,7 @@ class AndroidTaintAnalysisBuilder{
     val iota : ISet[TaintFact] = initialFacts + TaintFact(initRFAFact, "TaintAnalysis")
     val initial : ISet[TaintFact] = isetEmpty
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[TaintFact](cg,
-      true, true, false, gen, kill, callr, iota, initial, switchAsOrderedMatch, None)
+      true, true, false, parallel, gen, kill, callr, iota, initial, switchAsOrderedMatch, None)
 
 //    print("TA\n")
 //    print(result)
@@ -660,7 +661,8 @@ object AndroidTaintAnalysis {
   def apply(cg : CallGraph[AndroidReachingFactsAnalysis.Node],
 				   rfaFacts : AndroidReachingFactsAnalysis.Result,
 				   initialFacts : ISet[TaintFact] = isetEmpty,
+				   parallel : Boolean = false,
 				   switchAsOrderedMatch : Boolean = false)
-    = new AndroidTaintAnalysisBuilder().build(cg, rfaFacts, initialFacts, switchAsOrderedMatch)
+    = new AndroidTaintAnalysisBuilder().build(cg, rfaFacts, initialFacts, parallel, switchAsOrderedMatch)
 
 }

@@ -16,6 +16,7 @@ import org.sireum.amandroid.android.interProcedural.taintAnalysis.SourceAndSinkC
 import org.sireum.amandroid.util.StringFormConverter
 import org.sireum.amandroid.interProcedural.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
 import org.sireum.amandroid.android.interProcedural.taintAnalysis.AndroidDataDependentTaintAnalysis
+import java.net.URI
 
 trait CompleteRFATestFramework extends TestFramework {
 
@@ -42,6 +43,7 @@ trait CompleteRFATestFramework extends TestFramework {
     	Center.reset
     	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
     	AmandroidCodeSource.clearAppRecordsCodes
+//    	ClassLoadManager.reset
     	
     	// now get the dex file from the source apk file 
     	val apkName = src.substring(src.lastIndexOf("/") + 1, src.lastIndexOf("."))
@@ -50,57 +52,66 @@ trait CompleteRFATestFramework extends TestFramework {
     	val dexFile = APKFileResolver.getDexFile(src)
     	
     	// convert the dex file to the "pilar" form
-    	val pilarFile = Dex2PilarConverter.convert(dexFile)
+    	val pilarFileUri = Dex2PilarConverter.convert(dexFile)
+    	val pilarFile = new File(new URI(pilarFileUri))
+    	if(pilarFile.length() <= (5 * 1024 * 1024)){
     	
-    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
-    	LightWeightPilarParser(Right(pilarFile), AmandroidCodeSource.CodeType.APP)
-    	
-    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
-    	AmandroidCodeSource.getAppRecordsCodes.keys foreach{
-    	  k =>
-    	    Center.resolveRecord(k, Center.ResolveLevel.BODIES)
+	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
+	    	LightWeightPilarParser(Right(pilarFileUri), AmandroidCodeSource.CodeType.APP)
+	    	
+	    	try{
+		    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
+		    	AmandroidCodeSource.getAppRecordsCodes.keys foreach{
+		    	  k =>
+		    	    Center.resolveRecord(k, Center.ResolveLevel.BODIES)
+		    	}
+		    	
+		    	val pre = new AppInfoCollector(new File(src.toString().substring(5)).toString())
+				  pre.calculateEntrypoints
+				  
+				  AndroidRFAConfig.setupCenter
+		    	val entryPoints = Center.getEntryPoints("dummyMain")
+		    	entryPoints.foreach{
+		    	  ep =>
+		    	    println("--------------Component " + ep + "--------------")
+		    	    val initialfacts = AndroidRFAConfig.getInitialFactsForDummyMain(ep)
+		    	    val (cg, rfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, false)
+		    	    println("processed-->" + cg.getProcessed.size)
+		    	    println("exit facts: " + rfaResult.entrySet(cg.exitNode).size)
+		//    	    val taResult = AndroidTaintAnalysis(cg, rfaResult)
+		    	    val iddg = InterproceduralDataDependenceAnalysis(cg, rfaResult)
+		    	    AndroidDataDependentTaintAnalysis(iddg, rfaResult)
+		//    	    val f1 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "rfa.txt")
+		//			    val o1 = new FileOutputStream(f1)
+		//			    val w1 = new OutputStreamWriter(o1)
+		//			    cg.nodes.foreach{
+		//			      node =>
+		//			        w1.write(node + ":" + rfaResult.entrySet(node).toString + "\n\n\n")
+		//			    }
+		    	    
+		//    	    val f2 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "CG.dot")
+		//			    val o2 = new FileOutputStream(f2)
+		//			    val w2 = new OutputStreamWriter(o2)
+		//			    cg.toDot(w2)
+		//			    
+		//			    val f3 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "IDDG.dot")
+		//			    val o3 = new FileOutputStream(f3)
+		//			    val w3 = new OutputStreamWriter(o3)
+		//			    iddg.toDot(w3)
+		    	}
+	    	} catch {
+	    	  case re : RuntimeException => 
+	    	    re.printStackTrace()
+	    	}
+	    	
+	//    	val r = Center.resolveRecord("[|java:lang:Class|]", Center.ResolveLevel.BODIES)
+	//    	r.getProcedures.toSeq.sortBy(f => f.getSignature).foreach{
+	//    	  p =>
+	//    	    println("  case \"" + p.getSignature + "\" =>  //" + p.getAccessFlagString)
+	//    	}
+    	} else {
+    	  System.err.println("Pilar file size is too large:" + pilarFile.length()/1024/1024 + "MB")
     	}
-    	
-    	val pre = new AppInfoCollector(new File(src.toString().substring(5)).toString())
-		  pre.calculateEntrypoints
-		  
-		  AndroidRFAConfig.setupCenter
-    	val entryPoints = Center.getEntryPoints("dummyMain")
-    	entryPoints.foreach{
-    	  ep =>
-    	    println("--------------Component " + ep + "--------------")
-    	    val initialfacts = AndroidRFAConfig.getInitialFactsForDummyMain(ep)
-    	    val (cg, rfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts)
-    	    println("processed-->" + cg.getProcessed.size)
-    	    println("exit facts: " + rfaResult.entrySet(cg.exitNode).size)
-//    	    val taResult = AndroidTaintAnalysis(cg, rfaResult)
-    	    val iddg = InterproceduralDataDependenceAnalysis(cg, rfaResult)
-    	    AndroidDataDependentTaintAnalysis(iddg, rfaResult)
-    	    val f1 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "rfa.txt")
-			    val o1 = new FileOutputStream(f1)
-			    val w1 = new OutputStreamWriter(o1)
-			    cg.nodes.foreach{
-			      node =>
-			        w1.write(node + ":" + rfaResult.entrySet(node).toString + "\n\n\n")
-			    }
-    	    
-    	    val f2 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "CG.dot")
-			    val o2 = new FileOutputStream(f2)
-			    val w2 = new OutputStreamWriter(o2)
-			    cg.toDot(w2)
-			    
-			    val f3 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "IDDG.dot")
-			    val o3 = new FileOutputStream(f3)
-			    val w3 = new OutputStreamWriter(o3)
-			    iddg.toDot(w3)
-    	}
-    	
-//    	val r = Center.resolveRecord("[|java:lang:Class|]", Center.ResolveLevel.BODIES)
-//    	r.getProcedures.toSeq.sortBy(f => f.getSignature).foreach{
-//    	  p =>
-//    	    println("  case \"" + p.getSignature + "\" =>  //" + p.getAccessFlagString)
-//    	}
-    	
     	System.gc()
 		  System.gc()
     	

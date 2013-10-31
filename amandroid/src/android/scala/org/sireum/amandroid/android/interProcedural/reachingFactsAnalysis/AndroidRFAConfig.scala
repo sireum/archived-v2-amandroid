@@ -27,7 +27,7 @@ object AndroidRFAConfig {
     rec.init(Center.UNKNOWN_RECORD)
     val p = new AmandroidProcedure
     p.init(Center.UNKNOWN_PROCEDURE_SIG)
-    p.setReality(false)
+    p.setPhantom
     rec.addProcedure(p)
     Center.addRecord(rec)
   }

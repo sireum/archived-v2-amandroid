@@ -25,12 +25,14 @@ object InterproceduralReachingDefinitionAnalysis {
   type Node = AndroidReachingFactsAnalysis.Node
   
   def apply(cg : CallGraph[Node],
-	    switchAsOrderedMatch : Boolean = false) = build(cg, switchAsOrderedMatch)
+      parallel : Boolean = false,
+	    switchAsOrderedMatch : Boolean = false) = build(cg, parallel, switchAsOrderedMatch)
 	
 	def build(
 	    cg : CallGraph[Node],
+	    parallel : Boolean = false,
 	    switchAsOrderedMatch : Boolean = false) = {
-    new InterproceduralReachingDefinitionAnalysis().build(cg)
+    new InterproceduralReachingDefinitionAnalysis().build(cg, parallel, switchAsOrderedMatch)
   }
 }
 
@@ -44,7 +46,8 @@ class InterproceduralReachingDefinitionAnalysis {
   
 	def build(
 	    cg : CallGraph[Node],
-	    switchAsOrderedMatch : Boolean = false) = {
+	    parallel : Boolean,
+	    switchAsOrderedMatch : Boolean) = {
 	  val gen = new Gen
     val kill = new Kill
     val callr = new Callr
@@ -67,7 +70,7 @@ class InterproceduralReachingDefinitionAnalysis {
     val iota : ISet[IRDFact] = isetEmpty + (((VarSlot("@@IRDA"), InitDefDesc), initialContext))
     val initial : ISet[IRDFact] = isetEmpty
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[IRDFact](cg,
-      true, true, false, gen, kill, callr, iota, initial, switchAsOrderedMatch, None)
+      true, true, false, parallel, gen, kill, callr, iota, initial, switchAsOrderedMatch, None)
 
 //    print("IRD\n")
 //    print(result)
@@ -127,7 +130,7 @@ class InterproceduralReachingDefinitionAnalysis {
 		    else succs.map(node => factSet(node).filter(fact => isGlobal(fact._1._1) && isDef(fact._1._2))).reduce(iunion[IRDFact])
 		  val globDefFacts = globFacts.filter(fact => isDef(fact._1._2))
 		  val flowingGlobFacts = s.filter(fact => isGlobal(fact._1._1) && isDef(fact._1._2))
-		  factSet += (node -> (factSet(node) -- globFacts ++ flowingGlobFacts ++ globDefFacts))
+		  factSet += (node -> (factSet.getOrElse(node, isetEmpty) -- globFacts ++ flowingGlobFacts ++ globDefFacts))
 		  globDefFacts
 		}
 	  def apply(s : ISet[IRDFact], e : Exp, currentNode : CGLocNode) : ISet[IRDFact] = isetEmpty

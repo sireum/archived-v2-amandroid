@@ -9,6 +9,8 @@ import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.amandroid.Center
 import scala.util.control.Breaks._
 import org.sireum.amandroid.GlobalConfig
+import scala.collection.mutable.HashMap
+import scala.collection.mutable.SynchronizedMap
 
 /**
  * @author Fengguo Wei & Sankardas Roy
@@ -59,7 +61,7 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
 
   def build[LatticeElement] //
   (cg : CallGraph[N],
-   forward : Boolean, lub : Boolean, rapid : Boolean,
+   forward : Boolean, lub : Boolean, rapid : Boolean, par : Boolean,
    gen : InterProceduralMonotonicFunction[LatticeElement],
    kill : InterProceduralMonotonicFunction[LatticeElement],
    callr : CallResolver[LatticeElement],
@@ -74,7 +76,8 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
       if (lub) bigIUnion else bigIIntersect
 
     val flow = if (forward) cg else cg.reverse
-    val entrySetMap = idmapEmpty[N, ISet[LatticeElement]]
+    val entrySetMap = if(par) new HashMap[N, ISet[LatticeElement]] with SynchronizedMap[N, ISet[LatticeElement]]
+    									else new HashMap[N, ISet[LatticeElement]]
     
     def getEntrySet(n : N) = entrySetMap.getOrElse(n, initial)
     
@@ -518,60 +521,78 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
     }
     
     val imdaf = new IMdaf(getEntrySet _, initial)
+    
+    def process(n : N) : ISet[N] = {
+	    var result = isetEmpty[N]
+	    n match {
+	      case en : CGEntryNode =>
+	        for (succ <- cg.successors(n)) {
+	          if(imdaf.update(getEntrySet(en), succ)){
+	            result += succ
+	          }
+	        }
+	      case xn : CGExitNode =>
+	        for (succ <- cg.successors(n)){
+	          val factsForCaller = callr.getAndMapFactsForCaller(getEntrySet(xn), succ, xn)
+	          imdaf.update(confluence(getEntrySet(succ), factsForCaller), succ)
+	          result += succ
+	        }
+	      case cn : CGCallNode =>
+	        if (imdaf.visit(cn)){
+	          result ++= cg.successors(n)
+	        }
+	      case rn : CGReturnNode =>
+	        for (succ <- cg.successors(n)) {
+	          if(imdaf.update(getEntrySet(n), succ)){
+	            result += succ
+	          }
+	        }
+	      case nn : CGNormalNode =>
+	        if (imdaf.visit(nn)){
+	          result ++= cg.successors(n)
+	        }
+	      case a => throw new RuntimeException("unexpected node type: " + a)
+	    }
+	    result
+	  }
 
     entrySetMap.put(flow.entryNode, iota)
     val workList = mlistEmpty[N]
     workList += flow.entryNode
     while(!workList.isEmpty){
 	    while (!workList.isEmpty) {
-	      val n = workList.remove(0)
-	      val callerContext = n.getContext.copy
-	      callerContext.removeTopContext
-	      n match {
-	        case en : CGEntryNode =>
-	          for (succ <- cg.successors(n)) {
-	            if(imdaf.update(getEntrySet(en), succ)){
-		            workList += succ
-	            }
-	          }
-	        case xn : CGExitNode =>
-	          for (succ <- cg.successors(n)){
-	            val factsForCaller = callr.getAndMapFactsForCaller(getEntrySet(xn), succ, xn)
-	            imdaf.update(confluence(getEntrySet(succ), factsForCaller), succ)
-	            workList += succ
-	          }
-	        case cn : CGCallNode =>
-	          if (imdaf.visit(cn)){
-	            workList ++= cg.successors(n)
-	          }
-	        case rn : CGReturnNode =>
-	          for (succ <- cg.successors(n)) {
-	            if(imdaf.update(getEntrySet(n), succ)){
-		            workList += succ
-	            }
-	          }
-	        case nn : CGNormalNode =>
-	          if (imdaf.visit(nn)){
-	            workList ++= cg.successors(n)
-	          }
-	        case a => throw new RuntimeException("unexpected node type: " + a)
+	      if(par){
+	        val newworkList = workList.par.map{
+	          n =>
+				      val newnodes = process(n)
+				      if(nl.isDefined) nl.get.onPostVisitNode(n, cg.successors(n))
+				      newnodes
+	        }.reduce(iunion[N])
+	        workList.clear
+	        workList ++= newworkList
+	      } else {
+		      val n = workList.remove(0)
+		      workList ++= process(n)
+		      if(nl.isDefined) nl.get.onPostVisitNode(n, cg.successors(n))
 	      }
-	      if(nl.isDefined) nl.get.onPostVisitNode(n, cg.successors(n))
 	    }
-	    cg.nodes.foreach{
+	    val nodes = if(par) cg.nodes.par else cg.nodes
+	    workList ++= nodes.map{
 	      node =>
+	        var newnodes = isetEmpty[N]
 	        node match{
 	          case xn : CGExitNode =>
 	            val succs = cg.successors(xn)
 		          for (succ <- succs){
 		            val factsForCaller = callr.getAndMapFactsForCaller(getEntrySet(xn), succ, xn)
 		            if (imdaf.update(confluence(getEntrySet(succ), factsForCaller), succ))
-		            	workList += succ
+		            	newnodes += succ
 		          }
 	            if(nl.isDefined) nl.get.onPostVisitNode(xn, succs)
 	          case _ =>
 	        }
-	    }
+	        newnodes
+	    }.reduce(iunion[N])
     }
     imdaf
     

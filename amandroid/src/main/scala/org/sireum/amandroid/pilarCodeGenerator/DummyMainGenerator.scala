@@ -224,7 +224,7 @@ class DummyMainGenerator {
 	          this.localVarsForClasses += (currentRecord.getName -> va)
 	          generateRecordConstructor(currentRecord, msetEmpty, classStartFragment)
 	        }
-	        val classLocalVar = localVarsForClasses(currentRecord.getName)
+	        val classLocalVar = localVarsForClasses.getOrElse(currentRecord.getName, null)
 	        
 	        //now start to generate lifecycle for the four kinds of component
 	        if(activity){
