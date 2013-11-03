@@ -258,10 +258,10 @@ object IntentModel {
 		    intentPutExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.putExtras:(Landroid/content/Intent;)Landroid/content/Intent;|]" =>  //public
 		    require(retVars.size == 1)
-		    intentPutExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+//		    intentPutExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.putExtras:(Landroid/os/Bundle;)Landroid/content/Intent;|]" =>  //public
 		    require(retVars.size == 1)
-		    intentPutExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+//		    intentPutExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
 		  case "[|Landroid/content/Intent;.putIntegerArrayListExtra:(Ljava/lang/String;Ljava/util/ArrayList;)Landroid/content/Intent;|]" =>  //public
 		    require(retVars.size == 1)
 		    intentPutExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}

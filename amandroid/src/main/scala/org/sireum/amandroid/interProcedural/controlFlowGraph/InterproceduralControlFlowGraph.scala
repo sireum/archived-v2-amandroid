@@ -1,4 +1,4 @@
-package org.sireum.amandroid.interProcedural.callGraph
+package org.sireum.amandroid.interProcedural.controlFlowGraph
 
 import org.sireum.alir._
 import org.sireum.pilar.symbol.ProcedureSymbolTable
@@ -16,19 +16,28 @@ import org.sireum.amandroid.interProcedural.Context
 import scala.collection.immutable.BitSet
 import scala.collection.mutable.SynchronizedMap
 import scala.collection.mutable.HashMap
+import org.jgrapht.alg.DijkstraShortestPath
 
 /**
  * @author Fengguo Wei & Sankardas Roy
  */
-class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
+class InterproceduralControlFlowGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
   private var succBranchMap : MMap[(Node, Option[Branch]), Node] = null
   private var predBranchMap : MMap[(Node, Option[Branch]), Node] = null
   val BRANCH_PROPERTY_KEY = ControlFlowGraph.BRANCH_PROPERTY_KEY
   final val EDGE_TYPE = "EdgeType"
-  object EdgeType extends Enumeration {
-		val CONCRETE, ABSTRACT, SPECIAL = Value
-	}
   
+  def addEdge(source : Node, target : Node, typ : String) : Edge = {
+    val e = addEdge(source, target)
+    if(typ != null)
+    	e.setProperty(EDGE_TYPE, typ)
+    e
+  }
+  
+  def isEdgeType(e : Edge, typ : String) : Boolean = {
+    e.getPropertyOrElse[String](EDGE_TYPE, null) == typ
+  }
+    
   protected var entryN : CGNode = null
 
   protected var exitN : CGNode = null
@@ -51,6 +60,13 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
     }
     throw new RuntimeException("Cannot find entry node for: " + proc)
   }
+  
+  def findPath(srcNode : Node, tarNode : Node) : IList[Edge] = {
+    import scala.collection.JavaConversions._
+	  val path = DijkstraShortestPath.findPathBetween(this.graph, srcNode, tarNode)
+	  if(path != null) path.toList
+	  else null
+	}
   
   /**
    * map from procedures to it's callee procedures
@@ -78,8 +94,8 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
 	    }.reduce((s1, s2) => s1 ++ s2)
   }
   
-  def reverse : CallGraph[Node] = {
-    val result = new CallGraph[Node]
+  def reverse : InterproceduralControlFlowGraph[Node] = {
+    val result = new InterproceduralControlFlowGraph[Node]
     for (n <- nodes) result.addNode(n)
     for (e <- edges) result.addEdge(e.target, e.source)
     result.entryN = this.exitNode
@@ -255,7 +271,7 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
    
   def isCall(l : LocationDecl) : Boolean = l.isInstanceOf[JumpLocation] && l.asInstanceOf[JumpLocation].jump.isInstanceOf[CallJump]
    
-  def merge(cg : CallGraph[Node]) = {
+  def merge(cg : InterproceduralControlFlowGraph[Node]) = {
     this.pl ++= cg.pool
     cg.nodes.foreach(addNode(_))
     cg.edges.foreach(addEdge(_))
@@ -415,12 +431,12 @@ class CallGraph[Node <: CGNode] extends InterProceduralGraph[Node]{
     targetNode
   }
   
-  def extendGraphOneWay(calleeSig  : String, callerContext : Context) : Node = {
+  def extendGraphOneWay(calleeSig  : String, callerContext : Context, typ : String = null) : Node = {
     val callNode = getCGCallNode(callerContext)
     val calleeContext = callerContext.copy
     calleeContext.setContext(calleeSig, calleeSig)
     val targetNode = getCGEntryNode(calleeContext)
-    addEdge(callNode, targetNode)
+    addEdge(callNode, targetNode, typ)
     targetNode
   }
   

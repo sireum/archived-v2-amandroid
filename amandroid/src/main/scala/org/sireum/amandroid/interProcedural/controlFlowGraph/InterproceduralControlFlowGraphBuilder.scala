@@ -1,4 +1,4 @@
-package org.sireum.amandroid.interProcedural.callGraph
+package org.sireum.amandroid.interProcedural.controlFlowGraph
 
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.alir.ControlFlowGraph
@@ -19,7 +19,7 @@ import org.sireum.pilar.ast.NameExp
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
-class CallGraphBuilder {
+class InterproceduralControlFlowGraphBuilder {
   var appInfo : AppInfoCollector = null
   var processed : Map[(String, Context), PointProc] = Map()
   var pgPointsMap : Map[String, MList[Point]] = Map()
@@ -34,7 +34,7 @@ class CallGraphBuilder {
 	 */
 	def getReachableProcedures(procedure : AmandroidProcedure, wholeProgram : Boolean) : Set[AmandroidProcedure] = {
     val pag = new PointerAssignmentGraph[PtaNode]()
-    val cg = new CallGraph[CGNode]
+    val cg = new InterproceduralControlFlowGraph[CGNode]
     pta(pag, cg, Set(procedure), wholeProgram)
     cg.getReachableProcedure(Set(procedure))
   }
@@ -47,14 +47,14 @@ class CallGraphBuilder {
 	 */
 	def getReachableProcedures(procedures : Set[AmandroidProcedure], wholeProgram : Boolean) : Set[AmandroidProcedure] = {
 	  val pag = new PointerAssignmentGraph[PtaNode]()
-    val cg = new CallGraph[CGNode]
+    val cg = new InterproceduralControlFlowGraph[CGNode]
     pta(pag, cg, procedures, wholeProgram)
     cg.getReachableProcedure(procedures)
 	}
   
-  def buildAppOnly(appInfoOpt : Option[AppInfoCollector]) : CallGraph[CGNode] = {
+  def buildAppOnly(appInfoOpt : Option[AppInfoCollector]) : InterproceduralControlFlowGraph[CGNode] = {
     val pag = new PointerAssignmentGraph[PtaNode]()
-    val cg = new CallGraph[CGNode]
+    val cg = new InterproceduralControlFlowGraph[CGNode]
     val entryPoints = Center.getEntryPoints
     appInfoOpt match{
       case Some(appInfo) =>
@@ -68,10 +68,10 @@ class CallGraphBuilder {
   }
 
   def buildWholeProgram(appInfoOpt : Option[AppInfoCollector])
-   : CallGraph[CGNode] = {
+   : InterproceduralControlFlowGraph[CGNode] = {
 //    if(GlobalConfig.mode < Mode.WHOLE_PROGRAM_TEST) throw new RuntimeException("Cannot get complete call graph, because not in whole program mode")
     val pag = new PointerAssignmentGraph[PtaNode]()
-    val cg = new CallGraph[CGNode]
+    val cg = new InterproceduralControlFlowGraph[CGNode]
     val entryPoints = Center.getEntryPoints
     appInfoOpt match{
       case Some(appInfo) =>
@@ -85,7 +85,7 @@ class CallGraphBuilder {
   }
   
   def pta(pag : PointerAssignmentGraph[PtaNode],
-          cg : CallGraph[CGNode],
+          cg : InterproceduralControlFlowGraph[CGNode],
           entryPoints : Set[AmandroidProcedure],
           wholeProgram : Boolean) = {
     entryPoints.foreach{
@@ -96,7 +96,7 @@ class CallGraphBuilder {
   }
   
   def ptaWithIcc(pag : PointerAssignmentGraph[PtaNode],
-          cg : CallGraph[CGNode],
+          cg : InterproceduralControlFlowGraph[CGNode],
           wholeProgram : Boolean) = {
 //    pag.setIntentFdb(appInfo.getIntentDB)
 //    pag.setEntryPoints(appInfo.getEntryPoints)
@@ -109,7 +109,7 @@ class CallGraphBuilder {
   
   def doPTA(ep : AmandroidProcedure,
             pag : PointerAssignmentGraph[PtaNode],
-            cg : CallGraph[CGNode],
+            cg : InterproceduralControlFlowGraph[CGNode],
             wholeProgram : Boolean) : Unit = {
     val points = new PointsCollector().points(ep.getSignature, ep.getProcedureBody)
     pgPointsMap += (ep.getSignature -> points.clone)
@@ -121,14 +121,14 @@ class CallGraphBuilder {
   }
   
   def overallFix(pag : PointerAssignmentGraph[PtaNode],
-		  					 cg : CallGraph[CGNode]) : Unit = {
+		  					 cg : InterproceduralControlFlowGraph[CGNode]) : Unit = {
 //    while(checkAndDoIccOperation(ofg, sCfg)){
 ////    	fix(ofg, sCfg)
 //    }
   }
   
   def workListPropagation(pag : PointerAssignmentGraph[PtaNode],
-		  					 cg : CallGraph[CGNode], wholeProgram : Boolean) : Unit = {
+		  					 cg : InterproceduralControlFlowGraph[CGNode], wholeProgram : Boolean) : Unit = {
     pag.edges.foreach{
       edge =>
         pag.getEdgeType(edge) match{
@@ -247,7 +247,7 @@ class CallGraphBuilder {
   def checkAndDoCall(node : PtaNode,
       							d : MSet[PTAInstance],
       							pag : PointerAssignmentGraph[PtaNode],
-      							cg : CallGraph[CGNode],
+      							cg : InterproceduralControlFlowGraph[CGNode],
       							wholeProgram : Boolean) = {
     val piOpt = pag.recvInverse(node)
     piOpt match {
@@ -341,7 +341,7 @@ class CallGraphBuilder {
       															pi : PointI, 
       															callerContext : Context,
       															pag : PointerAssignmentGraph[PtaNode], 
-      															cg : CallGraph[CGNode]) = {
+      															cg : InterproceduralControlFlowGraph[CGNode]) = {
     val calleeSig = calleeProc.getSignature
     if(pag.isModelOperation(calleeSig)){
       val ipN = pag.collectTrackerNodes(calleeSig, pi, callerContext.copy)

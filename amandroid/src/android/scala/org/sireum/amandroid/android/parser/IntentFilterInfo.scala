@@ -7,14 +7,9 @@ class IntentFilterDataBase {
   /**
    * Map from record name to it's intent filter information
    */
-  private var intentFmap : Map[AmandroidRecord, Set[IntentFilter]] = Map()
+  private var intentFmap : Map[String, Set[IntentFilter]] = Map()
   def updateIntentFmap(intentFilter : IntentFilter) = {
-    val rec = Center.resolveRecord(intentFilter.getHolder, Center.ResolveLevel.BODIES)
-    if(containsRecord(rec)){
-      var filters = intentFmap(rec)
-      filters += intentFilter
-      intentFmap += (rec -> filters)
-    } else intentFmap += (rec -> Set(intentFilter))
+    this.intentFmap += (intentFilter.getHolder -> (this.intentFmap.getOrElse(intentFilter.getHolder, Set()) + intentFilter))
   }
   def updateIntentFmap(intentFilterDB : IntentFilterDataBase) = {
     intentFilterDB.getIntentFmap.foreach{
@@ -26,9 +21,11 @@ class IntentFilterDataBase {
         }
     }
   }
-  def containsRecord(r : AmandroidRecord) : Boolean = intentFmap.contains(r)
+  def containsRecord(r : AmandroidRecord) : Boolean = containsRecord(r.getName)
+  def containsRecord(name : String) : Boolean = this.intentFmap.contains(name)
   def getIntentFmap() = intentFmap
-  def getIntentFilters(r : AmandroidRecord) = intentFmap.getOrElse(r, Set())
+  def getIntentFilters(r : AmandroidRecord) : Set[IntentFilter] = getIntentFilters(r.getName)
+  def getIntentFilters(name : String) : Set[IntentFilter] = this.intentFmap.getOrElse(name, Set())
   def getIntentFiltersActions(r : AmandroidRecord) : Set[String] = {
     val intentFilterS: Set[IntentFilter] = getIntentFilters(r)
     var actions:Set[String] = null

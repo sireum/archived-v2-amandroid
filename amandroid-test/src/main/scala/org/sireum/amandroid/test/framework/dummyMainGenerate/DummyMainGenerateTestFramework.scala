@@ -11,7 +11,6 @@ import org.sireum.pipeline.PipelineJob
 import org.sireum.amandroid.Center
 import org.sireum.amandroid.AmandroidCodeSource
 import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
-import org.sireum.amandroid.interProcedural.callGraph.CallGraphBuilder
 import org.sireum.amandroid.android.appInfo.AppInfoCollector
 import org.sireum.amandroid.test.framework.TestFramework
 

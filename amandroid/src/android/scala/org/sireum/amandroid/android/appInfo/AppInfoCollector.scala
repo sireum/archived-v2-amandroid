@@ -21,6 +21,7 @@ import org.sireum.amandroid.android.AppCenter
 import org.sireum.amandroid.GlobalConfig
 import org.sireum.amandroid.MessageCenter._
 import org.sireum.amandroid.android.interProcedural.taintAnalysis.SourceAndSinkCenter
+import org.sireum.amandroid.android.parser.ComponentInfo
 
 /**
  * adapted from Steven Arzt
@@ -28,7 +29,7 @@ import org.sireum.amandroid.android.interProcedural.taintAnalysis.SourceAndSinkC
  */
 class AppInfoCollector(apkFileLocation : String) {  
 	private var callbackMethods : Map[AmandroidRecord, Set[AmandroidProcedure]] = Map()
-	private var entrypoints : Set[String] = null
+	private var componentInfos : Set[ComponentInfo] = null
 	private var layoutControls : Map[Int, LayoutControl] = Map()
 	private var appPackageName : String = ""
 	private var taintWrapperFile : String = ""
@@ -43,12 +44,12 @@ class AppInfoCollector(apkFileLocation : String) {
 	  dummyMainMap.foreach{case(k, v) => println("dummyMain for " + k + "\n" + v)}
 	
 	def printEntrypoints() = {
-		if (this.entrypoints == null)
+		if (this.componentInfos == null)
 			println("Entry points not initialized")
 		else {
 			println("Classes containing entry points:")
-			for (className <- entrypoints)
-				println("\t" + className)
+			for (record <- componentInfos)
+				println("\t" + record)
 			println("End of Entrypoints")
 		}
 	}
@@ -57,10 +58,10 @@ class AppInfoCollector(apkFileLocation : String) {
 		this.taintWrapperFile = taintWrapperFile;
 	}
 	
-	def getIntentDB() = this.intentFdb
-	def getEntryPoints() = this.entrypoints
-			
-	def getDummyMainMap() = this.dummyMainMap
+	def getIntentDB = this.intentFdb
+	def getEntryPoints = this.componentInfos.map(_.name).toSet
+	def getComponentInfos = this.componentInfos
+	def getDummyMainMap = this.dummyMainMap
 	
 	def hasDummyMain(rec : AmandroidRecord) : Boolean = this.dummyMainMap.contains(rec)
 	
@@ -117,9 +118,9 @@ class AppInfoCollector(apkFileLocation : String) {
 	  val mfp = new ManifestParser
 		mfp.loadManifestFile(apkFileLocation)
 		this.appPackageName = mfp.getPackageName
-		this.entrypoints = mfp.getEntryPointClasses
+		this.componentInfos = mfp.getComponentInfos
 		this.intentFdb = mfp.getIntentDB
-	  msg_normal("entrypoints--->" + mfp.getEntryPointClasses)
+	  msg_normal("entrypoints--->" + mfp.getComponentRecords)
 	  msg_normal("packagename--->" + mfp.getPackageName)
 	  msg_normal("permissions--->" + mfp.getPermissions)
 	  msg_normal("intentDB------>" + mfp.getIntentDB)
@@ -132,13 +133,13 @@ class AppInfoCollector(apkFileLocation : String) {
 		// Find the user-defined sources in the layout XML files
 	  val lfp = new LayoutFileParser
 		lfp.setPackageName(this.appPackageName)
-		lfp.parseLayoutFile(apkFileLocation, this.entrypoints)
+		lfp.parseLayoutFile(apkFileLocation, this.componentInfos.map(_.name))
 		this.layoutControls = lfp.getUserControls
 		msg_detail("layoutcallback--->" + lfp.getCallbackMethods)
 	  msg_detail("layoutuser--->" + lfp.getUserControls)
 		
 		// Collect the callback interfaces implemented in the app's source code
-		val analysisHelper = new CallBackInfoCollector(this.entrypoints) 
+		val analysisHelper = new CallBackInfoCollector(this.componentInfos.map(_.name)) 
 		analysisHelper.collectCallbackMethods()
 		this.callbackMethods = analysisHelper.getCallbackMethods
 		msg_detail("LayoutClasses --> " + analysisHelper.getLayoutClasses)
@@ -189,9 +190,9 @@ class AppInfoCollector(apkFileLocation : String) {
 		msg_normal("Found " + callbacks.size + " callback methods")
 		msg_detail("Which are: " + this.callbackMethods)
     var components = isetEmpty[AmandroidRecord]
-    this.entrypoints.foreach{
+    this.componentInfos.foreach{
       f => 
-        val record = Center.resolveRecord(f, Center.ResolveLevel.BODIES)
+        val record = Center.resolveRecord(f.name, Center.ResolveLevel.BODIES)
         components += record
         val clCounter = generateDummyMain(record, codeLineCounter)
         codeLineCounter = clCounter

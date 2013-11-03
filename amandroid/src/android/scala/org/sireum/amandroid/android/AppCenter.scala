@@ -4,7 +4,7 @@ import org.sireum.util._
 import org.sireum.amandroid.AmandroidRecord
 import org.sireum.amandroid.android.parser.IntentFilterDataBase
 import org.sireum.amandroid.android.appInfo.AppInfoCollector
-import org.sireum.amandroid.interProcedural.callGraph._
+import org.sireum.amandroid.interProcedural.controlFlowGraph._
 
 /**
  * this is an object, which hold information of apps. e.g. components, intent-filter database, etc.
@@ -25,7 +25,7 @@ object AppCenter {
 	def updateIntentFilterDB(i : IntentFilterDataBase) = this.intentFdb.updateIntentFmap(i)
 	
 	def getIntentFilterDB ={
-	  if(this.intentFdb == null) throw new RuntimeException("intent-filter database is not exist.")
+	  if(this.intentFdb == null) throw new RuntimeException("intent-filter database does not exist.")
 	  this.intentFdb
 	}
 	
@@ -48,7 +48,7 @@ object AppCenter {
 	def getAppInfo : AppInfoCollector = 
 	  this.appInfoOpt match{
 	    case Some(info) => info
-	    case None => throw new RuntimeException("AppInfo is not exist.")
+	    case None => throw new RuntimeException("AppInfo does not exist.")
   	}
 	
 	
@@ -56,26 +56,26 @@ object AppCenter {
 	 * call graph of all procedures (app only)
 	 */
 	
-	private var appOnlyCallGraph : CallGraph[CGNode] = null
+	private var appOnlyCallGraph : InterproceduralControlFlowGraph[CGNode] = null
 	
 	/**
 	 * call graph of all procedures (whole program)
 	 */
 	
-	private var wholeProgramCallGraph : CallGraph[CGNode] = null
+	private var wholeProgramCallGraph : InterproceduralControlFlowGraph[CGNode] = null
 	
 	/**
 	 * set call graph for the current center
 	 */
 	  
-	def setAppOnlyCallGraph(cg : CallGraph[CGNode]) = this.appOnlyCallGraph = cg
+	def setAppOnlyCallGraph(cg : InterproceduralControlFlowGraph[CGNode]) = this.appOnlyCallGraph = cg
 	
 	/**
 	 * get call graph of the current center
 	 */
 	
-	def getAppOnlyCallGraph : CallGraph[CGNode] = {
-    if(!hasAppOnlyCallGraph) setAppOnlyCallGraph(new CallGraphBuilder().buildAppOnly(this.appInfoOpt))
+	def getAppOnlyCallGraph : InterproceduralControlFlowGraph[CGNode] = {
+    if(!hasAppOnlyCallGraph) setAppOnlyCallGraph(new InterproceduralControlFlowGraphBuilder().buildAppOnly(this.appInfoOpt))
     this.appOnlyCallGraph
   }
   
@@ -95,14 +95,14 @@ object AppCenter {
 	 * set call graph for the current center
 	 */
 	  
-	def setWholeProgramCallGraph(cg : CallGraph[CGNode]) = this.wholeProgramCallGraph = cg
+	def setWholeProgramCallGraph(cg : InterproceduralControlFlowGraph[CGNode]) = this.wholeProgramCallGraph = cg
 	
 	/**
 	 * get call graph of the current center
 	 */
 	
-	def getWholeProgramCallGraph : CallGraph[CGNode] = {
-    if(!hasWholeProgramCallGraph) setWholeProgramCallGraph(new CallGraphBuilder().buildWholeProgram(appInfoOpt))
+	def getWholeProgramCallGraph : InterproceduralControlFlowGraph[CGNode] = {
+    if(!hasWholeProgramCallGraph) setWholeProgramCallGraph(new InterproceduralControlFlowGraphBuilder().buildWholeProgram(appInfoOpt))
     this.wholeProgramCallGraph
   }
   

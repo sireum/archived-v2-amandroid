@@ -13,13 +13,23 @@ import java.io.IOException
 import javax.xml.parsers.ParserConfigurationException
 import org.xml.sax.SAXException
 
+final case class ComponentInfo(name : String, exported : Boolean, permission : Option[String])
+
 class ManifestParser extends AbstractAndroidXMLParser{
-	private var entryPointsClasses : Set[String] = Set()
+  private var componentInfos : Set[ComponentInfo] = Set()
+	private var components : Map[String, String] = Map()
 	private var packageName = ""
 	private var permissions : Set[String] = Set()
 	private val intentFdb : IntentFilterDataBase = new IntentFilterDataBase
 	private var currentComponent : String = null
+	private var applicationPermission : String = null
+	private var componentPermission : Map[String, String] = Map()
+	private var componentExported : Map[String, Boolean] = Map()
 	private var currentIntentFilter: IntentFilter = null
+	
+	private var minSdkVersion = 0
+	private var targetSdkVersion = 0
+	private var maxSdkVersion = 0
 	
 	private def buildIntentDB(intentFilter : IntentFilter) = {
 	  intentFdb.updateIntentFmap(intentFilter)
@@ -67,6 +77,14 @@ class ManifestParser extends AbstractAndroidXMLParser{
 						val tagName = parser.getName()
 						if (tagName.equals("manifest"))
 							this.packageName = getAttributeValue(parser, "package")
+					  else if (tagName.equals("uses-sdk")){
+					    var attrValue = getAttributeValue(parser, "minSdkVersion")
+					    if (attrValue != null) this.minSdkVersion = attrValue.toInt
+					    attrValue = getAttributeValue(parser, "targetSdkVersion")
+					    if (attrValue != null) this.targetSdkVersion = attrValue.toInt
+					    attrValue = getAttributeValue(parser, "maxSdkVersion")
+					    if (attrValue != null) this.maxSdkVersion = attrValue.toInt
+					  }
 						else if (tagName.equals("activity")
 								|| tagName.equals("receiver")
 								|| tagName.equals("service")
@@ -81,15 +99,23 @@ class ManifestParser extends AbstractAndroidXMLParser{
 									attrValue = getAttributeValue(parser, "name")
 									if (attrValue.startsWith(".")){
 									  this.currentComponent = toPilarRecord(this.packageName + attrValue)
-										entryPointsClasses += this.currentComponent
+									  this.components += (this.currentComponent -> tagName)
 									}
 									else if (attrValue.substring(0, 1).equals(attrValue.substring(0, 1).toUpperCase())){
 									  this.currentComponent = toPilarRecord(this.packageName + "." + attrValue)
-										entryPointsClasses += this.currentComponent
+									  this.components += (this.currentComponent -> tagName)
 									}
 									else {
 									  this.currentComponent = toPilarRecord(attrValue)
-										entryPointsClasses += this.currentComponent
+									  this.components += (this.currentComponent -> tagName)
+									}
+									attrValue = getAttributeValue(parser, "permission")
+									if (attrValue != null){
+									  this.componentPermission += (this.currentComponent -> attrValue)
+									}
+									attrValue = getAttributeValue(parser, "exported")
+									if(attrValue != null){
+									  this.componentExported += (this.currentComponent -> attrValue.toBoolean)
 									}
 								}
 							}
@@ -129,15 +155,14 @@ class ManifestParser extends AbstractAndroidXMLParser{
 						}
 						else if (tagName.equals("uses-permission")) {
 							var permissionName = getAttributeValue(parser, "name")
-							// We probably don't want to do this in some cases, so leave it
-							// to the user
-//							permissionName = permissionName.substring(permissionName.lastIndexOf(".") + 1)
 							this.permissions += permissionName
 						}
 						else if (tagName.equals("application")) {
 							// Check whether the application is disabled
-							val attrValue = getAttributeValue(parser, "enabled")
+							var attrValue = getAttributeValue(parser, "enabled")
 							applicationEnabled = (attrValue == null || !attrValue.equals("false"))
+							attrValue = getAttributeValue(parser, "permission")
+							this.applicationPermission = attrValue
 						}
 					case XmlPullParser.END_TAG =>
 					case XmlPullParser.TEXT =>
@@ -147,6 +172,40 @@ class ManifestParser extends AbstractAndroidXMLParser{
 		} catch {
 		  case e : Exception =>
 				e.printStackTrace()
+		} finally {
+		  this.components.foreach{
+		    case (name, typ) =>
+		      val exported = this.componentExported.getOrElse(name,
+		          {
+		        		/**
+		        		 * from: http://developer.android.com/guide/topics/manifest/provider-element.html
+		        		 * For activity, receiver and service:
+		        		 * The default value depends on whether the activity contains intent filters.
+		        		 * The absence of any filters means that the activity can be invoked only by
+		        		 * specifying its exact class name. This implies that the activity is intended
+		        		 * only for application-internal use (since others would not know the class name).
+		        		 * So in this case, the default value is "false". On the other hand, the presence
+		        		 * of at least one filter implies that the activity is intended for external use,
+		        		 * so the default value is "true".
+		        		 */
+		        		if(typ == "activity" || typ == "receiver" || typ == "service"){
+		        		  !this.intentFdb.getIntentFilters(name).isEmpty
+		        		} 
+		        		/**
+		        		 * from: http://developer.android.com/guide/topics/manifest/provider-element.html
+		        		 * For provider:
+		        		 * The default value is "true" for applications that set either android:minSdkVersion
+		        		 * or android:targetSdkVersion to "16" or lower. For applications that set either of
+		        		 * these attributes to "17" or higher, the default is "false".
+		        		 */
+		        		else if(typ == "provider") {
+		        		  this.minSdkVersion <= 16 || this.targetSdkVersion <= 16
+		        		} else throw new RuntimeException("Run component type: " + typ)
+		          })
+		      val permission = this.componentPermission.getOrElse(name, this.applicationPermission)
+		      val compermission = if(permission != null) Some(permission) else None
+		      this.componentInfos += ComponentInfo(name, exported, compermission)
+		  }
 		}
 	}
 	
@@ -175,15 +234,15 @@ class ManifestParser extends AbstractAndroidXMLParser{
 				
 				for (i <- 0 to activities.getLength() - 1) {
 					val activity = activities.item(i).asInstanceOf[Element]
-					loadManifestEntry(activity, "android.app.Activity", this.packageName)
+					loadManifestEntry(activity, "activity", this.packageName)
 				}
 				for (i <- 0 to receivers.getLength() - 1) {
 					val receiver = receivers.item(i).asInstanceOf[Element]
-					loadManifestEntry(receiver, "android.content.BroadcastReceiver", this.packageName)
+					loadManifestEntry(receiver, "receiver", this.packageName)
 				}
 				for (i <- 0 to services.getLength() - 1) {
 					val service = services.item(i).asInstanceOf[Element]
-					loadManifestEntry(service, "android.app.Service", this.packageName)
+					loadManifestEntry(service, "service", this.packageName)
 				}
 				
 				val permissions = appElement.getElementsByTagName("uses-permission")
@@ -209,14 +268,16 @@ class ManifestParser extends AbstractAndroidXMLParser{
 	private def loadManifestEntry(activity : Element, baseClass : String, packageName : String) = {
 		val className = activity.getAttribute("android:name")		
 		if (className.startsWith("."))
-			entryPointsClasses += packageName + className
+			this.components += (packageName + className -> baseClass)
 		else if (className.substring(0, 1).equals(className.substring(0, 1).toUpperCase()))
-			entryPointsClasses += packageName + "." + className
+			this.components += (packageName + "." + className -> baseClass)
 		else
-			entryPointsClasses += className
+			this.components += (className -> baseClass)
 	}
 
-	def getEntryPointClasses = this.entryPointsClasses
+	def getComponentRecords = this.components.map(_._1).toSet
+	
+	def getComponentInfos = this.componentInfos
 	
 	def getPermissions = this.permissions
 

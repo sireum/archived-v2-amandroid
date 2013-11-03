@@ -9,8 +9,7 @@ import org.sireum.pipeline.ErrorneousModulesThrowable
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.alir.ReachingDefinitionAnalysis
 import org.sireum.amandroid.intraProcedural.compressedControlFlowGraph.CompressedControlFlowGraph
-import org.sireum.amandroid.interProcedural.callGraph.CallGraph
-import org.sireum.amandroid.interProcedural.callGraph.CallGraphBuilder
+import org.sireum.amandroid.interProcedural.controlFlowGraph._
 
 class AndroidInterProceduralModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) 
 extends AndroidInterProceduralModule with ImplicitLogging {
@@ -79,6 +78,6 @@ extends AndroidInterProceduralModule with ImplicitLogging {
 }
 
 class CGModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends CGModule {
-  val result = new CallGraphBuilder().buildWholeProgram(this.appInfoOpt)
+  val result = new InterproceduralControlFlowGraphBuilder().buildWholeProgram(this.appInfoOpt)
   this.callGraph_=(result)
 }

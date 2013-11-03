@@ -8,8 +8,6 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAInstance
 import org.sireum.amandroid.android.AndroidConstants
 import org.sireum.amandroid.NormalType
 import org.sireum.amandroid.interProcedural.Context
-import org.sireum.amandroid.interProcedural.callGraph.CallGraph
-import org.sireum.amandroid.interProcedural.callGraph.CGNode
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.FieldSlot
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAConcreteStringInstance
 import org.sireum.amandroid.GlobalConfig

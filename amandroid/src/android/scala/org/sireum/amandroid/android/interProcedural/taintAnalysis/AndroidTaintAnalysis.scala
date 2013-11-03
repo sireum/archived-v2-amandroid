@@ -3,7 +3,7 @@ package org.sireum.amandroid.android.interProcedural.taintAnalysis
 import org.sireum.amandroid._
 import org.sireum.util._
 import org.sireum.amandroid.interProcedural.taintAnalysis.TaintFact
-import org.sireum.amandroid.interProcedural.callGraph._
+import org.sireum.amandroid.interProcedural.controlFlowGraph._
 import org.sireum.amandroid.interProcedural._
 import org.sireum.pilar.ast._
 import org.sireum.alir.Slot
@@ -22,10 +22,10 @@ import org.sireum.amandroid.interProcedural.taintAnalysis.TaintFact
 class AndroidTaintAnalysisBuilder{
   
   var rfaFacts : AndroidReachingFactsAnalysis.Result = null
-  var cg : CallGraph[AndroidReachingFactsAnalysis.Node] = null
+  var cg : InterproceduralControlFlowGraph[AndroidReachingFactsAnalysis.Node] = null
   
   def build //
-  (cg : CallGraph[AndroidReachingFactsAnalysis.Node],
+  (cg : InterproceduralControlFlowGraph[AndroidReachingFactsAnalysis.Node],
    rfaFacts : AndroidReachingFactsAnalysis.Result,
    initialFacts : ISet[TaintFact] = isetEmpty,
    parallel : Boolean,
@@ -386,7 +386,7 @@ class AndroidTaintAnalysisBuilder{
     /**
      * It returns the facts for each callee entry node and caller return node
      */
-    def resolveCall(s : ISet[TaintFact], cj : CallJump, callerContext : Context, cg : CallGraph[CGNode]) : (IMap[CGNode, ISet[TaintFact]], ISet[TaintFact]) = {
+    def resolveCall(s : ISet[TaintFact], cj : CallJump, callerContext : Context, cg : InterproceduralControlFlowGraph[CGNode]) : (IMap[CGNode, ISet[TaintFact]], ISet[TaintFact]) = {
       val calleeSet = getCalleeSet(s, cj, callerContext)
       var calleeFactsMap : IMap[CGNode, ISet[TaintFact]] = imapEmpty
       var returnFacts : ISet[TaintFact] = s
@@ -658,7 +658,7 @@ object AndroidTaintAnalysis {
   type Node = AndroidReachingFactsAnalysis.Node
   type Result = InterProceduralMonotoneDataFlowAnalysisResult[TaintFact]
    
-  def apply(cg : CallGraph[AndroidReachingFactsAnalysis.Node],
+  def apply(cg : InterproceduralControlFlowGraph[AndroidReachingFactsAnalysis.Node],
 				   rfaFacts : AndroidReachingFactsAnalysis.Result,
 				   initialFacts : ISet[TaintFact] = isetEmpty,
 				   parallel : Boolean = false,

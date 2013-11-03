@@ -12,7 +12,7 @@ import org.sireum.amandroid.AmandroidCodeSource
 import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
 import org.sireum.amandroid.Center
 import org.sireum.amandroid.AmandroidResolver
-import org.sireum.amandroid.interProcedural.callGraph.CallGraphBuilder
+import org.sireum.amandroid.interProcedural.controlFlowGraph.InterproceduralControlFlowGraphBuilder
 import org.sireum.amandroid.test.framework.TestFramework
 
 	/**
@@ -47,7 +47,7 @@ trait PointsToAnalysisTestFramework extends TestFramework {
     	    Center.resolveRecord(k, Center.ResolveLevel.BODIES)
     	}
     	
-    	new CallGraphBuilder().buildWholeProgram(None)
+    	new InterproceduralControlFlowGraphBuilder().buildWholeProgram(None)
     	
 //      val job = PipelineJob()
 //      

@@ -15,7 +15,7 @@ object XmlTest {
 	  AmandroidCodeSource.preLoad
 	  val mfp = new ManifestParser
 	  mfp.loadManifestFile("/Volumes/hd/fgwei/Desktop/apk/Callbacks_Button1.apk")
-	  println(mfp.getEntryPointClasses)
+	  println(mfp.getComponentInfos)
 	  println(mfp.getPackageName)
 	  println(mfp.getPermissions)
 	  println(mfp.getIntentDB)
@@ -25,7 +25,7 @@ object XmlTest {
 	  println("arscpackage-->" + afp.getPackages)
 	  val lfp = new LayoutFileParser
 	  lfp.setPackageName(mfp.getPackageName)
-	  lfp.parseLayoutFile("/Volumes/hd/fgwei/Desktop/apk/Callbacks_Button1.apk", mfp.getEntryPointClasses)
+	  lfp.parseLayoutFile("/Volumes/hd/fgwei/Desktop/apk/Callbacks_Button1.apk", mfp.getComponentRecords)
 	  println("layoutcalll--->" + lfp.getCallbackMethods)
 	  println("layoutuser--->" + lfp.getUserControls)
 	}

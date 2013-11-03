@@ -16,6 +16,14 @@ import org.sireum.amandroid.util.ExplicitValueFinder
 import org.sireum.pilar.ast.JumpLocation
 import org.sireum.amandroid.MessageCenter._
 import java.io.File
+import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAFact
+import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.model.InterComponentCommunicationModel
+import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.VarSlot
+import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.IntentHelper
+import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
+import org.sireum.amandroid.interProcedural.controlFlowGraph._
+import org.sireum.amandroid.interProcedural.dataDependenceAnalysis.InterProceduralDataDependenceGraph
+import org.sireum.amandroid.android.AppCenter
 
 object SourceAndSinkCenter {
   
@@ -97,6 +105,55 @@ object SourceAndSinkCenter {
 	  }
 	  false
 	}
+	
+	def checkIccSink(invNode : CGCallNode, rfaFact : ISet[RFAFact]) : Boolean = {
+    var sinkflag = false
+    val calleeSet = invNode.getCalleeSet
+    calleeSet.foreach{
+      callee =>
+        if(InterComponentCommunicationModel.isIccOperation(callee)){
+          val rfafactMap = ReachingFactsAnalysisHelper.getFactMap(rfaFact)
+          val intentSlot = VarSlot(callee.getParamName(1))
+          val intentValues = rfafactMap.getOrElse(intentSlot, isetEmpty)
+          val intentContents = IntentHelper.getIntentContents(rfafactMap, intentValues, invNode.getContext)
+          val comMap = IntentHelper.mappingIntents(intentContents)
+          comMap.foreach{
+            case (_, coms) =>
+              if(coms.isEmpty) sinkflag = true
+              coms.foreach{
+                case (com, typ) =>
+                  typ match {
+                    case IntentHelper.IntentType.EXPLICIT => if(com.isPhantom) sinkflag = true
+                    case IntentHelper.IntentType.IMPLICIT => sinkflag = true
+                  }
+              }
+          }
+        }
+    }
+    sinkflag
+	}
+  
+  def checkIccSource(iddg : InterProceduralDataDependenceGraph[CGNode], entNode : CGNode, sinkNodes : ISet[CGNode]) : Boolean = {
+    var sourceflag = false
+    val reachableSinks = sinkNodes.filter{sinN => iddg.findPath(entNode, sinN) != null}
+    if(!reachableSinks.isEmpty){
+	    val sinkProcs = reachableSinks.filter(_.isInstanceOf[CGCallNode]).map(_.asInstanceOf[CGCallNode].getCalleeSet).reduce(iunion[AmandroidProcedure])
+	    require(!sinkProcs.isEmpty)
+	    val neededPermissions = sinkProcs.map(sin => this.apiPermissions.getOrElse(sin.getSignature, isetEmpty)).reduce(iunion[String])
+	    val infos = AppCenter.getAppInfo.getComponentInfos
+	    infos.foreach{
+	      info =>
+	        if(info.name == entNode.getOwner.getDeclaringRecord.getName){
+	          if(info.exported == true){
+	            if(info.permission.isDefined){
+	              sourceflag = (neededPermissions - info.permission.get).isEmpty
+	            }
+	          }
+	        }
+	    }
+    }
+    sourceflag
+  }
 
 	
 	def addSource(source : String, category : Category.Value) = {

@@ -1,6 +1,6 @@
 package org.sireum.amandroid.interProcedural.dataDependenceAnalysis
 
-import org.sireum.amandroid.interProcedural.callGraph._
+import org.sireum.amandroid.interProcedural.controlFlowGraph._
 import org.sireum.amandroid.interProcedural.InterProceduralMonotonicFunction
 import org.sireum.util._
 import org.sireum.amandroid.interProcedural.Context
@@ -24,12 +24,12 @@ object InterproceduralReachingDefinitionAnalysis {
   type IRDFact = (RDFact, Context)
   type Node = AndroidReachingFactsAnalysis.Node
   
-  def apply(cg : CallGraph[Node],
+  def apply(cg : InterproceduralControlFlowGraph[Node],
       parallel : Boolean = false,
 	    switchAsOrderedMatch : Boolean = false) = build(cg, parallel, switchAsOrderedMatch)
 	
 	def build(
-	    cg : CallGraph[Node],
+	    cg : InterproceduralControlFlowGraph[Node],
 	    parallel : Boolean = false,
 	    switchAsOrderedMatch : Boolean = false) = {
     new InterproceduralReachingDefinitionAnalysis().build(cg, parallel, switchAsOrderedMatch)
@@ -41,11 +41,11 @@ class InterproceduralReachingDefinitionAnalysis {
   type IRDFact = InterproceduralReachingDefinitionAnalysis.IRDFact
 	type Node = InterproceduralReachingDefinitionAnalysis.Node
 	
-  var cg : CallGraph[Node] = null
+  var cg : InterproceduralControlFlowGraph[Node] = null
   var factSet = idmapEmpty[Node, ISet[IRDFact]]
   
 	def build(
-	    cg : CallGraph[Node],
+	    cg : InterproceduralControlFlowGraph[Node],
 	    parallel : Boolean,
 	    switchAsOrderedMatch : Boolean) = {
 	  val gen = new Gen
@@ -162,7 +162,7 @@ class InterproceduralReachingDefinitionAnalysis {
 	  /**
 		 * It returns the facts for each callee entry node and caller return node
 		 */
-	  def resolveCall(s : ISet[IRDFact], cj : CallJump, callerContext : Context, cg : CallGraph[CGNode]) : (IMap[CGNode, ISet[IRDFact]], ISet[IRDFact]) = {
+	  def resolveCall(s : ISet[IRDFact], cj : CallJump, callerContext : Context, cg : InterproceduralControlFlowGraph[CGNode]) : (IMap[CGNode, ISet[IRDFact]], ISet[IRDFact]) = {
       var calleeFactsMap : IMap[CGNode, ISet[IRDFact]] = imapEmpty
       var returnFacts : ISet[IRDFact] = isetEmpty
       val callNode = cg.getCGCallNode(callerContext)

@@ -2,7 +2,7 @@ package org.sireum.amandroid.interProcedural
 
 import org.sireum.alir._
 import org.sireum.util._
-import org.sireum.amandroid.interProcedural.callGraph._
+import org.sireum.amandroid.interProcedural.controlFlowGraph._
 import org.sireum.pilar.ast._
 import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.pilar.symbol.ProcedureSymbolTable
@@ -46,7 +46,7 @@ trait CallResolver[LatticeElement] {
   /**
 	 * It returns the facts for each callee entry node and caller return node
 	 */
-  def resolveCall(s : ISet[LatticeElement], cj : CallJump, callerContext : Context, cg : CallGraph[CGNode]) : (IMap[CGNode, ISet[LatticeElement]], ISet[LatticeElement])
+  def resolveCall(s : ISet[LatticeElement], cj : CallJump, callerContext : Context, cg : InterproceduralControlFlowGraph[CGNode]) : (IMap[CGNode, ISet[LatticeElement]], ISet[LatticeElement])
   def getAndMapFactsForCaller(calleeS : ISet[LatticeElement], callerNode : CGNode, calleeExitNode : CGVirtualNode) : ISet[LatticeElement]
 }
 
@@ -60,7 +60,7 @@ object InterProceduralMonotoneDataFlowAnalysisFramework {
 	def apply[LatticeElement] = build[LatticeElement] _
 
   def build[LatticeElement] //
-  (cg : CallGraph[N],
+  (cg : InterproceduralControlFlowGraph[N],
    forward : Boolean, lub : Boolean, rapid : Boolean, par : Boolean,
    gen : InterProceduralMonotonicFunction[LatticeElement],
    kill : InterProceduralMonotonicFunction[LatticeElement],

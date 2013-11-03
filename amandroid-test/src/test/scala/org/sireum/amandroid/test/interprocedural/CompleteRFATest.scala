@@ -18,20 +18,20 @@ class CompleteRFATest extends CompleteRFATestFramework {
 //  foreach { fileUri =>
 //    Analyzing title fileUri file fileUri
 //  }
-  InterproceduralExamples.normalAPKFiles.
-//  filter { s => s.endsWith("v1-1.apk") }.
-  foreach { fileUri =>
-//    if(i < 10) i += 1
-    Analyzing title fileUri file fileUri
-  }
-//  InterproceduralExamples.maliciousAPKFiles.
-//  filter { s => s.endsWith("0fbf.apk")}.
+//  InterproceduralExamples.normalAPKFiles.
+//  filter { s => s.endsWith("calculator-1.apk") }.
 //  foreach { fileUri =>
-////    if(i < 7) i += 1
+////    if(i < 37) i += 1
 //    Analyzing title fileUri file fileUri
 //  }
+  InterproceduralExamples.maliciousAPKFiles.
+//  filter { s => s.endsWith("0fbf.apk")}.
+  foreach { fileUri =>
+//    if(i < 7) i += 1
+    Analyzing title fileUri file fileUri
+  }
 //  InterproceduralExamples.benchAPKFiles.
-//  filter { s => s.endsWith("ActivityLifecycle1.apk") }.
+////  filter { s => s.endsWith("IntentSink2.apk") }.
 //  foreach { fileUri =>
 //    Analyzing title fileUri file fileUri
 //  }

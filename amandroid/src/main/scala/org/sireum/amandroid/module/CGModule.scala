@@ -7,8 +7,8 @@ import org.sireum.util._
 import org.sireum.pipeline._
 import java.lang.String
 import org.sireum.amandroid.android.appInfo.AppInfoCollector
-import org.sireum.amandroid.interProcedural.callGraph.CGNode
-import org.sireum.amandroid.interProcedural.callGraph.CallGraph
+import org.sireum.amandroid.interProcedural.controlFlowGraph.CGNode
+import org.sireum.amandroid.interProcedural.controlFlowGraph.InterproceduralControlFlowGraph
 import org.sireum.amandroid.module.AndroidInterProcedural.AndroidInterAnalysisResult
 import org.sireum.amandroid.module.AndroidIntraProcedural.AndroidIntraAnalysisResult
 import org.sireum.pilar.symbol.ProcedureSymbolTable
@@ -179,13 +179,13 @@ object CGModule extends PipelineModule {
         "Output error for '" + this.title + "': No entry found for 'callGraph'. Expecting (CGModule.callGraphKey or CGModule.globalCallGraphKey)") 
     }
 
-    if(job ? CGModule.callGraphKey && !job(CGModule.callGraphKey).isInstanceOf[org.sireum.amandroid.interProcedural.callGraph.CallGraph[org.sireum.amandroid.interProcedural.callGraph.CGNode]]) {
+    if(job ? CGModule.callGraphKey && !job(CGModule.callGraphKey).isInstanceOf[org.sireum.amandroid.interProcedural.controlFlowGraph.InterproceduralControlFlowGraph[org.sireum.amandroid.interProcedural.controlFlowGraph.CGNode]]) {
       tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker, 
         "Output error for '" + this.title + "': Wrong type found for CGModule.callGraphKey.  Expecting 'org.sireum.amandroid.interProcedural.callGraph.CallGraph[org.sireum.amandroid.interProcedural.callGraph.CGNode]' but found '" + 
         job(CGModule.callGraphKey).getClass.toString + "'")
     } 
 
-    if(job ? CGModule.globalCallGraphKey && !job(CGModule.globalCallGraphKey).isInstanceOf[org.sireum.amandroid.interProcedural.callGraph.CallGraph[org.sireum.amandroid.interProcedural.callGraph.CGNode]]) {
+    if(job ? CGModule.globalCallGraphKey && !job(CGModule.globalCallGraphKey).isInstanceOf[org.sireum.amandroid.interProcedural.controlFlowGraph.InterproceduralControlFlowGraph[org.sireum.amandroid.interProcedural.controlFlowGraph.CGNode]]) {
       tags += PipelineUtil.genTag(PipelineUtil.ErrorMarker, 
         "Output error for '" + this.title + "': Wrong type found for CGModule.globalCallGraphKey.  Expecting 'org.sireum.amandroid.interProcedural.callGraph.CallGraph[org.sireum.amandroid.interProcedural.callGraph.CGNode]' but found '" + 
         job(CGModule.globalCallGraphKey).getClass.toString + "'")
@@ -253,18 +253,18 @@ object CGModule extends PipelineModule {
     return options
   }
 
-  def getCallGraph (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.interProcedural.callGraph.CallGraph[org.sireum.amandroid.interProcedural.callGraph.CGNode] = {
+  def getCallGraph (options : scala.collection.Map[Property.Key, Any]) : org.sireum.amandroid.interProcedural.controlFlowGraph.InterproceduralControlFlowGraph[org.sireum.amandroid.interProcedural.controlFlowGraph.CGNode] = {
     if (options.contains(CGModule.globalCallGraphKey)) {
-       return options(CGModule.globalCallGraphKey).asInstanceOf[org.sireum.amandroid.interProcedural.callGraph.CallGraph[org.sireum.amandroid.interProcedural.callGraph.CGNode]]
+       return options(CGModule.globalCallGraphKey).asInstanceOf[org.sireum.amandroid.interProcedural.controlFlowGraph.InterproceduralControlFlowGraph[org.sireum.amandroid.interProcedural.controlFlowGraph.CGNode]]
     }
     if (options.contains(CGModule.callGraphKey)) {
-       return options(CGModule.callGraphKey).asInstanceOf[org.sireum.amandroid.interProcedural.callGraph.CallGraph[org.sireum.amandroid.interProcedural.callGraph.CGNode]]
+       return options(CGModule.callGraphKey).asInstanceOf[org.sireum.amandroid.interProcedural.controlFlowGraph.InterproceduralControlFlowGraph[org.sireum.amandroid.interProcedural.controlFlowGraph.CGNode]]
     }
 
     throw new Exception("Pipeline checker should guarantee we never reach here")
   }
 
-  def setCallGraph (options : MMap[Property.Key, Any], callGraph : org.sireum.amandroid.interProcedural.callGraph.CallGraph[org.sireum.amandroid.interProcedural.callGraph.CGNode]) : MMap[Property.Key, Any] = {
+  def setCallGraph (options : MMap[Property.Key, Any], callGraph : org.sireum.amandroid.interProcedural.controlFlowGraph.InterproceduralControlFlowGraph[org.sireum.amandroid.interProcedural.controlFlowGraph.CGNode]) : MMap[Property.Key, Any] = {
 
     options(CGModule.globalCallGraphKey) = callGraph
     options(callGraphKey) = callGraph
@@ -278,7 +278,7 @@ object CGModule extends PipelineModule {
       def appInfoOpt : scala.Option[org.sireum.amandroid.android.appInfo.AppInfoCollector] = CGModule.getAppInfoOpt(job.propertyMap)
       def rdas : scala.collection.mutable.Map[java.lang.String, org.sireum.alir.MonotoneDataFlowAnalysisResult[scala.Tuple2[org.sireum.alir.Slot, org.sireum.alir.DefDesc]]] = CGModule.getRdas(job.propertyMap)
       def procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = CGModule.getProcedureSymbolTables(job.propertyMap)
-      def callGraph : org.sireum.amandroid.interProcedural.callGraph.CallGraph[org.sireum.amandroid.interProcedural.callGraph.CGNode] = CGModule.getCallGraph(job.propertyMap)
+      def callGraph : org.sireum.amandroid.interProcedural.controlFlowGraph.InterproceduralControlFlowGraph[org.sireum.amandroid.interProcedural.controlFlowGraph.CGNode] = CGModule.getCallGraph(job.propertyMap)
     }
   }
 
@@ -297,8 +297,8 @@ object CGModule extends PipelineModule {
       def procedureSymbolTables_=(procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable]) { CGModule.setProcedureSymbolTables(job.propertyMap, procedureSymbolTables) }
       def procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = CGModule.getProcedureSymbolTables(job.propertyMap)
 
-      def callGraph_=(callGraph : org.sireum.amandroid.interProcedural.callGraph.CallGraph[org.sireum.amandroid.interProcedural.callGraph.CGNode]) { CGModule.setCallGraph(job.propertyMap, callGraph) }
-      def callGraph : org.sireum.amandroid.interProcedural.callGraph.CallGraph[org.sireum.amandroid.interProcedural.callGraph.CGNode] = CGModule.getCallGraph(job.propertyMap)
+      def callGraph_=(callGraph : org.sireum.amandroid.interProcedural.controlFlowGraph.InterproceduralControlFlowGraph[org.sireum.amandroid.interProcedural.controlFlowGraph.CGNode]) { CGModule.setCallGraph(job.propertyMap, callGraph) }
+      def callGraph : org.sireum.amandroid.interProcedural.controlFlowGraph.InterproceduralControlFlowGraph[org.sireum.amandroid.interProcedural.controlFlowGraph.CGNode] = CGModule.getCallGraph(job.propertyMap)
     }
   }
 }
@@ -315,6 +315,6 @@ trait CGModule {
   def procedureSymbolTables : scala.collection.Seq[org.sireum.pilar.symbol.ProcedureSymbolTable] = CGModule.getProcedureSymbolTables(job.propertyMap)
 
 
-  def callGraph_=(callGraph : org.sireum.amandroid.interProcedural.callGraph.CallGraph[org.sireum.amandroid.interProcedural.callGraph.CGNode]) { CGModule.setCallGraph(job.propertyMap, callGraph) }
-  def callGraph : org.sireum.amandroid.interProcedural.callGraph.CallGraph[org.sireum.amandroid.interProcedural.callGraph.CGNode] = CGModule.getCallGraph(job.propertyMap)
+  def callGraph_=(callGraph : org.sireum.amandroid.interProcedural.controlFlowGraph.InterproceduralControlFlowGraph[org.sireum.amandroid.interProcedural.controlFlowGraph.CGNode]) { CGModule.setCallGraph(job.propertyMap, callGraph) }
+  def callGraph : org.sireum.amandroid.interProcedural.controlFlowGraph.InterproceduralControlFlowGraph[org.sireum.amandroid.interProcedural.controlFlowGraph.CGNode] = CGModule.getCallGraph(job.propertyMap)
 }

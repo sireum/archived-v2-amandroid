@@ -13,6 +13,7 @@ import org.sireum.amandroid.Center
 import org.sireum.amandroid.AmandroidResolver
 import org.sireum.amandroid.util.SignatureParser
 import org.sireum.amandroid.MessageCenter._
+import org.sireum.amandroid.NormalType
 
 class DummyMainGenerator {
   private var currentComponent : String = null
@@ -296,9 +297,10 @@ class DummyMainGenerator {
 	  constructionStack.add(r)
 	  val ps = r.getProcedures
 	  var cons : String = null
-	  ps.foreach{
-	    p =>
-	      if(p.isConstructor && !p.isStatic) cons = p.getSignature
+	  val conProcs = ps.filter(p => p.isConstructor && !p.isStatic && !p.getParamTypes.contains(NormalType("[|java:lang:Class|]", 0)))
+	  if(!conProcs.isEmpty){
+	    val p = conProcs.minBy(_.getParamTypes.size)
+	  	cons = p.getSignature
 	  }
 	  if(cons != null){
 	    generateProcedureCall(cons, "direct", localVarsForClasses(r.getName), constructionStack, codefg)

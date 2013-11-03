@@ -2,11 +2,9 @@ package org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis
 
 import org.sireum.amandroid.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
 import org.sireum.alir.Slot
-import org.sireum.amandroid.interProcedural.callGraph.CGNode
 import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.util._
 import org.sireum.amandroid.interProcedural.InterProceduralMonotoneDataFlowAnalysisFramework
-import org.sireum.amandroid.interProcedural.callGraph.CallGraph
 import org.sireum.pilar.ast._
 import org.sireum.amandroid.interProcedural.InterProceduralMonotonicFunction
 import org.sireum.amandroid.interProcedural.Context
@@ -26,34 +24,30 @@ import org.sireum.amandroid.NullInstance
 import org.sireum.amandroid.UnknownInstance
 import org.sireum.amandroid.MessageCenter._
 import org.sireum.amandroid.GlobalConfig
-import org.sireum.amandroid.interProcedural.callGraph.CGCallNode
-import org.sireum.amandroid.interProcedural.callGraph.CGReturnNode
+import org.sireum.amandroid.interProcedural.controlFlowGraph._
 import org.sireum.amandroid.PilarAstHelper
 import org.sireum.amandroid.ExceptionCenter
 import org.sireum.amandroid.ClassLoadManager
 import org.sireum.amandroid.interProcedural.NodeListener
-import org.sireum.amandroid.interProcedural.callGraph.CGLocNode
-import org.sireum.amandroid.interProcedural.callGraph.CGVirtualNode
-import org.sireum.amandroid.interProcedural.callGraph.CGNormalNode
 import org.sireum.amandroid.Mode
 
 class AndroidReachingFactsAnalysisBuilder{
   
-  var callGraph : CallGraph[CGNode] = null
+  var icfg : InterproceduralControlFlowGraph[CGNode] = null
   
   def build //
   (entryPointProc : AmandroidProcedure,
    initialFacts : ISet[RFAFact] = isetEmpty,
    parallel : Boolean,
    initContext : Context,
-   switchAsOrderedMatch : Boolean) : (CallGraph[CGNode], AndroidReachingFactsAnalysis.Result) = {
+   switchAsOrderedMatch : Boolean) : (InterproceduralControlFlowGraph[CGNode], AndroidReachingFactsAnalysis.Result) = {
     val gen = new Gen
     val kill = new Kill
     val callr = new Callr
     val nl = new NodeL
     val initial : ISet[RFAFact] = isetEmpty
-    val cg = new CallGraph[CGNode]
-    this.callGraph = cg
+    val cg = new InterproceduralControlFlowGraph[CGNode]
+    this.icfg = cg
     cg.collectCfgToBaseGraph(entryPointProc, initContext, true)
     val iota : ISet[RFAFact] = initialFacts + RFAFact(VarSlot("@@[|RFAiota|]"), NullInstance(initContext))
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](cg,
@@ -78,12 +72,12 @@ class AndroidReachingFactsAnalysisBuilder{
           if(GlobalConfig.mode > Mode.APP_ONLY)
             result ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForClinit(p, currentNode.getContext)
         } else { // for normal call
-          this.callGraph.collectCfgToBaseGraph(p, currentNode.getContext, false)
+          this.icfg.collectCfgToBaseGraph(p, currentNode.getContext, false)
 	        val clinitVirContext = currentNode.getContext.copy.setContext(p.getSignature, p.getSignature)
-	        val clinitEntry = this.callGraph.getCGEntryNode(clinitVirContext)
-	        val clinitExit = this.callGraph.getCGExitNode(clinitVirContext)
-	        this.callGraph.addEdge(currentNode, clinitEntry)
-	        this.callGraph.addEdge(clinitExit, currentNode)
+	        val clinitEntry = this.icfg.getCGEntryNode(clinitVirContext)
+	        val clinitExit = this.icfg.getCGExitNode(clinitVirContext)
+	        this.icfg.addEdge(currentNode, clinitEntry)
+	        this.icfg.addEdge(clinitExit, currentNode)
         }
 	    }
     }
@@ -303,7 +297,7 @@ class AndroidReachingFactsAnalysisBuilder{
     /**
      * It returns the facts for each callee entry node and caller return node
      */
-    def resolveCall(s : ISet[RFAFact], cj : CallJump, callerContext : Context, cg : CallGraph[CGNode]) : (IMap[CGNode, ISet[RFAFact]], ISet[RFAFact]) = {
+    def resolveCall(s : ISet[RFAFact], cj : CallJump, callerContext : Context, cg : InterproceduralControlFlowGraph[CGNode]) : (IMap[CGNode, ISet[RFAFact]], ISet[RFAFact]) = {
       val calleeSet = ReachingFactsAnalysisHelper.getCalleeSet(s, cj, callerContext)
       val cgCallnode = cg.getCGCallNode(callerContext)
       cgCallnode.asInstanceOf[CGCallNode].setCalleeSet(calleeSet)
@@ -337,7 +331,7 @@ class AndroidReachingFactsAnalysisBuilder{
                 target =>
                   if(!cg.isProcessed(target, callerContext)){
 				            cg.collectCfgToBaseGraph[String](target, callerContext, false)
-									  cg.extendGraphOneWay(target.getSignature, callerContext)
+									  cg.extendGraphOneWay(target.getSignature, callerContext, AndroidReachingFactsAnalysis.ICC_EDGE)
 			            }
                   msg_normal(target.getDeclaringRecord + " started!")
                   calleeFactsMap += (cg.entryNode(target, callerContext) -> mapFactsToICCTarget(factsForCallee, cj, target.getProcedureBody.procedure))
@@ -446,7 +440,10 @@ class AndroidReachingFactsAnalysisBuilder{
 		      else tmpRec = tmpRec.getSuperClass
 	      }
 	      if(tmpRec == recCallee) return true
-		    else throw new RuntimeException("Given recvIns: " + recvIns + " and calleeProc: " + calleeProc + " is not in the Same hierachy.")
+		    else {
+		      err_msg_detail("Given recvIns: " + recvIns + " and calleeProc: " + calleeProc + " is not in the Same hierachy.")
+		      return false
+		    }
       }
     }
     
@@ -627,11 +624,12 @@ class AndroidReachingFactsAnalysisBuilder{
  */
 object AndroidReachingFactsAnalysis {
   type Node = CGNode
+  final val ICC_EDGE = "icc"
   type Result = InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]
   def apply(entryPointProc : AmandroidProcedure,
    initialFacts : ISet[RFAFact] = isetEmpty,
    parallel : Boolean = false,
    initContext : Context = new Context(GlobalConfig.CG_CONTEXT_K),
-   switchAsOrderedMatch : Boolean = false) : (CallGraph[Node], Result)
+   switchAsOrderedMatch : Boolean = false) : (InterproceduralControlFlowGraph[Node], Result)
 				   = new AndroidReachingFactsAnalysisBuilder().build(entryPointProc, initialFacts, parallel, initContext, switchAsOrderedMatch)
 }

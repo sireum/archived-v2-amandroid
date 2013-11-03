@@ -17,16 +17,35 @@ import org.sireum.alir.LocDefDesc
 import org.sireum.alir.InitDefDesc
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.alir.DefDesc
-import org.sireum.amandroid.interProcedural.callGraph._
+import org.sireum.amandroid.interProcedural.controlFlowGraph._
 import org.sireum.amandroid.PilarAstHelper
+import org.sireum.alir.AlirEdge
+
+trait InterproceduralDataDependenceInfo{
+  def getIddg : InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node]
+  def getDependentPath(src : InterproceduralDataDependenceAnalysis.Node, dst : InterproceduralDataDependenceAnalysis.Node) : IList[InterproceduralDataDependenceAnalysis.Edge]
+  def isDependent(src : InterproceduralDataDependenceAnalysis.Node, dst : InterproceduralDataDependenceAnalysis.Node) : Boolean
+}
 
 object InterproceduralDataDependenceAnalysis {
   
   type Node = CGNode
+  type Edge = AlirEdge[Node]
   
-	def apply(cg : CallGraph[Node], rfaResult : AndroidReachingFactsAnalysis.Result) : InterProceduralDataDependenceGraph[Node] = build(cg, rfaResult)
+	def apply(cg : InterproceduralControlFlowGraph[Node], rfaResult : AndroidReachingFactsAnalysis.Result) : InterproceduralDataDependenceInfo = build(cg, rfaResult)
 	
-	def build(cg : CallGraph[Node], rfaResult : AndroidReachingFactsAnalysis.Result) : InterProceduralDataDependenceGraph[Node] = {
+	def build(cg : InterproceduralControlFlowGraph[Node], rfaResult : AndroidReachingFactsAnalysis.Result) : InterproceduralDataDependenceInfo = {
+    
+    class Iddi(iddg : InterProceduralDataDependenceGraph[Node]) extends InterproceduralDataDependenceInfo{
+      def getIddg : InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node] = iddg
+		  def getDependentPath(src : InterproceduralDataDependenceAnalysis.Node, dst : InterproceduralDataDependenceAnalysis.Node) : IList[InterproceduralDataDependenceAnalysis.Edge] = {
+        iddg.findPath(src, dst)
+      }
+		  def isDependent(src : InterproceduralDataDependenceAnalysis.Node, dst : InterproceduralDataDependenceAnalysis.Node) : Boolean = {
+		    getDependentPath(src, dst) != null
+		  }
+    }
+    
     val irdaResult = InterproceduralReachingDefinitionAnalysis(cg)
 	  val iddg = new InterProceduralDataDependenceGraph[Node]
 	  iddg.initGraph(cg)
@@ -40,17 +59,6 @@ object InterproceduralDataDependenceAnalysis {
 	            val cgTarN = cg.predecessors(cgN)
 	            targetNodes ++= cgTarN.map(iddg.getNode(_))
 	          case en : CGExitNode =>
-//	          	val cgN = cg.getCGExitNode(en.getContext)
-//	            val cgTarN = cg.predecessors(cgN)
-//	            targetNodes ++= cgTarN.map(iddg.getNode(_))
-//	            val ownerProc = en.getOwner
-//	            val cfg = ownerProc.getCfg
-//				      val rda = ownerProc.getRda
-//				      val rdaFacts = rda.entrySet(cfg.exitNode)
-//	            ownerProc.getParamNames.foreach{
-//	          	  name =>
-//	          	    targetNodes ++= searchRda(ownerProc, name, rdaFacts, iddg, en.getContext)
-//	          	}
 	          case rn : CGReturnNode =>
 	            val tarN = cg.getCGCallNode(rn.getContext)
 	            targetNodes += iddg.getNode(tarN)
@@ -67,7 +75,7 @@ object InterproceduralDataDependenceAnalysis {
 	  }
 	  
 	  msg_normal("[IDDG building done!]")
-	  iddg
+	  new Iddi(iddg)
 	}
 	
 	def processLocation(loc : LocationDecl, rfaFacts : ISet[RFAFact], irdaFacts : ISet[InterproceduralReachingDefinitionAnalysis.IRDFact], iddg : InterProceduralDataDependenceGraph[Node]) : ISet[Node] = {

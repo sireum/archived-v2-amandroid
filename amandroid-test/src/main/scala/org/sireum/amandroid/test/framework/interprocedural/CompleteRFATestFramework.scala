@@ -17,6 +17,7 @@ import org.sireum.amandroid.util.StringFormConverter
 import org.sireum.amandroid.interProcedural.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
 import org.sireum.amandroid.android.interProcedural.taintAnalysis.AndroidDataDependentTaintAnalysis
 import java.net.URI
+import org.sireum.amandroid.android.AppCenter
 
 trait CompleteRFATestFramework extends TestFramework {
 
@@ -41,10 +42,10 @@ trait CompleteRFATestFramework extends TestFramework {
     	println("####" + title + "#####")
     	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
     	Center.reset
+    	AppCenter.reset
     	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
     	AmandroidCodeSource.clearAppRecordsCodes
-//    	ClassLoadManager.reset
-    	
+    	ClassLoadManager.reset
     	// now get the dex file from the source apk file 
     	val apkName = src.substring(src.lastIndexOf("/") + 1, src.lastIndexOf("."))
     	val apkfile = new File(System.getProperty("user.home") + "/Desktop/graphs/" + apkName)
@@ -75,12 +76,12 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	  ep =>
 		    	    println("--------------Component " + ep + "--------------")
 		    	    val initialfacts = AndroidRFAConfig.getInitialFactsForDummyMain(ep)
-		    	    val (cg, rfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, false)
-		    	    println("processed-->" + cg.getProcessed.size)
-		    	    println("exit facts: " + rfaResult.entrySet(cg.exitNode).size)
+		    	    val (icfg, rfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, false)
+		    	    println("processed-->" + icfg.getProcessed.size)
+		    	    println("exit facts: " + rfaResult.entrySet(icfg.exitNode).size)
 		//    	    val taResult = AndroidTaintAnalysis(cg, rfaResult)
-		    	    val iddg = InterproceduralDataDependenceAnalysis(cg, rfaResult)
-		    	    AndroidDataDependentTaintAnalysis(iddg, rfaResult)
+		    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, rfaResult)
+		    	    AndroidDataDependentTaintAnalysis(iddResult, rfaResult)
 		//    	    val f1 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "rfa.txt")
 		//			    val o1 = new FileOutputStream(f1)
 		//			    val w1 = new OutputStreamWriter(o1)

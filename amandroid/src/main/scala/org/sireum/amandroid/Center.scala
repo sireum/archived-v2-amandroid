@@ -1,10 +1,7 @@
 package org.sireum.amandroid
 
-import org.sireum.amandroid.interProcedural.callGraph.CallGraph
 import org.sireum.amandroid.util.StringFormConverter
 import org.sireum.util._
-import org.sireum.amandroid.interProcedural.callGraph.CGNode
-import org.sireum.amandroid.interProcedural.callGraph.CallGraphBuilder
 import org.sireum.amandroid.MessageCenter._
 
 /**
@@ -145,9 +142,14 @@ object Center {
 		            record.setOuterClass(outer)
 		            if(!outer.needToResolveExtends.isEmpty || outer.needToResolveOuterName.isDefined) worklist += outer
 		          case None =>
-		            val code = AmandroidCodeSource.getRecordCode(o)
-		            codes += code
-		            tmpList ::= record
+		            if(AmandroidCodeSource.containsRecord(o)){
+			            val code = AmandroidCodeSource.getRecordCode(o)
+			            codes += code
+			            tmpList ::= record
+		            } else {
+		              resolveRecord(o, ResolveLevel.BODIES)
+		              tmpList ::= record
+		            }
 		        }
 	        case None =>
 	      }

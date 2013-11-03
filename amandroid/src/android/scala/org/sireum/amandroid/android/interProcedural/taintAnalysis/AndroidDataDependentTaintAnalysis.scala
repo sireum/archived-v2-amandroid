@@ -8,26 +8,109 @@ import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAFact
 import org.sireum.amandroid.Center
 import org.sireum.amandroid.MessageCenter._
-import org.sireum.amandroid.interProcedural.callGraph.CGCallNode
+import org.sireum.amandroid.interProcedural.controlFlowGraph._
 import org.sireum.pilar.ast._
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAFact
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
-import org.sireum.amandroid.interProcedural.callGraph.CGInvokeNode
-import org.sireum.amandroid.interProcedural.callGraph.CGReturnNode
-import org.sireum.amandroid.interProcedural.callGraph.CGEntryNode
+import org.sireum.amandroid.interProcedural.dataDependenceAnalysis.InterproceduralDataDependenceInfo
+import org.sireum.amandroid.interProcedural.taintAnalysis._
+import org.sireum.amandroid.android.security.AndroidProblemCategories
 
 object AndroidDataDependentTaintAnalysis {
   type Node = InterproceduralDataDependenceAnalysis.Node
   
-  final val SOURCE = "source"
-  final val SINK = "sink"
+  final val API_SOURCE = "api_source"
+  final val API_SINK = "api_sink"
+  final val ICC_SOURCE = "icc_source"
+  final val ICC_SINK = "icc_sink"
+  final val CALLBACK_SOURCE = "callback_source"
   
-	def apply(iddg : InterProceduralDataDependenceGraph[Node], rfaResult : AndroidReachingFactsAnalysis.Result)
-  	= build(iddg, rfaResult)
+  case class Td(name : String, typ : String) extends TaintDescriptor
+    
+  class Tn(node : InterproceduralDataDependenceAnalysis.Node) extends TaintNode{
+    var descriptors : ISet[TaintDescriptor] = isetEmpty
+    var isSrc : Boolean = false
+    def getNode = node
+    def getDescriptors = this.descriptors
+    def isSource = this.isSrc
+    def isSink = !isSource
+  }
+  
+  class Tp(path : IList[InterproceduralDataDependenceAnalysis.Edge]) extends TaintPath{
+    var srcN : TaintNode = null
+    var sinN : TaintNode = null
+    var typs : ISet[String] = isetEmpty
+    
+    def getTypes : ISet[String] = this.typs
+    
+    override def toString : String = {
+      val sb = new StringBuilder
+      sb.append("find path from\n" + srcN.getDescriptors + "\nto\n" + sinN.getDescriptors + "\n")
+      sb.append("path types:" + this.typs)
+      path.reverse.foreach{
+        edge =>
+          sb.append(edge.target + " -> " + edge.source)
+      }
+      sb.toString().intern
+    }
+  }
+  
+  class Tar(iddi : InterproceduralDataDependenceInfo) extends TaintAnalysisResult{
+    var sourceNodes : ISet[TaintNode] = isetEmpty
+    var sinkNodes : ISet[TaintNode] = isetEmpty
+    
+    def getSourceNodes : ISet[TaintNode] = this.sourceNodes
+		def getSinkNodes : ISet[TaintNode] = this.sinkNodes
+		def getTaintedPaths : ISet[TaintPath] = {
+      var tps : ISet[TaintPath] = isetEmpty
+      sinkNodes.foreach{
+	      sinN =>
+	        sourceNodes.foreach{
+	          srcN =>
+	            val path = iddi.getDependentPath(sinN.getNode, srcN.getNode)
+	            if(path != null){
+		            val tp = new Tp(path)
+		            tp.srcN = srcN
+		            tp.sinN = sinN
+		            val srctyps = srcN.getDescriptors.map(_.typ)
+		            val sintyps = sinN.getDescriptors.map(_.typ)
+		            srctyps.foreach{
+		              srcTyp =>
+		                sintyps.foreach{
+		                  sinTyp =>
+		                    if(srcTyp == API_SOURCE || srcTyp == CALLBACK_SOURCE){
+		                      if(sinTyp == API_SINK) tp.typs += AndroidProblemCategories.MAL_INFOMATION_LEAK
+		                      else if(sinTyp == ICC_SINK) tp.typs += AndroidProblemCategories.VUL_INFOMATION_LEAK
+		                    } else if(srcTyp == ICC_SOURCE) {
+		                      if(sinTyp == API_SINK) tp.typs += AndroidProblemCategories.VUL_CAPABILITY_LEAK
+		                      else if(sinTyp == ICC_SINK) tp.typs += AndroidProblemCategories.VUL_INFOMATION_LEAK
+		                    }
+		                }
+		            }
+		            tps += tp
+	            }
+	        }
+	    }
+      tps
+    }
+    override def toString : String = {
+      val sb = new StringBuilder
+      val paths = getTaintedPaths
+      if(!paths.isEmpty){
+	      sb.append("path:\n")
+	      getTaintedPaths.foreach(tp => sb.append(tp.toString) + "\n")
+      }
+      sb.toString.intern()
+    }
+  }
+    
+	def apply(iddi : InterproceduralDataDependenceInfo, rfaResult : AndroidReachingFactsAnalysis.Result) : TaintAnalysisResult
+  	= build(iddi, rfaResult)
   	
-  def build(iddg : InterProceduralDataDependenceGraph[Node], rfaResult : AndroidReachingFactsAnalysis.Result) = {
-    var sourceNodes : ISet[Node] = isetEmpty
-    var sinkNodes : ISet[Node] = isetEmpty
+  def build(iddi : InterproceduralDataDependenceInfo, rfaResult : AndroidReachingFactsAnalysis.Result) : TaintAnalysisResult = {
+    var sourceNodes : ISet[TaintNode] = isetEmpty
+    var sinkNodes : ISet[TaintNode] = isetEmpty
+    val iddg = iddi.getIddg
     iddg.nodes.foreach{
       node =>
         node match{
@@ -36,35 +119,33 @@ object AndroidDataDependentTaintAnalysis {
             val (src, sin) = getSourceAndSinkNode(invNode, rfaFacts)
             sourceNodes ++= src
             sinkNodes ++= sin
+            if(invNode.isInstanceOf[CGCallNode] && SourceAndSinkCenter.checkIccSink(invNode.asInstanceOf[CGCallNode], rfaFacts)){
+              msg_normal("find icc sink: " + invNode)
+              val tn = new Tn(invNode)
+				      tn.descriptors += Td(invNode.getLocUri, ICC_SINK)
+				      sinkNodes += tn
+            }
           case entNode : CGEntryNode =>
             if(isCallBackSource(entNode)){
               msg_normal("find callback source: " + entNode)
-              val s = entNode.getPropertyOrElse[ISet[String]](SOURCE, isetEmpty[String])
-              entNode.setProperty(SOURCE, s + entNode.getOwner.getSignature)
-              sourceNodes += entNode
+              val tn = new Tn(entNode)
+				      tn.descriptors += Td(entNode.getOwner.getSignature, CALLBACK_SOURCE)
+				      sourceNodes += tn
             }
           case _ =>
         }
     }
-    sinkNodes.foreach{
-      sinN =>
-        sourceNodes.foreach{
-          srcN =>
-            val path = iddg.findPath(sinN, srcN)
-            if(path != null){
-              val sb = new StringBuilder
-              sb.append("find path from\n" + srcN.getProperty(SOURCE) + "\nto\n" + sinN.getProperty(SINK) + "\n")
-              sb.append("path:\n")
-              import scala.collection.JavaConversions._
-              path.reverse.foreach{
-                edge =>
-                  sb.append(edge.target + " -> " + edge.source + "\n")
-              }
-              sb.append("\n")
-              err_msg_critical(sb.toString.trim())
-            }
-        }
+    if(SourceAndSinkCenter.checkIccSource(iddg, iddg.entryNode, sinkNodes.map(_.getNode))){
+      msg_normal("find icc source: " + iddg.entryNode)
+      val tn = new Tn(iddg.entryNode)
+      tn.descriptors += Td(iddg.entryNode.getOwner.getSignature, ICC_SOURCE)
+      sourceNodes += tn
     }
+    val tar = new Tar(iddi)
+    tar.sourceNodes = sourceNodes
+    tar.sinkNodes = sinkNodes
+    println(tar.toString)
+    tar
   }
   
   def isCallBackSource(entNode : CGEntryNode) = {
@@ -74,8 +155,8 @@ object AndroidDataDependentTaintAnalysis {
   
   def getSourceAndSinkNode(invNode : CGInvokeNode, rfaFacts : ISet[RFAFact]) = {
     val calleeSet = invNode.getCalleeSet
-    var sources = isetEmpty[Node]
-    var sinks = isetEmpty[Node]
+    var sources = isetEmpty[TaintNode]
+    var sinks = isetEmpty[TaintNode]
     calleeSet.foreach{
       callee =>
         var soundCallee = callee
@@ -95,15 +176,15 @@ object AndroidDataDependentTaintAnalysis {
 		    }
 		    if(invNode.isInstanceOf[CGReturnNode] && SourceAndSinkCenter.isSource(soundCallee, caller, jumpLoc)){
 		      msg_normal("find source: " + soundCallee + "@" + invNode.getContext)
-		      val s = invNode.getPropertyOrElse[ISet[String]](SOURCE, isetEmpty[String])
-		      invNode.setProperty(SOURCE, s + soundCallee.getSignature)
-		      sources += invNode
+		      val tn = new Tn(invNode)
+		      tn.descriptors += Td(soundCallee.getSignature, API_SOURCE)
+		      sources += tn
 		    }
 		    if(invNode.isInstanceOf[CGCallNode] && SourceAndSinkCenter.isSinkProcedure(soundCallee)){
 		      msg_normal("find sink: " + soundCallee + "@" + invNode.getContext)
-		      val r = invNode.getPropertyOrElse[ISet[String]](SINK, isetEmpty[String])
-		      invNode.setProperty(SINK, r + soundCallee.getSignature)
-		      sinks += invNode
+		      val tn = new Tn(invNode)
+		      tn.descriptors += Td(soundCallee.getSignature, API_SINK)
+		      sinks += tn
 		    }
     }
     (sources, sinks)

@@ -8,14 +8,12 @@ import org.sireum.pilar.ast.ActionLocation
 import org.sireum.pilar.ast.AssignAction
 import org.sireum.pilar.ast.LiteralExp
 import org.sireum.pilar.ast.LiteralType
-import org.sireum.amandroid.interProcedural.callGraph.CallGraph
 import org.sireum.amandroid.android.AndroidConstants
 import org.sireum.amandroid.pilarCodeGenerator.AndroidEntryPointConstants
 import org.sireum.amandroid.AmandroidRecord
 import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.amandroid.Center
-import org.sireum.amandroid.interProcedural.callGraph.CGNode
-import org.sireum.amandroid.interProcedural.callGraph.CallGraphBuilder
+import org.sireum.amandroid.interProcedural.controlFlowGraph._
 import org.sireum.pilar.ast.CallJump
 import org.sireum.pilar.ast.JumpLocation
 import org.sireum.pilar.ast.TupleExp
@@ -52,7 +50,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	    val comp = Center.resolveRecord(compName, Center.ResolveLevel.BODIES)
 	    val methods : Set[AmandroidProcedure] = comp.getProcedures
 	    
-	    val reachableMethods = new CallGraphBuilder().getReachableProcedures(methods, false)
+	    val reachableMethods = new InterproceduralControlFlowGraphBuilder().getReachableProcedures(methods, false)
 	    val containerClasses = reachableMethods.map(item => item.getDeclaringRecord)
 	    containerClasses.map(item => analyzeClass(item, comp))
 	  }
@@ -70,7 +68,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	      val recUri = Center.resolveRecord(compName, Center.ResolveLevel.BODIES)
 	      procedures ++= recUri.getProcedures
 	  }
-	  new CallGraphBuilder().getReachableProcedures(procedures, false).foreach{
+	  new InterproceduralControlFlowGraphBuilder().getReachableProcedures(procedures, false).foreach{
 	    reachableProcedure =>
 	      if(reachableProcedure.isConcrete){
 	        reachableProcedure.getProcedureBody.locations foreach{

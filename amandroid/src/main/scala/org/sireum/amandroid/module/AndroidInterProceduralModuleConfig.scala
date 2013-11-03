@@ -8,9 +8,8 @@ import org.sireum.core.module.AlirIntraProcedural
 import org.sireum.pilar.ast.{LocationDecl, CatchClause}
 import org.sireum.alir._
 import org.sireum.pilar.symbol._
-import org.sireum.amandroid.interProcedural.callGraph.CallGraph
+import org.sireum.amandroid.interProcedural.controlFlowGraph._
 import org.sireum.amandroid.android.cache.AndroidCacheFile
-import org.sireum.amandroid.interProcedural.callGraph.CGNode
 import org.sireum.amandroid.android.appInfo.AppInfoCollector
 
 /*
@@ -23,7 +22,7 @@ http://www.eclipse.org/legal/epl-v10.html
 
 object AndroidInterProcedural {
   type VirtualLabel = String
-  type CG = CallGraph[CGNode]
+  type CG = InterproceduralControlFlowGraph[CGNode]
     
   final case class AndroidInterAnalysisResult(
     callGraph : AndroidInterProcedural.CG)
