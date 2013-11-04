@@ -24,6 +24,7 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsA
 import org.sireum.amandroid.interProcedural.controlFlowGraph._
 import org.sireum.amandroid.interProcedural.dataDependenceAnalysis.InterProceduralDataDependenceGraph
 import org.sireum.amandroid.android.AppCenter
+import org.sireum.pilar.ast._
 
 object SourceAndSinkCenter {
   
@@ -66,11 +67,7 @@ object SourceAndSinkCenter {
 	          this.apiPermissions += (sig -> ps)
 	      }
 	  }
-	  println("source size: " + this.sources.size + " sink size: " + this.sinks.size)
-//	  this.sources.foreach{
-//	    sour =>
-//	      println(sour._1)
-//	  }
+	  msg_detail("source size: " + this.sources.size + " sink size: " + this.sinks.size)
 	}
 	
 	private def matchs(procedure : AmandroidProcedure, procedurepool : ISet[String]) : Boolean = procedurepool.contains(procedure.getSignature)
@@ -113,7 +110,18 @@ object SourceAndSinkCenter {
       callee =>
         if(InterComponentCommunicationModel.isIccOperation(callee)){
           val rfafactMap = ReachingFactsAnalysisHelper.getFactMap(rfaFact)
-          val intentSlot = VarSlot(callee.getParamName(1))
+          val args = invNode.getOwner.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
+              case te : TupleExp =>
+                te.exps.map{
+			            exp =>
+			              exp match{
+					            case ne : NameExp => ne.name.name
+					            case _ => exp.toString()
+					          }
+			          }.toList
+              case a => throw new RuntimeException("wrong exp type: " + a)
+            }
+          val intentSlot = VarSlot(args(1))
           val intentValues = rfafactMap.getOrElse(intentSlot, isetEmpty)
           val intentContents = IntentHelper.getIntentContents(rfafactMap, intentValues, invNode.getContext)
           val comMap = IntentHelper.mappingIntents(intentContents)
@@ -146,7 +154,7 @@ object SourceAndSinkCenter {
 	        if(info.name == entNode.getOwner.getDeclaringRecord.getName){
 	          if(info.exported == true){
 	            if(info.permission.isDefined){
-	              sourceflag = (neededPermissions - info.permission.get).isEmpty
+	              sourceflag = !(neededPermissions - info.permission.get).isEmpty
 	            }
 	          }
 	        }

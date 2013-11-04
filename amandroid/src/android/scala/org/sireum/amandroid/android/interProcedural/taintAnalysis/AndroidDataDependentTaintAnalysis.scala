@@ -40,12 +40,16 @@ object AndroidDataDependentTaintAnalysis {
     var srcN : TaintNode = null
     var sinN : TaintNode = null
     var typs : ISet[String] = isetEmpty
-    
+    def getSource = srcN
+    def getSink = sinN
     def getTypes : ISet[String] = this.typs
+    def getPath : IList[InterproceduralDataDependenceAnalysis.Edge] = {
+      path.reverse.map(edge=> new InterproceduralDataDependenceAnalysis.Edge(edge.owner, edge.target, edge.source))
+    }
     
     override def toString : String = {
       val sb = new StringBuilder
-      sb.append("find path from\n" + srcN.getDescriptors + "\nto\n" + sinN.getDescriptors + "\n")
+      sb.append("found path from\n" + srcN.getDescriptors + "\nto\n" + sinN.getDescriptors + "\n")
       sb.append("path types:" + this.typs)
       path.reverse.foreach{
         edge =>
@@ -83,11 +87,11 @@ object AndroidDataDependentTaintAnalysis {
 		                      else if(sinTyp == ICC_SINK) tp.typs += AndroidProblemCategories.VUL_INFOMATION_LEAK
 		                    } else if(srcTyp == ICC_SOURCE) {
 		                      if(sinTyp == API_SINK) tp.typs += AndroidProblemCategories.VUL_CAPABILITY_LEAK
-		                      else if(sinTyp == ICC_SINK) tp.typs += AndroidProblemCategories.VUL_INFOMATION_LEAK
 		                    }
 		                }
 		            }
-		            tps += tp
+		            if(!tp.typs.isEmpty)
+		            	tps += tp
 	            }
 	        }
 	    }
@@ -120,15 +124,17 @@ object AndroidDataDependentTaintAnalysis {
             sourceNodes ++= src
             sinkNodes ++= sin
             if(invNode.isInstanceOf[CGCallNode] && SourceAndSinkCenter.checkIccSink(invNode.asInstanceOf[CGCallNode], rfaFacts)){
-              msg_normal("find icc sink: " + invNode)
+              msg_normal("found icc sink: " + invNode)
               val tn = new Tn(invNode)
+              tn.isSrc = false
 				      tn.descriptors += Td(invNode.getLocUri, ICC_SINK)
 				      sinkNodes += tn
             }
           case entNode : CGEntryNode =>
             if(isCallBackSource(entNode)){
-              msg_normal("find callback source: " + entNode)
+              msg_normal("found callback source: " + entNode)
               val tn = new Tn(entNode)
+              tn.isSrc = true
 				      tn.descriptors += Td(entNode.getOwner.getSignature, CALLBACK_SOURCE)
 				      sourceNodes += tn
             }
@@ -136,15 +142,17 @@ object AndroidDataDependentTaintAnalysis {
         }
     }
     if(SourceAndSinkCenter.checkIccSource(iddg, iddg.entryNode, sinkNodes.map(_.getNode))){
-      msg_normal("find icc source: " + iddg.entryNode)
+      msg_normal("found icc source: " + iddg.entryNode)
       val tn = new Tn(iddg.entryNode)
+      tn.isSrc = true
       tn.descriptors += Td(iddg.entryNode.getOwner.getSignature, ICC_SOURCE)
       sourceNodes += tn
     }
     val tar = new Tar(iddi)
     tar.sourceNodes = sourceNodes
     tar.sinkNodes = sinkNodes
-    println(tar.toString)
+    if(!tar.getTaintedPaths.isEmpty)
+    	err_msg_critical(tar.toString)
     tar
   }
   
@@ -175,14 +183,16 @@ object AndroidDataDependentTaintAnalysis {
 		      soundCallee = Center.getProcedureDeclaration(calleeSignature)
 		    }
 		    if(invNode.isInstanceOf[CGReturnNode] && SourceAndSinkCenter.isSource(soundCallee, caller, jumpLoc)){
-		      msg_normal("find source: " + soundCallee + "@" + invNode.getContext)
+		      msg_normal("found source: " + soundCallee + "@" + invNode.getContext)
 		      val tn = new Tn(invNode)
+		      tn.isSrc = true
 		      tn.descriptors += Td(soundCallee.getSignature, API_SOURCE)
 		      sources += tn
 		    }
 		    if(invNode.isInstanceOf[CGCallNode] && SourceAndSinkCenter.isSinkProcedure(soundCallee)){
-		      msg_normal("find sink: " + soundCallee + "@" + invNode.getContext)
+		      msg_normal("found sink: " + soundCallee + "@" + invNode.getContext)
 		      val tn = new Tn(invNode)
+		      tn.isSrc = false
 		      tn.descriptors += Td(soundCallee.getSignature, API_SINK)
 		      sinks += tn
 		    }

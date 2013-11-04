@@ -13,7 +13,7 @@ import java.io.IOException
 import javax.xml.parsers.ParserConfigurationException
 import org.xml.sax.SAXException
 
-final case class ComponentInfo(name : String, exported : Boolean, permission : Option[String])
+final case class ComponentInfo(name : String, typ : String, exported : Boolean, permission : Option[String])
 
 class ManifestParser extends AbstractAndroidXMLParser{
   private var componentInfos : Set[ComponentInfo] = Set()
@@ -204,7 +204,7 @@ class ManifestParser extends AbstractAndroidXMLParser{
 		          })
 		      val permission = this.componentPermission.getOrElse(name, this.applicationPermission)
 		      val compermission = if(permission != null) Some(permission) else None
-		      this.componentInfos += ComponentInfo(name, exported, compermission)
+		      this.componentInfos += ComponentInfo(name, typ, exported, compermission)
 		  }
 		}
 	}

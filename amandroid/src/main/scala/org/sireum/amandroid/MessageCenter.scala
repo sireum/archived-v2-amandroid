@@ -7,7 +7,7 @@ object MessageCenter {
 	 * DETAIL: Print all message
 	 */
 	object MSG_LEVEL extends Enumeration {
-	  val CRITICAL, NORMAL, DETAIL = Value
+	  val NO, CRITICAL, NORMAL, DETAIL = Value
 	}
 	var msglevel : MSG_LEVEL.Value = MSG_LEVEL.CRITICAL
 

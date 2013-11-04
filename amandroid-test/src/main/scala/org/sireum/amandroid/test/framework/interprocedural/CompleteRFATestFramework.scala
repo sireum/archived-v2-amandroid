@@ -18,6 +18,8 @@ import org.sireum.amandroid.interProcedural.dataDependenceAnalysis.Interprocedur
 import org.sireum.amandroid.android.interProcedural.taintAnalysis.AndroidDataDependentTaintAnalysis
 import java.net.URI
 import org.sireum.amandroid.android.AppCenter
+import org.sireum.amandroid.android.dataRecorder.DataCollector
+import java.io.PrintWriter
 
 trait CompleteRFATestFramework extends TestFramework {
 
@@ -48,7 +50,9 @@ trait CompleteRFATestFramework extends TestFramework {
     	ClassLoadManager.reset
     	// now get the dex file from the source apk file 
     	val apkName = src.substring(src.lastIndexOf("/") + 1, src.lastIndexOf("."))
-    	val apkfile = new File(System.getProperty("user.home") + "/Desktop/graphs/" + apkName)
+    	val resFile = new File(System.getProperty("user.home") + "/Desktop/AmandroidResult")
+    	if(!resFile.exists()) resFile.mkdir()
+    	val apkfile = new File(resFile + "/" + apkName)
     	if(!apkfile.exists()) apkfile.mkdir()
     	val dexFile = APKFileResolver.getDexFile(src)
     	
@@ -68,7 +72,7 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	}
 		    	
 		    	val pre = new AppInfoCollector(new File(src.toString().substring(5)).toString())
-				  pre.calculateEntrypoints
+				  pre.collectInfo
 				  
 				  AndroidRFAConfig.setupCenter
 		    	val entryPoints = Center.getEntryPoints("dummyMain")
@@ -76,12 +80,15 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	  ep =>
 		    	    println("--------------Component " + ep + "--------------")
 		    	    val initialfacts = AndroidRFAConfig.getInitialFactsForDummyMain(ep)
-		    	    val (icfg, rfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, false)
+		    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, false)
+		    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
 		    	    println("processed-->" + icfg.getProcessed.size)
-		    	    println("exit facts: " + rfaResult.entrySet(icfg.exitNode).size)
+		    	    println("exit facts: " + irfaResult.entrySet(icfg.exitNode).size)
 		//    	    val taResult = AndroidTaintAnalysis(cg, rfaResult)
-		    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, rfaResult)
-		    	    AndroidDataDependentTaintAnalysis(iddResult, rfaResult)
+		    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
+		    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
+		    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult)
+		    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
 		//    	    val f1 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "rfa.txt")
 		//			    val o1 = new FileOutputStream(f1)
 		//			    val w1 = new OutputStreamWriter(o1)
@@ -100,6 +107,10 @@ trait CompleteRFATestFramework extends TestFramework {
 		//			    val w3 = new OutputStreamWriter(o3)
 		//			    iddg.toDot(w3)
 		    	}
+		    	val appData = DataCollector.collect
+		    	val out = new PrintWriter(apkfile + "/AppData.txt")
+			    out.print(appData.toString)
+			    out.close()
 	    	} catch {
 	    	  case re : RuntimeException => 
 	    	    re.printStackTrace()

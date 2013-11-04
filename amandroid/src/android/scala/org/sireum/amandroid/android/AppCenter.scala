@@ -5,6 +5,11 @@ import org.sireum.amandroid.AmandroidRecord
 import org.sireum.amandroid.android.parser.IntentFilterDataBase
 import org.sireum.amandroid.android.appInfo.AppInfoCollector
 import org.sireum.amandroid.interProcedural.controlFlowGraph._
+import org.sireum.amandroid.interProcedural.taintAnalysis.TaintAnalysisResult
+import org.sireum.amandroid.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
+import org.sireum.amandroid.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
+import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAFact
+import org.sireum.amandroid.interProcedural.dataDependenceAnalysis.InterproceduralDataDependenceInfo
 
 /**
  * this is an object, which hold information of apps. e.g. components, intent-filter database, etc.
@@ -117,7 +122,25 @@ object AppCenter {
    */
   
   def releaseWholeProgramCallGraph = this.wholeProgramCallGraph = null
+  
+  private var irfaResults : IMap[AmandroidRecord, (InterproceduralControlFlowGraph[CGNode], InterProceduralMonotoneDataFlowAnalysisResult[RFAFact])] = imapEmpty
+  
+  def addInterproceduralReachingFactsAnalysisResult(key : AmandroidRecord, icfg : InterproceduralControlFlowGraph[CGNode], irfaResult : InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]) = this.irfaResults += (key -> (icfg, irfaResult))
+  def getInterproceduralReachingFactsAnalysisResult(key : AmandroidRecord) = this.irfaResults.getOrElse(key, throw new RuntimeException("Doesn't have irfa result for given record: " + key))
+  def getInterproceduralReachingFactsAnalysisResults = this.irfaResults
+  
+  private var iddaResults : IMap[AmandroidRecord, InterproceduralDataDependenceInfo] = imapEmpty
+  
+  def addInterproceduralDataDependenceAnalysisResult(key : AmandroidRecord, iddi : InterproceduralDataDependenceInfo) = this.iddaResults += (key -> iddi)
+  def getInterproceduralDataDependenceAnalysisResult(key : AmandroidRecord) = this.iddaResults.getOrElse(key, throw new RuntimeException("Doesn't have idda result for given record: " + key))
+  def getInterproceduralDataDependenceAnalysisResults = this.iddaResults
 	
+  private var taintResults : IMap[AmandroidRecord, TaintAnalysisResult] = imapEmpty
+  
+  def addTaintAnalysisResult(key : AmandroidRecord, tar : TaintAnalysisResult) = this.taintResults += (key -> tar)
+  def getTaintAnalysisResult(key : AmandroidRecord) = this.taintResults.getOrElse(key, throw new RuntimeException("Doesn't have taint result for given record: " + key))
+  def getTaintAnalysisResults = this.taintResults
+  
   def reset = {
     this.components = isetEmpty
     this.appOnlyCallGraph = null

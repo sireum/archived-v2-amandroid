@@ -13,11 +13,11 @@ import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
 class CompleteRFATest extends CompleteRFATestFramework {
   var i = 0
 	AmandroidCodeSource.preLoad
-//  InterproceduralExamples.testAPKFiles.
-//  filter { s => s.endsWith("BiggerWfgNP.apk") }.
-//  foreach { fileUri =>
-//    Analyzing title fileUri file fileUri
-//  }
+  InterproceduralExamples.testAPKFiles.
+//  filter { s => s.endsWith("LocationFlow2.apk") }.
+  foreach { fileUri =>
+    Analyzing title fileUri file fileUri
+  }
 //  InterproceduralExamples.normalAPKFiles.
 //  filter { s => s.endsWith("calculator-1.apk") }.
 //  foreach { fileUri =>
@@ -30,9 +30,15 @@ class CompleteRFATest extends CompleteRFATestFramework {
 //    if(i < 7) i += 1
     Analyzing title fileUri file fileUri
   }
-//  InterproceduralExamples.benchAPKFiles.
-////  filter { s => s.endsWith("IntentSink2.apk") }.
-//  foreach { fileUri =>
-//    Analyzing title fileUri file fileUri
-//  }
+  InterproceduralExamples.maliciousArborFiles.
+  //  filter { s => s.endsWith("0fbf.apk")}.
+  foreach { fileUri =>
+//    if(i < 7) i += 1
+    Analyzing title fileUri file fileUri
+  }
+  InterproceduralExamples.benchAPKFiles.
+//  filter { s => s.endsWith("IntentSink2.apk") }.
+  foreach { fileUri =>
+    Analyzing title fileUri file fileUri
+  }
 }

@@ -23,6 +23,9 @@ object InterproceduralExamples extends Examples{
   val MALICIOUS_APK_DIR_URI = sourceDirUri(this.getClass, "./maliciousapk/") 
   def maliciousAPKFiles = exampleFiles(MALICIOUS_APK_DIR_URI, ANDROID_APK_FILE_EXT)
   
+  val MALICIOUS_ARBOR_DIR_URI = sourceDirUri(this.getClass, "./maliciousArbor/") 
+  def maliciousArborFiles = exampleFiles(MALICIOUS_ARBOR_DIR_URI, ANDROID_APK_FILE_EXT)
+  
   val BENCH_APK_DIR_URI = sourceDirUri(this.getClass, "./droidBench/") 
   def benchAPKFiles = exampleFiles(BENCH_APK_DIR_URI, ANDROID_APK_FILE_EXT)
 }

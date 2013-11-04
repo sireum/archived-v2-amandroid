@@ -28,6 +28,10 @@ import org.sireum.amandroid.android.parser.ComponentInfo
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 class AppInfoCollector(apkFileLocation : String) {  
+  
+  private var appName : String = null
+  private var uses_permissions : ISet[String] = isetEmpty
+  
 	private var callbackMethods : Map[AmandroidRecord, Set[AmandroidProcedure]] = Map()
 	private var componentInfos : Set[ComponentInfo] = null
 	private var layoutControls : Map[Int, LayoutControl] = Map()
@@ -40,6 +44,9 @@ class AppInfoCollector(apkFileLocation : String) {
 	 */
 	private var dummyMainMap : Map[AmandroidRecord, AmandroidProcedure] = Map()
 
+	def getAppName = this.appName
+	def getUsesPermissions = this.uses_permissions
+	
 	def printDummyMains() =
 	  dummyMainMap.foreach{case(k, v) => println("dummyMain for " + k + "\n" + v)}
 	
@@ -112,13 +119,13 @@ class AppInfoCollector(apkFileLocation : String) {
     msg_normal("~~~~~~~~~~~~~~~~~~~~~~~~~Done~~~~~~~~~~~~~~~~~~~~~~~~~~")
 	}
 	
-	def calculateEntrypoints = {
-		// To look for callbacks, we need to start somewhere. We use the Android
-		// lifecycle methods for this purpose.
+	def collectInfo = {
+	  this.appName = this.apkFileLocation.substring(this.apkFileLocation.lastIndexOf("/") + 1, this.apkFileLocation.length())
 	  val mfp = new ManifestParser
 		mfp.loadManifestFile(apkFileLocation)
 		this.appPackageName = mfp.getPackageName
 		this.componentInfos = mfp.getComponentInfos
+		this.uses_permissions = mfp.getPermissions
 		this.intentFdb = mfp.getIntentDB
 	  msg_normal("entrypoints--->" + mfp.getComponentRecords)
 	  msg_normal("packagename--->" + mfp.getPackageName)

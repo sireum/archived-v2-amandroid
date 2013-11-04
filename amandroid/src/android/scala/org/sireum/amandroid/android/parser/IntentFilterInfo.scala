@@ -117,7 +117,16 @@ class Data{
   private var pathPatterns: Set[String] = Set()
   private var mimeTypes: Set[String] = Set()
   
+  def getSchemes = schemes
+  def getAuthorities = authorities
+  def getPaths = paths
+  def getPathPrefixs = pathPrefixs
+  def getPathPatterns = pathPatterns
+  def getMimeTypes = mimeTypes
+  
   case class Authority(host : String, port : String)
+  
+  def isEmpty : Boolean = schemes.isEmpty && authorities.isEmpty && paths.isEmpty && pathPrefixs.isEmpty && pathPatterns.isEmpty && mimeTypes.isEmpty
   
   // note that in android there is some discrepancy regarding data and mType on the Intent side compared to that on the Intent Filter side
   def matchWith(uriData:UriData, mType:String):Boolean = {

@@ -18,7 +18,10 @@ trait TaintNode {
 }
 
 trait TaintPath {
+  def getSource : TaintNode
+  def getSink : TaintNode
   def getTypes : ISet[String]
+  def getPath : IList[InterproceduralDataDependenceAnalysis.Edge]
 }
 
 trait TaintAnalysisResult {

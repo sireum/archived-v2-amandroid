@@ -1,0 +1,88 @@
+group AppData;
+
+delimiters "$", "$"
+
+AppData(name, uses_permissions, components) ::= <<
+Application Name: $name$
+Uses Permissions: $uses_permissions ; separator=", "$
+Components:
+  $components ; separator="\n\n"$
+>>
+
+ComponentData(compName, typ, exported, protectPermission, intentFilters, iccInfos, taintResult) ::= <<
+Component: $compName$
+  typ: $typ$
+  exported: $exported$
+  Protect Permission: $protectPermission$
+  IntentFilters:
+    $intentFilters ; separator="\n"$
+  ICC Result:
+    $iccInfos ; separator="\n"$
+  Taint Result:
+    $taintResult$
+>>
+
+IntentFilter(actions, categories, data) ::= <<
+{$if(actions)$Actions:[$actions ; separator=","$],$endif$$if(categories)$Categories:[$categories ; separator=","$],$endif$$if(data)$Data:[$data$]$endif$}
+>>
+
+Data(schemes, hosts, ports, paths, pathPrefixs, pathPatterns, mimeTypes) ::= <<
+($if(schemes)$Schemes:<"$schemes ; separator="\",\""$">,$endif$$if(hosts)$Hosts:<"$hosts ; separator="\",\""$">,$endif$$if(ports)$Ports:<"$ports ; separator="\",\""$">,$endif$$if(paths)$Paths:<"$paths ; separator="\",\""$">,$endif$$if(pathPrefixs)$PathPrefixs:<"$pathPrefix ; separator="\",\""$">,$endif$$if(pathPatterns)$PathPatterns:<"$pathPatterns ; separator="\",\""$">,$endif$$if(mimeTypes)$MimeTypes:<"$mimeTypes ; separator="\",\""$">$endif$)
+>>
+
+IccInfo(procs, context, intentDatas) ::= <<
+ICC call:
+  Procedure:
+    $procs ; separator="\n"$
+  Context: 
+    $context$
+  IntentDatas:
+    $intentDatas ; separator="\n"$
+>>
+
+IntentData(componentNames, actions, categories, datas, typs, targets) ::= <<
+IntentData:
+  $if(componentNames)$mComponentNames:
+    "$componentNames ; separator="\"\n\""$"$endif$
+  $if(actions)$mActions:
+    "$actions ; separator="\"\n\""$"$endif$
+  $if(categories)$mCategories:
+    "$categories ; separator="\"\n\""$"$endif$
+  $if(datas)$mDatas:
+    $datas ; separator="\"\n\""$$endif$
+  $if(typs)$mimeTypes:
+    "$typs ; separator="\"\n\""$"$endif$
+
+  Targets:
+    $targets ; separator="\n"$
+>>
+
+UriData(scheme, host, port, path, pathPrefix, pathPattern) ::= <<
+<Scheme:"$scheme$",Host:"$host$",Port:"$port$",Path:"$path$",PathPrefix:"$pathPrefix$",PathPattern:"$pathPattern$">
+>>
+
+TaintResult(sources, sinks, paths) ::= <<
+Sources:
+  $sources ; separator="\n"$
+Sinks:
+  $sinks ; separator="\n"$
+TaintPaths:
+  $paths ; separator="\n"$
+>>
+
+Target(proc, typ) ::= <<
+Target Component: $proc$, Intent Type: $typ$
+>>
+
+SourceSinkInfo(descriptors) ::= <<
+<Descriptors: $descriptors ; separator=" "$>
+>>
+
+TaintPath(source, sink, typs, path) ::= <<
+TaintPath:
+  Source: $source$
+  Sink: $sink$
+  Types: $typs ; separator=", "$
+  Path:
+    $path ; separator="\n"$
+>>

@@ -6,7 +6,7 @@ import org.sireum.amandroid.android.appInfo.AppInfoCollector
 
 class AndroidApplicationPrepareModuleDef (val job : PipelineJob, info : PipelineJobModuleInfo) extends AndroidApplicationPrepareModule {
   val pre = new AppInfoCollector(apkFileLocation)
-  pre.calculateEntrypoints
+  pre.collectInfo
   pre.printDummyMains
   this.appInfoOpt_=(Some(pre))
 

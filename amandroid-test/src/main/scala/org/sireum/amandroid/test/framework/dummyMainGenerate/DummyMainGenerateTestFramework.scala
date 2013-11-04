@@ -83,7 +83,7 @@ trait DummyMainGenerateTestFramework extends TestFramework {
     	    Center.resolveRecord(k, Center.ResolveLevel.BODIES)
     	}
     	val pre = new AppInfoCollector(f.toString)
-		  pre.calculateEntrypoints
+		  pre.collectInfo
     	
 //		  val cg = new CallGraphBuilder().buildWholeProgram(Some(pre))
 		  System.gc()
