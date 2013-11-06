@@ -101,21 +101,23 @@ class AppInfoCollector(apkFileLocation : String) {
 	  dmGen.getCodeCounter
 	}
 	
-	def dynamicRegisterComponent(comRec : AmandroidRecord) = {
+	def dynamicRegisterComponent(comRec : AmandroidRecord, iDB : IntentFilterDataBase, precise : Boolean) = {
 	  msg_critical("*************Dynamic Register Component**************")
 	  msg_normal("Component name: " + comRec)
+	  this.intentFdb.updateIntentFmap(iDB)
 	  val analysisHelper = new CallBackInfoCollector(Set(comRec.getName)) 
 		analysisHelper.collectCallbackMethods()
 		this.callbackMethods = analysisHelper.getCallbackMethods
-
 		analysisHelper.getCallbackMethods.foreach {
 	    case(k, v) =>
   			this.callbackMethods += (k -> (this.callbackMethods.getOrElse(k, isetEmpty) ++ v))
 		}
-	  
 	  msg_normal("Found " + this.callbackMethods.size + " callback methods")
     val clCounter = generateDummyMain(comRec, codeLineCounter)
     codeLineCounter = clCounter
+    AppCenter.addComponent(comRec)
+    AppCenter.addDynamicRegisteredComponent(comRec, precise)
+    AppCenter.updateIntentFilterDB(iDB)
     msg_normal("~~~~~~~~~~~~~~~~~~~~~~~~~Done~~~~~~~~~~~~~~~~~~~~~~~~~~")
 	}
 	
@@ -200,9 +202,11 @@ class AppInfoCollector(apkFileLocation : String) {
     this.componentInfos.foreach{
       f => 
         val record = Center.resolveRecord(f.name, Center.ResolveLevel.BODIES)
-        components += record
-        val clCounter = generateDummyMain(record, codeLineCounter)
-        codeLineCounter = clCounter
+        if(!record.isPhantom){
+	        components += record
+	        val clCounter = generateDummyMain(record, codeLineCounter)
+	        codeLineCounter = clCounter
+        }
     }
 		SourceAndSinkCenter.init(appPackageName, afp, layoutControls, callbacks)
 		AppCenter.setComponents(components)

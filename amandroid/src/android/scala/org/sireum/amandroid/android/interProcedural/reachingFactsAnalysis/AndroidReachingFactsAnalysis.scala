@@ -86,7 +86,6 @@ class AndroidReachingFactsAnalysisBuilder{
   
   private def checkClass(recName : String, s : ISet[RFAFact], currentNode : CGLocNode) : ISet[RFAFact] = {
     val rec = Center.resolveRecord(recName, Center.ResolveLevel.BODIES)
-    
     checkAndLoadClassFromHierarchy(rec, s, currentNode)
   }
   

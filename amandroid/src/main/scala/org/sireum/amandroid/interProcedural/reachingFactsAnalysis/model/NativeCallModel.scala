@@ -13,9 +13,10 @@ import org.sireum.amandroid.ClassInstance
 object NativeCallModel {
 	 def isNativeCall(p : AmandroidProcedure) : Boolean = p.isNative
 	 
-	 def doNativeCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+	 def doNativeCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
+	  var byPassFlag = true
 	  val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
 	  	  
 	  p.getSignature match{
@@ -33,6 +34,7 @@ object NativeCallModel {
 	          val strIns = RFAConcreteStringInstance(insRec.getClassObj.getName, insRec.getClassObj.getDefSite)
 	          newFacts += (RFAFact(FieldSlot(insRec.getClassObj, "[|java:lang:Class.name|]"), strIns))
 	      }
+	      byPassFlag = false
 	    case "[|Ljava/lang/Class;.getNameNative:()Ljava/lang/String;|]" =>
 	      // algo:thisValue.foreach.{ cIns => get value of (cIns.name|]") and create fact (retVar, value)}
 	      require(args.size > 0)
@@ -46,8 +48,9 @@ object NativeCallModel {
 	          val strIns = RFAConcreteStringInstance(name, cIns.getDefSite)
               newFacts += (RFAFact(VarSlot(retVars(0)), strIns))
 	      }
+	      byPassFlag = false
 	    case _ =>
 	  }
-	  (newFacts, delFacts)
+	  (newFacts, delFacts, byPassFlag)
 	}
 }

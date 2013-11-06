@@ -11,9 +11,10 @@ import org.sireum.amandroid.MessageCenter._
 object IntentFilterModel {
 	def isIntentFilter(r : AmandroidRecord) : Boolean = r.getName == AndroidConstants.INTENTFILTER
 	  
-	def doIntentFilterCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+	def doIntentFilterCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
+	  var byPassFlag = true
 	  p.getSignature match{
 	    case "[|Landroid/content/IntentFilter;.<clinit>:()V|]" =>  //static constructor
 		  case "[|Landroid/content/IntentFilter;.<init>:()V|]" =>  //public constructor
@@ -22,6 +23,7 @@ object IntentFilterModel {
 		  case "[|Landroid/content/IntentFilter;.<init>:(Landroid/os/Parcel;Landroid/content/IntentFilter$1;)V|]" =>  //synthetic constructor
 		  case "[|Landroid/content/IntentFilter;.<init>:(Ljava/lang/String;)V|]" =>  //public constructor
 		    intentFilterInitWithAction(s, args, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    byPassFlag = false
 		  case "[|Landroid/content/IntentFilter;.<init>:(Ljava/lang/String;Ljava/lang/String;)V|]" =>  //public constructor
 		  case "[|Landroid/content/IntentFilter;.actionsIterator:()Ljava/util/Iterator;|]" =>  //public final
 		  case "[|Landroid/content/IntentFilter;.addAction:(Ljava/lang/String;)V|]" =>  //public final
@@ -73,7 +75,7 @@ object IntentFilterModel {
 		  case "[|Landroid/content/IntentFilter;.writeToParcel:(Landroid/os/Parcel;I)V|]" =>  //public final
 		  case "[|Landroid/content/IntentFilter;.writeToXml:(Lorg/xmlpull/v1/XmlSerializer;)V|]" =>  //public
 	  }
-	  (newFacts, delFacts)
+	  (newFacts, delFacts, byPassFlag)
 	}
   
   

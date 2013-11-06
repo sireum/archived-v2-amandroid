@@ -34,12 +34,16 @@ trait ModelCallHandler {
    * instead of doing operation inside callee procedure's real code, we do it manually and return the result. 
    */
 	def doModelCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
-	  var (newFacts, delFacts) = caculateResult(s, calleeProc, args, retVars, currentContext)
-	  newFacts ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObject(calleeProc, s, newFacts, args, retVars, currentContext)
+	  var (newFacts, delFacts, byPassFlag) = caculateResult(s, calleeProc, args, retVars, currentContext)
+	  if(byPassFlag){
+	  	val (newF, delF) = ReachingFactsAnalysisHelper.getUnknownObject(calleeProc, s, args, retVars, currentContext)
+	  	newFacts ++= newF
+	  	delFacts ++= delF
+	  }
 	  s ++ newFacts -- delFacts
 	}
 	
-	def caculateResult(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+	def caculateResult(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  val r = calleeProc.getDeclaringRecord
 	  if(StringModel.isString(r)) StringModel.doStringCall(s, calleeProc, args, retVars, currentContext)
 	  else if(StringBuilderModel.isStringBuilder(r)) StringBuilderModel.doStringBuilderCall(s, calleeProc, args, retVars, currentContext)

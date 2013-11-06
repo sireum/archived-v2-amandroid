@@ -132,9 +132,10 @@ object HashtableModel {
 	  result
   }
 	  
-	def doHashtableCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+	def doHashtableCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
+	  var byPassFlag = true
 	  p.getSignature match{
 	    case "[|Ljava/util/Hashtable;.<clinit>:()V|]" =>
 		  case "[|Ljava/util/Hashtable;.<init>:()V|]" =>
@@ -151,6 +152,7 @@ object HashtableModel {
 		  case "[|Ljava/util/Hashtable;.clone:()Ljava/lang/Object;|]" =>
 		    require(retVars.size == 1)
 		    newFacts ++= cloneHashTable(s, args, retVars(0), currentContext)
+		    byPassFlag = false
 		  case "[|Ljava/util/Hashtable;.constructorPut:(Ljava/lang/Object;Ljava/lang/Object;)V|]" =>
 		  case "[|Ljava/util/Hashtable;.constructorPutAll:(Ljava/util/Map;)V|]" =>
 		  case "[|Ljava/util/Hashtable;.contains:(Ljava/lang/Object;)Z|]" =>
@@ -163,36 +165,44 @@ object HashtableModel {
 		  case "[|Ljava/util/Hashtable;.entrySet:()Ljava/util/Set;|]" =>
 		    require(retVars.size == 1)
 		    newFacts ++= getHashTableEntrySetFactToRet(s, args, retVars(0), currentContext)
+		    byPassFlag = false
 		  case "[|Ljava/util/Hashtable;.equals:(Ljava/lang/Object;)Z|]" =>
 		  case "[|Ljava/util/Hashtable;.get:(Ljava/lang/Object;)Ljava/lang/Object;|]" =>
 		    require(retVars.size == 1)
 		    newFacts ++= getHashTableValue(s, args, retVars(0), currentContext)
+		    byPassFlag = false
 		  case "[|Ljava/util/Hashtable;.hashCode:()I|]" =>
 		  case "[|Ljava/util/Hashtable;.isEmpty:()Z|]" =>
 		  case "[|Ljava/util/Hashtable;.keySet:()Ljava/util/Set;|]" =>
 		    require(retVars.size == 1)
 		    newFacts ++= getHashTableKeySetToRet(s, args, retVars(0), currentContext)
+		    byPassFlag = false
 		  case "[|Ljava/util/Hashtable;.keys:()Ljava/util/Enumeration;|]" =>
 		  case "[|Ljava/util/Hashtable;.makeTable:(I)[Ljava/util/Hashtable$HashtableEntry;|]" =>
 		  case "[|Ljava/util/Hashtable;.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;|]" =>
 		    newFacts ++= putHashTableValue(s, args, currentContext)
+		    byPassFlag = false
 		  case "[|Ljava/util/Hashtable;.putAll:(Ljava/util/Map;)V|]" =>
 		    newFacts ++= putAllHashTableValues(s, args, currentContext)
+		    byPassFlag = false
 		  case "[|Ljava/util/Hashtable;.readObject:(Ljava/io/ObjectInputStream;)V|]" =>
 		  case "[|Ljava/util/Hashtable;.rehash:()V|]" =>
 		  case "[|Ljava/util/Hashtable;.remove:(Ljava/lang/Object;)Ljava/lang/Object;|]" =>
 		    require(retVars.size == 1)
 		    newFacts ++= getHashTableValue(s, args, retVars(0), currentContext)
+		    byPassFlag = false
 		  case "[|Ljava/util/Hashtable;.removeMapping:(Ljava/lang/Object;Ljava/lang/Object;)Z|]" =>
 		  case "[|Ljava/util/Hashtable;.size:()I|]" =>
 		  case "[|Ljava/util/Hashtable;.toString:()Ljava/lang/String;|]" =>
 		    require(retVars.size == 1)
 		    newFacts += getPointStringToRet(retVars(0), currentContext)
+		    byPassFlag = false
 		  case "[|Ljava/util/Hashtable;.values:()Ljava/util/Collection;|]" =>
 		    require(retVars.size == 1)
 		    newFacts ++= getHashTableValuesToRet(s, args, retVars(0), currentContext)
+		    byPassFlag = false
 		  case "[|Ljava/util/Hashtable;.writeObject:(Ljava/io/ObjectOutputStream;)V|]" =>
 	  }
-	  (newFacts, delFacts)
+	  (newFacts, delFacts, byPassFlag)
 	}
 }

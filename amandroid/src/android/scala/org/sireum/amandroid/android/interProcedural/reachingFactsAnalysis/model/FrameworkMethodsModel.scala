@@ -34,45 +34,53 @@ object FrameworkMethodsModel {
 	  else false
 	}
 	
-	def doFrameworkMethodsModelCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+	def doFrameworkMethodsModelCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
+	  var byPassFlag = true
 	  p.getSubSignature match{
 	    case "setContentView:(I)V" =>
 	    case "registerReceiver:(Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;)Landroid/content/Intent;" =>
 	      require(retVars.size == 1)
 	      newFacts ++= registerReceiver(s, args, retVars(0), currentContext)
+	      byPassFlag = false
 	    case "registerReceiver:(Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;)Landroid/content/Intent;" => 
 	      require(retVars.size == 1)
 	      newFacts ++= registerReceiver(s, args, retVars(0), currentContext)
+	      byPassFlag = false
 	    case "getApplication:()Landroid/app/Application;" =>
 	      require(retVars.size == 1)
 	      ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|android:app:Application|]", 0), retVars(0), currentContext) match{
 	        case Some(f) => newFacts += f
 	        case None =>
 	      }
+	      byPassFlag = false
 	    case "getSystemService:(Ljava/lang/String;)Ljava/lang/Object;" =>
 	      require(retVars.size == 1)
 	      newFacts ++= getSystemService(s, args, retVars(0), currentContext)
+//	      byPassFlag = false
 	    case "getBaseContext:()Landroid/content/Context;" =>
 	      require(retVars.size == 1)
 	      ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|android:app:ContextImpl|]", 0), retVars(0), currentContext) match{
 	        case Some(f) => newFacts += f
 	        case None =>
 	      }
+	      byPassFlag = false
 	    case "getApplicationContext:()Landroid/content/Context;"=>
 	      require(retVars.size == 1)
 	      ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|android:app:Application|]", 0), retVars(0), currentContext) match{
 	        case Some(f) => newFacts += f
 	        case None =>
 	      }
+	      byPassFlag = false
 	    case _ =>
 	  }
-	  (newFacts, delFacts)
+	  (newFacts, delFacts, byPassFlag)
 	}
 	
 	private def registerReceiver(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
 	  var result = isetEmpty[RFAFact]
+	  var precise = true
 	  val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
     require(args.size > 2)
     val thisSlot = VarSlot(args(0))
@@ -95,12 +103,8 @@ object FrameworkMethodsModel {
 	              mav match{
 			            case cstr @ RFAConcreteStringInstance(text, c) =>
 			              intentF.addAction(text)
-			            case pstr @ RFAPointStringInstance(c) => 
-			              err_msg_detail("Register IntentFilter actions use point string: " + pstr)
-			            case un @ UnknownInstance(c) =>
-			              err_msg_detail("Register IntentFilter actions use Unknown Instance: " + un)
-			            case n @ NullInstance(c) =>
-			            case _ => throw new RuntimeException("unexpected instance type: " + mav)
+			            case _ =>
+			              precise = false
 			          }
 	          }
 	          val mCategoriesSlot = FieldSlot(fv, AndroidConstants.INTENTFILTER_CATEGORIES)
@@ -110,23 +114,18 @@ object FrameworkMethodsModel {
 	              mav match{
 			            case cstr @ RFAConcreteStringInstance(text, c) =>
 			              intentF.addCategory(text)
-			            case pstr @ RFAPointStringInstance(c) => 
-			              err_msg_detail("Register IntentFilter categories use point string: " + pstr)
-			            case un @ UnknownInstance(c) =>
-			              err_msg_detail("Register IntentFilter categories use Unknown Instance: " + un)
-			            case n @ NullInstance(c) =>
-			            case _ => throw new RuntimeException("unexpected instance type: " + mav)
+			            case _ =>
+			              precise = false
 			          }
 	          }
 	      }
-	      AppCenter.setComponent(comRec)
+	      AppCenter.addComponent(comRec)
 	      iDB.updateIntentFmap(intentF)
 	      val appinfo = AppCenter.getAppInfo
 	      if(!appinfo.hasDummyMain(comRec)){
-	        appinfo.dynamicRegisterComponent(comRec)
+	        appinfo.dynamicRegisterComponent(comRec, iDB, precise)
 	      }
 	  }
-	  AppCenter.updateIntentFilterDB(iDB)
 	  msg_normal("intentfilter database: " + AppCenter.getIntentFilterDB)
 	  isetEmpty
 	}

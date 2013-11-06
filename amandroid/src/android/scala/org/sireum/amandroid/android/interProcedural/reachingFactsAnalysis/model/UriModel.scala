@@ -10,9 +10,10 @@ import org.sireum.amandroid.MessageCenter._
 object UriModel {
 	def isUri(r : AmandroidRecord) : Boolean = r.getName == "[|android:net:Uri|]"
 	  
-	def doUriCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+	def doUriCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
+	  var byPassFlag = true
 	  p.getSignature match{
 	    case "[|Landroid/net/Uri;.<clinit>:()V|]" =>  //static constructor
 		  case "[|Landroid/net/Uri;.<init>:()V|]" =>  //private constructor
@@ -60,12 +61,13 @@ object UriModel {
 		  case "[|Landroid/net/Uri;.parse:(Ljava/lang/String;)Landroid/net/Uri;|]" =>  //public static
 		    require(retVars.size == 1)
 		    uriParse(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    byPassFlag = false
 		  case "[|Landroid/net/Uri;.toSafeString:()Ljava/lang/String;|]" =>  //public
 		  case "[|Landroid/net/Uri;.toString:()Ljava/lang/String;|]" =>  //public abstract
 		  case "[|Landroid/net/Uri;.withAppendedPath:(Landroid/net/Uri;Ljava/lang/String;)Landroid/net/Uri;|]" =>  //public static
 		  case "[|Landroid/net/Uri;.writeToParcel:(Landroid/os/Parcel;Landroid/net/Uri;)V|]" =>  //public static
 	  }
-	  (newFacts, delFacts)
+	  (newFacts, delFacts, byPassFlag)
 	}
 	
 	/**

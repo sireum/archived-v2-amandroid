@@ -20,9 +20,75 @@ object DataCollector {
   
   private val template = new STGroupFile("org/sireum/amandroid/android/dataRecorder/AppData.stg")
   
+  private def getIntentFilterStrings(intentFilters : ISet[IntentFilter]) : ArrayList[String] = {
+    val intFs : ArrayList[String] = new ArrayList[String]
+    intentFilters.foreach{
+      intfilter =>
+        val intF = template.getInstanceOf("IntentFilter")
+        val actions = intfilter.getActions
+        if(!actions.isEmpty){
+          val actionStrings : ArrayList[String] = new ArrayList[String]
+          actions.foreach(f=>actionStrings.add(f))
+          intF.add("actions", actionStrings)
+        }
+        val categories = intfilter.getCategorys
+        if(!categories.isEmpty){
+          val categoryStrings : ArrayList[String] = new ArrayList[String]
+          categories.foreach(f=>categoryStrings.add(f))
+          intF.add("categories", categoryStrings)
+        }
+        val data = intfilter.getData
+        if(!data.isEmpty){
+          val dataT = template.getInstanceOf("Data")
+          val schemes = data.getSchemes
+          if(!schemes.isEmpty){
+            val schemeStrings : ArrayList[String] = new ArrayList[String]
+            schemes.foreach(f=>schemeStrings.add(f))
+            dataT.add("schemes", schemeStrings)
+          }
+          val authorities = data.getAuthorities
+          if(!authorities.isEmpty){
+            val hostStrings : ArrayList[String] = new ArrayList[String]
+            val portStrings : ArrayList[String] = new ArrayList[String]
+            authorities.foreach{f=>hostStrings.add(f.host);portStrings.add(f.port)}
+            dataT.add("hosts", hostStrings)
+            dataT.add("ports", portStrings)
+          }
+          val paths = data.getPaths
+          if(!paths.isEmpty){
+            val pathStrings : ArrayList[String] = new ArrayList[String]
+            paths.foreach(f=>pathStrings.add(f))
+            dataT.add("paths", pathStrings)
+          }
+          val pathPrefixs = data.getPathPrefixs
+          if(!pathPrefixs.isEmpty){
+            val pathPrefixStrings : ArrayList[String] = new ArrayList[String]
+            pathPrefixs.foreach(f=>pathPrefixStrings.add(f))
+            dataT.add("pathPrefixs", pathPrefixStrings)
+          }
+          val pathPatterns = data.getPathPatterns
+          if(!pathPatterns.isEmpty){
+            val pathPatternStrings : ArrayList[String] = new ArrayList[String]
+            pathPatterns.foreach(f=>pathPatternStrings.add(f))
+            dataT.add("pathPatterns", pathPatternStrings)
+          }
+          val mimeTypes = data.getMimeTypes
+          if(!mimeTypes.isEmpty){
+            val mimeTypeStrings : ArrayList[String] = new ArrayList[String]
+            mimeTypes.foreach(f=>mimeTypeStrings.add(f))
+            dataT.add("mimeTypes", mimeTypeStrings)
+          }
+          intF.add("data", dataT.render())
+        }
+        intFs.add(intF.render())
+    }
+    intFs
+  }
+  
   final case class AppData(name : String, 
 	    										 uses_permissions : ISet[String],
-	    										 components : ISet[ComponentData]){
+	    										 components : ISet[ComponentData],
+	    										 dynamicRegisteredComponents : ISet[DynamicRegisteredComponentData]){
     override def toString : String = {
       val appData = template.getInstanceOf("AppData")
       appData.add("name", name)
@@ -32,6 +98,11 @@ object DataCollector {
       val comps : ArrayList[String] = new ArrayList[String]
       components.foreach(f=>comps.add(f.toString))
       appData.add("components", comps)
+      if(!dynamicRegisteredComponents.isEmpty){
+        val drcomps : ArrayList[String] = new ArrayList[String]
+	      dynamicRegisteredComponents.foreach(f=>drcomps.add(f.toString))
+	      appData.add("dynamicRegisteredComponents", drcomps)
+      }
       appData.render()
     }
   }
@@ -53,11 +124,22 @@ object DataCollector {
   }
   
   final case class IntentData(componentNames : ISet[String],
-      										 actions : ISet[String],
-      										 categories : ISet[String],
-      										 uriDatas : ISet[UriData],
-      										 types : ISet[String],
-      										 targets : ISet[(String, String)]){
+	      									 	  actions : ISet[String],
+	      										  categories : ISet[String],
+	      										  uriDatas : ISet[UriData],
+	      										  types : ISet[String],
+	      										  preciseExplicit : Boolean,
+	      										  preciseImplicit : Boolean,
+	      										  targets : ISet[(String, String)]){
+    final val EXPLICIT = "EXPLICIT"
+    final val IMPLICIT = "IMPLICIT"
+    final val MIXED = "mixed"
+    def getType : String = {
+      if(!componentNames.isEmpty && (!actions.isEmpty || !categories.isEmpty || !uriDatas.isEmpty || !types.isEmpty))
+        MIXED
+      else if(!componentNames.isEmpty) EXPLICIT
+      else IMPLICIT
+    }
     override def toString : String = {
       val intentData = template.getInstanceOf("IntentData")
       if(!componentNames.isEmpty){
@@ -93,8 +175,8 @@ object DataCollector {
 	            uriData.add("port", port)
 	          }
 	          val path = data.getPath
-	          if(port != null){
-	            uriData.add("port", port)
+	          if(path != null){
+	            uriData.add("path", path)
 	          }
 	          val pathPrefix = data.getPathPrefix
 	          if(pathPrefix != null){
@@ -125,6 +207,22 @@ object DataCollector {
       intentData.render()
     }
   }
+  
+  final case class DynamicRegisteredComponentData(
+      													 name : String, 
+	    													 typ : String,
+	    													 protectPermission : Option[String],
+	    													 intentFilters : ISet[IntentFilter],
+	    													 precise : Boolean){
+    override def toString : String = {
+      val compData = template.getInstanceOf("DynamicRegisteredComponentData")
+      compData.add("compName", name)
+      compData.add("typ", typ)
+      compData.add("protectPermission", protectPermission.getOrElse(null))
+      compData.add("intentFilters", getIntentFilterStrings(intentFilters))
+      compData.render()
+    }
+  }
     										 
   final case class ComponentData(name : String, 
 	    													 typ : String,
@@ -139,67 +237,7 @@ object DataCollector {
       compData.add("typ", typ)
       compData.add("exported", exported)
       compData.add("protectPermission", protectPermission.getOrElse(null))
-      val intFs : ArrayList[String] = new ArrayList[String]
-      intentFilters.foreach{
-        intfilter =>
-          val intF = template.getInstanceOf("IntentFilter")
-          val actions = intfilter.getActions
-          if(!actions.isEmpty){
-            val actionStrings : ArrayList[String] = new ArrayList[String]
-            actions.foreach(f=>actionStrings.add(f))
-            intF.add("actions", actionStrings)
-          }
-          val categories = intfilter.getCategorys
-          if(!categories.isEmpty){
-            val categoryStrings : ArrayList[String] = new ArrayList[String]
-            categories.foreach(f=>categoryStrings.add(f))
-            intF.add("categories", categoryStrings)
-          }
-          val data = intfilter.getData
-          if(!data.isEmpty){
-            val dataT = template.getInstanceOf("Data")
-            val schemes = data.getSchemes
-            if(!schemes.isEmpty){
-	            val schemeStrings : ArrayList[String] = new ArrayList[String]
-	            schemes.foreach(f=>schemeStrings.add(f))
-	            dataT.add("schemes", schemeStrings)
-	          }
-            val authorities = data.getAuthorities
-            if(!authorities.isEmpty){
-	            val hostStrings : ArrayList[String] = new ArrayList[String]
-	            val portStrings : ArrayList[String] = new ArrayList[String]
-	            authorities.foreach{f=>hostStrings.add(f.host);portStrings.add(f.port)}
-	            dataT.add("hosts", hostStrings)
-	            dataT.add("ports", portStrings)
-	          }
-            val paths = data.getPaths
-            if(!paths.isEmpty){
-	            val pathStrings : ArrayList[String] = new ArrayList[String]
-	            paths.foreach(f=>pathStrings.add(f))
-	            dataT.add("paths", pathStrings)
-	          }
-            val pathPrefixs = data.getPathPrefixs
-            if(!pathPrefixs.isEmpty){
-	            val pathPrefixStrings : ArrayList[String] = new ArrayList[String]
-	            pathPrefixs.foreach(f=>pathPrefixStrings.add(f))
-	            dataT.add("pathPrefixs", pathPrefixStrings)
-	          }
-            val pathPatterns = data.getPathPatterns
-            if(!pathPatterns.isEmpty){
-	            val pathPatternStrings : ArrayList[String] = new ArrayList[String]
-	            pathPatterns.foreach(f=>pathPatternStrings.add(f))
-	            dataT.add("pathPatterns", pathPatternStrings)
-	          }
-            val mimeTypes = data.getMimeTypes
-            if(!mimeTypes.isEmpty){
-	            val mimeTypeStrings : ArrayList[String] = new ArrayList[String]
-	            mimeTypes.foreach(f=>mimeTypeStrings.add(f))
-	            dataT.add("mimeTypes", mimeTypeStrings)
-	          }
-            intFs.add(dataT.render())
-          }
-      }
-      compData.add("intentFilters", intFs)
+      compData.add("intentFilters", getIntentFilterStrings(intentFilters))
       val iccInfoStrings = new ArrayList[String]
       iccInfos.foreach(iccinfo => iccInfoStrings.add(iccinfo.toString))
       compData.add("iccInfos", iccInfoStrings)
@@ -288,16 +326,20 @@ object DataCollector {
 				          }.toList
 	              case a => throw new RuntimeException("wrong exp type: " + a)
 	            }
-					  val intentSlot = VarSlot(args(1))
-					  val intentValues = factMap.getOrElse(intentSlot, isetEmpty)
-					  val intentcontents = IntentHelper.getIntentContents(factMap, intentValues, iccNode.getContext)
-					  val comMap = IntentHelper.mappingIntents(intentcontents)
-					  val intentDatas = intentcontents.map(ic=>IntentData(ic.componentNames, ic.actions, ic.categories, ic.datas, ic.types, comMap(ic).map(c=>(c._1.getName, c._2.toString()))))
-					  IccInfo(iccNode.getCalleeSet.map(_.getSignature), iccNode.getContext, intentDatas)
+						  val intentSlot = VarSlot(args(1))
+						  val intentValues = factMap.getOrElse(intentSlot, isetEmpty)
+						  val intentcontents = IntentHelper.getIntentContents(factMap, intentValues, iccNode.getContext)
+						  val comMap = IntentHelper.mappingIntents(intentcontents)
+						  val intentDatas = intentcontents.map(ic=>IntentData(ic.componentNames, ic.actions, ic.categories, ic.datas, ic.types, ic.preciseExplicit, ic.preciseImplicit, comMap(ic).map(c=>(c._1.getName, c._2.toString()))))
+						  IccInfo(iccNode.getCalleeSet.map(_.getSignature), iccNode.getContext, intentDatas)
 		      }.toSet
 	      val taintResult = AppCenter.getTaintAnalysisResult(compRec)
 	      ComponentData(compName, typ, exported, protectPermission, intentFilters, iccInfos, taintResult)
 	  }
-	  AppData(appName, uses_permissions, compDatas)
+	  val drcompDatas = AppCenter.getDynamicRegisteredComponents.map{
+	      case (comp, precise) =>
+	        DynamicRegisteredComponentData(comp.getName, "receiver", None, intentFDB.getIntentFilters(comp), precise)
+	    }.toSet
+	  AppData(appName, uses_permissions, compDatas, drcompDatas)
 	}
 }

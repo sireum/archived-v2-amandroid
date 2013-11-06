@@ -17,13 +17,21 @@ import org.sireum.amandroid.interProcedural.dataDependenceAnalysis.Interprocedur
 object AppCenter {
 	private var components : ISet[AmandroidRecord] = isetEmpty
 	
+	private var dynamicRegisteredComponents : IMap[AmandroidRecord, Boolean] = imapEmpty
+	
 	private var intentFdb : IntentFilterDataBase = new IntentFilterDataBase()
 	
-	def setComponent(comp : AmandroidRecord) = this.components += comp
+	def addComponent(comp : AmandroidRecord) = this.components += comp
 	
 	def setComponents(comps : ISet[AmandroidRecord]) = this.components ++= comps
 	
 	def getComponents = this.components
+	
+	def addDynamicRegisteredComponent(comp : AmandroidRecord, precise : Boolean) = this.dynamicRegisteredComponents += (comp -> precise)
+	
+	def setDynamicRegisteredComponents(comps : IMap[AmandroidRecord, Boolean]) = this.dynamicRegisteredComponents ++= comps
+	
+	def getDynamicRegisteredComponents = this.dynamicRegisteredComponents
 	
 	def setIntentFilterDB(i : IntentFilterDataBase) = this.intentFdb = i
 	

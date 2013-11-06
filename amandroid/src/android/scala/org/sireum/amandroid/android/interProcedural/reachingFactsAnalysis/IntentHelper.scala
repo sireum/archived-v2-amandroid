@@ -27,12 +27,21 @@ object IntentHelper {
 	  val EXPLICIT, IMPLICIT = Value
 	}
   
-  final case class IntentContent(componentNames : ISet[String], actions : ISet[String], categories : ISet[String], datas : ISet[UriData], types : ISet[String], senderContext : Context)
+  final case class IntentContent(componentNames : ISet[String], 
+      													 actions : ISet[String], 
+      													 categories : ISet[String], 
+      													 datas : ISet[UriData], 
+      													 types : ISet[String], 
+      													 preciseExplicit : Boolean,
+      													 preciseImplicit : Boolean,
+      													 senderContext : Context)
   
 	def getIntentContents(factMap : IMap[Slot, ISet[Instance]], intentValues : ISet[Instance], currentContext : Context) : ISet[IntentContent] = {
 	  var result = isetEmpty[IntentContent]
 	  intentValues.foreach{
       intentIns =>
+        var preciseExplicit = true
+        var preciseImplicit = true
         var componentNames = isetEmpty[String]
         val iFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_COMPONENT)
         factMap.getOrElse(iFieldSlot, isetEmpty).foreach{
@@ -42,6 +51,7 @@ object IntentHelper {
               ins =>
                 if(ins.isInstanceOf[RFAConcreteStringInstance])
                   componentNames += StringFormConverter.formatClassNameToRecordName(ins.asInstanceOf[RFAConcreteStringInstance].string)
+                else preciseExplicit = false
             }
         }
         var actions: ISet[String] = isetEmpty[String]
@@ -50,6 +60,7 @@ object IntentHelper {
           acIns =>
             if(acIns.isInstanceOf[RFAConcreteStringInstance])
               actions += acIns.asInstanceOf[RFAConcreteStringInstance].string
+            else preciseImplicit = false
         }
         
         var categories = isetEmpty[String] // the code to get the valueSet of categories is to be added below
@@ -59,10 +70,9 @@ object IntentHelper {
             val hashSetFieldSlot = FieldSlot(cateIns, "[|java:util:HashSet.items|]")
             factMap.getOrElse(hashSetFieldSlot, isetEmpty).foreach{
               itemIns =>
-                if(itemIns.isInstanceOf[RFAConcreteStringInstance]){
-                  val categoryString = itemIns.asInstanceOf[RFAConcreteStringInstance].string
-                  categories += categoryString
-                }
+                if(itemIns.isInstanceOf[RFAConcreteStringInstance])
+                  categories += itemIns.asInstanceOf[RFAConcreteStringInstance].string
+                else preciseImplicit = false
             }
         }
         
@@ -78,7 +88,7 @@ object IntentHelper {
                   var uriData = new UriData
                   populateByUri(uriData, uriString)
                   datas +=uriData
-                }
+                } else preciseImplicit = false
             }
         }
         
@@ -86,11 +96,12 @@ object IntentHelper {
         val mtypFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_MTYPE)
         factMap.getOrElse(mtypFieldSlot, isetEmpty).foreach{
           mtypIns =>
-            if(mtypIns.isInstanceOf[RFAConcreteStringInstance]){
+            if(mtypIns.isInstanceOf[RFAConcreteStringInstance])
               types += mtypIns.asInstanceOf[RFAConcreteStringInstance].string
-            }
+            else preciseImplicit = false
         }
-        val ic = IntentContent(componentNames, actions, categories, datas, types, currentContext)
+        val ic = IntentContent(componentNames, actions, categories, datas, types, 
+            									 preciseExplicit, preciseImplicit, currentContext)
         result += ic
     }
 	  result

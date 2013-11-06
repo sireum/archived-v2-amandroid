@@ -127,9 +127,10 @@ object HashMapModel {
 	  result
   }
 	
-	def doHashMapCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+	def doHashMapCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
+	  var byPassFlag = true
 	  p.getSignature match{
 	    case "[|Ljava/util/HashMap;.<clinit>:()V|]" =>
 		  case "[|Ljava/util/HashMap;.<init>:()V|]" =>
@@ -145,6 +146,7 @@ object HashMapModel {
 		  case "[|Ljava/util/HashMap;.clone:()Ljava/lang/Object;|]" =>
 		    require(retVars.size == 1)
 		    newFacts ++= cloneHashMap(s, args, retVars(0), currentContext)
+		    byPassFlag = false
 		  case "[|Ljava/util/HashMap;.constructorNewEntry:(Ljava/lang/Object;Ljava/lang/Object;ILjava/util/HashMap$HashMapEntry;)Ljava/util/HashMap$HashMapEntry;|]" =>
 		  case "[|Ljava/util/HashMap;.constructorPut:(Ljava/lang/Object;Ljava/lang/Object;)V|]" =>
 		  case "[|Ljava/util/HashMap;.constructorPutAll:(Ljava/util/Map;)V|]" =>
@@ -156,14 +158,17 @@ object HashMapModel {
 		  case "[|Ljava/util/HashMap;.entrySet:()Ljava/util/Set;|]" =>
 		    require(retVars.size == 1)
 		    newFacts ++= getHashMapEntrySetFactToRet(s, args, retVars(0), currentContext)
+		    byPassFlag = false
 		  case "[|Ljava/util/HashMap;.get:(Ljava/lang/Object;)Ljava/lang/Object;|]" =>
 		    require(retVars.size == 1)
 		    newFacts ++= getHashMapValue(s, args, retVars(0), currentContext)
+		    byPassFlag = false
 		  case "[|Ljava/util/HashMap;.init:()V|]" =>
 		  case "[|Ljava/util/HashMap;.isEmpty:()Z|]" =>
 		  case "[|Ljava/util/HashMap;.keySet:()Ljava/util/Set;|]" =>
 		    require(retVars.size == 1)
 		    newFacts ++= getHashMapKeySetToRet(s, args, retVars(0), currentContext)
+		    byPassFlag = false
 		  case "[|Ljava/util/HashMap;.makeTable:(I)[Ljava/util/HashMap$HashMapEntry;|]" =>
 		  case "[|Ljava/util/HashMap;.newEntryIterator:()Ljava/util/Iterator;|]" =>
 		  case "[|Ljava/util/HashMap;.newKeyIterator:()Ljava/util/Iterator;|]" =>
@@ -172,13 +177,16 @@ object HashMapModel {
 		  case "[|Ljava/util/HashMap;.preModify:(Ljava/util/HashMap$HashMapEntry;)V|]" =>
 		  case "[|Ljava/util/HashMap;.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;|]" =>
 		    newFacts ++= putHashMapValue(s, args, currentContext)
+		    byPassFlag = false
 		  case "[|Ljava/util/HashMap;.putAll:(Ljava/util/Map;)V|]" =>
 		    newFacts ++= putAllHashMapValues(s, args, currentContext)
+		    byPassFlag = false
 		  case "[|Ljava/util/HashMap;.putValueForNullKey:(Ljava/lang/Object;)Ljava/lang/Object;|]" =>
 		  case "[|Ljava/util/HashMap;.readObject:(Ljava/io/ObjectInputStream;)V|]" =>
 		  case "[|Ljava/util/HashMap;.remove:(Ljava/lang/Object;)Ljava/lang/Object;|]" =>
 		    require(retVars.size == 1)
 		    newFacts ++= getHashMapValue(s, args, retVars(0), currentContext)
+		    byPassFlag = false
 		  case "[|Ljava/util/HashMap;.removeMapping:(Ljava/lang/Object;Ljava/lang/Object;)Z|]" =>
 		  case "[|Ljava/util/HashMap;.removeNullKey:()Ljava/lang/Object;|]" =>
 		  case "[|Ljava/util/HashMap;.secondaryHash:(Ljava/lang/Object;)I|]" =>
@@ -186,8 +194,9 @@ object HashMapModel {
 		  case "[|Ljava/util/HashMap;.values:()Ljava/util/Collection;|]" =>
 		    require(retVars.size == 1)
 		    newFacts ++= getHashMapValuesToRet(s, args, retVars(0), currentContext)
+		    byPassFlag = false
 		  case "[|Ljava/util/HashMap;.writeObject:(Ljava/io/ObjectOutputStream;)V|]" =>
 	  }
-	  (newFacts, delFacts)
+	  (newFacts, delFacts, byPassFlag)
 	}
 }

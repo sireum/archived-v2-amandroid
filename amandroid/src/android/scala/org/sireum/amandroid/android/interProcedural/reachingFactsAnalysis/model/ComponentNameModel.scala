@@ -18,27 +18,33 @@ object ComponentNameModel {
   
 	def isComponentName(r : AmandroidRecord) : Boolean = r.getName == "[|android:content:ComponentName|]"
 	  
-	def doComponentNameCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+	def doComponentNameCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
+	  var byPassFlag = true
 	  p.getSignature match{
 	    case "[|Landroid/content/ComponentName;.<clinit>:()V|]" =>  //static constructor
 		  case "[|Landroid/content/ComponentName;.<init>:(Landroid/content/Context;Ljava/lang/Class;)V|]" =>  //public constructor
 		    newFacts ++= initComponentNameWithCC(s, args, currentContext)
+		    byPassFlag = false
 		  case "[|Landroid/content/ComponentName;.<init>:(Landroid/content/Context;Ljava/lang/String;)V|]" =>  //public constructor
 		    newFacts ++= initComponentNameWithCS(s, args, currentContext)
+		    byPassFlag = false
 		  case "[|Landroid/content/ComponentName;.<init>:(Landroid/os/Parcel;)V|]" =>  //public constructor
 		    //TODO: How to handle parcel
 		  case "[|Landroid/content/ComponentName;.<init>:(Ljava/lang/String;Landroid/os/Parcel;)V|]" =>  //private constructor
 		    //TODO: How to handle parcel
 		  case "[|Landroid/content/ComponentName;.<init>:(Ljava/lang/String;Ljava/lang/String;)V|]" =>  //public constructor
 		    newFacts ++= initComponentNameWithSS(s, args, currentContext)
+		    byPassFlag = false
 		  case "[|Landroid/content/ComponentName;.clone:()Landroid/content/ComponentName;|]" =>  //public
 		    require(retVars.size == 1)
 		    newFacts ++= cloneComponentName(s, args, retVars(0), currentContext)
+		    byPassFlag = false
 		  case "[|Landroid/content/ComponentName;.clone:()Ljava/lang/Object;|]" =>  //public synthetic
 		    require(retVars.size == 1)
 		    newFacts ++= cloneComponentName(s, args, retVars(0), currentContext)
+		    byPassFlag = false
 		  case "[|Landroid/content/ComponentName;.compareTo:(Landroid/content/ComponentName;)I|]" =>  //public
 		  case "[|Landroid/content/ComponentName;.compareTo:(Ljava/lang/Object;)I|]" =>  //public synthetic
 		  case "[|Landroid/content/ComponentName;.describeContents:()I|]" =>  //public
@@ -46,37 +52,45 @@ object ComponentNameModel {
 		  case "[|Landroid/content/ComponentName;.flattenToShortString:()Ljava/lang/String;|]" =>  //public
 		    require(retVars.size == 1)
 		    newFacts += RFAFact(VarSlot(retVars(0)), RFAPointStringInstance(currentContext))
+		    byPassFlag = false
 		  case "[|Landroid/content/ComponentName;.flattenToString:()Ljava/lang/String;|]" =>  //public
 		    require(retVars.size == 1)
 		    newFacts += RFAFact(VarSlot(retVars(0)), RFAPointStringInstance(currentContext))
+		    byPassFlag = false
 		  case "[|Landroid/content/ComponentName;.getClassName:()Ljava/lang/String;|]" =>  //public
 		    require(retVars.size == 1)
 		    newFacts ++=  getClassNameFromComponentName(s, args, retVars(0), currentContext)
+		    byPassFlag = false
 		  case "[|Landroid/content/ComponentName;.getPackageName:()Ljava/lang/String;|]" =>  //public
 		    require(retVars.size == 1)
 		    newFacts ++=  getPackageNameFromComponentName(s, args, retVars(0), currentContext)
+		    byPassFlag = false
 		  case "[|Landroid/content/ComponentName;.getShortClassName:()Ljava/lang/String;|]" =>  //public
 		    require(retVars.size == 1)
 		    newFacts ++=  getShortClassNameFromComponentName(s, args, retVars(0), currentContext)
+		    byPassFlag = false
 		  case "[|Landroid/content/ComponentName;.hashCode:()I|]" =>  //public
 		  case "[|Landroid/content/ComponentName;.readFromParcel:(Landroid/os/Parcel;)Landroid/content/ComponentName;|]" =>  //public static
 		    //TODO: How to handle parcel
 		  case "[|Landroid/content/ComponentName;.toShortString:()Ljava/lang/String;|]" =>  //public
 		    require(retVars.size == 1)
 		    newFacts += RFAFact(VarSlot(retVars(0)), RFAPointStringInstance(currentContext))
+		    byPassFlag = false
 		  case "[|Landroid/content/ComponentName;.toString:()Ljava/lang/String;|]" =>  //public
 		    require(retVars.size == 1)
 		    newFacts += RFAFact(VarSlot(retVars(0)), RFAPointStringInstance(currentContext))
+		    byPassFlag = false
 		  case "[|Landroid/content/ComponentName;.unflattenFromString:(Ljava/lang/String;)Landroid/content/ComponentName;|]" =>  //public static
 		    require(retVars.size == 1)
 		    newFacts += RFAFact(VarSlot(retVars(0)), RFAPointStringInstance(currentContext))
+		    byPassFlag = false
 		  case "[|Landroid/content/ComponentName;.writeToParcel:(Landroid/content/ComponentName;Landroid/os/Parcel;)V|]" =>  //public static
 		    //TODO: How to handle parcel
 		  case "[|Landroid/content/ComponentName;.writeToParcel:(Landroid/os/Parcel;I)V|]" =>  //public
 		    //TODO: How to handle parcel
 		  case _ =>
 	  }
-	  (newFacts, delFacts)
+	  (newFacts, delFacts, byPassFlag)
 	}
 	
 //	private def componentNameToString(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={

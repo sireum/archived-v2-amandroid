@@ -36,9 +36,10 @@ object HashSetModel {
 	  thisValue.map{s => RFAFact(VarSlot(retVar), s.clone(currentContext))}
   }
   
-  def doHashSetCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  def doHashSetCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
+	  var byPassFlag = true
 	  p.getSignature match{
       case "[|Ljava/util/HashSet;.<init>:()V|]" =>
 //        newFacts ++= initializeHashSetField(s, args, currentContext)
@@ -52,10 +53,12 @@ object HashSetModel {
 //		    newFacts ++= initializeHashSetField(s, args, currentContext)
 		  case "[|Ljava/util/HashSet;.add:(Ljava/lang/Object;)Z|]" =>
 		    newFacts ++= addItemToHashSetField(s, args, currentContext)
+		    byPassFlag = false
 		  case "[|Ljava/util/HashSet;.clear:()V|]" =>
 		  case "[|Ljava/util/HashSet;.clone:()Ljava/lang/Object;|]" =>
 		    require(retVars.size == 1)
 		    newFacts ++= cloneHashSetToRet(s, args, retVars(0), currentContext)
+		    byPassFlag = false
 		  case "[|Ljava/util/HashSet;.contains:(Ljava/lang/Object;)Z|]" =>
 		  case "[|Ljava/util/HashSet;.createBackingMap:(IF)Ljava/util/HashMap;|]" =>
 		    require(retVars.size == 1)
@@ -63,6 +66,7 @@ object HashSetModel {
 		      case Some(fact) => newFacts += fact
 		      case None =>
 		    }
+		    byPassFlag = false
 		  case "[|Ljava/util/HashSet;.isEmpty:()Z|]" =>
 		  case "[|Ljava/util/HashSet;.iterator:()Ljava/util/Iterator;|]" =>
 		  case "[|Ljava/util/HashSet;.readObject:(Ljava/io/ObjectInputStream;)V|]" =>
@@ -71,6 +75,6 @@ object HashSetModel {
 		  case "[|Ljava/util/HashSet;.writeObject:(Ljava/io/ObjectOutputStream;)V|]" =>
 		  case _ =>
     }
-    (newFacts, delFacts)
+    (newFacts, delFacts, byPassFlag)
   }
 }

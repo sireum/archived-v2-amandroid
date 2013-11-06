@@ -12,9 +12,10 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.FieldSlot
 object ActivityModel {
 	def isActivity(r : AmandroidRecord) : Boolean = r.getName == AndroidConstants.ACTIVITY
 	
-	def doActivityCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVar : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+	def doActivityCall(s : ISet[RFAFact], p : AmandroidProcedure, args : List[String], retVar : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
+	  var byPassFlag = true
 	  p.getSignature match{
 	    case "[|Landroid/app/Activity;.<clinit>:()V|]" =>  //static constructor
 		  case "[|Landroid/app/Activity;.<init>:()V|]" =>  //public constructor
@@ -55,6 +56,7 @@ object ActivityModel {
 		  case "[|Landroid/app/Activity;.getIntent:()Landroid/content/Intent;|]" =>  //public
 		    require(retVar.size == 1)
 		    getIntent(s, args, retVar(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    byPassFlag = false
 		  case "[|Landroid/app/Activity;.getLastNonConfigurationChildInstances:()Ljava/util/HashMap;|]" =>  //
 		  case "[|Landroid/app/Activity;.getLastNonConfigurationInstance:()Ljava/lang/Object;|]" =>  //public
 		  case "[|Landroid/app/Activity;.getLayoutInflater:()Landroid/view/LayoutInflater;|]" =>  //public
@@ -193,6 +195,7 @@ object ActivityModel {
 		  case "[|Landroid/app/Activity;.setImmersive:(Z)V|]" =>  //public
 		  case "[|Landroid/app/Activity;.setIntent:(Landroid/content/Intent;)V|]" =>  //public
 		    setIntent(s, args, currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+		    byPassFlag = false
 		  case "[|Landroid/app/Activity;.setParent:(Landroid/app/Activity;)V|]" =>  //final
 		  case "[|Landroid/app/Activity;.setPersistent:(Z)V|]" =>  //public
 		  case "[|Landroid/app/Activity;.setProgress:(I)V|]" =>  //public final
@@ -242,7 +245,7 @@ object ActivityModel {
 		  case "[|Landroid/app/Activity;.triggerSearch:(Ljava/lang/String;Landroid/os/Bundle;)V|]" =>  //public
 		  case "[|Landroid/app/Activity;.unregisterForContextMenu:(Landroid/view/View;)V|]" =>  //public
 	  }
-	  (newFacts, delFacts)
+	  (newFacts, delFacts, byPassFlag)
 	}
 	
 	private def setIntent(s : ISet[RFAFact], args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {

@@ -13,10 +13,24 @@ object AndroidConstants {
 	  
 	final val START_SERVICE = "startService:(Landroid/content/Intent;)Landroid/content/ComponentName;"
 	final val START_ACTIVITY = "startActivity:(Landroid/content/Intent;)V"
+	final val START_ACTIVITY_BUND = "startActivity:(Landroid/content/Intent;Landroid/os/Bundle;)V"
 	final val SEND_BROADCAST = "sendBroadcast:(Landroid/content/Intent;)V"
 	final val SEND_BROADCAST_PERM = "sendBroadcast:(Landroid/content/Intent;Ljava/lang/String;)V"
+	final val SEND_BROADCAST_AS_USER = "sendBroadcastAsUser:(Landroid/content/Intent;Landroid/os/UserHandle;)V"
+	final val SEND_BROADCAST_AS_USER_PERM = "sendBroadcastAsUser:(Landroid/content/Intent;Landroid/os/UserHandle;Ljava/lang/String;)V"
+	final val SEND_ORDERED_BROADCAST = "sendOrderedBroadcast:(Landroid/content/Intent;Ljava/lang/String;)V"
+	final val SEND_ORDERED_BROADCAST_SEVEN_PARM = "sendOrderedBroadcast:(Landroid/content/Intent;Ljava/lang/String;Landroid/content/BroadcastReceiver;Landroid/os/Handler;ILjava/lang/String;Landroid/os/Bundle;)V"
+	final val SEND_ORDERED_BROADCAST_AS_USER = "sendOrderedBroadcastAsUser:(Landroid/content/Intent;Landroid/os/UserHandle;Ljava/lang/String;Landroid/content/BroadcastReceiver;Landroid/os/Handler;ILjava/lang/String;Landroid/os/Bundle;)V"
+	final val SEND_STICKY_BROADCAST = "sendStickyBroadcast:(Landroid/content/Intent;)V"
+	final val SEND_STICKY_BROADCAST_AS_USER = "sendStickyBroadcastAsUser:(Landroid/content/Intent;Landroid/os/UserHandle;)V"
+	final val SEND_STICKY_ORDERED_BROADCAST = "sendStickyOrderedBroadcast:(Landroid/content/Intent;Landroid/content/BroadcastReceiver;Landroid/os/Handler;ILjava/lang/String;Landroid/os/Bundle;)V"
+	final val SEND_STICKY_ORDERED_BROADCAST_AS_USER = "sendStickyOrderedBroadcastAsUser:(Landroid/content/Intent;Landroid/os/UserHandle;Landroid/content/BroadcastReceiver;Landroid/os/Handler;ILjava/lang/String;Landroid/os/Bundle;)V"
 	  
-	private final val iccMethods = List(START_SERVICE, SEND_BROADCAST, START_ACTIVITY)
+	private final val iccMethods = List(START_ACTIVITY, START_ACTIVITY_BUND, START_SERVICE, 
+	    SEND_BROADCAST, SEND_BROADCAST_PERM, SEND_BROADCAST_AS_USER, SEND_BROADCAST_AS_USER_PERM,
+	    SEND_ORDERED_BROADCAST, SEND_ORDERED_BROADCAST_SEVEN_PARM, SEND_ORDERED_BROADCAST_AS_USER,
+	    SEND_STICKY_BROADCAST, SEND_STICKY_BROADCAST_AS_USER, SEND_STICKY_ORDERED_BROADCAST,
+	    SEND_STICKY_ORDERED_BROADCAST_AS_USER)
 	def getIccMethods() : List[String] = iccMethods
 	  
 	final val INTENT = "[|android:content:Intent|]"

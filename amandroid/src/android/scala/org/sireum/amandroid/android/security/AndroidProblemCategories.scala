@@ -11,5 +11,5 @@ object AndroidProblemCategories {
 	/**
 	 * following are maliciousness categories
 	 */
-	final val MAL_INFOMATION_LEAK = "maliciousness:infomation_leak"
+	final val MAL_INFOMATION_LEAK = "maliciousness:infomation_theft"
 }

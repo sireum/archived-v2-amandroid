@@ -18,6 +18,7 @@ import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.model.
 import org.sireum.amandroid.GlobalConfig
 import org.sireum.amandroid.Mode
 import org.sireum.amandroid.UnknownInstance
+import org.sireum.amandroid.UnknownInstance
 
 object ReachingFactsAnalysisHelper {
 	def getFactMap(s : ISet[RFAFact]) : Map[Slot, Set[Instance]] = s.groupBy(_.s).mapValues(_.map(_.v))
@@ -28,7 +29,7 @@ object ReachingFactsAnalysisHelper {
 	
 	def getRelatedFacts(slot : Slot, s : ISet[RFAFact]) : ISet[RFAFact] = {
     val bFacts = s.filter(fact=> slot == fact.s)
-    val rhFacts = ReachingFactsAnalysisHelper.getRelatedHeapFactsFrom(bFacts, s)
+    val rhFacts = getRelatedHeapFactsFrom(bFacts, s)
     bFacts ++ rhFacts
 	}
 	
@@ -147,39 +148,21 @@ object ReachingFactsAnalysisHelper {
 	  } else None
 	}
 	
-	def checkAndGetUnknownObject(calleeProc : AmandroidProcedure, s : ISet[RFAFact], newFacts : ISet[RFAFact], args : Seq[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
-	  var result : ISet[RFAFact] = isetEmpty
-	  if(newFacts.isEmpty){
-	    val argSlots = args.map(arg=>VarSlot(arg))
-	    if(GlobalConfig.mode > Mode.APP_ONLY){
-		    val argValues = s.filter{f=>argSlots.contains(f.s)}.map(_.v)
-		    argValues.foreach{
-		      argIns =>
-		        val recName = argIns.getType.name
-		        Center.tryLoadRecord(recName, Center.ResolveLevel.BODIES) match{
-		          case Some(rec) =>
-		            rec.getNonStaticObjectTypeFields.foreach{
-				          field =>
-				            result += RFAFact(FieldSlot(argIns, field.getSignature), UnknownInstance(currentContext))
-				        }
-		          case None =>
-		        }
-		    }
+	def getUnknownObject(calleeProc : AmandroidProcedure, s : ISet[RFAFact], args : Seq[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+	  var genFacts : ISet[RFAFact] = isetEmpty
+	  var killFacts : ISet[RFAFact] = isetEmpty
+    val argSlots = args.map(arg=>VarSlot(arg))
+    val argValues = s.filter{f=>argSlots.contains(f.s)}.map(_.v)
+    argValues.foreach(_.addFieldsUnknownDefSite(currentContext))
+    killFacts ++= ReachingFactsAnalysisHelper.getRelatedHeapFacts(argValues, s)
+    if(!Center.isJavaPrimitiveType(calleeProc.getReturnType))
+	    retVars.foreach{
+	      retVar =>
+		      val slot = VarSlot(retVar)
+	        val value = UnknownInstance(currentContext)
+	        genFacts += RFAFact(slot, value)
 	    }
-	    if(!Center.isJavaPrimitiveType(calleeProc.getReturnType))
-		    retVars.foreach{
-		      retVar =>
-			      val slot = VarSlot(retVar)
-		        val value = UnknownInstance(currentContext)
-		        result += RFAFact(slot, value)
-		    }
-//	    val globSlots = s.filter(f=>if(f.s.isInstanceOf[VarSlot])f.s.asInstanceOf[VarSlot].isGlobal else false).map(f=>f.s)
-//	    globSlots.foreach{
-//	      globSlot =>
-//	        result += RFAFact(globSlot, UnknownInstance(currentContext))
-//	    }
-	  }
-	  result
+	  (genFacts, killFacts)
 	}
 	
 	def checkAndGetUnknownObjectForClinit(calleeProc : AmandroidProcedure, currentContext : Context) : ISet[RFAFact] = {
@@ -339,7 +322,7 @@ object ReachingFactsAnalysisHelper {
                 else{
                   val fieldName = StringFormConverter.getFieldNameFromFieldSignature(fieldSig)
                   val fieldSlot = FieldSlot(ins, fieldName)
-	                val fieldValue : ISet[Instance] = factMap.getOrElse(fieldSlot, isetEmpty[Instance])
+	                val fieldValue : ISet[Instance] = factMap.getOrElse(fieldSlot, ins.getFieldsUnknownDefSites.map(defs=>UnknownInstance(defs)))
 			            result(i) = fieldValue
                 }
             }

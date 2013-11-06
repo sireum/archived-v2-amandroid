@@ -20,6 +20,7 @@ import java.net.URI
 import org.sireum.amandroid.android.AppCenter
 import org.sireum.amandroid.android.dataRecorder.DataCollector
 import java.io.PrintWriter
+import org.sireum.amandroid.android.dataRecorder.MatricRepo
 
 trait CompleteRFATestFramework extends TestFramework {
 
@@ -89,13 +90,13 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
 		    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult)
 		    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
-		//    	    val f1 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "rfa.txt")
-		//			    val o1 = new FileOutputStream(f1)
-		//			    val w1 = new OutputStreamWriter(o1)
-		//			    cg.nodes.foreach{
-		//			      node =>
-		//			        w1.write(node + ":" + rfaResult.entrySet(node).toString + "\n\n\n")
-		//			    }
+//		    	    val f1 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "rfa.txt")
+//					    val o1 = new FileOutputStream(f1)
+//					    val w1 = new OutputStreamWriter(o1)
+//					    icfg.nodes.foreach{
+//					      node =>
+//					        w1.write(node + ":" + irfaResult.entrySet(node).toString + "\n\n\n")
+//					    }
 		    	    
 		//    	    val f2 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "CG.dot")
 		//			    val o2 = new FileOutputStream(f2)
@@ -108,9 +109,13 @@ trait CompleteRFATestFramework extends TestFramework {
 		//			    iddg.toDot(w3)
 		    	}
 		    	val appData = DataCollector.collect
+		    	MatricRepo.collect(appData)
 		    	val out = new PrintWriter(apkfile + "/AppData.txt")
 			    out.print(appData.toString)
 			    out.close()
+			    val mr = new PrintWriter(System.getProperty("user.home") + "/Desktop/AmandroidResult/MatricInfo.txt")
+				  mr.print(MatricRepo.toString)
+				  mr.close()
 	    	} catch {
 	    	  case re : RuntimeException => 
 	    	    re.printStackTrace()
