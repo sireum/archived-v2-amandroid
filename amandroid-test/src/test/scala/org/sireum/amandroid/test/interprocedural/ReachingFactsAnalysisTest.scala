@@ -16,6 +16,6 @@ class ReachingFactsAnalysisTest extends ReachingFactsAnalysisTestFramework {
   InterproceduralExamples.modelFiles.
 //    filter { s => s.endsWith("bigWfgNP.pilar") }.
     foreach { fileUri =>
-      Analyzing title fileUri file fileUri
+//      Analyzing title fileUri file fileUri
     }
 }

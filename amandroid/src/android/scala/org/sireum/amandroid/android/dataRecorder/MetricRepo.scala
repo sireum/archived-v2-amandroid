@@ -6,7 +6,7 @@ import org.sireum.util._
 import org.sireum.amandroid.AmandroidRecord
 import org.sireum.amandroid.android.security.AndroidProblemCategories
 
-object MatricRepo {
+object MetricRepo {
   /**ICC compare*/
   var iccTotal = 0
 	var explicitIccTotal = 0
@@ -69,37 +69,39 @@ object MatricRepo {
 	  appData.components.foreach{
 	    comp =>
 	      val compType = comp.typ
-	      comp.taintResult.getTaintedPaths.foreach{
-	        tp =>
-	          tp.getTypes.foreach{
-	            problemType =>
-	              compType match{
-	                case "activity" =>
-	                  problemType match{
-	                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => activityHijacking += 1
-	                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => activityLaunch += 1
-	                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
-	                  }
-	                case "service" =>
-	                  problemType match{
-	                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => serviceHijacking += 1
-	                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => serviceLaunch += 1
-	                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
-	                  }
-	                case "receiver" =>
-	                  problemType match{
-	                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => broadcastReceiverTheft += 1
-	                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => broadcastReceiverInjection += 1
-	                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
-	                  }
-	                case "provider" =>
-	                  problemType match{
-	                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => contentProviderInfoLeak += 1
-	                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => contentProviderCapabilityLeak += 1
-	                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
-	                  }
-	              }
-	          }
+	      if(comp.taintResult != null){
+		      comp.taintResult.getTaintedPaths.foreach{
+		        tp =>
+		          tp.getTypes.foreach{
+		            problemType =>
+		              compType match{
+		                case "activity" =>
+		                  problemType match{
+		                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => activityHijacking += 1
+		                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => activityLaunch += 1
+		                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
+		                  }
+		                case "service" =>
+		                  problemType match{
+		                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => serviceHijacking += 1
+		                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => serviceLaunch += 1
+		                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
+		                  }
+		                case "receiver" =>
+		                  problemType match{
+		                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => broadcastReceiverTheft += 1
+		                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => broadcastReceiverInjection += 1
+		                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
+		                  }
+		                case "provider" =>
+		                  problemType match{
+		                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => contentProviderInfoLeak += 1
+		                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => contentProviderCapabilityLeak += 1
+		                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
+		                  }
+		              }
+		          }
+		      }
 	      }
 	  }
 	}
@@ -115,7 +117,7 @@ object MatricRepo {
 	  sb.append("Found implicit ICC targets: " + this.implicitIccTargetFound + "  " + {if(this.implicitIccTotal != 0) this.implicitIccTargetFound.toFloat/this.implicitIccTotal*100 + "%"} + "\n")
 	  sb.append("Total mixed ICC calls: " + this.mixedIccTotal + "\n")
 	  sb.append("Precise mixed ICC calls: " + this.mixedIccPrecise + "  " + {if(this.mixedIccTotal != 0) this.mixedIccPrecise.toFloat/this.mixedIccTotal*100 + "%"} + "\n")
-	  sb.append("Found implicit ICC targets: " + this.mixedIccTargetFound + "  " + {if(this.mixedIccTotal != 0) this.mixedIccTargetFound.toFloat/this.mixedIccTotal*100 + "%"} + "\n")
+	  sb.append("Found mixed ICC targets: " + this.mixedIccTargetFound + "  " + {if(this.mixedIccTotal != 0) this.mixedIccTargetFound.toFloat/this.mixedIccTotal*100 + "%"} + "\n")
 	  sb.append("Total dynamic register components: " + this.dynamicRegisteredIccTotal + "\n")
 	  sb.append("Precise dynamic register components: " + this.dynamicRegisteredIccPrecise + "  " + {if(this.dynamicRegisteredIccTotal != 0) this.dynamicRegisteredIccPrecise.toFloat/this.dynamicRegisteredIccTotal*100 + "%"} + "\n")
 	  sb.append("\n\n")

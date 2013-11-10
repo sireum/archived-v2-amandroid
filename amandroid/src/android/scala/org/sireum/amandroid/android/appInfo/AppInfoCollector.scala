@@ -118,7 +118,7 @@ class AppInfoCollector(apkFileLocation : String) {
     AppCenter.addComponent(comRec)
     AppCenter.addDynamicRegisteredComponent(comRec, precise)
     AppCenter.updateIntentFilterDB(iDB)
-    msg_normal("~~~~~~~~~~~~~~~~~~~~~~~~~Done~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    msg_critical("~~~~~~~~~~~~~~~~~~~~~~~~~Done~~~~~~~~~~~~~~~~~~~~~~~~~~")
 	}
 	
 	def collectInfo = {

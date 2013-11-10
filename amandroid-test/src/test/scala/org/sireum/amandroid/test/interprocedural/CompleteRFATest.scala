@@ -5,42 +5,49 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.sireum.amandroid.AmandroidCodeSource
 import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
-import org.sireum.amandroid.android.dataRecorder.MatricRepo
 import java.io.PrintWriter
+
+object Counter {
+  var total = 0
+  var oversize = 0
+  var haveresult = 0
+  override def toString : String = "total: " + total + ", oversize: " + oversize + ", haveResult: " + haveresult
+}
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 @RunWith(classOf[JUnitRunner])
 class CompleteRFATest extends CompleteRFATestFramework {
-  var i = 0
+  var i =0
 	AmandroidCodeSource.preLoad
-  InterproceduralExamples.testAPKFiles.
-//  filter { s => s.endsWith("LocationFlow2.apk") }.
-  foreach { fileUri =>
-    Analyzing title fileUri file fileUri
-  }
-  InterproceduralExamples.normalAPKFiles.
-  filter { s => s.endsWith("calculator-1.apk") }.
-  foreach { fileUri =>
-//    if(i < 37) i += 1
-    Analyzing title fileUri file fileUri
-  }
-  InterproceduralExamples.maliciousAPKFiles.
-//  filter { s => s.endsWith("0fbf.apk")}.
-  foreach { fileUri =>
-//    if(i < 7) i += 1
-    Analyzing title fileUri file fileUri
-  }
-//  InterproceduralExamples.maliciousArborFiles.
-//  //  filter { s => s.endsWith("0fbf.apk")}.
+//  InterproceduralExamples.testAPKUrls.
+//  filter { s => s.getPath().endsWith("LocationFlow2.apk") }.
+//  foreach { fileUri =>
+//    Analyzing title fileUri file fileUri
+//  }
+//  InterproceduralExamples.normalAPKFiles.
+//  filter { s => s.endsWith("android-1.apk") }.
+//  foreach { fileUri =>
+////    if(i < 37) i += 1
+//    Analyzing title fileUri file fileUri
+//  }
+//  InterproceduralExamples.maliciousAPKFiles.
+////  filter { s => s.endsWith("0fbf.apk")}.
 //  foreach { fileUri =>
 ////    if(i < 7) i += 1
 //    Analyzing title fileUri file fileUri
 //  }
-  InterproceduralExamples.benchAPKFiles.
-//  filter { s => s.endsWith("IntentSink2.apk") }.
+  InterproceduralExamples.maliciousArborUrls.
+//    filter { s => s.getPath().endsWith("0452b.apk")}.
   foreach { fileUri =>
+    if(i < 10) 
     Analyzing title fileUri file fileUri
+    i+=1
   }
+//  InterproceduralExamples.benchAPKFiles.
+////  filter { s => s.endsWith("IntentSink2.apk") }.
+//  foreach { fileUri =>
+//    Analyzing title fileUri file fileUri
+//  }
 }

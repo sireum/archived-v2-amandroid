@@ -13,6 +13,8 @@ import org.sireum.amandroid.AmandroidCodeSource
 import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
 import org.sireum.amandroid.android.appInfo.AppInfoCollector
 import org.sireum.amandroid.test.framework.TestFramework
+import java.io.FileInputStream
+import java.net.URI
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -77,7 +79,7 @@ trait DummyMainGenerateTestFramework extends TestFramework {
       apkPipeline.compute(job)
     	
       val pilarFile = FileUtil.toUri(d + dirName + "/" + dirName + ".pilar")
-    	LightWeightPilarParser(Right(pilarFile), AmandroidCodeSource.CodeType.APP)
+    	LightWeightPilarParser(Right(new FileInputStream(new File(new URI(pilarFile)))), AmandroidCodeSource.CodeType.APP)
     	AmandroidCodeSource.getAppRecordsCodes.keys foreach{
     	  k =>
     	    Center.resolveRecord(k, Center.ResolveLevel.BODIES)

@@ -134,12 +134,14 @@ object AppCenter {
   private var irfaResults : IMap[AmandroidRecord, (InterproceduralControlFlowGraph[CGNode], InterProceduralMonotoneDataFlowAnalysisResult[RFAFact])] = imapEmpty
   
   def addInterproceduralReachingFactsAnalysisResult(key : AmandroidRecord, icfg : InterproceduralControlFlowGraph[CGNode], irfaResult : InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]) = this.irfaResults += (key -> (icfg, irfaResult))
+  def hasInterproceduralReachingFactsAnalysisResult(key : AmandroidRecord) = this.irfaResults.contains(key)
   def getInterproceduralReachingFactsAnalysisResult(key : AmandroidRecord) = this.irfaResults.getOrElse(key, throw new RuntimeException("Doesn't have irfa result for given record: " + key))
   def getInterproceduralReachingFactsAnalysisResults = this.irfaResults
   
   private var iddaResults : IMap[AmandroidRecord, InterproceduralDataDependenceInfo] = imapEmpty
   
   def addInterproceduralDataDependenceAnalysisResult(key : AmandroidRecord, iddi : InterproceduralDataDependenceInfo) = this.iddaResults += (key -> iddi)
+  def hasInterproceduralDataDependenceAnalysisResult(key : AmandroidRecord) = this.iddaResults.contains(key)
   def getInterproceduralDataDependenceAnalysisResult(key : AmandroidRecord) = this.iddaResults.getOrElse(key, throw new RuntimeException("Doesn't have idda result for given record: " + key))
   def getInterproceduralDataDependenceAnalysisResults = this.iddaResults
 	

@@ -5,17 +5,18 @@ import org.sireum.util.FileUtil
 import java.util.zip.ZipFile
 import java.io.File
 import java.io.FileOutputStream
+import java.net.URL
 
 object APKFileResolver {
   
   /**
    * given an APK file uri, the following method returns the uri of the inner dex file
    */
-	def getDexFile(src : FileResourceUri) : FileResourceUri = {
+	def getDexFile(src : URL) : FileResourceUri = {
 	  val f = new File(src.toString().substring(5))
       //create directory
       val dirName = f.getName().substring(0, f.getName().lastIndexOf("."))
-      val d = src.substring(src.indexOf("/"), src.lastIndexOf("/")+1)
+      val d = src.getPath().substring(src.getPath().indexOf("/"), src.getPath().lastIndexOf("/")+1)
       val dirc = new File(d + dirName)
       if(!dirc.exists()){
         dirc.mkdir()

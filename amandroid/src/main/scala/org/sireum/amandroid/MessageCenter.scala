@@ -9,7 +9,7 @@ object MessageCenter {
 	object MSG_LEVEL extends Enumeration {
 	  val NO, CRITICAL, NORMAL, DETAIL = Value
 	}
-	var msglevel : MSG_LEVEL.Value = MSG_LEVEL.CRITICAL
+	var msglevel : MSG_LEVEL.Value = MSG_LEVEL.NORMAL
 
 	implicit def msg_critical(msg : String) = {
 	  if(msglevel >= MSG_LEVEL.CRITICAL)

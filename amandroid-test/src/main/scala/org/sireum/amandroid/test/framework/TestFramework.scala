@@ -41,7 +41,6 @@ trait TestFramework
   protected override def test(testName : String, testTags : T*)(f : => Unit) {
     val tags = if (isSingle) testTags.+:(SingleTestTag) else testTags
     isSingle = false
-
     super.test(testName, tags : _*)(f)
   }
 

@@ -1896,7 +1896,7 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
              {
                // find escape characters
                const char *Str = dexStringById(pDexFile, pDecInsn->vB);
-               char newStr [(int)strlen(Str)+100];
+               char newStr [(int)strlen(Str)*2+100];
                int m=0,n=0;
 
                while( m<=(int)strlen(Str)){

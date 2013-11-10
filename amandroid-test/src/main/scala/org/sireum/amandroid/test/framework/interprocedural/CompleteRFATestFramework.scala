@@ -20,18 +20,21 @@ import java.net.URI
 import org.sireum.amandroid.android.AppCenter
 import org.sireum.amandroid.android.dataRecorder.DataCollector
 import java.io.PrintWriter
-import org.sireum.amandroid.android.dataRecorder.MatricRepo
+import org.sireum.amandroid.android.dataRecorder.MetricRepo
+import java.io.FileInputStream
+import java.net.URL
+import org.sireum.amandroid.test.interprocedural.Counter
 
 trait CompleteRFATestFramework extends TestFramework {
 
   def Analyzing : this.type = this
 
-  def title(s : String) : this.type = {
+  def title(s : URL) : this.type = {
     _title = caseString + s
     this
   }
 
-  def file(fileUri : FileResourceUri) =
+  def file(fileUri : URL) =
     InterProceduralConfiguration(title, fileUri)
 /**
  * does inter procedural analysis of an app
@@ -39,10 +42,11 @@ trait CompleteRFATestFramework extends TestFramework {
  */
   case class InterProceduralConfiguration //
   (title : String,
-   src : FileResourceUri) {
+   src : URL) {
 
     test(title) {
     	println("####" + title + "#####")
+    	Counter.total += 1
     	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
     	Center.reset
     	AppCenter.reset
@@ -50,7 +54,7 @@ trait CompleteRFATestFramework extends TestFramework {
     	AmandroidCodeSource.clearAppRecordsCodes
     	ClassLoadManager.reset
     	// now get the dex file from the source apk file 
-    	val apkName = src.substring(src.lastIndexOf("/") + 1, src.lastIndexOf("."))
+    	val apkName = src.getPath().substring(src.getPath().lastIndexOf("/") + 1, src.getPath().lastIndexOf("."))
     	val resFile = new File(System.getProperty("user.home") + "/Desktop/AmandroidResult")
     	if(!resFile.exists()) resFile.mkdir()
     	val apkfile = new File(resFile + "/" + apkName)
@@ -60,10 +64,10 @@ trait CompleteRFATestFramework extends TestFramework {
     	// convert the dex file to the "pilar" form
     	val pilarFileUri = Dex2PilarConverter.convert(dexFile)
     	val pilarFile = new File(new URI(pilarFileUri))
-    	if(pilarFile.length() <= (5 * 1024 * 1024)){
-    	
+    	if(pilarFile.length() <= (10 * 1024 * 1024)){
+    		AndroidRFAConfig.setupCenter
 	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
-	    	LightWeightPilarParser(Right(pilarFileUri), AmandroidCodeSource.CodeType.APP)
+	    	LightWeightPilarParser(Right(new FileInputStream(new File(new URI(pilarFileUri)))), AmandroidCodeSource.CodeType.APP)
 	    	
 	    	try{
 		    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
@@ -74,8 +78,6 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	
 		    	val pre = new AppInfoCollector(new File(src.toString().substring(5)).toString())
 				  pre.collectInfo
-				  
-				  AndroidRFAConfig.setupCenter
 		    	val entryPoints = Center.getEntryPoints("dummyMain")
 		    	entryPoints.foreach{
 		    	  ep =>
@@ -109,13 +111,14 @@ trait CompleteRFATestFramework extends TestFramework {
 		//			    iddg.toDot(w3)
 		    	}
 		    	val appData = DataCollector.collect
-		    	MatricRepo.collect(appData)
+		    	MetricRepo.collect(appData)
 		    	val out = new PrintWriter(apkfile + "/AppData.txt")
 			    out.print(appData.toString)
 			    out.close()
 			    val mr = new PrintWriter(System.getProperty("user.home") + "/Desktop/AmandroidResult/MatricInfo.txt")
-				  mr.print(MatricRepo.toString)
+				  mr.print(MetricRepo.toString)
 				  mr.close()
+				  Counter.haveresult += 1
 	    	} catch {
 	    	  case re : RuntimeException => 
 	    	    re.printStackTrace()
@@ -127,11 +130,12 @@ trait CompleteRFATestFramework extends TestFramework {
 	//    	    println("  case \"" + p.getSignature + "\" =>  //" + p.getAccessFlagString)
 	//    	}
     	} else {
+    	  Counter.oversize += 1
     	  System.err.println("Pilar file size is too large:" + pilarFile.length()/1024/1024 + "MB")
     	}
     	System.gc()
 		  System.gc()
-    	
+    	println(Counter.toString)
     	println("************************************\n")
     }
   }

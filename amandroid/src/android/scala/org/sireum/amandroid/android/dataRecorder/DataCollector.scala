@@ -243,50 +243,52 @@ object DataCollector {
       compData.add("iccInfos", iccInfoStrings)
       val taintResultT = template.getInstanceOf("TaintResult")
       val sourceStrings : ArrayList[String] = new ArrayList[String]
-      taintResult.getSourceNodes.foreach{
-        sn =>
-          val ssInfo = template.getInstanceOf("SourceSinkInfo")
-          val descriptorStrings : ArrayList[String] = new ArrayList[String]
-          sn.getDescriptors.foreach(f=>descriptorStrings.add(f.toString()))
-          ssInfo.add("descriptors", descriptorStrings)
-          sourceStrings.add(ssInfo.render())
+      if(taintResult != null){
+	      taintResult.getSourceNodes.foreach{
+	        sn =>
+	          val ssInfo = template.getInstanceOf("SourceSinkInfo")
+	          val descriptorStrings : ArrayList[String] = new ArrayList[String]
+	          sn.getDescriptors.foreach(f=>descriptorStrings.add(f.toString()))
+	          ssInfo.add("descriptors", descriptorStrings)
+	          sourceStrings.add(ssInfo.render())
+	      }
+	      val sinkStrings : ArrayList[String] = new ArrayList[String]
+	      taintResult.getSinkNodes.foreach{
+	        sn =>
+	          val ssInfo = template.getInstanceOf("SourceSinkInfo")
+	          val descriptorStrings : ArrayList[String] = new ArrayList[String]
+	          sn.getDescriptors.foreach(f=>descriptorStrings.add(f.toString()))
+	          ssInfo.add("descriptors", descriptorStrings)
+	          sinkStrings.add(ssInfo.render())
+	      }
+	      taintResultT.add("sources", sourceStrings)
+	      taintResultT.add("sinks", sinkStrings)
+	      val pathStrings : ArrayList[String] = new ArrayList[String]
+	      val taintPaths = taintResult.getTaintedPaths
+	      taintPaths.foreach{
+	        taintPath =>
+	          val path = template.getInstanceOf("TaintPath")
+	          val sourcessInfo = template.getInstanceOf("SourceSinkInfo")
+	          val sourceDescriptorStrings : ArrayList[String] = new ArrayList[String]
+	          taintPath.getSource.getDescriptors.foreach(f=>sourceDescriptorStrings.add(f.toString()))
+	          sourcessInfo.add("descriptors", sourceDescriptorStrings)
+	          path.add("source", sourcessInfo)
+	          val sinkssInfo = template.getInstanceOf("SourceSinkInfo")
+	          val sinkDescriptorStrings : ArrayList[String] = new ArrayList[String]
+	          taintPath.getSink.getDescriptors.foreach(f=>sinkDescriptorStrings.add(f.toString()))
+	          sinkssInfo.add("descriptors", sinkDescriptorStrings)
+	          path.add("sink", sinkssInfo)
+	          val typStrings : ArrayList[String] = new ArrayList[String]
+	          taintPath.getTypes.foreach(f=>typStrings.add(f))
+	          path.add("typs", typStrings)
+	          val pathString : ArrayList[String] = new ArrayList[String]
+	          taintPath.getPath.foreach(f=>pathString.add(f.source + " -> " + f.target))
+	          path.add("path", pathString)
+	          pathStrings.add(path.render())
+	      }
+	      taintResultT.add("paths", pathStrings)
+	      compData.add("taintResult", taintResultT)
       }
-      val sinkStrings : ArrayList[String] = new ArrayList[String]
-      taintResult.getSinkNodes.foreach{
-        sn =>
-          val ssInfo = template.getInstanceOf("SourceSinkInfo")
-          val descriptorStrings : ArrayList[String] = new ArrayList[String]
-          sn.getDescriptors.foreach(f=>descriptorStrings.add(f.toString()))
-          ssInfo.add("descriptors", descriptorStrings)
-          sinkStrings.add(ssInfo.render())
-      }
-      taintResultT.add("sources", sourceStrings)
-      taintResultT.add("sinks", sinkStrings)
-      val pathStrings : ArrayList[String] = new ArrayList[String]
-      val taintPaths = taintResult.getTaintedPaths
-      taintPaths.foreach{
-        taintPath =>
-          val path = template.getInstanceOf("TaintPath")
-          val sourcessInfo = template.getInstanceOf("SourceSinkInfo")
-          val sourceDescriptorStrings : ArrayList[String] = new ArrayList[String]
-          taintPath.getSource.getDescriptors.foreach(f=>sourceDescriptorStrings.add(f.toString()))
-          sourcessInfo.add("descriptors", sourceDescriptorStrings)
-          path.add("source", sourcessInfo)
-          val sinkssInfo = template.getInstanceOf("SourceSinkInfo")
-          val sinkDescriptorStrings : ArrayList[String] = new ArrayList[String]
-          taintPath.getSink.getDescriptors.foreach(f=>sinkDescriptorStrings.add(f.toString()))
-          sinkssInfo.add("descriptors", sinkDescriptorStrings)
-          path.add("sink", sinkssInfo)
-          val typStrings : ArrayList[String] = new ArrayList[String]
-          taintPath.getTypes.foreach(f=>typStrings.add(f))
-          path.add("typs", typStrings)
-          val pathString : ArrayList[String] = new ArrayList[String]
-          taintPath.getPath.foreach(f=>pathString.add(f.source + " -> " + f.target))
-          path.add("path", pathString)
-          pathStrings.add(path.render())
-      }
-      taintResultT.add("paths", pathStrings)
-      compData.add("taintResult", taintResultT)
       compData.render()
     }
   }
@@ -305,35 +307,39 @@ object DataCollector {
 	      val exported = comp.exported
 	      val protectPermission = comp.permission
 	      val intentFilters = intentFDB.getIntentFilters(compName)
-	      val (icfg, irfaResult) = AppCenter.getInterproceduralReachingFactsAnalysisResult(compRec)
-	      val iccNodes = icfg.nodes.filter{
-	        	node =>
-	        	  node.isInstanceOf[CGCallNode] && node.asInstanceOf[CGCallNode].getCalleeSet.exists(InterComponentCommunicationModel.isIccOperation(_))
-	      	}.map(_.asInstanceOf[CGCallNode])
-	      val iccInfos =
-		      iccNodes.map{
-		        iccNode =>
-		          val s = irfaResult.entrySet(iccNode)
-				      val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
-				      val args = iccNode.getOwner.getProcedureBody.location(iccNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
-	              case te : TupleExp =>
-	                te.exps.map{
-				            exp =>
-				              exp match{
-						            case ne : NameExp => ne.name.name
-						            case _ => exp.toString()
-						          }
-				          }.toList
-	              case a => throw new RuntimeException("wrong exp type: " + a)
-	            }
-						  val intentSlot = VarSlot(args(1))
-						  val intentValues = factMap.getOrElse(intentSlot, isetEmpty)
-						  val intentcontents = IntentHelper.getIntentContents(factMap, intentValues, iccNode.getContext)
-						  val comMap = IntentHelper.mappingIntents(intentcontents)
-						  val intentDatas = intentcontents.map(ic=>IntentData(ic.componentNames, ic.actions, ic.categories, ic.datas, ic.types, ic.preciseExplicit, ic.preciseImplicit, comMap(ic).map(c=>(c._1.getName, c._2.toString()))))
-						  IccInfo(iccNode.getCalleeSet.map(_.getSignature), iccNode.getContext, intentDatas)
-		      }.toSet
-	      val taintResult = AppCenter.getTaintAnalysisResult(compRec)
+	      var iccInfos = isetEmpty[IccInfo]
+	      var taintResult : TaintAnalysisResult = null
+	      if(!compRec.isPhantom){
+		      val (icfg, irfaResult) = AppCenter.getInterproceduralReachingFactsAnalysisResult(compRec)
+		      val iccNodes = icfg.nodes.filter{
+		        	node =>
+		        	  node.isInstanceOf[CGCallNode] && node.asInstanceOf[CGCallNode].getCalleeSet.exists(InterComponentCommunicationModel.isIccOperation(_))
+		      	}.map(_.asInstanceOf[CGCallNode])
+		      iccInfos =
+			      iccNodes.map{
+			        iccNode =>
+			          val s = irfaResult.entrySet(iccNode)
+					      val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+					      val args = iccNode.getOwner.getProcedureBody.location(iccNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
+		              case te : TupleExp =>
+		                te.exps.map{
+					            exp =>
+					              exp match{
+							            case ne : NameExp => ne.name.name
+							            case _ => exp.toString()
+							          }
+					          }.toList
+		              case a => throw new RuntimeException("wrong exp type: " + a)
+		            }
+							  val intentSlot = VarSlot(args(1))
+							  val intentValues = factMap.getOrElse(intentSlot, isetEmpty)
+							  val intentcontents = IntentHelper.getIntentContents(factMap, intentValues, iccNode.getContext)
+							  val comMap = IntentHelper.mappingIntents(intentcontents)
+							  val intentDatas = intentcontents.map(ic=>IntentData(ic.componentNames, ic.actions, ic.categories, ic.datas, ic.types, ic.preciseExplicit, ic.preciseImplicit, comMap(ic).map(c=>(c._1.getName, c._2.toString()))))
+							  IccInfo(iccNode.getCalleeSet.map(_.getSignature), iccNode.getContext, intentDatas)
+			      }.toSet
+		      taintResult = AppCenter.getTaintAnalysisResult(compRec)
+	      }
 	      ComponentData(compName, typ, exported, protectPermission, intentFilters, iccInfos, taintResult)
 	  }
 	  val drcompDatas = AppCenter.getDynamicRegisteredComponents.map{

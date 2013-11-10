@@ -1,6 +1,7 @@
 package org.sireum.amandroid.example.interprocedural
 
 import org.sireum.amandroid.example.Examples
+import org.sireum.amandroid.util.MyFileUtil
 
 
 
@@ -28,4 +29,15 @@ object InterproceduralExamples extends Examples{
   
   val BENCH_APK_DIR_URI = sourceDirUri(this.getClass, "./droidBench/") 
   def benchAPKFiles = exampleFiles(BENCH_APK_DIR_URI, ANDROID_APK_FILE_EXT)
+  
+  protected def getFileUrl(path : String, ext : String) = {
+    val fileNames = MyFileUtil.getResourceListing(this.getClass(), path, ext)
+    fileNames.map(
+      name =>
+    		this.getClass().getResource(path + name)
+    )
+  }
+  
+  def testAPKUrls = getFileUrl("./testapk/", ANDROID_APK_FILE_EXT)
+  def maliciousArborUrls = getFileUrl("./maliciousArbor/", ANDROID_APK_FILE_EXT)
 }

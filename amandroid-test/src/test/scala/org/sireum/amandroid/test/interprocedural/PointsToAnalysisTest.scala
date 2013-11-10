@@ -23,6 +23,6 @@ class PointsToAnalysisTest extends PointsToAnalysisTestFramework {
   InterproceduralExamples.modelFiles.
 //    filter { s => s.endsWith("/StringLoopTest.pilar") }.
     foreach { fileUri =>
-      Analyzing title fileUri file fileUri
+//      Analyzing title fileUri file fileUri
     }
 }

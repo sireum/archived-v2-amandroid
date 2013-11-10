@@ -5,6 +5,7 @@ import org.sireum.util._
 import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
 import org.sireum.amandroid.AmandroidCodeSource
 import org.sireum.amandroid.test.framework.TestFramework
+import java.io.InputStream
 
 	/**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -21,12 +22,12 @@ trait LightWeightParserTestFramework extends TestFramework {
   def model(code : String) =
     InterProceduralConfiguration(title, Left(code))
 
-  def file(fileUri : FileResourceUri) =
+  def file(fileUri : InputStream) =
     InterProceduralConfiguration(title, Right(fileUri))
 
   case class InterProceduralConfiguration //
   (title : String,
-   src : Either[String, FileResourceUri]) {
+   src : Either[String, InputStream]) {
 
     test(title) {
     	println("####" + title + "#####")

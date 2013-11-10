@@ -16,6 +16,6 @@ class LightWeightParserTest extends LightWeightParserTestFramework {
   LightWeightParserExamples.pilarModelFiles.
 //    filter { s => s.endsWith("Test.pilar") }.
     foreach { fileUri =>
-      Analyzing title fileUri file fileUri
+//      Analyzing title fileUri file fileUri
     }
 }

@@ -105,6 +105,10 @@ class ManifestParser extends AbstractAndroidXMLParser{
 									  this.currentComponent = toPilarRecord(this.packageName + "." + attrValue)
 									  this.components += (this.currentComponent -> tagName)
 									}
+									else if (this.packageName != "" && !attrValue.contains(".")){
+									  this.currentComponent = toPilarRecord(this.packageName + "." + attrValue)
+									  this.components += (this.currentComponent -> tagName)
+									}
 									else {
 									  this.currentComponent = toPilarRecord(attrValue)
 									  this.components += (this.currentComponent -> tagName)
