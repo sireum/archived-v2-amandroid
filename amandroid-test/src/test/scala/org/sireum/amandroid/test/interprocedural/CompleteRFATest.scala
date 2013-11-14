@@ -21,30 +21,30 @@ object Counter {
 class CompleteRFATest extends CompleteRFATestFramework {
   var i =0
 	AmandroidCodeSource.preLoad
-//  InterproceduralExamples.testAPKUrls.
-//  filter { s => s.getPath().endsWith("LocationFlow2.apk") }.
-//  foreach { fileUri =>
-//    Analyzing title fileUri file fileUri
-//  }
+  InterproceduralExamples.testAPKUrls.
+  filter { s => s.getPath().endsWith("LocationFlow2.apk") }.
+  foreach { fileUri =>
+    Analyzing title fileUri file fileUri
+  }
 //  InterproceduralExamples.normalAPKFiles.
 //  filter { s => s.endsWith("android-1.apk") }.
 //  foreach { fileUri =>
 ////    if(i < 37) i += 1
 //    Analyzing title fileUri file fileUri
 //  }
-//  InterproceduralExamples.maliciousAPKFiles.
-////  filter { s => s.endsWith("0fbf.apk")}.
-//  foreach { fileUri =>
-////    if(i < 7) i += 1
-//    Analyzing title fileUri file fileUri
-//  }
-  InterproceduralExamples.maliciousArborUrls.
-//    filter { s => s.getPath().endsWith("0452b.apk")}.
+  InterproceduralExamples.maliciousAPKUrls.
+//  filter { s => s.endsWith("0fbf.apk")}.
   foreach { fileUri =>
-    if(i < 10) 
+//    if(i < 7) i += 1
     Analyzing title fileUri file fileUri
-    i+=1
   }
+//  InterproceduralExamples.maliciousArborUrls.
+////  filter { s => s.getPath().endsWith("0a29be.apk")}.
+//  foreach { fileUri =>
+////    if(i > 69) 
+//    Analyzing title fileUri file fileUri
+////    i+=1
+//  }
 //  InterproceduralExamples.benchAPKFiles.
 ////  filter { s => s.endsWith("IntentSink2.apk") }.
 //  foreach { fileUri =>

@@ -80,7 +80,8 @@ object AmandroidResolver {
    */
     
   def resolveRecord(recordName : String, desiredLevel : Center.ResolveLevel.Value) : AmandroidRecord = {
-    if(!AmandroidCodeSource.containsRecord(recordName)){
+    val typ = StringFormConverter.getTypeFromName(recordName)
+    if(!typ.isArray && !AmandroidCodeSource.containsRecord(recordName)){
       if(!Center.containsRecord(recordName) || Center.getRecord(recordName).getResolvingLevel < desiredLevel){
         Center.tryRemoveRecord(recordName)
 	      val rec = new AmandroidRecord().init(recordName)

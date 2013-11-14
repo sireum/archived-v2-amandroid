@@ -40,4 +40,5 @@ object InterproceduralExamples extends Examples{
   
   def testAPKUrls = getFileUrl("./testapk/", ANDROID_APK_FILE_EXT)
   def maliciousArborUrls = getFileUrl("./maliciousArbor/", ANDROID_APK_FILE_EXT)
+  def maliciousAPKUrls = getFileUrl("./maliciousapk/", ANDROID_APK_FILE_EXT)
 }

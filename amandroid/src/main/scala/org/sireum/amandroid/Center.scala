@@ -574,7 +574,7 @@ object Center {
 	  val f = r.getFieldByName(fieldName)
 	  if(f.isStatic)
 	  	Some(f)
-	  else throw new RuntimeException("Given field " + f + " is not a static field")
+	  else None
 	}
 	
 	/**

@@ -279,7 +279,7 @@ object ReachingFactsAnalysisHelper {
                 case Some(af) =>
                   value ++= factMap.getOrElse(VarSlot(af.getSignature), isetEmpty[Instance])
                 case None =>
-                  throw new RuntimeException("Given field may be in other library: " + ne.name.name)
+                  err_msg_normal("Given field may be in other library: " + ne.name.name)
               }
             } else value ++= factMap.getOrElse(slot, isetEmpty[Instance])
             result(i) = value

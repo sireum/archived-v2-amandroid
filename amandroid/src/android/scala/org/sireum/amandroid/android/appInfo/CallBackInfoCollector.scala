@@ -191,8 +191,9 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	}
 	
 	private def pilarify(classname : String) = {
-	  val temp = classname.replace('.', ':')
-	  "[|" + temp + "|]"
+	  val temp = "[|" + classname.replace('.', ':') + "|]"
+	  val rec = Center.resolveRecord(temp, Center.ResolveLevel.BODIES)
+	  temp
 	}
 	
 	private def analyzeClassInterfaceCallbacks(baseClass: AmandroidRecord, clazz: AmandroidRecord, lifecycleElement: AmandroidRecord):Unit = { 

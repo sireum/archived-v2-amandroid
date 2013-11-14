@@ -115,7 +115,7 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	val out = new PrintWriter(apkfile + "/AppData.txt")
 			    out.print(appData.toString)
 			    out.close()
-			    val mr = new PrintWriter(System.getProperty("user.home") + "/Desktop/AmandroidResult/MatricInfo.txt")
+			    val mr = new PrintWriter(System.getProperty("user.home") + "/Desktop/AmandroidResult/MetricInfo.txt")
 				  mr.print(MetricRepo.toString)
 				  mr.close()
 				  Counter.haveresult += 1
