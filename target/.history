@@ -1,0 +1,13 @@
+compile
+run
+test
+compile amandroid-test
+cd amandroid-test
+quit
+exit
+quit
+exit
+compile
+run
+test
+exit

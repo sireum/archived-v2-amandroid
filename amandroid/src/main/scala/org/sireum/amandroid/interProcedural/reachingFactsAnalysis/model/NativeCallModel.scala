@@ -6,6 +6,7 @@ import org.sireum.amandroid.interProcedural.reachingFactsAnalysis._
 import org.sireum.amandroid.Center
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.ClassInstance
+import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 
 /**
  * @author Fengguo Wei & Sankardas Roy

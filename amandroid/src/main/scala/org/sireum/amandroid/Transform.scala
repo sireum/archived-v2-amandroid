@@ -6,11 +6,13 @@ import org.sireum.pilar.ast._
 import org.sireum.alir._
 import org.sireum.pilar.symbol._
 import org.sireum.pilar.parser.ChunkingPilarParser
-import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis._
 import org.sireum.amandroid.symbolResolver.AmandroidSymbolTableBuilder
+import org.sireum.amandroid.intraProcedural.reachingDefinitionAnalysis.AmandroidReachingDefinitionAnalysis
 
 
 object Transform {
+  //for building cfg
+  type VirtualLabel = String
   
   val ERROR_TAG_TYPE = MarkerType(
   "org.sireum.pilar.tag.error.symtab",
@@ -30,10 +32,22 @@ object Transform {
   
   //for building symbol table
   var par : Boolean = false
-  val fst = { _ : Unit => new AmandroidSymbolTable }
   
-  //for building cfg
-  type VirtualLabel = String
+  var fst = { _ : Unit => new AmandroidSymbolTable }
+  
+  var dr : SymbolTable => DefRef = null
+  
+  val iopp : ProcedureSymbolTable => (ResourceUri => Boolean, ResourceUri => Boolean) = { pst =>
+    val params = pst.params.toSet[ResourceUri]
+    ({ localUri => params.contains(localUri) },
+      { s => falsePredicate1[ResourceUri](s) })
+  }
+  
+  val saom : Boolean = true
+  
+  def init(dr : SymbolTable => DefRef) = {
+    this.dr = dr
+  }
   
   def getExceptionName(cc : CatchClause) : String = {
     require(cc.typeSpec.isDefined)
@@ -68,14 +82,6 @@ object Transform {
       	
       	(result, false)
     } 
-  
-  val dr : SymbolTable => DefRef = { st => new AndroidDefRef(st, new AndroidVarAccesses(st)) }
-  val iopp : ProcedureSymbolTable => (ResourceUri => Boolean, ResourceUri => Boolean) = { pst =>
-    val params = pst.params.toSet[ResourceUri]
-    ({ localUri => params.contains(localUri) },
-      { s => falsePredicate1[ResourceUri](s) })
-  }
-  val saom : Boolean = true
   
 	def getIntraProcedureResult(code : String) : Map[ResourceUri, TransformIntraProcedureResult] = {
 	  val newModels = parseCodes(Set(code))
@@ -115,9 +121,9 @@ object Transform {
 	  (pool, result)
 	}
 	
-	def buildRda (pst : ProcedureSymbolTable, cfg : ControlFlowGraph[VirtualLabel], initialFacts : ISet[AndroidReachingDefinitionAnalysis.RDFact] = isetEmpty) = {
+	def buildRda (pst : ProcedureSymbolTable, cfg : ControlFlowGraph[VirtualLabel], initialFacts : ISet[AmandroidReachingDefinitionAnalysis.RDFact] = isetEmpty) = {
 	  val iiopp = iopp(pst)
-	  AndroidReachingDefinitionAnalysis[VirtualLabel](pst,
+	  AmandroidReachingDefinitionAnalysis[VirtualLabel](pst,
 	    cfg,
 	    dr(pst.symbolTable),
 	    first2(iiopp),
@@ -139,5 +145,5 @@ object Transform {
 	}
 }
 
-case class TransformIntraProcedureResult(pst : ProcedureSymbolTable, cfg : ControlFlowGraph[String], rda : AndroidReachingDefinitionAnalysis.Result)
+case class TransformIntraProcedureResult(pst : ProcedureSymbolTable, cfg : ControlFlowGraph[String], rda : AmandroidReachingDefinitionAnalysis.Result)
 

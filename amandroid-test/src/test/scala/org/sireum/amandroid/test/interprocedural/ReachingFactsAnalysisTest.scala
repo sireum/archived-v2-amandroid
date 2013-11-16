@@ -6,13 +6,14 @@ import org.scalatest.junit.JUnitRunner
 import org.sireum.amandroid.test.framework.interprocedural.ReachingFactsAnalysisTestFramework
 import org.sireum.amandroid.AmandroidCodeSource
 import org.sireum.amandroid.Center
+import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 @RunWith(classOf[JUnitRunner])
 class ReachingFactsAnalysisTest extends ReachingFactsAnalysisTestFramework {
-  AmandroidCodeSource.preLoad
+  AmandroidCodeSource.preLoad(AndroidLibPilarFiles.pilarInputStreams)
   InterproceduralExamples.modelFiles.
 //    filter { s => s.endsWith("bigWfgNP.pilar") }.
     foreach { fileUri =>

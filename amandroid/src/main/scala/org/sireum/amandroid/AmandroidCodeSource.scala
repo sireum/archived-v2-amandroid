@@ -4,7 +4,8 @@ import org.sireum.util.FileResourceUri
 import org.sireum.util.FileUtil
 import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
 import org.sireum.amandroid.util.StringFormConverter
-import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
+import org.sireum.util.ISet
+import java.io.InputStream
 
 object AmandroidCodeSource {
   
@@ -16,13 +17,7 @@ object AmandroidCodeSource {
    * pre-load all the code of the library
    */
   
-  def preLoad = {
-//    val fileUris = FileUtil.listFiles(GlobalConfig.libFileDir, ".pilar", true)
-//	  fileUris.map{
-//	    fileUri =>
-//	      LightWeightPilarParser(Right(fileUri), CodeType.LIBRARY)
-//	  }
-    val inputStreams = AndroidLibPilarFiles.pilarInputStreams
+  def preLoad(inputStreams : ISet[InputStream]) = {
     inputStreams.foreach{
       in =>
         LightWeightPilarParser(Right(in), CodeType.LIBRARY)

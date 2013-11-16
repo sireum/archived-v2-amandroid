@@ -11,6 +11,7 @@ import org.sireum.amandroid.android.cache.AndroidCacheFile
 import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
 import org.sireum.amandroid.AmandroidCodeSource
 import org.sireum.amandroid.test.framework.interprocedural.PointsToAnalysisTestFramework
+import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -19,7 +20,7 @@ import org.sireum.amandroid.test.framework.interprocedural.PointsToAnalysisTestF
 
 @RunWith(classOf[JUnitRunner])
 class PointsToAnalysisTest extends PointsToAnalysisTestFramework {
-  AmandroidCodeSource.preLoad
+  AmandroidCodeSource.preLoad(AndroidLibPilarFiles.pilarInputStreams)
   InterproceduralExamples.modelFiles.
 //    filter { s => s.endsWith("/StringLoopTest.pilar") }.
     foreach { fileUri =>

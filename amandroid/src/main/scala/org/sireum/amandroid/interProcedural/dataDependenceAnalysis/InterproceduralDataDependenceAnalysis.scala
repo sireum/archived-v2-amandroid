@@ -1,6 +1,5 @@
 package org.sireum.amandroid.interProcedural.dataDependenceAnalysis
 
-import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.pilar.ast._
 import org.sireum.util._
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
@@ -20,6 +19,7 @@ import org.sireum.alir.DefDesc
 import org.sireum.amandroid.interProcedural.controlFlowGraph._
 import org.sireum.amandroid.PilarAstHelper
 import org.sireum.alir.AlirEdge
+import org.sireum.amandroid.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
 
 trait InterproceduralDataDependenceInfo{
   def getIddg : InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node]
@@ -32,9 +32,9 @@ object InterproceduralDataDependenceAnalysis {
   type Node = CGNode
   type Edge = AlirEdge[Node]
   
-	def apply(cg : InterproceduralControlFlowGraph[Node], rfaResult : AndroidReachingFactsAnalysis.Result) : InterproceduralDataDependenceInfo = build(cg, rfaResult)
+	def apply(cg : InterproceduralControlFlowGraph[Node], rfaResult : InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]) : InterproceduralDataDependenceInfo = build(cg, rfaResult)
 	
-	def build(cg : InterproceduralControlFlowGraph[Node], rfaResult : AndroidReachingFactsAnalysis.Result) : InterproceduralDataDependenceInfo = {
+	def build(cg : InterproceduralControlFlowGraph[Node], rfaResult : InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]) : InterproceduralDataDependenceInfo = {
     
     class Iddi(iddg : InterProceduralDataDependenceGraph[Node]) extends InterproceduralDataDependenceInfo{
       def getIddg : InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node] = iddg

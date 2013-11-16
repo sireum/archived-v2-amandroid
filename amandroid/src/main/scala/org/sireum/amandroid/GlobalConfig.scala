@@ -2,17 +2,12 @@ package org.sireum.amandroid
 
 import org.sireum.util.FileUtil
 import java.io.File
-import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
 
 /**
  * All the global config's settings at the beginning
  */
 
 object GlobalConfig {
-  /**
-   * record where the dir for library code is
-   */
-	final var libFileDir = AndroidLibPilarFiles.PILAR_MODEL_DIR_URI
 	
 	/**
 	 * is whole program mode or not

@@ -10,7 +10,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-pilar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-pipeline"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-tools"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/amandroid"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/amandroid-test"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sireum-amandroid"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sireum-amandroid-test"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

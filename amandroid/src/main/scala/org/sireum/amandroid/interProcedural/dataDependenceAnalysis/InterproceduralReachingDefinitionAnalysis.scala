@@ -7,22 +7,20 @@ import org.sireum.amandroid.interProcedural.Context
 import org.sireum.pilar.ast.CallJump
 import org.sireum.pilar.ast.ProcedureDecl
 import org.sireum.amandroid.interProcedural.CallResolver
-import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
 import org.sireum.amandroid.GlobalConfig
 import org.sireum.amandroid.interProcedural.InterProceduralMonotoneDataFlowAnalysisFramework
-import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.alir.VarSlot
 import org.sireum.alir.InitDefDesc
 import org.sireum.amandroid.AmandroidProcedure
-import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.amandroid.PilarAstHelper
 import org.sireum.alir._
 import org.sireum.amandroid.interProcedural.NodeListener
+import org.sireum.amandroid.intraProcedural.reachingDefinitionAnalysis.AmandroidReachingDefinitionAnalysis
 
 object InterproceduralReachingDefinitionAnalysis {
-  type RDFact = AndroidReachingDefinitionAnalysis.RDFact
+  type RDFact = AmandroidReachingDefinitionAnalysis.RDFact
   type IRDFact = (RDFact, Context)
-  type Node = AndroidReachingFactsAnalysis.Node
+  type Node = CGNode
   
   def apply(cg : InterproceduralControlFlowGraph[Node],
       parallel : Boolean = false,

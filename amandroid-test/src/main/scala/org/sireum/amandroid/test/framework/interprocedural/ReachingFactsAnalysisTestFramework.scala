@@ -1,12 +1,7 @@
 package org.sireum.amandroid.test.framework.interprocedural
 
-import org.sireum.pipeline._
 import org.sireum.util._
 import java.io.PrintWriter
-import org.sireum.core.module.ChunkingPilarParserModule
-import org.sireum.amandroid.module.PilarAndroidSymbolResolverModule
-import org.sireum.amandroid.module.AndroidIntraProceduralModule
-import org.sireum.amandroid.module.AndroidInterProceduralModule
 import java.io.File
 import org.sireum.amandroid.AmandroidCodeSource
 import org.sireum.amandroid.pilar.parser.LightWeightPilarParser

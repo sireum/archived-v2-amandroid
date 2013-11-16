@@ -3,7 +3,7 @@ package org.sireum.amandroid.interProcedural.pointsToAnalysis
 import org.sireum.util._
 import org.sireum.alir._
 import org.sireum.amandroid._
-import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
+import org.sireum.amandroid.intraProcedural.reachingDefinitionAnalysis.AmandroidReachingDefinitionAnalysis
 
 trait PAGConstraint{
   
@@ -14,7 +14,7 @@ trait PAGConstraint{
   def applyConstraint(p : Point,
                       ps : MList[Point],
                       cfg : ControlFlowGraph[String],
-                      rda : AndroidReachingDefinitionAnalysis.Result) 
+                      rda : AmandroidReachingDefinitionAnalysis.Result) 
                       : MMap[EdgeType.Value, MMap[Point, MSet[Point]]] = {
     //contains the edge list related to point p
     val flowMap : MMap[EdgeType.Value, MMap[Point, MSet[Point]]] = mmapEmpty
@@ -159,7 +159,7 @@ trait PAGConstraint{
   def udChainForProcExit(p : PointRNoIndex,
                          points : MList[Point],
               cfg : ControlFlowGraph[String],
-              rda : AndroidReachingDefinitionAnalysis.Result,
+              rda : AmandroidReachingDefinitionAnalysis.Result,
               avoidMode : Boolean = true) : Set[Point] = {
     val slots = rda.entrySet(cfg.exitNode)
     searchRda(p, points, slots, avoidMode)
@@ -177,7 +177,7 @@ trait PAGConstraint{
   def udChain(p : PointWithIndex,
               points : MList[Point],
               cfg : ControlFlowGraph[String],
-              rda : AndroidReachingDefinitionAnalysis.Result,
+              rda : AmandroidReachingDefinitionAnalysis.Result,
               avoidMode : Boolean = true) : Set[Point] = {
     val slots = rda.entrySet(cfg.getNode(Some(p.locationUri), p.locationIndex))
     searchRda(p, points, slots, avoidMode)

@@ -4,7 +4,6 @@ import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.util._
 import java.io._
-import org.sireum.amandroid.android.intraProcedural.reachingDefinitionAnalysis.AndroidReachingDefinitionAnalysis
 import org.sireum.amandroid.PointsCollector
 import org.sireum.amandroid.interProcedural.Context
 import org.sireum.amandroid.AmandroidProcedure

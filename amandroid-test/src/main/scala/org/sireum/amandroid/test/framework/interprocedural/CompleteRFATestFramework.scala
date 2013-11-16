@@ -24,42 +24,46 @@ import org.sireum.amandroid.android.dataRecorder.MetricRepo
 import java.io.FileInputStream
 import java.net.URL
 import org.sireum.amandroid.test.interprocedural.Counter
+import java.io.InputStream
+import java.util.zip.ZipInputStream
+import org.sireum.amandroid.util.ResourceRetriever
+import org.sireum.amandroid.android.AndroidGlobalConfig
 
 trait CompleteRFATestFramework extends TestFramework {
 
   def Analyzing : this.type = this
 
-  def title(s : URL) : this.type = {
+  def title(s : String) : this.type = {
     _title = caseString + s
     this
   }
 
-  def file(fileUri : URL) =
-    InterProceduralConfiguration(title, fileUri)
+  def file(fileRet : ResourceRetriever) =
+    InterProceduralConfiguration(title, fileRet)
 /**
  * does inter procedural analysis of an app
  * @param src is the uri of the apk file
  */
   case class InterProceduralConfiguration //
   (title : String,
-   src : URL) {
+   srcRet : ResourceRetriever) {
 
     test(title) {
     	println("####" + title + "#####")
     	Counter.total += 1
     	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
+    	AndroidGlobalConfig.initTransform
     	Center.reset
     	AppCenter.reset
     	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
     	AmandroidCodeSource.clearAppRecordsCodes
     	ClassLoadManager.reset
+    	
     	// now get the dex file from the source apk file 
-    	val apkName = src.getPath().substring(src.getPath().lastIndexOf("/") + 1, src.getPath().lastIndexOf("."))
-    	val resFile = new File(System.getProperty("user.home") + "/Desktop/AmandroidResult")
-    	if(!resFile.exists()) resFile.mkdir()
-    	val apkfile = new File(resFile + "/" + apkName)
-    	if(!apkfile.exists()) apkfile.mkdir()
-    	val dexFile = APKFileResolver.getDexFile(src)
+    	val apkName = title
+    	val apkfile = new File(System.getProperty("user.home") + "/Desktop/AmandroidResult/" + apkName)
+    	if(!apkfile.exists()) apkfile.mkdirs()
+    	val dexFile = APKFileResolver.getDexFile(title, srcRet, System.getenv(AndroidGlobalConfig.android_output_dir))
     	
     	// convert the dex file to the "pilar" form
     	val pilarFileUri = Dex2PilarConverter.convert(dexFile)
@@ -76,7 +80,7 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	    Center.resolveRecord(k, Center.ResolveLevel.BODIES)
 		    	}
 		    	
-		    	val pre = new AppInfoCollector(new File(src.toString().substring(5)).toString())
+		    	val pre = new AppInfoCollector(srcRet)
 				  pre.collectInfo
 		    	val entryPoints = Center.getEntryPoints("dummyMain")
 		    	entryPoints.foreach{

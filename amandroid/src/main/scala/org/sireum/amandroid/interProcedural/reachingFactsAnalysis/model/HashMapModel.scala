@@ -4,6 +4,7 @@ import org.sireum.amandroid._
 import org.sireum.util._
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis._
 import org.sireum.amandroid.interProcedural.Context
+import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 
 object HashMapModel {
 	def isHashMap(r : AmandroidRecord) : Boolean = r.getName == "[|java:util:HashMap|]"

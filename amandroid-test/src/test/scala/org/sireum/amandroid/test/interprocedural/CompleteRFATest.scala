@@ -6,6 +6,7 @@ import org.scalatest.junit.JUnitRunner
 import org.sireum.amandroid.AmandroidCodeSource
 import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
 import java.io.PrintWriter
+import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
 
 object Counter {
   var total = 0
@@ -20,23 +21,23 @@ object Counter {
 @RunWith(classOf[JUnitRunner])
 class CompleteRFATest extends CompleteRFATestFramework {
   var i =0
-	AmandroidCodeSource.preLoad
-  InterproceduralExamples.testAPKUrls.
-  filter { s => s.getPath().endsWith("LocationFlow2.apk") }.
-  foreach { fileUri =>
-    Analyzing title fileUri file fileUri
-  }
+	AmandroidCodeSource.preLoad(AndroidLibPilarFiles.pilarInputStreams)
+//  InterproceduralExamples.testAPKRets.
+//  filter { s => s.name.endsWith("LocationFlow2.apk") }.
+//  foreach { resRet =>
+//    Analyzing title resRet.name file resRet
+//  }
 //  InterproceduralExamples.normalAPKFiles.
 //  filter { s => s.endsWith("android-1.apk") }.
 //  foreach { fileUri =>
 ////    if(i < 37) i += 1
 //    Analyzing title fileUri file fileUri
 //  }
-  InterproceduralExamples.maliciousAPKUrls.
-//  filter { s => s.endsWith("0fbf.apk")}.
-  foreach { fileUri =>
+  InterproceduralExamples.maliciousAPKRets.
+//  filter { s => s.name.endsWith("86add.apk")}.
+  foreach { resRet =>
 //    if(i < 7) i += 1
-    Analyzing title fileUri file fileUri
+    Analyzing title resRet.name file resRet
   }
 //  InterproceduralExamples.maliciousArborUrls.
 ////  filter { s => s.getPath().endsWith("0a29be.apk")}.

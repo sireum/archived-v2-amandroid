@@ -9,6 +9,7 @@ import org.sireum.amandroid.AmandroidProcedure
 import org.sireum.amandroid.Center
 import org.sireum.amandroid.Type
 import org.sireum.amandroid.NormalType
+import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 
 object HashSetModel {
 	def isHashSet(r : AmandroidRecord) : Boolean = r.getName == "[|java:util:HashSet|]"

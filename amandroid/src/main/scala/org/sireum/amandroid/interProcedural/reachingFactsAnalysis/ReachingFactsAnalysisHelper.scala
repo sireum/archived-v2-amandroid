@@ -1,24 +1,18 @@
 package org.sireum.amandroid.interProcedural.reachingFactsAnalysis
 
 import org.sireum.util._
-import org.sireum.amandroid.Instance
 import org.sireum.alir.Slot
-import org.sireum.amandroid.AmandroidProcedure
-import org.sireum.amandroid.Type
-import org.sireum.amandroid.interProcedural.Context
-import org.sireum.amandroid.Center
-import org.sireum.amandroid.UnknownInstance
+import org.sireum.amandroid.Instance
 import org.sireum.pilar.ast._
-import org.sireum.amandroid.NullInstance
-import org.sireum.amandroid.android.AndroidConstants
+import org.sireum.amandroid.interProcedural.Context
+import org.sireum.amandroid.AmandroidProcedure
+import org.sireum.amandroid.Center
 import org.sireum.amandroid.MessageCenter._
-import org.sireum.amandroid.NormalType
+import org.sireum.amandroid.NullInstance
+import org.sireum.amandroid.UnknownInstance
 import org.sireum.amandroid.util.StringFormConverter
-import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis.model.AndroidModelCallHandler
-import org.sireum.amandroid.GlobalConfig
-import org.sireum.amandroid.Mode
-import org.sireum.amandroid.UnknownInstance
-import org.sireum.amandroid.UnknownInstance
+import org.sireum.amandroid.NormalType
+import org.sireum.amandroid.Type
 
 object ReachingFactsAnalysisHelper {
 	def getFactMap(s : ISet[RFAFact]) : Map[Slot, Set[Instance]] = s.groupBy(_.s).mapValues(_.map(_.v))
@@ -117,22 +111,6 @@ object ReachingFactsAnalysisHelper {
       calleeSet += p
     }
     calleeSet
-  }
-	
-	def isModelCall(calleeProc : AmandroidProcedure) : Boolean = {
-    AndroidModelCallHandler.isModelCall(calleeProc)
-  }
-  
-  def doModelCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
-    AndroidModelCallHandler.doModelCall(s, calleeProc, args, retVars, currentContext)
-  }
-  
-  def isICCCall(calleeProc : AmandroidProcedure) : Boolean = {
-    AndroidModelCallHandler.isICCCall(calleeProc)
-  }
-  
-  def doICCCall(s : ISet[RFAFact], calleeProc : AmandroidProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[AmandroidProcedure]) = {
-    AndroidModelCallHandler.doICCCall(s, calleeProc, args, retVars, currentContext)
   }
 	
 	def getInstanceFromType(typ : Type, currentContext : Context) : Option[Instance] = {

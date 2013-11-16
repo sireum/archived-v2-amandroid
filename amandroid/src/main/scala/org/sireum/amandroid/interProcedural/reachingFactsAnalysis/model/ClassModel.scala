@@ -4,13 +4,13 @@ import org.sireum.amandroid._
 import org.sireum.util._
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAFact
 import org.sireum.amandroid.interProcedural.Context
-import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.VarSlot
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAConcreteStringInstance
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.FieldSlot
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.RFAPointStringInstance
 import org.sireum.amandroid.util.StringFormConverter
 import org.sireum.amandroid.MessageCenter._
+import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 
 object ClassModel {
 	def isClass(r : AmandroidRecord) : Boolean = r.getName == "[|java:lang:Class|]"

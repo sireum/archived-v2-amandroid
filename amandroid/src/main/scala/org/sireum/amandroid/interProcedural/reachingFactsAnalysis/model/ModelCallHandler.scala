@@ -10,6 +10,7 @@ import org.sireum.amandroid.NormalType
 import org.sireum.alir.Slot
 import org.sireum.amandroid.Instance
 import org.sireum.amandroid.interProcedural.reachingFactsAnalysis._
+import org.sireum.amandroid.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 
 /**
  * @author Fengguo Wei & Sankardas Roy
