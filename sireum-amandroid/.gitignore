@@ -2,3 +2,4 @@
 /target
 /.cache
 /.scala_dependencies
+.DS_Store

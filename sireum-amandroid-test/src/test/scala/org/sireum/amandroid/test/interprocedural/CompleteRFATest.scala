@@ -22,11 +22,11 @@ object Counter {
 class CompleteRFATest extends CompleteRFATestFramework {
   var i =0
 	AmandroidCodeSource.preLoad(AndroidLibPilarFiles.pilarInputStreams)
-//  InterproceduralExamples.testAPKRets.
-//  filter { s => s.name.endsWith("LocationFlow2.apk") }.
-//  foreach { resRet =>
-//    Analyzing title resRet.name file resRet
-//  }
+  InterproceduralExamples.testAPKRets.
+  filter { s => s.name.endsWith("LocationFlow2.apk") }.
+  foreach { resRet =>
+    Analyzing title resRet.name file resRet
+  }
 //  InterproceduralExamples.normalAPKFiles.
 //  filter { s => s.endsWith("android-1.apk") }.
 //  foreach { fileUri =>
@@ -34,7 +34,7 @@ class CompleteRFATest extends CompleteRFATestFramework {
 //    Analyzing title fileUri file fileUri
 //  }
   InterproceduralExamples.maliciousAPKRets.
-  filter { s => s.name.endsWith("86add.apk")}.
+//  filter { s => s.name.endsWith("86add.apk")}.
   foreach { resRet =>
 //    if(i < 7) i += 1
     Analyzing title resRet.name file resRet
