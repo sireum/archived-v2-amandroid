@@ -34,7 +34,7 @@ class CompleteRFATest extends CompleteRFATestFramework {
 //    Analyzing title fileUri file fileUri
 //  }
   InterproceduralExamples.maliciousAPKRets.
-//  filter { s => s.name.endsWith("86add.apk")}.
+  filter { s => s.name.endsWith("86add.apk")}.
   foreach { resRet =>
 //    if(i < 7) i += 1
     Analyzing title resRet.name file resRet
