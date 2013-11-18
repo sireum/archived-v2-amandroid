@@ -61,7 +61,7 @@ trait CompleteRFATestFramework extends TestFramework {
     	ClassLoadManager.reset
     	
     	// now get the dex file from the source apk file 
-    	val apkName = title
+    	val apkName = title.substring(0, title.lastIndexOf("."))
     	val apkfile = new File(System.getProperty("user.home") + "/Desktop/AmandroidResult/" + apkName)
     	if(!apkfile.exists()) apkfile.mkdirs()
     	val dexFile = APKFileResolver.getDexFile(title, srcRet, System.getenv(AndroidGlobalConfig.android_output_dir))

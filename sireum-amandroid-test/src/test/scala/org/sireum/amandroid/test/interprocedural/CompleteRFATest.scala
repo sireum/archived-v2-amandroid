@@ -25,12 +25,12 @@ class CompleteRFATest extends CompleteRFATestFramework {
 ////    if(i < 37) i += 1
 //    Analyzing title fileUri file fileUri
 //  }
-  InterproceduralExamples.maliciousAPKRets.
-//  filter { s => s.name.endsWith("86add.apk")}.
-  foreach { resRet =>
-//    if(i < 7) i += 1
-    Analyzing title resRet.name file resRet
-  }
+//  InterproceduralExamples.maliciousAPKRets.
+////  filter { s => s.name.endsWith("86add.apk")}.
+//  foreach { resRet =>
+////    if(i < 7) i += 1
+//    Analyzing title resRet.name file resRet
+//  }
 //  InterproceduralExamples.maliciousArborUrls.
 ////  filter { s => s.getPath().endsWith("0a29be.apk")}.
 //  foreach { fileUri =>
