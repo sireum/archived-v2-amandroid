@@ -4,10 +4,10 @@
 		module="sireum-amandroid-android_2.10"
 		revision="0.1-SNAPSHOT"
 		status="integration"
-		publication="20131116164536"
+		publication="20131117202117"
 	>
 		<description>
-		Sireum Amandroid android
+		Sireum Amandroid Android
 		</description>
 	</info>
 	<configurations>

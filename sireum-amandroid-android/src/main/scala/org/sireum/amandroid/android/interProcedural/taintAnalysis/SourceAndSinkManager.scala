@@ -25,6 +25,7 @@ import org.sireum.amandroid.interProcedural.controlFlowGraph._
 import org.sireum.amandroid.interProcedural.dataDependenceAnalysis.InterProceduralDataDependenceGraph
 import org.sireum.amandroid.android.AppCenter
 import org.sireum.pilar.ast._
+import java.io.InputStreamReader
 
 object SourceAndSinkCenter {
   
@@ -180,9 +181,9 @@ object SourceAndSinkCenter {
 }
 
 object SSParser{
-  private val ssFile = new File(this.getClass().getResource("AmandroidSourcesAndSinks.txt").toURI())
+  private val ssInputStream = this.getClass().getResourceAsStream("../../resources/interProcedural/taintAnalysis/AmandroidSourcesAndSinks.txt")
 	private val regex = "(\\[\\|.+\\|\\])\\s*(.+)?\\s+->\\s+(.+)"
-  def readFile : BufferedReader = new BufferedReader(new FileReader(ssFile))
+  def readFile : BufferedReader = new BufferedReader(new InputStreamReader(ssInputStream, "UTF-8"))
   def parse : (IMap[String, ISet[String]], IMap[String, ISet[String]]) = {
     var sources : IMap[String, ISet[String]] = imapEmpty
     var sinks : IMap[String, ISet[String]] = imapEmpty

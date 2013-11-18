@@ -7,9 +7,7 @@ import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
 import org.sireum.amandroid.util.APKFileResolver
 import org.sireum.amandroid.util.Dex2PilarConverter
 import org.sireum.amandroid.android.appInfo.AppInfoCollector
-import java.io.File
-import java.io.FileOutputStream
-import java.io.OutputStreamWriter
+import java.io._
 import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis._
 import org.sireum.amandroid.android.interProcedural.taintAnalysis.AndroidTaintAnalysis
 import org.sireum.amandroid.android.interProcedural.taintAnalysis.SourceAndSinkCenter
@@ -19,15 +17,18 @@ import org.sireum.amandroid.android.interProcedural.taintAnalysis.AndroidDataDep
 import java.net.URI
 import org.sireum.amandroid.android.AppCenter
 import org.sireum.amandroid.android.dataRecorder.DataCollector
-import java.io.PrintWriter
 import org.sireum.amandroid.android.dataRecorder.MetricRepo
-import java.io.FileInputStream
-import java.net.URL
-import org.sireum.amandroid.test.interprocedural.Counter
-import java.io.InputStream
 import java.util.zip.ZipInputStream
 import org.sireum.amandroid.util.ResourceRetriever
 import org.sireum.amandroid.android.AndroidGlobalConfig
+import org.sireum.amandroid.MessageCenter._
+
+object Counter {
+  var total = 0
+  var oversize = 0
+  var haveresult = 0
+  override def toString : String = "total: " + total + ", oversize: " + oversize + ", haveResult: " + haveresult
+}
 
 trait CompleteRFATestFramework extends TestFramework {
 
@@ -49,7 +50,7 @@ trait CompleteRFATestFramework extends TestFramework {
    srcRet : ResourceRetriever) {
 
     test(title) {
-    	println("####" + title + "#####")
+    	msg_critical("####" + title + "#####")
     	Counter.total += 1
     	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
     	AndroidGlobalConfig.initTransform
@@ -85,12 +86,12 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	val entryPoints = Center.getEntryPoints("dummyMain")
 		    	entryPoints.foreach{
 		    	  ep =>
-		    	    println("--------------Component " + ep + "--------------")
+		    	    msg_critical("--------------Component " + ep + "--------------")
 		    	    val initialfacts = AndroidRFAConfig.getInitialFactsForDummyMain(ep)
 		    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, false)
 		    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
-		    	    println("processed-->" + icfg.getProcessed.size)
-		    	    println("exit facts: " + irfaResult.entrySet(icfg.exitNode).size)
+		    	    err_msg_normal("processed-->" + icfg.getProcessed.size)
+		    	    err_msg_normal("exit facts: " + irfaResult.entrySet(icfg.exitNode).size)
 		//    	    val taResult = AndroidTaintAnalysis(cg, rfaResult)
 		    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
 		    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
@@ -135,12 +136,12 @@ trait CompleteRFATestFramework extends TestFramework {
 	//    	}
     	} else {
     	  Counter.oversize += 1
-    	  System.err.println("Pilar file size is too large:" + pilarFile.length()/1024/1024 + "MB")
+    	  err_msg_critical("Pilar file size is too large:" + pilarFile.length()/1024/1024 + "MB")
     	}
     	System.gc()
 		  System.gc()
-    	println(Counter.toString)
-    	println("************************************\n")
+    	msg_critical(Counter.toString)
+    	msg_critical("************************************\n")
     }
   }
 

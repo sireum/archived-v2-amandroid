@@ -7,7 +7,8 @@
 [0m[[0mdebug[0m] [0m== resolving dependencies for SAnToS Laboratory#sireum-amandroid-android_2.10;0.1-SNAPSHOT [compile][0m
 [0m[[0mdebug[0m] [0m== resolving dependencies SAnToS Laboratory#sireum-amandroid-android_2.10;0.1-SNAPSHOT->org.scala-lang#scala-compiler;2.10.3 [compile->default(compile)][0m
 [0m[[0minfo[0m] [0mResolving org.scala-lang#scala-compiler;2.10.3 ...[0m
-[0m[[0mdebug[0m] [0msbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7f95213b[0m
+[0m[[0mdebug[0m] [0msbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@148bbe7c[0m
+[0m[[0mdebug[0m] [0mno default cache defined: set to /Volumes/hd/fgwei/.ivy2/cache[0m
 [0m[[0mdebug[0m] [0msbt-chain: module revision found in cache: org.scala-lang#scala-compiler;2.10.3[0m
 [0m[[0mdebug[0m] [0m	local: revision in cache: org.scala-lang#scala-compiler;2.10.3[0m
 [0m[[0mdebug[0m] [0m	found org.scala-lang#scala-compiler;2.10.3 in sbt-chain[0m
@@ -1059,7 +1060,7 @@
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scalatest#scalatest_2.10;2.0.RC1!scalatest_2.10.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-lang#jline;2.10.3!jline.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.fusesource.jansi#jansi;1.4!jansi.jar[0m
-[0m[[0mdebug[0m] [0m:: resolution report :: resolve 109ms :: artifacts dl 5ms[0m
+[0m[[0mdebug[0m] [0m:: resolution report :: resolve 114ms :: artifacts dl 4ms[0m
 [0m[[0mdebug[0m] [0m	report for SAnToS Laboratory#sireum-amandroid-android_2.10;0.1-SNAPSHOT compile produced in /git-repo/sireum-core-private/sireumv2/codebase/amandroid/sireum-amandroid-android/target/resolution-cache/reports/SAnToS Laboratory-sireum-amandroid-android_2.10-compile.xml[0m
 [0m[[0mdebug[0m] [0m	report for SAnToS Laboratory#sireum-amandroid-android_2.10;0.1-SNAPSHOT runtime produced in /git-repo/sireum-core-private/sireumv2/codebase/amandroid/sireum-amandroid-android/target/resolution-cache/reports/SAnToS Laboratory-sireum-amandroid-android_2.10-runtime.xml[0m
 [0m[[0mdebug[0m] [0m	report for SAnToS Laboratory#sireum-amandroid-android_2.10;0.1-SNAPSHOT test produced in /git-repo/sireum-core-private/sireumv2/codebase/amandroid/sireum-amandroid-android/target/resolution-cache/reports/SAnToS Laboratory-sireum-amandroid-android_2.10-test.xml[0m
@@ -1073,5 +1074,5 @@
 [0m[[0mdebug[0m] [0m	report for SAnToS Laboratory#sireum-amandroid-android_2.10;0.1-SNAPSHOT docs produced in /git-repo/sireum-core-private/sireumv2/codebase/amandroid/sireum-amandroid-android/target/resolution-cache/reports/SAnToS Laboratory-sireum-amandroid-android_2.10-docs.xml[0m
 [0m[[0mdebug[0m] [0m	report for SAnToS Laboratory#sireum-amandroid-android_2.10;0.1-SNAPSHOT pom produced in /git-repo/sireum-core-private/sireumv2/codebase/amandroid/sireum-amandroid-android/target/resolution-cache/reports/SAnToS Laboratory-sireum-amandroid-android_2.10-pom.xml[0m
 [0m[[0mdebug[0m] [0m	report for SAnToS Laboratory#sireum-amandroid-android_2.10;0.1-SNAPSHOT scala-tool produced in /git-repo/sireum-core-private/sireumv2/codebase/amandroid/sireum-amandroid-android/target/resolution-cache/reports/SAnToS Laboratory-sireum-amandroid-android_2.10-scala-tool.xml[0m
-[0m[[0mdebug[0m] [0m	resolve done (109ms resolve - 5ms download)[0m
+[0m[[0mdebug[0m] [0m	resolve done (114ms resolve - 4ms download)[0m
 [0m[[0minfo[0m] [0mDone updating.[0m

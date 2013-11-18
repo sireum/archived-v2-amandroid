@@ -14,6 +14,9 @@ import org.sireum.amandroid.AmandroidResolver
 import org.sireum.amandroid.util.SignatureParser
 import org.sireum.amandroid.MessageCenter._
 import org.sireum.amandroid.NormalType
+import com.google.common.io.CharStreams
+import java.io.InputStreamReader
+import org.sireum.amandroid.util.MyFileUtil
 
 class DummyMainGenerator {
   private var currentComponent : String = null
@@ -24,7 +27,7 @@ class DummyMainGenerator {
   private var callbackFunctions : Map[String, Set[String]] = Map()
   private var conditionCounter : Int = 0
   private var codeCounter : Int = 0
-  private val template = new STGroupFile("org/sireum/amandroid/pilarCodeGenerator/PilarCode.stg")
+  private val template = new STGroupFile("org/sireum/amandroid/resources/pilarCodeGenerator/PilarCode.stg")
   private val procDeclTemplate = template.getInstanceOf("ProcedureDecl")
   private val localVarsTemplate = template.getInstanceOf("LocalVars")
   private val bodyTemplate = template.getInstanceOf("Body")

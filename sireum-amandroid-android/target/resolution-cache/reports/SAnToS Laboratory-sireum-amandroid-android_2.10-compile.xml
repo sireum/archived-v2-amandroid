@@ -7,10 +7,10 @@
 		revision="0.1-SNAPSHOT"
 		conf="compile"
 		confs="compile, runtime, test, provided, optional, compile-internal, runtime-internal, test-internal, plugin, sources, docs, pom, scala-tool"
-		date="20131116164536"/>
+		date="20131117202117"/>
 	<dependencies>
 		<module organisation="SAnToS Laboratory" name="sireum-amandroid_2.10">
-			<revision name="0.1-SNAPSHOT" status="integration" pubdate="20131116164536" resolver="inter-project" artresolver="inter-project" downloaded="false" searched="false" default="false" conf="default(compile), compile" position="9">
+			<revision name="0.1-SNAPSHOT" status="integration" pubdate="20131117202117" resolver="inter-project" artresolver="inter-project" downloaded="false" searched="false" default="false" conf="default(compile), compile" position="9">
 				<metadata-artifact status="failed" details="" size="0" time="0" searched="false"/>
 				<caller organisation="SAnToS Laboratory" name="sireum-amandroid-android_2.10" conf="compile" rev="0.1-SNAPSHOT" rev-constraint-default="0.1-SNAPSHOT" rev-constraint-dynamic="0.1-SNAPSHOT" callerrev="0.1-SNAPSHOT"/>
 				<artifacts>
@@ -18,7 +18,7 @@
 			</revision>
 		</module>
 		<module organisation="SAnToS Laboratory" name="sireum-alir_2.10">
-			<revision name="0.1-SNAPSHOT" status="integration" pubdate="20131116164534" resolver="inter-project" artresolver="inter-project" downloaded="false" searched="false" default="false" conf="default(compile), compile" position="8">
+			<revision name="0.1-SNAPSHOT" status="integration" pubdate="20131117202116" resolver="inter-project" artresolver="inter-project" downloaded="false" searched="false" default="false" conf="default(compile), compile" position="8">
 				<metadata-artifact status="failed" details="" size="0" time="0" searched="false"/>
 				<caller organisation="SAnToS Laboratory" name="sireum-amandroid-android_2.10" conf="compile" rev="0.1-SNAPSHOT" rev-constraint-default="0.1-SNAPSHOT" rev-constraint-dynamic="0.1-SNAPSHOT" callerrev="0.1-SNAPSHOT"/>
 				<caller organisation="SAnToS Laboratory" name="sireum-amandroid_2.10" conf="compile" rev="0.1-SNAPSHOT" rev-constraint-default="0.1-SNAPSHOT" rev-constraint-dynamic="0.1-SNAPSHOT" callerrev="0.1-SNAPSHOT"/>
@@ -27,7 +27,7 @@
 			</revision>
 		</module>
 		<module organisation="SAnToS Laboratory" name="sireum-pilar_2.10">
-			<revision name="0.1-SNAPSHOT" status="integration" pubdate="20131116164533" resolver="inter-project" artresolver="inter-project" downloaded="false" searched="false" default="false" conf="default(compile), compile" position="6">
+			<revision name="0.1-SNAPSHOT" status="integration" pubdate="20131117202114" resolver="inter-project" artresolver="inter-project" downloaded="false" searched="false" default="false" conf="default(compile), compile" position="6">
 				<metadata-artifact status="failed" details="" size="0" time="0" searched="false"/>
 				<caller organisation="SAnToS Laboratory" name="sireum-alir_2.10" conf="compile" rev="0.1-SNAPSHOT" rev-constraint-default="0.1-SNAPSHOT" rev-constraint-dynamic="0.1-SNAPSHOT" callerrev="0.1-SNAPSHOT"/>
 				<caller organisation="SAnToS Laboratory" name="sireum-amandroid-android_2.10" conf="compile" rev="0.1-SNAPSHOT" rev-constraint-default="0.1-SNAPSHOT" rev-constraint-dynamic="0.1-SNAPSHOT" callerrev="0.1-SNAPSHOT"/>
@@ -37,7 +37,7 @@
 			</revision>
 		</module>
 		<module organisation="SAnToS Laboratory" name="sireum-parser_2.10">
-			<revision name="0.1-SNAPSHOT" status="integration" pubdate="20131116164533" resolver="inter-project" artresolver="inter-project" downloaded="false" searched="false" default="false" conf="default(compile), compile" position="7">
+			<revision name="0.1-SNAPSHOT" status="integration" pubdate="20131117202113" resolver="inter-project" artresolver="inter-project" downloaded="false" searched="false" default="false" conf="default(compile), compile" position="7">
 				<metadata-artifact status="failed" details="" size="0" time="0" searched="false"/>
 				<caller organisation="SAnToS Laboratory" name="sireum-pilar_2.10" conf="compile" rev="0.1-SNAPSHOT" rev-constraint-default="0.1-SNAPSHOT" rev-constraint-dynamic="0.1-SNAPSHOT" callerrev="0.1-SNAPSHOT"/>
 				<artifacts>
@@ -45,7 +45,7 @@
 			</revision>
 		</module>
 		<module organisation="SAnToS Laboratory" name="sireum-util_2.10">
-			<revision name="0.1-SNAPSHOT" status="integration" pubdate="20131116164532" resolver="inter-project" artresolver="inter-project" downloaded="false" searched="false" default="false" conf="default(compile), compile" position="5">
+			<revision name="0.1-SNAPSHOT" status="integration" pubdate="20131117202113" resolver="inter-project" artresolver="inter-project" downloaded="false" searched="false" default="false" conf="default(compile), compile" position="5">
 				<metadata-artifact status="failed" details="" size="0" time="0" searched="false"/>
 				<caller organisation="SAnToS Laboratory" name="sireum-alir_2.10" conf="compile" rev="0.1-SNAPSHOT" rev-constraint-default="0.1-SNAPSHOT" rev-constraint-dynamic="0.1-SNAPSHOT" callerrev="0.1-SNAPSHOT"/>
 				<caller organisation="SAnToS Laboratory" name="sireum-amandroid-android_2.10" conf="compile" rev="0.1-SNAPSHOT" rev-constraint-default="0.1-SNAPSHOT" rev-constraint-dynamic="0.1-SNAPSHOT" callerrev="0.1-SNAPSHOT"/>
@@ -56,7 +56,7 @@
 			</revision>
 		</module>
 		<module organisation="SAnToS Laboratory" name="sireum-lib_2.10">
-			<revision name="0.1-SNAPSHOT" status="integration" pubdate="20131116164532" resolver="inter-project" artresolver="inter-project" downloaded="false" searched="false" default="false" conf="default(compile), compile" position="3">
+			<revision name="0.1-SNAPSHOT" status="integration" pubdate="20131117202113" resolver="inter-project" artresolver="inter-project" downloaded="false" searched="false" default="false" conf="default(compile), compile" position="3">
 				<metadata-artifact status="failed" details="" size="0" time="0" searched="false"/>
 				<caller organisation="SAnToS Laboratory" name="sireum-alir_2.10" conf="compile" rev="0.1-SNAPSHOT" rev-constraint-default="0.1-SNAPSHOT" rev-constraint-dynamic="0.1-SNAPSHOT" callerrev="0.1-SNAPSHOT"/>
 				<caller organisation="SAnToS Laboratory" name="sireum-amandroid-android_2.10" conf="compile" rev="0.1-SNAPSHOT" rev-constraint-default="0.1-SNAPSHOT" rev-constraint-dynamic="0.1-SNAPSHOT" callerrev="0.1-SNAPSHOT"/>

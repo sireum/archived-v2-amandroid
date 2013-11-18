@@ -18,7 +18,7 @@ import org.sireum.amandroid.interProcedural.Context
 
 object DataCollector {
   
-  private val template = new STGroupFile("org/sireum/amandroid/android/dataRecorder/AppData.stg")
+  private val template = new STGroupFile("org/sireum/amandroid/android/resources/dataRecorder/AppData.stg")
   
   private def getIntentFilterStrings(intentFilters : ISet[IntentFilter]) : ArrayList[String] = {
     val intFs : ArrayList[String] = new ArrayList[String]
