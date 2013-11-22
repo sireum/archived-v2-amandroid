@@ -34,6 +34,7 @@ object AndroidDataDependentTaintAnalysis {
     def getDescriptors = this.descriptors
     def isSource = this.isSrc
     def isSink = !isSource
+    def isSame(tn : TaintNode) : Boolean = getDescriptors == tn.getDescriptors && getNode.getContext.getCurrentLocUri == tn.getNode.getContext.getCurrentLocUri
   }
   
   class Tp(path : IList[InterproceduralDataDependenceAnalysis.Edge]) extends TaintPath{
@@ -46,7 +47,7 @@ object AndroidDataDependentTaintAnalysis {
     def getPath : IList[InterproceduralDataDependenceAnalysis.Edge] = {
       path.reverse.map(edge=> new InterproceduralDataDependenceAnalysis.Edge(edge.owner, edge.target, edge.source))
     }
-    
+    def isSame(tp : TaintPath) : Boolean = getSource.isSame(tp.getSource) && getSink.isSame(tp.getSink)
     override def toString : String = {
       val sb = new StringBuilder
       sb.append("found path from\n" + srcN.getDescriptors + "\nto\n" + sinN.getDescriptors + "\n")
@@ -158,7 +159,7 @@ object AndroidDataDependentTaintAnalysis {
   
   def isCallBackSource(entNode : CGEntryNode) = {
     val owner = entNode.getOwner
-    SourceAndSinkCenter.isCallbackMethod(owner)
+    SourceAndSinkCenter.isCallbackSource(owner)
   }
   
   def getSourceAndSinkNode(invNode : CGInvokeNode, rfaFacts : ISet[RFAFact]) = {

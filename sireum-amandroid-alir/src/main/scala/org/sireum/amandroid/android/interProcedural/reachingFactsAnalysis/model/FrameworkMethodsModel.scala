@@ -92,39 +92,44 @@ object FrameworkMethodsModel {
 	  val iDB = new IntentFilterDataBase
 	  receiverValue.foreach{
 	    rv =>
-	      val intentF = new IntentFilter(rv.getType.name)
-	      val comRec = Center.resolveRecord(rv.getType.name, Center.ResolveLevel.BODIES)
-	      filterValue.foreach{
-	        fv =>
-	          val mActionsSlot = FieldSlot(fv, AndroidConstants.INTENTFILTER_ACTIONS)
-	          val mActionsValue = factMap.getOrElse(mActionsSlot, isetEmpty)
-	          mActionsValue.foreach{
-	            mav =>
-	              mav match{
-			            case cstr @ RFAConcreteStringInstance(text, c) =>
-			              intentF.addAction(text)
-			            case _ =>
-			              precise = false
+	      rv match{
+	        case ui : UnknownInstance =>
+	        case ni : NullInstance =>
+	        case _ =>
+	          val intentF = new IntentFilter(rv.getType.name)
+			      val comRec = Center.resolveRecord(rv.getType.name, Center.ResolveLevel.BODIES)
+			      filterValue.foreach{
+			        fv =>
+			          val mActionsSlot = FieldSlot(fv, AndroidConstants.INTENTFILTER_ACTIONS)
+			          val mActionsValue = factMap.getOrElse(mActionsSlot, isetEmpty)
+			          mActionsValue.foreach{
+			            mav =>
+			              mav match{
+					            case cstr @ RFAConcreteStringInstance(text, c) =>
+					              intentF.addAction(text)
+					            case _ =>
+					              precise = false
+					          }
 			          }
-	          }
-	          val mCategoriesSlot = FieldSlot(fv, AndroidConstants.INTENTFILTER_CATEGORIES)
-	          val mCategoriesValue = factMap.getOrElse(mCategoriesSlot, isetEmpty)
-	          mCategoriesValue.foreach{
-	            mav =>
-	              mav match{
-			            case cstr @ RFAConcreteStringInstance(text, c) =>
-			              intentF.addCategory(text)
-			            case _ =>
-			              precise = false
+			          val mCategoriesSlot = FieldSlot(fv, AndroidConstants.INTENTFILTER_CATEGORIES)
+			          val mCategoriesValue = factMap.getOrElse(mCategoriesSlot, isetEmpty)
+			          mCategoriesValue.foreach{
+			            mav =>
+			              mav match{
+					            case cstr @ RFAConcreteStringInstance(text, c) =>
+					              intentF.addCategory(text)
+					            case _ =>
+					              precise = false
+					          }
 			          }
-	          }
+			      }
+			      iDB.updateIntentFmap(intentF)
+			      val appinfo = AppCenter.getAppInfo
+			      if(!appinfo.hasDummyMain(comRec)){
+			        appinfo.dynamicRegisterComponent(comRec, iDB, precise)
+			      }
 	      }
-	      AppCenter.addComponent(comRec)
-	      iDB.updateIntentFmap(intentF)
-	      val appinfo = AppCenter.getAppInfo
-	      if(!appinfo.hasDummyMain(comRec)){
-	        appinfo.dynamicRegisterComponent(comRec, iDB, precise)
-	      }
+	      
 	  }
 	  msg_normal("intentfilter database: " + AppCenter.getIntentFilterDB)
 	  isetEmpty

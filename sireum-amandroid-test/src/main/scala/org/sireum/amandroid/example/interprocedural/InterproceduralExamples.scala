@@ -42,4 +42,5 @@ object InterproceduralExamples extends Examples{
   def testAPKRets = getFileRets("./testapk/", ANDROID_APK_FILE_EXT)
   def maliciousArborRets = getFileRets("./maliciousArbor/", ANDROID_APK_FILE_EXT)
   def maliciousAPKRets = getFileRets("./maliciousapk/", ANDROID_APK_FILE_EXT)
+  def normalAPKRets = getFileRets("./normalapk/", ANDROID_APK_FILE_EXT)
 }

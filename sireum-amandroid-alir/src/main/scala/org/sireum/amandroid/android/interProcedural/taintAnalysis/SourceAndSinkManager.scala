@@ -83,8 +83,8 @@ object SourceAndSinkCenter {
 	  false
 	}
 	
-	def isCallbackMethod(proc : AmandroidProcedure) : Boolean = {
-	  if(this.callbackMethods.contains(proc)) true
+	def isCallbackSource(proc : AmandroidProcedure) : Boolean = {
+	  if(this.callbackMethods.contains(proc) && proc.getParamNames.size > 0) true
 	  else false
 	}
 	
@@ -97,7 +97,7 @@ object SourceAndSinkCenter {
 	          case Some(control) =>
 	            return control.isSensitive
 	          case None =>
-	            err_msg_critical("Layout control with ID " + num + " not found.")
+	            err_msg_normal("Layout control with ID " + num + " not found.")
 	        }
 	    }
 	  }

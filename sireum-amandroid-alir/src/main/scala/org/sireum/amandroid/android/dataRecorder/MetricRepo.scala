@@ -5,6 +5,8 @@ import org.sireum.amandroid.Center
 import org.sireum.util._
 import org.sireum.amandroid.AmandroidRecord
 import org.sireum.amandroid.android.security.AndroidProblemCategories
+import org.sireum.util.ISet
+import org.sireum.amandroid.interProcedural.taintAnalysis.TaintPath
 
 object MetricRepo {
   /**ICC compare*/
@@ -66,41 +68,43 @@ object MetricRepo {
 	      dynamicRegisteredIccTotal += 1
 	      if(drComp.precise) dynamicRegisteredIccPrecise += 1
 	  }
+	  var totalTaintPaths : ISet[TaintPath] = isetEmpty
 	  appData.components.foreach{
 	    comp =>
 	      val compType = comp.typ
 	      if(comp.taintResult != null){
 		      comp.taintResult.getTaintedPaths.foreach{
 		        tp =>
-		          tp.getTypes.foreach{
-		            problemType =>
-		              compType match{
-		                case "activity" =>
-		                  problemType match{
-		                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => activityHijacking += 1
-		                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => activityLaunch += 1
-		                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
-		                  }
-		                case "service" =>
-		                  problemType match{
-		                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => serviceHijacking += 1
-		                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => serviceLaunch += 1
-		                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
-		                  }
-		                case "receiver" =>
-		                  problemType match{
-		                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => broadcastReceiverTheft += 1
-		                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => broadcastReceiverInjection += 1
-		                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
-		                  }
-		                case "provider" =>
-		                  problemType match{
-		                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => contentProviderInfoLeak += 1
-		                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => contentProviderCapabilityLeak += 1
-		                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
-		                  }
-		              }
-		          }
+		          if(!totalTaintPaths.exists(_.isSame(tp)))
+			          tp.getTypes.foreach{
+			            problemType =>
+			              compType match{
+			                case "activity" =>
+			                  problemType match{
+			                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => activityHijacking += 1
+			                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => activityLaunch += 1
+			                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
+			                  }
+			                case "service" =>
+			                  problemType match{
+			                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => serviceHijacking += 1
+			                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => serviceLaunch += 1
+			                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
+			                  }
+			                case "receiver" =>
+			                  problemType match{
+			                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => broadcastReceiverTheft += 1
+			                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => broadcastReceiverInjection += 1
+			                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
+			                  }
+			                case "provider" =>
+			                  problemType match{
+			                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => contentProviderInfoLeak += 1
+			                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => contentProviderCapabilityLeak += 1
+			                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
+			                  }
+			              }
+			          }
 		      }
 	      }
 	  }

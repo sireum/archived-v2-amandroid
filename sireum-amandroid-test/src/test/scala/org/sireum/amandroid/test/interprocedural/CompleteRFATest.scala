@@ -15,15 +15,15 @@ class CompleteRFATest extends CompleteRFATestFramework {
   var i =0
 	AmandroidCodeSource.preLoad(AndroidLibPilarFiles.pilarInputStreams)
   InterproceduralExamples.testAPKRets.
-  filter { s => s.name.endsWith("LocationFlow2.apk") }.
+  filter { s => s.name.endsWith("lite.apk") }.
   foreach { resRet =>
     Analyzing title resRet.name file resRet
   }
-//  InterproceduralExamples.normalAPKFiles.
-//  filter { s => s.endsWith("android-1.apk") }.
-//  foreach { fileUri =>
+//  InterproceduralExamples.normalAPKRets.
+////  filter { s => s.name.endsWith("android-1.apk") }.
+//  foreach { resRet =>
 ////    if(i < 37) i += 1
-//    Analyzing title fileUri file fileUri
+//    Analyzing title resRet.name file resRet
 //  }
 //  InterproceduralExamples.maliciousAPKRets.
 ////  filter { s => s.name.endsWith("86add.apk")}.
@@ -31,11 +31,11 @@ class CompleteRFATest extends CompleteRFATestFramework {
 ////    if(i < 7) i += 1
 //    Analyzing title resRet.name file resRet
 //  }
-//  InterproceduralExamples.maliciousArborUrls.
-////  filter { s => s.getPath().endsWith("0a29be.apk")}.
-//  foreach { fileUri =>
+//  InterproceduralExamples.maliciousArborRets.
+//  filter { s => s.name.endsWith("77cebd.apk")}.
+//  foreach { resRet =>
 ////    if(i > 69) 
-//    Analyzing title fileUri file fileUri
+//    Analyzing title resRet.name file resRet
 ////    i+=1
 //  }
 //  InterproceduralExamples.benchAPKFiles.
