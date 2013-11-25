@@ -125,7 +125,7 @@ object FrameworkMethodsModel {
 			      }
 			      iDB.updateIntentFmap(intentF)
 			      val appinfo = AppCenter.getAppInfo
-			      if(!appinfo.hasDummyMain(comRec)){
+			      if(!appinfo.hasEnv(comRec)){
 			        appinfo.dynamicRegisterComponent(comRec, iDB, precise)
 			      }
 	      }

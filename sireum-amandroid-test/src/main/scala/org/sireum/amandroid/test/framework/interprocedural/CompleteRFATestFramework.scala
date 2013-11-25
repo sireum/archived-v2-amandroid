@@ -22,6 +22,7 @@ import java.util.zip.ZipInputStream
 import org.sireum.amandroid.util.ResourceRetriever
 import org.sireum.amandroid.android.AndroidGlobalConfig
 import org.sireum.amandroid.MessageCenter._
+import org.sireum.amandroid.android.AndroidConstants
 
 object Counter {
   var total = 0
@@ -83,11 +84,11 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	
 		    	val pre = new AppInfoCollector(srcRet)
 				  pre.collectInfo
-		    	val entryPoints = Center.getEntryPoints("dummyMain")
+		    	val entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 		    	entryPoints.foreach{
 		    	  ep =>
 		    	    msg_critical("--------------Component " + ep + "--------------")
-		    	    val initialfacts = AndroidRFAConfig.getInitialFactsForDummyMain(ep)
+		    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
 		    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, false)
 		    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
 		    	    msg_critical("processed-->" + icfg.getProcessed.size)

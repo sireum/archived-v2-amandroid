@@ -15,7 +15,7 @@ class CompleteRFATest extends CompleteRFATestFramework {
   var i =0
 	AmandroidCodeSource.preLoad(AndroidLibPilarFiles.pilarInputStreams)
   InterproceduralExamples.testAPKRets.
-  filter { s => s.name.endsWith("lite.apk") }.
+  filter { s => s.name.endsWith("LocationFlow2.apk") }.
   foreach { resRet =>
     Analyzing title resRet.name file resRet
   }

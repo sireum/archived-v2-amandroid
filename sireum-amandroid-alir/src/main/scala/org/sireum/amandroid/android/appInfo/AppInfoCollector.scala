@@ -13,7 +13,6 @@ import org.sireum.amandroid.android.parser.ManifestParser
 import org.sireum.amandroid.AmandroidRecord
 import org.sireum.amandroid.Center
 import org.sireum.amandroid.AmandroidProcedure
-import org.sireum.amandroid.pilarCodeGenerator.DummyMainGenerator
 import org.sireum.amandroid.android.parser.LayoutFileParser
 import scala.util.control.Breaks._
 import org.sireum.amandroid.pilarCodeGenerator.AndroidSubstituteRecordMap
@@ -24,6 +23,7 @@ import org.sireum.amandroid.android.interProcedural.taintAnalysis.SourceAndSinkC
 import org.sireum.amandroid.android.parser.ComponentInfo
 import java.io.InputStream
 import org.sireum.amandroid.util.ResourceRetriever
+import org.sireum.amandroid.pilarCodeGenerator.AndroidEnvironmentGenerator
 
 /**
  * adapted from Steven Arzt
@@ -39,14 +39,14 @@ class AppInfoCollector(apkRet : ResourceRetriever) {
 	private var intentFdb : IntentFilterDataBase = null
 	private var codeLineCounter : Int = 0
 	/**
-	 * Map from record name to it's dummyMain procedure code.
+	 * Map from record name to it's env procedure code.
 	 */
-	private var dummyMainMap : Map[AmandroidRecord, AmandroidProcedure] = Map()
+	private var envMap : Map[AmandroidRecord, AmandroidProcedure] = Map()
 	def getAppName = this.apkRet.name
 	def getUsesPermissions = this.uses_permissions
 	
-	def printDummyMains() =
-	  dummyMainMap.foreach{case(k, v) => println("dummyMain for " + k + "\n" + v)}
+	def printEnvs() =
+	  envMap.foreach{case(k, v) => println("Environment for " + k + "\n" + v)}
 	
 	def printEntrypoints() = {
 		if (this.componentInfos == null)
@@ -66,22 +66,22 @@ class AppInfoCollector(apkRet : ResourceRetriever) {
 	def getIntentDB = this.intentFdb
 	def getEntryPoints = this.componentInfos.map(_.name).toSet
 	def getComponentInfos = this.componentInfos
-	def getDummyMainMap = this.dummyMainMap
+	def getEnvMap = this.envMap
 	
-	def hasDummyMain(rec : AmandroidRecord) : Boolean = this.dummyMainMap.contains(rec)
+	def hasEnv(rec : AmandroidRecord) : Boolean = this.envMap.contains(rec)
 	
 
 	/**
-	 * generates dummyMain code for a component like Activity, BroadcastReceiver, etc.
+	 * generates env code for a component like Activity, BroadcastReceiver, etc.
 	 * @param recordName component name
-	 * @param codeCtr code line number of the last generated dummyMain
+	 * @param codeCtr code line number of the last generated env
 	 * @return codeCtr + newly generated number of lines
 	 */
-	def generateDummyMain(record : AmandroidRecord, codeCtr: Int) : Int = {
+	def generateEnvironment(record : AmandroidRecord, envName : String, codeCtr: Int) : Int = {
 	  if(record == null) return 0
-		//generate dummy main method
+		//generate env main method
   	msg_critical("Generate environment for " + record)
-	  val dmGen = new DummyMainGenerator
+	  val dmGen = new AndroidEnvironmentGenerator
 	  dmGen.setSubstituteRecordMap(AndroidSubstituteRecordMap.getSubstituteRecordMap)
 	  dmGen.setCurrentComponent(record.getName)
 	  dmGen.setCodeCounter(codeCtr)
@@ -94,8 +94,8 @@ class AppInfoCollector(apkRet : ResourceRetriever) {
 	      }
 	  }
 	  dmGen.setCallbackFunctions(callbackMethodSigs)
-    val proc = dmGen.generateWithParam(List(AndroidEntryPointConstants.INTENT_NAME))
-	  this.dummyMainMap += (record -> proc)
+    val proc = dmGen.generateWithParam(List(AndroidEntryPointConstants.INTENT_NAME), envName)
+	  this.envMap += (record -> proc)
 	  dmGen.getCodeCounter
 	}
 	
@@ -111,7 +111,7 @@ class AppInfoCollector(apkRet : ResourceRetriever) {
   			this.callbackMethods += (k -> (this.callbackMethods.getOrElse(k, isetEmpty) ++ v))
 		}
 	  msg_normal("Found " + this.callbackMethods.size + " callback methods")
-    val clCounter = generateDummyMain(comRec, codeLineCounter)
+    val clCounter = generateEnvironment(comRec, AndroidConstants.COMP_ENV, codeLineCounter)
     codeLineCounter = clCounter
     AppCenter.addComponent(comRec)
     AppCenter.addDynamicRegisteredComponent(comRec, precise)
@@ -201,7 +201,7 @@ class AppInfoCollector(apkRet : ResourceRetriever) {
         val record = Center.resolveRecord(f.name, Center.ResolveLevel.BODIES)
         if(!record.isPhantom){
 	        components += record
-	        val clCounter = generateDummyMain(record, codeLineCounter)
+	        val clCounter = generateEnvironment(record, if(f.exported)AndroidConstants.MAINCOMP_ENV else AndroidConstants.COMP_ENV, codeLineCounter)
 	        codeLineCounter = clCounter
         }
     }

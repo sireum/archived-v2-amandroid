@@ -46,10 +46,13 @@ object InterComponentCommunicationModel {
 	    case (_, coms) =>
 	      coms.foreach{
 	        case (com, _) =>
-	          com.tryGetProcedure(AndroidConstants.DUMMY_MAIN) match{
-              case Some(r) => 
-                targets += r
-              case None => err_msg_critical("Target component " + com + " does not have dummymain.")
+	          com.tryGetProcedure(AndroidConstants.MAINCOMP_ENV_SUBSIG) match{
+              case Some(r) => targets += r
+              case None => 
+                com.tryGetProcedure(AndroidConstants.COMP_ENV_SUBSIG) match{
+                  case Some(r) => targets += r
+                  case None => err_msg_critical("Target component " + com + " does not have environment.")
+                }
             }
 	      }
 	  }

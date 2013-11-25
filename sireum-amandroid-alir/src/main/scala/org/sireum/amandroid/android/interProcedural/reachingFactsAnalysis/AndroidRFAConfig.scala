@@ -34,8 +34,8 @@ object AndroidRFAConfig {
    * generates and returns the initial facts corresponding to the "Intent" parameter of a dummyMain 
    * the generated fact says that the param Intent is generated at the Center.
    */
-	def getInitialFactsForDummyMain(dm : AmandroidProcedure) : ISet[RFAFact] = {
-	  require(dm.getShortName == "dummyMain")
+	def getInitialFactsForMainEnvironment(dm : AmandroidProcedure) : ISet[RFAFact] = {
+	  require(dm.getShortName == AndroidConstants.MAINCOMP_ENV)
 	  var result = isetEmpty[RFAFact]
 	  val intentSlot = VarSlot(dm.getParamName(0))
 	  val context : Context = new Context(GlobalConfig.CG_CONTEXT_K)

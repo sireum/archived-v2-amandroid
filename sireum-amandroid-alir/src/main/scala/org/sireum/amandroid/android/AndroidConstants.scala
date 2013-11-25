@@ -4,6 +4,12 @@ package org.sireum.amandroid.android
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 object AndroidConstants {
+  
+  final val MAINCOMP_ENV = "envMain"
+  final val COMP_ENV = "env"
+  final val MAINCOMP_ENV_SUBSIG = "envMain:(Landroid/content/Intent;)V"
+  final val COMP_ENV_SUBSIG = "env:(Landroid/content/Intent;)V"
+  
   //following is standard intent actions
 	final val ACTION_MAIN = "android.intent.action.MAIN"
 	final val ACTION_MANAGE_NETWORK_USAGE = "android.intent.action.MANAGE_NETWORK_USAGE"
@@ -11,6 +17,7 @@ object AndroidConstants {
 	//following is standard intent categories
 	final val CATEGORY_LAUNCHER = "android.intent.category.LAUNCHER"
 	  
+	//following are android ICC calls
 	final val START_SERVICE = "startService:(Landroid/content/Intent;)Landroid/content/ComponentName;"
 	final val START_ACTIVITY = "startActivity:(Landroid/content/Intent;)V"
 	final val START_ACTIVITY_BUND = "startActivity:(Landroid/content/Intent;Landroid/os/Bundle;)V"
@@ -56,7 +63,6 @@ object AndroidConstants {
 	final val VIEW_FINDVIEWBYID = "[|Landroid/view/View;.findViewById:(I)Landroid/view/View;|]"
 	  
 	final val SETCONTENTVIEW = "setContentView:(I)V"
-	final val DUMMY_MAIN = "dummyMain:(Landroid/content/Intent;)V"
 	final val ACTIVITY = "[|android:app:Activity|]"
 	final val ACTIVITY_INTENT = "[|android:app:Activity.mIntent|]"
 	  
