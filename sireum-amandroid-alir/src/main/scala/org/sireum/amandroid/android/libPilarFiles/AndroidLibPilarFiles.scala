@@ -18,10 +18,10 @@ object AndroidLibPilarFiles{
   def pilarModelFiles = listFiles(PILAR_MODEL_DIR_URI, ANDROID_PILAR_FILE_EXT)
   
   protected def getFileInputStreams(ext : String) = {
-    val fileNames = MyFileUtil.getResourceListing(this.getClass(), "../resources/libPilarFiles/", ext)
+    val fileNames = MyFileUtil.getResourceListing(this.getClass(), "../resources/AndroidLib/4.1/", ext)
     fileNames.map(
       name =>
-    		this.getClass().getResourceAsStream("../resources/libPilarFiles/" + name)
+    		this.getClass().getResourceAsStream("../resources/AndroidLib/4.1/" + name)
     )
   }
   
