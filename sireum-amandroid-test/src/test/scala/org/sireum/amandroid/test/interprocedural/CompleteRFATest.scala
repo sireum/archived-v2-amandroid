@@ -3,7 +3,7 @@ package org.sireum.amandroid.test.interprocedural
 import org.sireum.amandroid.test.framework.interprocedural.CompleteRFATestFramework
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.sireum.amandroid.AmandroidCodeSource
+import org.sireum.jawa.JawaCodeSource
 import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
 import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
 
@@ -13,7 +13,7 @@ import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
 @RunWith(classOf[JUnitRunner])
 class CompleteRFATest extends CompleteRFATestFramework {
   var i =0
-	AmandroidCodeSource.preLoad(AndroidLibPilarFiles.pilarInputStreams)
+	JawaCodeSource.preLoad(AndroidLibPilarFiles.pilarInputStreams)
   InterproceduralExamples.testAPKRets.
   filter { s => s.name.endsWith("LocationFlow2.apk") }.
   foreach { resRet =>

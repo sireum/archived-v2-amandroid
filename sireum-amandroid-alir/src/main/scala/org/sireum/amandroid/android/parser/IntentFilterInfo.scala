@@ -1,7 +1,7 @@
 package org.sireum.amandroid.android.parser
 
-import org.sireum.amandroid.AmandroidRecord
-import org.sireum.amandroid.Center
+import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.Center
 
 class IntentFilterDataBase {
   /**
@@ -21,12 +21,12 @@ class IntentFilterDataBase {
         }
     }
   }
-  def containsRecord(r : AmandroidRecord) : Boolean = containsRecord(r.getName)
+  def containsRecord(r : JawaRecord) : Boolean = containsRecord(r.getName)
   def containsRecord(name : String) : Boolean = this.intentFmap.contains(name)
   def getIntentFmap() = intentFmap
-  def getIntentFilters(r : AmandroidRecord) : Set[IntentFilter] = getIntentFilters(r.getName)
+  def getIntentFilters(r : JawaRecord) : Set[IntentFilter] = getIntentFilters(r.getName)
   def getIntentFilters(name : String) : Set[IntentFilter] = this.intentFmap.getOrElse(name, Set())
-  def getIntentFiltersActions(r : AmandroidRecord) : Set[String] = {
+  def getIntentFiltersActions(r : JawaRecord) : Set[String] = {
     val intentFilterS: Set[IntentFilter] = getIntentFilters(r)
     var actions:Set[String] = null
     if(intentFilterS != null){     

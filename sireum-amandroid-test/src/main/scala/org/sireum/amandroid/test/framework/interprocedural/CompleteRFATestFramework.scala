@@ -3,26 +3,29 @@ package org.sireum.amandroid.test.framework.interprocedural
 import org.sireum.amandroid.test.framework.TestFramework
 import org.sireum.util._
 import org.sireum.amandroid._
-import org.sireum.amandroid.pilar.parser.LightWeightPilarParser
-import org.sireum.amandroid.util.APKFileResolver
-import org.sireum.amandroid.util.Dex2PilarConverter
+import org.sireum.jawa.pilarParser.LightWeightPilarParser
+import org.sireum.jawa.util.APKFileResolver
+import org.sireum.jawa.util.Dex2PilarConverter
 import org.sireum.amandroid.android.appInfo.AppInfoCollector
 import java.io._
-import org.sireum.amandroid.android.interProcedural.reachingFactsAnalysis._
-import org.sireum.amandroid.android.interProcedural.taintAnalysis.AndroidTaintAnalysis
-import org.sireum.amandroid.android.interProcedural.taintAnalysis.SourceAndSinkCenter
-import org.sireum.amandroid.util.StringFormConverter
-import org.sireum.amandroid.interProcedural.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
-import org.sireum.amandroid.android.interProcedural.taintAnalysis.AndroidDataDependentTaintAnalysis
+import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis._
+import org.sireum.amandroid.alir.interProcedural.taintAnalysis.AndroidTaintAnalysis
+import org.sireum.amandroid.alir.interProcedural.taintAnalysis.SourceAndSinkCenter
+import org.sireum.jawa.util.StringFormConverter
+import org.sireum.jawa.alir.interProcedural.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
+import org.sireum.amandroid.alir.interProcedural.taintAnalysis.AndroidDataDependentTaintAnalysis
 import java.net.URI
-import org.sireum.amandroid.android.AppCenter
-import org.sireum.amandroid.android.dataRecorder.DataCollector
-import org.sireum.amandroid.android.dataRecorder.MetricRepo
+import org.sireum.amandroid.alir.AppCenter
+import org.sireum.amandroid.alir.dataRecorder.DataCollector
+import org.sireum.amandroid.alir.dataRecorder.MetricRepo
 import java.util.zip.ZipInputStream
-import org.sireum.amandroid.util.ResourceRetriever
-import org.sireum.amandroid.android.AndroidGlobalConfig
-import org.sireum.amandroid.MessageCenter._
-import org.sireum.amandroid.android.AndroidConstants
+import org.sireum.jawa.util.ResourceRetriever
+import org.sireum.amandroid.alir.AndroidGlobalConfig
+import org.sireum.jawa.MessageCenter._
+import org.sireum.amandroid.alir.AndroidConstants
+import org.sireum.jawa.JawaCodeSource
+import org.sireum.jawa.Center
+import org.sireum.jawa.ClassLoadManager
 
 object Counter {
   var total = 0
@@ -54,11 +57,11 @@ trait CompleteRFATestFramework extends TestFramework {
     	msg_critical("####" + title + "#####")
     	Counter.total += 1
     	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
-    	AndroidGlobalConfig.initTransform
+    	AndroidGlobalConfig.initJawaAlirInfoProvider
     	Center.reset
     	AppCenter.reset
     	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
-    	AmandroidCodeSource.clearAppRecordsCodes
+    	JawaCodeSource.clearAppRecordsCodes
     	ClassLoadManager.reset
     	
     	// now get the dex file from the source apk file 
@@ -73,11 +76,11 @@ trait CompleteRFATestFramework extends TestFramework {
     	if(pilarFile.length() <= (10 * 1024 * 1024)){
     		AndroidRFAConfig.setupCenter
 	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
-	    	LightWeightPilarParser(Right(new FileInputStream(new File(new URI(pilarFileUri)))), AmandroidCodeSource.CodeType.APP)
+	    	LightWeightPilarParser(Right(new FileInputStream(new File(new URI(pilarFileUri)))), JawaCodeSource.CodeType.APP)
 	    	
 	    	try{
 		    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
-		    	AmandroidCodeSource.getAppRecordsCodes.keys foreach{
+		    	JawaCodeSource.getAppRecordsCodes.keys foreach{
 		    	  k =>
 		    	    Center.resolveRecord(k, Center.ResolveLevel.BODIES)
 		    	}

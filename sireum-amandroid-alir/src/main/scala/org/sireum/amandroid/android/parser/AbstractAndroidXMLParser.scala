@@ -6,7 +6,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.io.InputStream
 import java.util.zip.ZipInputStream
-import org.sireum.amandroid.util.ResourceRetriever
+import org.sireum.jawa.util.ResourceRetriever
 
 /**
  * Common base class for all resource parser classes

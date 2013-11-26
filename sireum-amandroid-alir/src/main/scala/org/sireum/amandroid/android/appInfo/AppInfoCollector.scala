@@ -1,29 +1,29 @@
 package org.sireum.amandroid.android.appInfo
 
 import org.sireum.util._
-import org.sireum.amandroid.android.AndroidConstants
+import org.sireum.amandroid.alir.AndroidConstants
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.alir.ControlFlowGraph
 import org.sireum.amandroid.android.parser.LayoutControl
 import org.sireum.amandroid.android.parser.ARSCFileParser
 import org.sireum.amandroid.android.parser.IntentFilterDataBase
 import org.sireum.alir.ReachingDefinitionAnalysis
-import org.sireum.amandroid.pilarCodeGenerator.AndroidEntryPointConstants
 import org.sireum.amandroid.android.parser.ManifestParser
-import org.sireum.amandroid.AmandroidRecord
-import org.sireum.amandroid.Center
-import org.sireum.amandroid.AmandroidProcedure
+import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.Center
+import org.sireum.jawa.JawaProcedure
 import org.sireum.amandroid.android.parser.LayoutFileParser
 import scala.util.control.Breaks._
-import org.sireum.amandroid.pilarCodeGenerator.AndroidSubstituteRecordMap
-import org.sireum.amandroid.android.AppCenter
-import org.sireum.amandroid.GlobalConfig
-import org.sireum.amandroid.MessageCenter._
-import org.sireum.amandroid.android.interProcedural.taintAnalysis.SourceAndSinkCenter
+import org.sireum.amandroid.alir.AppCenter
+import org.sireum.jawa.GlobalConfig
+import org.sireum.jawa.MessageCenter._
+import org.sireum.amandroid.alir.interProcedural.taintAnalysis.SourceAndSinkCenter
 import org.sireum.amandroid.android.parser.ComponentInfo
 import java.io.InputStream
-import org.sireum.amandroid.util.ResourceRetriever
-import org.sireum.amandroid.pilarCodeGenerator.AndroidEnvironmentGenerator
+import org.sireum.jawa.util.ResourceRetriever
+import org.sireum.amandroid.android.pilarCodeGenerator.AndroidEnvironmentGenerator
+import org.sireum.amandroid.android.pilarCodeGenerator.AndroidSubstituteRecordMap
+import org.sireum.amandroid.android.pilarCodeGenerator.AndroidEntryPointConstants
 
 /**
  * adapted from Steven Arzt
@@ -31,7 +31,7 @@ import org.sireum.amandroid.pilarCodeGenerator.AndroidEnvironmentGenerator
  */
 class AppInfoCollector(apkRet : ResourceRetriever) {  
   private var uses_permissions : ISet[String] = isetEmpty
-	private var callbackMethods : Map[AmandroidRecord, Set[AmandroidProcedure]] = Map()
+	private var callbackMethods : Map[JawaRecord, Set[JawaProcedure]] = Map()
 	private var componentInfos : Set[ComponentInfo] = null
 	private var layoutControls : Map[Int, LayoutControl] = Map()
 	private var appPackageName : String = ""
@@ -41,7 +41,7 @@ class AppInfoCollector(apkRet : ResourceRetriever) {
 	/**
 	 * Map from record name to it's env procedure code.
 	 */
-	private var envMap : Map[AmandroidRecord, AmandroidProcedure] = Map()
+	private var envMap : Map[JawaRecord, JawaProcedure] = Map()
 	def getAppName = this.apkRet.name
 	def getUsesPermissions = this.uses_permissions
 	
@@ -68,7 +68,7 @@ class AppInfoCollector(apkRet : ResourceRetriever) {
 	def getComponentInfos = this.componentInfos
 	def getEnvMap = this.envMap
 	
-	def hasEnv(rec : AmandroidRecord) : Boolean = this.envMap.contains(rec)
+	def hasEnv(rec : JawaRecord) : Boolean = this.envMap.contains(rec)
 	
 
 	/**
@@ -77,7 +77,7 @@ class AppInfoCollector(apkRet : ResourceRetriever) {
 	 * @param codeCtr code line number of the last generated env
 	 * @return codeCtr + newly generated number of lines
 	 */
-	def generateEnvironment(record : AmandroidRecord, envName : String, codeCtr: Int) : Int = {
+	def generateEnvironment(record : JawaRecord, envName : String, codeCtr: Int) : Int = {
 	  if(record == null) return 0
 		//generate env main method
   	msg_critical("Generate environment for " + record)
@@ -99,7 +99,7 @@ class AppInfoCollector(apkRet : ResourceRetriever) {
 	  dmGen.getCodeCounter
 	}
 	
-	def dynamicRegisterComponent(comRec : AmandroidRecord, iDB : IntentFilterDataBase, precise : Boolean) = {
+	def dynamicRegisterComponent(comRec : JawaRecord, iDB : IntentFilterDataBase, precise : Boolean) = {
 	  msg_critical("*************Dynamic Register Component**************")
 	  msg_normal("Component name: " + comRec)
 	  this.intentFdb.updateIntentFmap(iDB)
@@ -169,7 +169,7 @@ class AppInfoCollector(apkRet : ResourceRetriever) {
 		                
 		                //The callback may be declared directly in the class or in one of the superclasses
 		                var callbackRecord = k
-		                var callbackProcedure : AmandroidProcedure = null
+		                var callbackProcedure : JawaProcedure = null
 		                breakable{ 
 		                  while(callbackProcedure == null){
 			                  if(callbackRecord.declaresProcedureByShortName(methodName))
@@ -192,10 +192,10 @@ class AppInfoCollector(apkRet : ResourceRetriever) {
 		        }
 		    }
 		}
-		val callbacks = if(!this.callbackMethods.isEmpty)this.callbackMethods.map(_._2).reduce(iunion[AmandroidProcedure]) else isetEmpty[AmandroidProcedure]
+		val callbacks = if(!this.callbackMethods.isEmpty)this.callbackMethods.map(_._2).reduce(iunion[JawaProcedure]) else isetEmpty[JawaProcedure]
 		msg_normal("Found " + callbacks.size + " callback methods")
 		msg_detail("Which are: " + this.callbackMethods)
-    var components = isetEmpty[AmandroidRecord]
+    var components = isetEmpty[JawaRecord]
     this.componentInfos.foreach{
       f => 
         val record = Center.resolveRecord(f.name, Center.ResolveLevel.BODIES)

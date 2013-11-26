@@ -3,8 +3,8 @@ package org.sireum.amandroid.android.parser
 import java.io.InputStream
 import java.io.IOException
 import org.sireum.util._
-import org.sireum.amandroid.util.ResourceRetriever
-import org.sireum.amandroid.MessageCenter._
+import org.sireum.jawa.util.ResourceRetriever
+import org.sireum.jawa.MessageCenter._
 
 /**
  * Parser for reading out the contents of Android's resource.arsc file.

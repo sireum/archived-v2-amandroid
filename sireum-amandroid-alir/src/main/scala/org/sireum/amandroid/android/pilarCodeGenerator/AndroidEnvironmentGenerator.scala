@@ -4,17 +4,17 @@ import org.sireum.util._
 import org.stringtemplate.v4.STGroupFile
 import org.stringtemplate.v4.ST
 import java.util.ArrayList
-import org.sireum.amandroid.util.SignatureParser
+import org.sireum.jawa.util.SignatureParser
 import java.util.Arrays
-import org.sireum.amandroid.AmandroidRecord
-import org.sireum.amandroid.AmandroidProcedure
-import org.sireum.amandroid.util.StringFormConverter
-import org.sireum.amandroid.Center
-import org.sireum.amandroid.AmandroidResolver
-import org.sireum.amandroid.util.SignatureParser
-import org.sireum.amandroid.MessageCenter._
-import org.sireum.amandroid.NormalType
-import org.sireum.amandroid.pilarCodeGenerator.VariableGenerator
+import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.util.StringFormConverter
+import org.sireum.jawa.Center
+import org.sireum.jawa.JawaResolver
+import org.sireum.jawa.util.SignatureParser
+import org.sireum.jawa.MessageCenter._
+import org.sireum.jawa.NormalType
+import org.sireum.jawa.pilarCodeGenerator.VariableGenerator
 
 class AndroidEnvironmentGenerator {
   private var currentComponent : String = null
@@ -25,7 +25,7 @@ class AndroidEnvironmentGenerator {
   private var callbackFunctions : Map[String, Set[String]] = Map()
   private var conditionCounter : Int = 0
   private var codeCounter : Int = 0
-  private val template = new STGroupFile("org/sireum/amandroid/resources/pilarCodeGenerator/PilarCode.stg")
+  private val template = new STGroupFile("org/sireum/jawa/alir/resources/pilarCodeGenerator/PilarCode.stg")
   private val procDeclTemplate = template.getInstanceOf("ProcedureDecl")
   private val localVarsTemplate = template.getInstanceOf("LocalVars")
   private val bodyTemplate = template.getInstanceOf("Body")
@@ -46,7 +46,7 @@ class AndroidEnvironmentGenerator {
   /**
    * Set of param's record name
    */
-  private var paramRecords : Set[AmandroidRecord] = Set()
+  private var paramRecords : Set[JawaRecord] = Set()
 
   /**
    * set the substituteRecordMap
@@ -88,14 +88,14 @@ class AndroidEnvironmentGenerator {
 		this.callbackFunctions = callbackFunctions
 	}
   
-	def generate(name : String) : AmandroidProcedure = {
+	def generate(name : String) : JawaProcedure = {
 	  generate(List(), name)
 	}
   
 	/**
 	 * generate environment with predefined methods list
 	 */
-  def generate(methods : List[String], name : String) : AmandroidProcedure = {
+  def generate(methods : List[String], name : String) : JawaProcedure = {
     val recordName = this.currentComponent
     val procedureName = recordName.substring(0, recordName.length() - 2) + "." + name + "|]"
 	  val annotations = new ArrayList[ST]
@@ -103,10 +103,10 @@ class AndroidEnvironmentGenerator {
 	  initProcedureHead("[|void|]", procedureName, recordName, signature, "STATIC")
 	  val code = generateInternal(List())
     msg_normal("environment code:\n" + code)
-    AmandroidResolver.resolveProcedureCode(signature, code)
+    JawaResolver.resolveProcedureCode(signature, code)
   }
   
-  def generateWithParam(params : List[String], name : String) : AmandroidProcedure = {
+  def generateWithParam(params : List[String], name : String) : JawaProcedure = {
     val recordName = this.currentComponent
     val procedureName = recordName.substring(0, recordName.length() - 2) + "." + name + "|]"
 	  val annotations = new ArrayList[ST]
@@ -130,7 +130,7 @@ class AndroidEnvironmentGenerator {
     procDeclTemplate.add("params", paramArray)
     val code = generateInternal(List())
     msg_critical("environment code:\n" + code)
-    AmandroidResolver.resolveProcedureCode(signature, code)
+    JawaResolver.resolveProcedureCode(signature, code)
   }
   
   private def generateParamAnnotation(flag : String, params : List[String]) : ST = {
@@ -199,7 +199,7 @@ class AndroidEnvironmentGenerator {
 	        if(!activity && !service && !broadcastReceiver && !contentProvider) plain = true
 	        var instanceNeeded = activity || service || broadcastReceiver || contentProvider
 	        //How this part work? item._2 always empty!
-	        var plainMethods: Map[String, AmandroidProcedure] = Map()
+	        var plainMethods: Map[String, JawaProcedure] = Map()
 	        if(!instanceNeeded || plain){
 	          item._2.foreach{
 	            procSig =>
@@ -294,7 +294,7 @@ class AndroidEnvironmentGenerator {
 	}
 
 	
-	def generateRecordConstructor(r : AmandroidRecord, constructionStack : MSet[AmandroidRecord], codefg : CodeFragmentGenerator) : String = {
+	def generateRecordConstructor(r : JawaRecord, constructionStack : MSet[JawaRecord], codefg : CodeFragmentGenerator) : String = {
 	  constructionStack.add(r)
 	  val ps = r.getProcedures
 	  var cons : String = null
@@ -312,7 +312,7 @@ class AndroidEnvironmentGenerator {
 	}
 	
 	
-	private def generateProcedureCall(pSig : String, typ : String, localClassVar : String, constructionStack : MSet[AmandroidRecord], codefg : CodeFragmentGenerator) : Unit = {
+	private def generateProcedureCall(pSig : String, typ : String, localClassVar : String, constructionStack : MSet[JawaRecord], codefg : CodeFragmentGenerator) : Unit = {
 	  val sigParser = new SignatureParser(pSig).getParamSig
     val paramNum = sigParser.getParameterNum
     val params = sigParser.getObjectParameters
@@ -364,7 +364,7 @@ class AndroidEnvironmentGenerator {
 	 * the order of the custom statements, we assume that it can loop arbitrarily.
 	 * 
 	 */
-	private def plainRecordGenerator(plainMethods: Map[String, AmandroidProcedure], endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
+	private def plainRecordGenerator(plainMethods: Map[String, JawaProcedure], endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
 	  val beforeClassFragment = new CodeFragmentGenerator
 	  beforeClassFragment.addLabel
 	  codeFragments.add(beforeClassFragment)
@@ -402,8 +402,8 @@ class AndroidEnvironmentGenerator {
 	 * @param classLocalVar Current record's local variable
 	 * @param codefg Current code fragment
 	 */
-	private def asyncTaskLifeCycleGenerator(entryPoints : MList[ResourceUri], record : AmandroidRecord, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
-	  val constructionStack : MSet[AmandroidRecord] = msetEmpty ++ this.paramRecords
+	private def asyncTaskLifeCycleGenerator(entryPoints : MList[ResourceUri], record : JawaRecord, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
+	  val constructionStack : MSet[JawaRecord] = msetEmpty ++ this.paramRecords
 		createIfStmt(endClassFragment, codefg)
 	}
 	
@@ -415,8 +415,8 @@ class AndroidEnvironmentGenerator {
 	 * @param classLocalVar Current record's local variable
 	 * @param codefg Current code fragment
 	 */
-	private def contentProviderLifeCycleGenerator(entryPoints : MList[ResourceUri], record : AmandroidRecord, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
-	  val constructionStack : MSet[AmandroidRecord] = msetEmpty ++ this.paramRecords
+	private def contentProviderLifeCycleGenerator(entryPoints : MList[ResourceUri], record : JawaRecord, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
+	  val constructionStack : MSet[JawaRecord] = msetEmpty ++ this.paramRecords
 		createIfStmt(endClassFragment, codefg)
 		
 		// 1. onCreate:
@@ -438,8 +438,8 @@ class AndroidEnvironmentGenerator {
 	 * @param classLocalVar Current record's local variable
 	 * @param codefg Current code fragment
 	 */
-	private def broadcastReceiverLifeCycleGenerator(entryPoints : MList[ResourceUri], record : AmandroidRecord, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
-	  val constructionStack : MSet[AmandroidRecord] = msetEmpty ++ this.paramRecords
+	private def broadcastReceiverLifeCycleGenerator(entryPoints : MList[ResourceUri], record : JawaRecord, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
+	  val constructionStack : MSet[JawaRecord] = msetEmpty ++ this.paramRecords
 		createIfStmt(endClassFragment, codefg)
 		
 		// 1. onReceive:
@@ -461,8 +461,8 @@ class AndroidEnvironmentGenerator {
 	 * @param classLocalVar Current record's local variable
 	 * @param codefg Current code fragment
 	 */
-	private def serviceLifeCycleGenerator(entryPoints : MList[ResourceUri], record : AmandroidRecord, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
-	  val constructionStack : MSet[AmandroidRecord] = msetEmpty ++ this.paramRecords
+	private def serviceLifeCycleGenerator(entryPoints : MList[ResourceUri], record : JawaRecord, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
+	  val constructionStack : MSet[JawaRecord] = msetEmpty ++ this.paramRecords
 		createIfStmt(endClassFragment, codefg)
 		
 	  val r = Center.resolveRecord("[|android:app:ContextImpl|]", Center.ResolveLevel.BODIES)
@@ -528,8 +528,8 @@ class AndroidEnvironmentGenerator {
 	 * @param classLocalVar Current record's local variable
 	 * @param codefg Current code fragment
 	 */
-	private def activityLifeCycleGenerator(entryPoints : MList[ResourceUri], record : AmandroidRecord, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
-	  val constructionStack : MSet[AmandroidRecord] = msetEmpty ++ this.paramRecords
+	private def activityLifeCycleGenerator(entryPoints : MList[ResourceUri], record : JawaRecord, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
+	  val constructionStack : MSet[JawaRecord] = msetEmpty ++ this.paramRecords
 	  createIfStmt(endClassFragment, codefg)
 	  val r = Center.resolveRecord("[|android:app:ContextImpl|]", Center.ResolveLevel.BODIES)
 	  val va = generateInstanceCreation(r.getName, codefg)
@@ -600,7 +600,7 @@ class AndroidEnvironmentGenerator {
 	  createIfStmt(endClassFragment, onDestoryFragment)
 	}
 	
-	private def generateAllCallbacks(entryPoints : MList[String], record : AmandroidRecord, classLocalVar : String) : CodeFragmentGenerator = {
+	private def generateAllCallbacks(entryPoints : MList[String], record : JawaRecord, classLocalVar : String) : CodeFragmentGenerator = {
 	  val startWhileFragment = new CodeFragmentGenerator
 	  startWhileFragment.addLabel
 	  codeFragments.add(startWhileFragment)
@@ -633,7 +633,7 @@ class AndroidEnvironmentGenerator {
 	  endWhileFragment
 	}
 	
-	private def generateCallToAllCallbacks(callbackRecord : AmandroidRecord, callbackProcedures : Set[AmandroidProcedure], classLocalVar : String, codefg : CodeFragmentGenerator) = {
+	private def generateCallToAllCallbacks(callbackRecord : JawaRecord, callbackProcedures : Set[JawaProcedure], classLocalVar : String, codefg : CodeFragmentGenerator) = {
 	  var oneCallBackFragment = codefg
 	  callbackProcedures.foreach{
 	    callbackProcedure =>
@@ -653,7 +653,7 @@ class AndroidEnvironmentGenerator {
 	  }
 	}
 	
-	private def searchAndBuildProcedureCall(subsignature : String, record : AmandroidRecord, entryPoints : MList[String], constructionStack : MSet[AmandroidRecord], codefg : CodeFragmentGenerator) = {
+	private def searchAndBuildProcedureCall(subsignature : String, record : JawaRecord, entryPoints : MList[String], constructionStack : MSet[JawaRecord], codefg : CodeFragmentGenerator) = {
 	  val apopt = findProcedure(record, subsignature)
 	  apopt match{
 	    case Some(ap) =>
@@ -671,9 +671,9 @@ class AndroidEnvironmentGenerator {
 	 * @param rUri Current record resource uri which under process
 	 * @param classLocalVar The local variable fro current record
 	 */
-	private def addCallbackProcedures(record : AmandroidRecord, parentClassLocalVar : String, codefg : CodeFragmentGenerator) : Unit = {
+	private def addCallbackProcedures(record : JawaRecord, parentClassLocalVar : String, codefg : CodeFragmentGenerator) : Unit = {
 	  if(!this.callbackFunctions.contains(record.getName)) return
-	  var callbackRecords : Map[AmandroidRecord, ISet[AmandroidProcedure]] = Map()
+	  var callbackRecords : Map[JawaRecord, ISet[JawaProcedure]] = Map()
     this.callbackFunctions(record.getName).map{
 	    case (pSig) => 
 	      val theRecord = Center.resolveRecord(StringFormConverter.getRecordNameFromProcedureSignature(pSig), Center.ResolveLevel.BODIES)
@@ -710,8 +710,8 @@ class AndroidEnvironmentGenerator {
 		}
 	}
 	
-	private def isCompatible(actual : AmandroidRecord, expected : AmandroidRecord) : Boolean = {
-	  var act : AmandroidRecord = actual
+	private def isCompatible(actual : JawaRecord, expected : JawaRecord) : Boolean = {
+	  var act : JawaRecord = actual
 	  while(act != null){
 	    if(act.getName.equals(expected.getName))
 	      return true
@@ -792,7 +792,7 @@ class AndroidEnvironmentGenerator {
 	  }
 	}
 	
-	protected def findProcedure(currentRecord : AmandroidRecord, subSig : String) : Option[AmandroidProcedure] = {
+	protected def findProcedure(currentRecord : JawaRecord, subSig : String) : Option[JawaProcedure] = {
 	  if(currentRecord.declaresProcedure(subSig)) Some(currentRecord.getProcedure(subSig))
 	  else if(currentRecord.hasSuperClass) findProcedure(currentRecord.getSuperClass, subSig)
 	  else None

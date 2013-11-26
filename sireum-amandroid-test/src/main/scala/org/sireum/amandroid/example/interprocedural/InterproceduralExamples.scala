@@ -1,8 +1,8 @@
 package org.sireum.amandroid.example.interprocedural
 
 import org.sireum.amandroid.example.Examples
-import org.sireum.amandroid.util.MyFileUtil
-import org.sireum.amandroid.util.ResourceRetriever
+import org.sireum.jawa.util.MyFileUtil
+import org.sireum.jawa.util.ResourceRetriever
 
 
 

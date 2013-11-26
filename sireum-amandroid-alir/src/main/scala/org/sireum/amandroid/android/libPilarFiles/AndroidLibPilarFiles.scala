@@ -1,7 +1,7 @@
 package org.sireum.amandroid.android.libPilarFiles
 
 import org.sireum.util._
-import org.sireum.amandroid.util.MyFileUtil
+import org.sireum.jawa.util.MyFileUtil
 
 object AndroidLibPilarFiles{
   protected def sourceDirUri(claz : Class[_], path : String) = { 

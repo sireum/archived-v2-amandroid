@@ -4,8 +4,8 @@ import org.sireum.util._
 import java.io._
 import java.util.zip.GZIPOutputStream
 import java.util.zip.GZIPInputStream
-import org.sireum.amandroid.util.CacheProvider
-import org.sireum.amandroid.util.FileCaseFactory
+import org.sireum.jawa.util.CacheProvider
+import org.sireum.jawa.util.FileCaseFactory
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

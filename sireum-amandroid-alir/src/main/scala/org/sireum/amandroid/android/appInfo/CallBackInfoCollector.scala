@@ -8,19 +8,19 @@ import org.sireum.pilar.ast.ActionLocation
 import org.sireum.pilar.ast.AssignAction
 import org.sireum.pilar.ast.LiteralExp
 import org.sireum.pilar.ast.LiteralType
-import org.sireum.amandroid.android.AndroidConstants
-import org.sireum.amandroid.pilarCodeGenerator.AndroidEntryPointConstants
-import org.sireum.amandroid.AmandroidRecord
-import org.sireum.amandroid.AmandroidProcedure
-import org.sireum.amandroid.Center
-import org.sireum.amandroid.interProcedural.controlFlowGraph._
+import org.sireum.amandroid.alir.AndroidConstants
+import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.Center
+import org.sireum.jawa.alir.interProcedural.controlFlowGraph._
 import org.sireum.pilar.ast.CallJump
 import org.sireum.pilar.ast.JumpLocation
 import org.sireum.pilar.ast.TupleExp
 import org.sireum.pilar.ast.NameExp
-import org.sireum.amandroid.MessageCenter._
-import org.sireum.amandroid.util.StringFormConverter
-import org.sireum.amandroid.util.ExplicitValueFinder
+import org.sireum.jawa.MessageCenter._
+import org.sireum.jawa.util.StringFormConverter
+import org.sireum.jawa.alir.util.ExplicitValueFinder
+import org.sireum.amandroid.android.pilarCodeGenerator.AndroidEntryPointConstants
 
 
 /**
@@ -32,8 +32,8 @@ import org.sireum.amandroid.util.ExplicitValueFinder
  */
 class CallBackInfoCollector(entryPointClasses:Set[String]) {
     
-	private final var callbackMethods : Map[AmandroidRecord, Set[AmandroidProcedure]] = Map()
-	private final var layoutClasses: Map[AmandroidRecord, Set[Int]] = Map()
+	private final var callbackMethods : Map[JawaRecord, Set[JawaProcedure]] = Map()
+	private final var layoutClasses: Map[JawaRecord, Set[Int]] = Map()
 	
 	def getCallbackMethods() = this.callbackMethods
 	def getLayoutClasses() = this.layoutClasses
@@ -48,7 +48,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	  
 	  for (compName <- entryPointClasses) {
 	    val comp = Center.resolveRecord(compName, Center.ResolveLevel.BODIES)
-	    val methods : Set[AmandroidProcedure] = comp.getProcedures
+	    val methods : Set[JawaProcedure] = comp.getProcedures
 	    
 	    val reachableMethods = new InterproceduralControlFlowGraphBuilder().getReachableProcedures(methods, false)
 	    val containerClasses = reachableMethods.map(item => item.getDeclaringRecord)
@@ -62,7 +62,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	 * Finds the mappings between classes and their respective layout files
 	 */
 	def findClassLayoutMappings() {
-	  var procedures : Set[AmandroidProcedure] = Set()
+	  var procedures : Set[JawaProcedure] = Set()
 	  this.entryPointClasses.foreach{
 	    compName =>
 	      val recUri = Center.resolveRecord(compName, Center.ResolveLevel.BODIES)
@@ -111,7 +111,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	 * @param lifecycleElement The lifecycle element (activity, service, etc.)
 	 * to which the callback methods belong
 	 */
-	private def analyzeClass(clazz: AmandroidRecord, lifecycleElement: AmandroidRecord) {
+	private def analyzeClass(clazz: JawaRecord, lifecycleElement: JawaRecord) {
 		// Check for callback handlers implemented via interfaces
 		analyzeClassInterfaceCallbacks(clazz, clazz, lifecycleElement)
 		// Check for method overrides
@@ -129,7 +129,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 		Plain = Value
 	}
 	
-	private def analyzeMethodOverrideCallbacks(record : AmandroidRecord):Unit = {
+	private def analyzeMethodOverrideCallbacks(record : JawaRecord):Unit = {
 		if (!record.isConcrete)
 			return;
 		
@@ -139,7 +139,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 		// it as a potential callback.
 		var classType = ClassType.Plain;
 		val systemMethods: MSet[String] = msetEmpty
-		for (ancestorClass : AmandroidRecord <- Center.getRecordHierarchy.getAllSuperClassesOf(record)) {
+		for (ancestorClass : JawaRecord <- Center.getRecordHierarchy.getAllSuperClassesOf(record)) {
 			if (ancestorClass.getName.equals(AndroidEntryPointConstants.ACTIVITY_CLASS))
 				classType = ClassType.Activity; 
 			else if (ancestorClass.getName.equals(AndroidEntryPointConstants.SERVICE_CLASS))
@@ -159,7 +159,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 		var lifecycleFlag = false // represents if a method is lifecycle method
 	    // Iterate over all user-implemented methods. If they are inherited
 		// from a system class, they are callback candidates.
-		for (sClass : AmandroidRecord <- Center.getRecordHierarchy.getAllSubClassesOfIncluding(record)) {
+		for (sClass : JawaRecord <- Center.getRecordHierarchy.getAllSubClassesOfIncluding(record)) {
 		  val rName = sClass.getName
 			if (!rName.startsWith("[|android:") && !rName.startsWith("[|com:android:"))
 				for (procedure <- sClass.getProcedures) {
@@ -196,7 +196,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	  temp
 	}
 	
-	private def analyzeClassInterfaceCallbacks(baseClass: AmandroidRecord, clazz: AmandroidRecord, lifecycleElement: AmandroidRecord):Unit = { 
+	private def analyzeClassInterfaceCallbacks(baseClass: JawaRecord, clazz: JawaRecord, lifecycleElement: JawaRecord):Unit = { 
 	  
 	    // We cannot create instances of abstract classes anyway, so there is no
 		// reason to look for interface implementations
@@ -1181,30 +1181,30 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	 * @param baseClass The base class (activity, service, etc.) to which this
 	 * callback method belongs
 	 */
-	private def checkAndAddMethod(proc: AmandroidProcedure, baseClass: AmandroidRecord) {
+	private def checkAndAddMethod(proc: JawaProcedure, baseClass: JawaRecord) {
 		if (!proc.getName.startsWith("[|android:")) {
 			this.callbackMethods += (baseClass -> (this.callbackMethods.getOrElse(baseClass, isetEmpty) + proc))
 		}
 	}
 	
-	private def collectAllInterfaces(ar : AmandroidRecord) : Set[AmandroidRecord] = {
+	private def collectAllInterfaces(ar : JawaRecord) : Set[JawaRecord] = {
 	  if(ar.getInterfaceSize == 0) Set()
     else ar.getInterfaces ++ ar.getInterfaces.map{collectAllInterfaces(_)}.reduce((s1, s2) => s1 ++ s2)
   }
 	
-	private def getProcedureFromHierarchyByShortName(r :AmandroidRecord, procShortName : String) : AmandroidProcedure = {
+	private def getProcedureFromHierarchyByShortName(r :JawaRecord, procShortName : String) : JawaProcedure = {
 	  if(r.declaresProcedureByShortName(procShortName)) r.getProcedureByShortName(procShortName)
 	  else if(r.hasSuperClass) getProcedureFromHierarchyByShortName(r.getSuperClass, procShortName)
 	  else throw new RuntimeException("Could not find procedure: " + procShortName)
 	}
 	
-	private def getProcedureFromHierarchyByName(r :AmandroidRecord, procName : String) : AmandroidProcedure = {
+	private def getProcedureFromHierarchyByName(r :JawaRecord, procName : String) : JawaProcedure = {
 	  if(r.declaresProcedureByName(procName)) r.getProcedureByName(procName)
 	  else if(r.hasSuperClass) getProcedureFromHierarchyByName(r.getSuperClass, procName)
 	  else throw new RuntimeException("Could not find procedure: " + procName)
 	}
 	
-	private def getProcedureFromHierarchy(r :AmandroidRecord, subSig : String) : AmandroidProcedure = {
+	private def getProcedureFromHierarchy(r :JawaRecord, subSig : String) : JawaProcedure = {
 	  if(r.declaresProcedure(subSig)) r.getProcedure(subSig)
 	  else if(r.hasSuperClass) getProcedureFromHierarchy(r.getSuperClass, subSig)
 	  else throw new RuntimeException("Could not find procedure: " + subSig)

@@ -6,10 +6,10 @@ import pxb.android.axml.AxmlReader
 import pxb.android.axml.AxmlVisitor
 import pxb.android.axml.AxmlVisitor.NodeVisitor
 import org.sireum.util._
-import org.sireum.amandroid.Center
-import org.sireum.amandroid.AmandroidRecord
-import org.sireum.amandroid.MessageCenter._
-import org.sireum.amandroid.util.ResourceRetriever
+import org.sireum.jawa.Center
+import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.MessageCenter._
+import org.sireum.jawa.util.ResourceRetriever
 
 /**
  * Parser for analyzing the layout XML files inside an android application
@@ -36,8 +36,8 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 	
 	def toPilarRecord(str : String) : String = "[|" + str.replaceAll("\\.", ":") + "|]"
 	
-	private def getLayoutClass(className : String) : AmandroidRecord = {
-	  var ar : Option[AmandroidRecord] = Center.tryLoadRecord(toPilarRecord(className), Center.ResolveLevel.BODIES)
+	private def getLayoutClass(className : String) : JawaRecord = {
+	  var ar : Option[JawaRecord] = Center.tryLoadRecord(toPilarRecord(className), Center.ResolveLevel.BODIES)
 	  if(!ar.isDefined || !this.packageName.isEmpty())
 	    ar = Center.tryLoadRecord(toPilarRecord(packageName + "." + className), Center.ResolveLevel.BODIES)
 	  if(!ar.isDefined)
@@ -49,7 +49,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 	  ar.getOrElse(null)
 	}
 	
-	private def isLayoutClass(theClass : AmandroidRecord) : Boolean = {
+	private def isLayoutClass(theClass : JawaRecord) : Boolean = {
 		if (theClass == null)
 			return false
  		// To make sure that nothing all wonky is going on here, we
@@ -63,7 +63,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
  		found
 	}
 	
-	private def isViewClass(theClass : AmandroidRecord) : Boolean = {
+	private def isViewClass(theClass : JawaRecord) : Boolean = {
 		if (theClass == null)
 			return false
 
@@ -79,7 +79,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 		false
 	}
 	
-	private class LayoutParser(layoutFile : String, theClass : AmandroidRecord) extends NodeVisitor {
+	private class LayoutParser(layoutFile : String, theClass : JawaRecord) extends NodeVisitor {
 
   	private var id = -1
   	private var isSensitive = false
