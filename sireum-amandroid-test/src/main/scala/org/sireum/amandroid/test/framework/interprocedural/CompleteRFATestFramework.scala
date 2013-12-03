@@ -39,19 +39,19 @@ trait CompleteRFATestFramework extends TestFramework {
   def Analyzing : this.type = this
 
   def title(s : String) : this.type = {
-    _title = caseString + s
+    _title = caseString + new File(new URI(s)).getName()
     this
   }
 
-  def file(fileRet : ResourceRetriever) =
-    InterProceduralConfiguration(title, fileRet)
+  def file(fileRes : FileResourceUri) =
+    InterProceduralConfiguration(title, fileRes)
 /**
  * does inter procedural analysis of an app
  * @param src is the uri of the apk file
  */
   case class InterProceduralConfiguration //
   (title : String,
-   srcRet : ResourceRetriever) {
+   srcRes : FileResourceUri) {
 
     test(title) {
     	msg_critical("####" + title + "#####")
@@ -64,11 +64,7 @@ trait CompleteRFATestFramework extends TestFramework {
     	JawaCodeSource.clearAppRecordsCodes
     	ClassLoadManager.reset
     	
-    	// now get the dex file from the source apk file 
-    	val apkName = title.substring(0, title.lastIndexOf("."))
-    	val apkfile = new File(System.getProperty("user.home") + "/Desktop/AmandroidResult/" + apkName)
-    	if(!apkfile.exists()) apkfile.mkdirs()
-    	val dexFile = APKFileResolver.getDexFile(title, srcRet, System.getenv(AndroidGlobalConfig.android_output_dir))
+    	val dexFile = APKFileResolver.getDexFile(srcRes)
     	
     	// convert the dex file to the "pilar" form
     	val pilarFileUri = Dex2PilarConverter.convert(dexFile)
@@ -76,7 +72,7 @@ trait CompleteRFATestFramework extends TestFramework {
     	if(pilarFile.length() <= (10 * 1024 * 1024)){
     		AndroidRFAConfig.setupCenter
 	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
-	    	LightWeightPilarParser(Right(new FileInputStream(new File(new URI(pilarFileUri)))), JawaCodeSource.CodeType.APP)
+	    	JawaCodeSource.load(pilarFileUri, JawaCodeSource.CodeType.APP)
 	    	
 	    	try{
 		    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
@@ -85,7 +81,7 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	    Center.resolveRecord(k, Center.ResolveLevel.BODIES)
 		    	}
 		    	
-		    	val pre = new AppInfoCollector(srcRet)
+		    	val pre = new AppInfoCollector(srcRes)
 				  pre.collectInfo
 		    	val entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 		    	entryPoints.foreach{
@@ -121,16 +117,22 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	}
 		    	val appData = DataCollector.collect
 		    	MetricRepo.collect(appData)
-		    	val out = new PrintWriter(apkfile + "/AppData.txt")
+		    	val outputDir = System.getenv(AndroidGlobalConfig.android_output_dir)
+		    	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.android_output_dir)
+		    	val apkName = title.substring(0, title.lastIndexOf("."))
+		    	val appDataDirFile = new File(outputDir + "/" + apkName)
+		    	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
+		    	val out = new PrintWriter(appDataDirFile + "/AppData.txt")
 			    out.print(appData.toString)
 			    out.close()
-			    val mr = new PrintWriter(System.getProperty("user.home") + "/Desktop/AmandroidResult/MetricInfo.txt")
+			    val mr = new PrintWriter(outputDir + "/MetricInfo.txt")
 				  mr.print(MetricRepo.toString)
 				  mr.close()
 				  Counter.haveresult += 1
 	    	} catch {
 	    	  case re : RuntimeException => 
 	    	    re.printStackTrace()
+	    	} finally {
 	    	}
 	    	
 	//    	val r = Center.resolveRecord("[|java:lang:Class|]", Center.ResolveLevel.BODIES)

@@ -47,8 +47,8 @@ class ManifestParser extends AbstractAndroidXMLParser{
 	
 	def toPilarRecord(str : String) : String = "[|" + str.replaceAll("\\.", ":") + "|]"
 	
-	def loadManifestFile(apkRet : ResourceRetriever) = {
-		handleAndroidXMLFiles(apkRet, Set("AndroidManifest.xml"), new AndroidXMLHandler() {
+	def loadManifestFile(apkUri : FileResourceUri) = {
+		handleAndroidXMLFiles(apkUri, Set("AndroidManifest.xml"), new AndroidXMLHandler() {
 			
 			override def handleXMLFile(fileName : String, fileNameFilter : Set[String], stream : InputStream) = {
 			  try {

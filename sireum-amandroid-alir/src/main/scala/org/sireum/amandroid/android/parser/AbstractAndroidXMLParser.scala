@@ -7,6 +7,9 @@ import java.util.zip.ZipFile
 import java.io.InputStream
 import java.util.zip.ZipInputStream
 import org.sireum.jawa.util.ResourceRetriever
+import org.sireum.util.FileResourceUri
+import java.io.FileInputStream
+import java.net.URI
 
 /**
  * Common base class for all resource parser classes
@@ -26,13 +29,13 @@ abstract class AbstractAndroidXMLParser {
 	 * adapted from Steven Arzt
 	 * modified by: Fengguo Wei, Sankardas Roy
 	 */
-	protected def handleAndroidXMLFiles(apkRet : ResourceRetriever, fileNameFilter : Set[String],
+	protected def handleAndroidXMLFiles(apkUri : FileResourceUri, fileNameFilter : Set[String],
 			handler : AndroidXMLHandler) = {
 
 		try {
 			var archive : ZipInputStream = null
 			try {
-				archive = new ZipInputStream(apkRet.getResourceStream)
+				archive = new ZipInputStream(new FileInputStream(new File(new URI(apkUri))))
 				while (archive.available() == 1) {
 					val entry = archive.getNextEntry()
 					if(entry != null){

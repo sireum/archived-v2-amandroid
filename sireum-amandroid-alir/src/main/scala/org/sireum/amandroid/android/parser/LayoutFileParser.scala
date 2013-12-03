@@ -160,8 +160,8 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 	 * the user controls in it.
 	 * @param fileName The APK file in which to look for user controls
 	 */
-	def parseLayoutFile(fileRet : ResourceRetriever, classes : Set[String]) {
-				handleAndroidXMLFiles(fileRet, null, new AndroidXMLHandler() {
+	def parseLayoutFile(apkUri : FileResourceUri, classes : Set[String]) {
+				handleAndroidXMLFiles(apkUri, null, new AndroidXMLHandler() {
 					
 					override def handleXMLFile(fileName : String, fileNameFilter : Set[String], stream : InputStream) : Unit = {
 						// We only process valid layout XML files

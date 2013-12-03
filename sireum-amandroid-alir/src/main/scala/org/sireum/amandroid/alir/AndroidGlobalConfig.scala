@@ -9,6 +9,8 @@ import org.sireum.jawa.alir.JawaAlirInfoProvider
 
 object AndroidGlobalConfig {
 	final val android_output_dir = "ANDROID_OUTPUT_DIR"
+	final val android_lib_dir = "ANDROID_LIB_DIR"
+	final val android_test_dir = "ANDROID_TEST_DIR"
   var dr : SymbolTable => DefRef = { st => new AmandroidDefRef(st, new AmandroidVarAccesses(st)) }
   
   def initJawaAlirInfoProvider = {

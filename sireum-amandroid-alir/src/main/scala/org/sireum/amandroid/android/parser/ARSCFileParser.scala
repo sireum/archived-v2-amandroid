@@ -730,8 +730,8 @@ class ARSCFileParser extends AbstractAndroidXMLParser {
 	
 	def ARSCFileParser = {}
 
-	def parse(apkRet : ResourceRetriever) = {
-		this.handleAndroidXMLFiles(apkRet, Set("resources.arsc"), new AndroidXMLHandler() {
+	def parse(apkUri : FileResourceUri) = {
+		this.handleAndroidXMLFiles(apkUri, Set("resources.arsc"), new AndroidXMLHandler() {
 			
 			@Override
 			def handleXMLFile(fileName : String, fileNameFilter : Set[String], stream : InputStream) = {

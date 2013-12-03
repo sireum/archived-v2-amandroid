@@ -24,12 +24,15 @@ import org.sireum.jawa.util.ResourceRetriever
 import org.sireum.amandroid.android.pilarCodeGenerator.AndroidEnvironmentGenerator
 import org.sireum.amandroid.android.pilarCodeGenerator.AndroidSubstituteRecordMap
 import org.sireum.amandroid.android.pilarCodeGenerator.AndroidEntryPointConstants
+import java.io.File
+import java.net.URI
 
 /**
  * adapted from Steven Arzt
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
-class AppInfoCollector(apkRet : ResourceRetriever) {  
+class AppInfoCollector(apkUri : FileResourceUri) {  
+  
   private var uses_permissions : ISet[String] = isetEmpty
 	private var callbackMethods : Map[JawaRecord, Set[JawaProcedure]] = Map()
 	private var componentInfos : Set[ComponentInfo] = null
@@ -42,7 +45,7 @@ class AppInfoCollector(apkRet : ResourceRetriever) {
 	 * Map from record name to it's env procedure code.
 	 */
 	private var envMap : Map[JawaRecord, JawaProcedure] = Map()
-	def getAppName = this.apkRet.name
+	def getAppName = new File(new URI(apkUri)).getName()
 	def getUsesPermissions = this.uses_permissions
 	
 	def printEnvs() =
@@ -121,7 +124,7 @@ class AppInfoCollector(apkRet : ResourceRetriever) {
 	
 	def collectInfo = {
 	  val mfp = new ManifestParser
-		mfp.loadManifestFile(apkRet)
+		mfp.loadManifestFile(apkUri)
 		this.appPackageName = mfp.getPackageName
 		this.componentInfos = mfp.getComponentInfos
 		this.uses_permissions = mfp.getPermissions
@@ -132,14 +135,14 @@ class AppInfoCollector(apkRet : ResourceRetriever) {
 	  msg_normal("intentDB------>" + mfp.getIntentDB)
 		// Parse the resource file
 	  val afp = new ARSCFileParser()
-		afp.parse(apkRet)
+		afp.parse(apkUri)
 	  msg_detail("arscstring-->" + afp.getGlobalStringPool)
 	  msg_detail("arscpackage-->" + afp.getPackages)
 		
 		// Find the user-defined sources in the layout XML files
 	  val lfp = new LayoutFileParser
 		lfp.setPackageName(this.appPackageName)
-		lfp.parseLayoutFile(apkRet, this.componentInfos.map(_.name))
+		lfp.parseLayoutFile(apkUri, this.componentInfos.map(_.name))
 		this.layoutControls = lfp.getUserControls
 		msg_detail("layoutcallback--->" + lfp.getCallbackMethods)
 	  msg_detail("layoutuser--->" + lfp.getUserControls)

@@ -8,8 +8,8 @@ import org.sireum.util._
 trait Examples {
   val PILAR_FILE_EXT = ".plr"
 
-  def sourceDirUri(claz : Class[_], path : String) = { 
-    FileUtil.fileUri(claz, path)
+  def sourceDirUri(path : String) = { 
+    FileUtil.toUri(path)
   }
 
   def exampleFiles(dirUri : FileResourceUri,
