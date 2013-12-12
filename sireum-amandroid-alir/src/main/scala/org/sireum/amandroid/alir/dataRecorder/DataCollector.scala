@@ -310,35 +310,37 @@ object DataCollector {
 	      var iccInfos = isetEmpty[IccInfo]
 	      var taintResult : TaintAnalysisResult = null
 	      if(!compRec.isPhantom){
-		      val (icfg, irfaResult) = AppCenter.getInterproceduralReachingFactsAnalysisResult(compRec)
-		      val iccNodes = icfg.nodes.filter{
-		        	node =>
-		        	  node.isInstanceOf[CGCallNode] && node.asInstanceOf[CGCallNode].getCalleeSet.exists(InterComponentCommunicationModel.isIccOperation(_))
-		      	}.map(_.asInstanceOf[CGCallNode])
-		      iccInfos =
-			      iccNodes.map{
-			        iccNode =>
-			          val s = irfaResult.entrySet(iccNode)
-					      val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
-					      val args = iccNode.getOwner.getProcedureBody.location(iccNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
-		              case te : TupleExp =>
-		                te.exps.map{
-					            exp =>
-					              exp match{
-							            case ne : NameExp => ne.name.name
-							            case _ => exp.toString()
-							          }
-					          }.toList
-		              case a => throw new RuntimeException("wrong exp type: " + a)
-		            }
-							  val intentSlot = VarSlot(args(1))
-							  val intentValues = factMap.getOrElse(intentSlot, isetEmpty)
-							  val intentcontents = IntentHelper.getIntentContents(factMap, intentValues, iccNode.getContext)
-							  val comMap = IntentHelper.mappingIntents(intentcontents)
-							  val intentDatas = intentcontents.map(ic=>IntentData(ic.componentNames, ic.actions, ic.categories, ic.datas, ic.types, ic.preciseExplicit, ic.preciseImplicit, comMap(ic).map(c=>(c._1.getName, c._2.toString()))))
-							  IccInfo(iccNode.getCalleeSet.map(_.getSignature), iccNode.getContext, intentDatas)
-			      }.toSet
-		      taintResult = AppCenter.getTaintAnalysisResult(compRec)
+	        if(AppCenter.hasInterproceduralReachingFactsAnalysisResult(compRec)){
+			      val (icfg, irfaResult) = AppCenter.getInterproceduralReachingFactsAnalysisResult(compRec)
+			      val iccNodes = icfg.nodes.filter{
+			        	node =>
+			        	  node.isInstanceOf[CGCallNode] && node.asInstanceOf[CGCallNode].getCalleeSet.exists(InterComponentCommunicationModel.isIccOperation(_))
+			      	}.map(_.asInstanceOf[CGCallNode])
+			      iccInfos =
+				      iccNodes.map{
+				        iccNode =>
+				          val s = irfaResult.entrySet(iccNode)
+						      val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+						      val args = iccNode.getOwner.getProcedureBody.location(iccNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
+			              case te : TupleExp =>
+			                te.exps.map{
+						            exp =>
+						              exp match{
+								            case ne : NameExp => ne.name.name
+								            case _ => exp.toString()
+								          }
+						          }.toList
+			              case a => throw new RuntimeException("wrong exp type: " + a)
+			            }
+								  val intentSlot = VarSlot(args(1))
+								  val intentValues = factMap.getOrElse(intentSlot, isetEmpty)
+								  val intentcontents = IntentHelper.getIntentContents(factMap, intentValues, iccNode.getContext)
+								  val comMap = IntentHelper.mappingIntents(intentcontents)
+								  val intentDatas = intentcontents.map(ic=>IntentData(ic.componentNames, ic.actions, ic.categories, ic.datas, ic.types, ic.preciseExplicit, ic.preciseImplicit, comMap(ic).map(c=>(c._1.getName, c._2.toString()))))
+								  IccInfo(iccNode.getCalleeSet.map(_.getSignature), iccNode.getContext, intentDatas)
+				      }.toSet
+			      taintResult = AppCenter.getTaintAnalysisResult(compRec)
+		      }
 	      }
 	      ComponentData(compName, typ, exported, protectPermission, intentFilters, iccInfos, taintResult)
 	  }

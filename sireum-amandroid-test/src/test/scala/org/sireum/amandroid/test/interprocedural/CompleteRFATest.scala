@@ -17,11 +17,11 @@ class CompleteRFATest extends CompleteRFATestFramework {
   val androidLibDir = System.getenv(AndroidGlobalConfig.android_lib_dir)
   if(androidLibDir != null){
 		JawaCodeSource.preLoad(AndroidLibPilarFiles.pilarModelFiles(androidLibDir).toSet)
-	  InterproceduralExamples.testAPKFiles.
-	  filter { s => s.endsWith("LocationFlow2.apk") }.
-	  foreach { resfile =>
-	    Analyzing title resfile file resfile
-	  }
+//	  InterproceduralExamples.testAPKFiles.
+//	  filter { s => s.endsWith("LocationFlow2.apk") }.
+//	  foreach { resfile =>
+//	    Analyzing title resfile file resfile
+//	  }
 //	  InterproceduralExamples.normalAPKRets.
 //	//  filter { s => s.name.endsWith("android-1.apk") }.
 //	  foreach { resRet =>
@@ -34,13 +34,13 @@ class CompleteRFATest extends CompleteRFATestFramework {
 //	//    if(i < 7) i += 1
 //	    Analyzing title resRet.name file resRet
 //	  }
-//	  InterproceduralExamples.maliciousArborRets.
-//	  filter { s => s.name.endsWith("77cebd.apk")}.
-//	  foreach { resRet =>
-//	//    if(i > 69) 
-//	    Analyzing title resRet.name file resRet
-//	//    i+=1
-//	  }
+	  InterproceduralExamples.maliciousArborFiles.
+//	  filter { s => s.endsWith("89750.apk")}.
+	  foreach { resfile =>
+	    if(i < 10) 
+	    Analyzing title resfile file resfile
+	    i+=1
+	  }
 //	  InterproceduralExamples.benchAPKFiles.
 //	//  filter { s => s.endsWith("IntentSink2.apk") }.
 //	  foreach { fileUri =>

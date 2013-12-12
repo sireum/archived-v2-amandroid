@@ -5,7 +5,6 @@ import org.sireum.util._
 import org.sireum.amandroid._
 import org.sireum.jawa.pilarParser.LightWeightPilarParser
 import org.sireum.jawa.util.APKFileResolver
-import org.sireum.jawa.util.Dex2PilarConverter
 import org.sireum.amandroid.android.appInfo.AppInfoCollector
 import java.io._
 import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis._
@@ -26,6 +25,7 @@ import org.sireum.amandroid.alir.AndroidConstants
 import org.sireum.jawa.JawaCodeSource
 import org.sireum.jawa.Center
 import org.sireum.jawa.ClassLoadManager
+import org.sireum.amandroid.android.decompile.Dex2PilarConverter
 
 object Counter {
   var total = 0

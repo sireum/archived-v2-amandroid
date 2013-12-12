@@ -10,5 +10,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-util"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-jawa-alir"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-jawa"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sireum-option"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
