@@ -2,7 +2,7 @@ sireum-amandroid-private
 ========================
 To run test case, you need to do following four steps:
 
-1. Add symbolic link from sireum-amandroid-test/src/test/resources/org/sireum/amandroid/example/interprocedural to where you store your test files. Currently, we support following dirs: maliciousArbor, droidBench, maliciousapk, normalapk, testapk. 
-2. Modify CompleteRFAtest.scala under org.sireum.amandroid.test.interprocedural package to use corresponding dirs.
-3. Add symbolic link from sireum-amandroid-alir/src/main/resources/org/sireum/amandroid/android/resources to where you store your pilar lib files.
+1. Set environment variable ANDROID_LIB_DIR points to the library-pilar-file's container directory.
+2. Set environment variable ANDROID_TEST_DIR points to the source directory. Inside source directory we support following dirs: maliciousArbor, droidBench, maliciousapk, normalapk, testapk. (If you want you can specify the dir you want to include by modify org.sireum.amandroid.example.interprocedural.InterproceduralExamples.scala file.)
+3. Modify CompleteRFAtest.scala under org.sireum.amandroid.test.interprocedural package to use corresponding dirs.
 4. Set environment variable ANDROID_OUTPUT_DIR points to the directory you want to output results.
