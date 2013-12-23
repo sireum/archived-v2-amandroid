@@ -6,8 +6,13 @@ import java.net.URI
 import org.sireum.amandroid.alir.AndroidGlobalConfig
 
 object Dex2PilarConverter {
-  val dexdumpDir = System.getenv(AndroidGlobalConfig.DEXDUMP_DIR)
-	val dexdumputil = if(dexdumpDir != null) Util(new File(dexdumpDir + "/dexdump")) else throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.DEXDUMP_DIR)
+  var dex2pilarFile = new File(System.getenv(AndroidGlobalConfig.SIREUM_HOME) + "/apps/amandroid/bin/dex2pilar")
+  if(!dex2pilarFile.exists()){
+    val dex2pilarDir = System.getenv(AndroidGlobalConfig.DEX2PILAR_DIR)
+    dex2pilarFile = if(dex2pilarDir != null) new File(dex2pilarDir + "/dex2pilar") else throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.DEX2PILAR_DIR)
+  }
+  
+	val dexdumputil = Util(dex2pilarFile)
 	
 	def convert(f : FileResourceUri) : FileResourceUri = {
 	  if (f.endsWith("dex") || f.endsWith("odex")) {

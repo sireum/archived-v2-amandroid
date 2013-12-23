@@ -109,21 +109,21 @@ object DataCollector {
   
   final case class IccInfo(procs : ISet[String],
       										 context : Context,
-      										 intentDatas : ISet[IntentData]){
+      										 intents : ISet[Intent]){
     override def toString : String = {
       val iccInfo = template.getInstanceOf("IccInfo")
       val procStrings = new ArrayList[String]
       procs.foreach(procStrings.add(_))
       iccInfo.add("procs", procStrings)
       iccInfo.add("context", context)
-      val intentDataStrings = new ArrayList[String]
-      intentDatas.foreach(id => intentDataStrings.add(id.toString))
-      iccInfo.add("intentDatas", intentDataStrings)
+      val intentStrings = new ArrayList[String]
+      intents.foreach(id => intentStrings.add(id.toString))
+      iccInfo.add("intents", intentStrings)
       iccInfo.render()
     }
   }
   
-  final case class IntentData(componentNames : ISet[String],
+  final case class Intent(componentNames : ISet[String],
 	      									 	  actions : ISet[String],
 	      										  categories : ISet[String],
 	      										  uriDatas : ISet[UriData],
@@ -141,21 +141,21 @@ object DataCollector {
       else IMPLICIT
     }
     override def toString : String = {
-      val intentData = template.getInstanceOf("IntentData")
+      val intent = template.getInstanceOf("Intent")
       if(!componentNames.isEmpty){
 	      val componentNameStrings = new ArrayList[String]
 	      componentNames.foreach(componentNameStrings.add(_))
-	      intentData.add("componentNames", componentNameStrings)
+	      intent.add("componentNames", componentNameStrings)
       }
       if(!actions.isEmpty){
 	      val actionStrings = new ArrayList[String]
 	      actions.foreach(actionStrings.add(_))
-	      intentData.add("actions", actionStrings)
+	      intent.add("actions", actionStrings)
       }
       if(!categories.isEmpty){
 	      val categoryStrings = new ArrayList[String]
 	      categories.foreach(categoryStrings.add(_))
-	      intentData.add("categories", categoryStrings)
+	      intent.add("categories", categoryStrings)
       }
       if(!uriDatas.isEmpty){
 	      val dataStrings = new ArrayList[String]
@@ -188,12 +188,12 @@ object DataCollector {
 	          }
 	          dataStrings.add(uriData.render())
 	      }
-	      intentData.add("datas", dataStrings)
+	      intent.add("datas", dataStrings)
       }
       if(!types.isEmpty){
 	      val typeStrings = new ArrayList[String]
 	      types.foreach(typeStrings.add(_))
-	      intentData.add("typs", typeStrings)
+	      intent.add("typs", typeStrings)
       }
       val targetStrings = new ArrayList[String]
       targets.foreach{
@@ -203,8 +203,8 @@ object DataCollector {
           target.add("typ", typ)
           targetStrings.add(target.render())
       }
-      intentData.add("targets", targetStrings)
-      intentData.render()
+      intent.add("targets", targetStrings)
+      intent.render()
     }
   }
   
@@ -336,8 +336,8 @@ object DataCollector {
 								  val intentValues = factMap.getOrElse(intentSlot, isetEmpty)
 								  val intentcontents = IntentHelper.getIntentContents(factMap, intentValues, iccNode.getContext)
 								  val comMap = IntentHelper.mappingIntents(intentcontents)
-								  val intentDatas = intentcontents.map(ic=>IntentData(ic.componentNames, ic.actions, ic.categories, ic.datas, ic.types, ic.preciseExplicit, ic.preciseImplicit, comMap(ic).map(c=>(c._1.getName, c._2.toString()))))
-								  IccInfo(iccNode.getCalleeSet.map(_.getSignature), iccNode.getContext, intentDatas)
+								  val intents = intentcontents.map(ic=>Intent(ic.componentNames, ic.actions, ic.categories, ic.datas, ic.types, ic.preciseExplicit, ic.preciseImplicit, comMap(ic).map(c=>(c._1.getName, c._2.toString()))))
+								  IccInfo(iccNode.getCalleeSet.map(_.getSignature), iccNode.getContext, intents)
 				      }.toSet
 			      taintResult = AppCenter.getTaintAnalysisResult(compRec)
 		      }

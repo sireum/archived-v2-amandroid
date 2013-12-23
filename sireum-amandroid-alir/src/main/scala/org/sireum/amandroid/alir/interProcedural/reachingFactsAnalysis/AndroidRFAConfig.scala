@@ -31,7 +31,7 @@ object AndroidRFAConfig {
    * the generated fact says that the param Intent is generated at the Center.
    */
 	def getInitialFactsForMainEnvironment(dm : JawaProcedure) : ISet[RFAFact] = {
-	  require(dm.getShortName == AndroidConstants.MAINCOMP_ENV)
+	  require(dm.getShortName == AndroidConstants.MAINCOMP_ENV || dm.getShortName == AndroidConstants.COMP_ENV)
 	  var result = isetEmpty[RFAFact]
 	  val intentSlot = VarSlot(dm.getParamName(0))
 	  val context : Context = new Context(GlobalConfig.CG_CONTEXT_K)

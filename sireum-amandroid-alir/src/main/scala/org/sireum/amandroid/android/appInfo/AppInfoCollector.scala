@@ -44,12 +44,16 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 	/**
 	 * Map from record name to it's env procedure code.
 	 */
-	private var envMap : Map[JawaRecord, JawaProcedure] = Map()
+	private var envProcMap : Map[JawaRecord, JawaProcedure] = Map()
+	private var envCodeMap : Map[JawaRecord, String] = Map()
 	def getAppName = new File(new URI(apkUri)).getName()
+	def getPackageName = this.appPackageName
 	def getUsesPermissions = this.uses_permissions
-	
+	def getLayoutControls = this.layoutControls
+	def getCallbackMethodMapping = this.callbackMethods
+	def getCallbackMethods = if(!this.callbackMethods.isEmpty)this.callbackMethods.map(_._2).reduce(iunion[JawaProcedure]) else isetEmpty[JawaProcedure]
 	def printEnvs() =
-	  envMap.foreach{case(k, v) => println("Environment for " + k + "\n" + v)}
+	  envProcMap.foreach{case(k, v) => println("Environment for " + k + "\n" + v)}
 	
 	def printEntrypoints() = {
 		if (this.componentInfos == null)
@@ -69,9 +73,18 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 	def getIntentDB = this.intentFdb
 	def getEntryPoints = this.componentInfos.map(_.name).toSet
 	def getComponentInfos = this.componentInfos
-	def getEnvMap = this.envMap
+	def getEnvMap = this.envProcMap
+	def getEnvString : String = {
+	  val sb = new StringBuilder
+	  this.envCodeMap.foreach{
+	    case (k, v) =>
+	      sb.append("*********************** Environment for " + k + " ************************\n")
+	      sb.append(v + "\n\n")
+	  }
+	  sb.toString.intern()
+	}
 	
-	def hasEnv(rec : JawaRecord) : Boolean = this.envMap.contains(rec)
+	def hasEnv(rec : JawaRecord) : Boolean = this.envProcMap.contains(rec)
 	
 
 	/**
@@ -97,8 +110,9 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 	      }
 	  }
 	  dmGen.setCallbackFunctions(callbackMethodSigs)
-    val proc = dmGen.generateWithParam(List(AndroidEntryPointConstants.INTENT_NAME), envName)
-	  this.envMap += (record -> proc)
+    val (proc, code) = dmGen.generateWithParam(List(AndroidEntryPointConstants.INTENT_NAME), envName)
+    this.envCodeMap += (record -> code)
+	  this.envProcMap += (record -> proc)
 	  dmGen.getCodeCounter
 	}
 	
@@ -195,9 +209,7 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 		        }
 		    }
 		}
-		val callbacks = if(!this.callbackMethods.isEmpty)this.callbackMethods.map(_._2).reduce(iunion[JawaProcedure]) else isetEmpty[JawaProcedure]
-		msg_normal("Found " + callbacks.size + " callback methods")
-		msg_detail("Which are: " + this.callbackMethods)
+
     var components = isetEmpty[JawaRecord]
     this.componentInfos.foreach{
       f => 
@@ -208,7 +220,7 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 	        codeLineCounter = clCounter
         }
     }
-		SourceAndSinkCenter.init(appPackageName, afp, layoutControls, callbacks)
+		
 		AppCenter.setComponents(components)
 		AppCenter.updateIntentFilterDB(this.intentFdb)
 		AppCenter.setAppInfo(this)

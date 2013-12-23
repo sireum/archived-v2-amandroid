@@ -24,7 +24,9 @@ object AndroidDataDependentTaintAnalysis {
   final val ICC_SINK = "icc_sink"
   final val CALLBACK_SOURCE = "callback_source"
   
-  case class Td(name : String, typ : String) extends TaintDescriptor
+  case class Td(name : String, typ : String) extends TaintDescriptor {
+    override def toString : String = "(" + name + "," + typ + ")"
+  }
     
   class Tn(node : InterproceduralDataDependenceAnalysis.Node) extends TaintNode{
     var descriptors : ISet[TaintDescriptor] = isetEmpty

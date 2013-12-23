@@ -14,14 +14,19 @@ import org.sireum.amandroid.alir.AndroidGlobalConfig
 @RunWith(classOf[JUnitRunner])
 class CompleteRFATest extends CompleteRFATestFramework {
   var i =0
-  val androidLibDir = System.getenv(AndroidGlobalConfig.android_lib_dir)
+  val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
   if(androidLibDir != null){
 		JawaCodeSource.preLoad(AndroidLibPilarFiles.pilarModelFiles(androidLibDir).toSet)
 //	  InterproceduralExamples.testAPKFiles.
-//	  filter { s => s.endsWith("LocationFlow2.apk") }.
+//	  filter { s => s.endsWith("com.infonow.bofa-1.apk") }.
 //	  foreach { resfile =>
 //	    Analyzing title resfile file resfile
 //	  }
+	  InterproceduralExamples.randomAPKFiles.
+	  filter { s => s.endsWith("blacknWhite.NoMissedCalls.apk") }.
+	  foreach { resfile =>
+	    Analyzing title resfile file resfile
+	  }
 //	  InterproceduralExamples.normalAPKRets.
 //	//  filter { s => s.name.endsWith("android-1.apk") }.
 //	  foreach { resRet =>
@@ -34,19 +39,19 @@ class CompleteRFATest extends CompleteRFATestFramework {
 //	//    if(i < 7) i += 1
 //	    Analyzing title resRet.name file resRet
 //	  }
-	  InterproceduralExamples.maliciousArborFiles.
-//	  filter { s => s.endsWith("89750.apk")}.
-	  foreach { resfile =>
-	    if(i < 10) 
-	    Analyzing title resfile file resfile
-	    i+=1
-	  }
+//	  InterproceduralExamples.maliciousArborFiles.
+////	  filter { s => s.endsWith("89750.apk")}.
+//	  foreach { resfile =>
+//	    if(i < 10) 
+//	    Analyzing title resfile file resfile
+//	    i+=1
+//	  }
 //	  InterproceduralExamples.benchAPKFiles.
 //	//  filter { s => s.endsWith("IntentSink2.apk") }.
 //	  foreach { fileUri =>
 //	    Analyzing title fileUri file fileUri
 //	  }
   } else {
-    System.err.println("Does not have env var: " + AndroidGlobalConfig.android_lib_dir)
+    System.err.println("Does not have env var: " + AndroidGlobalConfig.ANDROID_LIB_DIR)
   }
 }

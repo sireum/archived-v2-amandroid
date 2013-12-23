@@ -12,7 +12,7 @@ import org.sireum.amandroid.alir.AndroidGlobalConfig
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
 object InterproceduralExamples extends Examples{
-  val androidTestDir = System.getenv(AndroidGlobalConfig.android_test_dir)
+  val androidTestDir = System.getenv(AndroidGlobalConfig.ANDROID_TEST_DIR)
   
 //	val MODEL_DIR_URI = sourceDirUri(this.getClass, "./model/") 
   val ANDROID_PILAR_FILE_EXT = ".pilar"
@@ -28,6 +28,8 @@ object InterproceduralExamples extends Examples{
   def maliciousArborFiles = exampleFiles(sourceDirUri(androidTestDir + "/maliciousArbor/"), ANDROID_APK_FILE_EXT)
 
   def benchAPKFiles = exampleFiles(sourceDirUri(androidTestDir + "/droidBench/"), ANDROID_APK_FILE_EXT)
+  
+  def randomAPKFiles = exampleFiles(sourceDirUri(androidTestDir + "/random/"), ANDROID_APK_FILE_EXT)
   
   protected def getFileRets(path : String, ext : String) = {
     val fileNames = MyFileUtil.getResourceListing(this.getClass(), path, ext)

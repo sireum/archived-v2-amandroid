@@ -63,13 +63,13 @@ trait CompleteRFATestFramework extends TestFramework {
     	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
     	JawaCodeSource.clearAppRecordsCodes
     	ClassLoadManager.reset
-    	
-    	val dexFile = APKFileResolver.getDexFile(srcRes)
+    	val srcFile = new File(new URI(srcRes))
+    	val dexFile = APKFileResolver.getDexFile(srcRes, FileUtil.toUri(srcFile.getParentFile()))
     	
     	// convert the dex file to the "pilar" form
     	val pilarFileUri = Dex2PilarConverter.convert(dexFile)
     	val pilarFile = new File(new URI(pilarFileUri))
-    	if(pilarFile.length() <= (10 * 1024 * 1024)){
+    	if(pilarFile.length() <= (20 * 1024 * 1024)){
     		AndroidRFAConfig.setupCenter
 	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
 	    	JawaCodeSource.load(pilarFileUri, JawaCodeSource.CodeType.APP)
@@ -83,7 +83,9 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	
 		    	val pre = new AppInfoCollector(srcRes)
 				  pre.collectInfo
-		    	val entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
+				  SourceAndSinkCenter.init(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+		    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
+		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
 		    	entryPoints.foreach{
 		    	  ep =>
 		    	    msg_critical("--------------Component " + ep + "--------------")
@@ -117,8 +119,8 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	}
 		    	val appData = DataCollector.collect
 		    	MetricRepo.collect(appData)
-		    	val outputDir = System.getenv(AndroidGlobalConfig.android_output_dir)
-		    	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.android_output_dir)
+		    	val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
+		    	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
 		    	val apkName = title.substring(0, title.lastIndexOf("."))
 		    	val appDataDirFile = new File(outputDir + "/" + apkName)
 		    	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()

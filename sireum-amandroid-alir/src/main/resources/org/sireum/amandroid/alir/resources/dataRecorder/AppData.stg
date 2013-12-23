@@ -5,23 +5,31 @@ delimiters "$", "$"
 AppData(name, uses_permissions, components, dynamicRegisteredComponents) ::= <<
 Application Name: $name$
 Uses Permissions: $uses_permissions ; separator=", "$
-Components:
+
+Analysis results with components as entry points are listed below:
+
   $components ; separator="\n\n"$
 $if(dynamicRegisteredComponents)$Dynamic Registered Components:
   $dynamicRegisteredComponents ; separator="\n\n"$$endif$
 >>
 
 ComponentData(compName, typ, exported, protectPermission, intentFilters, iccInfos, taintResult) ::= <<
-Component: $compName$
-  typ: $typ$
+############################# Analysis result with one entry point starts #############################
+Entry point name: Component $compName$
+  Component type: $typ$
   exported: $exported$
-  Protect Permission: $protectPermission$
+  Required Permission: $protectPermission$
   IntentFilters:
     $intentFilters ; separator="\n"$
-  ICC Result:
+  *************************************************************
+  Inter-component communication (ICC) Result:
     $iccInfos ; separator="\n"$
-  Taint Result:
+  *************************************************************
+  Taint analysis result:
     $taintResult$
+  *************************************************************
+############################# Analysis result ends ####################################
+
 >>
 
 DynamicRegisteredComponentData(compName, typ, protectPermission, intentFilters) ::= <<
@@ -33,25 +41,23 @@ Dynamic registered component: $compName$
 >>
 
 IntentFilter(actions, categories, data) ::= <<
-{$if(actions)$Actions:["$actions ; separator="\",\""$"]$endif$$if(categories)$,Categories:["$categories ; separator="\",\""$"]$endif$$if(data)$,Data:[$data$]$endif$}
+IntentFilter:($if(actions)$Actions:["$actions ; separator="\",\""$"]$endif$$if(categories)$,Categories:["$categories ; separator="\",\""$"]$endif$$if(data)$,Data:[$data$]$endif$)
 >>
 
 Data(schemes, hosts, ports, paths, pathPrefixs, pathPatterns, mimeTypes) ::= <<
 ($if(schemes)$Schemes:<"$schemes ; separator="\",\""$">,$endif$$if(hosts)$Hosts:<"$hosts ; separator="\",\""$">,$endif$$if(ports)$Ports:<"$ports ; separator="\",\""$">,$endif$$if(paths)$Paths:<"$paths ; separator="\",\""$">,$endif$$if(pathPrefixs)$PathPrefixs:<"$pathPrefixs ; separator="\",\""$">,$endif$$if(pathPatterns)$PathPatterns:<"$pathPatterns ; separator="\",\""$">,$endif$$if(mimeTypes)$MimeTypes:<"$mimeTypes ; separator="\",\""$">$endif$)
 >>
 
-IccInfo(procs, context, intentDatas) ::= <<
-ICC call:
-  Procedure:
-    $procs ; separator="\n"$
-  Context: 
-    $context$
-  IntentDatas:
-    $intentDatas ; separator="\n"$
+IccInfo(procs, context, intents) ::= <<
+ICC call details are listed below:
+  Caller Procedure: $procs ; separator="\n"$
+  Caller Context: $context$
+  Outgoing Intents via this call:
+    $intents ; separator="\n"$
 >>
 
-IntentData(componentNames, actions, categories, datas, typs, targets) ::= <<
-IntentData:
+Intent(componentNames, actions, categories, datas, typs, targets) ::= <<
+Intent:
   $if(componentNames)$mComponentNames:
   "$componentNames ; separator="\"\n  \""$"$endif$
 
@@ -67,7 +73,7 @@ IntentData:
   $if(typs)$mimeTypes:
   "$typs ; separator="\"\n  \""$"$endif$
 
-  Targets:
+  ICC destinations:
     $targets ; separator="\n"$
 >>
 
@@ -76,11 +82,11 @@ UriData(scheme, host, port, path, pathPrefix, pathPattern) ::= <<
 >>
 
 TaintResult(sources, sinks, paths) ::= <<
-Sources:
+Sources found:
   $sources ; separator="\n"$
-Sinks:
+Sinks found:
   $sinks ; separator="\n"$
-TaintPaths:
+Discovered taint paths are listed below:
   $paths ; separator="\n"$
 >>
 
@@ -97,6 +103,6 @@ TaintPath:
   Source: $source$
   Sink: $sink$
   Types: $typs ; separator=", "$
-  Path:
+  The path consists of the following edges ("->"). The nodes have the context information. The source is at the top :
     $path ; separator="\n"$
 >>

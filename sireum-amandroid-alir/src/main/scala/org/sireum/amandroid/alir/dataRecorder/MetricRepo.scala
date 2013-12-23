@@ -41,7 +41,7 @@ object MetricRepo {
 	      iccInfos.foreach{
 	        iccInfo =>
 	          iccTotal += 1
-	          val intentDatas = iccInfo.intentDatas
+	          val intentDatas = iccInfo.intents
 	          intentDatas.foreach{
 	            intentData =>
 	              intentData.getType match{

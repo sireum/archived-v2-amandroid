@@ -119,12 +119,16 @@ object IntentHelper {
           val (head, query) = uriData.splitAt(uriData.indexOf("=") + 1)
           legalUriStr = head + URLEncoder.encode(query, "UTF-8")
         }
-        val uri = URI.create(legalUriStr)
-        scheme = uri.getScheme()
-        host = uri.getHost()
-        port = if(uri.getPort() != -1) uri.getPort().toString else null
-        path = if(uri.getPath() != "") uri.getPath() else null
-        data.set(scheme, host, port, path, null, null)
+        try{
+	        val uri = URI.create(legalUriStr)
+	        scheme = uri.getScheme()
+	        host = uri.getHost()
+	        port = if(uri.getPort() != -1) uri.getPort().toString else null
+	        path = if(uri.getPath() != "") uri.getPath() else null
+	        data.set(scheme, host, port, path, null, null)
+        } catch {
+          case e : IllegalArgumentException => err_msg_critical("Unexpected uri: " + legalUriStr)
+        }
       } else if(uriData.contains(":")){  // because e.g. app code can have intent.setdata("http:") instead of intent.setdata("http://xyz:200/pqr/abc")
         scheme = uriData.split(":")(0)
         if(scheme != null)

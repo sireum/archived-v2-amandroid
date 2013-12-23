@@ -26,6 +26,7 @@ import org.sireum.jawa.alir.interProcedural.dataDependenceAnalysis.InterProcedur
 import org.sireum.amandroid.alir.AppCenter
 import org.sireum.pilar.ast._
 import java.io.InputStreamReader
+import java.io.FileInputStream
 
 object SourceAndSinkCenter {
   
@@ -47,15 +48,14 @@ object SourceAndSinkCenter {
 	private var apiPermissions : IMap[String, ISet[String]] = imapEmpty
 	private var layoutControls : Map[Int, LayoutControl] = Map()
 	private var callbackMethods : ISet[JawaProcedure] = isetEmpty
-	private var resourceRepo : ARSCFileParser = null
+//	private var resourceRepo : ARSCFileParser = null
 	private var appPackageName : String = null
 	
-	def init(appPackageName : String, resourceRepo : ARSCFileParser, layoutControls : Map[Int, LayoutControl], callbackMethods : ISet[JawaProcedure]) = {
+	def init(appPackageName : String, layoutControls : Map[Int, LayoutControl], callbackMethods : ISet[JawaProcedure], sasFilePath : String) = {
 	  this.appPackageName = appPackageName
-	  this.resourceRepo = resourceRepo
 	  this.layoutControls = layoutControls
 	  this.callbackMethods = callbackMethods
-	  SSParser.parse match{
+	  SSParser.parse(sasFilePath) match{
 	    case (sources, sinks) => 
 	      sources.foreach{
 	        case (sig, ps) =>
@@ -181,10 +181,10 @@ object SourceAndSinkCenter {
 }
 
 object SSParser{
-  private val ssInputStream = this.getClass().getResourceAsStream("../../resources/interProcedural/taintAnalysis/AmandroidSourcesAndSinks.txt")
+  
 	private val regex = "(\\[\\|.+\\|\\])\\s*(.+)?\\s+->\\s+(.+)"
-  def readFile : BufferedReader = new BufferedReader(new InputStreamReader(ssInputStream, "UTF-8"))
-  def parse : (IMap[String, ISet[String]], IMap[String, ISet[String]]) = {
+  def parse(filePath : String) : (IMap[String, ISet[String]], IMap[String, ISet[String]]) = {
+	  def readFile : BufferedReader = new BufferedReader(new FileReader(filePath))
     var sources : IMap[String, ISet[String]] = imapEmpty
     var sinks : IMap[String, ISet[String]] = imapEmpty
     val p : Pattern = Pattern.compile(regex)

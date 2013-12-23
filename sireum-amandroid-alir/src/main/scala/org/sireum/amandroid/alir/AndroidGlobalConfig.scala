@@ -8,11 +8,14 @@ import org.sireum.jawa.alir.intraProcedural.reachingDefinitionAnalysis.Amandroid
 import org.sireum.jawa.alir.JawaAlirInfoProvider
 
 object AndroidGlobalConfig {
-	final val android_output_dir = "ANDROID_OUTPUT_DIR"
-	final val android_lib_dir = "ANDROID_LIB_DIR"
-	final val android_test_dir = "ANDROID_TEST_DIR"
+	final val ANDROID_OUTPUT_DIR = "ANDROID_OUTPUT_DIR"
+	final val ANDROID_LIB_DIR = "ANDROID_LIB_DIR"
+	final val ANDROID_TEST_DIR = "ANDROID_TEST_DIR"
 	  
-	final val DEXDUMP_DIR = "ANDROID_DEXDUMP_DIR"
+	final val SIREUM_HOME = "SIREUM_HOME"
+	final val DEX2PILAR_DIR = "ANDROID_DEX2PILAR_DIR"
+	  
+	final val SourceAndSinkFilePath = "/Volumes/hd/fgwei/Stash/Amandroid/taintAnalysis/sourceAndSinks/AmandroidSourcesAndSinks.txt"
 	  
   var dr : SymbolTable => DefRef = { st => new AmandroidDefRef(st, new AmandroidVarAccesses(st)) }
   
