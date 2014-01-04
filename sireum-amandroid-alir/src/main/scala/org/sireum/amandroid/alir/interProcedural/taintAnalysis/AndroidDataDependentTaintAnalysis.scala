@@ -14,6 +14,7 @@ import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis.ReachingFactsA
 import org.sireum.jawa.alir.interProcedural.dataDependenceAnalysis.InterproceduralDataDependenceInfo
 import org.sireum.jawa.alir.interProcedural.taintAnalysis._
 import org.sireum.amandroid.android.security.AndroidProblemCategories
+import scala.tools.nsc.ConsoleWriter
 
 object AndroidDataDependentTaintAnalysis {
   type Node = InterproceduralDataDependenceAnalysis.Node
@@ -89,6 +90,7 @@ object AndroidDataDependentTaintAnalysis {
 		                      else if(sinTyp == ICC_SINK) tp.typs += AndroidProblemCategories.VUL_INFOMATION_LEAK
 		                    } else if(srcTyp == ICC_SOURCE) {
 		                      if(sinTyp == API_SINK) tp.typs += AndroidProblemCategories.VUL_CAPABILITY_LEAK
+		                      else if(sinTyp == ICC_SINK) tp.typs += AndroidProblemCategories.VUL_CONFUSED_DEPUTY
 		                    }
 		                }
 		            }

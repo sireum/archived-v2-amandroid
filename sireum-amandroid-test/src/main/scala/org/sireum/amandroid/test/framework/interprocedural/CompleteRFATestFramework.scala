@@ -69,7 +69,7 @@ trait CompleteRFATestFramework extends TestFramework {
     	// convert the dex file to the "pilar" form
     	val pilarFileUri = Dex2PilarConverter.convert(dexFile)
     	val pilarFile = new File(new URI(pilarFileUri))
-    	if(pilarFile.length() <= (20 * 1024 * 1024)){
+    	if(pilarFile.length() <= (50 * 1024 * 1024)){
     		AndroidRFAConfig.setupCenter
 	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
 	    	JawaCodeSource.load(pilarFileUri, JawaCodeSource.CodeType.APP)

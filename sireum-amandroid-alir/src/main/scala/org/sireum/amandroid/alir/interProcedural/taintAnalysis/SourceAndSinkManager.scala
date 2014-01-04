@@ -110,6 +110,7 @@ object SourceAndSinkCenter {
     calleeSet.foreach{
       callee =>
         if(InterComponentCommunicationModel.isIccOperation(callee)){
+          sinkflag = true
           val rfafactMap = ReachingFactsAnalysisHelper.getFactMap(rfaFact)
           val args = invNode.getOwner.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
               case te : TupleExp =>
@@ -132,7 +133,8 @@ object SourceAndSinkCenter {
               coms.foreach{
                 case (com, typ) =>
                   typ match {
-                    case IntentHelper.IntentType.EXPLICIT => if(com.isPhantom) sinkflag = true
+//                    case IntentHelper.IntentType.EXPLICIT => if(com.isPhantom) sinkflag = true
+                    case IntentHelper.IntentType.EXPLICIT => sinkflag = true
                     case IntentHelper.IntentType.IMPLICIT => sinkflag = true
                   }
               }
@@ -143,7 +145,7 @@ object SourceAndSinkCenter {
 	}
   
   def checkIccSource(iddg : InterProceduralDataDependenceGraph[CGNode], entNode : CGNode, sinkNodes : ISet[CGNode]) : Boolean = {
-    var sourceflag = false
+    var sourceflag = true
     val reachableSinks = sinkNodes.filter{sinN => iddg.findPath(entNode, sinN) != null}
     if(!reachableSinks.isEmpty){
 	    val sinkProcs = reachableSinks.filter(_.isInstanceOf[CGCallNode]).map(_.asInstanceOf[CGCallNode].getCalleeSet).reduce(iunion[JawaProcedure])

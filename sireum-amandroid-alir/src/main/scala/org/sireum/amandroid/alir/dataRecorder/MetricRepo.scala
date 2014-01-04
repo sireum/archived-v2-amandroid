@@ -84,24 +84,28 @@ object MetricRepo {
 			                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => activityHijacking += 1
 			                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => activityLaunch += 1
 			                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
+			                    case AndroidProblemCategories.VUL_CONFUSED_DEPUTY => 
 			                  }
 			                case "service" =>
 			                  problemType match{
 			                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => serviceHijacking += 1
 			                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => serviceLaunch += 1
 			                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
+			                    case AndroidProblemCategories.VUL_CONFUSED_DEPUTY => 
 			                  }
 			                case "receiver" =>
 			                  problemType match{
 			                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => broadcastReceiverTheft += 1
 			                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => broadcastReceiverInjection += 1
 			                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
+			                    case AndroidProblemCategories.VUL_CONFUSED_DEPUTY => 
 			                  }
 			                case "provider" =>
 			                  problemType match{
 			                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => contentProviderInfoLeak += 1
 			                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => contentProviderCapabilityLeak += 1
 			                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
+			                    case AndroidProblemCategories.VUL_CONFUSED_DEPUTY => 
 			                  }
 			              }
 			          }

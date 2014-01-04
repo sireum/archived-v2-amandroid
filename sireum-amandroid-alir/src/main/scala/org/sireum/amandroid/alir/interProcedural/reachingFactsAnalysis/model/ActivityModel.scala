@@ -8,6 +8,7 @@ import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis.VarSlot
 import org.sireum.amandroid.alir.AndroidConstants
 import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis.FieldSlot
+import org.sireum.jawa.alir.UnknownInstance
 
 object ActivityModel {
 	def isActivity(r : JawaRecord) : Boolean = r.getName == AndroidConstants.ACTIVITY
@@ -283,7 +284,8 @@ object ActivityModel {
 	  thisValue.foreach{
 	    tv =>
 	      val mIntentSlot = FieldSlot(tv, AndroidConstants.ACTIVITY_INTENT)
-	      val mIntentValue = factMap.getOrElse(mIntentSlot, isetEmpty)
+	      var mIntentValue = factMap.getOrElse(mIntentSlot, isetEmpty)
+	      mIntentValue ++= tv.getFieldsUnknownDefSites.map{site => UnknownInstance(site)}
 	      newfacts ++= mIntentValue.map(miv=> RFAFact(VarSlot(retVar), miv))
 	  }
     (newfacts, delfacts)
