@@ -64,7 +64,6 @@ object Decompiler {
         println("Unexpected type: " + typ)
         return
     }
-	  println(dexFileUris)
     decompile(dexFileUris)
   }
 	

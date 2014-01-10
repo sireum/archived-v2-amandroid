@@ -595,7 +595,7 @@ object IntentModel {
       	value => 
       	  if(value.isInstanceOf[ClassInstance]){
       	  	RFAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
-      	  } else if(value.isInstanceOf[UnknownInstance] && value.isInstanceOf[NullInstance]){
+      	  } else if(value.isInstanceOf[UnknownInstance] || value.isInstanceOf[NullInstance]){
       	    value
       	  } else throw new RuntimeException("Unexpected instance type: " + value)
       }
@@ -682,7 +682,7 @@ object IntentModel {
       	value => 
       	  if(value.isInstanceOf[ClassInstance]){
       	  	RFAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
-      	  } else if(value.isInstanceOf[UnknownInstance] && value.isInstanceOf[NullInstance]){
+      	  } else if(value.isInstanceOf[UnknownInstance] || value.isInstanceOf[NullInstance]){
       	    value
       	  } else throw new RuntimeException("Unexpected instance type: " + value)
       }
@@ -855,7 +855,7 @@ object IntentModel {
       	value => 
       	  if(value.isInstanceOf[ClassInstance]){
       	  	RFAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
-      	  } else if(value.isInstanceOf[UnknownInstance] && value.isInstanceOf[NullInstance]){
+      	  } else if(value.isInstanceOf[UnknownInstance] || value.isInstanceOf[NullInstance]){
       	    value
       	  } else throw new RuntimeException("Unexpected instance type: " + value)
       }

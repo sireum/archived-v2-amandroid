@@ -17,13 +17,21 @@ object AndroidRFAConfig {
    * this special record is used to handle out-of-scope calls 
    */
   def setupCenter = {
-    val rec = new JawaRecord
-    rec.init(Center.UNKNOWN_RECORD)
-    val p = new JawaProcedure
-    p.init(Center.UNKNOWN_PROCEDURE_SIG)
-    p.setPhantom
-    rec.addProcedure(p)
-    Center.addRecord(rec)
+    val unknown = new JawaRecord
+    unknown.init(Center.UNKNOWN_RECORD)
+    val up = new JawaProcedure
+    up.init(Center.UNKNOWN_PROCEDURE_SIG)
+    up.setPhantom
+    unknown.addProcedure(up)
+    Center.addRecord(unknown)
+    
+    val center = new JawaRecord
+    center.init(Center.CENTER_RECORD)
+    val cp = new JawaProcedure
+    cp.init(Center.CENTER_PROCEDURE_SIG)
+    cp.setPhantom
+    center.addProcedure(cp)
+    Center.addRecord(center)
   }
   
   /**
@@ -35,7 +43,7 @@ object AndroidRFAConfig {
 	  var result = isetEmpty[RFAFact]
 	  val intentSlot = VarSlot(dm.getParamName(0))
 	  val context : Context = new Context(GlobalConfig.CG_CONTEXT_K)
-	  context.setContext("Center", "L0000")
+	  context.setContext("EntryPoint", "L0000")
 	  val intentValue = RFAInstance(NormalType(AndroidConstants.INTENT, 0), context.copy)
 	  result += RFAFact(intentSlot, intentValue)
 //	  val mActionSlot = FieldSlot(intentValue, AndroidConstants.INTENT_ACTION)

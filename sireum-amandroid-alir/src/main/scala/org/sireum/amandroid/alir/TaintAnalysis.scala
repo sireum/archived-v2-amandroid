@@ -86,6 +86,7 @@ object TanitAnalysis{
   def taintAnalyze(apkFileUris : Set[FileResourceUri], sasFilePath : String, outputUri : FileResourceUri) = {
 	  apkFileUris.foreach{
 	    apkFileUri =>
+	      println("Analyzing " + apkFileUri)
 	      val apkFile = new File(new URI(apkFileUri))
 	      val dexFileUri = APKFileResolver.getDexFile(apkFileUri, outputUri)
 	      val pilarFileUri = Dex2PilarConverter.convert(dexFileUri)
@@ -154,6 +155,7 @@ object TanitAnalysis{
 		  	}
 		  	System.gc()
 			  System.gc()
+			  println("Done!")
 	  }
 	  
 	}

@@ -72,7 +72,9 @@ class AndroidReachingFactsAnalysisBuilder{
           if(GlobalConfig.mode > Mode.APP_ONLY)
             result ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForClinit(p, currentNode.getContext)
         } else { // for normal call
-          this.icfg.collectCfgToBaseGraph(p, currentNode.getContext, false)
+          println("me:" + me)
+          val nodes = this.icfg.collectCfgToBaseGraph(p, currentNode.getContext, false)
+          nodes.foreach{n => n.setLoadedClassBitSet(ClassLoadManager.loadClass(me, bitset))}
 	        val clinitVirContext = currentNode.getContext.copy.setContext(p.getSignature, p.getSignature)
 	        val clinitEntry = this.icfg.getCGEntryNode(clinitVirContext)
 	        val clinitExit = this.icfg.getCGExitNode(clinitVirContext)

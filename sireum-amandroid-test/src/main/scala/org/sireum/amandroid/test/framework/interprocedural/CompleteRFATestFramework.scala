@@ -69,7 +69,7 @@ trait CompleteRFATestFramework extends TestFramework {
     	// convert the dex file to the "pilar" form
     	val pilarFileUri = Dex2PilarConverter.convert(dexFile)
     	val pilarFile = new File(new URI(pilarFileUri))
-    	if(pilarFile.length() <= (50 * 1024 * 1024)){
+    	if(pilarFile.length() <= (10 * 1024 * 1024)){
     		AndroidRFAConfig.setupCenter
 	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
 	    	JawaCodeSource.load(pilarFileUri, JawaCodeSource.CodeType.APP)
@@ -86,6 +86,7 @@ trait CompleteRFATestFramework extends TestFramework {
 				  SourceAndSinkCenter.init(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
 		    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
+		    	entryPoints=entryPoints.filter(p=>p.getSignature == "[|Lcom/google/android/apps/enterprise/dmagent/AppUpdateReceiver;.envMain:(Landroid/content/Intent;)V|]")
 		    	entryPoints.foreach{
 		    	  ep =>
 		    	    msg_critical("--------------Component " + ep + "--------------")
@@ -93,7 +94,7 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, false)
 		    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
 		    	    msg_critical("processed-->" + icfg.getProcessed.size)
-		    	    msg_critical("exit facts: " + irfaResult.entrySet(icfg.exitNode).size)
+//		    	    msg_critical("exit facts: " + irfaResult.entrySet(icfg.exitNode).size)
 		//    	    val taResult = AndroidTaintAnalysis(cg, rfaResult)
 		    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
 		    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
