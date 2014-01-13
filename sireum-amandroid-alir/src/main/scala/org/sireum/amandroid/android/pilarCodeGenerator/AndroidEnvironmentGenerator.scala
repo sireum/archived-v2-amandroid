@@ -46,7 +46,7 @@ class AndroidEnvironmentGenerator extends ProcedureGenerator {
 	        var broadcastReceiver = false
 	        var contentProvider = false
 	        var plain = false
-	        val currentRecord = Center.resolveRecord(item._1, Center.ResolveLevel.BODIES)
+	        val currentRecord = Center.resolveRecord(item._1, Center.ResolveLevel.HIERARCHY)
 	        val ancestors = Center.getRecordHierarchy.getAllSuperClassesOfIncluding(currentRecord)
 	        ancestors.foreach{
 	          ancestor =>
@@ -231,7 +231,7 @@ class AndroidEnvironmentGenerator extends ProcedureGenerator {
 	  val constructionStack : MSet[JawaRecord] = msetEmpty ++ this.paramRecords
 		createIfStmt(endClassFragment, codefg)
 		
-	  val r = Center.resolveRecord("[|android:app:ContextImpl|]", Center.ResolveLevel.BODIES)
+	  val r = Center.resolveRecord("[|android:app:ContextImpl|]", Center.ResolveLevel.HIERARCHY)
 	  val va = generateInstanceCreation(r.getName, codefg)
 	  localVarsForClasses += (r.getName -> va)
     generateRecordConstructor(r, constructionStack, codefg)
@@ -297,7 +297,7 @@ class AndroidEnvironmentGenerator extends ProcedureGenerator {
 	private def activityLifeCycleGenerator(entryPoints : MList[ResourceUri], record : JawaRecord, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
 	  val constructionStack : MSet[JawaRecord] = msetEmpty ++ this.paramRecords
 	  createIfStmt(endClassFragment, codefg)
-	  val r = Center.resolveRecord("[|android:app:ContextImpl|]", Center.ResolveLevel.BODIES)
+	  val r = Center.resolveRecord("[|android:app:ContextImpl|]", Center.ResolveLevel.HIERARCHY)
 	  val va = generateInstanceCreation(r.getName, codefg)
 	  localVarsForClasses += (r.getName -> va)
     generateRecordConstructor(r, constructionStack, codefg)

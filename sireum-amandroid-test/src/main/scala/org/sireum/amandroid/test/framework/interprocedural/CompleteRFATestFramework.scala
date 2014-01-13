@@ -78,7 +78,7 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
 		    	JawaCodeSource.getAppRecordsCodes.keys foreach{
 		    	  k =>
-		    	    Center.resolveRecord(k, Center.ResolveLevel.BODIES)
+		    	    Center.resolveRecord(k, Center.ResolveLevel.BODY)
 		    	}
 		    	
 		    	val pre = new AppInfoCollector(srcRes)
@@ -86,7 +86,6 @@ trait CompleteRFATestFramework extends TestFramework {
 				  SourceAndSinkCenter.init(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
 		    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
-		    	entryPoints=entryPoints.filter(p=>p.getSignature == "[|Lcom/google/android/apps/enterprise/dmagent/AppUpdateReceiver;.envMain:(Landroid/content/Intent;)V|]")
 		    	entryPoints.foreach{
 		    	  ep =>
 		    	    msg_critical("--------------Component " + ep + "--------------")

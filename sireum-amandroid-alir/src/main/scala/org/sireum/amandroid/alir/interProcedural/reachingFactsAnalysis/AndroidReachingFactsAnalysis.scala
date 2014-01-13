@@ -30,6 +30,7 @@ import org.sireum.jawa.ExceptionCenter
 import org.sireum.jawa.ClassLoadManager
 import org.sireum.jawa.alir.interProcedural.NodeListener
 import org.sireum.jawa.Mode
+import scala.collection.immutable.BitSet
 
 class AndroidReachingFactsAnalysisBuilder{
   
@@ -58,36 +59,33 @@ class AndroidReachingFactsAnalysisBuilder{
     (cg, result)
   }
   
-  private def checkAndLoadClassFromHierarchy(me : JawaRecord, s : ISet[RFAFact], currentNode : CGLocNode) : ISet[RFAFact] = {
-    var result = isetEmpty[RFAFact]
+  private def checkAndLoadClassFromHierarchy(me : JawaRecord, s : ISet[RFAFact], currentNode : CGLocNode) : Unit = {
     if(me.hasSuperClass){
-      result ++= checkAndLoadClassFromHierarchy(me.getSuperClass, s, currentNode)
+      checkAndLoadClassFromHierarchy(me.getSuperClass, s, currentNode)
     }
     val bitset = currentNode.getLoadedClassBitSet
     if(!ClassLoadManager.isLoaded(me, bitset)){
       currentNode.setLoadedClassBitSet(ClassLoadManager.loadClass(me, bitset))
+      val newbitset = currentNode.getLoadedClassBitSet
 	    if(me.declaresStaticInitializer){
 	      val p = me.getStaticInitializer
 	      if(AndroidReachingFactsAnalysisHelper.isModelCall(p)){
-          if(GlobalConfig.mode > Mode.APP_ONLY)
-            result ++= ReachingFactsAnalysisHelper.checkAndGetUnknownObjectForClinit(p, currentNode.getContext)
-        } else { // for normal call
-          println("me:" + me)
-          val nodes = this.icfg.collectCfgToBaseGraph(p, currentNode.getContext, false)
-          nodes.foreach{n => n.setLoadedClassBitSet(ClassLoadManager.loadClass(me, bitset))}
-	        val clinitVirContext = currentNode.getContext.copy.setContext(p.getSignature, p.getSignature)
-	        val clinitEntry = this.icfg.getCGEntryNode(clinitVirContext)
-	        val clinitExit = this.icfg.getCGExitNode(clinitVirContext)
-	        this.icfg.addEdge(currentNode, clinitEntry)
-	        this.icfg.addEdge(clinitExit, currentNode)
+          ReachingFactsAnalysisHelper.getUnknownObjectForClinit(p, currentNode.getContext)
+        } else if(!this.icfg.isProcessed(p, currentNode.getContext)) { // for normal call
+//          val nodes = this.icfg.collectCfgToBaseGraph(p, currentNode.getContext, false)
+//          nodes.foreach{n => n.setLoadedClassBitSet(ClassLoadManager.loadClass(me, bitset))}
+//	        val clinitVirContext = currentNode.getContext.copy.setContext(p.getSignature, p.getSignature)
+//	        val clinitEntry = this.icfg.getCGEntryNode(clinitVirContext)
+//	        val clinitExit = this.icfg.getCGExitNode(clinitVirContext)
+//	        this.icfg.addEdge(currentNode, clinitEntry)
+//	        this.icfg.addEdge(clinitExit, currentNode)
         }
 	    }
     }
-    result
   }
   
-  private def checkClass(recName : String, s : ISet[RFAFact], currentNode : CGLocNode) : ISet[RFAFact] = {
-    val rec = Center.resolveRecord(recName, Center.ResolveLevel.BODIES)
+  private def checkClass(recName : String, s : ISet[RFAFact], currentNode : CGLocNode) : Unit = {
+    val rec = Center.resolveRecord(recName, Center.ResolveLevel.HIERARCHY)
     checkAndLoadClassFromHierarchy(rec, s, currentNode)
   }
   
@@ -95,8 +93,7 @@ class AndroidReachingFactsAnalysisBuilder{
    * A.<clinit>() will be called under four kinds of situation: v0 = new A, A.f = v1, v2 = A.f, and A.foo()
    * also for v0 = new B where B is descendant of A, first we call A.<clinit>, later B.<clinit>.
    */
-  protected def checkAndLoadClasses(lhss : List[Exp], rhss : List[Exp], a : Assignment, s : ISet[RFAFact], currentNode : CGLocNode) : ISet[RFAFact] = {
-    var result = isetEmpty[RFAFact]
+  protected def checkAndLoadClasses(lhss : List[Exp], rhss : List[Exp], a : Assignment, s : ISet[RFAFact], currentNode : CGLocNode) : Unit = {
     val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
     lhss.foreach{
       lhs=>
@@ -105,7 +102,7 @@ class AndroidReachingFactsAnalysisBuilder{
             val slot = VarSlot(ne.name.name)
             if(slot.isGlobal){ 
             	val recName = StringFormConverter.getRecordNameFromFieldSignature(ne.name.name)
-            	result ++= checkClass(recName, s, currentNode)
+            	checkClass(recName, s, currentNode)
             }
           case _ =>
         }
@@ -123,12 +120,12 @@ class AndroidReachingFactsAnalysisBuilder{
               case _ =>
             }
       	    val typ = NormalType(recName, dimensions)
-      	    result ++= checkClass(typ.name, s, currentNode)
+      	    checkClass(typ.name, s, currentNode)
           case ne : NameExp =>
             val slot = VarSlot(ne.name.name)
             if(slot.isGlobal){ 
             	val recName = StringFormConverter.getRecordNameFromFieldSignature(ne.name.name)
-            	result ++= checkClass(recName, s, currentNode)
+            	checkClass(recName, s, currentNode)
             }
           case ce : CallExp =>
             val typ = a.getValueAnnotation("type") match {
@@ -147,12 +144,11 @@ class AndroidReachingFactsAnalysisBuilder{
 		        }
             val recName = StringFormConverter.getRecordNameFromProcedureSignature(signature)
             if(typ == "static"){
-            	result ++= checkClass(recName, s, currentNode)
+            	checkClass(recName, s, currentNode)
             }
           case _ =>
       	}
     }
-    result
   }
   
   protected def getFieldsFacts(rhss : List[Exp], s : ISet[RFAFact], currentContext : Context) : ISet[RFAFact] = {
@@ -171,7 +167,7 @@ class AndroidReachingFactsAnalysisBuilder{
               case _ =>
             }
       	    val typ = NormalType(recName, dimensions)
-      	    val rec = Center.resolveRecord(typ.name, Center.ResolveLevel.BODIES)
+      	    val rec = Center.resolveRecord(typ.name, Center.ResolveLevel.HIERARCHY)
       	    val ins = 
 	            if(recName == "[|java:lang:String|]" && dimensions == 0){
 	              RFAConcreteStringInstance("", currentContext.copy)
@@ -236,8 +232,7 @@ class AndroidReachingFactsAnalysisBuilder{
 	      val slots = ReachingFactsAnalysisHelper.processLHSs(lhss, s, currentNode.getContext)
 	      val fieldsFacts = getFieldsFacts(rhss, s, currentNode.getContext)
 	      result ++= fieldsFacts
-	      val classLoadingFacts = checkAndLoadClasses(lhss, rhss, a, s, currentNode)
-	      result ++= classLoadingFacts
+	      checkAndLoadClasses(lhss, rhss, a, s, currentNode)
 	      val values = ReachingFactsAnalysisHelper.processRHSs(rhss, s , currentNode.getContext) 
 	      slots.foreach{
 	        case(i, (slot, _)) =>
@@ -429,7 +424,7 @@ class AndroidReachingFactsAnalysisBuilder{
      * return true if the given recv Instance should pass to the given callee
      */
     private def shouldPass(recvIns : Instance, calleeProc : JawaProcedure, typ : String) : Boolean = {
-      val recRecv = Center.resolveRecord(recvIns.getType.name, Center.ResolveLevel.BODIES)
+      val recRecv = Center.resolveRecord(recvIns.getType.name, Center.ResolveLevel.HIERARCHY)
       val recCallee = calleeProc.getDeclaringRecord
       var tmpRec = recRecv
       if(typ == "direct" || typ == "super" ){
@@ -610,9 +605,13 @@ class AndroidReachingFactsAnalysisBuilder{
   }
 
   class NodeL extends NodeListener{
+    def onPreVisitNode(node : CGNode, preds : CSet[CGNode]) : Unit = {
+      val bitset = if(!preds.isEmpty)preds.map{_.getLoadedClassBitSet}.reduce{(x, y) => x.intersect(y)} else BitSet.empty
+      node.setLoadedClassBitSet(bitset)
+    }
+    
     def onPostVisitNode(node : CGNode, succs : CSet[CGNode]) : Unit = {
-      val bitset = node.getLoadedClassBitSet
-      succs.foreach(succ=>succ.updateLoadedClassBitSet(bitset))
+      
     }
   }
   

@@ -37,13 +37,13 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 	def toPilarRecord(str : String) : String = "[|" + str.replaceAll("\\.", ":") + "|]"
 	
 	private def getLayoutClass(className : String) : JawaRecord = {
-	  var ar : Option[JawaRecord] = Center.tryLoadRecord(toPilarRecord(className), Center.ResolveLevel.BODIES)
+	  var ar : Option[JawaRecord] = Center.tryLoadRecord(toPilarRecord(className), Center.ResolveLevel.HIERARCHY)
 	  if(!ar.isDefined || !this.packageName.isEmpty())
-	    ar = Center.tryLoadRecord(toPilarRecord(packageName + "." + className), Center.ResolveLevel.BODIES)
+	    ar = Center.tryLoadRecord(toPilarRecord(packageName + "." + className), Center.ResolveLevel.HIERARCHY)
 	  if(!ar.isDefined)
-	    ar = Center.tryLoadRecord(toPilarRecord("android.widget." + className), Center.ResolveLevel.BODIES)
+	    ar = Center.tryLoadRecord(toPilarRecord("android.widget." + className), Center.ResolveLevel.HIERARCHY)
 	  if(!ar.isDefined)
-	    ar = Center.tryLoadRecord(toPilarRecord("android.webkit." + className), Center.ResolveLevel.BODIES)
+	    ar = Center.tryLoadRecord(toPilarRecord("android.webkit." + className), Center.ResolveLevel.HIERARCHY)
 	  if(!ar.isDefined)
 	    err_msg_detail("Could not find layout class " + className)
 	  ar.getOrElse(null)

@@ -47,7 +47,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	  findClassLayoutMappings()
 	  
 	  for (compName <- entryPointClasses) {
-	    val comp = Center.resolveRecord(compName, Center.ResolveLevel.BODIES)
+	    val comp = Center.resolveRecord(compName, Center.ResolveLevel.HIERARCHY)
 	    val methods : Set[JawaProcedure] = comp.getProcedures
 	    
 	    val reachableMethods = new InterproceduralControlFlowGraphBuilder().getReachableProcedures(methods, false)
@@ -65,7 +65,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	  var procedures : Set[JawaProcedure] = Set()
 	  this.entryPointClasses.foreach{
 	    compName =>
-	      val recUri = Center.resolveRecord(compName, Center.ResolveLevel.BODIES)
+	      val recUri = Center.resolveRecord(compName, Center.ResolveLevel.BODY)
 	      procedures ++= recUri.getProcedures
 	  }
 	  new InterproceduralControlFlowGraphBuilder().getReachableProcedures(procedures, false).foreach{
@@ -192,7 +192,7 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	
 	private def pilarify(classname : String) = {
 	  val temp = "[|" + classname.replace('.', ':') + "|]"
-	  val rec = Center.resolveRecord(temp, Center.ResolveLevel.BODIES)
+	  val rec = Center.resolveRecord(temp, Center.ResolveLevel.HIERARCHY)
 	  temp
 	}
 	

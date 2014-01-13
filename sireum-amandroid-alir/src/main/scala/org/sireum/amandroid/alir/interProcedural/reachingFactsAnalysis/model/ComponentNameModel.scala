@@ -137,7 +137,7 @@ object ComponentNameModel {
 	      i match{
 	        case cstr @ RFAConcreteStringInstance(text, c) =>
 	          val recordName = StringFormConverter.formatClassNameToRecordName(text)
-	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.BODIES)
+	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
 	            case Some(rec) =>
 	              RFAConcreteStringInstance(rec.getShortName, currentContext)
@@ -188,7 +188,7 @@ object ComponentNameModel {
 		          cn match{
 		            case cstr @ RFAConcreteStringInstance(text, c) =>
 		              val recordName = StringFormConverter.formatClassNameToRecordName(text)
-		              val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.BODIES)
+		              val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
 		              var facts = isetEmpty[RFAFact]
 		              recOpt match{
 		                case Some(rec) =>
@@ -238,7 +238,7 @@ object ComponentNameModel {
 		          cn match{
 		            case cstr @ RFAConcreteStringInstance(text, c) =>
 		              val recordType = StringFormConverter.formatClassNameToType(text)
-		              val rec = Center.resolveRecord(recordType.name, Center.ResolveLevel.BODIES)
+		              val rec = Center.resolveRecord(recordType.name, Center.ResolveLevel.HIERARCHY)
 		              val claStr = RFAConcreteStringInstance(recordType.name, c)
 		              val pakStr = RFAConcreteStringInstance(rec.getPackageName, c)
 		              var facts = isetEmpty[RFAFact]

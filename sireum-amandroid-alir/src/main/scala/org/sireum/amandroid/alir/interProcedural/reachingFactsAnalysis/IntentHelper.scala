@@ -143,7 +143,7 @@ object IntentHelper {
 	      var components : ISet[(JawaRecord, IntentType.Value)] = isetEmpty
 	      ic.componentNames.foreach{
 	        targetRecName =>
-		        val targetRec = Center.resolveRecord(targetRecName, Center.ResolveLevel.BODIES)
+		        val targetRec = Center.resolveRecord(targetRecName, Center.ResolveLevel.HIERARCHY)
             if(DEBUG)
             	msg_detail("explicit target component: " + targetRec)
             components += ((targetRec, IntentType.EXPLICIT))

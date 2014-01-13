@@ -641,7 +641,7 @@ object IntentModel {
 	        sIns match {
 	          case cstr @ RFAConcreteStringInstance(text, c) =>
             val recordName = StringFormConverter.formatClassNameToRecordName(text)
-	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.BODIES)
+	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>
 		            val pakStr = RFAConcreteStringInstance(rec.getPackageName, c)
@@ -707,7 +707,7 @@ object IntentModel {
         sIns match {
           case cstr @ RFAConcreteStringInstance(text, c) =>
             val recordName = StringFormConverter.formatClassNameToRecordName(text)
-	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.BODIES)
+	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>
 		            val pakStr = RFAConcreteStringInstance(rec.getPackageName, c)
@@ -881,7 +881,7 @@ object IntentModel {
         sIns match {
           case cstr @ RFAConcreteStringInstance(text, c) =>
             val recordName = StringFormConverter.formatClassNameToRecordName(text)
-	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.BODIES)
+	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>
 		            val pakStr = RFAConcreteStringInstance(rec.getPackageName, c)
@@ -939,7 +939,7 @@ object IntentModel {
         name match{
           case cstr @ RFAConcreteStringInstance(text, c) =>
             val recordName = StringFormConverter.formatClassNameToRecordName(text)
-	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.BODIES)
+	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>
 		            val pakStr = RFAConcreteStringInstance(rec.getPackageName, c)

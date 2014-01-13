@@ -213,7 +213,7 @@ class AppInfoCollector(apkUri : FileResourceUri) {
     var components = isetEmpty[JawaRecord]
     this.componentInfos.foreach{
       f => 
-        val record = Center.resolveRecord(f.name, Center.ResolveLevel.BODIES)
+        val record = Center.resolveRecord(f.name, Center.ResolveLevel.HIERARCHY)
         if(!record.isPhantom){
 	        components += record
 	        val clCounter = generateEnvironment(record, if(f.exported)AndroidConstants.MAINCOMP_ENV else AndroidConstants.COMP_ENV, codeLineCounter)

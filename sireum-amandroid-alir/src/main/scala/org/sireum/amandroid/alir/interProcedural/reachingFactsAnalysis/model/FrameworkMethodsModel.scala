@@ -16,7 +16,7 @@ import org.sireum.jawa.alir.NullInstance
 
 object FrameworkMethodsModel {
 	def isFrameworkMethods(p : JawaProcedure) : Boolean = {
-	  val contextRec = Center.resolveRecord("[|android:content:Context|]", Center.ResolveLevel.BODIES)
+	  val contextRec = Center.resolveRecord("[|android:content:Context|]", Center.ResolveLevel.HIERARCHY)
 	  if(Center.getRecordHierarchy.isRecordRecursivelySubClassOfIncluding(p.getDeclaringRecord, contextRec))
 		  p.getSubSignature match{
 		    case "setContentView:(I)V" |
@@ -94,7 +94,7 @@ object FrameworkMethodsModel {
 	        case ni : NullInstance =>
 	        case _ =>
 	          val intentF = new IntentFilter(rv.getType.name)
-			      val comRec = Center.resolveRecord(rv.getType.name, Center.ResolveLevel.BODIES)
+			      val comRec = Center.resolveRecord(rv.getType.name, Center.ResolveLevel.HIERARCHY)
 			      filterValue.foreach{
 			        fv =>
 			          val mActionsSlot = FieldSlot(fv, AndroidConstants.INTENTFILTER_ACTIONS)

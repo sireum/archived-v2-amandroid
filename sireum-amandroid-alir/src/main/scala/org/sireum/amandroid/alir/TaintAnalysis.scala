@@ -107,7 +107,7 @@ object TanitAnalysis{
 			    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
 			    	JawaCodeSource.getAppRecordsCodes.keys foreach{
 			    	  k =>
-			    	    Center.resolveRecord(k, Center.ResolveLevel.BODIES)
+			    	    Center.resolveRecord(k, Center.ResolveLevel.BODY)
 			    	}
 			    	
 			    	val pre = new AppInfoCollector(apkFileUri)
