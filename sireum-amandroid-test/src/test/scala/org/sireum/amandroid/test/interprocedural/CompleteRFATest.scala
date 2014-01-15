@@ -18,7 +18,7 @@ class CompleteRFATest extends CompleteRFATestFramework {
   if(androidLibDir != null){
 		JawaCodeSource.preLoad(AndroidLibPilarFiles.pilarModelFiles(androidLibDir).toSet)
 	  InterproceduralExamples.testAPKFiles.
-	  filter { s => s.endsWith("LocationFlow2.apk") }.
+	  filter { s => s.endsWith("com.dropbox.android.apk") }.
 	  foreach { resfile =>
 	    Analyzing title resfile file resfile
 	  }

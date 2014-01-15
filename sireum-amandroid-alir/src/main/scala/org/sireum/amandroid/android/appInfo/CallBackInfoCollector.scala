@@ -68,8 +68,10 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	      val recUri = Center.resolveRecord(compName, Center.ResolveLevel.BODY)
 	      procedures ++= recUri.getProcedures
 	  }
+	  println("before")
 	  new InterproceduralControlFlowGraphBuilder().getReachableProcedures(procedures, false).foreach{
 	    reachableProcedure =>
+	      println("after")
 	      if(reachableProcedure.isConcrete){
 	        reachableProcedure.getProcedureBody.locations foreach{
 	          loc =>

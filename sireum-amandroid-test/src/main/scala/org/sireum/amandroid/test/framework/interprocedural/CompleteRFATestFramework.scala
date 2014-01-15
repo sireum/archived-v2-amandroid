@@ -69,24 +69,24 @@ trait CompleteRFATestFramework extends TestFramework {
     	// convert the dex file to the "pilar" form
     	val pilarFileUri = Dex2PilarConverter.convert(dexFile)
     	val pilarFile = new File(new URI(pilarFileUri))
-    	if(pilarFile.length() <= (10 * 1024 * 1024)){
+    	if(pilarFile.length() <= (30 * 1024 * 1024)){
     		AndroidRFAConfig.setupCenter
 	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
 	    	JawaCodeSource.load(pilarFileUri, JawaCodeSource.CodeType.APP)
 	    	
 	    	try{
 		    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
-		    	JawaCodeSource.getAppRecordsCodes.keys foreach{
-		    	  k =>
-		    	    Center.resolveRecord(k, Center.ResolveLevel.BODY)
-		    	}
+//		    	JawaCodeSource.getAppRecordsCodes.keys foreach{
+//		    	  k =>
+//		    	    Center.resolveRecord(k, Center.ResolveLevel.BODY)
+//		    	}
 		    	
 		    	val pre = new AppInfoCollector(srcRes)
 				  pre.collectInfo
 				  SourceAndSinkCenter.init(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
 		    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
-		    	entryPoints.foreach{
+		    	entryPoints.par.foreach{
 		    	  ep =>
 		    	    msg_critical("--------------Component " + ep + "--------------")
 		    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)

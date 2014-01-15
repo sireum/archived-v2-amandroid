@@ -340,10 +340,8 @@ class AndroidReachingFactsAnalysisBuilder{
             }
           } else { // for normal call
             if(!cg.isProcessed(callee, callerContext)){
-	            this.synchronized{
-	              cg.collectCfgToBaseGraph[String](callee, callerContext, false)
-	            	cg.extendGraph(callee.getSignature, callerContext)
-	            }
+              cg.collectCfgToBaseGraph[String](callee, callerContext, false)
+            	cg.extendGraph(callee.getSignature, callerContext)
             }
             val factsForCallee = getFactsForCallee(s, cj, callee)
             returnFacts --= factsForCallee
