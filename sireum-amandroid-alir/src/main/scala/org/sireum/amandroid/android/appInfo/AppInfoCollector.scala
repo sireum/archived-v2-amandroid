@@ -117,23 +117,25 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 	}
 	
 	def dynamicRegisterComponent(comRec : JawaRecord, iDB : IntentFilterDataBase, precise : Boolean) = {
-	  msg_critical("*************Dynamic Register Component**************")
-	  msg_normal("Component name: " + comRec)
-	  this.intentFdb.updateIntentFmap(iDB)
-	  val analysisHelper = new CallBackInfoCollector(Set(comRec.getName)) 
-		analysisHelper.collectCallbackMethods()
-		this.callbackMethods = analysisHelper.getCallbackMethods
-		analysisHelper.getCallbackMethods.foreach {
-	    case(k, v) =>
-  			this.callbackMethods += (k -> (this.callbackMethods.getOrElse(k, isetEmpty) ++ v))
-		}
-	  msg_normal("Found " + this.callbackMethods.size + " callback methods")
-    val clCounter = generateEnvironment(comRec, AndroidConstants.COMP_ENV, codeLineCounter)
-    codeLineCounter = clCounter
-    AppCenter.addComponent(comRec)
-    AppCenter.addDynamicRegisteredComponent(comRec, precise)
-    AppCenter.updateIntentFilterDB(iDB)
-    msg_critical("~~~~~~~~~~~~~~~~~~~~~~~~~Done~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	  if(!comRec.declaresProcedureByShortName(AndroidConstants.COMP_ENV)){
+		  msg_critical("*************Dynamically Register Component**************")
+		  msg_normal("Component name: " + comRec)
+		  this.intentFdb.updateIntentFmap(iDB)
+		  val analysisHelper = new CallBackInfoCollector(Set(comRec.getName)) 
+			analysisHelper.collectCallbackMethods()
+			this.callbackMethods = analysisHelper.getCallbackMethods
+			analysisHelper.getCallbackMethods.foreach {
+		    case(k, v) =>
+	  			this.callbackMethods += (k -> (this.callbackMethods.getOrElse(k, isetEmpty) ++ v))
+			}
+		  msg_normal("Found " + this.callbackMethods.size + " callback methods")
+	    val clCounter = generateEnvironment(comRec, AndroidConstants.COMP_ENV, codeLineCounter)
+	    codeLineCounter = clCounter
+	    AppCenter.addComponent(comRec)
+	    AppCenter.addDynamicRegisteredComponent(comRec, precise)
+	    AppCenter.updateIntentFilterDB(iDB)
+	    msg_critical("~~~~~~~~~~~~~~~~~~~~~~~~~Done~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	  }
 	}
 	
 	def collectInfo = {

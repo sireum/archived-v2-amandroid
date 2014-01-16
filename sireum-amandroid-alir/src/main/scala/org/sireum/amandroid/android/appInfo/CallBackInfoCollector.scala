@@ -21,6 +21,8 @@ import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.alir.util.ExplicitValueFinder
 import org.sireum.amandroid.android.pilarCodeGenerator.AndroidEntryPointConstants
+import org.sireum.jawa.GlobalConfig
+import org.sireum.jawa.alir.interProcedural.reachability.ReachabilityAnalysis
 
 
 /**
@@ -45,14 +47,13 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	 */
 	def collectCallbackMethods() = {
 	  findClassLayoutMappings()
-	  
-	  for (compName <- entryPointClasses) {
-	    val comp = Center.resolveRecord(compName, Center.ResolveLevel.HIERARCHY)
-	    val methods : Set[JawaProcedure] = comp.getProcedures
-	    
-	    val reachableMethods = new InterproceduralControlFlowGraphBuilder().getReachableProcedures(methods, false)
-	    val containerClasses = reachableMethods.map(item => item.getDeclaringRecord)
-	    containerClasses.map(item => analyzeClass(item, comp))
+	  (if(GlobalConfig.androidInfoCollectParallel) entryPointClasses.par else entryPointClasses).foreach {
+	    compName =>
+		    val comp = Center.getRecord(compName)
+		    val methods : Set[JawaProcedure] = comp.getProcedures
+		    val reachableMethods = ReachabilityAnalysis.getReachableProcedures(methods, false)
+		    val containerClasses = reachableMethods.map(item => item.getDeclaringRecord)
+		    containerClasses.map(item => analyzeClass(item, comp))
 	  }
 	  msg_detail("current all callbacks = " + this.callbackMethods)
 	  
@@ -68,12 +69,10 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 	      val recUri = Center.resolveRecord(compName, Center.ResolveLevel.BODY)
 	      procedures ++= recUri.getProcedures
 	  }
-	  println("before")
-	  new InterproceduralControlFlowGraphBuilder().getReachableProcedures(procedures, false).foreach{
-	    reachableProcedure =>
-	      println("after")
-	      if(reachableProcedure.isConcrete){
-	        reachableProcedure.getProcedureBody.locations foreach{
+	  procedures.foreach{
+	    procedure =>
+	      if(procedure.isConcrete){
+	        procedure.getProcedureBody.locations foreach{
 	          loc =>
 	            loc match{
 	              case j : JumpLocation =>
@@ -94,8 +93,8 @@ class CallBackInfoCollector(entryPointClasses:Set[String]) {
 							          case None => throw new RuntimeException("doesn't found annotation which name is 'type'")
 							        }
                       if(StringFormConverter.getSubSigFromProcSig(sig) == AndroidConstants.SETCONTENTVIEW){
-                        val nums = ExplicitValueFinder.findExplicitIntValueForArgs(reachableProcedure, j, 1)
-	                      val declRecord = reachableProcedure.getDeclaringRecord
+                        val nums = ExplicitValueFinder.findExplicitIntValueForArgs(procedure, j, 1)
+	                      val declRecord = procedure.getDeclaringRecord
 	                      this.layoutClasses += (declRecord -> (this.layoutClasses.getOrElse(declRecord, isetEmpty) ++ nums))
                       }
                     case _ =>

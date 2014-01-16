@@ -36,12 +36,12 @@ abstract class AbstractAndroidXMLParser {
 			var archive : ZipInputStream = null
 			try {
 				archive = new ZipInputStream(new FileInputStream(new File(new URI(apkUri))))
-				while (archive.available() == 1) {
-					val entry = archive.getNextEntry()
-					if(entry != null){
-						val entryName = entry.getName()
-						handler.handleXMLFile(entryName, fileNameFilter, archive)
-					}
+				var entry : ZipEntry = null
+				while (
+				  {entry = archive.getNextEntry()
+				   entry != null}) {
+					val entryName = entry.getName()
+					handler.handleXMLFile(entryName, fileNameFilter, archive)
 				}
 			}
 			finally {

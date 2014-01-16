@@ -17,11 +17,11 @@ class CompleteRFATest extends CompleteRFATestFramework {
   val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
   if(androidLibDir != null){
 		JawaCodeSource.preLoad(AndroidLibPilarFiles.pilarModelFiles(androidLibDir).toSet)
-	  InterproceduralExamples.testAPKFiles.
-	  filter { s => s.endsWith("com.dropbox.android.apk") }.
-	  foreach { resfile =>
-	    Analyzing title resfile file resfile
-	  }
+//	  InterproceduralExamples.testAPKFiles.
+//	  filter { s => s.endsWith("PasswordPassTest.apk") }.
+//	  foreach { resfile =>
+//	    Analyzing title resfile file resfile
+//	  }
 //	  InterproceduralExamples.randomAPKFiles.
 //	  filter { s => s.endsWith("enterprise.dmagent.apk") }.
 //	  foreach { resfile =>
@@ -41,15 +41,15 @@ class CompleteRFATest extends CompleteRFATestFramework {
 //	//    if(i < 7) i += 1
 //	    Analyzing title resRet.name file resRet
 //	  }
-//	  InterproceduralExamples.maliciousArborFiles.
-////	  filter { s => s.endsWith("89750.apk")}.
-//	  foreach { resfile =>
-////	    if(i < 10) 
-//	    Analyzing title resfile file resfile
+	  InterproceduralExamples.maliciousArborFiles.
+//	  filter { s => s.endsWith("89750.apk")}.
+	  foreach { resfile =>
+//	    if(i < 10) 
+	    Analyzing title resfile file resfile
 //	    i+=1
-//	  }
+	  }
 //	  InterproceduralExamples.benchAPKFiles.
-//	//  filter { s => s.endsWith("IntentSink2.apk") }.
+//	  filter { s => s.endsWith("PrivateDataLeak2.apk") }.
 //	  foreach { fileUri =>
 //	    Analyzing title fileUri file fileUri
 //	  }

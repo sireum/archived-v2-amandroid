@@ -11,6 +11,7 @@ import org.sireum.jawa.alir.interProcedural.InterProceduralMonotoneDataFlowAnaly
 import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.interProcedural.dataDependenceAnalysis.InterproceduralDataDependenceInfo
 import org.sireum.jawa.Center
+import org.sireum.jawa.alir.interProcedural.pointsToAnalysis.InterproceduralPointsToAnalysis
 
 /**
  * this is an object, which hold information of apps. e.g. components, intent-filter database, etc.
@@ -90,7 +91,7 @@ object AppCenter {
 	 */
 	
 	def getAppOnlyCallGraph : InterproceduralControlFlowGraph[CGNode] = {
-    if(!hasAppOnlyCallGraph) setAppOnlyCallGraph(new InterproceduralControlFlowGraphBuilder().buildAppOnly(Center.getEntryPoints(EntryPointName)))
+    if(!hasAppOnlyCallGraph) setAppOnlyCallGraph(new InterproceduralPointsToAnalysis().buildAppOnly(Center.getEntryPoints(EntryPointName)))
     this.appOnlyCallGraph
   }
   
@@ -117,7 +118,7 @@ object AppCenter {
 	 */
 	
 	def getWholeProgramCallGraph : InterproceduralControlFlowGraph[CGNode] = {
-    if(!hasWholeProgramCallGraph) setWholeProgramCallGraph(new InterproceduralControlFlowGraphBuilder().buildWholeProgram(Center.getEntryPoints(EntryPointName)))
+    if(!hasWholeProgramCallGraph) setWholeProgramCallGraph(new InterproceduralPointsToAnalysis().buildWholeProgram(Center.getEntryPoints(EntryPointName)))
     this.wholeProgramCallGraph
   }
   

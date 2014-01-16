@@ -165,7 +165,6 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 					
 					override def handleXMLFile(fileName : String, fileNameFilter : Set[String], stream : InputStream) : Unit = {
 						// We only process valid layout XML files
-					  
 						if (!fileName.startsWith("res/layout"))
 							return
 						if (!fileName.endsWith(".xml")) {
@@ -188,7 +187,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 							if (!found)
 								return
 						}
-
+						
 						try {
 							val bos = new ByteArrayOutputStream();
 							var in : Int = 0

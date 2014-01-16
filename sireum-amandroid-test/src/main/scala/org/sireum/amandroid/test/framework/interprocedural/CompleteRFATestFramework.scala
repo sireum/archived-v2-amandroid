@@ -69,7 +69,7 @@ trait CompleteRFATestFramework extends TestFramework {
     	// convert the dex file to the "pilar" form
     	val pilarFileUri = Dex2PilarConverter.convert(dexFile)
     	val pilarFile = new File(new URI(pilarFileUri))
-    	if(pilarFile.length() <= (30 * 1024 * 1024)){
+    	if(pilarFile.length() <= (20 * 1024 * 1024)){
     		AndroidRFAConfig.setupCenter
 	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
 	    	JawaCodeSource.load(pilarFileUri, JawaCodeSource.CodeType.APP)
@@ -78,7 +78,7 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
 //		    	JawaCodeSource.getAppRecordsCodes.keys foreach{
 //		    	  k =>
-//		    	    Center.resolveRecord(k, Center.ResolveLevel.BODY)
+//		    	    Center.resolveRecord(k, Center.ResolveLevel.HIERARCHY)
 //		    	}
 		    	
 		    	val pre = new AppInfoCollector(srcRes)
@@ -99,7 +99,7 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
 		    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult)
 		    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
-//		    	    val f1 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "rfa.txt")
+//		    	    val f1 = new File(System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR) + "/" + title.substring(0, title.lastIndexOf(".")) + "/" + ep.getDeclaringRecord.getShortName + "rfa.txt")
 //					    val o1 = new FileOutputStream(f1)
 //					    val w1 = new OutputStreamWriter(o1)
 //					    icfg.nodes.foreach{
