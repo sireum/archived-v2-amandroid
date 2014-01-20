@@ -26,12 +26,36 @@ import org.sireum.jawa.JawaCodeSource
 import org.sireum.jawa.Center
 import org.sireum.jawa.ClassLoadManager
 import org.sireum.amandroid.android.decompile.Dex2PilarConverter
+import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
+import org.sireum.jawa.util.IgnoreException
 
 object Counter {
   var total = 0
   var oversize = 0
   var haveresult = 0
-  override def toString : String = "total: " + total + ", oversize: " + oversize + ", haveResult: " + haveresult
+  var havePasswordView = 0
+  override def toString : String = "total: " + total + ", oversize: " + oversize + ", haveResult: " + haveresult + ", havePasswordView: " + havePasswordView
+  
+  val appRec = mmapEmpty[String, Int]
+  def addRecs(names : Iterable[String]) = {
+    names.foreach{
+      n =>
+        if(appRec.contains(n)){
+          appRec(n) = appRec(n) + 1
+        }
+        else appRec(n) = 1
+    }
+  }
+  
+  def outputRecStatistic = {
+  	val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
+  	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
+  	val appDataDirFile = new File(outputDir + "/recStatistic")
+  	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
+  	val out = new PrintWriter(appDataDirFile + "/RecStatistic.txt")
+    appRec.filter(p=> p._2 >= 5).toSeq.sortBy(_._1).sortBy(_._2).foreach(out.println(_))
+    out.close()
+  }
 }
 
 trait CompleteRFATestFramework extends TestFramework {
@@ -39,7 +63,7 @@ trait CompleteRFATestFramework extends TestFramework {
   def Analyzing : this.type = this
 
   def title(s : String) : this.type = {
-    _title = caseString + new File(new URI(s)).getName()
+    _title = caseString + s
     this
   }
 
@@ -69,11 +93,11 @@ trait CompleteRFATestFramework extends TestFramework {
     	// convert the dex file to the "pilar" form
     	val pilarFileUri = Dex2PilarConverter.convert(dexFile)
     	val pilarFile = new File(new URI(pilarFileUri))
-    	if(pilarFile.length() <= (20 * 1024 * 1024)){
+    	if(pilarFile.length() <= (100 * 1024 * 1024)){
     		AndroidRFAConfig.setupCenter
 	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
-	    	JawaCodeSource.load(pilarFileUri, JawaCodeSource.CodeType.APP)
-	    	
+	    	JawaCodeSource.load(pilarFileUri, AndroidLibraryAPISummary)
+	    	Counter.addRecs(JawaCodeSource.getAppRecordsCodes.keys)
 	    	try{
 		    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
 //		    	JawaCodeSource.getAppRecordsCodes.keys foreach{
@@ -83,9 +107,12 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	
 		    	val pre = new AppInfoCollector(srcRes)
 				  pre.collectInfo
+				  
+				  if(pre.getLayoutControls.exists(p => p._2.isSensitive == true)) Counter.havePasswordView += 1
 				  SourceAndSinkCenter.init(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
 		    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
+		    	entryPoints = entryPoints.filter(e=>pre.getSensitiveLayoutContainers.contains(e.getDeclaringRecord))
 		    	entryPoints.par.foreach{
 		    	  ep =>
 		    	    msg_critical("--------------Component " + ep + "--------------")
@@ -93,8 +120,6 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, false)
 		    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
 		    	    msg_critical("processed-->" + icfg.getProcessed.size)
-//		    	    msg_critical("exit facts: " + irfaResult.entrySet(icfg.exitNode).size)
-		//    	    val taResult = AndroidTaintAnalysis(cg, rfaResult)
 		    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
 		    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
 		    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult)
@@ -132,6 +157,8 @@ trait CompleteRFATestFramework extends TestFramework {
 				  mr.close()
 				  Counter.haveresult += 1
 	    	} catch {
+	    	  case ie : IgnoreException =>
+	    	    err_msg_critical("Ignored!")
 	    	  case re : RuntimeException => 
 	    	    re.printStackTrace()
 	    	} finally {
@@ -149,6 +176,7 @@ trait CompleteRFATestFramework extends TestFramework {
     	System.gc()
 		  System.gc()
     	msg_critical(Counter.toString)
+//    	Counter.outputRecStatistic
     	msg_critical("************************************\n")
     }
   }

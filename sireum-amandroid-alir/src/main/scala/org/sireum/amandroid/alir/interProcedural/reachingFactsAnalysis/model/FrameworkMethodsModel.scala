@@ -17,7 +17,7 @@ import org.sireum.jawa.alir.NullInstance
 object FrameworkMethodsModel {
 	def isFrameworkMethods(p : JawaProcedure) : Boolean = {
 	  val contextRec = Center.resolveRecord("[|android:content:Context|]", Center.ResolveLevel.HIERARCHY)
-	  if(Center.getRecordHierarchy.isRecordRecursivelySubClassOfIncluding(p.getDeclaringRecord, contextRec))
+	  if(!p.getDeclaringRecord.isInterface && Center.getRecordHierarchy.isRecordRecursivelySubClassOfIncluding(p.getDeclaringRecord, contextRec))
 		  p.getSubSignature match{
 		    case "setContentView:(I)V" |
 		    		 "registerReceiver:(Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;)Landroid/content/Intent;" |

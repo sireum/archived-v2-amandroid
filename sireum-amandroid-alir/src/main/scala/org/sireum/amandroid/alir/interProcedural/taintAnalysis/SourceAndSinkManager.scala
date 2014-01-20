@@ -84,7 +84,7 @@ object SourceAndSinkCenter {
 	}
 	
 	def isCallbackSource(proc : JawaProcedure) : Boolean = {
-	  if(this.callbackMethods.contains(proc) && proc.getParamNames.size > 0) true
+	  if(this.callbackMethods.contains(proc) && proc.getParamNames.size > 0) false
 	  else false
 	}
 	
@@ -95,6 +95,7 @@ object SourceAndSinkCenter {
 	      num =>
 	        this.layoutControls.get(num) match{
 	          case Some(control) =>
+	            if(control.isSensitive) println("Found UI source: " + calleeProcedure + " in " + callerLoc)
 	            return control.isSensitive
 	          case None =>
 	            err_msg_normal("Layout control with ID " + num + " not found.")
@@ -164,6 +165,7 @@ object SourceAndSinkCenter {
 	    }
     }
     sourceflag
+    false
   }
 
 	

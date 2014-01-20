@@ -26,6 +26,7 @@ import org.sireum.amandroid.android.pilarCodeGenerator.AndroidSubstituteRecordMa
 import org.sireum.amandroid.android.pilarCodeGenerator.AndroidEntryPointConstants
 import java.io.File
 import java.net.URI
+import org.sireum.jawa.util.IgnoreException
 
 /**
  * adapted from Steven Arzt
@@ -41,6 +42,7 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 	private var taintWrapperFile : String = ""
 	private var intentFdb : IntentFilterDataBase = null
 	private var codeLineCounter : Int = 0
+	private var sensitiveLayoutContainers : Set[JawaRecord] = Set()
 	/**
 	 * Map from record name to it's env procedure code.
 	 */
@@ -72,6 +74,7 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 	
 	def getIntentDB = this.intentFdb
 	def getEntryPoints = this.componentInfos.map(_.name).toSet
+	def getSensitiveLayoutContainers = this.sensitiveLayoutContainers
 	def getComponentInfos = this.componentInfos
 	def getEnvMap = this.envProcMap
 	def getEnvString : String = {
@@ -96,7 +99,7 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 	def generateEnvironment(record : JawaRecord, envName : String, codeCtr: Int) : Int = {
 	  if(record == null) return 0
 		//generate env main method
-  	msg_critical("Generate environment for " + record)
+  	msg_normal("Generate environment for " + record)
 	  val dmGen = new AndroidEnvironmentGenerator
 	  dmGen.setSubstituteRecordMap(AndroidSubstituteRecordMap.getSubstituteRecordMap)
 	  dmGen.setCurrentComponent(record.getName)
@@ -117,28 +120,30 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 	}
 	
 	def dynamicRegisterComponent(comRec : JawaRecord, iDB : IntentFilterDataBase, precise : Boolean) = {
-	  if(!comRec.declaresProcedureByShortName(AndroidConstants.COMP_ENV)){
-		  msg_critical("*************Dynamically Register Component**************")
-		  msg_normal("Component name: " + comRec)
-		  this.intentFdb.updateIntentFmap(iDB)
-		  val analysisHelper = new CallBackInfoCollector(Set(comRec.getName)) 
-			analysisHelper.collectCallbackMethods()
-			this.callbackMethods = analysisHelper.getCallbackMethods
-			analysisHelper.getCallbackMethods.foreach {
-		    case(k, v) =>
-	  			this.callbackMethods += (k -> (this.callbackMethods.getOrElse(k, isetEmpty) ++ v))
-			}
-		  msg_normal("Found " + this.callbackMethods.size + " callback methods")
-	    val clCounter = generateEnvironment(comRec, AndroidConstants.COMP_ENV, codeLineCounter)
-	    codeLineCounter = clCounter
-	    AppCenter.addComponent(comRec)
-	    AppCenter.addDynamicRegisteredComponent(comRec, precise)
-	    AppCenter.updateIntentFilterDB(iDB)
-	    msg_critical("~~~~~~~~~~~~~~~~~~~~~~~~~Done~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	  this.synchronized{
+		  if(!comRec.declaresProcedureByShortName(AndroidConstants.COMP_ENV)){
+			  msg_critical("*************Dynamically Register Component**************")
+			  msg_normal("Component name: " + comRec)
+			  this.intentFdb.updateIntentFmap(iDB)
+			  val analysisHelper = new ReachableInfoCollector(Set(comRec.getName)) 
+				analysisHelper.collectCallbackMethods()
+				this.callbackMethods = analysisHelper.getCallbackMethods
+				analysisHelper.getCallbackMethods.foreach {
+			    case(k, v) =>
+		  			this.callbackMethods += (k -> (this.callbackMethods.getOrElse(k, isetEmpty) ++ v))
+				}
+			  msg_normal("Found " + this.callbackMethods.size + " callback methods")
+		    val clCounter = generateEnvironment(comRec, AndroidConstants.COMP_ENV, codeLineCounter)
+		    codeLineCounter = clCounter
+		    AppCenter.addComponent(comRec)
+		    AppCenter.addDynamicRegisteredComponent(comRec, precise)
+		    AppCenter.updateIntentFilterDB(iDB)
+		    msg_critical("~~~~~~~~~~~~~~~~~~~~~~~~~Done~~~~~~~~~~~~~~~~~~~~~~~~~~")
+		  }
 	  }
 	}
 	
-	def collectInfo = {
+	def collectInfo : Unit = {
 	  val mfp = new ManifestParser
 		mfp.loadManifestFile(apkUri)
 		this.appPackageName = mfp.getPackageName
@@ -162,9 +167,11 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 		this.layoutControls = lfp.getUserControls
 		msg_detail("layoutcallback--->" + lfp.getCallbackMethods)
 	  msg_detail("layoutuser--->" + lfp.getUserControls)
-		
+		if(!this.layoutControls.exists(p => p._2.isSensitive)) throw new IgnoreException
 		// Collect the callback interfaces implemented in the app's source code
-		val analysisHelper = new CallBackInfoCollector(this.componentInfos.map(_.name)) 
+		val analysisHelper = new ReachableInfoCollector(this.componentInfos.map(_.name)) 
+	  analysisHelper.init
+	  this.sensitiveLayoutContainers = analysisHelper.getSensitiveLayoutContainer(this.layoutControls)
 		analysisHelper.collectCallbackMethods()
 		this.callbackMethods = analysisHelper.getCallbackMethods
 		msg_detail("LayoutClasses --> " + analysisHelper.getLayoutClasses)
@@ -185,21 +192,20 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 		          if(lfp.getCallbackMethods.contains(strRes.value)){
 		            lfp.getCallbackMethods(strRes.value).foreach{
 		              methodName =>
-		                
 		                //The callback may be declared directly in the class or in one of the superclasses
 		                var callbackRecord = k
-		                var callbackProcedure : JawaProcedure = null
+		                var callbackProcedure : Set[JawaProcedure] = Set()
 		                breakable{ 
-		                  while(callbackProcedure == null){
+		                  while(callbackProcedure.isEmpty){
 			                  if(callbackRecord.declaresProcedureByShortName(methodName))
-			                  	callbackProcedure = callbackRecord.getProcedureByShortName(methodName)
+			                  	callbackProcedure = callbackRecord.getProceduresByShortName(methodName)
 			                  if(callbackRecord.hasSuperClass)
 			                    callbackRecord = callbackRecord.getSuperClass
 			                  else break
 		                  }
 		                }
 		                if(callbackProcedure != null){
-		                  this.callbackMethods += (k -> (this.callbackMethods.getOrElse(k, isetEmpty) + callbackProcedure))
+		                  this.callbackMethods += (k -> (this.callbackMethods.getOrElse(k, isetEmpty) ++ callbackProcedure))
 		                } else {
 		                  err_msg_normal("Callback method " + methodName + " not found in class " + k);
 		                }
@@ -207,7 +213,7 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 		            }
 		          }
 		        } else {
-		          err_msg_critical("Unexpected resource type for layout class")
+		          err_msg_normal("Unexpected resource type for layout class")
 		        }
 		    }
 		}

@@ -21,6 +21,8 @@ object InterproceduralExamples extends Examples{
   val ANDROID_APK_FILE_EXT = ".apk"
   def testAPKFiles = exampleFiles(sourceDirUri(androidTestDir + "/testapk/"), ANDROID_APK_FILE_EXT)
   
+  def popularAPKFiles = exampleFiles(sourceDirUri(androidTestDir + "/appspopular/"), ANDROID_APK_FILE_EXT)
+  
   def normalAPKFiles = exampleFiles(sourceDirUri(androidTestDir + "/normalapk/"), ANDROID_APK_FILE_EXT)
 
   def maliciousAPKFiles = exampleFiles(sourceDirUri(androidTestDir + "/maliciousapk/"), ANDROID_APK_FILE_EXT)
@@ -30,6 +32,8 @@ object InterproceduralExamples extends Examples{
   def benchAPKFiles = exampleFiles(sourceDirUri(androidTestDir + "/droidBench/"), ANDROID_APK_FILE_EXT)
   
   def randomAPKFiles = exampleFiles(sourceDirUri(androidTestDir + "/random/"), ANDROID_APK_FILE_EXT)
+  
+  def testFiles = exampleFiles(sourceDirUri(androidTestDir + "/test/"), ANDROID_APK_FILE_EXT)
   
   protected def getFileRets(path : String, ext : String) = {
     val fileNames = MyFileUtil.getResourceListing(this.getClass(), path, ext)

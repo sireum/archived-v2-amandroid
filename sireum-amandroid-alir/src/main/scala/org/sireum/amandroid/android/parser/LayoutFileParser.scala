@@ -219,7 +219,6 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 						catch {
 						  case ex : Exception =>
 							  err_msg_detail("Could not read binary XML file: " + ex.getMessage())
-								ex.printStackTrace()
 						}
 					}
 				})

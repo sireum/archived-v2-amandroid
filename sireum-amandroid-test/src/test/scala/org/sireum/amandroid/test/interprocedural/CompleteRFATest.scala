@@ -7,6 +7,7 @@ import org.sireum.jawa.JawaCodeSource
 import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
 import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
 import org.sireum.amandroid.alir.AndroidGlobalConfig
+import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -22,14 +23,26 @@ class CompleteRFATest extends CompleteRFATestFramework {
 //	  foreach { resfile =>
 //	    Analyzing title resfile file resfile
 //	  }
+	  InterproceduralExamples.popularAPKFiles.
+//	  filter { s => s.contains("com.olivephone.edit.apk") }.
+	  foreach { resfile =>
+	    Analyzing title resfile file resfile
+	  }
+//		InterproceduralExamples.testFiles.
+////	  filter { s => s.endsWith("acctsvcs.us.apk")}.
+//	  foreach { resfile =>
+////	    if(i < 10) 
+//	    Analyzing title resfile file resfile
+////	    i+=1
+//	  }
 //	  InterproceduralExamples.randomAPKFiles.
-//	  filter { s => s.endsWith("enterprise.dmagent.apk") }.
+////	  filter { s => s.endsWith("enterprise.dmagent.apk") }.
 //	  foreach { resfile =>
 ////	    if(i < 89) i += 1
 //	    //if(resfile.endsWith("app.kazoebito.com.apk"))
 //	    Analyzing title resfile file resfile
 //	  }
-//	  InterproceduralExamples.normalAPKRets.
+//	  InterproceduralExamples.normalAPKFiles.
 //	//  filter { s => s.name.endsWith("android-1.apk") }.
 //	  foreach { resRet =>
 //	//    if(i < 37) i += 1
@@ -41,13 +54,13 @@ class CompleteRFATest extends CompleteRFATestFramework {
 //	//    if(i < 7) i += 1
 //	    Analyzing title resRet.name file resRet
 //	  }
-	  InterproceduralExamples.maliciousArborFiles.
-//	  filter { s => s.endsWith("89750.apk")}.
-	  foreach { resfile =>
-//	    if(i < 10) 
-	    Analyzing title resfile file resfile
-//	    i+=1
-	  }
+//	  InterproceduralExamples.maliciousArborFiles.
+////	  filter { s => s.endsWith("6ba36c93.apk")}.
+//	  foreach { resfile =>
+////	    if(i < 10) 
+//	    Analyzing title resfile file resfile
+////	    i+=1
+//	  }
 //	  InterproceduralExamples.benchAPKFiles.
 //	  filter { s => s.endsWith("PrivateDataLeak2.apk") }.
 //	  foreach { fileUri =>

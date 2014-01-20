@@ -25,7 +25,7 @@ class ManifestParser extends AbstractAndroidXMLParser{
 	private var currentComponent : String = null
 	private var applicationPermission : String = null
 	private var componentPermission : Map[String, String] = Map()
-	private var componentExported : Map[String, Boolean] = Map()
+	private var componentExported : Map[String, String] = Map()
 	private var currentIntentFilter: IntentFilter = null
 	
 	private var minSdkVersion = 0
@@ -120,7 +120,7 @@ class ManifestParser extends AbstractAndroidXMLParser{
 									}
 									attrValue = getAttributeValue(parser, "exported")
 									if(attrValue != null){
-									  this.componentExported += (this.currentComponent -> attrValue.toBoolean)
+									  this.componentExported += (this.currentComponent -> attrValue)
 									}
 								}
 							}
@@ -180,7 +180,13 @@ class ManifestParser extends AbstractAndroidXMLParser{
 		} finally {
 		  this.components.foreach{
 		    case (name, typ) =>
-		      val exported = this.componentExported.getOrElse(name,
+		      val exported = this.componentExported.get(name) match {
+		        case Some(tag) => 
+		          tag match{
+		            case "false" => false
+		            case _ => true
+		          }
+		        case None =>
 		          {
 		        		/**
 		        		 * from: http://developer.android.com/guide/topics/manifest/provider-element.html
@@ -205,8 +211,9 @@ class ManifestParser extends AbstractAndroidXMLParser{
 		        		 */
 		        		else if(typ == "provider") {
 		        		  this.minSdkVersion <= 16 || this.targetSdkVersion <= 16
-		        		} else throw new RuntimeException("Run component type: " + typ)
-		          })
+		        		} else throw new RuntimeException("Wrong component type: " + typ)
+		          }
+		      }
 		      val permission = this.componentPermission.getOrElse(name, this.applicationPermission)
 		      val compermission = if(permission != null) Some(permission) else None
 		      this.componentInfos += ComponentInfo(name, typ, exported, compermission)

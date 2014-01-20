@@ -24,6 +24,7 @@ import org.sireum.amandroid.android.decompile.Dex2PilarConverter
 import org.sireum.jawa.MessageCenter._
 import org.sireum.amandroid.alir.interProcedural.taintAnalysis.SourceAndSinkCenter
 import org.sireum.jawa.MessageCenter
+import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -101,7 +102,7 @@ object TanitAnalysis{
 		  	if(pilarFile.length() <= (10 * 1024 * 1024)){
 		  		AndroidRFAConfig.setupCenter
 		    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
-		    	JawaCodeSource.load(pilarFileUri, JawaCodeSource.CodeType.APP)
+		    	JawaCodeSource.load(pilarFileUri, AndroidLibraryAPISummary)
 		    	
 		    	try{
 			    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
