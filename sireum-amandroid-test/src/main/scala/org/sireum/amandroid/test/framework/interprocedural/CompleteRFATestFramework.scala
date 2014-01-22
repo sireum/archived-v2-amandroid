@@ -28,13 +28,29 @@ import org.sireum.jawa.ClassLoadManager
 import org.sireum.amandroid.android.decompile.Dex2PilarConverter
 import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
 import org.sireum.jawa.util.IgnoreException
+import java.util.Timer
+import java.util.TimerTask
+import java.util.concurrent.TimeoutException
+import org.junit.Test
+import org.junit.Rule
+import org.junit.rules.Timeout
+import org.scalatest.concurrent.Timeouts
+import org.scalatest.time.Span
+import org.scalatest.time.Millis
+import org.scalatest.exceptions.TestFailedDueToTimeoutException
+import org.scalatest.time.Seconds
 
 object Counter {
   var total = 0
   var oversize = 0
   var haveresult = 0
   var havePasswordView = 0
-  override def toString : String = "total: " + total + ", oversize: " + oversize + ", haveResult: " + haveresult + ", havePasswordView: " + havePasswordView
+  var foundPasswordContainer = 0
+  var taintPathFound = 0
+  var havePasswordViewList = Set[String]()
+  var foundPasswordContainerList = Set[String]()
+  var taintPathFoundList = Set[String]()
+  override def toString : String = "total: " + total + ", oversize: " + oversize + ", haveResult: " + haveresult + ", havePasswordView: " + havePasswordView + ", foundPasswordContainer: " + foundPasswordContainer + ", taintPathFound: " + taintPathFound
   
   val appRec = mmapEmpty[String, Int]
   def addRecs(names : Iterable[String]) = {
@@ -56,10 +72,26 @@ object Counter {
     appRec.filter(p=> p._2 >= 5).toSeq.sortBy(_._1).sortBy(_._2).foreach(out.println(_))
     out.close()
   }
+  
+  def outputInterestingFileNames = {
+  	val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
+  	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
+  	val appDataDirFile = new File(outputDir + "/interestingApps")
+  	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
+  	val out = new PrintWriter(appDataDirFile + "/interestingApps.txt")
+    out.println("HavePasswordViewList:")
+    havePasswordViewList.foreach(out.println(_))
+    out.println("\n\n\n\nfoundPasswordContainerList:")
+    foundPasswordContainerList.foreach(out.println(_))
+    out.println("\n\n\n\ntaintPathFoundList:")
+    taintPathFoundList.foreach(out.println(_))
+    out.close()
+  }
 }
 
-trait CompleteRFATestFramework extends TestFramework {
-
+@Test(timeout = 200)
+trait CompleteRFATestFramework extends TestFramework with Timeouts{
+  
   def Analyzing : this.type = this
 
   def title(s : String) : this.type = {
@@ -99,49 +131,44 @@ trait CompleteRFATestFramework extends TestFramework {
 	    	JawaCodeSource.load(pilarFileUri, AndroidLibraryAPISummary)
 	    	Counter.addRecs(JawaCodeSource.getAppRecordsCodes.keys)
 	    	try{
-		    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
-//		    	JawaCodeSource.getAppRecordsCodes.keys foreach{
-//		    	  k =>
-//		    	    Center.resolveRecord(k, Center.ResolveLevel.HIERARCHY)
-//		    	}
 		    	
 		    	val pre = new AppInfoCollector(srcRes)
 				  pre.collectInfo
-				  
-				  if(pre.getLayoutControls.exists(p => p._2.isSensitive == true)) Counter.havePasswordView += 1
+				  if(pre.getLayoutControls.exists(p => p._2.isSensitive == true)){
+				    Counter.havePasswordView += 1
+				    Counter.havePasswordViewList += title
+				  }
 				  SourceAndSinkCenter.init(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
 		    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
 		    	entryPoints = entryPoints.filter(e=>pre.getSensitiveLayoutContainers.contains(e.getDeclaringRecord))
+		    	if(!entryPoints.isEmpty){
+		    	  Counter.foundPasswordContainer += 1
+		    	  Counter.foundPasswordContainerList += title
+		    	}
 		    	entryPoints.par.foreach{
 		    	  ep =>
-		    	    msg_critical("--------------Component " + ep + "--------------")
-		    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-		    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, false)
-		    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
-		    	    msg_critical("processed-->" + icfg.getProcessed.size)
-		    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
-		    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
-		    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult)
-		    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
-//		    	    val f1 = new File(System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR) + "/" + title.substring(0, title.lastIndexOf(".")) + "/" + ep.getDeclaringRecord.getShortName + "rfa.txt")
-//					    val o1 = new FileOutputStream(f1)
-//					    val w1 = new OutputStreamWriter(o1)
-//					    icfg.nodes.foreach{
-//					      node =>
-//					        w1.write(node + ":" + irfaResult.entrySet(node).toString + "\n\n\n")
-//					    }
-		    	    
-		//    	    val f2 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "CG.dot")
-		//			    val o2 = new FileOutputStream(f2)
-		//			    val w2 = new OutputStreamWriter(o2)
-		//			    cg.toDot(w2)
-		//			    
-		//			    val f3 = new File(apkfile + "/" + ep.getDeclaringRecord.getShortName + "IDDG.dot")
-		//			    val o3 = new FileOutputStream(f3)
-		//			    val w3 = new OutputStreamWriter(o3)
-		//			    iddg.toDot(w3)
+		    	    try{
+			    	    failAfter(Span(200, Seconds)){
+				    	    msg_critical("--------------Component " + ep + "--------------")
+				    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
+				    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, false)
+				    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
+				    	    msg_critical("processed-->" + icfg.getProcessed.size)
+				    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
+				    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
+				    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult)    
+				    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
+			    	    }
+		    	    } catch {
+		    	      case te : TestFailedDueToTimeoutException => System.err.println("Timeout!")
+		    	    }
 		    	}
+				  
+		    	if(AppCenter.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
+    	      Counter.taintPathFound += 1
+    	      Counter.taintPathFoundList += title
+    	    }
 		    	val appData = DataCollector.collect
 		    	MetricRepo.collect(appData)
 		    	val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
@@ -159,6 +186,7 @@ trait CompleteRFATestFramework extends TestFramework {
 	    	} catch {
 	    	  case ie : IgnoreException =>
 	    	    err_msg_critical("Ignored!")
+	    	  
 	    	  case re : RuntimeException => 
 	    	    re.printStackTrace()
 	    	} finally {
@@ -176,6 +204,7 @@ trait CompleteRFATestFramework extends TestFramework {
     	System.gc()
 		  System.gc()
     	msg_critical(Counter.toString)
+    	Counter.outputInterestingFileNames
 //    	Counter.outputRecStatistic
     	msg_critical("************************************\n")
     }

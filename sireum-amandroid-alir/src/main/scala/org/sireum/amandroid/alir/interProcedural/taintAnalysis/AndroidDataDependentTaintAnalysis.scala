@@ -155,8 +155,10 @@ object AndroidDataDependentTaintAnalysis {
     val tar = new Tar(iddi)
     tar.sourceNodes = sourceNodes
     tar.sinkNodes = sinkNodes
-    if(!tar.getTaintedPaths.isEmpty)
+    if(!tar.getTaintedPaths.isEmpty){
+      err_msg_critical("Found " + tar.getTaintedPaths.size + " path.")
     	err_msg_critical(tar.toString)
+    }
     tar
   }
   

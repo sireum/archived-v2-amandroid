@@ -2,8 +2,8 @@ package org.sireum.amandroid.test.framework
 
 import org.scalatest._
 import org.scalatest.junit.ShouldMatchersForJUnit
-
 import org.sireum.util._
+import org.junit.Test
 
 /**
  * @author <a href="mailto:robby@k-state.edu">Robby</a>

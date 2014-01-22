@@ -57,7 +57,6 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	  layoutControls.foreach{
 	    case (i, lc) =>
 	      if(lc.isSensitive){
-	        println(i, lc)
 	        reachableMap.foreach{
 	          case (r, ps) =>
 	            if(ps.exists(p => p.retrieveCode.getOrElse("").contains(i.toString)))
@@ -65,7 +64,6 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	        }
 	      }
 	  }
-	  println("sensitive:" + result)
 	  result.toSet
 	}
 	

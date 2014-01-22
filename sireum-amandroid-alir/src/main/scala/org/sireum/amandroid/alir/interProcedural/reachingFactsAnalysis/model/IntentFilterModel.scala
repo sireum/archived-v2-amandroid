@@ -7,6 +7,8 @@ import org.sireum.jawa.alir.Context
 import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis._
 import org.sireum.amandroid.alir.AndroidConstants
 import org.sireum.jawa.MessageCenter._
+import org.sireum.jawa.alir.UnknownInstance
+import org.sireum.jawa.alir.NullInstance
 
 object IntentFilterModel {
 	def isIntentFilter(r : JawaRecord) : Boolean = r.getName == AndroidConstants.INTENTFILTER
@@ -109,6 +111,8 @@ object IntentFilterModel {
 	            case pstr @ RFAPointStringInstance(c) => 
 	              err_msg_detail("Init IntentFilter use point string: " + pstr)
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENTFILTER_ACTIONS), pstr)
+	            case ustr @ UnknownInstance(c) => 
+	            case ustr @ NullInstance(c) => 
 	            case _ => throw new RuntimeException("unexpected instance type: " + acStr)
 	          }
 		    }

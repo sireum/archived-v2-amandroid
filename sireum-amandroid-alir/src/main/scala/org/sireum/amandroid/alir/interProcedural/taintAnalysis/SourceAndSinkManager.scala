@@ -95,7 +95,6 @@ object SourceAndSinkCenter {
 	      num =>
 	        this.layoutControls.get(num) match{
 	          case Some(control) =>
-	            if(control.isSensitive) println("Found UI source: " + calleeProcedure + " in " + callerLoc)
 	            return control.isSensitive
 	          case None =>
 	            err_msg_normal("Layout control with ID " + num + " not found.")
