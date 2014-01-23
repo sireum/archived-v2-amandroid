@@ -8,11 +8,9 @@ import org.sireum.jawa.util.APKFileResolver
 import org.sireum.amandroid.android.appInfo.AppInfoCollector
 import java.io._
 import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis._
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis.AndroidTaintAnalysis
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis.SourceAndSinkCenter
+import org.sireum.amandroid.alir.interProcedural.taintAnalysis._
 import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.alir.interProcedural.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis.AndroidDataDependentTaintAnalysis
 import java.net.URI
 import org.sireum.amandroid.alir.AppCenter
 import org.sireum.amandroid.alir.dataRecorder.DataCollector
@@ -28,17 +26,9 @@ import org.sireum.jawa.ClassLoadManager
 import org.sireum.amandroid.android.decompile.Dex2PilarConverter
 import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
 import org.sireum.jawa.util.IgnoreException
-import java.util.Timer
-import java.util.TimerTask
-import java.util.concurrent.TimeoutException
-import org.junit.Test
-import org.junit.Rule
-import org.junit.rules.Timeout
-import org.scalatest.concurrent.Timeouts
-import org.scalatest.time.Span
-import org.scalatest.time.Millis
 import org.scalatest.exceptions.TestFailedDueToTimeoutException
-import org.scalatest.time.Seconds
+import org.sireum.jawa.util.TimeOutException
+import org.sireum.jawa.util.Timer
 
 object Counter {
   var total = 0
@@ -89,9 +79,7 @@ object Counter {
   }
 }
 
-@Test(timeout = 200)
-trait CompleteRFATestFramework extends TestFramework with Timeouts{
-  
+trait CompleteRFATestFramework extends TestFramework {
   def Analyzing : this.type = this
 
   def title(s : String) : this.type = {
@@ -146,24 +134,23 @@ trait CompleteRFATestFramework extends TestFramework with Timeouts{
 		    	  Counter.foundPasswordContainer += 1
 		    	  Counter.foundPasswordContainerList += title
 		    	}
+				  
 		    	entryPoints.par.foreach{
 		    	  ep =>
 		    	    try{
-			    	    failAfter(Span(200, Seconds)){
-				    	    msg_critical("--------------Component " + ep + "--------------")
-				    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-				    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, false)
-				    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
-				    	    msg_critical("processed-->" + icfg.getProcessed.size)
-				    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
-				    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
-				    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult)    
-				    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
-			    	    }
-		    	    } catch {
-		    	      case te : TestFailedDueToTimeoutException => System.err.println("Timeout!")
+			    	    msg_critical("--------------Component " + ep + "--------------")
+			    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
+			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, Some(new Timer(200000)), false)
+			    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
+			    	    msg_critical("processed-->" + icfg.getProcessed.size)
+			    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
+			    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
+			    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult)    
+			    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
+				    	} catch {
+		    	      case te : TimeOutException => System.err.println("Timeout!")
 		    	    }
-		    	}
+    	    } 
 				  
 		    	if(AppCenter.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
     	      Counter.taintPathFound += 1
@@ -186,7 +173,6 @@ trait CompleteRFATestFramework extends TestFramework with Timeouts{
 	    	} catch {
 	    	  case ie : IgnoreException =>
 	    	    err_msg_critical("Ignored!")
-	    	  
 	    	  case re : RuntimeException => 
 	    	    re.printStackTrace()
 	    	} finally {
@@ -204,7 +190,7 @@ trait CompleteRFATestFramework extends TestFramework with Timeouts{
     	System.gc()
 		  System.gc()
     	msg_critical(Counter.toString)
-    	Counter.outputInterestingFileNames
+//    	Counter.outputInterestingFileNames
 //    	Counter.outputRecStatistic
     	msg_critical("************************************\n")
     }

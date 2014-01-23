@@ -25,6 +25,7 @@ import org.sireum.jawa.MessageCenter._
 import org.sireum.amandroid.alir.interProcedural.taintAnalysis.SourceAndSinkCenter
 import org.sireum.jawa.MessageCenter
 import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
+import org.sireum.jawa.util.Timer
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -119,10 +120,9 @@ object TanitAnalysis{
 			    	  ep =>
 			    	    msg_critical("--------------Component " + ep + "--------------")
 			    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, false)
+			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, Some(new Timer(200000)), false)
 			    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
 			    	    msg_critical("processed-->" + icfg.getProcessed.size)
-			    	    msg_critical("exit facts: " + irfaResult.entrySet(icfg.exitNode).size)
 			//    	    val taResult = AndroidTaintAnalysis(cg, rfaResult)
 			    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
 			    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)

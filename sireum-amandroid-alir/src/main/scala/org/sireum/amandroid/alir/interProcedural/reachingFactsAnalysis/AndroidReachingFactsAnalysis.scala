@@ -31,8 +31,9 @@ import org.sireum.jawa.ClassLoadManager
 import org.sireum.jawa.alir.interProcedural.NodeListener
 import org.sireum.jawa.Mode
 import scala.collection.immutable.BitSet
+import org.sireum.jawa.util.Timer
 
-class AndroidReachingFactsAnalysisBuilder{
+class AndroidReachingFactsAnalysisBuilder(timerOpt : Option[Timer] = None){
   
   var icfg : InterproceduralControlFlowGraph[CGNode] = null
   
@@ -470,7 +471,7 @@ class AndroidReachingFactsAnalysisBuilder{
           
           for(i <- 0 to argSlots.size - 1){
             val argSlot = argSlots(i)
-            if(paramSlots.size < argSlots.size) err_msg_critical("cj-->" + cj + "\ncalleeProcedure-->" +calleeProcedure )
+            if(paramSlots.size < argSlots.size) err_msg_normal("cj-->" + cj + "\ncalleeProcedure-->" +calleeProcedure )
             val paramSlot = paramSlots(i)
             varFacts.foreach{
               fact =>
@@ -610,7 +611,10 @@ class AndroidReachingFactsAnalysisBuilder{
     }
     
     def onPostVisitNode(node : CGNode, succs : CSet[CGNode]) : Unit = {
-      
+      timerOpt match{
+        case Some(timer) => timer.isTimeOutAndThrow
+        case None =>
+      }
     }
   }
   
@@ -627,8 +631,9 @@ object AndroidReachingFactsAnalysis {
   type Result = InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]
   def apply(entryPointProc : JawaProcedure,
    initialFacts : ISet[RFAFact] = isetEmpty,
+   timerOpt : Option[Timer] = None,
    parallel : Boolean = false,
    initContext : Context = new Context(GlobalConfig.CG_CONTEXT_K),
    switchAsOrderedMatch : Boolean = false) : (InterproceduralControlFlowGraph[Node], Result)
-				   = new AndroidReachingFactsAnalysisBuilder().build(entryPointProc, initialFacts, parallel, initContext, switchAsOrderedMatch)
+				   = new AndroidReachingFactsAnalysisBuilder(timerOpt).build(entryPointProc, initialFacts, parallel, initContext, switchAsOrderedMatch)
 }
