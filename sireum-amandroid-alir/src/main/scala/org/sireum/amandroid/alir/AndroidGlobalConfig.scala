@@ -17,6 +17,8 @@ object AndroidGlobalConfig {
 	  
 	final val SourceAndSinkFilePath = "/Volumes/hd/fgwei/Stash/Amandroid/taintAnalysis/sourceAndSinks/AmandroidSourcesAndSinks.txt"
 	  
+	final var resolve_icc = false
+	  
   var dr : SymbolTable => DefRef = { st => new AmandroidDefRef(st, new AmandroidVarAccesses(st)) }
   
   def initJawaAlirInfoProvider = {

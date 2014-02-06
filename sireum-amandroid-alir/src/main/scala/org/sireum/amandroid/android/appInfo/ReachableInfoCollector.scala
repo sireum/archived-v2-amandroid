@@ -43,11 +43,22 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	
 	private var reachableMap : Map[JawaRecord, Set[JawaProcedure]] = Map()
 	
+	def getReachableMap = this.reachableMap
+	
 	def init = {
 		(if(GlobalConfig.androidInfoCollectParallel) entryPointClasses.par else entryPointClasses).foreach {
 		  compName =>
 		    val comp = Center.resolveRecord(compName, Center.ResolveLevel.BODY)
 		    val reachableMethods = ReachabilityAnalysis.getReachableProcedures(comp.getProcedures, false)
+		    reachableMap += (comp -> reachableMethods)
+		}
+	}
+	
+	def initWithEnv = {
+	  (if(GlobalConfig.androidInfoCollectParallel) entryPointClasses.par else entryPointClasses).foreach {
+		  compName =>
+		    val comp = Center.resolveRecord(compName, Center.ResolveLevel.BODY)
+		    val reachableMethods = ReachabilityAnalysis.getReachableProcedures(comp.getProceduresByShortName(AndroidConstants.MAINCOMP_ENV) ++ comp.getProceduresByShortName(AndroidConstants.COMP_ENV), false)
 		    reachableMap += (comp -> reachableMethods)
 		}
 	}
@@ -64,6 +75,16 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	        }
 	      }
 	  }
+	  result.toSet
+	}
+	
+	def getSensitiveAPIContainer(apiSig : String) : Set[JawaRecord] = {
+	  val result : MSet[JawaRecord] = msetEmpty
+    reachableMap.foreach{
+      case (r, ps) =>
+        if(ps.exists(p => p.retrieveCode.getOrElse("").contains(apiSig)))
+          result += r
+    }
 	  result.toSet
 	}
 	
@@ -1217,9 +1238,11 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
   }
 	
 	private def getProceduresFromHierarchyByShortName(r :JawaRecord, procShortName : String) : Set[JawaProcedure] = {
-	  if(r.declaresProcedureByShortName(procShortName)) r.getProceduresByShortName(procShortName)
-	  else if(r.hasSuperClass) getProceduresFromHierarchyByShortName(r.getSuperClass, procShortName)
-	  else throw new RuntimeException("Could not find procedure: " + procShortName)
+	  val tmp =
+		  if(r.declaresProcedureByShortName(procShortName)) r.getProceduresByShortName(procShortName)
+		  else if(r.hasSuperClass) getProceduresFromHierarchyByShortName(r.getSuperClass, procShortName)
+		  else throw new RuntimeException("Could not find procedure: " + procShortName)
+	  tmp.filter(!_.isStatic)
 	}
 	
 	private def getProcedureFromHierarchyByName(r :JawaRecord, procName : String) : JawaProcedure = {

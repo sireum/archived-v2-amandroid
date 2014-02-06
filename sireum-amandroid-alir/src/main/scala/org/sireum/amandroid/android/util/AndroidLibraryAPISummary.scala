@@ -48,7 +48,9 @@ object AndroidLibraryAPISummary extends LibraryAPISummary{
     "[|com:unity3d:player:",
     "[|com:urbanairship:",
     "[|com:admarvel:",
-    "[|com:admob:"
+    "[|com:admob:",
+    "[|mediba:ad:sdk:",
+    "[|com:adobe:air:"
     )
   
 	/**

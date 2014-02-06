@@ -22,10 +22,10 @@ import org.sireum.amandroid.alir.interProcedural.taintAnalysis.AndroidDataDepend
 import java.net.URI
 import org.sireum.amandroid.android.decompile.Dex2PilarConverter
 import org.sireum.jawa.MessageCenter._
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis.SourceAndSinkCenter
 import org.sireum.jawa.MessageCenter
 import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
 import org.sireum.jawa.util.Timer
+import org.sireum.amandroid.alir.interProcedural.taintAnalysis.DefaultSourceAndSinkManager
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -114,7 +114,7 @@ object TanitAnalysis{
 			    	
 			    	val pre = new AppInfoCollector(apkFileUri)
 					  pre.collectInfo
-					  SourceAndSinkCenter.init(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, sasFilePath)
+					  val ssm = new DefaultSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, sasFilePath)
 			    	val entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 			    	entryPoints.foreach{
 			    	  ep =>
@@ -126,7 +126,7 @@ object TanitAnalysis{
 			//    	    val taResult = AndroidTaintAnalysis(cg, rfaResult)
 			    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
 			    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
-			    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult)
+			    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult, ssm)
 			    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
 			    	}
 			    	val appData = DataCollector.collect

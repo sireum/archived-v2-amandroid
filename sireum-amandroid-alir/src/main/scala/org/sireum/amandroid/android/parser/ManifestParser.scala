@@ -98,29 +98,31 @@ class ManifestParser extends AbstractAndroidXMLParser{
 								} else {
 									// Get the class name
 									attrValue = getAttributeValue(parser, "name")
-									if (attrValue.startsWith(".")){
-									  this.currentComponent = toPilarRecord(this.packageName + attrValue)
-									  this.components += (this.currentComponent -> tagName)
-									}
-									else if (attrValue.substring(0, 1).equals(attrValue.substring(0, 1).toUpperCase())){
-									  this.currentComponent = toPilarRecord(this.packageName + "." + attrValue)
-									  this.components += (this.currentComponent -> tagName)
-									}
-									else if (this.packageName != "" && !attrValue.contains(".")){
-									  this.currentComponent = toPilarRecord(this.packageName + "." + attrValue)
-									  this.components += (this.currentComponent -> tagName)
-									}
-									else {
-									  this.currentComponent = toPilarRecord(attrValue)
-									  this.components += (this.currentComponent -> tagName)
-									}
-									attrValue = getAttributeValue(parser, "permission")
-									if (attrValue != null){
-									  this.componentPermission += (this.currentComponent -> attrValue)
-									}
-									attrValue = getAttributeValue(parser, "exported")
 									if(attrValue != null){
-									  this.componentExported += (this.currentComponent -> attrValue)
+										if (attrValue.startsWith(".")){
+										  this.currentComponent = toPilarRecord(this.packageName + attrValue)
+										  this.components += (this.currentComponent -> tagName)
+										}
+										else if (attrValue.substring(0, 1).equals(attrValue.substring(0, 1).toUpperCase())){
+										  this.currentComponent = toPilarRecord(this.packageName + "." + attrValue)
+										  this.components += (this.currentComponent -> tagName)
+										}
+										else if (this.packageName != "" && !attrValue.contains(".")){
+										  this.currentComponent = toPilarRecord(this.packageName + "." + attrValue)
+										  this.components += (this.currentComponent -> tagName)
+										}
+										else {
+										  this.currentComponent = toPilarRecord(attrValue)
+										  this.components += (this.currentComponent -> tagName)
+										}
+										attrValue = getAttributeValue(parser, "permission")
+										if (attrValue != null){
+										  this.componentPermission += (this.currentComponent -> attrValue)
+										}
+										attrValue = getAttributeValue(parser, "exported")
+										if(attrValue != null){
+										  this.componentExported += (this.currentComponent -> attrValue)
+										}
 									}
 								}
 							}

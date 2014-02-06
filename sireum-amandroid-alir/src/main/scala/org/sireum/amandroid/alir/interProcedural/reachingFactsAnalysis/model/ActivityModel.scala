@@ -285,7 +285,11 @@ object ActivityModel {
 	    tv =>
 	      val mIntentSlot = FieldSlot(tv, AndroidConstants.ACTIVITY_INTENT)
 	      var mIntentValue = factMap.getOrElse(mIntentSlot, isetEmpty)
-	      mIntentValue ++= tv.getFieldsUnknownDefSites.map{site => UnknownInstance(site)}
+        tv.getFieldsUnknownDefSites.foreach{
+        	case (defsite, fields) =>
+        	  if(fields.contains("ALL")) mIntentValue += UnknownInstance(defsite)
+        	  if(fields.contains(AndroidConstants.ACTIVITY_INTENT)) mIntentValue += UnknownInstance(defsite)
+      	}
 	      newfacts ++= mIntentValue.map(miv=> RFAFact(VarSlot(retVar), miv))
 	  }
     (newfacts, delfacts)

@@ -27,49 +27,48 @@ import org.sireum.amandroid.alir.AppCenter
 import org.sireum.pilar.ast._
 import java.io.InputStreamReader
 import java.io.FileInputStream
+import org.sireum.jawa.alir.interProcedural.Callee
+import org.sireum.jawa.alir.interProcedural.taintAnalysis.SourceAndSinkManager
 
-object SourceAndSinkCenter {
-  
-  object Category extends Enumeration {
-    val NORMAL, ICC = Value
-  }
-  
+object SourceAndSinkCategory {
+  final val API_SOURCE = "api_source"
+  final val API_SINK = "api_sink"
+  final val ICC_SOURCE = "icc_source"
+  final val ICC_SINK = "icc_sink"
+  final val CALLBACK_SOURCE = "callback_source"
+}
+
+abstract class BasicSourceAndSinkManager(appPackageName : String, 
+    												layoutControls : Map[Int, LayoutControl], 
+    												callbackMethods : ISet[JawaProcedure], 
+    												sasFilePath : String) extends SourceAndSinkManager{
   /**
    * it's a map from source API sig to it's category
    */
-	private var sources : IMap[String, Category.Value] = imapEmpty
+	protected var sources : IMap[String, String] = imapEmpty
 	/**
    * it's a map from sink API sig to it's category
    */
-	private var sinks : IMap[String, Category.Value] = imapEmpty
+	protected var sinks : IMap[String, String] = imapEmpty
 	/**
    * it's a map from API sig to its required permission
    */
-	private var apiPermissions : IMap[String, ISet[String]] = imapEmpty
-	private var layoutControls : Map[Int, LayoutControl] = Map()
-	private var callbackMethods : ISet[JawaProcedure] = isetEmpty
-//	private var resourceRepo : ARSCFileParser = null
-	private var appPackageName : String = null
-	
-	def init(appPackageName : String, layoutControls : Map[Int, LayoutControl], callbackMethods : ISet[JawaProcedure], sasFilePath : String) = {
-	  this.appPackageName = appPackageName
-	  this.layoutControls = layoutControls
-	  this.callbackMethods = callbackMethods
-	  SSParser.parse(sasFilePath) match{
-	    case (sources, sinks) => 
-	      sources.foreach{
-	        case (sig, ps) =>
-	          this.sources += (sig -> Category.NORMAL)
-	          this.apiPermissions += (sig -> ps)
-	      }
-	      sinks.foreach{
-	        case (sig, ps) =>
-	          this.sinks += (sig -> Category.NORMAL)
-	          this.apiPermissions += (sig -> ps)
-	      }
-	  }
-	  msg_detail("source size: " + this.sources.size + " sink size: " + this.sinks.size)
-	}
+	protected var apiPermissions : IMap[String, ISet[String]] = imapEmpty
+
+  SSParser.parse(sasFilePath) match{
+    case (sources, sinks) => 
+      sources.foreach{
+        case (sig, ps) =>
+          this.sources += (sig -> SourceAndSinkCategory.API_SOURCE)
+          this.apiPermissions += (sig -> ps)
+      }
+      sinks.foreach{
+        case (sig, ps) =>
+          this.sinks += (sig -> SourceAndSinkCategory.API_SINK)
+          this.apiPermissions += (sig -> ps)
+      }
+      msg_detail("source size: " + this.sources.size + " sink size: " + this.sinks.size)
+  }
 	
 	private def matchs(procedure : JawaProcedure, procedurepool : ISet[String]) : Boolean = procedurepool.contains(procedure.getSignature)
 	
@@ -82,6 +81,32 @@ object SourceAndSinkCenter {
 	  if(isUISource(calleeProcedure, callerProcedure, callerLoc)) return true
 	  false
 	}
+	
+	def addSource(source : String, category : String) = {
+	  this.sources += (source -> category)
+	  this.apiPermissions += (source -> this.apiPermissions.getOrElse(source, isetEmpty))
+	}
+	
+	def addSink(sink : String, category : String) = {
+	  this.sinks += (sink -> category)
+	  this.apiPermissions += (sink -> this.apiPermissions.getOrElse(sink, isetEmpty))
+	}
+	
+	def isCallbackSource(proc : JawaProcedure) : Boolean
+	def isUISource(calleeProcedure : JawaProcedure, callerProcedure : JawaProcedure, callerLoc : JumpLocation) : Boolean
+	def isIccSink(invNode : CGCallNode, rfaFact : ISet[RFAFact]) : Boolean
+	def isIccSource(entNode : CGNode, iddgEntNode : CGNode) : Boolean
+	
+	def getSourceSigs : ISet[String] = this.sources.map{_._1}.toSet
+	def getSinkSigs : ISet[String] = this.sinks.map{_._1}.toSet
+	def getInterestedSigs : ISet[String] = getSourceSigs ++ getSinkSigs
+	
+}
+
+class DefaultSourceAndSinkManager(appPackageName : String, 
+    												layoutControls : Map[Int, LayoutControl], 
+    												callbackMethods : ISet[JawaProcedure], 
+    												sasFilePath : String) extends BasicSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
 	
 	def isCallbackSource(proc : JawaProcedure) : Boolean = {
 	  if(this.callbackMethods.contains(proc) && proc.getParamNames.size > 0) false
@@ -104,12 +129,12 @@ object SourceAndSinkCenter {
 	  false
 	}
 	
-	def checkIccSink(invNode : CGCallNode, rfaFact : ISet[RFAFact]) : Boolean = {
+	def isIccSink(invNode : CGCallNode, rfaFact : ISet[RFAFact]) : Boolean = {
     var sinkflag = false
     val calleeSet = invNode.getCalleeSet
     calleeSet.foreach{
       callee =>
-        if(InterComponentCommunicationModel.isIccOperation(callee)){
+        if(InterComponentCommunicationModel.isIccOperation(callee.calleeProc)){
           sinkflag = true
           val rfafactMap = ReachingFactsAnalysisHelper.getFactMap(rfaFact)
           val args = invNode.getOwner.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
@@ -133,8 +158,8 @@ object SourceAndSinkCenter {
               coms.foreach{
                 case (com, typ) =>
                   typ match {
-//                    case IntentHelper.IntentType.EXPLICIT => if(com.isPhantom) sinkflag = true
-                    case IntentHelper.IntentType.EXPLICIT => sinkflag = true
+                    case IntentHelper.IntentType.EXPLICIT => if(com.isPhantom) sinkflag = true
+//                    case IntentHelper.IntentType.EXPLICIT => sinkflag = true
                     case IntentHelper.IntentType.IMPLICIT => sinkflag = true
                   }
               }
@@ -144,43 +169,27 @@ object SourceAndSinkCenter {
     sinkflag
 	}
   
-  def checkIccSource(iddg : InterProceduralDataDependenceGraph[CGNode], entNode : CGNode, sinkNodes : ISet[CGNode]) : Boolean = {
-    var sourceflag = true
-    val reachableSinks = sinkNodes.filter{sinN => iddg.findPath(entNode, sinN) != null}
-    if(!reachableSinks.isEmpty){
-	    val sinkProcs = reachableSinks.filter(_.isInstanceOf[CGCallNode]).map(_.asInstanceOf[CGCallNode].getCalleeSet).reduce(iunion[JawaProcedure])
-	    require(!sinkProcs.isEmpty)
-	    val neededPermissions = sinkProcs.map(sin => this.apiPermissions.getOrElse(sin.getSignature, isetEmpty)).reduce(iunion[String])
-	    val infos = AppCenter.getAppInfo.getComponentInfos
-	    infos.foreach{
-	      info =>
-	        if(info.name == entNode.getOwner.getDeclaringRecord.getName){
-	          if(info.exported == true){
-	            if(info.permission.isDefined){
-	              sourceflag = !(neededPermissions - info.permission.get).isEmpty
-	            }
-	          }
-	        }
-	    }
-    }
+  def isIccSource(entNode : CGNode, iddgEntNode : CGNode) : Boolean = {
+    var sourceflag = false
+//    val reachableSinks = sinkNodes.filter{sinN => iddg.findPath(entNode, sinN) != null}
+//    if(!reachableSinks.isEmpty){
+//	    val sinkProcs = reachableSinks.filter(_.isInstanceOf[CGCallNode]).map(_.asInstanceOf[CGCallNode].getCalleeSet).reduce(iunion[Callee])
+//	    require(!sinkProcs.isEmpty)
+//	    val neededPermissions = sinkProcs.map(sin => this.apiPermissions.getOrElse(sin.calleeProc.getSignature, isetEmpty)).reduce(iunion[String])
+//	    val infos = AppCenter.getAppInfo.getComponentInfos
+//	    infos.foreach{
+//	      info =>
+//	        if(info.name == entNode.getOwner.getDeclaringRecord.getName){
+//	          if(info.exported == true){
+//	            if(info.permission.isDefined){
+//	              sourceflag = !(neededPermissions - info.permission.get).isEmpty
+//	            }
+//	          }
+//	        }
+//	    }
+//    }
     sourceflag
-    false
   }
-
-	
-	def addSource(source : String, category : Category.Value) = {
-	  this.sources += (source -> category)
-	  this.apiPermissions += (source -> this.apiPermissions.getOrElse(source, isetEmpty))
-	}
-	
-	def addSink(sink : String, category : Category.Value) = {
-	  this.sinks += (sink -> category)
-	  this.apiPermissions += (sink -> this.apiPermissions.getOrElse(sink, isetEmpty))
-	}
-	
-	def getSourceSigs : ISet[String] = this.sources.map{_._1}.toSet
-	def getSinkSigs : ISet[String] = this.sinks.map{_._1}.toSet
-	def getInterestedSigs : ISet[String] = getSourceSigs ++ getSinkSigs
 }
 
 object SSParser{

@@ -17,7 +17,6 @@ import scala.util.control.Breaks._
 import org.sireum.amandroid.alir.AppCenter
 import org.sireum.jawa.GlobalConfig
 import org.sireum.jawa.MessageCenter._
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis.SourceAndSinkCenter
 import org.sireum.amandroid.android.parser.ComponentInfo
 import java.io.InputStream
 import org.sireum.jawa.util.ResourceRetriever
@@ -34,20 +33,19 @@ import org.sireum.jawa.util.IgnoreException
  */
 class AppInfoCollector(apkUri : FileResourceUri) {  
   
-  private var uses_permissions : ISet[String] = isetEmpty
-	private var callbackMethods : Map[JawaRecord, Set[JawaProcedure]] = Map()
-	private var componentInfos : Set[ComponentInfo] = null
-	private var layoutControls : Map[Int, LayoutControl] = Map()
-	private var appPackageName : String = ""
-	private var taintWrapperFile : String = ""
-	private var intentFdb : IntentFilterDataBase = null
-	private var codeLineCounter : Int = 0
-	private var sensitiveLayoutContainers : Set[JawaRecord] = Set()
+  protected var uses_permissions : ISet[String] = isetEmpty
+	protected var callbackMethods : Map[JawaRecord, Set[JawaProcedure]] = Map()
+	protected var componentInfos : Set[ComponentInfo] = Set()
+	protected var layoutControls : Map[Int, LayoutControl] = Map()
+	protected var appPackageName : String = null
+	protected var taintWrapperFile : String = null
+	protected var intentFdb : IntentFilterDataBase = null
+	protected var codeLineCounter : Int = 0
+	
 	/**
 	 * Map from record name to it's env procedure code.
 	 */
-	private var envProcMap : Map[JawaRecord, JawaProcedure] = Map()
-	private var envCodeMap : Map[JawaRecord, String] = Map()
+	protected var envProcMap : Map[JawaRecord, JawaProcedure] = Map()
 	def getAppName = new File(new URI(apkUri)).getName()
 	def getPackageName = this.appPackageName
 	def getUsesPermissions = this.uses_permissions
@@ -74,22 +72,21 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 	
 	def getIntentDB = this.intentFdb
 	def getEntryPoints = this.componentInfos.map(_.name).toSet
-	def getSensitiveLayoutContainers = this.sensitiveLayoutContainers
+	
 	def getComponentInfos = this.componentInfos
 	def getEnvMap = this.envProcMap
 	def getEnvString : String = {
 	  val sb = new StringBuilder
-	  this.envCodeMap.foreach{
+	  this.envProcMap.foreach{
 	    case (k, v) =>
 	      sb.append("*********************** Environment for " + k + " ************************\n")
-	      sb.append(v + "\n\n")
+	      sb.append(v.retrieveCode + "\n\n")
 	  }
 	  sb.toString.intern()
 	}
 	
 	def hasEnv(rec : JawaRecord) : Boolean = this.envProcMap.contains(rec)
 	
-
 	/**
 	 * generates env code for a component like Activity, BroadcastReceiver, etc.
 	 * @param recordName component name
@@ -113,9 +110,8 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 	      }
 	  }
 	  dmGen.setCallbackFunctions(callbackMethodSigs)
-    val (proc, code) = dmGen.generateWithParam(List(AndroidEntryPointConstants.INTENT_NAME), envName)
-    this.envCodeMap += (record -> code)
-	  this.envProcMap += (record -> proc)
+    val proc = dmGen.generateWithParam(List(AndroidEntryPointConstants.INTENT_NAME), envName)
+    this.envProcMap += (record -> proc)
 	  dmGen.getCodeCounter
 	}
 	
@@ -133,8 +129,8 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 		  			this.callbackMethods += (k -> (this.callbackMethods.getOrElse(k, isetEmpty) ++ v))
 				}
 			  msg_normal("Found " + this.callbackMethods.size + " callback methods")
-		    val clCounter = generateEnvironment(comRec, AndroidConstants.COMP_ENV, codeLineCounter)
-		    codeLineCounter = clCounter
+		    val clCounter = generateEnvironment(comRec, AndroidConstants.COMP_ENV, this.codeLineCounter)
+		    this.codeLineCounter = clCounter
 		    AppCenter.addComponent(comRec)
 		    AppCenter.addDynamicRegisteredComponent(comRec, precise)
 		    AppCenter.updateIntentFilterDB(iDB)
@@ -144,41 +140,76 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 	}
 	
 	def collectInfo : Unit = {
-	  val mfp = new ManifestParser
-		mfp.loadManifestFile(apkUri)
+	  val mfp = AppInfoCollector.analyzeManifest(apkUri)
+	  val afp = AppInfoCollector.analyzeARSC(apkUri)
+		val lfp = AppInfoCollector.analyzeLayouts(apkUri, mfp)
+		val ra = AppInfoCollector.reachabilityAnalysis(mfp)
+		val callbacks = AppInfoCollector.analyzeCallback(afp, lfp, ra)
+		
 		this.appPackageName = mfp.getPackageName
 		this.componentInfos = mfp.getComponentInfos
 		this.uses_permissions = mfp.getPermissions
 		this.intentFdb = mfp.getIntentDB
+		this.layoutControls = lfp.getUserControls
+		this.callbackMethods = callbacks
+		
+		var components = isetEmpty[JawaRecord]
+    mfp.getComponentInfos.foreach{
+      f => 
+        val record = Center.resolveRecord(f.name, Center.ResolveLevel.HIERARCHY)
+        if(!record.isPhantom){
+	        components += record
+	        val clCounter = generateEnvironment(record, if(f.exported)AndroidConstants.MAINCOMP_ENV else AndroidConstants.COMP_ENV, codeLineCounter)
+	        codeLineCounter = clCounter
+        }
+    }
+		
+		AppCenter.setComponents(components)
+		AppCenter.updateIntentFilterDB(this.intentFdb)
+		AppCenter.setAppInfo(this)
+		msg_normal("Entry point calculation done.")
+	}
+}
+
+object AppInfoCollector {
+	def analyzeManifest(apkUri : FileResourceUri) : ManifestParser = {
+	  val mfp = new ManifestParser
+		mfp.loadManifestFile(apkUri)
 	  msg_normal("entrypoints--->" + mfp.getComponentRecords)
 	  msg_normal("packagename--->" + mfp.getPackageName)
 	  msg_normal("permissions--->" + mfp.getPermissions)
 	  msg_normal("intentDB------>" + mfp.getIntentDB)
-		// Parse the resource file
+	  mfp
+	}
+	
+	def analyzeARSC(apkUri : FileResourceUri) : ARSCFileParser = {
+	  // Parse the resource file
 	  val afp = new ARSCFileParser()
 		afp.parse(apkUri)
 	  msg_detail("arscstring-->" + afp.getGlobalStringPool)
 	  msg_detail("arscpackage-->" + afp.getPackages)
-		
-		// Find the user-defined sources in the layout XML files
+	  afp
+	}
+	
+	def analyzeLayouts(apkUri : FileResourceUri, mfp : ManifestParser) : LayoutFileParser = {
+	  // Find the user-defined sources in the layout XML files
 	  val lfp = new LayoutFileParser
-		lfp.setPackageName(this.appPackageName)
-		lfp.parseLayoutFile(apkUri, this.componentInfos.map(_.name))
-		this.layoutControls = lfp.getUserControls
+		lfp.setPackageName(mfp.getPackageName)
+		lfp.parseLayoutFile(apkUri, mfp.getComponentInfos.map(_.name))
 		msg_detail("layoutcallback--->" + lfp.getCallbackMethods)
 	  msg_detail("layoutuser--->" + lfp.getUserControls)
-		if(!this.layoutControls.exists(p => p._2.isSensitive)) throw new IgnoreException
-		// Collect the callback interfaces implemented in the app's source code
-		val analysisHelper = new ReachableInfoCollector(this.componentInfos.map(_.name)) 
-	  analysisHelper.init
-	  this.sensitiveLayoutContainers = analysisHelper.getSensitiveLayoutContainer(this.layoutControls)
-		analysisHelper.collectCallbackMethods()
-		this.callbackMethods = analysisHelper.getCallbackMethods
+	  lfp
+	}
+	
+	def analyzeCallback(afp : ARSCFileParser, lfp : LayoutFileParser, analysisHelper : ReachableInfoCollector) : Map[JawaRecord, Set[JawaProcedure]] = {
+	  var callbackMethods : Map[JawaRecord, Set[JawaProcedure]] = Map()
+	  analysisHelper.collectCallbackMethods()
+		callbackMethods = analysisHelper.getCallbackMethods
 		msg_detail("LayoutClasses --> " + analysisHelper.getLayoutClasses)
 
 		analysisHelper.getCallbackMethods.foreach {
 	    case(k, v) =>
-  			this.callbackMethods += (k -> (this.callbackMethods.getOrElse(k, isetEmpty) ++ v))
+  			callbackMethods += (k -> (callbackMethods.getOrElse(k, isetEmpty) ++ v))
 		}
 	  
 		// Collect the XML-based callback methods
@@ -205,7 +236,7 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 		                  }
 		                }
 		                if(callbackProcedure != null){
-		                  this.callbackMethods += (k -> (this.callbackMethods.getOrElse(k, isetEmpty) ++ callbackProcedure))
+		                  callbackMethods += (k -> (callbackMethods.getOrElse(k, isetEmpty) ++ callbackProcedure))
 		                } else {
 		                  err_msg_normal("Callback method " + methodName + " not found in class " + k);
 		                }
@@ -217,21 +248,14 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 		        }
 		    }
 		}
-
-    var components = isetEmpty[JawaRecord]
-    this.componentInfos.foreach{
-      f => 
-        val record = Center.resolveRecord(f.name, Center.ResolveLevel.HIERARCHY)
-        if(!record.isPhantom){
-	        components += record
-	        val clCounter = generateEnvironment(record, if(f.exported)AndroidConstants.MAINCOMP_ENV else AndroidConstants.COMP_ENV, codeLineCounter)
-	        codeLineCounter = clCounter
-        }
-    }
-		
-		AppCenter.setComponents(components)
-		AppCenter.updateIntentFilterDB(this.intentFdb)
-		AppCenter.setAppInfo(this)
-		msg_normal("Entry point calculation done.")
+		callbackMethods
+	}
+	
+	def reachabilityAnalysis(mfp : ManifestParser) : ReachableInfoCollector = {
+	  // Collect the callback interfaces implemented in the app's source code
+		val analysisHelper = new ReachableInfoCollector(mfp.getComponentInfos.map(_.name)) 
+	  analysisHelper.init
+//	  this.sensitiveLayoutContainers = analysisHelper.getSensitiveLayoutContainer(this.layoutControls)
+		analysisHelper
 	}
 }

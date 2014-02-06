@@ -47,7 +47,7 @@ object InterComponentCommunicationModel {
               case None => 
                 com.tryGetProcedure(AndroidConstants.COMP_ENV_SUBSIG) match{
                   case Some(r) => targets += r
-                  case None => err_msg_critical("Target component " + com + " does not have environment.")
+                  case None => err_msg_normal("Target component " + com + " does not have environment.")
                 }
             }
 	      }

@@ -49,11 +49,13 @@ object IntentHelper {
             val cFieldSlot = FieldSlot(compIns, AndroidConstants.COMPONENTNAME_CLASS)
             factMap.getOrElse(cFieldSlot, isetEmpty).foreach{
               ins =>
-                if(ins.isInstanceOf[RFAConcreteStringInstance])
-                  componentNames += StringFormConverter.formatClassNameToRecordName(ins.asInstanceOf[RFAConcreteStringInstance].string)
+                if(ins.isInstanceOf[RFAConcreteStringInstance]){
+                  componentNames += ins.asInstanceOf[RFAConcreteStringInstance].string
+                }
                 else preciseExplicit = false
             }
         }
+        
         var actions: ISet[String] = isetEmpty[String]
         val acFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_ACTION)
         factMap.getOrElse(acFieldSlot, isetEmpty).foreach{
@@ -113,7 +115,7 @@ object IntentHelper {
     var port:String = null
     var path:String = null
     if(uriData != null){
-      if(!uriData.startsWith("tel") && uriData.contains("://") && uriData.indexOf("://") < uriData.length()){
+      if(!uriData.startsWith("tel:") && !uriData.startsWith("file:") && uriData.contains("://") && uriData.indexOf("://") < uriData.length()){
         var legalUriStr : String = uriData
         if(uriData.contains("=")){
           val (head, query) = uriData.splitAt(uriData.indexOf("=") + 1)
@@ -127,7 +129,7 @@ object IntentHelper {
 	        path = if(uri.getPath() != "") uri.getPath() else null
 	        data.set(scheme, host, port, path, null, null)
         } catch {
-          case e : IllegalArgumentException => err_msg_critical("Unexpected uri: " + legalUriStr)
+          case e : IllegalArgumentException => err_msg_normal("Unexpected uri: " + legalUriStr)
         }
       } else if(uriData.contains(":")){  // because e.g. app code can have intent.setdata("http:") instead of intent.setdata("http://xyz:200/pqr/abc")
         scheme = uriData.split(":")(0)
@@ -143,6 +145,7 @@ object IntentHelper {
 	      var components : ISet[(JawaRecord, IntentType.Value)] = isetEmpty
 	      ic.componentNames.foreach{
 	        targetRecName =>
+	          
 		        val targetRec = Center.resolveRecord(targetRecName, Center.ResolveLevel.HIERARCHY)
             if(DEBUG)
             	msg_detail("explicit target component: " + targetRec)

@@ -29,8 +29,11 @@ import org.sireum.jawa.util.IgnoreException
 import org.scalatest.exceptions.TestFailedDueToTimeoutException
 import org.sireum.jawa.util.TimeOutException
 import org.sireum.jawa.util.Timer
+import org.sireum.jawa.alir.interProcedural.sideEffectAnalysis.InterProceduralSideEffectAnalysisResult
+import org.sireum.amandroid.security.password.SensitiveViewCollector
+import org.sireum.amandroid.security.password.PasswordSourceAndSinkManager
 
-object Counter {
+object PasswordCounter {
   var total = 0
   var oversize = 0
   var haveresult = 0
@@ -99,14 +102,10 @@ trait CompleteRFATestFramework extends TestFramework {
 
     test(title) {
     	msg_critical("####" + title + "#####")
-    	Counter.total += 1
+    	PasswordCounter.total += 1
     	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
     	AndroidGlobalConfig.initJawaAlirInfoProvider
-    	Center.reset
-    	AppCenter.reset
-    	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
-    	JawaCodeSource.clearAppRecordsCodes
-    	ClassLoadManager.reset
+    	
     	val srcFile = new File(new URI(srcRes))
     	val dexFile = APKFileResolver.getDexFile(srcRes, FileUtil.toUri(srcFile.getParentFile()))
     	
@@ -117,22 +116,21 @@ trait CompleteRFATestFramework extends TestFramework {
     		AndroidRFAConfig.setupCenter
 	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
 	    	JawaCodeSource.load(pilarFileUri, AndroidLibraryAPISummary)
-	    	Counter.addRecs(JawaCodeSource.getAppRecordsCodes.keys)
+	    	PasswordCounter.addRecs(JawaCodeSource.getAppRecordsCodes.keys)
 	    	try{
-		    	
-		    	val pre = new AppInfoCollector(srcRes)
+		    	val pre = new SensitiveViewCollector(srcRes)
 				  pre.collectInfo
 				  if(pre.getLayoutControls.exists(p => p._2.isSensitive == true)){
-				    Counter.havePasswordView += 1
-				    Counter.havePasswordViewList += title
+				    PasswordCounter.havePasswordView += 1
+				    PasswordCounter.havePasswordViewList += title
 				  }
-				  SourceAndSinkCenter.init(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+				  val ssm = new PasswordSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
 		    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
 		    	entryPoints = entryPoints.filter(e=>pre.getSensitiveLayoutContainers.contains(e.getDeclaringRecord))
 		    	if(!entryPoints.isEmpty){
-		    	  Counter.foundPasswordContainer += 1
-		    	  Counter.foundPasswordContainerList += title
+		    	  PasswordCounter.foundPasswordContainer += 1
+		    	  PasswordCounter.foundPasswordContainerList += title
 		    	}
 				  
 		    	entryPoints.par.foreach{
@@ -140,12 +138,13 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	    try{
 			    	    msg_critical("--------------Component " + ep + "--------------")
 			    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, Some(new Timer(200000)), false)
+			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, Some(new Timer(300000)), false)
 			    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
 			    	    msg_critical("processed-->" + icfg.getProcessed.size)
 			    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
+//			    	    iddResult.getIddg.toDot(new PrintWriter(System.out))
 			    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
-			    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult)    
+			    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult, ssm)    
 			    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
 				    	} catch {
 		    	      case te : TimeOutException => System.err.println("Timeout!")
@@ -153,8 +152,8 @@ trait CompleteRFATestFramework extends TestFramework {
     	    } 
 				  
 		    	if(AppCenter.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
-    	      Counter.taintPathFound += 1
-    	      Counter.taintPathFoundList += title
+    	      PasswordCounter.taintPathFound += 1
+    	      PasswordCounter.taintPathFoundList += title
     	    }
 		    	val appData = DataCollector.collect
 		    	MetricRepo.collect(appData)
@@ -169,12 +168,14 @@ trait CompleteRFATestFramework extends TestFramework {
 			    val mr = new PrintWriter(outputDir + "/MetricInfo.txt")
 				  mr.print(MetricRepo.toString)
 				  mr.close()
-				  Counter.haveresult += 1
+				  PasswordCounter.haveresult += 1
 	    	} catch {
 	    	  case ie : IgnoreException =>
 	    	    err_msg_critical("Ignored!")
 	    	  case re : RuntimeException => 
 	    	    re.printStackTrace()
+	    	  case e : Exception =>
+	    	    e.printStackTrace()
 	    	} finally {
 	    	}
 	    	
@@ -184,14 +185,20 @@ trait CompleteRFATestFramework extends TestFramework {
 	//    	    println("  case \"" + p.getSignature + "\" =>  //" + p.getAccessFlagString)
 	//    	}
     	} else {
-    	  Counter.oversize += 1
+    	  PasswordCounter.oversize += 1
     	  err_msg_critical("Pilar file size is too large:" + pilarFile.length()/1024/1024 + "MB")
     	}
+    	
+    	Center.reset
+    	AppCenter.reset
+    	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
+    	JawaCodeSource.clearAppRecordsCodes
+    	ClassLoadManager.reset
     	System.gc()
 		  System.gc()
-    	msg_critical(Counter.toString)
-//    	Counter.outputInterestingFileNames
-//    	Counter.outputRecStatistic
+    	msg_critical(PasswordCounter.toString)
+//    	PasswordCounter.outputInterestingFileNames
+//    	PasswordCounter.outputRecStatistic
     	msg_critical("************************************\n")
     }
   }

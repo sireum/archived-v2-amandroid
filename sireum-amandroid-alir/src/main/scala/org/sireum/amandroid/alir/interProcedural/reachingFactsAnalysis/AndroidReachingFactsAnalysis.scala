@@ -32,6 +32,9 @@ import org.sireum.jawa.alir.interProcedural.NodeListener
 import org.sireum.jawa.Mode
 import scala.collection.immutable.BitSet
 import org.sireum.jawa.util.Timer
+import org.sireum.jawa.alir.interProcedural.sideEffectAnalysis.InterProceduralSideEffectAnalysisResult
+import org.sireum.amandroid.alir.AndroidGlobalConfig
+import java.io.PrintWriter
 
 class AndroidReachingFactsAnalysisBuilder(timerOpt : Option[Timer] = None){
   
@@ -54,9 +57,9 @@ class AndroidReachingFactsAnalysisBuilder(timerOpt : Option[Timer] = None){
     val iota : ISet[RFAFact] = initialFacts + RFAFact(VarSlot("@@[|RFAiota|]"), NullInstance(initContext))
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](cg,
       true, true, false, parallel, gen, kill, callr, iota, initial, switchAsOrderedMatch, Some(nl))
-
-//    print("RFA\n")
-//    print(result)
+//    val mr = new PrintWriter("/Volumes/hd/fgwei/Desktop/IRFA.txt")
+//	  mr.print(result)
+//	  mr.close()
     (cg, result)
   }
   
@@ -175,7 +178,7 @@ class AndroidReachingFactsAnalysisBuilder(timerOpt : Option[Timer] = None){
 	            } else {
 	              RFAInstance(typ, currentContext.copy)
 	            }
-      	    result ++= rec.getNonStaticObjectTypeFields.map(f=>RFAFact(FieldSlot(ins, f.getSignature), NullInstance(currentContext)))
+//      	    result ++= rec.getNonStaticObjectTypeFields.map(f=>RFAFact(FieldSlot(ins, f.getSignature), NullInstance(currentContext)))
       	  case _ =>
         }
     }
@@ -306,7 +309,8 @@ class AndroidReachingFactsAnalysisBuilder(timerOpt : Option[Timer] = None){
       var pureNormalFlag = true  //no mix of normal and model callee
       calleeSet.foreach{
         callee =>
-          if(AndroidReachingFactsAnalysisHelper.isICCCall(callee) || AndroidReachingFactsAnalysisHelper.isModelCall(callee)){
+          val calleep = callee.calleeProc
+          if(AndroidReachingFactsAnalysisHelper.isICCCall(calleep) || AndroidReachingFactsAnalysisHelper.isModelCall(calleep)){
             pureNormalFlag = false
             val args = cj.callExp.arg match{
               case te : TupleExp =>
@@ -319,10 +323,10 @@ class AndroidReachingFactsAnalysisBuilder(timerOpt : Option[Timer] = None){
 			          }.toList
               case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
             }
-            if(AndroidReachingFactsAnalysisHelper.isICCCall(callee)) {
-              val factsForCallee = getFactsForICCTarget(s, cj, callee)
+            if(AndroidGlobalConfig.resolve_icc && AndroidReachingFactsAnalysisHelper.isICCCall(calleep)) {
+              val factsForCallee = getFactsForICCTarget(s, cj, calleep)
               returnFacts --= factsForCallee
-              val (retFacts, targets) = AndroidReachingFactsAnalysisHelper.doICCCall(factsForCallee, callee, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)
+              val (retFacts, targets) = AndroidReachingFactsAnalysisHelper.doICCCall(factsForCallee, calleep, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)
               tmpReturnFacts ++= retFacts
               targets.foreach{
                 target =>
@@ -335,18 +339,18 @@ class AndroidReachingFactsAnalysisBuilder(timerOpt : Option[Timer] = None){
               }
             } else { // for non-ICC model call
 //              if(callee.getSubSignature == "unknown:()LCenter/Unknown;") println("callees-->" + calleeSet + "\ncontext-->" + callerContext + "\nfacts-->" + s)
-              val factsForCallee = getFactsForCallee(s, cj, callee)
+              val factsForCallee = getFactsForCallee(s, cj, calleep)
               returnFacts --= factsForCallee
-            	tmpReturnFacts ++= AndroidReachingFactsAnalysisHelper.doModelCall(factsForCallee, callee, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)
+            	tmpReturnFacts ++= AndroidReachingFactsAnalysisHelper.doModelCall(factsForCallee, calleep, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)
             }
           } else { // for normal call
-            if(!cg.isProcessed(callee, callerContext)){
-              cg.collectCfgToBaseGraph[String](callee, callerContext, false)
-            	cg.extendGraph(callee.getSignature, callerContext)
+            if(!cg.isProcessed(calleep, callerContext)){
+              cg.collectCfgToBaseGraph[String](calleep, callerContext, false)
+            	cg.extendGraph(calleep.getSignature, callerContext)
             }
-            val factsForCallee = getFactsForCallee(s, cj, callee)
+            val factsForCallee = getFactsForCallee(s, cj, calleep)
             returnFacts --= factsForCallee
-            calleeFactsMap += (cg.entryNode(callee, callerContext) -> mapFactsToCallee(factsForCallee, cj, callee.getProcedureBody.procedure))
+            calleeFactsMap += (cg.entryNode(calleep, callerContext) -> mapFactsToCallee(factsForCallee, cj, calleep.getProcedureBody.procedure))
           }
       }
       returnFacts ++= tmpReturnFacts
@@ -471,7 +475,7 @@ class AndroidReachingFactsAnalysisBuilder(timerOpt : Option[Timer] = None){
           
           for(i <- 0 to argSlots.size - 1){
             val argSlot = argSlots(i)
-            if(paramSlots.size < argSlots.size) err_msg_normal("cj-->" + cj + "\ncalleeProcedure-->" +calleeProcedure )
+            if(paramSlots.size < argSlots.size) err_msg_normal("argSlots does not adjust to paramSlots:\n" + argSlots + "\n" + paramSlots)
             val paramSlot = paramSlots(i)
             varFacts.foreach{
               fact =>

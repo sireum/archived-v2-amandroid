@@ -230,7 +230,7 @@ object DataCollector {
 	    													 protectPermission : Option[String],
 	    													 intentFilters : ISet[IntentFilter],
 	    													 iccInfos : ISet[IccInfo],
-	    													 taintResult : TaintAnalysisResult){
+	    													 taintResultOpt : Option[TaintAnalysisResult]){
     override def toString : String = {
       val compData = template.getInstanceOf("ComponentData")
       compData.add("compName", name)
@@ -243,8 +243,8 @@ object DataCollector {
       compData.add("iccInfos", iccInfoStrings)
       val taintResultT = template.getInstanceOf("TaintResult")
       val sourceStrings : ArrayList[String] = new ArrayList[String]
-      if(taintResult != null){
-	      taintResult.getSourceNodes.foreach{
+      if(taintResultOpt.isDefined){
+	      taintResultOpt.get.getSourceNodes.foreach{
 	        sn =>
 	          val ssInfo = template.getInstanceOf("SourceSinkInfo")
 	          val descriptorStrings : ArrayList[String] = new ArrayList[String]
@@ -253,7 +253,7 @@ object DataCollector {
 	          sourceStrings.add(ssInfo.render())
 	      }
 	      val sinkStrings : ArrayList[String] = new ArrayList[String]
-	      taintResult.getSinkNodes.foreach{
+	      taintResultOpt.get.getSinkNodes.foreach{
 	        sn =>
 	          val ssInfo = template.getInstanceOf("SourceSinkInfo")
 	          val descriptorStrings : ArrayList[String] = new ArrayList[String]
@@ -264,7 +264,7 @@ object DataCollector {
 	      taintResultT.add("sources", sourceStrings)
 	      taintResultT.add("sinks", sinkStrings)
 	      val pathStrings : ArrayList[String] = new ArrayList[String]
-	      val taintPaths = taintResult.getTaintedPaths
+	      val taintPaths = taintResultOpt.get.getTaintedPaths
 	      taintPaths.foreach{
 	        taintPath =>
 	          val path = template.getInstanceOf("TaintPath")
@@ -308,13 +308,13 @@ object DataCollector {
 	      val protectPermission = comp.permission
 	      val intentFilters = intentFDB.getIntentFilters(compName)
 	      var iccInfos = isetEmpty[IccInfo]
-	      var taintResult : TaintAnalysisResult = null
+	      var taintResult : Option[TaintAnalysisResult] = None
 	      if(!compRec.isPhantom){
 	        if(AppCenter.hasInterproceduralReachingFactsAnalysisResult(compRec)){
 			      val (icfg, irfaResult) = AppCenter.getInterproceduralReachingFactsAnalysisResult(compRec)
 			      val iccNodes = icfg.nodes.filter{
 			        	node =>
-			        	  node.isInstanceOf[CGCallNode] && node.asInstanceOf[CGCallNode].getCalleeSet.exists(InterComponentCommunicationModel.isIccOperation(_))
+			        	  node.isInstanceOf[CGCallNode] && node.asInstanceOf[CGCallNode].getCalleeSet.exists(c => InterComponentCommunicationModel.isIccOperation(c.calleeProc))
 			      	}.map(_.asInstanceOf[CGCallNode])
 			      iccInfos =
 				      iccNodes.map{
@@ -337,9 +337,9 @@ object DataCollector {
 								  val intentcontents = IntentHelper.getIntentContents(factMap, intentValues, iccNode.getContext)
 								  val comMap = IntentHelper.mappingIntents(intentcontents)
 								  val intents = intentcontents.map(ic=>Intent(ic.componentNames, ic.actions, ic.categories, ic.datas, ic.types, ic.preciseExplicit, ic.preciseImplicit, comMap(ic).map(c=>(c._1.getName, c._2.toString()))))
-								  IccInfo(iccNode.getCalleeSet.map(_.getSignature), iccNode.getContext, intents)
+								  IccInfo(iccNode.getCalleeSet.map(_.calleeProc.getSignature), iccNode.getContext, intents)
 				      }.toSet
-			      taintResult = AppCenter.getTaintAnalysisResult(compRec)
+			      taintResult = if(AppCenter.hasTaintAnalysisResult(compRec)) Some(AppCenter.getTaintAnalysisResult(compRec)) else None
 		      }
 	      }
 	      ComponentData(compName, typ, exported, protectPermission, intentFilters, iccInfos, taintResult)

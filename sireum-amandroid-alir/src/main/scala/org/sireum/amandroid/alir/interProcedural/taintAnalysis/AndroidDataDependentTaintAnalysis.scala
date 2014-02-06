@@ -19,12 +19,6 @@ import scala.tools.nsc.ConsoleWriter
 object AndroidDataDependentTaintAnalysis {
   type Node = InterproceduralDataDependenceAnalysis.Node
   
-  final val API_SOURCE = "api_source"
-  final val API_SINK = "api_sink"
-  final val ICC_SOURCE = "icc_source"
-  final val ICC_SINK = "icc_sink"
-  final val CALLBACK_SOURCE = "callback_source"
-  
   case class Td(name : String, typ : String) extends TaintDescriptor {
     override def toString : String = "(" + name + "," + typ + ")"
   }
@@ -85,12 +79,12 @@ object AndroidDataDependentTaintAnalysis {
 		              srcTyp =>
 		                sintyps.foreach{
 		                  sinTyp =>
-		                    if(srcTyp == API_SOURCE || srcTyp == CALLBACK_SOURCE){
-		                      if(sinTyp == API_SINK) tp.typs += AndroidProblemCategories.MAL_INFOMATION_LEAK
-		                      else if(sinTyp == ICC_SINK) tp.typs += AndroidProblemCategories.VUL_INFOMATION_LEAK
-		                    } else if(srcTyp == ICC_SOURCE) {
-		                      if(sinTyp == API_SINK) tp.typs += AndroidProblemCategories.VUL_CAPABILITY_LEAK
-		                      else if(sinTyp == ICC_SINK) tp.typs += AndroidProblemCategories.VUL_CONFUSED_DEPUTY
+		                    if(srcTyp == SourceAndSinkCategory.API_SOURCE || srcTyp == SourceAndSinkCategory.CALLBACK_SOURCE){
+		                      if(sinTyp == SourceAndSinkCategory.API_SINK) tp.typs += AndroidProblemCategories.MAL_INFOMATION_LEAK
+		                      else if(sinTyp == SourceAndSinkCategory.ICC_SINK) tp.typs += AndroidProblemCategories.VUL_INFOMATION_LEAK
+		                    } else if(srcTyp == SourceAndSinkCategory.ICC_SOURCE) {
+		                      if(sinTyp == SourceAndSinkCategory.API_SINK) tp.typs += AndroidProblemCategories.VUL_CAPABILITY_LEAK
+		                      else if(sinTyp == SourceAndSinkCategory.ICC_SINK) tp.typs += AndroidProblemCategories.VUL_CONFUSED_DEPUTY
 		                    }
 		                }
 		            }
@@ -112,46 +106,21 @@ object AndroidDataDependentTaintAnalysis {
     }
   }
     
-	def apply(iddi : InterproceduralDataDependenceInfo, rfaResult : AndroidReachingFactsAnalysis.Result) : TaintAnalysisResult
-  	= build(iddi, rfaResult)
+	def apply(iddi : InterproceduralDataDependenceInfo, rfaResult : AndroidReachingFactsAnalysis.Result, ssm : BasicSourceAndSinkManager) : TaintAnalysisResult
+  	= build(iddi, rfaResult, ssm)
   	
-  def build(iddi : InterproceduralDataDependenceInfo, rfaResult : AndroidReachingFactsAnalysis.Result) : TaintAnalysisResult = {
+  def build(iddi : InterproceduralDataDependenceInfo, rfaResult : AndroidReachingFactsAnalysis.Result, ssm : BasicSourceAndSinkManager) : TaintAnalysisResult = {
     var sourceNodes : ISet[TaintNode] = isetEmpty
     var sinkNodes : ISet[TaintNode] = isetEmpty
     val iddg = iddi.getIddg
     iddg.nodes.foreach{
       node =>
-        node match{
-          case invNode : CGInvokeNode =>
-            val rfaFacts = rfaResult.entrySet(invNode)
-            val (src, sin) = getSourceAndSinkNode(invNode, rfaFacts)
-            sourceNodes ++= src
-            sinkNodes ++= sin
-            if(invNode.isInstanceOf[CGCallNode] && SourceAndSinkCenter.checkIccSink(invNode.asInstanceOf[CGCallNode], rfaFacts)){
-              msg_normal("found icc sink: " + invNode)
-              val tn = new Tn(invNode)
-              tn.isSrc = false
-				      tn.descriptors += Td(invNode.getLocUri, ICC_SINK)
-				      sinkNodes += tn
-            }
-          case entNode : CGEntryNode =>
-            if(isCallBackSource(entNode)){
-              msg_normal("found callback source: " + entNode)
-              val tn = new Tn(entNode)
-              tn.isSrc = true
-				      tn.descriptors += Td(entNode.getOwner.getSignature, CALLBACK_SOURCE)
-				      sourceNodes += tn
-            }
-          case _ =>
-        }
+        val rfaFacts = rfaResult.entrySet(node)
+        val (src, sin) = getSourceAndSinkNode(node, rfaFacts, ssm, iddg)
+        sourceNodes ++= src
+        sinkNodes ++= sin
     }
-    if(SourceAndSinkCenter.checkIccSource(iddg, iddg.entryNode, sinkNodes.map(_.getNode))){
-      msg_normal("found icc source: " + iddg.entryNode)
-      val tn = new Tn(iddg.entryNode)
-      tn.isSrc = true
-      tn.descriptors += Td(iddg.entryNode.getOwner.getSignature, ICC_SOURCE)
-      sourceNodes += tn
-    }
+    
     val tar = new Tar(iddi)
     tar.sourceNodes = sourceNodes
     tar.sinkNodes = sinkNodes
@@ -162,47 +131,70 @@ object AndroidDataDependentTaintAnalysis {
     tar
   }
   
-  def isCallBackSource(entNode : CGEntryNode) = {
-    val owner = entNode.getOwner
-    SourceAndSinkCenter.isCallbackSource(owner)
-  }
-  
-  def getSourceAndSinkNode(invNode : CGInvokeNode, rfaFacts : ISet[RFAFact]) = {
-    val calleeSet = invNode.getCalleeSet
+  def getSourceAndSinkNode(node : CGNode, rfaFacts : ISet[RFAFact], ssm : BasicSourceAndSinkManager, iddg: InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node]) = {
     var sources = isetEmpty[TaintNode]
-    var sinks = isetEmpty[TaintNode]
-    calleeSet.foreach{
-      callee =>
-        var soundCallee = callee
-		    val caller = invNode.getOwner
-		    val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
-		    val cj = jumpLoc.jump.asInstanceOf[CallJump]
-		    if(callee.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
-		      val calleeSignature = cj.getValueAnnotation("signature") match {
-		        case Some(s) => s match {
-		          case ne : NameExp => ne.name.name
-		          case _ => ""
+		var sinks = isetEmpty[TaintNode]
+    node match{
+      case invNode : CGInvokeNode =>
+        val calleeSet = invNode.getCalleeSet
+		    calleeSet.foreach{
+		      callee =>
+		        val calleep = callee.calleeProc
+		        var soundCallee = calleep
+				    val caller = invNode.getOwner
+				    val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
+				    val cj = jumpLoc.jump.asInstanceOf[CallJump]
+				    if(calleep.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
+				      val calleeSignature = cj.getValueAnnotation("signature") match {
+				        case Some(s) => s match {
+				          case ne : NameExp => ne.name.name
+				          case _ => ""
+				        }
+				        case None => throw new RuntimeException("cannot found annotation 'signature' from: " + cj)
+				      }
+				      // source and sink APIs can only come from given app's parents.
+				      soundCallee = Center.getProcedureDeclaration(calleeSignature)
+				    }
+				    if(invNode.isInstanceOf[CGReturnNode] && ssm.isSource(soundCallee, caller, jumpLoc)){
+				      msg_normal("found source: " + soundCallee + "@" + invNode.getContext)
+				      val tn = new Tn(invNode)
+				      tn.isSrc = true
+				      tn.descriptors += Td(soundCallee.getSignature, SourceAndSinkCategory.API_SOURCE)
+				      sources += tn
+				    }
+				    if(invNode.isInstanceOf[CGCallNode] && ssm.isSinkProcedure(soundCallee)){
+				      msg_normal("found sink: " + soundCallee + "@" + invNode.getContext)
+				      val tn = new Tn(invNode)
+				      tn.isSrc = false
+				      tn.descriptors += Td(soundCallee.getSignature, SourceAndSinkCategory.API_SINK)
+				      sinks += tn
+				    }
+				    if(invNode.isInstanceOf[CGCallNode] && ssm.isIccSink(invNode.asInstanceOf[CGCallNode], rfaFacts)){
+		          msg_normal("found icc sink: " + invNode)
+		          val tn = new Tn(invNode)
+		          tn.isSrc = false
+				      tn.descriptors += Td(invNode.getLocUri, SourceAndSinkCategory.ICC_SINK)
+				      sinks += tn
 		        }
-		        case None => throw new RuntimeException("cannot found annotation 'signature' from: " + cj)
-		      }
-		      // source and sink APIs can only come from given app's parents.
-		      soundCallee = Center.getProcedureDeclaration(calleeSignature)
 		    }
-		    if(invNode.isInstanceOf[CGReturnNode] && SourceAndSinkCenter.isSource(soundCallee, caller, jumpLoc)){
-		      msg_normal("found source: " + soundCallee + "@" + invNode.getContext)
-		      val tn = new Tn(invNode)
+      case entNode : CGEntryNode =>
+        if(ssm.isIccSource(entNode, iddg.entryNode)){
+		      msg_normal("found icc source: " + iddg.entryNode)
+		      val tn = new Tn(iddg.entryNode)
 		      tn.isSrc = true
-		      tn.descriptors += Td(soundCallee.getSignature, API_SOURCE)
+		      tn.descriptors += Td(iddg.entryNode.getOwner.getSignature, SourceAndSinkCategory.ICC_SOURCE)
 		      sources += tn
 		    }
-		    if(invNode.isInstanceOf[CGCallNode] && SourceAndSinkCenter.isSinkProcedure(soundCallee)){
-		      msg_normal("found sink: " + soundCallee + "@" + invNode.getContext)
-		      val tn = new Tn(invNode)
-		      tn.isSrc = false
-		      tn.descriptors += Td(soundCallee.getSignature, API_SINK)
-		      sinks += tn
-		    }
+        if(ssm.isCallbackSource(entNode.getOwner)){
+          msg_normal("found callback source: " + entNode)
+          val tn = new Tn(entNode)
+          tn.isSrc = true
+		      tn.descriptors += Td(entNode.getOwner.getSignature, SourceAndSinkCategory.CALLBACK_SOURCE)
+		      sources += tn
+        }
+      case _ =>
     }
+    
     (sources, sinks)
   }
 }

@@ -244,40 +244,40 @@ class AndroidTaintAnalysisBuilder{
       // source and sink APIs can only come from given app's parents.
       soundCallee = Center.getProcedureDeclaration(calleeSignature)
     }
-    if(SourceAndSinkCenter.isSource(soundCallee, caller, jumpLoc)){
-      msg_normal("find source: " + soundCallee + "@" + currentContext)
-      lhssFacts.map{
-        case (i, _) => 
-          sources += (i -> (sources.getOrElse(i, isetEmpty) + soundCallee.getSignature))
-      }
-    }
-    if(SourceAndSinkCenter.isSinkProcedure(soundCallee)){
-      msg_normal("find sink: " + soundCallee + "@" + currentContext)
-      val args = cj.callExp.arg match{
-        case te : TupleExp =>
-          te.exps.map{
-            exp =>
-              exp match{
-		            case ne : NameExp => ne.name.name
-		            case _ => exp.toString()
-		          }
-          }.toList
-        case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
-      }
-      var argfacts = isetEmpty[RFAFact]
-      args.foreach{
-        arg =>
-          val argslot = VarSlot(arg)
-          argfacts ++= ReachingFactsAnalysisHelper.getRelatedFacts(argslot, cFacts)
-      }
-      val taintFacts = s.filter(taFact => argfacts.contains(taFact.fact))
-      if(!taintFacts.isEmpty){ // means at least one arg got tainted
-        taintFacts.foreach{
-          tFact =>
-            msg_critical("find path: " + tFact.source + " -> " + callee.getSignature)
-        }
-      }
-    }
+//    if(SourceAndSinkCenter.isSource(soundCallee, caller, jumpLoc)){
+//      msg_normal("find source: " + soundCallee + "@" + currentContext)
+//      lhssFacts.map{
+//        case (i, _) => 
+//          sources += (i -> (sources.getOrElse(i, isetEmpty) + soundCallee.getSignature))
+//      }
+//    }
+//    if(SourceAndSinkCenter.isSinkProcedure(soundCallee)){
+//      msg_normal("find sink: " + soundCallee + "@" + currentContext)
+//      val args = cj.callExp.arg match{
+//        case te : TupleExp =>
+//          te.exps.map{
+//            exp =>
+//              exp match{
+//		            case ne : NameExp => ne.name.name
+//		            case _ => exp.toString()
+//		          }
+//          }.toList
+//        case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
+//      }
+//      var argfacts = isetEmpty[RFAFact]
+//      args.foreach{
+//        arg =>
+//          val argslot = VarSlot(arg)
+//          argfacts ++= ReachingFactsAnalysisHelper.getRelatedFacts(argslot, cFacts)
+//      }
+//      val taintFacts = s.filter(taFact => argfacts.contains(taFact.fact))
+//      if(!taintFacts.isEmpty){ // means at least one arg got tainted
+//        taintFacts.foreach{
+//          tFact =>
+//            msg_critical("find path: " + tFact.source + " -> " + callee.getSignature)
+//        }
+//      }
+//    }
     if(isModelCall(callee)){
       val args = cj.callExp.arg match{
         case te : TupleExp =>
@@ -331,7 +331,7 @@ class AndroidTaintAnalysisBuilder{
           val calleeSet = callNode.getCalleeSet
           calleeSet.foreach{
             callee =>
-              val (srcs, taintset) = getSourceAndHandleSink(s, cFacts, callee, callNode, cj, lhssFacts, currentNode.getContext)
+              val (srcs, taintset) = getSourceAndHandleSink(s, cFacts, callee.calleeProc, callNode, cj, lhssFacts, currentNode.getContext)
               sources ++= srcs
               result ++= taintset
           }

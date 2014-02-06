@@ -72,8 +72,8 @@ object MetricRepo {
 	  appData.components.foreach{
 	    comp =>
 	      val compType = comp.typ
-	      if(comp.taintResult != null){
-		      comp.taintResult.getTaintedPaths.foreach{
+	      if(comp.taintResultOpt.isDefined){
+		      comp.taintResultOpt.get.getTaintedPaths.foreach{
 		        tp =>
 		          if(!totalTaintPaths.exists(_.isSame(tp)))
 			          tp.getTypes.foreach{
