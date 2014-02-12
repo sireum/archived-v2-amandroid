@@ -138,7 +138,7 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	    try{
 			    	    msg_critical("--------------Component " + ep + "--------------")
 			    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, Some(new Timer(300000)), false)
+			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, Some(new Timer(300000)), false)
 			    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
 			    	    msg_critical("processed-->" + icfg.getProcessed.size)
 			    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
@@ -193,7 +193,6 @@ trait CompleteRFATestFramework extends TestFramework {
     	AppCenter.reset
     	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
     	JawaCodeSource.clearAppRecordsCodes
-    	ClassLoadManager.reset
     	System.gc()
 		  System.gc()
     	msg_critical(PasswordCounter.toString)

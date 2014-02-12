@@ -880,7 +880,7 @@ object IntentModel {
       sIns =>
         sIns match {
           case cstr @ RFAConcreteStringInstance(text, c) =>
-            val recordName = StringFormConverter.formatClassNameToRecordName(text)
+            val recordName = text
 	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>

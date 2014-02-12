@@ -93,6 +93,10 @@ object FrameworkMethodsModel {
 	        case ui : UnknownInstance =>
 	        case ni : NullInstance =>
 	        case _ =>
+	          if(rv.getType.name == "[|java:util:ArrayList|]"){
+						  println(currentContext)
+						  println(receiverValue)
+	          }
 	          val intentF = new IntentFilter(rv.getType.name)
 			      val comRec = Center.resolveRecord(rv.getType.name, Center.ResolveLevel.HIERARCHY)
 			      filterValue.foreach{

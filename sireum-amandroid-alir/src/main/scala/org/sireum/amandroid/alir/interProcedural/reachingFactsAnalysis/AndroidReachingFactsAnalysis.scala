@@ -36,7 +36,7 @@ import org.sireum.jawa.alir.interProcedural.sideEffectAnalysis.InterProceduralSi
 import org.sireum.amandroid.alir.AndroidGlobalConfig
 import java.io.PrintWriter
 
-class AndroidReachingFactsAnalysisBuilder(timerOpt : Option[Timer] = None){
+class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager, timerOpt : Option[Timer] = None){
   
   var icfg : InterproceduralControlFlowGraph[CGNode] = null
   
@@ -68,8 +68,8 @@ class AndroidReachingFactsAnalysisBuilder(timerOpt : Option[Timer] = None){
       checkAndLoadClassFromHierarchy(me.getSuperClass, s, currentNode)
     }
     val bitset = currentNode.getLoadedClassBitSet
-    if(!ClassLoadManager.isLoaded(me, bitset)){
-      currentNode.setLoadedClassBitSet(ClassLoadManager.loadClass(me, bitset))
+    if(!clm.isLoaded(me, bitset)){
+      currentNode.setLoadedClassBitSet(clm.loadClass(me, bitset))
       val newbitset = currentNode.getLoadedClassBitSet
 	    if(me.declaresStaticInitializer){
 	      val p = me.getStaticInitializer
@@ -323,19 +323,21 @@ class AndroidReachingFactsAnalysisBuilder(timerOpt : Option[Timer] = None){
 			          }.toList
               case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
             }
-            if(AndroidGlobalConfig.resolve_icc && AndroidReachingFactsAnalysisHelper.isICCCall(calleep)) {
-              val factsForCallee = getFactsForICCTarget(s, cj, calleep)
-              returnFacts --= factsForCallee
-              val (retFacts, targets) = AndroidReachingFactsAnalysisHelper.doICCCall(factsForCallee, calleep, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)
-              tmpReturnFacts ++= retFacts
-              targets.foreach{
-                target =>
-                  if(!cg.isProcessed(target, callerContext)){
-				            cg.collectCfgToBaseGraph[String](target, callerContext, false)
-									  cg.extendGraphOneWay(target.getSignature, callerContext, AndroidReachingFactsAnalysis.ICC_EDGE)
-			            }
-                  msg_normal(target.getDeclaringRecord + " started!")
-                  calleeFactsMap += (cg.entryNode(target, callerContext) -> mapFactsToICCTarget(factsForCallee, cj, target.getProcedureBody.procedure))
+            if(AndroidReachingFactsAnalysisHelper.isICCCall(calleep)) {
+              if(AndroidGlobalConfig.resolve_icc){
+	              val factsForCallee = getFactsForICCTarget(s, cj, calleep)
+	              returnFacts --= factsForCallee
+	              val (retFacts, targets) = AndroidReachingFactsAnalysisHelper.doICCCall(factsForCallee, calleep, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)
+	              tmpReturnFacts ++= retFacts
+	              targets.foreach{
+	                target =>
+	                  if(!cg.isProcessed(target, callerContext)){
+					            cg.collectCfgToBaseGraph[String](target, callerContext, false)
+										  cg.extendGraphOneWay(target.getSignature, callerContext, AndroidReachingFactsAnalysis.ICC_EDGE)
+				            }
+	                  msg_normal(target.getDeclaringRecord + " started!")
+	                  calleeFactsMap += (cg.entryNode(target, callerContext) -> mapFactsToICCTarget(factsForCallee, cj, target.getProcedureBody.procedure))
+	              }
               }
             } else { // for non-ICC model call
 //              if(callee.getSubSignature == "unknown:()LCenter/Unknown;") println("callees-->" + calleeSet + "\ncontext-->" + callerContext + "\nfacts-->" + s)
@@ -474,12 +476,15 @@ class AndroidReachingFactsAnalysisBuilder(timerOpt : Option[Timer] = None){
           var result = isetEmpty[RFAFact]
           
           for(i <- 0 to argSlots.size - 1){
-            val argSlot = argSlots(i)
-            if(paramSlots.size < argSlots.size) err_msg_normal("argSlots does not adjust to paramSlots:\n" + argSlots + "\n" + paramSlots)
-            val paramSlot = paramSlots(i)
-            varFacts.foreach{
-              fact =>
-                if(fact.s == argSlot) result += (RFAFact(paramSlot, fact.v))
+            if(!paramSlots.isDefinedAt(i)){
+              err_msg_critical("argSlots does not adjust to paramSlots:\n" + cj.callExp.arg + "\n" + calleeProcedure.annotations)
+            } else {
+	            val argSlot = argSlots(i)
+	            val paramSlot = paramSlots(i)
+	            varFacts.foreach{
+	              fact =>
+	                if(fact.s == argSlot) result += (RFAFact(paramSlot, fact.v))
+	            }
             }
           }
           factsToCallee -- varFacts ++ result
@@ -588,16 +593,16 @@ class AndroidReachingFactsAnalysisBuilder(timerOpt : Option[Timer] = None){
 				            case _ => VarSlot(exp.toString)
 				          }
 		          }
-		          argSlots.foreach{
-		            argSlot =>
-		              var values : ISet[Instance] = isetEmpty
-			            calleeVarFacts.foreach{
-			              case (s, v) =>
-			                if(paramSlots(argSlots.indexOf(argSlot)) == s)
-			              	  values += v
-			            }
-		              result ++= values.map(v=>RFAFact(argSlot, v))
-		              result ++= ReachingFactsAnalysisHelper.getRelatedHeapFacts(values, calleeS)
+		          for(i <- 0 to argSlots.size - 1){
+			          val argSlot = argSlots(i)
+	              var values : ISet[Instance] = isetEmpty
+		            calleeVarFacts.foreach{
+		              case (s, v) =>
+		                if(paramSlots.isDefinedAt(i) && paramSlots(i) == s)
+		              	  values += v
+		            }
+	              result ++= values.map(v=>RFAFact(argSlot, v))
+	              result ++= ReachingFactsAnalysisHelper.getRelatedHeapFacts(values, calleeS)
 		          }
 		        case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
 		      }
@@ -635,9 +640,10 @@ object AndroidReachingFactsAnalysis {
   type Result = InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]
   def apply(entryPointProc : JawaProcedure,
    initialFacts : ISet[RFAFact] = isetEmpty,
+   clm : ClassLoadManager,
    timerOpt : Option[Timer] = None,
    parallel : Boolean = false,
    initContext : Context = new Context(GlobalConfig.CG_CONTEXT_K),
    switchAsOrderedMatch : Boolean = false) : (InterproceduralControlFlowGraph[Node], Result)
-				   = new AndroidReachingFactsAnalysisBuilder(timerOpt).build(entryPointProc, initialFacts, parallel, initContext, switchAsOrderedMatch)
+				   = new AndroidReachingFactsAnalysisBuilder(clm, timerOpt).build(entryPointProc, initialFacts, parallel, initContext, switchAsOrderedMatch)
 }

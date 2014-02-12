@@ -23,8 +23,9 @@ import org.sireum.jawa.util.Timer
 import org.sireum.jawa.util.TimeOutException
 import org.sireum.amandroid.alir.dataRecorder.DataCollector
 import org.sireum.amandroid.alir.dataRecorder.MetricRepo
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.jawa.util.SubStringCounter
+import org.sireum.jawa.ClassLoadManager
+import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 
 object IccCounter {
   var total = 0
@@ -98,7 +99,7 @@ class ICCTestFramework extends TestFramework {
 		    	    try{
 			    	    msg_critical("--------------Component " + ep + "--------------")
 			    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, Some(new Timer(300000)), false)
+			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, Some(new Timer(300000)), false)
 			    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
 			    	    msg_critical("processed-->" + icfg.getProcessed.size)
 				    	} catch {
@@ -138,7 +139,6 @@ class ICCTestFramework extends TestFramework {
     	AppCenter.reset
     	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
     	JawaCodeSource.clearAppRecordsCodes
-    	ClassLoadManager.reset
     	System.gc()
 		  System.gc()
     	msg_critical(IccCounter.toString)

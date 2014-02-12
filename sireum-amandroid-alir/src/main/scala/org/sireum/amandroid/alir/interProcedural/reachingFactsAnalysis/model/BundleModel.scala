@@ -384,7 +384,11 @@ object BundleModel {
 	  val value2 = factMap.getOrElse(slot2, isetEmpty)
 	  thisValue.foreach{
 	    ins =>
-	      result ++= value2.map(e => RFAFact(FieldSlot(ins, "[|android:os:Bundle.entries|]"), e))
+	      value2.foreach{
+	        e => 
+	          val ents = factMap.getOrElse(FieldSlot(e, "[|android:os:Bundle.entries|]"), isetEmpty)
+	          result ++= ents.map(e => RFAFact(FieldSlot(ins, "[|android:os:Bundle.entries|]"), e))
+	      }
 	  }
 	  result
   }

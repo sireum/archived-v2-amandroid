@@ -97,7 +97,6 @@ object TanitAnalysis{
 		  	AppCenter.reset
 		  	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
 		  	JawaCodeSource.clearAppRecordsCodes
-		  	ClassLoadManager.reset
 		 
 		  	val pilarFile = new File(new URI(pilarFileUri))
 		  	if(pilarFile.length() <= (10 * 1024 * 1024)){
@@ -120,7 +119,7 @@ object TanitAnalysis{
 			    	  ep =>
 			    	    msg_critical("--------------Component " + ep + "--------------")
 			    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, Some(new Timer(200000)), false)
+			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, Some(new Timer(200000)), false)
 			    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
 			    	    msg_critical("processed-->" + icfg.getProcessed.size)
 			//    	    val taResult = AndroidTaintAnalysis(cg, rfaResult)
