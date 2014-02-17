@@ -333,7 +333,7 @@ class ARSCFileParser extends AbstractAndroidXMLParser {
 	/**
 	 * Android resource that does not contain any data
 	 */
-	case class NullResource extends AbstractResource {	
+	case class NullResource() extends AbstractResource {	
 	}
 
 	/**
@@ -683,7 +683,7 @@ class ARSCFileParser extends AbstractAndroidXMLParser {
 	/**
 	 * Representation of a value in a resource, supplying type information.
 	 */
-	protected case class Res_Value {
+	protected case class Res_Value() {
 		/**
 		 * Number of bytes in this structure.
 		 */
