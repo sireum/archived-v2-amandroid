@@ -94,7 +94,7 @@ abstract class BasicSourceAndSinkManager(appPackageName : String,
 	
 	def isCallbackSource(proc : JawaProcedure) : Boolean
 	def isUISource(calleeProcedure : JawaProcedure, callerProcedure : JawaProcedure, callerLoc : JumpLocation) : Boolean
-	def isIccSink(invNode : CGCallNode, rfaFact : ISet[RFAFact]) : Boolean
+	def isIccSink(invNode : CGInvokeNode, rfaFact : ISet[RFAFact]) : Boolean
 	def isIccSource(entNode : CGNode, iddgEntNode : CGNode) : Boolean
 	
 	def getSourceSigs : ISet[String] = this.sources.map{_._1}.toSet
@@ -109,7 +109,7 @@ class DefaultSourceAndSinkManager(appPackageName : String,
     												sasFilePath : String) extends BasicSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
 	
 	def isCallbackSource(proc : JawaProcedure) : Boolean = {
-	  if(this.callbackMethods.contains(proc) && proc.getParamNames.size > 0) false
+	  if(this.callbackMethods.contains(proc) && proc.getParamNames.size > 1) true
 	  else false
 	}
 	
@@ -129,7 +129,7 @@ class DefaultSourceAndSinkManager(appPackageName : String,
 	  false
 	}
 	
-	def isIccSink(invNode : CGCallNode, rfaFact : ISet[RFAFact]) : Boolean = {
+	def isIccSink(invNode : CGInvokeNode, rfaFact : ISet[RFAFact]) : Boolean = {
     var sinkflag = false
     val calleeSet = invNode.getCalleeSet
     calleeSet.foreach{

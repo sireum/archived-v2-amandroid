@@ -42,7 +42,8 @@ object AndroidConstants {
 	    SEND_STICKY_BROADCAST, SEND_STICKY_BROADCAST_AS_USER, SEND_STICKY_ORDERED_BROADCAST,
 	    SEND_STICKY_ORDERED_BROADCAST_AS_USER)
 	def getIccMethods() : List[String] = iccMethods
-	  
+
+	
 	final val INTENT = "[|android:content:Intent|]"
 	final val INTENT_COMPONENT = "[|android:content:Intent.mComponent|]"
 	final val INTENT_ACTION  = "[|android:content:Intent.mAction|]"

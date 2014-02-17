@@ -16,6 +16,7 @@ import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis.ReachingFactsA
 import org.sireum.pilar.ast._
 import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.IntentHelper
 import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis.VarSlot
+import org.sireum.jawa.alir.interProcedural.controlFlowGraph.CGInvokeNode
 
 class PasswordSourceAndSinkManager(appPackageName : String, 
     												layoutControls : Map[Int, LayoutControl], 
@@ -41,7 +42,7 @@ class PasswordSourceAndSinkManager(appPackageName : String,
 	  false
 	}
 	
-	def isIccSink(invNode : CGCallNode, rfaFact : ISet[RFAFact]) : Boolean = {
+	def isIccSink(invNode : CGInvokeNode, rfaFact : ISet[RFAFact]) : Boolean = {
 	  var sinkflag = false
     val calleeSet = invNode.getCalleeSet
     calleeSet.foreach{

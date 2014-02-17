@@ -45,6 +45,21 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	
 	def getReachableMap = this.reachableMap
 	
+	def updateReachableMap(compProcMap : Map[JawaRecord, Set[JawaProcedure]]) : Boolean = {
+	  var flag = false
+	  compProcMap.foreach{
+	    case(comp, procs) => 
+	      val tmpReachableMethods = ReachabilityAnalysis.getReachableProcedures(procs, false)
+	      val oldReachableMethods = reachableMap.getOrElse(comp, Set())
+	      val newReachableMethods = tmpReachableMethods -- oldReachableMethods
+	      if(!newReachableMethods.isEmpty){
+	        flag = true
+	        reachableMap += (comp -> (oldReachableMethods ++ newReachableMethods))
+	      }
+	  }
+	  flag
+	}
+	
 	def init = {
 		(if(GlobalConfig.androidInfoCollectParallel) entryPointClasses.par else entryPointClasses).foreach {
 		  compName =>
@@ -95,10 +110,27 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	 */
 	def collectCallbackMethods() = {
 	  findClassLayoutMappings()
-	  reachableMap.foreach{
+	  val worklist : MList[(JawaRecord, JawaRecord)] = mlistEmpty
+	  val processed : MList[(JawaRecord, JawaRecord)] = mlistEmpty
+	  this.reachableMap.foreach{
 	    case(comp, procs) => 
 	      val containerClasses = procs.map(_.getDeclaringRecord)
-	      containerClasses.map(item => analyzeClass(item, comp))
+	      worklist ++= containerClasses.map((_, comp))
+	  }
+	  while(!worklist.isEmpty){
+	    worklist.foreach{
+	      case (item, comp) =>
+	      	analyzeClass(item, comp)
+	    }
+	    processed ++= worklist
+	    worklist.clear
+	    if(updateReachableMap(this.callbackMethods)){
+	      this.reachableMap.foreach{
+			    case(comp, procs) => 
+			      val containerClasses = procs.map(_.getDeclaringRecord)
+			      worklist ++= (containerClasses.map((_, comp)) -- processed)
+			  }
+	    }
 	  }
 	  msg_detail("current all callbacks = " + this.callbackMethods)
 	  

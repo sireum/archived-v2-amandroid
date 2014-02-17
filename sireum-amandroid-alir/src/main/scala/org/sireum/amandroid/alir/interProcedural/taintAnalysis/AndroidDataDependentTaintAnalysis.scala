@@ -1,7 +1,6 @@
 package org.sireum.amandroid.alir.interProcedural.taintAnalysis
 
-import org.sireum.jawa.alir.interProcedural.dataDependenceAnalysis.InterProceduralDataDependenceGraph
-import org.sireum.jawa.alir.interProcedural.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
+import org.sireum.jawa.alir.interProcedural.dataDependenceAnalysis._
 import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.util._
 import org.sireum.jawa.JawaProcedure
@@ -115,12 +114,12 @@ object AndroidDataDependentTaintAnalysis {
     val iddg = iddi.getIddg
     iddg.nodes.foreach{
       node =>
-        val rfaFacts = rfaResult.entrySet(node)
+        val cgN = node.getCGNode
+        val rfaFacts = rfaResult.entrySet(cgN)
         val (src, sin) = getSourceAndSinkNode(node, rfaFacts, ssm, iddg)
         sourceNodes ++= src
         sinkNodes ++= sin
     }
-    
     val tar = new Tar(iddi)
     tar.sourceNodes = sourceNodes
     tar.sinkNodes = sinkNodes
@@ -131,11 +130,11 @@ object AndroidDataDependentTaintAnalysis {
     tar
   }
   
-  def getSourceAndSinkNode(node : CGNode, rfaFacts : ISet[RFAFact], ssm : BasicSourceAndSinkManager, iddg: InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node]) = {
+  def getSourceAndSinkNode(node : IDDGNode, rfaFacts : ISet[RFAFact], ssm : BasicSourceAndSinkManager, iddg: InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node]) = {
     var sources = isetEmpty[TaintNode]
 		var sinks = isetEmpty[TaintNode]
     node match{
-      case invNode : CGInvokeNode =>
+      case invNode : IDDGInvokeNode =>
         val calleeSet = invNode.getCalleeSet
 		    calleeSet.foreach{
 		      callee =>
@@ -155,37 +154,39 @@ object AndroidDataDependentTaintAnalysis {
 				      // source and sink APIs can only come from given app's parents.
 				      soundCallee = Center.getProcedureDeclaration(calleeSignature)
 				    }
-				    if(invNode.isInstanceOf[CGReturnNode] && ssm.isSource(soundCallee, caller, jumpLoc)){
+				    if(invNode.isInstanceOf[IDDGVirtualBodyNode] && ssm.isSource(soundCallee, caller, jumpLoc)){
 				      msg_normal("found source: " + soundCallee + "@" + invNode.getContext)
 				      val tn = new Tn(invNode)
 				      tn.isSrc = true
 				      tn.descriptors += Td(soundCallee.getSignature, SourceAndSinkCategory.API_SOURCE)
 				      sources += tn
 				    }
-				    if(invNode.isInstanceOf[CGCallNode] && ssm.isSinkProcedure(soundCallee)){
+				    if(invNode.isInstanceOf[IDDGCallArgNode] && invNode.asInstanceOf[IDDGCallArgNode].position > 0 && ssm.isSinkProcedure(soundCallee)){
 				      msg_normal("found sink: " + soundCallee + "@" + invNode.getContext)
+				      iddg.extendGraphForSinkApis(invNode.asInstanceOf[IDDGCallArgNode], rfaFacts)
 				      val tn = new Tn(invNode)
 				      tn.isSrc = false
 				      tn.descriptors += Td(soundCallee.getSignature, SourceAndSinkCategory.API_SINK)
 				      sinks += tn
 				    }
-				    if(invNode.isInstanceOf[CGCallNode] && ssm.isIccSink(invNode.asInstanceOf[CGCallNode], rfaFacts)){
+				    if(invNode.isInstanceOf[IDDGCallArgNode] && invNode.asInstanceOf[IDDGCallArgNode].position > 0 && ssm.isIccSink(invNode.getCGNode.asInstanceOf[CGCallNode], rfaFacts)){
 		          msg_normal("found icc sink: " + invNode)
+		          iddg.extendGraphForSinkApis(invNode.asInstanceOf[IDDGCallArgNode], rfaFacts)
 		          val tn = new Tn(invNode)
 		          tn.isSrc = false
 				      tn.descriptors += Td(invNode.getLocUri, SourceAndSinkCategory.ICC_SINK)
 				      sinks += tn
 		        }
 		    }
-      case entNode : CGEntryNode =>
-        if(ssm.isIccSource(entNode, iddg.entryNode)){
+      case entNode : IDDGEntryParamNode =>
+        if(ssm.isIccSource(entNode.getCGNode, iddg.entryNode.getCGNode)){
 		      msg_normal("found icc source: " + iddg.entryNode)
 		      val tn = new Tn(iddg.entryNode)
 		      tn.isSrc = true
 		      tn.descriptors += Td(iddg.entryNode.getOwner.getSignature, SourceAndSinkCategory.ICC_SOURCE)
 		      sources += tn
 		    }
-        if(ssm.isCallbackSource(entNode.getOwner)){
+        if(entNode.position > 0 && ssm.isCallbackSource(entNode.getOwner)){
           msg_normal("found callback source: " + entNode)
           val tn = new Tn(entNode)
           tn.isSrc = true

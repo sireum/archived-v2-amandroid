@@ -57,9 +57,9 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager, timerOpt : Opt
     val iota : ISet[RFAFact] = initialFacts + RFAFact(VarSlot("@@[|RFAiota|]"), NullInstance(initContext))
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](cg,
       true, true, false, parallel, gen, kill, callr, iota, initial, switchAsOrderedMatch, Some(nl))
-//    val mr = new PrintWriter("/Volumes/hd/fgwei/Desktop/IRFA.txt")
-//	  mr.print(result)
-//	  mr.close()
+    val mr = new PrintWriter("/Volumes/hd/fgwei/Desktop/IRFA.txt")
+	  mr.print(result)
+	  mr.close()
     (cg, result)
   }
   
@@ -76,13 +76,13 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager, timerOpt : Opt
 	      if(AndroidReachingFactsAnalysisHelper.isModelCall(p)){
           ReachingFactsAnalysisHelper.getUnknownObjectForClinit(p, currentNode.getContext)
         } else if(!this.icfg.isProcessed(p, currentNode.getContext)) { // for normal call
-//          val nodes = this.icfg.collectCfgToBaseGraph(p, currentNode.getContext, false)
-//          nodes.foreach{n => n.setLoadedClassBitSet(ClassLoadManager.loadClass(me, bitset))}
-//	        val clinitVirContext = currentNode.getContext.copy.setContext(p.getSignature, p.getSignature)
-//	        val clinitEntry = this.icfg.getCGEntryNode(clinitVirContext)
-//	        val clinitExit = this.icfg.getCGExitNode(clinitVirContext)
-//	        this.icfg.addEdge(currentNode, clinitEntry)
-//	        this.icfg.addEdge(clinitExit, currentNode)
+          val nodes = this.icfg.collectCfgToBaseGraph(p, currentNode.getContext, false)
+          nodes.foreach{n => n.setLoadedClassBitSet(clm.loadClass(me, bitset))}
+	        val clinitVirContext = currentNode.getContext.copy.setContext(p.getSignature, p.getSignature)
+	        val clinitEntry = this.icfg.getCGEntryNode(clinitVirContext)
+	        val clinitExit = this.icfg.getCGExitNode(clinitVirContext)
+	        this.icfg.addEdge(currentNode, clinitEntry)
+	        this.icfg.addEdge(clinitExit, currentNode)
         }
 	    }
     }
