@@ -161,7 +161,7 @@ object AndroidDataDependentTaintAnalysis {
 				      tn.descriptors += Td(soundCallee.getSignature, SourceAndSinkCategory.API_SOURCE)
 				      sources += tn
 				    }
-				    if(invNode.isInstanceOf[IDDGCallArgNode] && invNode.asInstanceOf[IDDGCallArgNode].position > 0 && ssm.isSinkProcedure(soundCallee)){
+				    if(invNode.isInstanceOf[IDDGCallArgNode] && ssm.isSinkProcedure(soundCallee)){
 				      msg_normal("found sink: " + soundCallee + "@" + invNode.getContext)
 				      iddg.extendGraphForSinkApis(invNode.asInstanceOf[IDDGCallArgNode], rfaFacts)
 				      val tn = new Tn(invNode)

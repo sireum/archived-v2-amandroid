@@ -135,7 +135,6 @@ class DefaultSourceAndSinkManager(appPackageName : String,
     calleeSet.foreach{
       callee =>
         if(InterComponentCommunicationModel.isIccOperation(callee.calleeProc)){
-          sinkflag = true
           val rfafactMap = ReachingFactsAnalysisHelper.getFactMap(rfaFact)
           val args = invNode.getOwner.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
               case te : TupleExp =>

@@ -20,7 +20,7 @@ class DroidBenchTest extends DroidBenchTestFramework {
 		JawaCodeSource.preLoad(AndroidLibPilarFiles.pilarModelFiles(androidLibDir).toSet)
 		LibSideEffectProvider.init
 		
-//		val ints = Set("LocationFlow1WithLeak.apk", "PasswordPassTest.apk")
+		val ints = Set("InterComponentCommunication_Explicit1.apk")
 		
 	  InterproceduralExamples.benchAPKFiles.
 //	  filter { s => ints.exists(s.endsWith(_)) }.
@@ -30,6 +30,12 @@ class DroidBenchTest extends DroidBenchTestFramework {
 		
 //		InterproceduralExamples.testAPKFiles.
 //		filter { s => ints.exists(s.endsWith(_)) }.
+//		foreach { fileUri =>
+//		  Analyzing title fileUri file fileUri
+//		}
+		
+//		InterproceduralExamples.benchExtendAPKFiles.
+////		filter { s => ints.exists(s.endsWith(_)) }.
 //		foreach { fileUri =>
 //		  Analyzing title fileUri file fileUri
 //		}

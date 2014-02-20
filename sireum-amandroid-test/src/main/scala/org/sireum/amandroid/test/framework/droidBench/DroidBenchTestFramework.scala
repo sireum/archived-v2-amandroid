@@ -90,10 +90,10 @@ trait DroidBenchTestFramework extends TestFramework {
 			    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
 			    	    msg_critical("processed-->" + icfg.getProcessed.size)
 			    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
-//			    	    iddResult.getIddg.toDot(new PrintWriter(System.out))
 			    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
 			    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult, ssm)    
 			    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
+//			    	    iddResult.getIddg.toDot(new PrintWriter(System.out))
 				    	} catch {
 		    	      case te : TimeOutException => System.err.println("Timeout!")
 		    	    }

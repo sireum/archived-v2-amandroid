@@ -31,6 +31,8 @@ object InterproceduralExamples extends Examples{
 
   def benchAPKFiles = exampleFiles(sourceDirUri(androidTestDir + "/droidBench/"), ANDROID_APK_FILE_EXT)
   
+  def benchExtendAPKFiles = exampleFiles(sourceDirUri(androidTestDir + "/droidBenchExtend/"), ANDROID_APK_FILE_EXT)
+  
   def randomAPKFiles = exampleFiles(sourceDirUri(androidTestDir + "/random/"), ANDROID_APK_FILE_EXT)
   
   def testFiles = exampleFiles(sourceDirUri(androidTestDir + "/test/"), ANDROID_APK_FILE_EXT)
