@@ -26,6 +26,7 @@ import org.sireum.amandroid.alir.dataRecorder.MetricRepo
 import org.sireum.jawa.util.SubStringCounter
 import org.sireum.jawa.ClassLoadManager
 import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
+import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 
 object IccCounter {
   var total = 0
@@ -93,13 +94,16 @@ class ICCTestFramework extends TestFramework {
 		    	if(!entryPoints.isEmpty){
 		    	  IccCounter.foundIccContainer += 1
 		    	}
-				  
+				  AndroidReachingFactsAnalysisConfig.k_context = 1
+			    AndroidReachingFactsAnalysisConfig.resolve_icc = false
+			    AndroidReachingFactsAnalysisConfig.resolve_static_init = false
+			    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
 		    	entryPoints.par.foreach{
 		    	  ep =>
 		    	    try{
 			    	    msg_critical("--------------Component " + ep + "--------------")
 			    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, Some(new Timer(300000)), false)
+			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
 			    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
 			    	    msg_critical("processed-->" + icfg.getProcessed.size)
 				    	} catch {

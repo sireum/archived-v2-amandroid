@@ -1,11 +1,10 @@
-package org.sireum.amandroid.alir
+package org.sireum.amandroid.security.cli
 
 import org.sireum.option.SireumAmandroidTaintAnalysisMode
-import org.sireum.util.FileUtil
+import org.sireum.util._
 import org.sireum.option.AnalyzeSource
 import org.sireum.jawa.util.APKFileResolver
 import java.io.File
-import org.sireum.amandroid.android.decompile.Decompiler
 import org.sireum.jawa.JawaCodeSource
 import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
 import org.sireum.util.FileResourceUri
@@ -26,44 +25,66 @@ import org.sireum.jawa.MessageCenter
 import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
 import org.sireum.jawa.util.Timer
 import org.sireum.amandroid.alir.interProcedural.taintAnalysis.DefaultSourceAndSinkManager
+import org.sireum.amandroid.alir.AndroidConstants
+import org.sireum.amandroid.alir.AndroidGlobalConfig
+import org.sireum.amandroid.alir.AppCenter
+import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 object TaintAnalyzeCli {
 	def run(saamode : SireumAmandroidTaintAnalysisMode) {
-    val sourceType = saamode.typ match{
+    val sourceType = saamode.general.typ match{
       case AnalyzeSource.APK => "APK"
       case AnalyzeSource.DIR => "DIR"}
     val sourceDir = saamode.srcFile
     val sourceFile = new File(sourceDir)
     val sasDir = saamode.sasFile
-    val outputDirOpt = if(saamode.outFile == "") None else Some(saamode.outFile)
-    val outputDir = outputDirOpt match{
-	    case Some(path) => path
-	    case None => sourceFile.getParent()
-	  }
-    forkProcess(sourceType, sourceDir, sasDir, outputDir)
+    val outputDir = saamode.analysis.outdir
+    val nostatic = saamode.analysis.noStatic
+    val parallel = saamode.analysis.parallel
+    val noicc = saamode.analysis.noicc
+    val k_context = saamode.analysis.k_context
+    val timeout = saamode.analysis.timeout
+    val mem = saamode.general.mem
+    forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, sasDir, outputDir, mem)
     println("Generated environment-model and analysis results are saved in: " + outputDir)
   }
 	
-	def forkProcess(typSpec : String, sourceDir : String, sasDir : String, outputDir : String) = {
-	  val args = List("-t", typSpec, sourceDir, sasDir, outputDir)
-    org.sireum.jawa.util.JVMUtil.startSecondJVM(TanitAnalysis.getClass(), "-Xmx6G", args, true)
+	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : String, sourceDir : String, sasDir : String, outputDir : String, mem : Int) = {
+	  val args : MList[String] = mlistEmpty
+	  args += "-s"
+	  args += (!nostatic).toString
+	  args += "-par"
+	  args += parallel.toString
+	  args += "-i"
+	  args += (!noicc).toString
+	  args += "-k"
+	  args += k_context.toString
+	  args += "-to"
+	  args += timeout.toString
+	  args ++= List("-t", typSpec, sourceDir, sasDir, outputDir)
+    org.sireum.jawa.util.JVMUtil.startSecondJVM(PasswordTracking.getClass(), "-Xmx" + mem + "G", args.toList, true)
   }
 }
 
 object TanitAnalysis{
   def main(args: Array[String]) {
-	  if(args.size != 5){
-	    println("Usage: -t type[allows: APK, DIR] <source path> <SourceAndSink list file path> <output path>")
+	  if(args.size != 15){
+	    println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -t type[allows: APK, DIR] <source path> <Sink list file path> <output path>")
 	    return
 	  }
 	  MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NO
-	  val typ = args(1)
-	  val sourcePath = args(2)
-	  val sasFilePath = args(3)
-	  val outputPath = args(4)
+	  val static = args(1).toBoolean
+	  val parallel = args(3).toBoolean
+	  val icc = args(5).toBoolean
+	  val k_context = args(7).toInt
+	  val timeout = args(9).toInt
+	  val typ = args(11)
+	  val sourcePath = args(12)
+	  val sasFilePath = args(13)
+	  val outputPath = args(14)
 	  val apkFileUris = typ match{
       case "APK" =>
         require(sourcePath.endsWith(".apk"))
@@ -79,31 +100,33 @@ object TanitAnalysis{
     val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
 	  if(androidLibDir != null){
 			JawaCodeSource.preLoad(AndroidLibPilarFiles.pilarModelFiles(androidLibDir).toSet)	
-			taintAnalyze(apkFileUris, sasFilePath, outputUri)
+			taintAnalyze(apkFileUris, sasFilePath, outputUri, static, parallel, icc, k_context, timeout)
 	  } else {
 	    throw new RuntimeException("Does not have environment variable: " + AndroidGlobalConfig.ANDROID_LIB_DIR)
 	  }
 	}
   
-  def taintAnalyze(apkFileUris : Set[FileResourceUri], sasFilePath : String, outputUri : FileResourceUri) = {
+  def taintAnalyze(apkFileUris : Set[FileResourceUri], sasFilePath : String, outputUri : FileResourceUri, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int) = {
+    AndroidReachingFactsAnalysisConfig.k_context = k_context
+//    AndroidReachingFactsAnalysisConfig.parallel = parallel
+    AndroidReachingFactsAnalysisConfig.resolve_icc = icc
+    AndroidReachingFactsAnalysisConfig.resolve_static_init = static
+    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(timeout))
 	  apkFileUris.foreach{
 	    apkFileUri =>
 	      println("Analyzing " + apkFileUri)
+	      // before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
+	    	AndroidGlobalConfig.initJawaAlirInfoProvider
 	      val apkFile = new File(new URI(apkFileUri))
 	      val dexFileUri = APKFileResolver.getDexFile(apkFileUri, outputUri)
 	      val pilarFileUri = Dex2PilarConverter.convert(dexFileUri)
-	      AndroidGlobalConfig.initJawaAlirInfoProvider
-		  	Center.reset
-		  	AppCenter.reset
-		  	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
-		  	JawaCodeSource.clearAppRecordsCodes
 		 
 		  	val pilarFile = new File(new URI(pilarFileUri))
-		  	if(pilarFile.length() <= (10 * 1024 * 1024)){
+
+		  	if(pilarFile.length() <= (50 * 1024 * 1024)){
 		  		AndroidRFAConfig.setupCenter
 		    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
 		    	JawaCodeSource.load(pilarFileUri, AndroidLibraryAPISummary)
-		    	
 		    	try{
 			    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
 			    	JawaCodeSource.getAppRecordsCodes.keys foreach{
@@ -115,11 +138,11 @@ object TanitAnalysis{
 					  pre.collectInfo
 					  val ssm = new DefaultSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, sasFilePath)
 			    	val entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
-			    	entryPoints.foreach{
+			    	(if(parallel) entryPoints.par else entryPoints).foreach{
 			    	  ep =>
 			    	    msg_critical("--------------Component " + ep + "--------------")
 			    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, Some(new Timer(200000)), false)
+			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
 			    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
 			    	    msg_critical("processed-->" + icfg.getProcessed.size)
 			//    	    val taResult = AndroidTaintAnalysis(cg, rfaResult)
@@ -144,15 +167,19 @@ object TanitAnalysis{
 			    	val analysisResult = new PrintWriter(appDataDirFile + "/AnalysisResult.txt")
 				    analysisResult.print(appData.toString)
 				    analysisResult.close()
-				    
-				    val mr = new PrintWriter(opd + "/MetricInfo.txt")
-					  mr.print(MetricRepo.toString)
-					  mr.close()
 		    	} catch {
 		    	  case re : RuntimeException => 
 		    	    re.printStackTrace()
+		    	  case e : Exception =>
+		    	    e.printStackTrace()
+		    	} finally {
 		    	}
-		  	}
+		  	} else {
+	    	  println("Pilar file size is too large:" + pilarFile.length()/1024/1024 + "MB")
+	    	}
+	      Center.reset
+	    	AppCenter.reset
+	    	JawaCodeSource.clearAppRecordsCodes
 		  	System.gc()
 			  System.gc()
 			  println("Done!")

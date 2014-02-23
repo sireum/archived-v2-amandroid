@@ -22,7 +22,7 @@ object AndroidDataDependentTaintAnalysis {
     override def toString : String = "(" + name + "," + typ + ")"
   }
     
-  class Tn(node : InterproceduralDataDependenceAnalysis.Node) extends TaintNode{
+  case class Tn(node : InterproceduralDataDependenceAnalysis.Node) extends TaintNode{
     var descriptors : ISet[TaintDescriptor] = isetEmpty
     var isSrc : Boolean = false
     def getNode = node
@@ -32,7 +32,7 @@ object AndroidDataDependentTaintAnalysis {
     def isSame(tn : TaintNode) : Boolean = getDescriptors == tn.getDescriptors && getNode.getContext.getCurrentLocUri == tn.getNode.getContext.getCurrentLocUri
   }
   
-  class Tp(path : IList[InterproceduralDataDependenceAnalysis.Edge]) extends TaintPath{
+  case class Tp(path : IList[InterproceduralDataDependenceAnalysis.Edge]) extends TaintPath{
     var srcN : TaintNode = null
     var sinN : TaintNode = null
     var typs : ISet[String] = isetEmpty
@@ -55,7 +55,7 @@ object AndroidDataDependentTaintAnalysis {
     }
   }
   
-  class Tar(iddi : InterproceduralDataDependenceInfo) extends TaintAnalysisResult{
+  case class Tar(iddi : InterproceduralDataDependenceInfo) extends TaintAnalysisResult{
     var sourceNodes : ISet[TaintNode] = isetEmpty
     var sinkNodes : ISet[TaintNode] = isetEmpty
     
@@ -69,7 +69,7 @@ object AndroidDataDependentTaintAnalysis {
 	          srcN =>
 	            val path = iddi.getDependentPath(sinN.getNode, srcN.getNode)
 	            if(path != null){
-		            val tp = new Tp(path)
+		            val tp = Tp(path)
 		            tp.srcN = srcN
 		            tp.sinN = sinN
 		            val srctyps = srcN.getDescriptors.map(_.typ)
@@ -120,7 +120,7 @@ object AndroidDataDependentTaintAnalysis {
         sourceNodes ++= src
         sinkNodes ++= sin
     }
-    val tar = new Tar(iddi)
+    val tar = Tar(iddi)
     tar.sourceNodes = sourceNodes
     tar.sinkNodes = sinkNodes
     if(!tar.getTaintedPaths.isEmpty){
@@ -156,7 +156,7 @@ object AndroidDataDependentTaintAnalysis {
 				    }
 				    if(invNode.isInstanceOf[IDDGVirtualBodyNode] && ssm.isSource(soundCallee, caller, jumpLoc)){
 				      msg_normal("found source: " + soundCallee + "@" + invNode.getContext)
-				      val tn = new Tn(invNode)
+				      val tn = Tn(invNode)
 				      tn.isSrc = true
 				      tn.descriptors += Td(soundCallee.getSignature, SourceAndSinkCategory.API_SOURCE)
 				      sources += tn
@@ -164,7 +164,7 @@ object AndroidDataDependentTaintAnalysis {
 				    if(invNode.isInstanceOf[IDDGCallArgNode] && ssm.isSinkProcedure(soundCallee)){
 				      msg_normal("found sink: " + soundCallee + "@" + invNode.getContext)
 				      iddg.extendGraphForSinkApis(invNode.asInstanceOf[IDDGCallArgNode], rfaFacts)
-				      val tn = new Tn(invNode)
+				      val tn = Tn(invNode)
 				      tn.isSrc = false
 				      tn.descriptors += Td(soundCallee.getSignature, SourceAndSinkCategory.API_SINK)
 				      sinks += tn
@@ -172,7 +172,7 @@ object AndroidDataDependentTaintAnalysis {
 				    if(invNode.isInstanceOf[IDDGCallArgNode] && invNode.asInstanceOf[IDDGCallArgNode].position > 0 && ssm.isIccSink(invNode.getCGNode.asInstanceOf[CGCallNode], rfaFacts)){
 		          msg_normal("found icc sink: " + invNode)
 		          iddg.extendGraphForSinkApis(invNode.asInstanceOf[IDDGCallArgNode], rfaFacts)
-		          val tn = new Tn(invNode)
+		          val tn = Tn(invNode)
 		          tn.isSrc = false
 				      tn.descriptors += Td(invNode.getLocUri, SourceAndSinkCategory.ICC_SINK)
 				      sinks += tn
@@ -181,14 +181,14 @@ object AndroidDataDependentTaintAnalysis {
       case entNode : IDDGEntryParamNode =>
         if(ssm.isIccSource(entNode.getCGNode, iddg.entryNode.getCGNode)){
 		      msg_normal("found icc source: " + iddg.entryNode)
-		      val tn = new Tn(iddg.entryNode)
+		      val tn = Tn(iddg.entryNode)
 		      tn.isSrc = true
 		      tn.descriptors += Td(iddg.entryNode.getOwner.getSignature, SourceAndSinkCategory.ICC_SOURCE)
 		      sources += tn
 		    }
         if(entNode.position > 0 && ssm.isCallbackSource(entNode.getOwner)){
           msg_normal("found callback source: " + entNode)
-          val tn = new Tn(entNode)
+          val tn = Tn(entNode)
           tn.isSrc = true
 		      tn.descriptors += Td(entNode.getOwner.getSignature, SourceAndSinkCategory.CALLBACK_SOURCE)
 		      sources += tn

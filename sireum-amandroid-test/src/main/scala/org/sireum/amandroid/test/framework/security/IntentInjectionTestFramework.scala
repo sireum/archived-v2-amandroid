@@ -1,46 +1,42 @@
-package org.sireum.amandroid.test.framework.droidBench
+package org.sireum.amandroid.test.framework.security
 
 import org.sireum.amandroid.test.framework.TestFramework
 import org.sireum.util._
-import org.sireum.amandroid._
-import org.sireum.jawa.pilarParser.LightWeightPilarParser
-import org.sireum.jawa.util.APKFileResolver
-import org.sireum.amandroid.android.appInfo.AppInfoCollector
-import java.io._
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis._
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis._
-import org.sireum.jawa.util.StringFormConverter
-import org.sireum.jawa.alir.interProcedural.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
+import org.sireum.jawa.MessageCenter._
+import org.sireum.amandroid.alir.AndroidGlobalConfig
+import java.io.File
 import java.net.URI
-import org.sireum.amandroid.alir.AppCenter
+import org.sireum.jawa.util.APKFileResolver
+import org.sireum.amandroid.android.decompile.Dex2PilarConverter
+import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidRFAConfig
+import org.sireum.jawa.JawaCodeSource
+import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
+import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.jawa.util.Timer
+import org.sireum.jawa.Center
 import org.sireum.amandroid.alir.dataRecorder.DataCollector
 import org.sireum.amandroid.alir.dataRecorder.MetricRepo
-import java.util.zip.ZipInputStream
-import org.sireum.jawa.util.ResourceRetriever
-import org.sireum.amandroid.alir.AndroidGlobalConfig
-import org.sireum.jawa.MessageCenter._
-import org.sireum.amandroid.alir.AndroidConstants
-import org.sireum.jawa.JawaCodeSource
-import org.sireum.jawa.Center
-import org.sireum.jawa.ClassLoadManager
-import org.sireum.amandroid.android.decompile.Dex2PilarConverter
-import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
+import java.io.PrintWriter
+import org.sireum.amandroid.alir.AppCenter
 import org.sireum.jawa.util.IgnoreException
-import org.scalatest.exceptions.TestFailedDueToTimeoutException
+import org.sireum.amandroid.alir.AndroidConstants
+import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
+import org.sireum.jawa.ClassLoadManager
 import org.sireum.jawa.util.TimeOutException
-import org.sireum.jawa.util.Timer
-import org.sireum.jawa.alir.interProcedural.sideEffectAnalysis.InterProceduralSideEffectAnalysisResult
-import org.sireum.jawa.alir.interProcedural.taintAnalysis.SourceAndSinkManager
+import org.sireum.amandroid.security.dataInjection.IntentInjectionCollector
+import org.sireum.jawa.alir.interProcedural.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
+import org.sireum.amandroid.alir.interProcedural.taintAnalysis.AndroidDataDependentTaintAnalysis
+import org.sireum.amandroid.security.dataInjection.IntentInjectionSourceAndSinkManager
 
-object DroidBenchCounter {
+object IntentInjectionCounter {
   var total = 0
+  var oversize = 0
   var haveresult = 0
-  var taintPathFound = 0
-  var taintPathFoundList = Set[String]()
-  override def toString : String = "total: " + total + ", haveResult: " + haveresult + ", taintPathFound: " + taintPathFound
+  
+  override def toString : String = "total: " + total + ", oversize: " + oversize + ", haveResult: " + haveresult
 }
 
-trait DroidBenchTestFramework extends TestFramework {
+class IntentInjectionTestFramework extends TestFramework {
   def Analyzing : this.type = this
 
   def title(s : String) : this.type = {
@@ -60,7 +56,7 @@ trait DroidBenchTestFramework extends TestFramework {
 
     test(title) {
     	msg_critical("####" + title + "#####")
-    	DroidBenchCounter.total += 1
+    	IntentInjectionCounter.total += 1
     	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
     	AndroidGlobalConfig.initJawaAlirInfoProvider
     	
@@ -75,14 +71,17 @@ trait DroidBenchTestFramework extends TestFramework {
 	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
 	    	JawaCodeSource.load(pilarFileUri, AndroidLibraryAPISummary)
 	    	try{
-		    	val pre = new AppInfoCollector(srcRes)
+		    	val pre = new IntentInjectionCollector(srcRes)
 				  pre.collectInfo
-				  val ssm = new DefaultSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-		    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
-		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
+				  val ssm = new IntentInjectionSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+				  var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
+//		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
+		    	val iacs = pre.getInterestingContainers(ssm.getSinkSigs ++ AndroidConstants.getIccMethods)
+		    	entryPoints = entryPoints.filter(e=>iacs.contains(e.getDeclaringRecord))
+		    	println(entryPoints)
 				  AndroidReachingFactsAnalysisConfig.k_context = 1
-			    AndroidReachingFactsAnalysisConfig.resolve_icc = true
-			    AndroidReachingFactsAnalysisConfig.resolve_static_init = true
+			    AndroidReachingFactsAnalysisConfig.resolve_icc = false
+			    AndroidReachingFactsAnalysisConfig.resolve_static_init = false
 			    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
 		    	entryPoints.par.foreach{
 		    	  ep =>
@@ -96,16 +95,11 @@ trait DroidBenchTestFramework extends TestFramework {
 			    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
 			    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult, ssm)    
 			    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
-//			    	    iddResult.getIddg.toDot(new PrintWriter(System.out))
 				    	} catch {
 		    	      case te : TimeOutException => System.err.println("Timeout!")
 		    	    }
     	    } 
 				  
-		    	if(AppCenter.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
-    	      DroidBenchCounter.taintPathFound += 1
-    	      DroidBenchCounter.taintPathFoundList += title
-    	    }
 		    	val appData = DataCollector.collect
 		    	MetricRepo.collect(appData)
 		    	val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
@@ -119,7 +113,7 @@ trait DroidBenchTestFramework extends TestFramework {
 			    val mr = new PrintWriter(outputDir + "/MetricInfo.txt")
 				  mr.print(MetricRepo.toString)
 				  mr.close()
-				  DroidBenchCounter.haveresult += 1
+				  IntentInjectionCounter.haveresult += 1
 	    	} catch {
 	    	  case ie : IgnoreException =>
 	    	    err_msg_critical("Ignored!")
@@ -129,13 +123,8 @@ trait DroidBenchTestFramework extends TestFramework {
 	    	    e.printStackTrace()
 	    	} finally {
 	    	}
-	    	
-	//    	val r = Center.resolveRecord("[|java:lang:Class|]", Center.ResolveLevel.BODIES)
-	//    	r.getProcedures.toSeq.sortBy(f => f.getSignature).foreach{
-	//    	  p =>
-	//    	    println("  case \"" + p.getSignature + "\" =>  //" + p.getAccessFlagString)
-	//    	}
     	} else {
+    	  IntentInjectionCounter.oversize += 1
     	  err_msg_critical("Pilar file size is too large:" + pilarFile.length()/1024/1024 + "MB")
     	}
     	
@@ -145,9 +134,7 @@ trait DroidBenchTestFramework extends TestFramework {
     	JawaCodeSource.clearAppRecordsCodes
     	System.gc()
 		  System.gc()
-    	msg_critical(DroidBenchCounter.toString)
-//    	PasswordCounter.outputInterestingFileNames
-//    	PasswordCounter.outputRecStatistic
+    	msg_critical(IntentInjectionCounter.toString)
     	msg_critical("************************************\n")
     }
   }

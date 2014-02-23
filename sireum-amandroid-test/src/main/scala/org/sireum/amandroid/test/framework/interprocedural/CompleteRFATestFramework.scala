@@ -133,12 +133,16 @@ trait CompleteRFATestFramework extends TestFramework {
 		    	  PasswordCounter.foundPasswordContainerList += title
 		    	}
 				  
+				  AndroidReachingFactsAnalysisConfig.k_context = 1
+			    AndroidReachingFactsAnalysisConfig.resolve_icc = true
+			    AndroidReachingFactsAnalysisConfig.resolve_static_init = false
+			    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
 		    	entryPoints.par.foreach{
 		    	  ep =>
 		    	    try{
 			    	    msg_critical("--------------Component " + ep + "--------------")
 			    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, Some(new Timer(300000)), false)
+			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
 			    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
 			    	    msg_critical("processed-->" + icfg.getProcessed.size)
 			    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)

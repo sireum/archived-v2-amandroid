@@ -32,18 +32,16 @@ import org.sireum.jawa.alir.interProcedural.NodeListener
 import org.sireum.jawa.Mode
 import scala.collection.immutable.BitSet
 import org.sireum.jawa.util.Timer
-import org.sireum.jawa.alir.interProcedural.sideEffectAnalysis.InterProceduralSideEffectAnalysisResult
 import org.sireum.amandroid.alir.AndroidGlobalConfig
 import java.io.PrintWriter
 
-class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager, timerOpt : Option[Timer] = None){
+class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
   
   var icfg : InterproceduralControlFlowGraph[CGNode] = null
   
   def build //
   (entryPointProc : JawaProcedure,
    initialFacts : ISet[RFAFact] = isetEmpty,
-   parallel : Boolean,
    initContext : Context,
    switchAsOrderedMatch : Boolean) : (InterproceduralControlFlowGraph[CGNode], AndroidReachingFactsAnalysis.Result) = {
     val gen = new Gen
@@ -56,10 +54,10 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager, timerOpt : Opt
     cg.collectCfgToBaseGraph(entryPointProc, initContext, true)
     val iota : ISet[RFAFact] = initialFacts + RFAFact(VarSlot("@@[|RFAiota|]"), NullInstance(initContext))
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](cg,
-      true, true, false, parallel, gen, kill, callr, iota, initial, switchAsOrderedMatch, Some(nl))
-    val mr = new PrintWriter("/Volumes/hd/fgwei/Desktop/IRFA.txt")
-	  mr.print(result)
-	  mr.close()
+      true, true, false, AndroidReachingFactsAnalysisConfig.parallel, gen, kill, callr, iota, initial, switchAsOrderedMatch, Some(nl))
+//    val mr = new PrintWriter("/Volumes/hd/fgwei/Desktop/IRFA.txt")
+//	  mr.print(result)
+//	  mr.close()
     (cg, result)
   }
   
@@ -73,17 +71,19 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager, timerOpt : Opt
       val newbitset = currentNode.getLoadedClassBitSet
 	    if(me.declaresStaticInitializer){
 	      val p = me.getStaticInitializer
-	      if(AndroidReachingFactsAnalysisHelper.isModelCall(p)){
-          ReachingFactsAnalysisHelper.getUnknownObjectForClinit(p, currentNode.getContext)
-        } else if(!this.icfg.isProcessed(p, currentNode.getContext)) { // for normal call
-          val nodes = this.icfg.collectCfgToBaseGraph(p, currentNode.getContext, false)
-          nodes.foreach{n => n.setLoadedClassBitSet(clm.loadClass(me, bitset))}
-	        val clinitVirContext = currentNode.getContext.copy.setContext(p.getSignature, p.getSignature)
-	        val clinitEntry = this.icfg.getCGEntryNode(clinitVirContext)
-	        val clinitExit = this.icfg.getCGExitNode(clinitVirContext)
-	        this.icfg.addEdge(currentNode, clinitEntry)
-	        this.icfg.addEdge(clinitExit, currentNode)
-        }
+	      if(AndroidReachingFactsAnalysisConfig.resolve_static_init){
+		      if(AndroidReachingFactsAnalysisHelper.isModelCall(p)){
+	          ReachingFactsAnalysisHelper.getUnknownObjectForClinit(p, currentNode.getContext)
+	        } else if(!this.icfg.isProcessed(p, currentNode.getContext)) { // for normal call
+	          val nodes = this.icfg.collectCfgToBaseGraph(p, currentNode.getContext, false)
+	          nodes.foreach{n => n.setLoadedClassBitSet(clm.loadClass(me, bitset))}
+		        val clinitVirContext = currentNode.getContext.copy.setContext(p.getSignature, p.getSignature)
+		        val clinitEntry = this.icfg.getCGEntryNode(clinitVirContext)
+		        val clinitExit = this.icfg.getCGExitNode(clinitVirContext)
+		        this.icfg.addEdge(currentNode, clinitEntry)
+		        this.icfg.addEdge(clinitExit, currentNode)
+	        }
+	      }
 	    }
     }
   }
@@ -324,7 +324,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager, timerOpt : Opt
               case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
             }
             if(AndroidReachingFactsAnalysisHelper.isICCCall(calleep)) {
-              if(AndroidGlobalConfig.resolve_icc){
+              if(AndroidReachingFactsAnalysisConfig.resolve_icc){
 	              val factsForCallee = getFactsForICCTarget(s, cj, calleep)
 	              returnFacts --= factsForCallee
 	              val (retFacts, targets) = AndroidReachingFactsAnalysisHelper.doICCCall(factsForCallee, calleep, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)
@@ -620,7 +620,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager, timerOpt : Opt
     }
     
     def onPostVisitNode(node : CGNode, succs : CSet[CGNode]) : Unit = {
-      timerOpt match{
+      AndroidReachingFactsAnalysisConfig.timerOpt match{
         case Some(timer) => timer.isTimeOutAndThrow
         case None =>
       }
@@ -641,9 +641,7 @@ object AndroidReachingFactsAnalysis {
   def apply(entryPointProc : JawaProcedure,
    initialFacts : ISet[RFAFact] = isetEmpty,
    clm : ClassLoadManager,
-   timerOpt : Option[Timer] = None,
-   parallel : Boolean = false,
    initContext : Context = new Context(GlobalConfig.CG_CONTEXT_K),
    switchAsOrderedMatch : Boolean = false) : (InterproceduralControlFlowGraph[Node], Result)
-				   = new AndroidReachingFactsAnalysisBuilder(clm, timerOpt).build(entryPointProc, initialFacts, parallel, initContext, switchAsOrderedMatch)
+				   = new AndroidReachingFactsAnalysisBuilder(clm).build(entryPointProc, initialFacts, initContext, switchAsOrderedMatch)
 }
