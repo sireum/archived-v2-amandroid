@@ -230,7 +230,7 @@ class AndroidTaintAnalysisBuilder{
       currentContext : Context) : (IMap[Int, ISet[String]], ISet[TaintFact]) = {
     var sources : IMap[Int, ISet[String]] = imapEmpty
     var taintset : ISet[TaintFact] = isetEmpty
-    var soundCallee = callee
+    val callees : MSet[JawaProcedure] = msetEmpty
     val caller = callNode.getOwner
     val jumpLoc = caller.getProcedureBody.location(callNode.getLocIndex).asInstanceOf[JumpLocation]
     if(callee.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
@@ -242,8 +242,8 @@ class AndroidTaintAnalysisBuilder{
         case None => throw new RuntimeException("cannot found annotation 'signature' from: " + cj)
       }
       // source and sink APIs can only come from given app's parents.
-      soundCallee = Center.getProcedureDeclaration(calleeSignature)
-    }
+      callees ++= Center.getProcedureDeclarations(calleeSignature)
+    } else callees += callee
 //    if(SourceAndSinkCenter.isSource(soundCallee, caller, jumpLoc)){
 //      msg_normal("find source: " + soundCallee + "@" + currentContext)
 //      lhssFacts.map{

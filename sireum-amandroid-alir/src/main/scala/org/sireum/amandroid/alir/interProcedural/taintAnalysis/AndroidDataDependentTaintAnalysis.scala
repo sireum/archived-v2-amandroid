@@ -139,7 +139,7 @@ object AndroidDataDependentTaintAnalysis {
 		    calleeSet.foreach{
 		      callee =>
 		        val calleep = callee.calleeProc
-		        var soundCallee = calleep
+		        val callees : MSet[JawaProcedure] = msetEmpty
 				    val caller = invNode.getOwner
 				    val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
 				    val cj = jumpLoc.jump.asInstanceOf[CallJump]
@@ -152,31 +152,34 @@ object AndroidDataDependentTaintAnalysis {
 				        case None => throw new RuntimeException("cannot found annotation 'signature' from: " + cj)
 				      }
 				      // source and sink APIs can only come from given app's parents.
-				      soundCallee = Center.getProcedureDeclaration(calleeSignature)
+				      callees ++= Center.getProcedureDeclarations(calleeSignature)
+				    } else callees += calleep
+				    callees.foreach{
+				      callee =>
+						    if(invNode.isInstanceOf[IDDGVirtualBodyNode] && ssm.isSource(callee, caller, jumpLoc)){
+						      msg_normal("found source: " + callee + "@" + invNode.getContext)
+						      val tn = Tn(invNode)
+						      tn.isSrc = true
+						      tn.descriptors += Td(callee.getSignature, SourceAndSinkCategory.API_SOURCE)
+						      sources += tn
+						    }
+						    if(invNode.isInstanceOf[IDDGCallArgNode] && ssm.isSinkProcedure(callee)){
+						      msg_normal("found sink: " + callee + "@" + invNode.getContext)
+						      iddg.extendGraphForSinkApis(invNode.asInstanceOf[IDDGCallArgNode], rfaFacts)
+						      val tn = Tn(invNode)
+						      tn.isSrc = false
+						      tn.descriptors += Td(callee.getSignature, SourceAndSinkCategory.API_SINK)
+						      sinks += tn
+						    }
+						    if(invNode.isInstanceOf[IDDGCallArgNode] && invNode.asInstanceOf[IDDGCallArgNode].position > 0 && ssm.isIccSink(invNode.getCGNode.asInstanceOf[CGCallNode], rfaFacts)){
+				          msg_normal("found icc sink: " + invNode)
+				          iddg.extendGraphForSinkApis(invNode.asInstanceOf[IDDGCallArgNode], rfaFacts)
+				          val tn = Tn(invNode)
+				          tn.isSrc = false
+						      tn.descriptors += Td(invNode.getLocUri, SourceAndSinkCategory.ICC_SINK)
+						      sinks += tn
+				        }
 				    }
-				    if(invNode.isInstanceOf[IDDGVirtualBodyNode] && ssm.isSource(soundCallee, caller, jumpLoc)){
-				      msg_normal("found source: " + soundCallee + "@" + invNode.getContext)
-				      val tn = Tn(invNode)
-				      tn.isSrc = true
-				      tn.descriptors += Td(soundCallee.getSignature, SourceAndSinkCategory.API_SOURCE)
-				      sources += tn
-				    }
-				    if(invNode.isInstanceOf[IDDGCallArgNode] && ssm.isSinkProcedure(soundCallee)){
-				      msg_normal("found sink: " + soundCallee + "@" + invNode.getContext)
-				      iddg.extendGraphForSinkApis(invNode.asInstanceOf[IDDGCallArgNode], rfaFacts)
-				      val tn = Tn(invNode)
-				      tn.isSrc = false
-				      tn.descriptors += Td(soundCallee.getSignature, SourceAndSinkCategory.API_SINK)
-				      sinks += tn
-				    }
-				    if(invNode.isInstanceOf[IDDGCallArgNode] && invNode.asInstanceOf[IDDGCallArgNode].position > 0 && ssm.isIccSink(invNode.getCGNode.asInstanceOf[CGCallNode], rfaFacts)){
-		          msg_normal("found icc sink: " + invNode)
-		          iddg.extendGraphForSinkApis(invNode.asInstanceOf[IDDGCallArgNode], rfaFacts)
-		          val tn = Tn(invNode)
-		          tn.isSrc = false
-				      tn.descriptors += Td(invNode.getLocUri, SourceAndSinkCategory.ICC_SINK)
-				      sinks += tn
-		        }
 		    }
       case entNode : IDDGEntryParamNode =>
         if(ssm.isIccSource(entNode.getCGNode, iddg.entryNode.getCGNode)){

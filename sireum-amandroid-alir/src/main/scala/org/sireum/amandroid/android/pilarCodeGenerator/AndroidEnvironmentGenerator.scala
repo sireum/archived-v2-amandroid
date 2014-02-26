@@ -16,9 +16,14 @@ import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.NormalType
 import org.sireum.jawa.pilarCodeGenerator.VariableGenerator
 import org.sireum.jawa.pilarCodeGenerator.ProcedureGenerator
+import org.sireum.amandroid.android.parser.ComponentInfo
 
 class AndroidEnvironmentGenerator extends ProcedureGenerator {
 	
+  private var componentInfos : Set[ComponentInfo] = Set()
+  
+  def setComponentInfos(componentInfos : Set[ComponentInfo]) = this.componentInfos = componentInfos
+  
 	def generateInternal(procedures : List[String]) : String = {
 	  val classMap : MMap[String, MList[String]] = mmapEmpty
 	  procedures.map{
@@ -55,6 +60,18 @@ class AndroidEnvironmentGenerator extends ProcedureGenerator {
               if(recName.equals(AndroidEntryPointConstants.SERVICE_CLASS)) service = true
               if(recName.equals(AndroidEntryPointConstants.BROADCAST_RECEIVER_CLASS)) broadcastReceiver = true
               if(recName.equals(AndroidEntryPointConstants.CONTENT_PROVIDER_CLASS)) contentProvider = true
+	        }
+	        componentInfos.foreach{
+	          ci =>
+	            if(ci.name == currentRecord.getName){
+	              ci.typ match{
+	                case "activity" => activity = true
+	                case "service" => service = true
+	                case "receiver" => broadcastReceiver = true
+	                case "provider" => contentProvider = true
+	                case _ =>
+	              }
+	            }
 	        }
 	        if(!activity && !service && !broadcastReceiver && !contentProvider) plain = true
 	        var instanceNeeded = activity || service || broadcastReceiver || contentProvider

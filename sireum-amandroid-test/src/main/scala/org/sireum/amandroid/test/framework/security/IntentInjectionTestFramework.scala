@@ -78,7 +78,6 @@ class IntentInjectionTestFramework extends TestFramework {
 //		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
 		    	val iacs = pre.getInterestingContainers(ssm.getSinkSigs ++ AndroidConstants.getIccMethods)
 		    	entryPoints = entryPoints.filter(e=>iacs.contains(e.getDeclaringRecord))
-		    	println(entryPoints)
 				  AndroidReachingFactsAnalysisConfig.k_context = 1
 			    AndroidReachingFactsAnalysisConfig.resolve_icc = false
 			    AndroidReachingFactsAnalysisConfig.resolve_static_init = false

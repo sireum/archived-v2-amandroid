@@ -20,7 +20,7 @@ class DroidBenchTest extends DroidBenchTestFramework {
 		JawaCodeSource.preLoad(AndroidLibPilarFiles.pilarModelFiles(androidLibDir).toSet)
 		LibSideEffectProvider.init
 		
-		val ints = Set("InterComponentCommunication_Explicit1.apk")
+//		val ints = Set("InterComponentCommunication_DynRegister1.apk", "InterComponentCommunication_DynRegister2.apk")
 		
 	  InterproceduralExamples.benchAPKFiles.
 //	  filter { s => ints.exists(s.endsWith(_)) }.
@@ -34,11 +34,11 @@ class DroidBenchTest extends DroidBenchTestFramework {
 //		  Analyzing title fileUri file fileUri
 //		}
 		
-//		InterproceduralExamples.benchExtendAPKFiles.
-////		filter { s => ints.exists(s.endsWith(_)) }.
-//		foreach { fileUri =>
-//		  Analyzing title fileUri file fileUri
-//		}
+		InterproceduralExamples.benchExtendAPKFiles.
+//		filter { s => ints.exists(s.endsWith(_)) }.
+		foreach { fileUri =>
+		  Analyzing title fileUri file fileUri
+		}
   } else {
     System.err.println("Does not have env var: " + AndroidGlobalConfig.ANDROID_LIB_DIR)
   }

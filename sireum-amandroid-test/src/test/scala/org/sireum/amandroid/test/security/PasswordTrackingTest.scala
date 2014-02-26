@@ -1,23 +1,22 @@
-package org.sireum.amandroid.test.interprocedural
+package org.sireum.amandroid.test.security
 
-import org.sireum.amandroid.test.framework.interprocedural.CompleteRFATestFramework
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import org.sireum.jawa.JawaCodeSource
 import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
 import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
 import org.sireum.amandroid.alir.AndroidGlobalConfig
-import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
 import java.util.zip.GZIPInputStream
 import java.io.FileInputStream
 import org.sireum.jawa.xml.AndroidXStream
 import org.sireum.jawa.alir.interProcedural.sideEffectAnalysis.InterProceduralSideEffectAnalysisResult
+import org.scalatest.junit.JUnitRunner
+import org.sireum.amandroid.test.framework.security.PasswordTrackingTestFramework
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 @RunWith(classOf[JUnitRunner])
-class CompleteRFATest extends CompleteRFATestFramework {
+class CompleteRFATest extends PasswordTrackingTestFramework {
   var i = 0
   val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
   if(androidLibDir != null){
@@ -32,13 +31,13 @@ class CompleteRFATest extends CompleteRFATestFramework {
 //	  foreach { resfile =>
 //	    Analyzing title resfile file (resfile, interPSEA)
 //	  }
-	  InterproceduralExamples.popularAPKFiles.
-//	  filter { s => s.contains("la.droid.qr.apk") }.
-	  foreach { resfile =>
-	    if(i > 500) 
-	    Analyzing title resfile file resfile
-	    i+=1
-	  }
+//	  InterproceduralExamples.popularAPKFiles.
+////	  filter { s => s.contains("la.droid.qr.apk") }.
+//	  foreach { resfile =>
+//	    if(i > 500) 
+//	    Analyzing title resfile file resfile
+//	    i+=1
+//	  }
 //		InterproceduralExamples.testFiles.
 ////	  filter { s => s.endsWith("acctsvcs.us.apk")}.
 //	  foreach { resfile =>
@@ -46,13 +45,13 @@ class CompleteRFATest extends CompleteRFATestFramework {
 //	    Analyzing title resfile file resfile
 ////	    i+=1
 //	  }
-//	  InterproceduralExamples.randomAPKFiles.
-////	  filter { s => s.endsWith("enterprise.dmagent.apk") }.
-//	  foreach { resfile =>
-////	    if(i < 89) i += 1
-//	    //if(resfile.endsWith("app.kazoebito.com.apk"))
-//	    Analyzing title resfile file resfile
-//	  }
+	  InterproceduralExamples.randomAPKFiles.
+//	  filter { s => s.endsWith("enterprise.dmagent.apk") }.
+	  foreach { resfile =>
+//	    if(i < 89) i += 1
+	    //if(resfile.endsWith("app.kazoebito.com.apk"))
+	    Analyzing title resfile file resfile
+	  }
 //	  InterproceduralExamples.normalAPKFiles.
 //	//  filter { s => s.name.endsWith("android-1.apk") }.
 //	  foreach { resRet =>

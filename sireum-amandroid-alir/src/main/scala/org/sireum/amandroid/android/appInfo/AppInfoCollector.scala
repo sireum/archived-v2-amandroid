@@ -100,6 +100,7 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 	  val dmGen = new AndroidEnvironmentGenerator
 	  dmGen.setSubstituteRecordMap(AndroidSubstituteRecordMap.getSubstituteRecordMap)
 	  dmGen.setCurrentComponent(record.getName)
+	  dmGen.setComponentInfos(this.componentInfos)
 	  dmGen.setCodeCounter(codeCtr)
 	  var callbackMethodSigs : Map[String, Set[String]] = Map()
 	  this.callbackMethods.foreach{

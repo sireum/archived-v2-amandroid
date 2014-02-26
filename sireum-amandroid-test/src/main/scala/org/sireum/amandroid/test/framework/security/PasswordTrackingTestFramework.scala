@@ -1,22 +1,17 @@
-package org.sireum.amandroid.test.framework.interprocedural
+package org.sireum.amandroid.test.framework.security
 
 import org.sireum.amandroid.test.framework.TestFramework
 import org.sireum.util._
 import org.sireum.amandroid._
-import org.sireum.jawa.pilarParser.LightWeightPilarParser
 import org.sireum.jawa.util.APKFileResolver
-import org.sireum.amandroid.android.appInfo.AppInfoCollector
 import java.io._
 import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis._
 import org.sireum.amandroid.alir.interProcedural.taintAnalysis._
-import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.alir.interProcedural.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
 import java.net.URI
 import org.sireum.amandroid.alir.AppCenter
 import org.sireum.amandroid.alir.dataRecorder.DataCollector
 import org.sireum.amandroid.alir.dataRecorder.MetricRepo
-import java.util.zip.ZipInputStream
-import org.sireum.jawa.util.ResourceRetriever
 import org.sireum.amandroid.alir.AndroidGlobalConfig
 import org.sireum.jawa.MessageCenter._
 import org.sireum.amandroid.alir.AndroidConstants
@@ -26,10 +21,8 @@ import org.sireum.jawa.ClassLoadManager
 import org.sireum.amandroid.android.decompile.Dex2PilarConverter
 import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
 import org.sireum.jawa.util.IgnoreException
-import org.scalatest.exceptions.TestFailedDueToTimeoutException
 import org.sireum.jawa.util.TimeOutException
 import org.sireum.jawa.util.Timer
-import org.sireum.jawa.alir.interProcedural.sideEffectAnalysis.InterProceduralSideEffectAnalysisResult
 import org.sireum.amandroid.security.password.SensitiveViewCollector
 import org.sireum.amandroid.security.password.PasswordSourceAndSinkManager
 
@@ -82,7 +75,7 @@ object PasswordCounter {
   }
 }
 
-trait CompleteRFATestFramework extends TestFramework {
+trait PasswordTrackingTestFramework extends TestFramework {
   def Analyzing : this.type = this
 
   def title(s : String) : this.type = {

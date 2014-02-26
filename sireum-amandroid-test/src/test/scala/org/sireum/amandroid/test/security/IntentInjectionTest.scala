@@ -41,7 +41,7 @@ class IntentInjectionTest extends IntentInjectionTestFramework {
 //	  filter { s => s.endsWith("gtd.client.apk") }.
 	  foreach { resfile =>
 //	    if(i < 89) i += 1
-//	    if(resfile.endsWith("com.sellbackyourbook.sellback.apk"))
+	    if(resfile.endsWith("com.sellbackyourbook.sellback.apk"))
 	    Analyzing title resfile file resfile
 	  }
 //	  InterproceduralExamples.normalAPKFiles.

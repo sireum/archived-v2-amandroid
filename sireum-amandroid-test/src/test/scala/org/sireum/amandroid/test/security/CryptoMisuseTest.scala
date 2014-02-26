@@ -1,20 +1,16 @@
 package org.sireum.amandroid.test.security
 
 import org.junit.runner.RunWith
-import org.sireum.amandroid.test.framework.security.ICCTestFramework
 import org.scalatest.junit.JUnitRunner
+import org.sireum.amandroid.test.framework.security.CryptoMisuseTestFramework
 import org.sireum.amandroid.alir.AndroidGlobalConfig
 import org.sireum.jawa.JawaCodeSource
-import java.util.zip.GZIPInputStream
 import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
-import java.io.FileInputStream
-import org.sireum.jawa.xml.AndroidXStream
-import org.sireum.jawa.alir.interProcedural.sideEffectAnalysis.InterProceduralSideEffectAnalysisResult
-import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
 import org.sireum.jawa.alir.LibSideEffectProvider
+import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
 
 @RunWith(classOf[JUnitRunner])
-class IccTest extends ICCTestFramework {
+class CryptoMisuseTest extends CryptoMisuseTestFramework {
   var i = 0
   val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
   if(androidLibDir != null){
@@ -23,9 +19,9 @@ class IccTest extends ICCTestFramework {
 		LibSideEffectProvider.init
 		
 //	  InterproceduralExamples.testAPKFiles.
-//	  filter { s => s.endsWith("PasswordPassTest.apk") }.
+//	  filter { s => s.endsWith("Crypto_ECB.apk") }.
 //	  foreach { resfile =>
-//	    Analyzing title resfile file (resfile, interPSEA)
+//	    Analyzing title resfile file resfile
 //	  }
 //	  InterproceduralExamples.popularAPKFiles.
 //	  filter { s => s.contains("mobi.mgeek.TunnyBrowser.apk") }.
@@ -41,13 +37,13 @@ class IccTest extends ICCTestFramework {
 //	    Analyzing title resfile file resfile
 ////	    i+=1
 //	  }
-//	  InterproceduralExamples.randomAPKFiles.
-////	  filter { s => s.endsWith("gtd.client.apk") }.
-//	  foreach { resfile =>
-////	    if(i < 89) i += 1
-//	    //if(resfile.endsWith("app.kazoebito.com.apk"))
-//	    Analyzing title resfile file resfile
-//	  }
+	  InterproceduralExamples.randomAPKFiles.
+//	  filter { s => s.endsWith("com.ifs.banking.fiid1350.apk") }.
+	  foreach { resfile =>
+//	    if(i < 89) i += 1
+//	    if(resfile.endsWith("com.sellbackyourbook.sellback.apk"))
+	    Analyzing title resfile file resfile
+	  }
 //	  InterproceduralExamples.normalAPKFiles.
 //	//  filter { s => s.name.endsWith("android-1.apk") }.
 //	  foreach { resRet =>
@@ -73,10 +69,10 @@ class IccTest extends ICCTestFramework {
 //	    Analyzing title fileUri file fileUri
 //	  }
 //		InterproceduralExamples.benchExtendAPKFiles.
-//	  filter { s => s.contains("InterComponentCommunication_DynRegister") }.
-//	  foreach { fileUri =>
-//	    Analyzing title fileUri file fileUri
-//	  }
+////		filter { s => s.endsWith("PrivateDataLeak3.apk") }.
+//		foreach { fileUri =>
+//		  Analyzing title fileUri file fileUri
+//		}
   } else {
     System.err.println("Does not have env var: " + AndroidGlobalConfig.ANDROID_LIB_DIR)
   }

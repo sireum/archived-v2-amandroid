@@ -237,7 +237,7 @@ object ComponentNameModel {
 		        cn =>
 		          cn match{
 		            case cstr @ RFAConcreteStringInstance(text, c) =>
-		              val recordType = StringFormConverter.getTypeFromName(text)
+		              val recordType = StringFormConverter.formatClassNameToType(text)
 		              val rec = Center.resolveRecord(recordType.name, Center.ResolveLevel.HIERARCHY)
 		              val claStr = RFAConcreteStringInstance(recordType.name, c)
 		              val pakStr = RFAConcreteStringInstance(rec.getPackageName, c)
@@ -289,7 +289,7 @@ object ComponentNameModel {
 							        pv2 =>
 							          pv2 match{
 							            case cstr2 @ RFAConcreteStringInstance(text, c) =>
-							              val recordType = StringFormConverter.getTypeFromName(text)
+							              val recordType = StringFormConverter.formatClassNameToType(text)
 							              val claStr = RFAConcreteStringInstance(recordType.name, c)
 							              var facts = isetEmpty[RFAFact]
 							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pv1)

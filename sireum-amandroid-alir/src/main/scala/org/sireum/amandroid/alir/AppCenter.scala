@@ -32,6 +32,8 @@ object AppCenter {
 	
 	def addDynamicRegisteredComponent(comp : JawaRecord, precise : Boolean) = this.synchronized{this.dynamicRegisteredComponents += (comp -> precise)}
 	
+	def updateDynamicRegisteredComponent(comp : JawaRecord, precise : Boolean) = this.synchronized{this.dynamicRegisteredComponents += (comp -> precise)}
+	
 	def setDynamicRegisteredComponents(comps : IMap[JawaRecord, Boolean]) = this.synchronized{this.dynamicRegisteredComponents ++= comps}
 	
 	def getDynamicRegisteredComponents = this.dynamicRegisteredComponents

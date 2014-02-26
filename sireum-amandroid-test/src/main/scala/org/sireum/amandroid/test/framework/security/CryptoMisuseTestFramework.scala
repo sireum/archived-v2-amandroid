@@ -2,44 +2,38 @@ package org.sireum.amandroid.test.framework.security
 
 import org.sireum.amandroid.test.framework.TestFramework
 import org.sireum.util._
-import org.sireum.jawa.alir.interProcedural.sideEffectAnalysis.InterProceduralSideEffectAnalysisResult
 import org.sireum.jawa.MessageCenter._
 import org.sireum.amandroid.alir.AndroidGlobalConfig
 import java.io.File
-import java.net.URI
 import org.sireum.jawa.util.APKFileResolver
+import java.net.URI
 import org.sireum.amandroid.android.decompile.Dex2PilarConverter
 import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidRFAConfig
 import org.sireum.jawa.JawaCodeSource
 import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
-import org.sireum.jawa.ClassLoadManager
+import org.sireum.amandroid.security.apiMisuse.InterestingApiCollector
 import org.sireum.jawa.Center
-import org.sireum.jawa.util.IgnoreException
-import java.io.PrintWriter
-import org.sireum.amandroid.security.interComponentCommunication.IccCollector
-import org.sireum.amandroid.alir.AppCenter
+import org.sireum.amandroid.security.apiMisuse.CryptographicMisuse
+import org.sireum.amandroid.security.apiMisuse.CryptographicConstants
 import org.sireum.amandroid.alir.AndroidConstants
-import org.sireum.jawa.util.Timer
-import org.sireum.jawa.util.TimeOutException
-import org.sireum.amandroid.alir.dataRecorder.DataCollector
-import org.sireum.amandroid.alir.dataRecorder.MetricRepo
-import org.sireum.jawa.util.SubStringCounter
-import org.sireum.jawa.ClassLoadManager
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.jawa.util.Timer
+import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
+import org.sireum.jawa.ClassLoadManager
+import org.sireum.amandroid.alir.AppCenter
+import org.sireum.jawa.util.TimeOutException
+import org.sireum.jawa.util.IgnoreException
+import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 
-object IccCounter {
+object CryptoMisuseCounter {
   var total = 0
   var oversize = 0
   var haveresult = 0
-  var haveIcc = 0
-  var iccTotal = 0
-  var foundIccContainer = 0
   
-  override def toString : String = "total: " + total + ", oversize: " + oversize + ", haveResult: " + haveresult + ", haveIcc: " + haveIcc + ", iccTotal: " + iccTotal + ", foundIccContainer: " + foundIccContainer
+  override def toString : String = "total: " + total + ", oversize: " + oversize + ", haveResult: " + haveresult
 }
 
-class ICCTestFramework extends TestFramework {
+class CryptoMisuseTestFramework extends TestFramework {
   def Analyzing : this.type = this
 
   def title(s : String) : this.type = {
@@ -59,7 +53,7 @@ class ICCTestFramework extends TestFramework {
 
     test(title) {
     	msg_critical("####" + title + "#####")
-    	IccCounter.total += 1
+    	CryptoMisuseCounter.total += 1
     	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
     	AndroidGlobalConfig.initJawaAlirInfoProvider
     	
@@ -73,31 +67,25 @@ class ICCTestFramework extends TestFramework {
     		AndroidRFAConfig.setupCenter
 	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
 	    	JawaCodeSource.load(pilarFileUri, AndroidLibraryAPISummary)
+	    	
 	    	try{
-		    	val pre = new IccCollector(srcRes)
+	    	  if(
+	    	  !JawaCodeSource.getAppRecordsCodes.exists{
+	    	    case (sig, code) =>
+	    	      CryptographicConstants.getCryptoAPIs.exists(p => code.contains(p))
+	    	  }
+	    	  ) throw new IgnoreException
+	    	  
+		    	val pre = new InterestingApiCollector(srcRes)
 				  pre.collectInfo
-				  
-				  val iccSigs = AndroidConstants.getIccMethods
-				  if(JawaCodeSource.getAppRecordsCodes.exists{
-		    	  case (rName, code) =>
-		    	    iccSigs.exists(code.contains(_))
-		    	}) IccCounter.haveIcc += 1
-				  
-				  JawaCodeSource.getAppRecordsCodes.foreach{
-		    	  case (rName, code) =>
-	    	      IccCounter.iccTotal += iccSigs.map(sig => SubStringCounter.countSubstring(code, sig + "|] @classDescriptor")).reduce((i, j) => i + j)
-		    	}
 				  var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
-		    	entryPoints = entryPoints.filter(e=>pre.getIccContainers.contains(e.getDeclaringRecord))
-//		    	entryPoints = entryPoints.filter(e=>e.getDeclaringRecord.getName == "[|accessline:video_timer:video_rec_booking|]")
-		    	if(!entryPoints.isEmpty){
-		    	  IccCounter.foundIccContainer += 1
-		    	}
+		    	val iacs = pre.getInterestingContainers(CryptographicConstants.getCryptoAPIs)
+		    	entryPoints = entryPoints.filter(e=>iacs.contains(e.getDeclaringRecord))
 				  AndroidReachingFactsAnalysisConfig.k_context = 1
 			    AndroidReachingFactsAnalysisConfig.resolve_icc = false
 			    AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-			    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(10))
+			    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
 		    	entryPoints.par.foreach{
 		    	  ep =>
 		    	    try{
@@ -106,25 +94,12 @@ class ICCTestFramework extends TestFramework {
 			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
 			    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
 			    	    msg_critical("processed-->" + icfg.getProcessed.size)
+			    	    CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
 				    	} catch {
 		    	      case te : TimeOutException => System.err.println("Timeout!")
 		    	    }
     	    } 
-				  
-		    	val appData = DataCollector.collect
-		    	MetricRepo.collect(appData)
-		    	val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-		    	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-		    	val apkName = title.substring(0, title.lastIndexOf("."))
-		    	val appDataDirFile = new File(outputDir + "/" + apkName)
-		    	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
-		    	val out = new PrintWriter(appDataDirFile + "/AppData.txt")
-			    out.print(appData.toString)
-			    out.close()
-			    val mr = new PrintWriter(outputDir + "/MetricInfo.txt")
-				  mr.print(MetricRepo.toString)
-				  mr.close()
-				  IccCounter.haveresult += 1
+				  CryptoMisuseCounter.haveresult += 1
 	    	} catch {
 	    	  case ie : IgnoreException =>
 	    	    err_msg_critical("Ignored!")
@@ -135,7 +110,7 @@ class ICCTestFramework extends TestFramework {
 	    	} finally {
 	    	}
     	} else {
-    	  IccCounter.oversize += 1
+    	  CryptoMisuseCounter.oversize += 1
     	  err_msg_critical("Pilar file size is too large:" + pilarFile.length()/1024/1024 + "MB")
     	}
     	
@@ -145,9 +120,7 @@ class ICCTestFramework extends TestFramework {
     	JawaCodeSource.clearAppRecordsCodes
     	System.gc()
 		  System.gc()
-    	msg_critical(IccCounter.toString)
-//    	IccCounter.outputInterestingFileNames
-//    	IccCounter.outputRecStatistic
+    	msg_critical(CryptoMisuseCounter.toString)
     	msg_critical("************************************\n")
     }
   }
