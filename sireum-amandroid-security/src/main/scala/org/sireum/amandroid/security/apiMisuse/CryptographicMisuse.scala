@@ -30,8 +30,11 @@ object CryptographicMisuse {
         }
     }
     val rule1Res = ECBCheck(nodeMap, summary)
-    if(!rule1Res){
-      err_msg_critical("Using ECB mode, and ECB mode is deterministic and not stateful, thus cannot be IND-CPA secure.")
+    rule1Res.foreach{
+      case (n, b) =>
+        if(!b){
+          println(n.context + " using ECB mode!")
+        }
     }
   }
   
@@ -39,8 +42,8 @@ object CryptographicMisuse {
    * Rule 1 forbids the use of ECB mode because ECB mode is deterministic and not stateful, 
    * thus cannot be IND-CPA secure.
    */
-  def ECBCheck(nodeMap : MMap[String, MSet[CGCallNode]], summary : InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]) : Boolean = {
-    var result : Boolean = true
+  def ECBCheck(nodeMap : MMap[String, MSet[CGCallNode]], summary : InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]) : Map[CGCallNode, Boolean] = {
+    var result : Map[CGCallNode, Boolean] = Map()
     val nodes : MSet[CGCallNode] = msetEmpty
     nodeMap.foreach{
       case (sig, ns) =>
@@ -49,6 +52,7 @@ object CryptographicMisuse {
     }
     nodes.foreach{
       node =>
+        result += (node -> true)
         val rfaFacts = summary.entrySet(node)
         val loc = node.getOwner.getProcedureBody.location(node.getLocIndex)
         val argNames : MList[String] = mlistEmpty
@@ -79,7 +83,7 @@ object CryptographicMisuse {
           ins =>
             if(ins.isInstanceOf[RFAConcreteStringInstance]){
               if(CryptographicConstants.getECBSchemes.contains(ins.asInstanceOf[RFAConcreteStringInstance].string))
-                result = false
+                result += (node -> false)
             }
         }
     }

@@ -29,12 +29,16 @@ import org.sireum.jawa.util.IgnoreException
 import java.io.PrintWriter
 import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.alir.LibSideEffectProvider
+import org.sireum.amandroid.security.apiMisuse.CryptographicConstants
+import org.sireum.amandroid.security.apiMisuse.InterestingApiCollector
+import org.sireum.amandroid.security.apiMisuse.CryptographicMisuse
+import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.jawa.util.TimeOutException
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
-object PasswordTrackingCli {
+object CryptoMisuseCli {
 	def run(saamode : SireumAmandroidPasswordTrackingMode) {
     val sourceType = saamode.general.typ match{
       case AnalyzeSource.APK => "APK"
@@ -50,6 +54,7 @@ object PasswordTrackingCli {
     val timeout = saamode.analysis.timeout
     val mem = saamode.general.mem
     val libSideEffectPath = saamode.analysis.sideeffectPath
+    println(parallel)
     forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, sasDir, outputDir, mem, libSideEffectPath)
     println("Generated environment-model and analysis results are saved in: " + outputDir)
   }
@@ -67,11 +72,11 @@ object PasswordTrackingCli {
 	  args += "-to"
 	  args += timeout.toString
 	  args ++= List("-t", typSpec, "-ls", libSideEffectPath, sourceDir, sasDir, outputDir)
-    org.sireum.jawa.util.JVMUtil.startSecondJVM(PasswordTracking.getClass(), "-Xmx" + mem + "G", args.toList, true)
+    org.sireum.jawa.util.JVMUtil.startSecondJVM(CryptoMisuse.getClass(), "-Xmx" + mem + "G", args.toList, true)
   }
 }
 
-object PasswordTracking {
+object CryptoMisuse {
 	def main(args: Array[String]) {
 	  if(args.size != 17){
 	    println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -t type[allows: APK, DIR] -ls [Lib-SideEffect-Path] <source path> <Sink list file path> <output path>")
@@ -135,25 +140,27 @@ object PasswordTracking {
 		    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
 		    	JawaCodeSource.load(pilarFileUri, AndroidLibraryAPISummary)
 		    	try{
-			    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
-			    	val pre = new SensitiveViewCollector(apkFileUri)
+			    	if(
+		    	  !JawaCodeSource.getAppRecordsCodes.exists{
+		    	    case (sig, code) =>
+		    	      CryptographicConstants.getCryptoAPIs.exists(p => code.contains(p))
+		    	  }
+		    	  ) throw new IgnoreException
+		    	  
+			    	val pre = new InterestingApiCollector(apkFileUri)
 					  pre.collectInfo
-
-					  val ssm = new PasswordSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-			    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
+					  var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 			    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
-			    	entryPoints = entryPoints.filter(e=>pre.getSensitiveLayoutContainers.contains(e.getDeclaringRecord))
+			    	val iacs = pre.getInterestingContainers(CryptographicConstants.getCryptoAPIs)
+			    	entryPoints = entryPoints.filter(e=>iacs.contains(e.getDeclaringRecord))
 			    	(if(parallel) entryPoints.par else entryPoints).foreach{
 			    	  ep =>
 			    	    try{
 				    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
 				    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
 				    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
-				    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
-				    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
-				    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult, ssm)
-				    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
-				    	  } catch {
+				    	    CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
+			    	    } catch {
 			    	      case te : TimeOutException => System.err.println("Timeout!")
 			    	    }
 			    	}
@@ -168,13 +175,9 @@ object PasswordTracking {
 			    	val envString = pre.getEnvString
 				    environmentModel.print(envString)
 				    environmentModel.close()
-			    	
-			    	val analysisResult = new PrintWriter(appDataDirFile + "/PasswordTrackingResult.txt")
-				    analysisResult.print(appData.toString)
-				    analysisResult.close()
 		    	} catch {
 		    	  case ie : IgnoreException =>
-		    	    println("No password view!")
+		    	    println("Ignored!")
 		    	  case re : RuntimeException => 
 		    	    re.printStackTrace()
 		    	  case e : Exception =>

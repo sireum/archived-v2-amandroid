@@ -77,7 +77,7 @@ class ICCTestFramework extends TestFramework {
 		    	val pre = new IccCollector(srcRes)
 				  pre.collectInfo
 				  
-				  val iccSigs = AndroidConstants.getIccMethods
+				  val iccSigs = AndroidConstants.getDynRegisterMethods
 				  if(JawaCodeSource.getAppRecordsCodes.exists{
 		    	  case (rName, code) =>
 		    	    iccSigs.exists(code.contains(_))

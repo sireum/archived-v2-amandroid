@@ -41,13 +41,13 @@ class IccTest extends ICCTestFramework {
 //	    Analyzing title resfile file resfile
 ////	    i+=1
 //	  }
-//	  InterproceduralExamples.randomAPKFiles.
-////	  filter { s => s.endsWith("gtd.client.apk") }.
-//	  foreach { resfile =>
-////	    if(i < 89) i += 1
-//	    //if(resfile.endsWith("app.kazoebito.com.apk"))
-//	    Analyzing title resfile file resfile
-//	  }
+	  InterproceduralExamples.randomAPKFiles.
+//	  filter { s => s.endsWith("gtd.client.apk") }.
+	  foreach { resfile =>
+//	    if(i < 89) i += 1
+	    //if(resfile.endsWith("app.kazoebito.com.apk"))
+	    Analyzing title resfile file resfile
+	  }
 //	  InterproceduralExamples.normalAPKFiles.
 //	//  filter { s => s.name.endsWith("android-1.apk") }.
 //	  foreach { resRet =>

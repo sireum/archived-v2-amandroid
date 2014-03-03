@@ -30,10 +30,28 @@ import org.sireum.amandroid.security.dataInjection.IntentInjectionSourceAndSinkM
 
 object IntentInjectionCounter {
   var total = 0
+  var totalComponents = 0
   var oversize = 0
   var haveresult = 0
+  var locTimeMap : Map[String, (Int, Long)] = Map()
+  var timeoutapps : Set[String] = Set()
+  var timeoutComponents = 0
+  var havePath = 0
   
-  override def toString : String = "total: " + total + ", oversize: " + oversize + ", haveResult: " + haveresult
+  def outputRecStatistic = {
+  	val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
+  	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
+  	val appDataDirFile = new File(outputDir + "/LocAndTime")
+  	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
+  	val out = new PrintWriter(appDataDirFile + "/LocAndTime.txt")
+    locTimeMap.foreach{
+  	  case (fileName, (loc, time)) =>
+  	    out.write(loc + ", " + time + "\n")
+  	}
+    out.close()
+  }
+  
+  override def toString : String = "total: " + total + ", oversize: " + oversize + ", haveResult: " + haveresult + ", totalComponents: " + totalComponents + ", timeoutapps: " + timeoutapps.size + ", timeoutComponents: " + timeoutComponents + ", havePath: " + havePath
 }
 
 class IntentInjectionTestFramework extends TestFramework {
@@ -55,6 +73,8 @@ class IntentInjectionTestFramework extends TestFramework {
    srcRes : FileResourceUri) {
 
     test(title) {
+      var loc : Int = 0
+      val startTime = System.currentTimeMillis()
     	msg_critical("####" + title + "#####")
     	IntentInjectionCounter.total += 1
     	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
@@ -70,6 +90,17 @@ class IntentInjectionTestFramework extends TestFramework {
     		AndroidRFAConfig.setupCenter
 	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
 	    	JawaCodeSource.load(pilarFileUri, AndroidLibraryAPISummary)
+	    	
+	    	def countLines(str : String) : Int = {
+				   val lines = str.split("\r\n|\r|\n")
+				   lines.length
+				}
+	    	
+	    	JawaCodeSource.getAppRecordsCodes.foreach{
+    		  case (name, code) =>
+    		    loc += countLines(code)
+    		}
+	    	
 	    	try{
 		    	val pre = new IntentInjectionCollector(srcRes)
 				  pre.collectInfo
@@ -81,7 +112,9 @@ class IntentInjectionTestFramework extends TestFramework {
 				  AndroidReachingFactsAnalysisConfig.k_context = 1
 			    AndroidReachingFactsAnalysisConfig.resolve_icc = false
 			    AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-			    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
+			    AndroidReachingFactsAnalysisConfig.timerOpt = None
+			    IntentInjectionCounter.totalComponents += entryPoints.size
+			    
 		    	entryPoints.par.foreach{
 		    	  ep =>
 		    	    try{
@@ -95,10 +128,16 @@ class IntentInjectionTestFramework extends TestFramework {
 			    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult, ssm)    
 			    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
 				    	} catch {
-		    	      case te : TimeOutException => System.err.println("Timeout!")
+		    	      case te : TimeOutException => 
+		    	        System.err.println("Timeout!")
+		    	        IntentInjectionCounter.timeoutComponents += 1
+		    	        IntentInjectionCounter.timeoutapps += title
 		    	    }
     	    } 
 				  
+		    	if(AppCenter.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
+    	      IntentInjectionCounter.havePath += 1
+    	    }
 		    	val appData = DataCollector.collect
 		    	MetricRepo.collect(appData)
 		    	val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
@@ -133,8 +172,13 @@ class IntentInjectionTestFramework extends TestFramework {
     	JawaCodeSource.clearAppRecordsCodes
     	System.gc()
 		  System.gc()
+    	
+    	val endTime = System.currentTimeMillis()
+    	val totaltime = (endTime - startTime) / 1000
+    	IntentInjectionCounter.locTimeMap += (srcRes -> (loc, totaltime))
     	msg_critical(IntentInjectionCounter.toString)
     	msg_critical("************************************\n")
+    	IntentInjectionCounter.outputRecStatistic
     }
   }
 

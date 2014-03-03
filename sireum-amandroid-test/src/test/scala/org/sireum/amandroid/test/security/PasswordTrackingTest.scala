@@ -11,6 +11,7 @@ import org.sireum.jawa.xml.AndroidXStream
 import org.sireum.jawa.alir.interProcedural.sideEffectAnalysis.InterProceduralSideEffectAnalysisResult
 import org.scalatest.junit.JUnitRunner
 import org.sireum.amandroid.test.framework.security.PasswordTrackingTestFramework
+import org.sireum.jawa.alir.LibSideEffectProvider
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -22,9 +23,7 @@ class CompleteRFATest extends PasswordTrackingTestFramework {
   if(androidLibDir != null){
 		JawaCodeSource.preLoad(AndroidLibPilarFiles.pilarModelFiles(androidLibDir).toSet)
 		
-		val reader = new GZIPInputStream(new FileInputStream("/Volumes/hd/fgwei/Stash/Amandroid/LibSummary/AndroidLibSideEffectResult.xml.zip"))
-    val interPSEA = AndroidXStream.fromXml(reader).asInstanceOf[InterProceduralSideEffectAnalysisResult]
-    reader.close()
+		LibSideEffectProvider.init
 		
 //	  InterproceduralExamples.testAPKFiles.
 //	  filter { s => s.endsWith("PasswordPassTest.apk") }.

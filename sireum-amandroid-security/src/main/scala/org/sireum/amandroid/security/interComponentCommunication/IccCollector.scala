@@ -40,7 +40,7 @@ class IccCollector(apkUri : FileResourceUri) extends AppInfoCollector(apkUri) {
         }
     }
 	  ra.initWithEnv
-	  val sensitiveAPISigs = AndroidConstants.getIccMethods
+	  val sensitiveAPISigs = AndroidConstants.getDynRegisterMethods
 		this.iccContainers = sensitiveAPISigs.map(ra.getSensitiveAPIContainer(_)).reduce(iunion[JawaRecord])
 		AppCenter.setComponents(components)
 		AppCenter.updateIntentFilterDB(this.intentFdb)

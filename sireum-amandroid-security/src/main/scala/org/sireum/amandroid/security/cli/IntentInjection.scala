@@ -1,41 +1,39 @@
 package org.sireum.amandroid.security.cli
 
-import org.sireum.option.SireumAmandroidPasswordTrackingMode
-import org.sireum.option.AnalyzeSource
-import java.io.File
 import org.sireum.jawa.MessageCenter
 import org.sireum.util._
+import org.sireum.option.AnalyzeSource
+import java.io.File
+import org.sireum.amandroid.alir.AndroidGlobalConfig
 import org.sireum.jawa.JawaCodeSource
 import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
+import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import java.net.URI
 import org.sireum.jawa.util.APKFileResolver
 import org.sireum.amandroid.android.decompile.Dex2PilarConverter
-import org.sireum.jawa.Center
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidRFAConfig
+import org.sireum.jawa.util.Timer
 import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
-import org.sireum.amandroid.alir.AndroidConstants
-import org.sireum.amandroid.alir.AndroidGlobalConfig
+import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidRFAConfig
+import org.sireum.amandroid.alir.dataRecorder.DataCollector
+import java.io.PrintWriter
+import org.sireum.jawa.util.IgnoreException
+import org.sireum.jawa.Center
 import org.sireum.amandroid.alir.AppCenter
-import org.sireum.amandroid.android.appInfo.AppInfoCollector
-import org.sireum.amandroid.security.password.SensitiveViewCollector
-import org.sireum.amandroid.security.password.PasswordSourceAndSinkManager
+import org.sireum.option.SireumAmandroidIntentInjectionMode
+import org.sireum.amandroid.alir.AndroidConstants
 import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.jawa.ClassLoadManager
-import org.sireum.jawa.util.Timer
 import org.sireum.jawa.alir.interProcedural.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
 import org.sireum.amandroid.alir.interProcedural.taintAnalysis.AndroidDataDependentTaintAnalysis
-import org.sireum.amandroid.alir.dataRecorder.DataCollector
-import org.sireum.jawa.util.IgnoreException
-import java.io.PrintWriter
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.amandroid.security.dataInjection.IntentInjectionCollector
+import org.sireum.amandroid.security.dataInjection.IntentInjectionSourceAndSinkManager
 import org.sireum.jawa.alir.LibSideEffectProvider
-import org.sireum.jawa.util.TimeOutException
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
-object PasswordTrackingCli {
-	def run(saamode : SireumAmandroidPasswordTrackingMode) {
+object IntentInjectionCli {
+	def run(saamode : SireumAmandroidIntentInjectionMode) {
     val sourceType = saamode.general.typ match{
       case AnalyzeSource.APK => "APK"
       case AnalyzeSource.DIR => "DIR"}
@@ -67,11 +65,11 @@ object PasswordTrackingCli {
 	  args += "-to"
 	  args += timeout.toString
 	  args ++= List("-t", typSpec, "-ls", libSideEffectPath, sourceDir, sasDir, outputDir)
-    org.sireum.jawa.util.JVMUtil.startSecondJVM(PasswordTracking.getClass(), "-Xmx" + mem + "G", args.toList, true)
+    org.sireum.jawa.util.JVMUtil.startSecondJVM(IntentInjection.getClass(), "-Xmx" + mem + "G", args.toList, true)
   }
 }
 
-object PasswordTracking {
+object IntentInjection {
 	def main(args: Array[String]) {
 	  if(args.size != 17){
 	    println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -t type[allows: APK, DIR] -ls [Lib-SideEffect-Path] <source path> <Sink list file path> <output path>")
@@ -103,13 +101,13 @@ object PasswordTracking {
     val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
 	  if(androidLibDir != null){
 			JawaCodeSource.preLoad(AndroidLibPilarFiles.pilarModelFiles(androidLibDir).toSet)	
-			passwordTracking(apkFileUris, sasFilePath, libSideEffectPath, outputUri, static, parallel, icc, k_context, timeout)
+			intentInjection(apkFileUris, sasFilePath, libSideEffectPath, outputUri, static, parallel, icc, k_context, timeout)
 	  } else {
 	    throw new RuntimeException("Does not have environment variable: " + AndroidGlobalConfig.ANDROID_LIB_DIR)
 	  }
 	}
   
-  def passwordTracking(apkFileUris : Set[FileResourceUri], sasFilePath : String, libSideEffectPath : String, outputUri : FileResourceUri, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int) = {
+  def intentInjection(apkFileUris : Set[FileResourceUri], sasFilePath : String, libSideEffectPath : String, outputUri : FileResourceUri, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int) = {
     AndroidGlobalConfig.SourceAndSinkFilePath = sasFilePath
     if(libSideEffectPath != ""){
     	LibSideEffectProvider.init(libSideEffectPath)
@@ -121,7 +119,6 @@ object PasswordTracking {
     AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(timeout))
 	  apkFileUris.foreach{
 	    apkFileUri =>
-	      println("Analyzing " + apkFileUri)
 	      // before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
 	    	AndroidGlobalConfig.initJawaAlirInfoProvider
 	      val apkFile = new File(new URI(apkFileUri))
@@ -135,27 +132,24 @@ object PasswordTracking {
 		    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
 		    	JawaCodeSource.load(pilarFileUri, AndroidLibraryAPISummary)
 		    	try{
-			    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
-			    	val pre = new SensitiveViewCollector(apkFileUri)
+			    	
+			    	val pre = new IntentInjectionCollector(apkFileUri)
 					  pre.collectInfo
-
-					  val ssm = new PasswordSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-			    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
-			    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
-			    	entryPoints = entryPoints.filter(e=>pre.getSensitiveLayoutContainers.contains(e.getDeclaringRecord))
+					  val ssm = new IntentInjectionSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+					  var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
+	//		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
+			    	val iacs = pre.getInterestingContainers(ssm.getSinkSigs ++ AndroidConstants.getIccMethods)
+			    	entryPoints = entryPoints.filter(e=>iacs.contains(e.getDeclaringRecord))
+			    	
 			    	(if(parallel) entryPoints.par else entryPoints).foreach{
 			    	  ep =>
-			    	    try{
-				    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-				    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
-				    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
-				    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
-				    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
-				    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult, ssm)
-				    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
-				    	  } catch {
-			    	      case te : TimeOutException => System.err.println("Timeout!")
-			    	    }
+			    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
+			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
+			    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
+			    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
+			    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
+			    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult, ssm)
+			    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
 			    	}
 			    	val appData = DataCollector.collect
 
@@ -169,12 +163,12 @@ object PasswordTracking {
 				    environmentModel.print(envString)
 				    environmentModel.close()
 			    	
-			    	val analysisResult = new PrintWriter(appDataDirFile + "/PasswordTrackingResult.txt")
+			    	val analysisResult = new PrintWriter(appDataDirFile + "/IntentInectionResult.txt")
 				    analysisResult.print(appData.toString)
 				    analysisResult.close()
 		    	} catch {
 		    	  case ie : IgnoreException =>
-		    	    println("No password view!")
+		    	    println("No interesting component!")
 		    	  case re : RuntimeException => 
 		    	    re.printStackTrace()
 		    	  case e : Exception =>

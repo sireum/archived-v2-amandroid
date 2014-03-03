@@ -41,7 +41,15 @@ class IntentInjectionTest extends IntentInjectionTestFramework {
 //	  filter { s => s.endsWith("gtd.client.apk") }.
 	  foreach { resfile =>
 //	    if(i < 89) i += 1
-	    if(resfile.endsWith("com.sellbackyourbook.sellback.apk"))
+	    if(resfile.endsWith("com.fcbh.dbp.BibleSocietyOfPhilippines.apk") ||
+	        resfile.endsWith("com.genwi.delaware.apk")||
+	        resfile.endsWith("com.herocraft.game.montezuma2.lite.apk") ||
+	        resfile.endsWith("com.hlpth.thaiflood.apk") ||
+	        resfile.endsWith("com.hvandroid.ikhrsjzmpsutgfb.apk") ||
+	        resfile.endsWith("com.midnitestarinc.angelprincess.apk") ||
+	        resfile.endsWith("com.midnitestarinc.pinkcandles.apk") ||
+	        resfile.endsWith("com.ND.NamierzDziecko.apk")
+	        )
 	    Analyzing title resfile file resfile
 	  }
 //	  InterproceduralExamples.normalAPKFiles.
@@ -60,7 +68,7 @@ class IntentInjectionTest extends IntentInjectionTestFramework {
 ////	  filter { s => s.endsWith("6ba36c93.apk")}.
 //	  foreach { resfile =>
 ////	    if(i < 10) 
-//	    Analyzing title resfile file (resfile, interPSEA)
+//	    Analyzing title resfile file resfile
 ////	    i+=1
 //	  }
 //	  InterproceduralExamples.benchAPKFiles.

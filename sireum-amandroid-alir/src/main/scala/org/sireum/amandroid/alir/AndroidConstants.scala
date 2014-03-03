@@ -34,15 +34,18 @@ object AndroidConstants {
 	final val SEND_STICKY_BROADCAST_AS_USER = "sendStickyBroadcastAsUser:(Landroid/content/Intent;Landroid/os/UserHandle;)V"
 	final val SEND_STICKY_ORDERED_BROADCAST = "sendStickyOrderedBroadcast:(Landroid/content/Intent;Landroid/content/BroadcastReceiver;Landroid/os/Handler;ILjava/lang/String;Landroid/os/Bundle;)V"
 	final val SEND_STICKY_ORDERED_BROADCAST_AS_USER = "sendStickyOrderedBroadcastAsUser:(Landroid/content/Intent;Landroid/os/UserHandle;Landroid/content/BroadcastReceiver;Landroid/os/Handler;ILjava/lang/String;Landroid/os/Bundle;)V"
+	final val REGISTER_RECEIVER1 = "registerReceiver:(Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;)Landroid/content/Intent;"
+	final val	REGISTER_RECEIVER2 = "registerReceiver:(Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;)Landroid/content/Intent;"
 	  
 	private final val iccMethods = List(START_ACTIVITY, START_ACTIVITY_BUND, START_ACTIVITY_RESULT,
 	    START_ACTIVITY_RESULT_BUND, START_SERVICE, 
 	    SEND_BROADCAST, SEND_BROADCAST_PERM, SEND_BROADCAST_AS_USER, SEND_BROADCAST_AS_USER_PERM,
 	    SEND_ORDERED_BROADCAST, SEND_ORDERED_BROADCAST_SEVEN_PARM, SEND_ORDERED_BROADCAST_AS_USER,
 	    SEND_STICKY_BROADCAST, SEND_STICKY_BROADCAST_AS_USER, SEND_STICKY_ORDERED_BROADCAST,
-	    SEND_STICKY_ORDERED_BROADCAST_AS_USER)
+	    SEND_STICKY_ORDERED_BROADCAST_AS_USER, REGISTER_RECEIVER1, REGISTER_RECEIVER2)
 	def getIccMethods() : List[String] = iccMethods
 
+	def getDynRegisterMethods() : List[String] = List(REGISTER_RECEIVER1, REGISTER_RECEIVER2)
 	
 	final val INTENT = "[|android:content:Intent|]"
 	final val INTENT_COMPONENT = "[|android:content:Intent.mComponent|]"
