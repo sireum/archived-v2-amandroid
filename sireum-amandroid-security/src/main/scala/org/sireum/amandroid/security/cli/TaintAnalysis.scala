@@ -181,9 +181,9 @@ object TanitAnalysis{
 				    analysisResult.close()
 		    	} catch {
 		    	  case re : RuntimeException => 
-		    	    re.printStackTrace()
+		    	    println("Exception happened! Contact fgwei@ksu.edu.")
 		    	  case e : Exception =>
-		    	    e.printStackTrace()
+		    	    println("Exception happened! Contact fgwei@ksu.edu.")
 		    	} finally {
 		    	}
 		  	} else {

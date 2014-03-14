@@ -119,6 +119,7 @@ object IntentInjection {
     AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(timeout))
 	  apkFileUris.foreach{
 	    apkFileUri =>
+	      println("Analyzing " + apkFileUri)
 	      // before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
 	    	AndroidGlobalConfig.initJawaAlirInfoProvider
 	      val apkFile = new File(new URI(apkFileUri))
@@ -170,9 +171,9 @@ object IntentInjection {
 		    	  case ie : IgnoreException =>
 		    	    println("No interesting component!")
 		    	  case re : RuntimeException => 
-		    	    re.printStackTrace()
+		    	    println("Exception happened! Contact fgwei@ksu.edu.")
 		    	  case e : Exception =>
-		    	    e.printStackTrace()
+		    	    println("Exception happened! Contact fgwei@ksu.edu.")
 		    	} finally {
 		    	}
 		  	} else {

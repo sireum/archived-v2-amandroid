@@ -1,6 +1,5 @@
 package org.sireum.amandroid.security.cli
 
-import org.sireum.option.SireumAmandroidPasswordTrackingMode
 import org.sireum.option.AnalyzeSource
 import java.io.File
 import org.sireum.jawa.MessageCenter
@@ -34,18 +33,18 @@ import org.sireum.amandroid.security.apiMisuse.InterestingApiCollector
 import org.sireum.amandroid.security.apiMisuse.CryptographicMisuse
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.jawa.util.TimeOutException
+import org.sireum.option.SireumAmandroidCryptoMisuseMode
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 object CryptoMisuseCli {
-	def run(saamode : SireumAmandroidPasswordTrackingMode) {
+	def run(saamode : SireumAmandroidCryptoMisuseMode) {
     val sourceType = saamode.general.typ match{
       case AnalyzeSource.APK => "APK"
       case AnalyzeSource.DIR => "DIR"}
     val sourceDir = saamode.srcFile
     val sourceFile = new File(sourceDir)
-    val sasDir = saamode.sasFile
     val outputDir = saamode.analysis.outdir
     val nostatic = saamode.analysis.noStatic
     val parallel = saamode.analysis.parallel
@@ -54,12 +53,11 @@ object CryptoMisuseCli {
     val timeout = saamode.analysis.timeout
     val mem = saamode.general.mem
     val libSideEffectPath = saamode.analysis.sideeffectPath
-    println(parallel)
-    forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, sasDir, outputDir, mem, libSideEffectPath)
+    forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, outputDir, mem, libSideEffectPath)
     println("Generated environment-model and analysis results are saved in: " + outputDir)
   }
 	
-	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : String, sourceDir : String, sasDir : String, outputDir : String, mem : Int, libSideEffectPath : String) = {
+	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : String, sourceDir : String, outputDir : String, mem : Int, libSideEffectPath : String) = {
 	  val args : MList[String] = mlistEmpty
 	  args += "-s"
 	  args += (!nostatic).toString
@@ -71,15 +69,15 @@ object CryptoMisuseCli {
 	  args += k_context.toString
 	  args += "-to"
 	  args += timeout.toString
-	  args ++= List("-t", typSpec, "-ls", libSideEffectPath, sourceDir, sasDir, outputDir)
+	  args ++= List("-t", typSpec, "-ls", libSideEffectPath, sourceDir, outputDir)
     org.sireum.jawa.util.JVMUtil.startSecondJVM(CryptoMisuse.getClass(), "-Xmx" + mem + "G", args.toList, true)
   }
 }
 
 object CryptoMisuse {
 	def main(args: Array[String]) {
-	  if(args.size != 17){
-	    println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -t type[allows: APK, DIR] -ls [Lib-SideEffect-Path] <source path> <Sink list file path> <output path>")
+	  if(args.size != 16){
+	    println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -t type[allows: APK, DIR] -ls [Lib-SideEffect-Path] <source path> <output path>")
 	    return
 	  }
 	  MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NO
@@ -91,8 +89,7 @@ object CryptoMisuse {
 	  val typ = args(11)
 	  val libSideEffectPath = args(13)
 	  val sourcePath = args(14)
-	  val sasFilePath = args(15)
-	  val outputPath = args(16)
+	  val outputPath = args(15)
 	  val apkFileUris = typ match{
       case "APK" =>
         require(sourcePath.endsWith(".apk"))
@@ -108,14 +105,13 @@ object CryptoMisuse {
     val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
 	  if(androidLibDir != null){
 			JawaCodeSource.preLoad(AndroidLibPilarFiles.pilarModelFiles(androidLibDir).toSet)	
-			passwordTracking(apkFileUris, sasFilePath, libSideEffectPath, outputUri, static, parallel, icc, k_context, timeout)
+			cryptoMisuse(apkFileUris, libSideEffectPath, outputUri, static, parallel, icc, k_context, timeout)
 	  } else {
 	    throw new RuntimeException("Does not have environment variable: " + AndroidGlobalConfig.ANDROID_LIB_DIR)
 	  }
 	}
   
-  def passwordTracking(apkFileUris : Set[FileResourceUri], sasFilePath : String, libSideEffectPath : String, outputUri : FileResourceUri, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int) = {
-    AndroidGlobalConfig.SourceAndSinkFilePath = sasFilePath
+  def cryptoMisuse(apkFileUris : Set[FileResourceUri], libSideEffectPath : String, outputUri : FileResourceUri, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int) = {
     if(libSideEffectPath != ""){
     	LibSideEffectProvider.init(libSideEffectPath)
     }
@@ -179,9 +175,9 @@ object CryptoMisuse {
 		    	  case ie : IgnoreException =>
 		    	    println("Ignored!")
 		    	  case re : RuntimeException => 
-		    	    re.printStackTrace()
+		    	    println("Exception happened! Contact fgwei@ksu.edu.")
 		    	  case e : Exception =>
-		    	    e.printStackTrace()
+		    	    println("Exception happened! Contact fgwei@ksu.edu.")
 		    	} finally {
 		    	}
 		  	} else {

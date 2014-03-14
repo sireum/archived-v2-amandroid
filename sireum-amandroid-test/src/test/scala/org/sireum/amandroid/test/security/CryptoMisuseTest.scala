@@ -18,11 +18,11 @@ class CryptoMisuseTest extends CryptoMisuseTestFramework {
 		
 		LibSideEffectProvider.init
 		
-//	  InterproceduralExamples.testAPKFiles.
-//	  filter { s => s.endsWith("Crypto_ECB.apk") }.
-//	  foreach { resfile =>
-//	    Analyzing title resfile file resfile
-//	  }
+	  InterproceduralExamples.testAPKFiles.
+	  filter { s => s.endsWith("Crypto_ECB.apk") }.
+	  foreach { resfile =>
+	    Analyzing title resfile file resfile
+	  }
 //	  InterproceduralExamples.popularAPKFiles.
 //	  filter { s => s.contains("mobi.mgeek.TunnyBrowser.apk") }.
 //	  foreach { resfile =>
@@ -37,13 +37,13 @@ class CryptoMisuseTest extends CryptoMisuseTestFramework {
 //	    Analyzing title resfile file resfile
 ////	    i+=1
 //	  }
-	  InterproceduralExamples.randomAPKFiles.
-//	  filter { s => s.endsWith("com.ifs.banking.fiid1350.apk") }.
-	  foreach { resfile =>
-//	    if(i < 89) i += 1
-//	    if(resfile.endsWith("com.sellbackyourbook.sellback.apk"))
-	    Analyzing title resfile file resfile
-	  }
+//	  InterproceduralExamples.randomAPKFiles.
+////	  filter { s => s.endsWith("com.ifs.banking.fiid1350.apk") }.
+//	  foreach { resfile =>
+////	    if(i < 89) i += 1
+////	    if(resfile.endsWith("com.sellbackyourbook.sellback.apk"))
+//	    Analyzing title resfile file resfile
+//	  }
 //	  InterproceduralExamples.normalAPKFiles.
 //	//  filter { s => s.name.endsWith("android-1.apk") }.
 //	  foreach { resRet =>

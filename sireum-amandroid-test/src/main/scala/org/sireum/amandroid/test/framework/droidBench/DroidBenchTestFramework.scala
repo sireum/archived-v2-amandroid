@@ -1,6 +1,6 @@
 package org.sireum.amandroid.test.framework.droidBench
 
-import org.sireum.amandroid.test.framework.TestFramework
+import org.sireum.jawa.test.framework.TestFramework
 import org.sireum.util._
 import org.sireum.amandroid._
 import org.sireum.jawa.pilarParser.LightWeightPilarParser

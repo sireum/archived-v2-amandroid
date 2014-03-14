@@ -176,9 +176,9 @@ object PasswordTracking {
 		    	  case ie : IgnoreException =>
 		    	    println("No password view!")
 		    	  case re : RuntimeException => 
-		    	    re.printStackTrace()
+		    	    println("Exception happened! Contact fgwei@ksu.edu.")
 		    	  case e : Exception =>
-		    	    e.printStackTrace()
+		    	    println("Exception happened! Contact fgwei@ksu.edu.")
 		    	} finally {
 		    	}
 		  	} else {

@@ -1,6 +1,6 @@
 package org.sireum.amandroid.example.interprocedural
 
-import org.sireum.amandroid.example.Examples
+import org.sireum.jawa.example.Examples
 import org.sireum.jawa.util.MyFileUtil
 import org.sireum.jawa.util.ResourceRetriever
 import org.sireum.amandroid.alir.AndroidGlobalConfig
