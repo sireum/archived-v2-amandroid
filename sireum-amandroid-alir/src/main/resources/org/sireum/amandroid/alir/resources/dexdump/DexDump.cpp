@@ -177,7 +177,7 @@ static char* descriptorToDot(const char* str)
                  for (i = 0; i < targetLen; i++) {
                      char ch = str[offset + i];
                      if (ch == '/') {
-                       newStr[i+counter]=':';
+                       newStr[i+counter]='.';
                        //counter++;
                        //newStr[i+counter]=':';
                      }
@@ -902,7 +902,7 @@ void dumpLocals(DexFile* pDexFile, const DexCode* pCode,
     ****/
 
 	printf("      locals :\n");
-	fprintf(pFp,"      local temp ;\n"); // sankar adds: previously it was "placeholder" instead of "temp"
+	fprintf(pFp,"      temp ;\n"); // sankar adds: previously it was "local temp" instead of just "temp"
 
 	/****** moved the following block to dumpMethod() ****
     const DexMethodId *pMethodId
@@ -1194,12 +1194,12 @@ static char* indexString(DexFile* pDexFile,
               case 0x6b:
               case 0x6c:
               case 0x6d:
-                outSize = snprintf(buf, bufSize, "@@[|%s.%s|] ",                   // @@ identifies global/static variables in pilar
+                outSize = snprintf(buf, bufSize, "`@@%s.%s` ",                   // @@ identifies global/static variables in pilar
                     descriptorToDot(fieldInfo.classDescriptor), fieldInfo.name);
                                         //descriptorToDot(fieldInfo.signature));
                 break;
               default:
-                outSize = snprintf(buf, bufSize, ".[|%s.%s|] ",
+                outSize = snprintf(buf, bufSize, ".`%s.%s` ",
                     descriptorToDot( fieldInfo.classDescriptor), fieldInfo.name);
                         //descriptorToDot(fieldInfo.signature));
               }
@@ -1312,7 +1312,7 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
                      fprintf(pFp, "                 | %d => goto L%06x\n", minValue,
                     		 ((u1*)insns - pDexFile->baseAddr) +(((bytePtr[0] & 0xFF) |((bytePtr[1] & 0xFF) << 8) |((bytePtr[2] & 0xFF) << 16) |(bytePtr[3] << 24))+ temp->insnIdx)*2);
                }
-              fprintf(pFp, "                 | => goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(temp->insnIdx+3)*2);
+              fprintf(pFp, "                 | else => goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(temp->insnIdx+3)*2);
               ++l31t;
            // ********* sankar ends *********
 
@@ -1342,7 +1342,7 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
                     (bytePtr[0] & 0xFF) |((bytePtr[1] & 0xFF) << 8) |((bytePtr[2] & 0xFF) << 16) |(bytePtr[3] << 24),
                     ((u1*)insns - pDexFile->baseAddr) + (((bytePtr[size*4] & 0xFF) |((bytePtr[size*4+1] & 0xFF) << 8) |((bytePtr[size*4+2] & 0xFF) << 16) |(bytePtr[size*4+3] << 24))+ temp->insnIdx)*2);
               }
-                     fprintf(pFp, "                 | => goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(temp->insnIdx+3)*2);
+                     fprintf(pFp, "                 | else => goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(temp->insnIdx+3)*2);
                      ++l31t;
            // *********** sankar ends **************
 
@@ -2413,21 +2413,21 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
          printf(" v%d, v%d, %s", pDecInsn->vA, pDecInsn->vB, indexBuf); // not in pilar
 	     /**** sankar starts ****/
          {
-                /* now processing indexBuf which looks like "[obj+003b]" ; we want to convert z to "+|003b|+" */ 
+                /* now processing indexBuf which looks like "[obj+003b]" ; we want to convert z to "`003b`" */
                  char* newStr = (char*)malloc(sizeof(indexBuf));
                  int index1 = 0;
                  int index2 = 0;
                  assert(sizeof(newStr) > 10);
-                 strcpy(newStr,"+|");
-                 index1 = 2;
+                 strcpy(newStr,"`");
+                 index1 = 1;
                  index2 = 5;
-                 while(indexBuf[index2] != ']' && index1 < 8){
+                 while(indexBuf[index2] != ']' && index1 < 7){
                      newStr[index1] = indexBuf[index2];
                      index1++;
                      index2++;
                      }
                  newStr[index1]='\0';
-                 strcat(newStr, "|+");
+                 strcat(newStr, "`");
                  strcpy(indexBuf, newStr);
 				 free(newStr);
                /* indexBuf processing ends; note the free(newStr) at the end */ 
@@ -3268,7 +3268,7 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 			 strcat(paraTotal, paraThis);
 			 strcat(paraTotal, para);
 
-              fprintf(pFp, "    procedure %s [|%s.%s|] (%s) @owner %s @signature [|%s.%s:%s|] @Access %s {\n",
+              fprintf(pFp, "    procedure %s `%s.%s` (%s) @owner %s @signature `%s.%s.%s` @Access %s {\n",
 			            toPilar(rtype), owner, name, paraTotal, toPilar(owner), backDescriptor, name, typeDescriptor, accessStr); // not in dexdump
              free(rtype);
              free(para);
@@ -3424,8 +3424,8 @@ void dumpSField(const DexFile* pDexFile, const DexField* pSField, int i,bool fla
               printf("      type          : '%s'\n", typeDescriptor);
               printf("      access        : 0x%04x (%s)\n",
                   pSField->accessFlags, accessStr); 
-                    if(flag)fprintf(pFp, "      global %s @@[|%s.%s|]", toPilar(descriptorToDot(typeDescriptor)), className, name); // sankar adds className
-                    else fprintf(pFp, "      %s [|%s.%s|]",toPilar(descriptorToDot(typeDescriptor)), className, name); // sankar adds className
+                    if(flag)fprintf(pFp, "      global %s `@@%s.%s`", toPilar(descriptorToDot(typeDescriptor)), className, name); // sankar adds className
+                    else fprintf(pFp, "      %s `%s.%s`",toPilar(descriptorToDot(typeDescriptor)), className, name); // sankar adds className
                     fprintf(pFp, "    @AccessFlag %s;\n",accessStr);
 
             //******************* kui's modification ends  *******************

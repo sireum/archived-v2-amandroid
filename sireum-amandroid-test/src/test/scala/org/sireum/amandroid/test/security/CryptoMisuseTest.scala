@@ -16,7 +16,7 @@ class CryptoMisuseTest extends CryptoMisuseTestFramework {
   if(androidLibDir != null){
 		JawaCodeSource.preLoad(AndroidLibPilarFiles.pilarModelFiles(androidLibDir).toSet)
 		
-		LibSideEffectProvider.init
+		//LibSideEffectProvider.init
 		
 	  InterproceduralExamples.testAPKFiles.
 	  filter { s => s.endsWith("Crypto_ECB.apk") }.

@@ -18,7 +18,7 @@ class DroidBenchTest extends DroidBenchTestFramework {
   val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
   if(androidLibDir != null){
 		JawaCodeSource.preLoad(AndroidLibPilarFiles.pilarModelFiles(androidLibDir).toSet)
-		LibSideEffectProvider.init
+//		LibSideEffectProvider.init
 		
 		val ints = Set("LocationFlow1WithLeak.apk")
 		
