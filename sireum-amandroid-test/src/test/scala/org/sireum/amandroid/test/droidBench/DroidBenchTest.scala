@@ -18,27 +18,27 @@ class DroidBenchTest extends DroidBenchTestFramework {
   val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
   if(androidLibDir != null){
 		JawaCodeSource.preLoad(AndroidLibPilarFiles.pilarModelFiles(androidLibDir).toSet)
-		LibSideEffectProvider.init
+//		LibSideEffectProvider.init
 		
 //		val ints = Set("InterComponentCommunication_DynRegister1.apk", "InterComponentCommunication_DynRegister2.apk")
 		
-	  InterproceduralExamples.benchAPKFiles.
-//	  filter { s => ints.exists(s.endsWith(_)) }.
-	  foreach { fileUri =>
-	    Analyzing title fileUri file fileUri
-	  }
+//	  InterproceduralExamples.benchAPKFiles.
+////	  filter { s => ints.exists(s.endsWith(_)) }.
+//	  foreach { fileUri =>
+//	    Analyzing title fileUri file fileUri
+//	  }
 		
-//		InterproceduralExamples.testAPKFiles.
-//		filter { s => ints.exists(s.endsWith(_)) }.
-//		foreach { fileUri =>
-//		  Analyzing title fileUri file fileUri
-//		}
-		
-		InterproceduralExamples.benchExtendAPKFiles.
+		InterproceduralExamples.testAPKFiles.
 //		filter { s => ints.exists(s.endsWith(_)) }.
 		foreach { fileUri =>
 		  Analyzing title fileUri file fileUri
 		}
+		
+//		InterproceduralExamples.benchExtendAPKFiles.
+////		filter { s => ints.exists(s.endsWith(_)) }.
+//		foreach { fileUri =>
+//		  Analyzing title fileUri file fileUri
+//		}
   } else {
     System.err.println("Does not have env var: " + AndroidGlobalConfig.ANDROID_LIB_DIR)
   }
