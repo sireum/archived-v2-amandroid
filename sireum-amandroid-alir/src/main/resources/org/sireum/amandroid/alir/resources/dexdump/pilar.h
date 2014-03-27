@@ -9,11 +9,11 @@
 
 
 /* sankar adds toPilar: This func reformats a class descritptor to the pilar format.  For
- * example, "int[]" becomes "[|int|][]".
+ * example, "int[]" becomes "`int`[]".
  */
 static char* toPilar(const char* str)
 {
-    int targetLen = strlen(str) + 4; // [| |] are extra 4 chars
+    int targetLen = strlen(str) + 2; // `...` are extra 2 chars
     int offset = strlen(str) - 1;
     int arrayDepth = 0;
     char* newStr = (char*)malloc(targetLen + 1);   // source of memory leak as this space is never freed  
@@ -33,20 +33,18 @@ static char* toPilar(const char* str)
     
 
 
-    /* brace with [| |] i.e. copy class name in the middle */
+    /* brace with ` ` i.e. copy class name in the middle */
 
     int i = 0;
-    newStr[0] = '[';
-	newStr[1] = '|';
-	i = 2;
+    newStr[0] = '`';
+	i = 1;
     for (int j = 0; j <= offset; j++) {
          char ch = str[j];
-         newStr[j+2]=ch;
+         newStr[j+1]=ch;
 		 i++;
     }
 
-    newStr[i++] = '|';
-	newStr[i++] = ']';
+    newStr[i++] = '`';
 
     for(int j = 0; j<arrayDepth; j++) {
 	
@@ -65,11 +63,11 @@ static char* toPilar(const char* str)
 
 
 /* sankar adds toPilarS: This func reformats a class descritptor to the pilar format.  S stands for special reformat. For
- * example, "byte[v3]" becomes "[|byte|][v3]".
+ * example, "byte[v3]" becomes "`byte`[v3]".
  */
 static char* toPilarS(const char* str)
 {
-    int targetLen = strlen(str) + 4; // [| |] are extra 4 chars
+    int targetLen = strlen(str) + 2; // ` ` are extra 2 chars
     int offset = 0;
     int leng = strlen(str);
     char* newStr = (char*)malloc(targetLen + 1); // source of memory leak as this space is never freed;
@@ -88,20 +86,18 @@ static char* toPilarS(const char* str)
 
 
 
-    /* brace with [| |] i.e. copy class name in the middle */
+    /* brace with ` ` i.e. copy class name in the middle */
 
     int i = 0;
-    newStr[0] = '[';
-	newStr[1] = '|';
-	i = 2;
+    newStr[0] = '`';
+	i = 1;
     for (int j = 0; j < offset; j++) {
          char ch = str[j];
-         newStr[j+2]=ch;
+         newStr[j+1]=ch;
 		 i++;
     }
 
-    newStr[i++] = '|';
-	newStr[i++] = ']';
+    newStr[i++] = '`';
 
     for(int j = offset; j < leng; j++) {
 	     char ch = str[j];
@@ -206,24 +202,24 @@ static char* pilarExtName(const char* str)
  #define  outReturn(x)             fprintf(pFp,"return v%d;", x)
  #define  outReturnWide(x)         fprintf(pFp,"return v%d  @type wide;", x)
  #define  outReturnObj(x)          fprintf(pFp,"return v%d  @type object;", x);
- #define  outConst4(x, y)          fprintf(pFp,"v%d:= %d  @length 4;", x, y)
- #define  outConst16(x, y)         fprintf(pFp,"v%d:= %d  @length 16;", x, y)
- #define  outConst32(x, y)         fprintf(pFp,"v%d:= %d  @length 32;", x, y)
- #define  outConstHigh16(x, y)     fprintf(pFp,"v%d:= %d  @length high16;", x, y)
- #define  outConstWide16(x, y)     fprintf(pFp,"v%d:= %d  @length wide16;", x, y)
- #define  outConstWide32(x, y)     fprintf(pFp,"v%d:= %f  @length wide32;", x, y)
+ #define  outConst4(x, y)          fprintf(pFp,"v%d:= %dI  @length 4;", x, y)
+ #define  outConst16(x, y)         fprintf(pFp,"v%d:= %dI  @length 16;", x, y)
+ #define  outConst32(x, y)         fprintf(pFp,"v%d:= %dI  @length 32;", x, y)
+ #define  outConstHigh16(x, y)     fprintf(pFp,"v%d:= %dI  @length high16;", x, y)
+ #define  outConstWide16(x, y)     fprintf(pFp,"v%d:= %dL  @length wide16;", x, y)
+ #define  outConstWide32(x, y)     fprintf(pFp,"v%d:= %fF  @length wide32;", x, y)
 // #define  outConstWide(x, y)       fprintf(pFp,"v%d:= %fL  @length wide;", x, y)
  #define  outConstWideHigh16(x, y) fprintf(pFp,"v%d:= %lldL  @length wide_high16;", x, y)
- #define  outConstWide(x, y)       fprintf(pFp,"v%d:= %f  @length wide;", x, y)
+ #define  outConstWide(x, y)       fprintf(pFp,"v%d:= %fF  @length wide;", x, y)
 // #define  outConstWideHigh16(x, y) fprintf(pFp,"v%d:= %lld  @length wide_high16;", x, y)
  #define  outConstString(x, y)     fprintf(pFp,"v%d:= \"%s\" @type object;", x, y)  // adding annotation in pilar for const string to treat it as object
- #define  outConstClass(x, y)      fprintf(pFp,"v%d:= @@[|%s.class|] @type object;", x, y)
+ #define  outConstClass(x, y)      fprintf(pFp,"v%d:= `@@%s.class` @type object;", x, y)
  #define  outMonitorEnter(x)       fprintf(pFp,"(@monitorenter v%d)", x)
  #define  outMonitorExit(x)        fprintf(pFp,"(@monitorexit v%d)", x)
  #define  outCheckCast(x, y, z)    fprintf(pFp,"v%d:= (%s)v%d;", x, toPilar(y), z)
  #define  outInstanceOf(x, y, z)   fprintf(pFp,"v%d:= instanceof @varname v%d @type \"%s\";", x, y, toPilarS(z))
 // #define  outArrayLen(x, y)        fprintf(pFp,"v%d:= v%d.length;", x, y)
- #define  outArrayLen(x, y)        fprintf(pFp,"v%d:= v%d.[|Array[].length|];", x, y)
+ #define  outArrayLen(x, y)        fprintf(pFp,"v%d:= v%d.`Array[].length`;", x, y)
  #define  outNewIns(x, y)          fprintf(pFp,"v%d:= new %s;", x, toPilar(y))
  #define  outNewArray(x, y)        fprintf(pFp,"v%d:= new %s;", x, toPilarS(y))
 
@@ -336,7 +332,7 @@ static char* pilarExtName(const char* str)
 
 /********  Note that there are INCONSISTENCIES between above and following macro sets in the context of "z[i]", "y->vB", "y->arg[i], etc"  *****/
 
-char* cut3Char(char* proc) 
+char* cut3Char(char* proc)  // not in use now
 {
 			   /* processing a proc name which looks like "[|<name>|]" ; we want to cut it to "name>|]" */ 
 			assert(sizeof(proc) > 7);
@@ -345,7 +341,7 @@ char* cut3Char(char* proc)
 }          
 
 
-char* cut2Char(char* proc) 
+char* cut2Char(char* proc) // not in use now
 {
 			   /* processing a proc name which looks like "[|name|]" ; we want to cut it to "name|]" */ 
 			assert(sizeof(proc) > 5);
@@ -353,19 +349,27 @@ char* cut2Char(char* proc)
 			  /* processing ends;  */ 
 }          
 
+char* cut1Char(char* proc) // in use now
+{
+			   /* processing a proc name which looks like "`name`" ; we want to cut it to "name`" */
+			assert(sizeof(proc) > 3);
+			   return (&proc[1]);
+			  /* processing ends;  */
+}
+
 
 #define  outInvokeObjectInitRange(x, y, z) \
     { \
            FieldMethodInfo methInfo;\
            if (getMethodInfo(x, y->vB, &methInfo)) { \
-              fprintf(pFp,"call temp:=  [|%s.%s(", descriptorToDot(methInfo.classDescriptor), cut2Char(z));\
+              fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
               for (i = 0; i < (int) y->vA; i++) { \
                if (i == 0) \
                  fprintf(pFp,"v%d", y->arg[i]);\
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type (object, object_init);",methInfo.classDescriptor, methInfo.name,\
+               fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type (object, object_init);",methInfo.classDescriptor, methInfo.name,\
                    methInfo.signature, descriptorToDot(methInfo.classDescriptor));\
          }\
      }
@@ -375,14 +379,14 @@ char* cut2Char(char* proc)
     { \
            FieldMethodInfo methInfo;\
            if (getMethodInfo(x, y->vB, &methInfo)) { \
-              fprintf(pFp,"call temp:=  [|%s.%s(", descriptorToDot(methInfo.classDescriptor), cut2Char(z));\
+              fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
               for (i = 0; i < (int) y->vA; i++) { \
                if (i == 0) \
                  fprintf(pFp,"v%d", y->arg[i]);\
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type virtual;",methInfo.classDescriptor, methInfo.name,\
+               fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type virtual;",methInfo.classDescriptor, methInfo.name,\
                    methInfo.signature, descriptorToDot(methInfo.classDescriptor));\
          }\
      }
@@ -392,13 +396,13 @@ char* cut2Char(char* proc)
 #define  outInvokeVirtualQuick(x, y, z) \
     { \
 			   \
-			   /* now processing indexBuf z which looks like "[003b] //vtable 003b" ; we want to convert z to "+|003b|+" after removing comment */ \
+			   /* now processing indexBuf z which looks like "[003b] //vtable 003b" ; we want to convert z to "`003b`" after removing comment */ \
 				char* newStr = (char*)malloc(sizeof(z));\
 				int index1 = 0;\
 				int index2 = 0;\
 				assert(sizeof(newStr) > 19);\
-				strcpy(newStr,"+|");\
-				index1 = 2;\
+				strcpy(newStr,"`");\
+				index1 = 1;\
 				index2 = 1;\
 				while(z[index2] != ']' && index1 < 15){\
 					newStr[index1] = z[index2];\
@@ -406,7 +410,7 @@ char* cut2Char(char* proc)
 					index2++;\
 					}\
                 newStr[index1]='\0';\
-				strcat(newStr, "|+");\
+				strcat(newStr, "`");\
 			\
 			  /* z processing ends; note the free(newStr) at the end */ \
             \
@@ -417,7 +421,7 @@ char* cut2Char(char* proc)
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature [||] @classDescriptor [||] @type virtual_quick;");\
+               fprintf(pFp,") @signature `` @classDescriptor `` @type virtual_quick;");\
 				   free(newStr);    /**** this is to free the newStr ******/\
      }
 
@@ -425,14 +429,14 @@ char* cut2Char(char* proc)
     { \
            FieldMethodInfo methInfo;\
            if (getMethodInfo(x, y->vB, &methInfo)) { \
-              fprintf(pFp,"call temp:=  [|%s.%s(", descriptorToDot(methInfo.classDescriptor), cut2Char(z));\
+              fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
               for (i = 0; i < (int) y->vA; i++) { \
                if (i == 0) \
                  fprintf(pFp,"v%d", y->arg[i]);\
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type super;",methInfo.classDescriptor, methInfo.name,\
+               fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type super;",methInfo.classDescriptor, methInfo.name,\
                    methInfo.signature, descriptorToDot(methInfo.classDescriptor));\
          }\
 	}
@@ -440,13 +444,13 @@ char* cut2Char(char* proc)
 
 #define  outInvokeSuperQuick(x, y, z) \
     { \
-			   /* now processing indexBuf z which looks like "[003b] //vtable 003b" ; we want to convert z to "+|003b|+" after removing comment */ \
+			   /* now processing indexBuf z which looks like "[003b] //vtable 003b" ; we want to convert z to "`003b`" after removing comment */ \
 				char* newStr = (char*)malloc(sizeof(z));\
 				int index1 = 0;\
 				int index2 = 0;\
 				assert(sizeof(newStr) > 19);\
-				strcpy(newStr,"+|");\
-				index1 = 2;\
+				strcpy(newStr,"`");\
+				index1 = 1;\
 				index2 = 1;\
 				while(z[index2] != ']' && index1 < 15){\
 					newStr[index1] = z[index2];\
@@ -454,7 +458,7 @@ char* cut2Char(char* proc)
 					index2++;\
 					}\
                 newStr[index1]='\0';\
-				strcat(newStr, "|+");\
+				strcat(newStr, "`");\
 			\
 			  /* z processing ends; note the free(newStr) at the end */ \
             \
@@ -465,7 +469,7 @@ char* cut2Char(char* proc)
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature [||] @classDescriptor [||] @type super_quick;");\
+               fprintf(pFp,") @signature `` @classDescriptor `` @type super_quick;");\
 				   free(newStr); /**** this is to free the newStr ******/\
 	}
 
@@ -474,14 +478,14 @@ char* cut2Char(char* proc)
     { \
            FieldMethodInfo methInfo;\
            if (getMethodInfo(x, y->vB, &methInfo)) { \
-              fprintf(pFp,"call temp:=  [|%s.%s(", descriptorToDot(methInfo.classDescriptor), cut2Char(z));\
+              fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
               for (i = 0; i < (int) y->vA; i++) { \
                if (i == 0) \
                  fprintf(pFp,"v%d", y->arg[i]);\
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type direct;",methInfo.classDescriptor, methInfo.name,\
+               fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type direct;",methInfo.classDescriptor, methInfo.name,\
                    methInfo.signature, descriptorToDot(methInfo.classDescriptor));\
          }\
 	}
@@ -491,14 +495,14 @@ char* cut2Char(char* proc)
     { \
            FieldMethodInfo methInfo;\
            if (getMethodInfo(x, y->vB, &methInfo)) { \
-              fprintf(pFp,"call temp:=  [|%s.%s(", descriptorToDot(methInfo.classDescriptor), cut2Char(z));\
+              fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
               for (i = 0; i < (int) y->vA; i++) { \
                if (i == 0) \
                  fprintf(pFp,"v%d", y->arg[i]);\
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type static;",methInfo.classDescriptor, methInfo.name,\
+               fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type static;",methInfo.classDescriptor, methInfo.name,\
                    methInfo.signature, descriptorToDot(methInfo.classDescriptor));\
          }\
 	}
@@ -509,14 +513,14 @@ char* cut2Char(char* proc)
     { \
            FieldMethodInfo methInfo;\
            if (getMethodInfo(x, y->vB, &methInfo)) { \
-              fprintf(pFp,"call temp:=  [|%s.%s(", descriptorToDot(methInfo.classDescriptor), cut2Char(z));\
+              fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
               for (i = 0; i < (int) y->vA; i++) { \
                if (i == 0) \
                  fprintf(pFp,"v%d", y->arg[i]);\
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type interface;",methInfo.classDescriptor, methInfo.name,\
+               fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type interface;",methInfo.classDescriptor, methInfo.name,\
                    methInfo.signature, descriptorToDot(methInfo.classDescriptor));\
          }\
 	}
@@ -525,14 +529,14 @@ char* cut2Char(char* proc)
   { \
           FieldMethodInfo methInfo; \
           if (getMethodInfo(x, y->vB, &methInfo)) { \
-              fprintf(pFp,"call temp:=  [|%s.%s(", descriptorToDot(methInfo.classDescriptor), cut2Char(z));\
+              fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
           for (i = 0; i < (int) y->vA; i++) { \
             if (i == 0) \
                 fprintf(pFp,"v%d", y->vC + i); \
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type virtual;",methInfo.classDescriptor, methInfo.name, \
+          fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type virtual;",methInfo.classDescriptor, methInfo.name, \
                            methInfo.signature, descriptorToDot(methInfo.classDescriptor)); \
           } \
   }
@@ -542,13 +546,13 @@ char* cut2Char(char* proc)
 #define outInvokeVirtualQuickRange(x, y, z) \
   { \
                \
-			   /* now processing indexBuf z which looks like "[003b] //vtable 003b" ; we want to convert z to "+|offset|+" after removing comment */ \
+			   /* now processing indexBuf z which looks like "[003b] //vtable 003b" ; we want to convert z to "`offset`" after removing comment */ \
 				char* newStr = (char*)malloc(sizeof(z));\
 				int index1 = 0;\
 				int index2 = 0;\
 				assert(sizeof(newStr) > 19);\
-				strcpy(newStr,"+|");\
-				index1 = 2;\
+				strcpy(newStr,"`");\
+				index1 = 1;\
 				index2 = 1;\
 				while(z[index2] != ']' && index1 < 15){\
 					newStr[index1] = z[index2];\
@@ -556,7 +560,7 @@ char* cut2Char(char* proc)
 					index2++;\
 					}\
                 newStr[index1]='\0';\
-				strcat(newStr, "|+");\
+				strcat(newStr, "`");\
 			\
 			  /* z processing ends; note the free(newStr) at the end; */ \
          \
@@ -567,7 +571,7 @@ char* cut2Char(char* proc)
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature [||] @classDescriptor [||] @type virtual_quick;"); \
+          fprintf(pFp,") @signature `` @classDescriptor `` @type virtual_quick;"); \
 						   free(newStr);\
   }
 
@@ -577,14 +581,14 @@ char* cut2Char(char* proc)
   { \
           FieldMethodInfo methInfo; \
           if (getMethodInfo(x, y->vB, &methInfo)) { \
-              fprintf(pFp,"call temp:=  [|%s.%s(", descriptorToDot(methInfo.classDescriptor), cut2Char(z));\
+              fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
           for (i = 0; i < (int) y->vA; i++) { \
             if (i == 0) \
                 fprintf(pFp,"v%d", y->vC + i); \
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type super;",methInfo.classDescriptor, methInfo.name, \
+          fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type super;",methInfo.classDescriptor, methInfo.name, \
                            methInfo.signature, descriptorToDot(methInfo.classDescriptor)); \
           } \
   }
@@ -594,13 +598,13 @@ char* cut2Char(char* proc)
 #define outInvokeSuperQuickRange(x, y, z) \
   { \
                \
-			   /* now processing indexBuf z which looks like "[003b] //vtable 003b" ; we want to convert z to "+|offset|+" after removing comment */ \
+			   /* now processing indexBuf z which looks like "[003b] //vtable 003b" ; we want to convert z to "`offset`" after removing comment */ \
 				char* newStr = (char*)malloc(sizeof(z));\
 				int index1 = 0;\
 				int index2 = 0;\
 				assert(sizeof(newStr) > 19);\
-				strcpy(newStr,"+|");\
-				index1 = 2;\
+				strcpy(newStr,"`");\
+				index1 = 1;\
 				index2 = 1;\
 				while(z[index2] != ']' && index1 < 15){\
 					newStr[index1] = z[index2];\
@@ -608,7 +612,7 @@ char* cut2Char(char* proc)
 					index2++;\
 					}\
                 newStr[index1]='\0';\
-				strcat(newStr, "|+");\
+				strcat(newStr, "`");\
 			\
 			  /* z processing ends; note the free(newStr) at the end; */ \
          \
@@ -619,7 +623,7 @@ char* cut2Char(char* proc)
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature [||] @classDescriptor [||] @type super_quick;"); \
+          fprintf(pFp,") @signature `` @classDescriptor `` @type super_quick;"); \
 						   free(newStr);\
   }
 
@@ -627,14 +631,14 @@ char* cut2Char(char* proc)
   { \
           FieldMethodInfo methInfo; \
           if (getMethodInfo(x, y->vB, &methInfo)) { \
-              fprintf(pFp,"call temp:=  [|%s.%s(", descriptorToDot(methInfo.classDescriptor), cut2Char(z));\
+              fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
           for (i = 0; i < (int) y->vA; i++) { \
             if (i == 0) \
                 fprintf(pFp,"v%d", y->vC + i); \
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type direct;",methInfo.classDescriptor, methInfo.name, \
+          fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type direct;",methInfo.classDescriptor, methInfo.name, \
                            methInfo.signature, descriptorToDot(methInfo.classDescriptor)); \
           } \
   }
@@ -644,14 +648,14 @@ char* cut2Char(char* proc)
   { \
           FieldMethodInfo methInfo; \
           if (getMethodInfo(x, y->vB, &methInfo)) { \
-              fprintf(pFp,"call temp:=  [|%s.%s(", descriptorToDot(methInfo.classDescriptor), cut2Char(z));\
+              fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
           for (i = 0; i < (int) y->vA; i++) { \
             if (i == 0) \
                 fprintf(pFp,"v%d", y->vC + i); \
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type static;",methInfo.classDescriptor, methInfo.name, \
+          fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type static;",methInfo.classDescriptor, methInfo.name, \
                            methInfo.signature, descriptorToDot(methInfo.classDescriptor)); \
           } \
   }
@@ -660,14 +664,14 @@ char* cut2Char(char* proc)
   { \
           FieldMethodInfo methInfo; \
           if (getMethodInfo(x, y->vB, &methInfo)) { \
-              fprintf(pFp,"call temp:=  [|%s.%s(", descriptorToDot(methInfo.classDescriptor), cut2Char(z));\
+              fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
           for (i = 0; i < (int) y->vA; i++) { \
             if (i == 0) \
                 fprintf(pFp,"v%d", y->vC + i); \
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type interface;",methInfo.classDescriptor, methInfo.name, \
+          fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type interface;",methInfo.classDescriptor, methInfo.name, \
                            methInfo.signature, descriptorToDot(methInfo.classDescriptor)); \
           } \
   }
@@ -677,13 +681,13 @@ char* cut2Char(char* proc)
 #define  outExecuteInline(x, y, z) \
     { \
 			   \
-			   /* now processing indexBuf z which looks like "[003b] //inline 003b" ; we want to convert z to "+|003b|+" after removing comment */ \
+			   /* now processing indexBuf z which looks like "[003b] //inline 003b" ; we want to convert z to "`003b`" after removing comment */ \
 				char* newStr = (char*)malloc(sizeof(z));\
 				int index1 = 0;\
 				int index2 = 0;\
 				assert(sizeof(newStr) > 19);\
-				strcpy(newStr,"+|");\
-				index1 = 2;\
+				strcpy(newStr,"`");\
+				index1 = 1;\
 				index2 = 1;\
 				while(z[index2] != ']' && index1 < 15){\
 					newStr[index1] = z[index2];\
@@ -691,7 +695,7 @@ char* cut2Char(char* proc)
 					index2++;\
 					}\
                 newStr[index1]='\0';\
-				strcat(newStr, "|+");\
+				strcat(newStr, "`");\
 			\
 			  /* z processing ends; note the free(newStr) at the end */ \
             \
@@ -704,7 +708,7 @@ char* cut2Char(char* proc)
                     }\
                /* fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type execute_inline;",methInfo.classDescriptor, methInfo.name,\
                    methInfo.signature,descriptorToDot(methInfo.classDescriptor)); */\
-               fprintf(pFp,") @signature [||] @classDescriptor [||] @type execute_inline;");\
+               fprintf(pFp,") @signature `` @classDescriptor `` @type execute_inline;");\
 				   free(newStr);    /**** this is to free the newStr ******/\
      }
 
@@ -712,13 +716,13 @@ char* cut2Char(char* proc)
 #define outExecuteInlineRange(x, y, z) \
   { \
                \
-			   /* now processing indexBuf z which looks like "[003b] //inline 003b" ; we want to convert z to "+|offset|+" after removing comment */ \
+			   /* now processing indexBuf z which looks like "[003b] //inline 003b" ; we want to convert z to "`offset`" after removing comment */ \
 				char* newStr = (char*)malloc(sizeof(z));\
 				int index1 = 0;\
 				int index2 = 0;\
 				assert(sizeof(newStr) > 19);\
-				strcpy(newStr,"+|");\
-				index1 = 2;\
+				strcpy(newStr,"`");\
+				index1 = 1;\
 				index2 = 1;\
 				while(z[index2] != ']' && index1 < 15){\
 					newStr[index1] = z[index2];\
@@ -726,7 +730,7 @@ char* cut2Char(char* proc)
 					index2++;\
 					}\
                 newStr[index1]='\0';\
-				strcat(newStr, "|+");\
+				strcat(newStr, "`");\
 			\
 			  /* z processing ends; note the free(newStr) at the end; */ \
          \
@@ -737,7 +741,7 @@ char* cut2Char(char* proc)
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature [||] @classDescriptor [||] @type execute_inline;"); \
+          fprintf(pFp,") @signature `` @classDescriptor `` @type execute_inline;"); \
 						   free(newStr);\
   }
 
