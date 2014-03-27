@@ -74,7 +74,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
 	      if(AndroidReachingFactsAnalysisConfig.resolve_static_init){
 		      if(AndroidReachingFactsAnalysisHelper.isModelCall(p)){
 	          ReachingFactsAnalysisHelper.getUnknownObjectForClinit(p, currentNode.getContext)
-	        } else if(!this.icfg.isProcessed(p, currentNode.getContext)) { // for normal call
+	        } else if(!this.icfg.isProcessed(p.getSignature, currentNode.getContext)) { // for normal call
 	          val nodes = this.icfg.collectCfgToBaseGraph(p, currentNode.getContext, false)
 	          nodes.foreach{n => n.setLoadedClassBitSet(clm.loadClass(me, bitset))}
 		        val clinitVirContext = currentNode.getContext.copy.setContext(p.getSignature, p.getSignature)
@@ -309,7 +309,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
       var pureNormalFlag = true  //no mix of normal and model callee
       calleeSet.foreach{
         callee =>
-          val calleep = callee.calleeProc
+          val calleep = Center.getProcedureWithoutFailing(callee.callee)
           if(AndroidReachingFactsAnalysisHelper.isICCCall(calleep) || AndroidReachingFactsAnalysisHelper.isModelCall(calleep)){
             pureNormalFlag = false
             val args = cj.callExp.arg match{
@@ -331,12 +331,12 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
 	              tmpReturnFacts ++= retFacts
 	              targets.foreach{
 	                target =>
-	                  if(!cg.isProcessed(target, callerContext)){
+	                  if(!cg.isProcessed(target.getSignature, callerContext)){
 					            cg.collectCfgToBaseGraph[String](target, callerContext, false)
 										  cg.extendGraphOneWay(target.getSignature, callerContext, AndroidReachingFactsAnalysis.ICC_EDGE)
 				            }
 	                  msg_normal(target.getDeclaringRecord + " started!")
-	                  calleeFactsMap += (cg.entryNode(target, callerContext) -> mapFactsToICCTarget(factsForCallee, cj, target.getProcedureBody.procedure))
+	                  calleeFactsMap += (cg.entryNode(target.getSignature, callerContext) -> mapFactsToICCTarget(factsForCallee, cj, target.getProcedureBody.procedure))
 	              }
               }
             } else { // for non-ICC model call
@@ -346,13 +346,13 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
             	tmpReturnFacts ++= AndroidReachingFactsAnalysisHelper.doModelCall(factsForCallee, calleep, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)
             }
           } else { // for normal call
-            if(!cg.isProcessed(calleep, callerContext)){
+            if(!cg.isProcessed(calleep.getSignature, callerContext)){
               cg.collectCfgToBaseGraph[String](calleep, callerContext, false)
             	cg.extendGraph(calleep.getSignature, callerContext)
             }
             val factsForCallee = getFactsForCallee(s, cj, calleep)
             returnFacts --= factsForCallee
-            calleeFactsMap += (cg.entryNode(calleep, callerContext) -> mapFactsToCallee(factsForCallee, cj, calleep.getProcedureBody.procedure))
+            calleeFactsMap += (cg.entryNode(calleep.getSignature, callerContext) -> mapFactsToCallee(factsForCallee, cj, calleep.getProcedureBody.procedure))
           }
       }
       returnFacts ++= tmpReturnFacts
@@ -534,8 +534,8 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
       callerNode match{
         case crn : CGReturnNode =>
           val calleeVarFacts = calleeS.filter(_.s.isInstanceOf[VarSlot]).map{f=>(f.s.asInstanceOf[VarSlot], f.v)}.toSet
-          val calleeProcedure = calleeExitNode.getOwner.getProcedureBody.procedure
-          val cj = crn.getOwner.getProcedureBody.location(crn.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump]
+          val calleeProcedure = Center.getProcedureWithoutFailing(calleeExitNode.getOwner).getProcedureBody.procedure
+          val cj = Center.getProcedureWithoutFailing(crn.getOwner).getProcedureBody.location(crn.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump]
           val lhsSlots : ISeq[VarSlot] = cj.lhss.map{lhs=>VarSlot(lhs.name.name)}
           var paramSlots : List[VarSlot] = List()
           calleeProcedure.params.foreach{

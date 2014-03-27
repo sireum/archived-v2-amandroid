@@ -31,6 +31,12 @@ import org.sireum.jawa.util.TimeOutException
 import org.sireum.jawa.util.Timer
 import org.sireum.jawa.alir.interProcedural.sideEffectAnalysis.InterProceduralSideEffectAnalysisResult
 import org.sireum.jawa.alir.interProcedural.taintAnalysis.SourceAndSinkManager
+import java.util.zip.GZIPOutputStream
+import org.sireum.jawa.xml.AndroidXStream
+import java.util.zip.GZIPInputStream
+import org.sireum.jawa.alir.interProcedural.controlFlowGraph.InterproceduralControlFlowGraph
+import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
+import org.sireum.amandroid.alir.dataRecorder.AmandroidResult
 
 object DroidBenchCounter {
   var total = 0
@@ -84,6 +90,13 @@ trait DroidBenchTestFramework extends TestFramework {
 			    AndroidReachingFactsAnalysisConfig.resolve_icc = true
 			    AndroidReachingFactsAnalysisConfig.resolve_static_init = true
 			    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
+			    
+			    val fileName = title.substring(title.lastIndexOf("/"), title.lastIndexOf("."))
+    	    val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
+			  	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
+			  	val fileDir = new File(outputDir + "/AmandroidResult/DroidBench/" + fileName)
+    	    if(!fileDir.exists()) fileDir.mkdirs()
+			    
 		    	entryPoints.par.foreach{
 		    	  ep =>
 		    	    try{
@@ -92,11 +105,26 @@ trait DroidBenchTestFramework extends TestFramework {
 			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
 			    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
 			    	    msg_critical("processed-->" + icfg.getProcessed.size)
-			    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
-			    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
-			    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult, ssm)    
+			    	    val ddgResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
+			    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, ddgResult)
+			    	    
+			    	    val file = new File(fileDir + "/" + ep.getDeclaringRecord.getName.filter(_.isUnicodeIdentifierPart) + ".xml.zip")
+						    val w = new FileOutputStream(file)
+					      val zipw = new GZIPOutputStream(new BufferedOutputStream(w))
+						    AndroidXStream.toXml(AmandroidResult(InterProceduralDataFlowGraph(icfg, irfaResult), ddgResult), zipw)
+						    zipw.close()
+						    println("Result stored!")
+						    val reader = new GZIPInputStream(new FileInputStream(file))
+						    val xmlObject = AndroidXStream.fromXml(reader).asInstanceOf[AmandroidResult]
+					      reader.close()
+					      println("xml loaded!")
+					      println(icfg.nodes.size == xmlObject.idfg.icfg.nodes.size)
+					      println(icfg.edges.size == xmlObject.idfg.icfg.edges.size)
+			    	    
+					      val tar = AndroidDataDependentTaintAnalysis(xmlObject.ddg, xmlObject.idfg.summary, ssm)    
 			    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
 //			    	    iddResult.getIddg.toDot(new PrintWriter(System.out))
+					      
 				    	} catch {
 		    	      case te : TimeOutException => System.err.println("Timeout!")
 		    	    }
@@ -108,8 +136,6 @@ trait DroidBenchTestFramework extends TestFramework {
     	    }
 		    	val appData = DataCollector.collect
 		    	MetricRepo.collect(appData)
-		    	val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-		    	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
 		    	val apkName = title.substring(0, title.lastIndexOf("."))
 		    	val appDataDirFile = new File(outputDir + "/" + apkName)
 		    	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()

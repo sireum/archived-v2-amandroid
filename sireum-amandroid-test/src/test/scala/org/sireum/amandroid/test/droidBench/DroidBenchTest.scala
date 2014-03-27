@@ -20,19 +20,19 @@ class DroidBenchTest extends DroidBenchTestFramework {
 		JawaCodeSource.preLoad(AndroidLibPilarFiles.pilarModelFiles(androidLibDir).toSet)
 //		LibSideEffectProvider.init
 		
-		val ints = Set("LocationFlow1WithLeak.apk")
+//		val ints = Set("LocationFlow1WithLeak.apk")
 		
-//	  InterproceduralExamples.benchAPKFiles.
-////	  filter { s => ints.exists(s.endsWith(_)) }.
-//	  foreach { fileUri =>
-//	    Analyzing title fileUri file fileUri
-//	  }
+	  InterproceduralExamples.benchAPKFiles.
+//	  filter { s => ints.exists(s.endsWith(_)) }.
+	  foreach { fileUri =>
+	    Analyzing title fileUri file fileUri
+	  }
 		
-		InterproceduralExamples.testAPKFiles.
-		filter { s => ints.exists(s.endsWith(_)) }.
-		foreach { fileUri =>
-		  Analyzing title fileUri file fileUri
-		}
+//		InterproceduralExamples.testAPKFiles.
+//		filter { s => ints.exists(s.endsWith(_)) }.
+//		foreach { fileUri =>
+//		  Analyzing title fileUri file fileUri
+//		}
 		
 //		InterproceduralExamples.benchExtendAPKFiles.
 ////		filter { s => ints.exists(s.endsWith(_)) }.

@@ -138,9 +138,9 @@ object AndroidDataDependentTaintAnalysis {
         val calleeSet = invNode.getCalleeSet
 		    calleeSet.foreach{
 		      callee =>
-		        val calleep = callee.calleeProc
+		        val calleep = Center.getProcedureWithoutFailing(callee.callee)
 		        val callees : MSet[JawaProcedure] = msetEmpty
-				    val caller = invNode.getOwner
+				    val caller = Center.getProcedureWithoutFailing(invNode.getOwner)
 				    val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
 				    val cj = jumpLoc.jump.asInstanceOf[CallJump]
 				    if(calleep.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
@@ -186,14 +186,14 @@ object AndroidDataDependentTaintAnalysis {
 		      msg_normal("found icc source: " + iddg.entryNode)
 		      val tn = Tn(iddg.entryNode)
 		      tn.isSrc = true
-		      tn.descriptors += Td(iddg.entryNode.getOwner.getSignature, SourceAndSinkCategory.ICC_SOURCE)
+		      tn.descriptors += Td(iddg.entryNode.getOwner, SourceAndSinkCategory.ICC_SOURCE)
 		      sources += tn
 		    }
-        if(entNode.position > 0 && ssm.isCallbackSource(entNode.getOwner)){
+        if(entNode.position > 0 && ssm.isCallbackSource(Center.getProcedureWithoutFailing(entNode.getOwner))){
           msg_normal("found callback source: " + entNode)
           val tn = Tn(entNode)
           tn.isSrc = true
-		      tn.descriptors += Td(entNode.getOwner.getSignature, SourceAndSinkCategory.CALLBACK_SOURCE)
+		      tn.descriptors += Td(entNode.getOwner, SourceAndSinkCategory.CALLBACK_SOURCE)
 		      sources += tn
         }
       case _ =>
