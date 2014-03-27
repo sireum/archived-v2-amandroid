@@ -69,10 +69,11 @@ enum OutputFormat {
 u4 lastAddress = 0; // sankar adds : this would store the last address of the current method
 typedef struct locVarInfo locVarInf; // sankar adds
 
-PStash* locVarList = NULL; // sankar adds this list which holds local variables' info for the current method 
-char* pilarDir; // this will hold the current package's directory name; // sankar adds
-char* pilarFile; // this will hold the current class name; // sankar adds
-FILE* pFp; // represents files having the pilar output; at any point, it corresponds to the current "class" of dex; so, each file represents pilar of one "class".
+PStash* locVarList = NULL; // sankar adds this list which holds local variables' info for the current method
+char* pilarRootDir; // the root directory which contains all pilar
+char* currentDir; // this will hold the current package's directory name; // sankar adds
+char* currentFile; // this will hold the current class name; // sankar adds
+FILE* pFp; // a file pointer; at any point, it corresponds to the current "class" of dex;
 FILE* topFp; // represents a special file named top.pilar in the root directory; In addition to other info, this can hold some error information, if any.
 
 
@@ -3486,8 +3487,10 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
     const char* superclassDescriptor;
     char* accessStr = NULL;
 
-    char* newFile; // sankar adds
-    char* temp; // sankar adds
+    char* currentFile; // sankar adds
+    char* currentClassName; // sankar adds
+    char* classDesc; // sankar adds
+    char* currentPath; // sankar adds
     int i;
 
     pClassDef = dexGetClassDef(pDexFile, idx);
@@ -3570,63 +3573,66 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
     //******************* kui's and sankar's modification begins  *******************
 
     // starting creation of a file which will contain the current class's pilar
-     temp = descriptorToDot(classDescriptor);
-     pilarDir = replaceChar(dirName(temp), '.', '/');
-     pilarFile = className(temp);
-     mkdirp(pilarDir); // creating the directory if it does not already exists
-     newFile = (char*)malloc(strlen(temp) + 1); // double check for the length miscalculation here
-     strcpy(newFile, pilarDir);
-     strcat(newFile, "/");
-     strcat(newFile, pilarFile);
+     classDesc = descriptorToDot(classDescriptor);
+     currentDir = replaceChar(dirName(classDesc), '.', '/');
+     fprintf(topFp, "currentDir = %s \n", currentDir);
+     currentPath = (char*)malloc(strlen(pilarRootDir) + strlen(currentDir) + 2);
+     strcpy(currentPath, pilarRootDir);
+     strcat(currentPath, "/");
+     strcat(currentPath, currentDir);
 
-     pFp = fopen(newFile, "w"); // creating a file
-     if(!pFp)
-         {
-           fprintf(stderr, " \n could not open the pilar file %s \n", newFile);
-         }
+     currentClassName = className(classDesc);
+     mkdirp(currentPath); // creating the directory if it does not already exists
+     currentFile = (char*)malloc(strlen(currentPath) + strlen(currentClassName) + strlen(PILAR_EXT) + 2); // double check for the length miscalculation here
+     strcpy(currentFile, currentPath);
+     strcat(currentFile, "/");
+     strcat(currentFile, currentClassName);
+     strcat(currentFile, PILAR_EXT);
+     pFp = fopen(currentFile, "w"); // creating a file
+     if (!pFp) {
+	   fprintf(stderr, " \n could not open the pilar file %s \n", currentFile);
+	 }
 
      // creation of the file is done
 
     if (gOptions.outputFormat == OUTPUT_PLAIN) {
-              printf("Class #%d            -\n", idx);
-              printf("  Class descriptor  : '%s'\n", classDescriptor);
-              printf("  Access flags      : 0x%04x (%s)\n",
-                  pClassDef->accessFlags, accessStr);
+		printf("Class #%d            -\n", idx);
+		printf("  Class descriptor  : '%s'\n", classDescriptor);
+		printf("  Access flags      : 0x%04x (%s)\n",
+		  pClassDef->accessFlags, accessStr);
 
-              if (superclassDescriptor != NULL)
-                  printf("  Superclass        : '%s'\n", superclassDescriptor);
+		if (superclassDescriptor != NULL)
+		  printf("  Superclass        : '%s'\n", superclassDescriptor);
 
-              printf("  Interfaces        -\n"); // above 5 prints not in pilar
+		printf("  Interfaces        -\n"); // above 5 prints not in pilar
 
-          if(packageName==NULL||strcmp(packageName,getPackageName(classDescriptor))!=0)
-          {
-           // fprintf(pFp, "package [|%s|] ;\n", getPackageName(classDescriptor)); // not in dexdump
-            packageName=getPackageName(classDescriptor);
-          }
-             pInterfaces = dexGetInterfacesList(pDexFile, pClassDef);
-            if (superclassDescriptor != NULL && strcmp(superclassDescriptor,"Ljava/lang/Object;")!= 0)
-              {
-              fprintf(pFp, "record %s ", toPilar(descriptorToDot(classDescriptor))); // not in dexdump
-              if(!((pClassDef->accessFlags)&ACC_INTERFACE)==0)  fprintf(pFp, " @type interface");
-              else fprintf(pFp, " @type class"); // not in dexdump
-              fprintf(pFp, " @AccessFlag %s  extends %s",accessStr,toPilar(descriptorToDot(superclassDescriptor))); // not in dexdump
-              if (pInterfaces != NULL) {
-                for (i = 0; i < (int) pInterfaces->size; i++)
-                	dumpInterface(pDexFile, dexGetTypeItem(pInterfaces, i), i,1);
+		if(packageName==NULL||strcmp(packageName,getPackageName(classDescriptor))!=0) {
+		  // fprintf(pFp, "package [|%s|] ;\n", getPackageName(classDescriptor)); // not in dexdump
+		  packageName=getPackageName(classDescriptor);
+		}
+		pInterfaces = dexGetInterfacesList(pDexFile, pClassDef);
+		if (superclassDescriptor != NULL && strcmp(superclassDescriptor,"Ljava/lang/Object;")!= 0) {
+		  fprintf(pFp, "record %s ", toPilar(descriptorToDot(classDescriptor))); // not in dexdump
+		  if(!((pClassDef->accessFlags)&ACC_INTERFACE)==0)  fprintf(pFp, " @type interface");
+		  else fprintf(pFp, " @type class"); // not in dexdump
+		  fprintf(pFp, " @AccessFlag %s  extends %s",accessStr,toPilar(descriptorToDot(superclassDescriptor))); // not in dexdump
+		  if (pInterfaces != NULL) {
+			for (i = 0; i < (int) pInterfaces->size; i++)
+				dumpInterface(pDexFile, dexGetTypeItem(pInterfaces, i), i,1);
 
-                 }
-              }
-            else{
-              fprintf(pFp, "record %s ", toPilar(descriptorToDot(classDescriptor))); // not in dexdump
-              if(!((pClassDef->accessFlags)&ACC_INTERFACE)==0)  fprintf(pFp, " @type interface"); // not in dexdump
-                          else fprintf(pFp, " @type class"); // not in dexdump
-                          fprintf(pFp, " @AccessFlag %s ",accessStr); // not in dexdump
-              if (pInterfaces != NULL) {
-            	  fprintf(pFp, "extends "); // not in dexdump
-                  for (i = 0; i < (int) pInterfaces->size-1; i++)
-                  dumpInterface(pDexFile, dexGetTypeItem(pInterfaces, i), i,2);
-                  dumpInterface(pDexFile, dexGetTypeItem(pInterfaces, i), i,0);
-             }
+		  }
+		}
+		else{
+		  fprintf(pFp, "record %s ", toPilar(descriptorToDot(classDescriptor))); // not in dexdump
+		  if(!((pClassDef->accessFlags)&ACC_INTERFACE)==0)  fprintf(pFp, " @type interface"); // not in dexdump
+					  else fprintf(pFp, " @type class"); // not in dexdump
+					  fprintf(pFp, " @AccessFlag %s ",accessStr); // not in dexdump
+		  if (pInterfaces != NULL) {
+			  fprintf(pFp, "extends "); // not in dexdump
+			  for (i = 0; i < (int) pInterfaces->size-1; i++)
+			  dumpInterface(pDexFile, dexGetTypeItem(pInterfaces, i), i,2);
+			  dumpInterface(pDexFile, dexGetTypeItem(pInterfaces, i), i,0);
+		 }
              }
 
             fprintf(pFp, " {\n"); // not in dexdump
@@ -4141,13 +4147,13 @@ int main(int argc, char* const argv[])
 
         if(pilar) {  // sankar adds this if clause
            filename = strdup(argv[optind]); // is strdup safe? // sankar adds this line for pilar
-	       pilarDir = pilarDirName(filename);
+	       pilarRootDir = pilarDirName(filename);
 	          // cut .ext (.dex or .apk) from the input file name (x.ext), and get "x" as the pilar-containing-root-directory; // sankar adds;
 
-	       mkdirp(pilarDir); // creating the root directory which contains pilar
+	       mkdirp(pilarRootDir); // creating the root directory which contains pilar
 
-	       newFile = (char*)malloc(strlen(pilarDir) + 15); //  length of "/top.pilar" = 11;
-	       strcpy(newFile, pilarDir);
+	       newFile = (char*)malloc(strlen(pilarRootDir) + strlen("/top.pilar") + 1);
+	       strcpy(newFile, pilarRootDir);
 	       strcat(newFile, "/top.pilar");
 
 		   topFp = fopen(newFile, "w");

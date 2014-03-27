@@ -8,14 +8,15 @@
 
 #include<errno.h>
 #define DEFAULT_MODE      S_IRWXU | S_IRGRP |  S_IXGRP | S_IROTH | S_IXOTH  // used in mkdirp() which creates directory
-
+#define PILAR_EXT ".pilar"
 /*
  * replace character 'a' by another char 'b' (for all occurrences of 'a') in a string
  */
 static char* replaceChar(const char* str, char a, char b)
 {
-  char* mystring = strdup(str);
-  for (int count = 0; count < strlen(mystring); count++)
+  char* mystring = (char*)malloc(strlen(str) + 1);
+  strcpy(mystring, str);
+  for (unsigned int count = 0; count < strlen(mystring); count++)
   {
     if (mystring[count] == a)
      {
@@ -185,7 +186,8 @@ struct Op31t {
 
 bool mkdirp(const char* path, mode_t mode = DEFAULT_MODE) {
 
-            char* q = strdup(path); // a copy of "path", which gets modified and restored again and again
+            char* q = (char*)malloc(strlen(path) + 1);
+            strcpy(q, path); // a copy of "path", which gets modified and restored again and again
             char* p = q; // p traverses along string q
 
            // Do mkdir for each slash until end of string q or error
@@ -232,7 +234,7 @@ static char* dirName(const char* str)
 {
     const char* lastDot;
     char* dir;
-
+    int length = 0;
 
     lastDot = strrchr(str, '.');
     if ((lastDot == NULL) || (lastDot == str))
@@ -244,10 +246,11 @@ static char* dirName(const char* str)
     else
         {
 			assert(lastDot > str);
-			dir = (char*)malloc(lastDot - str + 1); // lastDot - str = length of "directory" part;
-		    strncpy(dir, str, lastDot - str);	// copy the "directory" part from str to newStr
+			length = lastDot - str;
+			dir = (char*)malloc(length + 1); // lastDot - str = length of "directory" part;
+		    strncpy(dir, str, length);	// copy the "directory" part from str to newStr
+		    dir[length]='\0';
         }
-
     return dir;
 }
 
@@ -262,7 +265,7 @@ static char* className(const char* str)
 {
     const char* lastDot;
     char* cName;
-
+    int length = 0;
 
     lastDot = strrchr(str, '.');
     if ((lastDot == NULL) || (lastDot == str))
@@ -274,8 +277,10 @@ static char* className(const char* str)
     else
         {
 			assert(lastDot > str);
-			cName = (char*)malloc(strlen(str) - lastDot); // strlen(str) - lastDot = length of "class" part;
-		    strncpy(cName, lastDot+1, strlen(lastDot+1));	// copy the "class" part from str to newStr
+			length = strlen(lastDot + 1);
+			cName = (char*)malloc(length + 1); // length of "class" part;
+		    strncpy(cName, lastDot+1, length);	// copy the "class" part from str to cName
+		    cName[length] = '\0';
         }
 
     return cName;
@@ -293,6 +298,7 @@ static char* pilarDirName(const char* str)
 {
     const char* lastDot;
     char* dir;
+    int length = 0;
 
 
     lastDot = strrchr(str, '.');
@@ -305,8 +311,10 @@ static char* pilarDirName(const char* str)
     else
         {
 			assert(lastDot > str);
-			dir = (char*)malloc(lastDot - str + 1); // lastDot - str = length of "name" part;
-		    strncpy(dir, str, lastDot - str);	// copy the name portion from str to newStr
+			length = lastDot - str;
+			dir = (char*)malloc(length + 1); // length of "name" part;
+		    strncpy(dir, str, length);	// copy the name portion from str to dir
+		    dir[length] = '\0';
         }
 
     return dir;
@@ -323,7 +331,7 @@ static char* pilarExtName(const char* str)
 {
     const char* lastDot;
     char* newStr;
-
+    int length = 0;
 
     lastDot = strrchr(str, '.');
     if ((lastDot == NULL) || (lastDot == str))
@@ -335,9 +343,11 @@ static char* pilarExtName(const char* str)
     else
         { 
 			assert(lastDot > str);
-			newStr = (char*)malloc(lastDot - str + 7); // lastDot - str = len(name); 7 = len of ".pilar";  
-		    strncpy(newStr, str, lastDot - str);	// copy the name portion from str to newStr
-			strcat(newStr, ".pilar");
+			length = lastDot - str;
+			newStr = (char*)malloc(length + strlen(PILAR_EXT));
+		    strncpy(newStr, str, length);	// copy the name portion from str to newStr
+		    newStr[length]='\0';
+			strcat(newStr, PILAR_EXT);
         }                
 
     return newStr;
