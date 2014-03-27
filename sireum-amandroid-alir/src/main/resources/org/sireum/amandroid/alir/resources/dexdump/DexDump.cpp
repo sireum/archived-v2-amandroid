@@ -70,8 +70,11 @@ u4 lastAddress = 0; // sankar adds : this would store the last address of the cu
 typedef struct locVarInfo locVarInf; // sankar adds
 
 PStash* locVarList = NULL; // sankar adds this list which holds local variables' info for the current method 
+char* pilarDir; // this will hold the current package's directory name; // sankar adds
+char* pilarFile; // this will hold the current class name; // sankar adds
+FILE* pFp; // represents files having the pilar output; at any point, it corresponds to the current "class" of dex; so, each file represents pilar of one "class".
+FILE* topFp; // represents a special file named top.pilar in the root directory; In addition to other info, this can hold some error information, if any.
 
-FILE* pFp; // represents the file which will have pilar output;
 
 /* command-line options */
 struct Options {
@@ -3483,6 +3486,8 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
     const char* superclassDescriptor;
     char* accessStr = NULL;
 
+    char* newFile; // sankar adds
+    char* temp; // sankar adds
     int i;
 
     pClassDef = dexGetClassDef(pDexFile, idx);
@@ -3498,7 +3503,7 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
 
     if (pClassData == NULL) {
         printf("Trouble reading class data (#%d)\n", idx);
-        fprintf(pFp, "Trouble reading class data (#%d)\n", idx); // sankar
+        fprintf(topFp, "Trouble reading class data (#%d)\n", idx); // sankar
         goto bail;
     }
 
@@ -3562,7 +3567,26 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
         superclassDescriptor =
             dexStringByTypeIdx(pDexFile, pClassDef->superclassIdx);
     }
-    //******************* kui's modification begins  *******************
+    //******************* kui's and sankar's modification begins  *******************
+
+    // starting creation of a file which will contain the current class's pilar
+     temp = descriptorToDot(classDescriptor);
+     pilarDir = replaceChar(dirName(temp), '.', '/');
+     pilarFile = className(temp);
+     mkdirp(pilarDir); // creating the directory if it does not already exists
+     newFile = (char*)malloc(strlen(temp) + 1); // double check for the length miscalculation here
+     strcpy(newFile, pilarDir);
+     strcat(newFile, "/");
+     strcat(newFile, pilarFile);
+
+     pFp = fopen(newFile, "w"); // creating a file
+     if(!pFp)
+         {
+           fprintf(stderr, " \n could not open the pilar file %s \n", newFile);
+         }
+
+     // creation of the file is done
+
     if (gOptions.outputFormat == OUTPUT_PLAIN) {
               printf("Class #%d            -\n", idx);
               printf("  Class descriptor  : '%s'\n", classDescriptor);
@@ -3690,6 +3714,9 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
         fprintf(pFp, "</class>\n"); // sankar
     }
 
+    if(pFp)
+    	fclose(pFp); // closing the current class's pilar file. // sankar adds.
+
 bail:
     free(pClassData);
     free(accessStr);
@@ -3763,7 +3790,7 @@ void dumpMethodMap(DexFile* pDexFile, const DexMethod* pDexMethod, int idx,
     pMethodId = dexGetMethodId(pDexFile, pDexMethod->methodIdx);
     name = dexStringById(pDexFile, pMethodId->nameIdx);
     printf("      #%d: 0x%08x %s\n", idx, offset, name);
-    fprintf(pFp, "      #%d: 0x%08x %s\n", idx, offset, name);
+    fprintf(topFp, "      #%d: 0x%08x %s\n", idx, offset, name);
 
     u1 format;
     int addrWidth;
@@ -3772,7 +3799,7 @@ void dumpMethodMap(DexFile* pDexFile, const DexMethod* pDexMethod, int idx,
     if (format == 1) {              /* kRegMapFormatNone */
         /* no map */
         printf("        (no map)\n");
-        fprintf(pFp, "        (no map)\n");
+        fprintf(topFp, "        (no map)\n");
         addrWidth = 0;
     } else if (format == 2) {       /* kRegMapFormatCompact8 */
         addrWidth = 1;
@@ -3783,7 +3810,7 @@ void dumpMethodMap(DexFile* pDexFile, const DexMethod* pDexMethod, int idx,
         goto bail;
     } else {
         printf("        (unknown format %d!)\n", format);
-        fprintf(pFp, "        (unknown format %d!)\n", format);
+        fprintf(topFp, "        (unknown format %d!)\n", format);
         /* don't know how to skip data; failure will cascade to end of class */
         goto bail;
     }
@@ -3803,13 +3830,13 @@ void dumpMethodMap(DexFile* pDexFile, const DexMethod* pDexMethod, int idx,
                 addr |= (*data++) << 8;
 
             printf("        %4x:", addr);
-            fprintf(pFp, "        %4x:", addr);
+            fprintf(topFp, "        %4x:", addr);
             for (byte = 0; byte < regWidth; byte++) {
                 printf(" %02x", *data++);
-                fprintf(pFp, " %02x", *data++);
+                fprintf(topFp, " %02x", *data++);
             }
             printf("\n");
-            fprintf(pFp, "\n");
+            fprintf(topFp, "\n");
         }
     }
 
@@ -3838,7 +3865,7 @@ void dumpRegisterMaps(DexFile* pDexFile)
 
     if (pClassPool == NULL) {
         printf("No register maps found\n");
-        fprintf(pFp, "No register maps found\n");
+        fprintf(topFp, "No register maps found\n");
         return;
     }
 
@@ -3848,9 +3875,9 @@ void dumpRegisterMaps(DexFile* pDexFile)
     classOffsets = (const u4*) ptr;
 
     printf("RMAP begins at offset 0x%07x\n", baseFileOffset);
-    fprintf(pFp, "RMAP begins at offset 0x%07x\n", baseFileOffset);
+    fprintf(topFp, "RMAP begins at offset 0x%07x\n", baseFileOffset);
     printf("Maps for %d classes\n", numClasses);
-    fprintf(pFp, "Maps for %d classes\n", numClasses);
+    fprintf(topFp, "Maps for %d classes\n", numClasses);
     for (idx = 0; idx < (int) numClasses; idx++) {
         const DexClassDef* pClassDef;
         const char* classDescriptor;
@@ -3860,7 +3887,7 @@ void dumpRegisterMaps(DexFile* pDexFile)
 
         printf("%4d: +%d (0x%08x) %s\n", idx, classOffsets[idx],
             baseFileOffset + classOffsets[idx], classDescriptor);
-        fprintf(pFp, "%4d: +%d (0x%08x) %s\n", idx, classOffsets[idx],
+        fprintf(topFp, "%4d: +%d (0x%08x) %s\n", idx, classOffsets[idx],
             baseFileOffset + classOffsets[idx], classDescriptor);
 
         if (classOffsets[idx] == 0)
@@ -3892,7 +3919,7 @@ void dumpRegisterMaps(DexFile* pDexFile)
             printf("NOTE: method count discrepancy (%d != %d + %d)\n",
                 methodCount, pClassData->header.directMethodsSize,
                 pClassData->header.virtualMethodsSize);
-            fprintf(pFp, "NOTE: method count discrepancy (%d != %d + %d)\n",
+            fprintf(topFp, "NOTE: method count discrepancy (%d != %d + %d)\n",
                 methodCount, pClassData->header.directMethodsSize,
                 pClassData->header.virtualMethodsSize);
             /* this is bad, but keep going anyway */
@@ -3900,7 +3927,7 @@ void dumpRegisterMaps(DexFile* pDexFile)
 
         printf("    direct methods: %d\n",
             pClassData->header.directMethodsSize);
-        fprintf(pFp, "    direct methods: %d\n",
+        fprintf(topFp, "    direct methods: %d\n",
             pClassData->header.directMethodsSize);
         for (i = 0; i < (int) pClassData->header.directMethodsSize; i++) {
             dumpMethodMap(pDexFile, &pClassData->directMethods[i], i, &data);
@@ -3908,7 +3935,7 @@ void dumpRegisterMaps(DexFile* pDexFile)
 
         printf("    virtual methods: %d\n",
             pClassData->header.virtualMethodsSize);
-        fprintf(pFp, "    virtual methods: %d\n",
+        fprintf(topFp, "    virtual methods: %d\n",
             pClassData->header.virtualMethodsSize);
         for (i = 0; i < (int) pClassData->header.virtualMethodsSize; i++) {
             dumpMethodMap(pDexFile, &pClassData->virtualMethods[i], i, &data);
@@ -3954,7 +3981,7 @@ void processDexFile(const char* fileName, DexFile* pDexFile)
     /* free the last one allocated */
     if (package != NULL) {
         printf("</package>\n");
-        fprintf(pFp, "</package>\n");
+        fprintf(topFp, "</package>\n");
         free(package);
     }
 
@@ -3993,7 +4020,7 @@ int process(const char* fileName)
 
     if (gOptions.checksumOnly) {
         printf("Checksum verified\n");
-        fprintf(pFp, "Checksum verified\n");
+        fprintf(topFp, "Checksum verified\n"); // sankar
     } else {
         processDexFile(fileName, pDexFile);
     }
@@ -4040,9 +4067,9 @@ int main(int argc, char* const argv[])
     bool wantUsage = false;
     int ic;
 
-    char* filename; // given file name; // sankar adds
-	char* pilarFile; // this will hold the .pilar filename; // sankar adds
-	bool pilar = false; // become true if -p option is used; // sankar adds
+    char* filename; // given (input) file name; // sankar adds
+	bool pilar = false; // becomes "true" if -p option is used; // sankar adds
+	char* newFile;
 
     memset(&gOptions, 0, sizeof(gOptions));
     gOptions.verbose = true;
@@ -4114,17 +4141,27 @@ int main(int argc, char* const argv[])
 
         if(pilar) {  // sankar adds this if clause
            filename = strdup(argv[optind]); // is strdup safe? // sankar adds this line for pilar
-	       pilarFile = pilarExtName(filename); // get .pilar extension filename; // sankar adds this line;  
-		   pFp = fopen(pilarFile, "w");
-		   if(!pFp)
+	       pilarDir = pilarDirName(filename);
+	          // cut .ext (.dex or .apk) from the input file name (x.ext), and get "x" as the pilar-containing-root-directory; // sankar adds;
+
+	       mkdirp(pilarDir); // creating the root directory which contains pilar
+
+	       newFile = (char*)malloc(strlen(pilarDir) + 15); //  length of "/top.pilar" = 11;
+	       strcpy(newFile, pilarDir);
+	       strcat(newFile, "/top.pilar");
+
+		   topFp = fopen(newFile, "w");
+		      // creating a file named top.pilar to hold some info, which can possibly be empty.
+		      // Maybe, we do not need to create this "top.pilar"; In that case I will delete this code later
+		   if(!topFp)
 			{
-			  fprintf(stderr, " \n could not open the pilar file \n");	   
+			  fprintf(stderr, " \n could not open the pilar file \n");
 			}
         }
 
         result |= process(argv[optind++]);
-
-        fclose(pFp); // sankar adds
+        if(topFp)
+          fclose(topFp); // sankar adds
     }
 
     return (result != 0);

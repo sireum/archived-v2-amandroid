@@ -4,9 +4,26 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
 
+#include<errno.h>
+#define DEFAULT_MODE      S_IRWXU | S_IRGRP |  S_IXGRP | S_IROTH | S_IXOTH  // used in mkdirp() which creates directory
 
-
+/*
+ * replace character 'a' by another char 'b' (for all occurrences of 'a') in a string
+ */
+static char* replaceChar(const char* str, char a, char b)
+{
+  char* mystring = strdup(str);
+  for (int count = 0; count < strlen(mystring); count++)
+  {
+    if (mystring[count] == a)
+     {
+       mystring[count] = b;
+     }
+  }
+  return mystring;
+}
 
 /* sankar adds toPilar: This func reformats a class descritptor to the pilar format.  For
  * example, "int[]" becomes "`int`[]".
@@ -160,9 +177,144 @@ struct Op31t {
 };
 //******************* kui's modification ends  *******************
 
+/*
+ * Creates directory in a path; returns "true" if successful, and "false" otherwise.
+ * It returns "false" only when some serious error happens.
+ */
+
+
+bool mkdirp(const char* path, mode_t mode = DEFAULT_MODE) {
+
+            char* q = strdup(path); // a copy of "path", which gets modified and restored again and again
+            char* p = q; // p traverses along string q
+
+           // Do mkdir for each slash until end of string q or error
+            while (*p != '\0') {
+               // Skip first character
+                p++;
+
+               // Find first slash or end
+                while(*p != '\0' && *p != '/') p++;
+
+                // Remember value from p
+                char v = *p;
+
+                // Write end of string at p
+                *p = '\0';
+
+                printf("directory = %s \n", q);
+
+                // Create directory:"from beginning to current p" (note that '\0' was inserted at p)
+                if(mkdir(q, mode) == -1 && errno != EEXIST) {
+                    // enters inside the condition only when some serious error happens
+                    // if the directory already exists, then errno=EEXIST and we do not enter inside
+                   *p = v;
+                   if(q)
+                     delete q;
+                   return false;
+                }
+
+                // Restore string q to the orginal path
+                *p = v;
+            }
+            if(q)
+              delete q;
+            return true;
+}
+
 
 /*
- * Extracts the name portion from the input filename name.ext. 
+ * Extracts the package directory name from a class descriptor.
+ *
+ * Returns a newly-allocated string.
+ */
+static char* dirName(const char* str)
+{
+    const char* lastDot;
+    char* dir;
+
+
+    lastDot = strrchr(str, '.');
+    if ((lastDot == NULL) || (lastDot == str))
+        {
+			fprintf(stderr,"the class descriptor has to be of the form x.y.z.abc");
+			exit(1);
+
+	    }
+    else
+        {
+			assert(lastDot > str);
+			dir = (char*)malloc(lastDot - str + 1); // lastDot - str = length of "directory" part;
+		    strncpy(dir, str, lastDot - str);	// copy the "directory" part from str to newStr
+        }
+
+    return dir;
+}
+
+
+
+/*
+ * Extracts the class part from a class descriptor.
+ *
+ * Returns a newly-allocated string.
+ */
+static char* className(const char* str)
+{
+    const char* lastDot;
+    char* cName;
+
+
+    lastDot = strrchr(str, '.');
+    if ((lastDot == NULL) || (lastDot == str))
+        {
+			fprintf(stderr,"the class descriptor has to be of the form x.y.z.abc");
+			exit(1);
+
+	    }
+    else
+        {
+			assert(lastDot > str);
+			cName = (char*)malloc(strlen(str) - lastDot); // strlen(str) - lastDot = length of "class" part;
+		    strncpy(cName, lastDot+1, strlen(lastDot+1));	// copy the "class" part from str to newStr
+        }
+
+    return cName;
+}
+
+
+
+/*
+ * Extracts the name portion from the input (app) filename, name.ext.
+ * If no ".ext" is found in input string, then raise error. Otherwise, it constructs a string, "name".
+ *
+ * Returns a newly-allocated string.
+ */
+static char* pilarDirName(const char* str)
+{
+    const char* lastDot;
+    char* dir;
+
+
+    lastDot = strrchr(str, '.');
+    if ((lastDot == NULL) || (lastDot == str))
+        {
+			fprintf(stderr,"the input file name has to be of the form name.apk or name.dex");
+			exit(1);
+
+	    }
+    else
+        {
+			assert(lastDot > str);
+			dir = (char*)malloc(lastDot - str + 1); // lastDot - str = length of "name" part;
+		    strncpy(dir, str, lastDot - str);	// copy the name portion from str to newStr
+        }
+
+    return dir;
+}
+
+
+/*
+ * Extracts the name portion from the input (app) filename, name.ext.
  * If no ".ext" is found in input string, then raise error. Otherwise, it constructs a string, "name.pilar".
  *
  * Returns a newly-allocated string.
