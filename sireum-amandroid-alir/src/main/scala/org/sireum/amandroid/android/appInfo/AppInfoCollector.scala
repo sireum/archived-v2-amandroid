@@ -164,7 +164,6 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 	        codeLineCounter = clCounter
         }
     }
-		
 		AppCenter.setComponents(components)
 		AppCenter.updateIntentFilterDB(this.intentFdb)
 		AppCenter.setAppInfo(this)

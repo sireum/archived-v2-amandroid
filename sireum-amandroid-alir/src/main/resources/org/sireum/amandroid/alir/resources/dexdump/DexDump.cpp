@@ -74,7 +74,7 @@ char* pilarRootDir; // the root directory which contains all pilar
 char* currentDir; // this will hold the current package's directory name; // sankar adds
 char* currentFile; // this will hold the current class name; // sankar adds
 FILE* pFp; // a file pointer; at any point, it corresponds to the current "class" of dex;
-FILE* topFp; // represents a special file named top.pilar in the root directory; In addition to other info, this can hold some error information, if any.
+FILE* topFp; // represents a special file named top.txt in the root directory; In addition to other info, this can hold some error information, if any.
 
 
 /* command-line options */
@@ -3575,7 +3575,6 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
     // starting creation of a file which will contain the current class's pilar
      classDesc = descriptorToDot(classDescriptor);
      currentDir = replaceChar(dirName(classDesc), '.', '/');
-     fprintf(topFp, "currentDir = %s \n", currentDir);
      currentPath = (char*)malloc(strlen(pilarRootDir) + strlen(currentDir) + 2);
      strcpy(currentPath, pilarRootDir);
      strcat(currentPath, "/");
@@ -4152,13 +4151,13 @@ int main(int argc, char* const argv[])
 
 	       mkdirp(pilarRootDir); // creating the root directory which contains pilar
 
-	       newFile = (char*)malloc(strlen(pilarRootDir) + strlen("/top.pilar") + 1);
+	       newFile = (char*)malloc(strlen(pilarRootDir) + strlen("/top.txt") + 1);
 	       strcpy(newFile, pilarRootDir);
-	       strcat(newFile, "/top.pilar");
+	       strcat(newFile, "/top.txt");
 
 		   topFp = fopen(newFile, "w");
-		      // creating a file named top.pilar to hold some info, which can possibly be empty.
-		      // Maybe, we do not need to create this "top.pilar"; In that case I will delete this code later
+		      // creating a file named top.txt to hold some info, which can possibly be empty.
+		      // Maybe, we do not need to create this "top.txt"; In that case I will delete this code later
 		   if(!topFp)
 			{
 			  fprintf(stderr, " \n could not open the pilar file \n");
