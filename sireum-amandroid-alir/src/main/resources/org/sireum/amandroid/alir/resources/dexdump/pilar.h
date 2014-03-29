@@ -531,7 +531,7 @@ char* cut1Char(char* proc) // in use now
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type (object, object_init);",methInfo.classDescriptor, methInfo.name,\
+               fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type (object, object_init);",methInfo.classDescriptor, methInfo.name,\
                    methInfo.signature, descriptorToDot(methInfo.classDescriptor));\
          }\
      }
@@ -548,7 +548,7 @@ char* cut1Char(char* proc) // in use now
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type virtual;",methInfo.classDescriptor, methInfo.name,\
+               fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type virtual;",methInfo.classDescriptor, methInfo.name,\
                    methInfo.signature, descriptorToDot(methInfo.classDescriptor));\
          }\
      }
@@ -598,7 +598,7 @@ char* cut1Char(char* proc) // in use now
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type super;",methInfo.classDescriptor, methInfo.name,\
+               fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type super;",methInfo.classDescriptor, methInfo.name,\
                    methInfo.signature, descriptorToDot(methInfo.classDescriptor));\
          }\
 	}
@@ -647,7 +647,7 @@ char* cut1Char(char* proc) // in use now
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type direct;",methInfo.classDescriptor, methInfo.name,\
+               fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type direct;",methInfo.classDescriptor, methInfo.name,\
                    methInfo.signature, descriptorToDot(methInfo.classDescriptor));\
          }\
 	}
@@ -664,7 +664,7 @@ char* cut1Char(char* proc) // in use now
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type static;",methInfo.classDescriptor, methInfo.name,\
+               fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type static;",methInfo.classDescriptor, methInfo.name,\
                    methInfo.signature, descriptorToDot(methInfo.classDescriptor));\
          }\
 	}
@@ -682,7 +682,7 @@ char* cut1Char(char* proc) // in use now
                else \
                  fprintf(pFp,", v%d", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type interface;",methInfo.classDescriptor, methInfo.name,\
+               fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type interface;",methInfo.classDescriptor, methInfo.name,\
                    methInfo.signature, descriptorToDot(methInfo.classDescriptor));\
          }\
 	}
@@ -698,7 +698,7 @@ char* cut1Char(char* proc) // in use now
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type virtual;",methInfo.classDescriptor, methInfo.name, \
+          fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type virtual;",methInfo.classDescriptor, methInfo.name, \
                            methInfo.signature, descriptorToDot(methInfo.classDescriptor)); \
           } \
   }
@@ -750,7 +750,7 @@ char* cut1Char(char* proc) // in use now
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type super;",methInfo.classDescriptor, methInfo.name, \
+          fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type super;",methInfo.classDescriptor, methInfo.name, \
                            methInfo.signature, descriptorToDot(methInfo.classDescriptor)); \
           } \
   }
@@ -800,7 +800,7 @@ char* cut1Char(char* proc) // in use now
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type direct;",methInfo.classDescriptor, methInfo.name, \
+          fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type direct;",methInfo.classDescriptor, methInfo.name, \
                            methInfo.signature, descriptorToDot(methInfo.classDescriptor)); \
           } \
   }
@@ -817,7 +817,7 @@ char* cut1Char(char* proc) // in use now
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type static;",methInfo.classDescriptor, methInfo.name, \
+          fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type static;",methInfo.classDescriptor, methInfo.name, \
                            methInfo.signature, descriptorToDot(methInfo.classDescriptor)); \
           } \
   }
@@ -833,7 +833,7 @@ char* cut1Char(char* proc) // in use now
             else \
                 fprintf(pFp,", v%d", y->vC + i); \
           } \
-          fprintf(pFp,") @signature `%s.%s.%s` @classDescriptor `%s` @type interface;",methInfo.classDescriptor, methInfo.name, \
+          fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type interface;",methInfo.classDescriptor, methInfo.name, \
                            methInfo.signature, descriptorToDot(methInfo.classDescriptor)); \
           } \
   }

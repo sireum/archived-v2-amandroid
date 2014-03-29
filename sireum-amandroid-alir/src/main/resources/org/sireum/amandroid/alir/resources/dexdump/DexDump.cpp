@@ -3272,7 +3272,7 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 			 strcat(paraTotal, paraThis);
 			 strcat(paraTotal, para);
 
-              fprintf(pFp, "    procedure %s `%s.%s` (%s) @owner %s @signature `%s.%s.%s` @Access %s {\n",
+              fprintf(pFp, "    procedure %s `%s.%s` (%s) @owner %s @signature `%s.%s:%s` @Access %s {\n",
 			            toPilar(rtype), owner, name, paraTotal, toPilar(owner), backDescriptor, name, typeDescriptor, accessStr); // not in dexdump
              free(rtype);
              free(para);
