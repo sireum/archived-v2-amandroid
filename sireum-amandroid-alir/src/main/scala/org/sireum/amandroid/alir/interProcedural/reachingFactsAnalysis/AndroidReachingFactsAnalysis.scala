@@ -37,6 +37,8 @@ import java.io.PrintWriter
 
 class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
   
+  final val TITLE = "AndroidReachingFactsAnalysisBuilder"
+  
   var icfg : InterproceduralControlFlowGraph[CGNode] = null
   
   def build //
@@ -335,7 +337,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
 					            cg.collectCfgToBaseGraph[String](target, callerContext, false)
 										  cg.extendGraphOneWay(target.getSignature, callerContext, AndroidReachingFactsAnalysis.ICC_EDGE)
 				            }
-	                  msg_normal(target.getDeclaringRecord + " started!")
+	                  msg_normal(TITLE, target.getDeclaringRecord + " started!")
 	                  calleeFactsMap += (cg.entryNode(target.getSignature, callerContext) -> mapFactsToICCTarget(factsForCallee, cj, target.getProcedureBody.procedure))
 	              }
               }
@@ -443,7 +445,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
 	      }
 	      if(tmpRec == recCallee) return true
 		    else {
-		      err_msg_detail("Given recvIns: " + recvIns + " and calleeProc: " + calleeProc + " is not in the Same hierachy.")
+		      err_msg_detail(TITLE, "Given recvIns: " + recvIns + " and calleeProc: " + calleeProc + " is not in the Same hierachy.")
 		      return false
 		    }
       }
@@ -477,7 +479,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
           
           for(i <- 0 to argSlots.size - 1){
             if(!paramSlots.isDefinedAt(i)){
-              err_msg_critical("argSlots does not adjust to paramSlots:\n" + cj.callExp.arg + "\n" + calleeProcedure.annotations)
+              err_msg_critical(TITLE, "argSlots does not adjust to paramSlots:\n" + cj.callExp.arg + "\n" + calleeProcedure.annotations)
             } else {
 	            val argSlot = argSlots(i)
 	            val paramSlot = paramSlots(i)

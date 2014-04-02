@@ -55,6 +55,7 @@ object IntentInjectionCounter {
 }
 
 class IntentInjectionTestFramework extends TestFramework {
+  private final val TITLE = "IntentInjectionTestFramework"
   def Analyzing : this.type = this
 
   def title(s : String) : this.type = {
@@ -75,7 +76,7 @@ class IntentInjectionTestFramework extends TestFramework {
     test(title) {
       var loc : Int = 0
       val startTime = System.currentTimeMillis()
-    	msg_critical("####" + title + "#####")
+    	msg_critical(TITLE, "####" + title + "#####")
     	IntentInjectionCounter.total += 1
     	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
     	AndroidGlobalConfig.initJawaAlirInfoProvider
@@ -118,11 +119,11 @@ class IntentInjectionTestFramework extends TestFramework {
 		    	entryPoints.par.foreach{
 		    	  ep =>
 		    	    try{
-			    	    msg_critical("--------------Component " + ep + "--------------")
+			    	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
 			    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
 			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
 			    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
-			    	    msg_critical("processed-->" + icfg.getProcessed.size)
+			    	    msg_critical(TITLE, "processed-->" + icfg.getProcessed.size)
 			    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
 			    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
 			    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult, ssm)    
@@ -154,7 +155,7 @@ class IntentInjectionTestFramework extends TestFramework {
 				  IntentInjectionCounter.haveresult += 1
 	    	} catch {
 	    	  case ie : IgnoreException =>
-	    	    err_msg_critical("Ignored!")
+	    	    err_msg_critical(TITLE, "Ignored!")
 	    	  case re : RuntimeException => 
 	    	    re.printStackTrace()
 	    	  case e : Exception =>
@@ -163,7 +164,7 @@ class IntentInjectionTestFramework extends TestFramework {
 	    	}
     	} else {
     	  IntentInjectionCounter.oversize += 1
-    	  err_msg_critical("Pilar file size is too large:" + pilarFile.length()/1024/1024 + "MB")
+    	  err_msg_critical(TITLE, "Pilar file size is too large:" + pilarFile.length()/1024/1024 + "MB")
     	}
     	
     	Center.reset
@@ -176,8 +177,8 @@ class IntentInjectionTestFramework extends TestFramework {
     	val endTime = System.currentTimeMillis()
     	val totaltime = (endTime - startTime) / 1000
     	IntentInjectionCounter.locTimeMap += (srcRes -> (loc, totaltime))
-    	msg_critical(IntentInjectionCounter.toString)
-    	msg_critical("************************************\n")
+    	msg_critical(TITLE, IntentInjectionCounter.toString)
+    	msg_critical(TITLE, "************************************\n")
     	IntentInjectionCounter.outputRecStatistic
     }
   }

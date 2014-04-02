@@ -45,6 +45,7 @@ object StagingCounter {
 }
 
 trait StagingTestFramework extends TestFramework {
+  private final val TITLE = "StagingTestFramework"
   def Analyzing : this.type = this
 
   def title(s : String) : this.type = {
@@ -63,7 +64,7 @@ trait StagingTestFramework extends TestFramework {
    srcRes : FileResourceUri) {
 
     test(title) {
-    	msg_critical("####" + title + "#####")
+    	msg_critical(TITLE, "####" + title + "#####")
     	StagingCounter.total += 1
     	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
     	AndroidGlobalConfig.initJawaAlirInfoProvider
@@ -98,11 +99,11 @@ trait StagingTestFramework extends TestFramework {
 	    	entryPoints.par.foreach{
 	    	  ep =>
 	    	    try{
-		    	    msg_critical("--------------Component " + ep + "--------------")
+		    	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
 		    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
 		    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
 		    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
-		    	    msg_critical("processed-->" + icfg.getProcessed.size)
+		    	    msg_critical(TITLE, "processed-->" + icfg.getProcessed.size)
 		    	    val ddgResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
 		    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, ddgResult)
 		    	    
@@ -111,12 +112,12 @@ trait StagingTestFramework extends TestFramework {
 				      val zipw = new GZIPOutputStream(new BufferedOutputStream(w))
 					    AndroidXStream.toXml(AmandroidResult(InterProceduralDataFlowGraph(icfg, irfaResult), ddgResult), zipw)
 					    zipw.close()
-					    msg_critical("Result stored!")
+					    msg_critical(TITLE, "Result stored!")
 					    val reader = new GZIPInputStream(new FileInputStream(file))
 					    val xmlObject = AndroidXStream.fromXml(reader).asInstanceOf[AmandroidResult]
 				      reader.close()
-				      msg_critical("xml loaded!")
-				      msg_critical("" + {icfg.nodes.size == xmlObject.idfg.icfg.nodes.size})
+				      msg_critical(TITLE, "xml loaded!")
+				      msg_critical(TITLE, "" + {icfg.nodes.size == xmlObject.idfg.icfg.nodes.size})
 			    	} catch {
 	    	      case te : TimeOutException => System.err.println("Timeout!")
 	    	    }
@@ -124,7 +125,7 @@ trait StagingTestFramework extends TestFramework {
 			  StagingCounter.haveresult += 1
     	} catch {
     	  case ie : IgnoreException =>
-    	    err_msg_critical("Ignored!")
+    	    err_msg_critical(TITLE, "Ignored!")
     	  case re : RuntimeException => 
     	    re.printStackTrace()
     	  case e : Exception =>
@@ -139,7 +140,7 @@ trait StagingTestFramework extends TestFramework {
     	JawaCodeSource.clearAppRecordsCodes
     	System.gc()
 		  System.gc()
-    	msg_critical("************************************\n")
+    	msg_critical(TITLE, "************************************\n")
     }
   }
 

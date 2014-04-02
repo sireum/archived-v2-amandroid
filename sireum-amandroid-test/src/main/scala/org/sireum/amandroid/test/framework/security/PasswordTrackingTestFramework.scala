@@ -76,6 +76,7 @@ object PasswordCounter {
 }
 
 trait PasswordTrackingTestFramework extends TestFramework {
+  private final val TITLE = "PasswordTrackingTestFramework"
   def Analyzing : this.type = this
 
   def title(s : String) : this.type = {
@@ -94,7 +95,7 @@ trait PasswordTrackingTestFramework extends TestFramework {
    srcRes : FileResourceUri) {
 
     test(title) {
-    	msg_critical("####" + title + "#####")
+    	msg_critical(TITLE, "####" + title + "#####")
     	PasswordCounter.total += 1
     	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
     	AndroidGlobalConfig.initJawaAlirInfoProvider
@@ -133,11 +134,11 @@ trait PasswordTrackingTestFramework extends TestFramework {
 		    	entryPoints.par.foreach{
 		    	  ep =>
 		    	    try{
-			    	    msg_critical("--------------Component " + ep + "--------------")
+			    	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
 			    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
 			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
 			    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
-			    	    msg_critical("processed-->" + icfg.getProcessed.size)
+			    	    msg_critical(TITLE, "processed-->" + icfg.getProcessed.size)
 			    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
 //			    	    iddResult.getIddg.toDot(new PrintWriter(System.out))
 			    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
@@ -168,7 +169,7 @@ trait PasswordTrackingTestFramework extends TestFramework {
 				  PasswordCounter.haveresult += 1
 	    	} catch {
 	    	  case ie : IgnoreException =>
-	    	    err_msg_critical("Ignored!")
+	    	    err_msg_critical(TITLE, "Ignored!")
 	    	  case re : RuntimeException => 
 	    	    re.printStackTrace()
 	    	  case e : Exception =>
@@ -183,7 +184,7 @@ trait PasswordTrackingTestFramework extends TestFramework {
 	//    	}
     	} else {
     	  PasswordCounter.oversize += 1
-    	  err_msg_critical("Pilar file size is too large:" + pilarFile.length()/1024/1024 + "MB")
+    	  err_msg_critical(TITLE, "Pilar file size is too large:" + pilarFile.length()/1024/1024 + "MB")
     	}
     	
     	Center.reset
@@ -192,10 +193,10 @@ trait PasswordTrackingTestFramework extends TestFramework {
     	JawaCodeSource.clearAppRecordsCodes
     	System.gc()
 		  System.gc()
-    	msg_critical(PasswordCounter.toString)
+    	msg_critical(TITLE, PasswordCounter.toString)
 //    	PasswordCounter.outputInterestingFileNames
 //    	PasswordCounter.outputRecStatistic
-    	msg_critical("************************************\n")
+    	msg_critical(TITLE, "************************************\n")
     }
   }
 

@@ -15,7 +15,7 @@ import org.sireum.jawa.MessageCenter._
  * modified by: Fengguo Wei
  */
 class ARSCFileParser extends AbstractAndroidXMLParser {
-	
+	final val TITLE = "ARSCFileParser"
 	private final val DEBUG = false
 
 	protected final val RES_STRING_POOL_TYPE = 0x0001
@@ -741,7 +741,7 @@ class ARSCFileParser extends AbstractAndroidXMLParser {
 				}
 				catch {
 				  case ex : IOException =>
-						err_msg_critical("Could not read resource file: " + ex.getMessage())
+						err_msg_critical(TITLE, "Could not read resource file: " + ex.getMessage())
 						ex.printStackTrace()
 				}
 			}
@@ -758,7 +758,7 @@ class ARSCFileParser extends AbstractAndroidXMLParser {
 		readChunkHeader(stream, resourceHeader.header)
 		resourceHeader.packageCount = readUInt32(stream)
 		if (DEBUG)
-			msg_normal("Package Groups (" + resourceHeader.packageCount + ")")
+			msg_normal(TITLE, "Package Groups (" + resourceHeader.packageCount + ")")
 		
 		// Do we have any packages to read?
 		var remainingSize = resourceHeader.header.size - resourceHeader.header.headerSize
@@ -772,7 +772,7 @@ class ARSCFileParser extends AbstractAndroidXMLParser {
 			val block = new Array[Byte](Math.min(BLOCK_SIZE, remainingSize - totalBytesRead))
 			val bytesRead = stream.read(block)
 			if (bytesRead == 0 && bytesRead < block.length) {
-				err_msg_critical("Could not read block from resource file")
+				err_msg_critical(TITLE, "Could not read block from resource file")
 				return
 			}
 			System.arraycopy(block, 0, remainingData, totalBytesRead, bytesRead)
@@ -808,7 +808,7 @@ class ARSCFileParser extends AbstractAndroidXMLParser {
 				offset = parsePackageTable(packageTable, remainingData, offset)
 				
 				if (DEBUG)
-					msg_normal("\tPackage " + packageCtr + " id=" + packageTable.id
+					msg_normal(TITLE, "\tPackage " + packageCtr + " id=" + packageTable.id
 							+ " name=" + packageTable.name)
 				
 				// Record the end of the object to know then to stop looking for
@@ -934,7 +934,7 @@ class ARSCFileParser extends AbstractAndroidXMLParser {
 									entryOffset = readValue(rval, remainingData, entryOffset)
 									res = parseValue(rval)
 									if (res == null) {
-										msg_normal("Could not parse resource " + keyStrings.get(entry.key)
+										msg_normal(TITLE, "Could not parse resource " + keyStrings.get(entry.key)
 												+ "of type " + Integer.toHexString(rval.dataType) + ", skipping entry")
 										flag = false
 									}
@@ -966,13 +966,13 @@ class ARSCFileParser extends AbstractAndroidXMLParser {
 				// Create the data objects for the types in the package
 				for (resType <- resPackage.types) {
 					if (DEBUG) {
-						msg_normal("\t\tType " + resType.typeName + " " + (resType.id - 1) + ", configCount="
+						msg_normal(TITLE, "\t\tType " + resType.typeName + " " + (resType.id - 1) + ", configCount="
 							+ resType.configurations.size + ", entryCount="
 							+ (if(resType.configurations.size > 0) resType.configurations(0).resources.size else 0))
 						for (resConfig <- resType.configurations) {
-							msg_normal("\t\t\tconfig")
+							msg_normal(TITLE, "\t\t\tconfig")
 							for (res <- resConfig.resources)
-								msg_normal("\t\t\t\tresource " + Integer.toHexString(res.resourceID)
+								msg_normal(TITLE, "\t\t\t\tresource " + Integer.toHexString(res.resourceID)
 										+ " " + res.resourceName)
 						}
 					}

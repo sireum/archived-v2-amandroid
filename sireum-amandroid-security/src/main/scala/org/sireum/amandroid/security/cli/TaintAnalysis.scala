@@ -36,6 +36,7 @@ import org.sireum.jawa.util.TimeOutException
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 object TaintAnalyzeCli {
+  private final val TITLE = "TaintAnalyzeCli"
 	def run(saamode : SireumAmandroidTaintAnalysisMode) {
     val sourceType = saamode.general.typ match{
       case AnalyzeSource.APK => "APK"
@@ -73,6 +74,7 @@ object TaintAnalyzeCli {
 }
 
 object TanitAnalysis{
+  private final val TITLE = "TaintAnalysis"
   def main(args: Array[String]) {
 	  if(args.size != 17){
 	    println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -t type[allows: APK, DIR] -ls [Lib-SideEffect-Path] <source path> <Sink list file path> <output path>")
@@ -149,11 +151,11 @@ object TanitAnalysis{
 			    	(if(parallel) entryPoints.par else entryPoints).foreach{
 			    	  ep =>
 			    	    try{
-				    	    msg_critical("--------------Component " + ep + "--------------")
+				    	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
 				    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
 				    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
 				    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
-				    	    msg_critical("processed-->" + icfg.getProcessed.size)
+				    	    msg_critical(TITLE, "processed-->" + icfg.getProcessed.size)
 				//    	    val taResult = AndroidTaintAnalysis(cg, rfaResult)
 				    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
 				    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)

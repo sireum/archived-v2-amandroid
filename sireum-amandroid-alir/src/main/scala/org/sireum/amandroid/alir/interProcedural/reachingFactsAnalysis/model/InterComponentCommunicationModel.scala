@@ -16,7 +16,7 @@ import org.sireum.jawa.MessageCenter._
 import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.IntentHelper
 
 object InterComponentCommunicationModel {
-  
+  final val TITLE = "InterComponentCommunicationModel"
 	def isIccOperation(proc : JawaProcedure) : Boolean = {
     var flag = false
     val childRecord = proc.getDeclaringRecord
@@ -47,7 +47,7 @@ object InterComponentCommunicationModel {
               case None => 
                 com.tryGetProcedure(AndroidConstants.COMP_ENV_SUBSIG) match{
                   case Some(r) => targets += r
-                  case None => err_msg_normal("Target component " + com + " does not have environment.")
+                  case None => err_msg_normal(TITLE, "Target component " + com + " does not have environment.")
                 }
             }
 	      }

@@ -20,7 +20,7 @@ import org.sireum.jawa.JawaProcedure
 import java.net.URLEncoder
 
 object IntentHelper {
-  
+  final val TITLE = "IntentHelper"
   val DEBUG = false
   
   object IntentType extends Enumeration {
@@ -129,7 +129,7 @@ object IntentHelper {
 	        path = if(uri.getPath() != "") uri.getPath() else null
 	        data.set(scheme, host, port, path, null, null)
         } catch {
-          case e : IllegalArgumentException => err_msg_normal("Unexpected uri: " + legalUriStr)
+          case e : IllegalArgumentException => err_msg_normal(TITLE, "Unexpected uri: " + legalUriStr)
         }
       } else if(uriData.contains(":")){  // because e.g. app code can have intent.setdata("http:") instead of intent.setdata("http://xyz:200/pqr/abc")
         scheme = uriData.split(":")(0)
@@ -148,7 +148,7 @@ object IntentHelper {
 	          
 		        val targetRec = Center.resolveRecord(targetRecName, Center.ResolveLevel.HIERARCHY)
             if(DEBUG)
-            	msg_detail("explicit target component: " + targetRec)
+            	msg_detail(TITLE, "explicit target component: " + targetRec)
             components += ((targetRec, IntentType.EXPLICIT))
 	      }
 	      components ++= findComponents(ic.actions, ic.categories, ic.datas, ic.types).map((_, IntentType.IMPLICIT))

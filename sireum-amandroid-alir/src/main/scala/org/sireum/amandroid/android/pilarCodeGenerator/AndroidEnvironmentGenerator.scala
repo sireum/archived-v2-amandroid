@@ -19,7 +19,7 @@ import org.sireum.jawa.pilarCodeGenerator.ProcedureGenerator
 import org.sireum.amandroid.android.parser.ComponentInfo
 
 class AndroidEnvironmentGenerator extends ProcedureGenerator {
-	
+	private final val TITLE = "AndroidEnvironmentGenerator"
   private var componentInfos : Set[ComponentInfo] = Set()
   
   def setComponentInfos(componentInfos : Set[ComponentInfo]) = this.componentInfos = componentInfos
@@ -86,13 +86,13 @@ class AndroidEnvironmentGenerator extends ProcedureGenerator {
 		                if(!p.isStatic) instanceNeeded = true
 	                case None =>
 	                  val recordName = StringFormConverter.getRecordNameFromProcedureSignature(procSig)
-	                  if(!Center.containsRecord(recordName)) err_msg_normal("Record for entry point " + recordName + " not found, skipping")
+	                  if(!Center.containsRecord(recordName)) err_msg_normal(TITLE, "Record for entry point " + recordName + " not found, skipping")
 	                  else{
 	                    Center.getProcedure(procSig) match{
 	                      case Some(p) => 
 	                        plainMethods += (procSig -> p)
 	                        if(!p.isStatic) instanceNeeded = true
-	                      case None => err_msg_normal("Procedure for entry point " + procSig + " not found, skipping")
+	                      case None => err_msg_normal(TITLE, "Procedure for entry point " + procSig + " not found, skipping")
 	                    }
 	                  }
 	              }
@@ -172,7 +172,7 @@ class AndroidEnvironmentGenerator extends ProcedureGenerator {
 	        codeFragments.add(elseFragment)
 	        createIfStmt(beforeClassFragment, elseFragment)
 	      } else {
-	        err_msg_normal("Skipping procedure " + currentProcedure + " because we have no instance")
+	        err_msg_normal(TITLE, "Skipping procedure " + currentProcedure + " because we have no instance")
 	      }
 	  }
 	}
@@ -248,11 +248,11 @@ class AndroidEnvironmentGenerator extends ProcedureGenerator {
 	  val constructionStack : MSet[JawaRecord] = msetEmpty ++ this.paramRecords
 		createIfStmt(endClassFragment, codefg)
 		
-	  val r = Center.resolveRecord("[|android:app:ContextImpl|]", Center.ResolveLevel.HIERARCHY)
+	  val r = Center.resolveRecord("android.app.ContextImpl", Center.ResolveLevel.HIERARCHY)
 	  val va = generateInstanceCreation(r.getName, codefg)
 	  localVarsForClasses += (r.getName -> va)
     generateRecordConstructor(r, constructionStack, codefg)
-    createFieldSetStmt(localVarsForClasses(record.getName), "[|android:content:ContextWrapper.mBase|]", va, List("object"), codefg)
+    createFieldSetStmt(localVarsForClasses(record.getName), "android.content.ContextWrapper.mBase", va, List("object"), codefg)
 	  
 	  
 		// 1. onCreate:
@@ -314,11 +314,11 @@ class AndroidEnvironmentGenerator extends ProcedureGenerator {
 	private def activityLifeCycleGenerator(entryPoints : MList[ResourceUri], record : JawaRecord, endClassFragment : CodeFragmentGenerator, classLocalVar : String, codefg : CodeFragmentGenerator) = {
 	  val constructionStack : MSet[JawaRecord] = msetEmpty ++ this.paramRecords
 	  createIfStmt(endClassFragment, codefg)
-	  val r = Center.resolveRecord("[|android:app:ContextImpl|]", Center.ResolveLevel.HIERARCHY)
+	  val r = Center.resolveRecord("android.app.ContextImpl", Center.ResolveLevel.HIERARCHY)
 	  val va = generateInstanceCreation(r.getName, codefg)
 	  localVarsForClasses += (r.getName -> va)
     generateRecordConstructor(r, constructionStack, codefg)
-    createFieldSetStmt(localVarsForClasses(record.getName), "[|android:view:ContextThemeWrapper.mBase|]", va, List("object"), codefg)
+    createFieldSetStmt(localVarsForClasses(record.getName), "android.view.ContextThemeWrapper.mBase", va, List("object"), codefg)
     
 	  generateProcedureCall(AndroidEntryPointConstants.ACTIVITY_SETINTENT_SIG, "virtual", localVarsForClasses(record.getName), constructionStack, codefg)
 	  

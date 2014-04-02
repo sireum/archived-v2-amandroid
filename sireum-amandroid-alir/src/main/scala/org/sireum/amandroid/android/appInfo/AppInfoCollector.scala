@@ -32,7 +32,7 @@ import org.sireum.jawa.util.IgnoreException
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 class AppInfoCollector(apkUri : FileResourceUri) {  
-  
+  private final val TITLE = "AppInfoCollector"
   protected var uses_permissions : ISet[String] = isetEmpty
 	protected var callbackMethods : Map[JawaRecord, Set[JawaProcedure]] = Map()
 	protected var componentInfos : Set[ComponentInfo] = Set()
@@ -96,7 +96,7 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 	def generateEnvironment(record : JawaRecord, envName : String, codeCtr: Int) : Int = {
 	  if(record == null) return 0
 		//generate env main method
-  	msg_normal("Generate environment for " + record)
+  	msg_normal(TITLE, "Generate environment for " + record)
 	  val dmGen = new AndroidEnvironmentGenerator
 	  dmGen.setSubstituteRecordMap(AndroidSubstituteRecordMap.getSubstituteRecordMap)
 	  dmGen.setCurrentComponent(record.getName)
@@ -119,8 +119,8 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 	def dynamicRegisterComponent(comRec : JawaRecord, iDB : IntentFilterDataBase, precise : Boolean) = {
 	  this.synchronized{
 		  if(!comRec.declaresProcedureByShortName(AndroidConstants.COMP_ENV)){
-			  msg_critical("*************Dynamically Register Component**************")
-			  msg_normal("Component name: " + comRec)
+			  msg_critical(TITLE, "*************Dynamically Register Component**************")
+			  msg_normal(TITLE, "Component name: " + comRec)
 			  this.intentFdb.updateIntentFmap(iDB)
 			  val analysisHelper = new ReachableInfoCollector(Set(comRec.getName)) 
 				analysisHelper.collectCallbackMethods()
@@ -129,13 +129,13 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 			    case(k, v) =>
 		  			this.callbackMethods += (k -> (this.callbackMethods.getOrElse(k, isetEmpty) ++ v))
 				}
-			  msg_normal("Found " + this.callbackMethods.size + " callback methods")
+			  msg_normal(TITLE, "Found " + this.callbackMethods.size + " callback methods")
 		    val clCounter = generateEnvironment(comRec, AndroidConstants.COMP_ENV, this.codeLineCounter)
 		    this.codeLineCounter = clCounter
 		    AppCenter.addComponent(comRec)
 		    AppCenter.addDynamicRegisteredComponent(comRec, precise)
 		    AppCenter.updateIntentFilterDB(iDB)
-		    msg_critical("~~~~~~~~~~~~~~~~~~~~~~~~~Done~~~~~~~~~~~~~~~~~~~~~~~~~~")
+		    msg_critical(TITLE, "~~~~~~~~~~~~~~~~~~~~~~~~~Done~~~~~~~~~~~~~~~~~~~~~~~~~~")
 		  }
 	  }
 	}
@@ -167,18 +167,19 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 		AppCenter.setComponents(components)
 		AppCenter.updateIntentFilterDB(this.intentFdb)
 		AppCenter.setAppInfo(this)
-		msg_normal("Entry point calculation done.")
+		msg_normal(TITLE, "Entry point calculation done.")
 	}
 }
 
 object AppInfoCollector {
+  final val TITLE = "AppInfoCollector"
 	def analyzeManifest(apkUri : FileResourceUri) : ManifestParser = {
 	  val mfp = new ManifestParser
 		mfp.loadManifestFile(apkUri)
-	  msg_normal("entrypoints--->" + mfp.getComponentRecords)
-	  msg_normal("packagename--->" + mfp.getPackageName)
-	  msg_normal("permissions--->" + mfp.getPermissions)
-	  msg_normal("intentDB------>" + mfp.getIntentDB)
+	  msg_normal(TITLE, "entrypoints--->" + mfp.getComponentRecords)
+	  msg_normal(TITLE, "packagename--->" + mfp.getPackageName)
+	  msg_normal(TITLE, "permissions--->" + mfp.getPermissions)
+	  msg_normal(TITLE, "intentDB------>" + mfp.getIntentDB)
 	  mfp
 	}
 	
@@ -186,8 +187,8 @@ object AppInfoCollector {
 	  // Parse the resource file
 	  val afp = new ARSCFileParser()
 		afp.parse(apkUri)
-	  msg_detail("arscstring-->" + afp.getGlobalStringPool)
-	  msg_detail("arscpackage-->" + afp.getPackages)
+	  msg_detail(TITLE, "arscstring-->" + afp.getGlobalStringPool)
+	  msg_detail(TITLE, "arscpackage-->" + afp.getPackages)
 	  afp
 	}
 	
@@ -196,8 +197,8 @@ object AppInfoCollector {
 	  val lfp = new LayoutFileParser
 		lfp.setPackageName(mfp.getPackageName)
 		lfp.parseLayoutFile(apkUri, mfp.getComponentInfos.map(_.name))
-		msg_detail("layoutcallback--->" + lfp.getCallbackMethods)
-	  msg_detail("layoutuser--->" + lfp.getUserControls)
+		msg_detail(TITLE, "layoutcallback--->" + lfp.getCallbackMethods)
+	  msg_detail(TITLE, "layoutuser--->" + lfp.getUserControls)
 	  lfp
 	}
 	
@@ -205,7 +206,7 @@ object AppInfoCollector {
 	  var callbackMethods : Map[JawaRecord, Set[JawaProcedure]] = Map()
 	  analysisHelper.collectCallbackMethods()
 		callbackMethods = analysisHelper.getCallbackMethods
-		msg_detail("LayoutClasses --> " + analysisHelper.getLayoutClasses)
+		msg_detail(TITLE, "LayoutClasses --> " + analysisHelper.getLayoutClasses)
 
 		analysisHelper.getCallbackMethods.foreach {
 	    case(k, v) =>
@@ -238,13 +239,13 @@ object AppInfoCollector {
 		                if(callbackProcedure != null){
 		                  callbackMethods += (k -> (callbackMethods.getOrElse(k, isetEmpty) ++ callbackProcedure))
 		                } else {
-		                  err_msg_normal("Callback method " + methodName + " not found in class " + k);
+		                  err_msg_normal(TITLE, "Callback method " + methodName + " not found in class " + k);
 		                }
 		                
 		            }
 		          }
 		        } else {
-		          err_msg_normal("Unexpected resource type for layout class")
+		          err_msg_normal(TITLE, "Unexpected resource type for layout class")
 		        }
 		    }
 		}

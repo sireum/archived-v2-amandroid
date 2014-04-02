@@ -15,8 +15,11 @@ import org.sireum.jawa.alir.UnknownInstance
 import org.sireum.jawa.alir.NullInstance
 
 object FrameworkMethodsModel {
+  
+  final val TITLE = "FrameworkMethodsModel"
+  
 	def isFrameworkMethods(p : JawaProcedure) : Boolean = {
-	  val contextRec = Center.resolveRecord("[|android:content:Context|]", Center.ResolveLevel.HIERARCHY)
+	  val contextRec = Center.resolveRecord("android.content.Context", Center.ResolveLevel.HIERARCHY)
 	  if(!p.getDeclaringRecord.isInterface && Center.getRecordHierarchy.isRecordRecursivelySubClassOfIncluding(p.getDeclaringRecord, contextRec))
 		  p.getSubSignature match{
 		    case "setContentView:(I)V" |
@@ -47,7 +50,7 @@ object FrameworkMethodsModel {
 	      byPassFlag = false
 	    case "getApplication:()Landroid/app/Application;" =>
 	      require(retVars.size == 1)
-	      ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|android:app:Application|]", 0), retVars(0), currentContext) match{
+	      ReachingFactsAnalysisHelper.getReturnFact(NormalType("android.app.Application", 0), retVars(0), currentContext) match{
 	        case Some(f) => newFacts += f
 	        case None =>
 	      }
@@ -58,14 +61,14 @@ object FrameworkMethodsModel {
 //	      byPassFlag = false
 	    case "getBaseContext:()Landroid/content/Context;" =>
 	      require(retVars.size == 1)
-	      ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|android:app:ContextImpl|]", 0), retVars(0), currentContext) match{
+	      ReachingFactsAnalysisHelper.getReturnFact(NormalType("android.app.ContextImpl", 0), retVars(0), currentContext) match{
 	        case Some(f) => newFacts += f
 	        case None =>
 	      }
 	      byPassFlag = false
 	    case "getApplicationContext:()Landroid/content/Context;"=>
 	      require(retVars.size == 1)
-	      ReachingFactsAnalysisHelper.getReturnFact(NormalType("[|android:app:Application|]", 0), retVars(0), currentContext) match{
+	      ReachingFactsAnalysisHelper.getReturnFact(NormalType("android.app.Application", 0), retVars(0), currentContext) match{
 	        case Some(f) => newFacts += f
 	        case None =>
 	      }
@@ -131,7 +134,7 @@ object FrameworkMethodsModel {
 	      }
 	      
 	  }
-	  msg_normal("intentfilter database: " + AppCenter.getIntentFilterDB)
+	  msg_normal(TITLE, "intentfilter database: " + AppCenter.getIntentFilterDB)
 	  isetEmpty
 	}
 	
@@ -146,12 +149,12 @@ object FrameworkMethodsModel {
 	      str match{
 			    case cstr @ RFAConcreteStringInstance(text, c) =>
 			      if(AndroidConstants.getSystemServiceStrings.contains(text)){
-			        msg_normal("Get " + text + " service in " + currentContext)
+			        msg_normal(TITLE, "Get " + text + " service in " + currentContext)
 			      } else {
-			        err_msg_normal("Given service does not exist: " + cstr)
+			        err_msg_normal(TITLE, "Given service does not exist: " + cstr)
 			      }
-			    case pstr @ RFAPointStringInstance(c) => err_msg_normal("Get system service use point string: " + pstr)
-			    case _ => err_msg_normal("Get system service use unexpected instance type: " + str)
+			    case pstr @ RFAPointStringInstance(c) => err_msg_normal(TITLE, "Get system service use point string: " + pstr)
+			    case _ => err_msg_normal(TITLE, "Get system service use unexpected instance type: " + str)
 	      }
 	  }
 	  result

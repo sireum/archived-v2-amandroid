@@ -47,6 +47,7 @@ object AnyCounter {
 }
 
 trait AnyTestFramework extends TestFramework {
+  private final val TITLE = "AnyTestFramework"
   def Analyzing : this.type = this
 
   def title(s : String) : this.type = {
@@ -65,8 +66,8 @@ trait AnyTestFramework extends TestFramework {
    srcRes : FileResourceUri) {
 
     test(title) {
-    	msg_critical("####" + title + "#####")
-    	MessageCenter.msglevel = MessageCenter.MSG_LEVEL.VERBOSE
+    	msg_critical(TITLE, "####" + title + "#####")
+//    	MessageCenter.msglevel = MessageCenter.MSG_LEVEL.VERBOSE
     	AnyCounter.total += 1
     	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
     	AndroidGlobalConfig.initJawaAlirInfoProvider
@@ -83,52 +84,52 @@ trait AnyTestFramework extends TestFramework {
     	try{
 	    	val pre = new AppInfoCollector(srcRes)
 			  pre.collectInfo
-//			  val ssm = new DefaultSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-//	    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
-//	    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
-//			  AndroidReachingFactsAnalysisConfig.k_context = 1
-//		    AndroidReachingFactsAnalysisConfig.resolve_icc = true
-//		    AndroidReachingFactsAnalysisConfig.resolve_static_init = true
-//		    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
-//		    
-//		    val fileName = title.substring(title.lastIndexOf("/"), title.lastIndexOf("."))
-//  	    val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-//		  	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-//		  	val fileDir = new File(outputDir + "/AmandroidResult/DroidBench/" + fileName)
-//  	    if(!fileDir.exists()) fileDir.mkdirs()
-//		    
-//	    	entryPoints.par.foreach{
-//	    	  ep =>
-//	    	    try{
-//		    	    msg_critical("--------------Component " + ep + "--------------")
-//		    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-//		    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
-//		    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
-//		    	    msg_critical("processed-->" + icfg.getProcessed.size)
-//		    	    val ddgResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
-//		    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, ddgResult)
-//		    	    
-//		    	    val file = new File(fileDir + "/" + ep.getDeclaringRecord.getName.filter(_.isUnicodeIdentifierPart) + ".xml.zip")
-//					    val w = new FileOutputStream(file)
-//				      val zipw = new GZIPOutputStream(new BufferedOutputStream(w))
-//					    AndroidXStream.toXml(AmandroidResult(InterProceduralDataFlowGraph(icfg, irfaResult), ddgResult), zipw)
-//					    zipw.close()
-//					    println("Result stored!")
-//					    val reader = new GZIPInputStream(new FileInputStream(file))
-//					    val xmlObject = AndroidXStream.fromXml(reader).asInstanceOf[AmandroidResult]
-//				      reader.close()
-//				      println("xml loaded!")
-//				      println(icfg.nodes.size == xmlObject.idfg.icfg.nodes.size)
-//				      println(icfg.edges.size == xmlObject.idfg.icfg.edges.size)
-//		    	    
-//				      val tar = AndroidDataDependentTaintAnalysis(xmlObject.ddg, xmlObject.idfg.summary, ssm)    
-//		    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
-////			    	    iddResult.getIddg.toDot(new PrintWriter(System.out))
-//				      
-//			    	} catch {
-//	    	      case te : TimeOutException => System.err.println("Timeout!")
-//	    	    }
-//  	    } 
+			  val ssm = new DefaultSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+	    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
+	    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
+	    	
+			  AndroidReachingFactsAnalysisConfig.k_context = 1
+		    AndroidReachingFactsAnalysisConfig.resolve_icc = true
+		    AndroidReachingFactsAnalysisConfig.resolve_static_init = true
+		    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
+		    
+		    val fileName = title.substring(title.lastIndexOf("/"), title.lastIndexOf("."))
+  	    val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
+		  	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
+		  	val fileDir = new File(outputDir + "/AmandroidResult/DroidBench/" + fileName)
+  	    if(!fileDir.exists()) fileDir.mkdirs()
+		    
+	    	entryPoints.foreach{
+	    	  ep =>
+	    	    try{
+		    	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
+		    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
+		    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
+		    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
+		    	    msg_critical(TITLE, "processed-->" + icfg.getProcessed.size)
+		    	    val ddgResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
+		    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, ddgResult)
+		    	    
+		    	    val file = new File(fileDir + "/" + ep.getDeclaringRecord.getName.filter(_.isUnicodeIdentifierPart) + ".xml.zip")
+					    val w = new FileOutputStream(file)
+				      val zipw = new GZIPOutputStream(new BufferedOutputStream(w))
+					    AndroidXStream.toXml(AmandroidResult(InterProceduralDataFlowGraph(icfg, irfaResult), ddgResult), zipw)
+					    zipw.close()
+					    println("Result stored!")
+					    val reader = new GZIPInputStream(new FileInputStream(file))
+					    val xmlObject = AndroidXStream.fromXml(reader).asInstanceOf[AmandroidResult]
+				      reader.close()
+				      println("xml loaded!")
+				      println(icfg.nodes.size == xmlObject.idfg.icfg.nodes.size)
+				      println(icfg.edges.size == xmlObject.idfg.icfg.edges.size)    
+				      val tar = AndroidDataDependentTaintAnalysis(xmlObject.ddg, xmlObject.idfg.summary, ssm)    
+		    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
+//			    	    iddResult.getIddg.toDot(new PrintWriter(System.out))
+				      
+			    	} catch {
+	    	      case te : TimeOutException => System.err.println("Timeout!")
+	    	    }
+  	    } 
 //			  
 //	    	val appData = DataCollector.collect
 //	    	MetricRepo.collect(appData)
@@ -144,7 +145,7 @@ trait AnyTestFramework extends TestFramework {
 //			  AnyCounter.haveresult += 1
     	} catch {
     	  case ie : IgnoreException =>
-    	    err_msg_critical("Ignored!")
+    	    err_msg_critical(TITLE, "Ignored!")
     	  case re : RuntimeException => 
     	    re.printStackTrace()
     	  case e : Exception =>
@@ -158,10 +159,10 @@ trait AnyTestFramework extends TestFramework {
     	JawaCodeSource.clearAppRecordsCodes
     	System.gc()
 		  System.gc()
-    	msg_critical(AnyCounter.toString)
+    	msg_critical(TITLE, AnyCounter.toString)
 //    	PasswordCounter.outputInterestingFileNames
 //    	PasswordCounter.outputRecStatistic
-    	msg_critical("************************************\n")
+    	msg_critical(TITLE, "************************************\n")
     }
   }
 

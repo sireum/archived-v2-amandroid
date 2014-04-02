@@ -76,6 +76,7 @@ object OAuthCounter {
 }
 
 class OAuthTestFramework extends TestFramework {
+  private final val TITLE = "OAuthTestFramework"
   def Analyzing : this.type = this
 
   def title(s : String) : this.type = {
@@ -94,7 +95,7 @@ class OAuthTestFramework extends TestFramework {
    srcRes : FileResourceUri) {
 
     test(title) {
-    	msg_critical("####" + title + "#####")
+    	msg_critical(TITLE, "####" + title + "#####")
     	OAuthCounter.total += 1
     	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
     	AndroidGlobalConfig.initJawaAlirInfoProvider
@@ -179,8 +180,8 @@ class OAuthTestFramework extends TestFramework {
     	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
     	JawaCodeSource.clearAppRecordsCodes
 		  System.gc()
-    	msg_critical(OAuthCounter.toString)
-    	msg_critical("************************************\n")
+    	msg_critical(TITLE, OAuthCounter.toString)
+    	msg_critical(TITLE, "************************************\n")
     }
   }
 

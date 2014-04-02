@@ -23,6 +23,8 @@ class PasswordSourceAndSinkManager(appPackageName : String,
     												layoutControls : Map[Int, LayoutControl], 
     												callbackMethods : ISet[JawaProcedure], 
     												sasFilePath : String) extends BasicSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
+  private final val TITLE = "PasswordSourceAndSinkManager"
+    
   def isCallbackSource(proc : JawaProcedure) : Boolean = {
     false
   }
@@ -36,7 +38,7 @@ class PasswordSourceAndSinkManager(appPackageName : String,
 	          case Some(control) =>
 	            return control.isSensitive
 	          case None =>
-	            err_msg_normal("Layout control with ID " + num + " not found.")
+	            err_msg_normal(TITLE, "Layout control with ID " + num + " not found.")
 	        }
 	    }
 	  }

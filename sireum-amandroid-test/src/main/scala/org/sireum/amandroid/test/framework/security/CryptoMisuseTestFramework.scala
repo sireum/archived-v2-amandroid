@@ -34,6 +34,7 @@ object CryptoMisuseCounter {
 }
 
 class CryptoMisuseTestFramework extends TestFramework {
+  private final val TITLE = "CryptoMisuseTestFramework"
   def Analyzing : this.type = this
 
   def title(s : String) : this.type = {
@@ -52,7 +53,7 @@ class CryptoMisuseTestFramework extends TestFramework {
    srcRes : FileResourceUri) {
 
     test(title) {
-    	msg_critical("####" + title + "#####")
+    	msg_critical(TITLE, "####" + title + "#####")
     	CryptoMisuseCounter.total += 1
     	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
     	AndroidGlobalConfig.initJawaAlirInfoProvider
@@ -89,11 +90,11 @@ class CryptoMisuseTestFramework extends TestFramework {
 		    	entryPoints.par.foreach{
 		    	  ep =>
 		    	    try{
-			    	    msg_critical("--------------Component " + ep + "--------------")
+			    	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
 			    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
 			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
 			    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
-			    	    msg_critical("processed-->" + icfg.getProcessed.size)
+			    	    msg_critical(TITLE, "processed-->" + icfg.getProcessed.size)
 			    	    CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
 				    	} catch {
 		    	      case te : TimeOutException => System.err.println("Timeout!")
@@ -102,7 +103,7 @@ class CryptoMisuseTestFramework extends TestFramework {
 				  CryptoMisuseCounter.haveresult += 1
 	    	} catch {
 	    	  case ie : IgnoreException =>
-	    	    err_msg_critical("Ignored!")
+	    	    err_msg_critical(TITLE, "Ignored!")
 	    	  case re : RuntimeException => 
 	    	    re.printStackTrace()
 	    	  case e : Exception =>
@@ -111,7 +112,7 @@ class CryptoMisuseTestFramework extends TestFramework {
 	    	}
     	} else {
     	  CryptoMisuseCounter.oversize += 1
-    	  err_msg_critical("Pilar file size is too large:" + pilarFile.length()/1024/1024 + "MB")
+    	  err_msg_critical(TITLE, "Pilar file size is too large:" + pilarFile.length()/1024/1024 + "MB")
     	}
     	
     	Center.reset
@@ -120,8 +121,8 @@ class CryptoMisuseTestFramework extends TestFramework {
     	JawaCodeSource.clearAppRecordsCodes
     	System.gc()
 		  System.gc()
-    	msg_critical(CryptoMisuseCounter.toString)
-    	msg_critical("************************************\n")
+    	msg_critical(TITLE, CryptoMisuseCounter.toString)
+    	msg_critical(TITLE, "************************************\n")
     }
   }
 

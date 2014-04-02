@@ -17,7 +17,7 @@ import org.sireum.jawa.alir.Context
 import org.sireum.jawa.alir.NullInstance
 
 class AndroidTaintAnalysisBuilder{
-  
+  final val TITLE = "AndroidTaintAnalysisBuilder"
   var rfaFacts : AndroidReachingFactsAnalysis.Result = null
   var cg : InterproceduralControlFlowGraph[AndroidReachingFactsAnalysis.Node] = null
   
@@ -74,7 +74,7 @@ class AndroidTaintAnalysisBuilder{
 		                if(baseFacts.size>1) result(i) = (resFacts, false)
 		                else result(i) = (resFacts, true)
 		              case None =>
-		                err_msg_detail("Given field may be in other library: " + fieldSig)
+		                err_msg_detail(TITLE, "Given field may be in other library: " + fieldSig)
 		            }
             }
           case ie : IndexingExp =>
@@ -127,7 +127,7 @@ class AndroidTaintAnalysisBuilder{
 		                val sources = s.filter(tfact => fieldRFAFacts.contains(tfact.fact)).map(tfact => tfact.source)
 				            result(i) = sources
                   case None =>
-                    err_msg_detail("Given field may be in other library: " + fieldSig)
+                    err_msg_detail(TITLE, "Given field may be in other library: " + fieldSig)
                 }
             }
           case ie : IndexingExp =>
