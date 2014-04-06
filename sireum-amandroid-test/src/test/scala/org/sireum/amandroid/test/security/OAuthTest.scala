@@ -16,7 +16,7 @@ class OAuthTest extends OAuthTestFramework {
   var i = 0
   val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
   if(androidLibDir != null){
-		JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
+	//	JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
 		
 		//LibSideEffectProvider.init
 		
@@ -25,13 +25,13 @@ class OAuthTest extends OAuthTestFramework {
 //	  foreach { resfile =>
 //	    Analyzing title resfile file resfile
 //	  }
-//	  InterproceduralExamples.popularAPKFiles.
-////	  filter { s => s.contains("mobi.mgeek.TunnyBrowser.apk") }.
-//	  foreach { resfile =>
-////	    if(i > 500) 
-//	    Analyzing title resfile file resfile
-//	    i+=1
-//	  }
+	  InterproceduralExamples.popularAPKFiles.
+//	  filter { s => s.contains("mobi.mgeek.TunnyBrowser.apk") }.
+	  foreach { resfile =>
+	    if(i > 838) 
+	    Analyzing title resfile file resfile
+	    i+=1
+	  }
 //		InterproceduralExamples.testFiles.
 ////	  filter { s => s.endsWith("acctsvcs.us.apk")}.
 //	  foreach { resfile =>
@@ -39,13 +39,13 @@ class OAuthTest extends OAuthTestFramework {
 //	    Analyzing title resfile file resfile
 ////	    i+=1
 //	  }
-	  InterproceduralExamples.randomAPKFiles.
-//	  filter { s => s.endsWith("com.ifs.banking.fiid1350.apk") }.
-	  foreach { resfile =>
-//	    if(i < 89) i += 1
-//	    if(resfile.endsWith("com.sellbackyourbook.sellback.apk"))
-	    Analyzing title resfile file resfile
-	  }
+//	  InterproceduralExamples.randomAPKFiles.
+//	  //filter { s => s.endsWith("appinventor.ai_murathankilic.MobilZikir.apk") }.
+//	  foreach { resfile =>
+////	    if(i < 89) i += 1
+////	    if(resfile.endsWith("com.sellbackyourbook.sellback.apk"))
+//	    Analyzing title resfile file resfile
+//	  }
 //	  InterproceduralExamples.normalAPKFiles.
 //	//  filter { s => s.name.endsWith("android-1.apk") }.
 //	  foreach { resRet =>
