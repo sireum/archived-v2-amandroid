@@ -37,6 +37,7 @@ import java.util.zip.GZIPInputStream
 import org.sireum.jawa.alir.interProcedural.controlFlowGraph.InterproceduralControlFlowGraph
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.amandroid.alir.dataRecorder.AmandroidResult
+import org.sireum.jawa.GlobalConfig
 
 object DroidBenchCounter {
   var total = 0
@@ -77,12 +78,12 @@ trait DroidBenchTestFramework extends TestFramework {
     	val dexFile = APKFileResolver.getDexFile(srcRes, FileUtil.toUri(srcFile.getParentFile()))
     	
     	// convert the dex file to the "pilar" form
-    	val pilarFileUri = Dex2PilarConverter.convert(dexFile)
-    	val pilarFile = new File(new URI(pilarFileUri))
+    	val pilarRootUri = Dex2PilarConverter.convert(dexFile)
+    	val pilarFile = new File(new URI(pilarRootUri))
     	if(pilarFile.length() <= (100 * 1024 * 1024)){
     		AndroidRFAConfig.setupCenter
 	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
-	    	JawaCodeSource.load(pilarFileUri, AndroidLibraryAPISummary)
+	    	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
 	    	try{
 		    	val pre = new AppInfoCollector(srcRes)
 				  pre.collectInfo
@@ -94,11 +95,11 @@ trait DroidBenchTestFramework extends TestFramework {
 			    AndroidReachingFactsAnalysisConfig.resolve_static_init = true
 			    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
 			    
-			    val fileName = title.substring(title.lastIndexOf("/"), title.lastIndexOf("."))
-    	    val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-			  	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-			  	val fileDir = new File(outputDir + "/AmandroidResult/DroidBench/" + fileName)
-    	    if(!fileDir.exists()) fileDir.mkdirs()
+//			    val fileName = title.substring(title.lastIndexOf("/"), title.lastIndexOf("."))
+//    	    val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
+//			  	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
+//			  	val fileDir = new File(outputDir + "/AmandroidResult/DroidBench/" + fileName)
+//    	    if(!fileDir.exists()) fileDir.mkdirs()
 			    
 		    	entryPoints.par.foreach{
 		    	  ep =>
@@ -111,22 +112,8 @@ trait DroidBenchTestFramework extends TestFramework {
 			    	    val ddgResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
 			    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, ddgResult)
 			    	    
-			    	    val file = new File(fileDir + "/" + ep.getDeclaringRecord.getName.filter(_.isUnicodeIdentifierPart) + ".xml.zip")
-						    val w = new FileOutputStream(file)
-					      val zipw = new GZIPOutputStream(new BufferedOutputStream(w))
-						    AndroidXStream.toXml(AmandroidResult(InterProceduralDataFlowGraph(icfg, irfaResult), ddgResult), zipw)
-						    zipw.close()
-						    println("Result stored!")
-						    val reader = new GZIPInputStream(new FileInputStream(file))
-						    val xmlObject = AndroidXStream.fromXml(reader).asInstanceOf[AmandroidResult]
-					      reader.close()
-					      println("xml loaded!")
-					      println(icfg.nodes.size == xmlObject.idfg.icfg.nodes.size)
-					      println(icfg.edges.size == xmlObject.idfg.icfg.edges.size)
-			    	    
-					      val tar = AndroidDataDependentTaintAnalysis(xmlObject.ddg, xmlObject.idfg.summary, ssm)    
+					      val tar = AndroidDataDependentTaintAnalysis(ddgResult, irfaResult, ssm)    
 			    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
-//			    	    iddResult.getIddg.toDot(new PrintWriter(System.out))
 					      
 				    	} catch {
 		    	      case te : TimeOutException => System.err.println("Timeout!")
@@ -139,15 +126,15 @@ trait DroidBenchTestFramework extends TestFramework {
     	    }
 		    	val appData = DataCollector.collect
 		    	MetricRepo.collect(appData)
-		    	val apkName = title.substring(0, title.lastIndexOf("."))
-		    	val appDataDirFile = new File(outputDir + "/" + apkName)
-		    	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
-		    	val out = new PrintWriter(appDataDirFile + "/AppData.txt")
-			    out.print(appData.toString)
-			    out.close()
-			    val mr = new PrintWriter(outputDir + "/MetricInfo.txt")
-				  mr.print(MetricRepo.toString)
-				  mr.close()
+//		    	val apkName = title.substring(0, title.lastIndexOf("."))
+//		    	val appDataDirFile = new File(outputDir + "/" + apkName)
+//		    	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
+//		    	val out = new PrintWriter(appDataDirFile + "/AppData.txt")
+//			    out.print(appData.toString)
+//			    out.close()
+//			    val mr = new PrintWriter(outputDir + "/MetricInfo.txt")
+//				  mr.print(MetricRepo.toString)
+//				  mr.close()
 				  DroidBenchCounter.haveresult += 1
 	    	} catch {
 	    	  case ie : IgnoreException =>
@@ -159,7 +146,7 @@ trait DroidBenchTestFramework extends TestFramework {
 	    	} finally {
 	    	}
 	    	
-	//    	val r = Center.resolveRecord("[|java:lang:Class|]", Center.ResolveLevel.BODIES)
+	//    	val r = Center.resolveRecord("java.lang.Class", Center.ResolveLevel.BODIES)
 	//    	r.getProcedures.toSeq.sortBy(f => f.getSignature).foreach{
 	//    	  p =>
 	//    	    println("  case \"" + p.getSignature + "\" =>  //" + p.getAccessFlagString)

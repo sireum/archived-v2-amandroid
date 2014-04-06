@@ -54,12 +54,12 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
     val cg = new InterproceduralControlFlowGraph[CGNode]
     this.icfg = cg
     cg.collectCfgToBaseGraph(entryPointProc, initContext, true)
-    val iota : ISet[RFAFact] = initialFacts + RFAFact(VarSlot("@@[|RFAiota|]"), NullInstance(initContext))
+    val iota : ISet[RFAFact] = initialFacts + RFAFact(VarSlot("@@RFAiota"), NullInstance(initContext))
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](cg,
       true, true, false, AndroidReachingFactsAnalysisConfig.parallel, gen, kill, callr, iota, initial, switchAsOrderedMatch, Some(nl))
-//    val mr = new PrintWriter("/Volumes/hd/fgwei/Desktop/IRFA.txt")
-//	  mr.print(result)
-//	  mr.close()
+    val mr = new PrintWriter("/Volumes/hd/fgwei/Desktop/IRFA.txt")
+	  mr.print(result)
+	  mr.close()
     (cg, result)
   }
   
@@ -175,7 +175,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
       	    val typ = NormalType(recName, dimensions)
       	    val rec = Center.resolveRecord(typ.name, Center.ResolveLevel.HIERARCHY)
       	    val ins = 
-	            if(recName == "[|java:lang:String|]" && dimensions == 0){
+	            if(recName == "java.lang.String" && dimensions == 0){
 	              RFAConcreteStringInstance("", currentContext.copy)
 	            } else {
 	              RFAInstance(typ, currentContext.copy)
@@ -469,7 +469,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
               param.typeSpec.get match{
 	              case nt : NamedTypeSpec => 
 	                val name = nt.name.name
-	                if(name=="[|long|]" || name=="[|double|]")
+	                if(name=="long" || name=="double")
 	                  paramSlots :+= VarSlot(param.name.name)
 	              case _ =>
               }
@@ -509,7 +509,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
               param.typeSpec.get match{
 	              case nt : NamedTypeSpec => 
 	                val name = nt.name.name
-	                if(name=="[|long|]" || name=="[|double|]")
+	                if(name=="long" || name=="double")
 	                  paramSlots :+= VarSlot(param.name.name)
 	              case _ =>
               }
@@ -546,13 +546,13 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
               param.typeSpec.get match{
 	              case nt : NamedTypeSpec => 
 	                val name = nt.name.name
-	                if(name=="[|long|]" || name=="[|double|]")
+	                if(name=="long" || name=="double")
 	                  paramSlots :+= VarSlot(param.name.name)
 	              case _ =>
               }
               paramSlots :+= VarSlot(param.name.name)
           }
-          var retSlots : ISet[VarSlot] = isetEmpty
+          val retSlots : MSet[MList[VarSlot]] = msetEmpty
           calleeProcedure.body match{
 		        case ib : ImplementedBody =>
 		          ib.locations.foreach{
@@ -562,8 +562,18 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
 		                rj.exp match{
 		                  case Some(n) => 
 		                    n match{
-		                      case ne : NameExp => retSlots += VarSlot(ne.name.name)
-		                      case _ =>
+		                      case te : TupleExp => 
+		                        val tmplist : MList[VarSlot] = mlistEmpty
+		                        te.exps.foreach{
+		                          exp =>
+		                            exp match {
+		                              case ne : NameExp =>
+		                                tmplist += VarSlot(ne.name.name)
+		                              case _ =>
+		                            }
+		                        }
+		                        retSlots += tmplist
+		                      case _ => 
 		                    }
 		                  case None =>
 		                }
@@ -575,10 +585,10 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
 		        lhsSlot =>
 			        var values : ISet[Instance] = isetEmpty
 			        retSlots.foreach{
-			          retSlot =>
+			          retSlotList =>
 			            calleeVarFacts.foreach{
 			              case (s, v) =>
-			                if(s == retSlot){
+			                if(s == retSlotList(lhsSlots.indexOf(lhsSlot))){
 			                  values += v
 			                }
 			            }

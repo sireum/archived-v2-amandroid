@@ -198,7 +198,7 @@ class DefaultSourceAndSinkManager(appPackageName : String,
 
 object SSParser{
   
-	private val regex = "(.+)\\s*(.+)?\\s+->\\s+(.+)"
+	private val regex = "([^\\s]+)\\s+(.+)?\\s*->\\s+(.+)"
   def parse(filePath : String) : (IMap[String, ISet[String]], IMap[String, ISet[String]]) = {
 	  def readFile : BufferedReader = new BufferedReader(new FileReader(filePath))
     var sources : IMap[String, ISet[String]] = imapEmpty

@@ -34,7 +34,7 @@ class AndroidTaintAnalysisBuilder{
     val initContext = new Context(GlobalConfig.CG_CONTEXT_K)
     this.rfaFacts = rfaFacts
     this.cg = cg
-    val initRFAFact = RFAFact(VarSlot("@@[|RFAiota|]"), NullInstance(initContext))
+    val initRFAFact = RFAFact(VarSlot("@@RFAiota"), NullInstance(initContext))
     val iota : ISet[TaintFact] = initialFacts + TaintFact(initRFAFact, "TaintAnalysis")
     val initial : ISet[TaintFact] = isetEmpty
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[TaintFact](cg,
@@ -463,7 +463,7 @@ class AndroidTaintAnalysisBuilder{
             param.typeSpec.get match{
               case nt : NamedTypeSpec => 
                 val name = nt.name.name
-                if(name=="[|long|]" || name=="[|double|]")
+                if(name=="long" || name=="double")
                   paramSlots ::= VarSlot(param.name.name)
               case _ =>
             }
@@ -523,7 +523,7 @@ class AndroidTaintAnalysisBuilder{
             param.typeSpec.get match{
               case nt : NamedTypeSpec => 
                 val name = nt.name.name
-                if(name=="[|long|]" || name=="[|double|]")
+                if(name=="long" || name=="double")
                   paramSlots ::= VarSlot(param.name.name)
               case _ =>
             }
