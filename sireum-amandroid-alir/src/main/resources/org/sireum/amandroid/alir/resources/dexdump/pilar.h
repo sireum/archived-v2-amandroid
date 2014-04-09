@@ -77,8 +77,50 @@ static char* toPilar(const char* str)
     return newStr;
 }
 
+/* fengguo adds toPilarArrayBaseType: This func reformats a class descritptor to the pilar format.  For
+ * example, "int[][]" becomes "`int`[]".
+ */
+static char* toPilarArrayBaseType(const char* str)
+{
+	int targetLen = strlen(str) + 2; // `...` are extra 2 chars
+	int offset = strlen(str) - 1;
+	int arrayDepth = 0;
+	char* newStr = (char*)malloc(targetLen + 1);   // source of memory leak as this space is never freed
 
+	/* strip trailing []s; this will again be added to end */
+	while (offset > 1) {
+		if(str[offset] == ']' && str[offset - 1] == '[')
+		 {
+			 offset = offset - 2;
+			 arrayDepth++;
+		 }
 
+		 else
+			 break;
+	}
+	/* brace with ` ` i.e. copy class name in the middle */
+
+	int i = 0;
+	newStr[0] = '`';
+	i = 1;
+	for (int j = 0; j <= offset; j++) {
+		 char ch = str[j];
+		 newStr[j+1]=ch;
+		 i++;
+	}
+
+	newStr[i++] = '`';
+
+	for(int j = 0; j<arrayDepth - 1; j++) {
+		 newStr[i] = '[';
+		 newStr[i+1] = ']';
+		 i = i + 2;
+	}
+
+	newStr[i] = '\0';
+	assert(i == targetLen);
+	return newStr;
+}
 
 /* sankar adds toPilarS: This func reformats a class descritptor to the pilar format.  S stands for special reformat. For
  * example, "byte[v3]" becomes "`byte`[v3]".
@@ -93,17 +135,12 @@ static char* toPilarS(const char* str)
 
     /* move the offset to the first [ of trailing []s or [v1]s */
     while(offset < leng){
-
        if(str[offset] == '['){
 		 arrayFlag = true;
 		 break;
 	   }
-
 	   offset++;
 	}
-
-
-
     /* brace with ` ` i.e. copy class name in the middle */
 
     int i = 0;
@@ -121,7 +158,6 @@ static char* toPilarS(const char* str)
 	     char ch = str[j];
 	     newStr[i] = ch;
 		 i++;
-		
     }
 
     newStr[i] = '\0';
@@ -387,7 +423,7 @@ static char* pilarExtName(const char* str)
 
 
  #define  outFilledNewArray(x, y, z)  {\
-                                        fprintf(pFp,"temp:= (%s)`[", x); \
+                                        fprintf(pFp,"temp:= new %s[", toPilarArrayBaseType(x)); \
                                         for (i = 0; i < (int) y; i++) { \
                                          if (i == 0) \
                                             fprintf(pFp,"v%d", z[i]); \
@@ -399,7 +435,7 @@ static char* pilarExtName(const char* str)
 
 
 #define outFilledNewArrRange(x, y, z)   {\
-                                         fprintf(pFp,"temp:= (%s)`[", x);\
+                                         fprintf(pFp,"temp:= new %s[", toPilarArrayBaseType(x));\
                                          for (i = 0; i < (int) y; i++) {\
                                              if (i == 0)\
                                                 fprintf(pFp,"v%d", z + i);\
