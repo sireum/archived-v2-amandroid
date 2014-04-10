@@ -3579,8 +3579,9 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
      strcpy(currentPath, pilarRootDir);
      strcat(currentPath, "/");
      strcat(currentPath, currentDir);
-
+     fprintf(topFp, "classDesc: %s\n", classDesc);
      currentClassName = className(classDesc);
+     fprintf(topFp, "currentClassName: %s\n", currentClassName);
      mkdirp(currentPath); // creating the directory if it does not already exists
      currentFile = (char*)malloc(strlen(currentPath) + strlen(currentClassName) + strlen(PILAR_EXT) + 2); // double check for the length miscalculation here
      strcpy(currentFile, currentPath);

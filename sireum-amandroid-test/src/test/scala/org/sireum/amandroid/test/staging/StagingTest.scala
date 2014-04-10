@@ -8,6 +8,8 @@ import org.sireum.jawa.JawaCodeSource
 import org.sireum.jawa.alir.LibSideEffectProvider
 import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
 import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
+import org.sireum.util.FileUtil
+import org.sireum.jawa.GlobalConfig
 
 
 /**
@@ -18,15 +20,15 @@ class StagingTest extends StagingTestFramework {
   var i = 0
   val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
   if(androidLibDir != null){
-		JawaCodeSource.preLoad(AndroidLibPilarFiles.pilarModelFiles(androidLibDir).toSet)
+		JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
 		
 		LibSideEffectProvider.init
 		
-//	  InterproceduralExamples.testAPKFiles.
-//	  filter { s => s.endsWith("PasswordPassTest.apk") }.
-//	  foreach { resfile =>
-//	    Analyzing title resfile file (resfile, interPSEA)
-//	  }
+	  InterproceduralExamples.testAPKFiles.
+	  filter { s => s.endsWith("Global.apk") }.
+	  foreach { resfile =>
+	    Analyzing title resfile file resfile
+	  }
 //	  InterproceduralExamples.popularAPKFiles.
 ////	  filter { s => s.contains("la.droid.qr.apk") }.
 //	  foreach { resfile =>
@@ -41,13 +43,13 @@ class StagingTest extends StagingTestFramework {
 //	    Analyzing title resfile file resfile
 ////	    i+=1
 //	  }
-	  InterproceduralExamples.randomAPKFiles.
-//	  filter { s => s.endsWith("enterprise.dmagent.apk") }.
-	  foreach { resfile =>
-//	    if(i < 89) i += 1
-	    //if(resfile.endsWith("app.kazoebito.com.apk"))
-	    Analyzing title resfile file resfile
-	  }
+//	  InterproceduralExamples.randomAPKFiles.
+////	  filter { s => s.endsWith("enterprise.dmagent.apk") }.
+//	  foreach { resfile =>
+////	    if(i < 89) i += 1
+//	    //if(resfile.endsWith("app.kazoebito.com.apk"))
+//	    Analyzing title resfile file resfile
+//	  }
 //	  InterproceduralExamples.normalAPKFiles.
 //	//  filter { s => s.name.endsWith("android-1.apk") }.
 //	  foreach { resRet =>
