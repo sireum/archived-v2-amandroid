@@ -76,7 +76,6 @@ char* currentFile; // this will hold the current class name; // sankar adds
 FILE* pFp; // a file pointer; at any point, it corresponds to the current "class" of dex;
 FILE* topFp; // represents a special file named top.txt in the root directory; In addition to other info, this can hold some error information, if any.
 
-
 /* command-line options */
 struct Options {
     bool checksumOnly;
@@ -3488,9 +3487,11 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
     char* accessStr = NULL;
 
     char* currentFile; // sankar adds
+    char* tmpFile; // fengguo adds
     char* currentClassName; // sankar adds
     char* classDesc; // sankar adds
     char* currentPath; // sankar adds
+    int fd;
     int i;
 
     pClassDef = dexGetClassDef(pDexFile, idx);
@@ -3579,15 +3580,26 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
      strcpy(currentPath, pilarRootDir);
      strcat(currentPath, "/");
      strcat(currentPath, currentDir);
-     fprintf(topFp, "classDesc: %s\n", classDesc);
      currentClassName = className(classDesc);
-     fprintf(topFp, "currentClassName: %s\n", currentClassName);
      mkdirp(currentPath); // creating the directory if it does not already exists
      currentFile = (char*)malloc(strlen(currentPath) + strlen(currentClassName) + strlen(PILAR_EXT) + 2); // double check for the length miscalculation here
      strcpy(currentFile, currentPath);
      strcat(currentFile, "/");
      strcat(currentFile, currentClassName);
      strcat(currentFile, PILAR_EXT);
+     while((fd = open(currentFile, O_CREAT | O_WRONLY | O_EXCL, S_IRUSR | S_IWUSR)) < 0){
+		 if(errno == EEXIST){
+			 close(fd);
+			 tmpFile = (char*)malloc(strlen(currentFile) + strlen(PILAR_EXT) + 1);
+			 strcpy(tmpFile, currentFile);
+			 strcat(tmpFile, PILAR_EXT);
+			 free(currentFile);
+			 currentFile = tmpFile;
+		 } else {
+			 break;
+		 }
+     }
+     close(fd);
      pFp = fopen(currentFile, "w"); // creating a file
      if (!pFp) {
 	   fprintf(stderr, " \n could not open the pilar file %s \n", currentFile);
@@ -4047,7 +4059,7 @@ bail:
  */
 void usage(void)
 {
-    fprintf(stderr, "Copyright (C) 2007 The Android Open Source Project\n\n");
+    fprintf(stderr, "Copyright (C) 2007 The Android Open Source Project\nSankar and Fengguo modified it!\n\n");
     fprintf(stderr,
         "%s: [-c] [-d] [-f] [-h] [-i] [-l layout] [-m] [-p] [-t tempfile] dexfile...\n",
         gProgName);
