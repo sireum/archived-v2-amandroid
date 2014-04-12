@@ -17,7 +17,7 @@ import org.sireum.jawa.alir.Context
 import org.sireum.jawa.alir.NullInstance
 
 class AndroidTaintAnalysisBuilder{
-  
+  final val TITLE = "AndroidTaintAnalysisBuilder"
   var rfaFacts : AndroidReachingFactsAnalysis.Result = null
   var cg : InterproceduralControlFlowGraph[AndroidReachingFactsAnalysis.Node] = null
   
@@ -34,7 +34,7 @@ class AndroidTaintAnalysisBuilder{
     val initContext = new Context(GlobalConfig.CG_CONTEXT_K)
     this.rfaFacts = rfaFacts
     this.cg = cg
-    val initRFAFact = RFAFact(VarSlot("@@[|RFAiota|]"), NullInstance(initContext))
+    val initRFAFact = RFAFact(VarSlot("@@RFAiota"), NullInstance(initContext))
     val iota : ISet[TaintFact] = initialFacts + TaintFact(initRFAFact, "TaintAnalysis")
     val initial : ISet[TaintFact] = isetEmpty
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[TaintFact](cg,
@@ -74,7 +74,7 @@ class AndroidTaintAnalysisBuilder{
 		                if(baseFacts.size>1) result(i) = (resFacts, false)
 		                else result(i) = (resFacts, true)
 		              case None =>
-		                err_msg_detail("Given field may be in other library: " + fieldSig)
+		                err_msg_detail(TITLE, "Given field may be in other library: " + fieldSig)
 		            }
             }
           case ie : IndexingExp =>
@@ -127,7 +127,7 @@ class AndroidTaintAnalysisBuilder{
 		                val sources = s.filter(tfact => fieldRFAFacts.contains(tfact.fact)).map(tfact => tfact.source)
 				            result(i) = sources
                   case None =>
-                    err_msg_detail("Given field may be in other library: " + fieldSig)
+                    err_msg_detail(TITLE, "Given field may be in other library: " + fieldSig)
                 }
             }
           case ie : IndexingExp =>
@@ -231,7 +231,7 @@ class AndroidTaintAnalysisBuilder{
     var sources : IMap[Int, ISet[String]] = imapEmpty
     var taintset : ISet[TaintFact] = isetEmpty
     val callees : MSet[JawaProcedure] = msetEmpty
-    val caller = callNode.getOwner
+    val caller = Center.getProcedureWithoutFailing(callNode.getOwner)
     val jumpLoc = caller.getProcedureBody.location(callNode.getLocIndex).asInstanceOf[JumpLocation]
     if(callee.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
       val calleeSignature = cj.getValueAnnotation("signature") match {
@@ -331,7 +331,7 @@ class AndroidTaintAnalysisBuilder{
           val calleeSet = callNode.getCalleeSet
           calleeSet.foreach{
             callee =>
-              val (srcs, taintset) = getSourceAndHandleSink(s, cFacts, callee.calleeProc, callNode, cj, lhssFacts, currentNode.getContext)
+              val (srcs, taintset) = getSourceAndHandleSink(s, cFacts, Center.getProcedureWithoutFailing(callee.callee), callNode, cj, lhssFacts, currentNode.getContext)
               sources ++= srcs
               result ++= taintset
           }
@@ -402,11 +402,11 @@ class AndroidTaintAnalysisBuilder{
               case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
             }
             val factsForCallee = getFactsForICCTarget(s, cj, callee, callerContext)
-            calleeFactsMap += (cg.entryNode(callee, callerContext) -> mapFactsToICCTarget(factsForCallee, cj, callee.getProcedureBody.procedure))
+            calleeFactsMap += (cg.entryNode(callee.getSignature, callerContext) -> mapFactsToICCTarget(factsForCallee, cj, callee.getProcedureBody.procedure))
           } else { // for normal call
             val factsForCallee = getFactsForCallee(s, cj, callee, callerContext)
             returnFacts --= factsForCallee
-            calleeFactsMap += (cg.entryNode(callee, callerContext) -> mapFactsToCallee(factsForCallee, cj, callee.getProcedureBody.procedure))
+            calleeFactsMap += (cg.entryNode(callee.getSignature, callerContext) -> mapFactsToCallee(factsForCallee, cj, callee.getProcedureBody.procedure))
           }
       }
 	    (calleeFactsMap, returnFacts)
@@ -423,7 +423,7 @@ class AndroidTaintAnalysisBuilder{
     cg.successors(callNode).foreach{
       suc =>
         if(suc.isInstanceOf[CGEntryNode]){
-          calleeSet += suc.getOwner
+          calleeSet += Center.getProcedureWithoutFailing(suc.getOwner)
         }
     }
     calleeSet
@@ -463,7 +463,7 @@ class AndroidTaintAnalysisBuilder{
             param.typeSpec.get match{
               case nt : NamedTypeSpec => 
                 val name = nt.name.name
-                if(name=="[|long|]" || name=="[|double|]")
+                if(name=="long" || name=="double")
                   paramSlots ::= VarSlot(param.name.name)
               case _ =>
             }
@@ -523,7 +523,7 @@ class AndroidTaintAnalysisBuilder{
             param.typeSpec.get match{
               case nt : NamedTypeSpec => 
                 val name = nt.name.name
-                if(name=="[|long|]" || name=="[|double|]")
+                if(name=="long" || name=="double")
                   paramSlots ::= VarSlot(param.name.name)
               case _ =>
             }

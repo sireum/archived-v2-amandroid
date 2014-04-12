@@ -11,6 +11,7 @@ import org.sireum.amandroid.alir.AppCenter
 import org.sireum.jawa.MessageCenter._
 
 class InterestingApiCollector (apkUri : FileResourceUri) extends AppInfoCollector(apkUri) {
+  private final val TITLE = "InterestingApiCollector"
   var ra : ReachableInfoCollector = null
 	def getInterestingContainers(interestingAPIs : Set[String]) : Set[JawaRecord] = {
 	  val interestingContainers : MSet[JawaRecord] = msetEmpty
@@ -49,7 +50,7 @@ class InterestingApiCollector (apkUri : FileResourceUri) extends AppInfoCollecto
 		AppCenter.setComponents(components)
 		AppCenter.updateIntentFilterDB(this.intentFdb)
 		AppCenter.setAppInfo(this)
-		msg_normal("Entry point calculation done.")
+		msg_normal(TITLE, "Entry point calculation done.")
 	}
 	
 }

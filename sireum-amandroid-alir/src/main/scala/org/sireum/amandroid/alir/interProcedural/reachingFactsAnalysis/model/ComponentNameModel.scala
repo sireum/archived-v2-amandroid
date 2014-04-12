@@ -13,78 +13,78 @@ import org.sireum.jawa.alir.Instance
 import org.sireum.jawa.alir.UnknownInstance
 
 object ComponentNameModel {
-  
-	def isComponentName(r : JawaRecord) : Boolean = r.getName == "[|android:content:ComponentName|]"
+  final val TITLE = "ComponentNameModel"
+	def isComponentName(r : JawaRecord) : Boolean = r.getName == "android.content.ComponentName"
 	  
 	def doComponentNameCall(s : ISet[RFAFact], p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true
 	  p.getSignature match{
-	    case "[|Landroid/content/ComponentName;.<clinit>:()V|]" =>  //static constructor
-		  case "[|Landroid/content/ComponentName;.<init>:(Landroid/content/Context;Ljava/lang/Class;)V|]" =>  //public constructor
+	    case "Landroid/content/ComponentName;.<clinit>:()V" =>  //static constructor
+		  case "Landroid/content/ComponentName;.<init>:(Landroid/content/Context;Ljava/lang/Class;)V" =>  //public constructor
 		    newFacts ++= initComponentNameWithCC(s, args, currentContext)
 		    byPassFlag = false
-		  case "[|Landroid/content/ComponentName;.<init>:(Landroid/content/Context;Ljava/lang/String;)V|]" =>  //public constructor
+		  case "Landroid/content/ComponentName;.<init>:(Landroid/content/Context;Ljava/lang/String;)V" =>  //public constructor
 		    newFacts ++= initComponentNameWithCS(s, args, currentContext)
 		    byPassFlag = false
-		  case "[|Landroid/content/ComponentName;.<init>:(Landroid/os/Parcel;)V|]" =>  //public constructor
+		  case "Landroid/content/ComponentName;.<init>:(Landroid/os/Parcel;)V" =>  //public constructor
 		    //TODO: How to handle parcel
-		  case "[|Landroid/content/ComponentName;.<init>:(Ljava/lang/String;Landroid/os/Parcel;)V|]" =>  //private constructor
+		  case "Landroid/content/ComponentName;.<init>:(Ljava/lang/String;Landroid/os/Parcel;)V" =>  //private constructor
 		    //TODO: How to handle parcel
-		  case "[|Landroid/content/ComponentName;.<init>:(Ljava/lang/String;Ljava/lang/String;)V|]" =>  //public constructor
+		  case "Landroid/content/ComponentName;.<init>:(Ljava/lang/String;Ljava/lang/String;)V" =>  //public constructor
 		    newFacts ++= initComponentNameWithSS(s, args, currentContext)
 		    byPassFlag = false
-		  case "[|Landroid/content/ComponentName;.clone:()Landroid/content/ComponentName;|]" =>  //public
+		  case "Landroid/content/ComponentName;.clone:()Landroid/content/ComponentName;" =>  //public
 		    require(retVars.size == 1)
 		    newFacts ++= cloneComponentName(s, args, retVars(0), currentContext)
 		    byPassFlag = false
-		  case "[|Landroid/content/ComponentName;.clone:()Ljava/lang/Object;|]" =>  //public synthetic
+		  case "Landroid/content/ComponentName;.clone:()Ljava/lang/Object;" =>  //public synthetic
 		    require(retVars.size == 1)
 		    newFacts ++= cloneComponentName(s, args, retVars(0), currentContext)
 		    byPassFlag = false
-		  case "[|Landroid/content/ComponentName;.compareTo:(Landroid/content/ComponentName;)I|]" =>  //public
-		  case "[|Landroid/content/ComponentName;.compareTo:(Ljava/lang/Object;)I|]" =>  //public synthetic
-		  case "[|Landroid/content/ComponentName;.describeContents:()I|]" =>  //public
-		  case "[|Landroid/content/ComponentName;.equals:(Ljava/lang/Object;)Z|]" =>  //public
-		  case "[|Landroid/content/ComponentName;.flattenToShortString:()Ljava/lang/String;|]" =>  //public
+		  case "Landroid/content/ComponentName;.compareTo:(Landroid/content/ComponentName;)I" =>  //public
+		  case "Landroid/content/ComponentName;.compareTo:(Ljava/lang/Object;)I" =>  //public synthetic
+		  case "Landroid/content/ComponentName;.describeContents:()I" =>  //public
+		  case "Landroid/content/ComponentName;.equals:(Ljava/lang/Object;)Z" =>  //public
+		  case "Landroid/content/ComponentName;.flattenToShortString:()Ljava/lang/String;" =>  //public
 		    require(retVars.size == 1)
 		    newFacts += RFAFact(VarSlot(retVars(0)), RFAPointStringInstance(currentContext))
 		    byPassFlag = false
-		  case "[|Landroid/content/ComponentName;.flattenToString:()Ljava/lang/String;|]" =>  //public
+		  case "Landroid/content/ComponentName;.flattenToString:()Ljava/lang/String;" =>  //public
 		    require(retVars.size == 1)
 		    newFacts += RFAFact(VarSlot(retVars(0)), RFAPointStringInstance(currentContext))
 		    byPassFlag = false
-		  case "[|Landroid/content/ComponentName;.getClassName:()Ljava/lang/String;|]" =>  //public
+		  case "Landroid/content/ComponentName;.getClassName:()Ljava/lang/String;" =>  //public
 		    require(retVars.size == 1)
 		    newFacts ++=  getClassNameFromComponentName(s, args, retVars(0), currentContext)
 		    byPassFlag = false
-		  case "[|Landroid/content/ComponentName;.getPackageName:()Ljava/lang/String;|]" =>  //public
+		  case "Landroid/content/ComponentName;.getPackageName:()Ljava/lang/String;" =>  //public
 		    require(retVars.size == 1)
 		    newFacts ++=  getPackageNameFromComponentName(s, args, retVars(0), currentContext)
 		    byPassFlag = false
-		  case "[|Landroid/content/ComponentName;.getShortClassName:()Ljava/lang/String;|]" =>  //public
+		  case "Landroid/content/ComponentName;.getShortClassName:()Ljava/lang/String;" =>  //public
 		    require(retVars.size == 1)
 		    newFacts ++=  getShortClassNameFromComponentName(s, args, retVars(0), currentContext)
 		    byPassFlag = false
-		  case "[|Landroid/content/ComponentName;.hashCode:()I|]" =>  //public
-		  case "[|Landroid/content/ComponentName;.readFromParcel:(Landroid/os/Parcel;)Landroid/content/ComponentName;|]" =>  //public static
+		  case "Landroid/content/ComponentName;.hashCode:()I" =>  //public
+		  case "Landroid/content/ComponentName;.readFromParcel:(Landroid/os/Parcel;)Landroid/content/ComponentName;" =>  //public static
 		    //TODO: How to handle parcel
-		  case "[|Landroid/content/ComponentName;.toShortString:()Ljava/lang/String;|]" =>  //public
+		  case "Landroid/content/ComponentName;.toShortString:()Ljava/lang/String;" =>  //public
 		    require(retVars.size == 1)
 		    newFacts += RFAFact(VarSlot(retVars(0)), RFAPointStringInstance(currentContext))
 		    byPassFlag = false
-		  case "[|Landroid/content/ComponentName;.toString:()Ljava/lang/String;|]" =>  //public
+		  case "Landroid/content/ComponentName;.toString:()Ljava/lang/String;" =>  //public
 		    require(retVars.size == 1)
 		    newFacts += RFAFact(VarSlot(retVars(0)), RFAPointStringInstance(currentContext))
 		    byPassFlag = false
-		  case "[|Landroid/content/ComponentName;.unflattenFromString:(Ljava/lang/String;)Landroid/content/ComponentName;|]" =>  //public static
+		  case "Landroid/content/ComponentName;.unflattenFromString:(Ljava/lang/String;)Landroid/content/ComponentName;" =>  //public static
 		    require(retVars.size == 1)
 		    newFacts += RFAFact(VarSlot(retVars(0)), RFAPointStringInstance(currentContext))
 		    byPassFlag = false
-		  case "[|Landroid/content/ComponentName;.writeToParcel:(Landroid/content/ComponentName;Landroid/os/Parcel;)V|]" =>  //public static
+		  case "Landroid/content/ComponentName;.writeToParcel:(Landroid/content/ComponentName;Landroid/os/Parcel;)V" =>  //public static
 		    //TODO: How to handle parcel
-		  case "[|Landroid/content/ComponentName;.writeToParcel:(Landroid/os/Parcel;I)V|]" =>  //public
+		  case "Landroid/content/ComponentName;.writeToParcel:(Landroid/os/Parcel;I)V" =>  //public
 		    //TODO: How to handle parcel
 		  case _ =>
 	  }
@@ -142,13 +142,13 @@ object ComponentNameModel {
 	            case Some(rec) =>
 	              RFAConcreteStringInstance(rec.getShortName, currentContext)
 	            case None =>
-	              err_msg_normal("Given class name probably come from another app: " + i)
+	              err_msg_normal(TITLE, "Given class name probably come from another app: " + i)
 	              UnknownInstance(currentContext)
 	          }
           case pstr @ RFAPointStringInstance(c) => 
           	RFAPointStringInstance(currentContext)
           case _ =>
-            err_msg_normal("Get short name use unknown instance: " + i)
+            err_msg_normal(TITLE, "Get short name use unknown instance: " + i)
             UnknownInstance(currentContext)
 	      }
 	  }
@@ -176,7 +176,7 @@ object ComponentNameModel {
 	    if(param2Value.isEmpty){
 		    isetEmpty[Instance]
 		  } else {
-		    param2Value.map(v=>factMap.getOrElse(FieldSlot(v, "[|java:lang:Class.name|]"), isetEmpty)).reduce(iunion[Instance])
+		    param2Value.map(v=>factMap.getOrElse(FieldSlot(v, "java.lang.Class.name"), isetEmpty)).reduce(iunion[Instance])
 		  }
 	  thisValue.map{
 	    tv =>
@@ -196,20 +196,20 @@ object ComponentNameModel {
 				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
 				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), cstr)
 		                case None =>
-		                  err_msg_normal("Given class name probably come from another app: " + cn)
+		                  err_msg_normal(TITLE, "Given class name probably come from another app: " + cn)
 				              val unknownIns = UnknownInstance(currentContext)
 				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
 		              }
 		              facts
 		            case pstr @ RFAPointStringInstance(c) => 
-		              err_msg_detail("Init ComponentName use point string: " + pstr)
+		              err_msg_detail(TITLE, "Init ComponentName use point string: " + pstr)
 		              var facts = isetEmpty[RFAFact]
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pstr)
 		              facts
 		            case _ => 
-		              err_msg_detail("Init ComponentName use Unknown instance: " + cn)
+		              err_msg_detail(TITLE, "Init ComponentName use Unknown instance: " + cn)
 		              var facts = isetEmpty[RFAFact]
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), cn)
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), cn)
@@ -246,13 +246,13 @@ object ComponentNameModel {
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), claStr)
 		              facts
 		            case pstr @ RFAPointStringInstance(c) => 
-		              err_msg_detail("Init ComponentName use point string: " + pstr)
+		              err_msg_detail(TITLE, "Init ComponentName use point string: " + pstr)
 		              var facts = isetEmpty[RFAFact]
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pstr)
 		              facts
 		            case _ =>
-		              err_msg_detail("Init ComponentName use unknown instance: " + cn)
+		              err_msg_detail(TITLE, "Init ComponentName use unknown instance: " + cn)
 		              var facts = isetEmpty[RFAFact]
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), cn)
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), cn)
@@ -296,13 +296,13 @@ object ComponentNameModel {
 							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), claStr)
 							              facts
 							            case pstr2 @ RFAPointStringInstance(c) => 
-							              err_msg_detail("Init ComponentName.mClass use point string: " + pv2)
+							              err_msg_detail(TITLE, "Init ComponentName.mClass use point string: " + pv2)
 							              var facts = isetEmpty[RFAFact]
 							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pstr2)
 							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pstr2)
 							              facts
 							            case _ =>
-							              err_msg_detail("Init ComponentName.mClass use Unknown instance: " + pv2)
+							              err_msg_detail(TITLE, "Init ComponentName.mClass use Unknown instance: " + pv2)
 							              var facts = isetEmpty[RFAFact]
 							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pv2)
 							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pv2)
@@ -311,13 +311,13 @@ object ComponentNameModel {
 							      }.reduce(iunion[RFAFact])
 						      }
 		            case pstr1 @ RFAPointStringInstance(c) => 
-		              err_msg_detail("Init ComponentName.mPackage use point string: " + pv1)
+		              err_msg_detail(TITLE, "Init ComponentName.mPackage use point string: " + pv1)
 		              var facts = isetEmpty[RFAFact]
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pstr1)
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pstr1)
 		              facts
 		            case _ =>
-		              err_msg_detail("Init ComponentName.mPackage use Unknown instance: " + pv1)
+		              err_msg_detail(TITLE, "Init ComponentName.mPackage use Unknown instance: " + pv1)
 		              var facts = isetEmpty[RFAFact]
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pv1)
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pv1)

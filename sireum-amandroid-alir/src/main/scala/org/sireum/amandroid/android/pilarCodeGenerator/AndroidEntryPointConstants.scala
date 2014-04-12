@@ -1,10 +1,10 @@
 package org.sireum.amandroid.android.pilarCodeGenerator
 
 object AndroidEntryPointConstants {
-	final val ACTIVITY_CLASS = "[|android:app:Activity|]"
-	final val SERVICE_CLASS = "[|android:app:Service|]"
-	final val BROADCAST_RECEIVER_CLASS = "[|android:content:BroadcastReceiver|]"
-	final val CONTENT_PROVIDER_CLASS = "[|android:content:ContentProvider|]"
+	final val ACTIVITY_CLASS = "android.app.Activity"
+	final val SERVICE_CLASS = "android.app.Service"
+	final val BROADCAST_RECEIVER_CLASS = "android.content.BroadcastReceiver"
+	final val CONTENT_PROVIDER_CLASS = "android.content.ContentProvider"
 	final val APPLICATION_CLASS = "[|android:app:Application|]"
 	
 	final val APPLICATION_ONCREATE = "onCreate:()V"
@@ -35,8 +35,8 @@ object AndroidEntryPointConstants {
 	
 	final val CONTENTPROVIDER_ONCREATE = "onCreate:()Z"
 	
-	final val INTENT_NAME = "[|android:content:Intent|]"
-	final val ACTIVITY_SETINTENT_SIG = "[|Landroid/app/Activity;.setIntent:(Landroid/content/Intent;)V|]"
+	final val INTENT_NAME = "android.content.Intent"
+	final val ACTIVITY_SETINTENT_SIG = "Landroid/app/Activity;.setIntent:(Landroid/content/Intent;)V"
 	
 	private final val applicationMethods = List(APPLICATION_ONCREATE, APPLICATION_ONTERMINATE)
 	private final val activityMethods = List(ACTIVITY_ONCREATE, ACTIVITY_ONDESTROY, ACTIVITY_ONPAUSE,

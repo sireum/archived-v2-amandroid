@@ -17,11 +17,14 @@ import org.sireum.pilar.ast._
 import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.IntentHelper
 import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis.VarSlot
 import org.sireum.jawa.alir.interProcedural.controlFlowGraph.CGInvokeNode
+import org.sireum.jawa.Center
 
 class PasswordSourceAndSinkManager(appPackageName : String, 
     												layoutControls : Map[Int, LayoutControl], 
     												callbackMethods : ISet[JawaProcedure], 
     												sasFilePath : String) extends BasicSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
+  private final val TITLE = "PasswordSourceAndSinkManager"
+    
   def isCallbackSource(proc : JawaProcedure) : Boolean = {
     false
   }
@@ -35,7 +38,7 @@ class PasswordSourceAndSinkManager(appPackageName : String,
 	          case Some(control) =>
 	            return control.isSensitive
 	          case None =>
-	            err_msg_normal("Layout control with ID " + num + " not found.")
+	            err_msg_normal(TITLE, "Layout control with ID " + num + " not found.")
 	        }
 	    }
 	  }
@@ -47,10 +50,10 @@ class PasswordSourceAndSinkManager(appPackageName : String,
     val calleeSet = invNode.getCalleeSet
     calleeSet.foreach{
       callee =>
-        if(InterComponentCommunicationModel.isIccOperation(callee.calleeProc)){
+        if(InterComponentCommunicationModel.isIccOperation(Center.getProcedureWithoutFailing(callee.callee))){
           sinkflag = true
           val rfafactMap = ReachingFactsAnalysisHelper.getFactMap(rfaFact)
-          val args = invNode.getOwner.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
+          val args = Center.getProcedureWithoutFailing(invNode.getOwner).getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
               case te : TupleExp =>
                 te.exps.map{
 			            exp =>

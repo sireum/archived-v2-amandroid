@@ -1,37 +1,33 @@
-package org.sireum.amandroid.test.security
+package org.sireum.amandroid.test.test
 
 import org.junit.runner.RunWith
-import org.sireum.jawa.JawaCodeSource
-import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
-import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
-import org.sireum.amandroid.alir.AndroidGlobalConfig
-import java.util.zip.GZIPInputStream
-import java.io.FileInputStream
-import org.sireum.jawa.xml.AndroidXStream
-import org.sireum.jawa.alir.interProcedural.sideEffectAnalysis.InterProceduralSideEffectAnalysisResult
 import org.scalatest.junit.JUnitRunner
-import org.sireum.amandroid.test.framework.security.PasswordTrackingTestFramework
+import org.sireum.amandroid.alir.AndroidGlobalConfig
+import org.sireum.jawa.JawaCodeSource
 import org.sireum.jawa.alir.LibSideEffectProvider
-import org.sireum.util.FileUtil
+import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
+import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
+import org.sireum.amandroid.test.framework.test.AnyTestFramework
 import org.sireum.jawa.GlobalConfig
+import org.sireum.util.FileUtil
+
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 @RunWith(classOf[JUnitRunner])
-class CompleteRFATest extends PasswordTrackingTestFramework {
+class AnyTest extends AnyTestFramework {
   var i = 0
   val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
   if(androidLibDir != null){
 		JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
+//		LibSideEffectProvider.init
 		
-		LibSideEffectProvider.init
-		
-//	  InterproceduralExamples.testAPKFiles.
-//	  filter { s => s.endsWith("PasswordPassTest.apk") }.
-//	  foreach { resfile =>
-//	    Analyzing title resfile file (resfile, interPSEA)
-//	  }
+	  InterproceduralExamples.testAPKFiles.
+	  filter { s => s.endsWith("PasswordPassTest.apk") }.
+	  foreach { resfile =>
+	    Analyzing title resfile file resfile
+	  }
 //	  InterproceduralExamples.popularAPKFiles.
 ////	  filter { s => s.contains("la.droid.qr.apk") }.
 //	  foreach { resfile =>
@@ -72,11 +68,11 @@ class CompleteRFATest extends PasswordTrackingTestFramework {
 //	    Analyzing title resfile file resfile
 ////	    i+=1
 //	  }
-	  InterproceduralExamples.benchAPKFiles.
-	  filter { s => s.endsWith("PrivateDataLeak2.apk") }.
-	  foreach { fileUri =>
-	    Analyzing title fileUri file fileUri
-	  }
+//	  InterproceduralExamples.benchAPKFiles.
+//	  filter { s => s.endsWith("PrivateDataLeak2.apk") }.
+//	  foreach { fileUri =>
+//	    Analyzing title fileUri file fileUri
+//	  }
   } else {
     System.err.println("Does not have env var: " + AndroidGlobalConfig.ANDROID_LIB_DIR)
   }

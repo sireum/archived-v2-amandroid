@@ -16,6 +16,7 @@ import org.sireum.amandroid.android.security.AndroidProblemCategories
 import scala.tools.nsc.ConsoleWriter
 
 object AndroidDataDependentTaintAnalysis {
+  final val TITLE = "AndroidDataDependentTaintAnalysis"
   type Node = InterproceduralDataDependenceAnalysis.Node
   
   case class Td(name : String, typ : String) extends TaintDescriptor {
@@ -124,8 +125,8 @@ object AndroidDataDependentTaintAnalysis {
     tar.sourceNodes = sourceNodes
     tar.sinkNodes = sinkNodes
     if(!tar.getTaintedPaths.isEmpty){
-      err_msg_critical("Found " + tar.getTaintedPaths.size + " path.")
-    	err_msg_critical(tar.toString)
+      err_msg_critical(TITLE, "Found " + tar.getTaintedPaths.size + " path.")
+    	err_msg_critical(TITLE, tar.toString)
     }
     tar
   }
@@ -138,9 +139,9 @@ object AndroidDataDependentTaintAnalysis {
         val calleeSet = invNode.getCalleeSet
 		    calleeSet.foreach{
 		      callee =>
-		        val calleep = callee.calleeProc
+		        val calleep = Center.getProcedureWithoutFailing(callee.callee)
 		        val callees : MSet[JawaProcedure] = msetEmpty
-				    val caller = invNode.getOwner
+				    val caller = Center.getProcedureWithoutFailing(invNode.getOwner)
 				    val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
 				    val cj = jumpLoc.jump.asInstanceOf[CallJump]
 				    if(calleep.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
@@ -157,14 +158,14 @@ object AndroidDataDependentTaintAnalysis {
 				    callees.foreach{
 				      callee =>
 						    if(invNode.isInstanceOf[IDDGVirtualBodyNode] && ssm.isSource(callee, caller, jumpLoc)){
-						      msg_normal("found source: " + callee + "@" + invNode.getContext)
+						      msg_normal(TITLE, "found source: " + callee + "@" + invNode.getContext)
 						      val tn = Tn(invNode)
 						      tn.isSrc = true
 						      tn.descriptors += Td(callee.getSignature, SourceAndSinkCategory.API_SOURCE)
 						      sources += tn
 						    }
 						    if(invNode.isInstanceOf[IDDGCallArgNode] && ssm.isSinkProcedure(callee)){
-						      msg_normal("found sink: " + callee + "@" + invNode.getContext)
+						      msg_normal(TITLE, "found sink: " + callee + "@" + invNode.getContext)
 						      iddg.extendGraphForSinkApis(invNode.asInstanceOf[IDDGCallArgNode], rfaFacts)
 						      val tn = Tn(invNode)
 						      tn.isSrc = false
@@ -172,7 +173,7 @@ object AndroidDataDependentTaintAnalysis {
 						      sinks += tn
 						    }
 						    if(invNode.isInstanceOf[IDDGCallArgNode] && invNode.asInstanceOf[IDDGCallArgNode].position > 0 && ssm.isIccSink(invNode.getCGNode.asInstanceOf[CGCallNode], rfaFacts)){
-				          msg_normal("found icc sink: " + invNode)
+				          msg_normal(TITLE, "found icc sink: " + invNode)
 				          iddg.extendGraphForSinkApis(invNode.asInstanceOf[IDDGCallArgNode], rfaFacts)
 				          val tn = Tn(invNode)
 				          tn.isSrc = false
@@ -183,17 +184,17 @@ object AndroidDataDependentTaintAnalysis {
 		    }
       case entNode : IDDGEntryParamNode =>
         if(ssm.isIccSource(entNode.getCGNode, iddg.entryNode.getCGNode)){
-		      msg_normal("found icc source: " + iddg.entryNode)
+		      msg_normal(TITLE, "found icc source: " + iddg.entryNode)
 		      val tn = Tn(iddg.entryNode)
 		      tn.isSrc = true
-		      tn.descriptors += Td(iddg.entryNode.getOwner.getSignature, SourceAndSinkCategory.ICC_SOURCE)
+		      tn.descriptors += Td(iddg.entryNode.getOwner, SourceAndSinkCategory.ICC_SOURCE)
 		      sources += tn
 		    }
-        if(entNode.position > 0 && ssm.isCallbackSource(entNode.getOwner)){
-          msg_normal("found callback source: " + entNode)
+        if(entNode.position > 0 && ssm.isCallbackSource(Center.getProcedureWithoutFailing(entNode.getOwner))){
+          msg_normal(TITLE, "found callback source: " + entNode)
           val tn = Tn(entNode)
           tn.isSrc = true
-		      tn.descriptors += Td(entNode.getOwner.getSignature, SourceAndSinkCategory.CALLBACK_SOURCE)
+		      tn.descriptors += Td(entNode.getOwner, SourceAndSinkCategory.CALLBACK_SOURCE)
 		      sources += tn
         }
       case _ =>

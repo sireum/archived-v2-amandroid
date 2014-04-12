@@ -34,7 +34,7 @@ import org.sireum.amandroid.android.parser.LayoutControl
  *
  */
 class ReachableInfoCollector(entryPointClasses:Set[String]) {
-    
+  final val TITLE = "ReachableInfoCollector"
 	private final var callbackMethods : Map[JawaRecord, Set[JawaProcedure]] = Map()
 	private final var layoutClasses: Map[JawaRecord, Set[Int]] = Map()
 	
@@ -132,7 +132,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 			  }
 	    }
 	  }
-	  msg_detail("current all callbacks = " + this.callbackMethods)
+	  msg_detail(TITLE, "current all callbacks = " + this.callbackMethods)
 	  
 	}
 	
@@ -227,7 +227,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 			else if (ancestorClass.getName.equals(AndroidEntryPointConstants.CONTENT_PROVIDER_CLASS))
 				classType = ClassType.ContentProvider;
 			
-			if (ancestorClass.getName.startsWith("[|android:"))
+			if (ancestorClass.getName.startsWith("android."))
 				for (procedure <- ancestorClass.getProcedures)
 					if (!procedure.isConstructor){
 						systemMethods.add(procedure.getSubSignature)
@@ -239,7 +239,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 		// from a system class, they are callback candidates.
 		for (sClass : JawaRecord <- Center.getRecordHierarchy.getAllSubClassesOfIncluding(record)) {
 		  val rName = sClass.getName
-			if (!rName.startsWith("[|android:") && !rName.startsWith("[|com:android:"))
+			if (!rName.startsWith("android.") && !rName.startsWith("com.android."))
 				for (procedure <- sClass.getProcedures) {
 				  if(!procedure.isStatic){ // static method cannot be overriden
 					  lifecycleFlag = false
@@ -269,7 +269,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	}
 	
 	private def pilarify(classname : String) = {
-	  val temp = "[|" + classname.replace('.', ':') + "|]"
+	  val temp = classname
 	  val rec = Center.resolveRecord(temp, Center.ResolveLevel.HIERARCHY)
 	  temp
 	}
@@ -283,7 +283,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 		
 		// For a first take, we consider all classes in the android.* packages
 		// to be part of the operating system
-		if (baseClass.getName.startsWith("[|android:"))
+		if (baseClass.getName.startsWith("android."))
 		  return
 		
 		// If we are a class, one of our superclasses might implement an Android
@@ -506,7 +506,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 					checkAndAddMethod(getProceduresFromHierarchyByShortName(baseClass, "onGesturingStarted"), lifecycleElement);
 			}
 			// android.graphics
-			else if (i.getName.equals(pilarify("android.graphics.SurfaceTexture%OnFrameAvailableListener"))) {
+			else if (i.getName.equals(pilarify("android.graphics.SurfaceTexture$OnFrameAvailableListener"))) {
 				if (i.declaresProcedureByShortName("onFrameAvailable"))
 					checkAndAddMethod(getProceduresFromHierarchyByShortName(baseClass, "onFrameAvailable"), lifecycleElement);
 			}
@@ -611,7 +611,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 					checkAndAddMethod(getProceduresFromHierarchyByShortName(baseClass, "onAudioFocusChange"), lifecycleElement);
 			}
 			else if (i.getName.equals(pilarify("android.media.AudioRecord$OnRecordPositionUpdateListener"))
-					|| i.getName.equals(pilarify("android.media.AudioRecord$OnPlaybackPositionUpdateListener"))) {
+					|| i.getName.equals(pilarify("android.media.AudioRecord$OnRecordPositionUpdateListener"))) {
 				if (i.declaresProcedureByShortName("onMarkerReached"))
 					checkAndAddMethod(getProceduresFromHierarchyByShortName(baseClass, "onMarkerReached"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onPeriodicNotification"))
@@ -717,7 +717,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 					checkAndAddMethod(getProceduresFromHierarchyByShortName(baseClass, "onWaveFormDataCapture"), lifecycleElement);
 			}
 			// android.media.effect
-			else if (i.getName.equals(pilarify("android.media.effect$EffectUpdateListener"))) {
+			else if (i.getName.equals(pilarify("android.media.effect.EffectUpdateListener"))) {
 				if (i.declaresProcedureByShortName("onEffectUpdated"))
 					checkAndAddMethod(getProceduresFromHierarchyByShortName(baseClass, "onEffectUpdated"), lifecycleElement);
 			}
@@ -1113,7 +1113,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 				if (i.declaresProcedureByShortName("onItemLongClick"))
 					checkAndAddMethod(getProceduresFromHierarchyByShortName(baseClass, "onItemLongClick"), lifecycleElement);
 			}
-			else if (i.getName.equals(pilarify("android.widget.AdapterView.OnItemSelectedListener"))) {
+			else if (i.getName.equals(pilarify("android.widget.AdapterView$OnItemSelectedListener"))) {
 				if (i.declaresProcedureByShortName("onItemSelected"))
 					checkAndAddMethod(getProceduresFromHierarchyByShortName(baseClass, "onItemSelected"), lifecycleElement);
 				if (i.declaresProcedureByShortName("onNothingSelected"))
@@ -1167,7 +1167,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 				if (i.declaresProcedureByShortName("onValueChange"))
 					checkAndAddMethod(getProceduresFromHierarchyByShortName(baseClass, "onValueChange"), lifecycleElement);
 			}
-			else if (i.getName.equals(pilarify("android.widget.NumberPicker$OnDismissListener"))) {
+			else if (i.getName.equals(pilarify("android.widget.PopupMenu$OnDismissListener"))) {
 				if (i.declaresProcedureByShortName("onDismiss"))
 					checkAndAddMethod(getProceduresFromHierarchyByShortName(baseClass, "onDismiss"), lifecycleElement);
 			}
@@ -1260,7 +1260,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	 * callback method belongs
 	 */
 	private def checkAndAddMethod(procs: Set[JawaProcedure], baseClass: JawaRecord) = {
-		val ps = procs.filter(proc => !proc.getName.startsWith("[|android:"))
+		val ps = procs.filter(proc => !proc.getName.startsWith("android."))
 		this.callbackMethods += (baseClass -> (this.callbackMethods.getOrElse(baseClass, isetEmpty) ++ ps))
 	}
 	

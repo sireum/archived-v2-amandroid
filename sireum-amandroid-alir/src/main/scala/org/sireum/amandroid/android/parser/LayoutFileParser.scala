@@ -18,7 +18,7 @@ import org.sireum.jawa.util.ResourceRetriever
  * modified by: Fengguo Wei
  */
 class LayoutFileParser extends AbstractAndroidXMLParser {
-	
+	final val TITLE = "LayoutFileParser"
 	private final val DEBUG = false
 	
 	private final var userControls : Map[Int, LayoutControl] = Map()
@@ -34,7 +34,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 		this.packageName = packageName;
 	}
 	
-	def toPilarRecord(str : String) : String = "[|" + str.replaceAll("\\.", ":") + "|]"
+	def toPilarRecord(str : String) : String = str
 	
 	private def getLayoutClass(className : String) : JawaRecord = {
 	  var ar : Option[JawaRecord] = Center.tryLoadRecord(toPilarRecord(className), Center.ResolveLevel.HIERARCHY)
@@ -45,7 +45,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 	  if(!ar.isDefined)
 	    ar = Center.tryLoadRecord(toPilarRecord("android.webkit." + className), Center.ResolveLevel.HIERARCHY)
 	  if(!ar.isDefined)
-	    err_msg_detail("Could not find layout class " + className)
+	    err_msg_detail(TITLE, "Could not find layout class " + className)
 	  ar.getOrElse(null)
 	}
 	
@@ -57,7 +57,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
  		var found = false
  		Center.getRecordHierarchy.getAllSuperClassesOf(theClass).foreach{
 	  	su =>
-	  		if(su.getName == "[|android:view:ViewGroup|]")
+	  		if(su.getName == "android.view.ViewGroup")
 	  		  found = true
 		}
  		found
@@ -71,10 +71,10 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
    		// check the hierarchy to find the android view class
  		Center.getRecordHierarchy.getAllSuperClassesOf(theClass).foreach{
 	  	su =>
-	  		if(su.getName == "[|android:view:View|]" || su.getName == "[|android:webkit:WebView|]")
+	  		if(su.getName == "android.view.View" || su.getName == "android.webkit.WebView")
 	  		  return true
 		}
-		err_msg_detail("Layout class " + theClass + " is not derived from "
+		err_msg_detail(TITLE, "Layout class " + theClass + " is not derived from "
 				+ "android.view.View");
 		false
 	}
@@ -86,7 +86,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 
   	override def child(ns : String, name : String) : NodeVisitor = {
 			if (name == null) {
-				err_msg_detail("Encountered a null node name "
+				err_msg_detail(TITLE, "Encountered a null node name "
 						+ "in file " + layoutFile + ", skipping node...")
 				return null
 			}
@@ -135,7 +135,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
   		}
   		else {
   			if (DEBUG && typ == AxmlVisitor.TYPE_STRING)
-  				err_msg_detail("Found unrecognized XML attribute:  " + tempName)
+  				err_msg_detail(TITLE, "Found unrecognized XML attribute:  " + tempName)
   		}
   	}
   	
@@ -168,7 +168,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 						if (!fileName.startsWith("res/layout"))
 							return
 						if (!fileName.endsWith(".xml")) {
-							err_msg_normal("Skipping file " + fileName + " in layout folder...")
+							err_msg_normal(TITLE, "Skipping file " + fileName + " in layout folder...")
 							return
 						}
 						// Get the fully-qualified class name
@@ -213,12 +213,12 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 								}
 							})
 							
-							msg_detail("Found " + userControls.size + " layout controls in file "
+							msg_detail(TITLE, "Found " + userControls.size + " layout controls in file "
 									+ fileName);
 						}
 						catch {
 						  case ex : Exception =>
-							  err_msg_detail("Could not read binary XML file: " + ex.getMessage())
+							  err_msg_detail(TITLE, "Could not read binary XML file: " + ex.getMessage())
 						}
 					}
 				})

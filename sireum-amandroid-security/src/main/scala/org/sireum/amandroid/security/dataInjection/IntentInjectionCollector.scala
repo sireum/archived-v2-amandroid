@@ -11,6 +11,7 @@ import org.sireum.jawa.Center
 import org.sireum.amandroid.android.appInfo.ReachableInfoCollector
 
 class IntentInjectionCollector(apkUri : FileResourceUri) extends AppInfoCollector(apkUri) {
+  private final val TITLE = "IntentInjectionCollector"
   var ra : ReachableInfoCollector = null
 	def getInterestingContainers(interestingAPIs : Set[String]) = {
 	  var interestingContainers : Set[JawaRecord] = Set()
@@ -49,6 +50,6 @@ class IntentInjectionCollector(apkUri : FileResourceUri) extends AppInfoCollecto
 		AppCenter.setComponents(components)
 		AppCenter.updateIntentFilterDB(this.intentFdb)
 		AppCenter.setAppInfo(this)
-		msg_normal("Entry point calculation done.")
+		msg_normal(TITLE, "Entry point calculation done.")
 	}
 }

@@ -19,6 +19,7 @@ import java.util.zip.GZIPInputStream
 import java.io.FileInputStream
 import org.sireum.jawa.alir.interProcedural.sideEffectAnalysis.InterProceduralSideEffectAnalysisResult
 import scala.collection.parallel.immutable.ParMap
+import org.sireum.jawa.GlobalConfig
 
 object AndroidLibSideEffectAnalysis {
   
@@ -27,7 +28,7 @@ object AndroidLibSideEffectAnalysis {
 	  val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
 	  if(androidLibDir != null){
 	    val startTime = System.currentTimeMillis()
-			JawaCodeSource.preLoad(AndroidLibPilarFiles.pilarModelFiles(androidLibDir).toSet)
+			JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
 			var x : Float = 0
 			val recSize = JawaCodeSource.getLibraryRecordsCodes.size
 			val recs =

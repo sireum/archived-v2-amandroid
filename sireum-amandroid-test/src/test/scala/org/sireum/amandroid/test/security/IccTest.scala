@@ -12,13 +12,15 @@ import org.sireum.jawa.xml.AndroidXStream
 import org.sireum.jawa.alir.interProcedural.sideEffectAnalysis.InterProceduralSideEffectAnalysisResult
 import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
 import org.sireum.jawa.alir.LibSideEffectProvider
+import org.sireum.util.FileUtil
+import org.sireum.jawa.GlobalConfig
 
 @RunWith(classOf[JUnitRunner])
 class IccTest extends ICCTestFramework {
   var i = 0
   val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
   if(androidLibDir != null){
-		JawaCodeSource.preLoad(AndroidLibPilarFiles.pilarModelFiles(androidLibDir).toSet)
+		JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
 		
 		LibSideEffectProvider.init
 		

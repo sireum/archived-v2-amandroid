@@ -10,7 +10,7 @@ import org.sireum.jawa.Center
 import org.sireum.jawa.util.IgnoreException
 
 class IccCollector(apkUri : FileResourceUri) extends AppInfoCollector(apkUri) {
-  
+  private final val TITLE = "IccCollector"
   private var iccContainers : Set[JawaRecord] = Set()
 	def getIccContainers = this.iccContainers
   
@@ -45,6 +45,6 @@ class IccCollector(apkUri : FileResourceUri) extends AppInfoCollector(apkUri) {
 		AppCenter.setComponents(components)
 		AppCenter.updateIntentFilterDB(this.intentFdb)
 		AppCenter.setAppInfo(this)
-		msg_normal("Entry point calculation done.")
+		msg_normal(TITLE, "Entry point calculation done.")
 	}
 }

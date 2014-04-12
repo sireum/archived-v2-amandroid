@@ -18,8 +18,8 @@ object CryptographicMisuse {
   	= build(idfg)
   	
   def build(idfg : InterProceduralDataFlowGraph) : Unit = {
-    val icfg = idfg.getICFG
-    val summary = idfg.getSummary
+    val icfg = idfg.icfg
+    val summary = idfg.summary
     val nodeMap : MMap[String, MSet[CGCallNode]] = mmapEmpty
     icfg.nodes.foreach{
       node =>
@@ -54,7 +54,7 @@ object CryptographicMisuse {
       node =>
         result += (node -> true)
         val rfaFacts = summary.entrySet(node)
-        val loc = node.getOwner.getProcedureBody.location(node.getLocIndex)
+        val loc = Center.getProcedureWithoutFailing(node.getOwner).getProcedureBody.location(node.getLocIndex)
         val argNames : MList[String] = mlistEmpty
         loc match{
           case jumploc : JumpLocation =>
@@ -97,9 +97,9 @@ object CryptographicMisuse {
         val calleeSet = invNode.getCalleeSet
 		    calleeSet.foreach{
 		      callee =>
-		        val calleep = callee.calleeProc
+		        val calleep = Center.getProcedureWithoutFailing(callee.callee)
 		        val callees : MSet[JawaProcedure] = msetEmpty
-				    val caller = invNode.getOwner
+				    val caller = Center.getProcedureWithoutFailing(invNode.getOwner)
 				    val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
 				    val cj = jumpLoc.jump.asInstanceOf[CallJump]
 				    if(calleep.getSignature == Center.UNKNOWN_PROCEDURE_SIG){

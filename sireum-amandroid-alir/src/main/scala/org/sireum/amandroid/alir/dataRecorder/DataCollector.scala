@@ -314,14 +314,14 @@ object DataCollector {
 			      val (icfg, irfaResult) = AppCenter.getInterproceduralReachingFactsAnalysisResult(compRec)
 			      val iccNodes = icfg.nodes.filter{
 			        	node =>
-			        	  node.isInstanceOf[CGCallNode] && node.asInstanceOf[CGCallNode].getCalleeSet.exists(c => InterComponentCommunicationModel.isIccOperation(c.calleeProc))
+			        	  node.isInstanceOf[CGCallNode] && node.asInstanceOf[CGCallNode].getCalleeSet.exists(c => InterComponentCommunicationModel.isIccOperation(Center.getProcedureWithoutFailing(c.callee)))
 			      	}.map(_.asInstanceOf[CGCallNode])
 			      iccInfos =
 				      iccNodes.map{
 				        iccNode =>
 				          val s = irfaResult.entrySet(iccNode)
 						      val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
-						      val args = iccNode.getOwner.getProcedureBody.location(iccNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
+						      val args = Center.getProcedureWithoutFailing(iccNode.getOwner).getProcedureBody.location(iccNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
 			              case te : TupleExp =>
 			                te.exps.map{
 						            exp =>
@@ -337,7 +337,7 @@ object DataCollector {
 								  val intentcontents = IntentHelper.getIntentContents(factMap, intentValues, iccNode.getContext)
 								  val comMap = IntentHelper.mappingIntents(intentcontents)
 								  val intents = intentcontents.map(ic=>Intent(ic.componentNames, ic.actions, ic.categories, ic.datas, ic.types, ic.preciseExplicit, ic.preciseImplicit, comMap(ic).map(c=>(c._1.getName, c._2.toString()))))
-								  IccInfo(iccNode.getCalleeSet.map(_.calleeProc.getSignature), iccNode.getContext, intents)
+								  IccInfo(iccNode.getCalleeSet.map(_.callee), iccNode.getContext, intents)
 				      }.toSet
 			      taintResult = if(AppCenter.hasTaintAnalysisResult(compRec)) Some(AppCenter.getTaintAnalysisResult(compRec)) else None
 		      }

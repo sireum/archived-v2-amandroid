@@ -42,6 +42,9 @@ abstract class BasicSourceAndSinkManager(appPackageName : String,
     												layoutControls : Map[Int, LayoutControl], 
     												callbackMethods : ISet[JawaProcedure], 
     												sasFilePath : String) extends SourceAndSinkManager{
+  
+  private final val TITLE = "BasicSourceAndSinkManager"
+  
   /**
    * it's a map from source API sig to it's category
    */
@@ -67,7 +70,7 @@ abstract class BasicSourceAndSinkManager(appPackageName : String,
           this.sinks += (sig -> SourceAndSinkCategory.API_SINK)
           this.apiPermissions += (sig -> ps)
       }
-      msg_detail("source size: " + this.sources.size + " sink size: " + this.sinks.size)
+      msg_detail(TITLE, "source size: " + this.sources.size + " sink size: " + this.sinks.size)
   }
 	
 	private def matchs(procedure : JawaProcedure, procedurepool : ISet[String]) : Boolean = procedurepool.contains(procedure.getSignature)
@@ -108,6 +111,8 @@ class DefaultSourceAndSinkManager(appPackageName : String,
     												callbackMethods : ISet[JawaProcedure], 
     												sasFilePath : String) extends BasicSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
 	
+  private final val TITLE = "DefaultSourceAndSinkManager"
+  
 	def isCallbackSource(proc : JawaProcedure) : Boolean = {
 	  if(this.callbackMethods.contains(proc) && proc.getParamNames.size > 1) true
 	  else false
@@ -122,7 +127,7 @@ class DefaultSourceAndSinkManager(appPackageName : String,
 	          case Some(control) =>
 	            return control.isSensitive
 	          case None =>
-	            err_msg_normal("Layout control with ID " + num + " not found.")
+	            err_msg_normal(TITLE, "Layout control with ID " + num + " not found.")
 	        }
 	    }
 	  }
@@ -134,9 +139,9 @@ class DefaultSourceAndSinkManager(appPackageName : String,
     val calleeSet = invNode.getCalleeSet
     calleeSet.foreach{
       callee =>
-        if(InterComponentCommunicationModel.isIccOperation(callee.calleeProc)){
+        if(InterComponentCommunicationModel.isIccOperation(Center.getProcedureWithoutFailing(callee.callee))){
           val rfafactMap = ReachingFactsAnalysisHelper.getFactMap(rfaFact)
-          val args = invNode.getOwner.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
+          val args = Center.getProcedureWithoutFailing(invNode.getOwner).getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
               case te : TupleExp =>
                 te.exps.map{
 			            exp =>
@@ -193,7 +198,7 @@ class DefaultSourceAndSinkManager(appPackageName : String,
 
 object SSParser{
   
-	private val regex = "(\\[\\|.+\\|\\])\\s*(.+)?\\s+->\\s+(.+)"
+	private val regex = "([^\\s]+)\\s+(.+)?\\s*->\\s+(.+)"
   def parse(filePath : String) : (IMap[String, ISet[String]], IMap[String, ISet[String]]) = {
 	  def readFile : BufferedReader = new BufferedReader(new FileReader(filePath))
     var sources : IMap[String, ISet[String]] = imapEmpty

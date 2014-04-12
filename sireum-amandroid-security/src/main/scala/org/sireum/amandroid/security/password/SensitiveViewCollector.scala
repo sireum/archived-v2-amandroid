@@ -10,6 +10,9 @@ import org.sireum.amandroid.alir.AndroidConstants
 import org.sireum.amandroid.alir.AppCenter
 
 class SensitiveViewCollector(apkUri : FileResourceUri) extends AppInfoCollector(apkUri) {
+  
+  private final val TITLE = "SensitiveViewCollector"
+  
 	private var sensitiveLayoutContainers : Set[JawaRecord] = Set()
 	def getSensitiveLayoutContainers = this.sensitiveLayoutContainers
 	
@@ -43,6 +46,6 @@ class SensitiveViewCollector(apkUri : FileResourceUri) extends AppInfoCollector(
 		AppCenter.setComponents(components)
 		AppCenter.updateIntentFilterDB(this.intentFdb)
 		AppCenter.setAppInfo(this)
-		msg_normal("Entry point calculation done.")
+		msg_normal(TITLE, "Entry point calculation done.")
 	}
 }
