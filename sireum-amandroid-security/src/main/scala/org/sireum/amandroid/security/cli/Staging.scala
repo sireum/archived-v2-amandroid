@@ -56,7 +56,7 @@ object StagingCli {
     val mem = saamode.general.mem
     val libSideEffectPath = saamode.analysis.sideeffectPath
     forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, outputDir, mem, libSideEffectPath)
-    println("Generated environment-model and analysis results are saved in: " + outputDir)
+    println("Generated analysis results are saved in: " + outputDir)
   }
 	
 	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : String, sourceDir : String, outputDir : String, mem : Int, libSideEffectPath : String) = {
@@ -152,9 +152,7 @@ object Staging {
 			    	val entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 			    	
 			    	val fileName = apkFileUri.substring(apkFileUri.lastIndexOf("/"), apkFileUri.lastIndexOf("."))
-		  	    val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-				  	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-				  	val fileDir = new File(outputDir + "/" + fileName)
+				  	val fileDir = new File(new URI(outputUri + "/store/" + fileName))
 		  	    if(!fileDir.exists()) fileDir.mkdirs()
 			    	
 			    	(if(parallel) entryPoints.par else entryPoints).foreach{
@@ -165,7 +163,6 @@ object Staging {
 				    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
 				    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
 				    	    msg_critical(TITLE, "processed-->" + icfg.getProcessed.size)
-				//    	    val taResult = AndroidTaintAnalysis(cg, rfaResult)
 				    	    val ddgResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
 				    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, ddgResult)
 				    	    
