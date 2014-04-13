@@ -29,6 +29,8 @@ object InterproceduralExamples extends Examples{
 
   def maliciousArborFiles = exampleFiles(sourceDirUri(androidTestDir + "/maliciousArbor/"), ANDROID_APK_FILE_EXT)
 
+  def randomArborFiles = exampleFiles(sourceDirUri(androidTestDir + "/randomArbor/"), ANDROID_APK_FILE_EXT)
+  
   def benchAPKFiles = exampleFiles(sourceDirUri(androidTestDir + "/droidBench/"), ANDROID_APK_FILE_EXT)
   
   def benchExtendAPKFiles = exampleFiles(sourceDirUri(androidTestDir + "/droidBenchExtend/"), ANDROID_APK_FILE_EXT)

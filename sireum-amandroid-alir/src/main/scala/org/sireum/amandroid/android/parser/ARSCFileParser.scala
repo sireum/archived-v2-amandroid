@@ -800,7 +800,7 @@ class ARSCFileParser extends AbstractAndroidXMLParser {
 				offset = readStringTable(remainingData, offset, beforeBlock,
 						stringPoolHeader, tempTable)
 				this.stringTable = tempTable.toMap
-				assert(this.stringTable.size == stringPoolHeader.stringCount)
+				if(this.stringTable.size != stringPoolHeader.stringCount) throw new RuntimeException
 			} else if (nextChunkHeader.typ == RES_TABLE_PACKAGE_TYPE) {
 				// Read the package header
 				val packageTable = new ResTable_Package()

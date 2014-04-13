@@ -89,7 +89,7 @@ trait StagingTestFramework extends TestFramework {
 			  AndroidReachingFactsAnalysisConfig.k_context = 1
 		    AndroidReachingFactsAnalysisConfig.resolve_icc = true
 		    AndroidReachingFactsAnalysisConfig.resolve_static_init = true
-		    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(30))
+		    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(60))
 		    
 		    val fileName = title.substring(title.lastIndexOf("/"), title.lastIndexOf("."))
   	    val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
@@ -132,16 +132,14 @@ trait StagingTestFramework extends TestFramework {
     	  case e : Exception =>
     	    e.printStackTrace()
     	} finally {
+    	  Center.reset
+	    	AppCenter.reset
+	    	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
+	    	JawaCodeSource.clearAppRecordsCodes
+	    	System.gc()
+			  System.gc()
+	    	msg_critical(TITLE, "************************************\n")
     	}
-	    	
-    	
-    	Center.reset
-    	AppCenter.reset
-    	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
-    	JawaCodeSource.clearAppRecordsCodes
-    	System.gc()
-		  System.gc()
-    	msg_critical(TITLE, "************************************\n")
     }
   }
 
