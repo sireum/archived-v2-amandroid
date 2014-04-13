@@ -31,6 +31,7 @@ import org.sireum.jawa.alir.interProcedural.Callee
 import org.sireum.jawa.alir.interProcedural.taintAnalysis.SourceAndSinkManager
 
 object SourceAndSinkCategory {
+  final val STMT_SOURCE = "stmt_source"
   final val API_SOURCE = "api_source"
   final val API_SINK = "api_sink"
   final val ICC_SOURCE = "icc_source"
@@ -84,6 +85,8 @@ abstract class BasicSourceAndSinkManager(appPackageName : String,
 	  if(isUISource(calleeProcedure, callerProcedure, callerLoc)) return true
 	  false
 	}
+	
+	def isSource(loc : LocationDecl) : Boolean = false
 	
 	def addSource(source : String, category : String) = {
 	  this.sources += (source -> category)

@@ -85,6 +85,9 @@ object AndroidDataDependentTaintAnalysis {
 		                    } else if(srcTyp == SourceAndSinkCategory.ICC_SOURCE) {
 		                      if(sinTyp == SourceAndSinkCategory.API_SINK) tp.typs += AndroidProblemCategories.VUL_CAPABILITY_LEAK
 		                      else if(sinTyp == SourceAndSinkCategory.ICC_SINK) tp.typs += AndroidProblemCategories.VUL_CONFUSED_DEPUTY
+		                    } else if(srcTyp == SourceAndSinkCategory.STMT_SOURCE){
+		                      if(sinTyp == SourceAndSinkCategory.API_SINK) tp.typs += AndroidProblemCategories.VUL_CAPABILITY_LEAK
+		                      else if(sinTyp == SourceAndSinkCategory.ICC_SINK) tp.typs += AndroidProblemCategories.VUL_CONFUSED_DEPUTY
 		                    }
 		                }
 		            }
@@ -124,6 +127,7 @@ object AndroidDataDependentTaintAnalysis {
     val tar = Tar(iddi)
     tar.sourceNodes = sourceNodes
     tar.sinkNodes = sinkNodes
+    
     if(!tar.getTaintedPaths.isEmpty){
       err_msg_critical(TITLE, "Found " + tar.getTaintedPaths.size + " path.")
     	err_msg_critical(TITLE, tar.toString)
@@ -133,7 +137,7 @@ object AndroidDataDependentTaintAnalysis {
   
   def getSourceAndSinkNode(node : IDDGNode, rfaFacts : ISet[RFAFact], ssm : BasicSourceAndSinkManager, iddg: InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node]) = {
     var sources = isetEmpty[TaintNode]
-		var sinks = isetEmpty[TaintNode]
+	var sinks = isetEmpty[TaintNode]
     node match{
       case invNode : IDDGInvokeNode =>
         val calleeSet = invNode.getCalleeSet
@@ -194,8 +198,18 @@ object AndroidDataDependentTaintAnalysis {
           msg_normal(TITLE, "found callback source: " + entNode)
           val tn = Tn(entNode)
           tn.isSrc = true
-		      tn.descriptors += Td(entNode.getOwner, SourceAndSinkCategory.CALLBACK_SOURCE)
-		      sources += tn
+	      tn.descriptors += Td(entNode.getOwner, SourceAndSinkCategory.CALLBACK_SOURCE)
+	      sources += tn
+        }
+      case normalNode : IDDGNormalNode =>
+        val owner = Center.getProcedureWithoutFailing(normalNode.getOwner)
+        val loc = owner.getProcedureBody.location(normalNode.getLocIndex)
+        if(ssm.isSource(loc)){
+          msg_normal(TITLE, "found simple statement source: " + normalNode)
+          val tn = Tn(normalNode)
+          tn.isSrc = true
+          tn.descriptors += Td(normalNode.getOwner, SourceAndSinkCategory.STMT_SOURCE)
+          sources += tn
         }
       case _ =>
     }

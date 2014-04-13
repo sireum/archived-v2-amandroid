@@ -71,12 +71,10 @@ class CryptoMisuseTestFramework extends TestFramework {
 	    	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
 	    	
 	    	try{
-	    	  if(
-	    	  !JawaCodeSource.getAppRecordsCodes.exists{
+	    	  if(!JawaCodeSource.getAppRecordsCodes.exists{
 	    	    case (sig, code) =>
 	    	      CryptographicConstants.getCryptoAPIs.exists(p => code.contains(p))
-	    	  }
-	    	  ) throw new IgnoreException
+	    	  }) throw new IgnoreException
 	    	  
 		    	val pre = new InterestingApiCollector(srcRes)
 				  pre.collectInfo
