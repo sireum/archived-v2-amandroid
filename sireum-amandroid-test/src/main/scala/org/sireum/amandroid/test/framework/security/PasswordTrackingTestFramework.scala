@@ -110,7 +110,7 @@ trait PasswordTrackingTestFramework extends TestFramework {
     	if(pilarFile.length() <= (100 * 1024 * 1024)){
     		AndroidRFAConfig.setupCenter
 	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
-	    	JawaCodeSource.load(pilarFileUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
+	    	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
 	    	PasswordCounter.addRecs(JawaCodeSource.getAppRecordsCodes.keys)
 	    	try{
 		    	val pre = new SensitiveViewCollector(srcRes)
