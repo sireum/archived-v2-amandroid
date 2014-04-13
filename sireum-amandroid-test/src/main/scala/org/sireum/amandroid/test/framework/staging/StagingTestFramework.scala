@@ -37,6 +37,7 @@ import java.util.zip.GZIPInputStream
 import org.sireum.jawa.alir.interProcedural.controlFlowGraph.InterproceduralControlFlowGraph
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.amandroid.alir.dataRecorder.AmandroidResult
+import org.sireum.jawa.GlobalConfig
 
 object StagingCounter {
   var total = 0
@@ -73,12 +74,12 @@ trait StagingTestFramework extends TestFramework {
     	val dexFile = APKFileResolver.getDexFile(srcRes, FileUtil.toUri(srcFile.getParentFile()))
     	
     	// convert the dex file to the "pilar" form
-    	val pilarFileUri = Dex2PilarConverter.convert(dexFile)
-    	val pilarFile = new File(new URI(pilarFileUri))
+    	val pilarRootUri = Dex2PilarConverter.convert(dexFile)
+    	val pilarFile = new File(new URI(pilarRootUri))
     	
   		AndroidRFAConfig.setupCenter
     	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
-    	JawaCodeSource.load(pilarFileUri, AndroidLibraryAPISummary)
+    	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
     	try{
 	    	val pre = new AppInfoCollector(srcRes)
 			  pre.collectInfo

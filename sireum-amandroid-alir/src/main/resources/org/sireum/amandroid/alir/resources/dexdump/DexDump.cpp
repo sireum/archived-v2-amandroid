@@ -76,7 +76,6 @@ char* currentFile; // this will hold the current class name; // sankar adds
 FILE* pFp; // a file pointer; at any point, it corresponds to the current "class" of dex;
 FILE* topFp; // represents a special file named top.txt in the root directory; In addition to other info, this can hold some error information, if any.
 
-
 /* command-line options */
 struct Options {
     bool checksumOnly;
@@ -1366,7 +1365,7 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
 
 		      // extra check ends
 
-              fprintf(pFp, "v%d:=`[", temp->vA);
+              fprintf(pFp, "v%d:= new `byte`[", temp->vA);
               const u1* bytePtr = (const u1*) &insns[insnIdx+1];
               int length=(bytePtr[0] & 0xFF) | ((bytePtr[1] & 0xFF) << 8);
               switch (length){
@@ -1391,7 +1390,7 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
                  for (i = 4; i < insnWidth; i+=4) {
                    const u1* bytePtr = (const u1*) &insns[insnIdx+i];
                    if(i>=insnWidth-4)
-                   fprintf(pFp, "%lldL "  ,(bytePtr[0]   & 0xFFL) |
+                   fprintf(pFp, "%lldL"  ,(bytePtr[0]   & 0xFFL) |
                                    ((bytePtr[1] & 0xFFL) << 8) |
                                    ((bytePtr[2] & 0xFFL) << 16) |
                                    ((bytePtr[3]  & 0xFFL) << 24) |
@@ -1411,11 +1410,11 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
                  }
                  break;
                  default:
-                   fprintf(pFp, "fill-array-data length error");
+                   //fprintf(pFp, "");
                    break;
               }
               fprintf(pFp, "];\n");
-              fprintf(pFp, "               goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(temp->insnIdx+3)*2);
+              fprintf(pFp, "#L%06x.   goto L%06x;", ((u1*)insns - pDexFile->baseAddr) + insnIdx*2 + 1, ((u1*)insns - pDexFile->baseAddr) +(temp->insnIdx+3)*2);
               ++l31t;
            // ************* sankar ends ***********
 
@@ -1927,7 +1926,7 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
 
 
              case 0x22:
-              outNewIns(pDecInsn->vA, indexBuf); // printf("v%d:=new [|%s|];",pDecInsn->vA, indexBuf);
+              outNewIns(pDecInsn->vA, indexBuf); // printf("v%d:=new %s;",pDecInsn->vA, indexBuf);
               break;
 
           //sget
@@ -2758,7 +2757,7 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
                       }
                   printf("];");
                  } */
-         
+
 		       outFilledNewArrRange(indexBuf, pDecInsn->vA, pDecInsn->vC); // this is a multi-line macro ****** double check for error
                break;
     
@@ -3176,7 +3175,7 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 					  char regNamebuff[20];
 					  sprintf(regNamebuff, " v%d", startReg);
 					  strcat(paraThis, regNamebuff);
-					  strcat(paraThis, " @type (this)");
+					  strcat(paraThis, " @type `this`");
 					  thisFlag = 1;
                      }
                   // now print other params 
@@ -3272,7 +3271,7 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 			 strcat(paraTotal, paraThis);
 			 strcat(paraTotal, para);
 
-              fprintf(pFp, "    procedure %s `%s.%s` (%s) @owner %s @signature `%s.%s:%s` @Access %s {\n",
+              fprintf(pFp, "    procedure %s `%s.%s` (%s) @owner %s @signature `%s.%s:%s` @Access `%s` {\n",
 			            toPilar(rtype), owner, name, paraTotal, toPilar(owner), backDescriptor, name, typeDescriptor, accessStr); // not in dexdump
              free(rtype);
              free(para);
@@ -3488,9 +3487,11 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
     char* accessStr = NULL;
 
     char* currentFile; // sankar adds
+    char* tmpFile; // fengguo adds
     char* currentClassName; // sankar adds
     char* classDesc; // sankar adds
     char* currentPath; // sankar adds
+    int fd;
     int i;
 
     pClassDef = dexGetClassDef(pDexFile, idx);
@@ -3579,7 +3580,6 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
      strcpy(currentPath, pilarRootDir);
      strcat(currentPath, "/");
      strcat(currentPath, currentDir);
-
      currentClassName = className(classDesc);
      mkdirp(currentPath); // creating the directory if it does not already exists
      currentFile = (char*)malloc(strlen(currentPath) + strlen(currentClassName) + strlen(PILAR_EXT) + 2); // double check for the length miscalculation here
@@ -3587,6 +3587,19 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
      strcat(currentFile, "/");
      strcat(currentFile, currentClassName);
      strcat(currentFile, PILAR_EXT);
+     while((fd = open(currentFile, O_CREAT | O_WRONLY | O_EXCL, S_IRUSR | S_IWUSR)) < 0){
+		 if(errno == EEXIST){
+			 close(fd);
+			 tmpFile = (char*)malloc(strlen(currentFile) + strlen(PILAR_EXT) + 1);
+			 strcpy(tmpFile, currentFile);
+			 strcat(tmpFile, PILAR_EXT);
+			 free(currentFile);
+			 currentFile = tmpFile;
+		 } else {
+			 break;
+		 }
+     }
+     close(fd);
      pFp = fopen(currentFile, "w"); // creating a file
      if (!pFp) {
 	   fprintf(stderr, " \n could not open the pilar file %s \n", currentFile);
@@ -4046,7 +4059,7 @@ bail:
  */
 void usage(void)
 {
-    fprintf(stderr, "Copyright (C) 2007 The Android Open Source Project\n\n");
+    fprintf(stderr, "Copyright (C) 2007 The Android Open Source Project\nSankar and Fengguo modified it!\n\n");
     fprintf(stderr,
         "%s: [-c] [-d] [-f] [-h] [-i] [-l layout] [-m] [-p] [-t tempfile] dexfile...\n",
         gProgName);

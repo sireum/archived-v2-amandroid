@@ -105,8 +105,8 @@ trait PasswordTrackingTestFramework extends TestFramework {
     	val dexFile = APKFileResolver.getDexFile(srcRes, FileUtil.toUri(srcFile.getParentFile()))
     	
     	// convert the dex file to the "pilar" form
-    	val pilarFileUri = Dex2PilarConverter.convert(dexFile)
-    	val pilarFile = new File(new URI(pilarFileUri))
+    	val pilarRootUri = Dex2PilarConverter.convert(dexFile)
+    	val pilarFile = new File(new URI(pilarRootUri))
     	if(pilarFile.length() <= (100 * 1024 * 1024)){
     		AndroidRFAConfig.setupCenter
 	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.

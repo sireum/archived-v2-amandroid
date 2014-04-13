@@ -31,6 +31,7 @@ import org.sireum.amandroid.alir.AppCenter
 import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.alir.LibSideEffectProvider
 import org.sireum.jawa.util.TimeOutException
+import org.sireum.jawa.GlobalConfig
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -105,7 +106,7 @@ object TanitAnalysis{
 	  val outputUri = FileUtil.toUri(outputPath)
     val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
 	  if(androidLibDir != null){
-			JawaCodeSource.preLoad(AndroidLibPilarFiles.pilarModelFiles(androidLibDir).toSet)	
+			JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
 			taintAnalyze(apkFileUris, sasFilePath, libSideEffectPath, outputUri, static, parallel, icc, k_context, timeout)
 	  } else {
 	    throw new RuntimeException("Does not have environment variable: " + AndroidGlobalConfig.ANDROID_LIB_DIR)
@@ -129,14 +130,14 @@ object TanitAnalysis{
 	    	AndroidGlobalConfig.initJawaAlirInfoProvider
 	      val apkFile = new File(new URI(apkFileUri))
 	      val dexFileUri = APKFileResolver.getDexFile(apkFileUri, outputUri)
-	      val pilarFileUri = Dex2PilarConverter.convert(dexFileUri)
+	      val pilarRootUri = Dex2PilarConverter.convert(dexFileUri)
 		 
-		  	val pilarFile = new File(new URI(pilarFileUri))
+		  	val pilarFile = new File(new URI(pilarRootUri))
 
 		  	if(pilarFile.length() <= (50 * 1024 * 1024)){
 		  		AndroidRFAConfig.setupCenter
 		    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
-		    	JawaCodeSource.load(pilarFileUri, AndroidLibraryAPISummary)
+		    	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
 		    	try{
 			    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
 			    	JawaCodeSource.getAppRecordsCodes.keys foreach{
