@@ -12,6 +12,8 @@ import org.sireum.jawa.alir.interProcedural.sideEffectAnalysis.InterProceduralSi
 import org.scalatest.junit.JUnitRunner
 import org.sireum.amandroid.test.framework.security.PasswordTrackingTestFramework
 import org.sireum.jawa.alir.LibSideEffectProvider
+import org.sireum.util.FileUtil
+import org.sireum.jawa.GlobalConfig
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -21,15 +23,15 @@ class CompleteRFATest extends PasswordTrackingTestFramework {
   var i = 0
   val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
   if(androidLibDir != null){
-		JawaCodeSource.preLoad(AndroidLibPilarFiles.pilarModelFiles(androidLibDir).toSet)
+		JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
 		
-		LibSideEffectProvider.init
+//		LibSideEffectProvider.init
 		
-//	  InterproceduralExamples.testAPKFiles.
-//	  filter { s => s.endsWith("PasswordPassTest.apk") }.
-//	  foreach { resfile =>
-//	    Analyzing title resfile file (resfile, interPSEA)
-//	  }
+	  InterproceduralExamples.testAPKFiles.
+	  filter { s => s.endsWith("PrivateDataLeak2.apk") }. // PasswordPassTest.apk
+	  foreach { resfile =>
+	    Analyzing title resfile file resfile
+	  }
 //	  InterproceduralExamples.popularAPKFiles.
 ////	  filter { s => s.contains("la.droid.qr.apk") }.
 //	  foreach { resfile =>
@@ -45,10 +47,10 @@ class CompleteRFATest extends PasswordTrackingTestFramework {
 ////	    i+=1
 //	  }
 //	  InterproceduralExamples.randomAPKFiles.
-////	  filter { s => s.endsWith("enterprise.dmagent.apk") }.
+//	  //filter { s => s.endsWith("enterprise.dmagent.apk") }.
 //	  foreach { resfile =>
-////	    if(i < 89) i += 1
-//	    //if(resfile.endsWith("app.kazoebito.com.apk"))
+//	   // if(i < 89) i += 1
+//	   // if(resfile.endsWith("app.kazoebito.com.apk"))
 //	    Analyzing title resfile file resfile
 //	  }
 //	  InterproceduralExamples.normalAPKFiles.
@@ -70,11 +72,11 @@ class CompleteRFATest extends PasswordTrackingTestFramework {
 //	    Analyzing title resfile file resfile
 ////	    i+=1
 //	  }
-	  InterproceduralExamples.benchAPKFiles.
-	  filter { s => s.endsWith("PrivateDataLeak2.apk") }.
-	  foreach { fileUri =>
-	    Analyzing title fileUri file fileUri
-	  }
+//	  InterproceduralExamples.benchAPKFiles.
+//	  filter { s => s.endsWith("PrivateDataLeak2.apk") }.
+//	  foreach { fileUri =>
+//	    Analyzing title fileUri file fileUri
+//	  }
   } else {
     System.err.println("Does not have env var: " + AndroidGlobalConfig.ANDROID_LIB_DIR)
   }

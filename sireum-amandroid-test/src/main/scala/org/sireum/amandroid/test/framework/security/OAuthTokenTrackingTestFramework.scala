@@ -23,21 +23,22 @@ import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.util.TimeOutException
 import org.sireum.jawa.util.Timer
-import org.sireum.amandroid.security.password.SensitiveViewCollector
-import org.sireum.amandroid.security.password.PasswordSourceAndSinkManager
 import org.sireum.jawa.GlobalConfig
+import org.sireum.amandroid.android.appInfo.AppInfoCollector
+import org.sireum.amandroid.security.oauth.OAuthSourceAndSinkManager
+import org.sireum.amandroid.security.oauth.OauthTokenContainerCollector
 
-object PasswordCounter {
+object OAuthTokenCounter {
   var total = 0
   var oversize = 0
   var haveresult = 0
-  var havePasswordView = 0
-  var foundPasswordContainer = 0
+  var haveOauthToken = 0
+  var foundOauthContainer = 0
   var taintPathFound = 0
-  var havePasswordViewList = Set[String]()
-  var foundPasswordContainerList = Set[String]()
+  var haveOauthTokenStatementList = Set[String]()
+  var foundOauthContainerList = Set[String]()
   var taintPathFoundList = Set[String]()
-  override def toString : String = "total: " + total + ", oversize: " + oversize + ", haveResult: " + haveresult + ", havePasswordView: " + havePasswordView + ", foundPasswordContainer: " + foundPasswordContainer + ", taintPathFound: " + taintPathFound
+  override def toString : String = "total: " + total + ", oversize: " + oversize + ", haveResult: " + haveresult + ", haveOauthToken: " + haveOauthToken + ", foundOauthContainer: " + foundOauthContainer + ", taintPathFound: " + taintPathFound
   
   val appRec = mmapEmpty[String, Int]
   def addRecs(names : Iterable[String]) = {
@@ -67,17 +68,17 @@ object PasswordCounter {
   	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
   	val out = new PrintWriter(appDataDirFile + "/interestingApps.txt")
     out.println("HavePasswordViewList:")
-    havePasswordViewList.foreach(out.println(_))
+    haveOauthTokenStatementList.foreach(out.println(_))
     out.println("\n\n\n\nfoundPasswordContainerList:")
-    foundPasswordContainerList.foreach(out.println(_))
+    foundOauthContainerList.foreach(out.println(_))
     out.println("\n\n\n\ntaintPathFoundList:")
     taintPathFoundList.foreach(out.println(_))
     out.close()
   }
 }
 
-trait PasswordTrackingTestFramework extends TestFramework {
-  private final val TITLE = "PasswordTrackingTestFramework"
+trait OAuthTokenTrackingTestFramework extends TestFramework {
+  private final val TITLE = "OAuthTokenTrackingTestFramework"
   def Analyzing : this.type = this
 
   def title(s : String) : this.type = {
@@ -97,8 +98,8 @@ trait PasswordTrackingTestFramework extends TestFramework {
 
     test(title) {
     	msg_critical(TITLE, "####" + title + "#####")
-    	PasswordCounter.total += 1
-    	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
+    	OAuthTokenCounter.total += 1
+    	// before starting the analysis of the current app, first init
     	AndroidGlobalConfig.initJawaAlirInfoProvider
     	
     	val srcFile = new File(new URI(srcRes))
@@ -111,24 +112,30 @@ trait PasswordTrackingTestFramework extends TestFramework {
     		AndroidRFAConfig.setupCenter
 	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
 	    	JawaCodeSource.load(pilarFileUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
-	    	PasswordCounter.addRecs(JawaCodeSource.getAppRecordsCodes.keys)
+	    	OAuthTokenCounter.addRecs(JawaCodeSource.getAppRecordsCodes.keys)
 	    	try{
-		    	val pre = new SensitiveViewCollector(srcRes)
+	    	  
+	    	  if(
+	    	    !(JawaCodeSource.getAppRecordsCodes.exists{
+	    	      case (sig, code) =>
+	    	        code.contains("access_token")
+	    	  })
+	    	  ) throw new IgnoreException
+	    	  
+		    	val pre = new OauthTokenContainerCollector(srcRes)
 				  pre.collectInfo
-				  if(pre.getLayoutControls.exists(p => p._2.isSensitive == true)){
-				    PasswordCounter.havePasswordView += 1
-				    PasswordCounter.havePasswordViewList += title
-				  }
-				  val ssm = new PasswordSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+				  
+				val ssm = new OAuthSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
 		    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
-		    	entryPoints = entryPoints.filter(e=>pre.getSensitiveLayoutContainers.contains(e.getDeclaringRecord))
+		    	val iacs = pre.getInterestingContainers(Set("access_token"))
+		    	entryPoints = entryPoints.filter(e=>iacs.contains(e.getDeclaringRecord))
 		    	if(!entryPoints.isEmpty){
-		    	  PasswordCounter.foundPasswordContainer += 1
-		    	  PasswordCounter.foundPasswordContainerList += title
+		    	  OAuthTokenCounter.foundOauthContainer += 1
+		    	  OAuthTokenCounter.foundOauthContainerList += title
 		    	}
-				  
-				  AndroidReachingFactsAnalysisConfig.k_context = 1
+				
+				AndroidReachingFactsAnalysisConfig.k_context = 1
 			    AndroidReachingFactsAnalysisConfig.resolve_icc = true
 			    AndroidReachingFactsAnalysisConfig.resolve_static_init = false
 			    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
@@ -151,8 +158,8 @@ trait PasswordTrackingTestFramework extends TestFramework {
     	    } 
 				  
 		    	if(AppCenter.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
-    	      PasswordCounter.taintPathFound += 1
-    	      PasswordCounter.taintPathFoundList += title
+    	      OAuthTokenCounter.taintPathFound += 1
+    	      OAuthTokenCounter.taintPathFoundList += title
     	    }
 		    	val appData = DataCollector.collect
 		    	MetricRepo.collect(appData)
@@ -167,7 +174,7 @@ trait PasswordTrackingTestFramework extends TestFramework {
 			    val mr = new PrintWriter(outputDir + "/MetricInfo.txt")
 				  mr.print(MetricRepo.toString)
 				  mr.close()
-				  PasswordCounter.haveresult += 1
+				  OAuthTokenCounter.haveresult += 1
 	    	} catch {
 	    	  case ie : IgnoreException =>
 	    	    err_msg_critical(TITLE, "Ignored!")
@@ -184,7 +191,7 @@ trait PasswordTrackingTestFramework extends TestFramework {
 	//    	    println("  case \"" + p.getSignature + "\" =>  //" + p.getAccessFlagString)
 	//    	}
     	} else {
-    	  PasswordCounter.oversize += 1
+    	  OAuthTokenCounter.oversize += 1
     	  err_msg_critical(TITLE, "Pilar file size is too large:" + pilarFile.length()/1024/1024 + "MB")
     	}
     	
@@ -193,10 +200,10 @@ trait PasswordTrackingTestFramework extends TestFramework {
     	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
     	JawaCodeSource.clearAppRecordsCodes
     	System.gc()
-		  System.gc()
-    	msg_critical(TITLE, PasswordCounter.toString)
-//    	PasswordCounter.outputInterestingFileNames
-//    	PasswordCounter.outputRecStatistic
+		System.gc()
+    	msg_critical(TITLE, OAuthTokenCounter.toString)
+//    	OAuthTokenCounter.outputInterestingFileNames
+//    	OAuthTokenCounter.outputRecStatistic
     	msg_critical(TITLE, "************************************\n")
     }
   }

@@ -30,7 +30,7 @@ import org.sireum.amandroid.android.parser.LayoutControl
  * Analyzes the classes in the APK file to find custom implementations of the
  * well-known Android callback and handler interfaces.
  * 
- * @author Sankardas Roy. Adapted Steven Arzt 's equivalent code
+ * @author Sankardas Roy. Adapted Steven Arzt (FlowDroid) 's equivalent code
  *
  */
 class ReachableInfoCollector(entryPointClasses:Set[String]) {
@@ -95,11 +95,21 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	
 	def getSensitiveAPIContainer(apiSig : String) : Set[JawaRecord] = {
 	  val result : MSet[JawaRecord] = msetEmpty
-    reachableMap.foreach{
-      case (r, ps) =>
-        if(ps.exists(p => p.retrieveCode.getOrElse("").contains(apiSig)))
-          result += r
-    }
+	    reachableMap.foreach{
+	      case (r, ps) =>
+	        if(ps.exists(p => p.retrieveCode.getOrElse("").contains(apiSig)))
+	          result += r
+	    }
+	  result.toSet
+	}
+	
+	def getInterestingStringContainer(str : String) : Set[JawaRecord] = {
+	  val result : MSet[JawaRecord] = msetEmpty
+	    reachableMap.foreach{
+	      case (r, ps) =>
+	        if(ps.exists(p => p.retrieveCode.getOrElse("").contains(str)))
+	          result += r
+	    }
 	  result.toSet
 	}
 	
@@ -193,7 +203,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 		// Check for callback handlers implemented via interfaces
 		analyzeClassInterfaceCallbacks(clazz, clazz, lifecycleElement)
 		// Check for method overrides
-		analyzeMethodOverrideCallbacks(clazz)
+		analyzeMethodOverrideCallbacks(clazz, lifecycleElement)
 	}
 	
 	/**
@@ -207,7 +217,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 		Plain = Value
 	}
 	
-	private def analyzeMethodOverrideCallbacks(record : JawaRecord):Unit = {
+	private def analyzeMethodOverrideCallbacks(record : JawaRecord, lifecycleElement : JawaRecord):Unit = {
 		if (!record.isConcrete)
 			return;
 		
@@ -258,8 +268,8 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 							if (classType == ClassType.ContentProvider
 									&& AndroidEntryPointConstants.getContentproviderLifecycleMethods().contains(procedure.getSubSignature))
 								    lifecycleFlag = true
-							if(!lifecycleFlag){	    
-							  checkAndAddMethod(Set(procedure), record) // This is a real callback method
+							if(!lifecycleFlag){
+							  checkAndAddMethod(Set(procedure), lifecycleElement) // This is a real callback method
 							}
 						}
 				  }
@@ -1085,11 +1095,31 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 				if (i.declaresProcedureByShortName("onGetSuggestions"))
 					checkAndAddMethod(getProceduresFromHierarchyByShortName(baseClass, "onGetSuggestions"), lifecycleElement);
 			}
-			// android.webkit
+			// android.webkit.DownloadListener
 			else if (i.getName.equals(pilarify("android.webkit.DownloadListener"))) {
 				if (i.declaresProcedureByShortName("onDownloadStart"))
 					checkAndAddMethod(getProceduresFromHierarchyByShortName(baseClass, "onDownloadStart"), lifecycleElement);
 			}
+			// android.webkit.WebViewClient
+			else if (i.getName.equals(pilarify("android.webkit.WebViewClient"))) {
+				if (i.declaresProcedureByShortName("onPageFinished"))
+					checkAndAddMethod(getProceduresFromHierarchyByShortName(baseClass, "onPageFinished"), lifecycleElement);
+				if (i.declaresProcedureByShortName("onPageStarted"))
+					checkAndAddMethod(getProceduresFromHierarchyByShortName(baseClass, "onPageStarted"), lifecycleElement);
+				if (i.declaresProcedureByShortName("onLoadResource"))
+					checkAndAddMethod(getProceduresFromHierarchyByShortName(baseClass, "onLoadResource"), lifecycleElement);
+				if (i.declaresProcedureByShortName("onReceivedError"))
+					checkAndAddMethod(getProceduresFromHierarchyByShortName(baseClass, "onReceivedError"), lifecycleElement);
+				if (i.declaresProcedureByShortName("onReceivedHttpAuthRequest"))
+					checkAndAddMethod(getProceduresFromHierarchyByShortName(baseClass, "onReceivedHttpAuthRequest"), lifecycleElement);
+				if (i.declaresProcedureByShortName("onReceivedLoginRequest"))
+					checkAndAddMethod(getProceduresFromHierarchyByShortName(baseClass, "onReceivedLoginRequest"), lifecycleElement);
+				if (i.declaresProcedureByShortName("shouldOverrideKeyEvent"))
+					checkAndAddMethod(getProceduresFromHierarchyByShortName(baseClass, "shouldOverrideKeyEvent"), lifecycleElement);
+				if (i.declaresProcedureByShortName("shouldOverrideUrlLoading"))
+					checkAndAddMethod(getProceduresFromHierarchyByShortName(baseClass, "shouldOverrideUrlLoading"), lifecycleElement);
+			}
+			
 			// android.widget
 			else if (i.getName.equals(pilarify("android.widget.AbsListView$MultiChoiceModeListener"))) {
 				if (i.declaresProcedureByShortName("onItemCheckedStateChanged"))

@@ -57,7 +57,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
     val iota : ISet[RFAFact] = initialFacts + RFAFact(VarSlot("@@RFAiota"), NullInstance(initContext))
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](cg,
       true, true, false, AndroidReachingFactsAnalysisConfig.parallel, gen, kill, callr, iota, initial, switchAsOrderedMatch, Some(nl))
-    val mr = new PrintWriter("/Volumes/hd/fgwei/Desktop/IRFA.txt")
+    val mr = new PrintWriter("/Users/sankar/Desktop/IRFA.txt")
 	  mr.print(result)
 	  mr.close()
     (cg, result)

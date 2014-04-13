@@ -1,29 +1,32 @@
-package org.sireum.amandroid.security.apiMisuse
+package org.sireum.amandroid.security.oauth
 
+import org.sireum.jawa.JawaRecord
 import org.sireum.amandroid.android.appInfo.AppInfoCollector
 import org.sireum.util._
-import org.sireum.amandroid.android.appInfo.ReachableInfoCollector
-import org.sireum.jawa.JawaRecord
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.Center
+import org.sireum.jawa.MessageCenter._
 import org.sireum.amandroid.alir.AndroidConstants
 import org.sireum.amandroid.alir.AppCenter
-import org.sireum.jawa.MessageCenter._
+import org.sireum.amandroid.android.appInfo.ReachableInfoCollector
 
-class InterestingApiCollector (apkUri : FileResourceUri) extends AppInfoCollector(apkUri) {
-  private final val TITLE = "InterestingApiCollector"
-  var ra : ReachableInfoCollector = null
+class OauthTokenContainerCollector(apkUri : FileResourceUri) extends AppInfoCollector(apkUri) {
   
-  def getInterestingContainers(interestingAPIs : Set[String]) : Set[JawaRecord] = {
+  private final val TITLE = "OauthTokenContainerCollector"
+  
+	var ra : ReachableInfoCollector = null
+	
+	def getInterestingContainers(strs : Set[String]) : Set[JawaRecord] = {
 	  val interestingContainers : MSet[JawaRecord] = msetEmpty
-    interestingAPIs.foreach{
-		  api =>
-		    interestingContainers ++= this.ra.getSensitiveAPIContainer(api)
-		}
-		if(interestingContainers.isEmpty) throw new IgnoreException
-    interestingContainers.toSet
-  }
-  
+	    strs.foreach{
+			  str =>
+			    interestingContainers ++= this.ra.getInterestingStringContainer(str)
+			}
+			if(interestingContainers.isEmpty) throw new IgnoreException
+	    interestingContainers.toSet
+	  }
+	
+	
 	override def collectInfo : Unit = {
 	  val mfp = AppInfoCollector.analyzeManifest(apkUri)
 	  this.appPackageName = mfp.getPackageName
@@ -34,6 +37,7 @@ class InterestingApiCollector (apkUri : FileResourceUri) extends AppInfoCollecto
 	  val afp = AppInfoCollector.analyzeARSC(apkUri)
 		val lfp = AppInfoCollector.analyzeLayouts(apkUri, mfp)
 		this.layoutControls = lfp.getUserControls
+		
 		this.ra = AppInfoCollector.reachabilityAnalysis(mfp)
 		val callbacks = AppInfoCollector.analyzeCallback(afp, lfp, ra)
 		this.callbackMethods = callbacks
@@ -53,5 +57,4 @@ class InterestingApiCollector (apkUri : FileResourceUri) extends AppInfoCollecto
 		AppCenter.setAppInfo(this)
 		msg_normal(TITLE, "Entry point calculation done.")
 	}
-	
 }
