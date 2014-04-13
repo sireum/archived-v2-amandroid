@@ -125,7 +125,7 @@ trait OAuthTokenTrackingTestFramework extends TestFramework {
 		    	val pre = new OauthTokenContainerCollector(srcRes)
 				  pre.collectInfo
 				  
-				val ssm = new OAuthSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+				val ssm = new OAuthSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, "/Volumes/hd/fgwei/Stash/Amandroid/taintAnalysis/sourceAndSinks/PasswordSourcesAndSinks.txt")
 		    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
 		    	val iacs = pre.getInterestingContainers(Set("access_token"))
@@ -138,7 +138,7 @@ trait OAuthTokenTrackingTestFramework extends TestFramework {
 				AndroidReachingFactsAnalysisConfig.k_context = 1
 			    AndroidReachingFactsAnalysisConfig.resolve_icc = true
 			    AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-			    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
+			    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(10))
 		    	entryPoints.par.foreach{
 		    	  ep =>
 		    	    try{

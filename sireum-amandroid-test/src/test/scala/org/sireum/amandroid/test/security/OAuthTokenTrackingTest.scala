@@ -27,13 +27,13 @@ class OAuthTokenTrackingTest extends OAuthTokenTrackingTestFramework {
   if(androidLibDir != null){
 		JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
 		
-//		LibSideEffectProvider.init
+		LibSideEffectProvider.init
 		
-	  InterproceduralExamples.testAPKFiles.
-	  //filter { s => s.endsWith("com.zoosk.zoosk.apk") }. // LocationFlow2.apk
-	  foreach { resfile =>
-	    Analyzing title resfile file resfile
-	  }
+//	  InterproceduralExamples.testAPKFiles.
+//	  //filter { s => s.endsWith("com.zoosk.zoosk.apk") }. // LocationFlow2.apk
+//	  foreach { resfile =>
+//	    Analyzing title resfile file resfile
+//	  }
 //	  InterproceduralExamples.popularAPKFiles.
 ////	  filter { s => s.contains("la.droid.qr.apk") }.
 //	  foreach { resfile =>
@@ -48,13 +48,13 @@ class OAuthTokenTrackingTest extends OAuthTokenTrackingTestFramework {
 //	    Analyzing title resfile file resfile
 ////	    i+=1
 //	  }
-//	  InterproceduralExamples.randomAPKFiles.
-//	  //filter { s => s.endsWith("enterprise.dmagent.apk") }.
-//	  foreach { resfile =>
-//	   // if(i < 89) i += 1
-//	   // if(resfile.endsWith("app.kazoebito.com.apk"))
-//	    Analyzing title resfile file resfile
-//	  }
+	  InterproceduralExamples.randomAPKFiles.
+	  //filter { s => s.endsWith("enterprise.dmagent.apk") }.
+	  foreach { resfile =>
+	   // if(i < 89) i += 1
+	   // if(resfile.endsWith("app.kazoebito.com.apk"))
+	    Analyzing title resfile file resfile
+	  }
 //	  InterproceduralExamples.normalAPKFiles.
 //	//  filter { s => s.name.endsWith("android-1.apk") }.
 //	  foreach { resRet =>

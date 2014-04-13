@@ -14,8 +14,7 @@ object AndroidGlobalConfig {
 	  
 	final val SIREUM_HOME = "SIREUM_HOME"
 	final val DEX2PILAR_DIR = "ANDROID_DEX2PILAR_DIR"
-	  
-	final var SourceAndSinkFilePath = "/Users/sankar/Stash/Amandroid/TaintSourcesAndSinks.txt"
+	
 	  
   var dr : SymbolTable => DefRef = { st => new AmandroidDefRef(st, new AmandroidVarAccesses(st)) }
   

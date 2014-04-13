@@ -25,11 +25,13 @@ class OAuthSourceAndSinkManager(appPackageName : String,
     												sasFilePath : String) extends BasicSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
   private final val TITLE = "OAuthSourceAndSinkManager"
     
-    def isCallbackSource(proc : JawaProcedure) : Boolean = {
-      false
-    }
+  override def isSource(calleeProcedure : JawaProcedure, callerProcedure : JawaProcedure, callerLoc : JumpLocation) = false
+    
+  override def isCallbackSource(proc : JawaProcedure) : Boolean = {
+    false
+  }
   
-	def isUISource(calleeProcedure : JawaProcedure, callerProcedure : JawaProcedure, callerLoc : JumpLocation) : Boolean = {
+	override def isUISource(calleeProcedure : JawaProcedure, callerProcedure : JawaProcedure, callerLoc : JumpLocation) : Boolean = {
 	  false
 	}
 	
