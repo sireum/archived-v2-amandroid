@@ -125,7 +125,7 @@ trait OAuthTokenTrackingTestFramework extends TestFramework {
 		    	val pre = new OauthTokenContainerCollector(srcRes)
 				  pre.collectInfo
 				  
-				val ssm = new OAuthSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, "/Volumes/hd/fgwei/Stash/Amandroid/taintAnalysis/sourceAndSinks/PasswordSourcesAndSinks.txt")
+				val ssm = new OAuthSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
 		    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
 		    	val iacs = pre.getInterestingContainers(Set("access_token"))

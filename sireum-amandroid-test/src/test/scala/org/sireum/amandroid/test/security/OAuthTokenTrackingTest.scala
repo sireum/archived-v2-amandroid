@@ -49,7 +49,7 @@ class OAuthTokenTrackingTest extends OAuthTokenTrackingTestFramework {
 ////	    i+=1
 //	  }
 	  InterproceduralExamples.randomAPKFiles.
-	  //filter { s => s.endsWith("enterprise.dmagent.apk") }.
+//	  filter { s => s.endsWith("com.citygatechurch.apk") }.
 	  foreach { resfile =>
 	   // if(i < 89) i += 1
 	   // if(resfile.endsWith("app.kazoebito.com.apk"))
