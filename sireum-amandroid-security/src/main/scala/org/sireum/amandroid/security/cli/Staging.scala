@@ -124,9 +124,10 @@ object Staging {
     AndroidReachingFactsAnalysisConfig.parallel = parallel
     AndroidReachingFactsAnalysisConfig.resolve_icc = icc
     AndroidReachingFactsAnalysisConfig.resolve_static_init = static
-    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(timeout))
+    
 	  apkFileUris.foreach{
 	    apkFileUri =>
+	      try {
 	      println("Analyzing " + apkFileUri)
 	      // before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
 	    	AndroidGlobalConfig.initJawaAlirInfoProvider
@@ -159,6 +160,7 @@ object Staging {
 			    	  ep =>
 			    	    try{
 				    	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
+				    	    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(timeout))
 				    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
 				    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
 				    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
@@ -185,12 +187,19 @@ object Staging {
 		  	} else {
 	    	  println("Pilar file size is too large:" + pilarFile.length()/1024/1024 + "MB")
 	    	}
-	      Center.reset
-	    	AppCenter.reset
-	    	JawaCodeSource.clearAppRecordsCodes
-		  	System.gc()
-			  System.gc()
 			  println("Done!")
+	      } catch {
+	        case re : RuntimeException => 
+	    	    println("Exception happened! Contact fgwei@ksu.edu.")
+	    	  case e : Exception =>
+	    	    println("Exception happened! Contact fgwei@ksu.edu.")
+	    	} finally {
+	    	  Center.reset
+		    	AppCenter.reset
+		    	JawaCodeSource.clearAppRecordsCodes
+			  	System.gc()
+				  System.gc()
+	    	}
 	  }
 	  
 	}
