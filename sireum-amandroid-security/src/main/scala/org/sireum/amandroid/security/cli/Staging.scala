@@ -55,7 +55,12 @@ object StagingCli {
     val k_context = saamode.analysis.k_context
     val timeout = saamode.analysis.timeout
     val mem = saamode.general.mem
-    val msgLevel = saamode.general.msgLevel
+    val msgLevel = saamode.general.msgLevel match{
+      case MessageLevel.NO => "NO"
+      case MessageLevel.CRITICAL => "CRITICAL"
+      case MessageLevel.NORMAL => "NORMAL"
+      case MessageLevel.VERBOSE => "VERBOSE"
+    }
     val libSideEffectPath = saamode.analysis.sideeffectPath
     forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, outputDir, mem, msgLevel, libSideEffectPath)
     println("Generated analysis results are saved in: " + outputDir)
@@ -65,7 +70,7 @@ object StagingCli {
 	    						noicc : Boolean, k_context : Int, 
 	    						timeout : Int, typSpec : String, 
 	    						sourceDir : String, outputDir : String, 
-	    						mem : Int, msgLevel : MessageLevel.Type, 
+	    						mem : Int, msgLevel : String, 
 	    						libSideEffectPath : String) = {
 	  val args : MList[String] = mlistEmpty
 	  args += "-s"
@@ -79,7 +84,7 @@ object StagingCli {
 	  args += "-to"
 	  args += timeout.toString
 	  args += "-msg"
-	  args += msgLevel.toString
+	  args += msgLevel
 	  args ++= List("-t", typSpec, "-ls", libSideEffectPath, sourceDir, outputDir)
     org.sireum.jawa.util.JVMUtil.startSecondJVM(Staging.getClass(), "-Xmx" + mem + "G", args.toList, true)
   }
@@ -120,6 +125,9 @@ object Staging {
 	    case "CRITICAL" => MessageCenter.msglevel = MSG_LEVEL.CRITICAL
 	    case "NORMAL" => MessageCenter.msglevel = MSG_LEVEL.NORMAL
 	    case "VERBOSE" => MessageCenter.msglevel = MSG_LEVEL.VERBOSE
+	    case _ => 
+        println("Unexpected msg level: " + msgLevel)
+        return
 	  }
 	  val outputUri = FileUtil.toUri(outputPath)
     val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
