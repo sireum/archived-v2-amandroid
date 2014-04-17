@@ -36,6 +36,7 @@ import java.util.zip.GZIPOutputStream
 import java.io.BufferedOutputStream
 import org.sireum.jawa.xml.AndroidXStream
 import org.sireum.amandroid.alir.dataRecorder.AmandroidResult
+import org.sireum.option.MessageLevel
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -54,12 +55,18 @@ object StagingCli {
     val k_context = saamode.analysis.k_context
     val timeout = saamode.analysis.timeout
     val mem = saamode.general.mem
+    val msgLevel = saamode.general.msgLevel
     val libSideEffectPath = saamode.analysis.sideeffectPath
-    forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, outputDir, mem, libSideEffectPath)
+    forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, outputDir, mem, msgLevel, libSideEffectPath)
     println("Generated analysis results are saved in: " + outputDir)
   }
 	
-	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : String, sourceDir : String, outputDir : String, mem : Int, libSideEffectPath : String) = {
+	def forkProcess(nostatic : Boolean, parallel : Boolean, 
+	    						noicc : Boolean, k_context : Int, 
+	    						timeout : Int, typSpec : String, 
+	    						sourceDir : String, outputDir : String, 
+	    						mem : Int, msgLevel : MessageLevel.Type, 
+	    						libSideEffectPath : String) = {
 	  val args : MList[String] = mlistEmpty
 	  args += "-s"
 	  args += (!nostatic).toString
@@ -71,6 +78,8 @@ object StagingCli {
 	  args += k_context.toString
 	  args += "-to"
 	  args += timeout.toString
+	  args += "-msg"
+	  args += msgLevel.toString
 	  args ++= List("-t", typSpec, "-ls", libSideEffectPath, sourceDir, outputDir)
     org.sireum.jawa.util.JVMUtil.startSecondJVM(Staging.getClass(), "-Xmx" + mem + "G", args.toList, true)
   }
@@ -81,20 +90,20 @@ object Staging {
   private final val TITLE = "Staging"
   
 	def main(args: Array[String]) {
-	  if(args.size != 16){
-	    println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -t type[allows: APK, DIR] -ls [Lib-SideEffect-Path] <source path> <output path>")
+	  if(args.size != 18){
+	    println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -t type[allows: APK, DIR] -ls [Lib-SideEffect-Path] <source path> <output path>")
 	    return
 	  }
-	  MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NO
 	  val static = args(1).toBoolean
 	  val parallel = args(3).toBoolean
 	  val icc = args(5).toBoolean
 	  val k_context = args(7).toInt
 	  val timeout = args(9).toInt
-	  val typ = args(11)
-	  val libSideEffectPath = args(13)
-	  val sourcePath = args(14)
-	  val outputPath = args(15)
+	  val msgLevel = args(11)
+	  val typ = args(13)
+	  val libSideEffectPath = args(15)
+	  val sourcePath = args(16)
+	  val outputPath = args(17)
 	  val apkFileUris = typ match{
       case "APK" =>
         require(sourcePath.endsWith(".apk"))
@@ -106,6 +115,12 @@ object Staging {
         println("Unexpected type: " + typ)
         return
     }
+	  msgLevel match{
+	    case "NO" => MessageCenter.msglevel = MSG_LEVEL.NO
+	    case "CRITICAL" => MessageCenter.msglevel = MSG_LEVEL.CRITICAL
+	    case "NORMAL" => MessageCenter.msglevel = MSG_LEVEL.NORMAL
+	    case "VERBOSE" => MessageCenter.msglevel = MSG_LEVEL.VERBOSE
+	  }
 	  val outputUri = FileUtil.toUri(outputPath)
     val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
 	  if(androidLibDir != null){

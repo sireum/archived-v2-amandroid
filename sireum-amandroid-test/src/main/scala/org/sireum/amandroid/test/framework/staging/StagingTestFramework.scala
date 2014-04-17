@@ -89,7 +89,7 @@ trait StagingTestFramework extends TestFramework {
 			  AndroidReachingFactsAnalysisConfig.k_context = 1
 		    AndroidReachingFactsAnalysisConfig.resolve_icc = true
 		    AndroidReachingFactsAnalysisConfig.resolve_static_init = true
-		    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(60))
+		    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(10))
 		    
 		    val fileName = title.substring(title.lastIndexOf("/"), title.lastIndexOf("."))
   	    val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)

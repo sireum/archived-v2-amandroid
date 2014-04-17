@@ -24,18 +24,18 @@ class StagingTest extends StagingTestFramework {
 		
 		LibSideEffectProvider.init
 		
-//	  InterproceduralExamples.testAPKFiles.
-////	  filter { s => s.endsWith("com.dropbox.android.apk") }.
-//	  foreach { resfile =>
-//	    Analyzing title resfile file resfile
-//	  }
-		
-		InterproceduralExamples.randomArborFiles.
-//	  filter { s => s.endsWith("com.dropbox.android.apk") }.
+	  InterproceduralExamples.testAPKFiles.
+	  filter { s => s.endsWith("14c03cd13616b0e5c34a5b864e1fac44.apk") }.
 	  foreach { resfile =>
 	    Analyzing title resfile file resfile
 	  }
 		
+//		InterproceduralExamples.randomArborFiles.
+////	  filter { s => s.endsWith("com.dropbox.android.apk") }.
+//	  foreach { resfile =>
+//	    Analyzing title resfile file resfile
+//	  }
+//		
 		
 //	  InterproceduralExamples.popularAPKFiles.
 ////	  filter { s => s.contains("la.droid.qr.apk") }.
