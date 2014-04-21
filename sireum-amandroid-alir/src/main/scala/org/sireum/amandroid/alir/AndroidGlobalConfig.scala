@@ -11,11 +11,15 @@ object AndroidGlobalConfig {
 	final val ANDROID_OUTPUT_DIR = "ANDROID_OUTPUT_DIR"
 	final val ANDROID_LIB_DIR = "ANDROID_LIB_DIR"
 	final val ANDROID_TEST_DIR = "ANDROID_TEST_DIR"
+	final val ANDROID_SS_PATH = "ANDROID_SS_PATH"
 	  
 	final val SIREUM_HOME = "SIREUM_HOME"
 	final val DEX2PILAR_DIR = "ANDROID_DEX2PILAR_DIR"
 	  
-	final var SourceAndSinkFilePath = "/Volumes/hd/fgwei/Stash/Amandroid/taintAnalysis/sourceAndSinks/PasswordSourcesAndSinks.txt"
+	final var SourceAndSinkFilePath = "/Volumes/hd/fgwei/Stash/Amandroid/taintAnalysis/sourceAndSinks/TaintSourcesAndSinks.txt"
+	final var PasswordSinkFilePath = "/Volumes/hd/fgwei/Stash/Amandroid/taintAnalysis/sourceAndSinks/PasswordSourcesAndSinks.txt"
+	final var IntentInjectionSinkFilePath = "/Volumes/hd/fgwei/Stash/Amandroid/taintAnalysis/sourceAndSinks/IntentInjectionSourcesAndSinks.txt"
+	  
 	  
   var dr : SymbolTable => DefRef = { st => new AmandroidDefRef(st, new AmandroidVarAccesses(st)) }
   

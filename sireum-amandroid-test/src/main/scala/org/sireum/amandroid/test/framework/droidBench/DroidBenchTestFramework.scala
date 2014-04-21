@@ -86,11 +86,11 @@ trait DroidBenchTestFramework extends TestFramework {
 	    	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
 	    	try{
 		    	val pre = new AppInfoCollector(srcRes)
-				pre.collectInfo
-				val ssm = new DefaultSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+					pre.collectInfo
+					val ssm = new DefaultSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
 		    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
-				AndroidReachingFactsAnalysisConfig.k_context = 1
+		    	AndroidReachingFactsAnalysisConfig.k_context = 1
 			    AndroidReachingFactsAnalysisConfig.resolve_icc = true
 			    AndroidReachingFactsAnalysisConfig.resolve_static_init = true
 			    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
@@ -118,7 +118,7 @@ trait DroidBenchTestFramework extends TestFramework {
 				    	} catch {
 		    	      case te : TimeOutException => System.err.println("Timeout!")
 		    	    }
-    	    } 
+    	    }
 				  
 		    	if(AppCenter.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
     	      DroidBenchCounter.taintPathFound += 1

@@ -125,7 +125,7 @@ trait OAuthTokenTrackingTestFramework extends TestFramework {
 		    	val pre = new OauthTokenContainerCollector(srcRes)
 				  pre.collectInfo
 				  
-				val ssm = new OAuthSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+				  val ssm = new OAuthSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
 		    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
 		    	val iacs = pre.getInterestingContainers(Set("access_token"))
@@ -135,7 +135,7 @@ trait OAuthTokenTrackingTestFramework extends TestFramework {
 		    	  OAuthTokenCounter.foundOauthContainerList += title
 		    	}
 				
-				AndroidReachingFactsAnalysisConfig.k_context = 1
+	    	  AndroidReachingFactsAnalysisConfig.k_context = 1
 			    AndroidReachingFactsAnalysisConfig.resolve_icc = true
 			    AndroidReachingFactsAnalysisConfig.resolve_static_init = false
 			    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(10))
@@ -200,7 +200,7 @@ trait OAuthTokenTrackingTestFramework extends TestFramework {
     	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
     	JawaCodeSource.clearAppRecordsCodes
     	System.gc()
-		System.gc()
+    	System.gc()
     	msg_critical(TITLE, OAuthTokenCounter.toString)
 //    	OAuthTokenCounter.outputInterestingFileNames
 //    	OAuthTokenCounter.outputRecStatistic

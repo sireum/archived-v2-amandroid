@@ -39,6 +39,8 @@ object InterproceduralExamples extends Examples{
   
   def testFiles = exampleFiles(sourceDirUri(androidTestDir + "/test/"), ANDROID_APK_FILE_EXT)
   
+  def arborSplitFiles = exampleFiles(sourceDirUri(androidTestDir + "/randomArborSplits/"), ANDROID_APK_FILE_EXT)
+  
   protected def getFileRets(path : String, ext : String) = {
     val fileNames = MyFileUtil.getResourceListing(this.getClass(), path, ext)
     fileNames.map(

@@ -196,6 +196,7 @@ object Staging {
 						      val zipw = new GZIPOutputStream(new BufferedOutputStream(w))
 							    AndroidXStream.toXml(AmandroidResult(InterProceduralDataFlowGraph(icfg, irfaResult), ddgResult), zipw)
 							    zipw.close()
+							    println(ep + " result stored!")
 			    	    } catch {
 			    	      case te : TimeOutException => System.err.println("Timeout!")
 			    	    }

@@ -14,6 +14,7 @@ import org.sireum.jawa.alir.interProcedural.dataDependenceAnalysis.Interprocedur
 import org.sireum.jawa.alir.interProcedural.taintAnalysis._
 import org.sireum.amandroid.android.security.AndroidProblemCategories
 import scala.tools.nsc.ConsoleWriter
+import org.sireum.jawa.util.StringFormConverter
 
 object AndroidDataDependentTaintAnalysis {
   final val TITLE = "AndroidDataDependentTaintAnalysis"
@@ -137,13 +138,17 @@ object AndroidDataDependentTaintAnalysis {
   
   def getSourceAndSinkNode(node : IDDGNode, rfaFacts : ISet[RFAFact], ssm : BasicSourceAndSinkManager, iddg: InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node]) = {
     var sources = isetEmpty[TaintNode]
-	var sinks = isetEmpty[TaintNode]
+    var sinks = isetEmpty[TaintNode]
     node match{
       case invNode : IDDGInvokeNode =>
         val calleeSet = invNode.getCalleeSet
 		    calleeSet.foreach{
 		      callee =>
-		        val calleep = Center.getProcedureWithoutFailing(callee.callee)
+		        val calleesig = callee.callee
+		        if(!Center.containsProcedure(calleesig)){
+		          Center.resolveRecord(StringFormConverter.getRecordNameFromProcedureSignature(calleesig), Center.ResolveLevel.HIERARCHY)
+		        }
+		        val calleep = Center.getProcedureWithoutFailing(calleesig)
 		        val callees : MSet[JawaProcedure] = msetEmpty
 				    val caller = Center.getProcedureWithoutFailing(invNode.getOwner)
 				    val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
