@@ -427,6 +427,10 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	}
 	
 	private def initAndroidCallbacks = {
+	  
+	    // java.lang.CharSequence
+    this.androidCallbacks += "java.lang.CharSequence" // sankar adds it. note that it is not an android stuff so we need to move it somewhere else.
+	  
 	  this.androidCallbacks += "android.accounts.OnAccountsUpdateListener"
 
       // android.animation
@@ -465,6 +469,8 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
     this.androidCallbacks += "android.content.Loader$OnLoadCompleteListener"
     this.androidCallbacks += "android.content.SharedPreferences$OnSharedPreferenceChangeListener"
     this.androidCallbacks += "android.content.SyncStatusObserver"
+        // android.database.Cursor
+    this.androidCallbacks += "android.database.Cursor"  // sankar added
       // android.database.sqlite
     this.androidCallbacks += "android.database.sqlite.SQLiteTransactionListener"
       // android.drm
