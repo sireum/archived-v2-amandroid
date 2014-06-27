@@ -374,13 +374,16 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 		if (clazz.hasSuperClass)
 			analyzeClassInterfaceCallbacks(baseClass, clazz.getSuperClass, lifecycleElement) // recursion
 		// Do we implement one of the well-known interfaces?
+			var x = collectAllInterfaces(clazz)
 		for (i <- collectAllInterfaces(clazz)) {
+
 		  if(this.androidCallbacks.contains(i.getName)){
 		    i.getProcedures.foreach{
 		      proc =>
 		        checkAndAddMethod(getProcedureFromHierarchy(baseClass, proc.getSubSignature), baseClass)
 		    }
 		  }
+
 		}
 		
 	}

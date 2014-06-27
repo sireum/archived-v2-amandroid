@@ -28,7 +28,7 @@ class CompleteRFATest extends PasswordTrackingTestFramework {
 //		LibSideEffectProvider.init
 		
 	  InterproceduralExamples.testAPKFiles.
-	  filter { s => s.endsWith("PrivateDataLeak2.apk") }. // PasswordPassTest.apk
+	  filter { s => s.endsWith("testCharSeqCallback.apk") }. // PasswordPassTest.apk
 	  foreach { resfile =>
 	    Analyzing title resfile file resfile
 	  }
