@@ -380,7 +380,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 		  if(this.androidCallbacks.contains(i.getName)){
 		    i.getProcedures.foreach{
 		      proc =>
-		        checkAndAddMethod(getProcedureFromHierarchy(baseClass, proc.getSubSignature), baseClass)
+		        checkAndAddMethod(getProcedureFromHierarchy(baseClass, proc.getSubSignature), lifecycleElement)
 		    }
 		  }
 
@@ -392,12 +392,12 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	 * Checks whether the given method comes from a system class. If not,
 	 * it is added to the list of callback methods.
 	 * @param pUri The method to check and add
-	 * @param baseClass The base class (activity, service, etc.) to which this
+	 * @param lifecycleElement The base class (activity, service, etc.) to which this
 	 * callback method belongs
 	 */
-	private def checkAndAddMethod(proc: JawaProcedure, baseClass: JawaRecord) = {
+	private def checkAndAddMethod(proc: JawaProcedure, lifecycleElement: JawaRecord) = {
 		if(!proc.getName.startsWith("android.")){
-		  this.callbackMethods += (baseClass -> (this.callbackMethods.getOrElse(baseClass, isetEmpty) + proc))
+		  this.callbackMethods += (lifecycleElement -> (this.callbackMethods.getOrElse(lifecycleElement, isetEmpty) + proc))
 		}
 	}
 	

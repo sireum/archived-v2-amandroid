@@ -24,7 +24,7 @@ class AnyTest extends AnyTestFramework {
 //		LibSideEffectProvider.init
 		
 	  InterproceduralExamples.testAPKFiles.
-	  filter { s => s.endsWith("testCursorCallback.apk") }.
+	  filter { s => s.endsWith("testCharSeqCallback.apk") }.
 	  foreach { resfile =>
 	    Analyzing title resfile file resfile
 	  }
