@@ -38,14 +38,14 @@ import org.sireum.jawa.util.SignatureParser
  */
 class ReachableInfoCollector(entryPointClasses:Set[String]) {
   final val TITLE = "ReachableInfoCollector"
-	private final var callbackMethods : Map[JawaRecord, Set[JawaProcedure]] = Map()
+	private final var callbackMethods : Map[JawaRecord, Set[JawaProcedure]] = Map() // a map from an app component to associated callbacks
 	private final var layoutClasses: Map[JawaRecord, Set[Int]] = Map()
-	private final var androidCallbacks : Set[String] = Set()
+	private final var androidCallbacks : Set[String] = Set()  // a list of system interfaces which have wellknown callback methods
 	
 	def getCallbackMethods() = this.callbackMethods
 	def getLayoutClasses() = this.layoutClasses
 	
-	private var reachableMap : Map[JawaRecord, Set[JawaProcedure]] = Map()
+	private var reachableMap : Map[JawaRecord, Set[JawaProcedure]] = Map() // a map from an app component to the rechable methods
 	
 	def getReachableMap = this.reachableMap
 	
@@ -126,6 +126,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	 */
 	def collectCallbackMethods() = {
 	  findClassLayoutMappings()
+	  // worklist is a list of tuples of the format (a reachable proc's declaring class, app-entrypoint-component)
 	  val worklist : MList[(JawaRecord, JawaRecord)] = mlistEmpty
 	  val processed : MList[(JawaRecord, JawaRecord)] = mlistEmpty
 	  this.reachableMap.foreach{
@@ -207,7 +208,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	 */
 	private def collectCallbackMethodsInAppSource(clazz: JawaRecord, lifecycleElement: JawaRecord) {
 		// Check for callback handlers implemented via interfaces
-	  val procs = this.reachableMap(lifecycleElement)
+	  val procs = this.reachableMap(lifecycleElement) 
 		analyzeReachableMethods(procs, lifecycleElement)
 		// Check for method overrides
 		analyzeMethodOverrideCallbacks(clazz, lifecycleElement)
@@ -300,7 +301,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	
 	private def analyzeMethodForCallbackRegistrations(proc : JawaProcedure, lifecycleElement: JawaRecord) : Unit = {
 	  // Do not analyze system classes
-	  if(proc.getDeclaringRecord.getName.startsWith("android.") ||
+	  if(proc.getDeclaringRecord.getName.startsWith("android.") || proc.getDeclaringRecord.getName.startsWith("com.android.") ||
 	      proc.getDeclaringRecord.getName.startsWith("java."))
 	    return
 	  
@@ -329,7 +330,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	                      callbackRecords ++= impls.map{
 	                        impl =>
 	                          hier.getAllSubClassesOfIncluding(impl)
-	                      }.reduce(iintersect[JawaRecord])
+	                      }.reduce(iunion[JawaRecord]) 
 	                    } else {
 	                      callbackRecords ++= hier.getAllSubClassesOfIncluding(typRec)
 	                    }
@@ -350,7 +351,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	
 	private def analyzeClass(clazz : JawaRecord, lifecycleElement: JawaRecord) : Unit = { 
 	  // Do not analyze system classes
-	  if (clazz.getName.startsWith("android.")|| clazz.getName.startsWith("java."))
+	  if (clazz.getName.startsWith("android.")|| clazz.getName.startsWith("com.android.") || clazz.getName.startsWith("java."))
       return
   
     // Check for callback handlers implemented via interfaces
@@ -359,14 +360,14 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	
 	private def analyzeClassInterfaceCallbacks(baseClass: JawaRecord, clazz: JawaRecord, lifecycleElement: JawaRecord):Unit = { 
 	  
-	    // We cannot create instances of abstract classes anyway, so there is no
+	  // We cannot create instances of abstract classes anyway, so there is no
 		// reason to look for interface implementations
 		if (!baseClass.isConcrete)
 			return;
 		
 		// For a first take, we consider all classes in the android.* packages
 		// to be part of the operating system
-		if (baseClass.getName.startsWith("android."))
+		if (baseClass.getName.startsWith("android.") || baseClass.getName.startsWith("com.android."))
 		  return
 		
 		// If we are a class, one of our superclasses might implement an Android
@@ -392,7 +393,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	 * Checks whether the given method comes from a system class. If not,
 	 * it is added to the list of callback methods.
 	 * @param pUri The method to check and add
-	 * @param lifecycleElement The base class (activity, service, etc.) to which this
+	 * @param lifecycleElement The component (activity, service, etc.) to which this
 	 * callback method belongs
 	 */
 	private def checkAndAddMethod(proc: JawaProcedure, lifecycleElement: JawaRecord) = {
