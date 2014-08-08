@@ -10,6 +10,7 @@ import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
 import org.sireum.amandroid.test.framework.security.OAuthTestFramework
 import org.sireum.util.FileUtil
 import org.sireum.jawa.GlobalConfig
+import org.sireum.amandroid.test.framework.security.OAuthCounter
 
 @RunWith(classOf[JUnitRunner])
 class OAuthTest extends OAuthTestFramework {
@@ -26,11 +27,14 @@ class OAuthTest extends OAuthTestFramework {
 //	  }
   InterproceduralExamples.popularAPKFiles.
 //	  filter { s => s.contains("mobi.mgeek.TunnyBrowser.apk") }.
+
   foreach { resfile =>
-    //if(i > 800 & i < 810) 
+    if(i > 504) 
     Analyzing title resfile file resfile
     i+=1
   }
+  
+  OAuthCounter.write
 //		InterproceduralExamples.testFiles.
 ////	  filter { s => s.endsWith("acctsvcs.us.apk")}.
 //	  foreach { resfile =>

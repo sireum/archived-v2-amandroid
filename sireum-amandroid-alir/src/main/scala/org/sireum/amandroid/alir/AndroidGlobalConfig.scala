@@ -13,7 +13,7 @@ object AndroidGlobalConfig {
 //	final val ANDROID_LIB_DIR = "ANDROID_LIB_DIR"
 //	final val ANDROID_TEST_DIR = "ANDROID_TEST_DIR"
 //	final val ANDROID_SS_PATH = "ANDROID_SS_PATH"
-	  
+
   final val SIREUM_HOME = "SIREUM_HOME"
 	final val AMANDROID_HOME = "AMANDROID_HOME"
 //	final val DEX2PILAR_DIR = "ANDROID_DEX2PILAR_DIR"

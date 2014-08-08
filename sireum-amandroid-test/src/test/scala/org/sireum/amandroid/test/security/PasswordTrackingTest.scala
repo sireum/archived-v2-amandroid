@@ -25,9 +25,8 @@ class CompleteRFATest extends PasswordTrackingTestFramework {
   JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
 		
 //		LibSideEffectProvider.init
-		
   InterproceduralExamples.testAPKFiles.
-  filter { s => s.endsWith("PrivateDataLeak2.apk") }. // PasswordPassTest.apk
+  filter { s => s.endsWith("testCharSeqCallback.apk") }. // PasswordPassTest.apk
   foreach { resfile =>
     Analyzing title resfile file resfile
   }

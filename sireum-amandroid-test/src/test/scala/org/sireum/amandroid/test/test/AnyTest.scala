@@ -21,9 +21,9 @@ class AnyTest extends AnyTestFramework {
   val androidLibDir = AndroidGlobalConfig.android_lib_dir
 	JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
 //		LibSideEffectProvider.init
-	
+		
   InterproceduralExamples.testAPKFiles.
-  filter { s => s.endsWith("PasswordPassTest.apk") }.
+  filter { s => s.endsWith("testCursorCallback.apk") }.
   foreach { resfile =>
     Analyzing title resfile file resfile
   }

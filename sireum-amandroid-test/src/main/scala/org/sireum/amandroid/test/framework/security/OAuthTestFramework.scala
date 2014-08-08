@@ -42,6 +42,10 @@ object OAuthCounter {
   
   var webviewUser = Set[String]()
   
+  var accessTokenUser = Set[String]()
+  
+  var oauthUser = Set[String]()
+  
   def write = {
     val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
     val appDataDirFile = new File(outputDir + "/oauthStat")
@@ -105,6 +109,14 @@ object OAuthCounter {
             }
         }
         
+        if(accessTokenUser.size > 0) {
+            out.write("\n access token users are : \n")
+            accessTokenUser.foreach{
+             srcFileName =>
+              out.write(srcFileName + "\n")
+            }
+        }
+        
         if(webviewUser.size > 0 & oldfacebookUser.size > 0) {
             out.write("\n webView-and-old-facebook users are : \n")
             webviewUser.intersect(oldfacebookUser).foreach{
@@ -112,6 +124,15 @@ object OAuthCounter {
               out.write(srcFileName + "\n")
             }
         }
+        
+        if(webviewUser.size > 0 & accessTokenUser.size > 0) {
+            out.write("\n webView-and-access-token users are : \n")
+            webviewUser.intersect(accessTokenUser).foreach{
+             srcFileName =>
+              out.write(srcFileName + "\n")
+            }
+        }
+        
 
     } finally {
     	out.close()
@@ -130,7 +151,11 @@ object OAuthCounter {
   		", githuburl: " + githubUrlUser.size +
   		", dropboxurl: " + dropboxUrlUser.size +
   		", webviewUser: " + webviewUser.size +
-  		", facebookAndTweeterUrl:" + (facebookUrlUser.intersect(tweeterUrlUser)).size
+  		", accessTokenUser: " + accessTokenUser.size +
+  		", facebookAndTweeterUrl:" + (facebookUrlUser.intersect(tweeterUrlUser)).size +
+  		", webViewAndOldfacebookUser:" + (webviewUser.intersect(oldfacebookUser)).size +
+  		", webViewAndAceessTokenUser:" + (webviewUser.intersect(accessTokenUser)).size +
+  		", OAuthUser:" + oauthUser.size 
 }
 
 class OAuthTestFramework extends TestFramework {
@@ -153,6 +178,7 @@ class OAuthTestFramework extends TestFramework {
    srcRes : FileResourceUri) {
 
     test(title) {
+      try{
     	msg_critical(TITLE, "####" + title + "#####")
     	OAuthCounter.total += 1
     	// before starting the analysis of the current app, first init
@@ -173,65 +199,79 @@ class OAuthTestFramework extends TestFramework {
     	    if(code.contains("m.facebook.com")){  // m.facebook.com/dialog/oauth
     	      System.err.println("Facebook url in App code record " + name)
     	      OAuthCounter.facebookUrlUser += srcRes
+    	      OAuthCounter.oauthUser += srcRes
     	    }
-    	    if(code.contains("Lcom/facebook/android/Facebook;.authorize:") ||
-    	        code.contains("Lcom/facebook/android/Facebook;.dialog:")){
+    	    if(code.contains("/Facebook;.authorize:") || // ("Lcom/facebook/android/Facebook;.authorize:")
+    	        code.contains("/Facebook;.dialog:")){
     	      System.err.println("old facebook sdk in App code record " + name)
     	      OAuthCounter.oldfacebookUser += srcRes
+    	      OAuthCounter.oauthUser += srcRes
     	    }
     	    if(code.contains("com.facebook.Session")){
     	      System.err.println("new facebook sdk in App code record " + name)
     	      OAuthCounter.newfacebookUser += srcRes
+    	      OAuthCounter.oauthUser += srcRes
     	    }
     	    
     	    if(code.contains("api.twitter.com/oauth")){
     	      System.err.println("Twitter url in App code record " + name)
     	      OAuthCounter.tweeterUrlUser += srcRes
+    	      OAuthCounter.oauthUser += srcRes
     	    }
     	    if(code.contains("accounts.google.com")){
     	      System.err.println("Google url in App code record " + name)
     	      OAuthCounter.googleUrlUser += srcRes
+    	      OAuthCounter.oauthUser += srcRes
     	    }
     	    if(code.contains("Lcom/google/android/gms/plus/PlusClient;.connect:") ||
     	        code.contains("Lcom/google/android/gms/auth/GoogleAuthUtil;.getToken:")){
     	      System.err.println("Google sdk in App code record " + name)
     	      OAuthCounter.googlesdkUser += srcRes
+    	      OAuthCounter.oauthUser += srcRes
     	    }
     	    
     	    if(code.contains(".live.com")){ // login.live.com
     	      System.err.println("live.com url in App code record " + name)
     	      OAuthCounter.microsoftUrlUser += srcRes
+    	      OAuthCounter.oauthUser += srcRes
     	    }
     	    if(code.contains("linkedin.com")){  // linkedin.com/uas/oauth
     	      System.err.println("Linkedin url in App code record " + name)
     	      OAuthCounter.linkedinUrlUser += srcRes
+    	      OAuthCounter.oauthUser += srcRes
     	    }
     	    if(code.contains("github.com")){  // github.com/login
     	      System.err.println("Github urlin App code record " + name)
     	      OAuthCounter.githubUrlUser += srcRes
+    	      OAuthCounter.oauthUser += srcRes
     	    }
     	    if(code.contains("dropbox.com")){  // dropbox.com/1/oauth2
     	      System.err.println("Dropbox url in App code record " + name)
     	      OAuthCounter.dropboxUrlUser += srcRes
+    	      OAuthCounter.oauthUser += srcRes
     	    }
     	    if(code.contains(".loadUrl:(Ljava/lang/String;")){
     	      System.err.println("Webview in App code record " + name)
     	      OAuthCounter.webviewUser += srcRes
     	    }
     	    
-    	    
-    	    if(code.contains("client_id")){
-    	      System.err.println("client_id found in App code record " + name)
-    	    }
-    	    if(code.contains("redirect_uri")){
-    	      System.err.println("redirect_uri found in App code record " + name)
-    	    }
-    	    if(code.contains("response_type")){
-    	      System.err.println("response_type found in App code record " + name)
-    	    }
     	    if(code.contains("access_token")){
-    	      System.err.println("access_token found in App code record " + name)
+    	      System.err.println("access_token in App code record " + name)
+    	      OAuthCounter.accessTokenUser += srcRes
     	    }
+    	    
+//    	    if(code.contains("client_id")){
+//    	      System.err.println("client_id found in App code record " + name)
+//    	    }
+//    	    if(code.contains("redirect_uri")){
+//    	      System.err.println("redirect_uri found in App code record " + name)
+//    	    }
+//    	    if(code.contains("response_type")){
+//    	      System.err.println("response_type found in App code record " + name)
+//    	    }
+//    	    if(code.contains("access_token")){
+//    	      System.err.println("access_token found in App code record " + name)
+//    	    }
     	}
     	
     	
@@ -240,76 +280,93 @@ class OAuthTestFramework extends TestFramework {
     	    if(code.contains("m.facebook.com")){
     	      System.err.println("Facebook url in App Using Lib:" + name)
     	      OAuthCounter.facebookUrlUser += srcRes
+    	      OAuthCounter.oauthUser += srcRes
     	    }
     	    if(code.contains("Lcom/facebook/android/Facebook;.authorize:") ||
     	        code.contains("Lcom/facebook/android/Facebook;.dialog:")){
     	      System.err.println("old facebook sdk! in App Using Lib:" + name)
     	      OAuthCounter.oldfacebookUser += srcRes
+    	      OAuthCounter.oauthUser += srcRes
     	    }
     	    if(code.contains("com.facebook.Session")){
     	      System.err.println("new facebook sdk! in App Using Lib:" + name)
     	      OAuthCounter.newfacebookUser += srcRes
+    	      OAuthCounter.oauthUser += srcRes
     	    }
     	    
     	    if(code.contains("api.twitter.com")){
     	      System.err.println("Twitter url! in App Using Lib:" + name)
     	      OAuthCounter.tweeterUrlUser += srcRes
+    	      OAuthCounter.oauthUser += srcRes
     	    }
     	    if(code.contains("accounts.google.com")){
     	      System.err.println("Google url! in App Using Lib:" + name)
     	      OAuthCounter.googleUrlUser += srcRes
+    	      OAuthCounter.oauthUser += srcRes
     	    }
     	    if(code.contains("Lcom/google/android/gms/plus/PlusClient;.connect:") ||
     	        code.contains("Lcom/google/android/gms/auth/GoogleAuthUtil;.getToken:")){
     	      System.err.println("Google sdk! in App Using Lib:" + name)
     	      OAuthCounter.googlesdkUser += srcRes
+    	      OAuthCounter.oauthUser += srcRes
     	    }
     	    
     	    if(code.contains(".live.com")){
     	      System.err.println("live.com url! in App Using Lib:" + name)
     	      OAuthCounter.microsoftUrlUser += srcRes
+    	      OAuthCounter.oauthUser += srcRes
     	    }
     	    if(code.contains("linkedin.com")){
     	      System.err.println("Linkedin url! in App Using Lib:" + name)
     	      OAuthCounter.linkedinUrlUser += srcRes
+    	      OAuthCounter.oauthUser += srcRes
     	    }
     	    if(code.contains("github.com")){
     	      System.err.println("Github url! in App Using Lib:" + name)
     	      OAuthCounter.githubUrlUser += srcRes
+    	      OAuthCounter.oauthUser += srcRes
     	    }
     	    if(code.contains("dropbox.com")){
     	      System.err.println("Dropbox url! in App Using Lib:" + name)
     	      OAuthCounter.dropboxUrlUser += srcRes
+    	      OAuthCounter.oauthUser += srcRes
     	    }
     	    if(code.contains(".loadUrl:(Ljava/lang/String;")){
     	      System.err.println("Webview! in App Using Lib:" + name)
     	      OAuthCounter.webviewUser += srcRes
     	    }
     	    
+    	     if(code.contains("access_token")){
+    	      System.err.println("access_token in App code record " + name)
+    	      OAuthCounter.accessTokenUser += srcRes
+    	    }
     	    
-    	    if(code.contains("client_id")){
-    	      System.err.println("client_id found! in App Using Lib:" + name)
-    	    }
-    	    if(code.contains("redirect_uri")){
-    	      System.err.println("redirect_uri found! in App Using Lib:" + name)
-    	    }
-    	    if(code.contains("response_type")){
-    	      System.err.println("response_type found! in App Using Lib:" + name)
-    	    }
-    	    if(code.contains("access_token")){
-    	      System.err.println("access_token found! in App Using Lib:" + name)
-    	    }
+//    	    if(code.contains("client_id")){
+//    	      System.err.println("client_id found! in App Using Lib:" + name)
+//    	    }
+//    	    if(code.contains("redirect_uri")){
+//    	      System.err.println("redirect_uri found! in App Using Lib:" + name)
+//    	    }
+//    	    if(code.contains("response_type")){
+//    	      System.err.println("response_type found! in App Using Lib:" + name)
+//    	    }
+//    	    if(code.contains("access_token")){
+//    	      System.err.println("access_token found! in App Using Lib:" + name)
+//    	    }
     	}
-    	
-    	
-    	Center.reset
-    	AppCenter.reset
-    	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
-    	JawaCodeSource.clearAppRecordsCodes
-		  System.gc()
-		OAuthCounter.write
-    	msg_critical(TITLE, OAuthCounter.toString)
-    	msg_critical(TITLE, "************************************\n")
+      	} catch {
+      	  case e : Exception =>
+      	    e.printStackTrace();
+      	} finally {
+	    	Center.reset
+	    	AppCenter.reset
+	    	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
+	    	JawaCodeSource.clearAppRecordsCodes
+			  System.gc()
+			//OAuthCounter.write
+	    	msg_critical(TITLE, OAuthCounter.toString)
+	    	msg_critical(TITLE, "************************************\n")
+      	}
     }
   }
 
