@@ -43,9 +43,8 @@ object OAuthCounter {
   var webviewUser = Set[String]()
   
   def write = {
-    val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-  	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-  	val appDataDirFile = new File(outputDir + "/oauthStat")
+    val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
+    val appDataDirFile = new File(outputDir + "/oauthStat")
   	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
   	val out = new PrintWriter(appDataDirFile + "/summary.txt")
     try{

@@ -116,8 +116,7 @@ class ICCTestFramework extends TestFramework {
 				  
 		    	val appData = DataCollector.collect
 		    	MetricRepo.collect(appData)
-		    	val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-		    	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
+		    	val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
 		    	val apkName = title.substring(0, title.lastIndexOf("."))
 		    	val appDataDirFile = new File(outputDir + "/" + apkName)
 		    	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()

@@ -23,11 +23,10 @@ import org.sireum.amandroid.test.framework.security.OAuthTokenTrackingTestFramew
 @RunWith(classOf[JUnitRunner])
 class OAuthTokenTrackingTest extends OAuthTokenTrackingTestFramework {
   var i = 0
-  val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
-  if(androidLibDir != null){
+  val androidLibDir = AndroidGlobalConfig.android_lib_dir
 		JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
 		
-		LibSideEffectProvider.init
+//		LibSideEffectProvider.init
 		
 //	  InterproceduralExamples.testAPKFiles.
 //	  //filter { s => s.endsWith("com.zoosk.zoosk.apk") }. // LocationFlow2.apk
@@ -79,8 +78,5 @@ class OAuthTokenTrackingTest extends OAuthTokenTrackingTestFramework {
 //	  foreach { fileUri =>
 //	    Analyzing title fileUri file fileUri
 //	  }
-  } else {
-    System.err.println("Does not have env var: " + AndroidGlobalConfig.ANDROID_LIB_DIR)
-  }
 }
 

@@ -18,11 +18,10 @@ import org.sireum.jawa.GlobalConfig
 @RunWith(classOf[JUnitRunner])
 class IccTest extends ICCTestFramework {
   var i = 0
-  val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
-  if(androidLibDir != null){
-		JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
-		
-		LibSideEffectProvider.init
+  val androidLibDir = AndroidGlobalConfig.android_lib_dir
+	JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
+	
+//	LibSideEffectProvider.init
 		
 //	  InterproceduralExamples.testAPKFiles.
 //	  filter { s => s.endsWith("PasswordPassTest.apk") }.
@@ -43,13 +42,13 @@ class IccTest extends ICCTestFramework {
 //	    Analyzing title resfile file resfile
 ////	    i+=1
 //	  }
-	  InterproceduralExamples.randomAPKFiles.
+  InterproceduralExamples.randomAPKFiles.
 //	  filter { s => s.endsWith("gtd.client.apk") }.
-	  foreach { resfile =>
+  foreach { resfile =>
 //	    if(i < 89) i += 1
-	    //if(resfile.endsWith("app.kazoebito.com.apk"))
-	    Analyzing title resfile file resfile
-	  }
+    //if(resfile.endsWith("app.kazoebito.com.apk"))
+    Analyzing title resfile file resfile
+  }
 //	  InterproceduralExamples.normalAPKFiles.
 //	//  filter { s => s.name.endsWith("android-1.apk") }.
 //	  foreach { resRet =>
@@ -79,7 +78,4 @@ class IccTest extends ICCTestFramework {
 //	  foreach { fileUri =>
 //	    Analyzing title fileUri file fileUri
 //	  }
-  } else {
-    System.err.println("Does not have env var: " + AndroidGlobalConfig.ANDROID_LIB_DIR)
-  }
 }

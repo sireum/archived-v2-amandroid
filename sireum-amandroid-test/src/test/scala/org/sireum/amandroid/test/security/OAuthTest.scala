@@ -14,8 +14,7 @@ import org.sireum.jawa.GlobalConfig
 @RunWith(classOf[JUnitRunner])
 class OAuthTest extends OAuthTestFramework {
   var i = 0
-  val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
-  if(androidLibDir != null){
+  val androidLibDir = AndroidGlobalConfig.android_lib_dir
 	//	JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
 		
 		//LibSideEffectProvider.init
@@ -25,13 +24,13 @@ class OAuthTest extends OAuthTestFramework {
 //	  foreach { resfile =>
 //	    Analyzing title resfile file resfile
 //	  }
-	  InterproceduralExamples.popularAPKFiles.
+  InterproceduralExamples.popularAPKFiles.
 //	  filter { s => s.contains("mobi.mgeek.TunnyBrowser.apk") }.
-	  foreach { resfile =>
-	    //if(i > 800 & i < 810) 
-	    Analyzing title resfile file resfile
-	    i+=1
-	  }
+  foreach { resfile =>
+    //if(i > 800 & i < 810) 
+    Analyzing title resfile file resfile
+    i+=1
+  }
 //		InterproceduralExamples.testFiles.
 ////	  filter { s => s.endsWith("acctsvcs.us.apk")}.
 //	  foreach { resfile =>
@@ -75,7 +74,4 @@ class OAuthTest extends OAuthTestFramework {
 //		foreach { fileUri =>
 //		  Analyzing title fileUri file fileUri
 //		}
-  } else {
-    System.err.println("Does not have env var: " + AndroidGlobalConfig.ANDROID_LIB_DIR)
-  }
 }

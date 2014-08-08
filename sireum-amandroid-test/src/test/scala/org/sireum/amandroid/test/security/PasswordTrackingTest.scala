@@ -21,17 +21,16 @@ import org.sireum.jawa.GlobalConfig
 @RunWith(classOf[JUnitRunner])
 class CompleteRFATest extends PasswordTrackingTestFramework {
   var i = 0
-  val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
-  if(androidLibDir != null){
-		JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
+  val androidLibDir = AndroidGlobalConfig.android_lib_dir
+  JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
 		
 //		LibSideEffectProvider.init
 		
-	  InterproceduralExamples.testAPKFiles.
-	  filter { s => s.endsWith("PrivateDataLeak2.apk") }. // PasswordPassTest.apk
-	  foreach { resfile =>
-	    Analyzing title resfile file resfile
-	  }
+  InterproceduralExamples.testAPKFiles.
+  filter { s => s.endsWith("PrivateDataLeak2.apk") }. // PasswordPassTest.apk
+  foreach { resfile =>
+    Analyzing title resfile file resfile
+  }
 //	  InterproceduralExamples.popularAPKFiles.
 ////	  filter { s => s.contains("la.droid.qr.apk") }.
 //	  foreach { resfile =>
@@ -77,7 +76,4 @@ class CompleteRFATest extends PasswordTrackingTestFramework {
 //	  foreach { fileUri =>
 //	    Analyzing title fileUri file fileUri
 //	  }
-  } else {
-    System.err.println("Does not have env var: " + AndroidGlobalConfig.ANDROID_LIB_DIR)
-  }
 }

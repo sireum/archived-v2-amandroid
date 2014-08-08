@@ -40,9 +40,8 @@ object IntentInjectionCounter {
   var havePath = 0
   
   def outputRecStatistic = {
-  	val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-  	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-  	val appDataDirFile = new File(outputDir + "/LocAndTime")
+  	val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
+    val appDataDirFile = new File(outputDir + "/LocAndTime")
   	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
   	val out = new PrintWriter(appDataDirFile + "/LocAndTime.txt")
     locTimeMap.foreach{
@@ -77,19 +76,22 @@ class IntentInjectionTestFramework extends TestFramework {
     test(title) {
       var loc : Int = 0
       val startTime = System.currentTimeMillis()
-    	msg_critical(TITLE, "####" + title + "#####")
-    	IntentInjectionCounter.total += 1
-    	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
-    	AndroidGlobalConfig.initJawaAlirInfoProvider
-    	
-    	val srcFile = new File(new URI(srcRes))
-    	val dexFile = APKFileResolver.getDexFile(srcRes, FileUtil.toUri(srcFile.getParentFile()))
-    	
-    	// convert the dex file to the "pilar" form
-    	val pilarRootUri = Dex2PilarConverter.convert(dexFile)
-    	val pilarFile = new File(new URI(pilarRootUri))
-    	if(pilarFile.length() <= (100 * 1024 * 1024)){
-    		AndroidRFAConfig.setupCenter
+      try{
+		msg_critical(TITLE, "####" + title + "#####")
+		IntentInjectionCounter.total += 1
+		// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
+		AndroidGlobalConfig.initJawaAlirInfoProvider
+		
+		val srcFile = new File(new URI(srcRes))
+	  val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
+		val resultDir = new File(outputDir + "/Results/")
+		val dexFile = APKFileResolver.getDexFile(srcRes, FileUtil.toUri(resultDir))
+		
+		// convert the dex file to the "pilar" form
+		val pilarRootUri = Dex2PilarConverter.convert(dexFile)
+		val pilarFile = new File(new URI(pilarRootUri))
+		if(pilarFile.length() <= (100 * 1024 * 1024)){
+			AndroidRFAConfig.setupCenter
 	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
 	    	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
 	    	
@@ -99,22 +101,22 @@ class IntentInjectionTestFramework extends TestFramework {
 				}
 	    	
 	    	JawaCodeSource.getAppRecordsCodes.foreach{
-    		  case (name, code) =>
-    		    loc += countLines(code)
-    		}
+			  case (name, code) =>
+			    loc += countLines(code)
+			}
 	    	
 	    	try{
 		    	val pre = new IntentInjectionCollector(srcRes)
 				  pre.collectInfo
-				  val ssm = new IntentInjectionSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+				  val ssm = new IntentInjectionSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)
 				  var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
-//		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
+	//		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
 		    	val iacs = pre.getInterestingContainers(ssm.getSinkSigs ++ AndroidConstants.getIccMethods)
 		    	entryPoints = entryPoints.filter(e=>iacs.contains(e.getDeclaringRecord))
 				  AndroidReachingFactsAnalysisConfig.k_context = 1
 			    AndroidReachingFactsAnalysisConfig.resolve_icc = false
 			    AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-			    AndroidReachingFactsAnalysisConfig.timerOpt = None
+			    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(10))
 			    IntentInjectionCounter.totalComponents += entryPoints.size
 			    
 		    	entryPoints.par.foreach{
@@ -135,24 +137,23 @@ class IntentInjectionTestFramework extends TestFramework {
 		    	        IntentInjectionCounter.timeoutComponents += 1
 		    	        IntentInjectionCounter.timeoutapps += title
 		    	    }
-    	    } 
+		    } 
 				  
 		    	if(AppCenter.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
-    	      IntentInjectionCounter.havePath += 1
-    	    }
+		      IntentInjectionCounter.havePath += 1
+		    }
 		    	val appData = DataCollector.collect
 		    	MetricRepo.collect(appData)
-		    	val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-		    	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-		    	val apkName = title.substring(0, title.lastIndexOf("."))
-		    	val appDataDirFile = new File(outputDir + "/" + apkName)
-		    	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
-		    	val out = new PrintWriter(appDataDirFile + "/AppData.txt")
-			    out.print(appData.toString)
-			    out.close()
-			    val mr = new PrintWriter(outputDir + "/MetricInfo.txt")
-				  mr.print(MetricRepo.toString)
-				  mr.close()
+		    	
+//		    	val apkName = title.substring(0, title.lastIndexOf("."))
+//		    	val appDataDirFile = new File(outputDir + "/" + apkName)
+//		    	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
+//		    	val out = new PrintWriter(appDataDirFile + "/AppData.txt")
+//			    out.print(appData.toString)
+//			    out.close()
+//			    val mr = new PrintWriter(outputDir + "/MetricInfo.txt")
+//				  mr.print(MetricRepo.toString)
+//				  mr.close()
 				  IntentInjectionCounter.haveresult += 1
 	    	} catch {
 	    	  case ie : IgnoreException =>
@@ -167,13 +168,15 @@ class IntentInjectionTestFramework extends TestFramework {
     	  IntentInjectionCounter.oversize += 1
     	  err_msg_critical(TITLE, "Pilar file size is too large:" + pilarFile.length()/1024/1024 + "MB")
     	}
-    	
+      } catch {
+        case e : Exception => e.printStackTrace()
+      } finally {
     	Center.reset
     	AppCenter.reset
     	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
     	JawaCodeSource.clearAppRecordsCodes
     	System.gc()
-		  System.gc()
+		System.gc()
     	
     	val endTime = System.currentTimeMillis()
     	val totaltime = (endTime - startTime) / 1000
@@ -181,6 +184,7 @@ class IntentInjectionTestFramework extends TestFramework {
     	msg_critical(TITLE, IntentInjectionCounter.toString)
     	msg_critical(TITLE, "************************************\n")
     	IntentInjectionCounter.outputRecStatistic
+      }
     }
   }
 

@@ -17,18 +17,17 @@ import org.sireum.jawa.GlobalConfig
 @RunWith(classOf[JUnitRunner])
 class DroidBenchTest extends DroidBenchTestFramework {
   var i = 0
-  val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
-  if(androidLibDir != null){
-		JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
+  val androidLibDir = AndroidGlobalConfig.android_lib_dir
+	JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
 //		LibSideEffectProvider.init
 		
 //		val ints = Set("AndroidSpecific_Library2.apk")
 		
-	  InterproceduralExamples.benchAPKFiles.
+  InterproceduralExamples.benchAPKFiles.
 //	  filter { s => ints.exists(s.endsWith(_)) }.
-	  foreach { fileUri =>
-	    Analyzing title fileUri file fileUri
-	  }
+  foreach { fileUri =>
+    Analyzing title fileUri file fileUri
+  }
 		
 //		InterproceduralExamples.testAPKFiles.
 //		filter { s => ints.exists(s.endsWith(_)) }.
@@ -41,7 +40,4 @@ class DroidBenchTest extends DroidBenchTestFramework {
 //		foreach { fileUri =>
 //		  Analyzing title fileUri file fileUri
 //		}
-  } else {
-    System.err.println("Does not have env var: " + AndroidGlobalConfig.ANDROID_LIB_DIR)
-  }
 }

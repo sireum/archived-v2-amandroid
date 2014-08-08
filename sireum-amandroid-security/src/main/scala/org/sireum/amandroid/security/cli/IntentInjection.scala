@@ -99,13 +99,9 @@ object IntentInjection {
         return
     }
 	  val outputUri = FileUtil.toUri(outputPath)
-    val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
-	  if(androidLibDir != null){
-			JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
-			intentInjection(apkFileUris, sasFilePath, libSideEffectPath, outputUri, static, parallel, icc, k_context, timeout)
-	  } else {
-	    throw new RuntimeException("Does not have environment variable: " + AndroidGlobalConfig.ANDROID_LIB_DIR)
-	  }
+    val androidLibDir = AndroidGlobalConfig.android_lib_dir
+		JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
+		intentInjection(apkFileUris, sasFilePath, libSideEffectPath, outputUri, static, parallel, icc, k_context, timeout)
 	}
   
   def intentInjection(apkFileUris : Set[FileResourceUri], sasFilePath : String, libSideEffectPath : String, outputUri : FileResourceUri, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int) = {

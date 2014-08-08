@@ -12,7 +12,7 @@ import org.sireum.amandroid.alir.AndroidGlobalConfig
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
 object InterproceduralExamples extends Examples{
-  val androidTestDir = System.getenv(AndroidGlobalConfig.ANDROID_TEST_DIR)
+  val androidTestDir = AndroidGlobalConfig.amandroid_home + "/Sources"
   
 //	val MODEL_DIR_URI = sourceDirUri(this.getClass, "./model/") 
   val ANDROID_PILAR_FILE_EXT = ".pilar"

@@ -25,7 +25,7 @@ object AndroidLibSideEffectAnalysis {
   
 	def main(args: Array[String]) {
 	  AndroidGlobalConfig.initJawaAlirInfoProvider
-	  val androidLibDir = System.getenv(AndroidGlobalConfig.ANDROID_LIB_DIR)
+	  val androidLibDir = AndroidGlobalConfig.android_lib_dir
 	  if(androidLibDir != null){
 	    val startTime = System.currentTimeMillis()
 			JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
@@ -56,8 +56,7 @@ object AndroidLibSideEffectAnalysis {
 	    intraPSEResults = ParMap()
 	    System.gc()
 	    System.gc()
-	    val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-	  	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
+	    val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
 	  	val fileDir = new File(outputDir + "/sideEffectAnalysis")
 	  	if(!fileDir.exists()) fileDir.mkdirs()
 	  	val file = new File(fileDir + "/AndroidLibSideEffectResult.xml.zip")
@@ -74,7 +73,7 @@ object AndroidLibSideEffectAnalysis {
 			val endTime = System.currentTimeMillis()
 			println("Total time: " + (endTime - startTime)/1000 + "s")
 	  } else {
-	  	System.err.println("Does not have env var: " + AndroidGlobalConfig.ANDROID_LIB_DIR)
+	  	System.err.println("Wrong!")
 	  }
   }
 }

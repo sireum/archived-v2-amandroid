@@ -66,12 +66,17 @@ trait StagingTestFramework extends TestFramework {
 
     test(title) {
     	msg_critical(TITLE, "####" + title + "#####")
+    	try{
     	StagingCounter.total += 1
     	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
     	AndroidGlobalConfig.initJawaAlirInfoProvider
     	
     	val srcFile = new File(new URI(srcRes))
-    	val dexFile = APKFileResolver.getDexFile(srcRes, FileUtil.toUri(srcFile.getParentFile()))
+    	
+    	val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
+    	val resultDir = new File(outputDir + "/Results/")
+    	
+    	val dexFile = APKFileResolver.getDexFile(srcRes, FileUtil.toUri(resultDir))
     	
     	// convert the dex file to the "pilar" form
     	val pilarRootUri = Dex2PilarConverter.convert(dexFile)
@@ -80,7 +85,7 @@ trait StagingTestFramework extends TestFramework {
   		AndroidRFAConfig.setupCenter
     	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
     	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
-    	try{
+    	
 	    	val pre = new AppInfoCollector(srcRes)
 			  pre.collectInfo
 
@@ -89,11 +94,10 @@ trait StagingTestFramework extends TestFramework {
 			  AndroidReachingFactsAnalysisConfig.k_context = 1
 		    AndroidReachingFactsAnalysisConfig.resolve_icc = true
 		    AndroidReachingFactsAnalysisConfig.resolve_static_init = true
-		    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(10))
+		    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(120))
 		    
 		    val fileName = title.substring(title.lastIndexOf("/"), title.lastIndexOf("."))
-  	    val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-		  	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
+  	    
 		  	val fileDir = new File(outputDir + "/AmandroidResult/ResultStore/" + fileName)
   	    if(!fileDir.exists()) fileDir.mkdirs()
 		    
@@ -114,11 +118,11 @@ trait StagingTestFramework extends TestFramework {
 					    AndroidXStream.toXml(AmandroidResult(InterProceduralDataFlowGraph(icfg, irfaResult), ddgResult), zipw)
 					    zipw.close()
 					    msg_critical(TITLE, "Result stored!")
-					    val reader = new GZIPInputStream(new FileInputStream(file))
-					    val xmlObject = AndroidXStream.fromXml(reader).asInstanceOf[AmandroidResult]
-				      reader.close()
-				      msg_critical(TITLE, "xml loaded!")
-				      msg_critical(TITLE, "" + {icfg.nodes.size == xmlObject.idfg.icfg.nodes.size})
+//					    val reader = new GZIPInputStream(new FileInputStream(file))
+//					    val xmlObject = AndroidXStream.fromXml(reader).asInstanceOf[AmandroidResult]
+//				      reader.close()
+//				      msg_critical(TITLE, "xml loaded!")
+//				      msg_critical(TITLE, "" + {icfg.nodes.size == xmlObject.idfg.icfg.nodes.size})
 			    	} catch {
 	    	      case te : TimeOutException => System.err.println("Timeout!")
 	    	    }

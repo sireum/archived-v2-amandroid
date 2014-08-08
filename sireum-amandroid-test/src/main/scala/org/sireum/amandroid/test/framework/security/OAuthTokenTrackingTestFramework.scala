@@ -52,9 +52,8 @@ object OAuthTokenCounter {
   }
   
   def outputRecStatistic = {
-  	val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-  	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-  	val appDataDirFile = new File(outputDir + "/recStatistic")
+  	val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
+    val appDataDirFile = new File(outputDir + "/recStatistic")
   	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
   	val out = new PrintWriter(appDataDirFile + "/RecStatistic.txt")
     appRec.filter(p=> p._2 >= 5).toSeq.sortBy(_._1).sortBy(_._2).foreach(out.println(_))
@@ -62,8 +61,7 @@ object OAuthTokenCounter {
   }
   
   def outputInterestingFileNames = {
-  	val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-  	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
+  	val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
   	val appDataDirFile = new File(outputDir + "/interestingApps")
   	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
   	val out = new PrintWriter(appDataDirFile + "/interestingApps.txt")
@@ -163,8 +161,7 @@ trait OAuthTokenTrackingTestFramework extends TestFramework {
     	    }
 		    	val appData = DataCollector.collect
 		    	MetricRepo.collect(appData)
-		    	val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-		    	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
+		    	val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
 		    	val apkName = title.substring(0, title.lastIndexOf("."))
 		    	val appDataDirFile = new File(outputDir + "/" + apkName)
 		    	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()

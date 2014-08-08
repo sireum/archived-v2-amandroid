@@ -94,8 +94,7 @@ trait AnyTestFramework extends TestFramework {
 		    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
 		    
 		    val fileName = title.substring(title.lastIndexOf("/"), title.lastIndexOf("."))
-  	    val outputDir = System.getenv(AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
-		  	if(outputDir == null) throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.ANDROID_OUTPUT_DIR)
+  	    val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
 		  	val fileDir = new File(outputDir + "/AmandroidResult/DroidBench/" + fileName)
   	    if(!fileDir.exists()) fileDir.mkdirs()
 		    

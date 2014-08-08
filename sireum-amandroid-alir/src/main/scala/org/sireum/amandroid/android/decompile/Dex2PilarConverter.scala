@@ -4,12 +4,13 @@ import java.io._
 import org.sireum.util._
 import java.net.URI
 import org.sireum.amandroid.alir.AndroidGlobalConfig
+import org.sireum.jawa.util.OsUtils
 
 object Dex2PilarConverter {
   var dex2pilarFile = new File(System.getenv(AndroidGlobalConfig.SIREUM_HOME) + "/apps/amandroid/bin/newdex2pilar")
   if(!dex2pilarFile.exists()){
-    val dex2pilarDir = System.getenv(AndroidGlobalConfig.DEX2PILAR_DIR)
-    dex2pilarFile = if(dex2pilarDir != null) new File(dex2pilarDir + "/dex2pilar") else throw new RuntimeException("Does not have env var: " + AndroidGlobalConfig.DEX2PILAR_DIR)
+    dex2pilarFile = new File(AndroidGlobalConfig.android_dex2pilar_dir + "/newdex2pilar")
+    if(!dex2pilarFile.exists()) throw new RuntimeException("Could not find dex2pilar from: " + AndroidGlobalConfig.android_dex2pilar_dir)
   }
   
 	val dexdumputil = Util(dex2pilarFile)
