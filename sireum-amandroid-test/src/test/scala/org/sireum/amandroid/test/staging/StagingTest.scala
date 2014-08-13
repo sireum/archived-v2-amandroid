@@ -17,11 +17,11 @@ import org.sireum.jawa.GlobalConfig
  */
 @RunWith(classOf[JUnitRunner])
 class StagingTest extends StagingTestFramework {
-  var i = 0
-  val androidLibDir = AndroidGlobalConfig.android_lib_dir
-	JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
-	
-	LibSideEffectProvider.init(AndroidGlobalConfig.android_libsummary_dir)
+//  var i = 0
+//  val androidLibDir = AndroidGlobalConfig.android_lib_dir
+//	JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
+//	
+//	LibSideEffectProvider.init(AndroidGlobalConfig.android_libsummary_dir)
 	
 //	  InterproceduralExamples.testAPKFiles.
 //	  filter { s => s.endsWith("14c03cd13616b0e5c34a5b864e1fac44.apk") }.
@@ -29,10 +29,10 @@ class StagingTest extends StagingTestFramework {
 //	    Analyzing title resfile file resfile
 //	  }
   
-  InterproceduralExamples.arborSplitFiles.
-  foreach { resfile =>
-    Analyzing title resfile file resfile
-  }
+//  InterproceduralExamples.arborSplitFiles.
+//  foreach { resfile =>
+//    Analyzing title resfile file resfile
+//  }
 	
 //		InterproceduralExamples.randomArborFiles.
 ////	  filter { s => s.endsWith("com.dropbox.android.apk") }.
@@ -41,13 +41,13 @@ class StagingTest extends StagingTestFramework {
 //	  }
 //		
 	
-  InterproceduralExamples.popularAPKFiles.
+//  InterproceduralExamples.popularAPKFiles.
 //	  filter { s => s.contains("la.droid.qr.apk") }.
-  foreach { resfile =>
+//  foreach { resfile =>
 //	    if(i > 500) 
-    Analyzing title resfile file resfile
+//    Analyzing title resfile file resfile
 //	    i+=1
-  }
+//  }
 //		InterproceduralExamples.testFiles.
 ////	  filter { s => s.endsWith("acctsvcs.us.apk")}.
 //	  foreach { resfile =>
@@ -55,13 +55,13 @@ class StagingTest extends StagingTestFramework {
 //	    Analyzing title resfile file resfile
 ////	    i+=1
 //	  }
-  InterproceduralExamples.randomAPKFiles.
+//  InterproceduralExamples.randomAPKFiles.
 //	  filter { s => s.endsWith("enterprise.dmagent.apk") }.
-  foreach { resfile =>
+//  foreach { resfile =>
 //	    if(i < 89) i += 1
     //if(resfile.endsWith("app.kazoebito.com.apk"))
-    Analyzing title resfile file resfile
-  }
+//    Analyzing title resfile file resfile
+//  }
 //	  InterproceduralExamples.normalAPKFiles.
 //	//  filter { s => s.name.endsWith("android-1.apk") }.
 //	  foreach { resRet =>

@@ -14,8 +14,8 @@ import org.sireum.amandroid.test.framework.security.OAuthCounter
 
 @RunWith(classOf[JUnitRunner])
 class OAuthTest extends OAuthTestFramework {
-  var i = 0
-  val androidLibDir = AndroidGlobalConfig.android_lib_dir
+//  var i = 0
+//  val androidLibDir = AndroidGlobalConfig.android_lib_dir
 	//	JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
 		
 		//LibSideEffectProvider.init
@@ -25,16 +25,16 @@ class OAuthTest extends OAuthTestFramework {
 //	  foreach { resfile =>
 //	    Analyzing title resfile file resfile
 //	  }
-  InterproceduralExamples.popularAPKFiles.
+//  InterproceduralExamples.popularAPKFiles.
 //	  filter { s => s.contains("mobi.mgeek.TunnyBrowser.apk") }.
 
-  foreach { resfile =>
-    if(i > 504) 
-    Analyzing title resfile file resfile
-    i+=1
-  }
+//  foreach { resfile =>
+//    if(i > 504) 
+//    Analyzing title resfile file resfile
+//    i+=1
+//  }
   
-  OAuthCounter.write
+//  OAuthCounter.write
 //		InterproceduralExamples.testFiles.
 ////	  filter { s => s.endsWith("acctsvcs.us.apk")}.
 //	  foreach { resfile =>

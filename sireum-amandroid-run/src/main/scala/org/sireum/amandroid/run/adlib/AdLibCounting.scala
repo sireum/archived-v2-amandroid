@@ -1,4 +1,4 @@
-package org.sireum.amandroid.security.test
+package org.sireum.amandroid.run.adlib
 
 import org.sireum.util.FileUtil
 import org.sireum.jawa.Center
@@ -250,7 +250,10 @@ object AdLibCounting {
   }
   
   def main(args: Array[String]): Unit = {
-    require(args.size == 1)
+    if(args.size != 1){
+      System.err.print("Usage: source_path")
+      return
+    }
     JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), GlobalConfig.PILAR_FILE_EXT)
     val outputUri = FileUtil.toUri("/media/fgwei/c3337db2-6708-4063-9079-a61c105f519f/Outputs/adlib")
     val sourcePath = args(0)

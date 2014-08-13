@@ -20,16 +20,16 @@ import org.sireum.jawa.GlobalConfig
  */
 @RunWith(classOf[JUnitRunner])
 class CompleteRFATest extends PasswordTrackingTestFramework {
-  var i = 0
-  val androidLibDir = AndroidGlobalConfig.android_lib_dir
-  JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
+//  var i = 0
+//  val androidLibDir = AndroidGlobalConfig.android_lib_dir
+//  JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
 		
 //		LibSideEffectProvider.init
-  InterproceduralExamples.testAPKFiles.
-  filter { s => s.endsWith("testCharSeqCallback.apk") }. // PasswordPassTest.apk
-  foreach { resfile =>
-    Analyzing title resfile file resfile
-  }
+//  InterproceduralExamples.testAPKFiles.
+//  filter { s => s.endsWith("testCharSeqCallback.apk") }. // PasswordPassTest.apk
+//  foreach { resfile =>
+//    Analyzing title resfile file resfile
+//  }
 //	  InterproceduralExamples.popularAPKFiles.
 ////	  filter { s => s.contains("la.droid.qr.apk") }.
 //	  foreach { resfile =>

@@ -13,9 +13,9 @@ import org.sireum.jawa.GlobalConfig
 
 @RunWith(classOf[JUnitRunner])
 class IntentInjectionTest extends IntentInjectionTestFramework {
-  var i = 0
-  val androidLibDir = AndroidGlobalConfig.android_lib_dir
-	JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
+//  var i = 0
+//  val androidLibDir = AndroidGlobalConfig.android_lib_dir
+//	JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
 		
 //		LibSideEffectProvider.init
 		
@@ -24,13 +24,13 @@ class IntentInjectionTest extends IntentInjectionTestFramework {
 //	  foreach { resfile =>
 //	    Analyzing title resfile file resfile
 //	  }
-  InterproceduralExamples.popularAPKFiles.
+//  InterproceduralExamples.popularAPKFiles.
 //	  filter { s => s.contains("mobi.mgeek.TunnyBrowser.apk") }.
-  foreach { resfile =>
+//  foreach { resfile =>
 //	    if(i > 500) 
-    Analyzing title resfile file resfile
+//    Analyzing title resfile file resfile
 //	    i+=1
-  }
+//  }
 //		InterproceduralExamples.testFiles.
 ////	  filter { s => s.endsWith("acctsvcs.us.apk")}.
 //	  foreach { resfile =>
@@ -38,9 +38,9 @@ class IntentInjectionTest extends IntentInjectionTestFramework {
 //	    Analyzing title resfile file resfile
 ////	    i+=1
 //	  }
-  InterproceduralExamples.randomAPKFiles.
+//  InterproceduralExamples.randomAPKFiles.
 //	  filter { s => s.endsWith("gtd.client.apk") }.
-  foreach { resfile =>
+//  foreach { resfile =>
 //	    if(i < 89) i += 1
 //	    if(resfile.endsWith("com.fcbh.dbp.BibleSocietyOfPhilippines.apk") ||
 //	        resfile.endsWith("com.genwi.delaware.apk")||
@@ -51,8 +51,8 @@ class IntentInjectionTest extends IntentInjectionTestFramework {
 //	        resfile.endsWith("com.midnitestarinc.pinkcandles.apk") ||
 //	        resfile.endsWith("com.ND.NamierzDziecko.apk")
 //	        )
-    Analyzing title resfile file resfile
-  }
+//    Analyzing title resfile file resfile
+//  }
 //	  InterproceduralExamples.normalAPKFiles.
 //	//  filter { s => s.name.endsWith("android-1.apk") }.
 //	  foreach { resfile =>

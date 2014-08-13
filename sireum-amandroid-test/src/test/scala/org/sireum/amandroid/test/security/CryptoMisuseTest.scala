@@ -13,17 +13,17 @@ import org.sireum.jawa.GlobalConfig
 
 @RunWith(classOf[JUnitRunner])
 class CryptoMisuseTest extends CryptoMisuseTestFramework {
-  var i = 0
-  val androidLibDir = AndroidGlobalConfig.android_lib_dir
-	JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
-	
-	//LibSideEffectProvider.init
-	
-  InterproceduralExamples.testAPKFiles.
-  filter { s => s.endsWith("Crypto_ECB.apk") }.
-  foreach { resfile =>
-    Analyzing title resfile file resfile
-  }
+//  var i = 0
+//  val androidLibDir = AndroidGlobalConfig.android_lib_dir
+//	JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
+//	
+//LibSideEffectProvider.init
+//	
+//  InterproceduralExamples.testAPKFiles.
+//  filter { s => s.endsWith("Crypto_ECB.apk") }.
+//  foreach { resfile =>
+//    Analyzing title resfile file resfile
+//  }
 //	  InterproceduralExamples.popularAPKFiles.
 //	  filter { s => s.contains("mobi.mgeek.TunnyBrowser.apk") }.
 //	  foreach { resfile =>

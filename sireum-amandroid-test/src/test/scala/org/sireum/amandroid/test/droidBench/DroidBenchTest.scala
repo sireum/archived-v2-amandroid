@@ -20,24 +20,9 @@ class DroidBenchTest extends DroidBenchTestFramework {
   val androidLibDir = AndroidGlobalConfig.android_lib_dir
 	JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
 //		LibSideEffectProvider.init
-		
-//		val ints = Set("AndroidSpecific_Library2.apk")
-		
-  InterproceduralExamples.benchAPKFiles.
+//  InterproceduralExamples.benchAPKFiles.
 //	  filter { s => ints.exists(s.endsWith(_)) }.
-  foreach { fileUri =>
-    Analyzing title fileUri file fileUri
-  }
-		
-//		InterproceduralExamples.testAPKFiles.
-//		filter { s => ints.exists(s.endsWith(_)) }.
-//		foreach { fileUri =>
-//		  Analyzing title fileUri file fileUri
-//		}
-		
-//		InterproceduralExamples.benchExtendAPKFiles.
-////		filter { s => ints.exists(s.endsWith(_)) }.
-//		foreach { fileUri =>
-//		  Analyzing title fileUri file fileUri
-//		}
+//  foreach { fileUri =>
+//    Analyzing title fileUri file fileUri
+//  }
 }
