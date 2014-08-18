@@ -1,4 +1,4 @@
-package org.sireum.amandroid.test.staging
+package org.sireum.amandroid.run.test
 
 import org.sireum.util._
 import org.sireum.amandroid._
@@ -37,17 +37,18 @@ import org.sireum.jawa.alir.interProcedural.controlFlowGraph.InterproceduralCont
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.amandroid.alir.dataRecorder.AmandroidResult
 import org.sireum.jawa.GlobalConfig
+import org.sireum.jawa.MessageCenter
 import org.sireum.jawa.alir.LibSideEffectProvider
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
-object Staging_run {
-  private final val TITLE = "Staging_run"
-  object StagingCounter {
+object Test_run  {
+  private final val TITLE = "Test_run"
+  object AnyCounter {
     var total = 0
     var haveresult = 0
-    override def toString : String = "total: " + total
+    override def toString : String = "total: " + total + ", haveResult: " + haveresult
   }
   
   def main(args: Array[String]): Unit = {
@@ -57,48 +58,45 @@ object Staging_run {
     }
     
     JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), GlobalConfig.PILAR_FILE_EXT)
-    LibSideEffectProvider.init(AndroidGlobalConfig.android_libsummary_dir)
-    val outputUri = FileUtil.toUri("/media/fgwei/c3337db2-6708-4063-9079-a61c105f519f/Outputs/icc")
+    LibSideEffectProvider.init(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSideEffectResult.xml.zip")
+    val outputUri = FileUtil.toUri("/media/fgwei/c3337db2-6708-4063-9079-a61c105f519f/Outputs/test")
     val sourcePath = args(0)
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
     files.foreach{
       file =>
-        try{
-          StagingCounter.total += 1
-        	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
-        	AndroidGlobalConfig.initJawaAlirInfoProvider
-        	
-        	val srcFile = new File(new URI(file))
-        	
-        	val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
-        	val resultDir = new File(outputDir + "/Results/")
-        	
-        	val dexFile = APKFileResolver.getDexFile(file, FileUtil.toUri(resultDir))
-        	
-        	// convert the dex file to the "pilar" form
-        	val pilarRootUri = Dex2PilarConverter.convert(dexFile)
-        	val pilarFile = new File(new URI(pilarRootUri))
-        	
-      		AndroidRFAConfig.setupCenter
-        	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
-        	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
+        msg_critical(TITLE, "####" + file + "#####")
+  //    	MessageCenter.msglevel = MessageCenter.MSG_LEVEL.VERBOSE
+      	AnyCounter.total += 1
+      	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
+      	AndroidGlobalConfig.initJawaAlirInfoProvider
       	
+      	val srcFile = new File(new URI(file))
+      	val dexFile = APKFileResolver.getDexFile(file, FileUtil.toUri(srcFile.getParentFile()))
+      	
+      	// convert the dex file to the "pilar" form
+      	val pilarRootUri = Dex2PilarConverter.convert(dexFile)
+      	val pilarFile = new File(new URI(pilarRootUri))
+    		AndroidRFAConfig.setupCenter
+      	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
+      	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
+      	try{
   	    	val pre = new AppInfoCollector(file)
   			  pre.collectInfo
-  
-  			  var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
+  			  val ssm = new DefaultSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+  	    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
   	    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
+  	    	
   			  AndroidReachingFactsAnalysisConfig.k_context = 1
   		    AndroidReachingFactsAnalysisConfig.resolve_icc = true
   		    AndroidReachingFactsAnalysisConfig.resolve_static_init = true
-  		    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(120))
+  		    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
   		    
   		    val fileName = file.substring(file.lastIndexOf("/"), file.lastIndexOf("."))
-    	    
-  		  	val fileDir = new File(outputDir + "/AmandroidResult/ResultStore/" + fileName)
+    	    val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
+  		  	val fileDir = new File(outputDir + "/AmandroidResult/DroidBench/" + fileName)
     	    if(!fileDir.exists()) fileDir.mkdirs()
   		    
-  	    	entryPoints.par.foreach{
+  	    	entryPoints.foreach{
   	    	  ep =>
   	    	    try{
   		    	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
@@ -114,17 +112,34 @@ object Staging_run {
   				      val zipw = new GZIPOutputStream(new BufferedOutputStream(w))
   					    AndroidXStream.toXml(AmandroidResult(InterProceduralDataFlowGraph(icfg, irfaResult), ddgResult), zipw)
   					    zipw.close()
-  					    msg_critical(TITLE, "Result stored!")
-  //					    val reader = new GZIPInputStream(new FileInputStream(file))
-  //					    val xmlObject = AndroidXStream.fromXml(reader).asInstanceOf[AmandroidResult]
-  //				      reader.close()
-  //				      msg_critical(TITLE, "xml loaded!")
-  //				      msg_critical(TITLE, "" + {icfg.nodes.size == xmlObject.idfg.icfg.nodes.size})
+  					    println("Result stored!")
+  					    val reader = new GZIPInputStream(new FileInputStream(file))
+  					    val xmlObject = AndroidXStream.fromXml(reader).asInstanceOf[AmandroidResult]
+  				      reader.close()
+  				      println("xml loaded!")
+  				      println(icfg.nodes.size == xmlObject.idfg.icfg.nodes.size)
+  				      println(icfg.edges.size == xmlObject.idfg.icfg.edges.size)    
+  				      val tar = AndroidDataDependentTaintAnalysis(xmlObject.ddg, xmlObject.idfg.summary, ssm)    
+  		    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
+  //			    	    iddResult.getIddg.toDot(new PrintWriter(System.out))
+  				      
   			    	} catch {
   	    	      case te : TimeOutException => System.err.println("Timeout!")
   	    	    }
     	    } 
-  			  StagingCounter.haveresult += 1
+  //			  
+  //	    	val appData = DataCollector.collect
+  //	    	MetricRepo.collect(appData)
+  //	    	val apkName = file.substring(0, file.lastIndexOf("."))
+  //	    	val appDataDirFile = new File(outputDir + "/" + apkName)
+  //	    	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
+  //	    	val out = new PrintWriter(appDataDirFile + "/AppData.txt")
+  //		    out.print(appData.toString)
+  //		    out.close()
+  //		    val mr = new PrintWriter(outputDir + "/MetricInfo.txt")
+  //			  mr.print(MetricRepo.toString)
+  //			  mr.close()
+  //			  AnyCounter.haveresult += 1
       	} catch {
       	  case ie : IgnoreException =>
       	    err_msg_critical(TITLE, "Ignored!")
@@ -133,14 +148,18 @@ object Staging_run {
       	  case e : Exception =>
       	    e.printStackTrace()
       	} finally {
-      	  Center.reset
-  	    	AppCenter.reset
-  	    	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
-  	    	JawaCodeSource.clearAppRecordsCodes
-  	    	System.gc()
-  			  System.gc()
-  	    	msg_critical(TITLE, "************************************\n")
       	}
+      	
+      	Center.reset
+      	AppCenter.reset
+      	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
+      	JawaCodeSource.clearAppRecordsCodes
+      	System.gc()
+  		  System.gc()
+      	msg_critical(TITLE, AnyCounter.toString)
+  //    	PasswordCounter.outputInterestingFileNames
+  //    	PasswordCounter.outputRecStatistic
+      	msg_critical(TITLE, "************************************\n")
     }
   }
 }

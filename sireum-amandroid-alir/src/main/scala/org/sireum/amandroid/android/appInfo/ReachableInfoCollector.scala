@@ -327,10 +327,12 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	                    val hier = Center.getRecordHierarchy
 	                    if(typRec.isInterface){
 	                      val impls = hier.getAllImplementersOf(typRec)
-	                      callbackRecords ++= impls.map{
-	                        impl =>
-	                          hier.getAllSubClassesOfIncluding(impl)
-	                      }.reduce(iunion[JawaRecord]) 
+	                      if(!impls.isEmpty){
+  	                      callbackRecords ++= impls.map{
+  	                        impl =>
+  	                          hier.getAllSubClassesOfIncluding(impl)
+  	                      }.reduce(iunion[JawaRecord]) 
+	                      }
 	                    } else {
 	                      callbackRecords ++= hier.getAllSubClassesOfIncluding(typRec)
 	                    }

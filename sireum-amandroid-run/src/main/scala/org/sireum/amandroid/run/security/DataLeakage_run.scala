@@ -1,44 +1,44 @@
 package org.sireum.amandroid.run.security
 
-import org.sireum.amandroid.alir.AndroidGlobalConfig
 import org.sireum.jawa.JawaCodeSource
 import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
+import org.sireum.amandroid.alir.AndroidGlobalConfig
 import org.sireum.jawa.alir.LibSideEffectProvider
 import org.sireum.util.FileUtil
 import org.sireum.jawa.GlobalConfig
-import org.sireum.jawa.util.APKFileResolver
-import org.sireum.jawa.MessageCenter._
+import org.sireum.jawa.util.IgnoreException
+import org.sireum.amandroid.alir.dataRecorder.MetricRepo
+import org.sireum.amandroid.alir.dataRecorder.DataCollector
+import org.sireum.amandroid.alir.AppCenter
+import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.jawa.util.Timer
+import org.sireum.jawa.Center
+import org.sireum.amandroid.alir.AndroidConstants
+import org.sireum.amandroid.alir.interProcedural.taintAnalysis.DefaultSourceAndSinkManager
+import org.sireum.amandroid.android.appInfo.AppInfoCollector
+import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidRFAConfig
 import java.io.File
 import java.net.URI
 import org.sireum.amandroid.android.decompile.Dex2PilarConverter
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidRFAConfig
+import org.sireum.jawa.util.APKFileResolver
+import org.sireum.jawa.MessageCenter._
 import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
-import org.sireum.amandroid.security.apiMisuse.CryptographicConstants
-import org.sireum.jawa.util.IgnoreException
-import org.sireum.amandroid.security.apiMisuse.InterestingApiCollector
-import org.sireum.amandroid.alir.AndroidConstants
-import org.sireum.jawa.Center
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
-import org.sireum.amandroid.alir.AppCenter
 import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
-import org.sireum.amandroid.security.apiMisuse.CryptographicMisuse
-import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
+import org.sireum.jawa.alir.interProcedural.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
 import org.sireum.jawa.ClassLoadManager
+import org.sireum.amandroid.alir.interProcedural.taintAnalysis.AndroidDataDependentTaintAnalysis
 import org.sireum.jawa.util.TimeOutException
-import org.sireum.jawa.util.Timer
+import org.sireum.jawa.MessageCenter
 
-/**
- * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
- */
-object CryptoMisuse_run {
-  private final val TITLE = "CryptoMisuse_run"
-  
-  object CryptoMisuseCounter {
+object DataLeakage_run {
+  private final val TITLE = "DataLeakage_run"
+  MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
+  object DataLeakageCounter {
     var total = 0
-    var oversize = 0
     var haveresult = 0
-    
-    override def toString : String = "total: " + total + ", oversize: " + oversize + ", haveResult: " + haveresult
+    var taintPathFound = 0
+    var taintPathFoundList = Set[String]()
+    override def toString : String = "total: " + total + ", haveResult: " + haveresult + ", taintPathFound: " + taintPathFound
   }
   
   def main(args: Array[String]): Unit = {
@@ -49,13 +49,13 @@ object CryptoMisuse_run {
     
     JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), GlobalConfig.PILAR_FILE_EXT)
     LibSideEffectProvider.init(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSideEffectResult.xml.zip")
-    val outputUri = FileUtil.toUri("/media/fgwei/c3337db2-6708-4063-9079-a61c105f519f/Outputs/crypto_misuse")
+    val outputUri = FileUtil.toUri("/media/fgwei/c3337db2-6708-4063-9079-a61c105f519f/Outputs/data_leakage")
     val sourcePath = args(0)
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
     files.foreach{
       file =>
         msg_critical(TITLE, "####" + file + "#####")
-      	CryptoMisuseCounter.total += 1
+      	DataLeakageCounter.total += 1
       	// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
       	AndroidGlobalConfig.initJawaAlirInfoProvider
       	
@@ -69,23 +69,17 @@ object CryptoMisuse_run {
       		AndroidRFAConfig.setupCenter
   	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
   	    	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
-  	    	
   	    	try{
-  	    	  if(!JawaCodeSource.getAppRecordsCodes.exists{
-  	    	    case (sig, code) =>
-  	    	      CryptographicConstants.getCryptoAPIs.exists(p => code.contains(p))
-  	    	  }) throw new IgnoreException
-  	    	  
-  		    	val pre = new InterestingApiCollector(file)
-  				  pre.collectInfo
-  				  var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
+  		    	val pre = new AppInfoCollector(file)
+  					pre.collectInfo
+  					val ssm = new DefaultSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+  		    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
   		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
-  		    	val iacs = pre.getInterestingContainers(CryptographicConstants.getCryptoAPIs)
-  		    	entryPoints = entryPoints.filter(e=>iacs.contains(e.getDeclaringRecord))
-  				  AndroidReachingFactsAnalysisConfig.k_context = 1
-  			    AndroidReachingFactsAnalysisConfig.resolve_icc = false
+  		    	AndroidReachingFactsAnalysisConfig.k_context = 1
+  			    AndroidReachingFactsAnalysisConfig.resolve_icc = true
   			    AndroidReachingFactsAnalysisConfig.resolve_static_init = false
   			    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
+
   		    	entryPoints.par.foreach{
   		    	  ep =>
   		    	    try{
@@ -94,12 +88,32 @@ object CryptoMisuse_run {
   			    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
   			    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
   			    	    msg_critical(TITLE, "processed-->" + icfg.getProcessed.size)
-  			    	    CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
+  			    	    val ddgResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
+  			    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, ddgResult)
+  			    	    
+  					      val tar = AndroidDataDependentTaintAnalysis(ddgResult, irfaResult, ssm)    
+  			    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
+  					      if(!tar.getTaintedPaths.isEmpty){
+  					        val paths = tar.getTaintedPaths
+  					        paths.foreach{
+  					          path =>
+  					            val sink = path.getSink.getNode.getCGNode
+  					            val facts = irfaResult.entrySet(sink)
+  					            msg_critical(TITLE, facts.toString())
+  					        }
+  					      }
   				    	} catch {
   		    	      case te : TimeOutException => System.err.println("Timeout!")
   		    	    }
-      	    } 
-  				  CryptoMisuseCounter.haveresult += 1
+      	    }
+  				  
+  		    	if(AppCenter.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
+      	      DataLeakageCounter.taintPathFound += 1
+      	      DataLeakageCounter.taintPathFoundList += file
+      	    }
+  		    	val appData = DataCollector.collect
+  		    	MetricRepo.collect(appData)
+  				  DataLeakageCounter.haveresult += 1
   	    	} catch {
   	    	  case ie : IgnoreException =>
   	    	    err_msg_critical(TITLE, "Ignored!")
@@ -110,7 +124,6 @@ object CryptoMisuse_run {
   	    	} finally {
   	    	}
       	} else {
-      	  CryptoMisuseCounter.oversize += 1
       	  err_msg_critical(TITLE, "Pilar file size is too large:" + pilarFile.length()/1024/1024 + "MB")
       	}
       	
@@ -120,10 +133,8 @@ object CryptoMisuse_run {
       	JawaCodeSource.clearAppRecordsCodes
       	System.gc()
   		  System.gc()
-      	msg_critical(TITLE, CryptoMisuseCounter.toString)
+      	msg_critical(TITLE, DataLeakageCounter.toString)
       	msg_critical(TITLE, "************************************\n")
-        
     }
   }
-  
 }
