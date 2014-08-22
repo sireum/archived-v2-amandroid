@@ -90,7 +90,7 @@ object AdLibCounting {
     var wooboo : Set[String] = Set()
     
     def output = {
-      val outputpath = "/media/fgwei/c3337db2-6708-4063-9079-a61c105f519f/Outputs/adlib"
+      val outputpath = "/Volumes/ArgusGroup/Stash/outputs/adlib"
       val summaryStr : String = 
         "adfonic: " + Counter.adfonic.size + "\n" + 
   	    "winad: " + Counter.winad.size + "\n" +
@@ -164,76 +164,76 @@ object AdLibCounting {
   	    "wooboo: " + Counter.wooboo.size + "\n"
   	  
   	  val detailStr : String = 
-        "adfonic: \n" + Counter.adfonic + "\n" +
-  	    "winad: \n" + Counter.winad + "\n" +
-  	    "admarvel: \n" + Counter.admarvel + "\n" +
-  	    "appmedia: \n" + Counter.appmedia + "\n" +
-  	    "smartadserver: \n" + Counter.smartadserver + "\n" +
-  	    "immob: \n" + Counter.immob + "\n" +
-  	    "polar: \n" + Counter.polar + "\n" +
-  	    "medialets: \n" + Counter.medialets + "\n" +
-  	    "baidu: \n" + Counter.baidu + "\n" +
-  	    "sense: \n" + Counter.sense + "\n" +
-  	    "mads: \n" + Counter.mads + "\n" +
-  	    "tapjoy: \n" + Counter.tapjoy + "\n" +
-  	    "innerActive: \n" + Counter.innerActive + "\n" +
-  	    "zestadz: \n" + Counter.zestadz + "\n" +
-  	    "admogo: \n" + Counter.admogo + "\n" +
-  	    "smaato: \n" + Counter.smaato + "\n" +
-  	    "daum: \n" + Counter.daum + "\n" +
-  	    "inmobi: \n" + Counter.inmobi + "\n" +
-  	    "imobile: \n" + Counter.imobile + "\n" +
-  	    "flurry: \n" + Counter.flurry + "\n" +
-  	    "youmi: \n" + Counter.youmi + "\n" +
-  	    "airad: \n" + Counter.airad + "\n" +
-  	    "mopub: \n" + Counter.mopub + "\n" +
-  	    "millennialmedia: \n" + Counter.millennialmedia + "\n" +
-  	    "adchina: \n" + Counter.adchina + "\n" +
-  	    "mobclix: \n" + Counter.mobclix + "\n" +
-  	    "adlib_android: \n" + Counter.adlib_android + "\n" +
-  	    "vpon: \n" + Counter.vpon + "\n" +
-  	    "mobfox: \n" + Counter.mobfox + "\n" +
-  	    "casee: \n" + Counter.casee + "\n" +
-  	    "cauly: \n" + Counter.cauly + "\n" +
-  	    "adserver: \n" + Counter.adserver + "\n" +
-  	    "waps: \n" + Counter.waps + "\n" +
-  	    "pontiflex: \n" + Counter.pontiflex + "\n" +
-  	    "googleads: \n" + Counter.googleads + "\n" +
-  	    "adwo: \n" + Counter.adwo + "\n" +
-  	    "adwhirl: \n" + Counter.adwhirl + "\n" +
-  	    "domob: \n" + Counter.domob + "\n" +
-  	    "energysource: \n" + Counter.energysource + "\n" +
-  	    "madvertise: \n" + Counter.madvertise + "\n" +
-  	    "madhouse: \n" + Counter.madhouse + "\n" +
-  	    "qwapi: \n" + Counter.qwapi + "\n" +
-  	    "mdotm: \n" + Counter.mdotm + "\n" +
-  	    "guohead: \n" + Counter.guohead + "\n" +
-  	    "nexage: \n" + Counter.nexage + "\n" +
-  	    "wiyun: \n" + Counter.wiyun + "\n" +
-  	    "mobisage: \n" + Counter.mobisage + "\n" +
-  	    "sktelecom: \n" + Counter.sktelecom + "\n" +
-  	    "vdopia: \n" + Counter.vdopia + "\n" +
-  	    "adlocal: \n" + Counter.adlocal + "\n" +
-  	    "admob: \n" + Counter.admob + "\n" +
-  	    "greystripe: \n" + Counter.greystripe + "\n" +
-  	    "uplusad: \n" + Counter.uplusad + "\n" +
-  	    "adagogo: \n" + Counter.adagogo + "\n" +
-  	    "jumptap: \n" + Counter.jumptap + "\n" +
-  	    "everbadge: \n" + Counter.everbadge + "\n" +
-  	    "microad: \n" + Counter.microad + "\n" +
-  	    "mobgold: \n" + Counter.mobgold + "\n" +
-  	    "yicha: \n" + Counter.yicha + "\n" +
-  	    "mobot: \n" + Counter.mobot + "\n" +
-  	    "mediba: \n" + Counter.mediba + "\n" +
-  	    "moolah: \n" + Counter.moolah + "\n" +
-  	    "adknowledge: \n" + Counter.adknowledge + "\n" +
-  	    "transpera: \n" + Counter.transpera + "\n" +
-  	    "adview: \n" + Counter.adview + "\n" +
-  	    "adlantis: \n" + Counter.adlantis + "\n" +
-  	    "airpush: \n" + Counter.airpush + "\n" +
-  	    "leadbolt: \n" + Counter.leadbolt + "\n" +
-  	    "wqmobile: \n" + Counter.wqmobile + "\n" +
-  	    "wooboo: \n" + Counter.wooboo + "\n"
+        "adfonic: \n" + Counter.adfonic + "\n\n" +
+  	    "winad: \n" + Counter.winad + "\n\n" +
+  	    "admarvel: \n" + Counter.admarvel + "\n\n" +
+  	    "appmedia: \n" + Counter.appmedia + "\n\n" +
+  	    "smartadserver: \n" + Counter.smartadserver + "\n\n" +
+  	    "immob: \n" + Counter.immob + "\n\n" +
+  	    "polar: \n" + Counter.polar + "\n\n" +
+  	    "medialets: \n" + Counter.medialets + "\n\n" +
+  	    "baidu: \n" + Counter.baidu + "\n\n" +
+  	    "sense: \n" + Counter.sense + "\n\n" +
+  	    "mads: \n" + Counter.mads + "\n\n" +
+  	    "tapjoy: \n" + Counter.tapjoy + "\n\n" +
+  	    "innerActive: \n" + Counter.innerActive + "\n\n" +
+  	    "zestadz: \n" + Counter.zestadz + "\n\n" +
+  	    "admogo: \n" + Counter.admogo + "\n\n" +
+  	    "smaato: \n" + Counter.smaato + "\n\n" +
+  	    "daum: \n" + Counter.daum + "\n\n" +
+  	    "inmobi: \n" + Counter.inmobi + "\n\n" +
+  	    "imobile: \n" + Counter.imobile + "\n\n" +
+  	    "flurry: \n" + Counter.flurry + "\n\n" +
+  	    "youmi: \n" + Counter.youmi + "\n\n" +
+  	    "airad: \n" + Counter.airad + "\n\n" +
+  	    "mopub: \n" + Counter.mopub + "\n\n" +
+  	    "millennialmedia: \n" + Counter.millennialmedia + "\n\n" +
+  	    "adchina: \n" + Counter.adchina + "\n\n" +
+  	    "mobclix: \n" + Counter.mobclix + "\n\n" +
+  	    "adlib_android: \n" + Counter.adlib_android + "\n\n" +
+  	    "vpon: \n" + Counter.vpon + "\n\n" +
+  	    "mobfox: \n" + Counter.mobfox + "\n\n" +
+  	    "casee: \n" + Counter.casee + "\n\n" +
+  	    "cauly: \n" + Counter.cauly + "\n\n" +
+  	    "adserver: \n" + Counter.adserver + "\n\n" +
+  	    "waps: \n" + Counter.waps + "\n\n" +
+  	    "pontiflex: \n" + Counter.pontiflex + "\n\n" +
+  	    "googleads: \n" + Counter.googleads + "\n\n" +
+  	    "adwo: \n" + Counter.adwo + "\n\n" +
+  	    "adwhirl: \n" + Counter.adwhirl + "\n\n" +
+  	    "domob: \n" + Counter.domob + "\n\n" +
+  	    "energysource: \n" + Counter.energysource + "\n\n" +
+  	    "madvertise: \n" + Counter.madvertise + "\n\n" +
+  	    "madhouse: \n" + Counter.madhouse + "\n\n" +
+  	    "qwapi: \n" + Counter.qwapi + "\n\n" +
+  	    "mdotm: \n" + Counter.mdotm + "\n\n" +
+  	    "guohead: \n" + Counter.guohead + "\n\n" +
+  	    "nexage: \n" + Counter.nexage + "\n\n" +
+  	    "wiyun: \n" + Counter.wiyun + "\n\n" +
+  	    "mobisage: \n" + Counter.mobisage + "\n\n" +
+  	    "sktelecom: \n" + Counter.sktelecom + "\n\n" +
+  	    "vdopia: \n" + Counter.vdopia + "\n\n" +
+  	    "adlocal: \n" + Counter.adlocal + "\n\n" +
+  	    "admob: \n" + Counter.admob + "\n\n" +
+  	    "greystripe: \n" + Counter.greystripe + "\n\n" +
+  	    "uplusad: \n" + Counter.uplusad + "\n\n" +
+  	    "adagogo: \n" + Counter.adagogo + "\n\n" +
+  	    "jumptap: \n" + Counter.jumptap + "\n\n" +
+  	    "everbadge: \n" + Counter.everbadge + "\n\n" +
+  	    "microad: \n" + Counter.microad + "\n\n" +
+  	    "mobgold: \n" + Counter.mobgold + "\n\n" +
+  	    "yicha: \n" + Counter.yicha + "\n\n" +
+  	    "mobot: \n" + Counter.mobot + "\n\n" +
+  	    "mediba: \n" + Counter.mediba + "\n\n" +
+  	    "moolah: \n" + Counter.moolah + "\n\n" +
+  	    "adknowledge: \n" + Counter.adknowledge + "\n\n" +
+  	    "transpera: \n" + Counter.transpera + "\n\n" +
+  	    "adview: \n" + Counter.adview + "\n\n" +
+  	    "adlantis: \n" + Counter.adlantis + "\n\n" +
+  	    "airpush: \n" + Counter.airpush + "\n\n" +
+  	    "leadbolt: \n" + Counter.leadbolt + "\n\n" +
+  	    "wqmobile: \n" + Counter.wqmobile + "\n\n" +
+  	    "wooboo: \n" + Counter.wooboo + "\n\n"
   	    
   	  val summaryfile = new File(outputpath + "/summary.txt")
       val sos = new PrintWriter(summaryfile)
@@ -255,7 +255,7 @@ object AdLibCounting {
       return
     }
     JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), GlobalConfig.PILAR_FILE_EXT)
-    val outputUri = FileUtil.toUri("/media/fgwei/c3337db2-6708-4063-9079-a61c105f519f/Outputs/adlib")
+    val outputUri = FileUtil.toUri("/Volumes/ArgusGroup/Stash/outputs/adlib")
     val sourcePath = args(0)
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
     files.foreach{

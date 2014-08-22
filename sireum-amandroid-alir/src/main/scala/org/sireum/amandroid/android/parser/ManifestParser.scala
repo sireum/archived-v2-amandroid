@@ -12,7 +12,6 @@ import org.w3c.dom.Element
 import java.io.IOException
 import javax.xml.parsers.ParserConfigurationException
 import org.xml.sax.SAXException
-import org.sireum.jawa.util.ResourceRetriever
 
 final case class ComponentInfo(name : String, typ : String, exported : Boolean, permission : Option[String])
 
