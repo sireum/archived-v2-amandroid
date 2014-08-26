@@ -2,7 +2,6 @@ package org.sireum.amandroid.test.staging
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.sireum.amandroid.test.framework.droidBench.StagingTestFramework
 import org.sireum.amandroid.alir.AndroidGlobalConfig
 import org.sireum.jawa.JawaCodeSource
 import org.sireum.jawa.alir.LibSideEffectProvider
@@ -11,7 +10,6 @@ import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
 import org.sireum.util.FileUtil
 import org.sireum.jawa.GlobalConfig
 import org.sireum.amandroid.android.appInfo.AppInfoCollector
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis.DefaultSourceAndSinkManager
 import java.io.File
 import java.net.URI
 import org.sireum.jawa.util.APKFileResolver

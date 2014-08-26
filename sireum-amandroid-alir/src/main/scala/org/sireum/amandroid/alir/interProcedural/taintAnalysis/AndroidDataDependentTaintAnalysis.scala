@@ -110,10 +110,10 @@ object AndroidDataDependentTaintAnalysis {
     }
   }
     
-	def apply(iddi : InterproceduralDataDependenceInfo, rfaResult : AndroidReachingFactsAnalysis.Result, ssm : BasicSourceAndSinkManager) : TaintAnalysisResult
+	def apply(iddi : InterproceduralDataDependenceInfo, rfaResult : AndroidReachingFactsAnalysis.Result, ssm : AndroidSourceAndSinkManager) : TaintAnalysisResult
   	= build(iddi, rfaResult, ssm)
   	
-  def build(iddi : InterproceduralDataDependenceInfo, rfaResult : AndroidReachingFactsAnalysis.Result, ssm : BasicSourceAndSinkManager) : TaintAnalysisResult = {
+  def build(iddi : InterproceduralDataDependenceInfo, rfaResult : AndroidReachingFactsAnalysis.Result, ssm : AndroidSourceAndSinkManager) : TaintAnalysisResult = {
     var sourceNodes : ISet[TaintNode] = isetEmpty
     var sinkNodes : ISet[TaintNode] = isetEmpty
     val iddg = iddi.getIddg
@@ -136,7 +136,7 @@ object AndroidDataDependentTaintAnalysis {
     tar
   }
   
-  def getSourceAndSinkNode(node : IDDGNode, rfaFacts : ISet[RFAFact], ssm : BasicSourceAndSinkManager, iddg: InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node]) = {
+  def getSourceAndSinkNode(node : IDDGNode, rfaFacts : ISet[RFAFact], ssm : AndroidSourceAndSinkManager, iddg: InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node]) = {
     var sources = isetEmpty[TaintNode]
     var sinks = isetEmpty[TaintNode]
     node match{

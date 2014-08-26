@@ -4,7 +4,6 @@ import org.sireum.amandroid.android.parser.LayoutControl
 import org.sireum.util._
 import org.sireum.jawa.JawaProcedure
 import org.sireum.jawa.MessageCenter._
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis.BasicSourceAndSinkManager
 import org.sireum.pilar.ast._
 import org.sireum.amandroid.alir.AndroidConstants
 import org.sireum.jawa.alir.util.ExplicitValueFinder
@@ -16,12 +15,13 @@ import org.sireum.jawa.alir.interProcedural.controlFlowGraph.CGNode
 import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.IntentHelper
 import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis.VarSlot
 import org.sireum.jawa.Center
+import org.sireum.amandroid.alir.interProcedural.taintAnalysis.AndroidSourceAndSinkManager
 
 class IntentInjectionSourceAndSinkManager(appPackageName : String, 
     												layoutControls : Map[Int, LayoutControl], 
     												callbackMethods : ISet[JawaProcedure], 
     												sasFilePath : String) 
-    												extends BasicSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
+    												extends AndroidSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
   
   override def isSource(calleeProcedure : JawaProcedure, callerProcedure : JawaProcedure, callerLoc : JumpLocation) : Boolean = {
 	  false

@@ -9,7 +9,7 @@ import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
 import org.sireum.util.FileUtil
 import org.sireum.jawa.GlobalConfig
 import org.sireum.amandroid.android.appInfo.AppInfoCollector
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis.DefaultSourceAndSinkManager
+import org.sireum.amandroid.alir.interProcedural.taintAnalysis.DefaultAndroidSourceAndSinkManager
 import java.io.File
 import java.net.URI
 import org.sireum.jawa.util.APKFileResolver
@@ -68,7 +68,7 @@ object StagingAnalyses_run {
   		    
   	    	val pre = new AppInfoCollector(file)
   		    pre.collectInfo
-  	    	val ssm = new DefaultSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+  	    	val ssm = new DefaultAndroidSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
   		    val pssm = new PasswordSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.PasswordSinkFilePath)
   		    val ossm = new OAuthSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.PasswordSinkFilePath)
   		    val iissm = new IntentInjectionSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)

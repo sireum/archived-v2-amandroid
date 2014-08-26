@@ -27,6 +27,7 @@ import org.sireum.amandroid.android.appInfo.AppInfoCollector
 import org.sireum.amandroid.security.oauth.OAuthSourceAndSinkManager
 import org.sireum.amandroid.security.oauth.OauthTokenContainerCollector
 import org.sireum.jawa.alir.LibSideEffectProvider
+import org.sireum.jawa.MessageCenter
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -85,10 +86,10 @@ object OAuthTokenTracking_run {
       System.err.print("Usage: source_path")
       return
     }
-    
+    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
     JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), GlobalConfig.PILAR_FILE_EXT)
     LibSideEffectProvider.init(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSideEffectResult.xml.zip")
-    val outputUri = FileUtil.toUri("/media/fgwei/c3337db2-6708-4063-9079-a61c105f519f/Outputs/oauth_token_tracking")
+    val outputUri = FileUtil.toUri("/Volumes/ArgusGroup/Stash/outputs/oauth_token_tracking")
     val sourcePath = args(0)
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
     files.foreach{

@@ -157,10 +157,10 @@ object UrlPermissionCompare_run {
         }
     }
     
-    val base_url_perm_only : MSet[String] = base_url_perm.intersect(base_url_perm_reverse)
-    val uncomm_url_perm_only : MSet[String] = uncomm_url_perm.intersect(uncomm_url_perm_reverse)
-    val uncomm_norAd_url_perm_only : MSet[String] = uncomm_norAd_url_perm.intersect(uncomm_norAd_url_perm_reverse)
-    val uncomm_norAd_nororg_url_perm_only : MSet[String] = uncomm_norAd_nororg_url_perm.intersect(uncomm_norAd_nororg_url_perm_reverse)
+    val base_url_perm_only : MSet[String] = base_url_perm -- base_url_perm_reverse
+    val uncomm_url_perm_only : MSet[String] = uncomm_url_perm -- uncomm_url_perm_reverse
+    val uncomm_norAd_url_perm_only : MSet[String] = uncomm_norAd_url_perm -- uncomm_norAd_url_perm_reverse
+    val uncomm_norAd_nororg_url_perm_only : MSet[String] = uncomm_norAd_nororg_url_perm -- uncomm_norAd_nororg_url_perm_reverse
 
     val basefile = outputpath + "/baseurl_perm.txt"
     val basepw = new FileWriter(basefile)

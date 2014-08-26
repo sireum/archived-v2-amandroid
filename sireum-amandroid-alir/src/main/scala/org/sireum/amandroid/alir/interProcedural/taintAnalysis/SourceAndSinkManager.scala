@@ -39,7 +39,7 @@ object SourceAndSinkCategory {
   final val CALLBACK_SOURCE = "callback_source"
 }
 
-abstract class BasicSourceAndSinkManager(appPackageName : String, 
+abstract class AndroidSourceAndSinkManager(appPackageName : String, 
     												layoutControls : Map[Int, LayoutControl], 
     												callbackMethods : ISet[JawaProcedure], 
     												sasFilePath : String) extends SourceAndSinkManager{
@@ -109,10 +109,10 @@ abstract class BasicSourceAndSinkManager(appPackageName : String,
 	
 }
 
-class DefaultSourceAndSinkManager(appPackageName : String, 
+class DefaultAndroidSourceAndSinkManager(appPackageName : String, 
     												layoutControls : Map[Int, LayoutControl], 
     												callbackMethods : ISet[JawaProcedure], 
-    												sasFilePath : String) extends BasicSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
+    												sasFilePath : String) extends AndroidSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
 	
   private final val TITLE = "DefaultSourceAndSinkManager"
   

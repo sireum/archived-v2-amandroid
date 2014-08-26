@@ -87,7 +87,7 @@ trait DroidBenchTestFramework extends TestFramework {
 	    	try{
 		    	val pre = new AppInfoCollector(srcRes)
 					pre.collectInfo
-					val ssm = new DefaultSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+					val ssm = new DefaultAndroidSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
 		    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
 		    	AndroidReachingFactsAnalysisConfig.k_context = 1

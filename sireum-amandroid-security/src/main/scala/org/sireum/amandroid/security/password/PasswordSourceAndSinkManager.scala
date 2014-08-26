@@ -1,6 +1,5 @@
 package org.sireum.amandroid.security.password
 
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis.BasicSourceAndSinkManager
 import org.sireum.amandroid.android.parser.LayoutControl
 import org.sireum.util._
 import org.sireum.jawa.JawaProcedure
@@ -18,11 +17,12 @@ import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.IntentHel
 import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis.VarSlot
 import org.sireum.jawa.alir.interProcedural.controlFlowGraph.CGInvokeNode
 import org.sireum.jawa.Center
+import org.sireum.amandroid.alir.interProcedural.taintAnalysis.AndroidSourceAndSinkManager
 
 class PasswordSourceAndSinkManager(appPackageName : String, 
     												layoutControls : Map[Int, LayoutControl], 
     												callbackMethods : ISet[JawaProcedure], 
-    												sasFilePath : String) extends BasicSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
+    												sasFilePath : String) extends AndroidSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
   private final val TITLE = "PasswordSourceAndSinkManager"
     
   def isCallbackSource(proc : JawaProcedure) : Boolean = {

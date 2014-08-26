@@ -24,7 +24,7 @@ import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.MessageCenter
 import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
 import org.sireum.jawa.util.Timer
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis.DefaultSourceAndSinkManager
+import org.sireum.amandroid.alir.interProcedural.taintAnalysis.DefaultAndroidSourceAndSinkManager
 import org.sireum.amandroid.alir.AndroidConstants
 import org.sireum.amandroid.alir.AndroidGlobalConfig
 import org.sireum.amandroid.alir.AppCenter
@@ -143,7 +143,7 @@ object TanitAnalysis{
 			    	
 			    	val pre = new AppInfoCollector(apkFileUri)
 					  pre.collectInfo
-					  val ssm = new DefaultSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+					  val ssm = new DefaultAndroidSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
 			    	val entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 			    	(if(parallel) entryPoints.par else entryPoints).foreach{
 			    	  ep =>

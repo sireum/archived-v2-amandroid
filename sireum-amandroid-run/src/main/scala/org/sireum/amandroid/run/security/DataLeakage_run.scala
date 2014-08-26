@@ -14,7 +14,7 @@ import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidRe
 import org.sireum.jawa.util.Timer
 import org.sireum.jawa.Center
 import org.sireum.amandroid.alir.AndroidConstants
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis.DefaultSourceAndSinkManager
+import org.sireum.amandroid.alir.interProcedural.taintAnalysis.DefaultAndroidSourceAndSinkManager
 import org.sireum.amandroid.android.appInfo.AppInfoCollector
 import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidRFAConfig
 import java.io.File
@@ -72,7 +72,7 @@ object DataLeakage_run {
   	    	try{
   		    	val pre = new AppInfoCollector(file)
   					pre.collectInfo
-  					val ssm = new DefaultSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+  					val ssm = new DefaultAndroidSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
   		    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
   		    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
   		    	AndroidReachingFactsAnalysisConfig.k_context = 1

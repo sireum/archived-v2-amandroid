@@ -1,6 +1,6 @@
 package org.sireum.amandroid.security.oauth
 
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis.BasicSourceAndSinkManager
+import org.sireum.amandroid.alir.interProcedural.taintAnalysis.AndroidSourceAndSinkManager
 import org.sireum.amandroid.android.parser.LayoutControl
 import org.sireum.util._
 import org.sireum.jawa.JawaProcedure
@@ -22,7 +22,7 @@ import org.sireum.jawa.Center
 class OAuthSourceAndSinkManager(appPackageName : String, 
     												layoutControls : Map[Int, LayoutControl], 
     												callbackMethods : ISet[JawaProcedure], 
-    												sasFilePath : String) extends BasicSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
+    												sasFilePath : String) extends AndroidSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
   private final val TITLE = "OAuthSourceAndSinkManager"
     
   override def isSource(calleeProcedure : JawaProcedure, callerProcedure : JawaProcedure, callerLoc : JumpLocation) = false
