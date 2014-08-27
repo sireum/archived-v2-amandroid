@@ -30,7 +30,7 @@ trait AmandroidSocketListener {
   def onPreAnalysis : Unit
   def onCodeLoaded(codes : Map[String, String]) : Unit
   def entryPointFilter(eps : Set[JawaProcedure]) : Set[JawaProcedure]
-  def onAnalysisSuccess(source_apk : String) : Unit
+  def onAnalysisSuccess : Unit
   def onTimeout : Unit
   def onPostAnalysis : Unit
 }
@@ -43,7 +43,7 @@ class AmandroidSocket {
     LibSideEffectProvider.init(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSideEffectResult.xml.zip")
   }
   
-  def plug(source_apk : String, 
+  def plugWithDDA(source_apk : String, 
             output_path : String,
             lib_sum : LibraryAPISummary,
             ssm : AndroidSourceAndSinkManager,
@@ -104,7 +104,89 @@ class AmandroidSocket {
 	    	    }
 	      } 
 	  
-	    	if(listener_opt.isDefined) listener_opt.get.onAnalysisSuccess(source_apk)
+	    	if(listener_opt.isDefined) listener_opt.get.onAnalysisSuccess
+    	} catch {
+    	  case ie : IgnoreException =>
+    	    err_msg_critical(TITLE, "Ignored!")
+    	  case re : RuntimeException => 
+    	    re.printStackTrace()
+    	  case e : Exception =>
+    	    e.printStackTrace()
+    	}
+    } catch {
+      case e : Exception => e.printStackTrace()
+    } finally {
+    	Center.reset
+    	AppCenter.reset
+    	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
+    	JawaCodeSource.clearAppRecordsCodes
+    	System.gc()
+      System.gc()
+	
+    	if(listener_opt.isDefined) listener_opt.get.onPostAnalysis
+    	msg_critical(TITLE, "************************************\n")
+    }
+  }
+  
+  def plugWithoutDDA(source_apk : String, 
+            output_path : String,
+            lib_sum : LibraryAPISummary,
+            public_only : Boolean,
+            listener_opt : Option[AmandroidSocketListener]) = {
+    
+    val outputUri = FileUtil.toUri(output_path)
+    
+    var loc : Int = 0
+    val startTime = System.currentTimeMillis()
+    try{
+  		msg_critical(TITLE, "####" + source_apk + "#####")
+  		
+  		if(listener_opt.isDefined) listener_opt.get.onPreAnalysis
+  		
+  		// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
+  		AndroidGlobalConfig.initJawaAlirInfoProvider
+
+  		val srcFile = new File(new URI(source_apk))
+  	  val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
+  		val resultDir = new File(outputDir + "/Results/")
+  		val dexFile = APKFileResolver.getDexFile(source_apk, FileUtil.toUri(resultDir))
+
+  		// convert the dex file to the "pilar" form
+  		val pilarRootUri = Dex2PilarConverter.convert(dexFile)
+  		val pilarFile = new File(new URI(pilarRootUri))
+      AndroidRFAConfig.setupCenter
+    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
+    	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, lib_sum)
+    	
+  		if(listener_opt.isDefined) listener_opt.get.onCodeLoaded(JawaCodeSource.getAppRecordsCodes)
+	
+	    try{
+			  var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
+			  
+			  if(!public_only)
+			    entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
+	    	
+	    	if(listener_opt.isDefined) 
+		    	entryPoints = listener_opt.get.entryPointFilter(entryPoints)
+    
+	    	entryPoints.par.foreach{
+	    	  ep =>
+	    	    try{
+		    	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
+		    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
+		    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
+		    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
+		    	    msg_critical(TITLE, "processed-->" + icfg.getProcessed.size)
+		    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
+		    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
+			    	} catch {
+	    	      case te : TimeOutException => 
+	    	        err_msg_critical(TITLE, "Timeout!")
+	    	        if(listener_opt.isDefined) listener_opt.get.onTimeout
+	    	    }
+	      } 
+	  
+	    	if(listener_opt.isDefined) listener_opt.get.onAnalysisSuccess
     	} catch {
     	  case ie : IgnoreException =>
     	    err_msg_critical(TITLE, "Ignored!")

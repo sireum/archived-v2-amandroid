@@ -1,35 +1,18 @@
 package org.sireum.amandroid.run.droidBench
 
-import org.sireum.jawa.JawaCodeSource
-import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
-import org.sireum.amandroid.alir.AndroidGlobalConfig
-import org.sireum.jawa.alir.LibSideEffectProvider
-import org.sireum.util.FileUtil
-import org.sireum.jawa.GlobalConfig
-import org.sireum.jawa.util.IgnoreException
-import org.sireum.amandroid.alir.dataRecorder.MetricRepo
-import org.sireum.amandroid.alir.dataRecorder.DataCollector
+import org.sireum.jawa.MessageCenter._
+import org.sireum.amandroid.security._
 import org.sireum.amandroid.alir.AppCenter
+import org.sireum.amandroid.alir.dataRecorder.DataCollector
+import org.sireum.amandroid.alir.dataRecorder.MetricRepo
 import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.util.Timer
-import org.sireum.jawa.Center
-import org.sireum.amandroid.alir.AndroidConstants
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis.DefaultAndroidSourceAndSinkManager
+import org.sireum.util.FileUtil
 import org.sireum.amandroid.android.appInfo.AppInfoCollector
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidRFAConfig
-import java.io.File
-import java.net.URI
-import org.sireum.amandroid.android.decompile.Dex2PilarConverter
-import org.sireum.jawa.util.APKFileResolver
-import org.sireum.jawa.MessageCenter._
+import org.sireum.amandroid.alir.interProcedural.taintAnalysis.DefaultAndroidSourceAndSinkManager
+import org.sireum.amandroid.alir.AndroidGlobalConfig
 import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
-import org.sireum.jawa.alir.interProcedural.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
-import org.sireum.jawa.ClassLoadManager
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis.AndroidDataDependentTaintAnalysis
-import org.sireum.jawa.util.TimeOutException
-import org.sireum.amandroid.security.AmandroidSocket
-import org.sireum.amandroid.security.AmandroidSocketListener
+import org.sireum.jawa.alir.LibSideEffectProvider
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -45,7 +28,7 @@ object DroidBench_run {
     override def toString : String = "total: " + total + ", haveResult: " + haveresult + ", taintPathFound: " + taintPathFound
   }
   
-  private class DroidBenchListener extends AmandroidSocketListener {
+  private class DroidBenchListener(source_apk : String) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
       DroidBenchCounter.total += 1
     }
@@ -56,12 +39,12 @@ object DroidBench_run {
       eps
     }
 
-    def onTimeout: Unit = {}
+    def onTimeout : Unit = {}
 
-    def onAnalysisSuccess(file : String) : Unit = {
+    def onAnalysisSuccess : Unit = {
       if(AppCenter.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
 	      DroidBenchCounter.taintPathFound += 1
-	      DroidBenchCounter.taintPathFoundList += file
+	      DroidBenchCounter.taintPathFoundList += source_apk
 	    }
     	val appData = DataCollector.collect
     	MetricRepo.collect(appData)
@@ -80,8 +63,6 @@ object DroidBench_run {
     def onPostAnalysis: Unit = {
       msg_critical(TITLE, DroidBenchCounter.toString)
     }
-
-    
   }
   
   def main(args: Array[String]): Unit = {
@@ -89,6 +70,14 @@ object DroidBench_run {
       System.err.print("Usage: source_path output_path")
       return
     }
+    
+    AndroidReachingFactsAnalysisConfig.k_context = 1
+    AndroidReachingFactsAnalysisConfig.resolve_icc = false
+    AndroidReachingFactsAnalysisConfig.resolve_static_init = false
+    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
+    
+    val socket = new AmandroidSocket
+    socket.preProcess
     
     val sourcePath = args(0)
     val outputPath = args(1)
@@ -100,8 +89,7 @@ object DroidBench_run {
         val app_info = new AppInfoCollector(file)
         app_info.collectInfo
         val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-        val socket = new AmandroidSocket
-        socket.plug(file, outputPath, AndroidLibraryAPISummary, ssm, false, Some(new DroidBenchListener))
+        socket.plugWithDDA(file, outputPath, AndroidLibraryAPISummary, ssm, false, Some(new DroidBenchListener(file)))
     }
   }
 }

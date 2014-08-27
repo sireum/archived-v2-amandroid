@@ -165,15 +165,16 @@ object OAuth_run {
   }
   
   def main(args: Array[String]): Unit = {
-    if(args.size != 1){
-      System.err.print("Usage: source_path")
+    if(args.size != 2){
+      System.err.print("Usage: source_path output_path")
       return
     }
     
+    val sourcePath = args(0)
+    val outputPath = args(1)
+    
     JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), GlobalConfig.PILAR_FILE_EXT)
     LibSideEffectProvider.init(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSideEffectResult.xml.zip")
-    val outputUri = FileUtil.toUri("/media/fgwei/c3337db2-6708-4063-9079-a61c105f519f/Outputs/oauth")
-    val sourcePath = args(0)
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
     files.foreach{
       file =>
