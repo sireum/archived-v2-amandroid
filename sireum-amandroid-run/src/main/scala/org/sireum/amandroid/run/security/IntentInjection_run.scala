@@ -16,6 +16,8 @@ import org.sireum.util.FileUtil
 import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
 import org.sireum.jawa.util.Timer
 import org.sireum.jawa.MessageCenter._
+import org.sireum.util.FileResourceUri
+import org.sireum.jawa.util.IgnoreException
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -46,7 +48,7 @@ object IntentInjection_run {
     override def toString : String = "total: " + total + ", haveResult: " + haveresult + ", totalComponents: " + totalComponents + ", timeoutapps: " + timeoutapps.size + ", timeoutComponents: " + timeoutComponents + ", havePath: " + havePath
   }
   
-  private class IntentInjectionListener(source_apk : String, app_info : IntentInjectionCollector, ssm : IntentInjectionSourceAndSinkManager) extends AmandroidSocketListener {
+  private class IntentInjectionListener(source_apk : FileResourceUri, app_info : IntentInjectionCollector, ssm : IntentInjectionSourceAndSinkManager) extends AmandroidSocketListener {
     
     var loc : Int = 0
     val startTime = System.currentTimeMillis()
@@ -105,6 +107,14 @@ object IntentInjection_run {
       msg_critical(TITLE, IntentInjectionCounter.toString)
       IntentInjectionCounter.outputRecStatistic
     }
+    
+    def onException(e : Exception) : Unit = {
+      e match{
+        case ie : IgnoreException => System.err.print("Ignored!")
+        case a => 
+          e.printStackTrace()
+      }
+    }
   }
   
   def main(args: Array[String]): Unit = {
@@ -131,7 +141,7 @@ object IntentInjection_run {
         val app_info = new IntentInjectionCollector(file)
         app_info.collectInfo
         val ssm = new IntentInjectionSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-        socket.plugWithDDA(file, outputPath, AndroidLibraryAPISummary, ssm, true, Some(new IntentInjectionListener(file, app_info, ssm)))
+        socket.plugWithDDA(file, outputPath, AndroidLibraryAPISummary, ssm, true, true, Some(new IntentInjectionListener(file, app_info, ssm)))
     }
   }
 }

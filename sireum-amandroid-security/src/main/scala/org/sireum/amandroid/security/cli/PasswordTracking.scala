@@ -31,6 +31,9 @@ import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidRe
 import org.sireum.jawa.alir.LibSideEffectProvider
 import org.sireum.jawa.util.TimeOutException
 import org.sireum.jawa.GlobalConfig
+import org.sireum.option.MessageLevel
+import org.sireum.amandroid.security.AmandroidSocket
+import org.sireum.amandroid.security.AmandroidSocketListener
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -50,12 +53,12 @@ object PasswordTrackingCli {
     val k_context = saamode.analysis.k_context
     val timeout = saamode.analysis.timeout
     val mem = saamode.general.mem
-    val libSideEffectPath = saamode.analysis.sideeffectPath
-    forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, sasDir, outputDir, mem, libSideEffectPath)
+    val msgLevel = saamode.general.msgLevel
+    forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, sasDir, outputDir, mem, msgLevel)
     println("Generated environment-model and analysis results are saved in: " + outputDir)
   }
 	
-	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : String, sourceDir : String, sasDir : String, outputDir : String, mem : Int, libSideEffectPath : String) = {
+	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : String, sourceDir : String, sasDir : String, outputDir : String, mem : Int, msgLevel : MessageLevel.Type) = {
 	  val args : MList[String] = mlistEmpty
 	  args += "-s"
 	  args += (!nostatic).toString
@@ -67,7 +70,9 @@ object PasswordTrackingCli {
 	  args += k_context.toString
 	  args += "-to"
 	  args += timeout.toString
-	  args ++= List("-t", typSpec, "-ls", libSideEffectPath, sourceDir, sasDir, outputDir)
+	  args += "-msg"
+	  args += msgLevel.toString
+	  args ++= List("-t", typSpec, sourceDir, sasDir, outputDir)
     org.sireum.jawa.util.JVMUtil.startSecondJVM(PasswordTracking.getClass(), "-Xmx" + mem + "G", args.toList, true)
   }
 }
@@ -75,20 +80,34 @@ object PasswordTrackingCli {
 object PasswordTracking {
 	def main(args: Array[String]) {
 	  if(args.size != 17){
-	    println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -t type[allows: APK, DIR] -ls [Lib-SideEffect-Path] <source path> <Sink list file path> <output path>")
+	    println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -t type[allows: APK, DIR] <source path> <Sink list file path> <output path>")
 	    return
 	  }
-	  MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NO
 	  val static = args(1).toBoolean
 	  val parallel = args(3).toBoolean
 	  val icc = args(5).toBoolean
 	  val k_context = args(7).toInt
 	  val timeout = args(9).toInt
-	  val typ = args(11)
-	  val libSideEffectPath = args(13)
+	  val msgLevel = args(11)
+	  val typ = args(13)
 	  val sourcePath = args(14)
 	  val sasFilePath = args(15)
 	  val outputPath = args(16)
+	  
+	  msgLevel match{
+	    case "NO" =>
+	      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NO
+	    case "CRITICAL" =>
+	      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
+	    case "NORMAL" =>
+	      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
+	    case "VERBOSE" =>
+	      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.VERBOSE
+      case _ => 
+        println("Unexpected msg level: " + msgLevel)
+        return
+	  }
+	  
 	  val apkFileUris = typ match{
       case "APK" =>
         require(sourcePath.endsWith(".apk"))
@@ -100,94 +119,76 @@ object PasswordTracking {
         println("Unexpected type: " + typ)
         return
     }
-	  val outputUri = FileUtil.toUri(outputPath)
     val androidLibDir = AndroidGlobalConfig.android_lib_dir
 		JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
-		passwordTracking(apkFileUris, sasFilePath, libSideEffectPath, outputUri, static, parallel, icc, k_context, timeout)
+		passwordTracking(apkFileUris, sasFilePath, outputPath, static, parallel, icc, k_context, timeout)
 	}
   
-  def passwordTracking(apkFileUris : Set[FileResourceUri], sasFilePath : String, libSideEffectPath : String, outputUri : FileResourceUri, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int) = {
+  def passwordTracking(apkFileUris : Set[FileResourceUri], sasFilePath : String, outputPath : String, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int) = {
     AndroidGlobalConfig.SourceAndSinkFilePath = sasFilePath
-    if(libSideEffectPath != ""){
-    	LibSideEffectProvider.init(libSideEffectPath)
-    }
     AndroidReachingFactsAnalysisConfig.k_context = k_context
     AndroidReachingFactsAnalysisConfig.parallel = parallel
     AndroidReachingFactsAnalysisConfig.resolve_icc = icc
     AndroidReachingFactsAnalysisConfig.resolve_static_init = static
     AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(timeout))
-	  apkFileUris.foreach{
-	    apkFileUri =>
-	      println("Analyzing " + apkFileUri)
-	      // before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
-	    	AndroidGlobalConfig.initJawaAlirInfoProvider
-	      val apkFile = new File(new URI(apkFileUri))
-	      val dexFileUri = APKFileResolver.getDexFile(apkFileUri, outputUri)
-	      val pilarRootUri = Dex2PilarConverter.convert(dexFileUri)
-		 
-		  	val pilarFile = new File(new URI(pilarRootUri))
-
-		  	if(pilarFile.length() <= (50 * 1024 * 1024)){
-		  		AndroidRFAConfig.setupCenter
-		    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
-		    	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
-		    	try{
-			    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
-			    	val pre = new SensitiveViewCollector(apkFileUri)
-					  pre.collectInfo
-
-					  val ssm = new PasswordSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-			    	var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
-			    	entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
-			    	entryPoints = entryPoints.filter(e=>pre.getSensitiveLayoutContainers.contains(e.getDeclaringRecord))
-			    	(if(parallel) entryPoints.par else entryPoints).foreach{
-			    	  ep =>
-			    	    try{
-				    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-				    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
-				    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
-				    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
-				    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
-				    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult, ssm)
-				    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
-				    	  } catch {
-			    	      case te : TimeOutException => System.err.println("Timeout!")
-			    	    }
-			    	}
-			    	val appData = DataCollector.collect
-
-			    	val apkName = apkFile.getName().substring(0, apkFile.getName().lastIndexOf("."))
-			    	val opd = new File(new URI(outputUri))
-			    	val appDataDirFile = new File(opd + "/" + apkName)
-			    	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
-			    	
-			    	val environmentModel = new PrintWriter(appDataDirFile + "/EnvironmentModel.txt")
-			    	val envString = pre.getEnvString
-				    environmentModel.print(envString)
-				    environmentModel.close()
-			    	
-			    	val analysisResult = new PrintWriter(appDataDirFile + "/PasswordTrackingResult.txt")
-				    analysisResult.print(appData.toString)
-				    analysisResult.close()
-		    	} catch {
-		    	  case ie : IgnoreException =>
-		    	    println("No password view!")
-		    	  case re : RuntimeException => 
-		    	    println("Exception happened! Contact fgwei@ksu.edu.")
-		    	  case e : Exception =>
-		    	    println("Exception happened! Contact fgwei@ksu.edu.")
-		    	} finally {
-		    	}
-		  	} else {
-	    	  println("Pilar file size is too large:" + pilarFile.length()/1024/1024 + "MB")
-	    	}
-	      Center.reset
-	    	AppCenter.reset
-	    	JawaCodeSource.clearAppRecordsCodes
-		  	System.gc()
-			  System.gc()
-			  println("Done!")
-	  }
+    
+    println("Total apks: " + apkFileUris.size)
+    
+    val socket = new AmandroidSocket
+    socket.preProcess
+        
+    apkFileUris.foreach{
+      apkFileUri =>
+        println("Analyzing " + apkFileUri)
+        val app_info = new SensitiveViewCollector(apkFileUri)
+        app_info.collectInfo
+        val ssm = new PasswordSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+        socket.plugWithDDA(apkFileUri, outputPath, AndroidLibraryAPISummary, ssm, false, parallel, Some(new TaintListener(apkFileUri, outputPath, app_info)))
+        println("Done!")
+    }
 	  
 	}
+  
+  private class TaintListener(source_apk : FileResourceUri, output_dir : String, app_info : SensitiveViewCollector) extends AmandroidSocketListener {
+    def onPreAnalysis: Unit = {
+    }
+
+    def onCodeLoaded(codes: Map[String,String]): Unit = {}
+
+    def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
+      eps
+    }
+
+    def onTimeout : Unit = {
+      System.err.println("Timeout!")
+    }
+
+    def onAnalysisSuccess : Unit = {
+      val appData = DataCollector.collect
+
+    	val apkName = source_apk.substring(source_apk.lastIndexOf("/"), source_apk.lastIndexOf("."))
+    	val appDataDirFile = new File(output_dir + "/" + apkName)
+    	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
+    	
+    	val environmentModel = new PrintWriter(appDataDirFile + "/EnvironmentModel.txt")
+    	val envString = app_info.getEnvString
+	    environmentModel.print(envString)
+	    environmentModel.close()
+    	
+    	val analysisResult = new PrintWriter(appDataDirFile + "/PasswordTrackingResult.txt")
+	    analysisResult.print(appData.toString)
+	    analysisResult.close()
+    }
+
+    def onPostAnalysis: Unit = {
+    }
+    
+    def onException(e : Exception) : Unit = {
+      e match{
+        case ie : IgnoreException => println("No password view!")
+        case a => 
+          System.err.println("Exception: " + e)
+      }
+    }
+  }
 }

@@ -174,7 +174,7 @@ object OAuth_run {
     val outputPath = args(1)
     
     JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), GlobalConfig.PILAR_FILE_EXT)
-    LibSideEffectProvider.init(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSideEffectResult.xml.zip")
+    LibSideEffectProvider.init(new File(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSideEffectResult.xml.zip"))
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
     files.foreach{
       file =>

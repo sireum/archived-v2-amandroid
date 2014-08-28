@@ -16,6 +16,7 @@ import org.sireum.util._
 import org.sireum.amandroid.security.oauth.OAuthSourceAndSinkManager
 import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.alir.AppCenter
+import org.sireum.jawa.util.IgnoreException
 
 
 /**
@@ -66,7 +67,7 @@ object OAuthTokenTracking_run {
     }
   }
   
-  private class OAuthTokenTrackingListener(source_apk : String, app_info : OauthTokenContainerCollector) extends AmandroidSocketListener {
+  private class OAuthTokenTrackingListener(source_apk : FileResourceUri, app_info : OauthTokenContainerCollector) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
       OAuthTokenCounter.total += 1
     }
@@ -108,6 +109,14 @@ object OAuthTokenTracking_run {
     def onPostAnalysis: Unit = {
       msg_critical(TITLE, OAuthTokenCounter.toString)
     }
+    
+    def onException(e : Exception) : Unit = {
+      e match{
+        case ie : IgnoreException => System.err.print("Ignored!")
+        case a => 
+          e.printStackTrace()
+      }
+    }
   }
   
   def main(args: Array[String]): Unit = {
@@ -136,7 +145,7 @@ object OAuthTokenTracking_run {
         val app_info = new OauthTokenContainerCollector(file)
         app_info.collectInfo
         val ssm = new OAuthSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-        socket.plugWithDDA(file, outputPath, AndroidLibraryAPISummary, ssm, false, Some(new OAuthTokenTrackingListener(file, app_info)))
+        socket.plugWithDDA(file, outputPath, AndroidLibraryAPISummary, ssm, false, true, Some(new OAuthTokenTrackingListener(file, app_info)))
     }
   }
 }

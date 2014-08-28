@@ -37,6 +37,8 @@ import java.io.BufferedOutputStream
 import org.sireum.jawa.xml.AndroidXStream
 import org.sireum.amandroid.alir.dataRecorder.AmandroidResult
 import org.sireum.option.MessageLevel
+import org.sireum.amandroid.security.AmandroidSocket
+import org.sireum.amandroid.security.AmandroidSocketListener
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -55,14 +57,8 @@ object StagingCli {
     val k_context = saamode.analysis.k_context
     val timeout = saamode.analysis.timeout
     val mem = saamode.general.mem
-    val msgLevel = saamode.general.msgLevel match{
-      case MessageLevel.NO => "NO"
-      case MessageLevel.CRITICAL => "CRITICAL"
-      case MessageLevel.NORMAL => "NORMAL"
-      case MessageLevel.VERBOSE => "VERBOSE"
-    }
-    val libSideEffectPath = saamode.analysis.sideeffectPath
-    forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, outputDir, mem, msgLevel, libSideEffectPath)
+    val msgLevel = saamode.general.msgLevel
+    forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, outputDir, mem, msgLevel)
     println("Generated analysis results are saved in: " + outputDir)
   }
 	
@@ -70,8 +66,8 @@ object StagingCli {
 	    						noicc : Boolean, k_context : Int, 
 	    						timeout : Int, typSpec : String, 
 	    						sourceDir : String, outputDir : String, 
-	    						mem : Int, msgLevel : String, 
-	    						libSideEffectPath : String) = {
+	    						mem : Int,
+	    						msgLevel : MessageLevel.Type) = {
 	  val args : MList[String] = mlistEmpty
 	  args += "-s"
 	  args += (!nostatic).toString
@@ -84,8 +80,8 @@ object StagingCli {
 	  args += "-to"
 	  args += timeout.toString
 	  args += "-msg"
-	  args += msgLevel
-	  args ++= List("-t", typSpec, "-ls", libSideEffectPath, sourceDir, outputDir)
+	  args += msgLevel.toString
+	  args ++= List("-t", typSpec, sourceDir, outputDir)
     org.sireum.jawa.util.JVMUtil.startSecondJVM(Staging.getClass(), "-Xmx" + mem + "G", args.toList, true)
   }
 }
@@ -95,7 +91,7 @@ object Staging {
   private final val TITLE = "Staging"
   
 	def main(args: Array[String]) {
-	  if(args.size != 18){
+	  if(args.size != 16){
 	    println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -t type[allows: APK, DIR] -ls [Lib-SideEffect-Path] <source path> <output path>")
 	    return
 	  }
@@ -106,9 +102,23 @@ object Staging {
 	  val timeout = args(9).toInt
 	  val msgLevel = args(11)
 	  val typ = args(13)
-	  val libSideEffectPath = args(15)
-	  val sourcePath = args(16)
-	  val outputPath = args(17)
+	  val sourcePath = args(14)
+	  val outputPath = args(15)
+	  
+	  msgLevel match{
+	    case "NO" =>
+	      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NO
+	    case "CRITICAL" =>
+	      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
+	    case "NORMAL" =>
+	      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
+	    case "VERBOSE" =>
+	      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.VERBOSE
+      case _ => 
+        println("Unexpected msg level: " + msgLevel)
+        return
+	  }
+	  
 	  val apkFileUris = typ match{
       case "APK" =>
         require(sourcePath.endsWith(".apk"))
@@ -120,107 +130,78 @@ object Staging {
         println("Unexpected type: " + typ)
         return
     }
-	  msgLevel match{
-	    case "NO" => MessageCenter.msglevel = MSG_LEVEL.NO
-	    case "CRITICAL" => MessageCenter.msglevel = MSG_LEVEL.CRITICAL
-	    case "NORMAL" => MessageCenter.msglevel = MSG_LEVEL.NORMAL
-	    case "VERBOSE" => MessageCenter.msglevel = MSG_LEVEL.VERBOSE
-	    case _ => 
-        println("Unexpected msg level: " + msgLevel)
-        return
-	  }
-	  val outputUri = FileUtil.toUri(outputPath)
     val androidLibDir = AndroidGlobalConfig.android_lib_dir
 		JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
-		staging(apkFileUris, libSideEffectPath, outputUri, static, parallel, icc, k_context, timeout)
+		staging(apkFileUris, outputPath, static, parallel, icc, k_context, timeout)
 	}
   
-  def staging(apkFileUris : Set[FileResourceUri], libSideEffectPath : String, outputUri : FileResourceUri, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int) = {
-    if(libSideEffectPath != ""){
-    	LibSideEffectProvider.init(libSideEffectPath)
-    }
+  def staging(apkFileUris : Set[FileResourceUri], outputPath : String, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int) = {
     AndroidReachingFactsAnalysisConfig.k_context = k_context
     AndroidReachingFactsAnalysisConfig.parallel = parallel
     AndroidReachingFactsAnalysisConfig.resolve_icc = icc
     AndroidReachingFactsAnalysisConfig.resolve_static_init = static
     
-	  apkFileUris.foreach{
-	    apkFileUri =>
-	      try {
-	      println("Analyzing " + apkFileUri)
-	      // before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
-	    	AndroidGlobalConfig.initJawaAlirInfoProvider
-	      val apkFile = new File(new URI(apkFileUri))
-	      val dexFileUri = APKFileResolver.getDexFile(apkFileUri, outputUri)
-	      val pilarRootUri = Dex2PilarConverter.convert(dexFileUri)
-		 
-		  	val pilarFile = new File(new URI(pilarRootUri))
-
-		  	if(pilarFile.length() <= (50 * 1024 * 1024)){
-		  		AndroidRFAConfig.setupCenter
-		    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
-		    	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
-		    	try{
-			    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
-			    	JawaCodeSource.getAppRecordsCodes.keys foreach{
-			    	  k =>
-			    	    Center.resolveRecord(k, Center.ResolveLevel.BODY)
-			    	}
-			    	
-			    	val pre = new AppInfoCollector(apkFileUri)
-					  pre.collectInfo
-			    	val entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
-			    	
-			    	val fileName = apkFileUri.substring(apkFileUri.lastIndexOf("/"), apkFileUri.lastIndexOf("."))
-				  	val fileDir = new File(new URI(outputUri + "/store/" + fileName))
-		  	    if(!fileDir.exists()) fileDir.mkdirs()
-			    	
-			    	(if(parallel) entryPoints.par else entryPoints).foreach{
-			    	  ep =>
-			    	    try{
-				    	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
-				    	    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(timeout))
-				    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-				    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
-				    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
-				    	    msg_critical(TITLE, "processed-->" + icfg.getProcessed.size)
-				    	    val ddgResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
-				    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, ddgResult)
-				    	    
-				    	    val file = new File(fileDir + "/" + ep.getDeclaringRecord.getName.filter(_.isUnicodeIdentifierPart) + ".xml.zip")
-							    val w = new FileOutputStream(file)
-						      val zipw = new GZIPOutputStream(new BufferedOutputStream(w))
-							    AndroidXStream.toXml(AmandroidResult(InterProceduralDataFlowGraph(icfg, irfaResult), ddgResult), zipw)
-							    zipw.close()
-							    println(ep + " result stored!")
-			    	    } catch {
-			    	      case te : TimeOutException => System.err.println("Timeout!")
-			    	    }
-			    	}
-		    	} catch {
-		    	  case re : RuntimeException => 
-		    	    println("Exception happened! Contact fgwei@ksu.edu.")
-		    	  case e : Exception =>
-		    	    println("Exception happened! Contact fgwei@ksu.edu.")
-		    	} finally {
-		    	}
-		  	} else {
-	    	  println("Pilar file size is too large:" + pilarFile.length()/1024/1024 + "MB")
-	    	}
-			  println("Done!")
-	      } catch {
-	        case re : RuntimeException => 
-	    	    println("Exception happened! Contact fgwei@ksu.edu.")
-	    	  case e : Exception =>
-	    	    println("Exception happened! Contact fgwei@ksu.edu.")
-	    	} finally {
-	    	  Center.reset
-		    	AppCenter.reset
-		    	JawaCodeSource.clearAppRecordsCodes
-			  	System.gc()
-				  System.gc()
-	    	}
-	  }
-	  
+    println("Total apks: " + apkFileUris.size)
+    
+    val socket = new AmandroidSocket
+    socket.preProcess
+    
+    apkFileUris.foreach{
+      apkFileUri =>
+        println("Analyzing " + apkFileUri)
+        
+        val fileName = apkFileUri.substring(apkFileUri.lastIndexOf("/"), apkFileUri.lastIndexOf("."))
+		  	val outputfile = new File(outputPath + "/store/" + fileName)
+        
+        val app_info = new AppInfoCollector(apkFileUri)
+        app_info.collectInfo
+        socket.plugWithoutDDA(apkFileUri, outputPath, AndroidLibraryAPISummary, false, parallel, Some(new StagingListener(apkFileUri, outputfile)))
+        println("Done!")
+    }
 	}
+  
+  private class StagingListener(source_apk : FileResourceUri, outputfile : File) extends AmandroidSocketListener {
+    def onPreAnalysis: Unit = {
+    }
+
+    def onCodeLoaded(codes: Map[String,String]): Unit = {}
+
+    def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
+      eps
+    }
+
+    def onTimeout : Unit = {
+      System.err.println("Timeout!")
+    }
+
+    def onAnalysisSuccess : Unit = {
+      val irfaress = AppCenter.getInterproceduralReachingFactsAnalysisResults
+      val ddgress = AppCenter.getInterproceduralDataDependenceAnalysisResults
+      irfaress.foreach{
+        case (rec, (icfg, irfaResult)) =>
+          val ddgResultOpt = ddgress.get(rec)
+          if(ddgResultOpt.isDefined){
+            val ddgResult = ddgResultOpt.get
+            val file = new File(outputfile + "/" + rec.getName.filter(_.isUnicodeIdentifierPart) + ".xml.zip")
+      	    val w = new FileOutputStream(file)
+            val zipw = new GZIPOutputStream(new BufferedOutputStream(w))
+      	    AndroidXStream.toXml(AmandroidResult(InterProceduralDataFlowGraph(icfg, irfaResult), ddgResult), zipw)
+      	    zipw.close()
+      	    println(rec + " result stored!")
+          }
+      }
+      
+    }
+
+    def onPostAnalysis: Unit = {
+    }
+    
+    def onException(e : Exception) : Unit = {
+      e match{
+        case ie : IgnoreException => System.err.print("Ignored!")
+        case a => 
+          System.err.println("Exception: " + e)
+      }
+    }
+  }
 }

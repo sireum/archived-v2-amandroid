@@ -11,6 +11,8 @@ import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.alir.AndroidGlobalConfig
 import org.sireum.jawa.util.Timer
 import org.sireum.amandroid.alir.AppCenter
+import org.sireum.util.FileResourceUri
+import org.sireum.jawa.util.IgnoreException
 
 object DataLeakage_run {
   private final val TITLE = "DataLeakage_run"
@@ -23,7 +25,7 @@ object DataLeakage_run {
     override def toString : String = "total: " + total + ", haveResult: " + haveresult + ", taintPathFound: " + taintPathFound
   }
   
-  private class DataLeakageListener(source_apk : String) extends AmandroidSocketListener {
+  private class DataLeakageListener(source_apk : FileResourceUri) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
       DataLeakageCounter.total += 1
     }
@@ -46,6 +48,14 @@ object DataLeakage_run {
 
     def onPostAnalysis: Unit = {
       msg_critical(TITLE, DataLeakageCounter.toString)
+    }
+    
+    def onException(e : Exception) : Unit = {
+      e match{
+        case ie : IgnoreException => System.err.print("Ignored!")
+        case a => 
+          e.printStackTrace()
+      }
     }
   }
   
@@ -73,7 +83,7 @@ object DataLeakage_run {
         val app_info = new AppInfoCollector(file)
         app_info.collectInfo
         val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-        socket.plugWithDDA(file, outputPath, AndroidLibraryAPISummary, ssm, false, Some(new DataLeakageListener(file)))
+        socket.plugWithDDA(file, outputPath, AndroidLibraryAPISummary, ssm, false, true, Some(new DataLeakageListener(file)))
     }
   }
 }

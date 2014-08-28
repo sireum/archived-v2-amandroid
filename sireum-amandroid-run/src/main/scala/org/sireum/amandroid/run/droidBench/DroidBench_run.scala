@@ -13,6 +13,8 @@ import org.sireum.amandroid.alir.interProcedural.taintAnalysis.DefaultAndroidSou
 import org.sireum.amandroid.alir.AndroidGlobalConfig
 import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
 import org.sireum.jawa.alir.LibSideEffectProvider
+import org.sireum.util.FileResourceUri
+import org.sireum.jawa.util.IgnoreException
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -28,7 +30,7 @@ object DroidBench_run {
     override def toString : String = "total: " + total + ", haveResult: " + haveresult + ", taintPathFound: " + taintPathFound
   }
   
-  private class DroidBenchListener(source_apk : String) extends AmandroidSocketListener {
+  private class DroidBenchListener(source_apk : FileResourceUri) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
       DroidBenchCounter.total += 1
     }
@@ -63,6 +65,14 @@ object DroidBench_run {
     def onPostAnalysis: Unit = {
       msg_critical(TITLE, DroidBenchCounter.toString)
     }
+    
+    def onException(e : Exception) : Unit = {
+      e match{
+        case ie : IgnoreException => System.err.print("Ignored!")
+        case a => 
+          e.printStackTrace()
+      }
+    }
   }
   
   def main(args: Array[String]): Unit = {
@@ -89,7 +99,7 @@ object DroidBench_run {
         val app_info = new AppInfoCollector(file)
         app_info.collectInfo
         val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-        socket.plugWithDDA(file, outputPath, AndroidLibraryAPISummary, ssm, false, Some(new DroidBenchListener(file)))
+        socket.plugWithDDA(file, outputPath, AndroidLibraryAPISummary, ssm, false, true, Some(new DroidBenchListener(file)))
     }
   }
 }

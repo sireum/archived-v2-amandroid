@@ -10,6 +10,7 @@ import org.sireum.amandroid.security.apiMisuse.CryptographicMisuse
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.util.Timer
+import org.sireum.jawa.util.IgnoreException
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -45,6 +46,14 @@ object CryptoMisuse_run {
     def onPostAnalysis: Unit = {
       msg_critical(TITLE, CryptoMisuseCounter.toString)
     }
+    
+    def onException(e : Exception) : Unit = {
+      e match{
+        case ie : IgnoreException => System.err.print("Ignored!")
+        case a => 
+          e.printStackTrace()
+      }
+    }
   }
   
   def main(args: Array[String]): Unit = {
@@ -70,7 +79,7 @@ object CryptoMisuse_run {
       file =>
         val app_info = new InterestingApiCollector(file)
         app_info.collectInfo
-        socket.plugWithoutDDA(file, outputPath, AndroidLibraryAPISummary, false, Some(new CryptoMisuseListener))
+        socket.plugWithoutDDA(file, outputPath, AndroidLibraryAPISummary, false, true, Some(new CryptoMisuseListener))
         val icfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
         icfgs.foreach{
           case (rec, (icfg, irfaResult)) =>

@@ -16,6 +16,8 @@ import java.io.File
 import org.sireum.amandroid.alir.AndroidConstants
 import org.sireum.jawa.JawaCodeSource
 import org.sireum.jawa.util.SubStringCounter
+import org.sireum.util.FileResourceUri
+import org.sireum.jawa.util.IgnoreException
 
 
 /**
@@ -33,7 +35,7 @@ object Icc_run {
     override def toString : String = "total: " + total + ", haveResult: " + haveresult + ", haveIcc: " + haveIcc + ", iccTotal: " + iccTotal + ", foundIccContainer: " + foundIccContainer
   }
   
-  private class IccListener(source_apk : String, app_info : IccCollector) extends AmandroidSocketListener {
+  private class IccListener(source_apk : FileResourceUri, app_info : IccCollector) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
       IccCounter.total += 1
     }
@@ -80,6 +82,14 @@ object Icc_run {
     def onPostAnalysis: Unit = {
       msg_critical(TITLE, IccCounter.toString)
     }
+    
+    def onException(e : Exception) : Unit = {
+      e match{
+        case ie : IgnoreException => System.err.print("Ignored!")
+        case a => 
+          e.printStackTrace()
+      }
+    }
   }
   
   def main(args: Array[String]): Unit = {
@@ -105,7 +115,7 @@ object Icc_run {
       file =>
         val app_info = new IccCollector(file)
         app_info.collectInfo
-        socket.plugWithoutDDA(file, outputPath, AndroidLibraryAPISummary, false, Some(new IccListener(file, app_info)))
+        socket.plugWithoutDDA(file, outputPath, AndroidLibraryAPISummary, false, true, Some(new IccListener(file, app_info)))
     }
   }
 }
