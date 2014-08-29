@@ -98,13 +98,13 @@ object CryptoMisuse {
 	  val outputPath = args(15)
 	  
 	  msgLevel match{
-	    case "NO" =>
+	    case "NO$" =>
 	      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NO
-	    case "CRITICAL" =>
+	    case "CRITICAL$" =>
 	      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
-	    case "NORMAL" =>
+	    case "NORMAL$" =>
 	      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
-	    case "VERBOSE" =>
+	    case "VERBOSE$" =>
 	      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.VERBOSE
       case _ => 
         println("Unexpected msg level: " + msgLevel)
