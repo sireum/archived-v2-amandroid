@@ -35,8 +35,6 @@ object DroidBench_run {
       DroidBenchCounter.total += 1
     }
 
-    def onCodeLoaded(codes: Map[String,String]): Unit = {}
-
     def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
       eps
     }
@@ -68,7 +66,7 @@ object DroidBench_run {
     
     def onException(e : Exception) : Unit = {
       e match{
-        case ie : IgnoreException => System.err.print("Ignored!")
+        case ie : IgnoreException => System.err.println("Ignored!")
         case a => 
           e.printStackTrace()
       }
@@ -96,10 +94,11 @@ object DroidBench_run {
     
     files.foreach{
       file =>
+        msg_critical(TITLE, "####" + file + "#####")
         val app_info = new AppInfoCollector(file)
-        app_info.collectInfo
+        socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
         val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-        socket.plugWithDDA(file, outputPath, AndroidLibraryAPISummary, ssm, false, true, Some(new DroidBenchListener(file)))
+        socket.plugWithDDA(ssm, false, true, Some(new DroidBenchListener(file)))
     }
   }
 }

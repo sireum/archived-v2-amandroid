@@ -18,6 +18,7 @@ import org.sireum.jawa.util.Timer
 import org.sireum.jawa.MessageCenter._
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.util.IgnoreException
+import org.sireum.jawa.JawaCodeSource
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -51,19 +52,17 @@ object IntentInjection_run {
   private class IntentInjectionListener(source_apk : FileResourceUri, app_info : IntentInjectionCollector, ssm : IntentInjectionSourceAndSinkManager) extends AmandroidSocketListener {
     
     var loc : Int = 0
-    val startTime = System.currentTimeMillis()
+    var startTime : Long = 0
     
     def onPreAnalysis: Unit = {
+      startTime = System.currentTimeMillis
       IntentInjectionCounter.total += 1
-    }
-
-    def onCodeLoaded(codes: Map[String,String]): Unit = {
       def countLines(str : String) : Int = {
 			   val lines = str.split("\r\n|\r|\n")
 			   lines.length
 			}
     	
-    	codes.foreach{
+    	JawaCodeSource.getAppRecordsCodes.foreach{
 			  case (name, code) =>
 			    loc += countLines(code)
       }
@@ -110,7 +109,7 @@ object IntentInjection_run {
     
     def onException(e : Exception) : Unit = {
       e match{
-        case ie : IgnoreException => System.err.print("Ignored!")
+        case ie : IgnoreException => System.err.println("Ignored!")
         case a => 
           e.printStackTrace()
       }
@@ -138,10 +137,11 @@ object IntentInjection_run {
     
     files.foreach{
       file =>
+        msg_critical(TITLE, "####" + file + "#####")
         val app_info = new IntentInjectionCollector(file)
-        app_info.collectInfo
-        val ssm = new IntentInjectionSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-        socket.plugWithDDA(file, outputPath, AndroidLibraryAPISummary, ssm, true, true, Some(new IntentInjectionListener(file, app_info, ssm)))
+        socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
+        val ssm = new IntentInjectionSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)
+        socket.plugWithDDA(ssm, true, true, Some(new IntentInjectionListener(file, app_info, ssm)))
     }
   }
 }

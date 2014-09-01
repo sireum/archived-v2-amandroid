@@ -143,8 +143,8 @@ object CryptoMisuse {
       apkFileUri =>
         println("Analyzing " + apkFileUri)
         val app_info = new InterestingApiCollector(apkFileUri)
-        app_info.collectInfo
-        socket.plugWithoutDDA(apkFileUri, outputPath, AndroidLibraryAPISummary, false, parallel, Some(new CryptoMisuseListener(apkFileUri, outputPath, app_info)))
+        socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
+        socket.plugWithoutDDA(false, parallel, Some(new CryptoMisuseListener(apkFileUri, outputPath, app_info)))
         val icfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
         icfgs.foreach{
           case (rec, (icfg, irfaResult)) =>
@@ -157,8 +157,6 @@ object CryptoMisuse {
   private class CryptoMisuseListener(source_apk : FileResourceUri, output_dir : String, app_info : InterestingApiCollector) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
     }
-
-    def onCodeLoaded(codes: Map[String,String]): Unit = {}
 
     def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
       val iacs = app_info.getInterestingContainers(CryptographicConstants.getCryptoAPIs)
@@ -187,7 +185,7 @@ object CryptoMisuse {
     
     def onException(e : Exception) : Unit = {
       e match{
-        case ie : IgnoreException => System.err.print("Ignored!")
+        case ie : IgnoreException => System.err.println("Ignored!")
         case a => 
           System.err.println("Exception: " + e)
       }

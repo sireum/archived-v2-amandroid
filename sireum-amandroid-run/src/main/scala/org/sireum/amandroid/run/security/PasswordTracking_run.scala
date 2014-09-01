@@ -74,8 +74,6 @@ object PasswordTracking_run {
       PasswordCounter.total += 1
     }
 
-    def onCodeLoaded(codes: Map[String,String]): Unit = {}
-
     def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
       val res = eps.filter(e=>app_info.getSensitiveLayoutContainers.contains(e.getDeclaringRecord))
     	if(!res.isEmpty){
@@ -113,7 +111,7 @@ object PasswordTracking_run {
     
     def onException(e : Exception) : Unit = {
       e match{
-        case ie : IgnoreException => System.err.print("Ignored!")
+        case ie : IgnoreException => System.err.println("Ignored!")
         case a => 
           e.printStackTrace()
       }
@@ -143,14 +141,15 @@ object PasswordTracking_run {
     
     files.foreach{
       file =>
+        msg_critical(TITLE, "####" + file + "#####")
         val app_info = new SensitiveViewCollector(file)
-        app_info.collectInfo
+        socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
         if(app_info.getLayoutControls.exists(p => p._2.isSensitive == true)){
 			    PasswordCounter.havePasswordView += 1
 			    PasswordCounter.havePasswordViewList += file
 			  }
-        val ssm = new PasswordSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-        socket.plugWithDDA(file, outputPath, AndroidLibraryAPISummary, ssm, false, true, Some(new PasswordTrackingListener(file, app_info)))
+        val ssm = new PasswordSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.PasswordSinkFilePath)
+        socket.plugWithDDA(ssm, false, true, Some(new PasswordTrackingListener(file, app_info)))
     }
   }
 }

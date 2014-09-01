@@ -72,8 +72,6 @@ object OAuthTokenTracking_run {
       OAuthTokenCounter.total += 1
     }
 
-    def onCodeLoaded(codes: Map[String,String]): Unit = {}
-
     def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
       val iacs = app_info.getInterestingContainers(Set("access_token"))
     	val res = eps.filter(e=>iacs.contains(e.getDeclaringRecord))
@@ -112,7 +110,7 @@ object OAuthTokenTracking_run {
     
     def onException(e : Exception) : Unit = {
       e match{
-        case ie : IgnoreException => System.err.print("Ignored!")
+        case ie : IgnoreException => System.err.println("Ignored!")
         case a => 
           e.printStackTrace()
       }
@@ -142,10 +140,11 @@ object OAuthTokenTracking_run {
     
     files.foreach{
       file =>
+        msg_critical(TITLE, "####" + file + "#####")
         val app_info = new OauthTokenContainerCollector(file)
-        app_info.collectInfo
+        socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
         val ssm = new OAuthSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-        socket.plugWithDDA(file, outputPath, AndroidLibraryAPISummary, ssm, false, true, Some(new OAuthTokenTrackingListener(file, app_info)))
+        socket.plugWithDDA(ssm, false, true, Some(new OAuthTokenTrackingListener(file, app_info)))
     }
   }
 }

@@ -31,8 +31,6 @@ object CryptoMisuse_run {
       CryptoMisuseCounter.total += 1
     }
 
-    def onCodeLoaded(codes: Map[String,String]): Unit = {}
-
     def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
       eps
     }
@@ -49,7 +47,7 @@ object CryptoMisuse_run {
     
     def onException(e : Exception) : Unit = {
       e match{
-        case ie : IgnoreException => System.err.print("Ignored!")
+        case ie : IgnoreException => System.err.println("Ignored!")
         case a => 
           e.printStackTrace()
       }
@@ -77,9 +75,10 @@ object CryptoMisuse_run {
     
     files.foreach{
       file =>
+        msg_critical(TITLE, "####" + file + "#####")
         val app_info = new InterestingApiCollector(file)
-        app_info.collectInfo
-        socket.plugWithoutDDA(file, outputPath, AndroidLibraryAPISummary, false, true, Some(new CryptoMisuseListener))
+        socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
+        socket.plugWithoutDDA(false, true, Some(new CryptoMisuseListener))
         val icfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
         icfgs.foreach{
           case (rec, (icfg, irfaResult)) =>

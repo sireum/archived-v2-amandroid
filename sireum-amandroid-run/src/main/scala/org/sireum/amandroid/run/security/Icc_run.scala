@@ -38,10 +38,8 @@ object Icc_run {
   private class IccListener(source_apk : FileResourceUri, app_info : IccCollector) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
       IccCounter.total += 1
-    }
-
-    def onCodeLoaded(codes: Map[String,String]): Unit = {
       val iccSigs = AndroidConstants.getIccMethods()
+      val codes = JawaCodeSource.getAppRecordsCodes
 		  if(codes.exists{
     	  case (rName, code) =>
     	    iccSigs.exists(code.contains(_))
@@ -85,7 +83,7 @@ object Icc_run {
     
     def onException(e : Exception) : Unit = {
       e match{
-        case ie : IgnoreException => System.err.print("Ignored!")
+        case ie : IgnoreException => System.err.println("Ignored!")
         case a => 
           e.printStackTrace()
       }
@@ -113,9 +111,10 @@ object Icc_run {
     
     files.foreach{
       file =>
+        msg_critical(TITLE, "####" + file + "#####")
         val app_info = new IccCollector(file)
-        app_info.collectInfo
-        socket.plugWithoutDDA(file, outputPath, AndroidLibraryAPISummary, false, true, Some(new IccListener(file, app_info)))
+        socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
+        socket.plugWithoutDDA(false, true, Some(new IccListener(file, app_info)))
     }
   }
 }

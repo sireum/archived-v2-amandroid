@@ -141,9 +141,9 @@ object PasswordTracking {
       apkFileUri =>
         println("Analyzing " + apkFileUri)
         val app_info = new SensitiveViewCollector(apkFileUri)
-        app_info.collectInfo
-        val ssm = new PasswordSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-        socket.plugWithDDA(apkFileUri, outputPath, AndroidLibraryAPISummary, ssm, false, parallel, Some(new TaintListener(apkFileUri, outputPath, app_info)))
+        socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
+        val ssm = new PasswordSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.PasswordSinkFilePath)
+        socket.plugWithDDA(ssm, false, parallel, Some(new TaintListener(apkFileUri, outputPath, app_info)))
         println("Done!")
     }
 	  
@@ -152,8 +152,6 @@ object PasswordTracking {
   private class TaintListener(source_apk : FileResourceUri, output_dir : String, app_info : SensitiveViewCollector) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
     }
-
-    def onCodeLoaded(codes: Map[String,String]): Unit = {}
 
     def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
       eps

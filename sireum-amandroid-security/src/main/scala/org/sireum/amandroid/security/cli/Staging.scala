@@ -154,8 +154,8 @@ object Staging {
 		  	val outputfile = new File(outputPath + "/store/" + fileName)
         
         val app_info = new AppInfoCollector(apkFileUri)
-        app_info.collectInfo
-        socket.plugWithoutDDA(apkFileUri, outputPath, AndroidLibraryAPISummary, false, parallel, Some(new StagingListener(apkFileUri, outputfile)))
+        socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
+        socket.plugWithoutDDA(false, parallel, Some(new StagingListener(apkFileUri, outputfile)))
         println("Done!")
     }
 	}
@@ -163,8 +163,6 @@ object Staging {
   private class StagingListener(source_apk : FileResourceUri, outputfile : File) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
     }
-
-    def onCodeLoaded(codes: Map[String,String]): Unit = {}
 
     def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
       eps
@@ -198,7 +196,7 @@ object Staging {
     
     def onException(e : Exception) : Unit = {
       e match{
-        case ie : IgnoreException => System.err.print("Ignored!")
+        case ie : IgnoreException => System.err.println("Ignored!")
         case a => 
           System.err.println("Exception: " + e)
       }

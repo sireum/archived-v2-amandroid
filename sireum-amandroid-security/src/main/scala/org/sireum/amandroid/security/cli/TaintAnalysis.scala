@@ -146,9 +146,9 @@ object TanitAnalysis{
       apkFileUri =>
         println("Analyzing " + apkFileUri)
         val app_info = new AppInfoCollector(apkFileUri)
-        app_info.collectInfo
+        socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
         val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-        socket.plugWithDDA(apkFileUri, outputPath, AndroidLibraryAPISummary, ssm, false, parallel, Some(new TaintListener(apkFileUri, outputPath, app_info)))
+        socket.plugWithDDA(ssm, false, parallel, Some(new TaintListener(apkFileUri, outputPath, app_info)))
         println("Done!")
     }
 	  
@@ -157,8 +157,6 @@ object TanitAnalysis{
   private class TaintListener(source_apk : FileResourceUri, output_dir : String, app_info : AppInfoCollector) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
     }
-
-    def onCodeLoaded(codes: Map[String,String]): Unit = {}
 
     def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
       eps
@@ -191,7 +189,7 @@ object TanitAnalysis{
     
     def onException(e : Exception) : Unit = {
       e match{
-        case ie : IgnoreException => System.err.print("Ignored!")
+        case ie : IgnoreException => System.err.println("Ignored!")
         case a => 
           System.err.println("Exception: " + e)
       }
