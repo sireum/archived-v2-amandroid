@@ -12,5 +12,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-jawa"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-amandroid-security"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-jawa-test"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sireum-amandroid"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

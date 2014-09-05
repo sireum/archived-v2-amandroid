@@ -12,7 +12,7 @@ import org.sireum.pilar.ast._
 import org.sireum.jawa.alir.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceInfo
 import org.sireum.jawa.alir.taintAnalysis._
-import org.sireum.amandroid.android.security.AndroidProblemCategories
+import org.sireum.amandroid.security.AndroidProblemCategories
 import scala.tools.nsc.ConsoleWriter
 import org.sireum.jawa.util.StringFormConverter
 

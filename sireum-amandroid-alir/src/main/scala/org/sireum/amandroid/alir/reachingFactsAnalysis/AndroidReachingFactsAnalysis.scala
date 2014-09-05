@@ -19,7 +19,6 @@ import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.alir.reachingFactsAnalysis._
 import org.sireum.amandroid.alir.model.AndroidModelCallHandler
 import org.sireum.jawa.JawaRecord
-import org.sireum.amandroid.alir.AndroidConstants
 import org.sireum.jawa.alir.NullInstance
 import org.sireum.jawa.alir.UnknownInstance
 import org.sireum.jawa.MessageCenter._
@@ -32,7 +31,6 @@ import org.sireum.jawa.alir.interProcedural.NodeListener
 import org.sireum.jawa.Mode
 import scala.collection.immutable.BitSet
 import org.sireum.jawa.util.Timer
-import org.sireum.amandroid.alir.AndroidGlobalConfig
 import java.io.PrintWriter
 
 class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){

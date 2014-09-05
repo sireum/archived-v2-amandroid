@@ -5,12 +5,12 @@ import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnaly
 import org.sireum.jawa.MessageCenter
 import org.sireum.jawa.MessageCenter._
 import org.sireum.util.FileUtil
-import org.sireum.amandroid.android.appInfo.AppInfoCollector
+import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.amandroid.alir.taintAnalysis.DefaultAndroidSourceAndSinkManager
-import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
-import org.sireum.amandroid.alir.AndroidGlobalConfig
+import org.sireum.amandroid.util.AndroidLibraryAPISummary
+import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.jawa.util.Timer
-import org.sireum.amandroid.alir.AppCenter
+import org.sireum.amandroid.AppCenter
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.util.IgnoreException
 

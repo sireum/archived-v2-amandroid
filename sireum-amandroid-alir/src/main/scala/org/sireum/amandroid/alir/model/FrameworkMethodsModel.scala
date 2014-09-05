@@ -4,10 +4,10 @@ import org.sireum.jawa.alir.Context
 import org.sireum.util._
 import org.sireum.jawa._
 import org.sireum.jawa.alir.reachingFactsAnalysis._
-import org.sireum.amandroid.alir.AndroidConstants
-import org.sireum.amandroid.alir.AppCenter
-import org.sireum.amandroid.android.parser.IntentFilterDataBase
-import org.sireum.amandroid.android.parser.IntentFilter
+import org.sireum.amandroid.AndroidConstants
+import org.sireum.amandroid.AppCenter
+import org.sireum.amandroid.parser.IntentFilterDataBase
+import org.sireum.amandroid.parser.IntentFilter
 import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.alir.UnknownInstance
 import org.sireum.jawa.alir.NullInstance

@@ -5,15 +5,15 @@ import org.sireum.jawa.MessageCenter._
 import java.io.File
 import java.net.URI
 import org.sireum.jawa.util.APKFileResolver
-import org.sireum.amandroid.android.decompile.Dex2PilarConverter
+import org.sireum.amandroid.decompile.Dex2PilarConverter
 import org.sireum.jawa.JawaCodeSource
 import org.sireum.jawa.GlobalConfig
 import org.sireum.jawa.DefaultLibraryAPISummary
 import org.sireum.jawa.util.URLInString
 import java.io.PrintWriter
-import org.sireum.amandroid.android.appInfo.AppInfoCollector
-import org.sireum.amandroid.android.parser.ResourceFileParser
-import org.sireum.amandroid.android.parser.ARSCFileParser
+import org.sireum.amandroid.appInfo.AppInfoCollector
+import org.sireum.amandroid.parser.ResourceFileParser
+import org.sireum.amandroid.parser.ARSCFileParser
 import java.io.FileWriter
 import org.sireum.jawa.MessageCenter
 

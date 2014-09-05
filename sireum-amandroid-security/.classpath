@@ -11,5 +11,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-parser"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-pilar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-util"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sireum-amandroid"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

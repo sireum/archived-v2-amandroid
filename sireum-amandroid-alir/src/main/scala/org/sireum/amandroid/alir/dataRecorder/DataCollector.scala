@@ -1,8 +1,8 @@
 package org.sireum.amandroid.alir.dataRecorder
 
-import org.sireum.amandroid.alir.AppCenter
+import org.sireum.amandroid.AppCenter
 import org.sireum.util._
-import org.sireum.amandroid.android.parser.IntentFilter
+import org.sireum.amandroid.parser.IntentFilter
 import org.sireum.jawa.alir.taintAnalysis.TaintAnalysisResult
 import org.sireum.jawa.Center
 import org.stringtemplate.v4.STGroupFile
@@ -13,7 +13,7 @@ import org.sireum.jawa.alir.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.jawa.alir.reachingFactsAnalysis.VarSlot
 import org.sireum.amandroid.alir.reachingFactsAnalysis.IntentHelper
 import org.sireum.pilar.ast._
-import org.sireum.amandroid.android.parser.UriData
+import org.sireum.amandroid.parser.UriData
 import org.sireum.jawa.alir.Context
 
 object DataCollector {

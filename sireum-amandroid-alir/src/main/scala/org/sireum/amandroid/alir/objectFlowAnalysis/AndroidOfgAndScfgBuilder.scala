@@ -12,10 +12,10 @@ import java.io.OutputStreamWriter
 import scala.collection.JavaConversions._
 import org.sireum.jawa.util.SignatureParser
 import org.sireum.jawa.alir.objectFlowAnalysis._
-import org.sireum.amandroid.android.appInfo.AppInfoCollector
+import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid._
-import org.sireum.amandroid.android.cache.AndroidCacheFile
+import org.sireum.amandroid.cache.AndroidCacheFile
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.jawa.alir.compressedControlFlowGraph.CompressedControlFlowGraph
 import org.sireum.jawa.PointProc

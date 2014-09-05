@@ -1,11 +1,11 @@
 package org.sireum.amandroid.security.dataInjection
 
-import org.sireum.amandroid.android.parser.LayoutControl
+import org.sireum.amandroid.parser.LayoutControl
 import org.sireum.util._
 import org.sireum.jawa.JawaProcedure
 import org.sireum.jawa.MessageCenter._
 import org.sireum.pilar.ast._
-import org.sireum.amandroid.alir.AndroidConstants
+import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.alir.util.ExplicitValueFinder
 import org.sireum.jawa.alir.controlFlowGraph.CGInvokeNode
 import org.sireum.jawa.alir.reachingFactsAnalysis.RFAFact

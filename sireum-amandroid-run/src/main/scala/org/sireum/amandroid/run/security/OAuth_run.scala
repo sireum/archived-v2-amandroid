@@ -2,21 +2,21 @@ package org.sireum.amandroid.run.security
 
 import org.sireum.util._
 import org.sireum.jawa.MessageCenter._
-import org.sireum.amandroid.alir.AndroidGlobalConfig
+import org.sireum.amandroid.AndroidGlobalConfig
 import java.io.File
 import org.sireum.jawa.util.APKFileResolver
 import java.net.URI
-import org.sireum.amandroid.android.decompile.Dex2PilarConverter
+import org.sireum.amandroid.decompile.Dex2PilarConverter
 import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidRFAConfig
 import org.sireum.jawa.JawaCodeSource
-import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
+import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.jawa.Center
-import org.sireum.amandroid.alir.AndroidConstants
+import org.sireum.amandroid.AndroidConstants
 import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.util.Timer
 import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.jawa.ClassLoadManager
-import org.sireum.amandroid.alir.AppCenter
+import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.util.TimeOutException
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
@@ -181,8 +181,6 @@ object OAuth_run {
         try{
           msg_critical(TITLE, "####" + file + "#####")
         	OAuthCounter.total += 1
-        	// before starting the analysis of the current app, first init
-        	AndroidGlobalConfig.initJawaAlirInfoProvider
         	
         	val srcFile = new File(new URI(file))
         	val dexFile = APKFileResolver.getDexFile(file, FileUtil.toUri(srcFile.getParentFile()))

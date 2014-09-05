@@ -2,22 +2,22 @@ package org.sireum.amandroid.security
 
 import org.sireum.jawa.JawaCodeSource
 import org.sireum.util.FileUtil
-import org.sireum.amandroid.alir.AndroidGlobalConfig
+import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.jawa.GlobalConfig
 import org.sireum.jawa.alir.LibSideEffectProvider
 import org.sireum.jawa.MessageCenter._
 import java.io.File
 import java.net.URI
 import org.sireum.jawa.util.APKFileResolver
-import org.sireum.amandroid.android.decompile.Dex2PilarConverter
+import org.sireum.amandroid.decompile.Dex2PilarConverter
 import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidRFAConfig
 import org.sireum.jawa.LibraryAPISummary
-import org.sireum.amandroid.android.appInfo.AppInfoCollector
+import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.jawa.Center
-import org.sireum.amandroid.alir.AndroidConstants
+import org.sireum.amandroid.AndroidConstants
 import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.jawa.ClassLoadManager
-import org.sireum.amandroid.alir.AppCenter
+import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
 import org.sireum.amandroid.alir.taintAnalysis.AndroidDataDependentTaintAnalysis
 import org.sireum.jawa.util.TimeOutException
@@ -42,7 +42,6 @@ class AmandroidSocket {
   
   def preProcess : Unit = {
     // before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
-		AndroidGlobalConfig.initJawaAlirInfoProvider
     JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), GlobalConfig.PILAR_FILE_EXT)
     val libsum_file = new File(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSideEffectResult.xml.zip")
     if(libsum_file.exists())
@@ -128,7 +127,6 @@ class AmandroidSocket {
   		if(listener_opt.isDefined) listener_opt.get.onPreAnalysis
   		
   		// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
-  		AndroidGlobalConfig.initJawaAlirInfoProvider
 
 		  var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 		  

@@ -4,7 +4,7 @@ import org.sireum.util._
 import org.sireum.jawa._
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.alir.reachingFactsAnalysis._
-import org.sireum.amandroid.alir.AndroidConstants
+import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.alir.Instance

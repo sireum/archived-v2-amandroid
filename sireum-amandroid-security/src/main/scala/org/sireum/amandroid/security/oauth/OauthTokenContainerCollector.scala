@@ -1,14 +1,14 @@
 package org.sireum.amandroid.security.oauth
 
 import org.sireum.jawa.JawaRecord
-import org.sireum.amandroid.android.appInfo.AppInfoCollector
+import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.util._
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.Center
 import org.sireum.jawa.MessageCenter._
-import org.sireum.amandroid.alir.AndroidConstants
-import org.sireum.amandroid.alir.AppCenter
-import org.sireum.amandroid.android.appInfo.ReachableInfoCollector
+import org.sireum.amandroid.AndroidConstants
+import org.sireum.amandroid.AppCenter
+import org.sireum.amandroid.appInfo.ReachableInfoCollector
 
 class OauthTokenContainerCollector(apkUri : FileResourceUri) extends AppInfoCollector(apkUri) {
   

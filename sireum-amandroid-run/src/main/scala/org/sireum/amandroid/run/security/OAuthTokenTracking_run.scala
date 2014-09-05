@@ -2,7 +2,7 @@ package org.sireum.amandroid.run.security
 
 import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.amandroid.security.AmandroidSocketListener
-import org.sireum.amandroid.alir.AndroidGlobalConfig
+import org.sireum.amandroid.AndroidGlobalConfig
 import java.io.PrintWriter
 import java.io.File
 import org.sireum.amandroid.security.oauth.OauthTokenContainerCollector
@@ -14,8 +14,8 @@ import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnaly
 import org.sireum.jawa.util.Timer
 import org.sireum.util._
 import org.sireum.amandroid.security.oauth.OAuthSourceAndSinkManager
-import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
-import org.sireum.amandroid.alir.AppCenter
+import org.sireum.amandroid.util.AndroidLibraryAPISummary
+import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.util.IgnoreException
 
 

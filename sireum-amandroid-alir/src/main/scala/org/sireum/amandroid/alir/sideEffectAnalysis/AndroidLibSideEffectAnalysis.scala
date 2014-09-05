@@ -1,8 +1,8 @@
 package org.sireum.amandroid.alir.sideEffectAnalysis
 
-import org.sireum.amandroid.alir.AndroidGlobalConfig
+import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.jawa.JawaCodeSource
-import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
+import org.sireum.amandroid.libPilarFiles.AndroidLibPilarFiles
 import org.sireum.jawa.Center
 import org.sireum.jawa.alir.JawaAlirInfoProvider
 import org.sireum.jawa.alir.sideEffectAnalysis.SideEffectAnalysis
@@ -24,7 +24,6 @@ import org.sireum.jawa.GlobalConfig
 object AndroidLibSideEffectAnalysis {
   
 	def main(args: Array[String]) {
-	  AndroidGlobalConfig.initJawaAlirInfoProvider
 	  val androidLibDir = AndroidGlobalConfig.android_lib_dir
 	  if(androidLibDir != null){
 	    val startTime = System.currentTimeMillis()

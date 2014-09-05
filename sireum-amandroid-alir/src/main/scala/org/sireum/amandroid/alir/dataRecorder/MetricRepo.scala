@@ -1,10 +1,10 @@
 package org.sireum.amandroid.alir.dataRecorder
 
-import org.sireum.amandroid.android.appInfo.AppInfoCollector
+import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.jawa.Center
 import org.sireum.util._
 import org.sireum.jawa.JawaRecord
-import org.sireum.amandroid.android.security.AndroidProblemCategories
+import org.sireum.amandroid.security.AndroidProblemCategories
 import org.sireum.util.ISet
 import org.sireum.jawa.alir.taintAnalysis.TaintPath
 

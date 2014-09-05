@@ -6,7 +6,7 @@ import org.sireum.jawa.JawaRecord
 import org.sireum.jawa.alir.reachingFactsAnalysis._
 import org.sireum.jawa.JawaProcedure
 import org.sireum.jawa.alir.Context
-import org.sireum.amandroid.alir.AndroidConstants
+import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.alir.UnknownInstance
 import org.sireum.jawa.Center
 

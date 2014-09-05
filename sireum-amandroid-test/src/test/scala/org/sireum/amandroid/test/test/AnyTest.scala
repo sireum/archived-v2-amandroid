@@ -2,13 +2,6 @@ package org.sireum.amandroid.test.test
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.sireum.amandroid.alir.AndroidGlobalConfig
-import org.sireum.jawa.JawaCodeSource
-import org.sireum.jawa.alir.LibSideEffectProvider
-import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
-import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
-import org.sireum.jawa.GlobalConfig
-import org.sireum.util.FileUtil
 
 
 /**

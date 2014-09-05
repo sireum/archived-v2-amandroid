@@ -4,8 +4,8 @@ import org.sireum.amandroid.security._
 import org.sireum.jawa.MessageCenter._
 import org.sireum.util.FileUtil
 import org.sireum.amandroid.security.apiMisuse.InterestingApiCollector
-import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
-import org.sireum.amandroid.alir.AppCenter
+import org.sireum.amandroid.util.AndroidLibraryAPISummary
+import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.security.apiMisuse.CryptographicMisuse
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig

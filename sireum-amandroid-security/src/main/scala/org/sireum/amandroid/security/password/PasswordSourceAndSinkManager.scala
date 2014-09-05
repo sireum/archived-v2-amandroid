@@ -1,13 +1,13 @@
 package org.sireum.amandroid.security.password
 
-import org.sireum.amandroid.android.parser.LayoutControl
+import org.sireum.amandroid.parser.LayoutControl
 import org.sireum.util._
 import org.sireum.jawa.JawaProcedure
 import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.jawa.alir.reachingFactsAnalysis.RFAFact
 import org.sireum.pilar.ast.JumpLocation
-import org.sireum.amandroid.alir.AndroidConstants
+import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.alir.util.ExplicitValueFinder
 import org.sireum.amandroid.alir.model.InterComponentCommunicationModel
 import org.sireum.jawa.alir.reachingFactsAnalysis.ReachingFactsAnalysisHelper

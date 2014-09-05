@@ -3,13 +3,13 @@ package org.sireum.amandroid.alir.reachingFactsAnalysis
 import org.sireum.util._
 import org.sireum.jawa.alir.Instance
 import org.sireum.jawa.alir.reachingFactsAnalysis._
-import org.sireum.amandroid.alir.AndroidConstants
+import org.sireum.amandroid.AndroidConstants
 import org.sireum.alir.Slot
 import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.JawaRecord
-import org.sireum.amandroid.android.parser.UriData
+import org.sireum.amandroid.parser.UriData
 import java.net.URI
-import org.sireum.amandroid.alir.AppCenter
+import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.Center
 import org.sireum.jawa.MessageCenter._

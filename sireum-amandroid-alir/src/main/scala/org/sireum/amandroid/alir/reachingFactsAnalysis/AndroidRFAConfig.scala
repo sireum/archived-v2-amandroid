@@ -3,7 +3,7 @@ package org.sireum.amandroid.alir.reachingFactsAnalysis
 import org.sireum.util._
 import org.sireum.jawa.alir.reachingFactsAnalysis._
 import org.sireum.jawa.JawaProcedure
-import org.sireum.amandroid.alir.AndroidConstants
+import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.NormalType
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.GlobalConfig

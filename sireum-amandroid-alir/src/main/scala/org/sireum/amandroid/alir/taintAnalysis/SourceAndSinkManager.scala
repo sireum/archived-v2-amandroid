@@ -4,13 +4,13 @@ import java.io.BufferedReader
 import java.io.FileReader
 import org.sireum.util._
 import org.sireum.jawa.JawaProcedure
-import org.sireum.amandroid.android.parser.LayoutControl
-import org.sireum.amandroid.android.parser.ARSCFileParser
+import org.sireum.amandroid.parser.LayoutControl
+import org.sireum.amandroid.parser.ARSCFileParser
 import java.util.regex.Pattern
 import java.util.regex.Matcher
 import org.sireum.jawa.Center
 import org.sireum.jawa.util.StringFormConverter
-import org.sireum.amandroid.alir.AndroidConstants
+import org.sireum.amandroid.AndroidConstants
 import org.sireum.pilar.ast.LocationDecl
 import org.sireum.jawa.alir.util.ExplicitValueFinder
 import org.sireum.pilar.ast.JumpLocation
@@ -23,7 +23,7 @@ import org.sireum.amandroid.alir.reachingFactsAnalysis.IntentHelper
 import org.sireum.jawa.alir.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterProceduralDataDependenceGraph
-import org.sireum.amandroid.alir.AppCenter
+import org.sireum.amandroid.AppCenter
 import org.sireum.pilar.ast._
 import java.io.InputStreamReader
 import java.io.FileInputStream
