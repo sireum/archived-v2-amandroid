@@ -9,7 +9,7 @@ import java.io.File
 import java.net.URI
 import org.sireum.jawa.util.APKFileResolver
 import org.sireum.amandroid.android.decompile.Dex2PilarConverter
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidRFAConfig
+import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidRFAConfig
 import org.sireum.jawa.GlobalConfig
 import org.sireum.jawa.DefaultLibraryAPISummary
 import java.io.FileOutputStream

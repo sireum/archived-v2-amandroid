@@ -7,15 +7,15 @@ import org.sireum.jawa.MessageCenter._
 import org.sireum.pilar.ast._
 import org.sireum.amandroid.alir.AndroidConstants
 import org.sireum.jawa.alir.util.ExplicitValueFinder
-import org.sireum.jawa.alir.interProcedural.controlFlowGraph.CGInvokeNode
-import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis.RFAFact
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.model.InterComponentCommunicationModel
-import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
-import org.sireum.jawa.alir.interProcedural.controlFlowGraph.CGNode
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.IntentHelper
-import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis.VarSlot
+import org.sireum.jawa.alir.controlFlowGraph.CGInvokeNode
+import org.sireum.jawa.alir.reachingFactsAnalysis.RFAFact
+import org.sireum.amandroid.alir.model.InterComponentCommunicationModel
+import org.sireum.jawa.alir.reachingFactsAnalysis.ReachingFactsAnalysisHelper
+import org.sireum.jawa.alir.controlFlowGraph.CGNode
+import org.sireum.amandroid.alir.reachingFactsAnalysis.IntentHelper
+import org.sireum.jawa.alir.reachingFactsAnalysis.VarSlot
 import org.sireum.jawa.Center
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis.AndroidSourceAndSinkManager
+import org.sireum.amandroid.alir.taintAnalysis.AndroidSourceAndSinkManager
 
 class IntentInjectionSourceAndSinkManager(appPackageName : String, 
     												layoutControls : Map[Int, LayoutControl], 

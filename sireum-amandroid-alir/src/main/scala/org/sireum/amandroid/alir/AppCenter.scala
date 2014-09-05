@@ -4,14 +4,14 @@ import org.sireum.util._
 import org.sireum.jawa.JawaRecord
 import org.sireum.amandroid.android.parser.IntentFilterDataBase
 import org.sireum.amandroid.android.appInfo.AppInfoCollector
-import org.sireum.jawa.alir.interProcedural.controlFlowGraph._
-import org.sireum.jawa.alir.interProcedural.taintAnalysis.TaintAnalysisResult
+import org.sireum.jawa.alir.controlFlowGraph._
+import org.sireum.jawa.alir.taintAnalysis.TaintAnalysisResult
 import org.sireum.jawa.alir.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
 import org.sireum.jawa.alir.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
-import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis.RFAFact
-import org.sireum.jawa.alir.interProcedural.dataDependenceAnalysis.InterproceduralDataDependenceInfo
+import org.sireum.jawa.alir.reachingFactsAnalysis.RFAFact
+import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceInfo
 import org.sireum.jawa.Center
-import org.sireum.jawa.alir.interProcedural.pointsToAnalysis.InterproceduralPointsToAnalysis
+import org.sireum.jawa.alir.pointsToAnalysis.InterproceduralPointsToAnalysis
 
 /**
  * this is an object, which hold information of apps. e.g. components, intent-filter database, etc.

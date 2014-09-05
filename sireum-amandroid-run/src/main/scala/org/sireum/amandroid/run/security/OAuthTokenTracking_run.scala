@@ -10,7 +10,7 @@ import org.sireum.amandroid.alir.dataRecorder.DataCollector
 import org.sireum.amandroid.alir.dataRecorder.MetricRepo
 import org.sireum.jawa.MessageCenter
 import org.sireum.jawa.MessageCenter._
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.util.Timer
 import org.sireum.util._
 import org.sireum.amandroid.security.oauth.OAuthSourceAndSinkManager

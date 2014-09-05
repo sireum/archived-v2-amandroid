@@ -7,14 +7,14 @@ import java.io.File
 import org.sireum.jawa.util.APKFileResolver
 import java.net.URI
 import org.sireum.amandroid.android.decompile.Dex2PilarConverter
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidRFAConfig
+import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidRFAConfig
 import org.sireum.jawa.JawaCodeSource
 import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
 import org.sireum.jawa.Center
 import org.sireum.amandroid.alir.AndroidConstants
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.util.Timer
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
+import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.jawa.ClassLoadManager
 import org.sireum.amandroid.alir.AppCenter
 import org.sireum.jawa.util.TimeOutException

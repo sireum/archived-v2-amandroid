@@ -6,7 +6,7 @@ import org.sireum.util._
 import org.sireum.jawa.JawaRecord
 import org.sireum.amandroid.android.security.AndroidProblemCategories
 import org.sireum.util.ISet
-import org.sireum.jawa.alir.interProcedural.taintAnalysis.TaintPath
+import org.sireum.jawa.alir.taintAnalysis.TaintPath
 
 object MetricRepo {
   /**ICC compare*/

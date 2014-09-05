@@ -5,11 +5,11 @@ import org.sireum.amandroid.security._
 import org.sireum.amandroid.alir.AppCenter
 import org.sireum.amandroid.alir.dataRecorder.DataCollector
 import org.sireum.amandroid.alir.dataRecorder.MetricRepo
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.util.Timer
 import org.sireum.util.FileUtil
 import org.sireum.amandroid.android.appInfo.AppInfoCollector
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis.DefaultAndroidSourceAndSinkManager
+import org.sireum.amandroid.alir.taintAnalysis.DefaultAndroidSourceAndSinkManager
 import org.sireum.amandroid.alir.AndroidGlobalConfig
 import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
 import org.sireum.jawa.alir.LibSideEffectProvider

@@ -12,7 +12,7 @@ import org.sireum.amandroid.alir.AndroidConstants
 import org.sireum.jawa.JawaRecord
 import org.sireum.jawa.JawaProcedure
 import org.sireum.jawa.Center
-import org.sireum.jawa.alir.interProcedural.controlFlowGraph._
+import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.pilar.ast.CallJump
 import org.sireum.pilar.ast.JumpLocation
 import org.sireum.pilar.ast.TupleExp
@@ -22,7 +22,7 @@ import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.alir.util.ExplicitValueFinder
 import org.sireum.amandroid.android.pilarCodeGenerator.AndroidEntryPointConstants
 import org.sireum.jawa.GlobalConfig
-import org.sireum.jawa.alir.interProcedural.reachability.ReachabilityAnalysis
+import org.sireum.jawa.alir.reachability.ReachabilityAnalysis
 import org.sireum.amandroid.android.parser.LayoutControl
 import org.sireum.jawa.PointsCollector
 import org.sireum.jawa.PointI

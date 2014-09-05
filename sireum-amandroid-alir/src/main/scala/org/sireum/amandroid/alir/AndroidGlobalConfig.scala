@@ -3,8 +3,7 @@ package org.sireum.amandroid.alir
 import org.sireum.pilar.symbol.SymbolTable
 import org.sireum.alir.DefRef
 import org.sireum.jawa.Transform
-import org.sireum.jawa.alir.intraProcedural.reachingDefinitionAnalysis.AmandroidDefRef
-import org.sireum.jawa.alir.intraProcedural.reachingDefinitionAnalysis.AmandroidVarAccesses
+import org.sireum.jawa.alir.reachingDefinitionAnalysis._
 import org.sireum.jawa.alir.JawaAlirInfoProvider
 import org.sireum.jawa.util.OsUtils
 
@@ -24,7 +23,7 @@ object AndroidGlobalConfig {
 	final var IntentInjectionSinkFilePath = amandroid_home + "/taintAnalysis/sourceAndSinks/IntentInjectionSourcesAndSinks.txt"
 	  
 	  
-  var dr : SymbolTable => DefRef = { st => new AmandroidDefRef(st, new AmandroidVarAccesses(st)) }
+  var dr : SymbolTable => DefRef = { st => new JawaDefRef(st, new JawaVarAccesses(st)) }
   
   def initJawaAlirInfoProvider = {
     JawaAlirInfoProvider.init(dr)

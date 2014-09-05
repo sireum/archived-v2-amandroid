@@ -1,6 +1,6 @@
 package org.sireum.amandroid.run.security
 
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.jawa.util.Timer
 import org.sireum.util.FileUtil

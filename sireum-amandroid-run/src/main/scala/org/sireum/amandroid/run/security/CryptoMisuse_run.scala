@@ -8,7 +8,7 @@ import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.alir.AppCenter
 import org.sireum.amandroid.security.apiMisuse.CryptographicMisuse
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.util.Timer
 import org.sireum.jawa.util.IgnoreException
 
