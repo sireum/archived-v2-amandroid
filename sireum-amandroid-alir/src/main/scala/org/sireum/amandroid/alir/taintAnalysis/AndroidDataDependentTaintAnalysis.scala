@@ -48,10 +48,10 @@ object AndroidDataDependentTaintAnalysis {
     override def toString : String = {
       val sb = new StringBuilder
       sb.append("found path from\n" + srcN.getDescriptors + "\nto\n" + sinN.getDescriptors + "\n")
-      sb.append("path types:" + this.typs)
+      sb.append("path types:" + this.typs + "\n")
       path.reverse.foreach{
         edge =>
-          sb.append(edge.target + " -> " + edge.source)
+          sb.append(edge.target + " -> " + edge.source + "\n")
       }
       sb.toString().intern
     }

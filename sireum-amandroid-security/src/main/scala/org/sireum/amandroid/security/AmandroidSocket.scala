@@ -41,8 +41,13 @@ class AmandroidSocket {
   private final val TITLE = "AmandroidSocket"
   
   def preProcess : Unit = {
-    // before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
-    JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), GlobalConfig.PILAR_FILE_EXT)
+    val imgfile = new File(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSummary.xml.zip")
+    if(imgfile.exists()){
+      Center.init(imgfile)
+      JawaCodeSource.setPreLoadFlag
+    } else {
+      JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), GlobalConfig.PILAR_FILE_EXT)
+    }
     val libsum_file = new File(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSideEffectResult.xml.zip")
     if(libsum_file.exists())
       LibSideEffectProvider.init(libsum_file)
