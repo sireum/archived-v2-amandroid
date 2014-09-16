@@ -1,22 +1,22 @@
 package org.sireum.amandroid.security.oauth
 
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis.AndroidSourceAndSinkManager
-import org.sireum.amandroid.android.parser.LayoutControl
+import org.sireum.amandroid.alir.taintAnalysis.AndroidSourceAndSinkManager
+import org.sireum.amandroid.parser.LayoutControl
 import org.sireum.util._
 import org.sireum.jawa.JawaProcedure
 import org.sireum.jawa.MessageCenter._
-import org.sireum.jawa.alir.interProcedural.controlFlowGraph.CGCallNode
-import org.sireum.jawa.alir.interProcedural.controlFlowGraph.CGNode
-import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis.RFAFact
+import org.sireum.jawa.alir.controlFlowGraph.CGCallNode
+import org.sireum.jawa.alir.controlFlowGraph.CGNode
+import org.sireum.jawa.alir.reachingFactsAnalysis.RFAFact
 import org.sireum.pilar.ast.JumpLocation
-import org.sireum.amandroid.alir.AndroidConstants
+import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.alir.util.ExplicitValueFinder
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.model.InterComponentCommunicationModel
-import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis.ReachingFactsAnalysisHelper
+import org.sireum.amandroid.alir.model.InterComponentCommunicationModel
+import org.sireum.jawa.alir.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.pilar.ast._
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.IntentHelper
-import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis.VarSlot
-import org.sireum.jawa.alir.interProcedural.controlFlowGraph.CGInvokeNode
+import org.sireum.amandroid.alir.reachingFactsAnalysis.IntentHelper
+import org.sireum.jawa.alir.reachingFactsAnalysis.VarSlot
+import org.sireum.jawa.alir.controlFlowGraph.CGInvokeNode
 import org.sireum.jawa.Center
 
 class OAuthSourceAndSinkManager(appPackageName : String, 
@@ -35,7 +35,7 @@ class OAuthSourceAndSinkManager(appPackageName : String,
 	  false
 	}
 	
-	override def isSource(loc : LocationDecl) : Boolean = {
+	override def isSource(loc : LocationDecl, s : ISet[RFAFact]) : Boolean = {
 	  var flag = false
 	  val visitor = Visitor.build({
 	      case as : AssignAction =>

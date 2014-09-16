@@ -1,13 +1,13 @@
 package org.sireum.amandroid.security.password
 
 import org.sireum.jawa.JawaRecord
-import org.sireum.amandroid.android.appInfo.AppInfoCollector
+import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.util._
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.Center
 import org.sireum.jawa.MessageCenter._
-import org.sireum.amandroid.alir.AndroidConstants
-import org.sireum.amandroid.alir.AppCenter
+import org.sireum.amandroid.AndroidConstants
+import org.sireum.amandroid.AppCenter
 
 class SensitiveViewCollector(apkUri : FileResourceUri) extends AppInfoCollector(apkUri) {
   

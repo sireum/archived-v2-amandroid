@@ -2,25 +2,25 @@ package org.sireum.amandroid.run.staging
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.sireum.amandroid.alir.AndroidGlobalConfig
+import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.jawa.JawaCodeSource
 import org.sireum.jawa.alir.LibSideEffectProvider
-import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
+import org.sireum.amandroid.libPilarFiles.AndroidLibPilarFiles
 import org.sireum.util.FileUtil
 import org.sireum.jawa.GlobalConfig
-import org.sireum.amandroid.android.appInfo.AppInfoCollector
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis.DefaultAndroidSourceAndSinkManager
+import org.sireum.amandroid.appInfo.AppInfoCollector
+import org.sireum.amandroid.alir.taintAnalysis.DefaultAndroidSourceAndSinkManager
 import java.io.File
 import java.net.URI
 import org.sireum.jawa.util.APKFileResolver
-import org.sireum.amandroid.android.decompile.Dex2PilarConverter
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidRFAConfig
-import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
+import org.sireum.amandroid.decompile.Dex2PilarConverter
+import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidRFAConfig
+import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.jawa.Center
-import org.sireum.amandroid.alir.AndroidConstants
-import org.sireum.amandroid.alir.AppCenter
+import org.sireum.amandroid.AndroidConstants
+import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.MessageCenter._
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis.AndroidDataDependentTaintAnalysis
+import org.sireum.amandroid.alir.taintAnalysis.AndroidDataDependentTaintAnalysis
 import java.util.zip.GZIPInputStream
 import java.io.FileInputStream
 import org.sireum.jawa.xml.AndroidXStream
@@ -54,7 +54,6 @@ object StagingAnalyses_run {
       file =>
   	    println("Processing -> " + file)
   	    try{
-  		    AndroidGlobalConfig.initJawaAlirInfoProvider
   	    	
   	    	val srcFile = new File(new URI(file))
   	    	val dexFile = APKFileResolver.getDexFile(file, FileUtil.toUri(srcFile.getParentFile()))

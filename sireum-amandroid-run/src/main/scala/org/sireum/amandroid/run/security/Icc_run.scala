@@ -1,19 +1,19 @@
 package org.sireum.amandroid.run.security
 
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.jawa.util.Timer
 import org.sireum.util.FileUtil
 import org.sireum.amandroid.security.interComponentCommunication.IccCollector
-import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
+import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.security.AmandroidSocketListener
 import org.sireum.jawa.MessageCenter._
 import org.sireum.amandroid.alir.dataRecorder.DataCollector
 import org.sireum.amandroid.alir.dataRecorder.MetricRepo
-import org.sireum.amandroid.alir.AndroidGlobalConfig
+import org.sireum.amandroid.AndroidGlobalConfig
 import java.io.PrintWriter
 import java.io.File
-import org.sireum.amandroid.alir.AndroidConstants
+import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.JawaCodeSource
 import org.sireum.jawa.util.SubStringCounter
 import org.sireum.util.FileResourceUri

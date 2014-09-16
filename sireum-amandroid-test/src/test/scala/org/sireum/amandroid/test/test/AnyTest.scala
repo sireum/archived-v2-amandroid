@@ -2,21 +2,13 @@ package org.sireum.amandroid.test.test
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.sireum.amandroid.alir.AndroidGlobalConfig
-import org.sireum.jawa.JawaCodeSource
-import org.sireum.jawa.alir.LibSideEffectProvider
-import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
-import org.sireum.amandroid.example.interprocedural.InterproceduralExamples
-import org.sireum.amandroid.test.framework.test.AnyTestFramework
-import org.sireum.jawa.GlobalConfig
-import org.sireum.util.FileUtil
 
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 @RunWith(classOf[JUnitRunner])
-class AnyTest extends AnyTestFramework {
+class AnyTest {
 //  var i = 0
 //  val androidLibDir = AndroidGlobalConfig.android_lib_dir
 //	JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)

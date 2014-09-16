@@ -2,14 +2,14 @@ package org.sireum.amandroid.run.adlib
 
 import org.sireum.util.FileUtil
 import org.sireum.jawa.Center
-import org.sireum.amandroid.alir.AppCenter
+import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.JawaCodeSource
-import org.sireum.amandroid.alir.AndroidGlobalConfig
+import org.sireum.amandroid.AndroidGlobalConfig
 import java.io.File
 import java.net.URI
 import org.sireum.jawa.util.APKFileResolver
-import org.sireum.amandroid.android.decompile.Dex2PilarConverter
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidRFAConfig
+import org.sireum.amandroid.decompile.Dex2PilarConverter
+import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidRFAConfig
 import org.sireum.jawa.GlobalConfig
 import org.sireum.jawa.DefaultLibraryAPISummary
 import java.io.FileOutputStream
@@ -262,8 +262,6 @@ object AdLibCounting {
 	    file =>
 	      try {
 	      println("Analyzing " + file)
-	      // before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
-	    	AndroidGlobalConfig.initJawaAlirInfoProvider
 	      val apkFile = new File(new URI(file))
 	      
 	      val dexFileUri = APKFileResolver.getDexFile(file, outputUri)

@@ -3,13 +3,13 @@ package org.sireum.amandroid.security.apiMisuse
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.jawa.MessageCenter._
 import org.sireum.util._
-import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis.RFAFact
-import org.sireum.jawa.alir.interProcedural.controlFlowGraph._
+import org.sireum.jawa.alir.reachingFactsAnalysis.RFAFact
+import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.pilar.ast._
 import org.sireum.jawa.Center
 import org.sireum.jawa.alir.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
-import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis.VarSlot
-import org.sireum.jawa.alir.interProcedural.reachingFactsAnalysis.RFAConcreteStringInstance
+import org.sireum.jawa.alir.reachingFactsAnalysis.VarSlot
+import org.sireum.jawa.alir.reachingFactsAnalysis.RFAConcreteStringInstance
 import org.sireum.jawa.JawaProcedure
 
 object CryptographicMisuse {

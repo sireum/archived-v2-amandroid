@@ -4,27 +4,26 @@ import org.sireum.jawa.MessageCenter
 import org.sireum.util._
 import org.sireum.option.AnalyzeSource
 import java.io.File
-import org.sireum.amandroid.alir.AndroidGlobalConfig
+import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.jawa.JawaCodeSource
-import org.sireum.amandroid.android.libPilarFiles.AndroidLibPilarFiles
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.amandroid.libPilarFiles.AndroidLibPilarFiles
 import java.net.URI
 import org.sireum.jawa.util.APKFileResolver
-import org.sireum.amandroid.android.decompile.Dex2PilarConverter
+import org.sireum.amandroid.decompile.Dex2PilarConverter
 import org.sireum.jawa.util.Timer
-import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidRFAConfig
+import org.sireum.amandroid.util.AndroidLibraryAPISummary
+import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidRFAConfig
 import org.sireum.amandroid.alir.dataRecorder.DataCollector
 import java.io.PrintWriter
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.Center
-import org.sireum.amandroid.alir.AppCenter
+import org.sireum.amandroid.AppCenter
 import org.sireum.option.SireumAmandroidIntentInjectionMode
-import org.sireum.amandroid.alir.AndroidConstants
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
+import org.sireum.amandroid.AndroidConstants
+import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.jawa.ClassLoadManager
-import org.sireum.jawa.alir.interProcedural.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
-import org.sireum.amandroid.alir.interProcedural.taintAnalysis.AndroidDataDependentTaintAnalysis
+import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
+import org.sireum.amandroid.alir.taintAnalysis.AndroidDataDependentTaintAnalysis
 import org.sireum.amandroid.security.dataInjection.IntentInjectionCollector
 import org.sireum.amandroid.security.dataInjection.IntentInjectionSourceAndSinkManager
 import org.sireum.jawa.alir.LibSideEffectProvider
@@ -32,6 +31,7 @@ import org.sireum.jawa.GlobalConfig
 import org.sireum.option.MessageLevel
 import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.amandroid.security.AmandroidSocketListener
+import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

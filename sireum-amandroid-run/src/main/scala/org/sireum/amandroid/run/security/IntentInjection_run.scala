@@ -2,23 +2,24 @@ package org.sireum.amandroid.run.security
 
 import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.amandroid.security.AmandroidSocketListener
-import org.sireum.amandroid.alir.AndroidGlobalConfig
+import org.sireum.amandroid.AndroidGlobalConfig
 import java.io.PrintWriter
 import java.io.File
 import org.sireum.amandroid.security.dataInjection.IntentInjectionCollector
 import org.sireum.amandroid.security.dataInjection.IntentInjectionSourceAndSinkManager
-import org.sireum.amandroid.alir.AndroidConstants
-import org.sireum.amandroid.alir.AppCenter
+import org.sireum.amandroid.AndroidConstants
+import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.alir.dataRecorder.MetricRepo
 import org.sireum.amandroid.alir.dataRecorder.DataCollector
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.util.FileUtil
-import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
+import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.jawa.util.Timer
 import org.sireum.jawa.MessageCenter._
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.JawaCodeSource
+import org.sireum.jawa.MessageCenter
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -72,7 +73,8 @@ object IntentInjection_run {
       val iacs = app_info.getInterestingContainers(ssm.getSinkSigs ++ AndroidConstants.getIccMethods)
       val res = eps.filter(e=>iacs.contains(e.getDeclaringRecord))
       IntentInjectionCounter.totalComponents += res.size
-      res
+//      res
+      res.filter(p => p.getName.contains("RssListActivity"))
     }
 
     def onTimeout : Unit = {
@@ -121,11 +123,11 @@ object IntentInjection_run {
       System.err.print("Usage: source_path output_path")
       return
     }
-    
+    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
     AndroidReachingFactsAnalysisConfig.k_context = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(10))
+    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(20))
     
     val socket = new AmandroidSocket
     socket.preProcess
