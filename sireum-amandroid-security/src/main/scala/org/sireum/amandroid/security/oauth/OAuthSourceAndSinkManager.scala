@@ -35,7 +35,7 @@ class OAuthSourceAndSinkManager(appPackageName : String,
 	  false
 	}
 	
-	override def isSource(loc : LocationDecl) : Boolean = {
+	override def isSource(loc : LocationDecl, s : ISet[RFAFact]) : Boolean = {
 	  var flag = false
 	  val visitor = Visitor.build({
 	      case as : AssignAction =>

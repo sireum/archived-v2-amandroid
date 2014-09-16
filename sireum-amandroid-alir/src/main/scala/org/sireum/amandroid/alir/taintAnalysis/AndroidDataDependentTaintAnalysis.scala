@@ -210,12 +210,19 @@ object AndroidDataDependentTaintAnalysis {
       case normalNode : IDDGNormalNode =>
         val owner = Center.getProcedureWithoutFailing(normalNode.getOwner)
         val loc = owner.getProcedureBody.location(normalNode.getLocIndex)
-        if(ssm.isSource(loc)){
+        if(ssm.isSource(loc, rfaFacts)){
           msg_normal(TITLE, "found simple statement source: " + normalNode)
           val tn = Tn(normalNode)
           tn.isSrc = true
           tn.descriptors += Td(normalNode.getOwner, SourceAndSinkCategory.STMT_SOURCE)
           sources += tn
+        }
+        if(ssm.isSink(loc, rfaFacts)){
+          msg_normal(TITLE, "found simple statement sink: " + normalNode)
+          val tn = Tn(normalNode)
+          tn.isSrc = false
+          tn.descriptors += Td(normalNode.getOwner, SourceAndSinkCategory.STMT_SINK)
+          sinks += tn
         }
       case _ =>
     }

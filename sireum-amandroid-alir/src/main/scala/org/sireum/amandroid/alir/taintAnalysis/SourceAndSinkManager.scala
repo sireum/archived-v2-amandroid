@@ -32,6 +32,7 @@ import org.sireum.jawa.alir.taintAnalysis.SourceAndSinkManager
 
 object SourceAndSinkCategory {
   final val STMT_SOURCE = "stmt_source"
+  final val STMT_SINK = "stmt_sink"
   final val API_SOURCE = "api_source"
   final val API_SINK = "api_sink"
   final val ICC_SOURCE = "icc_source"
@@ -86,7 +87,9 @@ abstract class AndroidSourceAndSinkManager(appPackageName : String,
 	  false
 	}
 	
-	def isSource(loc : LocationDecl) : Boolean = false
+	def isSource(loc : LocationDecl, s : ISet[RFAFact]) : Boolean = false
+	
+	def isSink(loc : LocationDecl, s : ISet[RFAFact]) : Boolean = false
 	
 	def addSource(source : String, category : String) = {
 	  this.sources += (source -> category)

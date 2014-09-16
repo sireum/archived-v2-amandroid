@@ -36,6 +36,7 @@ object UrlCollection_run {
         msg_critical(TITLE, "####" + file + "#####")
         try{
           val man = AppInfoCollector.analyzeManifest(file)
+          
           val strs = msetEmpty[String]
         	val rfp = new ResourceFileParser
         	rfp.parseResourceFile(file)
