@@ -119,8 +119,6 @@ object PasswordTracking {
         println("Unexpected type: " + typ)
         return
     }
-    val androidLibDir = AndroidGlobalConfig.android_lib_dir
-		JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
 		passwordTracking(apkFileUris, sasFilePath, outputPath, static, parallel, icc, k_context, timeout)
 	}
   
