@@ -16,7 +16,7 @@ import org.sireum.jawa.util.IgnoreException
 
 object DataLeakage_run {
   private final val TITLE = "DataLeakage_run"
-  MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
+  MessageCenter.msglevel = MessageCenter.MSG_LEVEL.VERBOSE
   object DataLeakageCounter {
     var total = 0
     var haveresult = 0
@@ -66,7 +66,7 @@ object DataLeakage_run {
     AndroidReachingFactsAnalysisConfig.k_context = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = true
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
+    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(10))
     
     val socket = new AmandroidSocket
     socket.preProcess

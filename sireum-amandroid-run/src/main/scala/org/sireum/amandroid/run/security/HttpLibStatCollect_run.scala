@@ -1,0 +1,206 @@
+package org.sireum.amandroid.run.security
+
+import org.sireum.util._
+import org.sireum.jawa.MessageCenter._
+import org.sireum.amandroid.alir.AndroidGlobalConfig
+import java.io.File
+import org.sireum.jawa.util.APKFileResolver
+import java.net.URI
+import org.sireum.amandroid.android.decompile.Dex2PilarConverter
+import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidRFAConfig
+import org.sireum.jawa.JawaCodeSource
+import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
+import org.sireum.jawa.Center
+import org.sireum.amandroid.alir.AndroidConstants
+import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.jawa.util.Timer
+import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidReachingFactsAnalysis
+import org.sireum.jawa.ClassLoadManager
+import org.sireum.amandroid.alir.AppCenter
+import org.sireum.jawa.util.TimeOutException
+import org.sireum.jawa.util.IgnoreException
+import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
+import org.sireum.jawa.GlobalConfig
+import java.io.PrintWriter
+import org.sireum.jawa.alir.LibSideEffectProvider
+
+/**
+ * @author <a href="mailto:sroy@k-state.edu">S. Roy</a>
+ */
+object HttpLibStatCollect_run {
+  private final val TITLE = "HttpLibCollect_run"
+  object Counter {
+    var total = 0
+    var haveresult = 0
+    var javaNetHttpClientUser = Set[String]()
+   
+    var apacheHttpClientUser = Set[String]()
+    
+    var googleHttpClientUser = Set[String]()
+    
+    var chBoyeHttpClientUser = Set[String]()
+    
+    def write = {
+      val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
+      val appDataDirFile = new File(outputDir + "/httpLibStat")
+    	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
+    	val out = new PrintWriter(appDataDirFile + "/summary.txt")
+      try{
+           if(javaNetHttpClientUser.size > 0) {
+              out.write("\n java net http client users are : \n")
+              javaNetHttpClientUser.foreach{
+               srcFileName =>
+                 out.write(srcFileName + "\n")
+             }
+           }
+           
+        
+            if(apacheHttpClientUser.size > 0) {
+              out.write("\n apache http client users are : \n")
+              apacheHttpClientUser.foreach{
+               srcFileName =>
+                 out.write(srcFileName + "\n")
+             }
+           }
+           
+         if(googleHttpClientUser.size > 0) {
+              out.write("\n google HttpClient users are : \n")
+              googleHttpClientUser.foreach{
+               srcFileName =>
+                 out.write(srcFileName + "\n")
+             }
+           }
+           
+        
+          
+          if(chBoyeHttpClientUser.size > 0) {
+              out.write("\n ch.Boye Http Client users are : \n")
+              chBoyeHttpClientUser.foreach{
+               srcFileName =>
+                out.write(srcFileName + "\n")
+              }
+          }
+          
+       
+          
+          if(javaNetHttpClientUser.size > 0 & apacheHttpClientUser.size > 0) {
+              out.write("\n javaNet-and-apache Http users are : \n")
+              javaNetHttpClientUser.intersect(apacheHttpClientUser).foreach{
+               srcFileName =>
+                out.write(srcFileName + "\n")
+              }
+          }
+          
+  
+      } finally {
+      	out.close()
+      }
+    }
+    
+    override def toString : String = 
+      "total: " + total + ", haveResult: " + haveresult + 
+  		", javaNetHttpClientUser: " + javaNetHttpClientUser.size +
+  		", apacheHttpClientUser: " + apacheHttpClientUser.size +
+  		", JavaNetAndApacheHttpClientUser:" + (javaNetHttpClientUser.intersect(apacheHttpClientUser)).size +
+  		", googleHttpClientUser: " + googleHttpClientUser.size +
+  		", chBoyeHttpClientUser:" + chBoyeHttpClientUser.size 
+  }
+  
+  def main(args: Array[String]): Unit = {
+    if(args.size != 2){
+      System.err.print("Usage: source_path output_path")
+      return
+    }
+    
+    val sourcePath = args(0)
+    val outputPath = args(1)
+    
+    //JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), GlobalConfig.PILAR_FILE_EXT)
+    //LibSideEffectProvider.init(new File(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSideEffectResult.xml.zip"))
+    val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
+    files.foreach{
+      file =>
+        try{
+          msg_critical(TITLE, "####" + file + "#####")
+        	Counter.total += 1
+        	// before starting the analysis of the current app, first init
+        	AndroidGlobalConfig.initJawaAlirInfoProvider
+        	
+        	val srcFile = new File(new URI(file))
+        	val dexFile = APKFileResolver.getDexFile(file, FileUtil.toUri(srcFile.getParentFile()))
+        	
+        	// convert the dex file to the "pilar" form
+        	val pilarFileUri = Dex2PilarConverter.convert(dexFile)
+      		AndroidRFAConfig.setupCenter
+        	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
+        	JawaCodeSource.load(pilarFileUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
+      	
+      	
+        	(JawaCodeSource.getAppRecordsCodes).foreach{
+        	  case (name, code) => 	    
+        	    if(code.contains("java.net.HttpURLConnection")){  // java net http client
+        	      System.err.println("java net httpURLConn in App code record " + name)
+        	      Counter.javaNetHttpClientUser += file
+        	      
+        	    }
+        	   
+        	    
+        	    if(code.contains("org.apache.http.client")){
+        	      System.err.println("apache http client in App code record " + name)
+        	      Counter.apacheHttpClientUser += file
+        	    }
+        	    
+        	    if(code.contains("com.google.api.client.http")){
+        	      System.err.println("google http client in App code record " + name)
+        	      Counter.googleHttpClientUser += file
+        	    }
+        	    
+        	    if(code.contains("ch.boye.httpclientandroidlib")){
+        	      System.err.println("ch boye http client in App code record " + name)
+        	      Counter.chBoyeHttpClientUser += file
+        	    }
+        	}
+      	
+      	
+        	(JawaCodeSource.getAppUsingLibraryRecordsCodes).foreach{
+        	  case (name, code) =>
+        	    
+        	   if(code.contains("java.net.HttpURLConnection")){  // java net http client
+        	      System.err.println("java net httpURLConn in App Using Lib " + name)
+        	      Counter.javaNetHttpClientUser += file
+        	      
+        	    }
+        	          	    
+        	    if(code.contains("org.apache.http.client")){
+        	      System.err.println("apache http client in App Using Lib " + name)
+        	      Counter.apacheHttpClientUser += file
+        	    }
+        	    
+        	    if(code.contains("com.google.api.client.http")){
+        	      System.err.println("google http client in App Using Lib " + name)
+        	      Counter.googleHttpClientUser += file
+        	    }
+        	    
+        	    if(code.contains("ch.boye.httpclientandroidlib")){
+        	      System.err.println("ch boye http client in App Using Lib " + name)
+        	      Counter.chBoyeHttpClientUser += file
+        	    }
+        	    
+  
+        	}
+      	} catch {
+      	  case e : Exception =>
+      	    e.printStackTrace();
+      	} finally {
+  	    	Center.reset
+  	    	AppCenter.reset
+  	    	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
+  	    	JawaCodeSource.clearAppRecordsCodes
+  			  System.gc()
+  			  Counter.write
+  	    	msg_critical(TITLE, Counter.toString)
+  	    	msg_critical(TITLE, "************************************\n")
+      	}
+    }
+  }
+}
