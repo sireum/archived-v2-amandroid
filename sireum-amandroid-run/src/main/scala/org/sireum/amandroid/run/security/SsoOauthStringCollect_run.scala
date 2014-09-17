@@ -2,21 +2,21 @@ package org.sireum.amandroid.run.security
 
 import org.sireum.util._
 import org.sireum.jawa.MessageCenter._
-import org.sireum.amandroid.alir.AndroidGlobalConfig
+import org.sireum.amandroid.AndroidGlobalConfig
 import java.io.File
 import java.io.PrintWriter
 import java.net.URI
 import org.sireum.jawa.util.APKFileResolver
-import org.sireum.amandroid.android.decompile.Dex2PilarConverter
-import org.sireum.amandroid.alir.interProcedural.reachingFactsAnalysis.AndroidRFAConfig
+import org.sireum.amandroid.decompile.Dex2PilarConverter
+import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidRFAConfig
 import org.sireum.jawa.JawaCodeSource
 import org.sireum.jawa.GlobalConfig
-import org.sireum.amandroid.android.util.AndroidLibraryAPISummary
+import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.jawa.Center
-import org.sireum.amandroid.alir.AppCenter
-import org.sireum.amandroid.android.appInfo.AppInfoCollector
-import org.sireum.amandroid.android.parser.ResourceFileParser
-import org.sireum.amandroid.android.parser.ARSCFileParser
+import org.sireum.amandroid.AppCenter
+import org.sireum.amandroid.appInfo.AppInfoCollector
+import org.sireum.amandroid.parser.ResourceFileParser
+import org.sireum.amandroid.parser.ARSCFileParser
 import java.util.regex.Pattern
 import org.sireum.jawa.MessageCenter
 /**
@@ -199,9 +199,6 @@ object SsoOauthStringCollect_run {
         try{         
           msg_critical(TITLE, "####" + file + "#####")
         	Counter.total += 1
-      	
-        	// before starting the analysis of the current app, first init
-        	AndroidGlobalConfig.initJawaAlirInfoProvider
        	
         	val man = AppInfoCollector.analyzeManifest(file)
         	val strs = msetEmpty[String]
