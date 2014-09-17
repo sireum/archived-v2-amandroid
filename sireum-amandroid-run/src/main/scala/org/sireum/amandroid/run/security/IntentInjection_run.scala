@@ -73,8 +73,8 @@ object IntentInjection_run {
       val iacs = app_info.getInterestingContainers(ssm.getSinkSigs ++ AndroidConstants.getIccMethods)
       val res = eps.filter(e=>iacs.contains(e.getDeclaringRecord))
       IntentInjectionCounter.totalComponents += res.size
-//      res
-      res.filter(p => p.getName.contains("RssListActivity"))
+      res
+      // res.filter(p => p.getName.contains("RssListActivity"))
     }
 
     def onTimeout : Unit = {
