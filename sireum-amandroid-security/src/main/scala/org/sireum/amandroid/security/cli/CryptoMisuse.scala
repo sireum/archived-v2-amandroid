@@ -129,22 +129,28 @@ object CryptoMisuse {
     AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(timeout))
     
     println("Total apks: " + apkFileUris.size)
-    
-    val socket = new AmandroidSocket
-    socket.preProcess
-        
-    apkFileUris.foreach{
-      apkFileUri =>
-        println("Analyzing " + apkFileUri)
-        val app_info = new InterestingApiCollector(apkFileUri)
-        socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
-        socket.plugWithoutDDA(false, parallel, Some(new CryptoMisuseListener(apkFileUri, outputPath, app_info)))
-        val icfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
-        icfgs.foreach{
-          case (rec, (icfg, irfaResult)) =>
-            CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
-        }
-        println("Done!")
+    try{
+      val socket = new AmandroidSocket
+      socket.preProcess
+          
+      var i : Int = 0
+      
+      apkFileUris.foreach{
+        apkFileUri =>
+          i+=1
+          println("Analyzing " + apkFileUri)
+          val app_info = new InterestingApiCollector(apkFileUri)
+          socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
+          socket.plugWithoutDDA(false, parallel, Some(new CryptoMisuseListener(apkFileUri, outputPath, app_info)))
+          val icfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
+          icfgs.foreach{
+            case (rec, (icfg, irfaResult)) =>
+              CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
+          }
+          println("#" + i + ":Done!")
+      }
+    } catch {
+      case e : Throwable => System.err.println(e)
     }
 	}
   

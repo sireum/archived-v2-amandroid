@@ -133,20 +133,25 @@ object PasswordTracking {
     AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(timeout))
     
     println("Total apks: " + apkFileUris.size)
-    
-    val socket = new AmandroidSocket
-    socket.preProcess
-        
-    apkFileUris.foreach{
-      apkFileUri =>
-        println("Analyzing " + apkFileUri)
-        val app_info = new SensitiveViewCollector(apkFileUri)
-        socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
-        val ssm = new PasswordSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.PasswordSinkFilePath)
-        socket.plugWithDDA(ssm, false, parallel, Some(new TaintListener(apkFileUri, outputPath, app_info)))
-        println("Done!")
+    try{
+      val socket = new AmandroidSocket
+      socket.preProcess
+          
+      var i : Int = 0
+      
+      apkFileUris.foreach{
+        apkFileUri =>
+          i+=1
+          println("Analyzing " + apkFileUri)
+          val app_info = new SensitiveViewCollector(apkFileUri)
+          socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
+          val ssm = new PasswordSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.PasswordSinkFilePath)
+          socket.plugWithDDA(ssm, false, parallel, Some(new TaintListener(apkFileUri, outputPath, app_info)))
+          println("#" + i + ":Done!")
+      }
+    } catch {
+      case e : Throwable => System.err.println(e)
     }
-	  
 	}
   
   private class TaintListener(source_apk : FileResourceUri, output_dir : String, app_info : SensitiveViewCollector) extends AmandroidSocketListener {

@@ -142,12 +142,15 @@ object Staging {
     AndroidReachingFactsAnalysisConfig.resolve_static_init = static
     
     println("Total apks: " + apkFileUris.size)
-    
+    try{
     val socket = new AmandroidSocket
     socket.preProcess
     
+    var i : Int = 0
+    
     apkFileUris.foreach{
       apkFileUri =>
+        i+=1
         println("Analyzing " + apkFileUri)
         
         val fileName = apkFileUri.substring(apkFileUri.lastIndexOf("/"), apkFileUri.lastIndexOf("."))
@@ -156,7 +159,10 @@ object Staging {
         val app_info = new AppInfoCollector(apkFileUri)
         socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
         socket.plugWithoutDDA(false, parallel, Some(new StagingListener(apkFileUri, outputfile)))
-        println("Done!")
+        println("#" + i + ":Done!")
+    }
+    } catch {
+      case e : Throwable => System.err.println(e)
     }
 	}
   
