@@ -1,4 +1,4 @@
-package org.sireum.amandroid.decompile
+package org.sireum.amandroid.cli
 
 import org.sireum.option.SireumAmandroidDecompileMode
 import org.sireum.option.DumpSource
@@ -8,6 +8,7 @@ import java.io.File
 import org.sireum.util.FileResourceUri
 import java.net.URI
 import org.sireum.amandroid.cli.util.CliLogger
+import org.sireum.amandroid.decompile.Dex2PilarConverter
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
