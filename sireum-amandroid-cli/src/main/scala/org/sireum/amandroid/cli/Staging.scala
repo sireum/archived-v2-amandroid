@@ -1,4 +1,4 @@
-package org.sireum.amandroid.security.cli
+package org.sireum.amandroid.cli
 
 import org.sireum.option.AnalyzeSource
 import java.io.File
@@ -39,6 +39,7 @@ import org.sireum.amandroid.alir.dataRecorder.AmandroidResult
 import org.sireum.option.MessageLevel
 import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.amandroid.security.AmandroidSocketListener
+import org.sireum.amandroid.cli.util.CliLogger
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -59,7 +60,6 @@ object StagingCli {
     val mem = saamode.general.mem
     val msgLevel = saamode.general.msgLevel
     forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, outputDir, mem, msgLevel)
-    println("Generated analysis results are saved in: " + outputDir)
   }
 	
 	def forkProcess(nostatic : Boolean, parallel : Boolean, 
@@ -152,19 +152,19 @@ object Staging {
         println("Analyzing " + apkFileUri)
         
         val fileName = apkFileUri.substring(apkFileUri.lastIndexOf("/"), apkFileUri.lastIndexOf("."))
-		  	val outputfile = new File(outputPath + "/store/" + fileName)
         
         val app_info = new AppInfoCollector(apkFileUri)
         socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
-        socket.plugWithoutDDA(false, parallel, Some(new StagingListener(apkFileUri, outputfile)))
+        socket.plugWithoutDDA(false, parallel, Some(new StagingListener(apkFileUri, outputPath)))
         println("#" + i + ":Done!")
     }
     } catch {
-      case e : Throwable => System.err.println(e)
+      case e : Throwable => 
+        CliLogger.logError(new File(outputPath), "Error: " , e)
     }
 	}
   
-  private class StagingListener(source_apk : FileResourceUri, outputfile : File) extends AmandroidSocketListener {
+  private class StagingListener(source_apk : FileResourceUri, output_dir : String) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
     }
 
@@ -184,7 +184,7 @@ object Staging {
           val ddgResultOpt = ddgress.get(rec)
           if(ddgResultOpt.isDefined){
             val ddgResult = ddgResultOpt.get
-            val file = new File(outputfile + "/" + rec.getName.filter(_.isUnicodeIdentifierPart) + ".xml.zip")
+            val file = new File(output_dir + "/" + rec.getName.filter(_.isUnicodeIdentifierPart) + ".xml.zip")
       	    val w = new FileOutputStream(file)
             val zipw = new GZIPOutputStream(new BufferedOutputStream(w))
       	    AndroidXStream.toXml(AmandroidResult(InterProceduralDataFlowGraph(icfg, irfaResult), ddgResult), zipw)
@@ -202,7 +202,7 @@ object Staging {
       e match{
         case ie : IgnoreException => System.err.println("Ignored!")
         case a => 
-          System.err.println("Exception: " + e)
+          CliLogger.logError(new File(output_dir), "Error: " , e)
       }
     }
   }

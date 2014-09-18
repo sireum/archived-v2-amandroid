@@ -7,6 +7,7 @@ import org.sireum.util.FileUtil
 import java.io.File
 import org.sireum.util.FileResourceUri
 import java.net.URI
+import org.sireum.amandroid.cli.util.CliLogger
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -26,7 +27,6 @@ object DecompilerCli {
 	    case None => sourceFile.getParent()
 	  }
     forkProcess(sourceType, sourceDir, outputDir)
-    println("Decompile finish and results are saved in: " + outputDir)
   }
 	
 	def forkProcess(typSpec : String, sourceDir : String, outputDir : String) = {
@@ -64,13 +64,18 @@ object Decompiler {
         println("Unexpected type: " + typ)
         return
     }
-    decompile(dexFileUris)
+    decompile(dexFileUris, outputPath)
   }
 	
-	def decompile(dexFileUris : Set[FileResourceUri]) : Set[FileResourceUri] = {
-    dexFileUris.map{
+	def decompile(dexFileUris : Set[FileResourceUri], outputPath : String) = {
+    dexFileUris.foreach{
       dexFileUri =>
-        Dex2PilarConverter.convert(dexFileUri)
+        try{
+          Dex2PilarConverter.convert(dexFileUri)
+        } catch {
+          case e : Throwable =>
+            CliLogger.logError(new File(outputPath), "Error: " , e)
+        }
     }
 	}
 }

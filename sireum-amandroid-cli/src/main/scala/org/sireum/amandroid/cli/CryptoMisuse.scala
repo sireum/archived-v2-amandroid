@@ -1,49 +1,49 @@
-package org.sireum.amandroid.security.cli
+package org.sireum.amandroid.cli
 
-import org.sireum.jawa.MessageCenter
-import org.sireum.util._
 import org.sireum.option.AnalyzeSource
 import java.io.File
-import org.sireum.amandroid.AndroidGlobalConfig
+import org.sireum.jawa.MessageCenter
+import org.sireum.util._
 import org.sireum.jawa.JawaCodeSource
 import org.sireum.amandroid.libPilarFiles.AndroidLibPilarFiles
 import java.net.URI
 import org.sireum.jawa.util.APKFileResolver
 import org.sireum.amandroid.decompile.Dex2PilarConverter
-import org.sireum.jawa.util.Timer
-import org.sireum.amandroid.util.AndroidLibraryAPISummary
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidRFAConfig
-import org.sireum.amandroid.alir.dataRecorder.DataCollector
-import java.io.PrintWriter
-import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.Center
-import org.sireum.amandroid.AppCenter
-import org.sireum.option.SireumAmandroidIntentInjectionMode
-import org.sireum.amandroid.AndroidConstants
+import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidRFAConfig
+import org.sireum.amandroid.util.AndroidLibraryAPISummary
+import org.sireum.amandroid._
+import org.sireum.amandroid.appInfo.AppInfoCollector
+import org.sireum.amandroid.security.password._
 import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.jawa.ClassLoadManager
+import org.sireum.jawa.util.Timer
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
 import org.sireum.amandroid.alir.taintAnalysis.AndroidDataDependentTaintAnalysis
-import org.sireum.amandroid.security.dataInjection.IntentInjectionCollector
-import org.sireum.amandroid.security.dataInjection.IntentInjectionSourceAndSinkManager
+import org.sireum.amandroid.alir.dataRecorder.DataCollector
+import org.sireum.jawa.util.IgnoreException
+import java.io.PrintWriter
+import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.alir.LibSideEffectProvider
+import org.sireum.amandroid.security.apiMisuse._
+import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
+import org.sireum.jawa.util.TimeOutException
+import org.sireum.option.SireumAmandroidCryptoMisuseMode
 import org.sireum.jawa.GlobalConfig
 import org.sireum.option.MessageLevel
-import org.sireum.amandroid.security.AmandroidSocket
-import org.sireum.amandroid.security.AmandroidSocketListener
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.amandroid.security._
+import org.sireum.amandroid.cli.util.CliLogger
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
-object IntentInjectionCli {
-	def run(saamode : SireumAmandroidIntentInjectionMode) {
+object CryptoMisuseCli {
+	def run(saamode : SireumAmandroidCryptoMisuseMode) {
     val sourceType = saamode.general.typ match{
       case AnalyzeSource.APK => "APK"
       case AnalyzeSource.DIR => "DIR"}
     val sourceDir = saamode.srcFile
     val sourceFile = new File(sourceDir)
-    val sasDir = saamode.sasFile
     val outputDir = saamode.analysis.outdir
     val nostatic = saamode.analysis.noStatic
     val parallel = saamode.analysis.parallel
@@ -52,11 +52,10 @@ object IntentInjectionCli {
     val timeout = saamode.analysis.timeout
     val mem = saamode.general.mem
     val msgLevel = saamode.general.msgLevel
-    forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, sasDir, outputDir, mem, msgLevel)
-    println("Generated environment-model and analysis results are saved in: " + outputDir)
+    forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, outputDir, mem, msgLevel)
   }
 	
-	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : String, sourceDir : String, sasDir : String, outputDir : String, mem : Int, msgLevel : MessageLevel.Type) = {
+	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : String, sourceDir : String, outputDir : String, mem : Int, msgLevel : MessageLevel.Type) = {
 	  val args : MList[String] = mlistEmpty
 	  args += "-s"
 	  args += (!nostatic).toString
@@ -70,17 +69,18 @@ object IntentInjectionCli {
 	  args += timeout.toString
 	  args += "-msg"
 	  args += msgLevel.toString
-	  args ++= List("-t", typSpec, sourceDir, sasDir, outputDir)
-    org.sireum.jawa.util.JVMUtil.startSecondJVM(IntentInjection.getClass(), "-Xmx" + mem + "G", args.toList, true)
+	  args ++= List("-t", typSpec, sourceDir, outputDir)
+    org.sireum.jawa.util.JVMUtil.startSecondJVM(CryptoMisuse.getClass(), "-Xmx" + mem + "G", args.toList, true)
   }
 }
 
-object IntentInjection {
+object CryptoMisuse {
 	def main(args: Array[String]) {
-	  if(args.size != 17){
-	    println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -t type[allows: APK, DIR] <source path> <Sink list file path> <output path>")
+	  if(args.size != 16){
+	    println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -t type[allows: APK, DIR] <source path> <output path>")
 	    return
 	  }
+	  
 	  val static = args(1).toBoolean
 	  val parallel = args(3).toBoolean
 	  val icc = args(5).toBoolean
@@ -89,8 +89,7 @@ object IntentInjection {
 	  val msgLevel = args(11)
 	  val typ = args(13)
 	  val sourcePath = args(14)
-	  val sasFilePath = args(15)
-	  val outputPath = args(16)
+	  val outputPath = args(15)
 	  
 	  msgLevel match{
 	    case "NO$" =>
@@ -117,11 +116,10 @@ object IntentInjection {
         println("Unexpected type: " + typ)
         return
     }
-		intentInjection(apkFileUris, sasFilePath, outputPath, static, parallel, icc, k_context, timeout)
+		cryptoMisuse(apkFileUris, outputPath, static, parallel, icc, k_context, timeout)
 	}
   
-  def intentInjection(apkFileUris : Set[FileResourceUri], sasFilePath : String, outputPath : String, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int) = {
-    AndroidGlobalConfig.SourceAndSinkFilePath = sasFilePath
+  def cryptoMisuse(apkFileUris : Set[FileResourceUri], outputPath : String, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int) = {
     AndroidReachingFactsAnalysisConfig.k_context = k_context
     AndroidReachingFactsAnalysisConfig.parallel = parallel
     AndroidReachingFactsAnalysisConfig.resolve_icc = icc
@@ -129,36 +127,39 @@ object IntentInjection {
     AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(timeout))
     
     println("Total apks: " + apkFileUris.size)
-    
     try{
-    val socket = new AmandroidSocket
-    socket.preProcess
-        
-    var i : Int = 0
-    
-    apkFileUris.foreach{
-      apkFileUri =>
-        i+=1
-        println("Analyzing " + apkFileUri)
-        val app_info = new IntentInjectionCollector(apkFileUri)
-        socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
-        val ssm = new IntentInjectionSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)
-        socket.plugWithDDA(ssm, false, parallel, Some(new IntentInjectionListener(apkFileUri, outputPath, app_info)))
-        println("#" + i + ":Done!")
-    }
+      val socket = new AmandroidSocket
+      socket.preProcess
+          
+      var i : Int = 0
+      
+      apkFileUris.foreach{
+        apkFileUri =>
+          i+=1
+          println("Analyzing " + apkFileUri)
+          val app_info = new InterestingApiCollector(apkFileUri)
+          socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
+          socket.plugWithoutDDA(false, parallel, Some(new CryptoMisuseListener(apkFileUri, outputPath, app_info)))
+          val icfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
+          icfgs.foreach{
+            case (rec, (icfg, irfaResult)) =>
+              CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
+          }
+          println("#" + i + ":Done!")
+      }
     } catch {
-      case e : Throwable => System.err.println(e)
+      case e : Throwable => 
+        CliLogger.logError(new File(outputPath), "Error: " , e)
     }
-	  
 	}
   
-  
-  private class IntentInjectionListener(source_apk : FileResourceUri, output_dir : String, app_info : IntentInjectionCollector) extends AmandroidSocketListener {
+  private class CryptoMisuseListener(source_apk : FileResourceUri, output_dir : String, app_info : InterestingApiCollector) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
     }
 
     def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
-      eps
+      val iacs = app_info.getInterestingContainers(CryptographicConstants.getCryptoAPIs)
+      eps.filter(e=>iacs.contains(e.getDeclaringRecord))
     }
 
     def onTimeout : Unit = {
@@ -176,10 +177,6 @@ object IntentInjection {
     	val envString = app_info.getEnvString
 	    environmentModel.print(envString)
 	    environmentModel.close()
-    	
-    	val analysisResult = new PrintWriter(appDataDirFile + "/IntentInectionResult.txt")
-	    analysisResult.print(appData.toString)
-	    analysisResult.close()
     }
 
     def onPostAnalysis: Unit = {
@@ -187,9 +184,9 @@ object IntentInjection {
     
     def onException(e : Exception) : Unit = {
       e match{
-        case ie : IgnoreException => println("No interesting component!")
+        case ie : IgnoreException => System.err.println("Ignored!")
         case a => 
-          System.err.println("Exception: " + e)
+          CliLogger.logError(new File(output_dir), "Error: " , e)
       }
     }
   }
