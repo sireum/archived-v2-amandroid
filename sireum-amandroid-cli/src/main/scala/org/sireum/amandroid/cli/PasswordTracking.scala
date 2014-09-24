@@ -131,6 +131,7 @@ object PasswordTracking {
     AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(timeout))
     
     println("Total apks: " + apkFileUris.size)
+
     try{
       val socket = new AmandroidSocket
       socket.preProcess
@@ -144,7 +145,8 @@ object PasswordTracking {
           val app_info = new SensitiveViewCollector(apkFileUri)
           socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
           val ssm = new PasswordSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.PasswordSinkFilePath)
-          socket.plugWithDDA(ssm, false, parallel, Some(new TaintListener(apkFileUri, outputPath, app_info)))
+          socket.plugListener(new TaintListener(apkFileUri, outputPath, app_info))
+          socket.runWithDDA(ssm, false, parallel)
           println("#" + i + ":Done!")
       }
     } catch {

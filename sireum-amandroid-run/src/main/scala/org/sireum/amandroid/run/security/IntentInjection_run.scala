@@ -130,7 +130,7 @@ object IntentInjection_run {
     AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(20))
     
     val socket = new AmandroidSocket
-    socket.preProcess
+    socket.preProcess // this loads the android library's class hierarchy and the android library's API sideeffects summary
     
     val sourcePath = args(0)
     val outputPath = args(1)
@@ -143,7 +143,8 @@ object IntentInjection_run {
         val app_info = new IntentInjectionCollector(file)
         socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
         val ssm = new IntentInjectionSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)
-        socket.plugWithDDA(ssm, true, true, Some(new IntentInjectionListener(file, app_info, ssm)))
+        socket.plugListener(new IntentInjectionListener(file, app_info, ssm))
+        socket.runWithDDA(ssm, true, true)
     }
   }
 }

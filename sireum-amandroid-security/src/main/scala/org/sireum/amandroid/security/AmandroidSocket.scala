@@ -39,6 +39,7 @@ trait AmandroidSocketListener {
 
 class AmandroidSocket {
   private final val TITLE = "AmandroidSocket"
+  private var myListener_opt: Option[AmandroidSocketListener] = None
   
   def preProcess : Unit = {
     val imgfile = new File(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSummary.xml.zip")
@@ -51,6 +52,11 @@ class AmandroidSocket {
     val libsum_file = new File(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSideEffectResult.xml.zip")
     if(libsum_file.exists())
       LibSideEffectProvider.init(libsum_file)
+  }
+  
+  def plugListener(listener : AmandroidSocketListener): Unit = {
+    myListener_opt = Some(listener)
+    
   }
   
   def loadApk(source_apk : FileResourceUri, 
@@ -72,21 +78,20 @@ class AmandroidSocket {
   	app_info.collectInfo
   }
   
-  def plugWithDDA(
+  def runWithDDA(
             ssm : AndroidSourceAndSinkManager,
             public_only : Boolean,
-            parallel : Boolean,
-            listener_opt : Option[AmandroidSocketListener]) = {    
+            parallel : Boolean) = {    
     try{
-  		if(listener_opt.isDefined) listener_opt.get.onPreAnalysis
+  		if(myListener_opt.isDefined) myListener_opt.get.onPreAnalysis
   		
 		  var entryPoints = Center.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
 		  
 		  if(!public_only)
 		    entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
     			    
-    	if(listener_opt.isDefined) 
-	    	entryPoints = listener_opt.get.entryPointFilter(entryPoints)
+    	if(myListener_opt.isDefined) 
+	    	entryPoints = myListener_opt.get.entryPointFilter(entryPoints)
   	    	
 	    {if(parallel) entryPoints.par else entryPoints}.foreach{
     	  ep =>
@@ -103,14 +108,14 @@ class AmandroidSocket {
 		    	} catch {
     	      case te : TimeOutException => 
     	        err_msg_critical(TITLE, "Timeout!")
-    	        if(listener_opt.isDefined) listener_opt.get.onTimeout
+    	        if(myListener_opt.isDefined) myListener_opt.get.onTimeout
     	    }
       } 
   
-    	if(listener_opt.isDefined) listener_opt.get.onAnalysisSuccess
+    	if(myListener_opt.isDefined) myListener_opt.get.onAnalysisSuccess
     } catch {
       case e : Exception => 
-        if(listener_opt.isDefined) listener_opt.get.onException(e)
+        if(myListener_opt.isDefined) myListener_opt.get.onException(e)
     } finally {
     	Center.reset
     	AppCenter.reset
@@ -119,17 +124,17 @@ class AmandroidSocket {
     	System.gc()
       System.gc()
 	
-    	if(listener_opt.isDefined) listener_opt.get.onPostAnalysis
+    	if(myListener_opt.isDefined) myListener_opt.get.onPostAnalysis
     	msg_critical(TITLE, "************************************\n")
     }
   }
   
-  def plugWithoutDDA(
+  def runWithoutDDA(
             public_only : Boolean,
-            parallel : Boolean,
-            listener_opt : Option[AmandroidSocketListener]) = {    
+            parallel : Boolean
+            ) = {    
     try{
-  		if(listener_opt.isDefined) listener_opt.get.onPreAnalysis
+  		if(myListener_opt.isDefined) myListener_opt.get.onPreAnalysis
   		
   		// before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
 
@@ -138,8 +143,8 @@ class AmandroidSocket {
 		  if(!public_only)
 		    entryPoints ++= Center.getEntryPoints(AndroidConstants.COMP_ENV)
     	
-    	if(listener_opt.isDefined) 
-	    	entryPoints = listener_opt.get.entryPointFilter(entryPoints)
+    	if(myListener_opt.isDefined) 
+	    	entryPoints = myListener_opt.get.entryPointFilter(entryPoints)
   
     	{if(parallel) entryPoints.par else entryPoints}.foreach{
     	  ep =>
@@ -154,14 +159,14 @@ class AmandroidSocket {
 		    	} catch {
     	      case te : TimeOutException => 
     	        err_msg_critical(TITLE, "Timeout!")
-    	        if(listener_opt.isDefined) listener_opt.get.onTimeout
+    	        if(myListener_opt.isDefined) myListener_opt.get.onTimeout
     	    }
       } 
   
-    	if(listener_opt.isDefined) listener_opt.get.onAnalysisSuccess
+    	if(myListener_opt.isDefined) myListener_opt.get.onAnalysisSuccess
     } catch {
       case e : Exception => 
-        if(listener_opt.isDefined) listener_opt.get.onException(e)
+        if(myListener_opt.isDefined) myListener_opt.get.onException(e)
     } finally {
     	Center.reset
     	AppCenter.reset
@@ -170,7 +175,7 @@ class AmandroidSocket {
     	System.gc()
       System.gc()
 	
-    	if(listener_opt.isDefined) listener_opt.get.onPostAnalysis
+    	if(myListener_opt.isDefined) myListener_opt.get.onPostAnalysis
     	msg_critical(TITLE, "************************************\n")
     }
   }

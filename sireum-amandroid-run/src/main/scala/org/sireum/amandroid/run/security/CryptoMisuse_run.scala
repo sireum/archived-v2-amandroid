@@ -78,7 +78,9 @@ object CryptoMisuse_run {
         msg_critical(TITLE, "####" + file + "#####")
         val app_info = new InterestingApiCollector(file)
         socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
-        socket.plugWithoutDDA(false, true, Some(new CryptoMisuseListener))
+        socket.plugListener(new CryptoMisuseListener)
+        socket.runWithoutDDA(false, true)
+        
         val icfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
         icfgs.foreach{
           case (rec, (icfg, irfaResult)) =>

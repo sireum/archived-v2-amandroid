@@ -155,12 +155,14 @@ object Staging {
         
         val app_info = new AppInfoCollector(apkFileUri)
         socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
-        socket.plugWithoutDDA(false, parallel, Some(new StagingListener(apkFileUri, outputPath)))
+        socket.plugListener(new StagingListener(apkFileUri, outputPath))
+        socket.runWithoutDDA(false, parallel)
         println("#" + i + ":Done!")
     }
     } catch {
       case e : Throwable => 
         CliLogger.logError(new File(outputPath), "Error: " , e)
+
     }
 	}
   

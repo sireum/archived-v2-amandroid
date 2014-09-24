@@ -143,12 +143,18 @@ object IntentInjection {
         val app_info = new IntentInjectionCollector(apkFileUri)
         socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
         val ssm = new IntentInjectionSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)
+<<<<<<< HEAD:sireum-amandroid-cli/src/main/scala/org/sireum/amandroid/cli/IntentInjection.scala
         socket.plugWithDDA(ssm, false, parallel, Some(new IntentInjectionListener(apkFileUri, outputPath, app_info)))
         println("#" + i + ":Done!")
     }
     } catch {
       case e : Throwable => 
         CliLogger.logError(new File(outputPath), "Error: " , e)
+=======
+        socket.plugListener(new IntentInjectionListener(apkFileUri, outputPath, app_info))
+        socket.runWithDDA(ssm, false, parallel)
+        println("Done!")
+>>>>>>> introduced socket.plug(socketlisterner) and made related changes:sireum-amandroid-security/src/main/scala/org/sireum/amandroid/security/cli/IntentInjection.scala
     }
 	  
 	}

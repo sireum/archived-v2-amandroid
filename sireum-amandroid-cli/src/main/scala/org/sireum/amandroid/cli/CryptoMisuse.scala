@@ -127,6 +127,7 @@ object CryptoMisuse {
     AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(timeout))
     
     println("Total apks: " + apkFileUris.size)
+
     try{
       val socket = new AmandroidSocket
       socket.preProcess
@@ -139,7 +140,8 @@ object CryptoMisuse {
           println("Analyzing " + apkFileUri)
           val app_info = new InterestingApiCollector(apkFileUri)
           socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
-          socket.plugWithoutDDA(false, parallel, Some(new CryptoMisuseListener(apkFileUri, outputPath, app_info)))
+          socket.plugListener(new CryptoMisuseListener(apkFileUri, outputPath, app_info))
+          socket.runWithoutDDA(false, parallel)
           val icfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
           icfgs.foreach{
             case (rec, (icfg, irfaResult)) =>
@@ -150,6 +152,7 @@ object CryptoMisuse {
     } catch {
       case e : Throwable => 
         CliLogger.logError(new File(outputPath), "Error: " , e)
+
     }
 	}
   

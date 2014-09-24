@@ -144,7 +144,8 @@ object OAuthTokenTracking_run {
         val app_info = new OauthTokenContainerCollector(file)
         socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
         val ssm = new OAuthSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-        socket.plugWithDDA(ssm, false, true, Some(new OAuthTokenTrackingListener(file, app_info)))
+        socket.plugListener(new OAuthTokenTrackingListener(file, app_info))
+        socket.runWithDDA(ssm, false, true)
     }
   }
 }
