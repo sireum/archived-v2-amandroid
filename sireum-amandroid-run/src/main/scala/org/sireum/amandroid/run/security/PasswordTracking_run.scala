@@ -149,7 +149,8 @@ object PasswordTracking_run {
 			    PasswordCounter.havePasswordViewList += file
 			  }
         val ssm = new PasswordSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.PasswordSinkFilePath)
-        socket.plugWithDDA(ssm, false, true, Some(new PasswordTrackingListener(file, app_info)))
+        socket.plugListener(new PasswordTrackingListener(file, app_info))
+        socket.runWithDDA(ssm, false, true)
     }
   }
 }

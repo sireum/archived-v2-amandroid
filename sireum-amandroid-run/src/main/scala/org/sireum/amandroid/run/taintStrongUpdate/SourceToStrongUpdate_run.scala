@@ -83,7 +83,8 @@ object SourceToStrongUpdate_run {
         val app_info = new AppInfoCollector(file)
         socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
         val ssm = new SourceToStrongUpdateManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-        socket.plugWithDDA(ssm, false, true, Some(new SourceToStrongUpdateListener(file)))
+        socket.plugListener(new SourceToStrongUpdateListener(file))
+        socket.runWithDDA(ssm, false, true)
     }
   }
 }

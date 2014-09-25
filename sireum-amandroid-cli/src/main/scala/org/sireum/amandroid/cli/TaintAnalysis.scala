@@ -137,6 +137,7 @@ object TanitAnalysis{
     
     println("Total apks: " + apkFileUris.size)
     
+
     try{
       val socket = new AmandroidSocket
       socket.preProcess
@@ -150,12 +151,14 @@ object TanitAnalysis{
           val app_info = new AppInfoCollector(apkFileUri)
           socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
           val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-          socket.plugWithDDA(ssm, false, parallel, Some(new TaintListener(apkFileUri, outputPath, app_info)))
+          socket.plugListener(new TaintListener(apkFileUri, outputPath, app_info))
+          socket.runWithDDA(ssm, false, parallel)
           println("#" + i + ":Done!")
       }
     } catch {
       case e : Throwable => 
         CliLogger.logError(new File(outputPath), "Error: " , e)
+
     }
 	  
 	}

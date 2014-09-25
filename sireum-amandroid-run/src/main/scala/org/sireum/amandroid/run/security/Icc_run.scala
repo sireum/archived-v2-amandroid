@@ -114,7 +114,8 @@ object Icc_run {
         msg_critical(TITLE, "####" + file + "#####")
         val app_info = new IccCollector(file)
         socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
-        socket.plugWithoutDDA(false, true, Some(new IccListener(file, app_info)))
+        socket.plugListener(new IccListener(file, app_info))
+        socket.runWithoutDDA(false, true)
     }
   }
 }

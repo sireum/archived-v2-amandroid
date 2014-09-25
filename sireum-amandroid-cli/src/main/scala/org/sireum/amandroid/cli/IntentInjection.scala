@@ -143,12 +143,14 @@ object IntentInjection {
         val app_info = new IntentInjectionCollector(apkFileUri)
         socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
         val ssm = new IntentInjectionSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)
-        socket.plugWithDDA(ssm, false, parallel, Some(new IntentInjectionListener(apkFileUri, outputPath, app_info)))
+        socket.plugListener(new IntentInjectionListener(apkFileUri, outputPath, app_info))
+        socket.runWithDDA(ssm, false, parallel)
         println("#" + i + ":Done!")
     }
     } catch {
       case e : Throwable => 
         CliLogger.logError(new File(outputPath), "Error: " , e)
+
     }
 	  
 	}
