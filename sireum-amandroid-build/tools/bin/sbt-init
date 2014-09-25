@@ -1,0 +1,5 @@
+PROJECT_DIR=`dirname $(cd "${0%/*}/../.." 2>/dev/null; echo "$PWD"/"${0##*/}")`
+if [ -z $SBT_DIR ]; then 
+    SBT_DIR=$PROJECT_DIR/sbt 
+fi
+java -Divy.home=$SBT_DIR/ivy -Dsbt.ivy.home=$SBT_DIR/sbtivy -Dsbt.boot.directory=$SBT_DIR/boot -Dfile.encoding=UTF8 $JAVA_OPTS -XX:ReservedCodeCacheSize=${RESERVED_CODE_CACHE_SIZE:=900m} -Xss1M -XX:+CMSClassUnloadingEnabled -Xmx${JAVA_HEAP_SIZE:=1336m} $JAVA_OPTS -jar $PROJECT_DIR/tools/bin/sbt-launch.jar $SBT_OPTS "$@"

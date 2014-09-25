@@ -1,0 +1,11 @@
+/bin
+/target
+/temp
+/update
+/sbt
+/.cache
+/.scala_dependencies
+/sireum-*
+/bakar
+/core
+/project-dependency.dot
