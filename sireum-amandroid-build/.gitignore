@@ -1,3 +1,4 @@
+.DS_Store
 /bin
 /target
 /temp
@@ -9,3 +10,4 @@
 /bakar
 /core
 /project-dependency.dot
+/codebase
