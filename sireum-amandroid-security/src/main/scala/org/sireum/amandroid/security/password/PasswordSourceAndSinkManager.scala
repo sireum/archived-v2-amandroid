@@ -25,6 +25,10 @@ import org.sireum.jawa.alir.controlFlowGraph.CGInvokeNode
 import org.sireum.jawa.Center
 import org.sireum.amandroid.alir.taintAnalysis.AndroidSourceAndSinkManager
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 class PasswordSourceAndSinkManager(appPackageName : String, 
     												layoutControls : Map[Int, LayoutControl], 
     												callbackMethods : ISet[JawaProcedure], 

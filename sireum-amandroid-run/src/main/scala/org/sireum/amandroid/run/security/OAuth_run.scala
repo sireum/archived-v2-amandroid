@@ -33,7 +33,8 @@ import org.sireum.jawa.alir.LibSideEffectProvider
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
- */
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object OAuth_run {
   private final val TITLE = "OAuth_run"
   object OAuthCounter {

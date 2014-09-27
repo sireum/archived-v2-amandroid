@@ -21,6 +21,10 @@ import org.sireum.amandroid.AppCenter
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.util.IgnoreException
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object DataLeakage_run {
   private final val TITLE = "DataLeakage_run"
   MessageCenter.msglevel = MessageCenter.MSG_LEVEL.VERBOSE

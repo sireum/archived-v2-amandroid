@@ -13,6 +13,9 @@ import java.io.PrintWriter
 import java.text.SimpleDateFormat
 import java.util.Date
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */ 
 object CliLogger {
   
   def timeStamp = new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date)

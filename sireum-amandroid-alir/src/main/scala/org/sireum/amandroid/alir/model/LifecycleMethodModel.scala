@@ -12,6 +12,10 @@ import org.sireum.util._
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.alir.reachingFactsAnalysis._
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object LifecycleMethodModel {
 	def isLifecycleMethod(p : JawaProcedure) : Boolean = {
 	  p.getSignature match{

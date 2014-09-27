@@ -20,7 +20,6 @@ import org.sireum.amandroid.decompile.Dex2PilarConverter
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
-
 object DecompilerCli {
 	def run(sadmode : SireumAmandroidDecompileMode) {
     val sourceType = sadmode.typ match{
@@ -43,6 +42,9 @@ object DecompilerCli {
   }
 }
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */ 
 object Decompiler {
 	def main(args: Array[String]) {
 	  if(args.size != 4){

@@ -17,6 +17,10 @@ import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.alir._
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object IntentModel {
   final val TITLE = "IntentModel"
   

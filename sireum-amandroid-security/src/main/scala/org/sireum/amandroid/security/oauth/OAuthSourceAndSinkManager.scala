@@ -26,6 +26,10 @@ import org.sireum.jawa.alir.reachingFactsAnalysis.VarSlot
 import org.sireum.jawa.alir.controlFlowGraph.CGInvokeNode
 import org.sireum.jawa.Center
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 class OAuthSourceAndSinkManager(appPackageName : String, 
     												layoutControls : Map[Int, LayoutControl], 
     												callbackMethods : ISet[JawaProcedure], 

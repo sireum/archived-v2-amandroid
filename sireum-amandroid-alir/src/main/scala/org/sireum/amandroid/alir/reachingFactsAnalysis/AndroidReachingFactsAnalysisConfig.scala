@@ -9,6 +9,10 @@ package org.sireum.amandroid.alir.reachingFactsAnalysis
 
 import org.sireum.jawa.util.Timer
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object AndroidReachingFactsAnalysisConfig {
 	final var k_context = 1
 	final var resolve_icc = true

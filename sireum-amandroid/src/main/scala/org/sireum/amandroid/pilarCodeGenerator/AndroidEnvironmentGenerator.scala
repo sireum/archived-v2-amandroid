@@ -25,6 +25,10 @@ import org.sireum.jawa.pilarCodeGenerator.VariableGenerator
 import org.sireum.jawa.pilarCodeGenerator.ProcedureGenerator
 import org.sireum.amandroid.parser.ComponentInfo
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 class AndroidEnvironmentGenerator extends ProcedureGenerator {
 	private final val TITLE = "AndroidEnvironmentGenerator"
   private var componentInfos : Set[ComponentInfo] = Set()

@@ -22,7 +22,9 @@ import java.net.URI
  * Common base class for all resource parser classes
  * 
  * adapted from Steven Arzt
- * modified by: Fengguo Wei, Sankardas Roy
+ *
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
 abstract class AbstractAndroidXMLParser {
 	/**

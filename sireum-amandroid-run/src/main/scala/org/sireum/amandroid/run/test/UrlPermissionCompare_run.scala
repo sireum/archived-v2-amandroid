@@ -25,6 +25,10 @@ import java.io.FileWriter
 import java.io.BufferedReader
 import java.io.FileReader
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object UrlPermissionCompare_run {
   private final val TITLE = "UrlPermissionCompare_run"
   

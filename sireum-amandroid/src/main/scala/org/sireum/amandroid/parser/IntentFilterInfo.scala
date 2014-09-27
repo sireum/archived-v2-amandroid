@@ -10,6 +10,10 @@ package org.sireum.amandroid.parser
 import org.sireum.jawa.JawaRecord
 import org.sireum.jawa.Center
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 class IntentFilterDataBase {
   /**
    * Map from record name to it's intent filter information

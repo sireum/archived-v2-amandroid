@@ -11,6 +11,10 @@ import org.sireum.util._
 import org.sireum.jawa.util.MyFileUtil
 import org.sireum.jawa.GlobalConfig
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object AndroidLibPilarFiles{
   protected def sourceDirUri(path : String) = { 
     FileUtil.toUri(path)

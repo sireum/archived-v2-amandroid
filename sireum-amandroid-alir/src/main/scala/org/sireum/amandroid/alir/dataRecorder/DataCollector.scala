@@ -23,6 +23,10 @@ import org.sireum.pilar.ast._
 import org.sireum.amandroid.parser.UriData
 import org.sireum.jawa.alir.Context
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object DataCollector {
   
   private val template = new STGroupFile("org/sireum/amandroid/alir/resources/dataRecorder/AppData.stg")

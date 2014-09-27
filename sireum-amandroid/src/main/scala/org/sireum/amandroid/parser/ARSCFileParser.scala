@@ -19,7 +19,9 @@ import org.sireum.jawa.MessageCenter._
  * code and ported from java to scala.
  * 
  * adapted from Steven Arzt
- * modified by: Fengguo Wei
+ * 
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
 class ARSCFileParser extends AbstractAndroidXMLParser {
 	final val TITLE = "ARSCFileParser"

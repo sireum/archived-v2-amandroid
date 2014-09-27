@@ -14,6 +14,10 @@ import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.alir.reachingFactsAnalysis._
 import org.sireum.jawa.alir.UnknownInstance
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object ActivityModel {
 	def isActivity(r : JawaRecord) : Boolean = r.getName == AndroidConstants.ACTIVITY
 	

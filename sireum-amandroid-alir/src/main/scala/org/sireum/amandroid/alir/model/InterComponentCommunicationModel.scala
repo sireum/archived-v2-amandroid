@@ -22,6 +22,10 @@ import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.MessageCenter._
 import org.sireum.amandroid.alir.reachingFactsAnalysis.IntentHelper
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object InterComponentCommunicationModel {
   final val TITLE = "InterComponentCommunicationModel"
 	def isIccOperation(proc : JawaProcedure) : Boolean = {

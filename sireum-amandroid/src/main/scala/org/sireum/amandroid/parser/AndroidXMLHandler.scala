@@ -14,7 +14,9 @@ import java.io.InputStream
  * Common interface for handlers working on Android xml files
  * 
  * adapted from Steven Arzt
- * modified by: Fengugo wei, Sankardas Roy
+ *
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
 trait AndroidXMLHandler {
   

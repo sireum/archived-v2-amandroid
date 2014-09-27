@@ -22,7 +22,9 @@ import org.sireum.jawa.util.ResourceRetriever
  * Parser for analyzing the layout XML files inside an android application
  * 
  * adapted from Steven Arzt
- * modified by: Fengguo Wei
+ * 
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
 class LayoutFileParser extends AbstractAndroidXMLParser {
 	final val TITLE = "LayoutFileParser"

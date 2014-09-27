@@ -13,6 +13,10 @@ import java.net.URI
 import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.jawa.util.OsUtils
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object Dex2PilarConverter {
   var dex2pilarFile = new File(System.getenv(AndroidGlobalConfig.SIREUM_HOME) + "/apps/amandroid/bin/newdex2pilar")
   if(!dex2pilarFile.exists()){
@@ -35,6 +39,10 @@ object Dex2PilarConverter {
 	}
 }
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 case class Util(dexdump : File) {
 
   def copy(srcUri : FileResourceUri, destUri : FileResourceUri) {

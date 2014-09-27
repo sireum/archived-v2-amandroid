@@ -14,6 +14,10 @@ import org.sireum.jawa.alir.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.MessageCenter._
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object UriModel {
   final val TITLE = "UriModel"
 	def isUri(r : JawaRecord) : Boolean = r.getName == "android.net.Uri"

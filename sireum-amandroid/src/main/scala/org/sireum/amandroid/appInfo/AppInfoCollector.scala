@@ -36,6 +36,7 @@ import org.sireum.jawa.util.IgnoreException
 
 /**
  * adapted from Steven Arzt of the FlowDroid group
+ * 
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 class AppInfoCollector(apkUri : FileResourceUri) {  

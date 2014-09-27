@@ -17,6 +17,10 @@ import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.Center
 import org.sireum.amandroid.appInfo.ReachableInfoCollector
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 class IntentInjectionCollector(apkUri : FileResourceUri) extends AppInfoCollector(apkUri) {
   private final val TITLE = "IntentInjectionCollector"
   var ra : ReachableInfoCollector = null

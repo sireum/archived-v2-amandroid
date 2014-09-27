@@ -28,6 +28,10 @@ import org.sireum.jawa.alir.sideEffectAnalysis.InterProceduralSideEffectAnalysis
 import scala.collection.parallel.immutable.ParMap
 import org.sireum.jawa.GlobalConfig
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object AndroidLibSideEffectAnalysis {
   
 	def main(args: Array[String]) {

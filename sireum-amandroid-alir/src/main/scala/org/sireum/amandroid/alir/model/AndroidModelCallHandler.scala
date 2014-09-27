@@ -21,8 +21,9 @@ import org.sireum.jawa.alir.model._
 import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidRFAScopeManager
 
 /**
- * @author Fengguo Wei & Sankardas Roy
- */
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object AndroidModelCallHandler extends ModelCallHandler{
 
   /**

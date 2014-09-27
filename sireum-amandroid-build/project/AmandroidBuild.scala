@@ -26,6 +26,9 @@ import eu.henkelmann.sbt.JUnitXmlTestsListener
 import sbtunidoc.Plugin._
 import UnidocKeys._
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */ 
 object AmandroidBuild extends Build {
   final val BUILD_FILENAME = "BUILD"
   final val PRELUDE_DIR = "codebase/prelude/"
@@ -61,6 +64,8 @@ object AmandroidBuild extends Build {
             -- inProjects(alir)
             -- inProjects(option)
             -- inProjects(amandroidProject)
+            -- inProjects(amandroidTest)
+            -- inProjects(jawaTest)
           ),
       base = file(".")) aggregate (
         lib, macr, util, parser,

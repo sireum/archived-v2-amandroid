@@ -20,8 +20,16 @@ import java.io.IOException
 import javax.xml.parsers.ParserConfigurationException
 import org.xml.sax.SAXException
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 final case class ComponentInfo(name : String, typ : String, exported : Boolean, permission : Option[String])
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 class ManifestParser extends AbstractAndroidXMLParser{
   private var componentInfos : Set[ComponentInfo] = Set()
 	private var components : Map[String, String] = Map()

@@ -34,7 +34,10 @@ import org.sireum.jawa.JawaProcedure
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.alir.Context
 
-
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 trait AmandroidSocketListener {
   def onPreAnalysis : Unit
   def entryPointFilter(eps : Set[JawaProcedure]) : Set[JawaProcedure]
@@ -44,6 +47,10 @@ trait AmandroidSocketListener {
   def onPostAnalysis : Unit
 }
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 class AmandroidSocket {
   private final val TITLE = "AmandroidSocket"
   private var myListener_opt: Option[AmandroidSocketListener] = None

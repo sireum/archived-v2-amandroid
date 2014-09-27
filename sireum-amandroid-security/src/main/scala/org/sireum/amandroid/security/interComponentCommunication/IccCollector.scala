@@ -16,6 +16,10 @@ import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.Center
 import org.sireum.jawa.util.IgnoreException
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 class IccCollector(apkUri : FileResourceUri) extends AppInfoCollector(apkUri) {
   private final val TITLE = "IccCollector"
   private var iccContainers : Set[JawaRecord] = Set()

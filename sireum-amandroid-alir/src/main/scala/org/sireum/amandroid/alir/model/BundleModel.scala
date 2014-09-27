@@ -15,8 +15,9 @@ import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.alir.Instance
 
 /**
- * @author Fengguo Wei & Sankardas Roy
- */
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object BundleModel {
 	def isBundle(r : JawaRecord) : Boolean = r.getName == AndroidConstants.BUNDLE
 	  

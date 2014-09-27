@@ -26,10 +26,10 @@ import org.sireum.amandroid.parser.ResourceFileParser
 import org.sireum.amandroid.parser.ARSCFileParser
 import java.util.regex.Pattern
 import org.sireum.jawa.MessageCenter
+
 /**
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
-
 object SsoOauthStringCollect_run {
 
   private final val TITLE = "SsoOauthStringCollect_run"

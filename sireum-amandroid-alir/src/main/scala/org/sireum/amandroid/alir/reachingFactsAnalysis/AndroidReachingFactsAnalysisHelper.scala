@@ -13,6 +13,10 @@ import org.sireum.amandroid.alir.model.AndroidModelCallHandler
 import org.sireum.jawa.alir.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.Context
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object AndroidReachingFactsAnalysisHelper {
 	
 	def isModelCall(calleeProc : JawaProcedure) : Boolean = {

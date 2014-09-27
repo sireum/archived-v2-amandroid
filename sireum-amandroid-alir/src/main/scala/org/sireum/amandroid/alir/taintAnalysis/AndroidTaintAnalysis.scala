@@ -23,6 +23,10 @@ import org.sireum.jawa.alir.taintAnalysis.TaintFact
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.alir.NullInstance
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 class AndroidTaintAnalysisBuilder{
   final val TITLE = "AndroidTaintAnalysisBuilder"
   var rfaFacts : AndroidReachingFactsAnalysis.Result = null
@@ -655,8 +659,9 @@ class AndroidTaintAnalysisBuilder{
 }
 
 /**
- * @author Fengguo Wei & Sankardas Roy
- */
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object AndroidTaintAnalysis {
 
   type Node = AndroidReachingFactsAnalysis.Node

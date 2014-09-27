@@ -84,6 +84,9 @@ object PasswordTrackingCli {
   }
 }
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */ 
 object PasswordTracking {
 	def main(args: Array[String]) {
 	  if(args.size != 17){

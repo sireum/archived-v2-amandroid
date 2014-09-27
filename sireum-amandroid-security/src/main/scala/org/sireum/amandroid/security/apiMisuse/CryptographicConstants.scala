@@ -7,6 +7,10 @@ http://www.eclipse.org/legal/epl-v10.html
 */
 package org.sireum.amandroid.security.apiMisuse
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object CryptographicConstants {
   final val JAVAX_CIPHER_GETINSTANCE_1 = "[|Ljavax/crypto/Cipher;.getInstance:(Ljava/lang/String;)Ljavax/crypto/Cipher;|]"
   final val JAVAX_CIPHER_GETINSTANCE_2 = "[|Ljavax/crypto/Cipher;.getInstance:(Ljava/lang/String;Ljava/lang/String;)Ljavax/crypto/Cipher;|]"

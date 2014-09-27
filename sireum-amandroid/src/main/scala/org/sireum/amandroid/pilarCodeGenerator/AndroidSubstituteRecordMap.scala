@@ -9,6 +9,10 @@ package org.sireum.amandroid.pilarCodeGenerator
 
 import org.sireum.util._
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object AndroidSubstituteRecordMap {
 	def getSubstituteRecordMap : IMap[String, String] = {
 	  val map : MMap[String, String] = mmapEmpty

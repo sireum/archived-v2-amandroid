@@ -7,6 +7,10 @@ http://www.eclipse.org/legal/epl-v10.html
 */
 package org.sireum.amandroid.pilarCodeGenerator
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object AndroidEntryPointConstants {
 	final val ACTIVITY_CLASS = "android.app.Activity"
 	final val SERVICE_CLASS = "android.app.Service"

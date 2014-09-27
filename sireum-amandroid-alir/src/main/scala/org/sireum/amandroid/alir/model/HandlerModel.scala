@@ -13,6 +13,10 @@ import org.sireum.jawa.JawaProcedure
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.alir.reachingFactsAnalysis._
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object HandlerModel {
 	def isHandler(r : JawaRecord) : Boolean = r.getName == "android.os.Handler"
 	def doHandlerCall(s : ISet[RFAFact], p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {

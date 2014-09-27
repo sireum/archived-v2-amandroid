@@ -19,6 +19,9 @@ import org.sireum.amandroid.appInfo.AppInfoCollector
 
 /**
  * this is an object, which hold information of apps. e.g. components, intent-filter database, etc.
+ *
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a> 
  */
 object AppCenter {
   

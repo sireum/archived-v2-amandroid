@@ -15,6 +15,10 @@ import org.sireum.amandroid.security.AndroidProblemCategories
 import org.sireum.util.ISet
 import org.sireum.jawa.alir.taintAnalysis.TaintPath
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object MetricRepo {
   /**ICC compare*/
   var iccTotal = 0

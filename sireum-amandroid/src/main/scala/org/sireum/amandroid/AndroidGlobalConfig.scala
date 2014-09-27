@@ -9,6 +9,10 @@ package org.sireum.amandroid
 
 import org.sireum.jawa.util.OsUtils
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object AndroidGlobalConfig {
 
   final val SIREUM_HOME = "SIREUM_HOME"

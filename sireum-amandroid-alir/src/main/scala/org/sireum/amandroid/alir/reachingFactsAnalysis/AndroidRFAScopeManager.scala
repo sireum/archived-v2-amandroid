@@ -17,6 +17,10 @@ import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.alir.UnknownInstance
 import org.sireum.jawa.Center
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object AndroidRFAScopeManager extends ScopeManager{
   private var packages : ISet[String] = isetEmpty
   private var includeMode = true

@@ -13,7 +13,9 @@ import org.sireum.jawa.JawaRecord
  * Data class representing a layout control on the android screen
  * 
  * adapted from Steven Arzt
- * modified by: Fenguo Wei
+ * 
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
 final case class LayoutControl(id : Int, viewClass : JawaRecord, isSensitive : Boolean = false) {
 }

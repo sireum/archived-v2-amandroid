@@ -37,6 +37,10 @@ import java.io.FileInputStream
 import org.sireum.jawa.alir.interProcedural.Callee
 import org.sireum.jawa.alir.taintAnalysis.SourceAndSinkManager
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object SourceAndSinkCategory {
   final val STMT_SOURCE = "stmt_source"
   final val STMT_SINK = "stmt_sink"
@@ -47,6 +51,10 @@ object SourceAndSinkCategory {
   final val CALLBACK_SOURCE = "callback_source"
 }
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 abstract class AndroidSourceAndSinkManager(appPackageName : String, 
     												layoutControls : Map[Int, LayoutControl], 
     												callbackMethods : ISet[JawaProcedure], 
@@ -119,6 +127,10 @@ abstract class AndroidSourceAndSinkManager(appPackageName : String,
 	
 }
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 class DefaultAndroidSourceAndSinkManager(appPackageName : String, 
     												layoutControls : Map[Int, LayoutControl], 
     												callbackMethods : ISet[JawaProcedure], 
@@ -209,6 +221,10 @@ class DefaultAndroidSourceAndSinkManager(appPackageName : String,
   }
 }
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object SSParser{
   
 	private val regex = "([^\\s]+)\\s+(.+)?\\s*->\\s+(.+)"

@@ -87,6 +87,9 @@ object TaintAnalyzeCli {
   }
 }
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ */ 
 object TanitAnalysis{
   private final val TITLE = "TaintAnalysis"
   def main(args: Array[String]) {

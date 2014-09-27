@@ -10,4 +10,8 @@ package org.sireum.amandroid.alir.dataRecorder
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceInfo
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 case class AmandroidResult(idfg : InterProceduralDataFlowGraph, ddg : InterproceduralDataDependenceInfo)

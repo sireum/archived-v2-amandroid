@@ -33,8 +33,9 @@ import org.sireum.jawa.util.SignatureParser
  * Analyzes the classes in the APK file to find custom implementations of the
  * well-known Android callback and handler interfaces.
  * 
- * @author Sankardas Roy. Adapted Steven Arzt (FlowDroid) 's equivalent code
- *
+ * Adapted Steven Arzt (FlowDroid) 's equivalent code
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author Sankardas Roy. 
  */
 class ReachableInfoCollector(entryPointClasses:Set[String]) {
   final val TITLE = "ReachableInfoCollector"

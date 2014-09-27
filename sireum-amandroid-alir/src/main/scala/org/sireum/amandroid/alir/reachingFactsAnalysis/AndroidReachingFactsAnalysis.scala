@@ -40,6 +40,10 @@ import scala.collection.immutable.BitSet
 import org.sireum.jawa.util.Timer
 import java.io.PrintWriter
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
   
   final val TITLE = "AndroidReachingFactsAnalysisBuilder"
@@ -646,8 +650,9 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
 
 
 /**
- * @author Fengguo Wei & Sankardas Roy
- */
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object AndroidReachingFactsAnalysis {
   type Node = CGNode
   final val ICC_EDGE = "icc"

@@ -29,8 +29,9 @@ import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidRFAConfig
 import org.sireum.amandroid.AppCenter
 
 /**
- * @author <a href="mailto:sroy@k-state.edu">S. Roy</a>
- */
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object HttpLibStatCollect_run {
   private final val TITLE = "HttpLibCollect_run"
   object Counter {

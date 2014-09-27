@@ -17,6 +17,10 @@ import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.alir.Instance
 import org.sireum.jawa.alir.UnknownInstance
 
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object ComponentNameModel {
   final val TITLE = "ComponentNameModel"
 	def isComponentName(r : JawaRecord) : Boolean = r.getName == "android.content.ComponentName"
