@@ -1,5 +1,4 @@
-sireum-amandroid-private
+amandroid
 ========================
-To run test case, you need to do following:
 
-Set environment variable AMANDROID_HOME point to your Amandroid data store home directory.
+Visit http://amandroid.sireum.org/docs/ to get more information.
