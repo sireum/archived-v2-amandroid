@@ -77,14 +77,11 @@ class AmandroidSocket {
               output_path : String,
               lib_sum : LibraryAPISummary,
               app_info : AppInfoCollector) = {
-    val srcFile = new File(new URI(source_apk))
-	  val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
-		val resultDir = new File(outputDir + "/Results/")
+		val resultDir = new File(output_path + "/APKs/")
 		val dexFile = APKFileResolver.getDexFile(source_apk, FileUtil.toUri(resultDir))
 
 		// convert the dex file to the "pilar" form
 		val pilarRootUri = Dex2PilarConverter.convert(dexFile)
-		val pilarFile = new File(new URI(pilarRootUri))
     AndroidRFAConfig.setupCenter
     
   	//store the app's pilar code in AmandroidCodeSource which is organized record by record.

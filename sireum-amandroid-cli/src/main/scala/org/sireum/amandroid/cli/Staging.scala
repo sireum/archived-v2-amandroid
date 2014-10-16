@@ -161,9 +161,7 @@ object Staging {
       apkFileUri =>
         i+=1
         println("Analyzing " + apkFileUri)
-        
-        val fileName = apkFileUri.substring(apkFileUri.lastIndexOf("/"), apkFileUri.lastIndexOf("."))
-        
+                
         val app_info = new AppInfoCollector(apkFileUri)
         socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
         socket.plugListener(new StagingListener(apkFileUri, outputPath))
