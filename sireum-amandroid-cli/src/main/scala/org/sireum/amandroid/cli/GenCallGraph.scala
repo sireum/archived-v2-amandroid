@@ -34,6 +34,7 @@ import java.io.FileOutputStream
 import java.util.zip.GZIPOutputStream
 import java.io.BufferedOutputStream
 import org.sireum.jawa.xml.AndroidXStream
+import org.sireum.amandroid.AndroidGlobalConfig
 
 
 /**
@@ -114,50 +115,56 @@ object GenCallGraph {
     
     println("Total apks: " + apkFileUris.size)
     try{
+      var i : Int = 0
+      JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), GlobalConfig.PILAR_FILE_EXT)
+      
+      apkFileUris.foreach{
+        apkFileUri =>
+          try{
+            i+=1
+            println("Analyzing " + apkFileUri)
+            
+            val apkName = apkFileUri.substring(apkFileUri.lastIndexOf("/"), apkFileUri.lastIndexOf("."))
+            
+        		val resultDir = new File(outputPath + "/APPs/")
+        		val dexFile = APKFileResolver.getDexFile(apkFileUri, FileUtil.toUri(resultDir))
+        
+        		// convert the dex file to the "pilar" form
+        		val pilarRootUri = Dex2PilarConverter.convert(dexFile)
+            
+          	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
+          	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
+          	
+          	val app_info = new AppInfoCollector(apkFileUri)
+          	app_info.collectInfo
+            
+          	val pag = new PointerAssignmentGraph[PtaNode]()
+            val cg = new InterproceduralControlFlowGraph[CGNode]
+            val eps = app_info.getEntryPoints
+            val pros =
+              eps.map{
+                compName =>
+                  val comp = Center.resolveRecord(compName, Center.ResolveLevel.BODY)
+                  val procedures = comp.getProceduresByShortName(AndroidConstants.MAINCOMP_ENV) ++ comp.getProceduresByShortName(AndroidConstants.COMP_ENV)
+                  procedures
+              }.reduce(iunion[JawaProcedure])
     
-    var i : Int = 0
-    
-    apkFileUris.foreach{
-      apkFileUri =>
-        i+=1
-        println("Analyzing " + apkFileUri)
-        
-        val apkName = apkFileUri.substring(apkFileUri.lastIndexOf("/"), apkFileUri.lastIndexOf("."))
-        
-    		val resultDir = new File(outputPath + "/APPs/")
-    		val dexFile = APKFileResolver.getDexFile(apkFileUri, FileUtil.toUri(resultDir))
-    
-    		// convert the dex file to the "pilar" form
-    		val pilarRootUri = Dex2PilarConverter.convert(dexFile)
-        
-      	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
-      	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
-      	
-      	val app_info = new AppInfoCollector(apkFileUri)
-      	app_info.collectInfo
-        
-      	val pag = new PointerAssignmentGraph[PtaNode]()
-        val cg = new InterproceduralControlFlowGraph[CGNode]
-        val eps = app_info.getEntryPoints
-        val pros =
-          eps.map{
-            compName =>
-              val comp = Center.resolveRecord(compName, Center.ResolveLevel.BODY)
-              val procedures = comp.getProceduresByShortName(AndroidConstants.MAINCOMP_ENV) ++ comp.getProceduresByShortName(AndroidConstants.COMP_ENV)
-              procedures
-          }.reduce(iunion[JawaProcedure])
-
-        new InterproceduralPointsToAnalysis().pta(pag, cg, pros, false)
-      	
-        val file = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ".xml.zip")
-  	    val w = new FileOutputStream(file)
-        val zipw = new GZIPOutputStream(new BufferedOutputStream(w))
-  	    AndroidXStream.toXml(cg, zipw)
-  	    zipw.close()
-  	    println(apkName + " result stored!")
-        
-        println("#" + i + ":Done!")
-    }
+            new InterproceduralPointsToAnalysis().pta(pag, cg, pros, false)
+          	
+            val file = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ".xml.zip")
+      	    val w = new FileOutputStream(file)
+            val zipw = new GZIPOutputStream(new BufferedOutputStream(w))
+      	    AndroidXStream.toXml(cg, zipw)
+      	    zipw.close()
+      	    println(apkName + " result stored!")
+            
+            println("#" + i + ":Done!")
+          } catch {
+            case e : Throwable => 
+              CliLogger.logError(new File(outputPath), "Error: " , e)
+      
+          }
+      }
     } catch {
       case e : Throwable => 
         CliLogger.logError(new File(outputPath), "Error: " , e)

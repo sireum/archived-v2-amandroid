@@ -135,7 +135,6 @@ object OAuthTokenTracking_run {
     AndroidReachingFactsAnalysisConfig.k_context = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(10))
     
     val socket = new AmandroidSocket
     socket.preProcess
@@ -147,12 +146,18 @@ object OAuthTokenTracking_run {
     
     files.foreach{
       file =>
-        msg_critical(TITLE, "####" + file + "#####")
-        val app_info = new OauthTokenContainerCollector(file)
-        socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
-        val ssm = new OAuthSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-        socket.plugListener(new OAuthTokenTrackingListener(file, app_info))
-        socket.runWithDDA(ssm, false, true)
+        try{
+          msg_critical(TITLE, "####" + file + "#####")
+          AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(10))
+          val app_info = new OauthTokenContainerCollector(file)
+          socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
+          val ssm = new OAuthSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+          socket.plugListener(new OAuthTokenTrackingListener(file, app_info))
+          socket.runWithDDA(ssm, false, true)
+        } catch {
+          case e : Throwable =>
+            e.printStackTrace()
+        }
     }
   }
 }
