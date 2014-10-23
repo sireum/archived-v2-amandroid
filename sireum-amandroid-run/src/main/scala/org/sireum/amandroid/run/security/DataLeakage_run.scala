@@ -20,6 +20,10 @@ import org.sireum.jawa.util.Timer
 import org.sireum.amandroid.AppCenter
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.util.IgnoreException
+import java.io.File
+import java.io.FileOutputStream
+import java.io.BufferedWriter
+import java.io.OutputStreamWriter
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -27,7 +31,7 @@ import org.sireum.jawa.util.IgnoreException
  */ 
 object DataLeakage_run {
   private final val TITLE = "DataLeakage_run"
-  MessageCenter.msglevel = MessageCenter.MSG_LEVEL.VERBOSE
+  MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
   object DataLeakageCounter {
     var total = 0
     var haveresult = 0
@@ -36,7 +40,7 @@ object DataLeakage_run {
     override def toString : String = "total: " + total + ", haveResult: " + haveresult + ", taintPathFound: " + taintPathFound
   }
   
-  private class DataLeakageListener(source_apk : FileResourceUri) extends AmandroidSocketListener {
+  private class DataLeakageListener(source_apk : FileResourceUri, outputPath : String) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
       DataLeakageCounter.total += 1
     }
@@ -53,6 +57,17 @@ object DataLeakage_run {
 	      DataLeakageCounter.taintPathFoundList += source_apk
 	    }
 		  DataLeakageCounter.haveresult += 1
+		  val msgfile = new File(outputPath + "/msg.txt")
+		  val msgw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(msgfile, true)))
+		  msgw.write("################# " + source_apk + " ################\n")
+		  val tRes = AppCenter.getTaintAnalysisResults
+      tRes.foreach{
+        case (rec, res) =>
+          msgw.write(rec.getName + "\n")
+          msgw.write("Found " + res.getTaintedPaths.size + " path.")
+	        msgw.write(res.toString)
+	        msgw.write("\n\n")
+      }
     }
 
     def onPostAnalysis: Unit = {
@@ -74,27 +89,40 @@ object DataLeakage_run {
       return
     }
     
-    AndroidReachingFactsAnalysisConfig.k_context = 1
-    AndroidReachingFactsAnalysisConfig.resolve_icc = true
-    AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(10))
+    try{
     
-    val socket = new AmandroidSocket
-    socket.preProcess
-    
-    val sourcePath = args(0)
-    val outputPath = args(1)
-    
-    val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
-    
-    files.foreach{
-      file =>
-        msg_critical(TITLE, "####" + file + "#####")
-        val app_info = new AppInfoCollector(file)
-        socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
-        val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-        socket.plugListener(new DataLeakageListener(file))
-        socket.runWithDDA(ssm, false, true)
+      AndroidReachingFactsAnalysisConfig.k_context = 1
+      AndroidReachingFactsAnalysisConfig.resolve_icc = true
+      AndroidReachingFactsAnalysisConfig.resolve_static_init = false
+      
+      val socket = new AmandroidSocket
+      socket.preProcess
+      
+      val sourcePath = args(0)
+      val outputPath = args(1)
+      
+      
+      val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
+      
+      files.foreach{
+        file =>
+          try{
+            msg_critical(TITLE, "####" + file + "#####")
+            AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(10))
+            val app_info = new AppInfoCollector(file)
+            socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
+            val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+            socket.plugListener(new DataLeakageListener(file, outputPath))
+            socket.runWithDDA(ssm, false, true)
+          } catch {
+            case e =>
+              e.printStackTrace()
+          }
+      }
+    } catch {
+      case e =>
+        e.printStackTrace()
     }
   }
+  
 }

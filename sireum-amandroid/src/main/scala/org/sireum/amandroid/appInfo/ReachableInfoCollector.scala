@@ -655,5 +655,15 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
     this.androidCallbacks += "android.widget.TextView$OnEditorActionListener"
     this.androidCallbacks += "android.widget.TimePicker$OnTimeChangedListener"
     this.androidCallbacks += "android.widget.ZoomButtonsController$OnZoomListener"
+    
+    // bluetooth
+    this.androidCallbacks += "android.bluetooth.BluetoothAdapter$LeScanCallback"
+    this.androidCallbacks += "android.bluetooth.BluetoothProfile$ServiceListener"
+    
+    // nfc
+    this.androidCallbacks += "android.nfc.NfcAdapter$CreateNdefMessageCallback"
+    this.androidCallbacks += "android.nfc.NfcAdapter$OnNdefPushCompleteCallback"
+    
+    
 	}
 }
