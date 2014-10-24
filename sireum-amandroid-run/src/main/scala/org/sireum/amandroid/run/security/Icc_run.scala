@@ -107,7 +107,6 @@ object Icc_run {
     AndroidReachingFactsAnalysisConfig.k_context = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(10))
     
     val socket = new AmandroidSocket
     socket.preProcess
@@ -119,11 +118,17 @@ object Icc_run {
     
     files.foreach{
       file =>
-        msg_critical(TITLE, "####" + file + "#####")
-        val app_info = new IccCollector(file)
-        socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
-        socket.plugListener(new IccListener(file, app_info))
-        socket.runWithoutDDA(false, true)
+        try{
+          msg_critical(TITLE, "####" + file + "#####")
+          AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(10))
+          val app_info = new IccCollector(file)
+          socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
+          socket.plugListener(new IccListener(file, app_info))
+          socket.runWithoutDDA(false, true)
+        } catch {
+          case e : Throwable =>
+            e.printStackTrace()
+        }
     }
   }
 }

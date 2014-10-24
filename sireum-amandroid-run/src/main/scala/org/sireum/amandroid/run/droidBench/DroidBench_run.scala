@@ -89,7 +89,6 @@ object DroidBench_run {
     AndroidReachingFactsAnalysisConfig.k_context = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
     
     val socket = new AmandroidSocket
     socket.preProcess
@@ -101,12 +100,18 @@ object DroidBench_run {
     
     files.foreach{
       file =>
-        msg_critical(TITLE, "####" + file + "#####")
-        val app_info = new AppInfoCollector(file)
-        socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
-        val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-        socket.plugListener(new DroidBenchListener(file))
-        socket.runWithDDA(ssm, false, true)
+        try{
+          msg_critical(TITLE, "####" + file + "#####")
+          AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
+          val app_info = new AppInfoCollector(file)
+          socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
+          val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+          socket.plugListener(new DroidBenchListener(file))
+          socket.runWithDDA(ssm, false, true)
+        } catch {
+          case e : Throwable =>
+            e.printStackTrace()
+        }
     }
   }
 }

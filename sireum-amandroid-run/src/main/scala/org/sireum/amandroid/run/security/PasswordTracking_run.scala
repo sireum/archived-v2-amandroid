@@ -136,7 +136,6 @@ object PasswordTracking_run {
     AndroidReachingFactsAnalysisConfig.k_context = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = true
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
     
     val socket = new AmandroidSocket
     socket.preProcess
@@ -148,16 +147,22 @@ object PasswordTracking_run {
     
     files.foreach{
       file =>
-        msg_critical(TITLE, "####" + file + "#####")
-        val app_info = new SensitiveViewCollector(file)
-        socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
-        if(app_info.getLayoutControls.exists(p => p._2.isSensitive == true)){
-			    PasswordCounter.havePasswordView += 1
-			    PasswordCounter.havePasswordViewList += file
-			  }
-        val ssm = new PasswordSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.PasswordSinkFilePath)
-        socket.plugListener(new PasswordTrackingListener(file, app_info))
-        socket.runWithDDA(ssm, false, true)
+        try{
+          msg_critical(TITLE, "####" + file + "#####")
+          AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
+          val app_info = new SensitiveViewCollector(file)
+          socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
+          if(app_info.getLayoutControls.exists(p => p._2.isSensitive == true)){
+  			    PasswordCounter.havePasswordView += 1
+  			    PasswordCounter.havePasswordViewList += file
+  			  }
+          val ssm = new PasswordSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.PasswordSinkFilePath)
+          socket.plugListener(new PasswordTrackingListener(file, app_info))
+          socket.runWithDDA(ssm, false, true)
+        } catch {
+          case e : Throwable =>
+            e.printStackTrace()
+        }
     }
   }
 }

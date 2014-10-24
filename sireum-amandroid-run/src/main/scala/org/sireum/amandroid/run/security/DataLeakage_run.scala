@@ -115,14 +115,14 @@ object DataLeakage_run {
             socket.plugListener(new DataLeakageListener(file, outputPath))
             socket.runWithDDA(ssm, false, true)
           } catch {
-            case e =>
+            case e : Throwable =>
               e.printStackTrace()
           } finally {
             socket.cleanEnv
           }
       }
     } catch {
-      case e =>
+      case e : Throwable =>
         e.printStackTrace()
     }
   }

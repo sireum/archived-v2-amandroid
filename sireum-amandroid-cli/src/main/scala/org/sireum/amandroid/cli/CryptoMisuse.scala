@@ -134,7 +134,6 @@ object CryptoMisuse {
     AndroidReachingFactsAnalysisConfig.parallel = parallel
     AndroidReachingFactsAnalysisConfig.resolve_icc = icc
     AndroidReachingFactsAnalysisConfig.resolve_static_init = static
-    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(timeout))
     
     println("Total apks: " + apkFileUris.size)
 
@@ -146,18 +145,24 @@ object CryptoMisuse {
       
       apkFileUris.foreach{
         apkFileUri =>
-          i+=1
-          println("Analyzing " + apkFileUri)
-          val app_info = new InterestingApiCollector(apkFileUri)
-          socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
-          socket.plugListener(new CryptoMisuseListener(apkFileUri, outputPath, app_info))
-          socket.runWithoutDDA(false, parallel)
-          val icfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
-          icfgs.foreach{
-            case (rec, (icfg, irfaResult)) =>
-              CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
+          try{
+            i+=1
+            println("Analyzing " + apkFileUri)
+            AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(timeout))
+            val app_info = new InterestingApiCollector(apkFileUri)
+            socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
+            socket.plugListener(new CryptoMisuseListener(apkFileUri, outputPath, app_info))
+            socket.runWithoutDDA(false, parallel)
+            val icfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
+            icfgs.foreach{
+              case (rec, (icfg, irfaResult)) =>
+                CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
+            }
+            println("#" + i + ":Done!")
+          } catch {
+            case e : Throwable =>
+              CliLogger.logError(new File(outputPath), "Error: " , e)
           }
-          println("#" + i + ":Done!")
       }
     } catch {
       case e : Throwable => 

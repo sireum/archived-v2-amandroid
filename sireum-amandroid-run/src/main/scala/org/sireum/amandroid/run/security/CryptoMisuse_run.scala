@@ -73,7 +73,6 @@ object CryptoMisuse_run {
     AndroidReachingFactsAnalysisConfig.k_context = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
     
     val sourcePath = args(0)
     val outputPath = args(1)
@@ -82,16 +81,22 @@ object CryptoMisuse_run {
     
     files.foreach{
       file =>
-        msg_critical(TITLE, "####" + file + "#####")
-        val app_info = new InterestingApiCollector(file)
-        socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
-        socket.plugListener(new CryptoMisuseListener)
-        socket.runWithoutDDA(false, true)
-        
-        val icfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
-        icfgs.foreach{
-          case (rec, (icfg, irfaResult)) =>
-            CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
+        try{
+          msg_critical(TITLE, "####" + file + "#####")
+          AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
+          val app_info = new InterestingApiCollector(file)
+          socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
+          socket.plugListener(new CryptoMisuseListener)
+          socket.runWithoutDDA(false, true)
+          
+          val icfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
+          icfgs.foreach{
+            case (rec, (icfg, irfaResult)) =>
+              CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
+          }
+        } catch {
+          case e : Throwable =>
+            e.printStackTrace()
         }
     }
   }

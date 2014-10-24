@@ -159,14 +159,19 @@ object Staging {
     
     apkFileUris.foreach{
       apkFileUri =>
-        i+=1
-        println("Analyzing " + apkFileUri)
-                
-        val app_info = new AppInfoCollector(apkFileUri)
-        socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
-        socket.plugListener(new StagingListener(apkFileUri, outputPath))
-        socket.runWithoutDDA(false, parallel)
-        println("#" + i + ":Done!")
+        try{
+          i+=1
+          println("Analyzing " + apkFileUri)
+          AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(timeout))
+          val app_info = new AppInfoCollector(apkFileUri)
+          socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
+          socket.plugListener(new StagingListener(apkFileUri, outputPath))
+          socket.runWithoutDDA(false, parallel)
+          println("#" + i + ":Done!")
+        } catch {
+          case e : Throwable => 
+            CliLogger.logError(new File(outputPath), "Error: " , e)
+        }
     }
     } catch {
       case e : Throwable => 
