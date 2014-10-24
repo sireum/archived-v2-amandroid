@@ -195,7 +195,7 @@ object Staging {
           val ddgResultOpt = ddgress.get(rec)
           if(ddgResultOpt.isDefined){
             val ddgResult = ddgResultOpt.get
-            val file = new File(output_dir + "/" + rec.getName.filter(_.isUnicodeIdentifierPart) + ".xml.zip")
+            val file = new File(output_dir + "/" + rec.getName.filter(_.isUnicodeIdentifierPart) + ".xml.gz")
       	    val w = new FileOutputStream(file)
             val zipw = new GZIPOutputStream(new BufferedOutputStream(w))
       	    AndroidXStream.toXml(AmandroidResult(InterProceduralDataFlowGraph(icfg, irfaResult), ddgResult), zipw)

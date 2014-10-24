@@ -117,6 +117,8 @@ object DataLeakage_run {
           } catch {
             case e =>
               e.printStackTrace()
+          } finally {
+            socket.cleanEnv
           }
       }
     } catch {
