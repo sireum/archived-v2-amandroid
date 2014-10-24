@@ -152,31 +152,32 @@ object Staging {
     
     println("Total apks: " + apkFileUris.size)
     try{
-    val socket = new AmandroidSocket
-    socket.preProcess
-    
-    var i : Int = 0
-    
-    apkFileUris.foreach{
-      apkFileUri =>
-        try{
-          i+=1
-          println("Analyzing " + apkFileUri)
-          AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(timeout))
-          val app_info = new AppInfoCollector(apkFileUri)
-          socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
-          socket.plugListener(new StagingListener(apkFileUri, outputPath))
-          socket.runWithoutDDA(false, parallel)
-          println("#" + i + ":Done!")
-        } catch {
-          case e : Throwable => 
-            CliLogger.logError(new File(outputPath), "Error: " , e)
-        }
-    }
+      val socket = new AmandroidSocket
+      socket.preProcess
+      
+      var i : Int = 0
+      
+      apkFileUris.foreach{
+        apkFileUri =>
+          try{
+            i+=1
+            println("Analyzing " + apkFileUri)
+            AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(timeout))
+            val app_info = new AppInfoCollector(apkFileUri)
+            socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
+            socket.plugListener(new StagingListener(apkFileUri, outputPath))
+            socket.runWithoutDDA(false, parallel)
+            println("#" + i + ":Done!")
+          } catch {
+            case e : Throwable => 
+              CliLogger.logError(new File(outputPath), "Error: " , e)
+          } finally {
+            socket.cleanEnv
+          }
+      }
     } catch {
       case e : Throwable => 
         CliLogger.logError(new File(outputPath), "Error: " , e)
-
     }
 	}
   

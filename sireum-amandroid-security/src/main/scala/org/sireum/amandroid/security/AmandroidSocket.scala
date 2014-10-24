@@ -54,8 +54,11 @@ trait AmandroidSocketListener {
 class AmandroidSocket {
   private final val TITLE = "AmandroidSocket"
   private var myListener_opt: Option[AmandroidSocketListener] = None
+  private var dirtyFlag = false
   
   def preProcess : Unit = {
+    if(dirtyFlag) throw new RuntimeException("Before your analysis please call cleanEnv first.")
+    dirtyFlag = true
     val imgfile = new File(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSummary.xml.zip")
 //    if(imgfile.exists()){
 //      Center.init(imgfile)
@@ -93,6 +96,7 @@ class AmandroidSocket {
    * Always call this after analysis one application.
    */
   def cleanEnv = {
+    dirtyFlag = false
     Center.reset
   	AppCenter.reset
   	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
@@ -184,13 +188,6 @@ class AmandroidSocket {
       case e : Exception => 
         if(myListener_opt.isDefined) myListener_opt.get.onException(e)
     } finally {
-    	Center.reset
-    	AppCenter.reset
-    	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
-    	JawaCodeSource.clearAppRecordsCodes
-    	System.gc()
-      System.gc()
-	
     	if(myListener_opt.isDefined) myListener_opt.get.onPostAnalysis
     	msg_critical(TITLE, "************************************\n")
     }

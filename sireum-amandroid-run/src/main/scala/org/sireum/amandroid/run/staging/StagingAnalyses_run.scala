@@ -53,7 +53,7 @@ object StagingAnalyses_run {
     }
     
     JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), GlobalConfig.PILAR_FILE_EXT)
-    LibSideEffectProvider.init(new File(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSideEffectResult.xml.zip"))
+    LibSideEffectProvider.init(new File(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSideEffectResult.xml.gz"))
     val outputUri = FileUtil.toUri("/media/fgwei/c3337db2-6708-4063-9079-a61c105f519f/Outputs/staging_analyses")
     val sourcePath = args(0)
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
@@ -93,7 +93,7 @@ object StagingAnalyses_run {
   	    	  ep =>
   	    	    try{
   		    	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
-  		    	    val file = new File(fileDir + "/" + ep.getDeclaringRecord.getName.filter(_.isUnicodeIdentifierPart) + ".xml.zip")
+  		    	    val file = new File(fileDir + "/" + ep.getDeclaringRecord.getName.filter(_.isUnicodeIdentifierPart) + ".xml.gz")
   		    	    if(file.exists()){
   						    val reader = new GZIPInputStream(new FileInputStream(file))
   						    val xmlObject = AndroidXStream.fromXml(reader).asInstanceOf[AmandroidResult]

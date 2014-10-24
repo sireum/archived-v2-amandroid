@@ -35,6 +35,7 @@ import java.util.zip.GZIPOutputStream
 import java.io.BufferedOutputStream
 import org.sireum.jawa.xml.AndroidXStream
 import org.sireum.amandroid.AndroidGlobalConfig
+import org.sireum.amandroid.AppCenter
 
 
 /**
@@ -108,10 +109,10 @@ object GenCallGraph {
         println("Unexpected type: " + typ)
         return
     }
-		staging(apkFileUris, outputPath)
+		genCallGraph(apkFileUris, outputPath)
 	}
   
-  def staging(apkFileUris : Set[FileResourceUri], outputPath : String) = {
+  def genCallGraph(apkFileUris : Set[FileResourceUri], outputPath : String) = {
     
     println("Total apks: " + apkFileUris.size)
     try{
@@ -162,6 +163,13 @@ object GenCallGraph {
           } catch {
             case e : Throwable => 
               CliLogger.logError(new File(outputPath), "Error: " , e)
+          } finally {
+            Center.reset
+          	AppCenter.reset
+          	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
+          	JawaCodeSource.clearAppRecordsCodes
+          	System.gc()
+            System.gc()
           }
       }
     } catch {

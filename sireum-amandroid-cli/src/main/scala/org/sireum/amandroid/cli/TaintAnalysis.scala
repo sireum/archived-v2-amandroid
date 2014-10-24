@@ -168,7 +168,8 @@ object TanitAnalysis{
           } catch {
             case e : Throwable => 
               CliLogger.logError(new File(outputPath), "Error: " , e)
-      
+          } finally {
+            socket.cleanEnv
           }
       }
     } catch {

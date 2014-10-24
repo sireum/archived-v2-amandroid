@@ -97,6 +97,8 @@ object CryptoMisuse_run {
         } catch {
           case e : Throwable =>
             e.printStackTrace()
+        } finally {
+          socket.cleanEnv
         }
     }
   }
