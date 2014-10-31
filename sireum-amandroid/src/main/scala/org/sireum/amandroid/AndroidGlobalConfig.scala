@@ -19,7 +19,7 @@ object AndroidGlobalConfig {
 	final val AMANDROID_HOME = "AMANDROID_HOME"
 	final val amandroid_home = 
     if(System.getenv(AMANDROID_HOME) != null) System.getenv(AMANDROID_HOME)
-    else if(System.getenv(SIREUM_HOME) != null) System.getenv(SIREUM_HOME) + "apps/amandroid"
+    else if(System.getenv(SIREUM_HOME) != null) System.getenv(SIREUM_HOME) + "/apps/amandroid"
     else throw new RuntimeException("Please set env variable SIREUM_HOME!")
 //	if(amandroid_home == null) throw new RuntimeException("Please set env variable AMANDROID_HOME!")  
 	final val android_lib_dir = amandroid_home + "/AndroidLib/4.1"
