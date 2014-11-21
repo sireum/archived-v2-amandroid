@@ -22,6 +22,7 @@ import org.sireum.amandroid.alir.reachingFactsAnalysis.IntentHelper
 import org.sireum.pilar.ast._
 import org.sireum.amandroid.parser.UriData
 import org.sireum.jawa.alir.Context
+import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -322,7 +323,7 @@ object DataCollector {
 	      var taintResult : Option[TaintAnalysisResult] = None
 	      if(!compRec.isPhantom){
 	        if(AppCenter.hasInterproceduralReachingFactsAnalysisResult(compRec)){
-			      val (icfg, irfaResult) = AppCenter.getInterproceduralReachingFactsAnalysisResult(compRec)
+			      val InterProceduralDataFlowGraph(icfg, irfaResult) = AppCenter.getInterproceduralReachingFactsAnalysisResult(compRec)
 			      val iccNodes = icfg.nodes.filter{
 			        	node =>
 			        	  node.isInstanceOf[CGCallNode] && node.asInstanceOf[CGCallNode].getCalleeSet.exists(c => InterComponentCommunicationModel.isIccOperation(Center.getProcedureWithoutFailing(c.callee)))

@@ -197,7 +197,7 @@ object Staging {
       val irfaress = AppCenter.getInterproceduralReachingFactsAnalysisResults
       val ddgress = AppCenter.getInterproceduralDataDependenceAnalysisResults
       irfaress.foreach{
-        case (rec, (icfg, irfaResult)) =>
+        case (rec, InterProceduralDataFlowGraph(icfg, irfaResult)) =>
           val ddgResultOpt = ddgress.get(rec)
           if(ddgResultOpt.isDefined){
             val ddgResult = ddgResultOpt.get

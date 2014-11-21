@@ -68,7 +68,7 @@ object StagingAnalyses_run {
   	    	// convert the dex file to the "pilar" form
   	    	val pilarRootUri = Dex2PilarConverter.convert(dexFile)
   	    	val pilarFile = new File(new URI(pilarRootUri))
-  	  		AndroidRFAConfig.setupCenter
+  	  		
   	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
   	    	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
   		    

@@ -60,12 +60,7 @@ class AmandroidSocket {
     if(dirtyFlag) throw new RuntimeException("Before your analysis please call cleanEnv first.")
     dirtyFlag = true
     val imgfile = new File(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSummary.xml.zip")
-//    if(imgfile.exists()){
-//      Center.init(imgfile)
-//      JawaCodeSource.setPreLoadFlag
-//    } else {
-      JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), GlobalConfig.PILAR_FILE_EXT)
-//    }
+    JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), GlobalConfig.PILAR_FILE_EXT)
     val libsum_file = new File(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSideEffectResult.xml.zip")
     if(libsum_file.exists())
       LibSideEffectProvider.init(libsum_file)
@@ -85,7 +80,6 @@ class AmandroidSocket {
 
 		// convert the dex file to the "pilar" form
 		val pilarRootUri = Dex2PilarConverter.convert(dexFile)
-    AndroidRFAConfig.setupCenter
     
   	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
   	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, lib_sum)

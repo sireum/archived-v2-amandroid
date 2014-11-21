@@ -153,9 +153,9 @@ object CryptoMisuse {
             socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
             socket.plugListener(new CryptoMisuseListener(apkFileUri, outputPath, app_info))
             socket.runWithoutDDA(false, parallel)
-            val icfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
-            icfgs.foreach{
-              case (rec, (icfg, irfaResult)) =>
+            val idfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
+            idfgs.foreach{
+              case (rec, InterProceduralDataFlowGraph(icfg, irfaResult)) =>
                 CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
             }
             println("#" + i + ":Done!")

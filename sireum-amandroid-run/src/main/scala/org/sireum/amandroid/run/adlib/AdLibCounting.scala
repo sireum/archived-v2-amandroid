@@ -279,7 +279,7 @@ object AdLibCounting {
 	      val pilarRootUri = Dex2PilarConverter.convert(dexFileUri)
 		 
 		  	val pilarFile = new File(new URI(pilarRootUri))
-	  		AndroidRFAConfig.setupCenter
+	  		
 	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
 	    	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, DefaultLibraryAPISummary)
 	    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.

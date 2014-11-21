@@ -91,7 +91,7 @@ object CryptoMisuse_run {
           
           val icfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
           icfgs.foreach{
-            case (rec, (icfg, irfaResult)) =>
+            case (rec, InterProceduralDataFlowGraph(icfg, irfaResult)) =>
               CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
           }
         } catch {

@@ -134,7 +134,7 @@ object HttpLibStatCollect_run {
         	
         	// convert the dex file to the "pilar" form
         	val pilarFileUri = Dex2PilarConverter.convert(dexFile)
-      		AndroidRFAConfig.setupCenter
+      		
         	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
         	JawaCodeSource.load(pilarFileUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
       	

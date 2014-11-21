@@ -16,6 +16,7 @@ import org.sireum.jawa.alir.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceInfo
 import org.sireum.amandroid.parser.IntentFilterDataBase
 import org.sireum.amandroid.appInfo.AppInfoCollector
+import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 
 /**
  * this is an object, which hold information of apps. e.g. components, intent-filter database, etc.
@@ -147,9 +148,9 @@ object AppCenter {
 //  
 //  def releaseWholeProgramCallGraph = this.wholeProgramCallGraph = null
   
-  private var irfaResults : IMap[JawaRecord, (InterproceduralControlFlowGraph[CGNode], InterProceduralMonotoneDataFlowAnalysisResult[RFAFact])] = imapEmpty
+  private var irfaResults : IMap[JawaRecord, InterProceduralDataFlowGraph] = imapEmpty
   
-  def addInterproceduralReachingFactsAnalysisResult(key : JawaRecord, icfg : InterproceduralControlFlowGraph[CGNode], irfaResult : InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]) = this.synchronized(this.irfaResults += (key -> (icfg, irfaResult)))
+  def addInterproceduralReachingFactsAnalysisResult(key : JawaRecord, icfg : InterproceduralControlFlowGraph[CGNode], irfaResult : InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]) = this.synchronized(this.irfaResults += (key -> InterProceduralDataFlowGraph(icfg, irfaResult)))
   def hasInterproceduralReachingFactsAnalysisResult(key : JawaRecord) = this.irfaResults.contains(key)
   def getInterproceduralReachingFactsAnalysisResult(key : JawaRecord) = this.irfaResults.getOrElse(key, throw new RuntimeException("Doesn't have irfa result for given record: " + key))
   def getInterproceduralReachingFactsAnalysisResults = this.irfaResults
