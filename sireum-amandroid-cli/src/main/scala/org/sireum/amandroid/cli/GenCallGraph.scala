@@ -155,7 +155,8 @@ object GenCallGraph {
             val file = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ".xml.gz")
       	    val w = new FileOutputStream(file)
             val zipw = new GZIPOutputStream(new BufferedOutputStream(w))
-      	    AndroidXStream.toXml(cg, zipw)
+      	    val graph = cg.toTextGraph
+      	    zipw.write(graph.getBytes())
       	    zipw.close()
       	    println(apkName + " result stored!")
             
