@@ -85,9 +85,10 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
 	        } else if(!this.icfg.isProcessed(p.getSignature, currentNode.getContext)) { // for normal call
 	          val nodes = this.icfg.collectCfgToBaseGraph(p, currentNode.getContext, false)
 	          nodes.foreach{n => n.setLoadedClassBitSet(clm.loadClass(me, bitset))}
-		        val clinitVirContext = currentNode.getContext.copy.setContext(p.getSignature, p.getSignature)
-		        val clinitEntry = this.icfg.getCGEntryNode(clinitVirContext)
-		        val clinitExit = this.icfg.getCGExitNode(clinitVirContext)
+		        val clinitVirEntryContext = currentNode.getContext.copy.setContext(p.getSignature, "Entry")
+		        val clinitVirExitContext = currentNode.getContext.copy.setContext(p.getSignature, "Exit")
+		        val clinitEntry = this.icfg.getCGEntryNode(clinitVirEntryContext)
+		        val clinitExit = this.icfg.getCGExitNode(clinitVirExitContext)
 		        this.icfg.addEdge(currentNode, clinitEntry)
 		        this.icfg.addEdge(clinitExit, currentNode)
 	        }
