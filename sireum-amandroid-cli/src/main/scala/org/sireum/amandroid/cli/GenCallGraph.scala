@@ -72,7 +72,7 @@ object GenCallGraphCli {
  */ 
 object GenCallGraph {
   
-  private final val TITLE = "Staging"
+  private final val TITLE = "GenCallGraph"
   
 	def main(args: Array[String]) {
 	  if(args.size != 6){
