@@ -32,12 +32,12 @@ object UrlCollection_run {
   private final val TITLE = "UrlCollection_run"
   
   def main(args: Array[String]): Unit = {
-    if(args.size != 1){
-      System.err.print("Usage: source_path")
+    if(args.size != 2){
+      System.err.print("Usage: source_path output_path")
       return
     }
     MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
-    val outputpath = "/Volumes/ArgusGroup/Stash/outputs/url_collection"
+    val outputpath = args(1)
     val outputUri = FileUtil.toUri(outputpath)
     val sourcePath = args(0)
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
