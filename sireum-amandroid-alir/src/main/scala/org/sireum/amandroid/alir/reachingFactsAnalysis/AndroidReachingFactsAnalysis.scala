@@ -367,7 +367,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
       returnFacts ++= tmpReturnFacts
       if(!pureNormalFlag){
         if(!cg.hasEdge(cgCallnode, cgReturnnode)){
-        	this.synchronized(cg.addEdge(cgCallnode, cgReturnnode))
+        	cg.addEdge(cgCallnode, cgReturnnode)
         }
       }
 	    (calleeFactsMap, returnFacts)

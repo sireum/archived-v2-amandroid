@@ -93,6 +93,7 @@ object DataLeakage_run {
     
       AndroidReachingFactsAnalysisConfig.k_context = 1
       AndroidReachingFactsAnalysisConfig.resolve_icc = true
+      AndroidReachingFactsAnalysisConfig.parallel = true
       AndroidReachingFactsAnalysisConfig.resolve_static_init = false
       
       val socket = new AmandroidSocket
