@@ -149,7 +149,7 @@ object Staging {
     AndroidReachingFactsAnalysisConfig.parallel = parallel
     AndroidReachingFactsAnalysisConfig.resolve_icc = icc
     AndroidReachingFactsAnalysisConfig.resolve_static_init = static
-    
+    AndroidReachingFactsAnalysisConfig.timeout = timeout
     println("Total apks: " + apkFileUris.size)
     try{
       val socket = new AmandroidSocket
@@ -162,7 +162,6 @@ object Staging {
           try{
             i+=1
             println("Analyzing " + apkFileUri)
-            AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(timeout))
             val app_info = new AppInfoCollector(apkFileUri)
             socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
             socket.plugListener(new StagingListener(apkFileUri, outputPath))

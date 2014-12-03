@@ -17,6 +17,10 @@ object AndroidReachingFactsAnalysisConfig {
 	final var k_context = 1
 	final var resolve_icc = true
 	final var resolve_static_init = true
-	final var timerOpt : Option[Timer] = None
+	
+	/**
+	 * Time out period. 0 means never. Other positive number means how many mins.
+	 */
+	final var timeout = 0
 	final var parallel : Boolean = false
 }

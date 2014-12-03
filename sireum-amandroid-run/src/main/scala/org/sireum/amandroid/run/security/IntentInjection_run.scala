@@ -135,6 +135,7 @@ object IntentInjection_run {
     AndroidReachingFactsAnalysisConfig.k_context = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
+    AndroidReachingFactsAnalysisConfig.timeout = 20
     
     val socket = new AmandroidSocket
     socket.preProcess // this loads the android library's class hierarchy and the android library's API sideeffects summary
@@ -148,7 +149,6 @@ object IntentInjection_run {
       file =>
         try{
           msg_critical(TITLE, "####" + file + "#####")
-          AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(20))
           val app_info = new IntentInjectionCollector(file)
           socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
           val ssm = new IntentInjectionSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)

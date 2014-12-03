@@ -73,7 +73,7 @@ object HttpsMisuse_run {
     AndroidReachingFactsAnalysisConfig.k_context = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = true;
-    
+    AndroidReachingFactsAnalysisConfig.timeout = 5
     val sourcePath = args(0)
     val outputPath = args(1)
     
@@ -83,7 +83,6 @@ object HttpsMisuse_run {
       file =>
         try{
           msg_critical(TITLE, "####" + file + "#####")
-          AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
           val app_info = new InterestingApiCollector(file)
           socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
           socket.plugListener(new HTTPSMisuseListener)

@@ -95,6 +95,7 @@ object DataLeakage_run {
       AndroidReachingFactsAnalysisConfig.resolve_icc = true
       AndroidReachingFactsAnalysisConfig.parallel = true
       AndroidReachingFactsAnalysisConfig.resolve_static_init = false
+      AndroidReachingFactsAnalysisConfig.timeout = 10
       
       val socket = new AmandroidSocket
       socket.preProcess
@@ -109,7 +110,6 @@ object DataLeakage_run {
         file =>
           try{
             msg_critical(TITLE, "####" + file + "#####")
-            AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(10))
             val app_info = new AppInfoCollector(file)
             socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
             val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)

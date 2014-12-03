@@ -136,7 +136,7 @@ object IntentInjection {
     AndroidReachingFactsAnalysisConfig.parallel = parallel
     AndroidReachingFactsAnalysisConfig.resolve_icc = icc
     AndroidReachingFactsAnalysisConfig.resolve_static_init = static
-    
+    AndroidReachingFactsAnalysisConfig.timeout = timeout
     println("Total apks: " + apkFileUris.size)
     
     try{
@@ -150,7 +150,6 @@ object IntentInjection {
           try{
             i+=1
             println("Analyzing " + apkFileUri)
-            AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(timeout))
             val app_info = new IntentInjectionCollector(apkFileUri)
             socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
             val ssm = new IntentInjectionSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)

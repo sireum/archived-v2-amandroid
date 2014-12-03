@@ -136,6 +136,7 @@ object PasswordTracking_run {
     AndroidReachingFactsAnalysisConfig.k_context = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = true
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
+    AndroidReachingFactsAnalysisConfig.timeout = 5
     
     val socket = new AmandroidSocket
     socket.preProcess
@@ -149,7 +150,6 @@ object PasswordTracking_run {
       file =>
         try{
           msg_critical(TITLE, "####" + file + "#####")
-          AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
           val app_info = new SensitiveViewCollector(file)
           socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
           if(app_info.getLayoutControls.exists(p => p._2.isSensitive == true)){

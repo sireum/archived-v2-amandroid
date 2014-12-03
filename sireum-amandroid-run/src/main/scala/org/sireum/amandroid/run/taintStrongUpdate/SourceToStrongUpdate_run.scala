@@ -74,8 +74,7 @@ object SourceToStrongUpdate_run {
     AndroidReachingFactsAnalysisConfig.k_context = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = true
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-    AndroidReachingFactsAnalysisConfig.timerOpt = Some(new Timer(5))
-    
+    AndroidReachingFactsAnalysisConfig.timeout = 5
     val socket = new AmandroidSocket
     socket.preProcess
     
