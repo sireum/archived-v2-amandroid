@@ -150,8 +150,10 @@ object IntentInjection {
           try{
             i+=1
             println("Analyzing " + apkFileUri)
+            
+            socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary)
             val app_info = new IntentInjectionCollector(apkFileUri)
-            socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
+            app_info.collectInfo
             val ssm = new IntentInjectionSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)
             socket.plugListener(new IntentInjectionListener(apkFileUri, outputPath, app_info))
             socket.runWithDDA(ssm, false, parallel)

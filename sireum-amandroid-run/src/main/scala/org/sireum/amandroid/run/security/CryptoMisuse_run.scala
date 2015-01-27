@@ -83,8 +83,9 @@ object CryptoMisuse_run {
       file =>
         try{
           msg_critical(TITLE, "####" + file + "#####")
+          socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
           val app_info = new InterestingApiCollector(file)
-          socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
+          app_info.collectInfo
           socket.plugListener(new CryptoMisuseListener)
           socket.runWithoutDDA(false, true)
           

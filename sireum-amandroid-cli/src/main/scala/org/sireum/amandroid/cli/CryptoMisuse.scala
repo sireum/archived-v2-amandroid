@@ -149,8 +149,9 @@ object CryptoMisuse {
             i+=1
             println("Analyzing " + apkFileUri)
             
+            socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary)
             val app_info = new InterestingApiCollector(apkFileUri)
-            socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
+            app_info.collectInfo
             socket.plugListener(new CryptoMisuseListener(apkFileUri, outputPath, app_info))
             socket.runWithoutDDA(false, parallel)
             val idfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults

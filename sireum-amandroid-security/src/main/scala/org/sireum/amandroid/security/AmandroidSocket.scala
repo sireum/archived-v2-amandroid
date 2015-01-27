@@ -73,17 +73,13 @@ class AmandroidSocket {
   
   def loadApk(source_apk : FileResourceUri, 
               output_path : String,
-              lib_sum : LibraryAPISummary,
-              app_info : AppInfoCollector) = {
+              lib_sum : LibraryAPISummary) = {
 		val resultDir = new File(output_path + "/APKs/")
 		val dexFile = APKFileResolver.getDexFile(source_apk, FileUtil.toUri(resultDir))
-
 		// convert the dex file to the "pilar" form
 		val pilarRootUri = Dex2PilarConverter.convert(dexFile)
-    
   	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
   	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, lib_sum)
-  	app_info.collectInfo
   }
   
   /**

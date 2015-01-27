@@ -149,8 +149,10 @@ object IntentInjection_run {
       file =>
         try{
           msg_critical(TITLE, "####" + file + "#####")
+          
+          socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
           val app_info = new IntentInjectionCollector(file)
-          socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
+          app_info.collectInfo
           val ssm = new IntentInjectionSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)
           socket.plugListener(new IntentInjectionListener(file, app_info, ssm))
           socket.runWithDDA(ssm, true, true)

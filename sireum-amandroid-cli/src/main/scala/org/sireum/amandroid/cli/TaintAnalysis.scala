@@ -158,8 +158,10 @@ object TanitAnalysis{
           try{
             i+=1
             println("Analyzing " + apkFileUri)
+            
+            socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary)
             val app_info = new AppInfoCollector(apkFileUri)
-            socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary, app_info)
+            app_info.collectInfo
             val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
             socket.plugListener(new TaintListener(apkFileUri, outputPath, app_info))
             socket.runWithDDA(ssm, false, parallel)

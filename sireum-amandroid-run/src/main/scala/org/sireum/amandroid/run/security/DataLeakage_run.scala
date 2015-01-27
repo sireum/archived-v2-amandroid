@@ -110,8 +110,9 @@ object DataLeakage_run {
         file =>
           try{
             msg_critical(TITLE, "####" + file + "#####")
+            socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
             val app_info = new AppInfoCollector(file)
-            socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
+            app_info.collectInfo
             val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
             socket.plugListener(new DataLeakageListener(file, outputPath))
             socket.runWithDDA(ssm, false, true)
