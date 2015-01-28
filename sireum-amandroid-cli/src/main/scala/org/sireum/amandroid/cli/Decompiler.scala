@@ -10,12 +10,12 @@ package org.sireum.amandroid.cli
 import org.sireum.option.SireumAmandroidDecompileMode
 import org.sireum.option.DumpSource
 import org.sireum.jawa.util.APKFileResolver
-import org.sireum.util.FileUtil
+import org.sireum.util._
 import java.io.File
-import org.sireum.util.FileResourceUri
 import java.net.URI
 import org.sireum.amandroid.cli.util.CliLogger
 import org.sireum.amandroid.decompile.Dex2PilarConverter
+import brut.androlib.ApkDecoder
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -55,17 +55,17 @@ object Decompiler {
 	  val sourcePath = args(2)
 	  val outputPath = args(3)
 	  val outputUri = FileUtil.toUri(outputPath)
+    
 	  val dexFileUris = typ match{
       case "APK" =>
         require(sourcePath.endsWith(".apk"))
-        val apkFileUri = FileUtil.toUri(sourcePath)
-        Set(APKFileResolver.getDexFile(apkFileUri, outputUri))
+        Set(decode(FileUtil.toUri(sourcePath), outputUri))
       case "DIR" =>
         require(new File(sourcePath).isDirectory())
         val apkFileUris = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
         apkFileUris.map{
 		      apkFileUri=>
-		        APKFileResolver.getDexFile(apkFileUri, outputUri)
+		        decode(apkFileUri, outputUri)
 		    }
       case "DEX" =>
         require(sourcePath.endsWith(".dex") || sourcePath.endsWith(".odex"))
@@ -76,7 +76,19 @@ object Decompiler {
     }
     decompile(dexFileUris, outputPath)
   }
-	
+  
+  def decode(sourcePathUri : FileResourceUri, outputUri : FileResourceUri) : FileResourceUri = {
+    val apkFile = FileUtil.toFile(sourcePathUri)
+    val decoder = new ApkDecoder
+    decoder.setDecodeSources(0x0000)
+    decoder.setApkFile(apkFile)
+    decoder.decode()
+    val dirName = apkFile.getName().substring(0, apkFile.getName().lastIndexOf("."))
+    val outputDir = new File(new URI(outputUri + "/" + dirName))
+    val outputFile = new File(outputDir + "/" + dirName + ".dex")
+    FileUtil.toUri(outputFile)
+  }
+  
 	def decompile(dexFileUris : Set[FileResourceUri], outputPath : String) = {
     dexFileUris.foreach{
       dexFileUri =>
