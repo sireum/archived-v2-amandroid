@@ -33,6 +33,7 @@ import org.sireum.amandroid.pilarCodeGenerator.AndroidEntryPointConstants
 import java.io.File
 import java.net.URI
 import org.sireum.jawa.util.IgnoreException
+import org.sireum.amandroid.parser.ARSCFileParser_apktool
 
 /**
  * adapted from Steven Arzt of the FlowDroid group
@@ -191,9 +192,9 @@ object AppInfoCollector {
 	  mfp
 	}
 	
-	def analyzeARSC(apkUri : FileResourceUri) : ARSCFileParser = {
+	def analyzeARSC(apkUri : FileResourceUri) : ARSCFileParser_apktool = {
 	  // Parse the resource file
-	  val afp = new ARSCFileParser()
+	  val afp = new ARSCFileParser_apktool()
 		afp.parse(apkUri)
 	  msg_detail(TITLE, "arscstring-->" + afp.getGlobalStringPool)
 	  msg_detail(TITLE, "arscpackage-->" + afp.getPackages)
@@ -210,7 +211,7 @@ object AppInfoCollector {
 	  lfp
 	}
 	
-	def analyzeCallback(afp : ARSCFileParser, lfp : LayoutFileParser, analysisHelper : ReachableInfoCollector) : Map[JawaRecord, Set[JawaProcedure]] = {
+	def analyzeCallback(afp : ARSCFileParser_apktool, lfp : LayoutFileParser, analysisHelper : ReachableInfoCollector) : Map[JawaRecord, Set[JawaProcedure]] = {
 	  var callbackMethods : Map[JawaRecord, Set[JawaProcedure]] = Map()
 	  analysisHelper.collectCallbackMethods()
 		callbackMethods = analysisHelper.getCallbackMethods
@@ -227,10 +228,10 @@ object AppInfoCollector {
 		    v.foreach {
 		      i =>
 		        val resource = afp.findResource(i)
-		        if(resource.isInstanceOf[afp.StringResource]){
-		          val strRes = resource.asInstanceOf[afp.StringResource]
-		          if(lfp.getCallbackMethods.contains(strRes.value)){
-		            lfp.getCallbackMethods(strRes.value).foreach{
+		        if(resource.getType.getName == "layout"){
+		          val strRes = resource
+		          if(lfp.getCallbackMethods.contains(strRes.getName)){
+		            lfp.getCallbackMethods(strRes.getName).foreach{
 		              methodName =>
 		                //The callback may be declared directly in the class or in one of the superclasses
 		                var callbackRecord = k
@@ -253,7 +254,7 @@ object AppInfoCollector {
 		            }
 		          }
 		        } else {
-		          err_msg_normal(TITLE, "Unexpected resource type for layout class")
+		          err_msg_normal(TITLE, "Unexpected resource type for layout class: " + resource.getType)
 		        }
 		    }
 		}

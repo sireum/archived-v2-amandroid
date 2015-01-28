@@ -25,6 +25,8 @@ import org.sireum.amandroid.decompile.Dex2PilarConverter
 import org.sireum.jawa.MessageCenter
 import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.amandroid.security.AmandroidSocket
+import org.sireum.amandroid.parser.ARSCFileParser_apktool
+import org.sireum.amandroid.parser.ARSCFileParser
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -44,11 +46,6 @@ object Test_run  {
     
     MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
     try{
-    
-      AndroidReachingFactsAnalysisConfig.k_context = 1
-      AndroidReachingFactsAnalysisConfig.resolve_icc = true
-      AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-      AndroidReachingFactsAnalysisConfig.timeout = 10
       
       val socket = new AmandroidSocket
       socket.preProcess
@@ -60,18 +57,6 @@ object Test_run  {
           try{
             msg_critical(TITLE, "####" + file + "#####")
             
-            socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-            val app_info = new AppInfoCollector(file)
-            app_info.collectInfo
-            socket.runWithoutDDA(false, true)
-            val idfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
-            idfgs.foreach{
-              idfg=>
-                val icfg = idfg._2.icfg
-                val rProcs = icfg.getReachableProcedures(Set("Lcom/example/testwebview/MainActivity;.onCreate:(Landroid/os/Bundle;)V"))
-                if(rProcs.contains("Lcom/example/testwebview/TestActivity;.env:(Landroid/content/Intent;)V"))
-                  println(rProcs)
-            }
           } catch {
             case e : Throwable =>
               e.printStackTrace()

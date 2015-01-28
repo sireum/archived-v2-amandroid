@@ -10,5 +10,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-option"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-alir"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-jawa-alir"/>
+	<classpathentry exported="true" kind="lib" path="lib/apktool.jar" sourcepath="lib/apktool-src.zip">
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

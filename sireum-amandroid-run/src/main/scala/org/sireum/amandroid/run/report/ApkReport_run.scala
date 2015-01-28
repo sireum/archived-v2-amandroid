@@ -88,6 +88,8 @@ object ApkReport_run {
             reportGen.libLoaded ++= lac.usedLib
             val urls = AndroidUrlCollector.collectUrls(file)
             reportGen.urls ++= urls
+            val app_info = new AppInfoCollector(file)
+            app_info.collectInfo
 //            socket.plugListener(new ApkReportListener(file, outputPath))
 //            socket.runWithoutDDA(false, true)
             println(reportGen.toString())
