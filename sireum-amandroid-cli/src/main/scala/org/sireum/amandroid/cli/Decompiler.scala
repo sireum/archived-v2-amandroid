@@ -51,21 +51,25 @@ object Decompiler {
 	    println("Usage: -t type[allows: APK, DIR, DEX] <source path> <output path>")
 	    return
 	  }
+    
 	  val typ = args(1)
 	  val sourcePath = args(2)
 	  val outputPath = args(3)
 	  val outputUri = FileUtil.toUri(outputPath)
     
-	  val dexFileUris = typ match{
+	  val dexFileUris : MSet[String] = msetEmpty
+    typ match{
       case "APK" =>
         require(sourcePath.endsWith(".apk"))
-        Set(decode(FileUtil.toUri(sourcePath), outputUri))
+        val dexopt = decode(FileUtil.toUri(sourcePath), outputUri)
+        if(dexopt.isDefined) dexFileUris += dexopt.get
       case "DIR" =>
         require(new File(sourcePath).isDirectory())
         val apkFileUris = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
         apkFileUris.map{
 		      apkFileUri=>
-		        decode(apkFileUri, outputUri)
+		        val dexopt = decode(apkFileUri, outputUri)
+            if(dexopt.isDefined) dexFileUris += dexopt.get
 		    }
       case "DEX" =>
         require(sourcePath.endsWith(".dex") || sourcePath.endsWith(".odex"))
@@ -74,19 +78,23 @@ object Decompiler {
         println("Unexpected type: " + typ)
         return
     }
-    decompile(dexFileUris, outputPath)
+    decompile(dexFileUris.toSet, outputPath)
   }
   
-  def decode(sourcePathUri : FileResourceUri, outputUri : FileResourceUri) : FileResourceUri = {
+  def decode(sourcePathUri : FileResourceUri, outputUri : FileResourceUri) : Option[FileResourceUri] = {
     val apkFile = FileUtil.toFile(sourcePathUri)
+    val dirName = apkFile.getName().substring(0, apkFile.getName().lastIndexOf("."))
+    val outputDir = new File(new URI(outputUri + "/" + dirName))
     val decoder = new ApkDecoder
     decoder.setDecodeSources(0x0000)
     decoder.setApkFile(apkFile)
+    decoder.setOutDir(outputDir)
+    decoder.setForceDelete(true)
     decoder.decode()
-    val dirName = apkFile.getName().substring(0, apkFile.getName().lastIndexOf("."))
-    val outputDir = new File(new URI(outputUri + "/" + dirName))
-    val outputFile = new File(outputDir + "/" + dirName + ".dex")
-    FileUtil.toUri(outputFile)
+    val outputFile = new File(outputDir + "/classes.dex")
+    if(outputFile.exists())
+      Some(FileUtil.toUri(outputFile))
+    else None
   }
   
 	def decompile(dexFileUris : Set[FileResourceUri], outputPath : String) = {
