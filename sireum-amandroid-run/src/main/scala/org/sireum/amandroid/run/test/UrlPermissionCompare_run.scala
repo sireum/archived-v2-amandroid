@@ -24,6 +24,8 @@ import org.sireum.jawa.util.URLInString
 import java.io.FileWriter
 import java.io.BufferedReader
 import java.io.FileReader
+import org.sireum.amandroid.util.AndroidLibraryAPISummary
+import org.sireum.amandroid.security.AmandroidSocket
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -93,13 +95,15 @@ object UrlPermissionCompare_run {
     val uncomm_norAd_nororg_url_perm_reverse : MSet[String] = msetEmpty
     
     val sourcePath = args(0)
+    val socket = new AmandroidSocket
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
 //    val results : MMap[String, (Set[String], Set[String])] = mmapEmpty
     files.foreach{
       file =>
         msg_critical(TITLE, "####" + file + "#####")
         try{
-          val man = AppInfoCollector.analyzeManifest(file)
+          val outUri = socket.loadApk(file, outputpath, AndroidLibraryAPISummary)
+          val man = AppInfoCollector.analyzeManifest(outUri + "AndroidManifest.xml")
           val perms = man.getPermissions
           val strs = msetEmpty[String]
         	val rfp = new ResourceFileParser

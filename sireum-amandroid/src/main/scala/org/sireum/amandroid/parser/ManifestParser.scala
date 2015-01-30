@@ -250,17 +250,25 @@ class ManifestParser extends AbstractAndroidXMLParser{
 			val rootElement = doc.getDocumentElement()
 			this.packageName = rootElement.getAttribute("package")
 			
+      val permissions = rootElement.getElementsByTagName("uses-permission")
+      for (i <- 0 to permissions.getLength() - 1) {
+        val permission = permissions.item(i).asInstanceOf[Element]
+        this.permissions += permission.getAttribute("android:name")
+      }
+      
 			val appsElement = rootElement.getElementsByTagName("application")
 			for (appIdx <- 0 to appsElement.getLength() - 1) {
 				val appElement : Element = appsElement.item(appIdx).asInstanceOf[Element]
         // Check whether the application is disabled
-        val enabled = appElement.getAttribute("enabled")
-        applicationEnabled = (enabled == null || !enabled.equals("false"))
-        val appperm = appElement.getAttribute("permission")
-        this.applicationPermission = appperm
+        val enabled = appElement.getAttribute("android:enabled")
+        applicationEnabled = (enabled.isEmpty() || !enabled.equals("false"))
+        val appperm = appElement.getAttribute("android:permission")
+        if(!appperm.isEmpty())
+          this.applicationPermission = appperm
 				val activities = appElement.getElementsByTagName("activity")
 				val receivers = appElement.getElementsByTagName("receiver")
 				val services  = appElement.getElementsByTagName("service")
+        val providers = appElement.getElementsByTagName("provider")
 				
 				for (i <- 0 to activities.getLength() - 1) {
 					val activity = activities.item(i).asInstanceOf[Element]
@@ -274,12 +282,11 @@ class ManifestParser extends AbstractAndroidXMLParser{
 					val service = services.item(i).asInstanceOf[Element]
 					loadManifestEntry(service, "service", this.packageName)
 				}
+        for (i <- 0 to providers.getLength() - 1) {
+          val provider = providers.item(i).asInstanceOf[Element]
+          loadManifestEntry(provider, "provider", this.packageName)
+        }
 				
-				val permissions = appElement.getElementsByTagName("uses-permission")
-				for (i <- 0 to permissions.getLength() - 1) {
-					val permission = permissions.item(i).asInstanceOf[Element]
-					this.permissions += permission.getAttribute("android:name")
-				}
 			}
       this.components.foreach{
         case (name, typ) =>
@@ -318,7 +325,7 @@ class ManifestParser extends AbstractAndroidXMLParser{
               }
           }
           val permission = this.componentPermission.getOrElse(name, this.applicationPermission)
-          val compermission = if(permission != null) Some(permission) else None
+          val compermission = if(permission != null && !permission.isEmpty()) Some(permission) else None
           this.componentInfos += ComponentInfo(name, typ, exported, compermission)
       }
 		}
@@ -353,12 +360,12 @@ class ManifestParser extends AbstractAndroidXMLParser{
       this.currentComponent = toPilarRecord(className)
       this.components += (this.currentComponent -> baseClass)
     }
-    val permission = comp.getAttribute("permission")
-    if (permission != null){
+    val permission = comp.getAttribute("android:permission")
+    if (!permission.isEmpty()){
       this.componentPermission += (className -> permission)
     }
-    val exported = comp.getAttribute("exported")
-    if(exported != null){
+    val exported = comp.getAttribute("android:exported")
+    if(!exported.isEmpty()){
       this.componentExported += (className -> exported)
     }
     val intentfs = comp.getElementsByTagName("intent-filter")
@@ -371,7 +378,7 @@ class ManifestParser extends AbstractAndroidXMLParser{
         for (a <- 0 to actions.getLength() - 1) {
           if (this.currentIntentFilter != null){
             val action = actions.item(a).asInstanceOf[Element]
-            val name = action.getAttribute("name")
+            val name = action.getAttribute("android:name")
             val intentF = this.currentIntentFilter
             intentF.addAction(name)              
           }
@@ -380,7 +387,7 @@ class ManifestParser extends AbstractAndroidXMLParser{
         for (c <- 0 to categories.getLength() - 1) {
           if (this.currentIntentFilter != null){
             val category = categories.item(c).asInstanceOf[Element]
-            val name = category.getAttribute("name")
+            val name = category.getAttribute("android:name")
             val intentF = this.currentIntentFilter
             intentF.addCategory(name)              
           }
@@ -389,13 +396,13 @@ class ManifestParser extends AbstractAndroidXMLParser{
         for (d <- 0 to datas.getLength() - 1) {
           if (this.currentIntentFilter != null){
             val data = datas.item(d).asInstanceOf[Element]
-            val scheme = data.getAttribute("scheme")
-            val host = data.getAttribute("host")
-            val port = data.getAttribute("port")
-            val path = data.getAttribute("path")
-            val pathPrefix = data.getAttribute("pathPrefix")
-            val pathPattern = data.getAttribute("pathPattern")
-            val mimeType = data.getAttribute("mimeType")
+            val scheme = data.getAttribute("android:scheme")
+            val host = data.getAttribute("android:host")
+            val port = data.getAttribute("android:port")
+            val path = data.getAttribute("android:path")
+            val pathPrefix = data.getAttribute("android:pathPrefix")
+            val pathPattern = data.getAttribute("android:pathPattern")
+            val mimeType = data.getAttribute("android:mimeType")
             val intentF = this.currentIntentFilter
             intentF.modData(scheme, host, port, path, pathPrefix, pathPattern, mimeType)
           }

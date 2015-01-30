@@ -26,6 +26,7 @@ import org.sireum.amandroid.parser.ResourceFileParser
 import org.sireum.amandroid.parser.ARSCFileParser
 import java.util.regex.Pattern
 import org.sireum.jawa.MessageCenter
+import org.sireum.amandroid.security.AmandroidSocket
 
 /**
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
@@ -195,7 +196,7 @@ object SsoOauthStringCollect_run {
     
     val sourcePath = args(0)
     val outputPath = args(1)
-    
+    val socket = new AmandroidSocket
     //JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), GlobalConfig.PILAR_FILE_EXT)
     //LibSideEffectProvider.init(new File(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSideEffectResult.xml.zip"))
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
@@ -207,7 +208,8 @@ object SsoOauthStringCollect_run {
           msg_critical(TITLE, "####" + file + "#####")
         	Counter.total += 1
        	  
-        	val man = AppInfoCollector.analyzeManifest(file)
+        	val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+          val man = AppInfoCollector.analyzeManifest(outUri + "AndroidManifest.xml")
         	val strs = msetEmpty[String]
           val rfp = new ResourceFileParser
         	rfp.parseResourceFile(file)

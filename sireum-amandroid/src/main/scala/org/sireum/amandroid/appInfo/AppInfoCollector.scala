@@ -187,7 +187,6 @@ class AppInfoCollector(apkUri : FileResourceUri, outputUri : FileResourceUri) {
 object AppInfoCollector {
   final val TITLE = "AppInfoCollector"
 	def analyzeManifest(manifestUri : FileResourceUri) : ManifestParser = {
-    println("ana:" + manifestUri)
     val manifestIS = new FileInputStream(FileUtil.toFile(manifestUri))
 	  val mfp = new ManifestParser
 		mfp.loadClassesFromTextManifest(manifestIS)

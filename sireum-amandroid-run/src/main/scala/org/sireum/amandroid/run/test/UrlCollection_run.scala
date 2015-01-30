@@ -23,6 +23,8 @@ import org.sireum.amandroid.parser.ResourceFileParser
 import org.sireum.amandroid.parser.ARSCFileParser
 import java.io.FileWriter
 import org.sireum.jawa.MessageCenter
+import org.sireum.amandroid.util.AndroidLibraryAPISummary
+import org.sireum.amandroid.security.AmandroidSocket
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -40,13 +42,15 @@ object UrlCollection_run {
     val outputpath = args(1)
     val outputUri = FileUtil.toUri(outputpath)
     val sourcePath = args(0)
+    val socket = new AmandroidSocket
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
 //    val results : MMap[String, (Set[String], Set[String])] = mmapEmpty
     files.foreach{
       file =>
         msg_critical(TITLE, "####" + file + "#####")
         try{
-          val man = AppInfoCollector.analyzeManifest(file)
+          val outUri = socket.loadApk(file, outputpath, AndroidLibraryAPISummary)
+          val man = AppInfoCollector.analyzeManifest(outUri + "AndroidManifest.xml")
           
           val strs = msetEmpty[String]
         	val rfp = new ResourceFileParser
