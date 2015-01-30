@@ -150,8 +150,8 @@ object OAuthTokenTracking_run {
         try{
           msg_critical(TITLE, "####" + file + "#####")
           
-          socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-          val app_info = new OauthTokenContainerCollector(file)
+          val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+          val app_info = new OauthTokenContainerCollector(file, outUri)
           app_info.collectInfo
           val ssm = new OAuthSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
           socket.plugListener(new OAuthTokenTrackingListener(file, app_info))

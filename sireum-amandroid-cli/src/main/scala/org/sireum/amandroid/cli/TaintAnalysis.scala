@@ -159,8 +159,8 @@ object TanitAnalysis{
             i+=1
             println("Analyzing " + apkFileUri)
             
-            socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary)
-            val app_info = new AppInfoCollector(apkFileUri)
+            val outUri = socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary)
+            val app_info = new AppInfoCollector(apkFileUri, outUri)
             app_info.collectInfo
             val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
             socket.plugListener(new TaintListener(apkFileUri, outputPath, app_info))

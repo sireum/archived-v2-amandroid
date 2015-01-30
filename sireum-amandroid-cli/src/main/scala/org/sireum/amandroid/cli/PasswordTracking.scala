@@ -153,8 +153,8 @@ object PasswordTracking {
             i+=1
             println("Analyzing " + apkFileUri)
             
-            socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary)
-            val app_info = new SensitiveViewCollector(apkFileUri)
+            val outUri = socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary)
+            val app_info = new SensitiveViewCollector(apkFileUri, outUri)
             app_info.collectInfo
             val ssm = new PasswordSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.PasswordSinkFilePath)
             socket.plugListener(new TaintListener(apkFileUri, outputPath, app_info))

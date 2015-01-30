@@ -76,8 +76,8 @@ object ApkReport_run {
             val reportGen = new ReportGen(FileUtil.filename(file))
             
             val lac = new LibraryAPICollector
-            socket.loadApk(file, outputPath, lac)
-            val man = AppInfoCollector.analyzeManifest(file)
+            val outUri = socket.loadApk(file, outputPath, lac)
+            val man = AppInfoCollector.analyzeManifest(outUri + "AndroidManifest.xml")
             
             reportGen.permissions ++= man.getPermissions
             val comps = man.getComponentInfos
@@ -93,10 +93,10 @@ object ApkReport_run {
                 reportGen.comps += comp_report
             }
             reportGen.libLoaded ++= lac.usedLib
-            val urls = AndroidUrlCollector.collectUrls(file)
+            val urls = AndroidUrlCollector.collectUrls(file, outUri)
             reportGen.urls ++= urls
-            val app_info = new AppInfoCollector(file)
-            app_info.collectInfo
+//            val app_info = new AppInfoCollector(file, outUri)
+//            app_info.collectInfo
 //            socket.plugListener(new ApkReportListener(file, outputPath))
 //            socket.runWithoutDDA(false, true)
             println(reportGen.toString())

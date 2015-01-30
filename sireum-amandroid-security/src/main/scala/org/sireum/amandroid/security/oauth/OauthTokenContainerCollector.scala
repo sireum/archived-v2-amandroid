@@ -21,7 +21,7 @@ import org.sireum.amandroid.appInfo.ReachableInfoCollector
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-class OauthTokenContainerCollector(apkUri : FileResourceUri) extends AppInfoCollector(apkUri) {
+class OauthTokenContainerCollector(apkUri : FileResourceUri, outputUri : FileResourceUri) extends AppInfoCollector(apkUri, outputUri) {
   
   private final val TITLE = "OauthTokenContainerCollector"
   
@@ -39,7 +39,8 @@ class OauthTokenContainerCollector(apkUri : FileResourceUri) extends AppInfoColl
 	
 	
 	override def collectInfo : Unit = {
-	  val mfp = AppInfoCollector.analyzeManifest(apkUri)
+	  val manifestUri = outputUri + "/AndroidManifest.xml"
+    val mfp = AppInfoCollector.analyzeManifest(manifestUri)
 	  this.appPackageName = mfp.getPackageName
 		this.componentInfos = mfp.getComponentInfos
 		this.uses_permissions = mfp.getPermissions

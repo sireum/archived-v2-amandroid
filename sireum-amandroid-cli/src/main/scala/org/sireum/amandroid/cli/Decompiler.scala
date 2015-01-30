@@ -16,6 +16,7 @@ import java.net.URI
 import org.sireum.amandroid.cli.util.CliLogger
 import org.sireum.amandroid.decompile.Dex2PilarConverter
 import brut.androlib.ApkDecoder
+import org.sireum.amandroid.decompile.AmDecoder
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -51,7 +52,6 @@ object Decompiler {
 	    println("Usage: -t type[allows: APK, DIR, DEX] <source path> <output path>")
 	    return
 	  }
-    
 	  val typ = args(1)
 	  val sourcePath = args(2)
 	  val outputPath = args(3)
@@ -61,19 +61,19 @@ object Decompiler {
     typ match{
       case "APK" =>
         require(sourcePath.endsWith(".apk"))
-        val dexopt = decode(FileUtil.toUri(sourcePath), outputUri)
-        if(dexopt.isDefined) dexFileUris += dexopt.get
+        val out = AmDecoder.decode(FileUtil.toUri(sourcePath), outputUri)
+        dexFileUris += out + "/classes.dex"
       case "DIR" =>
         require(new File(sourcePath).isDirectory())
         val apkFileUris = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
         apkFileUris.map{
 		      apkFileUri=>
-		        val dexopt = decode(apkFileUri, outputUri)
-            if(dexopt.isDefined) dexFileUris += dexopt.get
+		        val out = AmDecoder.decode(apkFileUri, outputUri)
+            dexFileUris += out + "/classes.dex"
 		    }
       case "DEX" =>
         require(sourcePath.endsWith(".dex") || sourcePath.endsWith(".odex"))
-        Set(FileUtil.toUri(sourcePath))
+        dexFileUris += FileUtil.toUri(sourcePath)
       case _ => 
         println("Unexpected type: " + typ)
         return
@@ -81,27 +81,12 @@ object Decompiler {
     decompile(dexFileUris.toSet, outputPath)
   }
   
-  def decode(sourcePathUri : FileResourceUri, outputUri : FileResourceUri) : Option[FileResourceUri] = {
-    val apkFile = FileUtil.toFile(sourcePathUri)
-    val dirName = apkFile.getName().substring(0, apkFile.getName().lastIndexOf("."))
-    val outputDir = new File(new URI(outputUri + "/" + dirName))
-    val decoder = new ApkDecoder
-    decoder.setDecodeSources(0x0000)
-    decoder.setApkFile(apkFile)
-    decoder.setOutDir(outputDir)
-    decoder.setForceDelete(true)
-    decoder.decode()
-    val outputFile = new File(outputDir + "/classes.dex")
-    if(outputFile.exists())
-      Some(FileUtil.toUri(outputFile))
-    else None
-  }
-  
 	def decompile(dexFileUris : Set[FileResourceUri], outputPath : String) = {
     dexFileUris.foreach{
       dexFileUri =>
         try{
-          Dex2PilarConverter.convert(dexFileUri)
+          if(FileUtil.toFile(dexFileUri).exists())
+            Dex2PilarConverter.convert(dexFileUri)
         } catch {
           case e : Throwable =>
             CliLogger.logError(new File(outputPath), "Error: " , e)

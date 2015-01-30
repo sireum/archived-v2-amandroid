@@ -163,8 +163,8 @@ object Staging {
             i+=1
             println("Analyzing " + apkFileUri)
             
-            socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary)
-            val app_info = new AppInfoCollector(apkFileUri)
+            val outUri = socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary)
+            val app_info = new AppInfoCollector(apkFileUri, outUri)
             app_info.collectInfo
             socket.plugListener(new StagingListener(apkFileUri, outputPath))
             socket.runWithoutDDA(false, parallel)

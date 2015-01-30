@@ -104,8 +104,8 @@ object DroidBench_run {
         try{
           msg_critical(TITLE, "####" + file + "#####")
           
-          socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-          val app_info = new AppInfoCollector(file)
+          val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+          val app_info = new AppInfoCollector(file, outUri)
           app_info.collectInfo
           val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
           socket.plugListener(new DroidBenchListener(file))

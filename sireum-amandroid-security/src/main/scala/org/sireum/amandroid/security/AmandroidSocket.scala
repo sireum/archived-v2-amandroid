@@ -33,6 +33,7 @@ import org.sireum.amandroid.alir.taintAnalysis.AndroidSourceAndSinkManager
 import org.sireum.jawa.JawaProcedure
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.alir.Context
+import org.sireum.amandroid.decompile.AmDecoder
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -73,13 +74,17 @@ class AmandroidSocket {
   
   def loadApk(source_apk : FileResourceUri, 
               output_path : String,
-              lib_sum : LibraryAPISummary) = {
+              lib_sum : LibraryAPISummary) : FileResourceUri = {
 		val resultDir = new File(output_path + "/APKs/")
-		val dexFile = APKFileResolver.getDexFile(source_apk, FileUtil.toUri(resultDir))
+		val out = AmDecoder.decode(source_apk, FileUtil.toUri(resultDir))
 		// convert the dex file to the "pilar" form
-		val pilarRootUri = Dex2PilarConverter.convert(dexFile)
-  	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
-  	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, lib_sum)
+    val dexFile = out + "classes.dex"
+    if(FileUtil.toFile(dexFile).exists()){
+		  val pilarRootUri = Dex2PilarConverter.convert(dexFile)
+    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
+    	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, lib_sum)
+    }
+    out
   }
   
   /**

@@ -21,7 +21,7 @@ import org.sireum.jawa.MessageCenter._
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-class InterestingApiCollector (apkUri : FileResourceUri) extends AppInfoCollector(apkUri) {
+class InterestingApiCollector (apkUri : FileResourceUri, outputUri : FileResourceUri) extends AppInfoCollector(apkUri, outputUri) {
   private final val TITLE = "InterestingApiCollector"
   var ra : ReachableInfoCollector = null
   
@@ -36,7 +36,8 @@ class InterestingApiCollector (apkUri : FileResourceUri) extends AppInfoCollecto
   }
   
 	override def collectInfo : Unit = {
-	  val mfp = AppInfoCollector.analyzeManifest(apkUri)
+	  val manifestUri = outputUri + "/AndroidManifest.xml"
+    val mfp = AppInfoCollector.analyzeManifest(manifestUri)
 	  this.appPackageName = mfp.getPackageName
 		this.componentInfos = mfp.getComponentInfos
 		this.uses_permissions = mfp.getPermissions

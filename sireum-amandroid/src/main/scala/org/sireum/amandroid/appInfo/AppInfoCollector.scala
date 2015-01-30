@@ -34,13 +34,16 @@ import java.io.File
 import java.net.URI
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.amandroid.parser.ARSCFileParser_apktool
+import java.io.FileInputStream
+import java.io.BufferedInputStream
 
 /**
- * adapted from Steven Arzt of the FlowDroid group
+ * It takes the apkUri and outputDir as input parameters.
  * 
+ * adapted from Steven Arzt of the FlowDroid group
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
-class AppInfoCollector(apkUri : FileResourceUri) {  
+class AppInfoCollector(apkUri : FileResourceUri, outputUri : FileResourceUri) {  
   private final val TITLE = "AppInfoCollector"
   protected var uses_permissions : ISet[String] = isetEmpty
 	protected var callbackMethods : Map[JawaRecord, Set[JawaProcedure]] = Map()
@@ -150,7 +153,8 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 	}
 	
 	def collectInfo : Unit = {
-	  val mfp = AppInfoCollector.analyzeManifest(apkUri)
+    val manifestUri = outputUri + "AndroidManifest.xml"
+	  val mfp = AppInfoCollector.analyzeManifest(manifestUri)
 	  val afp = AppInfoCollector.analyzeARSC(apkUri)
 		val lfp = AppInfoCollector.analyzeLayouts(apkUri, mfp)
 		val ra = AppInfoCollector.reachabilityAnalysis(mfp)
@@ -182,9 +186,12 @@ class AppInfoCollector(apkUri : FileResourceUri) {
 
 object AppInfoCollector {
   final val TITLE = "AppInfoCollector"
-	def analyzeManifest(apkUri : FileResourceUri) : ManifestParser = {
+	def analyzeManifest(manifestUri : FileResourceUri) : ManifestParser = {
+    println("ana:" + manifestUri)
+    val manifestIS = new FileInputStream(FileUtil.toFile(manifestUri))
 	  val mfp = new ManifestParser
-		mfp.loadManifestFile(apkUri)
+		mfp.loadClassesFromTextManifest(manifestIS)
+    manifestIS.close()
 	  msg_normal(TITLE, "entrypoints--->" + mfp.getComponentRecords)
 	  msg_normal(TITLE, "packagename--->" + mfp.getPackageName)
 	  msg_normal(TITLE, "permissions--->" + mfp.getPermissions)

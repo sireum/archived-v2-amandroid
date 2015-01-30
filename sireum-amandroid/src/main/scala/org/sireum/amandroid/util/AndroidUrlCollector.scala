@@ -7,8 +7,8 @@ import org.sireum.jawa.JawaCodeSource
 import org.sireum.jawa.util.URLInString
 
 object AndroidUrlCollector {
-  def collectUrls(file : FileResourceUri) : ISet[String] = {
-    val man = AppInfoCollector.analyzeManifest(file)
+  def collectUrls(file : FileResourceUri, outUri : FileResourceUri) : ISet[String] = {
+    val man = AppInfoCollector.analyzeManifest(outUri + "AndroidManifest.xml")
     val afp = AppInfoCollector.analyzeARSC(file)    
     val strs = msetEmpty[String]
     val rfp = new ResourceFileParser

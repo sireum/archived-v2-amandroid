@@ -87,8 +87,8 @@ object SourceToStrongUpdate_run {
       file =>
         msg_critical(TITLE, "####" + file + "#####")
         
-        socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-        val app_info = new AppInfoCollector(file)
+        val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+        val app_info = new AppInfoCollector(file, outUri)
         app_info.collectInfo
         val ssm = new SourceToStrongUpdateManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
         socket.plugListener(new SourceToStrongUpdateListener(file))

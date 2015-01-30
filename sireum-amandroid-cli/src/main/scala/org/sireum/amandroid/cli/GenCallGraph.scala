@@ -36,6 +36,7 @@ import java.io.BufferedOutputStream
 import org.sireum.jawa.xml.AndroidXStream
 import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.amandroid.AppCenter
+import org.sireum.amandroid.decompile.AmDecoder
 
 
 /**
@@ -128,7 +129,9 @@ object GenCallGraph {
             val apkName = apkFileUri.substring(apkFileUri.lastIndexOf("/"), apkFileUri.lastIndexOf("."))
             
         		val resultDir = new File(outputPath + "/APPs/")
-        		val dexFile = APKFileResolver.getDexFile(apkFileUri, FileUtil.toUri(resultDir))
+            val outputUri = FileUtil.toUri(outputPath)
+        		val outUri = AmDecoder.decode(apkFileUri, outputUri)
+            val dexFile = outUri + "/classes.dex"
         
         		// convert the dex file to the "pilar" form
         		val pilarRootUri = Dex2PilarConverter.convert(dexFile)
@@ -136,7 +139,7 @@ object GenCallGraph {
           	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
           	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
           	
-          	val app_info = new AppInfoCollector(apkFileUri)
+          	val app_info = new AppInfoCollector(apkFileUri, outUri)
           	app_info.collectInfo
             
           	val pag = new PointerAssignmentGraph[PtaNode]()

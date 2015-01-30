@@ -206,7 +206,7 @@ object SsoOauthStringCollect_run {
         try{         
           msg_critical(TITLE, "####" + file + "#####")
         	Counter.total += 1
-       	
+       	  
         	val man = AppInfoCollector.analyzeManifest(file)
         	val strs = msetEmpty[String]
           val rfp = new ResourceFileParser

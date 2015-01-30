@@ -92,8 +92,8 @@ object Staging_run {
           try{
             msg_critical(TITLE, "####" + file + "#####")
             
-            socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-            val app_info = new AppInfoCollector(file)
+            val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+            val app_info = new AppInfoCollector(file, outUri)
             app_info.collectInfo
             socket.plugListener(new StagingListener(file, outputPath))
             socket.runWithoutDDA(false, true)

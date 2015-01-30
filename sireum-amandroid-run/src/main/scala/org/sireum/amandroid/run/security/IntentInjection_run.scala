@@ -150,8 +150,8 @@ object IntentInjection_run {
         try{
           msg_critical(TITLE, "####" + file + "#####")
           
-          socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-          val app_info = new IntentInjectionCollector(file)
+          val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+          val app_info = new IntentInjectionCollector(file, outUri)
           app_info.collectInfo
           val ssm = new IntentInjectionSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)
           socket.plugListener(new IntentInjectionListener(file, app_info, ssm))

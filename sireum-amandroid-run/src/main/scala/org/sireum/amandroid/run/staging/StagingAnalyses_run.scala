@@ -37,6 +37,7 @@ import org.sireum.amandroid.security.oauth.OAuthSourceAndSinkManager
 import org.sireum.amandroid.security.dataInjection.IntentInjectionSourceAndSinkManager
 import org.sireum.amandroid.security.apiMisuse.CryptographicMisuse
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
+import org.sireum.amandroid.decompile.AmDecoder
 
 
 /**
@@ -63,8 +64,8 @@ object StagingAnalyses_run {
   	    try{
   	    	
   	    	val srcFile = new File(new URI(file))
-  	    	val dexFile = APKFileResolver.getDexFile(file, FileUtil.toUri(srcFile.getParentFile()))
-  	    	
+  	    	val outUri = AmDecoder.decode(file, outputUri)
+  	    	val dexFile = outUri + "/classes.dex"
   	    	// convert the dex file to the "pilar" form
   	    	val pilarRootUri = Dex2PilarConverter.convert(dexFile)
   	    	val pilarFile = new File(new URI(pilarRootUri))
@@ -72,7 +73,7 @@ object StagingAnalyses_run {
   	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
   	    	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
   		    
-  	    	val pre = new AppInfoCollector(file)
+  	    	val pre = new AppInfoCollector(file, outUri)
   		    pre.collectInfo
   	    	val ssm = new DefaultAndroidSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
   		    val pssm = new PasswordSourceAndSinkManager(pre.getPackageName, pre.getLayoutControls, pre.getCallbackMethods, AndroidGlobalConfig.PasswordSinkFilePath)
