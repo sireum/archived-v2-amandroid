@@ -32,7 +32,7 @@ object AmDecoder {
     val dirName = apkFile.getName().substring(0, apkFile.getName().lastIndexOf("."))
     val outputDir = new File(new URI(outputUri + "/" + dirName))
     val decoder = new ApkDecoder
-    decoder.setDecodeSources(0x0000)
+    decoder.setDecodeSources(0x0000) // DECODE_SOURCES_NONE = 0x0000
     decoder.setApkFile(apkFile)
     decoder.setOutDir(outputDir)
     decoder.setForceDelete(true)
