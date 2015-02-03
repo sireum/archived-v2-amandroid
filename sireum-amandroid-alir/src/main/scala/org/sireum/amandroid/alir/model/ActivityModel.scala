@@ -295,8 +295,8 @@ object ActivityModel {
 	      var mIntentValue = factMap.getOrElse(mIntentSlot, isetEmpty)
         tv.getFieldsUnknownDefSites.foreach{
         	case (defsite, fields) =>
-        	  if(fields.contains("ALL")) mIntentValue += UnknownInstance(defsite)
-        	  if(fields.contains(AndroidConstants.ACTIVITY_INTENT)) mIntentValue += UnknownInstance(defsite)
+        	  if(fields.contains("ALL")) mIntentValue += UnknownInstance(new NormalType(AndroidConstants.INTENT), defsite)
+        	  if(fields.contains(AndroidConstants.ACTIVITY_INTENT)) mIntentValue += UnknownInstance(new NormalType(AndroidConstants.INTENT), defsite)
       	}
 	      newfacts ++= mIntentValue.map(miv=> RFAFact(VarSlot(retVar), miv))
 	  }

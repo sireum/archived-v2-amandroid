@@ -662,7 +662,7 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
                 err_msg_normal(TITLE, "Cannot find Given class: " + cstr)
-                val unknownIns = UnknownInstance(c)
+                val unknownIns = UnknownInstance(new NormalType(recordName), c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }
@@ -728,7 +728,7 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
                 err_msg_normal(TITLE, "Cannot find Given class: " + cstr)
-                val unknownIns = UnknownInstance(c)
+                val unknownIns = UnknownInstance(new NormalType(recordName), c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }
@@ -902,7 +902,7 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
                 err_msg_normal(TITLE, "Cannot find Given class: " + cstr)
-                val unknownIns = UnknownInstance(c)
+                val unknownIns = UnknownInstance(new NormalType(recordName), c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }
@@ -960,7 +960,7 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
                 err_msg_normal(TITLE, "Cannot find Given class: " + cstr)
-                val unknownIns = UnknownInstance(c)
+                val unknownIns = UnknownInstance(new NormalType(recordName), c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }

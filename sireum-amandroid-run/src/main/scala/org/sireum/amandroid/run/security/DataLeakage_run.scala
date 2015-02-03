@@ -46,7 +46,7 @@ object DataLeakage_run {
     }
 
     def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
-      eps
+      eps.filter { ep => ep.getSignature.contains("envMain") }
     }
 
     def onTimeout : Unit = {}
@@ -96,7 +96,7 @@ object DataLeakage_run {
       AndroidReachingFactsAnalysisConfig.parallel = true
       AndroidReachingFactsAnalysisConfig.resolve_static_init = false
       AndroidReachingFactsAnalysisConfig.timeout = 10
-      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.VERBOSE
+      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
       val socket = new AmandroidSocket
       socket.preProcess
       

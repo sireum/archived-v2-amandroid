@@ -151,18 +151,18 @@ object HttpsMisuse {
             val caller = Center.getProcedureWithoutFailing(invNode.getOwner)
             val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
             val cj = jumpLoc.jump.asInstanceOf[CallJump]
-            if(calleep.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
-              val calleeSignature = cj.getValueAnnotation("signature") match {
-                case Some(s) => s match {
-                  case ne : NameExp => ne.name.name
-                  case _ => ""
-                }
-                case None => throw new RuntimeException("cannot found annotation 'signature' from: " + cj)
-              }
-              callees ++= Center.getProcedureDeclarations(calleeSignature)
-            } else {
+//            if(calleep.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
+//              val calleeSignature = cj.getValueAnnotation("signature") match {
+//                case Some(s) => s match {
+//                  case ne : NameExp => ne.name.name
+//                  case _ => ""
+//                }
+//                case None => throw new RuntimeException("cannot found annotation 'signature' from: " + cj)
+//              }
+//              callees ++= Center.getProcedureDeclarations(calleeSignature)
+//            } else {
               callees += calleep
-            }
+//            }
             callees.foreach{
               callee =>
                 if(callee.getSignature.equals(API_SIG)){

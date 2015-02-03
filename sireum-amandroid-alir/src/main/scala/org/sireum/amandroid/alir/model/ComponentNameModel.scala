@@ -152,13 +152,13 @@ object ComponentNameModel {
 	              RFAConcreteStringInstance(rec.getShortName, currentContext)
 	            case None =>
 	              err_msg_normal(TITLE, "Given class name probably come from another app: " + i)
-	              UnknownInstance(currentContext)
+	              UnknownInstance(new NormalType(recordName), currentContext)
 	          }
           case pstr @ RFAPointStringInstance(c) => 
           	RFAPointStringInstance(currentContext)
           case _ =>
             err_msg_normal(TITLE, "Get short name use unknown instance: " + i)
-            UnknownInstance(currentContext)
+            UnknownInstance(new NormalType(Center.DEFAULT_TOPLEVEL_OBJECT), currentContext)
 	      }
 	  }
 	}
@@ -206,7 +206,7 @@ object ComponentNameModel {
 				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), cstr)
 		                case None =>
 		                  err_msg_normal(TITLE, "Given class name probably come from another app: " + cn)
-				              val unknownIns = UnknownInstance(currentContext)
+				              val unknownIns = UnknownInstance(new NormalType(recordName), currentContext)
 				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
 		              }
