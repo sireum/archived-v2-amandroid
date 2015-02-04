@@ -321,7 +321,7 @@ object DataCollector {
 	      val intentFilters = intentFDB.getIntentFilters(compName)
 	      var iccInfos = isetEmpty[IccInfo]
 	      var taintResult : Option[TaintAnalysisResult] = None
-	      if(!compRec.isPhantom){
+	      if(!compRec.isUnknown){
 	        if(AppCenter.hasInterproceduralReachingFactsAnalysisResult(compRec)){
 			      val InterProceduralDataFlowGraph(icfg, irfaResult) = AppCenter.getInterproceduralReachingFactsAnalysisResult(compRec)
 			      val iccNodes = icfg.nodes.filter{

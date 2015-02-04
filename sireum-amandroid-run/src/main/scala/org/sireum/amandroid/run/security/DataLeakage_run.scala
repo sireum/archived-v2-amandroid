@@ -46,7 +46,7 @@ object DataLeakage_run {
     }
 
     def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
-      eps.filter { ep => ep.getSignature.contains("envMain") }
+      eps//.filter { ep => ep.getSignature.contains("envMain") }
     }
 
     def onTimeout : Unit = {}
