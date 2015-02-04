@@ -13,7 +13,6 @@ import org.sireum.jawa.MessageCenter
 import org.sireum.jawa.MessageCenter._
 import org.sireum.util.FileUtil
 import org.sireum.amandroid.appInfo.AppInfoCollector
-import org.sireum.amandroid.alir.taintAnalysis.DefaultAndroidSourceAndSinkManager
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.jawa.util.Timer
@@ -24,6 +23,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.BufferedWriter
 import java.io.OutputStreamWriter
+import org.sireum.amandroid.alir.taintAnalysis.DataLeakageAndroidSourceAndSinkManager
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -96,7 +96,7 @@ object DataLeakage_run {
       AndroidReachingFactsAnalysisConfig.parallel = true
       AndroidReachingFactsAnalysisConfig.resolve_static_init = false
       AndroidReachingFactsAnalysisConfig.timeout = 10
-      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.VERBOSE
+      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
       val socket = new AmandroidSocket
       socket.preProcess
       
@@ -113,7 +113,7 @@ object DataLeakage_run {
             val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
             val app_info = new AppInfoCollector(file, outUri)
             app_info.collectInfo
-            val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+            val ssm = new DataLeakageAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
             socket.plugListener(new DataLeakageListener(file, outputPath))
             socket.runWithDDA(ssm, false, true)
           } catch {

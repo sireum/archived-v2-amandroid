@@ -225,6 +225,23 @@ class DefaultAndroidSourceAndSinkManager(appPackageName : String,
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
+class DataLeakageAndroidSourceAndSinkManager(appPackageName : String, 
+                            layoutControls : Map[Int, LayoutControl], 
+                            callbackMethods : ISet[JawaProcedure], 
+                            sasFilePath : String) extends DefaultAndroidSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
+  
+  private final val TITLE = "DataLeakageAndroidSourceAndSinkManager"
+  
+  override def isCallbackSource(proc : JawaProcedure) : Boolean = {
+    if(this.callbackMethods.contains(proc) && proc.getParamNames.size > 1) false
+    else false
+  }
+}
+
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
 object SSParser{
   
 	private val regex = "([^\\s]+)\\s+(.+)?\\s*->\\s+(.+)"
