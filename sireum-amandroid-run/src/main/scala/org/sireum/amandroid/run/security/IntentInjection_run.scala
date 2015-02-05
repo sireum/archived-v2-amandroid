@@ -135,7 +135,7 @@ object IntentInjection_run {
     AndroidReachingFactsAnalysisConfig.k_context = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-    AndroidReachingFactsAnalysisConfig.timeout = 20
+//    AndroidReachingFactsAnalysisConfig.timeout = 20
     
     val socket = new AmandroidSocket
     socket.preProcess // this loads the android library's class hierarchy and the android library's API sideeffects summary

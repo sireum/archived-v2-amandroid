@@ -95,7 +95,7 @@ object DataLeakage_run {
       AndroidReachingFactsAnalysisConfig.resolve_icc = true
       AndroidReachingFactsAnalysisConfig.parallel = true
       AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-      AndroidReachingFactsAnalysisConfig.timeout = 10
+//      AndroidReachingFactsAnalysisConfig.timeout = 10
       MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
       val socket = new AmandroidSocket
       socket.preProcess

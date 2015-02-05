@@ -76,7 +76,7 @@ object Staging_run {
       AndroidReachingFactsAnalysisConfig.k_context = 1
       AndroidReachingFactsAnalysisConfig.resolve_icc = true
       AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-      AndroidReachingFactsAnalysisConfig.timeout = 60
+//      AndroidReachingFactsAnalysisConfig.timeout = 60
       
       val socket = new AmandroidSocket
       socket.preProcess

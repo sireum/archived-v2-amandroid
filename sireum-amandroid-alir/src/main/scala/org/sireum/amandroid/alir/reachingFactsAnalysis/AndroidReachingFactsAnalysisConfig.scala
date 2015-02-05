@@ -21,6 +21,6 @@ object AndroidReachingFactsAnalysisConfig {
 	/**
 	 * Time out period. 0 means never. Other positive number means how many mins.
 	 */
-	final var timeout = 0
+//	final var timeout = 0
 	final var parallel : Boolean = false
 }

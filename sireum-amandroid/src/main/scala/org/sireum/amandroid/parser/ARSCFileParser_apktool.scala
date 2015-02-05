@@ -17,18 +17,21 @@ import brut.androlib.res.data.ResPackage
 import java.util.regex.Pattern
 import org.sireum.util._
 import java.util.zip.ZipFile
+import org.sireum.jawa.MessageCenter._
 
 class ARSCFileParser_apktool {
-  
+  final private val TITLE = "ARSCFileParser_apktool"
   private var data : ARSCData = null
   
   def parse(apkUri : FileResourceUri) : Unit = {
     val apkFile = FileUtil.toFilePath(apkUri)
     val zf = new ZipFile(apkFile)
     try{
-      val ze = zf.getEntry("resources.arsc");
-      val in = zf.getInputStream(ze)
-      this.data = ARSCDecoder.decode(in, false, false)
+      val ze = zf.getEntry("resources.arsc")
+      if(ze != null){
+        val in = zf.getInputStream(ze)
+        this.data = ARSCDecoder.decode(in, false, false)
+      } else err_msg_normal(TITLE, "Cannot find resources.arsc file.")
     } finally {
       zf.close()
     }
@@ -37,22 +40,26 @@ class ARSCFileParser_apktool {
   def findResource(resourceId : Int) : ResResSpec = {
     var result : ResResSpec = null
     val id = new ResID(resourceId)
-    this.data.getPackages.foreach{
-      pkg =>
-        if(pkg.hasResSpec(id)){
-          result = pkg.getResSpec(id)
-        }
+    if(this.data != null){
+      this.data.getPackages.foreach{
+        pkg =>
+          if(pkg.hasResSpec(id)){
+            result = pkg.getResSpec(id)
+          }
+      }
     }
     result
   }
   
   def getPackages : Set[ResPackage] = {
-    data.getPackages.toSet
+    if(this.data != null){
+      data.getPackages.toSet
+    } else Set()
   }
   
   def getGlobalStringPool : Map[Int, String] = {
     val matches : MMap[Int, String] = mmapEmpty
-    data.getPackages.map{
+    getPackages.map{
       pkg =>
         val str = pkg.getResTable.toString()
         val strs = str.substring(1, str.length() - 1).split(", ")

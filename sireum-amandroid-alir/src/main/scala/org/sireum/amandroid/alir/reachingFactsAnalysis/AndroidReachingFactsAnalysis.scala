@@ -48,10 +48,10 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
   
   final val TITLE = "AndroidReachingFactsAnalysisBuilder"
   
-  val timerOpt = AndroidReachingFactsAnalysisConfig.timeout match{
-    case 0 => None
-    case a => Some(new Timer(a))
-  }
+//  val timerOpt = AndroidReachingFactsAnalysisConfig.timeout match{
+//    case 0 => None
+//    case a => Some(new Timer(a))
+//  }
   
   var icfg : InterproceduralControlFlowGraph[CGNode] = null
   
@@ -644,10 +644,10 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
     }
     
     def onPostVisitNode(node : CGNode, succs : CSet[CGNode]) : Unit = {
-      timerOpt match{
-        case Some(timer) => timer.isTimeOutAndThrow
-        case None =>
-      }
+//      timerOpt match{
+//        case Some(timer) => timer.isTimeOutAndThrow
+//        case None =>
+//      }
     }
   }
   
