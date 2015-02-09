@@ -75,7 +75,7 @@ object LogSensitiveInfo_run {
     AndroidReachingFactsAnalysisConfig.k_context = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = true;
-    AndroidReachingFactsAnalysisConfig.timeout = 5
+//    AndroidReachingFactsAnalysisConfig.timeout = 5
     val sourcePath = args(0)
     val outputPath = args(1)
     
@@ -85,8 +85,9 @@ object LogSensitiveInfo_run {
       file =>
         try{
           msg_critical(TITLE, "####" + file + "#####")
-          val app_info = new InterestingApiCollector(file)
-          socket.loadApk(file, outputPath, AndroidLibraryAPISummary, app_info)
+          val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+          val app_info = new InterestingApiCollector(file, outUri)
+          app_info.collectInfo
           socket.plugListener(new LogSensitiveInfoListener)
           val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
           // socket.runWithoutDDA(false, true)
