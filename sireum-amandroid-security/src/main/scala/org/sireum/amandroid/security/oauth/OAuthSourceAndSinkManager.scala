@@ -95,7 +95,7 @@ class OAuthSourceAndSinkManager(appPackageName : String,
               coms.foreach{
                 case (com, typ) =>
                   typ match {
-                    case IntentHelper.IntentType.EXPLICIT => if(com.isPhantom) sinkflag = true
+                    case IntentHelper.IntentType.EXPLICIT => if(com.isUnknown) sinkflag = true
 //                    case IntentHelper.IntentType.EXPLICIT => sinkflag = true
                     case IntentHelper.IntentType.IMPLICIT => sinkflag = true
                   }

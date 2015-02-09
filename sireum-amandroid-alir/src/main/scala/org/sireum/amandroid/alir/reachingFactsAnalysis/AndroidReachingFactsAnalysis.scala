@@ -337,6 +337,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
 			          }.toList
               case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
             }
+            
             if(AndroidReachingFactsAnalysisHelper.isICCCall(calleep)) {
               if(AndroidReachingFactsAnalysisConfig.resolve_icc){
 	              val factsForCallee = getFactsForICCTarget(s, cj, calleep)
@@ -422,13 +423,8 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
               if(typ != "static" && i == 0){
                 value = 
                   value.filter{
-                  	r => 
-                  	  if(callee.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
-                  	    if(r.isInstanceOf[UnknownInstance]) true
-                  	    else false
-                  	  } else{
-                  	  	!r.isInstanceOf[NullInstance] && !r.isInstanceOf[UnknownInstance] && shouldPass(r, callee, typ)
-                  	  }
+                  	r =>
+                      !r.isInstanceOf[NullInstance] && !r.isInstanceOf[UnknownInstance] && shouldPass(r, callee, typ)
                   }
               } 
               calleeFacts ++= value.map{r => RFAFact(slot, r)}

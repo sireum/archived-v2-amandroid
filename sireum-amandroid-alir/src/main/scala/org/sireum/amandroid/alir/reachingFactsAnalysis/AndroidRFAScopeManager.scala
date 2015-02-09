@@ -46,15 +46,12 @@ object AndroidRFAScopeManager extends ScopeManager{
 	 * return true if given record needs to be bypassed
 	 */
 	def shouldBypass(rec : JawaRecord) : Boolean = {
-    rec.getName == Center.UNKNOWN_RECORD ||
+    rec.isLibraryRecord &&
     {
-	    rec.isLibraryRecord &&
-	    {
-		    if(isIncludeMode){
-		    	if(rec.getPackageName != null) !contains(rec.getPackageName) else true
-		    } else {
-		      if(rec.getPackageName != null) contains(rec.getPackageName) else false
-		    }
+	    if(isIncludeMode){
+	    	if(rec.getPackageName != null) !contains(rec.getPackageName) else true
+	    } else {
+	      if(rec.getPackageName != null) contains(rec.getPackageName) else false
 	    }
     }
   }
