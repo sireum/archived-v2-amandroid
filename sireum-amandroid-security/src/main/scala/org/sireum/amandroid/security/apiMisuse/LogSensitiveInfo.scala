@@ -66,7 +66,6 @@ object LogSensitiveInfo {
     val callmap = icfg.getCallMap
     icfg.nodes.foreach{
       node =>
-        println("Calling getINTERESTINGAPI on node - " + node.toString())
         val result = getParticularAPINode(node)
         result.foreach{
           r =>
@@ -147,6 +146,7 @@ object LogSensitiveInfo {
     val result : MSet[(String, CGCallNode)] = msetEmpty
     node match{
       case invNode : CGCallNode =>
+        println("Calling getINTERESTINGAPI on node - " + node.toString())
         val calleeSet = invNode.getCalleeSet
         println("ZWZW - callee set for current invNode is - " + calleeSet.toString)
         calleeSet.foreach{
