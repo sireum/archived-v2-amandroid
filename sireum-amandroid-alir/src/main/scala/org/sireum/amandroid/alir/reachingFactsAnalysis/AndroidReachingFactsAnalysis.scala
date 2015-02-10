@@ -48,10 +48,10 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
   
   final val TITLE = "AndroidReachingFactsAnalysisBuilder"
   
-  val timerOpt = AndroidReachingFactsAnalysisConfig.timeout match{
-    case 0 => None
-    case a => Some(new Timer(a))
-  }
+//  val timerOpt = AndroidReachingFactsAnalysisConfig.timeout match{
+//    case 0 => None
+//    case a => Some(new Timer(a))
+//  }
   
   var icfg : InterproceduralControlFlowGraph[CGNode] = null
   
@@ -313,6 +313,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
      */
     def resolveCall(s : ISet[RFAFact], cj : CallJump, callerContext : Context, cg : InterproceduralControlFlowGraph[CGNode]) : (IMap[CGNode, ISet[RFAFact]], ISet[RFAFact]) = {
       val calleeSet = ReachingFactsAnalysisHelper.getCalleeSet(s, cj, callerContext)
+      if(callerContext.toString().contains("L000644")) println("ssssssss-> " + calleeSet)
       val cgCallnode = cg.getCGCallNode(callerContext)
       cgCallnode.asInstanceOf[CGCallNode].setCalleeSet(calleeSet)
       val cgReturnnode = cg.getCGReturnNode(callerContext)
@@ -337,6 +338,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
 			          }.toList
               case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
             }
+            
             if(AndroidReachingFactsAnalysisHelper.isICCCall(calleep)) {
               if(AndroidReachingFactsAnalysisConfig.resolve_icc){
 	              val factsForCallee = getFactsForICCTarget(s, cj, calleep)
@@ -422,13 +424,8 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
               if(typ != "static" && i == 0){
                 value = 
                   value.filter{
-                  	r => 
-                  	  if(callee.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
-                  	    if(r.isInstanceOf[UnknownInstance]) true
-                  	    else false
-                  	  } else{
-                  	  	!r.isInstanceOf[NullInstance] && !r.isInstanceOf[UnknownInstance] && shouldPass(r, callee, typ)
-                  	  }
+                  	r =>
+                      !r.isInstanceOf[NullInstance] && !r.isInstanceOf[UnknownInstance] && shouldPass(r, callee, typ)
                   }
               } 
               calleeFacts ++= value.map{r => RFAFact(slot, r)}
@@ -644,10 +641,10 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
     }
     
     def onPostVisitNode(node : CGNode, succs : CSet[CGNode]) : Unit = {
-      timerOpt match{
-        case Some(timer) => timer.isTimeOutAndThrow
-        case None =>
-      }
+//      timerOpt match{
+//        case Some(timer) => timer.isTimeOutAndThrow
+//        case None =>
+//      }
     }
   }
   

@@ -3154,7 +3154,7 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 									   strcat(paraThis, toPilar(t1->descriptor));
 									   // strcat(paraThis, "|]");
 									   char regNamebuff[20];
-									   sprintf(regNamebuff, " v%d", t1->reg);
+									   sprintf(regNamebuff, " v%d", startReg);
 									   strcat(paraThis, regNamebuff);
 									   strcat(paraThis, " @type `this`");
 									   thisFlag = 1;

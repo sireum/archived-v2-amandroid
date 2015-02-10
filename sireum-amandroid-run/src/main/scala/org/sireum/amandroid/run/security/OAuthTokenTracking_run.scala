@@ -135,7 +135,7 @@ object OAuthTokenTracking_run {
     AndroidReachingFactsAnalysisConfig.k_context = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-    AndroidReachingFactsAnalysisConfig.timeout = 10
+//    AndroidReachingFactsAnalysisConfig.timeout = 10
     
     val socket = new AmandroidSocket
     socket.preProcess

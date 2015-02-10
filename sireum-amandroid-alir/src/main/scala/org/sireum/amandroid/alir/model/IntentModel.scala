@@ -662,7 +662,7 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
                 err_msg_normal(TITLE, "Cannot find Given class: " + cstr)
-                val unknownIns = UnknownInstance(c)
+                val unknownIns = UnknownInstance(new NormalType(recordName), c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }
@@ -728,7 +728,7 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
                 err_msg_normal(TITLE, "Cannot find Given class: " + cstr)
-                val unknownIns = UnknownInstance(c)
+                val unknownIns = UnknownInstance(new NormalType(recordName), c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }
@@ -902,7 +902,7 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
                 err_msg_normal(TITLE, "Cannot find Given class: " + cstr)
-                val unknownIns = UnknownInstance(c)
+                val unknownIns = UnknownInstance(new NormalType(recordName), c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }
@@ -960,7 +960,7 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
                 err_msg_normal(TITLE, "Cannot find Given class: " + cstr)
-                val unknownIns = UnknownInstance(c)
+                val unknownIns = UnknownInstance(new NormalType(recordName), c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }
@@ -1238,7 +1238,11 @@ object IntentModel {
       ins => 
       	val mExtraSlot = FieldSlot(ins, AndroidConstants.INTENT_EXTRAS)
       	val mExtraValue = factMap.getOrElse(mExtraSlot, isetEmpty)
-        newfacts ++= mExtraValue.map{mev => RFAFact(VarSlot(retVar), mev)}
+        if(!mExtraValue.isEmpty){
+          newfacts ++= mExtraValue.map{mev => RFAFact(VarSlot(retVar), mev)}
+        } else {
+          newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(Center.DEFAULT_TOPLEVEL_OBJECT), currentContext)))
+        }
     }
     (newfacts, delfacts)
   }
@@ -1261,21 +1265,24 @@ object IntentModel {
 	    	mExtraValue.map{ins => factMap.getOrElse(FieldSlot(ins, "android.os.Bundle.entries"), isetEmpty)}.reduce(iunion[Instance])
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
-	  if(keyValue.filter(_.isInstanceOf[RFAPointStringInstance]).isEmpty){
-		  entValue.foreach{
-		    v =>
-		      require(v.isInstanceOf[RFATupleInstance])
-		      if(keyValue.contains(v.asInstanceOf[RFATupleInstance].left)){
-		        newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[RFATupleInstance].right))
-		      }
-		  }
-	  } else {
-	    entValue.foreach{
-		    v =>
-		      require(v.isInstanceOf[RFATupleInstance])
-		      newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[RFATupleInstance].right))
-		  }
-	  }
+	  if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[RFAPointStringInstance]).isEmpty){
+      val keys = keyValue.map{k => k.asInstanceOf[RFAConcreteStringInstance].string}
+      entValue.foreach{
+        v =>
+          require(v.isInstanceOf[RFATupleInstance])
+          if(keys.contains(v.asInstanceOf[RFATupleInstance].left.asInstanceOf[RFAConcreteStringInstance].string)){
+            newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[RFATupleInstance].right))
+          }
+      }
+    } else if(!entValue.isEmpty) {
+      entValue.foreach{
+        v =>
+          require(v.isInstanceOf[RFATupleInstance])
+          newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[RFATupleInstance].right))
+      }
+    } else {
+      newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(Center.DEFAULT_TOPLEVEL_OBJECT), currentContext)))
+    }
     (newfacts, delfacts)
   }
   
@@ -1299,21 +1306,24 @@ object IntentModel {
 	    	mExtraValue.map{ins => factMap.getOrElse(FieldSlot(ins, "android.os.Bundle.entries"), isetEmpty)}.reduce(iunion[Instance])
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
-	  if(keyValue.filter(_.isInstanceOf[RFAPointStringInstance]).isEmpty){
-		  entValue.foreach{
-		    v =>
-		      require(v.isInstanceOf[RFATupleInstance])
-		      if(keyValue.contains(v.asInstanceOf[RFATupleInstance].left)){
-		        newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[RFATupleInstance].right))
-		      }
-		  }
-	  } else {
-	    entValue.foreach{
-		    v =>
-		      require(v.isInstanceOf[RFATupleInstance])
-		      newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[RFATupleInstance].right))
-		  }
-	  }
+	  if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[RFAPointStringInstance]).isEmpty){
+      val keys = keyValue.map{k => k.asInstanceOf[RFAConcreteStringInstance].string}
+      entValue.foreach{
+        v =>
+          require(v.isInstanceOf[RFATupleInstance])
+          if(keys.contains(v.asInstanceOf[RFATupleInstance].left.asInstanceOf[RFAConcreteStringInstance].string)){
+            newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[RFATupleInstance].right))
+          }
+      }
+    } else if(!entValue.isEmpty) {
+      entValue.foreach{
+        v =>
+          require(v.isInstanceOf[RFATupleInstance])
+          newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[RFATupleInstance].right))
+      }
+    } else {
+      newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(Center.DEFAULT_TOPLEVEL_OBJECT), currentContext)))
+    }
 	  if(newfacts.isEmpty){
 	    newfacts ++= defaultValue.map(RFAFact(VarSlot(retVar), _))
 	  }

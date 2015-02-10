@@ -149,7 +149,7 @@ object Staging {
     AndroidReachingFactsAnalysisConfig.parallel = parallel
     AndroidReachingFactsAnalysisConfig.resolve_icc = icc
     AndroidReachingFactsAnalysisConfig.resolve_static_init = static
-    AndroidReachingFactsAnalysisConfig.timeout = timeout
+//    AndroidReachingFactsAnalysisConfig.timeout = timeout
     println("Total apks: " + apkFileUris.size)
     try{
       val socket = new AmandroidSocket

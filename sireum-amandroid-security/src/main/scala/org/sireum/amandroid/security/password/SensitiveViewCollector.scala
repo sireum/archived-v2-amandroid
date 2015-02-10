@@ -48,7 +48,7 @@ class SensitiveViewCollector(apkUri : FileResourceUri, outputUri : FileResourceU
     mfp.getComponentInfos.foreach{
       f => 
         val record = Center.resolveRecord(f.name, Center.ResolveLevel.HIERARCHY)
-        if(!record.isPhantom && record.isApplicationRecord){
+        if(!record.isUnknown && record.isApplicationRecord){
 	        components += record
 	        val clCounter = generateEnvironment(record, if(f.exported)AndroidConstants.MAINCOMP_ENV else AndroidConstants.COMP_ENV, codeLineCounter)
 	        codeLineCounter = clCounter

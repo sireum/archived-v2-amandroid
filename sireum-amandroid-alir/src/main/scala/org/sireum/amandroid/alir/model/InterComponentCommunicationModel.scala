@@ -32,7 +32,7 @@ object InterComponentCommunicationModel {
     var flag = false
     val childRecord = proc.getDeclaringRecord
     val parentRecord = Center.resolveRecord(AndroidConstants.CONTEXT, Center.ResolveLevel.HIERARCHY)
-    if(Center.getRecordHierarchy.isRecordRecursivelySubClassOfIncluding(childRecord, parentRecord))
+    if(!childRecord.isInterface && Center.getRecordHierarchy.isRecordRecursivelySubClassOfIncluding(childRecord, parentRecord))
 	    AndroidConstants.getIccMethods.foreach{
 	      item =>
 	        if(proc.getSubSignature == item)

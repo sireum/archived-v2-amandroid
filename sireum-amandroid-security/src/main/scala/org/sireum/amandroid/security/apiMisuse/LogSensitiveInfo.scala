@@ -66,7 +66,6 @@ object LogSensitiveInfo {
     val callmap = icfg.getCallMap
     icfg.nodes.foreach{
       node =>
-        println("Calling getINTERESTINGAPI on node - " + node.toString())
         val result = getParticularAPINode(node)
         result.foreach{
           r =>
@@ -147,6 +146,7 @@ object LogSensitiveInfo {
     val result : MSet[(String, CGCallNode)] = msetEmpty
     node match{
       case invNode : CGCallNode =>
+        println("Calling getINTERESTINGAPI on node - " + node.toString())
         val calleeSet = invNode.getCalleeSet
         println("ZWZW - callee set for current invNode is - " + calleeSet.toString)
         calleeSet.foreach{
@@ -157,18 +157,19 @@ object LogSensitiveInfo {
             val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
             val cj = jumpLoc.jump.asInstanceOf[CallJump]
             println("ZWZW - callee's signature - " + calleep.getSignature)
-            if(calleep.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
-              val calleeSignature = cj.getValueAnnotation("signature") match {
-                case Some(s) => s match {
-                  case ne : NameExp => ne.name.name
-                  case _ => ""
-                }
-                case None => throw new RuntimeException("cannot found annotation 'signature' from: " + cj)
-              }
-              callees ++= Center.getProcedureDeclarations(calleeSignature)
-            } else {
+
+//            if(calleep.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
+//              val calleeSignature = cj.getValueAnnotation("signature") match {
+//                case Some(s) => s match {
+//                  case ne : NameExp => ne.name.name
+//                  case _ => ""
+//                }
+//                case None => throw new RuntimeException("cannot found annotation 'signature' from: " + cj)
+//              }
+//              callees ++= Center.getProcedureDeclarations(calleeSignature)
+//            } else {
               callees += calleep
-            }
+//            }
             callees.foreach{
               callee =>
                 println("=======")
