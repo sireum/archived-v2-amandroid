@@ -344,7 +344,7 @@ object SsoOauthStringCollect_run {
         	    
           }
         	
-        	(JawaCodeSource.getAppUsingLibraryRecordsCodes).foreach{
+        	(JawaCodeSource.getThirdPartyLibraryRecordsCodes).foreach{
         	  case (name, code) => 	    
         	    if(!extract(code, regexSso).isEmpty){ 
         	      Counter.ssoLoginUser += file

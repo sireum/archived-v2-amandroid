@@ -156,7 +156,7 @@ object AndroidDataDependentTaintAnalysis {
         val calleeSet = invNode.getCalleeSet
 		    calleeSet.foreach{
 		      callee =>
-		        val calleesig = callee.callee
+		        val calleesig = callee.callee.getSignature
 		        if(!Center.containsProcedure(calleesig)){
 		          Center.resolveRecord(StringFormConverter.getRecordNameFromProcedureSignature(calleesig), Center.ResolveLevel.HIERARCHY)
 		        }

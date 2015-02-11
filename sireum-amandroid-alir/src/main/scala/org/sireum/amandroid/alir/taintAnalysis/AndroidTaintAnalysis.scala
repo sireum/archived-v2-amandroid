@@ -343,7 +343,7 @@ class AndroidTaintAnalysisBuilder{
           val calleeSet = callNode.getCalleeSet
           calleeSet.foreach{
             callee =>
-              val (srcs, taintset) = getSourceAndHandleSink(s, cFacts, Center.getProcedureWithoutFailing(callee.callee), callNode, cj, lhssFacts, currentNode.getContext)
+              val (srcs, taintset) = getSourceAndHandleSink(s, cFacts, callee.callee, callNode, cj, lhssFacts, currentNode.getContext)
               sources ++= srcs
               result ++= taintset
           }

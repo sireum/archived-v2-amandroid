@@ -146,7 +146,7 @@ object HttpsMisuse {
         val calleeSet = invNode.getCalleeSet
         calleeSet.foreach{
           callee =>
-            val calleep = Center.getProcedureWithoutFailing(callee.callee)
+            val calleep = callee.callee
             val callees : MSet[JawaProcedure] = msetEmpty
             val caller = Center.getProcedureWithoutFailing(invNode.getOwner)
             val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]

@@ -63,7 +63,7 @@ class IntentInjectionSourceAndSinkManager(appPackageName : String,
     val calleeSet = invNode.getCalleeSet
     calleeSet.foreach{
       callee =>
-        if(InterComponentCommunicationModel.isIccOperation(Center.getProcedureWithoutFailing(callee.callee))){
+        if(InterComponentCommunicationModel.isIccOperation(callee.callee)){
           sinkflag = true
 //          val rfafactMap = ReachingFactsAnalysisHelper.getFactMap(rfaFact)
 //          val args = invNode.getOwner.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{

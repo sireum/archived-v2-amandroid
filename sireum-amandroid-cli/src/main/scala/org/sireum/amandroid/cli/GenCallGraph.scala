@@ -141,9 +141,7 @@ object GenCallGraph {
           	
           	val app_info = new AppInfoCollector(apkFileUri, outUri)
           	app_info.collectInfo
-            
-          	val pag = new PointerAssignmentGraph[PtaNode]()
-            val cg = new InterproceduralControlFlowGraph[CGNode]
+
             val eps = app_info.getEntryPoints
             val pros =
               eps.map{
@@ -153,7 +151,7 @@ object GenCallGraph {
                   procedures
               }.reduce(iunion[JawaProcedure])
 
-            new InterproceduralPointsToAnalysis().pta(pag, cg, pros, false)
+            val cg = InterproceduralPointsToAnalysis(pros)
           	
             val file = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ".txt.gz")
       	    val w = new FileOutputStream(file)

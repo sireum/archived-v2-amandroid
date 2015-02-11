@@ -165,7 +165,7 @@ object HttpLibStatCollect_run {
         	}
       	
       	
-        	(JawaCodeSource.getAppUsingLibraryRecordsCodes).foreach{
+        	(JawaCodeSource.getThirdPartyLibraryRecordsCodes).foreach{
         	  case (name, code) =>
         	    
         	   if(code.contains("java.net.HttpURLConnection")){  // java net http client

@@ -54,7 +54,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	  var flag = false
 	  compProcMap.foreach{
 	    case(comp, procs) => 
-	      val tmpReachableMethods = ReachabilityAnalysis.getReachableProcedures(procs, false)
+	      val tmpReachableMethods = ReachabilityAnalysis.getReachableProcedures(procs)
 	      val oldReachableMethods = reachableMap.getOrElse(comp, Set())
 	      val newReachableMethods = tmpReachableMethods -- oldReachableMethods
 	      if(!newReachableMethods.isEmpty){
@@ -70,7 +70,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 		(if(GlobalConfig.androidInfoCollectParallel) entryPointClasses.par else entryPointClasses).foreach {
 		  compName =>
 		    val comp = Center.resolveRecord(compName, Center.ResolveLevel.BODY)
-		    val reachableMethods = ReachabilityAnalysis.getReachableProcedures(comp.getProcedures, false)
+		    val reachableMethods = ReachabilityAnalysis.getReachableProcedures(comp.getProcedures)
 		    reachableMap += (comp -> reachableMethods)
 		}
 	}
@@ -80,7 +80,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	  (if(GlobalConfig.androidInfoCollectParallel) entryPointClasses.par else entryPointClasses).foreach {
 		  compName =>
 		    val comp = Center.resolveRecord(compName, Center.ResolveLevel.BODY)
-		    val reachableMethods = ReachabilityAnalysis.getReachableProcedures(comp.getProceduresByShortName(AndroidConstants.MAINCOMP_ENV) ++ comp.getProceduresByShortName(AndroidConstants.COMP_ENV), false)
+		    val reachableMethods = ReachabilityAnalysis.getReachableProcedures(comp.getProceduresByShortName(AndroidConstants.MAINCOMP_ENV) ++ comp.getProceduresByShortName(AndroidConstants.COMP_ENV))
 		    reachableMap += (comp -> reachableMethods)
 		}
 	}

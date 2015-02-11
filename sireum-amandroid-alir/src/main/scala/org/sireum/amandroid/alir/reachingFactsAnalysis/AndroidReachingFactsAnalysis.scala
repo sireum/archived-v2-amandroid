@@ -324,7 +324,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
       var pureNormalFlag = true  //no mix of normal and model callee
       calleeSet.foreach{
         callee =>
-          val calleep = Center.getProcedureWithoutFailing(callee.callee)
+          val calleep = callee.callee
           if(AndroidReachingFactsAnalysisHelper.isICCCall(calleep) || AndroidReachingFactsAnalysisHelper.isModelCall(calleep)){
             pureNormalFlag = false
             val args = cj.callExp.arg match{

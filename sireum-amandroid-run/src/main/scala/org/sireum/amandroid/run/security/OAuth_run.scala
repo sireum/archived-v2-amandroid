@@ -281,7 +281,7 @@ object OAuth_run {
         	}
       	
       	
-        	(JawaCodeSource.getAppUsingLibraryRecordsCodes).foreach{
+        	(JawaCodeSource.getThirdPartyLibraryRecordsCodes).foreach{
         	  case (name, code) =>
         	    if(code.contains("m.facebook.com")){
         	      System.err.println("Facebook url in App Using Lib:" + name)
