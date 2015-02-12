@@ -9,7 +9,6 @@ package org.sireum.amandroid.run.security
 
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.amandroid.security.AmandroidSocket
-import org.sireum.jawa.util.Timer
 import org.sireum.util.FileUtil
 import org.sireum.amandroid.security.interComponentCommunication.IccCollector
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
@@ -25,6 +24,10 @@ import org.sireum.jawa.JawaCodeSource
 import org.sireum.jawa.util.SubStringCounter
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.util.IgnoreException
+import scala.actors.threadpool.Callable
+import scala.actors.threadpool.Executors
+import scala.actors.threadpool.TimeUnit
+import scala.actors.threadpool.TimeoutException
 
 
 /**
@@ -118,19 +121,36 @@ object Icc_run {
     
     files.foreach{
       file =>
+        val executor = Executors.newSingleThreadExecutor()
+        val future = executor.submit(new Task(sourcePath, outputPath, file, socket))
         try{
-          msg_critical(TITLE, "####" + file + "#####")
-          val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-          val app_info = new IccCollector(file, outUri)
-          app_info.collectInfo
-          socket.plugListener(new IccListener(file, app_info))
-          socket.runWithoutDDA(false, true)
+          msg_critical(TITLE, future.get(10, TimeUnit.MINUTES).toString())
         } catch {
-          case e : Throwable =>
-            e.printStackTrace()
+          case te : TimeoutException => err_msg_critical(TITLE, "Timeout!")
+          case e : Throwable => e.printStackTrace()
         } finally {
           socket.cleanEnv
+          future.cancel(true)
         }
+    }
+  }
+  
+  private case class Task(sourcePath : String, outputPath : String, file : FileResourceUri, socket : AmandroidSocket) extends Callable{
+    def call() : String = {
+      try{
+        msg_critical(TITLE, "####" + file + "#####")
+        val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+        val app_info = new IccCollector(file, outUri)
+        app_info.collectInfo
+        socket.plugListener(new IccListener(file, app_info))
+        socket.runWithoutDDA(false, true)
+      } catch {
+        case e : Throwable =>
+          e.printStackTrace()
+      } finally {
+        msg_critical(TITLE, IccCounter.toString)
+      }
+      return "Done!"
     }
   }
 }

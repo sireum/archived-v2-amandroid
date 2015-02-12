@@ -8,6 +8,7 @@ http://www.eclipse.org/legal/epl-v10.html
 package org.sireum.amandroid.cli
 
 import org.sireum.jawa.MessageCenter
+import org.sireum.jawa.MessageCenter._
 import org.sireum.util._
 import org.sireum.option.AnalyzeSource
 import java.io.File
@@ -17,7 +18,6 @@ import org.sireum.amandroid.libPilarFiles.AndroidLibPilarFiles
 import java.net.URI
 import org.sireum.jawa.util.APKFileResolver
 import org.sireum.amandroid.decompile.Dex2PilarConverter
-import org.sireum.jawa.util.Timer
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAConfig
 import org.sireum.amandroid.alir.dataRecorder.DataCollector
@@ -40,6 +40,10 @@ import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.amandroid.security.AmandroidSocketListener
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.amandroid.cli.util.CliLogger
+import scala.actors.threadpool.Callable
+import scala.actors.threadpool.Executors
+import scala.actors.threadpool.TimeUnit
+import scala.actors.threadpool.TimeoutException
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -86,6 +90,7 @@ object IntentInjectionCli {
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */ 
 object IntentInjection {
+  private final val TITLE = "IntentInjection"
 	def main(args: Array[String]) {
 	  if(args.size != 17){
 	    println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -t type[allows: APK, DIR] <source path> <Sink list file path> <output path>")
@@ -146,23 +151,18 @@ object IntentInjection {
       var i : Int = 0
       
       apkFileUris.foreach{
-        apkFileUri =>
+        file =>
+          i += 1
+          val executor = Executors.newSingleThreadExecutor()
+          val future = executor.submit(new Task(outputPath, file, socket, parallel))
           try{
-            i+=1
-            println("Analyzing " + apkFileUri)
-            
-            val outUri = socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary)
-            val app_info = new IntentInjectionCollector(apkFileUri, outUri)
-            app_info.collectInfo
-            val ssm = new IntentInjectionSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)
-            socket.plugListener(new IntentInjectionListener(apkFileUri, outputPath, app_info))
-            socket.runWithDDA(ssm, false, parallel)
-            println("#" + i + ":Done!")
+            msg_critical(TITLE, "#" + i + ":" + future.get(timeout, TimeUnit.MINUTES).toString())
           } catch {
-            case e : Throwable => 
-              CliLogger.logError(new File(outputPath), "Error: " , e)
+            case te : TimeoutException => err_msg_critical(TITLE, "Timeout!")
+            case e : Throwable => e.printStackTrace()
           } finally {
             socket.cleanEnv
+            future.cancel(true)
           }
       }
     } catch {
@@ -172,6 +172,26 @@ object IntentInjection {
     }
 	  
 	}
+  
+  private case class Task(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, parallel : Boolean) extends Callable{
+    def call() : String = {
+      try{
+        println("Analyzing " + file)
+        
+        val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+        val app_info = new IntentInjectionCollector(file, outUri)
+        app_info.collectInfo
+        val ssm = new IntentInjectionSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)
+        socket.plugListener(new IntentInjectionListener(file, outputPath, app_info))
+        socket.runWithDDA(ssm, false, parallel)
+      } catch {
+        case e : Throwable => 
+          CliLogger.logError(new File(outputPath), "Error: " , e)
+      } finally {
+      }
+      return "Done!"
+    }
+  }
   
   
   private class IntentInjectionListener(source_apk : FileResourceUri, output_dir : String, app_info : IntentInjectionCollector) extends AmandroidSocketListener {

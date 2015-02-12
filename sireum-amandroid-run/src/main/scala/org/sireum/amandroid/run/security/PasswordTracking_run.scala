@@ -20,7 +20,6 @@ import org.sireum.jawa.MessageCenter._
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.amandroid.security.password.PasswordSourceAndSinkManager
 import org.sireum.amandroid.security.AmandroidSocket
-import org.sireum.jawa.util.Timer
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.security.AmandroidSocketListener
 import scala.actors.threadpool.Callable
@@ -93,8 +92,6 @@ object PasswordTracking_run {
     	}
       res
     }
-
-    def onTimeout : Unit = {}
 
     def onAnalysisSuccess : Unit = {
       if(AppCenter.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){

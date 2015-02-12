@@ -14,9 +14,7 @@ import org.sireum.jawa.util.APKFileResolver
 import java.net.URI
 import org.sireum.jawa.JawaCodeSource
 import org.sireum.jawa.Center
-import org.sireum.jawa.util.Timer
 import org.sireum.jawa.ClassLoadManager
-import org.sireum.jawa.util.TimeOutException
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.jawa.GlobalConfig

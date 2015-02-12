@@ -16,8 +16,12 @@ import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.security.apiMisuse.CryptographicMisuse
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
-import org.sireum.jawa.util.Timer
 import org.sireum.jawa.util.IgnoreException
+import org.sireum.util.FileResourceUri
+import scala.actors.threadpool.Executors
+import scala.actors.threadpool.Callable
+import scala.actors.threadpool.TimeUnit
+import scala.actors.threadpool.TimeoutException
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -81,25 +85,42 @@ object CryptoMisuse_run {
     
     files.foreach{
       file =>
+        val executor = Executors.newSingleThreadExecutor()
+        val future = executor.submit(new Task(outputPath, file, socket))
         try{
-          msg_critical(TITLE, "####" + file + "#####")
-          val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-          val app_info = new InterestingApiCollector(file, outUri)
-          app_info.collectInfo
-          socket.plugListener(new CryptoMisuseListener)
-          socket.runWithoutDDA(false, true)
-          
-          val icfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
-          icfgs.foreach{
-            case (rec, InterProceduralDataFlowGraph(icfg, irfaResult)) =>
-              CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
-          }
+          msg_critical(TITLE, future.get(10, TimeUnit.MINUTES).toString())
         } catch {
-          case e : Throwable =>
-            e.printStackTrace()
+          case te : TimeoutException => err_msg_critical(TITLE, "Timeout!")
+          case e : Throwable => e.printStackTrace()
         } finally {
           socket.cleanEnv
+          future.cancel(true)
         }
+    }
+  }
+  
+  private case class Task(outputPath : String, file : FileResourceUri, socket : AmandroidSocket) extends Callable{
+    def call() : String = {
+      try{
+        msg_critical(TITLE, "####" + file + "#####")
+        val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+        val app_info = new InterestingApiCollector(file, outUri)
+        app_info.collectInfo
+        socket.plugListener(new CryptoMisuseListener)
+        socket.runWithoutDDA(false, true)
+        
+        val icfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
+        icfgs.foreach{
+          case (rec, InterProceduralDataFlowGraph(icfg, irfaResult)) =>
+            CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
+        }
+      } catch {
+        case e : Throwable =>
+          e.printStackTrace()
+      } finally {
+        msg_critical(TITLE, CryptoMisuseCounter.toString)
+      }
+      return "Done!"
     }
   }
   

@@ -20,11 +20,9 @@ import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.jawa.Center
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
-import org.sireum.jawa.util.Timer
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.jawa.ClassLoadManager
 import org.sireum.amandroid.AppCenter
-import org.sireum.jawa.util.TimeOutException
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.jawa.GlobalConfig

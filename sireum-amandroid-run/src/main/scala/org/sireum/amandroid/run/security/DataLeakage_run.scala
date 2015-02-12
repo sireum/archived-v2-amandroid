@@ -15,7 +15,6 @@ import org.sireum.util.FileUtil
 import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.AndroidGlobalConfig
-import org.sireum.jawa.util.Timer
 import org.sireum.amandroid.AppCenter
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.util.IgnoreException
@@ -24,6 +23,10 @@ import java.io.FileOutputStream
 import java.io.BufferedWriter
 import java.io.OutputStreamWriter
 import org.sireum.amandroid.alir.taintAnalysis.DataLeakageAndroidSourceAndSinkManager
+import scala.actors.threadpool.Callable
+import scala.actors.threadpool.Executors
+import scala.actors.threadpool.TimeoutException
+import scala.actors.threadpool.TimeUnit
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -89,44 +92,54 @@ object DataLeakage_run {
       return
     }
     
-    try{
-    
-      AndroidReachingFactsAnalysisConfig.k_context = 1
-      AndroidReachingFactsAnalysisConfig.resolve_icc = true
-      AndroidReachingFactsAnalysisConfig.parallel = true
-      AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-//      AndroidReachingFactsAnalysisConfig.timeout = 10
+    AndroidReachingFactsAnalysisConfig.k_context = 1
+    AndroidReachingFactsAnalysisConfig.resolve_icc = true
+    AndroidReachingFactsAnalysisConfig.parallel = true
+    AndroidReachingFactsAnalysisConfig.resolve_static_init = false
 
-      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
-      val socket = new AmandroidSocket
-      socket.preProcess
-      
-      val sourcePath = args(0)
-      val outputPath = args(1)
-      
-      
-      val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
-      
-      files.foreach{
-        file =>
-          try{
-            msg_critical(TITLE, "####" + file + "#####")
-            val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-            val app_info = new AppInfoCollector(file, outUri)
-            app_info.collectInfo
-            val ssm = new DataLeakageAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-            socket.plugListener(new DataLeakageListener(file, outputPath))
-            socket.runWithDDA(ssm, false, true)
-          } catch {
-            case e : Throwable =>
-              e.printStackTrace()
-          } finally {
-            socket.cleanEnv
-          }
+    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
+    val socket = new AmandroidSocket
+    socket.preProcess
+    
+    val sourcePath = args(0)
+    val outputPath = args(1)
+    
+    
+    val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
+    
+    files.foreach{
+      file =>
+        val executor = Executors.newSingleThreadExecutor()
+        val future = executor.submit(new Task(outputPath, file, socket))
+        try{
+          msg_critical(TITLE, future.get(10, TimeUnit.MINUTES).toString())
+        } catch {
+          case te : TimeoutException => err_msg_critical(TITLE, "Timeout!")
+          case e : Throwable => e.printStackTrace()
+        } finally {
+          socket.cleanEnv
+          future.cancel(true)
+        }
+    }
+  }
+  
+  private case class Task(outputPath : String, file : FileResourceUri, socket : AmandroidSocket) extends Callable{
+    def call() : String = {
+      try{
+        msg_critical(TITLE, "####" + file + "#####")
+        val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+        val app_info = new AppInfoCollector(file, outUri)
+        app_info.collectInfo
+        val ssm = new DataLeakageAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+        socket.plugListener(new DataLeakageListener(file, outputPath))
+        socket.runWithDDA(ssm, false, true)
+      } catch {
+        case e : Throwable =>
+          e.printStackTrace()
+      } finally {
+        msg_critical(TITLE, DataLeakageCounter.toString)
       }
-    } catch {
-      case e : Throwable =>
-        e.printStackTrace()
+      return "Done!"
     }
   }
   

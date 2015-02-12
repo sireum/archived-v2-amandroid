@@ -36,7 +36,6 @@ import org.sireum.jawa.ClassLoadManager
 import org.sireum.jawa.alir.interProcedural.NodeListener
 import org.sireum.jawa.Mode
 import scala.collection.immutable.BitSet
-import org.sireum.jawa.util.Timer
 import java.io.PrintWriter
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.pta.PTAInstance
