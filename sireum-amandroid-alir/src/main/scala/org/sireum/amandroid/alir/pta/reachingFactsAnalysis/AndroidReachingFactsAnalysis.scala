@@ -5,7 +5,7 @@ are made available under the terms of the Eclipse Public License v1.0
 which accompanies this distribution, and is available at              
 http://www.eclipse.org/legal/epl-v10.html                             
 */
-package org.sireum.amandroid.alir.reachingFactsAnalysis
+package org.sireum.amandroid.alir.pta.reachingFactsAnalysis
 
 import org.sireum.jawa.alir.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
 import org.sireum.alir.Slot
@@ -23,8 +23,7 @@ import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 import org.sireum.jawa.alir.Instance
 import org.sireum.jawa.util.StringFormConverter
-import org.sireum.jawa.alir.reachingFactsAnalysis._
-import org.sireum.amandroid.alir.model.AndroidModelCallHandler
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.jawa.JawaRecord
 import org.sireum.jawa.alir.NullInstance
 import org.sireum.jawa.alir.UnknownInstance
@@ -39,6 +38,8 @@ import org.sireum.jawa.Mode
 import scala.collection.immutable.BitSet
 import org.sireum.jawa.util.Timer
 import java.io.PrintWriter
+import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
+import org.sireum.jawa.alir.pta.PTAInstance
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -188,9 +189,9 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
       	    val rec = Center.resolveRecord(typ.name, Center.ResolveLevel.HIERARCHY)
       	    val ins = 
 	            if(recName == "java.lang.String" && dimensions == 0){
-	              RFAConcreteStringInstance("", currentContext.copy)
+	              PTAConcreteStringInstance("", currentContext.copy)
 	            } else {
-	              RFAInstance(typ, currentContext.copy)
+	              PTAInstance(typ, currentContext.copy)
 	            }
 //      	    result ++= rec.getNonStaticObjectTypeFields.map(f=>RFAFact(FieldSlot(ins, f.getSignature), NullInstance(currentContext)))
       	  case _ =>
@@ -207,7 +208,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
 		    thrownExcNames.foreach{
 		      excName =>
 		        if(excName != ExceptionCenter.ANY_EXCEPTION){
-		          val ins = RFAInstance(NormalType(excName, 0), currentContext.copy)
+		          val ins = PTAInstance(NormalType(excName, 0), currentContext.copy)
 		          result += RFAFact(VarSlot(ExceptionCenter.EXCEPTION_VAR_NAME), ins)
 		        }
 		    }
@@ -313,7 +314,6 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
      */
     def resolveCall(s : ISet[RFAFact], cj : CallJump, callerContext : Context, cg : InterproceduralControlFlowGraph[CGNode]) : (IMap[CGNode, ISet[RFAFact]], ISet[RFAFact]) = {
       val calleeSet = ReachingFactsAnalysisHelper.getCalleeSet(s, cj, callerContext)
-      if(callerContext.toString().contains("L000644")) println("ssssssss-> " + calleeSet)
       val cgCallnode = cg.getCGCallNode(callerContext)
       cgCallnode.asInstanceOf[CGCallNode].setCalleeSet(calleeSet)
       val cgReturnnode = cg.getCGReturnNode(callerContext)
@@ -356,7 +356,6 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
 	              }
               }
             } else { // for non-ICC model call
-//              if(callee.getSubSignature == "unknown:()LCenter/Unknown;") println("callees-->" + calleeSet + "\ncontext-->" + callerContext + "\nfacts-->" + s)
               val factsForCallee = getFactsForCallee(s, cj, calleep)
               returnFacts --= factsForCallee
             	tmpReturnFacts ++= AndroidReachingFactsAnalysisHelper.doModelCall(factsForCallee, calleep, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)

@@ -18,7 +18,7 @@ import org.sireum.amandroid.AndroidConstants
 import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.alir.dataRecorder.MetricRepo
 import org.sireum.amandroid.alir.dataRecorder.DataCollector
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.util.FileUtil
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.jawa.util.Timer

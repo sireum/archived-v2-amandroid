@@ -19,7 +19,7 @@ import org.sireum.jawa.util.APKFileResolver
 import org.sireum.amandroid.decompile.Dex2PilarConverter
 import org.sireum.jawa.util.Timer
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidRFAConfig
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAConfig
 import org.sireum.amandroid.alir.dataRecorder.DataCollector
 import java.io.PrintWriter
 import org.sireum.jawa.util.IgnoreException
@@ -27,7 +27,7 @@ import org.sireum.jawa.Center
 import org.sireum.amandroid.AppCenter
 import org.sireum.option.SireumAmandroidIntentInjectionMode
 import org.sireum.amandroid.AndroidConstants
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysis
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.jawa.ClassLoadManager
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
 import org.sireum.amandroid.alir.taintAnalysis.AndroidDataDependentTaintAnalysis
@@ -38,7 +38,7 @@ import org.sireum.jawa.GlobalConfig
 import org.sireum.option.MessageLevel
 import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.amandroid.security.AmandroidSocketListener
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.amandroid.cli.util.CliLogger
 
 /**

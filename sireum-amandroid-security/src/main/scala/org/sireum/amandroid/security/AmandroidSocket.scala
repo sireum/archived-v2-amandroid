@@ -17,12 +17,12 @@ import java.io.File
 import java.net.URI
 import org.sireum.jawa.util.APKFileResolver
 import org.sireum.amandroid.decompile.Dex2PilarConverter
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidRFAConfig
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAConfig
 import org.sireum.jawa.LibraryAPISummary
 import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.jawa.Center
 import org.sireum.amandroid.AndroidConstants
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysis
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.jawa.ClassLoadManager
 import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis

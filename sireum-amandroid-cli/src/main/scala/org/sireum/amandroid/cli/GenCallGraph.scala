@@ -22,11 +22,8 @@ import org.sireum.jawa.JawaCodeSource
 import org.sireum.jawa.GlobalConfig
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.appInfo.AppInfoCollector
-import org.sireum.jawa.alir.pointsToAnalysis.PointerAssignmentGraph
 import org.sireum.jawa.alir.controlFlowGraph.InterproceduralControlFlowGraph
-import org.sireum.jawa.alir.pointsToAnalysis.PtaNode
 import org.sireum.jawa.alir.controlFlowGraph.CGNode
-import org.sireum.jawa.alir.pointsToAnalysis.InterproceduralPointsToAnalysis
 import org.sireum.jawa.Center
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.JawaProcedure
@@ -37,6 +34,7 @@ import org.sireum.jawa.xml.AndroidXStream
 import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.decompile.AmDecoder
+import org.sireum.jawa.alir.pta.suspark.InterproceduralSuperSpark
 
 
 /**
@@ -151,7 +149,7 @@ object GenCallGraph {
                   procedures
               }.reduce(iunion[JawaProcedure])
 
-            val cg = InterproceduralPointsToAnalysis(pros)
+            val cg = InterproceduralSuperSpark(pros)
           	
             val file = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ".txt.gz")
       	    val w = new FileOutputStream(file)

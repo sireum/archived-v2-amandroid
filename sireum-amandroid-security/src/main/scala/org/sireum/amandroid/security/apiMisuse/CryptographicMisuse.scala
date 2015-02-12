@@ -10,14 +10,14 @@ package org.sireum.amandroid.security.apiMisuse
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.jawa.MessageCenter._
 import org.sireum.util._
-import org.sireum.jawa.alir.reachingFactsAnalysis.RFAFact
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.pilar.ast._
 import org.sireum.jawa.Center
 import org.sireum.jawa.alir.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
-import org.sireum.jawa.alir.reachingFactsAnalysis.VarSlot
-import org.sireum.jawa.alir.reachingFactsAnalysis.RFAConcreteStringInstance
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
 import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -92,8 +92,8 @@ object CryptographicMisuse {
         val argValue = rfaFacts.filter(p=>argSlot == p.s).map(_.v)
         argValue.foreach{
           ins =>
-            if(ins.isInstanceOf[RFAConcreteStringInstance]){
-              if(CryptographicConstants.getECBSchemes.contains(ins.asInstanceOf[RFAConcreteStringInstance].string))
+            if(ins.isInstanceOf[PTAConcreteStringInstance]){
+              if(CryptographicConstants.getECBSchemes.contains(ins.asInstanceOf[PTAConcreteStringInstance].string))
                 result += (node -> false)
             }
         }

@@ -15,14 +15,14 @@ import org.sireum.jawa.Center
 import org.stringtemplate.v4.STGroupFile
 import java.util.ArrayList
 import org.sireum.jawa.alir.controlFlowGraph.CGCallNode
-import org.sireum.amandroid.alir.model.InterComponentCommunicationModel
-import org.sireum.jawa.alir.reachingFactsAnalysis.ReachingFactsAnalysisHelper
-import org.sireum.jawa.alir.reachingFactsAnalysis.VarSlot
-import org.sireum.amandroid.alir.reachingFactsAnalysis.IntentHelper
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.ReachingFactsAnalysisHelper
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
 import org.sireum.pilar.ast._
 import org.sireum.amandroid.parser.UriData
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentCommunicationModel
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

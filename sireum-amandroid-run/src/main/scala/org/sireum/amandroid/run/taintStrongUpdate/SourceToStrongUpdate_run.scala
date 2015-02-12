@@ -12,7 +12,7 @@ import org.sireum.jawa.MessageCenter._
 import org.sireum.util._
 import org.sireum.amandroid.security.AmandroidSocketListener
 import org.sireum.amandroid.AppCenter
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.util.Timer
 import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.amandroid.appInfo.AppInfoCollector

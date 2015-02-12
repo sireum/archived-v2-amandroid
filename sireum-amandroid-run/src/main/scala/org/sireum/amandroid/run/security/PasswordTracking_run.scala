@@ -17,7 +17,7 @@ import org.sireum.amandroid.alir.dataRecorder.MetricRepo
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.MessageCenter
 import org.sireum.jawa.MessageCenter._
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.amandroid.security.password.PasswordSourceAndSinkManager
 import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.jawa.util.Timer

@@ -5,14 +5,17 @@ are made available under the terms of the Eclipse Public License v1.0
 which accompanies this distribution, and is available at              
 http://www.eclipse.org/legal/epl-v10.html                             
 */
-package org.sireum.amandroid.alir.model
+package org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model
 
 import org.sireum.jawa._
 import org.sireum.util._
 import org.sireum.jawa.alir.Context
-import org.sireum.jawa.alir.reachingFactsAnalysis._
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.MessageCenter._
+import org.sireum.jawa.alir.pta.PTAPointStringInstance
+import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
+import org.sireum.jawa.alir.pta.PTAInstance
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -92,14 +95,14 @@ object UriModel {
 	  val strValue = factMap.getOrElse(strSlot, isetEmpty)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
-    val stringUriIns = RFAInstance(NormalType(AndroidConstants.URI_STRING_URI, 0), currentContext)
+    val stringUriIns = PTAInstance(NormalType(AndroidConstants.URI_STRING_URI, 0), currentContext)
     newfacts += RFAFact(VarSlot(retVar), stringUriIns)
     strValue.map{
       sv =>
         sv match{
-          case cstr @ RFAConcreteStringInstance(text, c) =>
+          case cstr @ PTAConcreteStringInstance(text, c) =>
             newfacts += RFAFact(FieldSlot(stringUriIns, AndroidConstants.URI_STRING_URI_URI_STRING), cstr)
-          case pstr @ RFAPointStringInstance(c) => 
+          case pstr @ PTAPointStringInstance(c) => 
             err_msg_detail(TITLE, "Init uri string use point string: " + pstr)
             newfacts += RFAFact(FieldSlot(stringUriIns, AndroidConstants.URI_STRING_URI_URI_STRING), pstr)
           case _ => 

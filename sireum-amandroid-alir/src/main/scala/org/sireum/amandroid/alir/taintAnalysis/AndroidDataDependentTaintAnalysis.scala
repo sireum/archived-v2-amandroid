@@ -8,20 +8,21 @@ http://www.eclipse.org/legal/epl-v10.html
 package org.sireum.amandroid.alir.taintAnalysis
 
 import org.sireum.jawa.alir.dataDependenceAnalysis._
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysis
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.util._
 import org.sireum.jawa.JawaProcedure
-import org.sireum.jawa.alir.reachingFactsAnalysis.RFAFact
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.Center
 import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.pilar.ast._
-import org.sireum.jawa.alir.reachingFactsAnalysis.ReachingFactsAnalysisHelper
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceInfo
 import org.sireum.jawa.alir.taintAnalysis._
 import org.sireum.amandroid.security.AndroidProblemCategories
 import scala.tools.nsc.ConsoleWriter
 import org.sireum.jawa.util.StringFormConverter
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -189,7 +190,7 @@ object AndroidDataDependentTaintAnalysis {
 //                println(callee)
 						    if(invNode.isInstanceOf[IDDGCallArgNode] && ssm.isSinkProcedure(callee)){
 						      msg_normal(TITLE, "found sink: " + callee + "@" + invNode.getContext)
-						      iddg.extendGraphForSinkApis(invNode.asInstanceOf[IDDGCallArgNode], rfaFacts)
+						      extendIDDGForSinkApis(iddg, invNode.asInstanceOf[IDDGCallArgNode], rfaFacts)
 						      val tn = Tn(invNode)
 						      tn.isSrc = false
 						      tn.descriptors += Td(callee.getSignature, SourceAndSinkCategory.API_SINK)
@@ -197,7 +198,7 @@ object AndroidDataDependentTaintAnalysis {
 						    }
 						    if(invNode.isInstanceOf[IDDGCallArgNode] && invNode.asInstanceOf[IDDGCallArgNode].position > 0 && ssm.isIccSink(invNode.getCGNode.asInstanceOf[CGCallNode], rfaFacts)){
 				          msg_normal(TITLE, "found icc sink: " + invNode)
-				          iddg.extendGraphForSinkApis(invNode.asInstanceOf[IDDGCallArgNode], rfaFacts)
+				          extendIDDGForSinkApis(iddg, invNode.asInstanceOf[IDDGCallArgNode], rfaFacts)
 				          val tn = Tn(invNode)
 				          tn.isSrc = false
 						      tn.descriptors += Td(invNode.getLocUri, SourceAndSinkCategory.ICC_SINK)
@@ -241,4 +242,30 @@ object AndroidDataDependentTaintAnalysis {
     }
     (sources, sinks)
   }
+  
+  def extendIDDGForSinkApis(iddg: InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node], callArgNode : IDDGCallArgNode, rfaFacts : ISet[RFAFact]) = {
+    val calleeSet = callArgNode.getCalleeSet
+    calleeSet.foreach{
+      callee =>
+        val argSlot = VarSlot(callArgNode.argName)
+        val argFacts = rfaFacts.filter(fact=> argSlot == fact.s)
+        val argRelatedFacts = ReachingFactsAnalysisHelper.getRelatedHeapFactsFrom(argFacts, rfaFacts)
+        argRelatedFacts.foreach{
+          case RFAFact(slot, ins) =>
+            val t = iddg.findDefSite(ins.getDefSite)
+            iddg.addEdge(callArgNode.asInstanceOf[Node], t)
+        }
+        argFacts.foreach{
+          case RFAFact(slot, argIns) => 
+            argIns.getFieldsUnknownDefSites.foreach{
+              case (defsite, udfields) =>
+                if(callArgNode.getContext != defsite){
+                  val t = iddg.findDefSite(defsite)
+                  iddg.addEdge(callArgNode.asInstanceOf[Node], t)
+                }
+            }
+        }
+    }
+  }
+  
 }

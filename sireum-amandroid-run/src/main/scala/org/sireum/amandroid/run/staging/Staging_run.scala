@@ -11,7 +11,7 @@ import org.sireum.util.FileResourceUri
 import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.amandroid.security.AmandroidSocketListener
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.util.FileUtil
 import org.sireum.amandroid.appInfo.AppInfoCollector
