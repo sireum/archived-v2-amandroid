@@ -34,7 +34,7 @@ import scala.actors.threadpool.TimeUnit
  */ 
 object DataLeakage_run {
   private final val TITLE = "DataLeakage_run"
-  MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
+  MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
   object DataLeakageCounter {
     var total = 0
     var haveresult = 0
@@ -74,7 +74,6 @@ object DataLeakage_run {
     }
 
     def onPostAnalysis: Unit = {
-      msg_critical(TITLE, DataLeakageCounter.toString)
     }
     
     def onException(e : Exception) : Unit = {

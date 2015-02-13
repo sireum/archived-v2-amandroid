@@ -1245,7 +1245,7 @@ object IntentModel {
         if(!mExtraValue.isEmpty){
           newfacts ++= mExtraValue.map{mev => RFAFact(VarSlot(retVar), mev)}
         } else {
-          newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(Center.DEFAULT_TOPLEVEL_OBJECT), currentContext)))
+          newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(AndroidConstants.BUNDLE), currentContext)))
         }
     }
     (newfacts, delfacts)

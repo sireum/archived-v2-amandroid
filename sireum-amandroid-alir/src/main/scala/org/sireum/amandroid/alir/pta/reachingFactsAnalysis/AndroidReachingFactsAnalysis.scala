@@ -366,7 +366,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
             }
             val factsForCallee = getFactsForCallee(s, cj, calleep)
             returnFacts --= factsForCallee
-            calleeFactsMap += (cg.entryNode(calleep.getSignature, callerContext) -> mapFactsToCallee(factsForCallee, cj, calleep.getProcedureBody.procedure))
+            calleeFactsMap += (cg.entryNode(calleep.getSignature, callerContext) -> mapFactsToCallee(factsForCallee, callerContext, cj, calleep))
           }
       }
       returnFacts ++= tmpReturnFacts
@@ -458,8 +458,9 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
       }
     }
     
-    def mapFactsToCallee(factsToCallee : ISet[RFAFact], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[RFAFact] = {
+    def mapFactsToCallee(factsToCallee : ISet[RFAFact], callerContext : Context, cj : CallJump, calleep : JawaProcedure) : ISet[RFAFact] = {
       val varFacts = factsToCallee.filter(f=>f.s.isInstanceOf[VarSlot] && !f.s.asInstanceOf[VarSlot].isGlobal).map{f=>RFAFact(f.s.asInstanceOf[VarSlot], f.v)}
+      val calleeProcedure = calleep.getProcedureBody.procedure
       cj.callExp.arg match{
         case te : TupleExp =>
           val argSlots = te.exps.map{
@@ -486,7 +487,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
           
           for(i <- 0 to argSlots.size - 1){
             if(!paramSlots.isDefinedAt(i)){
-              err_msg_critical(TITLE, "argSlots does not adjust to paramSlots:\n" + cj.callExp.arg + "\n" + calleeProcedure.annotations)
+              err_msg_critical(TITLE, "argSlots does not adjust to paramSlots:\n" + callerContext + "\n" + argSlots + "\n" + calleep.getSignature + "\n" + paramSlots)
             } else {
 	            val argSlot = argSlots(i)
 	            val paramSlot = paramSlots(i)
