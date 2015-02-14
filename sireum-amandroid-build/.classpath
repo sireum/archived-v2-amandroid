@@ -45,5 +45,6 @@
 	<classpathentry kind="lib" path="sbt/boot/scala-2.10.4/org.scala-sbt/sbt/0.13.5/testing-0.13.5.jar"/>
 	<classpathentry kind="lib" path="sbt/boot/scala-2.10.4/org.scala-sbt/sbt/0.13.5/tracking-0.13.5.jar"/>
 	<classpathentry kind="lib" path="sbt/sbtivy/cache/scala_2.10/sbt_0.13/com.eed3si9n/sbt-unidoc/jars/sbt-unidoc-0.3.1.jar"/>
+	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
