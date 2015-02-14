@@ -27,8 +27,9 @@ object CommunicationLeakage_run {
     var haveresult = 0
     var taintPathFound = 0
     var taintPathFoundList = Set[String]()
-    override def toString : String = "total: " + total + ", haveResult: " + haveresult + ", taintPathFound: " + taintPathFound
-  }
+    var leakagetype = Set[String]()
+    override def toString : String = "total: " + total + ", haveResult: " + haveresult + ", taintPathFound: " + taintPathFound 
+  }//通讯录、通话记录、短信三种泄露类型
   
   private class CommunicationLeakageListener(source_apk : FileResourceUri, outputPath : String) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
