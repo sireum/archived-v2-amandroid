@@ -286,14 +286,16 @@ object BundleModel {
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
 	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+    if(!thisValue.isEmpty){
 	  val strValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, "android.os.Bundle.entries"), isetEmpty)}.reduce(iunion[Instance])
-	  val rf = ReachingFactsAnalysisHelper.getReturnFact(NormalType("java.util.HashSet", 0), retVar, currentContext).get
-	  result += rf
-	  result ++= strValue.map{
-	    s => 
-	      require(s.isInstanceOf[PTATupleInstance])
-	      RFAFact(FieldSlot(rf.v, "java.util.HashSet.items"), s.asInstanceOf[PTATupleInstance].left)
-	  }
+  	  val rf = ReachingFactsAnalysisHelper.getReturnFact(NormalType("java.util.HashSet", 0), retVar, currentContext).get
+  	  result += rf
+  	  result ++= strValue.map{
+  	    s => 
+  	      require(s.isInstanceOf[PTATupleInstance])
+  	      RFAFact(FieldSlot(rf.v, "java.util.HashSet.items"), s.asInstanceOf[PTATupleInstance].left)
+  	  }
+    }
 	  result
   }
 	

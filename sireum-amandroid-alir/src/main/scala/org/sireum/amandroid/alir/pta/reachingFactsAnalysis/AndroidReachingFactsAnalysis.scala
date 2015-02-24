@@ -39,6 +39,7 @@ import scala.collection.immutable.BitSet
 import java.io.PrintWriter
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.pta.PTAInstance
+import org.sireum.jawa.util.MyTimer
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -48,16 +49,12 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
   
   final val TITLE = "AndroidReachingFactsAnalysisBuilder"
   
-//  val timerOpt = AndroidReachingFactsAnalysisConfig.timeout match{
-//    case 0 => None
-//    case a => Some(new Timer(a))
-//  }
-  
   var icfg : InterproceduralControlFlowGraph[CGNode] = null
   
   def build //
   (entryPointProc : JawaProcedure,
    initialFacts : ISet[RFAFact] = isetEmpty,
+   timer : Option[MyTimer],
    initContext : Context,
    switchAsOrderedMatch : Boolean) : (InterproceduralControlFlowGraph[CGNode], AndroidReachingFactsAnalysis.Result) = {
     val gen = new Gen
@@ -70,7 +67,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
     cg.collectCfgToBaseGraph(entryPointProc, initContext, true)
     val iota : ISet[RFAFact] = initialFacts + RFAFact(VarSlot("@@RFAiota"), NullInstance(initContext))
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](cg,
-      true, true, false, AndroidReachingFactsAnalysisConfig.parallel, gen, kill, callr, iota, initial, switchAsOrderedMatch, Some(nl))
+      true, true, false, AndroidReachingFactsAnalysisConfig.parallel, gen, kill, callr, iota, initial, timer, switchAsOrderedMatch, Some(nl))
     (cg, result)
   }
   
@@ -640,10 +637,6 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
     }
     
     def onPostVisitNode(node : CGNode, succs : CSet[CGNode]) : Unit = {
-//      timerOpt match{
-//        case Some(timer) => timer.isTimeOutAndThrow
-//        case None =>
-//      }
     }
   }
   
@@ -662,7 +655,8 @@ object AndroidReachingFactsAnalysis {
   def apply(entryPointProc : JawaProcedure,
    initialFacts : ISet[RFAFact] = isetEmpty,
    clm : ClassLoadManager,
+   timer : Option[MyTimer],
    initContext : Context = new Context(GlobalConfig.CG_CONTEXT_K),
    switchAsOrderedMatch : Boolean = false) : (InterproceduralControlFlowGraph[Node], Result)
-				   = new AndroidReachingFactsAnalysisBuilder(clm).build(entryPointProc, initialFacts, initContext, switchAsOrderedMatch)
+				   = new AndroidReachingFactsAnalysisBuilder(clm).build(entryPointProc, initialFacts, timer, initContext, switchAsOrderedMatch)
 }

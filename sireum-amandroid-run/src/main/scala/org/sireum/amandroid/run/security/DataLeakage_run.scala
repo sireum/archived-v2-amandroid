@@ -23,10 +23,9 @@ import java.io.FileOutputStream
 import java.io.BufferedWriter
 import java.io.OutputStreamWriter
 import org.sireum.amandroid.alir.taintAnalysis.DataLeakageAndroidSourceAndSinkManager
-import scala.actors.threadpool.Callable
-import scala.actors.threadpool.Executors
-import scala.actors.threadpool.TimeoutException
-import scala.actors.threadpool.TimeUnit
+import org.sireum.jawa.util.MyTimeoutException
+import org.sireum.jawa.util.MyTimer
+import org.sireum.jawa.GlobalConfig
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -91,7 +90,7 @@ object DataLeakage_run {
       return
     }
     
-    AndroidReachingFactsAnalysisConfig.k_context = 1
+    GlobalConfig.CG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = true
     AndroidReachingFactsAnalysisConfig.parallel = true
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
@@ -108,38 +107,33 @@ object DataLeakage_run {
     
     files.foreach{
       file =>
-        val executor = Executors.newSingleThreadExecutor()
-        val future = executor.submit(new Task(outputPath, file, socket))
         try{
-          msg_critical(TITLE, future.get(10, TimeUnit.MINUTES).toString())
+          msg_critical(TITLE, DataLeakageTask(outputPath, file, socket, Some(10)).run)   
         } catch {
-          case te : TimeoutException => err_msg_critical(TITLE, "Timeout!")
+          case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
           case e : Throwable => e.printStackTrace()
-        } finally {
+        } finally{
+          msg_critical(TITLE, DataLeakageCounter.toString)
           socket.cleanEnv
-          future.cancel(true)
         }
     }
   }
   
-  private case class Task(outputPath : String, file : FileResourceUri, socket : AmandroidSocket) extends Callable{
-    def call() : String = {
-      try{
-        msg_critical(TITLE, "####" + file + "#####")
-        val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-        val app_info = new AppInfoCollector(file, outUri)
-        app_info.collectInfo
-        val ssm = new DataLeakageAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-        socket.plugListener(new DataLeakageListener(file, outputPath))
-        socket.runWithDDA(ssm, false, true)
-      } catch {
-        case e : Throwable =>
-          e.printStackTrace()
-      } finally {
-        msg_critical(TITLE, DataLeakageCounter.toString)
+  private case class DataLeakageTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]) {
+    def run : String = {
+      msg_critical(TITLE, "####" + file + "#####")
+      val timer = timeout match {
+        case Some(t) => Some(new MyTimer(t))
+        case None => None
       }
+      if(timer.isDefined) timer.get.start
+      val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+      val app_info = new AppInfoCollector(file, outUri, timer)
+      app_info.collectInfo
+      val ssm = new DataLeakageAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+      socket.plugListener(new DataLeakageListener(file, outputPath))
+      socket.runWithDDA(ssm, false, false, timer)
       return "Done!"
     }
-  }
-  
+  }  
 }

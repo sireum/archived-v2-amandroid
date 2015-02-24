@@ -26,10 +26,10 @@ import org.sireum.util.FileResourceUri
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.JawaCodeSource
 import org.sireum.jawa.MessageCenter
-import scala.actors.threadpool.Callable
-import scala.actors.threadpool.Executors
-import scala.actors.threadpool.TimeUnit
-import scala.actors.threadpool.TimeoutException
+import org.sireum.jawa.util.MyTimer
+import org.sireum.jawa.util.MyTimer
+import org.sireum.jawa.util.MyTimeoutException
+import org.sireum.jawa.GlobalConfig
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -135,7 +135,7 @@ object IntentInjection_run {
       return
     }
     MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
-    AndroidReachingFactsAnalysisConfig.k_context = 1
+    GlobalConfig.CG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
 //    AndroidReachingFactsAnalysisConfig.timeout = 20
@@ -150,37 +150,32 @@ object IntentInjection_run {
     
     files.foreach{
       file =>
-        val executor = Executors.newSingleThreadExecutor()
-        val future = executor.submit(new Task(sourcePath, outputPath, file, socket))
         try{
-          msg_critical(TITLE, future.get(10, TimeUnit.MINUTES).toString())
+          msg_critical(TITLE, IntentInjectionTask(outputPath, file, socket, Some(500)).run)   
         } catch {
-          case te : TimeoutException => err_msg_critical(TITLE, "Timeout!")
+          case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
           case e : Throwable => e.printStackTrace()
-        } finally {
+        } finally{
+          msg_critical(TITLE, IntentInjectionCounter.toString)
           socket.cleanEnv
-          future.cancel(true)
         }
     }
   }
   
-  private case class Task(sourcePath : String, outputPath : String, file : FileResourceUri, socket : AmandroidSocket) extends Callable{
-    def call() : String = {
-      try{
-        msg_critical(TITLE, "####" + file + "#####")
-        
-        val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-        val app_info = new IntentInjectionCollector(file, outUri)
-        app_info.collectInfo
-        val ssm = new IntentInjectionSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)
-        socket.plugListener(new IntentInjectionListener(file, app_info, ssm))
-        socket.runWithDDA(ssm, true, true)
-      } catch {
-        case e : Throwable =>
-          e.printStackTrace()
-      } finally {
-        msg_critical(TITLE, IntentInjectionCounter.toString)
+  private case class IntentInjectionTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]) {
+    def run : String = {
+      msg_critical(TITLE, "####" + file + "#####")
+      val timer = timeout match {
+        case Some(t) => Some(new MyTimer(t))
+        case None => None
       }
+      if(timer.isDefined) timer.get.start
+      val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+      val app_info = new IntentInjectionCollector(file, outUri, timer)
+      app_info.collectInfo
+      val ssm = new IntentInjectionSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)
+      socket.plugListener(new IntentInjectionListener(file, app_info, ssm))
+      socket.runWithDDA(ssm, true, true, timer)
       return "Done!"
     }
   }

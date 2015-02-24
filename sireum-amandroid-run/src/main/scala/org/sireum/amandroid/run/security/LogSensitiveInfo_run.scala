@@ -20,10 +20,9 @@ import org.sireum.jawa.util.IgnoreException
 import org.sireum.amandroid.alir.taintAnalysis.DefaultAndroidSourceAndSinkManager
 import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.util.FileResourceUri
-import scala.actors.threadpool.Callable
-import scala.actors.threadpool.Executors
-import scala.actors.threadpool.TimeUnit
-import scala.actors.threadpool.TimeoutException
+import org.sireum.jawa.util.MyTimer
+import org.sireum.jawa.util.MyTimeoutException
+import org.sireum.jawa.GlobalConfig
 
 /**
  * 
@@ -76,7 +75,7 @@ object LogSensitiveInfo_run {
     val socket = new AmandroidSocket
     socket.preProcess
     
-    AndroidReachingFactsAnalysisConfig.k_context = 1
+    GlobalConfig.CG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = true;
 
@@ -87,42 +86,38 @@ object LogSensitiveInfo_run {
     
     files.foreach{
       file =>
-        val executor = Executors.newSingleThreadExecutor()
-        val future = executor.submit(new Task(sourcePath, outputPath, file, socket))
         try{
-          msg_critical(TITLE, future.get(10, TimeUnit.MINUTES).toString())
+          msg_critical(TITLE, LogSensitiveInfoTask(outputPath, file, socket, Some(500)).run)   
         } catch {
-          case te : TimeoutException => err_msg_critical(TITLE, "Timeout!")
+          case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
           case e : Throwable => e.printStackTrace()
-        } finally {
+        } finally{
+          msg_critical(TITLE, LogSensitiveInfoCounter.toString)
           socket.cleanEnv
-          future.cancel(true)
         }
     }
   }
   
-  private case class Task(sourcePath : String, outputPath : String, file : FileResourceUri, socket : AmandroidSocket) extends Callable{
-    def call() : String = {
-      try{
-        msg_critical(TITLE, "####" + file + "#####")
-        val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-        val app_info = new InterestingApiCollector(file, outUri)
-        app_info.collectInfo
-        socket.plugListener(new LogSensitiveInfoListener)
-        val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-        // socket.runWithoutDDA(false, true)
-        socket.runWithDDA(ssm, false, true)
-         
-         val idfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
-          idfgs.foreach{
-            case (rec, InterProceduralDataFlowGraph(icfg, irfaResult)) =>
-              LogSensitiveInfo(new InterProceduralDataFlowGraph(icfg, irfaResult))
-          }
-      } catch {
-        case e : Throwable =>
-          e.printStackTrace()
-      } finally {
-        msg_critical(TITLE, LogSensitiveInfoCounter.toString)
+  private case class LogSensitiveInfoTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]){
+    def run : String = {
+      msg_critical(TITLE, "####" + file + "#####")
+      val timer = timeout match {
+        case Some(t) => Some(new MyTimer(t))
+        case None => None
+      }
+      if(timer.isDefined) timer.get.start
+      val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+      val app_info = new InterestingApiCollector(file, outUri, timer)
+      app_info.collectInfo
+      socket.plugListener(new LogSensitiveInfoListener)
+      val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+      // socket.runWithoutDDA(false, true)
+      socket.runWithDDA(ssm, false, true, timer)
+       
+      val idfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
+      idfgs.foreach{
+        case (rec, InterProceduralDataFlowGraph(icfg, irfaResult)) =>
+          LogSensitiveInfo(new InterProceduralDataFlowGraph(icfg, irfaResult))
       }
       return "Done!"
     }

@@ -42,10 +42,8 @@ import org.sireum.amandroid.security.AmandroidSocketListener
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.option.MessageLevel
 import org.sireum.amandroid.cli.util.CliLogger
-import scala.actors.threadpool.Callable
-import scala.actors.threadpool.Executors
-import scala.actors.threadpool.TimeUnit
-import scala.actors.threadpool.TimeoutException
+import org.sireum.jawa.util.MyTimer
+import org.sireum.jawa.util.MyTimeoutException
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -141,7 +139,7 @@ object TanitAnalysis{
   
   def taintAnalyze(apkFileUris : Set[FileResourceUri], sasFilePath : String, outputPath : String, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int) = {
     AndroidGlobalConfig.SourceAndSinkFilePath = sasFilePath
-    AndroidReachingFactsAnalysisConfig.k_context = k_context
+    GlobalConfig.CG_CONTEXT_K = k_context
     AndroidReachingFactsAnalysisConfig.parallel = parallel
     AndroidReachingFactsAnalysisConfig.resolve_icc = icc
     AndroidReachingFactsAnalysisConfig.resolve_static_init = static
@@ -158,16 +156,15 @@ object TanitAnalysis{
       apkFileUris.foreach{
         file =>
           i += 1
-          val executor = Executors.newSingleThreadExecutor()
-          val future = executor.submit(new Task(outputPath, file, socket, parallel))
           try{
-            msg_critical(TITLE, "#" + i + ":" + future.get(timeout, TimeUnit.MINUTES).toString())
+            msg_critical(TITLE, "Analyzing #" + i + ":" + file)
+            msg_critical(TITLE, TaintTask(outputPath, file, socket, parallel, Some(timeout*60)).run)   
           } catch {
-            case te : TimeoutException => err_msg_critical(TITLE, "Timeout!")
-            case e : Throwable => e.printStackTrace()
-          } finally {
+            case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
+            case e : Throwable =>
+              CliLogger.logError(new File(outputPath), "Error: " , e)
+          } finally{
             socket.cleanEnv
-            future.cancel(true)
           }
       }
     } catch {
@@ -178,22 +175,19 @@ object TanitAnalysis{
 	  
 	}
   
-  private case class Task(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, parallel : Boolean) extends Callable{
-    def call() : String = {
-      try{
-        println("Analyzing " + file)
-        
-        val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-        val app_info = new AppInfoCollector(file, outUri)
-        app_info.collectInfo
-        val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-        socket.plugListener(new TaintListener(file, outputPath, app_info))
-        socket.runWithDDA(ssm, false, parallel)
-      } catch {
-        case e : Throwable => 
-          CliLogger.logError(new File(outputPath), "Error: " , e)
-      } finally {
+  private case class TaintTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, parallel : Boolean, timeout : Option[Int]) {
+    def run : String = {
+      val timer = timeout match {
+        case Some(t) => Some(new MyTimer(t))
+        case None => None
       }
+      if(timer.isDefined) timer.get.start
+      val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+      val app_info = new AppInfoCollector(file, outUri, timer)
+      app_info.collectInfo
+      val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+      socket.plugListener(new TaintListener(file, outputPath, app_info))
+      socket.runWithDDA(ssm, false, parallel, timer)
       return "Done!"
     }
   }

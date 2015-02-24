@@ -33,6 +33,7 @@ import org.sireum.jawa.JawaProcedure
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.decompile.AmDecoder
+import org.sireum.jawa.util.MyTimer
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -101,7 +102,8 @@ class AmandroidSocket {
   def runWithDDA(
             ssm : AndroidSourceAndSinkManager,
             public_only : Boolean,
-            parallel : Boolean) = {    
+            parallel : Boolean,
+            timer : Option[MyTimer]) = {    
     try{
   		if(myListener_opt.isDefined) myListener_opt.get.onPreAnalysis
   		
@@ -117,7 +119,7 @@ class AmandroidSocket {
     	  ep =>
     	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
     	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
+    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, timer)
     	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)	    	    
     	    msg_critical(TITLE, "processed-->" + icfg.getProcessed.size)
     	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
@@ -138,7 +140,8 @@ class AmandroidSocket {
   
   def runWithoutDDA(
             public_only : Boolean,
-            parallel : Boolean
+            parallel : Boolean,
+            timer : Option[MyTimer]
             ) = {    
     try{
   		if(myListener_opt.isDefined) myListener_opt.get.onPreAnalysis
@@ -157,7 +160,7 @@ class AmandroidSocket {
     	  ep =>
     	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
     	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
+    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, timer)
     	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
     	    msg_critical(TITLE, "processed-->" + icfg.getProcessed.size)
     	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)

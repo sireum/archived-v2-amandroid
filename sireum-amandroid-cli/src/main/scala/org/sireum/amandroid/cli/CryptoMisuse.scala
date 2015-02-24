@@ -25,12 +25,11 @@ import org.sireum.amandroid.alir.dataRecorder.DataCollector
 import java.io.PrintWriter
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.amandroid.security.AmandroidSocketListener
-import scala.actors.threadpool.TimeoutException
-import scala.actors.threadpool.Callable
-import scala.actors.threadpool.Executors
-import scala.actors.threadpool.TimeUnit
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.amandroid.security.apiMisuse.CryptographicMisuse
+import org.sireum.jawa.util.MyTimer
+import org.sireum.jawa.util.MyTimeoutException
+import org.sireum.jawa.GlobalConfig
 
 
 /**
@@ -125,7 +124,7 @@ object CryptoMisuse {
 	}
   
   def cryptoMisuse(apkFileUris : Set[FileResourceUri], outputPath : String, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int) = {
-    AndroidReachingFactsAnalysisConfig.k_context = k_context
+    GlobalConfig.CG_CONTEXT_K = k_context
     AndroidReachingFactsAnalysisConfig.parallel = parallel
     AndroidReachingFactsAnalysisConfig.resolve_icc = icc
     AndroidReachingFactsAnalysisConfig.resolve_static_init = static
@@ -140,16 +139,15 @@ object CryptoMisuse {
       apkFileUris.foreach{
         file =>
           i += 1
-          val executor = Executors.newSingleThreadExecutor()
-          val future = executor.submit(new Task(outputPath, file, socket, parallel))
           try{
-            msg_critical(TITLE, "#" + i + ":" + future.get(timeout, TimeUnit.MINUTES).toString())
+            msg_critical(TITLE, "Analyzing #" + i + ":" + file)
+            msg_critical(TITLE, CryptoMisuseTask(outputPath, file, socket, parallel, Some(timeout*60)).run)   
           } catch {
-            case te : TimeoutException => err_msg_critical(TITLE, "Timeout!")
-            case e : Throwable => e.printStackTrace()
-          } finally {
+            case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
+            case e : Throwable =>
+              CliLogger.logError(new File(outputPath), "Error: " , e)
+          } finally{
             socket.cleanEnv
-            future.cancel(true)
           }
       }
     } catch {
@@ -159,25 +157,22 @@ object CryptoMisuse {
     }
 	}
   
-  private case class Task(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, parallel : Boolean) extends Callable{
-    def call() : String = {
-      try{
-        println("Analyzing " + file)
-        
-        val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-        val app_info = new InterestingApiCollector(file, outUri)
-        app_info.collectInfo
-        socket.plugListener(new CryptoMisuseListener(file, outputPath, app_info))
-        socket.runWithoutDDA(false, parallel)
-        val idfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
-        idfgs.foreach{
-          case (rec, InterProceduralDataFlowGraph(icfg, irfaResult)) =>
-            CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
-        }
-      } catch {
-        case e : Throwable =>
-          CliLogger.logError(new File(outputPath), "Error: " , e)
-      } finally {
+  private case class CryptoMisuseTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, parallel : Boolean, timeout : Option[Int]) {
+    def run : String = {
+      val timer = timeout match {
+        case Some(t) => Some(new MyTimer(t))
+        case None => None
+      }
+      if(timer.isDefined) timer.get.start
+      val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+      val app_info = new InterestingApiCollector(file, outUri, timer)
+      app_info.collectInfo
+      socket.plugListener(new CryptoMisuseListener(file, outputPath, app_info))
+      socket.runWithoutDDA(false, parallel, timer)
+      val idfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
+      idfgs.foreach{
+        case (rec, InterProceduralDataFlowGraph(icfg, irfaResult)) =>
+          CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
       }
       return "Done!"
     }
@@ -190,10 +185,6 @@ object CryptoMisuse {
     def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
       val iacs = app_info.getInterestingContainers(CryptographicConstants.getCryptoAPIs)
       eps.filter(e=>iacs.contains(e.getDeclaringRecord))
-    }
-
-    def onTimeout : Unit = {
-      System.err.println("Timeout!")
     }
 
     def onAnalysisSuccess : Unit = {

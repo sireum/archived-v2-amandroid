@@ -25,7 +25,6 @@ import org.sireum.util.MMap
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.pilar.ast.NameExp
 import org.sireum.pilar.ast.TupleExp
-import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAConcreteStringInstance
 import org.sireum.pilar.ast.CallJump
 import org.sireum.jawa.JawaProcedure
 import org.sireum.pilar.ast.JumpLocation
@@ -40,12 +39,10 @@ import org.sireum.pilar.ast._
 import org.sireum.jawa.Center
 import org.sireum.jawa.alir.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
-import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAConcreteStringInstance
 import org.sireum.jawa.JawaProcedure
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.security.AmandroidSocketListener
 import org.sireum.jawa.util.IgnoreException
-import org.sireum.jawa.util.Timer
 import org.sireum.jawa.alir.reachability.ReachabilityAnalysis
 /*
  * @author <a href="mailto:i@flanker017.me">Qidan He</a>

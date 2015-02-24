@@ -21,10 +21,9 @@ import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.jawa.alir.LibSideEffectProvider
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.util.IgnoreException
-import scala.actors.threadpool.Callable
-import scala.actors.threadpool.Executors
-import scala.actors.threadpool.TimeoutException
-import scala.actors.threadpool.TimeUnit
+import org.sireum.jawa.util.MyTimer
+import org.sireum.jawa.util.MyTimeoutException
+import org.sireum.jawa.GlobalConfig
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -48,8 +47,6 @@ object DroidBench_run {
     def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
       eps
     }
-
-    def onTimeout : Unit = {}
 
     def onAnalysisSuccess : Unit = {
       if(AppCenter.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
@@ -89,7 +86,7 @@ object DroidBench_run {
       return
     }
     
-    AndroidReachingFactsAnalysisConfig.k_context = 1
+    GlobalConfig.CG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
     
@@ -103,36 +100,32 @@ object DroidBench_run {
     
     files.foreach{
       file =>
-        val executor = Executors.newSingleThreadExecutor()
-        val future = executor.submit(new Task(sourcePath, outputPath, file, socket))
         try{
-          msg_critical(TITLE, future.get(10, TimeUnit.MINUTES).toString())
+          msg_critical(TITLE, DroidBenchTask(outputPath, file, socket, Some(500)).run)
         } catch {
-          case te : TimeoutException => err_msg_critical(TITLE, "Timeout!")
+          case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
           case e : Throwable => e.printStackTrace()
         } finally {
+          msg_critical(TITLE, DroidBenchCounter.toString)
           socket.cleanEnv
-          future.cancel(true)
         }
     }
   }
   
-  private case class Task(sourcePath : String, outputPath : String, file : FileResourceUri, socket : AmandroidSocket) extends Callable{
-    def call() : String = {
-      try{
-        msg_critical(TITLE, "####" + file + "#####")
-        val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-        val app_info = new AppInfoCollector(file, outUri)
-        app_info.collectInfo
-        val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-        socket.plugListener(new DroidBenchListener(file))
-        socket.runWithDDA(ssm, false, true)
-      } catch {
-        case e : Throwable =>
-          e.printStackTrace()
-      } finally {
-        msg_critical(TITLE, DroidBenchCounter.toString)
+  private case class DroidBenchTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]) {
+    def run : String = {
+      msg_critical(TITLE, "####" + file + "#####")
+      val timer = timeout match {
+        case Some(t) => Some(new MyTimer(t))
+        case None => None
       }
+      if(timer.isDefined) timer.get.start
+      val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+      val app_info = new AppInfoCollector(file, outUri, timer)
+      app_info.collectInfo
+      val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+      socket.plugListener(new DroidBenchListener(file))
+      socket.runWithDDA(ssm, false, true, timer)
       return "Done!"
     }
   }

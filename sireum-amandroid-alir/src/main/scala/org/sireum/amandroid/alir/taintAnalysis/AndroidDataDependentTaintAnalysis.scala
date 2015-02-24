@@ -158,10 +158,7 @@ object AndroidDataDependentTaintAnalysis {
 		    calleeSet.foreach{
 		      callee =>
 		        val calleesig = callee.callee.getSignature
-		        if(!Center.containsProcedure(calleesig)){
-		          Center.resolveRecord(StringFormConverter.getRecordNameFromProcedureSignature(calleesig), Center.ResolveLevel.HIERARCHY)
-		        }
-		        val calleep = Center.getProcedureWithoutFailing(calleesig)
+		        val calleep = callee.callee
 		        val callees : MSet[JawaProcedure] = msetEmpty
 				    val caller = Center.getProcedureWithoutFailing(invNode.getOwner)
 				    val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]

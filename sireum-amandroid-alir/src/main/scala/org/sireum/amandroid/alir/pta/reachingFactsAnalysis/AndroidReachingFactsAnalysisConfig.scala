@@ -12,9 +12,8 @@ package org.sireum.amandroid.alir.pta.reachingFactsAnalysis
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
 object AndroidReachingFactsAnalysisConfig {
-	final var k_context = 1
 	final var resolve_icc = true
 	final var resolve_static_init = true
-
 	final var parallel : Boolean = false
+  final var timeout : Option[Int] = None
 }
