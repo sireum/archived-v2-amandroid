@@ -58,10 +58,11 @@ object GenCallGraphCli {
     val timeout = saamode.analysis.timeout
     val mem = saamode.general.mem
     val msgLevel = saamode.general.msgLevel
-    forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, outputDir, mem, msgLevel)
+    val apionly = saamode.apionly
+    forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, outputDir, mem, apionly, msgLevel)
   }
 	
-	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : String, sourceDir : String, outputDir : String, mem : Int, msgLevel : MessageLevel.Type) = {
+	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : String, sourceDir : String, outputDir : String, mem : Int, apionly : Boolean, msgLevel : MessageLevel.Type) = {
     val args : MList[String] = mlistEmpty
     args += "-s"
     args += (!nostatic).toString
@@ -73,6 +74,8 @@ object GenCallGraphCli {
     args += k_context.toString
     args += "-to"
     args += timeout.toString
+    args += "-api"
+    args += apionly.toString
     args += "-msg"
     args += msgLevel.toString
     args ++= List("-t", typSpec, sourceDir, outputDir)
@@ -89,8 +92,8 @@ object GenCallGraph {
   private final val TITLE = "GenCallGraph"
   
 	def main(args: Array[String]) {
-	  if(args.size != 16){
-      println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -t type[allows: APK, DIR] <source path> <output path>")
+	  if(args.size != 18){
+      println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -api [api only] -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -t type[allows: APK, DIR] <source path> <output path>")
       return
     }
     val static = args(1).toBoolean
@@ -98,10 +101,11 @@ object GenCallGraph {
     val icc = args(5).toBoolean
     val k_context = args(7).toInt
     val timeout = args(9).toInt
-    val msgLevel = args(11)
-    val typ = args(13)
-    val sourcePath = args(14)
-    val outputPath = args(15)
+    val apionly = args(11).toBoolean
+    val msgLevel = args(13)
+    val typ = args(15)
+    val sourcePath = args(16)
+    val outputPath = args(17)
     
     msgLevel match{
       case "NO$" =>
@@ -128,10 +132,10 @@ object GenCallGraph {
         println("Unexpected type: " + typ)
         return
     }
-		genCallGraph(apkFileUris, outputPath, static, parallel, icc, k_context, timeout)
+		genCallGraph(apkFileUris, outputPath, static, parallel, icc, k_context, timeout, apionly)
 	}
   
-  def genCallGraph(apkFileUris : Set[FileResourceUri], outputPath : String, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int) = {
+  def genCallGraph(apkFileUris : Set[FileResourceUri], outputPath : String, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int, apionly : Boolean) = {
     GlobalConfig.CG_CONTEXT_K = k_context
     println("Total apks: " + apkFileUris.size)
     try{
@@ -145,7 +149,7 @@ object GenCallGraph {
             println("Analyzing #" + i + ":" + apkFileUri)
             val timer = Some(new MyTimer(timeout*60))
             if(timer.isDefined) timer.get.start
-            val apkName = apkFileUri.substring(apkFileUri.lastIndexOf("/"), apkFileUri.lastIndexOf("."))
+            val apkName = apkFileUri.substring(apkFileUri.lastIndexOf("/") + 1, apkFileUri.lastIndexOf("."))
             
         		val resultDir = new File(outputPath + "/APPs/")
             val outputUri = FileUtil.toUri(outputPath)
@@ -175,7 +179,7 @@ object GenCallGraph {
             val file = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ".txt.gz")
       	    val w = new FileOutputStream(file)
             val zipw = new GZIPOutputStream(new BufferedOutputStream(w))
-      	    val graph = cg.toTextGraph
+      	    val graph = if(apionly) cg.toApiGraph else cg.toTextGraph
       	    zipw.write(graph.getBytes())
       	    zipw.close()
       	    println(apkName + " result stored!")
