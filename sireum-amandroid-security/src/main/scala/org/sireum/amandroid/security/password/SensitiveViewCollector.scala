@@ -15,12 +15,13 @@ import org.sireum.jawa.Center
 import org.sireum.jawa.MessageCenter._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.amandroid.AppCenter
+import org.sireum.jawa.util.MyTimer
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-class SensitiveViewCollector(apkUri : FileResourceUri, outputUri : FileResourceUri) extends AppInfoCollector(apkUri, outputUri) {
+class SensitiveViewCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, timer : Option[MyTimer]) extends AppInfoCollector(apkUri, outputUri, timer) {
   
   private final val TITLE = "SensitiveViewCollector"
   
@@ -40,7 +41,7 @@ class SensitiveViewCollector(apkUri : FileResourceUri, outputUri : FileResourceU
 		this.layoutControls = lfp.getUserControls
 		if(!this.layoutControls.exists(p => p._2.isSensitive)) throw new IgnoreException
 		
-		val ra = AppInfoCollector.reachabilityAnalysis(mfp)
+		val ra = AppInfoCollector.reachabilityAnalysis(mfp, timer)
 		this.sensitiveLayoutContainers = ra.getSensitiveLayoutContainer(layoutControls)
 		val callbacks = AppInfoCollector.analyzeCallback(afp, lfp, ra)
 		this.callbackMethods = callbacks

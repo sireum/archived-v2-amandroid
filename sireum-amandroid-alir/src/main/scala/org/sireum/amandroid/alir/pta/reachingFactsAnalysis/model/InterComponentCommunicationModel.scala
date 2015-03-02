@@ -5,14 +5,14 @@ are made available under the terms of the Eclipse Public License v1.0
 which accompanies this distribution, and is available at              
 http://www.eclipse.org/legal/epl-v10.html                             
 */
-package org.sireum.amandroid.alir.model
+package org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model
 
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.Center
 import org.sireum.util._
 import org.sireum.jawa.JawaProcedure
 import org.sireum.jawa.alir.Context
-import org.sireum.jawa.alir.reachingFactsAnalysis._
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.parser.UriData
 import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.JawaRecord
@@ -20,7 +20,7 @@ import org.sireum.jawa.alir.Instance
 import java.net.URI
 import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.MessageCenter._
-import org.sireum.amandroid.alir.reachingFactsAnalysis.IntentHelper
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

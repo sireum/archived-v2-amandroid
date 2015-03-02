@@ -17,16 +17,14 @@ import org.sireum.amandroid.alir.dataRecorder.MetricRepo
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.MessageCenter
 import org.sireum.jawa.MessageCenter._
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.amandroid.security.password.PasswordSourceAndSinkManager
 import org.sireum.amandroid.security.AmandroidSocket
-import org.sireum.jawa.util.Timer
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.security.AmandroidSocketListener
-import scala.actors.threadpool.Callable
-import scala.actors.threadpool.Executors
-import scala.actors.threadpool.TimeoutException
-import scala.actors.threadpool.TimeUnit
+import org.sireum.jawa.util.MyTimer
+import org.sireum.jawa.util.MyTimeoutException
+import org.sireum.jawa.GlobalConfig
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -94,8 +92,6 @@ object PasswordTracking_run {
       res
     }
 
-    def onTimeout : Unit = {}
-
     def onAnalysisSuccess : Unit = {
       if(AppCenter.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
 	      PasswordCounter.taintPathFound += 1
@@ -139,7 +135,7 @@ object PasswordTracking_run {
     
     MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
       
-    AndroidReachingFactsAnalysisConfig.k_context = 1
+    GlobalConfig.CG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = true
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
 //    AndroidReachingFactsAnalysisConfig.timeout = 5
@@ -151,42 +147,36 @@ object PasswordTracking_run {
     
     files.foreach{
       file =>
-        val executor = Executors.newSingleThreadExecutor()
-        val future = executor.submit(new Task(sourcePath, outputPath, file, socket))
         try{
-          msg_critical(TITLE, future.get(10, TimeUnit.MINUTES).toString())
+          msg_critical(TITLE, PasswordTrackingTask(outputPath, file, socket, Some(10)).run)   
         } catch {
-          case te : TimeoutException => err_msg_critical(TITLE, "Timeout!")
+          case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
           case e : Throwable => e.printStackTrace()
-        } finally {
+        } finally{
+          msg_critical(TITLE, PasswordCounter.toString)
           socket.cleanEnv
-          future.cancel(true)
         }
     }
   }
   
-  private case class Task(sourcePath : String, outputPath : String, file : FileResourceUri, socket : AmandroidSocket) extends Callable{
-    def call() : String = {
-      try{
-        msg_critical(TITLE, "####" + file + "#####")
-        
-        val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-        val app_info = new SensitiveViewCollector(file, outUri)
-        app_info.collectInfo
-        if(app_info.getLayoutControls.exists(p => p._2.isSensitive == true)){
-			    PasswordCounter.havePasswordView += 1
-			    PasswordCounter.havePasswordViewList += file
-			  }
-        val ssm = new PasswordSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.PasswordSinkFilePath)
-        socket.plugListener(new PasswordTrackingListener(file, app_info))
-        socket.runWithDDA(ssm, false, true)
-      } catch {
-        case ie : IgnoreException => err_msg_critical(TITLE, "Ignored!")
-        case e : Throwable =>
-          e.printStackTrace()
-      } finally {
-        msg_critical(TITLE, PasswordCounter.toString)
+  private case class PasswordTrackingTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]) {
+    def run : String = {
+      msg_critical(TITLE, "####" + file + "#####")
+      val timer = timeout match {
+        case Some(t) => Some(new MyTimer(t))
+        case None => None
       }
+      if(timer.isDefined) timer.get.start
+      val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+      val app_info = new SensitiveViewCollector(file, outUri, timer)
+      app_info.collectInfo
+      if(app_info.getLayoutControls.exists(p => p._2.isSensitive == true)){
+		    PasswordCounter.havePasswordView += 1
+		    PasswordCounter.havePasswordViewList += file
+		  }
+      val ssm = new PasswordSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.PasswordSinkFilePath)
+      socket.plugListener(new PasswordTrackingListener(file, app_info))
+      socket.runWithDDA(ssm, false, true, timer)
       return "Done!"
     }
   }

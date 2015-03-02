@@ -17,23 +17,23 @@ import java.io.File
 import java.net.URI
 import org.sireum.jawa.util.APKFileResolver
 import org.sireum.amandroid.decompile.Dex2PilarConverter
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidRFAConfig
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAConfig
 import org.sireum.jawa.LibraryAPISummary
 import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.jawa.Center
 import org.sireum.amandroid.AndroidConstants
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysis
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.jawa.ClassLoadManager
 import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
 import org.sireum.amandroid.alir.taintAnalysis.AndroidDataDependentTaintAnalysis
-import org.sireum.jawa.util.TimeOutException
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.amandroid.alir.taintAnalysis.AndroidSourceAndSinkManager
 import org.sireum.jawa.JawaProcedure
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.decompile.AmDecoder
+import org.sireum.jawa.util.MyTimer
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -43,7 +43,6 @@ trait AmandroidSocketListener {
   def onPreAnalysis : Unit
   def entryPointFilter(eps : Set[JawaProcedure]) : Set[JawaProcedure]
   def onAnalysisSuccess : Unit
-  def onTimeout : Unit
   def onException(e : Exception) : Unit
   def onPostAnalysis : Unit
 }
@@ -103,7 +102,8 @@ class AmandroidSocket {
   def runWithDDA(
             ssm : AndroidSourceAndSinkManager,
             public_only : Boolean,
-            parallel : Boolean) = {    
+            parallel : Boolean,
+            timer : Option[MyTimer]) = {    
     try{
   		if(myListener_opt.isDefined) myListener_opt.get.onPreAnalysis
   		
@@ -117,21 +117,15 @@ class AmandroidSocket {
   	    	
 	    {if(parallel) entryPoints.par else entryPoints}.foreach{
     	  ep =>
-    	    try{
-	    	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
-	    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-	    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
-	    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)	    	    
-	    	    msg_critical(TITLE, "processed-->" + icfg.getProcessed.size)
-	    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
-	    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
-	    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult, ssm)    
-	    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
-		    	} catch {
-    	      case te : TimeOutException => 
-    	        err_msg_critical(TITLE, "Timeout!")
-    	        if(myListener_opt.isDefined) myListener_opt.get.onTimeout
-    	    }
+    	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
+    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
+    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, timer)
+    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)	    	    
+    	    msg_critical(TITLE, "processed-->" + icfg.getProcessed.size)
+    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
+    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
+    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult, ssm)    
+    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
       } 
   
     	if(myListener_opt.isDefined) myListener_opt.get.onAnalysisSuccess
@@ -146,7 +140,8 @@ class AmandroidSocket {
   
   def runWithoutDDA(
             public_only : Boolean,
-            parallel : Boolean
+            parallel : Boolean,
+            timer : Option[MyTimer]
             ) = {    
     try{
   		if(myListener_opt.isDefined) myListener_opt.get.onPreAnalysis
@@ -163,19 +158,13 @@ class AmandroidSocket {
   
     	{if(parallel) entryPoints.par else entryPoints}.foreach{
     	  ep =>
-    	    try{
-	    	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
-	    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-	    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager)
-	    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
-	    	    msg_critical(TITLE, "processed-->" + icfg.getProcessed.size)
-	    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
-	    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
-		    	} catch {
-    	      case te : TimeOutException => 
-    	        err_msg_critical(TITLE, "Timeout!")
-    	        if(myListener_opt.isDefined) myListener_opt.get.onTimeout
-    	    }
+    	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
+    	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
+    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, timer)
+    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
+    	    msg_critical(TITLE, "processed-->" + icfg.getProcessed.size)
+    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
+    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
       } 
   
     	if(myListener_opt.isDefined) myListener_opt.get.onAnalysisSuccess

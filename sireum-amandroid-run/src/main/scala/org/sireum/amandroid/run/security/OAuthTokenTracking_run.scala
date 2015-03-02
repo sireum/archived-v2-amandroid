@@ -17,13 +17,19 @@ import org.sireum.amandroid.alir.dataRecorder.DataCollector
 import org.sireum.amandroid.alir.dataRecorder.MetricRepo
 import org.sireum.jawa.MessageCenter
 import org.sireum.jawa.MessageCenter._
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
-import org.sireum.jawa.util.Timer
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.util._
 import org.sireum.amandroid.security.oauth.OAuthSourceAndSinkManager
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.util.IgnoreException
+import scala.actors.threadpool.Callable
+import scala.actors.threadpool.Executors
+import scala.actors.threadpool.TimeUnit
+import scala.actors.threadpool.TimeoutException
+import org.sireum.jawa.util.MyTimer
+import org.sireum.jawa.util.MyTimeoutException
+import org.sireum.jawa.GlobalConfig
 
 
 /**
@@ -132,7 +138,7 @@ object OAuthTokenTracking_run {
     
     MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
     
-    AndroidReachingFactsAnalysisConfig.k_context = 1
+    GlobalConfig.CG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
 //    AndroidReachingFactsAnalysisConfig.timeout = 10
@@ -148,20 +154,32 @@ object OAuthTokenTracking_run {
     files.foreach{
       file =>
         try{
-          msg_critical(TITLE, "####" + file + "#####")
-          
-          val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-          val app_info = new OauthTokenContainerCollector(file, outUri)
-          app_info.collectInfo
-          val ssm = new OAuthSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-          socket.plugListener(new OAuthTokenTrackingListener(file, app_info))
-          socket.runWithDDA(ssm, false, true)
+          msg_critical(TITLE, OAuthTokenTrackingTask(outputPath, file, socket, Some(10)).run)   
         } catch {
-          case e : Throwable =>
-            e.printStackTrace()
-        } finally {
+          case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
+          case e : Throwable => e.printStackTrace()
+        } finally{
+          msg_critical(TITLE, OAuthTokenCounter.toString)
           socket.cleanEnv
         }
+    }
+  }
+  
+  private case class OAuthTokenTrackingTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]){
+    def run : String = {
+      msg_critical(TITLE, "####" + file + "#####")
+      val timer = timeout match {
+        case Some(t) => Some(new MyTimer(t))
+        case None => None
+      }
+      if(timer.isDefined) timer.get.start
+      val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+      val app_info = new OauthTokenContainerCollector(file, outUri, timer)
+      app_info.collectInfo
+      val ssm = new OAuthSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+      socket.plugListener(new OAuthTokenTrackingListener(file, app_info))
+      socket.runWithDDA(ssm, false, true, timer)
+      return "Done!"
     }
   }
 }

@@ -15,14 +15,14 @@ import org.sireum.jawa.Center
 import org.stringtemplate.v4.STGroupFile
 import java.util.ArrayList
 import org.sireum.jawa.alir.controlFlowGraph.CGCallNode
-import org.sireum.amandroid.alir.model.InterComponentCommunicationModel
-import org.sireum.jawa.alir.reachingFactsAnalysis.ReachingFactsAnalysisHelper
-import org.sireum.jawa.alir.reachingFactsAnalysis.VarSlot
-import org.sireum.amandroid.alir.reachingFactsAnalysis.IntentHelper
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.ReachingFactsAnalysisHelper
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
 import org.sireum.pilar.ast._
 import org.sireum.amandroid.parser.UriData
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentCommunicationModel
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -326,7 +326,7 @@ object DataCollector {
 			      val InterProceduralDataFlowGraph(icfg, irfaResult) = AppCenter.getInterproceduralReachingFactsAnalysisResult(compRec)
 			      val iccNodes = icfg.nodes.filter{
 			        	node =>
-			        	  node.isInstanceOf[CGCallNode] && node.asInstanceOf[CGCallNode].getCalleeSet.exists(c => InterComponentCommunicationModel.isIccOperation(Center.getProcedureWithoutFailing(c.callee)))
+			        	  node.isInstanceOf[CGCallNode] && node.asInstanceOf[CGCallNode].getCalleeSet.exists(c => InterComponentCommunicationModel.isIccOperation(c.callee))
 			      	}.map(_.asInstanceOf[CGCallNode])
 			      iccInfos =
 				      iccNodes.map{
@@ -349,7 +349,7 @@ object DataCollector {
 								  val intentcontents = IntentHelper.getIntentContents(factMap, intentValues, iccNode.getContext)
 								  val comMap = IntentHelper.mappingIntents(intentcontents)
 								  val intents = intentcontents.map(ic=>Intent(ic.componentNames, ic.actions, ic.categories, ic.datas, ic.types, ic.preciseExplicit, ic.preciseImplicit, comMap(ic).map(c=>(c._1.getName, c._2.toString()))))
-								  IccInfo(iccNode.getCalleeSet.map(_.callee), iccNode.getContext, intents)
+								  IccInfo(iccNode.getCalleeSet.map(_.callee.getSignature), iccNode.getContext, intents)
 				      }.toSet
 			      taintResult = if(AppCenter.hasTaintAnalysisResult(compRec)) Some(AppCenter.getTaintAnalysisResult(compRec)) else None
 		      }

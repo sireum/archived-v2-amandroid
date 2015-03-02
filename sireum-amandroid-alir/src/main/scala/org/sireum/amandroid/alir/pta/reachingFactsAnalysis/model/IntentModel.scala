@@ -5,17 +5,21 @@ are made available under the terms of the Eclipse Public License v1.0
 which accompanies this distribution, and is available at              
 http://www.eclipse.org/legal/epl-v10.html                             
 */
-package org.sireum.amandroid.alir.model
+package org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model
 
 import org.sireum.util._
 import org.sireum.jawa._
-import org.sireum.jawa.alir.reachingFactsAnalysis._
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.alir.Slot
 import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.alir._
+import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
+import org.sireum.jawa.alir.pta.PTAInstance
+import org.sireum.jawa.alir.pta.PTAPointStringInstance
+import org.sireum.jawa.alir.pta.PTATupleInstance
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -525,9 +529,9 @@ object IntentModel {
 	      actionValue.foreach{
 		      acStr =>
 	          acStr match{
-	            case cstr @ RFAConcreteStringInstance(text, c) =>
+	            case cstr @ PTAConcreteStringInstance(text, c) =>
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
-	            case pstr @ RFAPointStringInstance(c) => 
+	            case pstr @ PTAPointStringInstance(c) => 
 	              err_msg_detail(TITLE, "Init action use point string: " + pstr)
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), pstr)
 	            case _ =>
@@ -570,9 +574,9 @@ object IntentModel {
 	      actionValue.foreach{
 		      acStr =>
 	          acStr match{
-	            case cstr @ RFAConcreteStringInstance(text, c) =>
+	            case cstr @ PTAConcreteStringInstance(text, c) =>
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
-	            case pstr @ RFAPointStringInstance(c) => 
+	            case pstr @ PTAPointStringInstance(c) => 
 	              err_msg_detail(TITLE,"Init action use point string: " + pstr)
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), pstr)
 	            case _ =>
@@ -607,13 +611,13 @@ object IntentModel {
 	    classValue.map{
       	value => 
       	  if(value.isInstanceOf[ClassInstance]){
-      	  	RFAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
+      	  	PTAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
       	  } else if(value.isInstanceOf[UnknownInstance] || value.isInstanceOf[NullInstance]){
       	    value
       	  } else throw new RuntimeException("Unexpected instance type: " + value)
       }
 
-	  val componentNameIns = RFAInstance(NormalType(AndroidConstants.COMPONENTNAME, 0), currentContext)
+	  val componentNameIns = PTAInstance(NormalType(AndroidConstants.COMPONENTNAME, 0), currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
@@ -634,9 +638,9 @@ object IntentModel {
 	      actionValue.foreach{
 		      acStr =>
 	          acStr match{
-	            case cstr @ RFAConcreteStringInstance(text, c) =>
+	            case cstr @ PTAConcreteStringInstance(text, c) =>
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
-	            case pstr @ RFAPointStringInstance(c) => 
+	            case pstr @ PTAPointStringInstance(c) => 
 	              err_msg_detail(TITLE, "Init action use point string: " + pstr)
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), pstr)
 	            case _ =>
@@ -652,12 +656,12 @@ object IntentModel {
 	      clazzNames.foreach{
 	      sIns =>
 	        sIns match {
-	          case cstr @ RFAConcreteStringInstance(text, c) =>
+	          case cstr @ PTAConcreteStringInstance(text, c) =>
             val recordName = text
 	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>
-		            val pakStr = RFAConcreteStringInstance(rec.getPackageName, c)
+		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
@@ -666,7 +670,7 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }
-          case pstr @ RFAPointStringInstance(c) => 
+          case pstr @ PTAPointStringInstance(c) => 
             err_msg_detail(TITLE, "Init ComponentName use point string: " + pstr)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), pstr)
@@ -694,12 +698,12 @@ object IntentModel {
 	    param2Value.map{
       	value => 
       	  if(value.isInstanceOf[ClassInstance]){
-      	  	RFAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
+      	  	PTAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
       	  } else if(value.isInstanceOf[UnknownInstance] || value.isInstanceOf[NullInstance]){
       	    value
       	  } else throw new RuntimeException("Unexpected instance type: " + value)
       }
-    val componentNameIns = RFAInstance(NormalType(AndroidConstants.COMPONENTNAME, 0), currentContext)
+    val componentNameIns = PTAInstance(NormalType(AndroidConstants.COMPONENTNAME, 0), currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.map{
@@ -718,12 +722,12 @@ object IntentModel {
     clazzNames.foreach{
       sIns =>
         sIns match {
-          case cstr @ RFAConcreteStringInstance(text, c) =>
+          case cstr @ PTAConcreteStringInstance(text, c) =>
             val recordName = text
 	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>
-		            val pakStr = RFAConcreteStringInstance(rec.getPackageName, c)
+		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
@@ -732,7 +736,7 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }
-          case pstr @ RFAPointStringInstance(c) => 
+          case pstr @ PTAPointStringInstance(c) => 
             err_msg_detail(TITLE, "Init ComponentName use point string: " + pstr)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), pstr)
@@ -765,16 +769,16 @@ object IntentModel {
 	        cv => 
 	          var hashsetIns = cv
 	          if(cv.isInstanceOf[NullInstance]){
-	            hashsetIns = RFAInstance(NormalType("java.util.HashSet", 0), currentContext)
+	            hashsetIns = PTAInstance(NormalType("java.util.HashSet", 0), currentContext)
 	            newfacts += RFAFact(mCategorySlot, hashsetIns)
 	            delfacts += RFAFact(mCategorySlot, cv)
 	          }
 	          categoryValue.map{
 				      cn =>
 				        cn match{
-				          case cstr @ RFAConcreteStringInstance(text, c) =>
+				          case cstr @ PTAConcreteStringInstance(text, c) =>
 				            newfacts += RFAFact(FieldSlot(hashsetIns, "java.util.HashSet.items"), cstr)
-				          case pstr @ RFAPointStringInstance(c) => 
+				          case pstr @ PTAPointStringInstance(c) => 
 				            err_msg_detail(TITLE, "add category use point string: " + pstr)
 				            newfacts += RFAFact(FieldSlot(hashsetIns, "java.util.HashSet.items"), pstr)
 				          case _ =>
@@ -836,9 +840,9 @@ object IntentModel {
 	          thisValue.foreach{
 	            tv =>
 	              str match{
-			            case cstr @ RFAConcreteStringInstance(text, c) =>
+			            case cstr @ PTAConcreteStringInstance(text, c) =>
 			              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
-			            case pstr @ RFAPointStringInstance(c) => 
+			            case pstr @ PTAPointStringInstance(c) => 
 			              err_msg_detail(TITLE, "Init package use point string: " + pstr)
 			              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), pstr)
 			            case _ =>
@@ -867,12 +871,12 @@ object IntentModel {
 	    param2Value.map{
       	value => 
       	  if(value.isInstanceOf[ClassInstance]){
-      	  	RFAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
+      	  	PTAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
       	  } else if(value.isInstanceOf[UnknownInstance] || value.isInstanceOf[NullInstance]){
       	    value
       	  } else throw new RuntimeException("Unexpected instance type: " + value)
       }
-    val componentNameIns = RFAInstance(NormalType(AndroidConstants.COMPONENTNAME, 0), currentContext)
+    val componentNameIns = PTAInstance(NormalType(AndroidConstants.COMPONENTNAME, 0), currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.map{
@@ -892,12 +896,12 @@ object IntentModel {
     clazzNames.foreach{
       sIns =>
         sIns match {
-          case cstr @ RFAConcreteStringInstance(text, c) =>
+          case cstr @ PTAConcreteStringInstance(text, c) =>
             val recordName = text
 	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>
-		            val pakStr = RFAConcreteStringInstance(rec.getPackageName, c)
+		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
@@ -906,7 +910,7 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }
-          case pstr @ RFAPointStringInstance(c) => 
+          case pstr @ PTAPointStringInstance(c) => 
             err_msg_detail(TITLE, "Init ComponentName use point string: " + pstr)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), pstr)
@@ -930,7 +934,7 @@ object IntentModel {
 	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
 	  val clazzSlot = VarSlot(args(2))
 	  val clazzValue = factMap.getOrElse(clazzSlot, isetEmpty)
-    val componentNameIns = RFAInstance(NormalType(AndroidConstants.COMPONENTNAME, 0), currentContext)
+    val componentNameIns = PTAInstance(NormalType(AndroidConstants.COMPONENTNAME, 0), currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.map{
@@ -950,12 +954,12 @@ object IntentModel {
     clazzValue.map{
       name =>
         name match{
-          case cstr @ RFAConcreteStringInstance(text, c) =>
+          case cstr @ PTAConcreteStringInstance(text, c) =>
             val recordName = text
 	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>
-		            val pakStr = RFAConcreteStringInstance(rec.getPackageName, c)
+		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
@@ -964,7 +968,7 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }
-          case pstr @ RFAPointStringInstance(c) => 
+          case pstr @ PTAPointStringInstance(c) => 
             err_msg_detail(TITLE, "Init ComponentName use point string: " + pstr)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), pstr)
@@ -1151,9 +1155,9 @@ object IntentModel {
 	          thisValue.foreach{
 	            tv =>
 	              str match{
-			            case cstr @ RFAConcreteStringInstance(text, c) =>
+			            case cstr @ PTAConcreteStringInstance(text, c) =>
 			              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_PACKAGE), cstr)
-			            case pstr @ RFAPointStringInstance(c) => 
+			            case pstr @ PTAPointStringInstance(c) => 
 			              err_msg_detail(TITLE, "Init package use point string: " + pstr)
 			              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_PACKAGE), pstr)
 			            case _ =>
@@ -1198,7 +1202,7 @@ object IntentModel {
 	  val valueValue = factMap.getOrElse(valueSlot, isetEmpty)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
-    val bundleIns = RFAInstance(NormalType(AndroidConstants.BUNDLE, 0), currentContext)
+    val bundleIns = PTAInstance(NormalType(AndroidConstants.BUNDLE, 0), currentContext)
 	  thisValue.foreach{
 	    tv =>
 	      val mExtraSlot = FieldSlot(tv, AndroidConstants.INTENT_EXTRAS)
@@ -1214,7 +1218,7 @@ object IntentModel {
 				      str =>
 			          valueValue.foreach{
 			            vv =>
-			              entries += RFATupleInstance(str, vv, currentContext)
+			              entries += PTATupleInstance(str, vv, currentContext)
 			          }
 				    }
 	          newfacts ++= entries.map(e => RFAFact(FieldSlot(mev, "android.os.Bundle.entries"), e))
@@ -1241,7 +1245,7 @@ object IntentModel {
         if(!mExtraValue.isEmpty){
           newfacts ++= mExtraValue.map{mev => RFAFact(VarSlot(retVar), mev)}
         } else {
-          newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(Center.DEFAULT_TOPLEVEL_OBJECT), currentContext)))
+          newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(AndroidConstants.BUNDLE), currentContext)))
         }
     }
     (newfacts, delfacts)
@@ -1265,20 +1269,20 @@ object IntentModel {
 	    	mExtraValue.map{ins => factMap.getOrElse(FieldSlot(ins, "android.os.Bundle.entries"), isetEmpty)}.reduce(iunion[Instance])
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
-	  if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[RFAPointStringInstance]).isEmpty){
-      val keys = keyValue.map{k => k.asInstanceOf[RFAConcreteStringInstance].string}
+	  if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
+      val keys = keyValue.map{k => k.asInstanceOf[PTAConcreteStringInstance].string}
       entValue.foreach{
         v =>
-          require(v.isInstanceOf[RFATupleInstance])
-          if(keys.contains(v.asInstanceOf[RFATupleInstance].left.asInstanceOf[RFAConcreteStringInstance].string)){
-            newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[RFATupleInstance].right))
+          require(v.isInstanceOf[PTATupleInstance])
+          if(keys.contains(v.asInstanceOf[PTATupleInstance].left.asInstanceOf[PTAConcreteStringInstance].string)){
+            newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
           }
       }
     } else if(!entValue.isEmpty) {
       entValue.foreach{
         v =>
-          require(v.isInstanceOf[RFATupleInstance])
-          newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[RFATupleInstance].right))
+          require(v.isInstanceOf[PTATupleInstance])
+          newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
       }
     } else {
       newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(Center.DEFAULT_TOPLEVEL_OBJECT), currentContext)))
@@ -1306,20 +1310,20 @@ object IntentModel {
 	    	mExtraValue.map{ins => factMap.getOrElse(FieldSlot(ins, "android.os.Bundle.entries"), isetEmpty)}.reduce(iunion[Instance])
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
-	  if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[RFAPointStringInstance]).isEmpty){
-      val keys = keyValue.map{k => k.asInstanceOf[RFAConcreteStringInstance].string}
+	  if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
+      val keys = keyValue.map{k => k.asInstanceOf[PTAConcreteStringInstance].string}
       entValue.foreach{
         v =>
-          require(v.isInstanceOf[RFATupleInstance])
-          if(keys.contains(v.asInstanceOf[RFATupleInstance].left.asInstanceOf[RFAConcreteStringInstance].string)){
-            newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[RFATupleInstance].right))
+          require(v.isInstanceOf[PTATupleInstance])
+          if(keys.contains(v.asInstanceOf[PTATupleInstance].left.asInstanceOf[PTAConcreteStringInstance].string)){
+            newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
           }
       }
     } else if(!entValue.isEmpty) {
       entValue.foreach{
         v =>
-          require(v.isInstanceOf[RFATupleInstance])
-          newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[RFATupleInstance].right))
+          require(v.isInstanceOf[PTATupleInstance])
+          newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
       }
     } else {
       newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(Center.DEFAULT_TOPLEVEL_OBJECT), currentContext)))

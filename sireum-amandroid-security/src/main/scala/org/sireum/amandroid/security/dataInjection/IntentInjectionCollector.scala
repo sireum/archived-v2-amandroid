@@ -16,12 +16,13 @@ import org.sireum.jawa.JawaRecord
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.Center
 import org.sireum.amandroid.appInfo.ReachableInfoCollector
+import org.sireum.jawa.util.MyTimer
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-class IntentInjectionCollector(apkUri : FileResourceUri, outputUri : FileResourceUri) extends AppInfoCollector(apkUri, outputUri) {
+class IntentInjectionCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, timer : Option[MyTimer]) extends AppInfoCollector(apkUri, outputUri, timer) {
   private final val TITLE = "IntentInjectionCollector"
   var ra : ReachableInfoCollector = null
 	def getInterestingContainers(interestingAPIs : Set[String]) = {
@@ -45,7 +46,7 @@ class IntentInjectionCollector(apkUri : FileResourceUri, outputUri : FileResourc
 	  val afp = AppInfoCollector.analyzeARSC(apkUri)
 		val lfp = AppInfoCollector.analyzeLayouts(apkUri, mfp)
 		this.layoutControls = lfp.getUserControls
-		this.ra = AppInfoCollector.reachabilityAnalysis(mfp)
+		this.ra = AppInfoCollector.reachabilityAnalysis(mfp, timer)
 		val callbacks = AppInfoCollector.analyzeCallback(afp, lfp, ra)
 		this.callbackMethods = callbacks
 		var components = isetEmpty[JawaRecord]

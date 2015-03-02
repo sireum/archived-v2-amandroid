@@ -5,11 +5,11 @@ are made available under the terms of the Eclipse Public License v1.0
 which accompanies this distribution, and is available at              
 http://www.eclipse.org/legal/epl-v10.html                             
 */
-package org.sireum.amandroid.alir.reachingFactsAnalysis
+package org.sireum.amandroid.alir.pta.reachingFactsAnalysis
 
 import org.sireum.util._
 import org.sireum.jawa.alir.Instance
-import org.sireum.jawa.alir.reachingFactsAnalysis._
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.alir.Slot
 import org.sireum.jawa.util.StringFormConverter
@@ -22,6 +22,7 @@ import org.sireum.jawa.Center
 import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.JawaProcedure
 import java.net.URLEncoder
+import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -57,8 +58,8 @@ object IntentHelper {
             val cFieldSlot = FieldSlot(compIns, AndroidConstants.COMPONENTNAME_CLASS)
             factMap.getOrElse(cFieldSlot, isetEmpty).foreach{
               ins =>
-                if(ins.isInstanceOf[RFAConcreteStringInstance]){
-                  componentNames += ins.asInstanceOf[RFAConcreteStringInstance].string
+                if(ins.isInstanceOf[PTAConcreteStringInstance]){
+                  componentNames += ins.asInstanceOf[PTAConcreteStringInstance].string
                 }
                 else preciseExplicit = false
             }
@@ -68,8 +69,8 @@ object IntentHelper {
         val acFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_ACTION)
         factMap.getOrElse(acFieldSlot, isetEmpty).foreach{
           acIns =>
-            if(acIns.isInstanceOf[RFAConcreteStringInstance])
-              actions += acIns.asInstanceOf[RFAConcreteStringInstance].string
+            if(acIns.isInstanceOf[PTAConcreteStringInstance])
+              actions += acIns.asInstanceOf[PTAConcreteStringInstance].string
             else preciseImplicit = false
         }
         
@@ -80,8 +81,8 @@ object IntentHelper {
             val hashSetFieldSlot = FieldSlot(cateIns, "[|java:util:HashSet.items|]")
             factMap.getOrElse(hashSetFieldSlot, isetEmpty).foreach{
               itemIns =>
-                if(itemIns.isInstanceOf[RFAConcreteStringInstance])
-                  categories += itemIns.asInstanceOf[RFAConcreteStringInstance].string
+                if(itemIns.isInstanceOf[PTAConcreteStringInstance])
+                  categories += itemIns.asInstanceOf[PTAConcreteStringInstance].string
                 else preciseImplicit = false
             }
         }
@@ -93,8 +94,8 @@ object IntentHelper {
             val uriStringFieldSlot = FieldSlot(dataIns, AndroidConstants.URI_STRING_URI_URI_STRING)
             factMap.getOrElse(uriStringFieldSlot, isetEmpty).foreach{
               usIns =>
-                if(usIns.isInstanceOf[RFAConcreteStringInstance]){
-                  val uriString = usIns.asInstanceOf[RFAConcreteStringInstance].string
+                if(usIns.isInstanceOf[PTAConcreteStringInstance]){
+                  val uriString = usIns.asInstanceOf[PTAConcreteStringInstance].string
                   var uriData = new UriData
                   populateByUri(uriData, uriString)
                   datas +=uriData
@@ -106,8 +107,8 @@ object IntentHelper {
         val mtypFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_MTYPE)
         factMap.getOrElse(mtypFieldSlot, isetEmpty).foreach{
           mtypIns =>
-            if(mtypIns.isInstanceOf[RFAConcreteStringInstance])
-              types += mtypIns.asInstanceOf[RFAConcreteStringInstance].string
+            if(mtypIns.isInstanceOf[PTAConcreteStringInstance])
+              types += mtypIns.asInstanceOf[PTAConcreteStringInstance].string
             else preciseImplicit = false
         }
         val ic = IntentContent(componentNames, actions, categories, datas, types, 

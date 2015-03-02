@@ -5,17 +5,19 @@ are made available under the terms of the Eclipse Public License v1.0
 which accompanies this distribution, and is available at              
 http://www.eclipse.org/legal/epl-v10.html                             
 */
-package org.sireum.amandroid.alir.model
+package org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model
 
 import org.sireum.util._
 import org.sireum.jawa._
 import org.sireum.jawa.alir.Context
-import org.sireum.jawa.alir.reachingFactsAnalysis._
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.alir.Instance
 import org.sireum.jawa.alir.UnknownInstance
+import org.sireum.jawa.alir.pta.PTAPointStringInstance
+import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -58,11 +60,11 @@ object ComponentNameModel {
 		  case "Landroid/content/ComponentName;.equals:(Ljava/lang/Object;)Z" =>  //public
 		  case "Landroid/content/ComponentName;.flattenToShortString:()Ljava/lang/String;" =>  //public
 		    require(retVars.size == 1)
-		    newFacts += RFAFact(VarSlot(retVars(0)), RFAPointStringInstance(currentContext))
+		    newFacts += RFAFact(VarSlot(retVars(0)), PTAPointStringInstance(currentContext))
 		    byPassFlag = false
 		  case "Landroid/content/ComponentName;.flattenToString:()Ljava/lang/String;" =>  //public
 		    require(retVars.size == 1)
-		    newFacts += RFAFact(VarSlot(retVars(0)), RFAPointStringInstance(currentContext))
+		    newFacts += RFAFact(VarSlot(retVars(0)), PTAPointStringInstance(currentContext))
 		    byPassFlag = false
 		  case "Landroid/content/ComponentName;.getClassName:()Ljava/lang/String;" =>  //public
 		    require(retVars.size == 1)
@@ -81,15 +83,15 @@ object ComponentNameModel {
 		    //TODO: How to handle parcel
 		  case "Landroid/content/ComponentName;.toShortString:()Ljava/lang/String;" =>  //public
 		    require(retVars.size == 1)
-		    newFacts += RFAFact(VarSlot(retVars(0)), RFAPointStringInstance(currentContext))
+		    newFacts += RFAFact(VarSlot(retVars(0)), PTAPointStringInstance(currentContext))
 		    byPassFlag = false
 		  case "Landroid/content/ComponentName;.toString:()Ljava/lang/String;" =>  //public
 		    require(retVars.size == 1)
-		    newFacts += RFAFact(VarSlot(retVars(0)), RFAPointStringInstance(currentContext))
+		    newFacts += RFAFact(VarSlot(retVars(0)), PTAPointStringInstance(currentContext))
 		    byPassFlag = false
 		  case "Landroid/content/ComponentName;.unflattenFromString:(Ljava/lang/String;)Landroid/content/ComponentName;" =>  //public static
 		    require(retVars.size == 1)
-		    newFacts += RFAFact(VarSlot(retVars(0)), RFAPointStringInstance(currentContext))
+		    newFacts += RFAFact(VarSlot(retVars(0)), PTAPointStringInstance(currentContext))
 		    byPassFlag = false
 		  case "Landroid/content/ComponentName;.writeToParcel:(Landroid/content/ComponentName;Landroid/os/Parcel;)V" =>  //public static
 		    //TODO: How to handle parcel
@@ -144,18 +146,18 @@ object ComponentNameModel {
 	  s.map{
 	    i =>
 	      i match{
-	        case cstr @ RFAConcreteStringInstance(text, c) =>
+	        case cstr @ PTAConcreteStringInstance(text, c) =>
 	          val recordName = text
 	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
 	            case Some(rec) =>
-	              RFAConcreteStringInstance(rec.getShortName, currentContext)
+	              PTAConcreteStringInstance(rec.getShortName, currentContext)
 	            case None =>
 	              err_msg_normal(TITLE, "Given class name probably come from another app: " + i)
 	              UnknownInstance(new NormalType(recordName), currentContext)
 	          }
-          case pstr @ RFAPointStringInstance(c) => 
-          	RFAPointStringInstance(currentContext)
+          case pstr @ PTAPointStringInstance(c) => 
+          	PTAPointStringInstance(currentContext)
           case _ =>
             err_msg_normal(TITLE, "Get short name use unknown instance: " + i)
             UnknownInstance(new NormalType(Center.DEFAULT_TOPLEVEL_OBJECT), currentContext)
@@ -195,13 +197,13 @@ object ComponentNameModel {
 		      clazzNames.map{
 		        cn =>
 		          cn match{
-		            case cstr @ RFAConcreteStringInstance(text, c) =>
+		            case cstr @ PTAConcreteStringInstance(text, c) =>
 		              val recordName = text
 		              val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
 		              var facts = isetEmpty[RFAFact]
 		              recOpt match{
 		                case Some(rec) =>
-				              val pakStr = RFAConcreteStringInstance(rec.getPackageName, c)
+				              val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
 				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
 				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), cstr)
 		                case None =>
@@ -211,7 +213,7 @@ object ComponentNameModel {
 				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
 		              }
 		              facts
-		            case pstr @ RFAPointStringInstance(c) => 
+		            case pstr @ PTAPointStringInstance(c) => 
 		              err_msg_detail(TITLE, "Init ComponentName use point string: " + pstr)
 		              var facts = isetEmpty[RFAFact]
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
@@ -245,16 +247,16 @@ object ComponentNameModel {
 		      param2Value.map{
 		        cn =>
 		          cn match{
-		            case cstr @ RFAConcreteStringInstance(text, c) =>
+		            case cstr @ PTAConcreteStringInstance(text, c) =>
 		              val recordType = StringFormConverter.formatClassNameToType(text)
 		              val rec = Center.resolveRecord(recordType.name, Center.ResolveLevel.HIERARCHY)
-		              val claStr = RFAConcreteStringInstance(recordType.name, c)
-		              val pakStr = RFAConcreteStringInstance(rec.getPackageName, c)
+		              val claStr = PTAConcreteStringInstance(recordType.name, c)
+		              val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
 		              var facts = isetEmpty[RFAFact]
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), claStr)
 		              facts
-		            case pstr @ RFAPointStringInstance(c) => 
+		            case pstr @ PTAPointStringInstance(c) => 
 		              err_msg_detail(TITLE, "Init ComponentName use point string: " + pstr)
 		              var facts = isetEmpty[RFAFact]
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
@@ -290,21 +292,21 @@ object ComponentNameModel {
 		      param1Value.map{
 		        pv1 =>
 		          pv1 match{
-		            case cstr1 @ RFAConcreteStringInstance(text, c) =>
+		            case cstr1 @ PTAConcreteStringInstance(text, c) =>
 		              if(param2Value.isEmpty){
 						        isetEmpty[RFAFact]
 						      } else {
 			              param2Value.map{
 							        pv2 =>
 							          pv2 match{
-							            case cstr2 @ RFAConcreteStringInstance(text, c) =>
+							            case cstr2 @ PTAConcreteStringInstance(text, c) =>
 							              val recordType = StringFormConverter.formatClassNameToType(text)
-							              val claStr = RFAConcreteStringInstance(recordType.name, c)
+							              val claStr = PTAConcreteStringInstance(recordType.name, c)
 							              var facts = isetEmpty[RFAFact]
 							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pv1)
 							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), claStr)
 							              facts
-							            case pstr2 @ RFAPointStringInstance(c) => 
+							            case pstr2 @ PTAPointStringInstance(c) => 
 							              err_msg_detail(TITLE, "Init ComponentName.mClass use point string: " + pv2)
 							              var facts = isetEmpty[RFAFact]
 							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pstr2)
@@ -319,7 +321,7 @@ object ComponentNameModel {
 							          }
 							      }.reduce(iunion[RFAFact])
 						      }
-		            case pstr1 @ RFAPointStringInstance(c) => 
+		            case pstr1 @ PTAPointStringInstance(c) => 
 		              err_msg_detail(TITLE, "Init ComponentName.mPackage use point string: " + pv1)
 		              var facts = isetEmpty[RFAFact]
 		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pstr1)

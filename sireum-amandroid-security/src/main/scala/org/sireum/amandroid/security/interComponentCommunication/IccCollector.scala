@@ -15,12 +15,13 @@ import org.sireum.jawa.JawaRecord
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.Center
 import org.sireum.jawa.util.IgnoreException
+import org.sireum.jawa.util.MyTimer
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-class IccCollector(apkUri : FileResourceUri, outputUri : FileResourceUri) extends AppInfoCollector(apkUri, outputUri) {
+class IccCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, timer : Option[MyTimer]) extends AppInfoCollector(apkUri, outputUri, timer) {
   private final val TITLE = "IccCollector"
   private var iccContainers : Set[JawaRecord] = Set()
 	def getIccContainers = this.iccContainers
@@ -36,7 +37,7 @@ class IccCollector(apkUri : FileResourceUri, outputUri : FileResourceUri) extend
 	  val afp = AppInfoCollector.analyzeARSC(apkUri)
 		val lfp = AppInfoCollector.analyzeLayouts(apkUri, mfp)
 		
-		val ra = AppInfoCollector.reachabilityAnalysis(mfp)
+		val ra = AppInfoCollector.reachabilityAnalysis(mfp, timer)
 		
 		val callbacks = AppInfoCollector.analyzeCallback(afp, lfp, ra)
 		this.callbackMethods = callbacks

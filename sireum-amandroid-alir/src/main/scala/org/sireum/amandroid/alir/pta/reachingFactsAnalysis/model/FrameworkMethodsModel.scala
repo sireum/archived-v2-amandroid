@@ -5,12 +5,12 @@ are made available under the terms of the Eclipse Public License v1.0
 which accompanies this distribution, and is available at              
 http://www.eclipse.org/legal/epl-v10.html                             
 */
-package org.sireum.amandroid.alir.model
+package org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model
 
 import org.sireum.jawa.alir.Context
 import org.sireum.util._
 import org.sireum.jawa._
-import org.sireum.jawa.alir.reachingFactsAnalysis._
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.parser.IntentFilterDataBase
@@ -18,6 +18,8 @@ import org.sireum.amandroid.parser.IntentFilter
 import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.alir.UnknownInstance
 import org.sireum.jawa.alir.NullInstance
+import org.sireum.jawa.alir.pta.PTAPointStringInstance
+import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -115,7 +117,7 @@ object FrameworkMethodsModel {
 			          mActionsValue.foreach{
 			            mav =>
 			              mav match{
-					            case cstr @ RFAConcreteStringInstance(text, c) =>
+					            case cstr @ PTAConcreteStringInstance(text, c) =>
 					              intentF.addAction(text)
 					            case _ =>
 					              precise = false
@@ -126,7 +128,7 @@ object FrameworkMethodsModel {
 			          mCategoriesValue.foreach{
 			            mav =>
 			              mav match{
-					            case cstr @ RFAConcreteStringInstance(text, c) =>
+					            case cstr @ PTAConcreteStringInstance(text, c) =>
 					              intentF.addCategory(text)
 					            case _ =>
 					              precise = false
@@ -157,13 +159,13 @@ object FrameworkMethodsModel {
 	  paramValue.foreach{
 	    str =>
 	      str match{
-			    case cstr @ RFAConcreteStringInstance(text, c) =>
+			    case cstr @ PTAConcreteStringInstance(text, c) =>
 			      if(AndroidConstants.getSystemServiceStrings.contains(text)){
 			        msg_normal(TITLE, "Get " + text + " service in " + currentContext)
 			      } else {
 			        err_msg_normal(TITLE, "Given service does not exist: " + cstr)
 			      }
-			    case pstr @ RFAPointStringInstance(c) => err_msg_normal(TITLE, "Get system service use point string: " + pstr)
+			    case pstr @ PTAPointStringInstance(c) => err_msg_normal(TITLE, "Get system service use point string: " + pstr)
 			    case _ => err_msg_normal(TITLE, "Get system service use unexpected instance type: " + str)
 	      }
 	  }
