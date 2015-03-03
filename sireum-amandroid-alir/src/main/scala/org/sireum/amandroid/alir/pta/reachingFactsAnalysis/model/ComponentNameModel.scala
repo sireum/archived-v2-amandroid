@@ -14,8 +14,8 @@ import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.MessageCenter._
-import org.sireum.jawa.alir.Instance
-import org.sireum.jawa.alir.UnknownInstance
+import org.sireum.jawa.alir.pta.Instance
+import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 

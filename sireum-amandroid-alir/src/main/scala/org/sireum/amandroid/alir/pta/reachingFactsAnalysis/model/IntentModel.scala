@@ -20,6 +20,10 @@ import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.pta.PTAInstance
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
 import org.sireum.jawa.alir.pta.PTATupleInstance
+import org.sireum.jawa.alir.pta.ClassInstance
+import org.sireum.jawa.alir.pta.UnknownInstance
+import org.sireum.jawa.alir.pta.NullInstance
+import org.sireum.jawa.alir.pta.Instance
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

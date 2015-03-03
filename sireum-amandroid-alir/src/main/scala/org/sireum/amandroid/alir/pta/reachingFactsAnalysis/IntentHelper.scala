@@ -8,7 +8,7 @@ http://www.eclipse.org/legal/epl-v10.html
 package org.sireum.amandroid.alir.pta.reachingFactsAnalysis
 
 import org.sireum.util._
-import org.sireum.jawa.alir.Instance
+import org.sireum.jawa.alir.pta.Instance
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.alir.Slot

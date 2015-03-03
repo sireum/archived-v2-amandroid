@@ -14,7 +14,7 @@ import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.jawa.JawaProcedure
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.AndroidConstants
-import org.sireum.jawa.alir.UnknownInstance
+import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.Center
 
 /**

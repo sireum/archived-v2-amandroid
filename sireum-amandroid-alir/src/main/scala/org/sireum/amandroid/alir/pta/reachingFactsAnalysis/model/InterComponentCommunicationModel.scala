@@ -16,7 +16,7 @@ import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.parser.UriData
 import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.JawaRecord
-import org.sireum.jawa.alir.Instance
+import org.sireum.jawa.alir.pta.Instance
 import java.net.URI
 import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.MessageCenter._

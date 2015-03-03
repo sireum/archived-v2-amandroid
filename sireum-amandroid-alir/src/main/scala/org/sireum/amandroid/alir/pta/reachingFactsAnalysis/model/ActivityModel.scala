@@ -12,7 +12,7 @@ import org.sireum.util._
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
-import org.sireum.jawa.alir.UnknownInstance
+import org.sireum.jawa.alir.pta.UnknownInstance
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

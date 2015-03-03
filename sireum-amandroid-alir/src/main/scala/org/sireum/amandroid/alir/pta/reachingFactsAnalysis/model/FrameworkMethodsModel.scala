@@ -16,8 +16,8 @@ import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.parser.IntentFilterDataBase
 import org.sireum.amandroid.parser.IntentFilter
 import org.sireum.jawa.MessageCenter._
-import org.sireum.jawa.alir.UnknownInstance
-import org.sireum.jawa.alir.NullInstance
+import org.sireum.jawa.alir.pta.UnknownInstance
+import org.sireum.jawa.alir.pta.NullInstance
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 

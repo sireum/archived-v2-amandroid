@@ -15,7 +15,7 @@ import org.sireum.jawa.alir.Context
 import org.sireum.jawa.Center
 import org.sireum.jawa.NormalType
 import org.sireum.alir.Slot
-import org.sireum.jawa.alir.Instance
+import org.sireum.jawa.alir.pta.Instance
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAScopeManager
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.model.ModelCallHandler
