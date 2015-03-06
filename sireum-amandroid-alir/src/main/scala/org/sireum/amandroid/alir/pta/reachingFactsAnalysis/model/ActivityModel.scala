@@ -13,6 +13,7 @@ import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.jawa.alir.pta.UnknownInstance
+import org.sireum.jawa.alir.pta.PTAResult
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -21,7 +22,7 @@ import org.sireum.jawa.alir.pta.UnknownInstance
 object ActivityModel {
 	def isActivity(r : JawaRecord) : Boolean = r.getName == AndroidConstants.ACTIVITY
 	
-	def doActivityCall(s : ISet[RFAFact], p : JawaProcedure, args : List[String], retVar : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	def doActivityCall(s : PTAResult, p : JawaProcedure, args : List[String], retVar : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true
@@ -257,24 +258,20 @@ object ActivityModel {
 	  (newFacts, delFacts, byPassFlag)
 	}
 	
-	private def setIntent(s : ISet[RFAFact], args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+	private def setIntent(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  val intentSlot = VarSlot(args(1))
-	  val intentValue = factMap.getOrElse(intentSlot, isetEmpty)
+	  val intentValue = s.pointsToSet(intentSlot.toString, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
 	      val mIntentSlot = FieldSlot(tv, AndroidConstants.ACTIVITY_INTENT)
 	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (mIntentSlot == slot) {
-		          delfacts += rdf
-		        }
+	        for (v <- s.pointsToSet(mIntentSlot.toString, currentContext)) {
+		        delfacts += RFAFact(mIntentSlot, v)
 		      }
 	      }
 	      newfacts ++= intentValue.map(iv => RFAFact(mIntentSlot, iv))
@@ -282,17 +279,16 @@ object ActivityModel {
     (newfacts, delfacts)
   }
 	
-	private def getIntent(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+	private def getIntent(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
 	      val mIntentSlot = FieldSlot(tv, AndroidConstants.ACTIVITY_INTENT)
-	      var mIntentValue = factMap.getOrElse(mIntentSlot, isetEmpty)
+	      var mIntentValue = s.pointsToSet(mIntentSlot.toString, currentContext)
         tv.getFieldsUnknownDefSites.foreach{
         	case (defsite, fields) =>
         	  if(fields.contains("ALL")) mIntentValue += UnknownInstance(new NormalType(AndroidConstants.INTENT), defsite)

@@ -17,6 +17,7 @@ import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.alir.pta.NullInstance
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
+import org.sireum.jawa.alir.pta.PTAResult
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -28,7 +29,7 @@ object IntentFilterModel {
   
 	def isIntentFilter(r : JawaRecord) : Boolean = r.getName == AndroidConstants.INTENTFILTER
 	  
-	def doIntentFilterCall(s : ISet[RFAFact], p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	def doIntentFilterCall(s : PTAResult, p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true
@@ -99,24 +100,20 @@ object IntentFilterModel {
 	/**
 	 * Landroid/content/IntentFilter;.<init>:(Ljava/lang/String;)V
 	 */
-	private def intentFilterInitWithAction(s : ISet[RFAFact], args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+	private def intentFilterInitWithAction(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  val actionSlot = VarSlot(args(1))
-	  val actionValue = factMap.getOrElse(actionSlot, isetEmpty)
+	  val actionValue = s.pointsToSet(actionSlot.toString, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
 	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (FieldSlot(tv, AndroidConstants.INTENTFILTER_ACTIONS) == slot) {
-		          delfacts += rdf
-		        }
-		      }
+          for(v <- s.pointsToSet(FieldSlot(tv, AndroidConstants.INTENTFILTER_ACTIONS).toString, currentContext)){
+            delfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENTFILTER_ACTIONS), v)
+          }
 	      }
 	      actionValue.foreach{
 		      acStr =>

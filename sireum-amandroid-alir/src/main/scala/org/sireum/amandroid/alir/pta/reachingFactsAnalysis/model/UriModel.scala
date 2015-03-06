@@ -16,6 +16,7 @@ import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.pta.PTAInstance
+import org.sireum.jawa.alir.pta.PTAResult
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -25,7 +26,7 @@ object UriModel {
   final val TITLE = "UriModel"
 	def isUri(r : JawaRecord) : Boolean = r.getName == "android.net.Uri"
 	  
-	def doUriCall(s : ISet[RFAFact], p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	def doUriCall(s : PTAResult, p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true
@@ -88,11 +89,10 @@ object UriModel {
 	/**
    * Landroid/net/Uri;.parse:(Ljava/lang/String;)Landroid/net/Uri;
    */
-  private def uriParse(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def uriParse(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >0)
 	  val strSlot = VarSlot(args(0))
-	  val strValue = factMap.getOrElse(strSlot, isetEmpty)
+	  val strValue = s.pointsToSet(strSlot.toString, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
     val stringUriIns = PTAInstance(NormalType(AndroidConstants.URI_STRING_URI, 0), currentContext)

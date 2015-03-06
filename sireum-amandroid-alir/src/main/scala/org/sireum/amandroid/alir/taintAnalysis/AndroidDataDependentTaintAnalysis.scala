@@ -11,18 +11,16 @@ import org.sireum.jawa.alir.dataDependenceAnalysis._
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.util._
 import org.sireum.jawa.JawaProcedure
-import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.Center
 import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.pilar.ast._
-import org.sireum.jawa.alir.pta.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceInfo
 import org.sireum.jawa.alir.taintAnalysis._
 import org.sireum.amandroid.security.AndroidProblemCategories
 import scala.tools.nsc.ConsoleWriter
 import org.sireum.jawa.util.StringFormConverter
-import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
+import org.sireum.jawa.alir.pta.PTAResult
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -122,19 +120,17 @@ object AndroidDataDependentTaintAnalysis {
     }
   }
     
-	def apply(iddi : InterproceduralDataDependenceInfo, rfaResult : AndroidReachingFactsAnalysis.Result, ssm : AndroidSourceAndSinkManager) : TaintAnalysisResult
-  	= build(iddi, rfaResult, ssm)
+	def apply(iddi : InterproceduralDataDependenceInfo, ptaresult : PTAResult, ssm : AndroidSourceAndSinkManager) : TaintAnalysisResult
+  	= build(iddi, ptaresult, ssm)
   	
-  def build(iddi : InterproceduralDataDependenceInfo, rfaResult : AndroidReachingFactsAnalysis.Result, ssm : AndroidSourceAndSinkManager) : TaintAnalysisResult = {
+  def build(iddi : InterproceduralDataDependenceInfo, ptaresult : PTAResult, ssm : AndroidSourceAndSinkManager) : TaintAnalysisResult = {
     var sourceNodes : ISet[TaintNode] = isetEmpty
     var sinkNodes : ISet[TaintNode] = isetEmpty
     
     val iddg = iddi.getIddg
     iddg.nodes.foreach{
       node =>
-        val cgN = node.getCGNode
-        val rfaFacts = rfaResult.entrySet(cgN)
-        val (src, sin) = getSourceAndSinkNode(node, rfaFacts, ssm, iddg)
+        val (src, sin) = getSourceAndSinkNode(node, ptaresult, ssm, iddg)
         sourceNodes ++= src
         sinkNodes ++= sin
     }
@@ -149,7 +145,7 @@ object AndroidDataDependentTaintAnalysis {
     tar
   }
   
-  def getSourceAndSinkNode(node : IDDGNode, rfaFacts : ISet[RFAFact], ssm : AndroidSourceAndSinkManager, iddg: InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node]) = {
+  def getSourceAndSinkNode(node : IDDGNode, ptaresult : PTAResult, ssm : AndroidSourceAndSinkManager, iddg: InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node]) = {
     var sources = isetEmpty[TaintNode]
     var sinks = isetEmpty[TaintNode]
     node match{
@@ -240,13 +236,13 @@ object AndroidDataDependentTaintAnalysis {
     (sources, sinks)
   }
   
-  def extendIDDGForSinkApis(iddg: InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node], callArgNode : IDDGCallArgNode, rfaFacts : ISet[RFAFact]) = {
+  def extendIDDGForSinkApis(iddg: InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node], callArgNode : IDDGCallArgNode, ptaresult : PTAResult) = {
     val calleeSet = callArgNode.getCalleeSet
     calleeSet.foreach{
       callee =>
         val argSlot = VarSlot(callArgNode.argName)
-        val argFacts = rfaFacts.filter(fact=> argSlot == fact.s)
-        val argRelatedFacts = ReachingFactsAnalysisHelper.getRelatedHeapFactsFrom(argFacts, rfaFacts)
+        val argValue = ptaresult.pointsToSet(argSlot.toString, callArgNode.getContext)
+        val argRelatedFacts = ReachingFactsAnalysisHelper.getRelatedHeapFacts(argValue, rfaFacts)
         argRelatedFacts.foreach{
           case RFAFact(slot, ins) =>
             val t = iddg.findDefSite(ins.getDefSite)

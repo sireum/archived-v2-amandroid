@@ -20,6 +20,7 @@ import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.alir.pta.NullInstance
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
+import org.sireum.jawa.alir.pta.PTAResult
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -46,7 +47,7 @@ object FrameworkMethodsModel {
 	  else false
 	}
 	
-	def doFrameworkMethodsModelCall(s : ISet[RFAFact], p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	def doFrameworkMethodsModelCall(s : PTAResult, p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true
@@ -90,17 +91,16 @@ object FrameworkMethodsModel {
 	  (newFacts, delFacts, byPassFlag)
 	}
 	
-	private def registerReceiver(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
+	private def registerReceiver(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
 	  var result = isetEmpty[RFAFact]
 	  var precise = true
-	  val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
     require(args.size > 2)
     val thisSlot = VarSlot(args(0))
-    val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+    val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
     val receiverSlot = VarSlot(args(1))
-	  val receiverValue = factMap.getOrElse(receiverSlot, isetEmpty)
+	  val receiverValue = s.pointsToSet(receiverSlot.toString, currentContext)
 	  val filterSlot = VarSlot(args(2))
-	  val filterValue = factMap.getOrElse(filterSlot, isetEmpty)
+	  val filterValue = s.pointsToSet(filterSlot.toString, currentContext)
 	  val iDB = new IntentFilterDataBase
 	  receiverValue.foreach{
 	    rv =>
@@ -113,7 +113,7 @@ object FrameworkMethodsModel {
 			      filterValue.foreach{
 			        fv =>
 			          val mActionsSlot = FieldSlot(fv, AndroidConstants.INTENTFILTER_ACTIONS)
-			          val mActionsValue = factMap.getOrElse(mActionsSlot, isetEmpty)
+			          val mActionsValue = s.pointsToSet(mActionsSlot.toString, currentContext)
 			          mActionsValue.foreach{
 			            mav =>
 			              mav match{
@@ -124,7 +124,7 @@ object FrameworkMethodsModel {
 					          }
 			          }
 			          val mCategoriesSlot = FieldSlot(fv, AndroidConstants.INTENTFILTER_CATEGORIES)
-			          val mCategoriesValue = factMap.getOrElse(mCategoriesSlot, isetEmpty)
+			          val mCategoriesValue = s.pointsToSet(mCategoriesSlot.toString, currentContext)
 			          mCategoriesValue.foreach{
 			            mav =>
 			              mav match{
@@ -150,12 +150,11 @@ object FrameworkMethodsModel {
 	  isetEmpty
 	}
 	
-	private def getSystemService(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
+	private def getSystemService(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
 	  var result = isetEmpty[RFAFact]
-	  val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
     require(args.size >1)
     val paramSlot = VarSlot(args(1))
-	  val paramValue = factMap.getOrElse(paramSlot, isetEmpty)
+	  val paramValue = s.pointsToSet(paramSlot.toString, currentContext)
 	  paramValue.foreach{
 	    str =>
 	      str match{

@@ -23,6 +23,7 @@ import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.JawaProcedure
 import java.net.URLEncoder
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
+import org.sireum.jawa.alir.pta.PTAResult
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -45,7 +46,7 @@ object IntentHelper {
       													 preciseImplicit : Boolean,
       													 senderContext : Context)
   
-	def getIntentContents(factMap : IMap[Slot, ISet[Instance]], intentValues : ISet[Instance], currentContext : Context) : ISet[IntentContent] = {
+	def getIntentContents(s : PTAResult, intentValues : ISet[Instance], currentContext : Context) : ISet[IntentContent] = {
 	  var result = isetEmpty[IntentContent]
 	  intentValues.foreach{
       intentIns =>
@@ -53,10 +54,10 @@ object IntentHelper {
         var preciseImplicit = true
         var componentNames = isetEmpty[String]
         val iFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_COMPONENT)
-        factMap.getOrElse(iFieldSlot, isetEmpty).foreach{
+        s.pointsToSet(iFieldSlot.toString, currentContext).foreach{
           compIns =>
             val cFieldSlot = FieldSlot(compIns, AndroidConstants.COMPONENTNAME_CLASS)
-            factMap.getOrElse(cFieldSlot, isetEmpty).foreach{
+            s.pointsToSet(cFieldSlot.toString, currentContext).foreach{
               ins =>
                 if(ins.isInstanceOf[PTAConcreteStringInstance]){
                   componentNames += ins.asInstanceOf[PTAConcreteStringInstance].string
@@ -67,7 +68,7 @@ object IntentHelper {
         
         var actions: ISet[String] = isetEmpty[String]
         val acFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_ACTION)
-        factMap.getOrElse(acFieldSlot, isetEmpty).foreach{
+        s.pointsToSet(acFieldSlot.toString, currentContext).foreach{
           acIns =>
             if(acIns.isInstanceOf[PTAConcreteStringInstance])
               actions += acIns.asInstanceOf[PTAConcreteStringInstance].string
@@ -76,10 +77,10 @@ object IntentHelper {
         
         var categories = isetEmpty[String] // the code to get the valueSet of categories is to be added below
         val categoryFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_CATEGORIES)
-        factMap.getOrElse(categoryFieldSlot, isetEmpty).foreach{
+        s.pointsToSet(categoryFieldSlot.toString, currentContext).foreach{
           cateIns =>
-            val hashSetFieldSlot = FieldSlot(cateIns, "[|java:util:HashSet.items|]")
-            factMap.getOrElse(hashSetFieldSlot, isetEmpty).foreach{
+            val hashSetFieldSlot = FieldSlot(cateIns, "java.util.HashSet.items")
+            s.pointsToSet(hashSetFieldSlot.toString, currentContext).foreach{
               itemIns =>
                 if(itemIns.isInstanceOf[PTAConcreteStringInstance])
                   categories += itemIns.asInstanceOf[PTAConcreteStringInstance].string
@@ -89,10 +90,10 @@ object IntentHelper {
         
         var datas: ISet[UriData] = isetEmpty
         val dataFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_URI_DATA)
-        factMap.getOrElse(dataFieldSlot, isetEmpty).foreach{
+        s.pointsToSet(dataFieldSlot.toString, currentContext).foreach{
           dataIns =>
             val uriStringFieldSlot = FieldSlot(dataIns, AndroidConstants.URI_STRING_URI_URI_STRING)
-            factMap.getOrElse(uriStringFieldSlot, isetEmpty).foreach{
+            s.pointsToSet(uriStringFieldSlot.toString, currentContext).foreach{
               usIns =>
                 if(usIns.isInstanceOf[PTAConcreteStringInstance]){
                   val uriString = usIns.asInstanceOf[PTAConcreteStringInstance].string
@@ -105,7 +106,7 @@ object IntentHelper {
         
         var types:Set[String] = Set()
         val mtypFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_MTYPE)
-        factMap.getOrElse(mtypFieldSlot, isetEmpty).foreach{
+        s.pointsToSet(mtypFieldSlot.toString, currentContext).foreach{
           mtypIns =>
             if(mtypIns.isInstanceOf[PTAConcreteStringInstance])
               types += mtypIns.asInstanceOf[PTAConcreteStringInstance].string

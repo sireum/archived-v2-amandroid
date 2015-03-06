@@ -24,6 +24,7 @@ import org.sireum.jawa.alir.pta.ClassInstance
 import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.alir.pta.NullInstance
 import org.sireum.jawa.alir.pta.Instance
+import org.sireum.jawa.alir.pta.PTAResult
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -34,7 +35,7 @@ object IntentModel {
   
 	def isIntent(r : JawaRecord) : Boolean = r.getName == AndroidConstants.INTENT
 	  
-	def doIntentCall(s : ISet[RFAFact], p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	def doIntentCall(s : PTAResult, p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true
@@ -438,13 +439,12 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.<init>:(Ljava/lang/String;)V
    */
-  private def intentInitWithIntent(s : ISet[RFAFact], args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentInitWithIntent(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  val paramSlot = VarSlot(args(1))
-	  val paramValue = factMap.getOrElse(paramSlot, isetEmpty)
+	  val paramValue = s.pointsToSet(paramSlot.toString, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
@@ -457,48 +457,48 @@ object IntentModel {
 	          FieldSlot(tv, AndroidConstants.INTENT_URI_DATA),
 	          FieldSlot(tv, AndroidConstants.INTENT_EXTRAS)
 	        )
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (interestSlots.contains(slot)) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (interestSlots.contains(slot)) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      paramValue.foreach{
 		      pv =>
 		        val mActionSlot = FieldSlot(pv, AndroidConstants.INTENT_ACTION)
-		        val mActionValue = factMap.getOrElse(mActionSlot, isetEmpty)
+		        val mActionValue = s.pointsToSet(mActionSlot.toString, currentContext)
 		        mActionValue.foreach{
 		          mav =>
 		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), mav)
 		        }
 		        val mCategoriesSlot = FieldSlot(pv, AndroidConstants.INTENT_CATEGORIES)
-		        val mCategoriesValue = factMap.getOrElse(mCategoriesSlot, isetEmpty)
+		        val mCategoriesValue = s.pointsToSet(mCategoriesSlot.toString, currentContext)
 		        mCategoriesValue.foreach{
 		          mcv =>
 		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_CATEGORIES), mcv)
 		        }
 		        val mComponentSlot = FieldSlot(pv, AndroidConstants.INTENT_COMPONENT)
-		        val mComponentValue = factMap.getOrElse(mComponentSlot, isetEmpty)
+		        val mComponentValue = s.pointsToSet(mComponentSlot.toString, currentContext)
 		        mComponentValue.foreach{
 		          mcv =>
 		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_COMPONENT), mcv)
 		        }
 		        val mDataSlot = FieldSlot(pv, AndroidConstants.INTENT_URI_DATA)
-		        val mDataValue = factMap.getOrElse(mDataSlot, isetEmpty)
+		        val mDataValue = s.pointsToSet(mDataSlot.toString, currentContext)
 		        mDataValue.foreach{
 		          mdv =>
 		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_URI_DATA), mdv)
 		        }
 		        val mTypeSlot = FieldSlot(pv, AndroidConstants.INTENT_MTYPE)
-		        val mTypeValue = factMap.getOrElse(mTypeSlot, isetEmpty)
+		        val mTypeValue = s.pointsToSet(mTypeSlot.toString, currentContext)
 		        mTypeValue.foreach{
 		          mtv =>
 		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_MTYPE), mtv)
 		        }
 		        val mExtrasSlot = FieldSlot(pv, AndroidConstants.INTENT_EXTRAS)
-		        val mExtrasValue = factMap.getOrElse(mExtrasSlot, isetEmpty)
+		        val mExtrasValue = s.pointsToSet(mExtrasSlot.toString, currentContext)
 		        mExtrasValue.foreach{
 		          mev =>
 		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_EXTRAS), mev)
@@ -511,25 +511,24 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.<init>:(Landroid/content/Intent;)V
    */
-  private def intentInitWithAction(s : ISet[RFAFact], args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentInitWithAction(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  val actionSlot = VarSlot(args(1))
-	  val actionValue = factMap.getOrElse(actionSlot, isetEmpty)
+	  val actionValue = s.pointsToSet(actionSlot.toString, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (FieldSlot(tv, AndroidConstants.INTENT_ACTION) == slot) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (FieldSlot(tv, AndroidConstants.INTENT_ACTION) == slot) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      actionValue.foreach{
 		      acStr =>
 	          acStr match{
@@ -550,15 +549,14 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.<init>:(Ljava/lang/String;Landroid/net/Uri;)V
    */
-  private def intentInitWithActionAndData(s : ISet[RFAFact], args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentInitWithActionAndData(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  val actionSlot = VarSlot(args(1))
-	  val actionValue = factMap.getOrElse(actionSlot, isetEmpty)
+	  val actionValue = s.pointsToSet(actionSlot.toString, currentContext)
 	  val dataSlot = VarSlot(args(2))
-	  val dataValue = factMap.getOrElse(dataSlot, isetEmpty)
+	  val dataValue = s.pointsToSet(dataSlot.toString, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
@@ -567,14 +565,14 @@ object IntentModel {
 	        Set(FieldSlot(tv, AndroidConstants.INTENT_ACTION),
 	          FieldSlot(tv, AndroidConstants.INTENT_URI_DATA)
 	        )
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (interestSlots.contains(slot)) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (interestSlots.contains(slot)) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      actionValue.foreach{
 		      acStr =>
 	          acStr match{
@@ -599,17 +597,16 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.<init>:(Ljava/lang/String;Landroid/net/Uri;Landroid/content/Context;Ljava/lang/Class;)V
    */
-  private def intentInitWithActionDataAndComponent(s : ISet[RFAFact], args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentInitWithActionDataAndComponent(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >4)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  val actionSlot = VarSlot(args(1))
-	  val actionValue = factMap.getOrElse(actionSlot, isetEmpty)
+	  val actionValue = s.pointsToSet(actionSlot.toString, currentContext)
 	  val dataSlot = VarSlot(args(2))
-	  val dataValue = factMap.getOrElse(dataSlot, isetEmpty)
+	  val dataValue = s.pointsToSet(dataSlot.toString, currentContext)
 	  val classSlot = VarSlot(args(4))
-	  val classValue = factMap.getOrElse(classSlot, isetEmpty)
+	  val classValue = s.pointsToSet(classSlot.toString, currentContext)
 	  
 	  val clazzNames = 
 	    classValue.map{
@@ -631,14 +628,14 @@ object IntentModel {
 	          FieldSlot(tv, AndroidConstants.INTENT_URI_DATA),
 	          FieldSlot(tv, AndroidConstants.INTENT_COMPONENT)
 	        )
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (interestSlots.contains(slot)) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (interestSlots.contains(slot)) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      actionValue.foreach{
 		      acStr =>
 	          acStr match{
@@ -691,13 +688,12 @@ object IntentModel {
 	/**
 	 * Landroid/content/Intent;.<init>:(Landroid/content/Context;Ljava/lang/Class;)V
 	 */
-	private def intentInitWithCC(s : ISet[RFAFact], args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+	private def intentInitWithCC(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  val param2Slot = VarSlot(args(2))
-	  val param2Value = factMap.getOrElse(param2Slot, isetEmpty)
+	  val param2Value = s.pointsToSet(param2Slot.toString, currentContext)
 	  val clazzNames = 
 	    param2Value.map{
       	value => 
@@ -713,14 +709,14 @@ object IntentModel {
 	  thisValue.map{
 	    tv =>
 	      val mComponentSlot = FieldSlot(tv, AndroidConstants.INTENT_COMPONENT)
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (slot == mComponentSlot) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (slot == mComponentSlot) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      newfacts += RFAFact(mComponentSlot, componentNameIns)
 	  }
     clazzNames.foreach{
@@ -756,19 +752,18 @@ object IntentModel {
 	/**
 	 * Landroid/content/Intent;.addCategory:(Ljava/lang/String;)Landroid/content/Intent;
 	 */
-	private def intentAddCategory(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+	private def intentAddCategory(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  val categorySlot = VarSlot(args(1))
-	  val categoryValue = factMap.getOrElse(categorySlot, isetEmpty)
+	  val categoryValue = s.pointsToSet(categorySlot.toString, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.map{
 	    tv =>
 	      val mCategorySlot = FieldSlot(tv, AndroidConstants.INTENT_CATEGORIES)
-	      val mCategoryValue = factMap.getOrElse(mCategorySlot, isetEmpty)
+	      val mCategoryValue = s.pointsToSet(mCategorySlot.toString, currentContext)
 	      mCategoryValue.foreach{
 	        cv => 
 	          var hashsetIns = cv
@@ -802,11 +797,10 @@ object IntentModel {
 	/**
    * Landroid/content/Intent;.clone:()Ljava/lang/Object;
    */
-  private def intentClone(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentClone(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
@@ -820,25 +814,24 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setAction:(Ljava/lang/String;)Landroid/content/Intent;
    */
-  private def intentSetAction(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentSetAction(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  val actionSlot = VarSlot(args(1))
-	  val actionValue = factMap.getOrElse(actionSlot, isetEmpty)
+	  val actionValue = s.pointsToSet(actionSlot.toString, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (FieldSlot(tv, AndroidConstants.INTENT_ACTION) == slot) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (FieldSlot(tv, AndroidConstants.INTENT_ACTION) == slot) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      actionValue.foreach{
 		      str =>
 	          thisValue.foreach{
@@ -864,13 +857,12 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setClass:(Landroid/content/Context;Ljava/lang/Class;)Landroid/content/Intent;
    */
-  private def intentSetClass(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentSetClass(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue =s.pointsToSet(thisSlot.toString, currentContext)
 	  val param2Slot = VarSlot(args(2))
-	  val param2Value = factMap.getOrElse(param2Slot, isetEmpty)
+	  val param2Value = s.pointsToSet(param2Slot.toString, currentContext)
 	  val clazzNames = 
 	    param2Value.map{
       	value => 
@@ -886,14 +878,14 @@ object IntentModel {
 	  thisValue.map{
 	    tv =>
 	      val mComponentSlot = FieldSlot(tv, AndroidConstants.INTENT_COMPONENT)
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (slot == mComponentSlot) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (slot == mComponentSlot) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      newfacts += RFAFact(mComponentSlot, componentNameIns)
 	      newfacts += RFAFact(VarSlot(retVar), tv)
 	  }
@@ -931,27 +923,26 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setClassName:(Landroid/content/Context;Ljava/lang/String;)Landroid/content/Intent;
    */
-  private def intentSetClassName(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentSetClassName(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  val clazzSlot = VarSlot(args(2))
-	  val clazzValue = factMap.getOrElse(clazzSlot, isetEmpty)
+	  val clazzValue = s.pointsToSet(clazzSlot.toString, currentContext)
     val componentNameIns = PTAInstance(NormalType(AndroidConstants.COMPONENTNAME, 0), currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.map{
 	    tv =>
 	      val mComponentSlot = FieldSlot(tv, AndroidConstants.INTENT_COMPONENT)
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (slot == mComponentSlot) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (slot == mComponentSlot) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      newfacts += RFAFact(mComponentSlot, componentNameIns)
 	      newfacts += RFAFact(VarSlot(retVar), tv)
 	  }
@@ -989,25 +980,24 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setComponent:(Landroid/content/ComponentName;)Landroid/content/Intent;
    */
-  private def intentSetComponent(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentSetComponent(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  val componentSlot = VarSlot(args(1))
-	  val componentValue = factMap.getOrElse(componentSlot, isetEmpty)
+	  val componentValue = s.pointsToSet(componentSlot.toString, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (FieldSlot(tv, AndroidConstants.INTENT_COMPONENT) == slot) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (FieldSlot(tv, AndroidConstants.INTENT_COMPONENT) == slot) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      componentValue.foreach{
 		      component =>
 	          thisValue.foreach{
@@ -1023,25 +1013,24 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setData:(Landroid/net/Uri;)Landroid/content/Intent;
    */
-  private def intentSetData(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentSetData(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  val dataSlot = VarSlot(args(1))
-	  val dataValue = factMap.getOrElse(dataSlot, isetEmpty)
+	  val dataValue = s.pointsToSet(dataSlot.toString, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (FieldSlot(tv, AndroidConstants.INTENT_URI_DATA) == slot) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (FieldSlot(tv, AndroidConstants.INTENT_URI_DATA) == slot) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      dataValue.foreach{
 		      data =>
 	          thisValue.foreach{
@@ -1057,28 +1046,27 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setDataAndType:(Landroid/net/Uri;Ljava/lang/String;)Landroid/content/Intent;
    */
-  private def intentSetDataAndType(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentSetDataAndType(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  val dataSlot = VarSlot(args(1))
-	  val dataValue = factMap.getOrElse(dataSlot, isetEmpty)
+	  val dataValue = s.pointsToSet(dataSlot.toString, currentContext)
 	  val typeSlot = VarSlot(args(2))
-	  val typeValue = factMap.getOrElse(typeSlot, isetEmpty)
+	  val typeValue = s.pointsToSet(typeSlot.toString, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-	          val fieldsSlot : ISet[Slot] = Set(FieldSlot(tv, AndroidConstants.INTENT_URI_DATA), FieldSlot(tv, AndroidConstants.INTENT_MTYPE))
-		        //if it is a strong definition, we can kill the existing definition
-		        if (fieldsSlot.contains(slot)) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//	          val fieldsSlot : ISet[Slot] = Set(FieldSlot(tv, AndroidConstants.INTENT_URI_DATA), FieldSlot(tv, AndroidConstants.INTENT_MTYPE))
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (fieldsSlot.contains(slot)) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      dataValue.foreach{
 		      data =>
 	          thisValue.foreach{
@@ -1101,25 +1089,24 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setType:(Ljava/lang/String;)Landroid/content/Intent;
    */
-  private def intentSetType(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentSetType(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  val typeSlot = VarSlot(args(1))
-	  val typeValue = factMap.getOrElse(typeSlot, isetEmpty)
+	  val typeValue = s.pointsToSet(typeSlot.toString, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (FieldSlot(tv, AndroidConstants.INTENT_MTYPE) == slot) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (FieldSlot(tv, AndroidConstants.INTENT_MTYPE) == slot) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      typeValue.foreach{
 		      typ =>
 	          thisValue.foreach{
@@ -1135,25 +1122,24 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setPackage:(Ljava/lang/String;)Landroid/content/Intent;
    */
-  private def intentSetPackage(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentSetPackage(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  val packageSlot = VarSlot(args(1))
-	  val packageValue = factMap.getOrElse(packageSlot, isetEmpty)
+	  val packageValue = s.pointsToSet(packageSlot.toString, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (FieldSlot(tv, AndroidConstants.INTENT_PACKAGE) == slot) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (FieldSlot(tv, AndroidConstants.INTENT_PACKAGE) == slot) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      packageValue.foreach{
 		      str =>
 	          thisValue.foreach{
@@ -1178,11 +1164,10 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setFlags:(I)Landroid/content/Intent;
    */
-  private def intentSetFlags(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentSetFlags(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
@@ -1195,22 +1180,21 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.putExtra:(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;
    */
-  private def intentPutExtra(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentPutExtra(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  val keySlot = VarSlot(args(1))
-	  val keyValue = factMap.getOrElse(keySlot, isetEmpty)
+	  val keyValue = s.pointsToSet(keySlot.toString, currentContext)
 	  val valueSlot = VarSlot(args(2))
-	  val valueValue = factMap.getOrElse(valueSlot, isetEmpty)
+	  val valueValue = s.pointsToSet(valueSlot.toString, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
     val bundleIns = PTAInstance(NormalType(AndroidConstants.BUNDLE, 0), currentContext)
 	  thisValue.foreach{
 	    tv =>
 	      val mExtraSlot = FieldSlot(tv, AndroidConstants.INTENT_EXTRAS)
-	      var mExtraValue = factMap.getOrElse(mExtraSlot, isetEmpty)
+	      var mExtraValue = s.pointsToSet(mExtraSlot.toString, currentContext)
 	      if(mExtraValue.isEmpty){
 	        mExtraValue += bundleIns
 	        newfacts += RFAFact(mExtraSlot, bundleIns)
@@ -1235,17 +1219,16 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.getExtras:()Landroid/os/Bundle;
    */
-  private def intentGetExtras(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentGetExtras(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
     thisValue.foreach{
       ins => 
       	val mExtraSlot = FieldSlot(ins, AndroidConstants.INTENT_EXTRAS)
-      	val mExtraValue = factMap.getOrElse(mExtraSlot, isetEmpty)
+      	val mExtraValue = s.pointsToSet(mExtraSlot.toString, currentContext)
         if(!mExtraValue.isEmpty){
           newfacts ++= mExtraValue.map{mev => RFAFact(VarSlot(retVar), mev)}
         } else {
@@ -1258,38 +1241,40 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.getExtra:(Ljava/lang/String;)Ljava/lang/Object;
    */
-  private def intentGetExtra(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentGetExtra(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  val keySlot = VarSlot(args(1))
-	  val keyValue = factMap.getOrElse(keySlot, isetEmpty)
-	  val mExtraValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, AndroidConstants.INTENT_EXTRAS), isetEmpty)}.reduce(iunion[Instance])
-	  val entValue = 
-	    if(mExtraValue.isEmpty)
-	      isetEmpty
-	    else
-	    	mExtraValue.map{ins => factMap.getOrElse(FieldSlot(ins, "android.os.Bundle.entries"), isetEmpty)}.reduce(iunion[Instance])
-	  var newfacts = isetEmpty[RFAFact]
+	  val keyValue = s.pointsToSet(keySlot.toString, currentContext)
+    var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
-	  if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
-      val keys = keyValue.map{k => k.asInstanceOf[PTAConcreteStringInstance].string}
-      entValue.foreach{
-        v =>
-          require(v.isInstanceOf[PTATupleInstance])
-          if(keys.contains(v.asInstanceOf[PTATupleInstance].left.asInstanceOf[PTAConcreteStringInstance].string)){
+    if(!thisValue.isEmpty){
+  	  val mExtraValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, AndroidConstants.INTENT_EXTRAS).toString, currentContext)}.reduce(iunion[Instance])
+  	  val entValue = 
+  	    if(mExtraValue.isEmpty)
+  	      isetEmpty
+  	    else
+  	    	mExtraValue.map{ins => s.pointsToSet(FieldSlot(ins, "android.os.Bundle.entries").toString, currentContext)}.reduce(iunion[Instance])
+  	  
+  	  if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
+        val keys = keyValue.map{k => k.asInstanceOf[PTAConcreteStringInstance].string}
+        entValue.foreach{
+          v =>
+            require(v.isInstanceOf[PTATupleInstance])
+            if(keys.contains(v.asInstanceOf[PTATupleInstance].left.asInstanceOf[PTAConcreteStringInstance].string)){
+              newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
+            }
+        }
+      } else if(!entValue.isEmpty) {
+        entValue.foreach{
+          v =>
+            require(v.isInstanceOf[PTATupleInstance])
             newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
-          }
+        }
+      } else {
+        newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(Center.DEFAULT_TOPLEVEL_OBJECT), currentContext)))
       }
-    } else if(!entValue.isEmpty) {
-      entValue.foreach{
-        v =>
-          require(v.isInstanceOf[PTATupleInstance])
-          newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
-      }
-    } else {
-      newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(Center.DEFAULT_TOPLEVEL_OBJECT), currentContext)))
     }
     (newfacts, delfacts)
   }
@@ -1297,40 +1282,42 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.getExtra:(Ljava/lang/String;)Ljava/lang/Object;
    */
-  private def intentGetExtraWithDefault(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentGetExtraWithDefault(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
 	  val keySlot = VarSlot(args(1))
-	  val keyValue = factMap.getOrElse(keySlot, isetEmpty)
+	  val keyValue = s.pointsToSet(keySlot.toString, currentContext)
 	  val defaultSlot = VarSlot(args(2))
-	  val defaultValue = factMap.getOrElse(defaultSlot, isetEmpty)
-	  val mExtraValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, AndroidConstants.INTENT_EXTRAS), isetEmpty)}.reduce(iunion[Instance])
-	  val entValue = 
-	    if(mExtraValue.isEmpty)
-	      isetEmpty
-	    else
-	    	mExtraValue.map{ins => factMap.getOrElse(FieldSlot(ins, "android.os.Bundle.entries"), isetEmpty)}.reduce(iunion[Instance])
-	  var newfacts = isetEmpty[RFAFact]
+	  val defaultValue = s.pointsToSet(defaultSlot.toString, currentContext)
+    var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
-	  if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
-      val keys = keyValue.map{k => k.asInstanceOf[PTAConcreteStringInstance].string}
-      entValue.foreach{
-        v =>
-          require(v.isInstanceOf[PTATupleInstance])
-          if(keys.contains(v.asInstanceOf[PTATupleInstance].left.asInstanceOf[PTAConcreteStringInstance].string)){
+    if(!thisValue.isEmpty){
+  	  val mExtraValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, AndroidConstants.INTENT_EXTRAS).toString, currentContext)}.reduce(iunion[Instance])
+  	  val entValue = 
+  	    if(mExtraValue.isEmpty)
+  	      isetEmpty
+  	    else
+  	    	mExtraValue.map{ins => s.pointsToSet(FieldSlot(ins, "android.os.Bundle.entries").toString, currentContext)}.reduce(iunion[Instance])
+  	  
+  	  if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
+        val keys = keyValue.map{k => k.asInstanceOf[PTAConcreteStringInstance].string}
+        entValue.foreach{
+          v =>
+            require(v.isInstanceOf[PTATupleInstance])
+            if(keys.contains(v.asInstanceOf[PTATupleInstance].left.asInstanceOf[PTAConcreteStringInstance].string)){
+              newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
+            }
+        }
+      } else if(!entValue.isEmpty) {
+        entValue.foreach{
+          v =>
+            require(v.isInstanceOf[PTATupleInstance])
             newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
-          }
+        }
+      } else {
+        newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(Center.DEFAULT_TOPLEVEL_OBJECT), currentContext)))
       }
-    } else if(!entValue.isEmpty) {
-      entValue.foreach{
-        v =>
-          require(v.isInstanceOf[PTATupleInstance])
-          newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
-      }
-    } else {
-      newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(Center.DEFAULT_TOPLEVEL_OBJECT), currentContext)))
     }
 	  if(newfacts.isEmpty){
 	    newfacts ++= defaultValue.map(RFAFact(VarSlot(retVar), _))
