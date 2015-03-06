@@ -5,14 +5,16 @@ are made available under the terms of the Eclipse Public License v1.0
 which accompanies this distribution, and is available at              
 http://www.eclipse.org/legal/epl-v10.html                             
 */
-package org.sireum.amandroid.alir.model
+package org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model
 
 import org.sireum.jawa._
 import org.sireum.util._
 import org.sireum.jawa.alir.Context
-import org.sireum.jawa.alir.reachingFactsAnalysis._
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.alir.Instance
+import org.sireum.jawa.alir.pta.PTAPointStringInstance
+import org.sireum.jawa.alir.pta.PTATupleInstance
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -229,7 +231,7 @@ object BundleModel {
 	}
 	
 	private def getPointStringToRet(retVar : String, currentContext : Context): RFAFact = {
-    val newThisValue = RFAPointStringInstance(currentContext.copy)
+    val newThisValue = PTAPointStringInstance(currentContext.copy)
     RFAFact(VarSlot(retVar), newThisValue)	 
 	}
 	  
@@ -272,7 +274,7 @@ object BundleModel {
 	    kv =>
 	      param2Value.foreach{
 	        vv =>
-	          entries += RFATupleInstance(kv, vv, currentContext)
+	          entries += PTATupleInstance(kv, vv, currentContext)
 	      }
 	  }
 	  entries.map{s => RFAFact(FieldSlot(rf.v, "android.os.Bundle"), s)}
@@ -284,14 +286,16 @@ object BundleModel {
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
 	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+    if(!thisValue.isEmpty){
 	  val strValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, "android.os.Bundle.entries"), isetEmpty)}.reduce(iunion[Instance])
-	  val rf = ReachingFactsAnalysisHelper.getReturnFact(NormalType("java.util.HashSet", 0), retVar, currentContext).get
-	  result += rf
-	  result ++= strValue.map{
-	    s => 
-	      require(s.isInstanceOf[RFATupleInstance])
-	      RFAFact(FieldSlot(rf.v, "java.util.HashSet.items"), s.asInstanceOf[RFATupleInstance].left)
-	  }
+  	  val rf = ReachingFactsAnalysisHelper.getReturnFact(NormalType("java.util.HashSet", 0), retVar, currentContext).get
+  	  result += rf
+  	  result ++= strValue.map{
+  	    s => 
+  	      require(s.isInstanceOf[PTATupleInstance])
+  	      RFAFact(FieldSlot(rf.v, "java.util.HashSet.items"), s.asInstanceOf[PTATupleInstance].left)
+  	  }
+    }
 	  result
   }
 	
@@ -303,22 +307,24 @@ object BundleModel {
 	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
 	  val keySlot = VarSlot(args(1))
 	  val keyValue = factMap.getOrElse(keySlot, isetEmpty)
-	  val entValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, "android.os.Bundle.entries"), isetEmpty)}.reduce(iunion[Instance])
-	  if(keyValue.filter(_.isInstanceOf[RFAPointStringInstance]).isEmpty){
-		  entValue.foreach{
-		    v =>
-		      require(v.isInstanceOf[RFATupleInstance])
-		      if(keyValue.contains(v.asInstanceOf[RFATupleInstance].left)){
-		        result += (RFAFact(VarSlot(retVar), v.asInstanceOf[RFATupleInstance].right))
-		      }
-		  }
-	  } else {
-	    entValue.foreach{
-		    v =>
-		      require(v.isInstanceOf[RFATupleInstance])
-		      result += (RFAFact(VarSlot(retVar), v.asInstanceOf[RFATupleInstance].right))
-		  }
-	  }
+    if(!thisValue.isEmpty){
+  	  val entValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, "android.os.Bundle.entries"), isetEmpty)}.reduce(iunion[Instance])
+  	  if(keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
+  		  entValue.foreach{
+  		    v =>
+  		      require(v.isInstanceOf[PTATupleInstance])
+  		      if(keyValue.contains(v.asInstanceOf[PTATupleInstance].left)){
+  		        result += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
+  		      }
+  		  }
+  	  } else {
+  	    entValue.foreach{
+  		    v =>
+  		      require(v.isInstanceOf[PTATupleInstance])
+  		      result += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
+  		  }
+  	  }
+    }
 	  result
   }
 	
@@ -333,19 +339,19 @@ object BundleModel {
 	  val defaultSlot = VarSlot(args(2))
 	  val defaultValue = factMap.getOrElse(defaultSlot, isetEmpty)
 	  val entValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, "android.os.Bundle.entries"), isetEmpty)}.reduce(iunion[Instance])
-	  if(keyValue.filter(_.isInstanceOf[RFAPointStringInstance]).isEmpty){
+	  if(keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
 		  entValue.foreach{
 		    v =>
-		      require(v.isInstanceOf[RFATupleInstance])
-		      if(keyValue.contains(v.asInstanceOf[RFATupleInstance].left)){
-		        result += (RFAFact(VarSlot(retVar), v.asInstanceOf[RFATupleInstance].right))
+		      require(v.isInstanceOf[PTATupleInstance])
+		      if(keyValue.contains(v.asInstanceOf[PTATupleInstance].left)){
+		        result += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
 		      }
 		  }
 	  } else {
 	    entValue.foreach{
 		    v =>
-		      require(v.isInstanceOf[RFATupleInstance])
-		      result += (RFAFact(VarSlot(retVar), v.asInstanceOf[RFATupleInstance].right))
+		      require(v.isInstanceOf[PTATupleInstance])
+		      result += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
 		  }
 	  }
 	  if(result.isEmpty){
@@ -369,7 +375,7 @@ object BundleModel {
 	    kv =>
 	      valueValue.foreach{
 	        vv =>
-	          entries += RFATupleInstance(kv, vv, currentContext)
+	          entries += PTATupleInstance(kv, vv, currentContext)
 	      }
 	  }
 	  thisValue.foreach{

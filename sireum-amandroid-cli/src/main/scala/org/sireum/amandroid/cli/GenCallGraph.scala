@@ -13,6 +13,7 @@ import java.io.File
 import org.sireum.option.MessageLevel
 import org.sireum.util._
 import org.sireum.jawa.MessageCenter
+import org.sireum.jawa.MessageCenter._
 import org.sireum.amandroid.cli.util.CliLogger
 import org.sireum.jawa.util.IgnoreException
 import java.net.URI
@@ -22,11 +23,8 @@ import org.sireum.jawa.JawaCodeSource
 import org.sireum.jawa.GlobalConfig
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.appInfo.AppInfoCollector
-import org.sireum.jawa.alir.pointsToAnalysis.PointerAssignmentGraph
 import org.sireum.jawa.alir.controlFlowGraph.InterproceduralControlFlowGraph
-import org.sireum.jawa.alir.pointsToAnalysis.PtaNode
 import org.sireum.jawa.alir.controlFlowGraph.CGNode
-import org.sireum.jawa.alir.pointsToAnalysis.InterproceduralPointsToAnalysis
 import org.sireum.jawa.Center
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.JawaProcedure
@@ -37,6 +35,9 @@ import org.sireum.jawa.xml.AndroidXStream
 import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.decompile.AmDecoder
+import org.sireum.jawa.alir.pta.suspark.InterproceduralSuperSpark
+import org.sireum.jawa.util.MyTimeoutException
+import org.sireum.jawa.util.MyTimer
 
 
 /**
@@ -49,21 +50,36 @@ object GenCallGraphCli {
       case AnalyzeSource.DIR => "DIR"}
     val sourceDir = saamode.srcFile
     val sourceFile = new File(sourceDir)
-    val outputDir = saamode.outFile
+    val outputDir = saamode.analysis.outdir
+    val nostatic = saamode.analysis.noStatic
+    val parallel = saamode.analysis.parallel
+    val noicc = saamode.analysis.noicc
+    val k_context = saamode.analysis.k_context
+    val timeout = saamode.analysis.timeout
     val mem = saamode.general.mem
     val msgLevel = saamode.general.msgLevel
-    forkProcess(sourceType, sourceDir, outputDir, mem, msgLevel)
+    val apionly = saamode.apionly
+    forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, outputDir, mem, apionly, msgLevel)
   }
 	
-	def forkProcess(typSpec : String, 
-	    						sourceDir : String, outputDir : String, 
-	    						mem : Int,
-	    						msgLevel : MessageLevel.Type) = {
-	  val args : MList[String] = mlistEmpty
-	  args += "-msg"
-	  args += msgLevel.toString
-	  args ++= List("-t", typSpec, sourceDir, outputDir)
-    org.sireum.jawa.util.JVMUtil.startSecondJVM(GenCallGraph.getClass(), "-Xmx" + mem + "G", args.toList, true)
+	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : String, sourceDir : String, outputDir : String, mem : Int, apionly : Boolean, msgLevel : MessageLevel.Type) = {
+    val args : MList[String] = mlistEmpty
+    args += "-s"
+    args += (!nostatic).toString
+    args += "-par"
+    args += parallel.toString
+    args += "-i"
+    args += (!noicc).toString
+    args += "-k"
+    args += k_context.toString
+    args += "-to"
+    args += timeout.toString
+    args += "-api"
+    args += apionly.toString
+    args += "-msg"
+    args += msgLevel.toString
+    args ++= List("-t", typSpec, sourceDir, outputDir)
+    org.sireum.jawa.util.JVMUtil.startSecondJVM(IntentInjection.getClass(), "-Xmx" + mem + "G", args.toList, true)
   }
 }
 
@@ -76,30 +92,36 @@ object GenCallGraph {
   private final val TITLE = "GenCallGraph"
   
 	def main(args: Array[String]) {
-	  if(args.size != 6){
-	    println("Usage: -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -t type[allows: APK, DIR] <source path> <output path>")
-	    return
-	  }
-	  val msgLevel = args(1)
-	  val typ = args(3)
-	  val sourcePath = args(4)
-	  val outputPath = args(5)
-	  
-	  msgLevel match{
-	    case "NO$" =>
-	      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NO
-	    case "CRITICAL$" =>
-	      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
-	    case "NORMAL$" =>
-	      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
-	    case "VERBOSE$" =>
-	      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.VERBOSE
+	  if(args.size != 18){
+      println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -api [api only] -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -t type[allows: APK, DIR] <source path> <output path>")
+      return
+    }
+    val static = args(1).toBoolean
+    val parallel = args(3).toBoolean
+    val icc = args(5).toBoolean
+    val k_context = args(7).toInt
+    val timeout = args(9).toInt
+    val apionly = args(11).toBoolean
+    val msgLevel = args(13)
+    val typ = args(15)
+    val sourcePath = args(16)
+    val outputPath = args(17)
+    
+    msgLevel match{
+      case "NO$" =>
+        MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NO
+      case "CRITICAL$" =>
+        MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
+      case "NORMAL$" =>
+        MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
+      case "VERBOSE$" =>
+        MessageCenter.msglevel = MessageCenter.MSG_LEVEL.VERBOSE
       case _ => 
         println("Unexpected msg level: " + msgLevel)
         return
-	  }
-	  
-	  val apkFileUris = typ match{
+    }
+    
+    val apkFileUris = typ match{
       case "APK" =>
         require(sourcePath.endsWith(".apk"))
         Set(FileUtil.toUri(sourcePath))
@@ -110,11 +132,11 @@ object GenCallGraph {
         println("Unexpected type: " + typ)
         return
     }
-		genCallGraph(apkFileUris, outputPath)
+		genCallGraph(apkFileUris, outputPath, static, parallel, icc, k_context, timeout, apionly)
 	}
   
-  def genCallGraph(apkFileUris : Set[FileResourceUri], outputPath : String) = {
-    
+  def genCallGraph(apkFileUris : Set[FileResourceUri], outputPath : String, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int, apionly : Boolean) = {
+    GlobalConfig.CG_CONTEXT_K = k_context
     println("Total apks: " + apkFileUris.size)
     try{
       var i : Int = 0
@@ -124,9 +146,10 @@ object GenCallGraph {
         apkFileUri =>
           try{
             i+=1
-            println("Analyzing " + apkFileUri)
-            
-            val apkName = apkFileUri.substring(apkFileUri.lastIndexOf("/"), apkFileUri.lastIndexOf("."))
+            println("Analyzing #" + i + ":" + apkFileUri)
+            val timer = Some(new MyTimer(timeout*60))
+            if(timer.isDefined) timer.get.start
+            val apkName = apkFileUri.substring(apkFileUri.lastIndexOf("/") + 1, apkFileUri.lastIndexOf("."))
             
         		val resultDir = new File(outputPath + "/APPs/")
             val outputUri = FileUtil.toUri(outputPath)
@@ -139,11 +162,9 @@ object GenCallGraph {
           	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
           	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
           	
-          	val app_info = new AppInfoCollector(apkFileUri, outUri)
+          	val app_info = new AppInfoCollector(apkFileUri, outUri, timer)
           	app_info.collectInfo
-            
-          	val pag = new PointerAssignmentGraph[PtaNode]()
-            val cg = new InterproceduralControlFlowGraph[CGNode]
+
             val eps = app_info.getEntryPoints
             val pros =
               eps.map{
@@ -153,18 +174,19 @@ object GenCallGraph {
                   procedures
               }.reduce(iunion[JawaProcedure])
 
-            new InterproceduralPointsToAnalysis().pta(pag, cg, pros, false)
+            val cg = InterproceduralSuperSpark(pros, timer)
           	
             val file = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ".txt.gz")
       	    val w = new FileOutputStream(file)
             val zipw = new GZIPOutputStream(new BufferedOutputStream(w))
-      	    val graph = cg.toTextGraph
+      	    val graph = if(apionly) cg.toApiGraph else cg.toTextGraph
       	    zipw.write(graph.getBytes())
       	    zipw.close()
       	    println(apkName + " result stored!")
             
-            println("#" + i + ":Done!")
+            println("Done!")
           } catch {
+            case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
             case e : Throwable => 
               CliLogger.logError(new File(outputPath), "Error: " , e)
           } finally {

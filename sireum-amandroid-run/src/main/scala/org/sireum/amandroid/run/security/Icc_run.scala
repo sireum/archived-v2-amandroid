@@ -7,9 +7,8 @@ http://www.eclipse.org/legal/epl-v10.html
 */
 package org.sireum.amandroid.run.security
 
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.amandroid.security.AmandroidSocket
-import org.sireum.jawa.util.Timer
 import org.sireum.util.FileUtil
 import org.sireum.amandroid.security.interComponentCommunication.IccCollector
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
@@ -25,6 +24,9 @@ import org.sireum.jawa.JawaCodeSource
 import org.sireum.jawa.util.SubStringCounter
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.util.IgnoreException
+import org.sireum.jawa.util.MyTimer
+import org.sireum.jawa.util.MyTimeoutException
+import org.sireum.jawa.GlobalConfig
 
 
 /**
@@ -104,7 +106,7 @@ object Icc_run {
       return
     }
     
-    AndroidReachingFactsAnalysisConfig.k_context = 1
+    GlobalConfig.CG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
 //    AndroidReachingFactsAnalysisConfig.timeout = 10
@@ -119,18 +121,31 @@ object Icc_run {
     files.foreach{
       file =>
         try{
-          msg_critical(TITLE, "####" + file + "#####")
-          val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-          val app_info = new IccCollector(file, outUri)
-          app_info.collectInfo
-          socket.plugListener(new IccListener(file, app_info))
-          socket.runWithoutDDA(false, true)
+          msg_critical(TITLE, IccTask(outputPath, file, socket, Some(500)).run)   
         } catch {
-          case e : Throwable =>
-            e.printStackTrace()
-        } finally {
+          case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
+          case e : Throwable => e.printStackTrace()
+        } finally{
+          msg_critical(TITLE, IccCounter.toString)
           socket.cleanEnv
         }
+    }
+  }
+  
+  private case class IccTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]){
+    def run : String = {
+      msg_critical(TITLE, "####" + file + "#####")
+      val timer = timeout match {
+        case Some(t) => Some(new MyTimer(t))
+        case None => None
+      }
+      if(timer.isDefined) timer.get.start
+      val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+      val app_info = new IccCollector(file, outUri, timer)
+      app_info.collectInfo
+      socket.plugListener(new IccListener(file, app_info))
+      socket.runWithoutDDA(false, true, timer)
+      return "Done!"
     }
   }
 }

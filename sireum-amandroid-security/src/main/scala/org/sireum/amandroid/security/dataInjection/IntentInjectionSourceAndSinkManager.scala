@@ -15,14 +15,11 @@ import org.sireum.pilar.ast._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.alir.util.ExplicitValueFinder
 import org.sireum.jawa.alir.controlFlowGraph.CGInvokeNode
-import org.sireum.jawa.alir.reachingFactsAnalysis.RFAFact
-import org.sireum.amandroid.alir.model.InterComponentCommunicationModel
-import org.sireum.jawa.alir.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.jawa.alir.controlFlowGraph.CGNode
-import org.sireum.amandroid.alir.reachingFactsAnalysis.IntentHelper
-import org.sireum.jawa.alir.reachingFactsAnalysis.VarSlot
 import org.sireum.jawa.Center
 import org.sireum.amandroid.alir.taintAnalysis.AndroidSourceAndSinkManager
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentCommunicationModel
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -63,7 +60,7 @@ class IntentInjectionSourceAndSinkManager(appPackageName : String,
     val calleeSet = invNode.getCalleeSet
     calleeSet.foreach{
       callee =>
-        if(InterComponentCommunicationModel.isIccOperation(Center.getProcedureWithoutFailing(callee.callee))){
+        if(InterComponentCommunicationModel.isIccOperation(callee.callee)){
           sinkflag = true
 //          val rfafactMap = ReachingFactsAnalysisHelper.getFactMap(rfaFact)
 //          val args = invNode.getOwner.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{

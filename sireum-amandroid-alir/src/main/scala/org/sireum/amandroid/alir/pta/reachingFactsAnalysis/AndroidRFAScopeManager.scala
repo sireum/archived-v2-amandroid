@@ -5,12 +5,12 @@ are made available under the terms of the Eclipse Public License v1.0
 which accompanies this distribution, and is available at              
 http://www.eclipse.org/legal/epl-v10.html                             
 */
-package org.sireum.amandroid.alir.reachingFactsAnalysis
+package org.sireum.amandroid.alir.pta.reachingFactsAnalysis
 
 import org.sireum.jawa.ScopeManager
 import org.sireum.util._
 import org.sireum.jawa.JawaRecord
-import org.sireum.jawa.alir.reachingFactsAnalysis._
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.jawa.JawaProcedure
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.AndroidConstants
@@ -46,7 +46,7 @@ object AndroidRFAScopeManager extends ScopeManager{
 	 * return true if given record needs to be bypassed
 	 */
 	def shouldBypass(rec : JawaRecord) : Boolean = {
-    rec.isLibraryRecord &&
+    (rec.isFrameworkRecord || rec.isThirdPartyLibRecord) &&
     {
 	    if(isIncludeMode){
 	    	if(rec.getPackageName != null) !contains(rec.getPackageName) else true

@@ -23,11 +23,10 @@ import org.sireum.jawa.alir.util.ExplicitValueFinder
 import org.sireum.pilar.ast.JumpLocation
 import org.sireum.jawa.MessageCenter._
 import java.io.File
-import org.sireum.jawa.alir.reachingFactsAnalysis.RFAFact
-import org.sireum.amandroid.alir.model.InterComponentCommunicationModel
-import org.sireum.jawa.alir.reachingFactsAnalysis.VarSlot
-import org.sireum.amandroid.alir.reachingFactsAnalysis.IntentHelper
-import org.sireum.jawa.alir.reachingFactsAnalysis.ReachingFactsAnalysisHelper
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterProceduralDataDependenceGraph
 import org.sireum.amandroid.AppCenter
@@ -36,6 +35,7 @@ import java.io.InputStreamReader
 import java.io.FileInputStream
 import org.sireum.jawa.alir.interProcedural.Callee
 import org.sireum.jawa.alir.taintAnalysis.SourceAndSinkManager
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentCommunicationModel
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -58,7 +58,7 @@ object SourceAndSinkCategory {
 abstract class AndroidSourceAndSinkManager(appPackageName : String, 
     												layoutControls : Map[Int, LayoutControl], 
     												callbackMethods : ISet[JawaProcedure], 
-    												sasFilePath : String) extends SourceAndSinkManager{
+    												sasFilePath : String) extends SourceAndSinkManager[RFAFact]{
   
   private final val TITLE = "BasicSourceAndSinkManager"
   
@@ -164,7 +164,7 @@ class DefaultAndroidSourceAndSinkManager(appPackageName : String,
     val calleeSet = invNode.getCalleeSet
     calleeSet.foreach{
       callee =>
-        if(InterComponentCommunicationModel.isIccOperation(Center.getProcedureWithoutFailing(callee.callee))){
+        if(InterComponentCommunicationModel.isIccOperation(callee.callee)){
           val rfafactMap = ReachingFactsAnalysisHelper.getFactMap(rfaFact)
           val args = Center.getProcedureWithoutFailing(invNode.getOwner).getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
               case te : TupleExp =>

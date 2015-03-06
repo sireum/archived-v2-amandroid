@@ -9,8 +9,7 @@ package org.sireum.amandroid.run.test
 
 import org.sireum.util._
 import org.sireum.jawa.MessageCenter._
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
-import org.sireum.jawa.util.Timer
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.amandroid.security.apiMisuse.InterestingApiCollector
 import org.sireum.jawa.MessageCenter._
 import org.sireum.amandroid.util.AndroidLibraryAPISummary

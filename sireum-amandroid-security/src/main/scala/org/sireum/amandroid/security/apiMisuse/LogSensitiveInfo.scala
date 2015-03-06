@@ -9,11 +9,11 @@ package org.sireum.amandroid.security.apiMisuse
 
 import org.sireum.jawa.MessageCenter
 import org.sireum.util.FileUtil
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.jawa.Center
 import org.sireum.amandroid.AndroidConstants
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysis
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.ClassLoadManager
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
@@ -22,30 +22,27 @@ import org.sireum.jawa.alir.controlFlowGraph.CGNode
 import org.sireum.jawa.alir.controlFlowGraph.CGCallNode
 import org.sireum.util.MSet
 import org.sireum.util.MMap
-import org.sireum.jawa.alir.reachingFactsAnalysis.RFAFact
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.pilar.ast.NameExp
 import org.sireum.pilar.ast.TupleExp
-import org.sireum.jawa.alir.reachingFactsAnalysis.RFAConcreteStringInstance
 import org.sireum.pilar.ast.CallJump
 import org.sireum.jawa.JawaProcedure
 import org.sireum.pilar.ast.JumpLocation
 import org.sireum.util.MList
-import org.sireum.jawa.alir.reachingFactsAnalysis.VarSlot
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.jawa.MessageCenter._
 import org.sireum.util._
-import org.sireum.jawa.alir.reachingFactsAnalysis.RFAFact
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.pilar.ast._
 import org.sireum.jawa.Center
 import org.sireum.jawa.alir.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
-import org.sireum.jawa.alir.reachingFactsAnalysis.VarSlot
-import org.sireum.jawa.alir.reachingFactsAnalysis.RFAConcreteStringInstance
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
 import org.sireum.jawa.JawaProcedure
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.security.AmandroidSocketListener
 import org.sireum.jawa.util.IgnoreException
-import org.sireum.jawa.util.Timer
 import org.sireum.jawa.alir.reachability.ReachabilityAnalysis
 /*
  * @author <a href="mailto:i@flanker017.me">Qidan He</a>
@@ -151,7 +148,7 @@ object LogSensitiveInfo {
         println("ZWZW - callee set for current invNode is - " + calleeSet.toString)
         calleeSet.foreach{
           callee =>
-            val calleep = Center.getProcedureWithoutFailing(callee.callee)
+            val calleep = callee.callee
             val callees : MSet[JawaProcedure] = msetEmpty
             val caller = Center.getProcedureWithoutFailing(invNode.getOwner)
             val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]

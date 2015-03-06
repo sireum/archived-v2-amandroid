@@ -12,7 +12,7 @@ import org.sireum.jawa.JawaRecord
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.jawa.alir.taintAnalysis.TaintAnalysisResult
 import org.sireum.jawa.alir.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
-import org.sireum.jawa.alir.reachingFactsAnalysis.RFAFact
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceInfo
 import org.sireum.amandroid.parser.IntentFilterDataBase
 import org.sireum.amandroid.appInfo.AppInfoCollector

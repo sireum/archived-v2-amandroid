@@ -5,16 +5,18 @@ are made available under the terms of the Eclipse Public License v1.0
 which accompanies this distribution, and is available at              
 http://www.eclipse.org/legal/epl-v10.html                             
 */
-package org.sireum.amandroid.alir.model
+package org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model
 
 import org.sireum.jawa._
 import org.sireum.util._
 import org.sireum.jawa.alir.Context
-import org.sireum.jawa.alir.reachingFactsAnalysis._
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.alir.UnknownInstance
 import org.sireum.jawa.alir.NullInstance
+import org.sireum.jawa.alir.pta.PTAPointStringInstance
+import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -119,9 +121,9 @@ object IntentFilterModel {
 	      actionValue.foreach{
 		      acStr =>
 	          acStr match{
-	            case cstr @ RFAConcreteStringInstance(text, c) =>
+	            case cstr @ PTAConcreteStringInstance(text, c) =>
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENTFILTER_ACTIONS), cstr)
-	            case pstr @ RFAPointStringInstance(c) => 
+	            case pstr @ PTAPointStringInstance(c) => 
 	              err_msg_detail(TITLE, "Init IntentFilter use point string: " + pstr)
 	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENTFILTER_ACTIONS), pstr)
 	            case ustr @ UnknownInstance(t, c) => 

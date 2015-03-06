@@ -5,7 +5,7 @@ are made available under the terms of the Eclipse Public License v1.0
 which accompanies this distribution, and is available at              
 http://www.eclipse.org/legal/epl-v10.html                             
 */
-package org.sireum.amandroid.alir.reachingFactsAnalysis
+package org.sireum.amandroid.alir.pta.reachingFactsAnalysis
 
 import org.sireum.jawa.alir.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
 import org.sireum.alir.Slot
@@ -23,8 +23,7 @@ import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 import org.sireum.jawa.alir.Instance
 import org.sireum.jawa.util.StringFormConverter
-import org.sireum.jawa.alir.reachingFactsAnalysis._
-import org.sireum.amandroid.alir.model.AndroidModelCallHandler
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.jawa.JawaRecord
 import org.sireum.jawa.alir.NullInstance
 import org.sireum.jawa.alir.UnknownInstance
@@ -37,8 +36,10 @@ import org.sireum.jawa.ClassLoadManager
 import org.sireum.jawa.alir.interProcedural.NodeListener
 import org.sireum.jawa.Mode
 import scala.collection.immutable.BitSet
-import org.sireum.jawa.util.Timer
 import java.io.PrintWriter
+import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
+import org.sireum.jawa.alir.pta.PTAInstance
+import org.sireum.jawa.util.MyTimer
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -48,16 +49,12 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
   
   final val TITLE = "AndroidReachingFactsAnalysisBuilder"
   
-//  val timerOpt = AndroidReachingFactsAnalysisConfig.timeout match{
-//    case 0 => None
-//    case a => Some(new Timer(a))
-//  }
-  
   var icfg : InterproceduralControlFlowGraph[CGNode] = null
   
   def build //
   (entryPointProc : JawaProcedure,
    initialFacts : ISet[RFAFact] = isetEmpty,
+   timer : Option[MyTimer],
    initContext : Context,
    switchAsOrderedMatch : Boolean) : (InterproceduralControlFlowGraph[CGNode], AndroidReachingFactsAnalysis.Result) = {
     val gen = new Gen
@@ -70,7 +67,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
     cg.collectCfgToBaseGraph(entryPointProc, initContext, true)
     val iota : ISet[RFAFact] = initialFacts + RFAFact(VarSlot("@@RFAiota"), NullInstance(initContext))
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](cg,
-      true, true, false, AndroidReachingFactsAnalysisConfig.parallel, gen, kill, callr, iota, initial, switchAsOrderedMatch, Some(nl))
+      true, true, false, AndroidReachingFactsAnalysisConfig.parallel, gen, kill, callr, iota, initial, timer, switchAsOrderedMatch, Some(nl))
     (cg, result)
   }
   
@@ -188,9 +185,9 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
       	    val rec = Center.resolveRecord(typ.name, Center.ResolveLevel.HIERARCHY)
       	    val ins = 
 	            if(recName == "java.lang.String" && dimensions == 0){
-	              RFAConcreteStringInstance("", currentContext.copy)
+	              PTAConcreteStringInstance("", currentContext.copy)
 	            } else {
-	              RFAInstance(typ, currentContext.copy)
+	              PTAInstance(typ, currentContext.copy)
 	            }
 //      	    result ++= rec.getNonStaticObjectTypeFields.map(f=>RFAFact(FieldSlot(ins, f.getSignature), NullInstance(currentContext)))
       	  case _ =>
@@ -207,7 +204,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
 		    thrownExcNames.foreach{
 		      excName =>
 		        if(excName != ExceptionCenter.ANY_EXCEPTION){
-		          val ins = RFAInstance(NormalType(excName, 0), currentContext.copy)
+		          val ins = PTAInstance(NormalType(excName, 0), currentContext.copy)
 		          result += RFAFact(VarSlot(ExceptionCenter.EXCEPTION_VAR_NAME), ins)
 		        }
 		    }
@@ -313,7 +310,6 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
      */
     def resolveCall(s : ISet[RFAFact], cj : CallJump, callerContext : Context, cg : InterproceduralControlFlowGraph[CGNode]) : (IMap[CGNode, ISet[RFAFact]], ISet[RFAFact]) = {
       val calleeSet = ReachingFactsAnalysisHelper.getCalleeSet(s, cj, callerContext)
-      if(callerContext.toString().contains("L000644")) println("ssssssss-> " + calleeSet)
       val cgCallnode = cg.getCGCallNode(callerContext)
       cgCallnode.asInstanceOf[CGCallNode].setCalleeSet(calleeSet)
       val cgReturnnode = cg.getCGReturnNode(callerContext)
@@ -324,7 +320,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
       var pureNormalFlag = true  //no mix of normal and model callee
       calleeSet.foreach{
         callee =>
-          val calleep = Center.getProcedureWithoutFailing(callee.callee)
+          val calleep = callee.callee
           if(AndroidReachingFactsAnalysisHelper.isICCCall(calleep) || AndroidReachingFactsAnalysisHelper.isModelCall(calleep)){
             pureNormalFlag = false
             val args = cj.callExp.arg match{
@@ -356,7 +352,6 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
 	              }
               }
             } else { // for non-ICC model call
-//              if(callee.getSubSignature == "unknown:()LCenter/Unknown;") println("callees-->" + calleeSet + "\ncontext-->" + callerContext + "\nfacts-->" + s)
               val factsForCallee = getFactsForCallee(s, cj, calleep)
               returnFacts --= factsForCallee
             	tmpReturnFacts ++= AndroidReachingFactsAnalysisHelper.doModelCall(factsForCallee, calleep, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)
@@ -368,7 +363,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
             }
             val factsForCallee = getFactsForCallee(s, cj, calleep)
             returnFacts --= factsForCallee
-            calleeFactsMap += (cg.entryNode(calleep.getSignature, callerContext) -> mapFactsToCallee(factsForCallee, cj, calleep.getProcedureBody.procedure))
+            calleeFactsMap += (cg.entryNode(calleep.getSignature, callerContext) -> mapFactsToCallee(factsForCallee, callerContext, cj, calleep))
           }
       }
       returnFacts ++= tmpReturnFacts
@@ -460,8 +455,9 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
       }
     }
     
-    def mapFactsToCallee(factsToCallee : ISet[RFAFact], cj : CallJump, calleeProcedure : ProcedureDecl) : ISet[RFAFact] = {
+    def mapFactsToCallee(factsToCallee : ISet[RFAFact], callerContext : Context, cj : CallJump, calleep : JawaProcedure) : ISet[RFAFact] = {
       val varFacts = factsToCallee.filter(f=>f.s.isInstanceOf[VarSlot] && !f.s.asInstanceOf[VarSlot].isGlobal).map{f=>RFAFact(f.s.asInstanceOf[VarSlot], f.v)}
+      val calleeProcedure = calleep.getProcedureBody.procedure
       cj.callExp.arg match{
         case te : TupleExp =>
           val argSlots = te.exps.map{
@@ -488,7 +484,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
           
           for(i <- 0 to argSlots.size - 1){
             if(!paramSlots.isDefinedAt(i)){
-              err_msg_critical(TITLE, "argSlots does not adjust to paramSlots:\n" + cj.callExp.arg + "\n" + calleeProcedure.annotations)
+              err_msg_critical(TITLE, "argSlots does not adjust to paramSlots:\n" + callerContext + "\n" + argSlots + "\n" + calleep.getSignature + "\n" + paramSlots)
             } else {
 	            val argSlot = argSlots(i)
 	            val paramSlot = paramSlots(i)
@@ -641,10 +637,6 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
     }
     
     def onPostVisitNode(node : CGNode, succs : CSet[CGNode]) : Unit = {
-//      timerOpt match{
-//        case Some(timer) => timer.isTimeOutAndThrow
-//        case None =>
-//      }
     }
   }
   
@@ -663,7 +655,8 @@ object AndroidReachingFactsAnalysis {
   def apply(entryPointProc : JawaProcedure,
    initialFacts : ISet[RFAFact] = isetEmpty,
    clm : ClassLoadManager,
+   timer : Option[MyTimer],
    initContext : Context = new Context(GlobalConfig.CG_CONTEXT_K),
    switchAsOrderedMatch : Boolean = false) : (InterproceduralControlFlowGraph[Node], Result)
-				   = new AndroidReachingFactsAnalysisBuilder(clm).build(entryPointProc, initialFacts, initContext, switchAsOrderedMatch)
+				   = new AndroidReachingFactsAnalysisBuilder(clm).build(entryPointProc, initialFacts, timer, initContext, switchAsOrderedMatch)
 }

@@ -15,7 +15,7 @@ import java.io.PrintWriter
 import java.net.URI
 import org.sireum.jawa.util.APKFileResolver
 import org.sireum.amandroid.decompile.Dex2PilarConverter
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidRFAConfig
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAConfig
 import org.sireum.jawa.JawaCodeSource
 import org.sireum.jawa.GlobalConfig
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
@@ -344,7 +344,7 @@ object SsoOauthStringCollect_run {
         	    
           }
         	
-        	(JawaCodeSource.getAppUsingLibraryRecordsCodes).foreach{
+        	(JawaCodeSource.getThirdPartyLibraryRecordsCodes).foreach{
         	  case (name, code) => 	    
         	    if(!extract(code, regexSso).isEmpty){ 
         	      Counter.ssoLoginUser += file

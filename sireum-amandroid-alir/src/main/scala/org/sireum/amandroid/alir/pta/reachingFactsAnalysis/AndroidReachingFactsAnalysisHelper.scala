@@ -5,13 +5,13 @@ are made available under the terms of the Eclipse Public License v1.0
 which accompanies this distribution, and is available at              
 http://www.eclipse.org/legal/epl-v10.html                             
 */
-package org.sireum.amandroid.alir.reachingFactsAnalysis
+package org.sireum.amandroid.alir.pta.reachingFactsAnalysis
 
 import org.sireum.util._
 import org.sireum.jawa.JawaProcedure
-import org.sireum.amandroid.alir.model.AndroidModelCallHandler
-import org.sireum.jawa.alir.reachingFactsAnalysis.RFAFact
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.Context
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.AndroidModelCallHandler
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

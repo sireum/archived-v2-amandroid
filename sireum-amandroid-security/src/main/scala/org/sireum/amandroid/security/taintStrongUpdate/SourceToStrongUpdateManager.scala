@@ -12,11 +12,11 @@ import org.sireum.util._
 import org.sireum.jawa.JawaProcedure
 import org.sireum.amandroid.alir.taintAnalysis.AndroidSourceAndSinkManager
 import org.sireum.jawa.alir.controlFlowGraph._
-import org.sireum.jawa.alir.reachingFactsAnalysis.RFAFact
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.pilar.ast._
 import org.sireum.jawa.PilarAstHelper
-import org.sireum.jawa.alir.reachingFactsAnalysis.VarSlot
-import org.sireum.jawa.alir.reachingFactsAnalysis.ReachingFactsAnalysisHelper
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
