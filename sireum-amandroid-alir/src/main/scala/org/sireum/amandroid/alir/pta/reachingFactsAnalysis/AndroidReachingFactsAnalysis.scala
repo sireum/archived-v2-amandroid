@@ -516,7 +516,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
 		            case _ => VarSlot(exp.toString())
 		          }
           }
-          var paramSlots : List[VarSlot] = List()
+          val paramSlots : MList[VarSlot] = mlistEmpty
           calleeProcedure.params.foreach{
             param =>
               require(param.typeSpec.isDefined)
@@ -524,10 +524,10 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
 	              case nt : NamedTypeSpec => 
 	                val name = nt.name.name
 	                if(name=="long" || name=="double")
-	                  paramSlots :+= VarSlot(param.name.name)
+	                  paramSlots += VarSlot(param.name.name)
 	              case _ =>
               }
-              paramSlots :+= VarSlot(param.name.name)
+              paramSlots += VarSlot(param.name.name)
           }
           var result = isetEmpty[RFAFact]
           
@@ -556,7 +556,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
             case ne : NameExp => VarSlot(ne.name.name)
             case exp => VarSlot(exp.toString())
           }
-          var paramSlots : List[VarSlot] = List()
+          val paramSlots : MList[VarSlot] = mlistEmpty
           calleeProcedure.params.foreach{
             param =>
               require(param.typeSpec.isDefined)
@@ -564,10 +564,10 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
 	              case nt : NamedTypeSpec => 
 	                val name = nt.name.name
 	                if(name=="long" || name=="double")
-	                  paramSlots :+= VarSlot(param.name.name)
+	                  paramSlots += VarSlot(param.name.name)
 	              case _ =>
               }
-              paramSlots :+= VarSlot(param.name.name)
+              paramSlots += VarSlot(param.name.name)
           }
           var result = isetEmpty[RFAFact]
           val paramSlot = paramSlots(0)
