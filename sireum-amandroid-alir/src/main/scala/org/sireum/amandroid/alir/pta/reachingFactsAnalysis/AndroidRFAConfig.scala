@@ -17,6 +17,7 @@ import org.sireum.jawa.GlobalConfig
 import org.sireum.jawa.JawaRecord
 import org.sireum.jawa.Center
 import org.sireum.jawa.alir.pta.PTAInstance
+import org.sireum.jawa.alir.pta.VarSlot
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

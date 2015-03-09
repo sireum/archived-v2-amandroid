@@ -19,6 +19,8 @@ import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.jawa.alir.pta.VarSlot
+import org.sireum.jawa.alir.pta.FieldSlot
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -126,9 +128,9 @@ object ComponentNameModel {
 	private def getClassNameFromComponentName(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
     if(!thisValue.isEmpty){
-  	  val cValue = thisValue.map(tv=>s.pointsToSet(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS).toString, currentContext)).reduce(iunion[Instance])
+  	  val cValue = thisValue.map(tv=>s.pointsToSet(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), currentContext)).reduce(iunion[Instance])
   	  cValue.map(cv=> RFAFact(VarSlot(retVar), cv))
     } else isetEmpty
 	}
@@ -136,9 +138,9 @@ object ComponentNameModel {
 	private def getShortClassNameFromComponentName(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
     if(!thisValue.isEmpty){
-  	  val cValue = thisValue.map(tv=>s.pointsToSet(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS).toString, currentContext)).reduce(iunion[Instance])
+  	  val cValue = thisValue.map(tv=>s.pointsToSet(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), currentContext)).reduce(iunion[Instance])
   	  getShortNameFromClassName(cValue, currentContext).map(cv=> RFAFact(VarSlot(retVar), cv))
     } else isetEmpty
 	}
@@ -169,9 +171,9 @@ object ComponentNameModel {
 	private def getPackageNameFromComponentName(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
     if(!thisValue.isEmpty){
-  	  val cValue = thisValue.map(tv=>s.pointsToSet(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE).toString, currentContext)).reduce(iunion[Instance])
+  	  val cValue = thisValue.map(tv=>s.pointsToSet(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), currentContext)).reduce(iunion[Instance])
   	  cValue.map(cv=> RFAFact(VarSlot(retVar), cv))
     } else isetEmpty
 	}
@@ -179,14 +181,14 @@ object ComponentNameModel {
 	private def initComponentNameWithCC(s : PTAResult, args : List[String], currentContext : Context) : ISet[RFAFact] ={
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val param2Slot = VarSlot(args(2))
-	  val param2Value = s.pointsToSet(param2Slot.toString, currentContext)
+	  val param2Value = s.pointsToSet(param2Slot, currentContext)
 	  val clazzNames = 
 	    if(param2Value.isEmpty){
 		    isetEmpty[Instance]
 		  } else {
-		    param2Value.map(v=>s.pointsToSet(FieldSlot(v, "java.lang.Class.name").toString, currentContext)).reduce(iunion[Instance])
+		    param2Value.map(v=>s.pointsToSet(FieldSlot(v, "name"), currentContext)).reduce(iunion[Instance])
 		  }
     if(!thisValue.isEmpty){
   	  thisValue.map{
@@ -204,26 +206,26 @@ object ComponentNameModel {
   		              recOpt match{
   		                case Some(rec) =>
   				              val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
-  				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
-  				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), cstr)
+  				              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
+  				              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
   		                case None =>
   		                  err_msg_normal(TITLE, "Given class name probably come from another app: " + cn)
   				              val unknownIns = UnknownInstance(new NormalType(recordName), currentContext)
-  				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
-  				              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
+  				              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
+  				              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
   		              }
   		              facts
   		            case pstr @ PTAPointStringInstance(c) => 
   		              err_msg_detail(TITLE, "Init ComponentName use point string: " + pstr)
   		              var facts = isetEmpty[RFAFact]
-  		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
-  		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pstr)
+  		              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr)
+  		              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), pstr)
   		              facts
   		            case _ => 
   		              err_msg_detail(TITLE, "Init ComponentName use Unknown instance: " + cn)
   		              var facts = isetEmpty[RFAFact]
-  		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), cn)
-  		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), cn)
+  		              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), cn)
+  		              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), cn)
   		              facts
   		          }
   		      }.reduce(iunion[RFAFact])
@@ -235,9 +237,9 @@ object ComponentNameModel {
 	private def initComponentNameWithCS(s : PTAResult, args : List[String], currentContext : Context) : ISet[RFAFact] ={
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val param2Slot = VarSlot(args(2))
-	  val param2Value = s.pointsToSet(param2Slot.toString, currentContext)
+	  val param2Value = s.pointsToSet(param2Slot, currentContext)
 	  thisValue.map{
 	    tv =>
 	      if(param2Value.isEmpty){
@@ -252,20 +254,20 @@ object ComponentNameModel {
 		              val claStr = PTAConcreteStringInstance(recordType.name, c)
 		              val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
 		              var facts = isetEmpty[RFAFact]
-		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
-		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), claStr)
+		              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
+		              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), claStr)
 		              facts
 		            case pstr @ PTAPointStringInstance(c) => 
 		              err_msg_detail(TITLE, "Init ComponentName use point string: " + pstr)
 		              var facts = isetEmpty[RFAFact]
-		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
-		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pstr)
+		              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr)
+		              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), pstr)
 		              facts
 		            case _ =>
 		              err_msg_detail(TITLE, "Init ComponentName use unknown instance: " + cn)
 		              var facts = isetEmpty[RFAFact]
-		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), cn)
-		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), cn)
+		              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), cn)
+		              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), cn)
 		              facts
 		          }
 		      }.reduce(iunion[RFAFact])
@@ -276,11 +278,11 @@ object ComponentNameModel {
 	private def initComponentNameWithSS(s : PTAResult, args : List[String], currentContext : Context) : ISet[RFAFact] ={
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val param1Slot = VarSlot(args(1))
-	  val param1Value = s.pointsToSet(param1Slot.toString, currentContext)
+	  val param1Value = s.pointsToSet(param1Slot, currentContext)
 	  val param2Slot = VarSlot(args(2))
-	  val param2Value = s.pointsToSet(param2Slot.toString, currentContext)
+	  val param2Value = s.pointsToSet(param2Slot, currentContext)
 	  thisValue.map{
 	    tv =>
 	      if(param1Value.isEmpty){
@@ -300,20 +302,20 @@ object ComponentNameModel {
 							              val recordType = StringFormConverter.formatClassNameToType(text)
 							              val claStr = PTAConcreteStringInstance(recordType.name, c)
 							              var facts = isetEmpty[RFAFact]
-							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pv1)
-							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), claStr)
+							              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pv1)
+							              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), claStr)
 							              facts
 							            case pstr2 @ PTAPointStringInstance(c) => 
 							              err_msg_detail(TITLE, "Init ComponentName.mClass use point string: " + pv2)
 							              var facts = isetEmpty[RFAFact]
-							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pstr2)
-							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pstr2)
+							              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr2)
+							              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), pstr2)
 							              facts
 							            case _ =>
 							              err_msg_detail(TITLE, "Init ComponentName.mClass use Unknown instance: " + pv2)
 							              var facts = isetEmpty[RFAFact]
-							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pv2)
-							              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pv2)
+							              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pv2)
+							              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), pv2)
 							              facts
 							          }
 							      }.reduce(iunion[RFAFact])
@@ -321,14 +323,14 @@ object ComponentNameModel {
 		            case pstr1 @ PTAPointStringInstance(c) => 
 		              err_msg_detail(TITLE, "Init ComponentName.mPackage use point string: " + pv1)
 		              var facts = isetEmpty[RFAFact]
-		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pstr1)
-		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pstr1)
+		              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr1)
+		              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), pstr1)
 		              facts
 		            case _ =>
 		              err_msg_detail(TITLE, "Init ComponentName.mPackage use Unknown instance: " + pv1)
 		              var facts = isetEmpty[RFAFact]
-		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_PACKAGE), pv1)
-		              facts += RFAFact(FieldSlot(tv, AndroidConstants.COMPONENTNAME_CLASS), pv1)
+		              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pv1)
+		              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), pv1)
 		              facts
 		          }
 		      }.reduce(iunion[RFAFact])
@@ -339,7 +341,7 @@ object ComponentNameModel {
 	private def cloneComponentName(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  thisValue.map{s => RFAFact(VarSlot(retVar), s.clone(currentContext))}
   }
 }

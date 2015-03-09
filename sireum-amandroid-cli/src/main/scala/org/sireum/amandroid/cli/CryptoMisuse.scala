@@ -25,11 +25,11 @@ import org.sireum.amandroid.alir.dataRecorder.DataCollector
 import java.io.PrintWriter
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.amandroid.security.AmandroidSocketListener
-import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.amandroid.security.apiMisuse.CryptographicMisuse
 import org.sireum.jawa.util.MyTimer
 import org.sireum.jawa.util.MyTimeoutException
 import org.sireum.jawa.GlobalConfig
+import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 
 
 /**
@@ -171,8 +171,8 @@ object CryptoMisuse {
       socket.runWithoutDDA(false, parallel, timer)
       val idfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
       idfgs.foreach{
-        case (rec, InterProceduralDataFlowGraph(icfg, irfaResult)) =>
-          CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
+        case (rec, idfg) =>
+          CryptographicMisuse(idfg)
       }
       return "Done!"
     }

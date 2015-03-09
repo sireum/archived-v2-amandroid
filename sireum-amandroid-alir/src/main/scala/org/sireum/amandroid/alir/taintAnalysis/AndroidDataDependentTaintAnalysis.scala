@@ -21,6 +21,8 @@ import org.sireum.amandroid.security.AndroidProblemCategories
 import scala.tools.nsc.ConsoleWriter
 import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.jawa.alir.pta.VarSlot
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -183,15 +185,15 @@ object AndroidDataDependentTaintAnalysis {
 //                println(callee)
 						    if(invNode.isInstanceOf[IDDGCallArgNode] && ssm.isSinkProcedure(callee)){
 						      msg_normal(TITLE, "found sink: " + callee + "@" + invNode.getContext)
-						      extendIDDGForSinkApis(iddg, invNode.asInstanceOf[IDDGCallArgNode], rfaFacts)
+						      extendIDDGForSinkApis(iddg, invNode.asInstanceOf[IDDGCallArgNode], ptaresult)
 						      val tn = Tn(invNode)
 						      tn.isSrc = false
 						      tn.descriptors += Td(callee.getSignature, SourceAndSinkCategory.API_SINK)
 						      sinks += tn
 						    }
-						    if(invNode.isInstanceOf[IDDGCallArgNode] && invNode.asInstanceOf[IDDGCallArgNode].position > 0 && ssm.isIccSink(invNode.getCGNode.asInstanceOf[CGCallNode], rfaFacts)){
+						    if(invNode.isInstanceOf[IDDGCallArgNode] && invNode.asInstanceOf[IDDGCallArgNode].position > 0 && ssm.isIccSink(invNode.getCGNode.asInstanceOf[CGCallNode], ptaresult)){
 				          msg_normal(TITLE, "found icc sink: " + invNode)
-				          extendIDDGForSinkApis(iddg, invNode.asInstanceOf[IDDGCallArgNode], rfaFacts)
+				          extendIDDGForSinkApis(iddg, invNode.asInstanceOf[IDDGCallArgNode], ptaresult)
 				          val tn = Tn(invNode)
 				          tn.isSrc = false
 						      tn.descriptors += Td(invNode.getLocUri, SourceAndSinkCategory.ICC_SINK)
@@ -217,14 +219,14 @@ object AndroidDataDependentTaintAnalysis {
       case normalNode : IDDGNormalNode =>
         val owner = Center.getProcedureWithoutFailing(normalNode.getOwner)
         val loc = owner.getProcedureBody.location(normalNode.getLocIndex)
-        if(ssm.isSource(loc, rfaFacts)){
+        if(ssm.isSource(loc, ptaresult)){
           msg_normal(TITLE, "found simple statement source: " + normalNode)
           val tn = Tn(normalNode)
           tn.isSrc = true
           tn.descriptors += Td(normalNode.getOwner, SourceAndSinkCategory.STMT_SOURCE)
           sources += tn
         }
-        if(ssm.isSink(loc, rfaFacts)){
+        if(ssm.isSink(loc, ptaresult)){
           msg_normal(TITLE, "found simple statement sink: " + normalNode)
           val tn = Tn(normalNode)
           tn.isSrc = false
@@ -241,15 +243,15 @@ object AndroidDataDependentTaintAnalysis {
     calleeSet.foreach{
       callee =>
         val argSlot = VarSlot(callArgNode.argName)
-        val argValue = ptaresult.pointsToSet(argSlot.toString, callArgNode.getContext)
-        val argRelatedFacts = ReachingFactsAnalysisHelper.getRelatedHeapFacts(argValue, rfaFacts)
-        argRelatedFacts.foreach{
-          case RFAFact(slot, ins) =>
+        val argValue = ptaresult.pointsToSet(argSlot, callArgNode.getContext)
+        val argRelatedValue = ptaresult.getRelatedHeapInstances(argValue, callArgNode.getContext)
+        argRelatedValue.foreach{
+          case ins =>
             val t = iddg.findDefSite(ins.getDefSite)
             iddg.addEdge(callArgNode.asInstanceOf[Node], t)
         }
-        argFacts.foreach{
-          case RFAFact(slot, argIns) => 
+        argValue.foreach{
+          case argIns => 
             argIns.getFieldsUnknownDefSites.foreach{
               case (defsite, udfields) =>
                 if(callArgNode.getContext != defsite){

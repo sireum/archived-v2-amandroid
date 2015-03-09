@@ -16,6 +16,8 @@ import org.sireum.jawa.alir.pta.Instance
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
 import org.sireum.jawa.alir.pta.PTATupleInstance
 import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.jawa.alir.pta.VarSlot
+import org.sireum.jawa.alir.pta.FieldSlot
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -239,14 +241,14 @@ object BundleModel {
 	private def initBundleFromBundle(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val paramSlot = VarSlot(args(1))
-	  val paramValue = s.pointsToSet(paramSlot.toString, currentContext)
+	  val paramValue = s.pointsToSet(paramSlot, currentContext)
 	  if(!paramValue.isEmpty && !thisValue.isEmpty){
-	    val pvs = paramValue.map{ins => s.pointsToSet(FieldSlot(ins, "android.os.Bundle.entries").toString, currentContext)}.reduce(iunion[Instance])
+	    val pvs = paramValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
 	    thisValue.map{
 	      tv =>
-	        pvs.map{s => RFAFact(FieldSlot(tv, "android.os.Bundle.entries"), s)}
+	        pvs.map{s => RFAFact(FieldSlot(tv, "entries"), s)}
 	    }.reduce(iunion[RFAFact])
 	  } else {
 	    isetEmpty
@@ -256,7 +258,7 @@ object BundleModel {
 	private def cloneBundle(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  thisValue.map{s => RFAFact(VarSlot(retVar), s.clone(currentContext))}
   }
 	
@@ -264,9 +266,9 @@ object BundleModel {
     val rf = ReachingFactsAnalysisHelper.getReturnFact(NormalType("android.os.Bundle", 0), retVar, currentContext).get
     require(args.size >1)
     val param1Slot = VarSlot(args(0))
-	  val param1Value = s.pointsToSet(param1Slot.toString, currentContext)
+	  val param1Value = s.pointsToSet(param1Slot, currentContext)
 	  val param2Slot = VarSlot(args(1))
-	  val param2Value = s.pointsToSet(param2Slot.toString, currentContext)
+	  val param2Value = s.pointsToSet(param2Slot, currentContext)
 	  var entries = isetEmpty[Instance]
 	  param1Value.foreach{
 	    kv =>
@@ -275,16 +277,16 @@ object BundleModel {
 	          entries += PTATupleInstance(kv, vv, currentContext)
 	      }
 	  }
-	  entries.map{s => RFAFact(FieldSlot(rf.v, "android.os.Bundle"), s)}
+	  entries.map{s => RFAFact(FieldSlot(rf.v, "entries"), s)}
   }
 	
 	private def getBundleKeySetToRet(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
 	  var result = isetEmpty[RFAFact]
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
     if(!thisValue.isEmpty){
-	    val strValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, "android.os.Bundle.entries").toString, currentContext)}.reduce(iunion[Instance])
+	    val strValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
   	  val rf = ReachingFactsAnalysisHelper.getReturnFact(NormalType("java.util.HashSet", 0), retVar, currentContext).get
   	  result += rf
   	  result ++= strValue.map{
@@ -300,11 +302,11 @@ object BundleModel {
 	  var result = isetEmpty[RFAFact]
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val keySlot = VarSlot(args(1))
-	  val keyValue = s.pointsToSet(keySlot.toString, currentContext)
+	  val keyValue = s.pointsToSet(keySlot, currentContext)
     if(!thisValue.isEmpty){
-  	  val entValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, "android.os.Bundle.entries").toString, currentContext)}.reduce(iunion[Instance])
+  	  val entValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
   	  if(keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
   		  entValue.foreach{
   		    v =>
@@ -328,13 +330,13 @@ object BundleModel {
 	  var result = isetEmpty[RFAFact]
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val keySlot = VarSlot(args(1))
-	  val keyValue = s.pointsToSet(keySlot.toString, currentContext)
+	  val keyValue = s.pointsToSet(keySlot, currentContext)
 	  val defaultSlot = VarSlot(args(2))
-	  val defaultValue = s.pointsToSet(defaultSlot.toString, currentContext)
+	  val defaultValue = s.pointsToSet(defaultSlot, currentContext)
     if(!thisValue.isEmpty){
-  	  val entValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, "android.os.Bundle.entries").toString, currentContext)}.reduce(iunion[Instance])
+  	  val entValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
   	  if(keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
   		  entValue.foreach{
   		    v =>
@@ -361,11 +363,11 @@ object BundleModel {
 	  var result = isetEmpty[RFAFact]
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val keySlot = VarSlot(args(1))
-	  val keyValue = s.pointsToSet(keySlot.toString, currentContext)
+	  val keyValue = s.pointsToSet(keySlot, currentContext)
 	  val valueSlot = VarSlot(args(2))
-	  val valueValue = s.pointsToSet(valueSlot.toString, currentContext)
+	  val valueValue = s.pointsToSet(valueSlot, currentContext)
 	  var entries = isetEmpty[Instance]
 	  keyValue.foreach{
 	    kv =>
@@ -376,7 +378,7 @@ object BundleModel {
 	  }
 	  thisValue.foreach{
 	    ins =>
-	      result ++= entries.map(e => RFAFact(FieldSlot(ins, "android.os.Bundle.entries"), e))
+	      result ++= entries.map(e => RFAFact(FieldSlot(ins, "entries"), e))
 	  }
 	  result
   }
@@ -387,15 +389,15 @@ object BundleModel {
 	  var result = isetEmpty[RFAFact]
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val slot2 = VarSlot(args(1))
-	  val value2 = s.pointsToSet(slot2.toString, currentContext)
+	  val value2 = s.pointsToSet(slot2, currentContext)
 	  thisValue.foreach{
 	    ins =>
 	      value2.foreach{
 	        e => 
-	          val ents = s.pointsToSet(FieldSlot(e, "android.os.Bundle.entries").toString, currentContext)
-	          result ++= ents.map(e => RFAFact(FieldSlot(ins, "android.os.Bundle.entries"), e))
+	          val ents = s.pointsToSet(FieldSlot(e, "entries"), currentContext)
+	          result ++= ents.map(e => RFAFact(FieldSlot(ins, "entries"), e))
 	      }
 	  }
 	  result

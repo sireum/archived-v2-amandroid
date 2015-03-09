@@ -32,7 +32,6 @@ import org.sireum.jawa.util.IgnoreException
 import java.io.PrintWriter
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.alir.LibSideEffectProvider
-import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.option.SireumAmandroidStagingMode
 import org.sireum.jawa.GlobalConfig
 import org.sireum.jawa.MessageCenter._
@@ -205,14 +204,14 @@ object Staging {
       val irfaress = AppCenter.getInterproceduralReachingFactsAnalysisResults
       val ddgress = AppCenter.getInterproceduralDataDependenceAnalysisResults
       irfaress.foreach{
-        case (rec, InterProceduralDataFlowGraph(icfg, irfaResult)) =>
+        case (rec, idfg) =>
           val ddgResultOpt = ddgress.get(rec)
           if(ddgResultOpt.isDefined){
             val ddgResult = ddgResultOpt.get
             val file = new File(output_dir + "/" + rec.getName.filter(_.isUnicodeIdentifierPart) + ".xml.gz")
       	    val w = new FileOutputStream(file)
             val zipw = new GZIPOutputStream(new BufferedOutputStream(w))
-      	    AndroidXStream.toXml(AmandroidResult(InterProceduralDataFlowGraph(icfg, irfaResult), ddgResult), zipw)
+      	    AndroidXStream.toXml(AmandroidResult(idfg, ddgResult), zipw)
       	    zipw.close()
       	    println(rec + " result stored!")
           }

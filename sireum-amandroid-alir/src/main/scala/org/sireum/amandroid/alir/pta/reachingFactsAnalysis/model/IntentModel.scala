@@ -25,6 +25,8 @@ import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.alir.pta.NullInstance
 import org.sireum.jawa.alir.pta.Instance
 import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.jawa.alir.pta.FieldSlot
+import org.sireum.jawa.alir.pta.VarSlot
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -442,20 +444,20 @@ object IntentModel {
   private def intentInitWithIntent(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val paramSlot = VarSlot(args(1))
-	  val paramValue = s.pointsToSet(paramSlot.toString, currentContext)
+	  val paramValue = s.pointsToSet(paramSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
 	      val interestSlots : ISet[Slot] = 
-	        Set(FieldSlot(tv, AndroidConstants.INTENT_ACTION),
-	          FieldSlot(tv, AndroidConstants.INTENT_CATEGORIES),
-	          FieldSlot(tv, AndroidConstants.INTENT_COMPONENT),
-	          FieldSlot(tv, AndroidConstants.INTENT_MTYPE),
-	          FieldSlot(tv, AndroidConstants.INTENT_URI_DATA),
-	          FieldSlot(tv, AndroidConstants.INTENT_EXTRAS)
+	        Set(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)),
+	          FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_CATEGORIES)),
+	          FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT)),
+	          FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_MTYPE)),
+	          FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA)),
+	          FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_EXTRAS))
 	        )
 //	      if(thisValue.size == 1){
 //	        for (rdf @ RFAFact(slot, _) <- s) {
@@ -467,41 +469,41 @@ object IntentModel {
 //	      }
 	      paramValue.foreach{
 		      pv =>
-		        val mActionSlot = FieldSlot(pv, AndroidConstants.INTENT_ACTION)
-		        val mActionValue = s.pointsToSet(mActionSlot.toString, currentContext)
+		        val mActionSlot = FieldSlot(pv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION))
+		        val mActionValue = s.pointsToSet(mActionSlot, currentContext)
 		        mActionValue.foreach{
 		          mav =>
-		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), mav)
+		            newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), mav)
 		        }
-		        val mCategoriesSlot = FieldSlot(pv, AndroidConstants.INTENT_CATEGORIES)
-		        val mCategoriesValue = s.pointsToSet(mCategoriesSlot.toString, currentContext)
+		        val mCategoriesSlot = FieldSlot(pv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_CATEGORIES))
+		        val mCategoriesValue = s.pointsToSet(mCategoriesSlot, currentContext)
 		        mCategoriesValue.foreach{
 		          mcv =>
-		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_CATEGORIES), mcv)
+		            newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_CATEGORIES)), mcv)
 		        }
-		        val mComponentSlot = FieldSlot(pv, AndroidConstants.INTENT_COMPONENT)
-		        val mComponentValue = s.pointsToSet(mComponentSlot.toString, currentContext)
+		        val mComponentSlot = FieldSlot(pv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT))
+		        val mComponentValue = s.pointsToSet(mComponentSlot, currentContext)
 		        mComponentValue.foreach{
 		          mcv =>
-		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_COMPONENT), mcv)
+		            newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT)), mcv)
 		        }
-		        val mDataSlot = FieldSlot(pv, AndroidConstants.INTENT_URI_DATA)
-		        val mDataValue = s.pointsToSet(mDataSlot.toString, currentContext)
+		        val mDataSlot = FieldSlot(pv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA))
+		        val mDataValue = s.pointsToSet(mDataSlot, currentContext)
 		        mDataValue.foreach{
 		          mdv =>
-		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_URI_DATA), mdv)
+		            newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA)), mdv)
 		        }
-		        val mTypeSlot = FieldSlot(pv, AndroidConstants.INTENT_MTYPE)
-		        val mTypeValue = s.pointsToSet(mTypeSlot.toString, currentContext)
+		        val mTypeSlot = FieldSlot(pv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_MTYPE))
+		        val mTypeValue = s.pointsToSet(mTypeSlot, currentContext)
 		        mTypeValue.foreach{
 		          mtv =>
-		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_MTYPE), mtv)
+		            newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_MTYPE)), mtv)
 		        }
-		        val mExtrasSlot = FieldSlot(pv, AndroidConstants.INTENT_EXTRAS)
-		        val mExtrasValue = s.pointsToSet(mExtrasSlot.toString, currentContext)
+		        val mExtrasSlot = FieldSlot(pv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_EXTRAS))
+		        val mExtrasValue = s.pointsToSet(mExtrasSlot, currentContext)
 		        mExtrasValue.foreach{
 		          mev =>
-		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_EXTRAS), mev)
+		            newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_EXTRAS)), mev)
 		        }
 		    }
 	  }
@@ -514,9 +516,9 @@ object IntentModel {
   private def intentInitWithAction(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val actionSlot = VarSlot(args(1))
-	  val actionValue = s.pointsToSet(actionSlot.toString, currentContext)
+	  val actionValue = s.pointsToSet(actionSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
@@ -533,13 +535,13 @@ object IntentModel {
 		      acStr =>
 	          acStr match{
 	            case cstr @ PTAConcreteStringInstance(text, c) =>
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), cstr)
 	            case pstr @ PTAPointStringInstance(c) => 
 	              err_msg_detail(TITLE, "Init action use point string: " + pstr)
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), pstr)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), pstr)
 	            case _ =>
 		            err_msg_detail(TITLE, "Init action use Unknown instance: " + acStr)
-		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), acStr)
+		            newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), acStr)
 	          }
 		    }
 	  }
@@ -552,18 +554,18 @@ object IntentModel {
   private def intentInitWithActionAndData(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val actionSlot = VarSlot(args(1))
-	  val actionValue = s.pointsToSet(actionSlot.toString, currentContext)
+	  val actionValue = s.pointsToSet(actionSlot, currentContext)
 	  val dataSlot = VarSlot(args(2))
-	  val dataValue = s.pointsToSet(dataSlot.toString, currentContext)
+	  val dataValue = s.pointsToSet(dataSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
 	      val interestSlots : ISet[Slot] = 
-	        Set(FieldSlot(tv, AndroidConstants.INTENT_ACTION),
-	          FieldSlot(tv, AndroidConstants.INTENT_URI_DATA)
+	        Set(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)),
+	          FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA))
 	        )
 //	      if(thisValue.size == 1){
 //	        for (rdf @ RFAFact(slot, _) <- s) {
@@ -577,18 +579,18 @@ object IntentModel {
 		      acStr =>
 	          acStr match{
 	            case cstr @ PTAConcreteStringInstance(text, c) =>
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), cstr)
 	            case pstr @ PTAPointStringInstance(c) => 
 	              err_msg_detail(TITLE,"Init action use point string: " + pstr)
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), pstr)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), pstr)
 	            case _ =>
 	              err_msg_detail(TITLE, "Init action use unknown instance: " + acStr)
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), acStr)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), acStr)
 	          }
 		    }
 	      dataValue.foreach{
 		      data =>
-	          newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_URI_DATA), data)
+	          newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA)), data)
 		    }
 	  }
     (newfacts, delfacts)
@@ -600,13 +602,13 @@ object IntentModel {
   private def intentInitWithActionDataAndComponent(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >4)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val actionSlot = VarSlot(args(1))
-	  val actionValue = s.pointsToSet(actionSlot.toString, currentContext)
+	  val actionValue = s.pointsToSet(actionSlot, currentContext)
 	  val dataSlot = VarSlot(args(2))
-	  val dataValue = s.pointsToSet(dataSlot.toString, currentContext)
+	  val dataValue = s.pointsToSet(dataSlot, currentContext)
 	  val classSlot = VarSlot(args(4))
-	  val classValue = s.pointsToSet(classSlot.toString, currentContext)
+	  val classValue = s.pointsToSet(classSlot, currentContext)
 	  
 	  val clazzNames = 
 	    classValue.map{
@@ -624,9 +626,9 @@ object IntentModel {
 	  thisValue.foreach{
 	    tv =>
 	      val interestSlots : ISet[Slot] = 
-	        Set(FieldSlot(tv, AndroidConstants.INTENT_ACTION),
-	          FieldSlot(tv, AndroidConstants.INTENT_URI_DATA),
-	          FieldSlot(tv, AndroidConstants.INTENT_COMPONENT)
+	        Set(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)),
+	          FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA)),
+	          FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT))
 	        )
 //	      if(thisValue.size == 1){
 //	        for (rdf @ RFAFact(slot, _) <- s) {
@@ -640,20 +642,20 @@ object IntentModel {
 		      acStr =>
 	          acStr match{
 	            case cstr @ PTAConcreteStringInstance(text, c) =>
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), cstr)
 	            case pstr @ PTAPointStringInstance(c) => 
 	              err_msg_detail(TITLE, "Init action use point string: " + pstr)
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), pstr)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), pstr)
 	            case _ =>
 	              err_msg_detail(TITLE, "Init action use unknown instance: " + acStr)
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), acStr)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), acStr)
 	          }
 		    }
 	      dataValue.foreach{
 		      data =>
-	          newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_URI_DATA), data)
+	          newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA)), data)
 		    }
-	      newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_COMPONENT), componentNameIns)
+	      newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT)), componentNameIns)
 	      clazzNames.foreach{
 	      sIns =>
 	        sIns match {
@@ -663,22 +665,22 @@ object IntentModel {
 	          recOpt match{
               case Some(rec) =>
 		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
               case None =>
                 err_msg_normal(TITLE, "Cannot find Given class: " + cstr)
                 val unknownIns = UnknownInstance(new NormalType(recordName), c)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
             }
           case pstr @ PTAPointStringInstance(c) => 
             err_msg_detail(TITLE, "Init ComponentName use point string: " + pstr)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), pstr)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), pstr)
           case a =>
             err_msg_detail(TITLE, "Init ComponentName use Unknown instance: " + a)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), a)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), a)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), a)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), a)
 	        }
 	    }
 	  }
@@ -691,9 +693,9 @@ object IntentModel {
 	private def intentInitWithCC(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val param2Slot = VarSlot(args(2))
-	  val param2Value = s.pointsToSet(param2Slot.toString, currentContext)
+	  val param2Value = s.pointsToSet(param2Slot, currentContext)
 	  val clazzNames = 
 	    param2Value.map{
       	value => 
@@ -708,7 +710,7 @@ object IntentModel {
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.map{
 	    tv =>
-	      val mComponentSlot = FieldSlot(tv, AndroidConstants.INTENT_COMPONENT)
+	      val mComponentSlot = FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT))
 //	      if(thisValue.size == 1){
 //	        for (rdf @ RFAFact(slot, _) <- s) {
 //		        //if it is a strong definition, we can kill the existing definition
@@ -728,22 +730,22 @@ object IntentModel {
 	          recOpt match{
               case Some(rec) =>
 		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
               case None =>
                 err_msg_normal(TITLE, "Cannot find Given class: " + cstr)
                 val unknownIns = UnknownInstance(new NormalType(recordName), c)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
             }
           case pstr @ PTAPointStringInstance(c) => 
             err_msg_detail(TITLE, "Init ComponentName use point string: " + pstr)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), pstr)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), pstr)
           case a =>
             err_msg_detail(TITLE, "Init ComponentName use Unknown instance: " + a)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), a)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), a)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), a)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), a)
         }
     }
     (newfacts, delfacts)
@@ -755,15 +757,15 @@ object IntentModel {
 	private def intentAddCategory(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val categorySlot = VarSlot(args(1))
-	  val categoryValue = s.pointsToSet(categorySlot.toString, currentContext)
+	  val categoryValue = s.pointsToSet(categorySlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.map{
 	    tv =>
-	      val mCategorySlot = FieldSlot(tv, AndroidConstants.INTENT_CATEGORIES)
-	      val mCategoryValue = s.pointsToSet(mCategorySlot.toString, currentContext)
+	      val mCategorySlot = FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_CATEGORIES))
+	      val mCategoryValue = s.pointsToSet(mCategorySlot, currentContext)
 	      mCategoryValue.foreach{
 	        cv => 
 	          var hashsetIns = cv
@@ -776,13 +778,13 @@ object IntentModel {
 				      cn =>
 				        cn match{
 				          case cstr @ PTAConcreteStringInstance(text, c) =>
-				            newfacts += RFAFact(FieldSlot(hashsetIns, "java.util.HashSet.items"), cstr)
+				            newfacts += RFAFact(FieldSlot(hashsetIns, "items"), cstr)
 				          case pstr @ PTAPointStringInstance(c) => 
 				            err_msg_detail(TITLE, "add category use point string: " + pstr)
-				            newfacts += RFAFact(FieldSlot(hashsetIns, "java.util.HashSet.items"), pstr)
+				            newfacts += RFAFact(FieldSlot(hashsetIns, "items"), pstr)
 				          case _ =>
 				            err_msg_detail(TITLE, "Init category use Unknown instance: " + cn)
-				            newfacts += RFAFact(FieldSlot(hashsetIns, "java.util.HashSet.items"), cn)
+				            newfacts += RFAFact(FieldSlot(hashsetIns, "items"), cn)
 				        }
 				    }
 	      }
@@ -800,7 +802,7 @@ object IntentModel {
   private def intentClone(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
@@ -817,9 +819,9 @@ object IntentModel {
   private def intentSetAction(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val actionSlot = VarSlot(args(1))
-	  val actionValue = s.pointsToSet(actionSlot.toString, currentContext)
+	  val actionValue = s.pointsToSet(actionSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
@@ -838,13 +840,13 @@ object IntentModel {
 	            tv =>
 	              str match{
 			            case cstr @ PTAConcreteStringInstance(text, c) =>
-			              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
+			              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), cstr)
 			            case pstr @ PTAPointStringInstance(c) => 
 			              err_msg_detail(TITLE, "Init package use point string: " + pstr)
-			              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), pstr)
+			              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), pstr)
 			            case _ =>
 				            err_msg_detail(TITLE, "Init package use Unknown instance: " + str)
-				            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), str)
+				            newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), str)
 			          }
 	          }
 		    }
@@ -860,9 +862,9 @@ object IntentModel {
   private def intentSetClass(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue =s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue =s.pointsToSet(thisSlot, currentContext)
 	  val param2Slot = VarSlot(args(2))
-	  val param2Value = s.pointsToSet(param2Slot.toString, currentContext)
+	  val param2Value = s.pointsToSet(param2Slot, currentContext)
 	  val clazzNames = 
 	    param2Value.map{
       	value => 
@@ -877,7 +879,7 @@ object IntentModel {
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.map{
 	    tv =>
-	      val mComponentSlot = FieldSlot(tv, AndroidConstants.INTENT_COMPONENT)
+	      val mComponentSlot = FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT))
 //	      if(thisValue.size == 1){
 //	        for (rdf @ RFAFact(slot, _) <- s) {
 //		        //if it is a strong definition, we can kill the existing definition
@@ -898,22 +900,22 @@ object IntentModel {
 	          recOpt match{
               case Some(rec) =>
 		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
               case None =>
                 err_msg_normal(TITLE, "Cannot find Given class: " + cstr)
                 val unknownIns = UnknownInstance(new NormalType(recordName), c)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
             }
           case pstr @ PTAPointStringInstance(c) => 
             err_msg_detail(TITLE, "Init ComponentName use point string: " + pstr)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), pstr)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), pstr)
           case a =>
             err_msg_detail(TITLE, "Init ComponentName use Unknown instance: " + a)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), a)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), a)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), a)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), a)
         }
     }
     (newfacts, delfacts)
@@ -926,15 +928,15 @@ object IntentModel {
   private def intentSetClassName(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val clazzSlot = VarSlot(args(2))
-	  val clazzValue = s.pointsToSet(clazzSlot.toString, currentContext)
+	  val clazzValue = s.pointsToSet(clazzSlot, currentContext)
     val componentNameIns = PTAInstance(NormalType(AndroidConstants.COMPONENTNAME, 0), currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.map{
 	    tv =>
-	      val mComponentSlot = FieldSlot(tv, AndroidConstants.INTENT_COMPONENT)
+	      val mComponentSlot = FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT))
 //	      if(thisValue.size == 1){
 //	        for (rdf @ RFAFact(slot, _) <- s) {
 //		        //if it is a strong definition, we can kill the existing definition
@@ -983,9 +985,9 @@ object IntentModel {
   private def intentSetComponent(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val componentSlot = VarSlot(args(1))
-	  val componentValue = s.pointsToSet(componentSlot.toString, currentContext)
+	  val componentValue = s.pointsToSet(componentSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
@@ -1002,7 +1004,7 @@ object IntentModel {
 		      component =>
 	          thisValue.foreach{
 	            tv =>
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_COMPONENT), component)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT)), component)
 	          }
 		    }
 	      newfacts += RFAFact(VarSlot(retVar), tv)
@@ -1016,9 +1018,9 @@ object IntentModel {
   private def intentSetData(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val dataSlot = VarSlot(args(1))
-	  val dataValue = s.pointsToSet(dataSlot.toString, currentContext)
+	  val dataValue = s.pointsToSet(dataSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
@@ -1035,7 +1037,7 @@ object IntentModel {
 		      data =>
 	          thisValue.foreach{
 	            tv =>
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_URI_DATA), data)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA)), data)
 	          }
 		    }
 	      newfacts += RFAFact(VarSlot(retVar), tv)
@@ -1049,11 +1051,11 @@ object IntentModel {
   private def intentSetDataAndType(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val dataSlot = VarSlot(args(1))
-	  val dataValue = s.pointsToSet(dataSlot.toString, currentContext)
+	  val dataValue = s.pointsToSet(dataSlot, currentContext)
 	  val typeSlot = VarSlot(args(2))
-	  val typeValue = s.pointsToSet(typeSlot.toString, currentContext)
+	  val typeValue = s.pointsToSet(typeSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
@@ -1071,14 +1073,14 @@ object IntentModel {
 		      data =>
 	          thisValue.foreach{
 	            tv =>
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_URI_DATA), data)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA)), data)
 	          }
 		    }
 	      typeValue.foreach{
 		      typ =>
 	          thisValue.foreach{
 	            tv =>
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_MTYPE), typ)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_MTYPE)), typ)
 	          }
 		    }
 	      newfacts += RFAFact(VarSlot(retVar), tv)
@@ -1092,9 +1094,9 @@ object IntentModel {
   private def intentSetType(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val typeSlot = VarSlot(args(1))
-	  val typeValue = s.pointsToSet(typeSlot.toString, currentContext)
+	  val typeValue = s.pointsToSet(typeSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
@@ -1111,7 +1113,7 @@ object IntentModel {
 		      typ =>
 	          thisValue.foreach{
 	            tv =>
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_MTYPE), typ)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_MTYPE)), typ)
 	          }
 		    }
 	      newfacts += RFAFact(VarSlot(retVar), tv)
@@ -1125,9 +1127,9 @@ object IntentModel {
   private def intentSetPackage(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val packageSlot = VarSlot(args(1))
-	  val packageValue = s.pointsToSet(packageSlot.toString, currentContext)
+	  val packageValue = s.pointsToSet(packageSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
@@ -1146,13 +1148,13 @@ object IntentModel {
 	            tv =>
 	              str match{
 			            case cstr @ PTAConcreteStringInstance(text, c) =>
-			              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_PACKAGE), cstr)
+			              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_PACKAGE)), cstr)
 			            case pstr @ PTAPointStringInstance(c) => 
 			              err_msg_detail(TITLE, "Init package use point string: " + pstr)
-			              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_PACKAGE), pstr)
+			              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_PACKAGE)), pstr)
 			            case _ =>
 				            err_msg_detail(TITLE, "Init package use Unknown instance: " + str)
-				            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_PACKAGE), str)
+				            newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_PACKAGE)), str)
 			          }
 	          }
 		    }
@@ -1167,7 +1169,7 @@ object IntentModel {
   private def intentSetFlags(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
@@ -1183,18 +1185,18 @@ object IntentModel {
   private def intentPutExtra(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val keySlot = VarSlot(args(1))
-	  val keyValue = s.pointsToSet(keySlot.toString, currentContext)
+	  val keyValue = s.pointsToSet(keySlot, currentContext)
 	  val valueSlot = VarSlot(args(2))
-	  val valueValue = s.pointsToSet(valueSlot.toString, currentContext)
+	  val valueValue = s.pointsToSet(valueSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
     val bundleIns = PTAInstance(NormalType(AndroidConstants.BUNDLE, 0), currentContext)
 	  thisValue.foreach{
 	    tv =>
-	      val mExtraSlot = FieldSlot(tv, AndroidConstants.INTENT_EXTRAS)
-	      var mExtraValue = s.pointsToSet(mExtraSlot.toString, currentContext)
+	      val mExtraSlot = FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_EXTRAS))
+	      var mExtraValue = s.pointsToSet(mExtraSlot, currentContext)
 	      if(mExtraValue.isEmpty){
 	        mExtraValue += bundleIns
 	        newfacts += RFAFact(mExtraSlot, bundleIns)
@@ -1209,7 +1211,7 @@ object IntentModel {
 			              entries += PTATupleInstance(str, vv, currentContext)
 			          }
 				    }
-	          newfacts ++= entries.map(e => RFAFact(FieldSlot(mev, "android.os.Bundle.entries"), e))
+	          newfacts ++= entries.map(e => RFAFact(FieldSlot(mev, "entries"), e))
 	      }
 	      newfacts += RFAFact(VarSlot(retVar), tv)
 	  }
@@ -1222,13 +1224,13 @@ object IntentModel {
   private def intentGetExtras(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
     thisValue.foreach{
       ins => 
-      	val mExtraSlot = FieldSlot(ins, AndroidConstants.INTENT_EXTRAS)
-      	val mExtraValue = s.pointsToSet(mExtraSlot.toString, currentContext)
+      	val mExtraSlot = FieldSlot(ins, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_EXTRAS))
+      	val mExtraValue = s.pointsToSet(mExtraSlot, currentContext)
         if(!mExtraValue.isEmpty){
           newfacts ++= mExtraValue.map{mev => RFAFact(VarSlot(retVar), mev)}
         } else {
@@ -1244,18 +1246,18 @@ object IntentModel {
   private def intentGetExtra(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val keySlot = VarSlot(args(1))
-	  val keyValue = s.pointsToSet(keySlot.toString, currentContext)
+	  val keyValue = s.pointsToSet(keySlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
     if(!thisValue.isEmpty){
-  	  val mExtraValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, AndroidConstants.INTENT_EXTRAS).toString, currentContext)}.reduce(iunion[Instance])
+  	  val mExtraValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_EXTRAS)), currentContext)}.reduce(iunion[Instance])
   	  val entValue = 
   	    if(mExtraValue.isEmpty)
   	      isetEmpty
   	    else
-  	    	mExtraValue.map{ins => s.pointsToSet(FieldSlot(ins, "android.os.Bundle.entries").toString, currentContext)}.reduce(iunion[Instance])
+  	    	mExtraValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
   	  
   	  if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
         val keys = keyValue.map{k => k.asInstanceOf[PTAConcreteStringInstance].string}
@@ -1285,20 +1287,20 @@ object IntentModel {
   private def intentGetExtraWithDefault(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val keySlot = VarSlot(args(1))
-	  val keyValue = s.pointsToSet(keySlot.toString, currentContext)
+	  val keyValue = s.pointsToSet(keySlot, currentContext)
 	  val defaultSlot = VarSlot(args(2))
-	  val defaultValue = s.pointsToSet(defaultSlot.toString, currentContext)
+	  val defaultValue = s.pointsToSet(defaultSlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
     if(!thisValue.isEmpty){
-  	  val mExtraValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, AndroidConstants.INTENT_EXTRAS).toString, currentContext)}.reduce(iunion[Instance])
+  	  val mExtraValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_EXTRAS)), currentContext)}.reduce(iunion[Instance])
   	  val entValue = 
   	    if(mExtraValue.isEmpty)
   	      isetEmpty
   	    else
-  	    	mExtraValue.map{ins => s.pointsToSet(FieldSlot(ins, "android.os.Bundle.entries").toString, currentContext)}.reduce(iunion[Instance])
+  	    	mExtraValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
   	  
   	  if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
         val keys = keyValue.map{k => k.asInstanceOf[PTAConcreteStringInstance].string}

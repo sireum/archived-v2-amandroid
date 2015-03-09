@@ -20,6 +20,7 @@ import org.sireum.jawa.Center
 import org.sireum.amandroid.alir.taintAnalysis.AndroidSourceAndSinkManager
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentCommunicationModel
+import org.sireum.jawa.alir.pta.PTAResult
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -55,7 +56,7 @@ class IntentInjectionSourceAndSinkManager(appPackageName : String,
 	  false
 	}
 	
-	override def isIccSink(invNode : CGInvokeNode, rfaFact : ISet[RFAFact]) : Boolean = {
+	override def isIccSink(invNode : CGInvokeNode, ptaresult : PTAResult) : Boolean = {
 	  var sinkflag = false
     val calleeSet = invNode.getCalleeSet
     calleeSet.foreach{

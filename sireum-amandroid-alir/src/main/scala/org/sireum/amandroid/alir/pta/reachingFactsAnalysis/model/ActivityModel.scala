@@ -14,6 +14,9 @@ import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.jawa.alir.pta.VarSlot
+import org.sireum.jawa.alir.pta.FieldSlot
+import org.sireum.jawa.util.StringFormConverter
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -261,16 +264,16 @@ object ActivityModel {
 	private def setIntent(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val intentSlot = VarSlot(args(1))
-	  val intentValue = s.pointsToSet(intentSlot.toString, currentContext)
+	  val intentValue = s.pointsToSet(intentSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
-	      val mIntentSlot = FieldSlot(tv, AndroidConstants.ACTIVITY_INTENT)
+	      val mIntentSlot = FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.ACTIVITY_INTENT))
 	      if(thisValue.size == 1){
-	        for (v <- s.pointsToSet(mIntentSlot.toString, currentContext)) {
+	        for (v <- s.pointsToSet(mIntentSlot, currentContext)) {
 		        delfacts += RFAFact(mIntentSlot, v)
 		      }
 	      }
@@ -282,13 +285,13 @@ object ActivityModel {
 	private def getIntent(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
-	      val mIntentSlot = FieldSlot(tv, AndroidConstants.ACTIVITY_INTENT)
-	      var mIntentValue = s.pointsToSet(mIntentSlot.toString, currentContext)
+	      val mIntentSlot = FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.ACTIVITY_INTENT))
+	      var mIntentValue = s.pointsToSet(mIntentSlot, currentContext)
         tv.getFieldsUnknownDefSites.foreach{
         	case (defsite, fields) =>
         	  if(fields.contains("ALL")) mIntentValue += UnknownInstance(new NormalType(AndroidConstants.INTENT), defsite)

@@ -21,10 +21,11 @@ import org.sireum.jawa.alir.util.ExplicitValueFinder
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.pilar.ast._
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
-import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
 import org.sireum.jawa.alir.controlFlowGraph.CGInvokeNode
 import org.sireum.jawa.Center
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentCommunicationModel
+import org.sireum.jawa.alir.pta.VarSlot
+import org.sireum.jawa.alir.pta.PTAResult
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -46,7 +47,7 @@ class OAuthSourceAndSinkManager(appPackageName : String,
 	  false
 	}
 	
-	override def isSource(loc : LocationDecl, s : ISet[RFAFact]) : Boolean = {
+	override def isSource(loc : LocationDecl, ptaresult : PTAResult) : Boolean = {
 	  var flag = false
 	  val visitor = Visitor.build({
 	      case as : AssignAction =>
@@ -66,14 +67,13 @@ class OAuthSourceAndSinkManager(appPackageName : String,
 	  flag
 	}
 	
-	def isIccSink(invNode : CGInvokeNode, rfaFact : ISet[RFAFact]) : Boolean = {
+	def isIccSink(invNode : CGInvokeNode, ptaresult : PTAResult) : Boolean = {
 	  var sinkflag = false
     val calleeSet = invNode.getCalleeSet
     calleeSet.foreach{
       callee =>
         if(InterComponentCommunicationModel.isIccOperation(callee.callee)){
           sinkflag = true
-          val rfafactMap = ReachingFactsAnalysisHelper.getFactMap(rfaFact)
           val args = Center.getProcedureWithoutFailing(invNode.getOwner).getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
               case te : TupleExp =>
                 te.exps.map{
@@ -86,8 +86,8 @@ class OAuthSourceAndSinkManager(appPackageName : String,
               case a => throw new RuntimeException("wrong exp type: " + a)
             }
           val intentSlot = VarSlot(args(1))
-          val intentValues = rfafactMap.getOrElse(intentSlot, isetEmpty)
-          val intentContents = IntentHelper.getIntentContents(rfafactMap, intentValues, invNode.getContext)
+          val intentValues = ptaresult.pointsToSet(intentSlot, invNode.getContext)
+          val intentContents = IntentHelper.getIntentContents(ptaresult, intentValues, invNode.getContext)
           val comMap = IntentHelper.mappingIntents(intentContents)
           comMap.foreach{
             case (_, coms) =>

@@ -17,6 +17,9 @@ import org.sireum.jawa.alir.pta.PTAPointStringInstance
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.pta.PTAInstance
 import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.jawa.alir.pta.VarSlot
+import org.sireum.jawa.alir.pta.FieldSlot
+import org.sireum.jawa.util.StringFormConverter
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -92,7 +95,7 @@ object UriModel {
   private def uriParse(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >0)
 	  val strSlot = VarSlot(args(0))
-	  val strValue = s.pointsToSet(strSlot.toString, currentContext)
+	  val strValue = s.pointsToSet(strSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
     val stringUriIns = PTAInstance(NormalType(AndroidConstants.URI_STRING_URI, 0), currentContext)
@@ -101,13 +104,13 @@ object UriModel {
       sv =>
         sv match{
           case cstr @ PTAConcreteStringInstance(text, c) =>
-            newfacts += RFAFact(FieldSlot(stringUriIns, AndroidConstants.URI_STRING_URI_URI_STRING), cstr)
+            newfacts += RFAFact(FieldSlot(stringUriIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.URI_STRING_URI_URI_STRING)), cstr)
           case pstr @ PTAPointStringInstance(c) => 
             err_msg_detail(TITLE, "Init uri string use point string: " + pstr)
-            newfacts += RFAFact(FieldSlot(stringUriIns, AndroidConstants.URI_STRING_URI_URI_STRING), pstr)
+            newfacts += RFAFact(FieldSlot(stringUriIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.URI_STRING_URI_URI_STRING)), pstr)
           case _ => 
             err_msg_detail(TITLE, "Init uri use unknown instance: " + sv)
-            newfacts += RFAFact(FieldSlot(stringUriIns, AndroidConstants.URI_STRING_URI_URI_STRING), sv)
+            newfacts += RFAFact(FieldSlot(stringUriIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.URI_STRING_URI_URI_STRING)), sv)
         }
     }
     (newfacts, delfacts)

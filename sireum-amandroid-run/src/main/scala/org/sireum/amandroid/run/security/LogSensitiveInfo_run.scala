@@ -14,7 +14,6 @@ import org.sireum.amandroid.security.apiMisuse.InterestingApiCollector
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.security.apiMisuse.LogSensitiveInfo
-import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.amandroid.alir.taintAnalysis.DefaultAndroidSourceAndSinkManager
@@ -116,8 +115,8 @@ object LogSensitiveInfo_run {
        
       val idfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
       idfgs.foreach{
-        case (rec, InterProceduralDataFlowGraph(icfg, irfaResult)) =>
-          LogSensitiveInfo(new InterProceduralDataFlowGraph(icfg, irfaResult))
+        case (rec, idfg) =>
+          LogSensitiveInfo(idfg)
       }
       return "Done!"
     }

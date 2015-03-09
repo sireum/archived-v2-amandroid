@@ -317,7 +317,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	    p =>
 	      p match {
 	        case pi : PointI =>
-	          val sig = pi.varName
+	          val sig = pi.sig
 	          val params = new SignatureParser(sig).getParamSig.getParameterTypes
 	          params.foreach{
 	            param =>

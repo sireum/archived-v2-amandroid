@@ -24,6 +24,7 @@ import org.sireum.jawa.JawaProcedure
 import java.net.URLEncoder
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.jawa.alir.pta.FieldSlot
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -53,11 +54,11 @@ object IntentHelper {
         var preciseExplicit = true
         var preciseImplicit = true
         var componentNames = isetEmpty[String]
-        val iFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_COMPONENT)
-        s.pointsToSet(iFieldSlot.toString, currentContext).foreach{
+        val iFieldSlot = FieldSlot(intentIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT))
+        s.pointsToSet(iFieldSlot, currentContext).foreach{
           compIns =>
-            val cFieldSlot = FieldSlot(compIns, AndroidConstants.COMPONENTNAME_CLASS)
-            s.pointsToSet(cFieldSlot.toString, currentContext).foreach{
+            val cFieldSlot = FieldSlot(compIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS))
+            s.pointsToSet(cFieldSlot, currentContext).foreach{
               ins =>
                 if(ins.isInstanceOf[PTAConcreteStringInstance]){
                   componentNames += ins.asInstanceOf[PTAConcreteStringInstance].string
@@ -67,8 +68,8 @@ object IntentHelper {
         }
         
         var actions: ISet[String] = isetEmpty[String]
-        val acFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_ACTION)
-        s.pointsToSet(acFieldSlot.toString, currentContext).foreach{
+        val acFieldSlot = FieldSlot(intentIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION))
+        s.pointsToSet(acFieldSlot, currentContext).foreach{
           acIns =>
             if(acIns.isInstanceOf[PTAConcreteStringInstance])
               actions += acIns.asInstanceOf[PTAConcreteStringInstance].string
@@ -76,11 +77,11 @@ object IntentHelper {
         }
         
         var categories = isetEmpty[String] // the code to get the valueSet of categories is to be added below
-        val categoryFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_CATEGORIES)
-        s.pointsToSet(categoryFieldSlot.toString, currentContext).foreach{
+        val categoryFieldSlot = FieldSlot(intentIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_CATEGORIES))
+        s.pointsToSet(categoryFieldSlot, currentContext).foreach{
           cateIns =>
-            val hashSetFieldSlot = FieldSlot(cateIns, "java.util.HashSet.items")
-            s.pointsToSet(hashSetFieldSlot.toString, currentContext).foreach{
+            val hashSetFieldSlot = FieldSlot(cateIns, "items")
+            s.pointsToSet(hashSetFieldSlot, currentContext).foreach{
               itemIns =>
                 if(itemIns.isInstanceOf[PTAConcreteStringInstance])
                   categories += itemIns.asInstanceOf[PTAConcreteStringInstance].string
@@ -89,11 +90,11 @@ object IntentHelper {
         }
         
         var datas: ISet[UriData] = isetEmpty
-        val dataFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_URI_DATA)
-        s.pointsToSet(dataFieldSlot.toString, currentContext).foreach{
+        val dataFieldSlot = FieldSlot(intentIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA))
+        s.pointsToSet(dataFieldSlot, currentContext).foreach{
           dataIns =>
-            val uriStringFieldSlot = FieldSlot(dataIns, AndroidConstants.URI_STRING_URI_URI_STRING)
-            s.pointsToSet(uriStringFieldSlot.toString, currentContext).foreach{
+            val uriStringFieldSlot = FieldSlot(dataIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.URI_STRING_URI_URI_STRING))
+            s.pointsToSet(uriStringFieldSlot, currentContext).foreach{
               usIns =>
                 if(usIns.isInstanceOf[PTAConcreteStringInstance]){
                   val uriString = usIns.asInstanceOf[PTAConcreteStringInstance].string
@@ -105,8 +106,8 @@ object IntentHelper {
         }
         
         var types:Set[String] = Set()
-        val mtypFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_MTYPE)
-        s.pointsToSet(mtypFieldSlot.toString, currentContext).foreach{
+        val mtypFieldSlot = FieldSlot(intentIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_MTYPE))
+        s.pointsToSet(mtypFieldSlot, currentContext).foreach{
           mtypIns =>
             if(mtypIns.isInstanceOf[PTAConcreteStringInstance])
               types += mtypIns.asInstanceOf[PTAConcreteStringInstance].string

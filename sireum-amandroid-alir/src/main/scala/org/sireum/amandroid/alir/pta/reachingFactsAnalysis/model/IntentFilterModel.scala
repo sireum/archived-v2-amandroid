@@ -18,6 +18,9 @@ import org.sireum.jawa.alir.pta.NullInstance
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.jawa.alir.pta.FieldSlot
+import org.sireum.jawa.util.StringFormConverter
+import org.sireum.jawa.alir.pta.VarSlot
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -103,16 +106,16 @@ object IntentFilterModel {
 	private def intentFilterInitWithAction(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val actionSlot = VarSlot(args(1))
-	  val actionValue = s.pointsToSet(actionSlot.toString, currentContext)
+	  val actionValue = s.pointsToSet(actionSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
 	      if(thisValue.size == 1){
-          for(v <- s.pointsToSet(FieldSlot(tv, AndroidConstants.INTENTFILTER_ACTIONS).toString, currentContext)){
-            delfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENTFILTER_ACTIONS), v)
+          for(v <- s.pointsToSet(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENTFILTER_ACTIONS)), currentContext)){
+            delfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENTFILTER_ACTIONS)), v)
           }
 	      }
 	      actionValue.foreach{

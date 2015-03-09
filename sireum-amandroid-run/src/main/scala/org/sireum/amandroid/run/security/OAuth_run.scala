@@ -24,7 +24,6 @@ import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsA
 import org.sireum.jawa.ClassLoadManager
 import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.util.IgnoreException
-import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.jawa.GlobalConfig
 import java.io.PrintWriter
 import org.sireum.jawa.alir.LibSideEffectProvider

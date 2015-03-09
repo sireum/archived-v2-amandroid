@@ -21,6 +21,9 @@ import org.sireum.jawa.alir.pta.NullInstance
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.jawa.alir.pta.VarSlot
+import org.sireum.jawa.alir.pta.FieldSlot
+import org.sireum.jawa.util.StringFormConverter
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -96,11 +99,11 @@ object FrameworkMethodsModel {
 	  var precise = true
     require(args.size > 2)
     val thisSlot = VarSlot(args(0))
-    val thisValue = s.pointsToSet(thisSlot.toString, currentContext)
+    val thisValue = s.pointsToSet(thisSlot, currentContext)
     val receiverSlot = VarSlot(args(1))
-	  val receiverValue = s.pointsToSet(receiverSlot.toString, currentContext)
+	  val receiverValue = s.pointsToSet(receiverSlot, currentContext)
 	  val filterSlot = VarSlot(args(2))
-	  val filterValue = s.pointsToSet(filterSlot.toString, currentContext)
+	  val filterValue = s.pointsToSet(filterSlot, currentContext)
 	  val iDB = new IntentFilterDataBase
 	  receiverValue.foreach{
 	    rv =>
@@ -112,8 +115,8 @@ object FrameworkMethodsModel {
 			      val comRec = Center.resolveRecord(rv.getType.name, Center.ResolveLevel.HIERARCHY)
 			      filterValue.foreach{
 			        fv =>
-			          val mActionsSlot = FieldSlot(fv, AndroidConstants.INTENTFILTER_ACTIONS)
-			          val mActionsValue = s.pointsToSet(mActionsSlot.toString, currentContext)
+			          val mActionsSlot = FieldSlot(fv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENTFILTER_ACTIONS))
+			          val mActionsValue = s.pointsToSet(mActionsSlot, currentContext)
 			          mActionsValue.foreach{
 			            mav =>
 			              mav match{
@@ -123,8 +126,8 @@ object FrameworkMethodsModel {
 					              precise = false
 					          }
 			          }
-			          val mCategoriesSlot = FieldSlot(fv, AndroidConstants.INTENTFILTER_CATEGORIES)
-			          val mCategoriesValue = s.pointsToSet(mCategoriesSlot.toString, currentContext)
+			          val mCategoriesSlot = FieldSlot(fv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENTFILTER_CATEGORIES))
+			          val mCategoriesValue = s.pointsToSet(mCategoriesSlot, currentContext)
 			          mCategoriesValue.foreach{
 			            mav =>
 			              mav match{
@@ -154,7 +157,7 @@ object FrameworkMethodsModel {
 	  var result = isetEmpty[RFAFact]
     require(args.size >1)
     val paramSlot = VarSlot(args(1))
-	  val paramValue = s.pointsToSet(paramSlot.toString, currentContext)
+	  val paramValue = s.pointsToSet(paramSlot, currentContext)
 	  paramValue.foreach{
 	    str =>
 	      str match{

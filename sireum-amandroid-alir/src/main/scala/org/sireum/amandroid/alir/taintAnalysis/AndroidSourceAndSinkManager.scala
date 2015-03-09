@@ -33,6 +33,8 @@ import java.io.FileInputStream
 import org.sireum.jawa.alir.interProcedural.Callee
 import org.sireum.jawa.alir.taintAnalysis.SourceAndSinkManager
 import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentCommunicationModel
+import org.sireum.jawa.alir.pta.VarSlot
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -99,9 +101,9 @@ abstract class AndroidSourceAndSinkManager(appPackageName : String,
 	  false
 	}
 	
-	def isSource(loc : LocationDecl, s : ISet[RFAFact]) : Boolean = false
+	def isSource(loc : LocationDecl, ptaresult : PTAResult) : Boolean = false
 	
-	def isSink(loc : LocationDecl, s : ISet[RFAFact]) : Boolean = false
+	def isSink(loc : LocationDecl, ptaresult : PTAResult) : Boolean = false
 	
 	def addSource(source : String, category : String) = {
 	  this.sources += (source -> category)
@@ -174,7 +176,7 @@ class DefaultAndroidSourceAndSinkManager(appPackageName : String,
               case a => throw new RuntimeException("wrong exp type: " + a)
             }
           val intentSlot = VarSlot(args(1))
-          val intentValues = s.pointsToSet(intentSlot.toString, invNode.getContext)
+          val intentValues = s.pointsToSet(intentSlot, invNode.getContext)
           val intentContents = IntentHelper.getIntentContents(s, intentValues, invNode.getContext)
           val comMap = IntentHelper.mappingIntents(intentContents)
           comMap.foreach{

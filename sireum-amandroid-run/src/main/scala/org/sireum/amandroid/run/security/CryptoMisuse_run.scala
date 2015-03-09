@@ -14,7 +14,6 @@ import org.sireum.amandroid.security.apiMisuse.InterestingApiCollector
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.security.apiMisuse.CryptographicMisuse
-import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.util.FileResourceUri
@@ -112,8 +111,8 @@ object CryptoMisuse_run {
       
       val icfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
       icfgs.foreach{
-        case (rec, InterProceduralDataFlowGraph(icfg, irfaResult)) =>
-          CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
+        case (rec, idfg) =>
+          CryptographicMisuse(idfg)
       }
       return "Done!"
     }

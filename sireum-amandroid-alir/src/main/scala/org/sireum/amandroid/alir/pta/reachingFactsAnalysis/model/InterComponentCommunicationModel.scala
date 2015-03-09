@@ -22,6 +22,7 @@ import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.MessageCenter._
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
 import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.jawa.alir.pta.VarSlot
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -45,7 +46,7 @@ object InterComponentCommunicationModel {
 	def doIccCall(s : PTAResult, calleeProc : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[JawaProcedure]) = {
 	  require(args.size > 1)
 	  val intentSlot = VarSlot(args(1))
-	  val intentValues = s.pointsToSet(intentSlot.toString, currentContext)
+	  val intentValues = s.pointsToSet(intentSlot, currentContext)
 	  val intentcontents = IntentHelper.getIntentContents(s, intentValues, currentContext)
 	  val comMap = IntentHelper.mappingIntents(intentcontents)
 	  var targets : ISet[JawaProcedure] = isetEmpty
