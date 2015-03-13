@@ -235,6 +235,7 @@ object AppInfoCollector {
 		    v.foreach {
 		      i =>
 		        val resource = afp.findResource(i)
+            println("resourceresource:" + resource)
 		        if(resource != null && resource.getType.getName == "layout"){
 		          val strRes = resource
 		          if(lfp.getCallbackMethods.contains(strRes.getName)){
