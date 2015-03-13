@@ -113,7 +113,7 @@ object LogSensitiveInfo_run {
       // socket.runWithoutDDA(false, true)
       socket.runWithDDA(ssm, false, true, timer)
        
-      val idfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
+      val idfgs = AppCenter.getIDFGs
       idfgs.foreach{
         case (rec, idfg) =>
           LogSensitiveInfo(idfg)

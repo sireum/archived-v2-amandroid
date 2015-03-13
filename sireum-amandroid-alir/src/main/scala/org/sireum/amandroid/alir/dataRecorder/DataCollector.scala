@@ -322,8 +322,8 @@ object DataCollector {
 	      var iccInfos = isetEmpty[IccInfo]
 	      var taintResult : Option[TaintAnalysisResult] = None
 	      if(!compRec.isUnknown){
-	        if(AppCenter.hasInterproceduralReachingFactsAnalysisResult(compRec)){
-			      val InterProceduralDataFlowGraph(icfg, ptaresult) = AppCenter.getInterproceduralReachingFactsAnalysisResult(compRec)
+	        if(AppCenter.hasIDFG(compRec)){
+			      val InterProceduralDataFlowGraph(icfg, ptaresult) = AppCenter.getIDFG(compRec)
 			      val iccNodes = icfg.nodes.filter{
 			        	node =>
 			        	  node.isInstanceOf[CGCallNode] && node.asInstanceOf[CGCallNode].getCalleeSet.exists(c => InterComponentCommunicationModel.isIccOperation(c.callee))

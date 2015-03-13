@@ -201,9 +201,9 @@ object Staging {
     }
 
     def onAnalysisSuccess : Unit = {
-      val irfaress = AppCenter.getInterproceduralReachingFactsAnalysisResults
-      val ddgress = AppCenter.getInterproceduralDataDependenceAnalysisResults
-      irfaress.foreach{
+      val idfgs = AppCenter.getIDFGs
+      val ddgress = AppCenter.getIDDGs
+      idfgs.foreach{
         case (rec, idfg) =>
           val ddgResultOpt = ddgress.get(rec)
           if(ddgResultOpt.isDefined){

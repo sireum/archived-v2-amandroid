@@ -182,7 +182,7 @@ object GenCallGraph {
                   procedures
               }.reduce(iunion[JawaProcedure])
 
-            val cg = InterproceduralSuperSpark(pros, timer)
+            val icfg = InterproceduralSuperSpark(pros, timer).icfg
           	
             val file = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ".txt.gz")
       	    val w = new FileOutputStream(file)
@@ -190,9 +190,9 @@ object GenCallGraph {
             val zipw = new BufferedWriter(new OutputStreamWriter(zips, "UTF-8"))
       	    val graph = 
               graphtyp match{
-                case "FULL$" => cg
-                case "CALL$" => cg.toCallGraph
-                case "API$" => cg.toApiGraph
+                case "FULL$" => icfg
+                case "CALL$" => icfg.toCallGraph
+                case "API$" => icfg.toApiGraph
               }
             format match {
               case "DOT$" => graph.toDot(zipw)

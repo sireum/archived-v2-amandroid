@@ -46,7 +46,7 @@ object Staging_run {
 
     def onAnalysisSuccess : Unit = {
 		  StagingCounter.haveresult += 1
-		  AppCenter.getInterproceduralReachingFactsAnalysisResults.foreach{
+		  AppCenter.getIDFGs.foreach{
 		    res =>
 		      val idfg = res._2
 //		      GraphDB.storeIdfg(res._1.getName, idfg)

@@ -4,6 +4,7 @@
 /temp
 /update
 /sbt
+/codebase
 /.cache
 /.scala_dependencies
 /sireum-*

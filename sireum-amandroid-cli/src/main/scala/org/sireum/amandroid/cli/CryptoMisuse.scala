@@ -169,7 +169,7 @@ object CryptoMisuse {
       app_info.collectInfo
       socket.plugListener(new CryptoMisuseListener(file, outputPath, app_info))
       socket.runWithoutDDA(false, parallel, timer)
-      val idfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
+      val idfgs = AppCenter.getIDFGs
       idfgs.foreach{
         case (rec, idfg) =>
           CryptographicMisuse(idfg)

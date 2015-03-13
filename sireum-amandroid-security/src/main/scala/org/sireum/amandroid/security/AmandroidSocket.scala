@@ -62,8 +62,8 @@ class AmandroidSocket {
     val imgfile = new File(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSummary.xml.zip")
     JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), GlobalConfig.PILAR_FILE_EXT)
     val libsum_file = new File(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSideEffectResult.xml.zip")
-    if(libsum_file.exists())
-      LibSideEffectProvider.init(libsum_file)
+//    if(libsum_file.exists())
+//      LibSideEffectProvider.init(libsum_file)
   }
   
   def plugListener(listener : AmandroidSocketListener): Unit = {
@@ -119,12 +119,12 @@ class AmandroidSocket {
     	  ep =>
     	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
     	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, timer)
-    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)	    	    
-    	    msg_critical(TITLE, "processed-->" + icfg.getProcessed.size)
-    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
-    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
-    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult, ssm)    
+    	    val idfg = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, timer)
+    	    AppCenter.addIDFG(ep.getDeclaringRecord, idfg)	    	    
+    	    msg_critical(TITLE, "processed-->" + idfg.icfg.getProcessed.size)
+    	    val iddResult = InterproceduralDataDependenceAnalysis(idfg)
+    	    AppCenter.addIDDG(ep.getDeclaringRecord, iddResult)
+    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, idfg.ptaresult, ssm)    
     	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
       } 
   
@@ -160,11 +160,11 @@ class AmandroidSocket {
     	  ep =>
     	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
     	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, timer)
-    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
-    	    msg_critical(TITLE, "processed-->" + icfg.getProcessed.size)
-    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
-    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
+    	    val idfg = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, timer)
+    	    AppCenter.addIDFG(ep.getDeclaringRecord, idfg)
+    	    msg_critical(TITLE, "processed-->" + idfg.icfg.getProcessed.size)
+    	    val iddResult = InterproceduralDataDependenceAnalysis(idfg)
+    	    AppCenter.addIDDG(ep.getDeclaringRecord, iddResult)
       } 
   
     	if(myListener_opt.isDefined) myListener_opt.get.onAnalysisSuccess

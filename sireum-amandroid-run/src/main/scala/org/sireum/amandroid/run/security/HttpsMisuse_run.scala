@@ -108,7 +108,7 @@ object HttpsMisuse_run {
       socket.plugListener(new HTTPSMisuseListener)
       socket.runWithoutDDA(false, true, timer)
        
-      val idfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
+      val idfgs = AppCenter.getIDFGs
       idfgs.foreach{
         case (rec, idfg) =>
           HttpsMisuse(idfg)
