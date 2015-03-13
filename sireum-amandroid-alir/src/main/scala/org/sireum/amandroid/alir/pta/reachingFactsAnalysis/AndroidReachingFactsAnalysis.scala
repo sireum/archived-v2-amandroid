@@ -42,6 +42,7 @@ import org.sireum.jawa.alir.dataFlowAnalysis.CallResolver
 import org.sireum.jawa.alir.dataFlowAnalysis.NodeListener
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralMonotoneDataFlowAnalysisResult
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
+import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -72,6 +73,9 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
     val iota : ISet[RFAFact] = initialFacts + RFAFact(VarSlot("@@RFAiota"), NullInstance(initContext.copy))
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](cg,
       true, true, false, AndroidReachingFactsAnalysisConfig.parallel, gen, kill, callr, iota, initial, timer, switchAsOrderedMatch, Some(nl))
+    println(ObjectSizeCalculator.getObjectSize(result))
+    println(ObjectSizeCalculator.getObjectSize(ptaresult))
+    println((ObjectSizeCalculator.getObjectSize(result).toDouble - ObjectSizeCalculator.getObjectSize(ptaresult).toDouble)/ObjectSizeCalculator.getObjectSize(result).toDouble)
     InterProceduralDataFlowGraph(cg, ptaresult)
   }
   

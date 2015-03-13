@@ -95,7 +95,7 @@ object DataLeakage_run {
     AndroidReachingFactsAnalysisConfig.parallel = true
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
 
-    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
+    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.VERBOSE
     val socket = new AmandroidSocket
     socket.preProcess
     
@@ -108,7 +108,7 @@ object DataLeakage_run {
     files.foreach{
       file =>
         try{
-          msg_critical(TITLE, DataLeakageTask(outputPath, file, socket, Some(10)).run)   
+          msg_critical(TITLE, DataLeakageTask(outputPath, file, socket, Some(100)).run)   
         } catch {
           case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
           case e : Throwable => e.printStackTrace()
