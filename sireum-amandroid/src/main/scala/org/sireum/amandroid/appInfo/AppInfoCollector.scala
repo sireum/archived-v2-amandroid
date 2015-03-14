@@ -238,29 +238,29 @@ object AppInfoCollector {
             println("resourceresource:" + resource)
 		        if(resource != null && resource.getType.getName == "layout"){
 		          val strRes = resource
-		          if(lfp.getCallbackMethods.contains(strRes.getName)){
-		            lfp.getCallbackMethods(strRes.getName).foreach{
-		              methodName =>
-		                //The callback may be declared directly in the class or in one of the superclasses
-		                var callbackRecord = k
-		                var callbackProcedure : Set[JawaProcedure] = Set()
-		                breakable{ 
-		                  while(callbackProcedure.isEmpty){
-			                  if(callbackRecord.declaresProcedureByShortName(methodName))
-			                  	callbackProcedure = callbackRecord.getProceduresByShortName(methodName)
-			                  if(callbackRecord.hasSuperClass)
-			                    callbackRecord = callbackRecord.getSuperClass
-			                  else break
-		                  }
-		                }
-		                if(callbackProcedure != null){
-		                  callbackMethods += (k -> (callbackMethods.getOrElse(k, isetEmpty) ++ callbackProcedure))
-		                } else {
-		                  err_msg_normal(TITLE, "Callback method " + methodName + " not found in class " + k);
-		                }
-		                
-		            }
-		          }
+	            lfp.getCallbackMethods.find(_._1.contains(strRes.getName)).foreach{
+                case (_, methodNames) =>
+                  methodNames foreach{
+                    methodName =>
+    	                //The callback may be declared directly in the class or in one of the superclasses
+    	                var callbackRecord = k
+    	                var callbackProcedure : Set[JawaProcedure] = Set()
+    	                breakable{ 
+    	                  while(callbackProcedure.isEmpty){
+    		                  if(callbackRecord.declaresProcedureByShortName(methodName))
+    		                  	callbackProcedure = callbackRecord.getProceduresByShortName(methodName)
+    		                  if(callbackRecord.hasSuperClass)
+    		                    callbackRecord = callbackRecord.getSuperClass
+    		                  else break
+    	                  }
+    	                }
+    	                if(callbackProcedure != null){
+    	                  callbackMethods += (k -> (callbackMethods.getOrElse(k, isetEmpty) ++ callbackProcedure))
+    	                } else {
+    	                  err_msg_normal(TITLE, "Callback method " + methodName + " not found in class " + k);
+    	                }
+                  }
+	            }
 		        } else {
 		          err_msg_normal(TITLE, "Unexpected resource type for layout class: " + resource.getType)
 		        }
