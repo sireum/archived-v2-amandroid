@@ -51,8 +51,6 @@ object DataLeakage_run {
       eps//.filter { ep => ep.getSignature.contains("envMain") }
     }
 
-    def onTimeout : Unit = {}
-
     def onAnalysisSuccess : Unit = {
       if(AppCenter.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
 	      DataLeakageCounter.taintPathFound += 1
@@ -78,6 +76,7 @@ object DataLeakage_run {
     def onException(e : Exception) : Unit = {
       e match{
         case ie : IgnoreException => System.err.println("Ignored!")
+        case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
         case a => 
           e.printStackTrace()
       }
