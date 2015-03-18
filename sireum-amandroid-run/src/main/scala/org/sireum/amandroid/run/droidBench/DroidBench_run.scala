@@ -86,7 +86,7 @@ object DroidBench_run {
       return
     }
     
-    GlobalConfig.CG_CONTEXT_K = 1
+    GlobalConfig.ICFG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
     

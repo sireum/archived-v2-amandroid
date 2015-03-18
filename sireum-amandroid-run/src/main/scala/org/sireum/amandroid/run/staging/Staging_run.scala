@@ -74,7 +74,7 @@ object Staging_run {
     }
     MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
     
-    GlobalConfig.CG_CONTEXT_K = 1
+    GlobalConfig.ICFG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = true
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
     

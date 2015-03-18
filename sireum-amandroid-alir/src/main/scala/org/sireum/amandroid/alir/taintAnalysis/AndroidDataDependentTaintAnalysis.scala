@@ -191,7 +191,7 @@ object AndroidDataDependentTaintAnalysis {
 						      tn.descriptors += Td(callee.getSignature, SourceAndSinkCategory.API_SINK)
 						      sinks += tn
 						    }
-						    if(invNode.isInstanceOf[IDDGCallArgNode] && invNode.asInstanceOf[IDDGCallArgNode].position > 0 && ssm.isIccSink(invNode.getCGNode.asInstanceOf[CGCallNode], ptaresult)){
+						    if(invNode.isInstanceOf[IDDGCallArgNode] && invNode.asInstanceOf[IDDGCallArgNode].position > 0 && ssm.isIccSink(invNode.getICFGNode.asInstanceOf[ICFGCallNode], ptaresult)){
 				          msg_normal(TITLE, "found icc sink: " + invNode)
 				          extendIDDGForSinkApis(iddg, invNode.asInstanceOf[IDDGCallArgNode], ptaresult)
 				          val tn = Tn(invNode)
@@ -202,7 +202,7 @@ object AndroidDataDependentTaintAnalysis {
 				    }
 		    }
       case entNode : IDDGEntryParamNode =>
-        if(ssm.isIccSource(entNode.getCGNode, iddg.entryNode.getCGNode)){
+        if(ssm.isIccSource(entNode.getICFGNode, iddg.entryNode.getICFGNode)){
 		      msg_normal(TITLE, "found icc source: " + iddg.entryNode)
 		      val tn = Tn(iddg.entryNode)
 		      tn.isSrc = true

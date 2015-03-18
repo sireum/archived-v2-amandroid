@@ -19,7 +19,7 @@ import org.sireum.jawa.alir.util.ExplicitValueFinder
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.pilar.ast._
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
-import org.sireum.jawa.alir.controlFlowGraph.CGInvokeNode
+import org.sireum.jawa.alir.controlFlowGraph.ICFGInvokeNode
 import org.sireum.jawa.Center
 import org.sireum.amandroid.alir.taintAnalysis.AndroidSourceAndSinkManager
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentCommunicationModel
@@ -56,7 +56,7 @@ class PasswordSourceAndSinkManager(appPackageName : String,
 	  false
 	}
 	
-	def isIccSink(invNode : CGInvokeNode, ptaresult : PTAResult) : Boolean = {
+	def isIccSink(invNode : ICFGInvokeNode, ptaresult : PTAResult) : Boolean = {
 	  var sinkflag = false
     val calleeSet = invNode.getCalleeSet
     calleeSet.foreach{
@@ -95,7 +95,7 @@ class PasswordSourceAndSinkManager(appPackageName : String,
     sinkflag
 	}
 	
-	def isIccSource(entNode : CGNode, iddgEntNode : CGNode) : Boolean = {
+	def isIccSource(entNode : ICFGNode, iddgEntNode : ICFGNode) : Boolean = {
 	  false
 	}
 	

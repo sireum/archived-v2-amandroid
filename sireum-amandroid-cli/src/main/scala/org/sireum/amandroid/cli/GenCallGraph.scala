@@ -24,7 +24,7 @@ import org.sireum.jawa.GlobalConfig
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.jawa.alir.controlFlowGraph.InterproceduralControlFlowGraph
-import org.sireum.jawa.alir.controlFlowGraph.CGNode
+import org.sireum.jawa.alir.controlFlowGraph.ICFGNode
 import org.sireum.jawa.Center
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.JawaProcedure
@@ -144,7 +144,7 @@ object GenCallGraph {
 	}
   
   def genCallGraph(apkFileUris : Set[FileResourceUri], outputPath : String, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int, format : String, graphtyp : String) = {
-    GlobalConfig.CG_CONTEXT_K = k_context
+    GlobalConfig.ICFG_CONTEXT_K = k_context
     println("Total apks: " + apkFileUris.size)
     try{
       var i : Int = 0

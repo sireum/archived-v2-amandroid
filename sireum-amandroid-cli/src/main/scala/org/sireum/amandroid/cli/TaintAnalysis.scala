@@ -139,7 +139,7 @@ object TanitAnalysis{
   
   def taintAnalyze(apkFileUris : Set[FileResourceUri], sasFilePath : String, outputPath : String, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int) = {
     AndroidGlobalConfig.SourceAndSinkFilePath = sasFilePath
-    GlobalConfig.CG_CONTEXT_K = k_context
+    GlobalConfig.ICFG_CONTEXT_K = k_context
     AndroidReachingFactsAnalysisConfig.parallel = parallel
     AndroidReachingFactsAnalysisConfig.resolve_icc = icc
     AndroidReachingFactsAnalysisConfig.resolve_static_init = static

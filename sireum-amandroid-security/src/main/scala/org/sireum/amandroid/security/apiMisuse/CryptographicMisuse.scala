@@ -31,7 +31,7 @@ object CryptographicMisuse {
   def build(idfg : InterProceduralDataFlowGraph) : Unit = {
     val icfg = idfg.icfg
     val ptaresult = idfg.ptaresult
-    val nodeMap : MMap[String, MSet[CGCallNode]] = mmapEmpty
+    val nodeMap : MMap[String, MSet[ICFGCallNode]] = mmapEmpty
     icfg.nodes.foreach{
       node =>
         val result = getCryptoNode(node)
@@ -53,9 +53,9 @@ object CryptographicMisuse {
    * Rule 1 forbids the use of ECB mode because ECB mode is deterministic and not stateful, 
    * thus cannot be IND-CPA secure.
    */
-  def ECBCheck(nodeMap : MMap[String, MSet[CGCallNode]], ptaresult : PTAResult) : Map[CGCallNode, Boolean] = {
-    var result : Map[CGCallNode, Boolean] = Map()
-    val nodes : MSet[CGCallNode] = msetEmpty
+  def ECBCheck(nodeMap : MMap[String, MSet[ICFGCallNode]], ptaresult : PTAResult) : Map[ICFGCallNode, Boolean] = {
+    var result : Map[ICFGCallNode, Boolean] = Map()
+    val nodes : MSet[ICFGCallNode] = msetEmpty
     nodeMap.foreach{
       case (sig, ns) =>
       	if(CryptographicConstants.getCipherGetinstanceAPIs.contains(sig))
@@ -100,10 +100,10 @@ object CryptographicMisuse {
     result
   }
   
-  def getCryptoNode(node : CGNode) : Set[(String, CGCallNode)] = {
-    val result : MSet[(String, CGCallNode)] = msetEmpty
+  def getCryptoNode(node : ICFGNode) : Set[(String, ICFGCallNode)] = {
+    val result : MSet[(String, ICFGCallNode)] = msetEmpty
     node match{
-      case invNode : CGCallNode =>
+      case invNode : ICFGCallNode =>
         val calleeSet = invNode.getCalleeSet
 		    calleeSet.foreach{
 		      callee =>

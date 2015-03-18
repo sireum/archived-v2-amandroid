@@ -14,7 +14,7 @@ import org.sireum.jawa.alir.taintAnalysis.TaintAnalysisResult
 import org.sireum.jawa.Center
 import org.stringtemplate.v4.STGroupFile
 import java.util.ArrayList
-import org.sireum.jawa.alir.controlFlowGraph.CGCallNode
+import org.sireum.jawa.alir.controlFlowGraph.ICFGCallNode
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
 import org.sireum.pilar.ast._
@@ -326,8 +326,8 @@ object DataCollector {
 			      val InterProceduralDataFlowGraph(icfg, ptaresult) = AppCenter.getIDFG(compRec)
 			      val iccNodes = icfg.nodes.filter{
 			        	node =>
-			        	  node.isInstanceOf[CGCallNode] && node.asInstanceOf[CGCallNode].getCalleeSet.exists(c => InterComponentCommunicationModel.isIccOperation(c.callee))
-			      	}.map(_.asInstanceOf[CGCallNode])
+			        	  node.isInstanceOf[ICFGCallNode] && node.asInstanceOf[ICFGCallNode].getCalleeSet.exists(c => InterComponentCommunicationModel.isIccOperation(c.callee))
+			      	}.map(_.asInstanceOf[ICFGCallNode])
 			      iccInfos =
 				      iccNodes.map{
 				        iccNode =>

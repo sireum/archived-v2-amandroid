@@ -117,8 +117,8 @@ abstract class AndroidSourceAndSinkManager(appPackageName : String,
 	
 	def isCallbackSource(proc : JawaProcedure) : Boolean
 	def isUISource(calleeProcedure : JawaProcedure, callerProcedure : JawaProcedure, callerLoc : JumpLocation) : Boolean
-	def isIccSink(invNode : CGInvokeNode, s : PTAResult) : Boolean
-	def isIccSource(entNode : CGNode, iddgEntNode : CGNode) : Boolean
+	def isIccSink(invNode : ICFGInvokeNode, s : PTAResult) : Boolean
+	def isIccSource(entNode : ICFGNode, iddgEntNode : ICFGNode) : Boolean
 	
 	def getSourceSigs : ISet[String] = this.sources.map{_._1}.toSet
 	def getSinkSigs : ISet[String] = this.sinks.map{_._1}.toSet
@@ -158,7 +158,7 @@ class DefaultAndroidSourceAndSinkManager(appPackageName : String,
 	  false
 	}
 	
-	def isIccSink(invNode : CGInvokeNode, s : PTAResult) : Boolean = {
+	def isIccSink(invNode : ICFGInvokeNode, s : PTAResult) : Boolean = {
     var sinkflag = false
     val calleeSet = invNode.getCalleeSet
     calleeSet.foreach{
@@ -196,11 +196,11 @@ class DefaultAndroidSourceAndSinkManager(appPackageName : String,
     sinkflag
 	}
   
-  def isIccSource(entNode : CGNode, iddgEntNode : CGNode) : Boolean = {
+  def isIccSource(entNode : ICFGNode, iddgEntNode : ICFGNode) : Boolean = {
     var sourceflag = false
 //    val reachableSinks = sinkNodes.filter{sinN => iddg.findPath(entNode, sinN) != null}
 //    if(!reachableSinks.isEmpty){
-//	    val sinkProcs = reachableSinks.filter(_.isInstanceOf[CGCallNode]).map(_.asInstanceOf[CGCallNode].getCalleeSet).reduce(iunion[Callee])
+//	    val sinkProcs = reachableSinks.filter(_.isInstanceOf[ICFGCallNode]).map(_.asInstanceOf[ICFGCallNode].getCalleeSet).reduce(iunion[Callee])
 //	    require(!sinkProcs.isEmpty)
 //	    val neededPermissions = sinkProcs.map(sin => this.apiPermissions.getOrElse(sin.calleeProc.getSignature, isetEmpty)).reduce(iunion[String])
 //	    val infos = AppCenter.getAppInfo.getComponentInfos

@@ -14,8 +14,8 @@ import org.sireum.jawa.MessageCenter._
 import org.sireum.pilar.ast._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.alir.util.ExplicitValueFinder
-import org.sireum.jawa.alir.controlFlowGraph.CGInvokeNode
-import org.sireum.jawa.alir.controlFlowGraph.CGNode
+import org.sireum.jawa.alir.controlFlowGraph.ICFGInvokeNode
+import org.sireum.jawa.alir.controlFlowGraph.ICFGNode
 import org.sireum.jawa.Center
 import org.sireum.amandroid.alir.taintAnalysis.AndroidSourceAndSinkManager
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
@@ -56,7 +56,7 @@ class IntentInjectionSourceAndSinkManager(appPackageName : String,
 	  false
 	}
 	
-	override def isIccSink(invNode : CGInvokeNode, ptaresult : PTAResult) : Boolean = {
+	override def isIccSink(invNode : ICFGInvokeNode, ptaresult : PTAResult) : Boolean = {
 	  var sinkflag = false
     val calleeSet = invNode.getCalleeSet
     calleeSet.foreach{
@@ -96,7 +96,7 @@ class IntentInjectionSourceAndSinkManager(appPackageName : String,
     sinkflag
 	}
 	
-	override def isIccSource(entNode : CGNode, iddgEntNode : CGNode) : Boolean = {
+	override def isIccSource(entNode : ICFGNode, iddgEntNode : ICFGNode) : Boolean = {
 	  entNode == iddgEntNode
 	}
 }

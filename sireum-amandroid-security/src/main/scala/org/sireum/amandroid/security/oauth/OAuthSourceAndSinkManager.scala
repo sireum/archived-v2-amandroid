@@ -12,8 +12,8 @@ import org.sireum.amandroid.parser.LayoutControl
 import org.sireum.util._
 import org.sireum.jawa.JawaProcedure
 import org.sireum.jawa.MessageCenter._
-import org.sireum.jawa.alir.controlFlowGraph.CGCallNode
-import org.sireum.jawa.alir.controlFlowGraph.CGNode
+import org.sireum.jawa.alir.controlFlowGraph.ICFGCallNode
+import org.sireum.jawa.alir.controlFlowGraph.ICFGNode
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.pilar.ast.JumpLocation
 import org.sireum.amandroid.AndroidConstants
@@ -21,7 +21,7 @@ import org.sireum.jawa.alir.util.ExplicitValueFinder
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.pilar.ast._
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
-import org.sireum.jawa.alir.controlFlowGraph.CGInvokeNode
+import org.sireum.jawa.alir.controlFlowGraph.ICFGInvokeNode
 import org.sireum.jawa.Center
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentCommunicationModel
 import org.sireum.jawa.alir.pta.VarSlot
@@ -67,7 +67,7 @@ class OAuthSourceAndSinkManager(appPackageName : String,
 	  flag
 	}
 	
-	def isIccSink(invNode : CGInvokeNode, ptaresult : PTAResult) : Boolean = {
+	def isIccSink(invNode : ICFGInvokeNode, ptaresult : PTAResult) : Boolean = {
 	  var sinkflag = false
     val calleeSet = invNode.getCalleeSet
     calleeSet.foreach{
@@ -106,7 +106,7 @@ class OAuthSourceAndSinkManager(appPackageName : String,
     sinkflag
 	}
 	
-	def isIccSource(entNode : CGNode, iddgEntNode : CGNode) : Boolean = {
+	def isIccSource(entNode : ICFGNode, iddgEntNode : ICFGNode) : Boolean = {
 	  false
 	}
 	
