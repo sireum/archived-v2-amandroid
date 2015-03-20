@@ -3,6 +3,7 @@
 /target
 /temp
 /update
+/codebase
 /sbt
 /.cache
 /.scala_dependencies

@@ -38,6 +38,10 @@ import org.sireum.amandroid.decompile.AmDecoder
 import org.sireum.jawa.alir.pta.suspark.InterproceduralSuperSpark
 import org.sireum.jawa.util.MyTimeoutException
 import org.sireum.jawa.util.MyTimer
+import org.sireum.option.GraphFormat
+import org.sireum.option.GraphType
+import java.io.BufferedWriter
+import java.io.OutputStreamWriter
 
 
 /**
@@ -58,11 +62,12 @@ object GenCallGraphCli {
     val timeout = saamode.analysis.timeout
     val mem = saamode.general.mem
     val msgLevel = saamode.general.msgLevel
-    val apionly = saamode.apionly
-    forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, outputDir, mem, apionly, msgLevel)
+    val format = saamode.format
+    val graphtyp = saamode.graphtyp
+    forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, outputDir, mem, format, graphtyp, msgLevel)
   }
 	
-	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : String, sourceDir : String, outputDir : String, mem : Int, apionly : Boolean, msgLevel : MessageLevel.Type) = {
+	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : String, sourceDir : String, outputDir : String, mem : Int, format : GraphFormat.Type, graphtyp : GraphType.Type, msgLevel : MessageLevel.Type) = {
     val args : MList[String] = mlistEmpty
     args += "-s"
     args += (!nostatic).toString
@@ -74,8 +79,10 @@ object GenCallGraphCli {
     args += k_context.toString
     args += "-to"
     args += timeout.toString
-    args += "-api"
-    args += apionly.toString
+    args += "-f"
+    args += format.toString
+    args += "-gt"
+    args += graphtyp.toString
     args += "-msg"
     args += msgLevel.toString
     args ++= List("-t", typSpec, sourceDir, outputDir)
@@ -92,8 +99,8 @@ object GenCallGraph {
   private final val TITLE = "GenCallGraph"
   
 	def main(args: Array[String]) {
-	  if(args.size != 18){
-      println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -api [api only] -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -t type[allows: APK, DIR] <source path> <output path>")
+	  if(args.size != 22){
+      println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -f [Graph Format: DOT, GraphML, GML, TEXT] -gt [Graph Type: FULL, CALL, API] -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -t type[allows: APK, DIR] <source path> <output path>")
       return
     }
     val static = args(1).toBoolean
@@ -101,11 +108,12 @@ object GenCallGraph {
     val icc = args(5).toBoolean
     val k_context = args(7).toInt
     val timeout = args(9).toInt
-    val apionly = args(11).toBoolean
-    val msgLevel = args(13)
-    val typ = args(15)
-    val sourcePath = args(16)
-    val outputPath = args(17)
+    val format = args(11)
+    val graphtyp = args(13)
+    val msgLevel = args(15)
+    val typ = args(17)
+    val sourcePath = args(19)
+    val outputPath = args(20)
     
     msgLevel match{
       case "NO$" =>
@@ -132,10 +140,10 @@ object GenCallGraph {
         println("Unexpected type: " + typ)
         return
     }
-		genCallGraph(apkFileUris, outputPath, static, parallel, icc, k_context, timeout, apionly)
+		genCallGraph(apkFileUris, outputPath, static, parallel, icc, k_context, timeout, format, graphtyp)
 	}
   
-  def genCallGraph(apkFileUris : Set[FileResourceUri], outputPath : String, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int, apionly : Boolean) = {
+  def genCallGraph(apkFileUris : Set[FileResourceUri], outputPath : String, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int, format : String, graphtyp : String) = {
     GlobalConfig.CG_CONTEXT_K = k_context
     println("Total apks: " + apkFileUris.size)
     try{
@@ -178,9 +186,20 @@ object GenCallGraph {
           	
             val file = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ".txt.gz")
       	    val w = new FileOutputStream(file)
-            val zipw = new GZIPOutputStream(new BufferedOutputStream(w))
-      	    val graph = if(apionly) cg.toApiGraph else cg.toTextGraph
-      	    zipw.write(graph.getBytes())
+            val zips = new GZIPOutputStream(new BufferedOutputStream(w))
+            val zipw = new BufferedWriter(new OutputStreamWriter(zips, "UTF-8"))
+      	    val graph = 
+              graphtyp match{
+                case "FULL$" => cg
+                case "CALL$" => cg.toCallGraph
+                case "API$" => cg.toApiGraph
+              }
+            format match {
+              case "DOT$" => graph.toDot(zipw)
+              case "GraphML$" => graph.toGraphML(zipw)
+              case "GML$" => graph.toGML(zipw)
+              case "TEXT$" => graph.toTextGraph(zipw)
+            }
       	    zipw.close()
       	    println(apkName + " result stored!")
             
