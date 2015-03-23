@@ -16,10 +16,8 @@ import org.sireum.amandroid.AndroidConstants
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.ClassLoadManager
-import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
-import org.sireum.jawa.alir.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
-import org.sireum.jawa.alir.controlFlowGraph.CGNode
-import org.sireum.jawa.alir.controlFlowGraph.CGCallNode
+import org.sireum.jawa.alir.controlFlowGraph.ICFGNode
+import org.sireum.jawa.alir.controlFlowGraph.ICFGCallNode
 import org.sireum.util.MSet
 import org.sireum.util.MMap
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
@@ -29,21 +27,20 @@ import org.sireum.pilar.ast.CallJump
 import org.sireum.jawa.JawaProcedure
 import org.sireum.pilar.ast.JumpLocation
 import org.sireum.util.MList
-import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
-import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.jawa.MessageCenter._
 import org.sireum.util._
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.pilar.ast._
 import org.sireum.jawa.Center
-import org.sireum.jawa.alir.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
-import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
 import org.sireum.jawa.JawaProcedure
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.security.AmandroidSocketListener
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.alir.reachability.ReachabilityAnalysis
+import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
+import org.sireum.jawa.alir.pta.VarSlot
+import org.sireum.jawa.alir.pta.PTAResult
 /*
  * @author <a href="mailto:i@flanker017.me">Qidan He</a>
  */
@@ -58,9 +55,9 @@ object LogSensitiveInfo {
     
   def build(idfg : InterProceduralDataFlowGraph) : Unit = {
     val icfg = idfg.icfg
-    val summary = idfg.summary
-    val nodeMap : MMap[String, MSet[CGCallNode]] = mmapEmpty
-    val callmap = icfg.getCallMap
+    val ptaresult = idfg.ptaresult
+    val nodeMap : MMap[String, MSet[ICFGCallNode]] = mmapEmpty
+    val callmap = icfg.getCallGraph.getCallMap
     icfg.nodes.foreach{
       node =>
         val result = getParticularAPINode(node)
@@ -69,7 +66,7 @@ object LogSensitiveInfo {
             nodeMap.getOrElseUpdate(r._1, msetEmpty) += r._2
         }
     }
-    val rule1Res = VerifierCheck(nodeMap, summary)
+    val rule1Res = VerifierCheck(nodeMap, ptaresult)
     rule1Res.foreach{
       case (n, b) =>
         if(!b){
@@ -82,9 +79,9 @@ object LogSensitiveInfo {
    * detect constant propagation on ALLOW_ALLHOSTNAME_VERIFIER
    * which is a common api miuse in many android apps.
    */
-  def VerifierCheck(nodeMap : MMap[String, MSet[CGCallNode]], summary : InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]): Map[CGCallNode, Boolean] = {
-    var result : Map[CGCallNode, Boolean] = Map()
-    val nodes : MSet[CGCallNode] = msetEmpty
+  def VerifierCheck(nodeMap : MMap[String, MSet[ICFGCallNode]], ptaresult : PTAResult): Map[ICFGCallNode, Boolean] = {
+    var result : Map[ICFGCallNode, Boolean] = Map()
+    val nodes : MSet[ICFGCallNode] = msetEmpty
     nodeMap.foreach{
       case (sig, ns) =>
         if(sig.equals(API_SIG))
@@ -94,7 +91,6 @@ object LogSensitiveInfo {
       node =>
         println("ZWZW - verify checker on " + node.toString())
         result += (node -> true)
-        val rfaFacts = summary.entrySet(node)//dataflowfact at this node
         
         val loc = Center.getProcedureWithoutFailing(node.getOwner).getProcedureBody.location(node.getLocIndex)
         val argNames : MList[String] = mlistEmpty
@@ -139,10 +135,10 @@ object LogSensitiveInfo {
     result
   }
   
-  def getParticularAPINode(node : CGNode): Set[(String, CGCallNode)] = {
-    val result : MSet[(String, CGCallNode)] = msetEmpty
+  def getParticularAPINode(node : ICFGNode): Set[(String, ICFGCallNode)] = {
+    val result : MSet[(String, ICFGCallNode)] = msetEmpty
     node match{
-      case invNode : CGCallNode =>
+      case invNode : ICFGCallNode =>
         println("Calling getINTERESTINGAPI on node - " + node.toString())
         val calleeSet = invNode.getCalleeSet
         println("ZWZW - callee set for current invNode is - " + calleeSet.toString)

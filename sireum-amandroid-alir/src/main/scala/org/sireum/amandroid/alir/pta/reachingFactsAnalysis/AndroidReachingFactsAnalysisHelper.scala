@@ -12,6 +12,7 @@ import org.sireum.jawa.JawaProcedure
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.AndroidModelCallHandler
+import org.sireum.jawa.alir.pta.PTAResult
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -23,7 +24,7 @@ object AndroidReachingFactsAnalysisHelper {
     AndroidModelCallHandler.isModelCall(calleeProc)
   }
   
-  def doModelCall(s : ISet[RFAFact], calleeProc : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+  def doModelCall(s : PTAResult, calleeProc : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     AndroidModelCallHandler.doModelCall(s, calleeProc, args, retVars, currentContext)
   }
   
@@ -31,7 +32,7 @@ object AndroidReachingFactsAnalysisHelper {
     AndroidModelCallHandler.isICCCall(calleeProc)
   }
   
-  def doICCCall(s : ISet[RFAFact], calleeProc : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[JawaProcedure]) = {
+  def doICCCall(s : PTAResult, calleeProc : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[JawaProcedure]) = {
     AndroidModelCallHandler.doICCCall(s, calleeProc, args, retVars, currentContext)
   }
 }

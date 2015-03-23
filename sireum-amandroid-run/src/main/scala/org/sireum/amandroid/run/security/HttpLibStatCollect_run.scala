@@ -16,7 +16,6 @@ import org.sireum.jawa.JawaCodeSource
 import org.sireum.jawa.Center
 import org.sireum.jawa.ClassLoadManager
 import org.sireum.jawa.util.IgnoreException
-import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.jawa.GlobalConfig
 import java.io.PrintWriter
 import org.sireum.jawa.alir.LibSideEffectProvider

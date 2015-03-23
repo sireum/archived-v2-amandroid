@@ -38,7 +38,7 @@ object ApkReport_run {
     def onTimeout : Unit = {}
 
     def onAnalysisSuccess : Unit = {
-      AppCenter.getInterproceduralReachingFactsAnalysisResults.foreach{
+      AppCenter.getIDFGs.foreach{
         res =>
           val idfg = res._2
       }

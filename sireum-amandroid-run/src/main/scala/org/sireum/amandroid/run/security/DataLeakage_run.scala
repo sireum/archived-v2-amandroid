@@ -75,7 +75,7 @@ object DataLeakage_run {
     
     def onException(e : Exception) : Unit = {
       e match{
-        case ie : IgnoreException => System.err.println("Ignored!")
+        case ie : IgnoreException => err_msg_critical(TITLE, "Ignored!")
         case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
         case a => 
           e.printStackTrace()
@@ -89,12 +89,12 @@ object DataLeakage_run {
       return
     }
     
-    GlobalConfig.CG_CONTEXT_K = 1
+    GlobalConfig.ICFG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = true
     AndroidReachingFactsAnalysisConfig.parallel = true
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
 
-    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.VERBOSE
+    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
     val socket = new AmandroidSocket
     socket.preProcess
     
@@ -107,7 +107,7 @@ object DataLeakage_run {
     files.foreach{
       file =>
         try{
-          msg_critical(TITLE, DataLeakageTask(outputPath, file, socket, Some(10)).run)   
+          msg_critical(TITLE, DataLeakageTask(outputPath, file, socket, Some(100)).run)   
         } catch {
           case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
           case e : Throwable => e.printStackTrace()

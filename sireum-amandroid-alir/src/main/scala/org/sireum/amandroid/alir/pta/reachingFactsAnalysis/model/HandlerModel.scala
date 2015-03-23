@@ -12,6 +12,7 @@ import org.sireum.util._
 import org.sireum.jawa.JawaProcedure
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
+import org.sireum.jawa.alir.pta.PTAResult
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -19,7 +20,7 @@ import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
  */ 
 object HandlerModel {
 	def isHandler(r : JawaRecord) : Boolean = r.getName == "android.os.Handler"
-	def doHandlerCall(s : ISet[RFAFact], p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	def doHandlerCall(s : PTAResult, p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true

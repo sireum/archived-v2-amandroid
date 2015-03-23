@@ -46,7 +46,7 @@ object Staging_run {
 
     def onAnalysisSuccess : Unit = {
 		  StagingCounter.haveresult += 1
-		  AppCenter.getInterproceduralReachingFactsAnalysisResults.foreach{
+		  AppCenter.getIDFGs.foreach{
 		    res =>
 		      val idfg = res._2
 //		      GraphDB.storeIdfg(res._1.getName, idfg)
@@ -74,7 +74,7 @@ object Staging_run {
     }
     MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
     
-    GlobalConfig.CG_CONTEXT_K = 1
+    GlobalConfig.ICFG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = true
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
     

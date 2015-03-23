@@ -7,17 +7,17 @@ http://www.eclipse.org/legal/epl-v10.html
 */
 package org.sireum.amandroid.security.apiMisuse
 
-import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 import org.sireum.jawa.MessageCenter._
 import org.sireum.util._
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.pilar.ast._
 import org.sireum.jawa.Center
-import org.sireum.jawa.alir.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
-import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
 import org.sireum.jawa.JawaProcedure
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
+import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
+import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.jawa.alir.pta.VarSlot
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -30,8 +30,8 @@ object CryptographicMisuse {
   	
   def build(idfg : InterProceduralDataFlowGraph) : Unit = {
     val icfg = idfg.icfg
-    val summary = idfg.summary
-    val nodeMap : MMap[String, MSet[CGCallNode]] = mmapEmpty
+    val ptaresult = idfg.ptaresult
+    val nodeMap : MMap[String, MSet[ICFGCallNode]] = mmapEmpty
     icfg.nodes.foreach{
       node =>
         val result = getCryptoNode(node)
@@ -40,7 +40,7 @@ object CryptographicMisuse {
             nodeMap.getOrElseUpdate(r._1, msetEmpty) += r._2
         }
     }
-    val rule1Res = ECBCheck(nodeMap, summary)
+    val rule1Res = ECBCheck(nodeMap, ptaresult)
     rule1Res.foreach{
       case (n, b) =>
         if(!b){
@@ -53,9 +53,9 @@ object CryptographicMisuse {
    * Rule 1 forbids the use of ECB mode because ECB mode is deterministic and not stateful, 
    * thus cannot be IND-CPA secure.
    */
-  def ECBCheck(nodeMap : MMap[String, MSet[CGCallNode]], summary : InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]) : Map[CGCallNode, Boolean] = {
-    var result : Map[CGCallNode, Boolean] = Map()
-    val nodes : MSet[CGCallNode] = msetEmpty
+  def ECBCheck(nodeMap : MMap[String, MSet[ICFGCallNode]], ptaresult : PTAResult) : Map[ICFGCallNode, Boolean] = {
+    var result : Map[ICFGCallNode, Boolean] = Map()
+    val nodes : MSet[ICFGCallNode] = msetEmpty
     nodeMap.foreach{
       case (sig, ns) =>
       	if(CryptographicConstants.getCipherGetinstanceAPIs.contains(sig))
@@ -64,7 +64,6 @@ object CryptographicMisuse {
     nodes.foreach{
       node =>
         result += (node -> true)
-        val rfaFacts = summary.entrySet(node)
         val loc = Center.getProcedureWithoutFailing(node.getOwner).getProcedureBody.location(node.getLocIndex)
         val argNames : MList[String] = mlistEmpty
         loc match{
@@ -89,7 +88,7 @@ object CryptographicMisuse {
         }
         require(argNames.isDefinedAt(0))
         val argSlot = VarSlot(argNames(0))
-        val argValue = rfaFacts.filter(p=>argSlot == p.s).map(_.v)
+        val argValue = ptaresult.pointsToSet(argSlot, node.context)
         argValue.foreach{
           ins =>
             if(ins.isInstanceOf[PTAConcreteStringInstance]){
@@ -101,10 +100,10 @@ object CryptographicMisuse {
     result
   }
   
-  def getCryptoNode(node : CGNode) : Set[(String, CGCallNode)] = {
-    val result : MSet[(String, CGCallNode)] = msetEmpty
+  def getCryptoNode(node : ICFGNode) : Set[(String, ICFGCallNode)] = {
+    val result : MSet[(String, ICFGCallNode)] = msetEmpty
     node match{
-      case invNode : CGCallNode =>
+      case invNode : ICFGCallNode =>
         val calleeSet = invNode.getCalleeSet
 		    calleeSet.foreach{
 		      callee =>

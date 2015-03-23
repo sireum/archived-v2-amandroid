@@ -35,10 +35,8 @@ object AmandroidBuild extends Build {
   final val CORE_DIR = "codebase/core/"
   final val CORE_INTERNAL_DIR = "codebase/core-internal/"
   final val PARSER_DIR = "codebase/parser/"
-  final val JVM_DIR = "codebase/jvm/"
-  final val JAWA_INTERNAL_DIR = "codebase/jawa-internal/"
-  final val AMANDROID_INTERNAL_DIR = "codebase/amandroid-internal/"
-  final val IS_INTERNAL = System.getenv("SIREUM_INTERNAL") != null
+  final val JAWA_DIR = "codebase/jawa/"
+  final val AMANDROID_DIR = "codebase/amandroid/"
 
   val APPS_STASH_PATH =
     if (System.getenv("APPS_PATH") != null)
@@ -168,43 +166,36 @@ object AmandroidBuild extends Build {
     macroPI, utilPI)
   val sireumv2PI = new ProjectInfo("Sireum Project", CORE_INTERNAL_DIR, Seq(),
     libPI)
-  val amandroidProjectPI = new ProjectInfo("Sireum Amandroid Project", AMANDROID_INTERNAL_DIR, Seq(),
+  val amandroidProjectPI = new ProjectInfo("Sireum Amandroid Project", AMANDROID_DIR, Seq(),
     libPI, sireumv2PI)
   val jawaPI = new ProjectInfo("Sireum Jawa",
-    JAWA_INTERNAL_DIR, Seq(),
+    JAWA_DIR, Seq(),
     libPI, utilPI, pilarPI)
   val jawaAlirPI = new ProjectInfo("Sireum Jawa Alir",
-    JAWA_INTERNAL_DIR, Seq(),
+    JAWA_DIR, Seq(),
     libPI, utilPI, pilarPI, alirPI, jawaPI)
   val jawaTestPI = new ProjectInfo("Sireum Jawa Test",
-    JAWA_INTERNAL_DIR, Seq(),
+    JAWA_DIR, Seq(),
     libPI, utilPI, pilarPI, alirPI, jawaPI, jawaAlirPI)
   val amandroidPI = new ProjectInfo("Sireum Amandroid",
-    AMANDROID_INTERNAL_DIR, Seq("Amandroid"),
+    AMANDROID_DIR, Seq("Amandroid"),
     libPI, utilPI, pilarPI, alirPI, optionPI, jawaPI, jawaAlirPI)
   val amandroidAlirPI = new ProjectInfo("Sireum Amandroid Alir",
-    AMANDROID_INTERNAL_DIR, Seq("Amandroid"),
+    AMANDROID_DIR, Seq("Amandroid"),
     libPI, utilPI, pilarPI, alirPI, optionPI, jawaPI, jawaAlirPI, amandroidPI)
   val amandroidSecurityPI = new ProjectInfo("Sireum Amandroid Security",
-    AMANDROID_INTERNAL_DIR, Seq("Amandroid"),
+    AMANDROID_DIR, Seq("Amandroid"),
     libPI, utilPI, pilarPI, alirPI, optionPI, jawaPI, jawaAlirPI, amandroidPI, amandroidAlirPI)
   val amandroidCliPI = new ProjectInfo("Sireum Amandroid Cli",
-    AMANDROID_INTERNAL_DIR, Seq("Amandroid"),
+    AMANDROID_DIR, Seq("Amandroid"),
     libPI, utilPI, pilarPI, alirPI, optionPI, jawaPI, jawaAlirPI, amandroidPI, amandroidAlirPI, amandroidSecurityPI)
   val amandroidTestPI = new ProjectInfo("Sireum Amandroid Test",
-    AMANDROID_INTERNAL_DIR, Seq("Amandroid"),
+    AMANDROID_DIR, Seq("Amandroid"),
     libPI, utilPI, pilarPI, alirPI, optionPI, jawaPI, jawaAlirPI, amandroidPI,
     amandroidAlirPI, amandroidSecurityPI, jawaTestPI)
 
   lazy val projectInfoMap : Map[String, ProjectInfo] = Map(
-    (if (!IS_INTERNAL)
-      Seq(
-      libPI,
-      macroPI,
-      utilPI,
-      optionPI
-    )
-    else Seq(
+    Seq(
       libPI,
       macroPI,
       utilPI,
@@ -219,6 +210,5 @@ object AmandroidBuild extends Build {
       amandroidAlirPI,
       amandroidSecurityPI,
       amandroidCliPI
-    )).map { pi => pi.id -> pi } : _*)
-
+    ).map { pi => pi.id -> pi } : _*)
 }

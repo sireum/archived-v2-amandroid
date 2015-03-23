@@ -14,8 +14,9 @@ import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.jawa.JawaProcedure
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.AndroidConstants
-import org.sireum.jawa.alir.UnknownInstance
+import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.Center
+import org.sireum.jawa.alir.pta.PTAResult
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -56,7 +57,7 @@ object AndroidRFAScopeManager extends ScopeManager{
     }
   }
   
-  def handleBypass(s : ISet[RFAFact], calleeProc : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+  def handleBypass(s : PTAResult, calleeProc : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
     (isetEmpty, isetEmpty, true)
   }
 }

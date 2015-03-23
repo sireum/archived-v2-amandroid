@@ -7,7 +7,7 @@ http://www.eclipse.org/legal/epl-v10.html
 */
 package org.sireum.amandroid.cli
 
-import org.sireum.option.SireumAmandroidGenCallGraphMode
+import org.sireum.option.SireumAmandroidGenGraphMode
 import org.sireum.option.AnalyzeSource
 import java.io.File
 import org.sireum.option.MessageLevel
@@ -24,7 +24,7 @@ import org.sireum.jawa.GlobalConfig
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.jawa.alir.controlFlowGraph.InterproceduralControlFlowGraph
-import org.sireum.jawa.alir.controlFlowGraph.CGNode
+import org.sireum.jawa.alir.controlFlowGraph.ICFGNode
 import org.sireum.jawa.Center
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.JawaProcedure
@@ -47,8 +47,8 @@ import java.io.OutputStreamWriter
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
-object GenCallGraphCli {
-	def run(saamode : SireumAmandroidGenCallGraphMode) {
+object GenGraphCli {
+	def run(saamode : SireumAmandroidGenGraphMode) {
     val sourceType = saamode.general.typ match{
       case AnalyzeSource.APK => "APK"
       case AnalyzeSource.DIR => "DIR"}
@@ -86,7 +86,7 @@ object GenCallGraphCli {
     args += "-msg"
     args += msgLevel.toString
     args ++= List("-t", typSpec, sourceDir, outputDir)
-    org.sireum.jawa.util.JVMUtil.startSecondJVM(IntentInjection.getClass(), "-Xmx" + mem + "G", args.toList, true)
+    org.sireum.jawa.util.JVMUtil.startSecondJVM(GenGraph.getClass(), "-Xmx" + mem + "G", args.toList, true)
   }
 }
 
@@ -94,7 +94,7 @@ object GenCallGraphCli {
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-object GenCallGraph {
+object GenGraph {
   
   private final val TITLE = "GenCallGraph"
   
@@ -140,11 +140,11 @@ object GenCallGraph {
         println("Unexpected type: " + typ)
         return
     }
-		genCallGraph(apkFileUris, outputPath, static, parallel, icc, k_context, timeout, format, graphtyp)
+		genGraph(apkFileUris, outputPath, static, parallel, icc, k_context, timeout, format, graphtyp)
 	}
   
-  def genCallGraph(apkFileUris : Set[FileResourceUri], outputPath : String, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int, format : String, graphtyp : String) = {
-    GlobalConfig.CG_CONTEXT_K = k_context
+  def genGraph(apkFileUris : Set[FileResourceUri], outputPath : String, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int, format : String, graphtyp : String) = {
+    GlobalConfig.ICFG_CONTEXT_K = k_context
     println("Total apks: " + apkFileUris.size)
     try{
       var i : Int = 0
@@ -182,7 +182,7 @@ object GenCallGraph {
                   procedures
               }.reduce(iunion[JawaProcedure])
 
-            val cg = InterproceduralSuperSpark(pros, timer)
+            val icfg = InterproceduralSuperSpark(pros, timer).icfg
           	
             val file = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ".txt.gz")
       	    val w = new FileOutputStream(file)
@@ -190,15 +190,15 @@ object GenCallGraph {
             val zipw = new BufferedWriter(new OutputStreamWriter(zips, "UTF-8"))
       	    val graph = 
               graphtyp match{
-                case "FULL$" => cg
-                case "CALL$" => cg.toCallGraph
-                case "API$" => cg.toApiGraph
+                case "FULL$" => icfg
+                case "SIMPLE_CALL$" => icfg.toSimpleCallGraph
+                case "API$" => icfg.toApiGraph
               }
             format match {
               case "DOT$" => graph.toDot(zipw)
               case "GraphML$" => graph.toGraphML(zipw)
               case "GML$" => graph.toGML(zipw)
-              case "TEXT$" => graph.toTextGraph(zipw)
+              case "TEXT$" => graph.toText(zipw)
             }
       	    zipw.close()
       	    println(apkName + " result stored!")
