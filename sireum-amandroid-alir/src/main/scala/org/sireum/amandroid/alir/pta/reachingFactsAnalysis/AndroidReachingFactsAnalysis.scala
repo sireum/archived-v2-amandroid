@@ -73,9 +73,6 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
     val iota : ISet[RFAFact] = initialFacts + RFAFact(VarSlot("@@RFAiota"), NullInstance(initContext.copy))
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](icfg,
       true, true, false, AndroidReachingFactsAnalysisConfig.parallel, gen, kill, callr, iota, initial, timer, switchAsOrderedMatch, Some(nl))
-    println(ObjectSizeCalculator.getObjectSize(result))
-    println(ObjectSizeCalculator.getObjectSize(ptaresult))
-    println((ObjectSizeCalculator.getObjectSize(result).toDouble - ObjectSizeCalculator.getObjectSize(ptaresult).toDouble)/ObjectSizeCalculator.getObjectSize(result).toDouble)
     InterProceduralDataFlowGraph(icfg, ptaresult)
   }
   

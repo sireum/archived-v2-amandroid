@@ -190,7 +190,6 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 							        }
                       if(StringFormConverter.getSubSigFromProcSig(sig) == AndroidConstants.SETCONTENTVIEW){
                         val nums = ExplicitValueFinder.findExplicitIntValueForArgs(procedure, j, 1)
-                        println(nums)
 	                      val declRecord = procedure.getDeclaringRecord
 	                      this.layoutClasses += (declRecord -> (this.layoutClasses.getOrElse(declRecord, isetEmpty) ++ nums))
                       }
@@ -201,7 +200,6 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	        }
 	      }
 	  }
-    println(this.layoutClasses)
 	}
 	
 	/**

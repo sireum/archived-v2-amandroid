@@ -59,9 +59,9 @@ class AmandroidSocket {
   def preProcess : Unit = {
     if(dirtyFlag) throw new RuntimeException("Before your analysis please call cleanEnv first.")
     dirtyFlag = true
-    val imgfile = new File(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSummary.xml.zip")
+//    val imgfile = new File(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSummary.xml.zip")
     JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), GlobalConfig.PILAR_FILE_EXT)
-    val libsum_file = new File(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSideEffectResult.xml.zip")
+//    val libsum_file = new File(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSideEffectResult.xml.zip")
 //    if(libsum_file.exists())
 //      LibSideEffectProvider.init(libsum_file)
   }
