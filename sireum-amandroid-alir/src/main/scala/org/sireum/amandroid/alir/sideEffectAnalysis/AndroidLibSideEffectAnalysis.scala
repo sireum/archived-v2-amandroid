@@ -27,6 +27,8 @@ import java.io.FileInputStream
 import org.sireum.jawa.alir.sideEffectAnalysis.InterProceduralSideEffectAnalysisResult
 import scala.collection.parallel.immutable.ParMap
 import org.sireum.jawa.GlobalConfig
+import org.sireum.jawa.alir.sideEffectAnalysis.IntraProceduralSideEffectResult
+import scala.collection.GenMap
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -36,34 +38,18 @@ object AndroidLibSideEffectAnalysis {
   
 	def main(args: Array[String]) {
 	  val androidLibDir = AndroidGlobalConfig.android_lib_dir
+    val smallmem = false
 	  if(androidLibDir != null){
 	    val startTime = System.currentTimeMillis()
 			JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
-			var x : Float = 0
-			val recSize = JawaCodeSource.getLibraryRecordsCodes.size
-			val recs =
-				JawaCodeSource.getLibraryRecordsCodes.par.map{
-				  case (recName, code) =>
-				    this.synchronized(x += 1)
-				    if(x%100==0)println((x/recSize)*100 + "%")
-				    if(x == recSize) println("Record resolving Done!")
-				    Center.resolveRecord(recName, Center.ResolveLevel.BODY)
-				}
-	    val procedures = recs.par.map(_.getProcedures.filter(_.isConcrete)).reduce(iunion[JawaProcedure])
-	    val procSize = procedures.size
-	    x = 0
-		  var intraPSEResults = procedures.par.map{
-        p => 
-          this.synchronized(x += 1)
-			    if(x%1000==0)println((x/procSize)*100 + "%")
-			    if(x == procSize) println("Intra side effect Done!")
-          (p.getSignature, SideEffectAnalysis.intraProceduralSideEffect(p))
-      }.toMap
+			var intraPSEResults = 
+        if(smallmem) smallMem
+        else largeMem
       Center.reset
       System.gc()
       System.gc()
 	    val interPSEResult = SideEffectAnalysis.interProceduralSideEffect(intraPSEResults)
-	    intraPSEResults = ParMap()
+	    intraPSEResults = null
 	    System.gc()
 	    System.gc()
 	    val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
@@ -85,5 +71,51 @@ object AndroidLibSideEffectAnalysis {
 	  } else {
 	  	System.err.println("Wrong!")
 	  }
+  }
+  
+  def largeMem : GenMap[String, IntraProceduralSideEffectResult] = {
+    var x : Float = 0
+    val recSize = JawaCodeSource.getFrameworkRecordsCodes.size
+    val recs =
+      JawaCodeSource.getFrameworkRecordsCodes.par.map{
+        case (recName, code) =>
+          this.synchronized(x += 1)
+          if(x%100==0)println((x/recSize)*100 + "%")
+          if(x == recSize) println("Record resolving Done!")
+          Center.resolveRecord(recName, Center.ResolveLevel.BODY)
+      }
+    val procedures = recs.par.map(_.getProcedures.filter(_.isConcrete)).reduce(iunion[JawaProcedure])
+    val procSize = procedures.size
+    x = 0
+    val intraPSEResults = procedures.par.map{
+      p => 
+        this.synchronized(x += 1)
+        if(x%1000==0)println((x/procSize)*100 + "%")
+        if(x == procSize) println("Intra side effect Done!")
+        (p.getSignature, SideEffectAnalysis.intraProceduralSideEffect(p))
+    }
+    intraPSEResults.toMap
+  }
+  
+  def smallMem : GenMap[String, IntraProceduralSideEffectResult] = {
+    var x : Float = 0
+    val recSize = JawaCodeSource.getFrameworkRecordsCodes.size
+    val intraPSEResults =
+      JawaCodeSource.getFrameworkRecordsCodes.flatMap{
+        case (recName, code) =>
+          this.synchronized(x += 1)
+          if(x%1000==0){
+            println((x/recSize)*100 + "%")
+            Center.reset
+            System.gc()
+          }
+          if(x == recSize) println("Record resolving Done!")
+          val rec = Center.resolveRecord(recName, Center.ResolveLevel.BODY)
+          rec.getProcedures.filter(_.isConcrete).map{
+            p =>
+              (p.getSignature, SideEffectAnalysis.intraProceduralSideEffect(p))
+          }
+      }
+    intraPSEResults
   }
 }

@@ -5,11 +5,11 @@ are made available under the terms of the Eclipse Public License v1.0
 which accompanies this distribution, and is available at              
 http://www.eclipse.org/legal/epl-v10.html                             
 */
-package org.sireum.amandroid.alir.reachingFactsAnalysis
+package org.sireum.amandroid.alir.pta.reachingFactsAnalysis
 
 import org.sireum.util._
-import org.sireum.jawa.alir.Instance
-import org.sireum.jawa.alir.reachingFactsAnalysis._
+import org.sireum.jawa.alir.pta.Instance
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.alir.Slot
 import org.sireum.jawa.util.StringFormConverter
@@ -22,6 +22,9 @@ import org.sireum.jawa.Center
 import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.JawaProcedure
 import java.net.URLEncoder
+import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
+import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.jawa.alir.pta.FieldSlot
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -44,57 +47,57 @@ object IntentHelper {
       													 preciseImplicit : Boolean,
       													 senderContext : Context)
   
-	def getIntentContents(factMap : IMap[Slot, ISet[Instance]], intentValues : ISet[Instance], currentContext : Context) : ISet[IntentContent] = {
+	def getIntentContents(s : PTAResult, intentValues : ISet[Instance], currentContext : Context) : ISet[IntentContent] = {
 	  var result = isetEmpty[IntentContent]
 	  intentValues.foreach{
       intentIns =>
         var preciseExplicit = true
         var preciseImplicit = true
         var componentNames = isetEmpty[String]
-        val iFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_COMPONENT)
-        factMap.getOrElse(iFieldSlot, isetEmpty).foreach{
+        val iFieldSlot = FieldSlot(intentIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT))
+        s.pointsToSet(iFieldSlot, currentContext).foreach{
           compIns =>
-            val cFieldSlot = FieldSlot(compIns, AndroidConstants.COMPONENTNAME_CLASS)
-            factMap.getOrElse(cFieldSlot, isetEmpty).foreach{
+            val cFieldSlot = FieldSlot(compIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS))
+            s.pointsToSet(cFieldSlot, currentContext).foreach{
               ins =>
-                if(ins.isInstanceOf[RFAConcreteStringInstance]){
-                  componentNames += ins.asInstanceOf[RFAConcreteStringInstance].string
+                if(ins.isInstanceOf[PTAConcreteStringInstance]){
+                  componentNames += ins.asInstanceOf[PTAConcreteStringInstance].string
                 }
                 else preciseExplicit = false
             }
         }
         
         var actions: ISet[String] = isetEmpty[String]
-        val acFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_ACTION)
-        factMap.getOrElse(acFieldSlot, isetEmpty).foreach{
+        val acFieldSlot = FieldSlot(intentIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION))
+        s.pointsToSet(acFieldSlot, currentContext).foreach{
           acIns =>
-            if(acIns.isInstanceOf[RFAConcreteStringInstance])
-              actions += acIns.asInstanceOf[RFAConcreteStringInstance].string
+            if(acIns.isInstanceOf[PTAConcreteStringInstance])
+              actions += acIns.asInstanceOf[PTAConcreteStringInstance].string
             else preciseImplicit = false
         }
         
         var categories = isetEmpty[String] // the code to get the valueSet of categories is to be added below
-        val categoryFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_CATEGORIES)
-        factMap.getOrElse(categoryFieldSlot, isetEmpty).foreach{
+        val categoryFieldSlot = FieldSlot(intentIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_CATEGORIES))
+        s.pointsToSet(categoryFieldSlot, currentContext).foreach{
           cateIns =>
-            val hashSetFieldSlot = FieldSlot(cateIns, "[|java:util:HashSet.items|]")
-            factMap.getOrElse(hashSetFieldSlot, isetEmpty).foreach{
+            val hashSetFieldSlot = FieldSlot(cateIns, "items")
+            s.pointsToSet(hashSetFieldSlot, currentContext).foreach{
               itemIns =>
-                if(itemIns.isInstanceOf[RFAConcreteStringInstance])
-                  categories += itemIns.asInstanceOf[RFAConcreteStringInstance].string
+                if(itemIns.isInstanceOf[PTAConcreteStringInstance])
+                  categories += itemIns.asInstanceOf[PTAConcreteStringInstance].string
                 else preciseImplicit = false
             }
         }
         
         var datas: ISet[UriData] = isetEmpty
-        val dataFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_URI_DATA)
-        factMap.getOrElse(dataFieldSlot, isetEmpty).foreach{
+        val dataFieldSlot = FieldSlot(intentIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA))
+        s.pointsToSet(dataFieldSlot, currentContext).foreach{
           dataIns =>
-            val uriStringFieldSlot = FieldSlot(dataIns, AndroidConstants.URI_STRING_URI_URI_STRING)
-            factMap.getOrElse(uriStringFieldSlot, isetEmpty).foreach{
+            val uriStringFieldSlot = FieldSlot(dataIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.URI_STRING_URI_URI_STRING))
+            s.pointsToSet(uriStringFieldSlot, currentContext).foreach{
               usIns =>
-                if(usIns.isInstanceOf[RFAConcreteStringInstance]){
-                  val uriString = usIns.asInstanceOf[RFAConcreteStringInstance].string
+                if(usIns.isInstanceOf[PTAConcreteStringInstance]){
+                  val uriString = usIns.asInstanceOf[PTAConcreteStringInstance].string
                   var uriData = new UriData
                   populateByUri(uriData, uriString)
                   datas +=uriData
@@ -103,11 +106,11 @@ object IntentHelper {
         }
         
         var types:Set[String] = Set()
-        val mtypFieldSlot = FieldSlot(intentIns, AndroidConstants.INTENT_MTYPE)
-        factMap.getOrElse(mtypFieldSlot, isetEmpty).foreach{
+        val mtypFieldSlot = FieldSlot(intentIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_MTYPE))
+        s.pointsToSet(mtypFieldSlot, currentContext).foreach{
           mtypIns =>
-            if(mtypIns.isInstanceOf[RFAConcreteStringInstance])
-              types += mtypIns.asInstanceOf[RFAConcreteStringInstance].string
+            if(mtypIns.isInstanceOf[PTAConcreteStringInstance])
+              types += mtypIns.asInstanceOf[PTAConcreteStringInstance].string
             else preciseImplicit = false
         }
         val ic = IntentContent(componentNames, actions, categories, datas, types, 

@@ -5,22 +5,24 @@ are made available under the terms of the Eclipse Public License v1.0
 which accompanies this distribution, and is available at              
 http://www.eclipse.org/legal/epl-v10.html                             
 */
-package org.sireum.amandroid.alir.model
+package org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model
 
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.Center
 import org.sireum.util._
 import org.sireum.jawa.JawaProcedure
 import org.sireum.jawa.alir.Context
-import org.sireum.jawa.alir.reachingFactsAnalysis._
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.parser.UriData
 import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.JawaRecord
-import org.sireum.jawa.alir.Instance
+import org.sireum.jawa.alir.pta.Instance
 import java.net.URI
 import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.MessageCenter._
-import org.sireum.amandroid.alir.reachingFactsAnalysis.IntentHelper
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
+import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.jawa.alir.pta.VarSlot
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -41,12 +43,11 @@ object InterComponentCommunicationModel {
     flag
   }
 	
-	def doIccCall(s : ISet[RFAFact], calleeProc : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[JawaProcedure]) = {
-	  val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+	def doIccCall(s : PTAResult, calleeProc : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[JawaProcedure]) = {
 	  require(args.size > 1)
 	  val intentSlot = VarSlot(args(1))
-	  val intentValues = factMap.getOrElse(intentSlot, isetEmpty)
-	  val intentcontents = IntentHelper.getIntentContents(factMap, intentValues, currentContext)
+	  val intentValues = s.pointsToSet(intentSlot, currentContext)
+	  val intentcontents = IntentHelper.getIntentContents(s, intentValues, currentContext)
 	  val comMap = IntentHelper.mappingIntents(intentcontents)
 	  var targets : ISet[JawaProcedure] = isetEmpty
 	  comMap.foreach{
@@ -63,7 +64,7 @@ object InterComponentCommunicationModel {
             }
 	      }
 	  }
-	  (s, targets)
+	  (isetEmpty, targets)
 	}
 
 }

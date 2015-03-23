@@ -5,10 +5,10 @@ are made available under the terms of the Eclipse Public License v1.0
 which accompanies this distribution, and is available at              
 http://www.eclipse.org/legal/epl-v10.html                             
 */
-package org.sireum.amandroid.alir.reachingFactsAnalysis
+package org.sireum.amandroid.alir.pta.reachingFactsAnalysis
 
 import org.sireum.util._
-import org.sireum.jawa.alir.reachingFactsAnalysis._
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.jawa.JawaProcedure
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.NormalType
@@ -16,6 +16,8 @@ import org.sireum.jawa.alir.Context
 import org.sireum.jawa.GlobalConfig
 import org.sireum.jawa.JawaRecord
 import org.sireum.jawa.Center
+import org.sireum.jawa.alir.pta.PTAInstance
+import org.sireum.jawa.alir.pta.VarSlot
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -30,9 +32,9 @@ object AndroidRFAConfig {
 	  require(dm.getShortName == AndroidConstants.MAINCOMP_ENV || dm.getShortName == AndroidConstants.COMP_ENV)
 	  var result = isetEmpty[RFAFact]
 	  val intentSlot = VarSlot(dm.getParamName(0))
-	  val context : Context = new Context(GlobalConfig.CG_CONTEXT_K)
+	  val context : Context = new Context(GlobalConfig.ICFG_CONTEXT_K)
 	  context.setContext("EntryPoint", "L0000")
-	  val intentValue = RFAInstance(NormalType(AndroidConstants.INTENT, 0), context.copy)
+	  val intentValue = PTAInstance(NormalType(AndroidConstants.INTENT, 0), context.copy)
 	  result += RFAFact(intentSlot, intentValue)
 //	  val mActionSlot = FieldSlot(intentValue, AndroidConstants.INTENT_ACTION)
 //	  val mActionValue = RFAConcreteStringInstance(AndroidConstants.ACTION_MAIN, context.copy)

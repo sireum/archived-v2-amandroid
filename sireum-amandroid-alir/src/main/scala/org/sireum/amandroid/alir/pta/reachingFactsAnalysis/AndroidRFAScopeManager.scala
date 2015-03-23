@@ -5,17 +5,18 @@ are made available under the terms of the Eclipse Public License v1.0
 which accompanies this distribution, and is available at              
 http://www.eclipse.org/legal/epl-v10.html                             
 */
-package org.sireum.amandroid.alir.reachingFactsAnalysis
+package org.sireum.amandroid.alir.pta.reachingFactsAnalysis
 
 import org.sireum.jawa.ScopeManager
 import org.sireum.util._
 import org.sireum.jawa.JawaRecord
-import org.sireum.jawa.alir.reachingFactsAnalysis._
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.jawa.JawaProcedure
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.AndroidConstants
-import org.sireum.jawa.alir.UnknownInstance
+import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.Center
+import org.sireum.jawa.alir.pta.PTAResult
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -46,7 +47,7 @@ object AndroidRFAScopeManager extends ScopeManager{
 	 * return true if given record needs to be bypassed
 	 */
 	def shouldBypass(rec : JawaRecord) : Boolean = {
-    rec.isLibraryRecord &&
+    (rec.isFrameworkRecord || rec.isThirdPartyLibRecord) &&
     {
 	    if(isIncludeMode){
 	    	if(rec.getPackageName != null) !contains(rec.getPackageName) else true
@@ -56,7 +57,7 @@ object AndroidRFAScopeManager extends ScopeManager{
     }
   }
   
-  def handleBypass(s : ISet[RFAFact], calleeProc : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+  def handleBypass(s : PTAResult, calleeProc : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
     (isetEmpty, isetEmpty, true)
   }
 }

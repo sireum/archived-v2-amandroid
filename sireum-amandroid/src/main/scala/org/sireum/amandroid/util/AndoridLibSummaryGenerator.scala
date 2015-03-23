@@ -33,8 +33,8 @@ object AndoridLibSummaryGenerator {
 	    val startTime = System.currentTimeMillis()
 			JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
 			var x : Float = 0
-			val recSize = JawaCodeSource.getLibraryRecordsCodes.size
-			JawaCodeSource.getLibraryRecordsCodes.par.map{
+			val recSize = JawaCodeSource.getFrameworkRecordsCodes.size
+			JawaCodeSource.getFrameworkRecordsCodes.par.map{
 			  case (recName, code) =>
 			    this.synchronized(x += 1)
 			    if(x%100==0)println((x/recSize)*100 + "%")

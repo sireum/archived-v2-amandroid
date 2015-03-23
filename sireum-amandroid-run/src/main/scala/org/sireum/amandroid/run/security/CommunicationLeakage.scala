@@ -1,10 +1,3 @@
-/*
-Copyright (c) 2013-2014 Fengguo Wei & Sankardas Roy, Kansas State University.        
-All rights reserved. This program and the accompanying materials      
-are made available under the terms of the Eclipse Public License v1.0 
-which accompanies this distribution, and is available at              
-http://www.eclipse.org/legal/epl-v10.html                             
-*/
 package org.sireum.amandroid.run.security
 
 import org.sireum.amandroid.security._
@@ -27,56 +20,56 @@ import org.sireum.jawa.util.MyTimeoutException
 import org.sireum.jawa.util.MyTimer
 import org.sireum.jawa.GlobalConfig
 
-/**
- * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
- * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
- */ 
-object DataLeakage_run {
-  private final val TITLE = "DataLeakage_run"
-  MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
-  object DataLeakageCounter {
+
+object CommunicationLeakage_run {
+  private final val TITLE = "CommunicationLeakage_run"
+  MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
+  object CommunicationLeakageCounter {
     var total = 0
     var haveresult = 0
     var taintPathFound = 0
     var taintPathFoundList = Set[String]()
-    override def toString : String = "total: " + total + ", haveResult: " + haveresult + ", taintPathFound: " + taintPathFound
-  }
+    var leakagetype = Set[String]()
+    override def toString : String = "total: " + total + ", haveResult: " + haveresult + ", taintPathFound: " + taintPathFound 
+  }//通讯录、通话记录、短信三种泄露类型
   
-  private class DataLeakageListener(source_apk : FileResourceUri, outputPath : String) extends AmandroidSocketListener {
+  private class CommunicationLeakageListener(source_apk : FileResourceUri, outputPath : String) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
-      DataLeakageCounter.total += 1
+      CommunicationLeakageCounter.total += 1
     }
 
     def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
       eps//.filter { ep => ep.getSignature.contains("envMain") }
     }
 
+    def onTimeout : Unit = {}
+
     def onAnalysisSuccess : Unit = {
       if(AppCenter.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
-	      DataLeakageCounter.taintPathFound += 1
-	      DataLeakageCounter.taintPathFoundList += source_apk
-	    }
-		  DataLeakageCounter.haveresult += 1
-		  val msgfile = new File(outputPath + "/msg.txt")
-		  val msgw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(msgfile, true)))
-		  msgw.write("################# " + source_apk + " ################\n")
-		  val tRes = AppCenter.getTaintAnalysisResults
+        CommunicationLeakageCounter.taintPathFound += 1
+        CommunicationLeakageCounter.taintPathFoundList += source_apk
+      }
+      CommunicationLeakageCounter.haveresult += 1
+      val msgfile = new File(outputPath + "/msg.txt")
+      val msgw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(msgfile, true)))
+      msgw.write("################# " + source_apk + " ################\n")
+      val tRes = AppCenter.getTaintAnalysisResults
       tRes.foreach{
         case (rec, res) =>
           msgw.write(rec.getName + "\n")
           msgw.write("Found " + res.getTaintedPaths.size + " path.")
-	        msgw.write(res.toString)
-	        msgw.write("\n\n")
+          msgw.write(res.toString)
+          msgw.write("\n\n")
       }
     }
 
     def onPostAnalysis: Unit = {
+      msg_critical(TITLE, CommunicationLeakageCounter.toString)
     }
     
     def onException(e : Exception) : Unit = {
       e match{
-        case ie : IgnoreException => err_msg_critical(TITLE, "Ignored!")
-        case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
+        case ie : IgnoreException => System.err.println("Ignored!")
         case a => 
           e.printStackTrace()
       }
@@ -107,12 +100,12 @@ object DataLeakage_run {
     files.foreach{
       file =>
         try{
-          msg_critical(TITLE, DataLeakageTask(outputPath, file, socket, Some(100)).run)   
+          msg_critical(TITLE, DataLeakageTask(outputPath, file, socket, Some(10)).run)   
         } catch {
           case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
           case e : Throwable => e.printStackTrace()
         } finally{
-          msg_critical(TITLE, DataLeakageCounter.toString)
+          msg_critical(TITLE, CommunicationLeakageCounter.toString)
           socket.cleanEnv
         }
     }
@@ -130,7 +123,7 @@ object DataLeakage_run {
       val app_info = new AppInfoCollector(file, outUri, timer)
       app_info.collectInfo
       val ssm = new DataLeakageAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-      socket.plugListener(new DataLeakageListener(file, outputPath))
+      socket.plugListener(new CommunicationLeakageListener(file, outputPath))
       socket.runWithDDA(ssm, false, false, timer)
       return "Done!"
     }

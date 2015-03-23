@@ -5,14 +5,21 @@ are made available under the terms of the Eclipse Public License v1.0
 which accompanies this distribution, and is available at              
 http://www.eclipse.org/legal/epl-v10.html                             
 */
-package org.sireum.amandroid.alir.model
+package org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model
 
 import org.sireum.jawa._
 import org.sireum.util._
 import org.sireum.jawa.alir.Context
-import org.sireum.jawa.alir.reachingFactsAnalysis._
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.MessageCenter._
+import org.sireum.jawa.alir.pta.PTAPointStringInstance
+import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
+import org.sireum.jawa.alir.pta.PTAInstance
+import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.jawa.alir.pta.VarSlot
+import org.sireum.jawa.alir.pta.FieldSlot
+import org.sireum.jawa.util.StringFormConverter
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -22,7 +29,7 @@ object UriModel {
   final val TITLE = "UriModel"
 	def isUri(r : JawaRecord) : Boolean = r.getName == "android.net.Uri"
 	  
-	def doUriCall(s : ISet[RFAFact], p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	def doUriCall(s : PTAResult, p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true
@@ -85,26 +92,25 @@ object UriModel {
 	/**
    * Landroid/net/Uri;.parse:(Ljava/lang/String;)Landroid/net/Uri;
    */
-  private def uriParse(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def uriParse(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >0)
 	  val strSlot = VarSlot(args(0))
-	  val strValue = factMap.getOrElse(strSlot, isetEmpty)
+	  val strValue = s.pointsToSet(strSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
-    val stringUriIns = RFAInstance(NormalType(AndroidConstants.URI_STRING_URI, 0), currentContext)
+    val stringUriIns = PTAInstance(NormalType(AndroidConstants.URI_STRING_URI, 0), currentContext)
     newfacts += RFAFact(VarSlot(retVar), stringUriIns)
     strValue.map{
       sv =>
         sv match{
-          case cstr @ RFAConcreteStringInstance(text, c) =>
-            newfacts += RFAFact(FieldSlot(stringUriIns, AndroidConstants.URI_STRING_URI_URI_STRING), cstr)
-          case pstr @ RFAPointStringInstance(c) => 
+          case cstr @ PTAConcreteStringInstance(text, c) =>
+            newfacts += RFAFact(FieldSlot(stringUriIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.URI_STRING_URI_URI_STRING)), cstr)
+          case pstr @ PTAPointStringInstance(c) => 
             err_msg_detail(TITLE, "Init uri string use point string: " + pstr)
-            newfacts += RFAFact(FieldSlot(stringUriIns, AndroidConstants.URI_STRING_URI_URI_STRING), pstr)
+            newfacts += RFAFact(FieldSlot(stringUriIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.URI_STRING_URI_URI_STRING)), pstr)
           case _ => 
             err_msg_detail(TITLE, "Init uri use unknown instance: " + sv)
-            newfacts += RFAFact(FieldSlot(stringUriIns, AndroidConstants.URI_STRING_URI_URI_STRING), sv)
+            newfacts += RFAFact(FieldSlot(stringUriIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.URI_STRING_URI_URI_STRING)), sv)
         }
     }
     (newfacts, delfacts)

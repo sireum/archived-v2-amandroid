@@ -36,6 +36,7 @@ import org.sireum.jawa.util.IgnoreException
 import org.sireum.amandroid.parser.ARSCFileParser_apktool
 import java.io.FileInputStream
 import java.io.BufferedInputStream
+import org.sireum.jawa.util.MyTimer
 
 /**
  * It takes the apkUri and outputDir as input parameters.
@@ -43,7 +44,7 @@ import java.io.BufferedInputStream
  * adapted from Steven Arzt of the FlowDroid group
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
-class AppInfoCollector(apkUri : FileResourceUri, outputUri : FileResourceUri) {  
+class AppInfoCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, timer : Option[MyTimer]) {  
   private final val TITLE = "AppInfoCollector"
   protected var uses_permissions : ISet[String] = isetEmpty
 	protected var callbackMethods : Map[JawaRecord, Set[JawaProcedure]] = Map()
@@ -134,7 +135,7 @@ class AppInfoCollector(apkUri : FileResourceUri, outputUri : FileResourceUri) {
 			  msg_critical(TITLE, "*************Dynamically Register Component**************")
 			  msg_normal(TITLE, "Component name: " + comRec)
 			  this.intentFdb.updateIntentFmap(iDB)
-			  val analysisHelper = new ReachableInfoCollector(Set(comRec.getName)) 
+			  val analysisHelper = new ReachableInfoCollector(Set(comRec.getName), timer) 
 				analysisHelper.collectCallbackMethods()
 				this.callbackMethods = analysisHelper.getCallbackMethods
 				analysisHelper.getCallbackMethods.foreach {
@@ -157,7 +158,7 @@ class AppInfoCollector(apkUri : FileResourceUri, outputUri : FileResourceUri) {
 	  val mfp = AppInfoCollector.analyzeManifest(manifestUri)
 	  val afp = AppInfoCollector.analyzeARSC(apkUri)
 		val lfp = AppInfoCollector.analyzeLayouts(apkUri, mfp)
-		val ra = AppInfoCollector.reachabilityAnalysis(mfp)
+		val ra = AppInfoCollector.reachabilityAnalysis(mfp, timer)
 		val callbacks = AppInfoCollector.analyzeCallback(afp, lfp, ra)
 		
 		this.appPackageName = mfp.getPackageName
@@ -236,29 +237,29 @@ object AppInfoCollector {
 		        val resource = afp.findResource(i)
 		        if(resource != null && resource.getType.getName == "layout"){
 		          val strRes = resource
-		          if(lfp.getCallbackMethods.contains(strRes.getName)){
-		            lfp.getCallbackMethods(strRes.getName).foreach{
-		              methodName =>
-		                //The callback may be declared directly in the class or in one of the superclasses
-		                var callbackRecord = k
-		                var callbackProcedure : Set[JawaProcedure] = Set()
-		                breakable{ 
-		                  while(callbackProcedure.isEmpty){
-			                  if(callbackRecord.declaresProcedureByShortName(methodName))
-			                  	callbackProcedure = callbackRecord.getProceduresByShortName(methodName)
-			                  if(callbackRecord.hasSuperClass)
-			                    callbackRecord = callbackRecord.getSuperClass
-			                  else break
-		                  }
-		                }
-		                if(callbackProcedure != null){
-		                  callbackMethods += (k -> (callbackMethods.getOrElse(k, isetEmpty) ++ callbackProcedure))
-		                } else {
-		                  err_msg_normal(TITLE, "Callback method " + methodName + " not found in class " + k);
-		                }
-		                
-		            }
-		          }
+	            lfp.getCallbackMethods.find(_._1.contains(strRes.getName)).foreach{
+                case (_, methodNames) =>
+                  methodNames foreach{
+                    methodName =>
+    	                //The callback may be declared directly in the class or in one of the superclasses
+    	                var callbackRecord = k
+    	                var callbackProcedure : Set[JawaProcedure] = Set()
+    	                breakable{ 
+    	                  while(callbackProcedure.isEmpty){
+    		                  if(callbackRecord.declaresProcedureByShortName(methodName))
+    		                  	callbackProcedure = callbackRecord.getProceduresByShortName(methodName)
+    		                  if(callbackRecord.hasSuperClass)
+    		                    callbackRecord = callbackRecord.getSuperClass
+    		                  else break
+    	                  }
+    	                }
+    	                if(callbackProcedure != null){
+    	                  callbackMethods += (k -> (callbackMethods.getOrElse(k, isetEmpty) ++ callbackProcedure))
+    	                } else {
+    	                  err_msg_normal(TITLE, "Callback method " + methodName + " not found in class " + k);
+    	                }
+                  }
+	            }
 		        } else {
 		          err_msg_normal(TITLE, "Unexpected resource type for layout class: " + resource.getType)
 		        }
@@ -267,9 +268,9 @@ object AppInfoCollector {
 		callbackMethods
 	}
 	
-	def reachabilityAnalysis(mfp : ManifestParser) : ReachableInfoCollector = {
+	def reachabilityAnalysis(mfp : ManifestParser, timer : Option[MyTimer]) : ReachableInfoCollector = {
 	  // Collect the callback interfaces implemented in the app's source code
-		val analysisHelper = new ReachableInfoCollector(mfp.getComponentInfos.map(_.name)) 
+		val analysisHelper = new ReachableInfoCollector(mfp.getComponentInfos.map(_.name), timer) 
 	  analysisHelper.init
 //	  this.sensitiveLayoutContainers = analysisHelper.getSensitiveLayoutContainer(this.layoutControls)
 		analysisHelper

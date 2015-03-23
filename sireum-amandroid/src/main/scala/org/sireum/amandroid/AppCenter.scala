@@ -11,12 +11,13 @@ import org.sireum.util._
 import org.sireum.jawa.JawaRecord
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.jawa.alir.taintAnalysis.TaintAnalysisResult
-import org.sireum.jawa.alir.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
-import org.sireum.jawa.alir.reachingFactsAnalysis.RFAFact
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceInfo
 import org.sireum.amandroid.parser.IntentFilterDataBase
 import org.sireum.amandroid.appInfo.AppInfoCollector
-import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
+import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
+import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralMonotoneDataFlowAnalysisResult
+import org.sireum.jawa.alir.pta.PTAResult
 
 /**
  * this is an object, which hold information of apps. e.g. components, intent-filter database, etc.
@@ -148,19 +149,19 @@ object AppCenter {
 //  
 //  def releaseWholeProgramCallGraph = this.wholeProgramCallGraph = null
   
-  private var irfaResults : IMap[JawaRecord, InterProceduralDataFlowGraph] = imapEmpty
+  private val idfgResults : MMap[JawaRecord, InterProceduralDataFlowGraph] = mmapEmpty
   
-  def addInterproceduralReachingFactsAnalysisResult(key : JawaRecord, icfg : InterproceduralControlFlowGraph[CGNode], irfaResult : InterProceduralMonotoneDataFlowAnalysisResult[RFAFact]) = this.synchronized(this.irfaResults += (key -> InterProceduralDataFlowGraph(icfg, irfaResult)))
-  def hasInterproceduralReachingFactsAnalysisResult(key : JawaRecord) = this.irfaResults.contains(key)
-  def getInterproceduralReachingFactsAnalysisResult(key : JawaRecord) = this.irfaResults.getOrElse(key, throw new RuntimeException("Doesn't have irfa result for given record: " + key))
-  def getInterproceduralReachingFactsAnalysisResults = this.irfaResults
+  def addIDFG(key : JawaRecord, idfg : InterProceduralDataFlowGraph) = this.synchronized(this.idfgResults += (key -> idfg))
+  def hasIDFG(key : JawaRecord) = this.idfgResults.contains(key)
+  def getIDFG(key : JawaRecord) = this.idfgResults.getOrElse(key, throw new RuntimeException("Doesn't have irfa result for given record: " + key))
+  def getIDFGs = this.idfgResults
   
-  private var iddaResults : IMap[JawaRecord, InterproceduralDataDependenceInfo] = imapEmpty
+  private val iddaResults : MMap[JawaRecord, InterproceduralDataDependenceInfo] = mmapEmpty
   
-  def addInterproceduralDataDependenceAnalysisResult(key : JawaRecord, iddi : InterproceduralDataDependenceInfo) = this.synchronized(this.iddaResults += (key -> iddi))
-  def hasInterproceduralDataDependenceAnalysisResult(key : JawaRecord) = this.iddaResults.contains(key)
-  def getInterproceduralDataDependenceAnalysisResult(key : JawaRecord) = this.iddaResults.getOrElse(key, throw new RuntimeException("Doesn't have idda result for given record: " + key))
-  def getInterproceduralDataDependenceAnalysisResults = this.iddaResults
+  def addIDDG(key : JawaRecord, iddi : InterproceduralDataDependenceInfo) = this.synchronized(this.iddaResults += (key -> iddi))
+  def hasIDDG(key : JawaRecord) = this.iddaResults.contains(key)
+  def getIDDG(key : JawaRecord) = this.iddaResults.getOrElse(key, throw new RuntimeException("Doesn't have idda result for given record: " + key))
+  def getIDDGs = this.iddaResults
 	
   private var taintResults : IMap[JawaRecord, TaintAnalysisResult] = imapEmpty
   
@@ -176,8 +177,8 @@ object AppCenter {
 //    this.appOnlyCallGraph = null
 //	  this.wholeProgramCallGraph = null
 	  this.appInfoOpt = None
-	  this.irfaResults = imapEmpty
-	  this.iddaResults = imapEmpty
+	  this.idfgResults.clear
+	  this.iddaResults.clear
 	  this.taintResults = imapEmpty
   }
 }

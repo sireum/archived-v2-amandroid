@@ -17,24 +17,21 @@ import java.net.URI
 import org.sireum.jawa.util.APKFileResolver
 import org.sireum.amandroid.decompile.Dex2PilarConverter
 import org.sireum.jawa.Center
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidRFAConfig
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAConfig
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.appInfo.AppInfoCollector
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysis
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.jawa.ClassLoadManager
-import org.sireum.jawa.util.Timer
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
 import org.sireum.amandroid.alir.taintAnalysis.AndroidDataDependentTaintAnalysis
 import org.sireum.amandroid.alir.dataRecorder.DataCollector
 import org.sireum.jawa.util.IgnoreException
 import java.io.PrintWriter
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.alir.LibSideEffectProvider
-import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
-import org.sireum.jawa.util.TimeOutException
 import org.sireum.option.SireumAmandroidStagingMode
 import org.sireum.jawa.GlobalConfig
 import org.sireum.jawa.MessageCenter._
@@ -47,6 +44,8 @@ import org.sireum.option.MessageLevel
 import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.amandroid.security.AmandroidSocketListener
 import org.sireum.amandroid.cli.util.CliLogger
+import org.sireum.jawa.util.MyTimer
+import org.sireum.jawa.util.MyTimeoutException
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -145,7 +144,7 @@ object Staging {
 	}
   
   def staging(apkFileUris : Set[FileResourceUri], outputPath : String, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int) = {
-    AndroidReachingFactsAnalysisConfig.k_context = k_context
+    GlobalConfig.ICFG_CONTEXT_K = k_context
     AndroidReachingFactsAnalysisConfig.parallel = parallel
     AndroidReachingFactsAnalysisConfig.resolve_icc = icc
     AndroidReachingFactsAnalysisConfig.resolve_static_init = static
@@ -158,21 +157,16 @@ object Staging {
       var i : Int = 0
       
       apkFileUris.foreach{
-        apkFileUri =>
+        file =>
+          i += 1
           try{
-            i+=1
-            println("Analyzing " + apkFileUri)
-            
-            val outUri = socket.loadApk(apkFileUri, outputPath, AndroidLibraryAPISummary)
-            val app_info = new AppInfoCollector(apkFileUri, outUri)
-            app_info.collectInfo
-            socket.plugListener(new StagingListener(apkFileUri, outputPath))
-            socket.runWithoutDDA(false, parallel)
-            println("#" + i + ":Done!")
+            msg_critical(TITLE, "Analyzing #" + i + ":" + file)
+            msg_critical(TITLE, StagingTask(outputPath, file, socket, parallel, Some(timeout*60)).run)   
           } catch {
-            case e : Throwable => 
+            case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
+            case e : Throwable =>
               CliLogger.logError(new File(outputPath), "Error: " , e)
-          } finally {
+          } finally{
             socket.cleanEnv
           }
       }
@@ -182,6 +176,22 @@ object Staging {
     }
 	}
   
+  private case class StagingTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, parallel : Boolean, timeout : Option[Int]) {
+    def run : String = {
+      val timer = timeout match {
+        case Some(t) => Some(new MyTimer(t))
+        case None => None
+      }
+      if(timer.isDefined) timer.get.start
+      val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+      val app_info = new AppInfoCollector(file, outUri, timer)
+      app_info.collectInfo
+      socket.plugListener(new StagingListener(file, outputPath))
+      socket.runWithoutDDA(false, parallel, timer)
+      return "Done!"
+    }
+  }
+  
   private class StagingListener(source_apk : FileResourceUri, output_dir : String) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
     }
@@ -190,22 +200,18 @@ object Staging {
       eps
     }
 
-    def onTimeout : Unit = {
-      System.err.println("Timeout!")
-    }
-
     def onAnalysisSuccess : Unit = {
-      val irfaress = AppCenter.getInterproceduralReachingFactsAnalysisResults
-      val ddgress = AppCenter.getInterproceduralDataDependenceAnalysisResults
-      irfaress.foreach{
-        case (rec, InterProceduralDataFlowGraph(icfg, irfaResult)) =>
+      val idfgs = AppCenter.getIDFGs
+      val ddgress = AppCenter.getIDDGs
+      idfgs.foreach{
+        case (rec, idfg) =>
           val ddgResultOpt = ddgress.get(rec)
           if(ddgResultOpt.isDefined){
             val ddgResult = ddgResultOpt.get
             val file = new File(output_dir + "/" + rec.getName.filter(_.isUnicodeIdentifierPart) + ".xml.gz")
       	    val w = new FileOutputStream(file)
             val zipw = new GZIPOutputStream(new BufferedOutputStream(w))
-      	    AndroidXStream.toXml(AmandroidResult(InterProceduralDataFlowGraph(icfg, irfaResult), ddgResult), zipw)
+      	    AndroidXStream.toXml(AmandroidResult(idfg, ddgResult), zipw)
       	    zipw.close()
       	    println(rec + " result stored!")
           }

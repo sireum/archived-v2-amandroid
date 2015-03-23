@@ -27,6 +27,7 @@ import org.sireum.amandroid.parser.LayoutControl
 import org.sireum.jawa.PointsCollector
 import org.sireum.jawa.PointI
 import org.sireum.jawa.util.SignatureParser
+import org.sireum.jawa.util.MyTimer
 
 
 /**
@@ -37,7 +38,7 @@ import org.sireum.jawa.util.SignatureParser
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author Sankardas Roy. 
  */
-class ReachableInfoCollector(entryPointClasses:Set[String]) {
+class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTimer]) {
   final val TITLE = "ReachableInfoCollector"
 	private final var callbackMethods : Map[JawaRecord, Set[JawaProcedure]] = Map() // a map from an app component to associated callbacks
 	private final var layoutClasses: Map[JawaRecord, Set[Int]] = Map()
@@ -54,7 +55,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	  var flag = false
 	  compProcMap.foreach{
 	    case(comp, procs) => 
-	      val tmpReachableMethods = ReachabilityAnalysis.getReachableProcedures(procs, false)
+	      val tmpReachableMethods = ReachabilityAnalysis.getReachableProcedures(procs, timer)
 	      val oldReachableMethods = reachableMap.getOrElse(comp, Set())
 	      val newReachableMethods = tmpReachableMethods -- oldReachableMethods
 	      if(!newReachableMethods.isEmpty){
@@ -70,7 +71,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 		(if(GlobalConfig.androidInfoCollectParallel) entryPointClasses.par else entryPointClasses).foreach {
 		  compName =>
 		    val comp = Center.resolveRecord(compName, Center.ResolveLevel.BODY)
-		    val reachableMethods = ReachabilityAnalysis.getReachableProcedures(comp.getProcedures, false)
+		    val reachableMethods = ReachabilityAnalysis.getReachableProcedures(comp.getProcedures)
 		    reachableMap += (comp -> reachableMethods)
 		}
 	}
@@ -80,7 +81,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	  (if(GlobalConfig.androidInfoCollectParallel) entryPointClasses.par else entryPointClasses).foreach {
 		  compName =>
 		    val comp = Center.resolveRecord(compName, Center.ResolveLevel.BODY)
-		    val reachableMethods = ReachabilityAnalysis.getReachableProcedures(comp.getProceduresByShortName(AndroidConstants.MAINCOMP_ENV) ++ comp.getProceduresByShortName(AndroidConstants.COMP_ENV), false)
+		    val reachableMethods = ReachabilityAnalysis.getReachableProcedures(comp.getProceduresByShortName(AndroidConstants.MAINCOMP_ENV) ++ comp.getProceduresByShortName(AndroidConstants.COMP_ENV))
 		    reachableMap += (comp -> reachableMethods)
 		}
 	}
@@ -316,7 +317,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String]) {
 	    p =>
 	      p match {
 	        case pi : PointI =>
-	          val sig = pi.varName
+	          val sig = pi.sig
 	          val params = new SignatureParser(sig).getParamSig.getParameterTypes
 	          params.foreach{
 	            param =>

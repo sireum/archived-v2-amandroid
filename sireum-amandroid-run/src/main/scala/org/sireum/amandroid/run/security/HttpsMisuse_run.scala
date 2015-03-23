@@ -14,10 +14,12 @@ import org.sireum.amandroid.security.apiMisuse.InterestingApiCollector
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.security.apiMisuse.HttpsMisuse
-import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
-import org.sireum.jawa.util.Timer
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.util.IgnoreException
+import org.sireum.util.FileResourceUri
+import org.sireum.jawa.util.MyTimer
+import org.sireum.jawa.util.MyTimeoutException
+import org.sireum.jawa.GlobalConfig
 
 /**
  * @author <a href="mailto:i@flanker017.me">Qidan He</a>
@@ -70,10 +72,9 @@ object HttpsMisuse_run {
     val socket = new AmandroidSocket
     socket.preProcess
     
-    AndroidReachingFactsAnalysisConfig.k_context = 1
+    GlobalConfig.ICFG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = true;
-//    AndroidReachingFactsAnalysisConfig.timeout = 5
     val sourcePath = args(0)
     val outputPath = args(1)
     
@@ -82,24 +83,37 @@ object HttpsMisuse_run {
     files.foreach{
       file =>
         try{
-          msg_critical(TITLE, "####" + file + "#####")
-          val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-          val app_info = new InterestingApiCollector(file, outUri)
-          app_info.collectInfo
-          socket.plugListener(new HTTPSMisuseListener)
-          socket.runWithoutDDA(false, true)
-           
-           val idfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
-            idfgs.foreach{
-              case (rec, InterProceduralDataFlowGraph(icfg, irfaResult)) =>
-                HttpsMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
-            }
+          msg_critical(TITLE, HttpsMisuseTask(outputPath, file, socket, Some(500)).run)
         } catch {
-          case e : Throwable =>
-            e.printStackTrace()
+          case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
+          case e : Throwable => e.printStackTrace()
         } finally {
+          msg_critical(TITLE, HttpsMisuseCounter.toString)
           socket.cleanEnv
         }
+    }
+  }
+  
+  private case class HttpsMisuseTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]) {
+    def run : String = {
+      msg_critical(TITLE, "####" + file + "#####")
+      val timer = timeout match {
+        case Some(t) => Some(new MyTimer(t))
+        case None => None
+      }
+      if(timer.isDefined) timer.get.start
+      val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+      val app_info = new InterestingApiCollector(file, outUri, timer)
+      app_info.collectInfo
+      socket.plugListener(new HTTPSMisuseListener)
+      socket.runWithoutDDA(false, true, timer)
+       
+      val idfgs = AppCenter.getIDFGs
+      idfgs.foreach{
+        case (rec, idfg) =>
+          HttpsMisuse(idfg)
+      }
+      return "Done!"
     }
   }
 

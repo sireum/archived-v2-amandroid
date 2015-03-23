@@ -23,11 +23,7 @@ import org.sireum.jawa.alir.util.ExplicitValueFinder
 import org.sireum.pilar.ast.JumpLocation
 import org.sireum.jawa.MessageCenter._
 import java.io.File
-import org.sireum.jawa.alir.reachingFactsAnalysis.RFAFact
-import org.sireum.amandroid.alir.model.InterComponentCommunicationModel
-import org.sireum.jawa.alir.reachingFactsAnalysis.VarSlot
-import org.sireum.amandroid.alir.reachingFactsAnalysis.IntentHelper
-import org.sireum.jawa.alir.reachingFactsAnalysis.ReachingFactsAnalysisHelper
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterProceduralDataDependenceGraph
 import org.sireum.amandroid.AppCenter
@@ -36,6 +32,9 @@ import java.io.InputStreamReader
 import java.io.FileInputStream
 import org.sireum.jawa.alir.interProcedural.Callee
 import org.sireum.jawa.alir.taintAnalysis.SourceAndSinkManager
+import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentCommunicationModel
+import org.sireum.jawa.alir.pta.VarSlot
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -102,9 +101,9 @@ abstract class AndroidSourceAndSinkManager(appPackageName : String,
 	  false
 	}
 	
-	def isSource(loc : LocationDecl, s : ISet[RFAFact]) : Boolean = false
+	def isSource(loc : LocationDecl, ptaresult : PTAResult) : Boolean = false
 	
-	def isSink(loc : LocationDecl, s : ISet[RFAFact]) : Boolean = false
+	def isSink(loc : LocationDecl, ptaresult : PTAResult) : Boolean = false
 	
 	def addSource(source : String, category : String) = {
 	  this.sources += (source -> category)
@@ -118,8 +117,8 @@ abstract class AndroidSourceAndSinkManager(appPackageName : String,
 	
 	def isCallbackSource(proc : JawaProcedure) : Boolean
 	def isUISource(calleeProcedure : JawaProcedure, callerProcedure : JawaProcedure, callerLoc : JumpLocation) : Boolean
-	def isIccSink(invNode : CGInvokeNode, rfaFact : ISet[RFAFact]) : Boolean
-	def isIccSource(entNode : CGNode, iddgEntNode : CGNode) : Boolean
+	def isIccSink(invNode : ICFGInvokeNode, s : PTAResult) : Boolean
+	def isIccSource(entNode : ICFGNode, iddgEntNode : ICFGNode) : Boolean
 	
 	def getSourceSigs : ISet[String] = this.sources.map{_._1}.toSet
 	def getSinkSigs : ISet[String] = this.sinks.map{_._1}.toSet
@@ -159,13 +158,12 @@ class DefaultAndroidSourceAndSinkManager(appPackageName : String,
 	  false
 	}
 	
-	def isIccSink(invNode : CGInvokeNode, rfaFact : ISet[RFAFact]) : Boolean = {
+	def isIccSink(invNode : ICFGInvokeNode, s : PTAResult) : Boolean = {
     var sinkflag = false
     val calleeSet = invNode.getCalleeSet
     calleeSet.foreach{
       callee =>
-        if(InterComponentCommunicationModel.isIccOperation(Center.getProcedureWithoutFailing(callee.callee))){
-          val rfafactMap = ReachingFactsAnalysisHelper.getFactMap(rfaFact)
+        if(InterComponentCommunicationModel.isIccOperation(callee.callee)){
           val args = Center.getProcedureWithoutFailing(invNode.getOwner).getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
               case te : TupleExp =>
                 te.exps.map{
@@ -178,8 +176,8 @@ class DefaultAndroidSourceAndSinkManager(appPackageName : String,
               case a => throw new RuntimeException("wrong exp type: " + a)
             }
           val intentSlot = VarSlot(args(1))
-          val intentValues = rfafactMap.getOrElse(intentSlot, isetEmpty)
-          val intentContents = IntentHelper.getIntentContents(rfafactMap, intentValues, invNode.getContext)
+          val intentValues = s.pointsToSet(intentSlot, invNode.getContext)
+          val intentContents = IntentHelper.getIntentContents(s, intentValues, invNode.getContext)
           val comMap = IntentHelper.mappingIntents(intentContents)
           comMap.foreach{
             case (_, coms) =>
@@ -198,11 +196,11 @@ class DefaultAndroidSourceAndSinkManager(appPackageName : String,
     sinkflag
 	}
   
-  def isIccSource(entNode : CGNode, iddgEntNode : CGNode) : Boolean = {
+  def isIccSource(entNode : ICFGNode, iddgEntNode : ICFGNode) : Boolean = {
     var sourceflag = false
 //    val reachableSinks = sinkNodes.filter{sinN => iddg.findPath(entNode, sinN) != null}
 //    if(!reachableSinks.isEmpty){
-//	    val sinkProcs = reachableSinks.filter(_.isInstanceOf[CGCallNode]).map(_.asInstanceOf[CGCallNode].getCalleeSet).reduce(iunion[Callee])
+//	    val sinkProcs = reachableSinks.filter(_.isInstanceOf[ICFGCallNode]).map(_.asInstanceOf[ICFGCallNode].getCalleeSet).reduce(iunion[Callee])
 //	    require(!sinkProcs.isEmpty)
 //	    val neededPermissions = sinkProcs.map(sin => this.apiPermissions.getOrElse(sin.calleeProc.getSignature, isetEmpty)).reduce(iunion[String])
 //	    val infos = AppCenter.getAppInfo.getComponentInfos

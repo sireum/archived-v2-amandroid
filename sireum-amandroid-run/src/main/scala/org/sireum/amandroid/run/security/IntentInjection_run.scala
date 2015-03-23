@@ -18,15 +18,18 @@ import org.sireum.amandroid.AndroidConstants
 import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.alir.dataRecorder.MetricRepo
 import org.sireum.amandroid.alir.dataRecorder.DataCollector
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.util.FileUtil
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
-import org.sireum.jawa.util.Timer
 import org.sireum.jawa.MessageCenter._
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.JawaCodeSource
 import org.sireum.jawa.MessageCenter
+import org.sireum.jawa.util.MyTimer
+import org.sireum.jawa.util.MyTimer
+import org.sireum.jawa.util.MyTimeoutException
+import org.sireum.jawa.GlobalConfig
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -132,7 +135,7 @@ object IntentInjection_run {
       return
     }
     MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
-    AndroidReachingFactsAnalysisConfig.k_context = 1
+    GlobalConfig.ICFG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
 //    AndroidReachingFactsAnalysisConfig.timeout = 20
@@ -148,20 +151,32 @@ object IntentInjection_run {
     files.foreach{
       file =>
         try{
-          msg_critical(TITLE, "####" + file + "#####")
-          
-          val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-          val app_info = new IntentInjectionCollector(file, outUri)
-          app_info.collectInfo
-          val ssm = new IntentInjectionSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)
-          socket.plugListener(new IntentInjectionListener(file, app_info, ssm))
-          socket.runWithDDA(ssm, true, true)
+          msg_critical(TITLE, IntentInjectionTask(outputPath, file, socket, Some(500)).run)   
         } catch {
-          case e : Throwable =>
-            e.printStackTrace()
-        } finally {
+          case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
+          case e : Throwable => e.printStackTrace()
+        } finally{
+          msg_critical(TITLE, IntentInjectionCounter.toString)
           socket.cleanEnv
         }
+    }
+  }
+  
+  private case class IntentInjectionTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]) {
+    def run : String = {
+      msg_critical(TITLE, "####" + file + "#####")
+      val timer = timeout match {
+        case Some(t) => Some(new MyTimer(t))
+        case None => None
+      }
+      if(timer.isDefined) timer.get.start
+      val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
+      val app_info = new IntentInjectionCollector(file, outUri, timer)
+      app_info.collectInfo
+      val ssm = new IntentInjectionSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)
+      socket.plugListener(new IntentInjectionListener(file, app_info, ssm))
+      socket.runWithDDA(ssm, true, true, timer)
+      return "Done!"
     }
   }
 }

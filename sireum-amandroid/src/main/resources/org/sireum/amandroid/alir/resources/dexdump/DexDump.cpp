@@ -575,6 +575,10 @@ void dumpFileHeader(const DexFile* pDexFile)
     // fprintf(pFp, "type_ids_off        : %d (0x%06x)\n",
        // pHeader->typeIdsOff, pHeader->typeIdsOff); // sankar
 
+    printf("proto_ids_size       : %d\n", pHeader->protoIdsSize);
+    printf("proto_ids_off        : %d (0x%06x)\n",
+    		pHeader->protoIdsOff, pHeader->protoIdsOff);
+
     printf("field_ids_size      : %d\n", pHeader->fieldIdsSize);
     // fprintf(pFp, "field_ids_size      : %d\n", pHeader->fieldIdsSize); // sankar
 
@@ -1170,6 +1174,7 @@ static char* indexString(DexFile* pDexFile,
             if (getMethodInfo(pDexFile, index, &methInfo)) {
               {
                 outSize = snprintf(buf, bufSize, "%s", toPilar(methInfo.name));
+                free((void *) methInfo.signature);
               }
                     //,descriptorToDot(methInfo.classDescriptor));
             } else {
@@ -2959,6 +2964,8 @@ void dumpBytecodes(DexFile* pDexFile, const DexMethod* pDexMethod)
     printf("%06x:                                        |[%06x] %s.%s:%s\n",
         startAddr, startAddr,
         className, methInfo.name, methInfo.signature); // not in pilar
+
+    free((void *) methInfo.signature);
 
     //******************* kui's modification begins  *******************
     PStash list; // sankar adds this; // Kui did "struct Op31t list[20];"

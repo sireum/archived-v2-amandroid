@@ -5,7 +5,7 @@ are made available under the terms of the Eclipse Public License v1.0
 which accompanies this distribution, and is available at              
 http://www.eclipse.org/legal/epl-v10.html                             
 */
-package org.sireum.amandroid.alir.model
+package org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model
 
 import org.sireum.jawa.JawaProcedure
 import org.sireum.util._
@@ -15,10 +15,11 @@ import org.sireum.jawa.alir.Context
 import org.sireum.jawa.Center
 import org.sireum.jawa.NormalType
 import org.sireum.alir.Slot
-import org.sireum.jawa.alir.Instance
-import org.sireum.jawa.alir.reachingFactsAnalysis._
-import org.sireum.jawa.alir.model._
-import org.sireum.amandroid.alir.reachingFactsAnalysis.AndroidRFAScopeManager
+import org.sireum.jawa.alir.pta.Instance
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAScopeManager
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.model.ModelCallHandler
+import org.sireum.jawa.alir.pta.PTAResult
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -50,7 +51,7 @@ object AndroidModelCallHandler extends ModelCallHandler{
   /**
    * instead of doing operation inside callee procedure's real code, we do it manually and return the result. 
    */
-	override def caculateResult(s : ISet[RFAFact], calleeProc : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	override def caculateResult(s : PTAResult, calleeProc : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  val r = calleeProc.getDeclaringRecord
 	  if(BundleModel.isBundle(r)) BundleModel.doBundleCall(s, calleeProc, args, retVars, currentContext)
 	  else if(HandlerModel.isHandler(r)) HandlerModel.doHandlerCall(s, calleeProc, args, retVars, currentContext)
@@ -65,7 +66,7 @@ object AndroidModelCallHandler extends ModelCallHandler{
 	  else throw new RuntimeException("given callee is not a model call: " + calleeProc)
 	}
 	
-	def doICCCall(s : ISet[RFAFact], calleeProc : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[JawaProcedure]) = {
+	def doICCCall(s : PTAResult, calleeProc : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[JawaProcedure]) = {
 	  if(InterComponentCommunicationModel.isIccOperation(calleeProc)) InterComponentCommunicationModel.doIccCall(s, calleeProc, args, retVars, currentContext)
 	  else throw new RuntimeException("given callee is not an ICC call: " + calleeProc)
 	}

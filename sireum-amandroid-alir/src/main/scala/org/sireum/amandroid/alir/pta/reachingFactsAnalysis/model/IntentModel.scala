@@ -5,17 +5,28 @@ are made available under the terms of the Eclipse Public License v1.0
 which accompanies this distribution, and is available at              
 http://www.eclipse.org/legal/epl-v10.html                             
 */
-package org.sireum.amandroid.alir.model
+package org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model
 
 import org.sireum.util._
 import org.sireum.jawa._
-import org.sireum.jawa.alir.reachingFactsAnalysis._
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.alir.Slot
 import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.alir._
+import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
+import org.sireum.jawa.alir.pta.PTAInstance
+import org.sireum.jawa.alir.pta.PTAPointStringInstance
+import org.sireum.jawa.alir.pta.PTATupleInstance
+import org.sireum.jawa.alir.pta.ClassInstance
+import org.sireum.jawa.alir.pta.UnknownInstance
+import org.sireum.jawa.alir.pta.NullInstance
+import org.sireum.jawa.alir.pta.Instance
+import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.jawa.alir.pta.FieldSlot
+import org.sireum.jawa.alir.pta.VarSlot
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -26,7 +37,7 @@ object IntentModel {
   
 	def isIntent(r : JawaRecord) : Boolean = r.getName == AndroidConstants.INTENT
 	  
-	def doIntentCall(s : ISet[RFAFact], p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	def doIntentCall(s : PTAResult, p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true
@@ -430,70 +441,69 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.<init>:(Ljava/lang/String;)V
    */
-  private def intentInitWithIntent(s : ISet[RFAFact], args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentInitWithIntent(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val paramSlot = VarSlot(args(1))
-	  val paramValue = factMap.getOrElse(paramSlot, isetEmpty)
+	  val paramValue = s.pointsToSet(paramSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
 	      val interestSlots : ISet[Slot] = 
-	        Set(FieldSlot(tv, AndroidConstants.INTENT_ACTION),
-	          FieldSlot(tv, AndroidConstants.INTENT_CATEGORIES),
-	          FieldSlot(tv, AndroidConstants.INTENT_COMPONENT),
-	          FieldSlot(tv, AndroidConstants.INTENT_MTYPE),
-	          FieldSlot(tv, AndroidConstants.INTENT_URI_DATA),
-	          FieldSlot(tv, AndroidConstants.INTENT_EXTRAS)
+	        Set(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)),
+	          FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_CATEGORIES)),
+	          FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT)),
+	          FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_MTYPE)),
+	          FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA)),
+	          FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_EXTRAS))
 	        )
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (interestSlots.contains(slot)) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (interestSlots.contains(slot)) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      paramValue.foreach{
 		      pv =>
-		        val mActionSlot = FieldSlot(pv, AndroidConstants.INTENT_ACTION)
-		        val mActionValue = factMap.getOrElse(mActionSlot, isetEmpty)
+		        val mActionSlot = FieldSlot(pv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION))
+		        val mActionValue = s.pointsToSet(mActionSlot, currentContext)
 		        mActionValue.foreach{
 		          mav =>
-		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), mav)
+		            newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), mav)
 		        }
-		        val mCategoriesSlot = FieldSlot(pv, AndroidConstants.INTENT_CATEGORIES)
-		        val mCategoriesValue = factMap.getOrElse(mCategoriesSlot, isetEmpty)
+		        val mCategoriesSlot = FieldSlot(pv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_CATEGORIES))
+		        val mCategoriesValue = s.pointsToSet(mCategoriesSlot, currentContext)
 		        mCategoriesValue.foreach{
 		          mcv =>
-		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_CATEGORIES), mcv)
+		            newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_CATEGORIES)), mcv)
 		        }
-		        val mComponentSlot = FieldSlot(pv, AndroidConstants.INTENT_COMPONENT)
-		        val mComponentValue = factMap.getOrElse(mComponentSlot, isetEmpty)
+		        val mComponentSlot = FieldSlot(pv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT))
+		        val mComponentValue = s.pointsToSet(mComponentSlot, currentContext)
 		        mComponentValue.foreach{
 		          mcv =>
-		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_COMPONENT), mcv)
+		            newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT)), mcv)
 		        }
-		        val mDataSlot = FieldSlot(pv, AndroidConstants.INTENT_URI_DATA)
-		        val mDataValue = factMap.getOrElse(mDataSlot, isetEmpty)
+		        val mDataSlot = FieldSlot(pv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA))
+		        val mDataValue = s.pointsToSet(mDataSlot, currentContext)
 		        mDataValue.foreach{
 		          mdv =>
-		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_URI_DATA), mdv)
+		            newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA)), mdv)
 		        }
-		        val mTypeSlot = FieldSlot(pv, AndroidConstants.INTENT_MTYPE)
-		        val mTypeValue = factMap.getOrElse(mTypeSlot, isetEmpty)
+		        val mTypeSlot = FieldSlot(pv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_MTYPE))
+		        val mTypeValue = s.pointsToSet(mTypeSlot, currentContext)
 		        mTypeValue.foreach{
 		          mtv =>
-		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_MTYPE), mtv)
+		            newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_MTYPE)), mtv)
 		        }
-		        val mExtrasSlot = FieldSlot(pv, AndroidConstants.INTENT_EXTRAS)
-		        val mExtrasValue = factMap.getOrElse(mExtrasSlot, isetEmpty)
+		        val mExtrasSlot = FieldSlot(pv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_EXTRAS))
+		        val mExtrasValue = s.pointsToSet(mExtrasSlot, currentContext)
 		        mExtrasValue.foreach{
 		          mev =>
-		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_EXTRAS), mev)
+		            newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_EXTRAS)), mev)
 		        }
 		    }
 	  }
@@ -503,36 +513,35 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.<init>:(Landroid/content/Intent;)V
    */
-  private def intentInitWithAction(s : ISet[RFAFact], args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentInitWithAction(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val actionSlot = VarSlot(args(1))
-	  val actionValue = factMap.getOrElse(actionSlot, isetEmpty)
+	  val actionValue = s.pointsToSet(actionSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (FieldSlot(tv, AndroidConstants.INTENT_ACTION) == slot) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (FieldSlot(tv, AndroidConstants.INTENT_ACTION) == slot) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      actionValue.foreach{
 		      acStr =>
 	          acStr match{
-	            case cstr @ RFAConcreteStringInstance(text, c) =>
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
-	            case pstr @ RFAPointStringInstance(c) => 
+	            case cstr @ PTAConcreteStringInstance(text, c) =>
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), cstr)
+	            case pstr @ PTAPointStringInstance(c) => 
 	              err_msg_detail(TITLE, "Init action use point string: " + pstr)
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), pstr)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), pstr)
 	            case _ =>
 		            err_msg_detail(TITLE, "Init action use Unknown instance: " + acStr)
-		            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), acStr)
+		            newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), acStr)
 	          }
 		    }
 	  }
@@ -542,47 +551,46 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.<init>:(Ljava/lang/String;Landroid/net/Uri;)V
    */
-  private def intentInitWithActionAndData(s : ISet[RFAFact], args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentInitWithActionAndData(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val actionSlot = VarSlot(args(1))
-	  val actionValue = factMap.getOrElse(actionSlot, isetEmpty)
+	  val actionValue = s.pointsToSet(actionSlot, currentContext)
 	  val dataSlot = VarSlot(args(2))
-	  val dataValue = factMap.getOrElse(dataSlot, isetEmpty)
+	  val dataValue = s.pointsToSet(dataSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
 	      val interestSlots : ISet[Slot] = 
-	        Set(FieldSlot(tv, AndroidConstants.INTENT_ACTION),
-	          FieldSlot(tv, AndroidConstants.INTENT_URI_DATA)
+	        Set(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)),
+	          FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA))
 	        )
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (interestSlots.contains(slot)) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (interestSlots.contains(slot)) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      actionValue.foreach{
 		      acStr =>
 	          acStr match{
-	            case cstr @ RFAConcreteStringInstance(text, c) =>
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
-	            case pstr @ RFAPointStringInstance(c) => 
+	            case cstr @ PTAConcreteStringInstance(text, c) =>
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), cstr)
+	            case pstr @ PTAPointStringInstance(c) => 
 	              err_msg_detail(TITLE,"Init action use point string: " + pstr)
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), pstr)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), pstr)
 	            case _ =>
 	              err_msg_detail(TITLE, "Init action use unknown instance: " + acStr)
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), acStr)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), acStr)
 	          }
 		    }
 	      dataValue.foreach{
 		      data =>
-	          newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_URI_DATA), data)
+	          newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA)), data)
 		    }
 	  }
     (newfacts, delfacts)
@@ -591,89 +599,88 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.<init>:(Ljava/lang/String;Landroid/net/Uri;Landroid/content/Context;Ljava/lang/Class;)V
    */
-  private def intentInitWithActionDataAndComponent(s : ISet[RFAFact], args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentInitWithActionDataAndComponent(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >4)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val actionSlot = VarSlot(args(1))
-	  val actionValue = factMap.getOrElse(actionSlot, isetEmpty)
+	  val actionValue = s.pointsToSet(actionSlot, currentContext)
 	  val dataSlot = VarSlot(args(2))
-	  val dataValue = factMap.getOrElse(dataSlot, isetEmpty)
+	  val dataValue = s.pointsToSet(dataSlot, currentContext)
 	  val classSlot = VarSlot(args(4))
-	  val classValue = factMap.getOrElse(classSlot, isetEmpty)
+	  val classValue = s.pointsToSet(classSlot, currentContext)
 	  
 	  val clazzNames = 
 	    classValue.map{
       	value => 
       	  if(value.isInstanceOf[ClassInstance]){
-      	  	RFAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
+      	  	PTAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
       	  } else if(value.isInstanceOf[UnknownInstance] || value.isInstanceOf[NullInstance]){
       	    value
       	  } else throw new RuntimeException("Unexpected instance type: " + value)
       }
 
-	  val componentNameIns = RFAInstance(NormalType(AndroidConstants.COMPONENTNAME, 0), currentContext)
+	  val componentNameIns = PTAInstance(NormalType(AndroidConstants.COMPONENTNAME, 0), currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
 	      val interestSlots : ISet[Slot] = 
-	        Set(FieldSlot(tv, AndroidConstants.INTENT_ACTION),
-	          FieldSlot(tv, AndroidConstants.INTENT_URI_DATA),
-	          FieldSlot(tv, AndroidConstants.INTENT_COMPONENT)
+	        Set(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)),
+	          FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA)),
+	          FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT))
 	        )
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (interestSlots.contains(slot)) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (interestSlots.contains(slot)) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      actionValue.foreach{
 		      acStr =>
 	          acStr match{
-	            case cstr @ RFAConcreteStringInstance(text, c) =>
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
-	            case pstr @ RFAPointStringInstance(c) => 
+	            case cstr @ PTAConcreteStringInstance(text, c) =>
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), cstr)
+	            case pstr @ PTAPointStringInstance(c) => 
 	              err_msg_detail(TITLE, "Init action use point string: " + pstr)
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), pstr)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), pstr)
 	            case _ =>
 	              err_msg_detail(TITLE, "Init action use unknown instance: " + acStr)
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), acStr)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), acStr)
 	          }
 		    }
 	      dataValue.foreach{
 		      data =>
-	          newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_URI_DATA), data)
+	          newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA)), data)
 		    }
-	      newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_COMPONENT), componentNameIns)
+	      newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT)), componentNameIns)
 	      clazzNames.foreach{
 	      sIns =>
 	        sIns match {
-	          case cstr @ RFAConcreteStringInstance(text, c) =>
+	          case cstr @ PTAConcreteStringInstance(text, c) =>
             val recordName = text
 	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>
-		            val pakStr = RFAConcreteStringInstance(rec.getPackageName, c)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
+		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
               case None =>
                 err_msg_normal(TITLE, "Cannot find Given class: " + cstr)
                 val unknownIns = UnknownInstance(new NormalType(recordName), c)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
             }
-          case pstr @ RFAPointStringInstance(c) => 
+          case pstr @ PTAPointStringInstance(c) => 
             err_msg_detail(TITLE, "Init ComponentName use point string: " + pstr)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), pstr)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), pstr)
           case a =>
             err_msg_detail(TITLE, "Init ComponentName use Unknown instance: " + a)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), a)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), a)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), a)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), a)
 	        }
 	    }
 	  }
@@ -683,63 +690,62 @@ object IntentModel {
 	/**
 	 * Landroid/content/Intent;.<init>:(Landroid/content/Context;Ljava/lang/Class;)V
 	 */
-	private def intentInitWithCC(s : ISet[RFAFact], args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+	private def intentInitWithCC(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val param2Slot = VarSlot(args(2))
-	  val param2Value = factMap.getOrElse(param2Slot, isetEmpty)
+	  val param2Value = s.pointsToSet(param2Slot, currentContext)
 	  val clazzNames = 
 	    param2Value.map{
       	value => 
       	  if(value.isInstanceOf[ClassInstance]){
-      	  	RFAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
+      	  	PTAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
       	  } else if(value.isInstanceOf[UnknownInstance] || value.isInstanceOf[NullInstance]){
       	    value
       	  } else throw new RuntimeException("Unexpected instance type: " + value)
       }
-    val componentNameIns = RFAInstance(NormalType(AndroidConstants.COMPONENTNAME, 0), currentContext)
+    val componentNameIns = PTAInstance(NormalType(AndroidConstants.COMPONENTNAME, 0), currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.map{
 	    tv =>
-	      val mComponentSlot = FieldSlot(tv, AndroidConstants.INTENT_COMPONENT)
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (slot == mComponentSlot) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+	      val mComponentSlot = FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT))
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (slot == mComponentSlot) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      newfacts += RFAFact(mComponentSlot, componentNameIns)
 	  }
     clazzNames.foreach{
       sIns =>
         sIns match {
-          case cstr @ RFAConcreteStringInstance(text, c) =>
+          case cstr @ PTAConcreteStringInstance(text, c) =>
             val recordName = text
 	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>
-		            val pakStr = RFAConcreteStringInstance(rec.getPackageName, c)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
+		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
               case None =>
                 err_msg_normal(TITLE, "Cannot find Given class: " + cstr)
                 val unknownIns = UnknownInstance(new NormalType(recordName), c)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
             }
-          case pstr @ RFAPointStringInstance(c) => 
+          case pstr @ PTAPointStringInstance(c) => 
             err_msg_detail(TITLE, "Init ComponentName use point string: " + pstr)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), pstr)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), pstr)
           case a =>
             err_msg_detail(TITLE, "Init ComponentName use Unknown instance: " + a)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), a)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), a)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), a)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), a)
         }
     }
     (newfacts, delfacts)
@@ -748,38 +754,37 @@ object IntentModel {
 	/**
 	 * Landroid/content/Intent;.addCategory:(Ljava/lang/String;)Landroid/content/Intent;
 	 */
-	private def intentAddCategory(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+	private def intentAddCategory(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val categorySlot = VarSlot(args(1))
-	  val categoryValue = factMap.getOrElse(categorySlot, isetEmpty)
+	  val categoryValue = s.pointsToSet(categorySlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.map{
 	    tv =>
-	      val mCategorySlot = FieldSlot(tv, AndroidConstants.INTENT_CATEGORIES)
-	      val mCategoryValue = factMap.getOrElse(mCategorySlot, isetEmpty)
+	      val mCategorySlot = FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_CATEGORIES))
+	      val mCategoryValue = s.pointsToSet(mCategorySlot, currentContext)
 	      mCategoryValue.foreach{
 	        cv => 
 	          var hashsetIns = cv
 	          if(cv.isInstanceOf[NullInstance]){
-	            hashsetIns = RFAInstance(NormalType("java.util.HashSet", 0), currentContext)
+	            hashsetIns = PTAInstance(NormalType("java.util.HashSet", 0), currentContext)
 	            newfacts += RFAFact(mCategorySlot, hashsetIns)
 	            delfacts += RFAFact(mCategorySlot, cv)
 	          }
 	          categoryValue.map{
 				      cn =>
 				        cn match{
-				          case cstr @ RFAConcreteStringInstance(text, c) =>
-				            newfacts += RFAFact(FieldSlot(hashsetIns, "java.util.HashSet.items"), cstr)
-				          case pstr @ RFAPointStringInstance(c) => 
+				          case cstr @ PTAConcreteStringInstance(text, c) =>
+				            newfacts += RFAFact(FieldSlot(hashsetIns, "items"), cstr)
+				          case pstr @ PTAPointStringInstance(c) => 
 				            err_msg_detail(TITLE, "add category use point string: " + pstr)
-				            newfacts += RFAFact(FieldSlot(hashsetIns, "java.util.HashSet.items"), pstr)
+				            newfacts += RFAFact(FieldSlot(hashsetIns, "items"), pstr)
 				          case _ =>
 				            err_msg_detail(TITLE, "Init category use Unknown instance: " + cn)
-				            newfacts += RFAFact(FieldSlot(hashsetIns, "java.util.HashSet.items"), cn)
+				            newfacts += RFAFact(FieldSlot(hashsetIns, "items"), cn)
 				        }
 				    }
 	      }
@@ -794,11 +799,10 @@ object IntentModel {
 	/**
    * Landroid/content/Intent;.clone:()Ljava/lang/Object;
    */
-  private def intentClone(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentClone(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
@@ -812,38 +816,37 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setAction:(Ljava/lang/String;)Landroid/content/Intent;
    */
-  private def intentSetAction(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentSetAction(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val actionSlot = VarSlot(args(1))
-	  val actionValue = factMap.getOrElse(actionSlot, isetEmpty)
+	  val actionValue = s.pointsToSet(actionSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (FieldSlot(tv, AndroidConstants.INTENT_ACTION) == slot) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (FieldSlot(tv, AndroidConstants.INTENT_ACTION) == slot) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      actionValue.foreach{
 		      str =>
 	          thisValue.foreach{
 	            tv =>
 	              str match{
-			            case cstr @ RFAConcreteStringInstance(text, c) =>
-			              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
-			            case pstr @ RFAPointStringInstance(c) => 
+			            case cstr @ PTAConcreteStringInstance(text, c) =>
+			              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), cstr)
+			            case pstr @ PTAPointStringInstance(c) => 
 			              err_msg_detail(TITLE, "Init package use point string: " + pstr)
-			              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), pstr)
+			              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), pstr)
 			            case _ =>
 				            err_msg_detail(TITLE, "Init package use Unknown instance: " + str)
-				            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), str)
+				            newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), str)
 			          }
 	          }
 		    }
@@ -856,64 +859,63 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setClass:(Landroid/content/Context;Ljava/lang/Class;)Landroid/content/Intent;
    */
-  private def intentSetClass(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentSetClass(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue =s.pointsToSet(thisSlot, currentContext)
 	  val param2Slot = VarSlot(args(2))
-	  val param2Value = factMap.getOrElse(param2Slot, isetEmpty)
+	  val param2Value = s.pointsToSet(param2Slot, currentContext)
 	  val clazzNames = 
 	    param2Value.map{
       	value => 
       	  if(value.isInstanceOf[ClassInstance]){
-      	  	RFAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
+      	  	PTAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
       	  } else if(value.isInstanceOf[UnknownInstance] || value.isInstanceOf[NullInstance]){
       	    value
       	  } else throw new RuntimeException("Unexpected instance type: " + value)
       }
-    val componentNameIns = RFAInstance(NormalType(AndroidConstants.COMPONENTNAME, 0), currentContext)
+    val componentNameIns = PTAInstance(NormalType(AndroidConstants.COMPONENTNAME, 0), currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.map{
 	    tv =>
-	      val mComponentSlot = FieldSlot(tv, AndroidConstants.INTENT_COMPONENT)
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (slot == mComponentSlot) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+	      val mComponentSlot = FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT))
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (slot == mComponentSlot) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      newfacts += RFAFact(mComponentSlot, componentNameIns)
 	      newfacts += RFAFact(VarSlot(retVar), tv)
 	  }
     clazzNames.foreach{
       sIns =>
         sIns match {
-          case cstr @ RFAConcreteStringInstance(text, c) =>
+          case cstr @ PTAConcreteStringInstance(text, c) =>
             val recordName = text
 	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>
-		            val pakStr = RFAConcreteStringInstance(rec.getPackageName, c)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
+		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
               case None =>
                 err_msg_normal(TITLE, "Cannot find Given class: " + cstr)
                 val unknownIns = UnknownInstance(new NormalType(recordName), c)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
             }
-          case pstr @ RFAPointStringInstance(c) => 
+          case pstr @ PTAPointStringInstance(c) => 
             err_msg_detail(TITLE, "Init ComponentName use point string: " + pstr)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), pstr)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), pstr)
           case a =>
             err_msg_detail(TITLE, "Init ComponentName use Unknown instance: " + a)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), a)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), a)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), a)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), a)
         }
     }
     (newfacts, delfacts)
@@ -923,39 +925,38 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setClassName:(Landroid/content/Context;Ljava/lang/String;)Landroid/content/Intent;
    */
-  private def intentSetClassName(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentSetClassName(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val clazzSlot = VarSlot(args(2))
-	  val clazzValue = factMap.getOrElse(clazzSlot, isetEmpty)
-    val componentNameIns = RFAInstance(NormalType(AndroidConstants.COMPONENTNAME, 0), currentContext)
+	  val clazzValue = s.pointsToSet(clazzSlot, currentContext)
+    val componentNameIns = PTAInstance(NormalType(AndroidConstants.COMPONENTNAME, 0), currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.map{
 	    tv =>
-	      val mComponentSlot = FieldSlot(tv, AndroidConstants.INTENT_COMPONENT)
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (slot == mComponentSlot) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+	      val mComponentSlot = FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT))
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (slot == mComponentSlot) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      newfacts += RFAFact(mComponentSlot, componentNameIns)
 	      newfacts += RFAFact(VarSlot(retVar), tv)
 	  }
     clazzValue.map{
       name =>
         name match{
-          case cstr @ RFAConcreteStringInstance(text, c) =>
+          case cstr @ PTAConcreteStringInstance(text, c) =>
             val recordName = text
 	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>
-		            val pakStr = RFAConcreteStringInstance(rec.getPackageName, c)
+		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
               case None =>
@@ -964,7 +965,7 @@ object IntentModel {
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
             }
-          case pstr @ RFAPointStringInstance(c) => 
+          case pstr @ PTAPointStringInstance(c) => 
             err_msg_detail(TITLE, "Init ComponentName use point string: " + pstr)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
             newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), pstr)
@@ -981,30 +982,29 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setComponent:(Landroid/content/ComponentName;)Landroid/content/Intent;
    */
-  private def intentSetComponent(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentSetComponent(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val componentSlot = VarSlot(args(1))
-	  val componentValue = factMap.getOrElse(componentSlot, isetEmpty)
+	  val componentValue = s.pointsToSet(componentSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (FieldSlot(tv, AndroidConstants.INTENT_COMPONENT) == slot) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (FieldSlot(tv, AndroidConstants.INTENT_COMPONENT) == slot) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      componentValue.foreach{
 		      component =>
 	          thisValue.foreach{
 	            tv =>
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_COMPONENT), component)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT)), component)
 	          }
 		    }
 	      newfacts += RFAFact(VarSlot(retVar), tv)
@@ -1015,30 +1015,29 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setData:(Landroid/net/Uri;)Landroid/content/Intent;
    */
-  private def intentSetData(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentSetData(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val dataSlot = VarSlot(args(1))
-	  val dataValue = factMap.getOrElse(dataSlot, isetEmpty)
+	  val dataValue = s.pointsToSet(dataSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (FieldSlot(tv, AndroidConstants.INTENT_URI_DATA) == slot) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (FieldSlot(tv, AndroidConstants.INTENT_URI_DATA) == slot) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      dataValue.foreach{
 		      data =>
 	          thisValue.foreach{
 	            tv =>
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_URI_DATA), data)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA)), data)
 	          }
 		    }
 	      newfacts += RFAFact(VarSlot(retVar), tv)
@@ -1049,40 +1048,39 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setDataAndType:(Landroid/net/Uri;Ljava/lang/String;)Landroid/content/Intent;
    */
-  private def intentSetDataAndType(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentSetDataAndType(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val dataSlot = VarSlot(args(1))
-	  val dataValue = factMap.getOrElse(dataSlot, isetEmpty)
+	  val dataValue = s.pointsToSet(dataSlot, currentContext)
 	  val typeSlot = VarSlot(args(2))
-	  val typeValue = factMap.getOrElse(typeSlot, isetEmpty)
+	  val typeValue = s.pointsToSet(typeSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-	          val fieldsSlot : ISet[Slot] = Set(FieldSlot(tv, AndroidConstants.INTENT_URI_DATA), FieldSlot(tv, AndroidConstants.INTENT_MTYPE))
-		        //if it is a strong definition, we can kill the existing definition
-		        if (fieldsSlot.contains(slot)) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//	          val fieldsSlot : ISet[Slot] = Set(FieldSlot(tv, AndroidConstants.INTENT_URI_DATA), FieldSlot(tv, AndroidConstants.INTENT_MTYPE))
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (fieldsSlot.contains(slot)) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      dataValue.foreach{
 		      data =>
 	          thisValue.foreach{
 	            tv =>
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_URI_DATA), data)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA)), data)
 	          }
 		    }
 	      typeValue.foreach{
 		      typ =>
 	          thisValue.foreach{
 	            tv =>
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_MTYPE), typ)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_MTYPE)), typ)
 	          }
 		    }
 	      newfacts += RFAFact(VarSlot(retVar), tv)
@@ -1093,30 +1091,29 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setType:(Ljava/lang/String;)Landroid/content/Intent;
    */
-  private def intentSetType(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentSetType(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val typeSlot = VarSlot(args(1))
-	  val typeValue = factMap.getOrElse(typeSlot, isetEmpty)
+	  val typeValue = s.pointsToSet(typeSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (FieldSlot(tv, AndroidConstants.INTENT_MTYPE) == slot) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (FieldSlot(tv, AndroidConstants.INTENT_MTYPE) == slot) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      typeValue.foreach{
 		      typ =>
 	          thisValue.foreach{
 	            tv =>
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_MTYPE), typ)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_MTYPE)), typ)
 	          }
 		    }
 	      newfacts += RFAFact(VarSlot(retVar), tv)
@@ -1127,38 +1124,37 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setPackage:(Ljava/lang/String;)Landroid/content/Intent;
    */
-  private def intentSetPackage(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentSetPackage(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val packageSlot = VarSlot(args(1))
-	  val packageValue = factMap.getOrElse(packageSlot, isetEmpty)
+	  val packageValue = s.pointsToSet(packageSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
-	      if(thisValue.size == 1){
-	        for (rdf @ RFAFact(slot, _) <- s) {
-		        //if it is a strong definition, we can kill the existing definition
-		        if (FieldSlot(tv, AndroidConstants.INTENT_PACKAGE) == slot) {
-		          delfacts += rdf
-		        }
-		      }
-	      }
+//	      if(thisValue.size == 1){
+//	        for (rdf @ RFAFact(slot, _) <- s) {
+//		        //if it is a strong definition, we can kill the existing definition
+//		        if (FieldSlot(tv, AndroidConstants.INTENT_PACKAGE) == slot) {
+//		          delfacts += rdf
+//		        }
+//		      }
+//	      }
 	      packageValue.foreach{
 		      str =>
 	          thisValue.foreach{
 	            tv =>
 	              str match{
-			            case cstr @ RFAConcreteStringInstance(text, c) =>
-			              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_PACKAGE), cstr)
-			            case pstr @ RFAPointStringInstance(c) => 
+			            case cstr @ PTAConcreteStringInstance(text, c) =>
+			              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_PACKAGE)), cstr)
+			            case pstr @ PTAPointStringInstance(c) => 
 			              err_msg_detail(TITLE, "Init package use point string: " + pstr)
-			              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_PACKAGE), pstr)
+			              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_PACKAGE)), pstr)
 			            case _ =>
 				            err_msg_detail(TITLE, "Init package use Unknown instance: " + str)
-				            newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_PACKAGE), str)
+				            newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_PACKAGE)), str)
 			          }
 	          }
 		    }
@@ -1170,11 +1166,10 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setFlags:(I)Landroid/content/Intent;
    */
-  private def intentSetFlags(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentSetFlags(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
@@ -1187,22 +1182,21 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.putExtra:(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;
    */
-  private def intentPutExtra(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentPutExtra(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val keySlot = VarSlot(args(1))
-	  val keyValue = factMap.getOrElse(keySlot, isetEmpty)
+	  val keyValue = s.pointsToSet(keySlot, currentContext)
 	  val valueSlot = VarSlot(args(2))
-	  val valueValue = factMap.getOrElse(valueSlot, isetEmpty)
+	  val valueValue = s.pointsToSet(valueSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
-    val bundleIns = RFAInstance(NormalType(AndroidConstants.BUNDLE, 0), currentContext)
+    val bundleIns = PTAInstance(NormalType(AndroidConstants.BUNDLE, 0), currentContext)
 	  thisValue.foreach{
 	    tv =>
-	      val mExtraSlot = FieldSlot(tv, AndroidConstants.INTENT_EXTRAS)
-	      var mExtraValue = factMap.getOrElse(mExtraSlot, isetEmpty)
+	      val mExtraSlot = FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_EXTRAS))
+	      var mExtraValue = s.pointsToSet(mExtraSlot, currentContext)
 	      if(mExtraValue.isEmpty){
 	        mExtraValue += bundleIns
 	        newfacts += RFAFact(mExtraSlot, bundleIns)
@@ -1214,10 +1208,10 @@ object IntentModel {
 				      str =>
 			          valueValue.foreach{
 			            vv =>
-			              entries += RFATupleInstance(str, vv, currentContext)
+			              entries += PTATupleInstance(str, vv, currentContext)
 			          }
 				    }
-	          newfacts ++= entries.map(e => RFAFact(FieldSlot(mev, "android.os.Bundle.entries"), e))
+	          newfacts ++= entries.map(e => RFAFact(FieldSlot(mev, "entries"), e))
 	      }
 	      newfacts += RFAFact(VarSlot(retVar), tv)
 	  }
@@ -1227,21 +1221,20 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.getExtras:()Landroid/os/Bundle;
    */
-  private def intentGetExtras(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentGetExtras(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
     thisValue.foreach{
       ins => 
-      	val mExtraSlot = FieldSlot(ins, AndroidConstants.INTENT_EXTRAS)
-      	val mExtraValue = factMap.getOrElse(mExtraSlot, isetEmpty)
+      	val mExtraSlot = FieldSlot(ins, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_EXTRAS))
+      	val mExtraValue = s.pointsToSet(mExtraSlot, currentContext)
         if(!mExtraValue.isEmpty){
           newfacts ++= mExtraValue.map{mev => RFAFact(VarSlot(retVar), mev)}
         } else {
-          newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(Center.DEFAULT_TOPLEVEL_OBJECT), currentContext)))
+          newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(AndroidConstants.BUNDLE), currentContext)))
         }
     }
     (newfacts, delfacts)
@@ -1250,38 +1243,40 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.getExtra:(Ljava/lang/String;)Ljava/lang/Object;
    */
-  private def intentGetExtra(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentGetExtra(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val keySlot = VarSlot(args(1))
-	  val keyValue = factMap.getOrElse(keySlot, isetEmpty)
-	  val mExtraValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, AndroidConstants.INTENT_EXTRAS), isetEmpty)}.reduce(iunion[Instance])
-	  val entValue = 
-	    if(mExtraValue.isEmpty)
-	      isetEmpty
-	    else
-	    	mExtraValue.map{ins => factMap.getOrElse(FieldSlot(ins, "android.os.Bundle.entries"), isetEmpty)}.reduce(iunion[Instance])
-	  var newfacts = isetEmpty[RFAFact]
+	  val keyValue = s.pointsToSet(keySlot, currentContext)
+    var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
-	  if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[RFAPointStringInstance]).isEmpty){
-      val keys = keyValue.map{k => k.asInstanceOf[RFAConcreteStringInstance].string}
-      entValue.foreach{
-        v =>
-          require(v.isInstanceOf[RFATupleInstance])
-          if(keys.contains(v.asInstanceOf[RFATupleInstance].left.asInstanceOf[RFAConcreteStringInstance].string)){
-            newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[RFATupleInstance].right))
-          }
+    if(!thisValue.isEmpty){
+  	  val mExtraValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_EXTRAS)), currentContext)}.reduce(iunion[Instance])
+  	  val entValue = 
+  	    if(mExtraValue.isEmpty)
+  	      isetEmpty
+  	    else
+  	    	mExtraValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
+  	  
+  	  if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
+        val keys = keyValue.map{k => k.asInstanceOf[PTAConcreteStringInstance].string}
+        entValue.foreach{
+          v =>
+            require(v.isInstanceOf[PTATupleInstance])
+            if(keys.contains(v.asInstanceOf[PTATupleInstance].left.asInstanceOf[PTAConcreteStringInstance].string)){
+              newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
+            }
+        }
+      } else if(!entValue.isEmpty) {
+        entValue.foreach{
+          v =>
+            require(v.isInstanceOf[PTATupleInstance])
+            newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
+        }
+      } else {
+        newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(Center.DEFAULT_TOPLEVEL_OBJECT), currentContext)))
       }
-    } else if(!entValue.isEmpty) {
-      entValue.foreach{
-        v =>
-          require(v.isInstanceOf[RFATupleInstance])
-          newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[RFATupleInstance].right))
-      }
-    } else {
-      newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(Center.DEFAULT_TOPLEVEL_OBJECT), currentContext)))
     }
     (newfacts, delfacts)
   }
@@ -1289,40 +1284,42 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.getExtra:(Ljava/lang/String;)Ljava/lang/Object;
    */
-  private def intentGetExtraWithDefault(s : ISet[RFAFact], args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+  private def intentGetExtraWithDefault(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0))
-	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val keySlot = VarSlot(args(1))
-	  val keyValue = factMap.getOrElse(keySlot, isetEmpty)
+	  val keyValue = s.pointsToSet(keySlot, currentContext)
 	  val defaultSlot = VarSlot(args(2))
-	  val defaultValue = factMap.getOrElse(defaultSlot, isetEmpty)
-	  val mExtraValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, AndroidConstants.INTENT_EXTRAS), isetEmpty)}.reduce(iunion[Instance])
-	  val entValue = 
-	    if(mExtraValue.isEmpty)
-	      isetEmpty
-	    else
-	    	mExtraValue.map{ins => factMap.getOrElse(FieldSlot(ins, "android.os.Bundle.entries"), isetEmpty)}.reduce(iunion[Instance])
-	  var newfacts = isetEmpty[RFAFact]
+	  val defaultValue = s.pointsToSet(defaultSlot, currentContext)
+    var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
-	  if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[RFAPointStringInstance]).isEmpty){
-      val keys = keyValue.map{k => k.asInstanceOf[RFAConcreteStringInstance].string}
-      entValue.foreach{
-        v =>
-          require(v.isInstanceOf[RFATupleInstance])
-          if(keys.contains(v.asInstanceOf[RFATupleInstance].left.asInstanceOf[RFAConcreteStringInstance].string)){
-            newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[RFATupleInstance].right))
-          }
+    if(!thisValue.isEmpty){
+  	  val mExtraValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_EXTRAS)), currentContext)}.reduce(iunion[Instance])
+  	  val entValue = 
+  	    if(mExtraValue.isEmpty)
+  	      isetEmpty
+  	    else
+  	    	mExtraValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
+  	  
+  	  if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
+        val keys = keyValue.map{k => k.asInstanceOf[PTAConcreteStringInstance].string}
+        entValue.foreach{
+          v =>
+            require(v.isInstanceOf[PTATupleInstance])
+            if(keys.contains(v.asInstanceOf[PTATupleInstance].left.asInstanceOf[PTAConcreteStringInstance].string)){
+              newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
+            }
+        }
+      } else if(!entValue.isEmpty) {
+        entValue.foreach{
+          v =>
+            require(v.isInstanceOf[PTATupleInstance])
+            newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
+        }
+      } else {
+        newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(Center.DEFAULT_TOPLEVEL_OBJECT), currentContext)))
       }
-    } else if(!entValue.isEmpty) {
-      entValue.foreach{
-        v =>
-          require(v.isInstanceOf[RFATupleInstance])
-          newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[RFATupleInstance].right))
-      }
-    } else {
-      newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(Center.DEFAULT_TOPLEVEL_OBJECT), currentContext)))
     }
 	  if(newfacts.isEmpty){
 	    newfacts ++= defaultValue.map(RFAFact(VarSlot(retVar), _))
