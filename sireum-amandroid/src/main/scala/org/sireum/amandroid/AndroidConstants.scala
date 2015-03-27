@@ -18,11 +18,11 @@ object AndroidConstants {
   final val COMP_ENV_SUBSIG = "env:(Landroid/content/Intent;)V"
   
   //following is standard intent actions
-	final val ACTION_MAIN = "android.intent.action.MAIN"
-	final val ACTION_MANAGE_NETWORK_USAGE = "android.intent.action.MANAGE_NETWORK_USAGE"
+  final val ACTION_MAIN = "android.intent.action.MAIN"
+  final val ACTION_MANAGE_NETWORK_USAGE = "android.intent.action.MANAGE_NETWORK_USAGE"
 	  
 	//following is standard intent categories
-	final val CATEGORY_LAUNCHER = "android.intent.category.LAUNCHER"
+  final val CATEGORY_LAUNCHER = "android.intent.category.LAUNCHER"
 	  
 	//following are android ICC calls
 	final val START_SERVICE = "startService:(Landroid/content/Intent;)Landroid/content/ComponentName;"

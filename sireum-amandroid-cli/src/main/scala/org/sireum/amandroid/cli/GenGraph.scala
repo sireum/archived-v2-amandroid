@@ -42,6 +42,13 @@ import org.sireum.option.GraphFormat
 import org.sireum.option.GraphType
 import java.io.BufferedWriter
 import java.io.OutputStreamWriter
+import org.jgrapht.ext.VertexNameProvider
+import org.jgrapht.ext.EdgeNameProvider
+import org.sireum.jawa.alir.controlFlowGraph.ICFGEntryNode
+import org.sireum.jawa.alir.controlFlowGraph.ICFGReturnNode
+import org.sireum.jawa.alir.controlFlowGraph.ICFGExitNode
+import org.sireum.jawa.alir.controlFlowGraph.ICFGCallNode
+import org.sireum.jawa.alir.controlFlowGraph.ICFGNormalNode
 
 
 /**
@@ -99,8 +106,8 @@ object GenGraph {
   private final val TITLE = "GenCallGraph"
   
 	def main(args: Array[String]) {
-	  if(args.size != 22){
-      println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -f [Graph Format: DOT, GraphML, GML, TEXT] -gt [Graph Type: FULL, CALL, API] -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -t type[allows: APK, DIR] <source path> <output path>")
+	  if(args.size != 20){
+      println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -f [Graph Format: DOT, GraphML, GML] -gt [Graph Type: FULL, SIMPLE_CALL, DETAILED_CALL, API] -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -t type[allows: APK, DIR] <source path> <output path>")
       return
     }
     val static = args(1).toBoolean
@@ -112,8 +119,8 @@ object GenGraph {
     val graphtyp = args(13)
     val msgLevel = args(15)
     val typ = args(17)
-    val sourcePath = args(19)
-    val outputPath = args(20)
+    val sourcePath = args(18)
+    val outputPath = args(19)
     
     msgLevel match{
       case "NO$" =>
@@ -130,10 +137,10 @@ object GenGraph {
     }
     
     val apkFileUris = typ match{
-      case "APK" =>
+      case "APK$" =>
         require(sourcePath.endsWith(".apk"))
         Set(FileUtil.toUri(sourcePath))
-      case "DIR" =>
+      case "DIR$" =>
         require(new File(sourcePath).isDirectory())
         FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
       case _ => 
@@ -188,17 +195,36 @@ object GenGraph {
       	    val w = new FileOutputStream(file)
             val zips = new GZIPOutputStream(new BufferedOutputStream(w))
             val zipw = new BufferedWriter(new OutputStreamWriter(zips, "UTF-8"))
-      	    val graph = 
-              graphtyp match{
-                case "FULL$" => icfg
-                case "SIMPLE_CALL$" => icfg.toSimpleCallGraph
-                case "API$" => icfg.toApiGraph
-              }
-            format match {
-              case "DOT$" => graph.toDot(zipw)
-              case "GraphML$" => graph.toGraphML(zipw)
-              case "GML$" => graph.toGML(zipw)
-              case "TEXT$" => graph.toText(zipw)
+            
+            graphtyp match{
+              case "FULL$" => 
+                val graph = icfg
+                format match {
+                  case "DOT$" => graph.toDot(zipw)
+                  case "GraphML$" => graph.toGraphML(zipw)
+                  case "GML$" => graph.toGML(zipw)
+                }
+              case "SIMPLE_CALL$" => 
+                val graph = icfg.getCallGraph.toSimpleCallGraph
+                format match {
+                  case "DOT$" => graph.toDot(zipw)
+                  case "GraphML$" => graph.toGraphML(zipw, graph.vlabelProvider, graph.elabelProvider)
+                  case "GML$" => graph.toGML(zipw, graph.vlabelProvider, graph.elabelProvider)
+                }
+              case "DETAILED_CALL$" => 
+                val graph = icfg.getCallGraph.toDetailedCallGraph(icfg)
+                format match {
+                  case "DOT$" => graph.toDot(zipw)
+                  case "GraphML$" => graph.toGraphML(zipw, graph.vlabelProvider, graph.elabelProvider)
+                  case "GML$" => graph.toGML(zipw, graph.vlabelProvider, graph.elabelProvider)
+                }
+              case "API$" => 
+                val graph = icfg.toApiGraph
+                format match {
+                  case "DOT$" => graph.toDot(zipw)
+                  case "GraphML$" => graph.toGraphML(zipw)
+                  case "GML$" => graph.toGML(zipw)
+                }
             }
       	    zipw.close()
       	    println(apkName + " result stored!")
