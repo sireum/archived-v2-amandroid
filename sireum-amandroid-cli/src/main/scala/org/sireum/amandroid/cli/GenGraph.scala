@@ -56,9 +56,7 @@ import org.sireum.jawa.alir.controlFlowGraph.ICFGNormalNode
  */
 object GenGraphCli {
 	def run(saamode : SireumAmandroidGenGraphMode) {
-    val sourceType = saamode.general.typ match{
-      case AnalyzeSource.APK => "APK"
-      case AnalyzeSource.DIR => "DIR"}
+    val sourceType = saamode.general.typ
     val sourceDir = saamode.srcFile
     val sourceFile = new File(sourceDir)
     val outputDir = saamode.analysis.outdir
@@ -74,7 +72,7 @@ object GenGraphCli {
     forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, outputDir, mem, format, graphtyp, msgLevel)
   }
 	
-	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : String, sourceDir : String, outputDir : String, mem : Int, format : GraphFormat.Type, graphtyp : GraphType.Type, msgLevel : MessageLevel.Type) = {
+	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : AnalyzeSource.Type, sourceDir : String, outputDir : String, mem : Int, format : GraphFormat.Type, graphtyp : GraphType.Type, msgLevel : MessageLevel.Type) = {
     val args : MList[String] = mlistEmpty
     args += "-s"
     args += (!nostatic).toString
@@ -92,7 +90,7 @@ object GenGraphCli {
     args += graphtyp.toString
     args += "-msg"
     args += msgLevel.toString
-    args ++= List("-t", typSpec, sourceDir, outputDir)
+    args ++= List("-t", typSpec.toString, sourceDir, outputDir)
     org.sireum.jawa.util.JVMUtil.startSecondJVM(GenGraph.getClass(), "-Xmx" + mem + "G", args.toList, true)
   }
 }
