@@ -3591,7 +3591,8 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
      mkdirp(currentPath); // creating the directory if it does not already exists
      currentFile = (char*)malloc(strlen(currentPath) + strlen(currentClassName) + strlen(PILAR_EXT) + 2); // double check for the length miscalculation here
      strcpy(currentFile, currentPath);
-     strcat(currentFile, "/");
+     if(strcmp(currentDir, "") != 0)
+    	 strcat(currentFile, "/");
      strcat(currentFile, currentClassName);
      strcat(currentFile, PILAR_EXT);
      while((fd = open(currentFile, O_CREAT | O_WRONLY | O_EXCL, S_IRUSR | S_IWUSR)) < 0){

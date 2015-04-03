@@ -206,15 +206,15 @@ object GenGraph {
                 val graph = icfg.getCallGraph.toSimpleCallGraph
                 format match {
                   case "DOT$" => graph.toDot(zipw)
-                  case "GraphML$" => graph.toGraphML(zipw, graph.vlabelProvider, graph.elabelProvider)
-                  case "GML$" => graph.toGML(zipw, graph.vlabelProvider, graph.elabelProvider)
+                  case "GraphML$" => graph.toGraphML(zipw, graph.vIDProvider, null, graph.eIDProvider, null)
+                  case "GML$" => graph.toGML(zipw, graph.vIDProvider, null, graph.eIDProvider, null)
                 }
               case "DETAILED_CALL$" => 
                 val graph = icfg.getCallGraph.toDetailedCallGraph(icfg)
                 format match {
                   case "DOT$" => graph.toDot(zipw)
-                  case "GraphML$" => graph.toGraphML(zipw, graph.vlabelProvider, graph.elabelProvider)
-                  case "GML$" => graph.toGML(zipw, graph.vlabelProvider, graph.elabelProvider)
+                  case "GraphML$" => graph.toGraphML(zipw, graph.vIDProvider, graph.vLabelProvider, graph.eIDProvider, null)
+                  case "GML$" => graph.toGML(zipw, graph.vIDProvider, graph.vLabelProvider, graph.eIDProvider, null)
                 }
               case "API$" => 
                 val graph = icfg.toApiGraph
