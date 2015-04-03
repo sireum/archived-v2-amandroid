@@ -4069,7 +4069,7 @@ void usage(void)
 {
     fprintf(stderr, "Copyright (C) 2007 The Android Open Source Project\nSankar and Fengguo modified it!\n\n");
     fprintf(stderr,
-        "%s: [-c] [-d] [-f] [-h] [-i] [-l layout] [-m] [-p] [-t tempfile] dexfile...\n",
+        "%s: [-c] [-d] [-f] [-h] [-i] [-l layout] [-m] [-p] [-t tempfile] [-o outputfile] filename[.apk|.dex|.odex]...\n",
         gProgName);
     fprintf(stderr, "\n");
     fprintf(stderr, " -c : verify checksum and exit\n");
@@ -4081,6 +4081,7 @@ void usage(void)
     fprintf(stderr, " -m : dump register maps (and nothing else)\n");
     fprintf(stderr, " -p : also produce pilar output in a file, name.pilar \n");  // sankar adds
     fprintf(stderr, " -t : temp file name (defaults to /sdcard/dex-temp-*)\n");
+    fprintf(stderr, " -o : output file name (defaults to /currentpath/filename)\n");	// fengguo adds
 }
 
 /*
@@ -4101,10 +4102,9 @@ int main(int argc, char* const argv[])
     gOptions.verbose = true;
 
     while (1) {
-        ic = getopt(argc, argv, "cdfhil:mpt:");  // sankar adds p
+        ic = getopt(argc, argv, "cdfhil:mpt:o:");  // sankar adds p fengguo adds o
         if (ic < 0)
             break;
-
         switch (ic) {
         case 'c':       // verify the checksum then exit
             gOptions.checksumOnly = true;
@@ -4141,6 +4141,9 @@ int main(int argc, char* const argv[])
         case 't':       // temp file, used when opening compressed Jar
             gOptions.tempFileName = optarg;
             break;
+        case 'o':		// fengguo adds this case
+        	pilarRootDir = optarg;
+        	break;
         default:
             wantUsage = true;
             break;
@@ -4167,7 +4170,8 @@ int main(int argc, char* const argv[])
 
         if(pilar) {  // sankar adds this if clause
            filename = strdup(argv[optind]); // is strdup safe? // sankar adds this line for pilar
-	       pilarRootDir = pilarDirName(filename);
+           if(!pilarRootDir)
+        	   pilarRootDir = pilarDirName(filename);
 	          // cut .ext (.dex or .apk) from the input file name (x.ext), and get "x" as the pilar-containing-root-directory; // sankar adds;
 
 	       mkdirp(pilarRootDir); // creating the root directory which contains pilar

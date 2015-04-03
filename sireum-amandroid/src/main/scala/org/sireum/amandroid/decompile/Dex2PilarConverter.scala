@@ -27,7 +27,7 @@ object Dex2PilarConverter {
 	val dexdumputil = Util(dex2pilarFile)
 	
 	def convert(f : FileResourceUri) : FileResourceUri = {
-	  if (f.endsWith("dex") || f.endsWith("odex")) {
+	  if (f.endsWith("apk") || f.endsWith("dex") || f.endsWith("odex")) {
       val uri = new URI(f)
       val args = ilist("/bin/bash", "-c",
         dexdumputil.dexdump.getAbsolutePath() + " -d -f -h -p " + uri.getPath())
@@ -35,7 +35,7 @@ object Dex2PilarConverter {
       //println(clOutput) // showing command line output
       val t : FileResourceUri = f.substring(0, f.lastIndexOf('.'))
       t // check if little type mismatch
-    } else throw new RuntimeException("Given file is not a dex file: " + f)
+    } else throw new RuntimeException("Given file is not a decompilable file: " + f)
 	}
 }
 
