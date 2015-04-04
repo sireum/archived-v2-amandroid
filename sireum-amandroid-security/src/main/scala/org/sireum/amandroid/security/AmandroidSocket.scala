@@ -77,9 +77,9 @@ class AmandroidSocket {
 		val resultDir = new File(output_path + "/APKs/")
 		val out = AmDecoder.decode(source_apk, FileUtil.toUri(resultDir))
 		// convert the dex file to the "pilar" form
-    val dexFile = out + "classes.dex"
-    if(FileUtil.toFile(dexFile).exists()){
-		  val pilarRootUri = Dex2PilarConverter.convert(dexFile)
+    val file = (source_apk, out + "/classes")
+    if(FileUtil.toFile(source_apk).exists()){
+		  val pilarRootUri = Dex2PilarConverter.convert(file._1, file._2)
     	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
     	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, lib_sum)
     }

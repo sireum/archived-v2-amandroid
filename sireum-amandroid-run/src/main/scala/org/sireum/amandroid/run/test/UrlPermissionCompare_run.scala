@@ -117,7 +117,7 @@ object UrlPermissionCompare_run {
         	val dexFile = APKFileResolver.getDexFile(file, FileUtil.toUri(srcFile.getParentFile()))
         	
         	// convert the dex file to the "pilar" form
-        	val pilarRootUri = Dex2PilarConverter.convert(dexFile)
+        	val pilarRootUri = Dex2PilarConverter.convert(dexFile, FileUtil.toUri(srcFile.getParentFile()))
         	val pilarFile = new File(new URI(pilarRootUri))
         	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
         	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, DefaultLibraryAPISummary)

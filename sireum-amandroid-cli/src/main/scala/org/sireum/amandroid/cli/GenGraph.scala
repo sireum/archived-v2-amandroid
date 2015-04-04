@@ -167,11 +167,10 @@ object GenGraph {
         		val resultDir = new File(outputPath + "/APPs/")
             val outputUri = FileUtil.toUri(outputPath)
         		val outUri = AmDecoder.decode(apkFileUri, outputUri)
-            val dexFile = outUri + "/classes.dex"
+            val fileandout = (apkFileUri, outUri + "classes")
         
         		// convert the dex file to the "pilar" form
-        		val pilarRootUri = Dex2PilarConverter.convert(dexFile)
-            
+        		val pilarRootUri = Dex2PilarConverter.convert(fileandout._1, fileandout._2)
           	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
           	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
           	

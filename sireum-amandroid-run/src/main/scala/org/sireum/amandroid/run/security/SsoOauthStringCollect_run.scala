@@ -299,7 +299,7 @@ object SsoOauthStringCollect_run {
         	val dexFile = APKFileResolver.getDexFile(file, FileUtil.toUri(srcFile.getParentFile()))
         	
         	// convert the dex file to the "pilar" form
-        	val pilarFileUri = Dex2PilarConverter.convert(dexFile)
+        	val pilarFileUri = Dex2PilarConverter.convert(dexFile, FileUtil.toUri(srcFile.getParentFile()))
       		
         	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
         	JawaCodeSource.load(pilarFileUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
