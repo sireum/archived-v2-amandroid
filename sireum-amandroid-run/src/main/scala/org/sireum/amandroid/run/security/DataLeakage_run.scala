@@ -107,7 +107,7 @@ object DataLeakage_run {
     files.foreach{
       file =>
         try{
-          msg_critical(TITLE, DataLeakageTask(outputPath, file, socket, Some(100)).run)   
+          msg_critical(TITLE, DataLeakageTask(outputPath, file, socket, Some(1000)).run)   
         } catch {
           case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
           case e : Throwable => e.printStackTrace()

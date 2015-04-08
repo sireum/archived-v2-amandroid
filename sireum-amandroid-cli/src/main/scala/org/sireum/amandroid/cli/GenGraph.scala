@@ -164,7 +164,6 @@ object GenGraph {
             if(timer.isDefined) timer.get.start
             val apkName = apkFileUri.substring(apkFileUri.lastIndexOf("/") + 1, apkFileUri.lastIndexOf("."))
             
-        		val resultDir = new File(outputPath + "/APPs/")
             val outputUri = FileUtil.toUri(outputPath)
         		val outUri = AmDecoder.decode(apkFileUri, outputUri)
             val fileandout = (apkFileUri, outUri + "classes")
@@ -176,7 +175,7 @@ object GenGraph {
           	
           	val app_info = new AppInfoCollector(apkFileUri, outUri, timer)
           	app_info.collectInfo
-
+            
             val eps = app_info.getEntryPoints
             val pros =
               eps.map{
@@ -187,38 +186,35 @@ object GenGraph {
               }.reduce(iunion[JawaProcedure])
 
             val icfg = InterproceduralSuperSpark(pros, timer).icfg
-          	
-            val file = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ".txt.gz")
+            val file = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ".txt")
       	    val w = new FileOutputStream(file)
-            val zips = new GZIPOutputStream(new BufferedOutputStream(w))
+            val zips = new BufferedOutputStream(w)
             val zipw = new BufferedWriter(new OutputStreamWriter(zips, "UTF-8"))
             
             graphtyp match{
               case "FULL$" => 
                 val graph = icfg
                 format match {
-                  case "DOT$" => graph.toDot(zipw)
                   case "GraphML$" => graph.toGraphML(zipw)
                   case "GML$" => graph.toGML(zipw)
                 }
               case "SIMPLE_CALL$" => 
-                val graph = icfg.getCallGraph.toSimpleCallGraph
-                format match {
-                  case "DOT$" => graph.toDot(zipw)
-                  case "GraphML$" => graph.toGraphML(zipw, graph.vIDProvider, null, graph.eIDProvider, null)
-                  case "GML$" => graph.toGML(zipw, graph.vIDProvider, null, graph.eIDProvider, null)
+                val path = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + "/simple_cg")
+                val fm = format match {
+                  case "GraphML$" => "GraphML"
+                  case "GML$" => "GML"
                 }
+                icfg.getCallGraph.toSimpleCallGraph(path.getPath, fm)
               case "DETAILED_CALL$" => 
-                val graph = icfg.getCallGraph.toDetailedCallGraph(icfg)
-                format match {
-                  case "DOT$" => graph.toDot(zipw)
-                  case "GraphML$" => graph.toGraphML(zipw, graph.vIDProvider, graph.vLabelProvider, graph.eIDProvider, null)
-                  case "GML$" => graph.toGML(zipw, graph.vIDProvider, graph.vLabelProvider, graph.eIDProvider, null)
+                val path = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + "/detailed_cg")
+                val fm = format match {
+                  case "GraphML$" => "GraphML"
+                  case "GML$" => "GML"
                 }
+                icfg.getCallGraph.toDetailedCallGraph(icfg, path.getPath, fm)
               case "API$" => 
                 val graph = icfg.toApiGraph
                 format match {
-                  case "DOT$" => graph.toDot(zipw)
                   case "GraphML$" => graph.toGraphML(zipw)
                   case "GML$" => graph.toGML(zipw)
                 }
