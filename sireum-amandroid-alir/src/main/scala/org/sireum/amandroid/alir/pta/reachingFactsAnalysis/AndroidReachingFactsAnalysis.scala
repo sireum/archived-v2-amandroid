@@ -267,14 +267,14 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
       }
       val exceptionFacts = getExceptionFacts(a, s, currentNode.getContext)
       result ++= exceptionFacts
-      result.foreach{
-        f =>
-          ptaresult.addInstance(f.s, currentNode.getContext, f.v)
-      }
       needtoremove.foreach{
         case (c, f) => ptaresult.removeInstance(f.s, c, f.v)
       }
       needtoremove.clear
+      result.foreach{
+        f =>
+          ptaresult.addInstance(f.s, currentNode.getContext, f.v)
+      }
       result
     }
 
