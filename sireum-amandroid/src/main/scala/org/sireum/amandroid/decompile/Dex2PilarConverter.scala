@@ -33,7 +33,7 @@ object Dex2PilarConverter {
       val args = ilist("/bin/bash", "-c",
         dexdumputil.dexdump.getAbsolutePath() + " -d -f -h -p " + "-o " + output.getPath + " " + input.getPath())
       val clOutput = new Exec().run(200000, args, None, None)  // check last argument
-//      println(clOutput)
+      if(clOutput.toString().contains("error")) throw new RuntimeException("Error on running: " + dex2pilarFile + "\n  Message: " + clOutput.toString())
       out // check if little type mismatch
     } else throw new RuntimeException("Given file is not a decompilable file: " + f)
 	}

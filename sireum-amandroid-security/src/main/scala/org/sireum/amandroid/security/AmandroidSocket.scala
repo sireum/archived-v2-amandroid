@@ -120,7 +120,7 @@ class AmandroidSocket {
     	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
     	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
     	    val idfg = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, timer)
-    	    AppCenter.addIDFG(ep.getDeclaringRecord, idfg)	    	    
+    	    AppCenter.addIDFG(ep.getDeclaringRecord, idfg)
     	    msg_critical(TITLE, "processed-->" + idfg.icfg.getProcessed.size)
     	    val iddResult = InterproceduralDataDependenceAnalysis(idfg)
     	    AppCenter.addIDDG(ep.getDeclaringRecord, iddResult)
