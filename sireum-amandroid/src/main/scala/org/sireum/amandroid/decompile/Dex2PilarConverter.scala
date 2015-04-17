@@ -31,7 +31,7 @@ object Dex2PilarConverter {
       val input = new URI(f)
       val output = new URI(out)
       val args = ilist("/bin/bash", "-c",
-        dexdumputil.dexdump.getAbsolutePath() + " -d -f -h -p " + "-o " + output.getPath + " " + input.getPath())
+        dexdumputil.dexdump.getAbsolutePath() + " -d -f -h -p " + "-o " + output.getPath + " " + input.getPath() + " > /dev/null")
       val clOutput = new Exec().run(200000, args, None, None)  // check last argument
       if(clOutput.toString().contains("error")) throw new RuntimeException("Error on running: " + dex2pilarFile + "\n  Message: " + clOutput.toString())
       out // check if little type mismatch
