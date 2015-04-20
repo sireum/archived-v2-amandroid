@@ -305,7 +305,7 @@ object SsoOauthStringCollect_run {
         	JawaCodeSource.load(pilarFileUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
       	
       	
-        	(JawaCodeSource.getAppRecordsCodes).foreach{
+        	(JawaCodeSource.getAppClassCodes).foreach{
         	  case (name, code) => 	    
         	    if(!extract(code, regexSso).isEmpty){         	     
         	      Counter.ssoLoginUser += file
@@ -344,7 +344,7 @@ object SsoOauthStringCollect_run {
         	    
           }
         	
-        	(JawaCodeSource.getThirdPartyLibraryRecordsCodes).foreach{
+        	(JawaCodeSource.getThirdPartyLibraryClassCodes).foreach{
         	  case (name, code) => 	    
         	    if(!extract(code, regexSso).isEmpty){ 
         	      Counter.ssoLoginUser += file
@@ -387,7 +387,7 @@ object SsoOauthStringCollect_run {
   	    	Center.reset
   	    	AppCenter.reset
   	    	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
-  	    	JawaCodeSource.clearAppRecordsCodes
+  	    	JawaCodeSource.clearAppClassCodes
   			  System.gc()
   			  //Counter.write
   	    	msg_critical(TITLE, Counter.toString)

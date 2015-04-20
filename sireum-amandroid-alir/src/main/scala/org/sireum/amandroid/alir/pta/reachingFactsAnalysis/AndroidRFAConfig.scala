@@ -9,12 +9,12 @@ package org.sireum.amandroid.alir.pta.reachingFactsAnalysis
 
 import org.sireum.util._
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
-import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.JawaMethod
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.NormalType
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.GlobalConfig
-import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.JawaClass
 import org.sireum.jawa.Center
 import org.sireum.jawa.alir.pta.PTAInstance
 import org.sireum.jawa.alir.pta.VarSlot
@@ -28,7 +28,7 @@ object AndroidRFAConfig {
    * generates and returns the initial facts corresponding to the "Intent" parameter of a dummyMain 
    * the generated fact says that the param Intent is generated at the Center.
    */
-	def getInitialFactsForMainEnvironment(dm : JawaProcedure) : ISet[RFAFact] = {
+	def getInitialFactsForMainEnvironment(dm : JawaMethod) : ISet[RFAFact] = {
 	  require(dm.getShortName == AndroidConstants.MAINCOMP_ENV || dm.getShortName == AndroidConstants.COMP_ENV)
 	  var result = isetEmpty[RFAFact]
 	  val intentSlot = VarSlot(dm.getParamName(0))

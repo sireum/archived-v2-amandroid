@@ -24,9 +24,9 @@ import org.sireum.jawa.alir.pta.FieldSlot
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
 object BundleModel {
-	def isBundle(r : JawaRecord) : Boolean = r.getName == AndroidConstants.BUNDLE
+	def isBundle(r : JawaClass) : Boolean = r.getName == AndroidConstants.BUNDLE
 	  
-	def doBundleCall(s : PTAResult, p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	def doBundleCall(s : PTAResult, p : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true

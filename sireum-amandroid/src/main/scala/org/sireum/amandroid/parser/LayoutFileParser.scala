@@ -14,7 +14,7 @@ import pxb.android.axml.AxmlVisitor
 import pxb.android.axml.AxmlVisitor.NodeVisitor
 import org.sireum.util._
 import org.sireum.jawa.Center
-import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.JawaClass
 import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.util.ResourceRetriever
 
@@ -43,28 +43,28 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 		this.packageName = packageName;
 	}
 	
-	def toPilarRecord(str : String) : String = str
+	def toPilarClass(str : String) : String = str
 	
-	private def getLayoutClass(className : String) : JawaRecord = {
-	  var ar : Option[JawaRecord] = Center.tryLoadRecord(toPilarRecord(className), Center.ResolveLevel.HIERARCHY)
+	private def getLayoutClass(className : String) : JawaClass = {
+	  var ar : Option[JawaClass] = Center.tryLoadClass(toPilarClass(className), Center.ResolveLevel.HIERARCHY)
 	  if(!ar.isDefined || !this.packageName.isEmpty())
-	    ar = Center.tryLoadRecord(toPilarRecord(packageName + "." + className), Center.ResolveLevel.HIERARCHY)
+	    ar = Center.tryLoadClass(toPilarClass(packageName + "." + className), Center.ResolveLevel.HIERARCHY)
 	  if(!ar.isDefined)
-	    ar = Center.tryLoadRecord(toPilarRecord("android.widget." + className), Center.ResolveLevel.HIERARCHY)
+	    ar = Center.tryLoadClass(toPilarClass("android.widget." + className), Center.ResolveLevel.HIERARCHY)
 	  if(!ar.isDefined)
-	    ar = Center.tryLoadRecord(toPilarRecord("android.webkit." + className), Center.ResolveLevel.HIERARCHY)
+	    ar = Center.tryLoadClass(toPilarClass("android.webkit." + className), Center.ResolveLevel.HIERARCHY)
 	  if(!ar.isDefined)
 	    err_msg_detail(TITLE, "Could not find layout class " + className)
 	  ar.getOrElse(null)
 	}
 	
-	private def isLayoutClass(theClass : JawaRecord) : Boolean = {
+	private def isLayoutClass(theClass : JawaClass) : Boolean = {
 		if (theClass == null)
 			return false
  		// To make sure that nothing all wonky is going on here, we
  		// check the hierarchy to find the android view class
  		var found = false
- 		Center.getRecordHierarchy.getAllSuperClassesOf(theClass).foreach{
+ 		Center.getClassHierarchy.getAllSuperClassesOf(theClass).foreach{
 	  	su =>
 	  		if(su.getName == "android.view.ViewGroup")
 	  		  found = true
@@ -72,13 +72,13 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
  		found
 	}
 	
-	private def isViewClass(theClass : JawaRecord) : Boolean = {
+	private def isViewClass(theClass : JawaClass) : Boolean = {
 		if (theClass == null)
 			return false
 
 		// To make sure that nothing all wonky is going on here, we
    		// check the hierarchy to find the android view class
- 		Center.getRecordHierarchy.getAllSuperClassesOf(theClass).foreach{
+ 		Center.getClassHierarchy.getAllSuperClassesOf(theClass).foreach{
 	  	su =>
 	  		if(su.getName == "android.view.View" || su.getName == "android.webkit.WebView")
 	  		  return true
@@ -88,7 +88,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 		false
 	}
 	
-	private class LayoutParser(layoutFile : String, theClass : JawaRecord) extends NodeVisitor {
+	private class LayoutParser(layoutFile : String, theClass : JawaClass) extends NodeVisitor {
 
   	private var id = -1
   	private var isSensitive = false

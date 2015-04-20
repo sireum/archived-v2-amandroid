@@ -17,7 +17,7 @@ import org.sireum.util.FileResourceUri
 import org.sireum.amandroid.security.AmandroidSocketListener
 import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.security.report.ReportGen
-import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.JawaMethod
 import org.sireum.amandroid.util.AndroidUrlCollector
 
 /**
@@ -31,7 +31,7 @@ object ApkReport_run {
       
     }
 
-    def entryPointFilter(eps: Set[JawaProcedure]): Set[JawaProcedure] = {
+    def entryPointFilter(eps: Set[JawaMethod]): Set[JawaMethod] = {
       eps
     }
 

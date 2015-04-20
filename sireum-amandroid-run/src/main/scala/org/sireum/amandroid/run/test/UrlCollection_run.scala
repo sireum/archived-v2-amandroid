@@ -68,7 +68,7 @@ object UrlCollection_run {
         	val pilarFile = new File(new URI(pilarRootUri))
         	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
         	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, DefaultLibraryAPISummary)
-        	val codes = JawaCodeSource.getAppRecordsCodes
+        	val codes = JawaCodeSource.getAppClassCodes
         	val code_urls : Set[String] =
           	if(!codes.isEmpty){
             	codes.map{
@@ -101,7 +101,7 @@ object UrlCollection_run {
             sos.write("\n\n")
           } finally {
             sos.close()
-            JawaCodeSource.clearAppRecordsCodes
+            JawaCodeSource.clearAppClassCodes
     	    	APKFileResolver.deleteOutputs(file, outputUri)
     	    	System.gc
           }

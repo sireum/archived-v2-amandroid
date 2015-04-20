@@ -33,9 +33,9 @@ object FrameworkMethodsModel {
   
   final val TITLE = "FrameworkMethodsModel"
   
-	def isFrameworkMethods(p : JawaProcedure) : Boolean = {
-	  val contextRec = Center.resolveRecord("android.content.Context", Center.ResolveLevel.HIERARCHY)
-	  if(!p.getDeclaringRecord.isInterface && Center.getRecordHierarchy.isRecordRecursivelySubClassOfIncluding(p.getDeclaringRecord, contextRec)){
+	def isFrameworkMethods(p : JawaMethod) : Boolean = {
+	  val contextRec = Center.resolveClass("android.content.Context", Center.ResolveLevel.HIERARCHY)
+	  if(!p.getDeclaringClass.isInterface && Center.getClassHierarchy.isClassRecursivelySubClassOfIncluding(p.getDeclaringClass, contextRec)){
 		  p.getSubSignature match{
 		    case "setContentView:(I)V" |
 		    		 "registerReceiver:(Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;)Landroid/content/Intent;" |
@@ -50,7 +50,7 @@ object FrameworkMethodsModel {
 	  else false
 	}
 	
-	def doFrameworkMethodsModelCall(s : PTAResult, p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	def doFrameworkMethodsModelCall(s : PTAResult, p : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true
@@ -112,7 +112,7 @@ object FrameworkMethodsModel {
 	        case ni : NullInstance =>
 	        case _ =>
 	          val intentF = new IntentFilter(rv.getType.name)
-			      val comRec = Center.resolveRecord(rv.getType.name, Center.ResolveLevel.HIERARCHY)
+			      val comRec = Center.resolveClass(rv.getType.name, Center.ResolveLevel.HIERARCHY)
 			      filterValue.foreach{
 			        fv =>
 			          val mActionsSlot = FieldSlot(fv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENTFILTER_ACTIONS))

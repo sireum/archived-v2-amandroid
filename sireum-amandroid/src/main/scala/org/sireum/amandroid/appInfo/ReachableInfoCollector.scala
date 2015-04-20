@@ -40,22 +40,22 @@ import org.sireum.jawa.util.MyTimer
  */
 class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTimer]) {
   final val TITLE = "ReachableInfoCollector"
-	private final var callbackMethods : Map[JawaRecord, Set[JawaProcedure]] = Map() // a map from an app component to associated callbacks
-	private final var layoutClasses: Map[JawaRecord, Set[Int]] = Map()
+	private final var callbackMethods : Map[JawaClass, Set[JawaMethod]] = Map() // a map from an app component to associated callbacks
+	private final var layoutClasses: Map[JawaClass, Set[Int]] = Map()
 	private final var androidCallbacks : Set[String] = Set()  // a list of system interfaces which have wellknown callback methods
 	
 	def getCallbackMethods() = this.callbackMethods
 	def getLayoutClasses() = this.layoutClasses
 	
-	private var reachableMap : Map[JawaRecord, Set[JawaProcedure]] = Map() // a map from an app component to the rechable methods
+	private var reachableMap : Map[JawaClass, Set[JawaMethod]] = Map() // a map from an app component to the rechable methods
 	
 	def getReachableMap = this.reachableMap
 	
-	def updateReachableMap(compProcMap : Map[JawaRecord, Set[JawaProcedure]]) : Boolean = {
+	def updateReachableMap(compProcMap : Map[JawaClass, Set[JawaMethod]]) : Boolean = {
 	  var flag = false
 	  compProcMap.foreach{
 	    case(comp, procs) => 
-	      val tmpReachableMethods = ReachabilityAnalysis.getReachableProcedures(procs, timer)
+	      val tmpReachableMethods = ReachabilityAnalysis.getReachableMethods(procs, timer)
 	      val oldReachableMethods = reachableMap.getOrElse(comp, Set())
 	      val newReachableMethods = tmpReachableMethods -- oldReachableMethods
 	      if(!newReachableMethods.isEmpty){
@@ -70,8 +70,8 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	  initAndroidCallbacks
 		(if(GlobalConfig.androidInfoCollectParallel) entryPointClasses.par else entryPointClasses).foreach {
 		  compName =>
-		    val comp = Center.resolveRecord(compName, Center.ResolveLevel.BODY)
-		    val reachableMethods = ReachabilityAnalysis.getReachableProcedures(comp.getProcedures)
+		    val comp = Center.resolveClass(compName, Center.ResolveLevel.BODY)
+		    val reachableMethods = ReachabilityAnalysis.getReachableMethods(comp.getMethods)
 		    reachableMap += (comp -> reachableMethods)
 		}
 	}
@@ -80,14 +80,14 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	  initAndroidCallbacks
 	  (if(GlobalConfig.androidInfoCollectParallel) entryPointClasses.par else entryPointClasses).foreach {
 		  compName =>
-		    val comp = Center.resolveRecord(compName, Center.ResolveLevel.BODY)
-		    val reachableMethods = ReachabilityAnalysis.getReachableProcedures(comp.getProceduresByShortName(AndroidConstants.MAINCOMP_ENV) ++ comp.getProceduresByShortName(AndroidConstants.COMP_ENV))
+		    val comp = Center.resolveClass(compName, Center.ResolveLevel.BODY)
+		    val reachableMethods = ReachabilityAnalysis.getReachableMethods(comp.getMethodsByShortName(AndroidConstants.MAINCOMP_ENV) ++ comp.getMethodsByShortName(AndroidConstants.COMP_ENV))
 		    reachableMap += (comp -> reachableMethods)
 		}
 	}
 	
-	def getSensitiveLayoutContainer(layoutControls : Map[Int, LayoutControl]) : Set[JawaRecord] = {
-	  val result : MSet[JawaRecord] = msetEmpty
+	def getSensitiveLayoutContainer(layoutControls : Map[Int, LayoutControl]) : Set[JawaClass] = {
+	  val result : MSet[JawaClass] = msetEmpty
 	  layoutControls.foreach{
 	    case (i, lc) =>
 	      if(lc.isSensitive){
@@ -101,8 +101,8 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	  result.toSet
 	}
 	
-	def getSensitiveAPIContainer(apiSig : String) : Set[JawaRecord] = {
-	  val result : MSet[JawaRecord] = msetEmpty
+	def getSensitiveAPIContainer(apiSig : String) : Set[JawaClass] = {
+	  val result : MSet[JawaClass] = msetEmpty
 	    reachableMap.foreach{
 	      case (r, ps) =>
 	        if(ps.exists(p => p.retrieveCode.getOrElse("").contains(apiSig)))
@@ -111,8 +111,8 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	  result.toSet
 	}
 	
-	def getInterestingStringContainer(str : String) : Set[JawaRecord] = {
-	  val result : MSet[JawaRecord] = msetEmpty
+	def getInterestingStringContainer(str : String) : Set[JawaClass] = {
+	  val result : MSet[JawaClass] = msetEmpty
 	    reachableMap.foreach{
 	      case (r, ps) =>
 	        if(ps.exists(p => p.retrieveCode.getOrElse("").contains(str)))
@@ -129,11 +129,11 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	def collectCallbackMethods() = {
 	  findClassLayoutMappings()
 	  // worklist is a list of tuples of the format (a reachable proc's declaring class, app-entrypoint-component)
-	  val worklist : MList[(JawaRecord, JawaRecord)] = mlistEmpty
-	  val processed : MList[(JawaRecord, JawaRecord)] = mlistEmpty
+	  val worklist : MList[(JawaClass, JawaClass)] = mlistEmpty
+	  val processed : MList[(JawaClass, JawaClass)] = mlistEmpty
 	  this.reachableMap.foreach{
 	    case(comp, procs) => 
-	      val containerClasses = procs.map(_.getDeclaringRecord)
+	      val containerClasses = procs.map(_.getDeclaringClass)
 	      worklist ++= containerClasses.map((_, comp))
 	  }
 	  while(!worklist.isEmpty){
@@ -146,7 +146,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	    if(updateReachableMap(this.callbackMethods)){
 	      this.reachableMap.foreach{
 			    case(comp, procs) => 
-			      val containerClasses = procs.map(_.getDeclaringRecord)
+			      val containerClasses = procs.map(_.getDeclaringClass)
 			      worklist ++= (containerClasses.map((_, comp)) -- processed)
 			  }
 	    }
@@ -159,16 +159,16 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	 * Finds the mappings between classes and their respective layout files
 	 */
 	def findClassLayoutMappings() {
-	  var procedures : Set[JawaProcedure] = Set()
+	  var procedures : Set[JawaMethod] = Set()
 	  this.entryPointClasses.foreach{
 	    compName =>
-	      val recUri = Center.getRecord(compName)
-	      procedures ++= recUri.getProcedures
+	      val recUri = Center.getClass(compName)
+	      procedures ++= recUri.getMethods
 	  }
 	  procedures.foreach{
 	    procedure =>
 	      if(procedure.isConcrete){
-	        procedure.getProcedureBody.locations foreach{
+	        procedure.getMethodBody.locations foreach{
 	          loc =>
 	            loc match{
 	              case j : JumpLocation =>
@@ -188,10 +188,10 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 							          }
 							          case None => throw new RuntimeException("doesn't found annotation which name is 'type'")
 							        }
-                      if(StringFormConverter.getSubSigFromProcSig(sig) == AndroidConstants.SETCONTENTVIEW){
+                      if(StringFormConverter.getSubSigFromMethodSig(sig) == AndroidConstants.SETCONTENTVIEW){
                         val nums = ExplicitValueFinder.findExplicitIntValueForArgs(procedure, j, 1)
-	                      val declRecord = procedure.getDeclaringRecord
-	                      this.layoutClasses += (declRecord -> (this.layoutClasses.getOrElse(declRecord, isetEmpty) ++ nums))
+	                      val declClass = procedure.getDeclaringClass
+	                      this.layoutClasses += (declClass -> (this.layoutClasses.getOrElse(declClass, isetEmpty) ++ nums))
                       }
                     case _ =>
                   }
@@ -208,7 +208,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	 * @param lifecycleElement The lifecycle element (activity, service, etc.)
 	 * to which the callback methods belong
 	 */
-	private def collectCallbackMethodsInAppSource(clazz: JawaRecord, lifecycleElement: JawaRecord) {
+	private def collectCallbackMethodsInAppSource(clazz: JawaClass, lifecycleElement: JawaClass) {
 		// Check for callback handlers implemented via interfaces
 	  val procs = this.reachableMap(lifecycleElement) 
 		analyzeReachableMethods(procs, lifecycleElement)
@@ -227,7 +227,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 		Plain = Value
 	}
 	
-	private def analyzeMethodOverrideCallbacks(record : JawaRecord, lifecycleElement : JawaRecord):Unit = {
+	private def analyzeMethodOverrideCallbacks(record : JawaClass, lifecycleElement : JawaClass):Unit = {
 		if (!record.isConcrete)
 			return;
 		
@@ -237,7 +237,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 		// it as a potential callback.
 		var classType = ClassType.Plain;
 		val systemMethods: MSet[String] = msetEmpty
-		for (ancestorClass : JawaRecord <- Center.getRecordHierarchy.getAllSuperClassesOf(record)) {
+		for (ancestorClass : JawaClass <- Center.getClassHierarchy.getAllSuperClassesOf(record)) {
 			if (ancestorClass.getName.equals(AndroidEntryPointConstants.ACTIVITY_CLASS))
 				classType = ClassType.Activity; 
 			else if (ancestorClass.getName.equals(AndroidEntryPointConstants.SERVICE_CLASS))
@@ -248,7 +248,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 				classType = ClassType.ContentProvider;
 			
 			if (ancestorClass.getName.startsWith("android."))
-				for (procedure <- ancestorClass.getProcedures)
+				for (procedure <- ancestorClass.getMethods)
 					if (!procedure.isConstructor){
 						systemMethods.add(procedure.getSubSignature)
 					}
@@ -257,10 +257,10 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 		var lifecycleFlag = false // represents if a method is lifecycle method
 	    // Iterate over all user-implemented methods. If they are inherited
 		// from a system class, they are callback candidates.
-		for (sClass : JawaRecord <- Center.getRecordHierarchy.getAllSubClassesOfIncluding(record)) {
+		for (sClass : JawaClass <- Center.getClassHierarchy.getAllSubClassesOfIncluding(record)) {
 		  val rName = sClass.getName
 			if (!rName.startsWith("android.") && !rName.startsWith("com.android."))
-				for (procedure <- sClass.getProcedures) {
+				for (procedure <- sClass.getMethods) {
 				  if(!procedure.isStatic){ // static method cannot be overriden
 					  lifecycleFlag = false
 						if (systemMethods.contains(procedure.getSubSignature)){
@@ -290,28 +290,28 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	
 //	private def pilarify(classname : String) = {
 //	  val temp = classname
-//	  val rec = Center.resolveRecord(temp, Center.ResolveLevel.HIERARCHY)
+//	  val rec = Center.resolveClass(temp, Center.ResolveLevel.HIERARCHY)
 //	  temp
 //	}
 	
-	private def analyzeReachableMethods(procs: Set[JawaProcedure], lifecycleElement: JawaRecord):Unit = { 
+	private def analyzeReachableMethods(procs: Set[JawaMethod], lifecycleElement: JawaClass):Unit = { 
     procs.foreach{
       proc =>
         analyzeMethodForCallbackRegistrations(proc, lifecycleElement)
     }
 	}
 	
-	private def analyzeMethodForCallbackRegistrations(proc : JawaProcedure, lifecycleElement: JawaRecord) : Unit = {
+	private def analyzeMethodForCallbackRegistrations(proc : JawaMethod, lifecycleElement: JawaClass) : Unit = {
 	  // Do not analyze system classes
-	  if(proc.getDeclaringRecord.getName.startsWith("android.") || proc.getDeclaringRecord.getName.startsWith("com.android.") ||
-	      proc.getDeclaringRecord.getName.startsWith("java."))
+	  if(proc.getDeclaringClass.getName.startsWith("android.") || proc.getDeclaringClass.getName.startsWith("com.android.") ||
+	      proc.getDeclaringClass.getName.startsWith("java."))
 	    return
 	  
 	  if(!proc.isConcrete)
 	    return
 	  
-	  val callbackRecords : MSet[JawaRecord] = msetEmpty
-	  val body = proc.getProcedureBody
+	  val callbackClasses : MSet[JawaClass] = msetEmpty
+	  val body = proc.getMethodBody
 	  val points = new PointsCollector().points(proc.getSignature, body)
 	  points.foreach{
 	    p =>
@@ -323,20 +323,20 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	            param =>
 	              val typ = param.typ
 	              if(this.androidCallbacks.contains(typ)){
-	                val typRecOpt = Center.tryLoadRecord(typ, Center.ResolveLevel.HIERARCHY)
+	                val typRecOpt = Center.tryLoadClass(typ, Center.ResolveLevel.HIERARCHY)
 	                typRecOpt match{
 	                  case Some(typRec) =>
-	                    val hier = Center.getRecordHierarchy
+	                    val hier = Center.getClassHierarchy
 	                    if(typRec.isInterface){
 	                      val impls = hier.getAllImplementersOf(typRec)
 	                      if(!impls.isEmpty){
-  	                      callbackRecords ++= impls.map{
+  	                      callbackClasses ++= impls.map{
   	                        impl =>
   	                          hier.getAllSubClassesOfIncluding(impl)
-  	                      }.reduce(iunion[JawaRecord]) 
+  	                      }.reduce(iunion[JawaClass]) 
 	                      }
 	                    } else {
-	                      callbackRecords ++= hier.getAllSubClassesOfIncluding(typRec)
+	                      callbackClasses ++= hier.getAllSubClassesOfIncluding(typRec)
 	                    }
 	                  case None =>
 	                }
@@ -346,14 +346,14 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	      }
 	  }
 	  
-	  callbackRecords.foreach{
+	  callbackClasses.foreach{
 	    rec =>
 	      analyzeClass(rec, lifecycleElement)
 	  }
 	  
 	}
 	
-	private def analyzeClass(clazz : JawaRecord, lifecycleElement: JawaRecord) : Unit = { 
+	private def analyzeClass(clazz : JawaClass, lifecycleElement: JawaClass) : Unit = { 
 	  // Do not analyze system classes
 	  if (clazz.getName.startsWith("android.")|| clazz.getName.startsWith("com.android.") || clazz.getName.startsWith("java."))
       return
@@ -362,7 +362,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
     analyzeClassInterfaceCallbacks(clazz, clazz, lifecycleElement)
 	}
 	
-	private def analyzeClassInterfaceCallbacks(baseClass: JawaRecord, clazz: JawaRecord, lifecycleElement: JawaRecord):Unit = { 
+	private def analyzeClassInterfaceCallbacks(baseClass: JawaClass, clazz: JawaClass, lifecycleElement: JawaClass):Unit = { 
 	  
 	  // We cannot create instances of abstract classes anyway, so there is no
 		// reason to look for interface implementations
@@ -383,9 +383,9 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 		for (i <- collectAllInterfaces(clazz)) {
 
 		  if(this.androidCallbacks.contains(i.getName)){
-		    i.getProcedures.foreach{
+		    i.getMethods.foreach{
 		      proc =>
-		        checkAndAddMethod(getProcedureFromHierarchy(baseClass, proc.getSubSignature), lifecycleElement)
+		        checkAndAddMethod(getMethodFromHierarchy(baseClass, proc.getSubSignature), lifecycleElement)
 		    }
 		  }
 
@@ -400,34 +400,34 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	 * @param lifecycleElement The component (activity, service, etc.) to which this
 	 * callback method belongs
 	 */
-	private def checkAndAddMethod(proc: JawaProcedure, lifecycleElement: JawaRecord) = {
+	private def checkAndAddMethod(proc: JawaMethod, lifecycleElement: JawaClass) = {
 		if(!proc.getName.startsWith("android.")){
 		  this.callbackMethods += (lifecycleElement -> (this.callbackMethods.getOrElse(lifecycleElement, isetEmpty) + proc))
 		}
 	}
 	
-	private def collectAllInterfaces(ar : JawaRecord) : Set[JawaRecord] = {
+	private def collectAllInterfaces(ar : JawaClass) : Set[JawaClass] = {
 	  if(ar.getInterfaceSize == 0) Set()
     else ar.getInterfaces ++ ar.getInterfaces.map{collectAllInterfaces(_)}.reduce((s1, s2) => s1 ++ s2)
   }
 	
-	private def getProceduresFromHierarchyByShortName(r :JawaRecord, procShortName : String) : Set[JawaProcedure] = {
+	private def getMethodsFromHierarchyByShortName(r :JawaClass, procShortName : String) : Set[JawaMethod] = {
 	  val tmp =
-		  if(r.declaresProcedureByShortName(procShortName)) r.getProceduresByShortName(procShortName)
-		  else if(r.hasSuperClass) getProceduresFromHierarchyByShortName(r.getSuperClass, procShortName)
+		  if(r.declaresMethodByShortName(procShortName)) r.getMethodsByShortName(procShortName)
+		  else if(r.hasSuperClass) getMethodsFromHierarchyByShortName(r.getSuperClass, procShortName)
 		  else throw new RuntimeException("Could not find procedure: " + procShortName)
 	  tmp.filter(!_.isStatic)
 	}
 	
-	private def getProcedureFromHierarchyByName(r :JawaRecord, procName : String) : JawaProcedure = {
-	  if(r.declaresProcedureByName(procName)) r.getProcedureByName(procName)
-	  else if(r.hasSuperClass) getProcedureFromHierarchyByName(r.getSuperClass, procName)
+	private def getMethodFromHierarchyByName(r :JawaClass, procName : String) : JawaMethod = {
+	  if(r.declaresMethodByName(procName)) r.getMethodByName(procName)
+	  else if(r.hasSuperClass) getMethodFromHierarchyByName(r.getSuperClass, procName)
 	  else throw new RuntimeException("Could not find procedure: " + procName)
 	}
 	
-	private def getProcedureFromHierarchy(r :JawaRecord, subSig : String) : JawaProcedure = {
-	  if(r.declaresProcedure(subSig)) r.getProcedure(subSig)
-	  else if(r.hasSuperClass) getProcedureFromHierarchy(r.getSuperClass, subSig)
+	private def getMethodFromHierarchy(r :JawaClass, subSig : String) : JawaMethod = {
+	  if(r.declaresMethod(subSig)) r.getMethod(subSig)
+	  else if(r.hasSuperClass) getMethodFromHierarchy(r.getSuperClass, subSig)
 	  else throw new RuntimeException("Could not find procedure: " + subSig)
 	}
 	

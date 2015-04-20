@@ -27,7 +27,7 @@ import org.sireum.jawa.alir.controlFlowGraph.InterproceduralControlFlowGraph
 import org.sireum.jawa.alir.controlFlowGraph.ICFGNode
 import org.sireum.jawa.Center
 import org.sireum.amandroid.AndroidConstants
-import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.JawaMethod
 import java.io.FileOutputStream
 import java.util.zip.GZIPOutputStream
 import java.io.BufferedOutputStream
@@ -180,10 +180,10 @@ object GenGraph {
             val pros =
               eps.map{
                 compName =>
-                  val comp = Center.resolveRecord(compName, Center.ResolveLevel.BODY)
-                  val procedures = comp.getProceduresByShortName(AndroidConstants.MAINCOMP_ENV) ++ comp.getProceduresByShortName(AndroidConstants.COMP_ENV)
+                  val comp = Center.resolveClass(compName, Center.ResolveLevel.BODY)
+                  val procedures = comp.getMethodsByShortName(AndroidConstants.MAINCOMP_ENV) ++ comp.getMethodsByShortName(AndroidConstants.COMP_ENV)
                   procedures
-              }.reduce(iunion[JawaProcedure])
+              }.reduce(iunion[JawaMethod])
 
             val icfg = InterproceduralSuperSpark(pros, timer).icfg
             val file = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ".txt")
@@ -231,7 +231,7 @@ object GenGraph {
             Center.reset
           	AppCenter.reset
           	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
-          	JawaCodeSource.clearAppRecordsCodes
+          	JawaCodeSource.clearAppClassCodes
           	System.gc()
             System.gc()
           }

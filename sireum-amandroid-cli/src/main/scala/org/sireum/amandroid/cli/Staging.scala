@@ -196,7 +196,7 @@ object Staging {
     def onPreAnalysis: Unit = {
     }
 
-    def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
+    def entryPointFilter(eps: Set[org.sireum.jawa.JawaMethod]): Set[org.sireum.jawa.JawaMethod] = {
       eps
     }
 

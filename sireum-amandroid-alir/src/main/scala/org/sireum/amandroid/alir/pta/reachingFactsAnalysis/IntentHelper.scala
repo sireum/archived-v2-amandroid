@@ -13,14 +13,13 @@ import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.alir.Slot
 import org.sireum.jawa.util.StringFormConverter
-import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.JawaClass
 import org.sireum.amandroid.parser.UriData
 import java.net.URI
 import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.Center
 import org.sireum.jawa.MessageCenter._
-import org.sireum.jawa.JawaProcedure
 import java.net.URLEncoder
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.pta.PTAResult
@@ -150,14 +149,14 @@ object IntentHelper {
     }
   }
 	
-	def mappingIntents(intentContents : ISet[IntentContent]) : IMap[IntentContent, ISet[(JawaRecord, IntentType.Value)]] = {
+	def mappingIntents(intentContents : ISet[IntentContent]) : IMap[IntentContent, ISet[(JawaClass, IntentType.Value)]] = {
 	  intentContents.map{
 	    ic =>
-	      var components : ISet[(JawaRecord, IntentType.Value)] = isetEmpty
+	      var components : ISet[(JawaClass, IntentType.Value)] = isetEmpty
 	      ic.componentNames.foreach{
 	        targetRecName =>
 	          
-		        val targetRec = Center.resolveRecord(targetRecName, Center.ResolveLevel.HIERARCHY)
+		        val targetRec = Center.resolveClass(targetRecName, Center.ResolveLevel.HIERARCHY)
             if(DEBUG)
             	msg_detail(TITLE, "explicit target component: " + targetRec)
             components += ((targetRec, IntentType.EXPLICIT))
@@ -167,8 +166,8 @@ object IntentHelper {
 	  }.toMap
 	}
 	
-	private def findComponents(actions: Set[String], categories: Set[String], datas : Set[UriData], mTypes:Set[String]) : ISet[JawaRecord] = {
-    var components : ISet[JawaRecord] = isetEmpty
+	private def findComponents(actions: Set[String], categories: Set[String], datas : Set[UriData], mTypes:Set[String]) : ISet[JawaClass] = {
+    var components : ISet[JawaClass] = isetEmpty
     if(actions.isEmpty){
 	      if(datas.isEmpty){
 	        if(mTypes.isEmpty) components ++= findComps(null, categories, null, null) 
@@ -201,8 +200,8 @@ object IntentHelper {
     components
   }
   
-  private def findComps(action:String, categories: Set[String], data:UriData, mType:String) : ISet[JawaRecord] = {
-    var components : ISet[JawaRecord] = isetEmpty
+  private def findComps(action:String, categories: Set[String], data:UriData, mType:String) : ISet[JawaClass] = {
+    var components : ISet[JawaClass] = isetEmpty
     AppCenter.getComponents.foreach{
 	    ep =>
 	      val iFilters = AppCenter.getIntentFilterDB.getIntentFilters(ep)

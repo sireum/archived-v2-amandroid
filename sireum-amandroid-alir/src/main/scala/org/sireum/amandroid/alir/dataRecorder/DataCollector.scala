@@ -314,7 +314,7 @@ object DataCollector {
 	  val compDatas = compInfos.map{
 	    comp =>
 	      val compName = comp.name
-	      val compRec = Center.getRecord(compName)
+	      val compRec = Center.getClass(compName)
 	      val typ = comp.typ
 	      val exported = comp.exported
 	      val protectPermission = comp.permission
@@ -331,7 +331,7 @@ object DataCollector {
 			      iccInfos =
 				      iccNodes.map{
 				        iccNode =>
-						      val args = Center.getProcedureWithoutFailing(iccNode.getOwner).getProcedureBody.location(iccNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
+						      val args = Center.getMethodWithoutFailing(iccNode.getOwner).getMethodBody.location(iccNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
 			              case te : TupleExp =>
 			                te.exps.map{
 						            exp =>

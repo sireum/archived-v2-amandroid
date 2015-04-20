@@ -10,7 +10,7 @@ package org.sireum.amandroid.security.apiMisuse
 import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.util._
 import org.sireum.amandroid.appInfo.ReachableInfoCollector
-import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.JawaClass
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.Center
 import org.sireum.amandroid.AndroidConstants
@@ -26,8 +26,8 @@ class InterestingApiCollector (apkUri : FileResourceUri, outputUri : FileResourc
   private final val TITLE = "InterestingApiCollector"
   var ra : ReachableInfoCollector = null
   
-  def getInterestingContainers(interestingAPIs : Set[String]) : Set[JawaRecord] = {
-	  val interestingContainers : MSet[JawaRecord] = msetEmpty
+  def getInterestingContainers(interestingAPIs : Set[String]) : Set[JawaClass] = {
+	  val interestingContainers : MSet[JawaClass] = msetEmpty
     interestingAPIs.foreach{
 		  api =>
 		    interestingContainers ++= this.ra.getSensitiveAPIContainer(api)
@@ -50,11 +50,11 @@ class InterestingApiCollector (apkUri : FileResourceUri, outputUri : FileResourc
 		this.ra = AppInfoCollector.reachabilityAnalysis(mfp, timer)
 		val callbacks = AppInfoCollector.analyzeCallback(afp, lfp, ra)
 		this.callbackMethods = callbacks
-		var components = isetEmpty[JawaRecord]
+		var components = isetEmpty[JawaClass]
     mfp.getComponentInfos.foreach{
       f => 
-        val record = Center.resolveRecord(f.name, Center.ResolveLevel.HIERARCHY)
-        if(!record.isUnknown && record.isApplicationRecord){
+        val record = Center.resolveClass(f.name, Center.ResolveLevel.HIERARCHY)
+        if(!record.isUnknown && record.isApplicationClass){
 	        components += record
 	        val clCounter = generateEnvironment(record, if(f.exported)AndroidConstants.MAINCOMP_ENV else AndroidConstants.COMP_ENV, codeLineCounter)
 	        codeLineCounter = clCounter

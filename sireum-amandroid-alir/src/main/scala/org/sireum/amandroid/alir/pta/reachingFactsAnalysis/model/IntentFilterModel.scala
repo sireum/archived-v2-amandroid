@@ -30,9 +30,9 @@ object IntentFilterModel {
   
   final val TITLE = "IntentFilterModel"
   
-	def isIntentFilter(r : JawaRecord) : Boolean = r.getName == AndroidConstants.INTENTFILTER
+	def isIntentFilter(r : JawaClass) : Boolean = r.getName == AndroidConstants.INTENTFILTER
 	  
-	def doIntentFilterCall(s : PTAResult, p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	def doIntentFilterCall(s : PTAResult, p : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true

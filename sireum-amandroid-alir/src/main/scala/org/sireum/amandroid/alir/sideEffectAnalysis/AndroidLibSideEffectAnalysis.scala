@@ -14,7 +14,7 @@ import org.sireum.jawa.Center
 import org.sireum.jawa.alir.JawaAlirInfoProvider
 import org.sireum.jawa.alir.sideEffectAnalysis.SideEffectAnalysis
 import org.sireum.util._
-import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.JawaMethod
 import org.sireum.jawa.xml.AndroidXStream
 import java.io.File
 import java.io.FileOutputStream
@@ -75,16 +75,16 @@ object AndroidLibSideEffectAnalysis {
   
   def largeMem : GenMap[String, IntraProceduralSideEffectResult] = {
     var x : Float = 0
-    val recSize = JawaCodeSource.getFrameworkRecordsCodes.size
+    val recSize = JawaCodeSource.getFrameworkClassCodes.size
     val recs =
-      JawaCodeSource.getFrameworkRecordsCodes.par.map{
+      JawaCodeSource.getFrameworkClassCodes.par.map{
         case (recName, code) =>
           this.synchronized(x += 1)
           if(x%100==0)println((x/recSize)*100 + "%")
-          if(x == recSize) println("Record resolving Done!")
-          Center.resolveRecord(recName, Center.ResolveLevel.BODY)
+          if(x == recSize) println("Class resolving Done!")
+          Center.resolveClass(recName, Center.ResolveLevel.BODY)
       }
-    val procedures = recs.par.map(_.getProcedures.filter(_.isConcrete)).reduce(iunion[JawaProcedure])
+    val procedures = recs.par.map(_.getMethods.filter(_.isConcrete)).reduce(iunion[JawaMethod])
     val procSize = procedures.size
     x = 0
     val intraPSEResults = procedures.par.map{
@@ -99,9 +99,9 @@ object AndroidLibSideEffectAnalysis {
   
   def smallMem : GenMap[String, IntraProceduralSideEffectResult] = {
     var x : Float = 0
-    val recSize = JawaCodeSource.getFrameworkRecordsCodes.size
+    val recSize = JawaCodeSource.getFrameworkClassCodes.size
     val intraPSEResults =
-      JawaCodeSource.getFrameworkRecordsCodes.flatMap{
+      JawaCodeSource.getFrameworkClassCodes.flatMap{
         case (recName, code) =>
           this.synchronized(x += 1)
           if(x%1000==0){
@@ -109,9 +109,9 @@ object AndroidLibSideEffectAnalysis {
             Center.reset
             System.gc()
           }
-          if(x == recSize) println("Record resolving Done!")
-          val rec = Center.resolveRecord(recName, Center.ResolveLevel.BODY)
-          rec.getProcedures.filter(_.isConcrete).map{
+          if(x == recSize) println("Class resolving Done!")
+          val rec = Center.resolveClass(recName, Center.ResolveLevel.BODY)
+          rec.getMethods.filter(_.isConcrete).map{
             p =>
               (p.getSignature, SideEffectAnalysis.intraProceduralSideEffect(p))
           }

@@ -7,9 +7,9 @@ http://www.eclipse.org/legal/epl-v10.html
 */
 package org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model
 
-import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.JawaMethod
 import org.sireum.util._
-import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.JawaClass
 import org.sireum.jawa.Type
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.Center
@@ -30,45 +30,45 @@ object AndroidModelCallHandler extends ModelCallHandler{
   /**
    * return true if the given callee procedure needs to be modeled
    */
-  override def isModelCall(calleeProc : JawaProcedure) : Boolean = {
-	  val r = calleeProc.getDeclaringRecord
+  override def isModelCall(calleeMethod : JawaMethod) : Boolean = {
+	  val r = calleeMethod.getDeclaringClass
 	  BundleModel.isBundle(r) ||
 	  HandlerModel.isHandler(r) ||
 	  ComponentNameModel.isComponentName(r) ||
 	  IntentFilterModel.isIntentFilter(r) ||
 	  IntentModel.isIntent(r) ||
 	  UriModel.isUri(r) ||
-	  FrameworkMethodsModel.isFrameworkMethods(calleeProc) ||
+	  FrameworkMethodsModel.isFrameworkMethods(calleeMethod) ||
 	  ActivityModel.isActivity(r) ||
-	  super.isModelCall(calleeProc) ||
+	  super.isModelCall(calleeMethod) ||
 	  AndroidRFAScopeManager.shouldBypass(r)
   }
   
-  def isICCCall(calleeProc : JawaProcedure) : Boolean = {
-    InterComponentCommunicationModel.isIccOperation(calleeProc)
+  def isICCCall(calleeMethod : JawaMethod) : Boolean = {
+    InterComponentCommunicationModel.isIccOperation(calleeMethod)
   }
   
   /**
    * instead of doing operation inside callee procedure's real code, we do it manually and return the result. 
    */
-	override def caculateResult(s : PTAResult, calleeProc : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
-	  val r = calleeProc.getDeclaringRecord
-	  if(BundleModel.isBundle(r)) BundleModel.doBundleCall(s, calleeProc, args, retVars, currentContext)
-	  else if(HandlerModel.isHandler(r)) HandlerModel.doHandlerCall(s, calleeProc, args, retVars, currentContext)
-	  else if(ComponentNameModel.isComponentName(r)) ComponentNameModel.doComponentNameCall(s, calleeProc, args, retVars, currentContext)
-	  else if(IntentFilterModel.isIntentFilter(r)) IntentFilterModel.doIntentFilterCall(s, calleeProc, args, retVars, currentContext)
-	  else if(IntentModel.isIntent(r)) IntentModel.doIntentCall(s, calleeProc, args, retVars, currentContext)
-	  else if(UriModel.isUri(r)) UriModel.doUriCall(s, calleeProc, args, retVars, currentContext)
-	  else if(FrameworkMethodsModel.isFrameworkMethods(calleeProc)) FrameworkMethodsModel.doFrameworkMethodsModelCall(s, calleeProc, args, retVars, currentContext)
-	  else if(ActivityModel.isActivity(r)) ActivityModel.doActivityCall(s, calleeProc, args, retVars, currentContext)
-	  else if(super.isModelCall(calleeProc)) super.caculateResult(s, calleeProc, args, retVars, currentContext)
-	  else if(AndroidRFAScopeManager.shouldBypass(r)) AndroidRFAScopeManager.handleBypass(s, calleeProc, args, retVars, currentContext)
-	  else throw new RuntimeException("given callee is not a model call: " + calleeProc)
+	override def caculateResult(s : PTAResult, calleeMethod : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	  val r = calleeMethod.getDeclaringClass
+	  if(BundleModel.isBundle(r)) BundleModel.doBundleCall(s, calleeMethod, args, retVars, currentContext)
+	  else if(HandlerModel.isHandler(r)) HandlerModel.doHandlerCall(s, calleeMethod, args, retVars, currentContext)
+	  else if(ComponentNameModel.isComponentName(r)) ComponentNameModel.doComponentNameCall(s, calleeMethod, args, retVars, currentContext)
+	  else if(IntentFilterModel.isIntentFilter(r)) IntentFilterModel.doIntentFilterCall(s, calleeMethod, args, retVars, currentContext)
+	  else if(IntentModel.isIntent(r)) IntentModel.doIntentCall(s, calleeMethod, args, retVars, currentContext)
+	  else if(UriModel.isUri(r)) UriModel.doUriCall(s, calleeMethod, args, retVars, currentContext)
+	  else if(FrameworkMethodsModel.isFrameworkMethods(calleeMethod)) FrameworkMethodsModel.doFrameworkMethodsModelCall(s, calleeMethod, args, retVars, currentContext)
+	  else if(ActivityModel.isActivity(r)) ActivityModel.doActivityCall(s, calleeMethod, args, retVars, currentContext)
+	  else if(super.isModelCall(calleeMethod)) super.caculateResult(s, calleeMethod, args, retVars, currentContext)
+	  else if(AndroidRFAScopeManager.shouldBypass(r)) AndroidRFAScopeManager.handleBypass(s, calleeMethod, args, retVars, currentContext)
+	  else throw new RuntimeException("given callee is not a model call: " + calleeMethod)
 	}
 	
-	def doICCCall(s : PTAResult, calleeProc : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[JawaProcedure]) = {
-	  if(InterComponentCommunicationModel.isIccOperation(calleeProc)) InterComponentCommunicationModel.doIccCall(s, calleeProc, args, retVars, currentContext)
-	  else throw new RuntimeException("given callee is not an ICC call: " + calleeProc)
+	def doICCCall(s : PTAResult, calleeMethod : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[JawaMethod]) = {
+	  if(InterComponentCommunicationModel.isIccOperation(calleeMethod)) InterComponentCommunicationModel.doIccCall(s, calleeMethod, args, retVars, currentContext)
+	  else throw new RuntimeException("given callee is not an ICC call: " + calleeMethod)
 	}
 
 }

@@ -11,7 +11,7 @@ import org.sireum.util._
 import org.sireum.jawa.MessageCenter._
 import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.amandroid.AppCenter
-import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.JawaClass
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.Center
 import org.sireum.jawa.util.IgnoreException
@@ -23,7 +23,7 @@ import org.sireum.jawa.util.MyTimer
  */ 
 class IccCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, timer : Option[MyTimer]) extends AppInfoCollector(apkUri, outputUri, timer) {
   private final val TITLE = "IccCollector"
-  private var iccContainers : Set[JawaRecord] = Set()
+  private var iccContainers : Set[JawaClass] = Set()
 	def getIccContainers = this.iccContainers
   
 	override def collectInfo : Unit = {
@@ -42,11 +42,11 @@ class IccCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, timer 
 		val callbacks = AppInfoCollector.analyzeCallback(afp, lfp, ra)
 		this.callbackMethods = callbacks
 		
-		var components = isetEmpty[JawaRecord]
+		var components = isetEmpty[JawaClass]
     mfp.getComponentInfos.foreach{
       f => 
-        val record = Center.resolveRecord(f.name, Center.ResolveLevel.HIERARCHY)
-        if(!record.isUnknown && record.isApplicationRecord){
+        val record = Center.resolveClass(f.name, Center.ResolveLevel.HIERARCHY)
+        if(!record.isUnknown && record.isApplicationClass){
 	        components += record
 	        val clCounter = generateEnvironment(record, if(f.exported)AndroidConstants.MAINCOMP_ENV else AndroidConstants.COMP_ENV, codeLineCounter)
 	        codeLineCounter = clCounter
@@ -54,7 +54,7 @@ class IccCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, timer 
     }
 	  ra.initWithEnv
 	  val sensitiveAPISigs = AndroidConstants.getDynRegisterMethods
-		this.iccContainers = sensitiveAPISigs.map(ra.getSensitiveAPIContainer(_)).reduce(iunion[JawaRecord])
+		this.iccContainers = sensitiveAPISigs.map(ra.getSensitiveAPIContainer(_)).reduce(iunion[JawaClass])
 		AppCenter.setComponents(components)
 		AppCenter.updateIntentFilterDB(this.intentFdb)
 		AppCenter.setAppInfo(this)

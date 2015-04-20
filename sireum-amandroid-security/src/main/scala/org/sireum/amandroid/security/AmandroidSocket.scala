@@ -29,7 +29,7 @@ import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependence
 import org.sireum.amandroid.alir.taintAnalysis.AndroidDataDependentTaintAnalysis
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.amandroid.alir.taintAnalysis.AndroidSourceAndSinkManager
-import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.JawaMethod
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.decompile.AmDecoder
@@ -41,7 +41,7 @@ import org.sireum.jawa.util.MyTimer
  */ 
 trait AmandroidSocketListener {
   def onPreAnalysis : Unit
-  def entryPointFilter(eps : Set[JawaProcedure]) : Set[JawaProcedure]
+  def entryPointFilter(eps : Set[JawaMethod]) : Set[JawaMethod]
   def onAnalysisSuccess : Unit
   def onException(e : Exception) : Unit
   def onPostAnalysis : Unit
@@ -94,7 +94,7 @@ class AmandroidSocket {
     Center.reset
   	AppCenter.reset
   	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
-  	JawaCodeSource.clearAppRecordsCodes
+  	JawaCodeSource.clearAppClassCodes
   	System.gc()
     System.gc()
   }
@@ -120,13 +120,13 @@ class AmandroidSocket {
     	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
     	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
     	    val idfg = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, timer)
-    	    AppCenter.addIDFG(ep.getDeclaringRecord, idfg)
+    	    AppCenter.addIDFG(ep.getDeclaringClass, idfg)
           
     	    msg_critical(TITLE, "processed-->" + idfg.icfg.getProcessed.size)
     	    val iddResult = InterproceduralDataDependenceAnalysis(idfg)
-    	    AppCenter.addIDDG(ep.getDeclaringRecord, iddResult)
+    	    AppCenter.addIDDG(ep.getDeclaringClass, iddResult)
     	    val tar = AndroidDataDependentTaintAnalysis(iddResult, idfg.ptaresult, ssm)    
-    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
+    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringClass, tar)
       } 
   
     	if(myListener_opt.isDefined) myListener_opt.get.onAnalysisSuccess
@@ -162,10 +162,10 @@ class AmandroidSocket {
     	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
     	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
     	    val idfg = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, timer)
-    	    AppCenter.addIDFG(ep.getDeclaringRecord, idfg)
+    	    AppCenter.addIDFG(ep.getDeclaringClass, idfg)
     	    msg_critical(TITLE, "processed-->" + idfg.icfg.getProcessed.size)
     	    val iddResult = InterproceduralDataDependenceAnalysis(idfg)
-    	    AppCenter.addIDDG(ep.getDeclaringRecord, iddResult)
+    	    AppCenter.addIDDG(ep.getDeclaringClass, iddResult)
       } 
   
     	if(myListener_opt.isDefined) myListener_opt.get.onAnalysisSuccess

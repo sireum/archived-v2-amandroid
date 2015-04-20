@@ -74,15 +74,15 @@ object IntentInjection_run {
 			   lines.length
 			}
     	
-    	JawaCodeSource.getAppRecordsCodes.foreach{
+    	JawaCodeSource.getAppClassCodes.foreach{
 			  case (name, code) =>
 			    loc += countLines(code)
       }
     }
 
-    def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
+    def entryPointFilter(eps: Set[org.sireum.jawa.JawaMethod]): Set[org.sireum.jawa.JawaMethod] = {
       val iacs = app_info.getInterestingContainers(ssm.getSinkSigs ++ AndroidConstants.getIccMethods)
-      val res = eps.filter(e=>iacs.contains(e.getDeclaringRecord))
+      val res = eps.filter(e=>iacs.contains(e.getDeclaringClass))
       IntentInjectionCounter.totalComponents += res.size
       res
       // res.filter(p => p.getName.contains("RssListActivity"))

@@ -9,9 +9,9 @@ package org.sireum.amandroid.alir.pta.reachingFactsAnalysis
 
 import org.sireum.jawa.ScopeManager
 import org.sireum.util._
-import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.JawaClass
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
-import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.JawaMethod
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.alir.pta.UnknownInstance
@@ -46,8 +46,8 @@ object AndroidRFAScopeManager extends ScopeManager{
 	/**
 	 * return true if given record needs to be bypassed
 	 */
-	def shouldBypass(rec : JawaRecord) : Boolean = {
-    (rec.isFrameworkRecord || rec.isThirdPartyLibRecord) &&
+	def shouldBypass(rec : JawaClass) : Boolean = {
+    (rec.isFrameworkClass || rec.isThirdPartyLibClass) &&
     {
 	    if(isIncludeMode){
 	    	if(rec.getPackageName != null) !contains(rec.getPackageName) else true
@@ -57,7 +57,7 @@ object AndroidRFAScopeManager extends ScopeManager{
     }
   }
   
-  def handleBypass(s : PTAResult, calleeProc : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+  def handleBypass(s : PTAResult, calleeMethod : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
     (isetEmpty, isetEmpty, true)
   }
 }

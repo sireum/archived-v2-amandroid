@@ -282,9 +282,9 @@ object AdLibCounting {
 	    	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
 	    	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, DefaultLibraryAPISummary)
 	    	// resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
-	    	JawaCodeSource.getAppRecordsCodes.keys foreach{
+	    	JawaCodeSource.getAppClassCodes.keys foreach{
 	    	  k =>
-	    	    val rec = Center.resolveRecord(k, Center.ResolveLevel.HIERARCHY)
+	    	    val rec = Center.resolveClass(k, Center.ResolveLevel.HIERARCHY)
 	    	    val pkg = rec.getPackageName
 	    	    if(pkg.contains("adfonic")) Counter.adfonic += file
 	    	    if(pkg.contains("winad")) Counter.winad += file
@@ -365,7 +365,7 @@ object AdLibCounting {
 	    	} finally {
 	    	  Center.reset
 		    	AppCenter.reset
-		    	JawaCodeSource.clearAppRecordsCodes
+		    	JawaCodeSource.clearAppClassCodes
 		    	Counter.output
 		    	APKFileResolver.deleteOutputs(file, outputUri)
 		    	System.gc

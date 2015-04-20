@@ -13,8 +13,8 @@ import org.sireum.util._
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-object AndroidSubstituteRecordMap {
-	def getSubstituteRecordMap : IMap[String, String] = {
+object AndroidSubstituteClassMap {
+	def getSubstituteClassMap : IMap[String, String] = {
 	  val map : MMap[String, String] = mmapEmpty
 	  map.put("android.content.Context", "android.content.ContextWrapper")
     map.put("android.view.Menu", "com.android.internal.view.menu.MenuBuilder")

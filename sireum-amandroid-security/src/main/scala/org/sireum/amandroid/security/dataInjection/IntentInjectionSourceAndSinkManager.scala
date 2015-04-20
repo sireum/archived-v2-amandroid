@@ -9,7 +9,7 @@ package org.sireum.amandroid.security.dataInjection
 
 import org.sireum.amandroid.parser.LayoutControl
 import org.sireum.util._
-import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.JawaMethod
 import org.sireum.jawa.MessageCenter._
 import org.sireum.pilar.ast._
 import org.sireum.amandroid.AndroidConstants
@@ -28,21 +28,21 @@ import org.sireum.jawa.alir.pta.PTAResult
  */ 
 class IntentInjectionSourceAndSinkManager(appPackageName : String, 
     												layoutControls : Map[Int, LayoutControl], 
-    												callbackMethods : ISet[JawaProcedure], 
+    												callbackMethods : ISet[JawaMethod], 
     												sasFilePath : String) 
     												extends AndroidSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
   
-  override def isSource(calleeProcedure : JawaProcedure, callerProcedure : JawaProcedure, callerLoc : JumpLocation) : Boolean = {
+  override def isSource(calleeMethod : JawaMethod, callerMethod : JawaMethod, callerLoc : JumpLocation) : Boolean = {
 	  false
 	}
   
-  override def isCallbackSource(proc : JawaProcedure) : Boolean = {
+  override def isCallbackSource(proc : JawaMethod) : Boolean = {
     false
   }
   
-	override def isUISource(calleeProcedure : JawaProcedure, callerProcedure : JawaProcedure, callerLoc : JumpLocation) : Boolean = {
-//	  if(calleeProcedure.getSignature == AndroidConstants.ACTIVITY_FINDVIEWBYID || calleeProcedure.getSignature == AndroidConstants.VIEW_FINDVIEWBYID){
-//	    val nums = ExplicitValueFinder.findExplicitIntValueForArgs(callerProcedure, callerLoc, 1)
+	override def isUISource(calleeMethod : JawaMethod, callerMethod : JawaMethod, callerLoc : JumpLocation) : Boolean = {
+//	  if(calleeMethod.getSignature == AndroidConstants.ACTIVITY_FINDVIEWBYID || calleeMethod.getSignature == AndroidConstants.VIEW_FINDVIEWBYID){
+//	    val nums = ExplicitValueFinder.findExplicitIntValueForArgs(callerMethod, callerLoc, 1)
 //	    nums.foreach{
 //	      num =>
 //	        this.layoutControls.get(num) match{
@@ -64,7 +64,7 @@ class IntentInjectionSourceAndSinkManager(appPackageName : String,
         if(InterComponentCommunicationModel.isIccOperation(callee.callee)){
           sinkflag = true
 //          val rfafactMap = ReachingFactsAnalysisHelper.getFactMap(rfaFact)
-//          val args = invNode.getOwner.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
+//          val args = invNode.getOwner.getMethodBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
 //              case te : TupleExp =>
 //                te.exps.map{
 //			            exp =>

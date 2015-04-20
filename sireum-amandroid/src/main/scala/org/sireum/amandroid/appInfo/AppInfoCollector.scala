@@ -16,9 +16,9 @@ import org.sireum.amandroid.parser.ARSCFileParser
 import org.sireum.amandroid.parser.IntentFilterDataBase
 import org.sireum.alir.ReachingDefinitionAnalysis
 import org.sireum.amandroid.parser.ManifestParser
-import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.JawaClass
 import org.sireum.jawa.Center
-import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.JawaMethod
 import org.sireum.amandroid.parser.LayoutFileParser
 import scala.util.control.Breaks._
 import org.sireum.amandroid.AppCenter
@@ -28,7 +28,7 @@ import org.sireum.amandroid.parser.ComponentInfo
 import java.io.InputStream
 import org.sireum.jawa.util.ResourceRetriever
 import org.sireum.amandroid.pilarCodeGenerator.AndroidEnvironmentGenerator
-import org.sireum.amandroid.pilarCodeGenerator.AndroidSubstituteRecordMap
+import org.sireum.amandroid.pilarCodeGenerator.AndroidSubstituteClassMap
 import org.sireum.amandroid.pilarCodeGenerator.AndroidEntryPointConstants
 import java.io.File
 import java.net.URI
@@ -47,7 +47,7 @@ import org.sireum.jawa.util.MyTimer
 class AppInfoCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, timer : Option[MyTimer]) {  
   private final val TITLE = "AppInfoCollector"
   protected var uses_permissions : ISet[String] = isetEmpty
-	protected var callbackMethods : Map[JawaRecord, Set[JawaProcedure]] = Map()
+	protected var callbackMethods : Map[JawaClass, Set[JawaMethod]] = Map()
 	protected var componentInfos : Set[ComponentInfo] = Set()
 	protected var layoutControls : Map[Int, LayoutControl] = Map()
 	protected var appPackageName : String = null
@@ -56,15 +56,15 @@ class AppInfoCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, ti
 	protected var codeLineCounter : Int = 0
 	
 	/**
-	 * Map from record name to it's env procedure code.
+	 * Map from record name to it's env method code.
 	 */
-	protected var envProcMap : Map[JawaRecord, JawaProcedure] = Map()
+	protected var envProcMap : Map[JawaClass, JawaMethod] = Map()
 	def getAppName = new File(new URI(apkUri)).getName()
 	def getPackageName = this.appPackageName
 	def getUsesPermissions = this.uses_permissions
 	def getLayoutControls = this.layoutControls
 	def getCallbackMethodMapping = this.callbackMethods
-	def getCallbackMethods = if(!this.callbackMethods.isEmpty)this.callbackMethods.map(_._2).reduce(iunion[JawaProcedure]) else isetEmpty[JawaProcedure]
+	def getCallbackMethods = if(!this.callbackMethods.isEmpty)this.callbackMethods.map(_._2).reduce(iunion[JawaMethod]) else isetEmpty[JawaMethod]
 	def printEnvs() =
 	  envProcMap.foreach{case(k, v) => println("Environment for " + k + "\n" + v)}
 	
@@ -98,7 +98,7 @@ class AppInfoCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, ti
 	  sb.toString.intern()
 	}
 	
-	def hasEnv(rec : JawaRecord) : Boolean = this.envProcMap.contains(rec)
+	def hasEnv(rec : JawaClass) : Boolean = this.envProcMap.contains(rec)
 	
 	/**
 	 * generates env code for a component like Activity, BroadcastReceiver, etc.
@@ -106,12 +106,12 @@ class AppInfoCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, ti
 	 * @param codeCtr code line number of the last generated env
 	 * @return codeCtr + newly generated number of lines
 	 */
-	def generateEnvironment(record : JawaRecord, envName : String, codeCtr: Int) : Int = {
+	def generateEnvironment(record : JawaClass, envName : String, codeCtr: Int) : Int = {
 	  if(record == null) return 0
 		//generate env main method
   	msg_normal(TITLE, "Generate environment for " + record)
 	  val dmGen = new AndroidEnvironmentGenerator
-	  dmGen.setSubstituteRecordMap(AndroidSubstituteRecordMap.getSubstituteRecordMap)
+	  dmGen.setSubstituteClassMap(AndroidSubstituteClassMap.getSubstituteClassMap)
 	  dmGen.setCurrentComponent(record.getName)
 	  dmGen.setComponentInfos(this.componentInfos)
 	  dmGen.setCodeCounter(codeCtr)
@@ -129,9 +129,9 @@ class AppInfoCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, ti
 	  dmGen.getCodeCounter
 	}
 	
-	def dynamicRegisterComponent(comRec : JawaRecord, iDB : IntentFilterDataBase, precise : Boolean) = {
+	def dynamicRegisterComponent(comRec : JawaClass, iDB : IntentFilterDataBase, precise : Boolean) = {
 	  this.synchronized{
-		  if(!comRec.declaresProcedureByShortName(AndroidConstants.COMP_ENV)){
+		  if(!comRec.declaresMethodByShortName(AndroidConstants.COMP_ENV)){
 			  msg_critical(TITLE, "*************Dynamically Register Component**************")
 			  msg_normal(TITLE, "Component name: " + comRec)
 			  this.intentFdb.updateIntentFmap(iDB)
@@ -168,11 +168,11 @@ class AppInfoCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, ti
 		this.layoutControls = lfp.getUserControls
 		this.callbackMethods = callbacks
 		
-		var components = isetEmpty[JawaRecord]
+		var components = isetEmpty[JawaClass]
     mfp.getComponentInfos.foreach{
       f => 
-        val record = Center.resolveRecord(f.name, Center.ResolveLevel.HIERARCHY)
-        if(!record.isUnknown && record.isApplicationRecord){
+        val record = Center.resolveClass(f.name, Center.ResolveLevel.HIERARCHY)
+        if(!record.isUnknown && record.isApplicationClass){
 	        components += record
 	        val clCounter = generateEnvironment(record, if(f.exported)AndroidConstants.MAINCOMP_ENV else AndroidConstants.COMP_ENV, codeLineCounter)
 	        codeLineCounter = clCounter
@@ -192,7 +192,7 @@ object AppInfoCollector {
 	  val mfp = new ManifestParser
 		mfp.loadClassesFromTextManifest(manifestIS)
     manifestIS.close()
-	  msg_normal(TITLE, "entrypoints--->" + mfp.getComponentRecords)
+	  msg_normal(TITLE, "entrypoints--->" + mfp.getComponentClasses)
 	  msg_normal(TITLE, "packagename--->" + mfp.getPackageName)
 	  msg_normal(TITLE, "permissions--->" + mfp.getPermissions)
 	  msg_normal(TITLE, "intentDB------>" + mfp.getIntentDB)
@@ -218,8 +218,8 @@ object AppInfoCollector {
 	  lfp
 	}
 	
-	def analyzeCallback(afp : ARSCFileParser_apktool, lfp : LayoutFileParser, analysisHelper : ReachableInfoCollector) : Map[JawaRecord, Set[JawaProcedure]] = {
-	  var callbackMethods : Map[JawaRecord, Set[JawaProcedure]] = Map()
+	def analyzeCallback(afp : ARSCFileParser_apktool, lfp : LayoutFileParser, analysisHelper : ReachableInfoCollector) : Map[JawaClass, Set[JawaMethod]] = {
+	  var callbackMethods : Map[JawaClass, Set[JawaMethod]] = Map()
 	  analysisHelper.collectCallbackMethods()
 		callbackMethods = analysisHelper.getCallbackMethods
 		msg_detail(TITLE, "LayoutClasses --> " + analysisHelper.getLayoutClasses)
@@ -242,19 +242,19 @@ object AppInfoCollector {
                   methodNames foreach{
                     methodName =>
     	                //The callback may be declared directly in the class or in one of the superclasses
-    	                var callbackRecord = k
-    	                var callbackProcedure : Set[JawaProcedure] = Set()
+    	                var callbackClass = k
+    	                var callbackMethod : Set[JawaMethod] = Set()
     	                breakable{ 
-    	                  while(callbackProcedure.isEmpty){
-    		                  if(callbackRecord.declaresProcedureByShortName(methodName))
-    		                  	callbackProcedure = callbackRecord.getProceduresByShortName(methodName)
-    		                  if(callbackRecord.hasSuperClass)
-    		                    callbackRecord = callbackRecord.getSuperClass
+    	                  while(callbackMethod.isEmpty){
+    		                  if(callbackClass.declaresMethodByShortName(methodName))
+    		                  	callbackMethod = callbackClass.getMethodsByShortName(methodName)
+    		                  if(callbackClass.hasSuperClass)
+    		                    callbackClass = callbackClass.getSuperClass
     		                  else break
     	                  }
     	                }
-    	                if(callbackProcedure != null){
-    	                  callbackMethods += (k -> (callbackMethods.getOrElse(k, isetEmpty) ++ callbackProcedure))
+    	                if(callbackMethod != null){
+    	                  callbackMethods += (k -> (callbackMethods.getOrElse(k, isetEmpty) ++ callbackMethod))
     	                } else {
     	                  err_msg_normal(TITLE, "Callback method " + methodName + " not found in class " + k);
     	                }

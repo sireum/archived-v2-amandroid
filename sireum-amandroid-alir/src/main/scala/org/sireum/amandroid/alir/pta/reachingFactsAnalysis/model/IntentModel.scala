@@ -35,9 +35,9 @@ import org.sireum.jawa.alir.pta.VarSlot
 object IntentModel {
   final val TITLE = "IntentModel"
   
-	def isIntent(r : JawaRecord) : Boolean = r.getName == AndroidConstants.INTENT
+	def isIntent(r : JawaClass) : Boolean = r.getName == AndroidConstants.INTENT
 	  
-	def doIntentCall(s : PTAResult, p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	def doIntentCall(s : PTAResult, p : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true
@@ -661,7 +661,7 @@ object IntentModel {
 	        sIns match {
 	          case cstr @ PTAConcreteStringInstance(text, c) =>
             val recordName = text
-	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
+	          val recOpt = Center.tryLoadClass(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>
 		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
@@ -726,7 +726,7 @@ object IntentModel {
         sIns match {
           case cstr @ PTAConcreteStringInstance(text, c) =>
             val recordName = text
-	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
+	          val recOpt = Center.tryLoadClass(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>
 		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
@@ -896,7 +896,7 @@ object IntentModel {
         sIns match {
           case cstr @ PTAConcreteStringInstance(text, c) =>
             val recordName = text
-	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
+	          val recOpt = Center.tryLoadClass(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>
 		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
@@ -953,7 +953,7 @@ object IntentModel {
         name match{
           case cstr @ PTAConcreteStringInstance(text, c) =>
             val recordName = text
-	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
+	          val recOpt = Center.tryLoadClass(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>
 		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)

@@ -13,7 +13,7 @@ import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.pilar.ast._
 import org.sireum.jawa.Center
-import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.JawaMethod
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 import org.sireum.jawa.alir.pta.PTAResult
@@ -64,7 +64,7 @@ object CryptographicMisuse {
     nodes.foreach{
       node =>
         result += (node -> true)
-        val loc = Center.getProcedureWithoutFailing(node.getOwner).getProcedureBody.location(node.getLocIndex)
+        val loc = Center.getMethodWithoutFailing(node.getOwner).getMethodBody.location(node.getLocIndex)
         val argNames : MList[String] = mlistEmpty
         loc match{
           case jumploc : JumpLocation =>
@@ -108,9 +108,9 @@ object CryptographicMisuse {
 		    calleeSet.foreach{
 		      callee =>
 		        val calleep = callee.callee
-		        val callees : MSet[JawaProcedure] = msetEmpty
-				    val caller = Center.getProcedureWithoutFailing(invNode.getOwner)
-				    val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
+		        val callees : MSet[JawaMethod] = msetEmpty
+				    val caller = Center.getMethodWithoutFailing(invNode.getOwner)
+				    val jumpLoc = caller.getMethodBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
 				    val cj = jumpLoc.jump.asInstanceOf[CallJump]
 //				    if(calleep.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
 //				      val calleeSignature = cj.getValueAnnotation("signature") match {
@@ -121,7 +121,7 @@ object CryptographicMisuse {
 //				        case None => throw new RuntimeException("cannot found annotation 'signature' from: " + cj)
 //				      }
 //				      // source and sink APIs can only come from given app's parents.
-//				      callees ++= Center.getProcedureDeclarations(calleeSignature)
+//				      callees ++= Center.getMethodDeclarations(calleeSignature)
 //				    } else {
 				      callees += calleep
 //				    }

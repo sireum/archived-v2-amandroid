@@ -85,9 +85,9 @@ object OAuthTokenTracking_run {
       OAuthTokenCounter.total += 1
     }
 
-    def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
+    def entryPointFilter(eps: Set[org.sireum.jawa.JawaMethod]): Set[org.sireum.jawa.JawaMethod] = {
       val iacs = app_info.getInterestingContainers(Set("access_token"))
-    	val res = eps.filter(e=>iacs.contains(e.getDeclaringRecord))
+    	val res = eps.filter(e=>iacs.contains(e.getDeclaringClass))
     	if(!res.isEmpty){
     	  OAuthTokenCounter.foundOauthContainer += 1
     	  OAuthTokenCounter.foundOauthContainerList += source_apk

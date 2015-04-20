@@ -57,7 +57,7 @@ class ManifestParser extends AbstractAndroidXMLParser{
 	 * 
 	 */
 	
-	def toPilarRecord(str : String) : String = str
+	def toPilarClass(str : String) : String = str
 	
 //	def loadManifestFile(apkUri : FileResourceUri) = {
 //		handleAndroidXMLFiles(apkUri, Set("AndroidManifest.xml"), new AndroidXMLHandler() {
@@ -112,19 +112,19 @@ class ManifestParser extends AbstractAndroidXMLParser{
 //									attrValue = getAttributeValue(parser, "name")
 //									if(attrValue != null){
 //										if (attrValue.startsWith(".")){
-//										  this.currentComponent = toPilarRecord(this.packageName + attrValue)
+//										  this.currentComponent = toPilarClass(this.packageName + attrValue)
 //										  this.components += (this.currentComponent -> tagName)
 //										}
 //										else if (attrValue.substring(0, 1).equals(attrValue.substring(0, 1).toUpperCase())){
-//										  this.currentComponent = toPilarRecord(this.packageName + "." + attrValue)
+//										  this.currentComponent = toPilarClass(this.packageName + "." + attrValue)
 //										  this.components += (this.currentComponent -> tagName)
 //										}
 //										else if (this.packageName != "" && !attrValue.contains(".")){
-//										  this.currentComponent = toPilarRecord(this.packageName + "." + attrValue)
+//										  this.currentComponent = toPilarClass(this.packageName + "." + attrValue)
 //										  this.components += (this.currentComponent -> tagName)
 //										}
 //										else {
-//										  this.currentComponent = toPilarRecord(attrValue)
+//										  this.currentComponent = toPilarClass(attrValue)
 //										  this.components += (this.currentComponent -> tagName)
 //										}
 //										attrValue = getAttributeValue(parser, "permission")
@@ -345,19 +345,19 @@ class ManifestParser extends AbstractAndroidXMLParser{
 	private def loadManifestEntry(comp : Element, baseClass : String, packageName : String) = {
 		val className = comp.getAttribute("android:name")		
     if (className.startsWith(".")){
-      this.currentComponent = toPilarRecord(this.packageName + className)
+      this.currentComponent = toPilarClass(this.packageName + className)
       this.components += (this.currentComponent -> baseClass)
     }
     else if (className.substring(0, 1).equals(className.substring(0, 1).toUpperCase())){
-      this.currentComponent = toPilarRecord(this.packageName + "." + className)
+      this.currentComponent = toPilarClass(this.packageName + "." + className)
       this.components += (this.currentComponent -> baseClass)
     }
     else if (this.packageName != "" && !className.contains(".")){
-      this.currentComponent = toPilarRecord(this.packageName + "." + className)
+      this.currentComponent = toPilarClass(this.packageName + "." + className)
       this.components += (this.currentComponent -> baseClass)
     }
     else {
-      this.currentComponent = toPilarRecord(className)
+      this.currentComponent = toPilarClass(className)
       this.components += (this.currentComponent -> baseClass)
     }
     val permission = comp.getAttribute("android:permission")
@@ -413,7 +413,7 @@ class ManifestParser extends AbstractAndroidXMLParser{
     
 	}
 
-	def getComponentRecords = this.components.map(_._1).toSet
+	def getComponentClasses = this.components.map(_._1).toSet
 	
 	def getComponentInfos = this.componentInfos
 	

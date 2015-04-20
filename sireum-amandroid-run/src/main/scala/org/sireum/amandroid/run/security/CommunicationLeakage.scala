@@ -38,7 +38,7 @@ object CommunicationLeakage_run {
       CommunicationLeakageCounter.total += 1
     }
 
-    def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
+    def entryPointFilter(eps: Set[org.sireum.jawa.JawaMethod]): Set[org.sireum.jawa.JawaMethod] = {
       eps//.filter { ep => ep.getSignature.contains("envMain") }
     }
 

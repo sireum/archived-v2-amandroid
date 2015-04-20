@@ -7,7 +7,7 @@ http://www.eclipse.org/legal/epl-v10.html
 */
 package org.sireum.amandroid.parser
 
-import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.JawaClass
 import org.sireum.jawa.Center
 
 /**
@@ -32,12 +32,12 @@ class IntentFilterDataBase {
         }
     }
   }
-  def containsRecord(r : JawaRecord) : Boolean = containsRecord(r.getName)
-  def containsRecord(name : String) : Boolean = this.intentFmap.contains(name)
+  def containsClass(r : JawaClass) : Boolean = containsClass(r.getName)
+  def containsClass(name : String) : Boolean = this.intentFmap.contains(name)
   def getIntentFmap() = intentFmap
-  def getIntentFilters(r : JawaRecord) : Set[IntentFilter] = getIntentFilters(r.getName)
+  def getIntentFilters(r : JawaClass) : Set[IntentFilter] = getIntentFilters(r.getName)
   def getIntentFilters(name : String) : Set[IntentFilter] = this.intentFmap.getOrElse(name, Set())
-  def getIntentFiltersActions(r : JawaRecord) : Set[String] = {
+  def getIntentFiltersActions(r : JawaClass) : Set[String] = {
     val intentFilterS: Set[IntentFilter] = getIntentFilters(r)
     var actions:Set[String] = null
     if(intentFilterS != null){     

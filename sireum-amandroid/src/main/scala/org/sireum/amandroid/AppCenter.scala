@@ -8,7 +8,7 @@ http://www.eclipse.org/legal/epl-v10.html
 package org.sireum.amandroid
 
 import org.sireum.util._
-import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.JawaClass
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.jawa.alir.taintAnalysis.TaintAnalysisResult
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
@@ -27,23 +27,23 @@ import org.sireum.jawa.alir.pta.PTAResult
  */
 object AppCenter {
   
-	private var components : ISet[JawaRecord] = isetEmpty
+	private var components : ISet[JawaClass] = isetEmpty
 	
-	private var dynamicRegisteredComponents : IMap[JawaRecord, Boolean] = imapEmpty
+	private var dynamicRegisteredComponents : IMap[JawaClass, Boolean] = imapEmpty
 	
 	private var intentFdb : IntentFilterDataBase = new IntentFilterDataBase()
 	
-	def addComponent(comp : JawaRecord) = this.synchronized{this.components += comp}
+	def addComponent(comp : JawaClass) = this.synchronized{this.components += comp}
 	
-	def setComponents(comps : ISet[JawaRecord]) = this.synchronized{this.components ++= comps}
+	def setComponents(comps : ISet[JawaClass]) = this.synchronized{this.components ++= comps}
 	
 	def getComponents = this.components
 	
-	def addDynamicRegisteredComponent(comp : JawaRecord, precise : Boolean) = this.synchronized{this.dynamicRegisteredComponents += (comp -> precise)}
+	def addDynamicRegisteredComponent(comp : JawaClass, precise : Boolean) = this.synchronized{this.dynamicRegisteredComponents += (comp -> precise)}
 	
-	def updateDynamicRegisteredComponent(comp : JawaRecord, precise : Boolean) = this.synchronized{this.dynamicRegisteredComponents += (comp -> precise)}
+	def updateDynamicRegisteredComponent(comp : JawaClass, precise : Boolean) = this.synchronized{this.dynamicRegisteredComponents += (comp -> precise)}
 	
-	def setDynamicRegisteredComponents(comps : IMap[JawaRecord, Boolean]) = this.synchronized{this.dynamicRegisteredComponents ++= comps}
+	def setDynamicRegisteredComponents(comps : IMap[JawaClass, Boolean]) = this.synchronized{this.dynamicRegisteredComponents ++= comps}
 	
 	def getDynamicRegisteredComponents = this.dynamicRegisteredComponents
 	
@@ -149,25 +149,25 @@ object AppCenter {
 //  
 //  def releaseWholeProgramCallGraph = this.wholeProgramCallGraph = null
   
-  private val idfgResults : MMap[JawaRecord, InterProceduralDataFlowGraph] = mmapEmpty
+  private val idfgResults : MMap[JawaClass, InterProceduralDataFlowGraph] = mmapEmpty
   
-  def addIDFG(key : JawaRecord, idfg : InterProceduralDataFlowGraph) = this.synchronized(this.idfgResults += (key -> idfg))
-  def hasIDFG(key : JawaRecord) = this.idfgResults.contains(key)
-  def getIDFG(key : JawaRecord) = this.idfgResults.getOrElse(key, throw new RuntimeException("Doesn't have irfa result for given record: " + key))
+  def addIDFG(key : JawaClass, idfg : InterProceduralDataFlowGraph) = this.synchronized(this.idfgResults += (key -> idfg))
+  def hasIDFG(key : JawaClass) = this.idfgResults.contains(key)
+  def getIDFG(key : JawaClass) = this.idfgResults.getOrElse(key, throw new RuntimeException("Doesn't have irfa result for given record: " + key))
   def getIDFGs = this.idfgResults
   
-  private val iddaResults : MMap[JawaRecord, InterproceduralDataDependenceInfo] = mmapEmpty
+  private val iddaResults : MMap[JawaClass, InterproceduralDataDependenceInfo] = mmapEmpty
   
-  def addIDDG(key : JawaRecord, iddi : InterproceduralDataDependenceInfo) = this.synchronized(this.iddaResults += (key -> iddi))
-  def hasIDDG(key : JawaRecord) = this.iddaResults.contains(key)
-  def getIDDG(key : JawaRecord) = this.iddaResults.getOrElse(key, throw new RuntimeException("Doesn't have idda result for given record: " + key))
+  def addIDDG(key : JawaClass, iddi : InterproceduralDataDependenceInfo) = this.synchronized(this.iddaResults += (key -> iddi))
+  def hasIDDG(key : JawaClass) = this.iddaResults.contains(key)
+  def getIDDG(key : JawaClass) = this.iddaResults.getOrElse(key, throw new RuntimeException("Doesn't have idda result for given record: " + key))
   def getIDDGs = this.iddaResults
 	
-  private var taintResults : IMap[JawaRecord, TaintAnalysisResult] = imapEmpty
+  private var taintResults : IMap[JawaClass, TaintAnalysisResult] = imapEmpty
   
-  def addTaintAnalysisResult(key : JawaRecord, tar : TaintAnalysisResult) = this.synchronized(this.taintResults += (key -> tar))
-  def hasTaintAnalysisResult(key : JawaRecord) = this.taintResults.contains(key)
-  def getTaintAnalysisResult(key : JawaRecord) = this.taintResults.getOrElse(key, throw new RuntimeException("Doesn't have taint result for given record: " + key))
+  def addTaintAnalysisResult(key : JawaClass, tar : TaintAnalysisResult) = this.synchronized(this.taintResults += (key -> tar))
+  def hasTaintAnalysisResult(key : JawaClass) = this.taintResults.contains(key)
+  def getTaintAnalysisResult(key : JawaClass) = this.taintResults.getOrElse(key, throw new RuntimeException("Doesn't have taint result for given record: " + key))
   def getTaintAnalysisResults = this.taintResults
   
   def reset = {

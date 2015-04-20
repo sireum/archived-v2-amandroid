@@ -10,7 +10,7 @@ package org.sireum.amandroid.alir.taintAnalysis
 import org.sireum.jawa.alir.dataDependenceAnalysis._
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.util._
-import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.JawaMethod
 import org.sireum.jawa.Center
 import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.alir.controlFlowGraph._
@@ -157,9 +157,9 @@ object AndroidDataDependentTaintAnalysis {
 		      callee =>
 		        val calleesig = callee.callee.getSignature
 		        val calleep = callee.callee
-		        val callees : MSet[JawaProcedure] = msetEmpty
-				    val caller = Center.getProcedureWithoutFailing(invNode.getOwner)
-				    val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
+		        val callees : MSet[JawaMethod] = msetEmpty
+				    val caller = Center.getMethodWithoutFailing(invNode.getOwner)
+				    val jumpLoc = caller.getMethodBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
 				    val cj = jumpLoc.jump.asInstanceOf[CallJump]
 //				    if(calleep.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
 //				      val calleeSignature = cj.getValueAnnotation("signature") match {
@@ -170,7 +170,7 @@ object AndroidDataDependentTaintAnalysis {
 //				        case None => throw new RuntimeException("cannot found annotation 'signature' from: " + cj)
 //				      }
 //				      // source and sink APIs can only come from given app's parents.
-//				      callees ++= Center.getProcedureDeclarations(calleeSignature)
+//				      callees ++= Center.getMethodDeclarations(calleeSignature)
 //				    } else 
               callees += calleep
 				    callees.foreach{
@@ -183,7 +183,7 @@ object AndroidDataDependentTaintAnalysis {
 						      sources += tn
 						    }
 //                println(callee)
-						    if(invNode.isInstanceOf[IDDGCallArgNode] && ssm.isSinkProcedure(callee)){
+						    if(invNode.isInstanceOf[IDDGCallArgNode] && ssm.isSinkMethod(callee)){
 						      msg_normal(TITLE, "found sink: " + callee + "@" + invNode.getContext)
 						      extendIDDGForSinkApis(iddg, invNode.asInstanceOf[IDDGCallArgNode], ptaresult)
 						      val tn = Tn(invNode)
@@ -209,7 +209,7 @@ object AndroidDataDependentTaintAnalysis {
 		      tn.descriptors += Td(iddg.entryNode.getOwner, SourceAndSinkCategory.ICC_SOURCE)
 		      sources += tn
 		    }
-        if(entNode.position > 0 && ssm.isCallbackSource(Center.getProcedureWithoutFailing(entNode.getOwner))){
+        if(entNode.position > 0 && ssm.isCallbackSource(Center.getMethodWithoutFailing(entNode.getOwner))){
           msg_normal(TITLE, "found callback source: " + entNode)
           val tn = Tn(entNode)
           tn.isSrc = true
@@ -217,8 +217,8 @@ object AndroidDataDependentTaintAnalysis {
 	      sources += tn
         }
       case normalNode : IDDGNormalNode =>
-        val owner = Center.getProcedureWithoutFailing(normalNode.getOwner)
-        val loc = owner.getProcedureBody.location(normalNode.getLocIndex)
+        val owner = Center.getMethodWithoutFailing(normalNode.getOwner)
+        val loc = owner.getMethodBody.location(normalNode.getLocIndex)
         if(ssm.isSource(loc, ptaresult)){
           msg_normal(TITLE, "found simple statement source: " + normalNode)
           val tn = Tn(normalNode)
