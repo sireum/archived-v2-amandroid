@@ -1370,7 +1370,7 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
 
 		      // extra check ends
 
-              fprintf(pFp, "v%d:= new `byte`[", temp->vA);
+              fprintf(pFp, "v%d:= (", temp->vA);
               const u1* bytePtr = (const u1*) &insns[insnIdx+1];
               int length=(bytePtr[0] & 0xFF) | ((bytePtr[1] & 0xFF) << 8);
               switch (length){
@@ -1418,7 +1418,7 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
                    //fprintf(pFp, "");
                    break;
               }
-              fprintf(pFp, "];\n");
+              fprintf(pFp, ");\n");
               fprintf(pFp, "#L%06x.   goto L%06x;", ((u1*)insns - pDexFile->baseAddr) + insnIdx*2 + 1, ((u1*)insns - pDexFile->baseAddr) +(temp->insnIdx+3)*2);
               ++l31t;
            // ************* sankar ends ***********
