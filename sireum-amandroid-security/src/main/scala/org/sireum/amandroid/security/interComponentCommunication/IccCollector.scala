@@ -30,9 +30,9 @@ class IccCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, timer 
 	  val manifestUri = outputUri + "/AndroidManifest.xml"
     val mfp = AppInfoCollector.analyzeManifest(manifestUri)
 	  this.appPackageName = mfp.getPackageName
-		this.componentInfos = mfp.getComponentInfos
-		this.uses_permissions = mfp.getPermissions
-		this.intentFdb = mfp.getIntentDB
+		this.componentInfos ++= mfp.getComponentInfos
+		this.uses_permissions ++= mfp.getPermissions
+		this.intentFdb.merge(mfp.getIntentDB)
 		
 	  val afp = AppInfoCollector.analyzeARSC(apkUri)
 		val lfp = AppInfoCollector.analyzeLayouts(apkUri, mfp)
@@ -40,7 +40,7 @@ class IccCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, timer 
 		val ra = AppInfoCollector.reachabilityAnalysis(mfp, timer)
 		
 		val callbacks = AppInfoCollector.analyzeCallback(afp, lfp, ra)
-		this.callbackMethods = callbacks
+		this.callbackMethods ++= callbacks
 		
 		var components = isetEmpty[JawaClass]
     mfp.getComponentInfos.foreach{

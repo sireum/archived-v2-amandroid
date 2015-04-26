@@ -292,7 +292,7 @@ object BundleModel {
   	  result ++= strValue.map{
   	    s => 
   	      require(s.isInstanceOf[PTATupleInstance])
-  	      RFAFact(FieldSlot(rf.v, "java.util.HashSet.items"), s.asInstanceOf[PTATupleInstance].left)
+  	      RFAFact(FieldSlot(rf.v, "items"), s.asInstanceOf[PTATupleInstance].left)
   	  }
     }
 	  result

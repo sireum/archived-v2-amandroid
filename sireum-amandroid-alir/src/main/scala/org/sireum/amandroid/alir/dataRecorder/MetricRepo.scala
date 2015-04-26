@@ -32,7 +32,6 @@ object MetricRepo {
 	var mixedIccPrecise = 0
 	var mixedIccTargetFound = 0
 	var dynamicRegisteredIccTotal = 0
-	var dynamicRegisteredIccPrecise = 0
 	
 	/**Security study compare*/
 	var activityHijacking = 0
@@ -77,7 +76,6 @@ object MetricRepo {
 	  appData.dynamicRegisteredComponents.foreach{
 	    drComp =>
 	      dynamicRegisteredIccTotal += 1
-	      if(drComp.precise) dynamicRegisteredIccPrecise += 1
 	  }
 	  var totalTaintPaths : ISet[TaintPath] = isetEmpty
 	  appData.components.foreach{
@@ -138,7 +136,6 @@ object MetricRepo {
 	  sb.append("Precise mixed ICC calls: " + this.mixedIccPrecise + "  " + {if(this.mixedIccTotal != 0) this.mixedIccPrecise.toFloat/this.mixedIccTotal*100 + "%"} + "\n")
 	  sb.append("Found mixed ICC targets: " + this.mixedIccTargetFound + "  " + {if(this.mixedIccTotal != 0) this.mixedIccTargetFound.toFloat/this.mixedIccTotal*100 + "%"} + "\n")
 	  sb.append("Total dynamic register components: " + this.dynamicRegisteredIccTotal + "\n")
-	  sb.append("Precise dynamic register components: " + this.dynamicRegisteredIccPrecise + "  " + {if(this.dynamicRegisteredIccTotal != 0) this.dynamicRegisteredIccPrecise.toFloat/this.dynamicRegisteredIccTotal*100 + "%"} + "\n")
 	  sb.append("\n\n")
 	  sb.append("Activity Hijacking: " + this.activityHijacking + "\n")
 	  sb.append("Service Hijacking: " + this.serviceHijacking + "\n")

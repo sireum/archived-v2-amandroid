@@ -88,7 +88,8 @@ class OAuthSourceAndSinkManager(appPackageName : String,
           val intentSlot = VarSlot(args(1))
           val intentValues = ptaresult.pointsToSet(intentSlot, invNode.getContext)
           val intentContents = IntentHelper.getIntentContents(ptaresult, intentValues, invNode.getContext)
-          val comMap = IntentHelper.mappingIntents(intentContents)
+          val compType = AndroidConstants.getIccCallType(callee.callee.getSubSignature)
+          val comMap = IntentHelper.mappingIntents(intentContents, compType)
           comMap.foreach{
             case (_, coms) =>
               if(coms.isEmpty) sinkflag = true

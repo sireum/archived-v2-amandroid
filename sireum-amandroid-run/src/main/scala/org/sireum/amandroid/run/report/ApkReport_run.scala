@@ -88,7 +88,7 @@ object ApkReport_run {
                 val intentfilters = man.getIntentDB.getIntentFilters(comp.name)
                 intentfilters foreach{
                   inf =>
-                    comp_report.addIntentFilter(inf.getActions(), inf.getCategorys(), inf.getData())
+                    comp_report.addIntentFilter(inf.getActions, inf.getCategorys, inf.getData)
                 }
                 reportGen.comps += comp_report
             }

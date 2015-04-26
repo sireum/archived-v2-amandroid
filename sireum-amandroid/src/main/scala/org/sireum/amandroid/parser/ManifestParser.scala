@@ -396,13 +396,13 @@ class ManifestParser extends AbstractAndroidXMLParser{
         for (d <- 0 to datas.getLength() - 1) {
           if (this.currentIntentFilter != null){
             val data = datas.item(d).asInstanceOf[Element]
-            val scheme = data.getAttribute("android:scheme")
-            val host = data.getAttribute("android:host")
-            val port = data.getAttribute("android:port")
-            val path = data.getAttribute("android:path")
-            val pathPrefix = data.getAttribute("android:pathPrefix")
-            val pathPattern = data.getAttribute("android:pathPattern")
-            val mimeType = data.getAttribute("android:mimeType")
+            val scheme = if(data.hasAttribute("android:scheme")) data.getAttribute("android:scheme") else null
+            val host = if(data.hasAttribute("android:host"))data.getAttribute("android:host") else null
+            val port = if(data.hasAttribute("android:port"))data.getAttribute("android:port") else null
+            val path = if(data.hasAttribute("android:path"))data.getAttribute("android:path") else null
+            val pathPrefix = if(data.hasAttribute("android:pathPrefix"))data.getAttribute("android:pathPrefix") else null
+            val pathPattern = if(data.hasAttribute("android:pathPattern"))data.getAttribute("android:pathPattern") else null
+            val mimeType = if(data.hasAttribute("android:mimeType"))data.getAttribute("android:mimeType") else null
             val intentF = this.currentIntentFilter
             intentF.modData(scheme, host, port, path, pathPrefix, pathPattern, mimeType)
           }

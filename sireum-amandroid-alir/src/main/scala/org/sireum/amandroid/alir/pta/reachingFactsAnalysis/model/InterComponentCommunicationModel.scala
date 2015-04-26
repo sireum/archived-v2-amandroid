@@ -43,12 +43,13 @@ object InterComponentCommunicationModel {
     flag
   }
 	
-	def doIccCall(s : PTAResult, calleeProc : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[JawaMethod]) = {
+	def doIccCall(s : PTAResult, calleeMethod : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[JawaMethod]) = {
 	  require(args.size > 1)
 	  val intentSlot = VarSlot(args(1))
 	  val intentValues = s.pointsToSet(intentSlot, currentContext)
 	  val intentcontents = IntentHelper.getIntentContents(s, intentValues, currentContext)
-	  val comMap = IntentHelper.mappingIntents(intentcontents)
+    val compType: AndroidConstants.CompType.Value = AndroidConstants.getIccCallType(calleeMethod.getSubSignature)
+	  val comMap = IntentHelper.mappingIntents(intentcontents, compType)
 	  var targets : ISet[JawaMethod] = isetEmpty
 	  comMap.foreach{
 	    case (_, coms) =>

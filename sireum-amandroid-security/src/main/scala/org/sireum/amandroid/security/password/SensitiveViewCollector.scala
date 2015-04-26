@@ -32,19 +32,19 @@ class SensitiveViewCollector(apkUri : FileResourceUri, outputUri : FileResourceU
 	  val manifestUri = outputUri + "/AndroidManifest.xml"
     val mfp = AppInfoCollector.analyzeManifest(manifestUri)
 	  this.appPackageName = mfp.getPackageName
-		this.componentInfos = mfp.getComponentInfos
-		this.uses_permissions = mfp.getPermissions
-		this.intentFdb = mfp.getIntentDB
+		this.componentInfos ++= mfp.getComponentInfos
+		this.uses_permissions ++= mfp.getPermissions
+		this.intentFdb.merge(mfp.getIntentDB)
 		
 	  val afp = AppInfoCollector.analyzeARSC(apkUri)
 		val lfp = AppInfoCollector.analyzeLayouts(apkUri, mfp)
-		this.layoutControls = lfp.getUserControls
+		this.layoutControls ++= lfp.getUserControls
 		if(!this.layoutControls.exists(p => p._2.isSensitive)) throw new IgnoreException
 		
 		val ra = AppInfoCollector.reachabilityAnalysis(mfp, timer)
-		this.sensitiveLayoutContainers = ra.getSensitiveLayoutContainer(layoutControls)
+		this.sensitiveLayoutContainers = ra.getSensitiveLayoutContainer(layoutControls.toMap)
 		val callbacks = AppInfoCollector.analyzeCallback(afp, lfp, ra)
-		this.callbackMethods = callbacks
+		this.callbackMethods ++= callbacks
 		var components = isetEmpty[JawaClass]
     mfp.getComponentInfos.foreach{
       f => 

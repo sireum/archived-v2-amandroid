@@ -39,16 +39,16 @@ class IntentInjectionCollector(apkUri : FileResourceUri, outputUri : FileResourc
 	  val manifestUri = outputUri + "/AndroidManifest.xml"
     val mfp = AppInfoCollector.analyzeManifest(manifestUri)
 	  this.appPackageName = mfp.getPackageName
-		this.componentInfos = mfp.getComponentInfos
-		this.uses_permissions = mfp.getPermissions
-		this.intentFdb = mfp.getIntentDB
+		this.componentInfos ++= mfp.getComponentInfos
+		this.uses_permissions ++= mfp.getPermissions
+		this.intentFdb.merge(mfp.getIntentDB)
 		
 	  val afp = AppInfoCollector.analyzeARSC(apkUri)
 		val lfp = AppInfoCollector.analyzeLayouts(apkUri, mfp)
-		this.layoutControls = lfp.getUserControls
+		this.layoutControls ++= lfp.getUserControls
 		this.ra = AppInfoCollector.reachabilityAnalysis(mfp, timer)
 		val callbacks = AppInfoCollector.analyzeCallback(afp, lfp, ra)
-		this.callbackMethods = callbacks
+		this.callbackMethods ++= callbacks
 		var components = isetEmpty[JawaClass]
     mfp.getComponentInfos.foreach{
       f => 

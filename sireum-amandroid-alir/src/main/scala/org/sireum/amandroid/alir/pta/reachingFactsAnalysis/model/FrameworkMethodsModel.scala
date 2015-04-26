@@ -95,8 +95,7 @@ object FrameworkMethodsModel {
 	}
 	
 	private def registerReceiver(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
-	  var result = isetEmpty[RFAFact]
-	  var precise = true
+	  val result = msetEmpty[RFAFact]
     require(args.size > 2)
     val thisSlot = VarSlot(args(0))
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -123,7 +122,7 @@ object FrameworkMethodsModel {
 					            case cstr @ PTAConcreteStringInstance(text, c) =>
 					              intentF.addAction(text)
 					            case _ =>
-					              precise = false
+					              intentF.addAction("ANY")
 					          }
 			          }
 			          val mCategoriesSlot = FieldSlot(fv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENTFILTER_CATEGORIES))
@@ -134,16 +133,15 @@ object FrameworkMethodsModel {
 					            case cstr @ PTAConcreteStringInstance(text, c) =>
 					              intentF.addCategory(text)
 					            case _ =>
-					              precise = false
+					              intentF.addCategory("ANY")
 					          }
 			          }
 			      }
 			      iDB.updateIntentFmap(intentF)
 			      val appinfo = AppCenter.getAppInfo
 			      if(!appinfo.hasEnv(comRec)){
-			        appinfo.dynamicRegisterComponent(comRec, iDB, precise)
+			        appinfo.dynamicRegisterReceiver(comRec, iDB)
 			      } else {
-			        AppCenter.updateDynamicRegisteredComponent(comRec, precise)
 			        AppCenter.updateIntentFilterDB(iDB)
 			      }
 	      }

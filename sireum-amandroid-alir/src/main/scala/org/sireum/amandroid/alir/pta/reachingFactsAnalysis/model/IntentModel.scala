@@ -957,22 +957,22 @@ object IntentModel {
 	          recOpt match{
               case Some(rec) =>
 		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
               case None =>
                 err_msg_normal(TITLE, "Cannot find Given class: " + cstr)
                 val unknownIns = UnknownInstance(new NormalType(recordName), c)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
             }
           case pstr @ PTAPointStringInstance(c) => 
             err_msg_detail(TITLE, "Init ComponentName use point string: " + pstr)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), pstr)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), pstr)
           case a =>
             err_msg_detail(TITLE, "Init ComponentName use Unknown instance: " + name)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), a)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), a)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), a)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), a)
         }
     }
     (newfacts, delfacts)
