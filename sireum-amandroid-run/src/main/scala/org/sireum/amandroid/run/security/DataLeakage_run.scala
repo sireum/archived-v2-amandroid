@@ -106,6 +106,7 @@ object DataLeakage_run {
     
     files.foreach{
       file =>
+//        if(file.contains("InterComponentCommunication_DynRegister2"))
         try{
           msg_critical(TITLE, DataLeakageTask(outputPath, file, socket, Some(1000)).run)   
         } catch {

@@ -94,10 +94,10 @@ class IntentFilter(holder: String) {
 	}
 	
 	def hasAction(action:String):Boolean = {
-	  this.actions.contains(action) || this.actions.contains("ALL")
+	  this.actions.contains(action) || this.actions.contains("ANY")
 	}
 	def hasCategories(categories: Set[String]):Boolean = {
-	  categories.subsetOf(this.categories) || this.categories.contains("ALL")
+	  categories.subsetOf(this.categories) || this.categories.contains("ANY")
 	}
 	
 	def addAction(action: String) = actions += action

@@ -395,7 +395,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
               val factsForCallee = getFactsForCallee(s, cj, calleep, callerContext)
               returnFacts --= factsForCallee
             	val (g, k) = AndroidReachingFactsAnalysisHelper.doModelCall(ptaresult, calleep, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)
-              tmpReturnFacts = tmpReturnFacts ++ factsForCallee ++ g -- k
+              tmpReturnFacts = tmpReturnFacts ++ factsForCallee -- g ++ g -- k
             }
           } else { // for normal call
             if(!icfg.isProcessed(calleep.getSignature, callerContext)){

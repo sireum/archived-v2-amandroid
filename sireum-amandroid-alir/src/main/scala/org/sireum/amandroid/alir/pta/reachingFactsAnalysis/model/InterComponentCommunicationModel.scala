@@ -50,7 +50,7 @@ object InterComponentCommunicationModel {
 	  val intentcontents = IntentHelper.getIntentContents(s, intentValues, currentContext)
     val compType: AndroidConstants.CompType.Value = AndroidConstants.getIccCallType(calleeMethod.getSubSignature)
 	  val comMap = IntentHelper.mappingIntents(intentcontents, compType)
-	  var targets : ISet[JawaMethod] = isetEmpty
+	  val targets : MSet[JawaMethod] = msetEmpty
 	  comMap.foreach{
 	    case (_, coms) =>
 	      coms.foreach{
@@ -65,7 +65,7 @@ object InterComponentCommunicationModel {
             }
 	      }
 	  }
-	  (isetEmpty, targets)
+	  (isetEmpty, targets.toSet)
 	}
 
 }

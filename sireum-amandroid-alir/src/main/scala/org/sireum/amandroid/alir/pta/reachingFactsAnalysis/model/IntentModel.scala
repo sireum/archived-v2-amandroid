@@ -1208,7 +1208,9 @@ object IntentModel {
 				      str =>
 			          valueValue.foreach{
 			            vv =>
-			              entries += PTATupleInstance(str, vv, currentContext)
+                    thisValue foreach{
+                      ins => entries += PTATupleInstance(str, vv, ins.getDefSite)
+                    }
 			          }
 				    }
 	          newfacts ++= entries.map(e => RFAFact(FieldSlot(mev, "entries"), e))
