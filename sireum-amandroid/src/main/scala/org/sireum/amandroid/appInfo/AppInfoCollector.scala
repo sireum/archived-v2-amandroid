@@ -169,12 +169,14 @@ class AppInfoCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, ti
 		
 		var components = isetEmpty[JawaClass]
     mfp.getComponentInfos.foreach{
-      f => 
-        val record = Center.resolveClass(f.name, Center.ResolveLevel.HIERARCHY)
-        if(!record.isUnknown && record.isApplicationClass){
-	        components += record
-	        val clCounter = generateEnvironment(record, if(f.exported)AndroidConstants.MAINCOMP_ENV else AndroidConstants.COMP_ENV, codeLineCounter)
-	        codeLineCounter = clCounter
+      f =>
+        if(f.enabled){
+          val record = Center.resolveClass(f.name, Center.ResolveLevel.HIERARCHY)
+          if(!record.isUnknown && record.isApplicationClass){
+  	        components += record
+  	        val clCounter = generateEnvironment(record, if(f.exported)AndroidConstants.MAINCOMP_ENV else AndroidConstants.COMP_ENV, codeLineCounter)
+  	        codeLineCounter = clCounter
+          }
         }
     }
 		AppCenter.setComponents(components)

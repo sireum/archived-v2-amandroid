@@ -22,29 +22,30 @@ import brut.androlib.res.decoder.AXmlResourceParser
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-final case class ComponentInfo(name : String, typ : String, exported : Boolean, permission : Option[String])
+final case class ComponentInfo(name: String, typ: String, exported: Boolean, enabled: Boolean, permission: Option[String])
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
 class ManifestParser extends AbstractAndroidXMLParser{
-  private var componentInfos : Set[ComponentInfo] = Set()
-	private var components : Map[String, String] = Map()
+  private val componentInfos: MSet[ComponentInfo] = msetEmpty
+	private val components: MMap[String, String] = mmapEmpty
 	private var packageName = ""
-	private var permissions : Set[String] = Set()
-	private val intentFdb : IntentFilterDataBase = new IntentFilterDataBase
-	private var currentComponent : String = null
-	private var applicationPermission : String = null
-	private var componentPermission : Map[String, String] = Map()
-	private var componentExported : Map[String, String] = Map()
+	private val permissions: MSet[String] = msetEmpty
+	private val intentFdb: IntentFilterDataBase = new IntentFilterDataBase
+	private var currentComponent: String = null
+	private var applicationPermission: String = null
+	private val componentPermission: MMap[String, String] = mmapEmpty
+	private val componentExported: MMap[String, String] = mmapEmpty
+  private val componentEnabled: MMap[String, String] = mmapEmpty
 	private var currentIntentFilter: IntentFilter = null
 	
 	private var minSdkVersion = 0
 	private var targetSdkVersion = 0
 	private var maxSdkVersion = 0
 	
-	private def buildIntentDB(intentFilter : IntentFilter) = {
+	private def buildIntentDB(intentFilter: IntentFilter) = {
 	  intentFdb.updateIntentFmap(intentFilter)
 	}
 	/**
@@ -57,18 +58,18 @@ class ManifestParser extends AbstractAndroidXMLParser{
 	 * 
 	 */
 	
-	def toPilarClass(str : String) : String = str
+	def toPilarClass(str: String): String = str
 	
-//	def loadManifestFile(apkUri : FileResourceUri) = {
+//	def loadManifestFile(apkUri: FileResourceUri) = {
 //		handleAndroidXMLFiles(apkUri, Set("AndroidManifest.xml"), new AndroidXMLHandler() {
 //			
-//			override def handleXMLFile(fileName : String, fileNameFilter : Set[String], stream : InputStream) = {
+//			override def handleXMLFile(fileName: String, fileNameFilter: Set[String], stream: InputStream) = {
 //			  try {
 //					if (fileNameFilter.contains(fileName))
 //						loadClassesFromBinaryManifest(stream)
 //				}
 //				catch {
-//				  case ex : IOException =>
+//				  case ex: IOException =>
 //						System.err.println("Could not read AndroidManifest file: " + ex.getMessage())
 //						ex.printStackTrace()
 //				}
@@ -77,7 +78,7 @@ class ManifestParser extends AbstractAndroidXMLParser{
 //		})
 //	}
 	
-//	protected def loadClassesFromBinaryManifest(manifestIS : InputStream) = {
+//	protected def loadClassesFromBinaryManifest(manifestIS: InputStream) = {
 //		try {
 //			val parser = new AXmlResourceParser()
 //			parser.open(manifestIS)
@@ -189,7 +190,7 @@ class ManifestParser extends AbstractAndroidXMLParser{
 //				typ = parser.next()
 //			}
 //		} catch {
-//		  case e : Exception =>
+//		  case e: Exception =>
 //				e.printStackTrace()
 //		} finally {
 //		  this.components.foreach{
@@ -235,14 +236,14 @@ class ManifestParser extends AbstractAndroidXMLParser{
 //		}
 //	}
 	
-//	private def getAttributeValue(parser : AXmlResourceParser, attributeName : String) : String = {
+//	private def getAttributeValue(parser: AXmlResourceParser, attributeName: String): String = {
 //		for (i <- 0 to parser.getAttributeCount() - 1)
 //			if (parser.getAttributeName(i).equals(attributeName))
 //				return AXMLPrinter.getAttributeValue(parser, i)
 //		return null
 //	}
   
-	def loadClassesFromTextManifest(manifestIS : InputStream) = {
+	def loadClassesFromTextManifest(manifestIS: InputStream) = {
 		try {
 			val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
 			val doc = db.parse(manifestIS)
@@ -258,33 +259,35 @@ class ManifestParser extends AbstractAndroidXMLParser{
       
 			val appsElement = rootElement.getElementsByTagName("application")
 			for (appIdx <- 0 to appsElement.getLength() - 1) {
-				val appElement : Element = appsElement.item(appIdx).asInstanceOf[Element]
+				val appElement: Element = appsElement.item(appIdx).asInstanceOf[Element]
         // Check whether the application is disabled
         val enabled = appElement.getAttribute("android:enabled")
         applicationEnabled = (enabled.isEmpty() || !enabled.equals("false"))
         val appperm = appElement.getAttribute("android:permission")
         if(!appperm.isEmpty())
           this.applicationPermission = appperm
-				val activities = appElement.getElementsByTagName("activity")
-				val receivers = appElement.getElementsByTagName("receiver")
-				val services  = appElement.getElementsByTagName("service")
-        val providers = appElement.getElementsByTagName("provider")
-				
-				for (i <- 0 to activities.getLength() - 1) {
-					val activity = activities.item(i).asInstanceOf[Element]
-					loadManifestEntry(activity, "activity", this.packageName)
-				}
-				for (i <- 0 to receivers.getLength() - 1) {
-					val receiver = receivers.item(i).asInstanceOf[Element]
-					loadManifestEntry(receiver, "receiver", this.packageName)
-				}
-				for (i <- 0 to services.getLength() - 1) {
-					val service = services.item(i).asInstanceOf[Element]
-					loadManifestEntry(service, "service", this.packageName)
-				}
-        for (i <- 0 to providers.getLength() - 1) {
-          val provider = providers.item(i).asInstanceOf[Element]
-          loadManifestEntry(provider, "provider", this.packageName)
+        if(applicationEnabled){
+  				val activities = appElement.getElementsByTagName("activity")
+  				val receivers = appElement.getElementsByTagName("receiver")
+  				val services  = appElement.getElementsByTagName("service")
+          val providers = appElement.getElementsByTagName("provider")
+  				
+  				for (i <- 0 to activities.getLength() - 1) {
+  					val activity = activities.item(i).asInstanceOf[Element]
+  					loadManifestEntry(activity, "activity", this.packageName)
+  				}
+  				for (i <- 0 to receivers.getLength() - 1) {
+  					val receiver = receivers.item(i).asInstanceOf[Element]
+  					loadManifestEntry(receiver, "receiver", this.packageName)
+  				}
+  				for (i <- 0 to services.getLength() - 1) {
+  					val service = services.item(i).asInstanceOf[Element]
+  					loadManifestEntry(service, "service", this.packageName)
+  				}
+          for (i <- 0 to providers.getLength() - 1) {
+            val provider = providers.item(i).asInstanceOf[Element]
+            loadManifestEntry(provider, "provider", this.packageName)
+          }
         }
 				
 			}
@@ -324,25 +327,34 @@ class ManifestParser extends AbstractAndroidXMLParser{
                 } else throw new RuntimeException("Wrong component type: " + typ)
               }
           }
+          val enabled = this.componentEnabled.get(name) match {
+            case Some(tag) => 
+              tag match{
+                case "false" => false
+                case _ => true
+              }
+            case None =>
+              true
+          }
           val permission = this.componentPermission.getOrElse(name, this.applicationPermission)
           val compermission = if(permission != null && !permission.isEmpty()) Some(permission) else None
-          this.componentInfos += ComponentInfo(name, typ, exported, compermission)
+          this.componentInfos += ComponentInfo(name, typ, exported, enabled, compermission)
       }
 		}
 		catch {
-		  case ex : IOException =>
+		  case ex: IOException =>
 				System.err.println("Could not parse manifest: " + ex.getMessage())
 				ex.printStackTrace()
-		  case ex : ParserConfigurationException =>
+		  case ex: ParserConfigurationException =>
 				System.err.println("Could not parse manifest: " + ex.getMessage())
 				ex.printStackTrace()
-		  case ex : SAXException =>
+		  case ex: SAXException =>
 				System.err.println("Could not parse manifest: " + ex.getMessage())
 				ex.printStackTrace()
 		}
 	}
 	
-	private def loadManifestEntry(comp : Element, baseClass : String, packageName : String) = {
+	private def loadManifestEntry(comp: Element, baseClass: String, packageName: String) = {
 		val className = comp.getAttribute("android:name")		
     if (className.startsWith(".")){
       this.currentComponent = toPilarClass(this.packageName + className)
@@ -367,6 +379,10 @@ class ManifestParser extends AbstractAndroidXMLParser{
     val exported = comp.getAttribute("android:exported")
     if(!exported.isEmpty()){
       this.componentExported += (className -> exported)
+    }
+    val enabled = comp.getAttribute("android:enabled")
+    if(!enabled.isEmpty()){
+      this.componentEnabled += (className -> enabled)
     }
     val intentfs = comp.getElementsByTagName("intent-filter")
     for (i <- 0 to intentfs.getLength() - 1) {
@@ -413,11 +429,11 @@ class ManifestParser extends AbstractAndroidXMLParser{
     
 	}
 
-	def getComponentClasses = this.components.map(_._1).toSet
+	def getComponentClasses: ISet[String] = this.components.map(_._1).toSet
 	
-	def getComponentInfos = this.componentInfos
+	def getComponentInfos: ISet[ComponentInfo] = this.componentInfos.toSet
 	
-	def getPermissions = this.permissions
+	def getPermissions: ISet[String] = this.permissions.toSet
 
 	def getPackageName = this.packageName
 	

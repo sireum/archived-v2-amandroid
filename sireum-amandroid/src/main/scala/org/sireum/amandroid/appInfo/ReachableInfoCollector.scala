@@ -40,18 +40,18 @@ import org.sireum.jawa.util.MyTimer
  */
 class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTimer]) {
   final val TITLE = "ReachableInfoCollector"
-	private final var callbackMethods : Map[JawaClass, Set[JawaMethod]] = Map() // a map from an app component to associated callbacks
-	private final var layoutClasses: Map[JawaClass, Set[Int]] = Map()
-	private final var androidCallbacks : Set[String] = Set()  // a list of system interfaces which have wellknown callback methods
+	private final val callbackMethods : MMap[JawaClass, Set[JawaMethod]] = mmapEmpty // a map from an app component to associated callbacks
+	private final val layoutClasses: MMap[JawaClass, Set[Int]] = mmapEmpty
+	private final val androidCallbacks : MSet[String] = msetEmpty  // a list of system interfaces which have wellknown callback methods
 	
-	def getCallbackMethods() = this.callbackMethods
-	def getLayoutClasses() = this.layoutClasses
+	def getCallbackMethods(): IMap[JawaClass, Set[JawaMethod]] = this.callbackMethods.toMap
+	def getLayoutClasses(): IMap[JawaClass, Set[Int]] = this.layoutClasses.toMap
 	
-	private var reachableMap : Map[JawaClass, Set[JawaMethod]] = Map() // a map from an app component to the rechable methods
+	private val reachableMap : MMap[JawaClass, Set[JawaMethod]] = mmapEmpty // a map from an app component to the rechable methods
 	
-	def getReachableMap = this.reachableMap
+	def getReachableMap: IMap[JawaClass, Set[JawaMethod]] = this.reachableMap.toMap
 	
-	def updateReachableMap(compProcMap : Map[JawaClass, Set[JawaMethod]]) : Boolean = {
+	def updateReachableMap(compProcMap : IMap[JawaClass, Set[JawaMethod]]) : Boolean = {
 	  var flag = false
 	  compProcMap.foreach{
 	    case(comp, procs) => 
@@ -86,7 +86,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 		}
 	}
 	
-	def getSensitiveLayoutContainer(layoutControls : Map[Int, LayoutControl]) : Set[JawaClass] = {
+	def getSensitiveLayoutContainer(layoutControls : IMap[Int, LayoutControl]) : Set[JawaClass] = {
 	  val result : MSet[JawaClass] = msetEmpty
 	  layoutControls.foreach{
 	    case (i, lc) =>
@@ -101,7 +101,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	  result.toSet
 	}
 	
-	def getSensitiveAPIContainer(apiSig : String) : Set[JawaClass] = {
+	def getSensitiveAPIContainer(apiSig : String) : ISet[JawaClass] = {
 	  val result : MSet[JawaClass] = msetEmpty
 	    reachableMap.foreach{
 	      case (r, ps) =>
@@ -111,7 +111,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	  result.toSet
 	}
 	
-	def getInterestingStringContainer(str : String) : Set[JawaClass] = {
+	def getInterestingStringContainer(str : String) : ISet[JawaClass] = {
 	  val result : MSet[JawaClass] = msetEmpty
 	    reachableMap.foreach{
 	      case (r, ps) =>
@@ -143,7 +143,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	    }
 	    processed ++= worklist
 	    worklist.clear
-	    if(updateReachableMap(this.callbackMethods)){
+	    if(updateReachableMap(this.callbackMethods.toMap)){
 	      this.reachableMap.foreach{
 			    case(comp, procs) => 
 			      val containerClasses = procs.map(_.getDeclaringClass)
@@ -159,7 +159,7 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	 * Finds the mappings between classes and their respective layout files
 	 */
 	def findClassLayoutMappings() {
-	  var procedures : Set[JawaMethod] = Set()
+	  val procedures : MSet[JawaMethod] = msetEmpty
 	  this.entryPointClasses.foreach{
 	    compName =>
 	      val recUri = Center.getClass(compName)
