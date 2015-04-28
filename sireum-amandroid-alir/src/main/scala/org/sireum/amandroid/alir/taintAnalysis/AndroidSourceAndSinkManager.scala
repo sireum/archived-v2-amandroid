@@ -232,7 +232,7 @@ class DataLeakageAndroidSourceAndSinkManager(appPackageName : String,
   private final val TITLE = "DataLeakageAndroidSourceAndSinkManager"
   
   override def isCallbackSource(proc : JawaMethod) : Boolean = {
-    if(this.callbackMethods.contains(proc) && proc.getParamNames.size > 1) false
+    if(this.callbackMethods.contains(proc) && proc.getParamNames.size > 1) true
     else false
   }
 }

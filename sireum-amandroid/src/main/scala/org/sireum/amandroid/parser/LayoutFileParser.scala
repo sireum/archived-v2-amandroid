@@ -30,23 +30,24 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 	final val TITLE = "LayoutFileParser"
 	private final val DEBUG = false
 	
-	private final var userControls : Map[Int, LayoutControl] = Map()
-	private final var callbackMethods : Map[String, MSet[String]] = Map()
-	private final var packageName : String = ""
+	private final val userControls: MMap[Int, LayoutControl] = mmapEmpty
+	private final val callbackMethods: MMap[String, MSet[String]] = mmapEmpty
+  private final val includes: MMap[String, MSet[Int]] = mmapEmpty
+	private final var packageName: String = ""
 	
 	private final val TYPE_NUMBER_VARIATION_PASSWORD = 0x00000010;
 	private final val TYPE_TEXT_VARIATION_PASSWORD = 0x00000080;
 	private final val TYPE_TEXT_VARIATION_VISIBLE_PASSWORD = 0x00000090;
 	private final val TYPE_TEXT_VARIATION_WEB_PASSWORD = 0x000000e0;
 	
-	def setPackageName(packageName : String) {
+	def setPackageName(packageName: String) {
 		this.packageName = packageName;
 	}
 	
-	def toPilarClass(str : String) : String = str
+	def toPilarClass(str: String): String = str
 	
-	private def getLayoutClass(className : String) : JawaClass = {
-	  var ar : Option[JawaClass] = Center.tryLoadClass(toPilarClass(className), Center.ResolveLevel.HIERARCHY)
+	private def getLayoutClass(className: String): JawaClass = {
+	  var ar: Option[JawaClass] = Center.tryLoadClass(toPilarClass(className), Center.ResolveLevel.HIERARCHY)
 	  if(!ar.isDefined || !this.packageName.isEmpty())
 	    ar = Center.tryLoadClass(toPilarClass(packageName + "." + className), Center.ResolveLevel.HIERARCHY)
 	  if(!ar.isDefined)
@@ -58,7 +59,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 	  ar.getOrElse(null)
 	}
 	
-	private def isLayoutClass(theClass : JawaClass) : Boolean = {
+	private def isLayoutClass(theClass: JawaClass): Boolean = {
 		if (theClass == null)
 			return false
  		// To make sure that nothing all wonky is going on here, we
@@ -72,7 +73,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
  		found
 	}
 	
-	private def isViewClass(theClass : JawaClass) : Boolean = {
+	private def isViewClass(theClass: JawaClass): Boolean = {
 		if (theClass == null)
 			return false
 
@@ -88,39 +89,32 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 		false
 	}
 	
-	private class LayoutParser(layoutFile : String, theClass : JawaClass) extends NodeVisitor {
+	private class LayoutParser(layoutFile: String, theClass: JawaClass) extends NodeVisitor {
 
   	private var id = -1
   	private var isSensitive = false
 
-  	override def child(ns : String, name : String) : NodeVisitor = {
+  	override def child(ns: String, name: String): NodeVisitor = {
 			if (name == null) {
 				err_msg_detail(TITLE, "Encountered a null node name "
 						+ "in file " + layoutFile + ", skipping node...")
 				return null
 			}
-	  			
-			val childClass = getLayoutClass(name.trim())
-			if (isLayoutClass(childClass) || isViewClass(childClass))
-	      new LayoutParser(layoutFile, childClass);
-			else
-				super.child(ns, name);
+	  	if(name.trim().equals("include")){
+        new LayoutParser(layoutFile, null)
+      } else {
+  			val childClass = getLayoutClass(name.trim())
+  			if (isLayoutClass(childClass) || isViewClass(childClass))
+  	      new LayoutParser(layoutFile, childClass)
+  			else
+  				super.child(ns, name);
+      }
     }
 	        	
-  	override def attr(ns : String, name : String, resourceId : Int, typ : Int, obj : Object) : Unit = {
-  		// Check that we're actually working on an android attribute
-  		if (ns == null)
-  			return
-  	  var tempNS = ns
-  		tempNS = tempNS.trim()
-  		if (tempNS.startsWith("*"))
-  			tempNS = tempNS.substring(1)
-  		if (!tempNS.equals("http://schemas.android.com/apk/res/android"))
-  			return
-
+  	override def attr(ns: String, name: String, resourceId: Int, typ: Int, obj: Object): Unit = {
   		// Read out the field data
   		var tempName = name
-  		tempName = tempName.trim();
+  		tempName = tempName.trim()
   		if (tempName.equals("id") && typ == AxmlVisitor.TYPE_REFERENCE)
   			this.id = obj.asInstanceOf[Int]
   		else if (tempName.equals("password") && typ == AxmlVisitor.TYPE_INT_BOOLEAN)
@@ -131,20 +125,19 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
   					|| ((tp & TYPE_TEXT_VARIATION_PASSWORD) == TYPE_TEXT_VARIATION_PASSWORD)
   					|| ((tp & TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) == TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
   					|| ((tp & TYPE_TEXT_VARIATION_WEB_PASSWORD) == TYPE_TEXT_VARIATION_WEB_PASSWORD))
-  		}
-  		else if (isActionListener(tempName) && typ == AxmlVisitor.TYPE_STRING && obj.isInstanceOf[String]) {
+  		} else if (isActionListener(tempName) && typ == AxmlVisitor.TYPE_STRING && obj.isInstanceOf[String]) {
   			val strData = obj.asInstanceOf[String].trim();
   			if (callbackMethods.keySet.contains(layoutFile))
   				callbackMethods(layoutFile) += strData
   			else {
-  				val callbackSet : MSet[String] = msetEmpty
+  				val callbackSet: MSet[String] = msetEmpty
   				callbackSet += strData
   				callbackMethods += (layoutFile -> callbackSet)
   			}
-  		}
-  		else {
-  			if (DEBUG && typ == AxmlVisitor.TYPE_STRING)
-  				err_msg_detail(TITLE, "Found unrecognized XML attribute:  " + tempName)
+  		} else if (tempName.equals("layout") && typ == AxmlVisitor.TYPE_REFERENCE) {
+        includes.getOrElseUpdate(layoutFile, msetEmpty) += obj.asInstanceOf[Int]
+      } else {
+				err_msg_detail(TITLE, "Found unrecognized XML attribute:  " + tempName)
   		}
   	}
   	
@@ -156,7 +149,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
   	 * @return True if the given attribute name corresponds to a listener,
   	 * otherwise false.
   	 */
-  	private def isActionListener(name : String) : Boolean = name.equals("onClick")
+  	private def isActionListener(name: String): Boolean = name.equals("onClick")
 
   	override def end() = {
   		if (id > 0)
@@ -169,10 +162,10 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 	 * the user controls in it.
 	 * @param fileName The APK file in which to look for user controls
 	 */
-	def parseLayoutFile(apkUri : FileResourceUri, classes : Set[String]) {
+	def parseLayoutFile(apkUri: FileResourceUri, classes: Set[String]) {
 				handleAndroidXMLFiles(apkUri, null, new AndroidXMLHandler() {
 					
-					override def handleXMLFile(fileName : String, fileNameFilter : Set[String], stream : InputStream) : Unit = {
+					override def handleXMLFile(fileName: String, fileNameFilter: Set[String], stream: InputStream): Unit = {
 						// We only process valid layout XML files
 						if (!fileName.startsWith("res/layout"))
 							return
@@ -199,7 +192,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 						
 						try {
 							val bos = new ByteArrayOutputStream();
-							var in : Int = 0
+							var in: Int = 0
 							in = stream.read()
 							while (in >= 0){
 								bos.write(in)
@@ -212,8 +205,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 							
 							val rdr = new AxmlReader(data)
 							rdr.accept(new AxmlVisitor() {
-								
-								override def first(ns : String, name : String) : NodeVisitor = {
+								override def first(ns: String, name: String): NodeVisitor = {
 									val theClass = if(name == null) null else getLayoutClass(name.trim())
 									if (theClass == null || isLayoutClass(theClass))
 										new LayoutParser(fileName, theClass)
@@ -226,7 +218,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 									+ fileName);
 						}
 						catch {
-						  case ex : Exception =>
+						  case ex: Exception =>
 							  err_msg_detail(TITLE, "Could not read binary XML file: " + ex.getMessage())
 						}
 					}
@@ -238,12 +230,14 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 	 * mapping from the id to the respective layout control.
 	 * @return The layout controls found in the XML file.
 	 */
-	def getUserControls : Map[Int, LayoutControl] = this.userControls
+	def getUserControls: IMap[Int, LayoutControl] = this.userControls.toMap
 
 	/**
 	 * Gets the callback methods found in the layout XML file. The result is a
 	 * mapping from the file name to the set of found callback methods.
 	 * @return The callback methods found in the XML file.
 	 */
-	def getCallbackMethods : Map[String, MSet[String]] = this.callbackMethods
+	def getCallbackMethods: IMap[String, ISet[String]] = this.callbackMethods.map{case (k, v) => (k, v.toSet)}.toMap
+  
+  def getIncludes: IMap[String, ISet[Int]] = this.includes.map{case (k, v) => (k, v.toSet)}.toMap
 }

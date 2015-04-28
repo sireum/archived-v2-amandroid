@@ -229,7 +229,6 @@ object AppInfoCollector {
 	    case(k, v) =>
   			callbackMethods += (k -> (callbackMethods.getOrElse(k, isetEmpty) ++ v))
 		}
-	  
 		// Collect the XML-based callback methods
 		analysisHelper.getLayoutClasses.foreach {
 		  case (k, v) =>
@@ -237,8 +236,9 @@ object AppInfoCollector {
 		      i =>
 		        val resource = afp.findResource(i)
 		        if(resource != null && resource.getType.getName == "layout"){
-		          val strRes = resource
-	            lfp.getCallbackMethods.find(_._1.contains(strRes.getName)).foreach{
+              val includes = lfp.getIncludes.filter(_._1.contains(resource.getName)).flatten(_._2).toSet
+              val resources = includes.map(i => afp.findResource(i)) + resource
+	            lfp.getCallbackMethods.find{case (file, _) => resources.map(_.getName).exists { x => file.contains(x) }}.foreach{
                 case (_, methodNames) =>
                   methodNames foreach{
                     methodName =>
