@@ -135,7 +135,6 @@ class AmandroidSocket {
         if(myListener_opt.isDefined) myListener_opt.get.onException(e)
     } finally {
     	if(myListener_opt.isDefined) myListener_opt.get.onPostAnalysis
-    	msg_critical(TITLE, "************************************\n")
     }
   }
   
@@ -174,7 +173,6 @@ class AmandroidSocket {
         if(myListener_opt.isDefined) myListener_opt.get.onException(e)
     } finally {
     	if(myListener_opt.isDefined) myListener_opt.get.onPostAnalysis
-    	msg_critical(TITLE, "************************************\n")
     }
   }
 }

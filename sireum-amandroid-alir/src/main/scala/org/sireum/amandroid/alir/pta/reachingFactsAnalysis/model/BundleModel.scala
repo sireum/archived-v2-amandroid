@@ -311,7 +311,7 @@ object BundleModel {
   		  entValue.foreach{
   		    v =>
   		      require(v.isInstanceOf[PTATupleInstance])
-  		      if(keyValue.contains(v.asInstanceOf[PTATupleInstance].left)){
+  		      if(keyValue.exists { kIns => kIns === v.asInstanceOf[PTATupleInstance].left }){
   		        result += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
   		      }
   		  }
@@ -341,7 +341,7 @@ object BundleModel {
   		  entValue.foreach{
   		    v =>
   		      require(v.isInstanceOf[PTATupleInstance])
-  		      if(keyValue.contains(v.asInstanceOf[PTATupleInstance].left)){
+  		      if(keyValue.exists { kIns => kIns === v.asInstanceOf[PTATupleInstance].left }){
   		        result += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
   		      }
   		  }

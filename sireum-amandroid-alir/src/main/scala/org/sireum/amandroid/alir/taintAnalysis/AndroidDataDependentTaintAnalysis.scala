@@ -148,8 +148,8 @@ object AndroidDataDependentTaintAnalysis {
   }
   
   def getSourceAndSinkNode(node : IDDGNode, ptaresult : PTAResult, ssm : AndroidSourceAndSinkManager, iddg: InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node]) = {
-    var sources = isetEmpty[TaintNode]
-    var sinks = isetEmpty[TaintNode]
+    val sources = msetEmpty[TaintNode]
+    val sinks = msetEmpty[TaintNode]
     node match{
       case invNode : IDDGInvokeNode =>
         val calleeSet = invNode.getCalleeSet
@@ -157,49 +157,32 @@ object AndroidDataDependentTaintAnalysis {
 		      callee =>
 		        val calleesig = callee.callee.getSignature
 		        val calleep = callee.callee
-		        val callees : MSet[JawaMethod] = msetEmpty
 				    val caller = Center.getMethodWithoutFailing(invNode.getOwner)
 				    val jumpLoc = caller.getMethodBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
-				    val cj = jumpLoc.jump.asInstanceOf[CallJump]
-//				    if(calleep.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
-//				      val calleeSignature = cj.getValueAnnotation("signature") match {
-//				        case Some(s) => s match {
-//				          case ne : NameExp => ne.name.name
-//				          case _ => ""
-//				        }
-//				        case None => throw new RuntimeException("cannot found annotation 'signature' from: " + cj)
-//				      }
-//				      // source and sink APIs can only come from given app's parents.
-//				      callees ++= Center.getMethodDeclarations(calleeSignature)
-//				    } else 
-              callees += calleep
-				    callees.foreach{
-				      callee =>
-						    if(invNode.isInstanceOf[IDDGVirtualBodyNode] && ssm.isSource(callee, caller, jumpLoc)){
-						      msg_normal(TITLE, "found source: " + callee + "@" + invNode.getContext)
-						      val tn = Tn(invNode)
-						      tn.isSrc = true
-						      tn.descriptors += Td(callee.getSignature, SourceAndSinkCategory.API_SOURCE)
-						      sources += tn
-						    }
-//                println(callee)
-						    if(invNode.isInstanceOf[IDDGCallArgNode] && ssm.isSinkMethod(callee)){
-						      msg_normal(TITLE, "found sink: " + callee + "@" + invNode.getContext)
-						      extendIDDGForSinkApis(iddg, invNode.asInstanceOf[IDDGCallArgNode], ptaresult)
-						      val tn = Tn(invNode)
-						      tn.isSrc = false
-						      tn.descriptors += Td(callee.getSignature, SourceAndSinkCategory.API_SINK)
-						      sinks += tn
-						    }
-						    if(invNode.isInstanceOf[IDDGCallArgNode] && invNode.asInstanceOf[IDDGCallArgNode].position > 0 && ssm.isIccSink(invNode.getICFGNode.asInstanceOf[ICFGCallNode], ptaresult)){
-				          msg_normal(TITLE, "found icc sink: " + invNode)
-				          extendIDDGForSinkApis(iddg, invNode.asInstanceOf[IDDGCallArgNode], ptaresult)
-				          val tn = Tn(invNode)
-				          tn.isSrc = false
-						      tn.descriptors += Td(invNode.getLocUri, SourceAndSinkCategory.ICC_SINK)
-						      sinks += tn
-				        }
+
+				    if(invNode.isInstanceOf[IDDGVirtualBodyNode] && ssm.isSource(calleep, caller, jumpLoc)){
+				      msg_normal(TITLE, "found source: " + calleep + "@" + invNode.getContext)
+				      val tn = Tn(invNode)
+				      tn.isSrc = true
+				      tn.descriptors += Td(calleep.getSignature, SourceAndSinkCategory.API_SOURCE)
+				      sources += tn
 				    }
+				    if(invNode.isInstanceOf[IDDGCallArgNode] && ssm.isSinkMethod(calleep)){
+				      msg_normal(TITLE, "found sink: " + calleep + "@" + invNode.getContext)
+				      extendIDDGForSinkApis(iddg, invNode.asInstanceOf[IDDGCallArgNode], ptaresult)
+				      val tn = Tn(invNode)
+				      tn.isSrc = false
+				      tn.descriptors += Td(calleep.getSignature, SourceAndSinkCategory.API_SINK)
+				      sinks += tn
+				    }
+				    if(invNode.isInstanceOf[IDDGCallArgNode] && invNode.asInstanceOf[IDDGCallArgNode].position > 0 && ssm.isIccSink(invNode.getICFGNode.asInstanceOf[ICFGCallNode], ptaresult)){
+		          msg_normal(TITLE, "found icc sink: " + invNode)
+		          extendIDDGForSinkApis(iddg, invNode.asInstanceOf[IDDGCallArgNode], ptaresult)
+		          val tn = Tn(invNode)
+		          tn.isSrc = false
+				      tn.descriptors += Td(invNode.getLocUri, SourceAndSinkCategory.ICC_SINK)
+				      sinks += tn
+		        }
 		    }
       case entNode : IDDGEntryParamNode =>
         if(ssm.isIccSource(entNode.getICFGNode, iddg.entryNode.getICFGNode)){
@@ -235,7 +218,7 @@ object AndroidDataDependentTaintAnalysis {
         }
       case _ =>
     }
-    (sources, sinks)
+    (sources.toSet, sinks.toSet)
   }
   
   def extendIDDGForSinkApis(iddg: InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node], callArgNode : IDDGCallArgNode, ptaresult : PTAResult) = {

@@ -170,35 +170,6 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
     }
   }
   
-  protected def getFieldsFacts(rhss : List[Exp], s : ISet[RFAFact], currentContext : Context) : ISet[RFAFact] = {
-    var result = isetEmpty[RFAFact]
-    rhss.foreach{
-      rhs =>
-        rhs match{
-      	  case ne : NewExp =>
-      	    var recName : ResourceUri = ""
-            var dimensions = 0
-            ne.typeSpec match {
-              case nt : NamedTypeSpec => 
-                dimensions = ne.dims.size + ne.typeFragments.size
-                recName = nt.name.name
-              case _ =>
-            }
-      	    val typ = NormalType(recName, dimensions)
-      	    val rec = Center.resolveClass(typ.name, Center.ResolveLevel.HIERARCHY)
-      	    val ins = 
-	            if(recName == "java.lang.String" && dimensions == 0){
-	              PTAConcreteStringInstance("", currentContext.copy)
-	            } else {
-	              PTAInstance(typ, currentContext.copy)
-	            }
-//      	    result ++= rec.getNonStaticObjectTypeFields.map(f=>RFAFact(FieldSlot(ins, f.getSignature), NullInstance(currentContext)))
-      	  case _ =>
-        }
-    }
-    result
-  }
-  
   def getExceptionFacts(a : Assignment, s : ISet[RFAFact], currentContext : Context) : ISet[RFAFact] = {
     var result = isetEmpty[RFAFact]
     a match{
@@ -214,13 +185,6 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
       case _ =>
     }
     result
-  }
-  
-  private def updatePTAResult(s : ISet[RFAFact], a : Assignment, currentNode : ICFGLocNode) = {
-    val currentContext = currentNode.getContext
-    val lhss = PilarAstHelper.getLHSs(a)
-    val rhss = PilarAstHelper.getRHSs(a)
-    
   }
 
   class Gen
@@ -255,8 +219,6 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
         val lhss = PilarAstHelper.getLHSs(a)
         val rhss = PilarAstHelper.getRHSs(a)
 	      val slots = ReachingFactsAnalysisHelper.processLHSs(lhss, currentNode.getContext, ptaresult)
-//	      val fieldsFacts = getFieldsFacts(rhss, s, currentNode.getContext)
-//	      result ++= fieldsFacts
 	      checkAndLoadClasses(lhss, rhss, a, s, currentNode)
 	      val values = ReachingFactsAnalysisHelper.processRHSs(rhss, currentNode.getContext, ptaresult) 
 	      slots.foreach{
@@ -264,18 +226,20 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
 	          if(values.contains(i))
 	            result ++= values(i).map{v => RFAFact(slot, v)}
 	      }
+        val heapUnknownFacts = ReachingFactsAnalysisHelper.getHeapUnknownFacts(rhss, currentNode.getContext, ptaresult)
+        result ++= heapUnknownFacts
       }
       val exceptionFacts = getExceptionFacts(a, s, currentNode.getContext)
       result ++= exceptionFacts
       needtoremove.foreach{
-        case (c, f) => ptaresult.removeInstance(f.s, c, f.v)
+        case (c, f) => 
+          ptaresult.removeInstance(f.s, c, f.v)
       }
       needtoremove.clear
       result.foreach{
         f =>
           ptaresult.addInstance(f.s, currentNode.getContext, f.v)
       }
-      
       result
     }
 
@@ -355,19 +319,6 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
           }.toList
         case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
       }
-      /**
-       *  update ptaresult with all args points-to info and it's related heap points-to info.
-       */
-//      args.foreach{
-//        arg =>
-//          val slot = VarSlot(arg)
-//          val value = s.filter { fact => slot == fact.s } map (_.v)
-//          val heapfacts = ReachingFactsAnalysisHelper.getRelatedHeapFacts(value, s)
-//          ptaresult.addInstances(slot, callerContext, value)
-//          heapfacts foreach {
-//            case RFAFact(s, v) => ptaresult.addInstance(s, callerContext, v)
-//          }
-//      }
       
       calleeSet.foreach{
         callee =>
