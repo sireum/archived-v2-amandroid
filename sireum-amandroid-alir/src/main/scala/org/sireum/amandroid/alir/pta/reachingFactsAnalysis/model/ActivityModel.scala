@@ -292,11 +292,16 @@ object ActivityModel {
 	    tv =>
 	      val mIntentSlot = FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.ACTIVITY_INTENT))
 	      var mIntentValue = s.pointsToSet(mIntentSlot, currentContext)
-        tv.getFieldsUnknownDefSites.foreach{
-        	case (defsite, fields) =>
-        	  if(fields.contains("ALL")) mIntentValue += UnknownInstance(new NormalType(AndroidConstants.INTENT), defsite)
-        	  if(fields.contains(AndroidConstants.ACTIVITY_INTENT)) mIntentValue += UnknownInstance(new NormalType(AndroidConstants.INTENT), defsite)
-      	}
+//        val mUnknownIntentSlot = FieldSlot(tv, "ALL")
+//        s.pointsToSet(mUnknownIntentSlot, currentContext) foreach {
+//          ins =>
+//            mIntentValue += UnknownInstance(new NormalType(AndroidConstants.INTENT), ins.defSite)
+//        }
+//        tv.getFieldsUnknownDefSites.foreach{
+//        	case (defsite, fields) =>
+//        	  if(fields.contains("ALL")) mIntentValue += UnknownInstance(new NormalType(AndroidConstants.INTENT), defsite)
+//        	  if(fields.contains(AndroidConstants.ACTIVITY_INTENT)) mIntentValue += UnknownInstance(new NormalType(AndroidConstants.INTENT), defsite)
+//      	}
 	      newfacts ++= mIntentValue.map(miv=> RFAFact(VarSlot(retVar), miv))
 	  }
     (newfacts, delfacts)

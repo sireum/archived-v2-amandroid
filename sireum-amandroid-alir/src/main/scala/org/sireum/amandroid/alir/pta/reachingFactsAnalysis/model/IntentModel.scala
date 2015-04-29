@@ -1209,7 +1209,7 @@ object IntentModel {
 			          valueValue.foreach{
 			            vv =>
                     thisValue foreach{
-                      ins => entries += PTATupleInstance(str, vv, ins.getDefSite)
+                      ins => entries += PTATupleInstance(str, vv, ins.defSite)
                     }
 			          }
 				    }

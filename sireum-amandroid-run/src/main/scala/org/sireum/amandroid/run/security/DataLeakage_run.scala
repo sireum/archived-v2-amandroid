@@ -106,7 +106,7 @@ object DataLeakage_run {
     
     files.foreach{
       file =>
-//        if(file.contains("Button4"))
+//        if(file.contains("LocationLeak1"))
         try{
           msg_critical(TITLE, DataLeakageTask(outputPath, file, socket, Some(1000)).run)   
         } catch {

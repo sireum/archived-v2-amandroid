@@ -115,7 +115,7 @@ object HttpsMisuse {
         val argValue = ptaresult.pointsToSet(argSlot, node.context)
         argValue.foreach{
           ins =>
-            val defsites = ins.getDefSite
+            val defsites = ins.defSite
             val loc = Center.getMethodWithoutFailing(defsites.getMethodSig).getMethodBody.location(defsites.getCurrentLocUri)
             //The found definition loc should be an assignment action
             var bar:ActionLocation = loc.asInstanceOf[ActionLocation]

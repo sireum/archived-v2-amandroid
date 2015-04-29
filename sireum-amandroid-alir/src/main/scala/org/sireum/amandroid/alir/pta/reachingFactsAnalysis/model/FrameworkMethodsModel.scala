@@ -110,8 +110,8 @@ object FrameworkMethodsModel {
 	        case ui : UnknownInstance =>
 	        case ni : NullInstance =>
 	        case _ =>
-	          val intentF = new IntentFilter(rv.getType.name)
-			      val comRec = Center.resolveClass(rv.getType.name, Center.ResolveLevel.HIERARCHY)
+	          val intentF = new IntentFilter(rv.typ.name)
+			      val comRec = Center.resolveClass(rv.typ.name, Center.ResolveLevel.HIERARCHY)
 			      filterValue.foreach{
 			        fv =>
 			          val mActionsSlot = FieldSlot(fv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENTFILTER_ACTIONS))

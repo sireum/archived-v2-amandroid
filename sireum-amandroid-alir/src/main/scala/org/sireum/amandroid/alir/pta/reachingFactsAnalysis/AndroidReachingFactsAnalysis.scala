@@ -222,9 +222,12 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
 	      checkAndLoadClasses(lhss, rhss, a, s, currentNode)
 	      val values = ReachingFactsAnalysisHelper.processRHSs(rhss, currentNode.getContext, ptaresult) 
 	      slots.foreach{
-	        case(i, (slot, _)) =>
-	          if(values.contains(i))
-	            result ++= values(i).map{v => RFAFact(slot, v)}
+	        case(i, smap) =>
+            smap.foreach{
+              case (slot, _) =>
+                if(values.contains(i))
+                  result ++= values(i).map{v => RFAFact(slot, v)}
+            }
 	      }
         val heapUnknownFacts = ReachingFactsAnalysisHelper.getHeapUnknownFacts(rhss, currentNode.getContext, ptaresult)
         result ++= heapUnknownFacts
@@ -272,7 +275,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
       ReachingFactsAnalysisHelper.updatePTAResultRHSs(rhss, currentNode.getContext, s, ptaresult)
       val lhss = PilarAstHelper.getLHSs(a)
       ReachingFactsAnalysisHelper.updatePTAResultLHSs(lhss, currentNode.getContext, s, ptaresult)
-      val slotsWithMark = ReachingFactsAnalysisHelper.processLHSs(lhss, currentNode.getContext, ptaresult).values.toSet
+      val slotsWithMark = ReachingFactsAnalysisHelper.processLHSs(lhss, currentNode.getContext, ptaresult).values.flatten.toSet
       for (rdf @ RFAFact(slot, value) <- s) {
         //if it is a strong definition, we can kill the existing definition
         if (slotsWithMark.contains(slot, true)) {
@@ -439,7 +442,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
      * return true if the given recv Instance should pass to the given callee
      */
     private def shouldPass(recvIns : Instance, calleeProc : JawaMethod, typ : String) : Boolean = {
-      val recRecv = Center.resolveClass(recvIns.getType.name, Center.ResolveLevel.HIERARCHY)
+      val recRecv = Center.resolveClass(recvIns.typ.name, Center.ResolveLevel.HIERARCHY)
       val recCallee = calleeProc.getDeclaringClass
       var tmpRec = recRecv
       if(typ == "direct" || typ == "super" ){

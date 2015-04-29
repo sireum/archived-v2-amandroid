@@ -375,7 +375,7 @@ object BundleModel {
 	        vv =>
             thisValue.foreach{
               ins =>
-                entries += PTATupleInstance(kv, vv, ins.getDefSite)
+                entries += PTATupleInstance(kv, vv, ins.defSite)
             }
 	      }
 	  }
