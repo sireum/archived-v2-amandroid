@@ -16,9 +16,9 @@ import org.sireum.amandroid.parser.ARSCFileParser
 import org.sireum.amandroid.parser.IntentFilterDataBase
 import org.sireum.alir.ReachingDefinitionAnalysis
 import org.sireum.amandroid.parser.ManifestParser
-import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.JawaClass
 import org.sireum.jawa.Center
-import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.JawaMethod
 import org.sireum.amandroid.parser.LayoutFileParser
 import scala.util.control.Breaks._
 import org.sireum.amandroid.AppCenter
@@ -28,7 +28,7 @@ import org.sireum.amandroid.parser.ComponentInfo
 import java.io.InputStream
 import org.sireum.jawa.util.ResourceRetriever
 import org.sireum.amandroid.pilarCodeGenerator.AndroidEnvironmentGenerator
-import org.sireum.amandroid.pilarCodeGenerator.AndroidSubstituteRecordMap
+import org.sireum.amandroid.pilarCodeGenerator.AndroidSubstituteClassMap
 import org.sireum.amandroid.pilarCodeGenerator.AndroidEntryPointConstants
 import java.io.File
 import java.net.URI
@@ -46,25 +46,25 @@ import org.sireum.jawa.util.MyTimer
  */
 class AppInfoCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, timer : Option[MyTimer]) {  
   private final val TITLE = "AppInfoCollector"
-  protected var uses_permissions : ISet[String] = isetEmpty
-	protected var callbackMethods : Map[JawaRecord, Set[JawaProcedure]] = Map()
-	protected var componentInfos : Set[ComponentInfo] = Set()
-	protected var layoutControls : Map[Int, LayoutControl] = Map()
+  protected val uses_permissions : MSet[String] = msetEmpty
+	protected val callbackMethods : MMap[JawaClass, Set[JawaMethod]] = mmapEmpty
+	protected val componentInfos : MSet[ComponentInfo] = msetEmpty
+	protected val layoutControls : MMap[Int, LayoutControl] = mmapEmpty
 	protected var appPackageName : String = null
 	protected var taintWrapperFile : String = null
-	protected var intentFdb : IntentFilterDataBase = null
+	protected val intentFdb : IntentFilterDataBase = new IntentFilterDataBase
 	protected var codeLineCounter : Int = 0
 	
 	/**
-	 * Map from record name to it's env procedure code.
+	 * Map from record name to it's env method code.
 	 */
-	protected var envProcMap : Map[JawaRecord, JawaProcedure] = Map()
-	def getAppName = new File(new URI(apkUri)).getName()
-	def getPackageName = this.appPackageName
-	def getUsesPermissions = this.uses_permissions
-	def getLayoutControls = this.layoutControls
-	def getCallbackMethodMapping = this.callbackMethods
-	def getCallbackMethods = if(!this.callbackMethods.isEmpty)this.callbackMethods.map(_._2).reduce(iunion[JawaProcedure]) else isetEmpty[JawaProcedure]
+	protected var envProcMap : Map[JawaClass, JawaMethod] = Map()
+	def getAppName: String = new File(new URI(apkUri)).getName()
+	def getPackageName: String = this.appPackageName
+	def getUsesPermissions: ISet[String] = this.uses_permissions.toSet
+	def getLayoutControls: IMap[Int, LayoutControl] = this.layoutControls.toMap
+	def getCallbackMethodMapping: IMap[JawaClass, Set[JawaMethod]] = this.callbackMethods.toMap
+	def getCallbackMethods: ISet[JawaMethod] = if(!this.callbackMethods.isEmpty)this.callbackMethods.map(_._2).reduce(iunion[JawaMethod]) else isetEmpty[JawaMethod]
 	def printEnvs() =
 	  envProcMap.foreach{case(k, v) => println("Environment for " + k + "\n" + v)}
 	
@@ -98,7 +98,7 @@ class AppInfoCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, ti
 	  sb.toString.intern()
 	}
 	
-	def hasEnv(rec : JawaRecord) : Boolean = this.envProcMap.contains(rec)
+	def hasEnv(rec : JawaClass) : Boolean = this.envProcMap.contains(rec)
 	
 	/**
 	 * generates env code for a component like Activity, BroadcastReceiver, etc.
@@ -106,14 +106,14 @@ class AppInfoCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, ti
 	 * @param codeCtr code line number of the last generated env
 	 * @return codeCtr + newly generated number of lines
 	 */
-	def generateEnvironment(record : JawaRecord, envName : String, codeCtr: Int) : Int = {
+	def generateEnvironment(record : JawaClass, envName : String, codeCtr: Int) : Int = {
 	  if(record == null) return 0
 		//generate env main method
   	msg_normal(TITLE, "Generate environment for " + record)
 	  val dmGen = new AndroidEnvironmentGenerator
-	  dmGen.setSubstituteRecordMap(AndroidSubstituteRecordMap.getSubstituteRecordMap)
+	  dmGen.setSubstituteClassMap(AndroidSubstituteClassMap.getSubstituteClassMap)
 	  dmGen.setCurrentComponent(record.getName)
-	  dmGen.setComponentInfos(this.componentInfos)
+	  dmGen.setComponentInfos(this.componentInfos.toSet)
 	  dmGen.setCodeCounter(codeCtr)
 	  var callbackMethodSigs : Map[String, Set[String]] = Map()
 	  this.callbackMethods.foreach{
@@ -129,15 +129,15 @@ class AppInfoCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, ti
 	  dmGen.getCodeCounter
 	}
 	
-	def dynamicRegisterComponent(comRec : JawaRecord, iDB : IntentFilterDataBase, precise : Boolean) = {
+	def dynamicRegisterReceiver(comRec : JawaClass, iDB : IntentFilterDataBase) = {
 	  this.synchronized{
-		  if(!comRec.declaresProcedureByShortName(AndroidConstants.COMP_ENV)){
+		  if(!comRec.declaresMethodByShortName(AndroidConstants.COMP_ENV)){
 			  msg_critical(TITLE, "*************Dynamically Register Component**************")
 			  msg_normal(TITLE, "Component name: " + comRec)
-			  this.intentFdb.updateIntentFmap(iDB)
+			  this.intentFdb.merge(iDB)
 			  val analysisHelper = new ReachableInfoCollector(Set(comRec.getName), timer) 
 				analysisHelper.collectCallbackMethods()
-				this.callbackMethods = analysisHelper.getCallbackMethods
+				this.callbackMethods ++= analysisHelper.getCallbackMethods
 				analysisHelper.getCallbackMethods.foreach {
 			    case(k, v) =>
 		  			this.callbackMethods += (k -> (this.callbackMethods.getOrElse(k, isetEmpty) ++ v))
@@ -145,8 +145,7 @@ class AppInfoCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, ti
 			  msg_normal(TITLE, "Found " + this.callbackMethods.size + " callback methods")
 		    val clCounter = generateEnvironment(comRec, AndroidConstants.COMP_ENV, this.codeLineCounter)
 		    this.codeLineCounter = clCounter
-		    AppCenter.addComponent(comRec)
-		    AppCenter.addDynamicRegisteredComponent(comRec, precise)
+		    AppCenter.addDynamicRegisteredReceiver(comRec)
 		    AppCenter.updateIntentFilterDB(iDB)
 		    msg_critical(TITLE, "~~~~~~~~~~~~~~~~~~~~~~~~~Done~~~~~~~~~~~~~~~~~~~~~~~~~~")
 		  }
@@ -162,20 +161,22 @@ class AppInfoCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, ti
 		val callbacks = AppInfoCollector.analyzeCallback(afp, lfp, ra)
 		
 		this.appPackageName = mfp.getPackageName
-		this.componentInfos = mfp.getComponentInfos
-		this.uses_permissions = mfp.getPermissions
-		this.intentFdb = mfp.getIntentDB
-		this.layoutControls = lfp.getUserControls
-		this.callbackMethods = callbacks
+		this.componentInfos ++= mfp.getComponentInfos
+		this.uses_permissions ++= mfp.getPermissions
+		this.intentFdb.merge(mfp.getIntentDB)
+		this.layoutControls ++= lfp.getUserControls
+		this.callbackMethods ++= callbacks
 		
-		var components = isetEmpty[JawaRecord]
+		var components = isetEmpty[JawaClass]
     mfp.getComponentInfos.foreach{
-      f => 
-        val record = Center.resolveRecord(f.name, Center.ResolveLevel.HIERARCHY)
-        if(!record.isUnknown && record.isApplicationRecord){
-	        components += record
-	        val clCounter = generateEnvironment(record, if(f.exported)AndroidConstants.MAINCOMP_ENV else AndroidConstants.COMP_ENV, codeLineCounter)
-	        codeLineCounter = clCounter
+      f =>
+        if(f.enabled){
+          val record = Center.resolveClass(f.name, Center.ResolveLevel.HIERARCHY)
+          if(!record.isUnknown && record.isApplicationClass){
+  	        components += record
+  	        val clCounter = generateEnvironment(record, if(f.exported)AndroidConstants.MAINCOMP_ENV else AndroidConstants.COMP_ENV, codeLineCounter)
+  	        codeLineCounter = clCounter
+          }
         }
     }
 		AppCenter.setComponents(components)
@@ -192,7 +193,7 @@ object AppInfoCollector {
 	  val mfp = new ManifestParser
 		mfp.loadClassesFromTextManifest(manifestIS)
     manifestIS.close()
-	  msg_normal(TITLE, "entrypoints--->" + mfp.getComponentRecords)
+	  msg_normal(TITLE, "entrypoints--->" + mfp.getComponentClasses)
 	  msg_normal(TITLE, "packagename--->" + mfp.getPackageName)
 	  msg_normal(TITLE, "permissions--->" + mfp.getPermissions)
 	  msg_normal(TITLE, "intentDB------>" + mfp.getIntentDB)
@@ -218,17 +219,16 @@ object AppInfoCollector {
 	  lfp
 	}
 	
-	def analyzeCallback(afp : ARSCFileParser_apktool, lfp : LayoutFileParser, analysisHelper : ReachableInfoCollector) : Map[JawaRecord, Set[JawaProcedure]] = {
-	  var callbackMethods : Map[JawaRecord, Set[JawaProcedure]] = Map()
+	def analyzeCallback(afp : ARSCFileParser_apktool, lfp : LayoutFileParser, analysisHelper : ReachableInfoCollector) : Map[JawaClass, Set[JawaMethod]] = {
+	  val callbackMethods : MMap[JawaClass, Set[JawaMethod]] = mmapEmpty
 	  analysisHelper.collectCallbackMethods()
-		callbackMethods = analysisHelper.getCallbackMethods
+		callbackMethods ++= analysisHelper.getCallbackMethods
 		msg_detail(TITLE, "LayoutClasses --> " + analysisHelper.getLayoutClasses)
 
 		analysisHelper.getCallbackMethods.foreach {
 	    case(k, v) =>
   			callbackMethods += (k -> (callbackMethods.getOrElse(k, isetEmpty) ++ v))
 		}
-	  
 		// Collect the XML-based callback methods
 		analysisHelper.getLayoutClasses.foreach {
 		  case (k, v) =>
@@ -236,25 +236,26 @@ object AppInfoCollector {
 		      i =>
 		        val resource = afp.findResource(i)
 		        if(resource != null && resource.getType.getName == "layout"){
-		          val strRes = resource
-	            lfp.getCallbackMethods.find(_._1.contains(strRes.getName)).foreach{
+              val includes = lfp.getIncludes.filter(_._1.contains(resource.getName)).flatten(_._2).toSet
+              val resources = includes.map(i => afp.findResource(i)) + resource
+	            lfp.getCallbackMethods.find{case (file, _) => resources.map(_.getName).exists { x => file.contains(x) }}.foreach{
                 case (_, methodNames) =>
                   methodNames foreach{
                     methodName =>
     	                //The callback may be declared directly in the class or in one of the superclasses
-    	                var callbackRecord = k
-    	                var callbackProcedure : Set[JawaProcedure] = Set()
+    	                var callbackClass = k
+    	                val callbackMethod : MSet[JawaMethod] = msetEmpty
     	                breakable{ 
-    	                  while(callbackProcedure.isEmpty){
-    		                  if(callbackRecord.declaresProcedureByShortName(methodName))
-    		                  	callbackProcedure = callbackRecord.getProceduresByShortName(methodName)
-    		                  if(callbackRecord.hasSuperClass)
-    		                    callbackRecord = callbackRecord.getSuperClass
+    	                  while(callbackMethod.isEmpty){
+    		                  if(callbackClass.declaresMethodByShortName(methodName))
+    		                  	callbackMethod ++= callbackClass.getMethodsByShortName(methodName)
+    		                  if(callbackClass.hasSuperClass)
+    		                    callbackClass = callbackClass.getSuperClass
     		                  else break
     	                  }
     	                }
-    	                if(callbackProcedure != null){
-    	                  callbackMethods += (k -> (callbackMethods.getOrElse(k, isetEmpty) ++ callbackProcedure))
+    	                if(callbackMethod != null){
+    	                  callbackMethods += (k -> (callbackMethods.getOrElse(k, isetEmpty) ++ callbackMethod))
     	                } else {
     	                  err_msg_normal(TITLE, "Callback method " + methodName + " not found in class " + k);
     	                }
@@ -265,7 +266,7 @@ object AppInfoCollector {
 		        }
 		    }
 		}
-		callbackMethods
+		callbackMethods.toMap
 	}
 	
 	def reachabilityAnalysis(mfp : ManifestParser, timer : Option[MyTimer]) : ReachableInfoCollector = {

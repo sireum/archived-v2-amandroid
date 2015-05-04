@@ -182,9 +182,9 @@ object CryptoMisuse {
     def onPreAnalysis: Unit = {
     }
 
-    def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
+    def entryPointFilter(eps: Set[org.sireum.jawa.JawaMethod]): Set[org.sireum.jawa.JawaMethod] = {
       val iacs = app_info.getInterestingContainers(CryptographicConstants.getCryptoAPIs)
-      eps.filter(e=>iacs.contains(e.getDeclaringRecord))
+      eps.filter(e=>iacs.contains(e.getDeclaringClass))
     }
 
     def onAnalysisSuccess : Unit = {

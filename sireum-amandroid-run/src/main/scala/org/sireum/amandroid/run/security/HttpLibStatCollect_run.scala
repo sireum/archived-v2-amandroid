@@ -130,13 +130,13 @@ object HttpLibStatCollect_run {
         	val dexFile = APKFileResolver.getDexFile(file, FileUtil.toUri(srcFile.getParentFile()))
         	
         	// convert the dex file to the "pilar" form
-        	val pilarFileUri = Dex2PilarConverter.convert(dexFile)
+        	val pilarFileUri = Dex2PilarConverter.convert(dexFile, FileUtil.toUri(srcFile.getParentFile()))
       		
         	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
         	JawaCodeSource.load(pilarFileUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
       	
       	
-        	(JawaCodeSource.getAppRecordsCodes).foreach{
+        	(JawaCodeSource.getAppClassCodes).foreach{
         	  case (name, code) => 	    
         	    if(code.contains("java.net.HttpURLConnection")){  // java net http client
         	      System.err.println("java net httpURLConn in App code record " + name)
@@ -162,7 +162,7 @@ object HttpLibStatCollect_run {
         	}
       	
       	
-        	(JawaCodeSource.getThirdPartyLibraryRecordsCodes).foreach{
+        	(JawaCodeSource.getThirdPartyLibraryClassCodes).foreach{
         	  case (name, code) =>
         	    
         	   if(code.contains("java.net.HttpURLConnection")){  // java net http client
@@ -195,7 +195,7 @@ object HttpLibStatCollect_run {
   	    	Center.reset
   	    	AppCenter.reset
   	    	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
-  	    	JawaCodeSource.clearAppRecordsCodes
+  	    	JawaCodeSource.clearAppClassCodes
   			  System.gc()
   			  Counter.write
   	    	msg_critical(TITLE, Counter.toString)

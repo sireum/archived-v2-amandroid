@@ -33,13 +33,13 @@ object AndoridLibSummaryGenerator {
 	    val startTime = System.currentTimeMillis()
 			JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
 			var x : Float = 0
-			val recSize = JawaCodeSource.getFrameworkRecordsCodes.size
-			JawaCodeSource.getFrameworkRecordsCodes.par.map{
+			val recSize = JawaCodeSource.getFrameworkClassCodes.size
+			JawaCodeSource.getFrameworkClassCodes.par.map{
 			  case (recName, code) =>
 			    this.synchronized(x += 1)
 			    if(x%100==0)println((x/recSize)*100 + "%")
-			    if(x == recSize) println("Record resolving Done!")
-			    Center.resolveRecord(recName, Center.ResolveLevel.HIERARCHY)
+			    if(x == recSize) println("Class resolving Done!")
+			    Center.resolveClass(recName, Center.ResolveLevel.HIERARCHY)
 			}
 	    
 	    val outputDir = AndroidGlobalConfig.amandroid_home + "/output"

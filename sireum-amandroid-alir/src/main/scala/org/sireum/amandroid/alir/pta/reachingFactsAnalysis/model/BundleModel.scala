@@ -24,9 +24,9 @@ import org.sireum.jawa.alir.pta.FieldSlot
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
 object BundleModel {
-	def isBundle(r : JawaRecord) : Boolean = r.getName == AndroidConstants.BUNDLE
+	def isBundle(r : JawaClass) : Boolean = r.getName == AndroidConstants.BUNDLE
 	  
-	def doBundleCall(s : PTAResult, p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	def doBundleCall(s : PTAResult, p : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true
@@ -292,7 +292,7 @@ object BundleModel {
   	  result ++= strValue.map{
   	    s => 
   	      require(s.isInstanceOf[PTATupleInstance])
-  	      RFAFact(FieldSlot(rf.v, "java.util.HashSet.items"), s.asInstanceOf[PTATupleInstance].left)
+  	      RFAFact(FieldSlot(rf.v, "items"), s.asInstanceOf[PTATupleInstance].left)
   	  }
     }
 	  result
@@ -311,7 +311,7 @@ object BundleModel {
   		  entValue.foreach{
   		    v =>
   		      require(v.isInstanceOf[PTATupleInstance])
-  		      if(keyValue.contains(v.asInstanceOf[PTATupleInstance].left)){
+  		      if(keyValue.exists { kIns => kIns === v.asInstanceOf[PTATupleInstance].left }){
   		        result += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
   		      }
   		  }
@@ -341,7 +341,7 @@ object BundleModel {
   		  entValue.foreach{
   		    v =>
   		      require(v.isInstanceOf[PTATupleInstance])
-  		      if(keyValue.contains(v.asInstanceOf[PTATupleInstance].left)){
+  		      if(keyValue.exists { kIns => kIns === v.asInstanceOf[PTATupleInstance].left }){
   		        result += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
   		      }
   		  }
@@ -373,7 +373,10 @@ object BundleModel {
 	    kv =>
 	      valueValue.foreach{
 	        vv =>
-	          entries += PTATupleInstance(kv, vv, currentContext)
+            thisValue.foreach{
+              ins =>
+                entries += PTATupleInstance(kv, vv, ins.defSite)
+            }
 	      }
 	  }
 	  thisValue.foreach{

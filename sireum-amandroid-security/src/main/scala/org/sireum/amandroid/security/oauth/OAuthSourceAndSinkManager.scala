@@ -10,7 +10,7 @@ package org.sireum.amandroid.security.oauth
 import org.sireum.amandroid.alir.taintAnalysis.AndroidSourceAndSinkManager
 import org.sireum.amandroid.parser.LayoutControl
 import org.sireum.util._
-import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.JawaMethod
 import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.alir.controlFlowGraph.ICFGCallNode
 import org.sireum.jawa.alir.controlFlowGraph.ICFGNode
@@ -33,17 +33,17 @@ import org.sireum.jawa.alir.pta.PTAResult
  */ 
 class OAuthSourceAndSinkManager(appPackageName : String, 
     												layoutControls : Map[Int, LayoutControl], 
-    												callbackMethods : ISet[JawaProcedure], 
+    												callbackMethods : ISet[JawaMethod], 
     												sasFilePath : String) extends AndroidSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
   private final val TITLE = "OAuthSourceAndSinkManager"
     
-  override def isSource(calleeProcedure : JawaProcedure, callerProcedure : JawaProcedure, callerLoc : JumpLocation) = false
+  override def isSource(calleeMethod : JawaMethod, callerMethod : JawaMethod, callerLoc : JumpLocation) = false
     
-  override def isCallbackSource(proc : JawaProcedure) : Boolean = {
+  override def isCallbackSource(proc : JawaMethod) : Boolean = {
     false
   }
   
-	override def isUISource(calleeProcedure : JawaProcedure, callerProcedure : JawaProcedure, callerLoc : JumpLocation) : Boolean = {
+	override def isUISource(calleeMethod : JawaMethod, callerMethod : JawaMethod, callerLoc : JumpLocation) : Boolean = {
 	  false
 	}
 	
@@ -74,7 +74,7 @@ class OAuthSourceAndSinkManager(appPackageName : String,
       callee =>
         if(InterComponentCommunicationModel.isIccOperation(callee.callee)){
           sinkflag = true
-          val args = Center.getProcedureWithoutFailing(invNode.getOwner).getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
+          val args = Center.getMethodWithoutFailing(invNode.getOwner).getMethodBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
               case te : TupleExp =>
                 te.exps.map{
 			            exp =>
@@ -88,7 +88,8 @@ class OAuthSourceAndSinkManager(appPackageName : String,
           val intentSlot = VarSlot(args(1))
           val intentValues = ptaresult.pointsToSet(intentSlot, invNode.getContext)
           val intentContents = IntentHelper.getIntentContents(ptaresult, intentValues, invNode.getContext)
-          val comMap = IntentHelper.mappingIntents(intentContents)
+          val compType = AndroidConstants.getIccCallType(callee.callee.getSubSignature)
+          val comMap = IntentHelper.mappingIntents(intentContents, compType)
           comMap.foreach{
             case (_, coms) =>
               if(coms.isEmpty) sinkflag = true

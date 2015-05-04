@@ -13,14 +13,13 @@ import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.alir.Slot
 import org.sireum.jawa.util.StringFormConverter
-import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.JawaClass
 import org.sireum.amandroid.parser.UriData
 import java.net.URI
 import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.Center
 import org.sireum.jawa.MessageCenter._
-import org.sireum.jawa.JawaProcedure
 import java.net.URLEncoder
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.pta.PTAResult
@@ -38,16 +37,16 @@ object IntentHelper {
 	  val EXPLICIT, IMPLICIT = Value
 	}
   
-  final case class IntentContent(componentNames : ISet[String], 
-      													 actions : ISet[String], 
-      													 categories : ISet[String], 
-      													 datas : ISet[UriData], 
-      													 types : ISet[String], 
-      													 preciseExplicit : Boolean,
-      													 preciseImplicit : Boolean,
-      													 senderContext : Context)
+  final case class IntentContent(componentNames: ISet[String], 
+      													 actions: ISet[String], 
+      													 categories: ISet[String], 
+      													 datas: ISet[UriData], 
+      													 types: ISet[String], 
+      													 preciseExplicit: Boolean,
+      													 preciseImplicit: Boolean,
+      													 senderContext: Context)
   
-	def getIntentContents(s : PTAResult, intentValues : ISet[Instance], currentContext : Context) : ISet[IntentContent] = {
+	def getIntentContents(s: PTAResult, intentValues: ISet[Instance], currentContext: Context): ISet[IntentContent] = {
 	  var result = isetEmpty[IntentContent]
 	  intentValues.foreach{
       intentIns =>
@@ -127,7 +126,7 @@ object IntentHelper {
     var path:String = null
     if(uriData != null){
       if(!uriData.startsWith("tel:") && !uriData.startsWith("file:") && uriData.contains("://") && uriData.indexOf("://") < uriData.length()){
-        var legalUriStr : String = uriData
+        var legalUriStr: String = uriData
         if(uriData.contains("=")){
           val (head, query) = uriData.splitAt(uriData.indexOf("=") + 1)
           legalUriStr = head + URLEncoder.encode(query, "UTF-8")
@@ -140,7 +139,7 @@ object IntentHelper {
 	        path = if(uri.getPath() != "") uri.getPath() else null
 	        data.set(scheme, host, port, path, null, null)
         } catch {
-          case e : IllegalArgumentException => err_msg_normal(TITLE, "Unexpected uri: " + legalUriStr)
+          case e: IllegalArgumentException => err_msg_normal(TITLE, "Unexpected uri: " + legalUriStr)
         }
       } else if(uriData.contains(":")){  // because e.g. app code can have intent.setdata("http:") instead of intent.setdata("http://xyz:200/pqr/abc")
         scheme = uriData.split(":")(0)
@@ -150,25 +149,47 @@ object IntentHelper {
     }
   }
 	
-	def mappingIntents(intentContents : ISet[IntentContent]) : IMap[IntentContent, ISet[(JawaRecord, IntentType.Value)]] = {
+	def mappingIntents(intentContents: ISet[IntentContent], compType: AndroidConstants.CompType.Value): IMap[IntentContent, ISet[(JawaClass, IntentType.Value)]] = {
 	  intentContents.map{
 	    ic =>
-	      var components : ISet[(JawaRecord, IntentType.Value)] = isetEmpty
+	      val components: MSet[(JawaClass, IntentType.Value)] = msetEmpty
+        if(!ic.preciseExplicit){
+          compType match {
+            case AndroidConstants.CompType.ACTIVITY =>
+              components ++= AppCenter.getActivities.map((_, IntentType.EXPLICIT))
+            case AndroidConstants.CompType.SERVICE =>
+              components ++= AppCenter.getServices.map((_, IntentType.EXPLICIT))
+            case AndroidConstants.CompType.RECEIVER =>
+              components ++= AppCenter.getReceivers.map((_, IntentType.EXPLICIT))
+            case AndroidConstants.CompType.PROVIDER =>
+              components ++= AppCenter.getProviders.map((_, IntentType.EXPLICIT))
+          }
+        } else if(!ic.preciseImplicit) {
+          compType match {
+            case AndroidConstants.CompType.ACTIVITY =>
+              components ++= AppCenter.getActivities.map((_, IntentType.IMPLICIT))
+            case AndroidConstants.CompType.SERVICE =>
+              components ++= AppCenter.getServices.map((_, IntentType.IMPLICIT))
+            case AndroidConstants.CompType.RECEIVER =>
+              components ++= AppCenter.getReceivers.map((_, IntentType.IMPLICIT))
+            case AndroidConstants.CompType.PROVIDER =>
+              components ++= AppCenter.getProviders.map((_, IntentType.IMPLICIT))
+          }
+        }
 	      ic.componentNames.foreach{
 	        targetRecName =>
-	          
-		        val targetRec = Center.resolveRecord(targetRecName, Center.ResolveLevel.HIERARCHY)
+		        val targetRec = Center.resolveClass(targetRecName, Center.ResolveLevel.HIERARCHY)
             if(DEBUG)
             	msg_detail(TITLE, "explicit target component: " + targetRec)
             components += ((targetRec, IntentType.EXPLICIT))
 	      }
 	      components ++= findComponents(ic.actions, ic.categories, ic.datas, ic.types).map((_, IntentType.IMPLICIT))
-	      (ic, components)
+	      (ic, components.toSet)
 	  }.toMap
 	}
 	
-	private def findComponents(actions: Set[String], categories: Set[String], datas : Set[UriData], mTypes:Set[String]) : ISet[JawaRecord] = {
-    var components : ISet[JawaRecord] = isetEmpty
+	private def findComponents(actions: Set[String], categories: Set[String], datas: Set[UriData], mTypes:Set[String]): ISet[JawaClass] = {
+    var components: ISet[JawaClass] = isetEmpty
     if(actions.isEmpty){
 	      if(datas.isEmpty){
 	        if(mTypes.isEmpty) components ++= findComps(null, categories, null, null) 
@@ -201,8 +222,8 @@ object IntentHelper {
     components
   }
   
-  private def findComps(action:String, categories: Set[String], data:UriData, mType:String) : ISet[JawaRecord] = {
-    var components : ISet[JawaRecord] = isetEmpty
+  private def findComps(action:String, categories: Set[String], data:UriData, mType:String): ISet[JawaClass] = {
+    var components: ISet[JawaClass] = isetEmpty
     AppCenter.getComponents.foreach{
 	    ep =>
 	      val iFilters = AppCenter.getIntentFilterDB.getIntentFilters(ep)

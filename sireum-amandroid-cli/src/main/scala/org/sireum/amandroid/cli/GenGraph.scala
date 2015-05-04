@@ -27,7 +27,7 @@ import org.sireum.jawa.alir.controlFlowGraph.InterproceduralControlFlowGraph
 import org.sireum.jawa.alir.controlFlowGraph.ICFGNode
 import org.sireum.jawa.Center
 import org.sireum.amandroid.AndroidConstants
-import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.JawaMethod
 import java.io.FileOutputStream
 import java.util.zip.GZIPOutputStream
 import java.io.BufferedOutputStream
@@ -42,6 +42,13 @@ import org.sireum.option.GraphFormat
 import org.sireum.option.GraphType
 import java.io.BufferedWriter
 import java.io.OutputStreamWriter
+import org.jgrapht.ext.VertexNameProvider
+import org.jgrapht.ext.EdgeNameProvider
+import org.sireum.jawa.alir.controlFlowGraph.ICFGEntryNode
+import org.sireum.jawa.alir.controlFlowGraph.ICFGReturnNode
+import org.sireum.jawa.alir.controlFlowGraph.ICFGExitNode
+import org.sireum.jawa.alir.controlFlowGraph.ICFGCallNode
+import org.sireum.jawa.alir.controlFlowGraph.ICFGNormalNode
 
 
 /**
@@ -49,9 +56,7 @@ import java.io.OutputStreamWriter
  */
 object GenGraphCli {
 	def run(saamode : SireumAmandroidGenGraphMode) {
-    val sourceType = saamode.general.typ match{
-      case AnalyzeSource.APK => "APK"
-      case AnalyzeSource.DIR => "DIR"}
+    val sourceType = saamode.general.typ
     val sourceDir = saamode.srcFile
     val sourceFile = new File(sourceDir)
     val outputDir = saamode.analysis.outdir
@@ -67,7 +72,7 @@ object GenGraphCli {
     forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, outputDir, mem, format, graphtyp, msgLevel)
   }
 	
-	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : String, sourceDir : String, outputDir : String, mem : Int, format : GraphFormat.Type, graphtyp : GraphType.Type, msgLevel : MessageLevel.Type) = {
+	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : AnalyzeSource.Type, sourceDir : String, outputDir : String, mem : Int, format : GraphFormat.Type, graphtyp : GraphType.Type, msgLevel : MessageLevel.Type) = {
     val args : MList[String] = mlistEmpty
     args += "-s"
     args += (!nostatic).toString
@@ -85,7 +90,7 @@ object GenGraphCli {
     args += graphtyp.toString
     args += "-msg"
     args += msgLevel.toString
-    args ++= List("-t", typSpec, sourceDir, outputDir)
+    args ++= List("-t", typSpec.toString, sourceDir, outputDir)
     org.sireum.jawa.util.JVMUtil.startSecondJVM(GenGraph.getClass(), "-Xmx" + mem + "G", args.toList, true)
   }
 }
@@ -99,8 +104,8 @@ object GenGraph {
   private final val TITLE = "GenCallGraph"
   
 	def main(args: Array[String]) {
-	  if(args.size != 22){
-      println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -f [Graph Format: DOT, GraphML, GML, TEXT] -gt [Graph Type: FULL, CALL, API] -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -t type[allows: APK, DIR] <source path> <output path>")
+	  if(args.size != 20){
+      println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -f [Graph Format: DOT, GraphML, GML] -gt [Graph Type: FULL, SIMPLE_CALL, DETAILED_CALL, API] -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -t type[allows: APK, DIR] <source path> <output path>")
       return
     }
     val static = args(1).toBoolean
@@ -112,8 +117,8 @@ object GenGraph {
     val graphtyp = args(13)
     val msgLevel = args(15)
     val typ = args(17)
-    val sourcePath = args(19)
-    val outputPath = args(20)
+    val sourcePath = args(18)
+    val outputPath = args(19)
     
     msgLevel match{
       case "NO$" =>
@@ -130,10 +135,10 @@ object GenGraph {
     }
     
     val apkFileUris = typ match{
-      case "APK" =>
+      case "APK$" =>
         require(sourcePath.endsWith(".apk"))
         Set(FileUtil.toUri(sourcePath))
-      case "DIR" =>
+      case "DIR$" =>
         require(new File(sourcePath).isDirectory())
         FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
       case _ => 
@@ -159,46 +164,60 @@ object GenGraph {
             if(timer.isDefined) timer.get.start
             val apkName = apkFileUri.substring(apkFileUri.lastIndexOf("/") + 1, apkFileUri.lastIndexOf("."))
             
-        		val resultDir = new File(outputPath + "/APPs/")
             val outputUri = FileUtil.toUri(outputPath)
         		val outUri = AmDecoder.decode(apkFileUri, outputUri)
-            val dexFile = outUri + "/classes.dex"
+            val fileandout = (apkFileUri, outUri + "classes")
         
         		// convert the dex file to the "pilar" form
-        		val pilarRootUri = Dex2PilarConverter.convert(dexFile)
-            
+        		val pilarRootUri = Dex2PilarConverter.convert(fileandout._1, fileandout._2)
           	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
           	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
           	
           	val app_info = new AppInfoCollector(apkFileUri, outUri, timer)
           	app_info.collectInfo
-
+            
             val eps = app_info.getEntryPoints
             val pros =
               eps.map{
                 compName =>
-                  val comp = Center.resolveRecord(compName, Center.ResolveLevel.BODY)
-                  val procedures = comp.getProceduresByShortName(AndroidConstants.MAINCOMP_ENV) ++ comp.getProceduresByShortName(AndroidConstants.COMP_ENV)
+                  val comp = Center.resolveClass(compName, Center.ResolveLevel.BODY)
+                  val procedures = comp.getMethodsByShortName(AndroidConstants.MAINCOMP_ENV) ++ comp.getMethodsByShortName(AndroidConstants.COMP_ENV)
                   procedures
-              }.reduce(iunion[JawaProcedure])
+              }.reduce(iunion[JawaMethod])
 
             val icfg = InterproceduralSuperSpark(pros, timer).icfg
-          	
-            val file = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ".txt.gz")
+            val file = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ".txt")
       	    val w = new FileOutputStream(file)
-            val zips = new GZIPOutputStream(new BufferedOutputStream(w))
+            val zips = new BufferedOutputStream(w)
             val zipw = new BufferedWriter(new OutputStreamWriter(zips, "UTF-8"))
-      	    val graph = 
-              graphtyp match{
-                case "FULL$" => icfg
-                case "SIMPLE_CALL$" => icfg.toSimpleCallGraph
-                case "API$" => icfg.toApiGraph
-              }
-            format match {
-              case "DOT$" => graph.toDot(zipw)
-              case "GraphML$" => graph.toGraphML(zipw)
-              case "GML$" => graph.toGML(zipw)
-              case "TEXT$" => graph.toText(zipw)
+            
+            graphtyp match{
+              case "FULL$" => 
+                val graph = icfg
+                format match {
+                  case "GraphML$" => graph.toGraphML(zipw)
+                  case "GML$" => graph.toGML(zipw)
+                }
+              case "SIMPLE_CALL$" => 
+                val path = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + "/simple_cg")
+                val fm = format match {
+                  case "GraphML$" => "GraphML"
+                  case "GML$" => "GML"
+                }
+                icfg.getCallGraph.toSimpleCallGraph(path.getPath, fm)
+              case "DETAILED_CALL$" => 
+                val path = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + "/detailed_cg")
+                val fm = format match {
+                  case "GraphML$" => "GraphML"
+                  case "GML$" => "GML"
+                }
+                icfg.getCallGraph.toDetailedCallGraph(icfg, path.getPath, fm)
+              case "API$" => 
+                val graph = icfg.toApiGraph
+                format match {
+                  case "GraphML$" => graph.toGraphML(zipw)
+                  case "GML$" => graph.toGML(zipw)
+                }
             }
       	    zipw.close()
       	    println(apkName + " result stored!")
@@ -212,7 +231,7 @@ object GenGraph {
             Center.reset
           	AppCenter.reset
           	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
-          	JawaCodeSource.clearAppRecordsCodes
+          	JawaCodeSource.clearAppClassCodes
           	System.gc()
             System.gc()
           }

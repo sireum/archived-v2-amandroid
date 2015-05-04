@@ -7,8 +7,9 @@ http://www.eclipse.org/legal/epl-v10.html
 */
 package org.sireum.amandroid.parser
 
-import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.JawaClass
 import org.sireum.jawa.Center
+import org.sireum.util._
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -18,11 +19,11 @@ class IntentFilterDataBase {
   /**
    * Map from record name to it's intent filter information
    */
-  private var intentFmap : Map[String, Set[IntentFilter]] = Map()
-  def updateIntentFmap(intentFilter : IntentFilter) = {
+  private val intentFmap: MMap[String, Set[IntentFilter]] = mmapEmpty
+  def updateIntentFmap(intentFilter: IntentFilter) = {
     this.intentFmap += (intentFilter.getHolder -> (this.intentFmap.getOrElse(intentFilter.getHolder, Set()) + intentFilter))
   }
-  def updateIntentFmap(intentFilterDB : IntentFilterDataBase) = {
+  def merge(intentFilterDB: IntentFilterDataBase) = {
     intentFilterDB.getIntentFmap.foreach{
       case (rec, filters) =>
         if(this.intentFmap.contains(rec)){
@@ -32,33 +33,35 @@ class IntentFilterDataBase {
         }
     }
   }
-  def containsRecord(r : JawaRecord) : Boolean = containsRecord(r.getName)
-  def containsRecord(name : String) : Boolean = this.intentFmap.contains(name)
-  def getIntentFmap() = intentFmap
-  def getIntentFilters(r : JawaRecord) : Set[IntentFilter] = getIntentFilters(r.getName)
-  def getIntentFilters(name : String) : Set[IntentFilter] = this.intentFmap.getOrElse(name, Set())
-  def getIntentFiltersActions(r : JawaRecord) : Set[String] = {
-    val intentFilterS: Set[IntentFilter] = getIntentFilters(r)
-    var actions:Set[String] = null
-    if(intentFilterS != null){     
-      actions = Set()
+  def containsClass(r: JawaClass): Boolean = containsClass(r.getName)
+  def containsClass(name: String): Boolean = this.intentFmap.contains(name)
+  def getIntentFmap(): IMap[String, Set[IntentFilter]] = intentFmap.toMap
+  def getIntentFilters(r: JawaClass): ISet[IntentFilter] = getIntentFilters(r.getName)
+  def getIntentFilters(name: String): ISet[IntentFilter] = this.intentFmap.getOrElse(name, Set())
+  def getIntentFiltersActions(r: JawaClass): ISet[String] = {
+    val intentFilterS: ISet[IntentFilter] = getIntentFilters(r)
+    val actions: MSet[String] = msetEmpty
+    if(intentFilterS != null){
       intentFilterS.foreach{       
       intentFilter =>
         actions ++= intentFilter.getActions
       }      
     }
-    actions
+    actions.toSet
   }
-  
+  def reset = {
+    this.intentFmap.clear()
+    this
+  }
   override def toString() = intentFmap.toString
 }
 
 
 
-class IntentFilter(holder : String) {
-	private var actions : Set[String] = Set()
-	private var categorys : Set[String] = Set()
-	private var data = new Data
+class IntentFilter(holder: String) {
+	private val actions: MSet[String] = msetEmpty
+	private val categories: MSet[String] = msetEmpty
+	private val data = new Data
     /**
      * checks if this filter can accept an intent with (action, categories, uriData, mType)
      */
@@ -79,7 +82,7 @@ class IntentFilter(holder : String) {
 	  //we ensure no false-negative (which means no match is ignored)
 	  if(categories.isEmpty){
 	    categoryTest = true
-	  } else if(!categories.filter(c => this.categorys.contains(c)).isEmpty){
+	  } else if(!categories.filter(c => this.categories.contains(c)).isEmpty){
 	    categoryTest = true
 	  }
 	  
@@ -91,42 +94,42 @@ class IntentFilter(holder : String) {
 	}
 	
 	def hasAction(action:String):Boolean = {
-	  this.actions.contains(action)
+	  this.actions.contains(action) || this.actions.contains("ANY")
 	}
 	def hasCategories(categories: Set[String]):Boolean = {
-	  categories.subsetOf(this.categorys)
+	  categories.subsetOf(this.categories) || this.categories.contains("ANY")
 	}
 	
-	def addAction(action : String) = actions += action
-	def addCategory(category : String) = categorys += category
-	def modData(scheme : String, 
-	    				host : String, 
-	    				port : String, 
-	    				path : String, 
-	    				pathPrefix : String, 
-	    				pathPattern : String,
-	    				mimeType : String) = {
+	def addAction(action: String) = actions += action
+	def addCategory(category: String) = categories += category
+	def modData(scheme: String, 
+	    				host: String, 
+	    				port: String, 
+	    				path: String, 
+	    				pathPrefix: String, 
+	    				pathPattern: String,
+	    				mimeType: String) = {
 	  data.add(scheme, host, port, path, pathPrefix, pathPattern, mimeType)
 		
   }
   
-  def getActions() = IntentFilter.this.actions
-  def getCategorys() = IntentFilter.this.categorys
-  def getData() = IntentFilter.this.data
+  def getActions: ISet[String] = IntentFilter.this.actions.toSet
+  def getCategorys: ISet[String] = IntentFilter.this.categories.toSet
+  def getData: Data = IntentFilter.this.data
   def getHolder() = IntentFilter.this.holder
   
-  override def toString() = "component: " + holder + " (actions: " + actions + " categorys: " + categorys + " datas: " + data + ")"
+  override def toString() = "component: " + holder + " (actions: " + actions + " categories: " + categories + " datas: " + data + ")"
 }
 
 // A Data class represents all pieces of info associated with all <data> tags of a particular filter as declared in a manifest file 
 
 class Data{
-  private var schemes: Set[String] = Set()
-  private var authorities : Set[Authority] = Set()
-  private var paths: Set[String] = Set()
-  private var pathPrefixs: Set[String] = Set()
-  private var pathPatterns: Set[String] = Set()
-  private var mimeTypes: Set[String] = Set()
+  private val schemes: MSet[String] = msetEmpty
+  private val authorities: MSet[Authority] = msetEmpty
+  private val paths: MSet[String] = msetEmpty
+  private val pathPrefixs: MSet[String] = msetEmpty
+  private val pathPatterns: MSet[String] = msetEmpty
+  private val mimeTypes: MSet[String] = msetEmpty
   
   def getSchemes = schemes
   def getAuthorities = authorities
@@ -135,9 +138,9 @@ class Data{
   def getPathPatterns = pathPatterns
   def getMimeTypes = mimeTypes
   
-  case class Authority(host : String, port : String)
+  case class Authority(host: String, port: String)
   
-  def isEmpty : Boolean = schemes.isEmpty && authorities.isEmpty && paths.isEmpty && pathPrefixs.isEmpty && pathPatterns.isEmpty && mimeTypes.isEmpty
+  def isEmpty: Boolean = schemes.isEmpty && authorities.isEmpty && paths.isEmpty && pathPrefixs.isEmpty && pathPatterns.isEmpty && mimeTypes.isEmpty
   
   // note that in android there is some discrepancy regarding data and mType on the Intent side compared to that on the Intent Filter side
   def matchWith(uriData:UriData, mType:String):Boolean = {
@@ -222,17 +225,17 @@ class Data{
 	      }
 	    }
     }
-//    println("schemeTest-->" + schemeTest + " authorityTest-->" + authorityTest + "(pathTest || pathPrefixTest || pathPatternTest)" + (pathTest || pathPrefixTest || pathPatternTest))
+//    println("schemeTest-->" + schemeTest + " authorityTest-->" + authorityTest + "(pathTest || pathPrefixTest || pathPatternTest)-->" + (pathTest || pathPrefixTest || pathPatternTest))
     schemeTest && authorityTest && (pathTest || pathPrefixTest || pathPatternTest)
   }
   
-  def add(scheme : String, 
-	    				host : String, 
-	    				port : String, 
-	    				path : String, 
-	    				pathPrefix : String, 
-	    				pathPattern : String, 
-	    				mimeType : String) = {
+  def add(scheme: String, 
+	    				host: String, 
+	    				port: String, 
+	    				path: String, 
+	    				pathPrefix: String, 
+	    				pathPattern: String, 
+	    				mimeType: String) = {
     if(scheme!= null){
       this.schemes +=scheme
     }
@@ -253,30 +256,30 @@ class Data{
 	}
   }
   
-  def addScheme(scheme : String) ={
+  def addScheme(scheme: String) ={
     if(scheme!= null){
       this.schemes +=scheme
     }
   }
   
-  def addAuthority(host : String, port : String) = {
+  def addAuthority(host: String, port: String) = {
     this.authorities += Authority(host, port)
   }
   
-  def addAuthorityHostOnly(host : String) = {
+  def addAuthorityHostOnly(host: String) = {
     this.authorities += Authority(host, null)
   }
   
-  def addAuthorityPortOnly(port : String) = {
+  def addAuthorityPortOnly(port: String) = {
     this.authorities += Authority(null, port)
   }
   
-  def addPath(path : String) ={
+  def addPath(path: String) ={
     if(path!= null){
       this.paths +=path
     }
   }
-  def addType(mimeType : String) ={
+  def addType(mimeType: String) ={
     if(mimeType!= null){
       this.mimeTypes +=mimeType
     }
@@ -295,12 +298,12 @@ class UriData{
   private var pathPattern: String = null
   
 
-  def set(scheme : String, 
-	    				host : String, 
-	    				port : String, 
-	    				path : String, 
-	    				pathPrefix : String, 
-	    				pathPattern : String
+  def set(scheme: String, 
+	    				host: String, 
+	    				port: String, 
+	    				path: String, 
+	    				pathPrefix: String, 
+	    				pathPattern: String
 	    				) = {
     if(scheme!= null){
       this.scheme =scheme
@@ -323,40 +326,40 @@ class UriData{
 	
   }
   
-  def setScheme(scheme : String) ={
+  def setScheme(scheme: String) ={
     if(scheme!= null){
       this.scheme =scheme
     }
   }
   def getScheme() = this.scheme
   
-  def setHost(host : String) ={
+  def setHost(host: String) ={
     if(host!= null){
       this.host =host
     }
   }
   def getHost() = this.host
-  def setPort(port : String) ={
+  def setPort(port: String) ={
     if(port!= null){
       this.port =port
     }
   }
   def getPort() = this.port
-  def setPath(path : String) ={
+  def setPath(path: String) ={
     if(path!= null){
       this.path =path
     }
   }
   def getPath() = this.path
   
-  def setPathPrefix(pathPrefix : String) ={
+  def setPathPrefix(pathPrefix: String) ={
     if(pathPrefix!= null){
       this.pathPrefix = pathPrefix
     }
   }
   def getPathPrefix() = this.pathPrefix
   
-  def setPathPattern(pathPattern : String) ={
+  def setPathPattern(pathPattern: String) ={
     if(pathPattern!= null){
       this.pathPattern = pathPattern
     }

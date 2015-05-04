@@ -7,7 +7,7 @@ http://www.eclipse.org/legal/epl-v10.html
 */
 package org.sireum.amandroid.parser
 
-import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.JawaClass
 
 /**
  * Data class representing a layout control on the android screen
@@ -17,5 +17,5 @@ import org.sireum.jawa.JawaRecord
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
-final case class LayoutControl(id : Int, viewClass : JawaRecord, isSensitive : Boolean = false) {
+final case class LayoutControl(id : Int, viewClass : JawaClass, isSensitive : Boolean = false) {
 }

@@ -10,7 +10,7 @@ package org.sireum.amandroid.alir.taintAnalysis
 import java.io.BufferedReader
 import java.io.FileReader
 import org.sireum.util._
-import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.JawaMethod
 import org.sireum.amandroid.parser.LayoutControl
 import org.sireum.amandroid.parser.ARSCFileParser
 import java.util.regex.Pattern
@@ -56,7 +56,7 @@ object SourceAndSinkCategory {
  */ 
 abstract class AndroidSourceAndSinkManager(appPackageName : String, 
     												layoutControls : Map[Int, LayoutControl], 
-    												callbackMethods : ISet[JawaProcedure], 
+    												callbackMethods : ISet[JawaMethod], 
     												sasFilePath : String) extends SourceAndSinkManager{
   
   private final val TITLE = "BasicSourceAndSinkManager"
@@ -89,15 +89,15 @@ abstract class AndroidSourceAndSinkManager(appPackageName : String,
       msg_detail(TITLE, "source size: " + this.sources.size + " sink size: " + this.sinks.size)
   }
 	
-	private def matchs(procedure : JawaProcedure, procedurepool : ISet[String]) : Boolean = procedurepool.contains(procedure.getSignature)
+	private def matchs(method : JawaMethod, methodpool : ISet[String]) : Boolean = methodpool.contains(method.getSignature)
 	
-	def isSourceProcedure(procedure : JawaProcedure) = matchs(procedure, this.sources.map(s=>s._1).toSet)
+	def isSourceMethod(method : JawaMethod) = matchs(method, this.sources.map(s=>s._1).toSet)
 	
-	def isSinkProcedure(procedure : JawaProcedure) = matchs(procedure, this.sinks.map(s=>s._1).toSet)
+	def isSinkMethod(method : JawaMethod) = matchs(method, this.sinks.map(s=>s._1).toSet)
 	
-	def isSource(calleeProcedure : JawaProcedure, callerProcedure : JawaProcedure, callerLoc : JumpLocation) : Boolean = {
-	  if(isSourceProcedure(calleeProcedure)) return true
-	  if(isUISource(calleeProcedure, callerProcedure, callerLoc)) return true
+	def isSource(calleeMethod : JawaMethod, callerMethod : JawaMethod, callerLoc : JumpLocation) : Boolean = {
+	  if(isSourceMethod(calleeMethod)) return true
+	  if(isUISource(calleeMethod, callerMethod, callerLoc)) return true
 	  false
 	}
 	
@@ -115,8 +115,8 @@ abstract class AndroidSourceAndSinkManager(appPackageName : String,
 	  this.apiPermissions += (sink -> this.apiPermissions.getOrElse(sink, isetEmpty))
 	}
 	
-	def isCallbackSource(proc : JawaProcedure) : Boolean
-	def isUISource(calleeProcedure : JawaProcedure, callerProcedure : JawaProcedure, callerLoc : JumpLocation) : Boolean
+	def isCallbackSource(proc : JawaMethod) : Boolean
+	def isUISource(calleeMethod : JawaMethod, callerMethod : JawaMethod, callerLoc : JumpLocation) : Boolean
 	def isIccSink(invNode : ICFGInvokeNode, s : PTAResult) : Boolean
 	def isIccSource(entNode : ICFGNode, iddgEntNode : ICFGNode) : Boolean
 	
@@ -132,19 +132,19 @@ abstract class AndroidSourceAndSinkManager(appPackageName : String,
  */ 
 class DefaultAndroidSourceAndSinkManager(appPackageName : String, 
     												layoutControls : Map[Int, LayoutControl], 
-    												callbackMethods : ISet[JawaProcedure], 
+    												callbackMethods : ISet[JawaMethod], 
     												sasFilePath : String) extends AndroidSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
 	
   private final val TITLE = "DefaultSourceAndSinkManager"
   
-	def isCallbackSource(proc : JawaProcedure) : Boolean = {
+	def isCallbackSource(proc : JawaMethod) : Boolean = {
 	  if(this.callbackMethods.contains(proc) && proc.getParamNames.size > 1) true
 	  else false
 	}
 	
-	def isUISource(calleeProcedure : JawaProcedure, callerProcedure : JawaProcedure, callerLoc : JumpLocation) : Boolean = {
-	  if(calleeProcedure.getSignature == AndroidConstants.ACTIVITY_FINDVIEWBYID || calleeProcedure.getSignature == AndroidConstants.VIEW_FINDVIEWBYID){
-	    val nums = ExplicitValueFinder.findExplicitIntValueForArgs(callerProcedure, callerLoc, 1)
+	def isUISource(calleeMethod : JawaMethod, callerMethod : JawaMethod, callerLoc : JumpLocation) : Boolean = {
+	  if(calleeMethod.getSignature == AndroidConstants.ACTIVITY_FINDVIEWBYID || calleeMethod.getSignature == AndroidConstants.VIEW_FINDVIEWBYID){
+	    val nums = ExplicitValueFinder.findExplicitIntValueForArgs(callerMethod, callerLoc, 1)
 	    nums.foreach{
 	      num =>
 	        this.layoutControls.get(num) match{
@@ -164,7 +164,7 @@ class DefaultAndroidSourceAndSinkManager(appPackageName : String,
     calleeSet.foreach{
       callee =>
         if(InterComponentCommunicationModel.isIccOperation(callee.callee)){
-          val args = Center.getProcedureWithoutFailing(invNode.getOwner).getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
+          val args = Center.getMethodWithoutFailing(invNode.getOwner).getMethodBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
               case te : TupleExp =>
                 te.exps.map{
 			            exp =>
@@ -178,7 +178,8 @@ class DefaultAndroidSourceAndSinkManager(appPackageName : String,
           val intentSlot = VarSlot(args(1))
           val intentValues = s.pointsToSet(intentSlot, invNode.getContext)
           val intentContents = IntentHelper.getIntentContents(s, intentValues, invNode.getContext)
-          val comMap = IntentHelper.mappingIntents(intentContents)
+          val compType = AndroidConstants.getIccCallType(callee.callee.getSubSignature)
+          val comMap = IntentHelper.mappingIntents(intentContents, compType)
           comMap.foreach{
             case (_, coms) =>
               if(coms.isEmpty) sinkflag = true
@@ -200,13 +201,13 @@ class DefaultAndroidSourceAndSinkManager(appPackageName : String,
     var sourceflag = false
 //    val reachableSinks = sinkNodes.filter{sinN => iddg.findPath(entNode, sinN) != null}
 //    if(!reachableSinks.isEmpty){
-//	    val sinkProcs = reachableSinks.filter(_.isInstanceOf[ICFGCallNode]).map(_.asInstanceOf[ICFGCallNode].getCalleeSet).reduce(iunion[Callee])
-//	    require(!sinkProcs.isEmpty)
-//	    val neededPermissions = sinkProcs.map(sin => this.apiPermissions.getOrElse(sin.calleeProc.getSignature, isetEmpty)).reduce(iunion[String])
+//	    val sinkMethods = reachableSinks.filter(_.isInstanceOf[ICFGCallNode]).map(_.asInstanceOf[ICFGCallNode].getCalleeSet).reduce(iunion[Callee])
+//	    require(!sinkMethods.isEmpty)
+//	    val neededPermissions = sinkMethods.map(sin => this.apiPermissions.getOrElse(sin.calleeMethod.getSignature, isetEmpty)).reduce(iunion[String])
 //	    val infos = AppCenter.getAppInfo.getComponentInfos
 //	    infos.foreach{
 //	      info =>
-//	        if(info.name == entNode.getOwner.getDeclaringRecord.getName){
+//	        if(info.name == entNode.getOwner.getDeclaringClass.getName){
 //	          if(info.exported == true){
 //	            if(info.permission.isDefined){
 //	              sourceflag = !(neededPermissions - info.permission.get).isEmpty
@@ -225,13 +226,18 @@ class DefaultAndroidSourceAndSinkManager(appPackageName : String,
  */ 
 class DataLeakageAndroidSourceAndSinkManager(appPackageName : String, 
                             layoutControls : Map[Int, LayoutControl], 
-                            callbackMethods : ISet[JawaProcedure], 
+                            callbackMethods : ISet[JawaMethod], 
                             sasFilePath : String) extends DefaultAndroidSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
   
   private final val TITLE = "DataLeakageAndroidSourceAndSinkManager"
   
-  override def isCallbackSource(proc : JawaProcedure) : Boolean = {
-    if(this.callbackMethods.contains(proc) && proc.getParamNames.size > 1) false
+  private def sensitiveData: ISet[String] = Set("android.location.Location")
+  
+  override def isCallbackSource(proc : JawaMethod) : Boolean = {
+    if(this.callbackMethods.contains(proc)){
+      if(proc.getParamTypes.exists { pt => sensitiveData.contains(pt.name) }) true
+      else false
+    }
     else false
   }
 }

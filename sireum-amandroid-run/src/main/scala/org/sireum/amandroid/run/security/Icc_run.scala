@@ -49,7 +49,7 @@ object Icc_run {
     def onPreAnalysis: Unit = {
       IccCounter.total += 1
       val iccSigs = AndroidConstants.getIccMethods()
-      val codes = JawaCodeSource.getAppRecordsCodes
+      val codes = JawaCodeSource.getAppClassCodes
 		  if(codes.exists{
     	  case (rName, code) =>
     	    iccSigs.exists(code.contains(_))
@@ -61,8 +61,8 @@ object Icc_run {
     	}
     }
 
-    def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
-      val res = eps.filter(e=>app_info.getIccContainers.contains(e.getDeclaringRecord))
+    def entryPointFilter(eps: Set[org.sireum.jawa.JawaMethod]): Set[org.sireum.jawa.JawaMethod] = {
+      val res = eps.filter(e=>app_info.getIccContainers.contains(e.getDeclaringClass))
       if(!res.isEmpty){
     	  IccCounter.foundIccContainer += 1
     	}

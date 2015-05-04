@@ -47,7 +47,7 @@ object DataLeakage_run {
       DataLeakageCounter.total += 1
     }
 
-    def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
+    def entryPointFilter(eps: Set[org.sireum.jawa.JawaMethod]): Set[org.sireum.jawa.JawaMethod] = {
       eps//.filter { ep => ep.getSignature.contains("envMain") }
     }
 
@@ -106,14 +106,16 @@ object DataLeakage_run {
     
     files.foreach{
       file =>
+//        if(file.contains("LocationLeak1"))
         try{
-          msg_critical(TITLE, DataLeakageTask(outputPath, file, socket, Some(100)).run)   
+          msg_critical(TITLE, DataLeakageTask(outputPath, file, socket, Some(1000)).run)   
         } catch {
           case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
           case e : Throwable => e.printStackTrace()
         } finally{
           msg_critical(TITLE, DataLeakageCounter.toString)
           socket.cleanEnv
+          msg_critical(TITLE, "************************************\n")
         }
     }
   }

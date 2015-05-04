@@ -1370,7 +1370,7 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
 
 		      // extra check ends
 
-              fprintf(pFp, "v%d:= new `byte`[", temp->vA);
+              fprintf(pFp, "v%d:= (", temp->vA);
               const u1* bytePtr = (const u1*) &insns[insnIdx+1];
               int length=(bytePtr[0] & 0xFF) | ((bytePtr[1] & 0xFF) << 8);
               switch (length){
@@ -1418,7 +1418,7 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
                    //fprintf(pFp, "");
                    break;
               }
-              fprintf(pFp, "];\n");
+              fprintf(pFp, ");\n");
               fprintf(pFp, "#L%06x.   goto L%06x;", ((u1*)insns - pDexFile->baseAddr) + insnIdx*2 + 1, ((u1*)insns - pDexFile->baseAddr) +(temp->insnIdx+3)*2);
               ++l31t;
            // ************* sankar ends ***********
@@ -3175,7 +3175,7 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
                   
 				  // sometimes populating locVarList in localsCb() method is not working, so no locVar e.g. "this" in locVarList. Below we forcefully add "this" to paraThis in that case
                   
-				  if((thisFlag == 0) && (pDexMethod->accessFlags & (ACC_STATIC | ACC_ABSTRACT | ACC_NATIVE)) ==0) // i.e. non-static method but still "this" is not added
+				  if((thisFlag == 0) && (pDexMethod->accessFlags & (ACC_STATIC | ACC_ABSTRACT)) ==0) // i.e. non-static method but still "this" is not added
                      { 
 				      strcpy(paraThis,""); // initializing with null string
 				      strcat(paraThis, toPilar(descriptorToDot(backDescriptor)));
@@ -3591,7 +3591,8 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
      mkdirp(currentPath); // creating the directory if it does not already exists
      currentFile = (char*)malloc(strlen(currentPath) + strlen(currentClassName) + strlen(PILAR_EXT) + 2); // double check for the length miscalculation here
      strcpy(currentFile, currentPath);
-     strcat(currentFile, "/");
+     if(strcmp(currentDir, "") != 0)
+    	 strcat(currentFile, "/");
      strcat(currentFile, currentClassName);
      strcat(currentFile, PILAR_EXT);
      while((fd = open(currentFile, O_CREAT | O_WRONLY | O_EXCL, S_IRUSR | S_IWUSR)) < 0){
@@ -4068,7 +4069,7 @@ void usage(void)
 {
     fprintf(stderr, "Copyright (C) 2007 The Android Open Source Project\nSankar and Fengguo modified it!\n\n");
     fprintf(stderr,
-        "%s: [-c] [-d] [-f] [-h] [-i] [-l layout] [-m] [-p] [-t tempfile] dexfile...\n",
+        "%s: [-c] [-d] [-f] [-h] [-i] [-l layout] [-m] [-p] [-t tempfile] [-o outputfile] filename[.apk|.dex|.odex]...\n",
         gProgName);
     fprintf(stderr, "\n");
     fprintf(stderr, " -c : verify checksum and exit\n");
@@ -4080,6 +4081,7 @@ void usage(void)
     fprintf(stderr, " -m : dump register maps (and nothing else)\n");
     fprintf(stderr, " -p : also produce pilar output in a file, name.pilar \n");  // sankar adds
     fprintf(stderr, " -t : temp file name (defaults to /sdcard/dex-temp-*)\n");
+    fprintf(stderr, " -o : output file name (defaults to /currentpath/filename)\n");	// fengguo adds
 }
 
 /*
@@ -4100,10 +4102,9 @@ int main(int argc, char* const argv[])
     gOptions.verbose = true;
 
     while (1) {
-        ic = getopt(argc, argv, "cdfhil:mpt:");  // sankar adds p
+        ic = getopt(argc, argv, "cdfhil:mpt:o:");  // sankar adds p fengguo adds o
         if (ic < 0)
             break;
-
         switch (ic) {
         case 'c':       // verify the checksum then exit
             gOptions.checksumOnly = true;
@@ -4140,6 +4141,9 @@ int main(int argc, char* const argv[])
         case 't':       // temp file, used when opening compressed Jar
             gOptions.tempFileName = optarg;
             break;
+        case 'o':		// fengguo adds this case
+        	pilarRootDir = optarg;
+        	break;
         default:
             wantUsage = true;
             break;
@@ -4166,7 +4170,8 @@ int main(int argc, char* const argv[])
 
         if(pilar) {  // sankar adds this if clause
            filename = strdup(argv[optind]); // is strdup safe? // sankar adds this line for pilar
-	       pilarRootDir = pilarDirName(filename);
+           if(!pilarRootDir)
+        	   pilarRootDir = pilarDirName(filename);
 	          // cut .ext (.dex or .apk) from the input file name (x.ext), and get "x" as the pilar-containing-root-directory; // sankar adds;
 
 	       mkdirp(pilarRootDir); // creating the root directory which contains pilar

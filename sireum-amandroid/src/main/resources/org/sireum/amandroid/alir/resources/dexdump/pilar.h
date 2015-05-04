@@ -271,13 +271,11 @@ static char* dirName(const char* str)
     const char* lastDot;
     char* dir;
     int length = 0;
-
     lastDot = strrchr(str, '.');
     if ((lastDot == NULL) || (lastDot == str))
         {
-			fprintf(stderr,"the class descriptor has to be of the form x.y.z.abc");
-			exit(1);
-
+			dir = (char*)malloc(length + 1);
+			dir[length] = '\0';
 	    }
     else
         {
@@ -306,9 +304,10 @@ static char* className(const char* str)
     lastDot = strrchr(str, '.');
     if ((lastDot == NULL) || (lastDot == str))
         {
-			fprintf(stderr,"the class descriptor has to be of the form x.y.z.abc");
-			exit(1);
-
+			length = strlen(str);
+			cName = (char*)malloc(length + 1);
+			strncpy(cName, str, length);
+			cName[length] = '\0';
 	    }
     else
         {
@@ -318,7 +317,6 @@ static char* className(const char* str)
 		    strncpy(cName, lastDot+1, length);	// copy the "class" part from str to cName
 		    cName[length] = '\0';
         }
-
     return cName;
 }
 

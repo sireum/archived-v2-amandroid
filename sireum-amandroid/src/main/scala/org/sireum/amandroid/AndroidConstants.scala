@@ -12,17 +12,21 @@ package org.sireum.amandroid
  */
 object AndroidConstants {
   
+  object CompType extends Enumeration {
+    val ACTIVITY, SERVICE, RECEIVER, PROVIDER = Value
+  }
+  
   final val MAINCOMP_ENV = "envMain"
   final val COMP_ENV = "env"
   final val MAINCOMP_ENV_SUBSIG = "envMain:(Landroid/content/Intent;)V"
   final val COMP_ENV_SUBSIG = "env:(Landroid/content/Intent;)V"
   
   //following is standard intent actions
-	final val ACTION_MAIN = "android.intent.action.MAIN"
-	final val ACTION_MANAGE_NETWORK_USAGE = "android.intent.action.MANAGE_NETWORK_USAGE"
+  final val ACTION_MAIN = "android.intent.action.MAIN"
+  final val ACTION_MANAGE_NETWORK_USAGE = "android.intent.action.MANAGE_NETWORK_USAGE"
 	  
 	//following is standard intent categories
-	final val CATEGORY_LAUNCHER = "android.intent.category.LAUNCHER"
+  final val CATEGORY_LAUNCHER = "android.intent.category.LAUNCHER"
 	  
 	//following are android ICC calls
 	final val START_SERVICE = "startService:(Landroid/content/Intent;)Landroid/content/ComponentName;"
@@ -44,14 +48,29 @@ object AndroidConstants {
 	final val REGISTER_RECEIVER1 = "registerReceiver:(Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;)Landroid/content/Intent;"
 	final val	REGISTER_RECEIVER2 = "registerReceiver:(Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;Ljava/lang/String;Landroid/os/Handler;)Landroid/content/Intent;"
 	  
-	private final val iccMethods = List(START_ACTIVITY, START_ACTIVITY_BUND, START_ACTIVITY_RESULT,
-	    START_ACTIVITY_RESULT_BUND, START_SERVICE, 
-	    SEND_BROADCAST, SEND_BROADCAST_PERM, SEND_BROADCAST_AS_USER, SEND_BROADCAST_AS_USER_PERM,
-	    SEND_ORDERED_BROADCAST, SEND_ORDERED_BROADCAST_SEVEN_PARM, SEND_ORDERED_BROADCAST_AS_USER,
-	    SEND_STICKY_BROADCAST, SEND_STICKY_BROADCAST_AS_USER, SEND_STICKY_ORDERED_BROADCAST,
-	    SEND_STICKY_ORDERED_BROADCAST_AS_USER)
+  private final val iccMethods_activity = List(START_ACTIVITY, START_ACTIVITY_BUND, START_ACTIVITY_RESULT,
+      START_ACTIVITY_RESULT_BUND)
+  private final val iccMethods_service = List(START_SERVICE)
+  private final val iccMethods_receiver = List(SEND_BROADCAST, SEND_BROADCAST_PERM, SEND_BROADCAST_AS_USER, SEND_BROADCAST_AS_USER_PERM,
+      SEND_ORDERED_BROADCAST, SEND_ORDERED_BROADCAST_SEVEN_PARM, SEND_ORDERED_BROADCAST_AS_USER,
+      SEND_STICKY_BROADCAST, SEND_STICKY_BROADCAST_AS_USER, SEND_STICKY_ORDERED_BROADCAST,
+      SEND_STICKY_ORDERED_BROADCAST_AS_USER)
+  
+	private final val iccMethods = iccMethods_activity ++ iccMethods_service ++ iccMethods_receiver
 	def getIccMethods() : List[String] = iccMethods
+  def isActivityIccMethod(subSig: String): Boolean = iccMethods_activity.contains(subSig)
+  def isServiceIccMethod(subSig: String): Boolean = iccMethods_service.contains(subSig)
+  def isReceiverIccMethod(subSig: String): Boolean = iccMethods_receiver.contains(subSig)
+  def isProviderIccMethod(subSig: String): Boolean = false
 
+  def getIccCallType(calleeSubsig: String): AndroidConstants.CompType.Value = calleeSubsig match {
+    case m if AndroidConstants.isActivityIccMethod(m) => AndroidConstants.CompType.ACTIVITY
+    case m if AndroidConstants.isServiceIccMethod(m) => AndroidConstants.CompType.SERVICE
+    case m if AndroidConstants.isReceiverIccMethod(m) => AndroidConstants.CompType.RECEIVER
+    case m if AndroidConstants.isProviderIccMethod(m) => AndroidConstants.CompType.PROVIDER
+    case a => throw new RuntimeException("unexpected ICC method: " + a)
+  }
+  
 	def getDynRegisterMethods() : List[String] = List(REGISTER_RECEIVER1, REGISTER_RECEIVER2)
 	
 	final val INTENT = "android.content.Intent"
@@ -78,6 +97,9 @@ object AndroidConstants {
 	  
 	final val SETCONTENTVIEW = "setContentView:(I)V"
 	final val ACTIVITY = "android.app.Activity"
+  final val SERVICE = "android.app.Service"
+  final val RECEIVER = "android.content.BroadcastReceiver"
+  final val PROVIDER = "android.content.ContentProvider"
 	final val ACTIVITY_INTENT = "android.app.Activity.mIntent"
 	  
 	final val BUNDLE = "android.os.Bundle"

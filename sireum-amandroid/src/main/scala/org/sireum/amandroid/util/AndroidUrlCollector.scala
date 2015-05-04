@@ -15,7 +15,7 @@ object AndroidUrlCollector {
     rfp.parseResourceFile(file)
     strs ++= rfp.getAllStrings
     strs ++= afp.getGlobalStringPool.map(_._2)
-    val codes = JawaCodeSource.getAppRecordsCodes
+    val codes = JawaCodeSource.getAppClassCodes
     val code_urls : Set[String] =
       if(!codes.isEmpty){
         codes.map{

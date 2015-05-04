@@ -57,36 +57,36 @@ object Decompiler {
 	  val outputPath = args(3)
 	  val outputUri = FileUtil.toUri(outputPath)
     
-	  val dexFileUris : MSet[String] = msetEmpty
+	  val fileUris : MSet[(FileResourceUri, FileResourceUri)] = msetEmpty
     typ match{
       case "APK" =>
         require(sourcePath.endsWith(".apk"))
         val out = AmDecoder.decode(FileUtil.toUri(sourcePath), outputUri)
-        dexFileUris += out + "/classes.dex"
+        fileUris += ((FileUtil.toUri(sourcePath), out + "classes"))
       case "DIR" =>
         require(new File(sourcePath).isDirectory())
         val apkFileUris = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
         apkFileUris.map{
 		      apkFileUri=>
 		        val out = AmDecoder.decode(apkFileUri, outputUri)
-            dexFileUris += out + "/classes.dex"
+            fileUris += ((apkFileUri, out + "classes"))
 		    }
       case "DEX" =>
         require(sourcePath.endsWith(".dex") || sourcePath.endsWith(".odex"))
-        dexFileUris += FileUtil.toUri(sourcePath)
+        fileUris += ((FileUtil.toUri(sourcePath), outputUri))
       case _ => 
         println("Unexpected type: " + typ)
         return
     }
-    decompile(dexFileUris.toSet, outputPath)
+    decompile(fileUris.toSet, outputPath)
   }
   
-	def decompile(dexFileUris : Set[FileResourceUri], outputPath : String) = {
-    dexFileUris.foreach{
-      dexFileUri =>
+	def decompile(fileUris : Set[(FileResourceUri, FileResourceUri)], outputPath : String) = {
+    fileUris.foreach{
+      case (apkFileUri, outUri) =>
         try{
-          if(FileUtil.toFile(dexFileUri).exists())
-            Dex2PilarConverter.convert(dexFileUri)
+          if(FileUtil.toFile(apkFileUri).exists())
+            Dex2PilarConverter.convert(apkFileUri, outUri)
         } catch {
           case e : Throwable =>
             CliLogger.logError(new File(outputPath), "Error: " , e)

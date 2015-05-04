@@ -27,9 +27,9 @@ import org.sireum.jawa.util.StringFormConverter
  */ 
 object UriModel {
   final val TITLE = "UriModel"
-	def isUri(r : JawaRecord) : Boolean = r.getName == "android.net.Uri"
+	def isUri(r : JawaClass) : Boolean = r.getName == "android.net.Uri"
 	  
-	def doUriCall(s : PTAResult, p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	def doUriCall(s : PTAResult, p : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true

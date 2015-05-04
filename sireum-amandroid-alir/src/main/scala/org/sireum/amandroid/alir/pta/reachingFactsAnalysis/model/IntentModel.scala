@@ -35,9 +35,9 @@ import org.sireum.jawa.alir.pta.VarSlot
 object IntentModel {
   final val TITLE = "IntentModel"
   
-	def isIntent(r : JawaRecord) : Boolean = r.getName == AndroidConstants.INTENT
+	def isIntent(r : JawaClass) : Boolean = r.getName == AndroidConstants.INTENT
 	  
-	def doIntentCall(s : PTAResult, p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	def doIntentCall(s : PTAResult, p : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true
@@ -661,7 +661,7 @@ object IntentModel {
 	        sIns match {
 	          case cstr @ PTAConcreteStringInstance(text, c) =>
             val recordName = text
-	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
+	          val recOpt = Center.tryLoadClass(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>
 		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
@@ -726,7 +726,7 @@ object IntentModel {
         sIns match {
           case cstr @ PTAConcreteStringInstance(text, c) =>
             val recordName = text
-	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
+	          val recOpt = Center.tryLoadClass(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>
 		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
@@ -896,7 +896,7 @@ object IntentModel {
         sIns match {
           case cstr @ PTAConcreteStringInstance(text, c) =>
             val recordName = text
-	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
+	          val recOpt = Center.tryLoadClass(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>
 		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
@@ -953,26 +953,26 @@ object IntentModel {
         name match{
           case cstr @ PTAConcreteStringInstance(text, c) =>
             val recordName = text
-	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
+	          val recOpt = Center.tryLoadClass(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
               case Some(rec) =>
 		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
               case None =>
                 err_msg_normal(TITLE, "Cannot find Given class: " + cstr)
                 val unknownIns = UnknownInstance(new NormalType(recordName), c)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), unknownIns)
-		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), unknownIns)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
             }
           case pstr @ PTAPointStringInstance(c) => 
             err_msg_detail(TITLE, "Init ComponentName use point string: " + pstr)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pstr)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), pstr)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), pstr)
           case a =>
             err_msg_detail(TITLE, "Init ComponentName use Unknown instance: " + name)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), a)
-            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), a)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), a)
+            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), a)
         }
     }
     (newfacts, delfacts)
@@ -1208,7 +1208,9 @@ object IntentModel {
 				      str =>
 			          valueValue.foreach{
 			            vv =>
-			              entries += PTATupleInstance(str, vv, currentContext)
+                    thisValue foreach{
+                      ins => entries += PTATupleInstance(str, vv, ins.defSite)
+                    }
 			          }
 				    }
 	          newfacts ++= entries.map(e => RFAFact(FieldSlot(mev, "entries"), e))

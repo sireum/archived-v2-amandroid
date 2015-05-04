@@ -30,9 +30,9 @@ object IntentFilterModel {
   
   final val TITLE = "IntentFilterModel"
   
-	def isIntentFilter(r : JawaRecord) : Boolean = r.getName == AndroidConstants.INTENTFILTER
+	def isIntentFilter(r : JawaClass) : Boolean = r.getName == AndroidConstants.INTENTFILTER
 	  
-	def doIntentFilterCall(s : PTAResult, p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	def doIntentFilterCall(s : PTAResult, p : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true
@@ -122,10 +122,10 @@ object IntentFilterModel {
 		      acStr =>
 	          acStr match{
 	            case cstr @ PTAConcreteStringInstance(text, c) =>
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENTFILTER_ACTIONS), cstr)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENTFILTER_ACTIONS)), cstr)
 	            case pstr @ PTAPointStringInstance(c) => 
 	              err_msg_detail(TITLE, "Init IntentFilter use point string: " + pstr)
-	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENTFILTER_ACTIONS), pstr)
+	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENTFILTER_ACTIONS)), pstr)
 	            case ustr @ UnknownInstance(t, c) => 
 	            case ustr @ NullInstance(c) => 
 	            case _ => throw new RuntimeException("unexpected instance type: " + acStr)

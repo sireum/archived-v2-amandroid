@@ -24,7 +24,7 @@ import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.pilar.ast.NameExp
 import org.sireum.pilar.ast.TupleExp
 import org.sireum.pilar.ast.CallJump
-import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.JawaMethod
 import org.sireum.pilar.ast.JumpLocation
 import org.sireum.util.MList
 import org.sireum.jawa.MessageCenter._
@@ -33,7 +33,6 @@ import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.pilar.ast._
 import org.sireum.jawa.Center
-import org.sireum.jawa.JawaProcedure
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.security.AmandroidSocketListener
 import org.sireum.jawa.util.IgnoreException
@@ -92,7 +91,7 @@ object LogSensitiveInfo {
         println("ZWZW - verify checker on " + node.toString())
         result += (node -> true)
         
-        val loc = Center.getProcedureWithoutFailing(node.getOwner).getProcedureBody.location(node.getLocIndex)
+        val loc = Center.getMethodWithoutFailing(node.getOwner).getMethodBody.location(node.getLocIndex)
         val argNames : MList[String] = mlistEmpty
         loc match{
           case jumploc : JumpLocation =>
@@ -120,7 +119,7 @@ object LogSensitiveInfo {
         argValue.foreach{
           ins =>
             val defsites = ins.getDefSite
-            val loc = Center.getProcedureWithoutFailing(defsites.getProcedureSig).getProcedureBody.location(defsites.getCurrentLocUri)
+            val loc = Center.getMethodWithoutFailing(defsites.getMethodSig).getMethodBody.location(defsites.getCurrentLocUri)
             //The found definition loc should be an assignment action
             var bar:ActionLocation = loc.asInstanceOf[ActionLocation]
             var as:AssignAction = bar.action.asInstanceOf[AssignAction]
@@ -145,9 +144,9 @@ object LogSensitiveInfo {
         calleeSet.foreach{
           callee =>
             val calleep = callee.callee
-            val callees : MSet[JawaProcedure] = msetEmpty
-            val caller = Center.getProcedureWithoutFailing(invNode.getOwner)
-            val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
+            val callees : MSet[JawaMethod] = msetEmpty
+            val caller = Center.getMethodWithoutFailing(invNode.getOwner)
+            val jumpLoc = caller.getMethodBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
             val cj = jumpLoc.jump.asInstanceOf[CallJump]
             println("ZWZW - callee's signature - " + calleep.getSignature)
 
@@ -159,7 +158,7 @@ object LogSensitiveInfo {
 //                }
 //                case None => throw new RuntimeException("cannot found annotation 'signature' from: " + cj)
 //              }
-//              callees ++= Center.getProcedureDeclarations(calleeSignature)
+//              callees ++= Center.getMethodDeclarations(calleeSignature)
 //            } else {
               callees += calleep
 //            }

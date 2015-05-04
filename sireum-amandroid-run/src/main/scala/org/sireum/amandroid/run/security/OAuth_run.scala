@@ -191,13 +191,13 @@ object OAuth_run {
         	val dexFile = APKFileResolver.getDexFile(file, FileUtil.toUri(srcFile.getParentFile()))
         	
         	// convert the dex file to the "pilar" form
-        	val pilarFileUri = Dex2PilarConverter.convert(dexFile)
+        	val pilarFileUri = Dex2PilarConverter.convert(dexFile, FileUtil.toUri(srcFile.getParentFile()))
       		
         	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
         	JawaCodeSource.load(pilarFileUri, GlobalConfig.PILAR_FILE_EXT, AndroidLibraryAPISummary)
       	
       	
-        	(JawaCodeSource.getAppRecordsCodes).foreach{
+        	(JawaCodeSource.getAppClassCodes).foreach{
         	  case (name, code) => 	    
         	    if(code.contains("m.facebook.com")){  // m.facebook.com/dialog/oauth
         	      System.err.println("Facebook url in App code record " + name)
@@ -278,7 +278,7 @@ object OAuth_run {
         	}
       	
       	
-        	(JawaCodeSource.getThirdPartyLibraryRecordsCodes).foreach{
+        	(JawaCodeSource.getThirdPartyLibraryClassCodes).foreach{
         	  case (name, code) =>
         	    if(code.contains("m.facebook.com")){
         	      System.err.println("Facebook url in App Using Lib:" + name)
@@ -364,7 +364,7 @@ object OAuth_run {
   	    	Center.reset
   	    	AppCenter.reset
   	    	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
-  	    	JawaCodeSource.clearAppRecordsCodes
+  	    	JawaCodeSource.clearAppClassCodes
   			  System.gc()
   			  //OAuthCounter.write
   	    	msg_critical(TITLE, OAuthCounter.toString)

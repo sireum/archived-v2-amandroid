@@ -23,9 +23,9 @@ import org.sireum.jawa.util.StringFormConverter
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
 object ActivityModel {
-	def isActivity(r : JawaRecord) : Boolean = r.getName == AndroidConstants.ACTIVITY
+	def isActivity(r : JawaClass) : Boolean = r.getName == AndroidConstants.ACTIVITY
 	
-	def doActivityCall(s : PTAResult, p : JawaProcedure, args : List[String], retVar : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	def doActivityCall(s : PTAResult, p : JawaMethod, args : List[String], retVar : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true
@@ -292,11 +292,16 @@ object ActivityModel {
 	    tv =>
 	      val mIntentSlot = FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.ACTIVITY_INTENT))
 	      var mIntentValue = s.pointsToSet(mIntentSlot, currentContext)
-        tv.getFieldsUnknownDefSites.foreach{
-        	case (defsite, fields) =>
-        	  if(fields.contains("ALL")) mIntentValue += UnknownInstance(new NormalType(AndroidConstants.INTENT), defsite)
-        	  if(fields.contains(AndroidConstants.ACTIVITY_INTENT)) mIntentValue += UnknownInstance(new NormalType(AndroidConstants.INTENT), defsite)
-      	}
+//        val mUnknownIntentSlot = FieldSlot(tv, "ALL")
+//        s.pointsToSet(mUnknownIntentSlot, currentContext) foreach {
+//          ins =>
+//            mIntentValue += UnknownInstance(new NormalType(AndroidConstants.INTENT), ins.defSite)
+//        }
+//        tv.getFieldsUnknownDefSites.foreach{
+//        	case (defsite, fields) =>
+//        	  if(fields.contains("ALL")) mIntentValue += UnknownInstance(new NormalType(AndroidConstants.INTENT), defsite)
+//        	  if(fields.contains(AndroidConstants.ACTIVITY_INTENT)) mIntentValue += UnknownInstance(new NormalType(AndroidConstants.INTENT), defsite)
+//      	}
 	      newfacts ++= mIntentValue.map(miv=> RFAFact(VarSlot(retVar), miv))
 	  }
     (newfacts, delfacts)

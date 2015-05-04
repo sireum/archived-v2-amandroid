@@ -7,9 +7,9 @@ http://www.eclipse.org/legal/epl-v10.html
 */
 package org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model
 
-import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.JawaClass
 import org.sireum.util._
-import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.JawaMethod
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.jawa.alir.pta.PTAResult
@@ -19,8 +19,8 @@ import org.sireum.jawa.alir.pta.PTAResult
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
 object HandlerModel {
-	def isHandler(r : JawaRecord) : Boolean = r.getName == "android.os.Handler"
-	def doHandlerCall(s : PTAResult, p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	def isHandler(r : JawaClass) : Boolean = r.getName == "android.os.Handler"
+	def doHandlerCall(s : PTAResult, p : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true

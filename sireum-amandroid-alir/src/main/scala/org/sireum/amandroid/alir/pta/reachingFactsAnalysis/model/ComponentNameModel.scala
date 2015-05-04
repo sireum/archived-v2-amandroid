@@ -28,9 +28,9 @@ import org.sireum.jawa.alir.pta.FieldSlot
  */ 
 object ComponentNameModel {
   final val TITLE = "ComponentNameModel"
-	def isComponentName(r : JawaRecord) : Boolean = r.getName == "android.content.ComponentName"
+	def isComponentName(r : JawaClass) : Boolean = r.getName == "android.content.ComponentName"
 	  
-	def doComponentNameCall(s : PTAResult, p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+	def doComponentNameCall(s : PTAResult, p : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true
@@ -151,7 +151,7 @@ object ComponentNameModel {
 	      i match{
 	        case cstr @ PTAConcreteStringInstance(text, c) =>
 	          val recordName = text
-	          val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
+	          val recOpt = Center.tryLoadClass(recordName, Center.ResolveLevel.HIERARCHY)
 	          recOpt match{
 	            case Some(rec) =>
 	              PTAConcreteStringInstance(rec.getShortName, currentContext)
@@ -201,7 +201,7 @@ object ComponentNameModel {
   		          cn match{
   		            case cstr @ PTAConcreteStringInstance(text, c) =>
   		              val recordName = text
-  		              val recOpt = Center.tryLoadRecord(recordName, Center.ResolveLevel.HIERARCHY)
+  		              val recOpt = Center.tryLoadClass(recordName, Center.ResolveLevel.HIERARCHY)
   		              var facts = isetEmpty[RFAFact]
   		              recOpt match{
   		                case Some(rec) =>
@@ -250,7 +250,7 @@ object ComponentNameModel {
 		          cn match{
 		            case cstr @ PTAConcreteStringInstance(text, c) =>
 		              val recordType = StringFormConverter.formatClassNameToType(text)
-		              val rec = Center.resolveRecord(recordType.name, Center.ResolveLevel.HIERARCHY)
+		              val rec = Center.resolveClass(recordType.name, Center.ResolveLevel.HIERARCHY)
 		              val claStr = PTAConcreteStringInstance(recordType.name, c)
 		              val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
 		              var facts = isetEmpty[RFAFact]

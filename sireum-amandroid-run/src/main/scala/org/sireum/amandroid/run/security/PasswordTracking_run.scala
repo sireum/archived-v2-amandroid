@@ -83,8 +83,8 @@ object PasswordTracking_run {
       PasswordCounter.total += 1
     }
 
-    def entryPointFilter(eps: Set[org.sireum.jawa.JawaProcedure]): Set[org.sireum.jawa.JawaProcedure] = {
-      val res = eps.filter(e=>app_info.getSensitiveLayoutContainers.contains(e.getDeclaringRecord))
+    def entryPointFilter(eps: Set[org.sireum.jawa.JawaMethod]): Set[org.sireum.jawa.JawaMethod] = {
+      val res = eps.filter(e=>app_info.getSensitiveLayoutContainers.contains(e.getDeclaringClass))
     	if(!res.isEmpty){
     	  PasswordCounter.foundPasswordContainer += 1
     	  PasswordCounter.foundPasswordContainerList += source_apk

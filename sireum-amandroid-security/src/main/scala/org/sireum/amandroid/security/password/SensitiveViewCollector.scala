@@ -7,7 +7,7 @@ http://www.eclipse.org/legal/epl-v10.html
 */
 package org.sireum.amandroid.security.password
 
-import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.JawaClass
 import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.util._
 import org.sireum.jawa.util.IgnoreException
@@ -25,31 +25,31 @@ class SensitiveViewCollector(apkUri : FileResourceUri, outputUri : FileResourceU
   
   private final val TITLE = "SensitiveViewCollector"
   
-	private var sensitiveLayoutContainers : Set[JawaRecord] = Set()
+	private var sensitiveLayoutContainers : Set[JawaClass] = Set()
 	def getSensitiveLayoutContainers = this.sensitiveLayoutContainers
 	
 	override def collectInfo : Unit = {
 	  val manifestUri = outputUri + "/AndroidManifest.xml"
     val mfp = AppInfoCollector.analyzeManifest(manifestUri)
 	  this.appPackageName = mfp.getPackageName
-		this.componentInfos = mfp.getComponentInfos
-		this.uses_permissions = mfp.getPermissions
-		this.intentFdb = mfp.getIntentDB
+		this.componentInfos ++= mfp.getComponentInfos
+		this.uses_permissions ++= mfp.getPermissions
+		this.intentFdb.merge(mfp.getIntentDB)
 		
 	  val afp = AppInfoCollector.analyzeARSC(apkUri)
 		val lfp = AppInfoCollector.analyzeLayouts(apkUri, mfp)
-		this.layoutControls = lfp.getUserControls
+		this.layoutControls ++= lfp.getUserControls
 		if(!this.layoutControls.exists(p => p._2.isSensitive)) throw new IgnoreException
 		
 		val ra = AppInfoCollector.reachabilityAnalysis(mfp, timer)
-		this.sensitiveLayoutContainers = ra.getSensitiveLayoutContainer(layoutControls)
+		this.sensitiveLayoutContainers = ra.getSensitiveLayoutContainer(layoutControls.toMap)
 		val callbacks = AppInfoCollector.analyzeCallback(afp, lfp, ra)
-		this.callbackMethods = callbacks
-		var components = isetEmpty[JawaRecord]
+		this.callbackMethods ++= callbacks
+		var components = isetEmpty[JawaClass]
     mfp.getComponentInfos.foreach{
       f => 
-        val record = Center.resolveRecord(f.name, Center.ResolveLevel.HIERARCHY)
-        if(!record.isUnknown && record.isApplicationRecord){
+        val record = Center.resolveClass(f.name, Center.ResolveLevel.HIERARCHY)
+        if(!record.isUnknown && record.isApplicationClass){
 	        components += record
 	        val clCounter = generateEnvironment(record, if(f.exported)AndroidConstants.MAINCOMP_ENV else AndroidConstants.COMP_ENV, codeLineCounter)
 	        codeLineCounter = clCounter

@@ -1,0 +1,273 @@
+format version: 5
+output mode:
+1 items
+0 -> single
+output directories:
+1 items
+output dir -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes
+compile options:
+0 items
+javac options:
+0 items
+compiler version:
+1 items
+0 -> 2.10.4
+compile order:
+1 items
+0 -> Mixed
+name hashing:
+1 items
+0 -> false
+products:
+48 items
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$1.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$10.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$11.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$12.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$13.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$14.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$2.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$3.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$4$$anonfun$apply$2.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$4.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$5.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$6.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$7.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$8.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$9.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$firstExists$1.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$projectInfoMap$1.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$sireum_amandroid$1$$anonfun$apply$1.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$sireum_amandroid$1.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$sireum_amandroid$2.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$sireum_amandroid$3.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$sireum_amandroid$4.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$sireum_amandroid$5.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$1.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$10.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$11.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$12.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$2.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$3.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$4.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$5.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$6.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$7.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$8.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$9.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/JUnitXmlTestsListener.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/eu/henkelmann/sbt/JUnitXmlTestsListener$$anonfun$testEvent$1.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/JUnitXmlTestsListener.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/eu/henkelmann/sbt/JUnitXmlTestsListener$TestSuite$$anonfun$1.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/JUnitXmlTestsListener.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/eu/henkelmann/sbt/JUnitXmlTestsListener$TestSuite$$anonfun$count$1.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/JUnitXmlTestsListener.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/eu/henkelmann/sbt/JUnitXmlTestsListener$TestSuite.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/JUnitXmlTestsListener.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/eu/henkelmann/sbt/JUnitXmlTestsListener.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/ProjectInfo.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/ProjectInfo$$anonfun$ProjectInfo$$mineFiles$1$1.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/ProjectInfo.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/ProjectInfo$$anonfun$h$1$1.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/ProjectInfo.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/ProjectInfo$$anonfun$toDot$1.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/ProjectInfo.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/ProjectInfo$$anonfun$toString$1.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/ProjectInfo.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/ProjectInfo$.class
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/ProjectInfo.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/ProjectInfo.class
+binary dependencies:
+21 items
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/boot/scala-2.10.4/lib/scala-library.jar
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/actions/jars/actions-0.13.5.jar
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/apply-macro/jars/apply-macro-0.13.5.jar
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/collections/jars/collections-0.13.5.jar
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/incremental-compiler/jars/incremental-compiler-0.13.5.jar
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/ivy/jars/ivy-0.13.5.jar
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/main-settings/jars/main-settings-0.13.5.jar
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/main/jars/main-0.13.5.jar
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/sbt/jars/sbt-0.13.5.jar
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/task-system/jars/task-system-0.13.5.jar
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/testing/jars/testing-0.13.5.jar
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/scala_2.10/sbt_0.13/com.eed3si9n/sbt-unidoc/jars/sbt-unidoc-0.3.1.jar
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/JUnitXmlTestsListener.scala -> /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/JUnitXmlTestsListener.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/boot/scala-2.10.4/lib/scala-library.jar
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/JUnitXmlTestsListener.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/test-interface/jars/test-interface-1.0.jar
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/JUnitXmlTestsListener.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/testing/jars/testing-0.13.5.jar
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/ProjectInfo.scala -> /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/ProjectInfo.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/boot/scala-2.10.4/lib/scala-library.jar
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/ProjectInfo.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/io/jars/io-0.13.5.jar
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/ProjectInfo.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/sbt/jars/sbt-0.13.5.jar
+direct source dependencies:
+2 items
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/JUnitXmlTestsListener.scala
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> /Users/linfengchi/git/amandroid/sireum-amandroid-build/project/ProjectInfo.scala
+direct external dependencies:
+0 items
+public inherited source dependencies:
+0 items
+public inherited external dependencies:
+0 items
+member reference internal dependencies:
+0 items
+member reference external dependencies:
+0 items
+inheritance internal dependencies:
+0 items
+inheritance external dependencies:
+0 items
+class names:
+48 items
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$1
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$10
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$11
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$12
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$13
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$14
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$2
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$3
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$4
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$4$$anonfun$apply$2
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$5
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$6
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$7
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$8
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$9
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$firstExists$1
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$projectInfoMap$1
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$sireum_amandroid$1
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$sireum_amandroid$1$$anonfun$apply$1
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$sireum_amandroid$2
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$sireum_amandroid$3
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$sireum_amandroid$4
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$sireum_amandroid$5
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$toSbtProject$1
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$toSbtProject$10
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$toSbtProject$11
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$toSbtProject$12
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$toSbtProject$2
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$toSbtProject$3
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$toSbtProject$4
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$toSbtProject$5
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$toSbtProject$6
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$toSbtProject$7
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$toSbtProject$8
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> AmandroidBuild$$anonfun$toSbtProject$9
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/JUnitXmlTestsListener.scala -> eu.henkelmann.sbt.JUnitXmlTestsListener
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/JUnitXmlTestsListener.scala -> eu.henkelmann.sbt.JUnitXmlTestsListener$$anonfun$testEvent$1
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/JUnitXmlTestsListener.scala -> eu.henkelmann.sbt.JUnitXmlTestsListener$TestSuite
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/JUnitXmlTestsListener.scala -> eu.henkelmann.sbt.JUnitXmlTestsListener$TestSuite$$anonfun$1
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/JUnitXmlTestsListener.scala -> eu.henkelmann.sbt.JUnitXmlTestsListener$TestSuite$$anonfun$count$1
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/ProjectInfo.scala -> ProjectInfo
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/ProjectInfo.scala -> ProjectInfo$
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/ProjectInfo.scala -> ProjectInfo$$anonfun$ProjectInfo$$mineFiles$1$1
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/ProjectInfo.scala -> ProjectInfo$$anonfun$h$1$1
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/ProjectInfo.scala -> ProjectInfo$$anonfun$toDot$1
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/ProjectInfo.scala -> ProjectInfo$$anonfun$toString$1
+used names:
+0 items
+product stamps:
+48 items
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$1.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$10.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$11.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$12.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$13.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$14.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$2.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$3.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$4$$anonfun$apply$2.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$4.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$5.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$6.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$7.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$8.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$9.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$firstExists$1.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$projectInfoMap$1.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$sireum_amandroid$1$$anonfun$apply$1.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$sireum_amandroid$1.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$sireum_amandroid$2.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$sireum_amandroid$3.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$sireum_amandroid$4.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$sireum_amandroid$5.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$1.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$10.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$11.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$12.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$2.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$3.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$4.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$5.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$6.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$7.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$8.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$$anonfun$toSbtProject$9.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild$.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/AmandroidBuild.class -> lastModified(1423885418000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/ProjectInfo$$anonfun$ProjectInfo$$mineFiles$1$1.class -> lastModified(1423885419000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/ProjectInfo$$anonfun$h$1$1.class -> lastModified(1423885419000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/ProjectInfo$$anonfun$toDot$1.class -> lastModified(1423885419000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/ProjectInfo$$anonfun$toString$1.class -> lastModified(1423885419000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/ProjectInfo$.class -> lastModified(1423885419000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/ProjectInfo.class -> lastModified(1423885419000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/eu/henkelmann/sbt/JUnitXmlTestsListener$$anonfun$testEvent$1.class -> lastModified(1423885419000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/eu/henkelmann/sbt/JUnitXmlTestsListener$TestSuite$$anonfun$1.class -> lastModified(1423885419000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/eu/henkelmann/sbt/JUnitXmlTestsListener$TestSuite$$anonfun$count$1.class -> lastModified(1423885419000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/eu/henkelmann/sbt/JUnitXmlTestsListener$TestSuite.class -> lastModified(1423885419000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/target/scala-2.10/sbt-0.13/classes/eu/henkelmann/sbt/JUnitXmlTestsListener.class -> lastModified(1423885419000)
+source stamps:
+3 items
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> hash(553e0241e4f3955ffc0663b06eb33a5679db8584)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/JUnitXmlTestsListener.scala -> hash(23534de2d07ec3ecce01621f69cc0d2c3b049e85)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/ProjectInfo.scala -> hash(bf0b52fff8d83a7261bce2f10f516a2d4c7b8bae)
+binary stamps:
+15 items
+/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar -> lastModified(1381430168000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/boot/scala-2.10.4/lib/scala-library.jar -> lastModified(1395179187000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/actions/jars/actions-0.13.5.jar -> lastModified(1401198373000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/apply-macro/jars/apply-macro-0.13.5.jar -> lastModified(1401198213000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/collections/jars/collections-0.13.5.jar -> lastModified(1401198267000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/incremental-compiler/jars/incremental-compiler-0.13.5.jar -> lastModified(1401198351000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/io/jars/io-0.13.5.jar -> lastModified(1401198198000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/ivy/jars/ivy-0.13.5.jar -> lastModified(1401198279000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/main-settings/jars/main-settings-0.13.5.jar -> lastModified(1401198341000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/main/jars/main-0.13.5.jar -> lastModified(1401198381000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/sbt/jars/sbt-0.13.5.jar -> lastModified(1401198390000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/task-system/jars/task-system-0.13.5.jar -> lastModified(1401198283000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/test-interface/jars/test-interface-1.0.jar -> lastModified(1372459476000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/testing/jars/testing-0.13.5.jar -> lastModified(1401198365000)
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/scala_2.10/sbt_0.13/com.eed3si9n/sbt-unidoc/jars/sbt-unidoc-0.3.1.jar -> lastModified(1398266040000)
+class names:
+15 items
+/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar -> java.lang.Object
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/boot/scala-2.10.4/lib/scala-library.jar -> scala.Equals
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/actions/jars/actions-0.13.5.jar -> sbt.Tests$
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/apply-macro/jars/apply-macro-0.13.5.jar -> sbt.appmacro.Instance$
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/collections/jars/collections-0.13.5.jar -> sbt.Init
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/incremental-compiler/jars/incremental-compiler-0.13.5.jar -> sbt.inc.IncOptions
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/io/jars/io-0.13.5.jar -> sbt.RichFile
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/ivy/jars/ivy-0.13.5.jar -> sbt.impl.ModuleIDConfigurable
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/main-settings/jars/main-settings-0.13.5.jar -> sbt.std.InitializeInstance$
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/main/jars/main-0.13.5.jar -> sbt.Build
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/sbt/jars/sbt-0.13.5.jar -> sbt.package$
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/task-system/jars/task-system-0.13.5.jar -> sbt.std.TaskExtra
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/test-interface/jars/test-interface-1.0.jar -> sbt.testing.Status
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/org.scala-sbt/testing/jars/testing-0.13.5.jar -> sbt.TestReportListener
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/sbt/sbtivy/cache/scala_2.10/sbt_0.13/com.eed3si9n/sbt-unidoc/jars/sbt-unidoc-0.3.1.jar -> sbtunidoc.Plugin$
+internal apis:
+3 items
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> 
+rO0ABXNyABB4c2J0aS5hcGkuU291cmNlFlpwRASfbtoCAAZJAAdhcGlIYXNoWgAIaGFzTWFjcm9MABhfaW50ZXJuYWxPbmx5X25hbWVIYXNoZXN0ACRMeHNidGkvYXBpL19pbnRlcm5hbE9ubHlfTmFtZUhhc2hlcztMAANhcGl0ABVMeHNidGkvYXBpL1NvdXJjZUFQSTtMAAtjb21waWxhdGlvbnQAF0x4c2J0aS9hcGkvQ29tcGlsYXRpb247WwAEaGFzaHQAAltCeHCNYDBvAHNyACJ4c2J0aS5hcGkuX2ludGVybmFsT25seV9OYW1lSGFzaGVzVNq+mfrU7EwCAAJbAA9pbXBsaWNpdE1lbWJlcnN0ACNbTHhzYnRpL2FwaS9faW50ZXJuYWxPbmx5X05hbWVIYXNoO1sADnJlZ3VsYXJNZW1iZXJzcQB+AAd4cHVyACNbTHhzYnRpLmFwaS5faW50ZXJuYWxPbmx5X05hbWVIYXNoO0lagLbdlov0AgAAeHAAAAAAdXEAfgAJAAAAAHNyABN4c2J0aS5hcGkuU291cmNlQVBJuV6n+SkjOKQCAAJbAAtkZWZpbml0aW9uc3QAF1tMeHNidGkvYXBpL0RlZmluaXRpb247WwAIcGFja2FnZXN0ABRbTHhzYnRpL2FwaS9QYWNrYWdlO3hwdXIAF1tMeHNidGkuYXBpLkRlZmluaXRpb247iMlc57TjXg4CAAB4cAAAAAFzcgATeHNidGkuYXBpLkNsYXNzTGlrZYM0HKHfsJdsAgAETAAOZGVmaW5pdGlvblR5cGV0ABpMeHNidGkvYXBpL0RlZmluaXRpb25UeXBlO1sAEHNhdmVkQW5ub3RhdGlvbnN0ABNbTGphdmEvbGFuZy9TdHJpbmc7TAAIc2VsZlR5cGV0ABBMeHNidGkvYXBpL0xhenk7TAAJc3RydWN0dXJlcQB+ABV4cgAheHNidGkuYXBpLlBhcmFtZXRlcml6ZWREZWZpbml0aW9u+RFusdVQPOICAAFbAA50eXBlUGFyYW1ldGVyc3QAGltMeHNidGkvYXBpL1R5cGVQYXJhbWV0ZXI7eHIAFHhzYnRpLmFwaS5EZWZpbml0aW9uhyob6HFC40YCAARMAAZhY2Nlc3N0ABJMeHNidGkvYXBpL0FjY2VzcztbAAthbm5vdGF0aW9uc3QAF1tMeHNidGkvYXBpL0Fubm90YXRpb247TAAJbW9kaWZpZXJzdAAVTHhzYnRpL2FwaS9Nb2RpZmllcnM7TAAEbmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwc3IAEHhzYnRpLmFwaS5QdWJsaWO6WD2ubC1gQgIAAHhyABB4c2J0aS5hcGkuQWNjZXNz3WKa+B1jMUgCAAB4cHVyABdbTHhzYnRpLmFwaS5Bbm5vdGF0aW9uO+uX6xkQ9o1IAgAAeHAAAAAAc3IAE3hzYnRpLmFwaS5Nb2RpZmllcnPHERMhaZzcJAIAAUIABWZsYWdzeHAAdAAOQW1hbmRyb2lkQnVpbGR1cgAaW0x4c2J0aS5hcGkuVHlwZVBhcmFtZXRlcjvZbSYPKJ3ytgIAAHhwAAAAAH5yABh4c2J0aS5hcGkuRGVmaW5pdGlvblR5cGUAAAAAAAAAABIAAHhyAA5qYXZhLmxhbmcuRW51bQAAAAAAAAAAEgAAeHB0AAZNb2R1bGV1cgATW0xqYXZhLmxhbmcuU3RyaW5nO63SVufpHXtHAgAAeHAAAAAAc3IAE3hzYnRpLlNhZmVMYXp5JEltcGxQAi6Tl5dAPwIAA1oACGJpdG1hcCQwTAACX3R0ABJMamF2YS9sYW5nL09iamVjdDtMAARldmFsdAARTHNjYWxhL0Z1bmN0aW9uMDt4cgAWeHNidGkuYXBpLkFic3RyYWN0TGF6edN3tQFfu+egAgAAeHAAcHNyACB4c2J0aS5TYWZlTGF6eSQkYW5vbmZ1biRzdHJpY3QkMQAAAAAAAAAAAgABTAAHdmFsdWUkMXEAfgAveHBzcgATeHNidGkuYXBpLkVtcHR5VHlwZbz9nkZJO4kkAgAAeHIAFHhzYnRpLmFwaS5TaW1wbGVUeXBlcnhiiCEjv0ACAAB4cgAOeHNidGkuYXBpLlR5cGU/atkhFkmqygIAAHhwc3EAfgAuAHBzcQB+ADNzcgATeHNidGkuYXBpLlN0cnVjdHVyZamq+YCTb9gAAgADTAAIZGVjbGFyZWRxAH4AFUwACWluaGVyaXRlZHEAfgAVTAAHcGFyZW50c3EAfgAVeHEAfgA3c3EAfgAuAHBzcQB+ADN1cQB+ABAAAAAAc3EAfgAuAHBzcQB+ADN1cQB+ABAAAAAAc3EAfgAuAHBzcQB+ADN1cgARW0x4c2J0aS5hcGkuVHlwZTt0/6Vae/npQQIAAHhwAAAAA3NyABR4c2J0aS5hcGkuUHJvamVjdGlvbvPSjVTpRaQtAgACTAACaWRxAH4AHEwABnByZWZpeHQAFkx4c2J0aS9hcGkvU2ltcGxlVHlwZTt4cQB+ADZ0AAVCdWlsZHNyABN4c2J0aS5hcGkuU2luZ2xldG9u/Kdf+M9W5EYCAAFMAARwYXRodAAQTHhzYnRpL2FwaS9QYXRoO3hxAH4ANnNyAA54c2J0aS5hcGkuUGF0aJs9XAjOpSeEAgABWwAKY29tcG9uZW50c3QAGltMeHNidGkvYXBpL1BhdGhDb21wb25lbnQ7eHB1cgAaW0x4c2J0aS5hcGkuUGF0aENvbXBvbmVudDtD2gl0LWcWdAIAAHhwAAAAAnNyAAx4c2J0aS5hcGkuSWSYMmyLN1PEQAIAAUwAAmlkcQB+ABx4cgAXeHNidGkuYXBpLlBhdGhDb21wb25lbnRfmiJbLoafvAIAAHhwdAADc2J0c3IADnhzYnRpLmFwaS5UaGlz2wntpsxaQFwCAAB4cQB+AFRzcQB+AEd0AAZPYmplY3RzcQB+AEtzcQB+AE51cQB+AFEAAAADc3EAfgBTdAAEamF2YXNxAH4AU3QABGxhbmdxAH4AWHNxAH4AR3QAA0FueXNxAH4AS3NxAH4ATnVxAH4AUQAAAAJzcQB+AFN0AAVzY2FsYXEAfgBYdXIAFFtMeHNidGkuYXBpLlBhY2thZ2U7WxMZN3CnJ6ECAAB4cAAAAABzcgAVeHNidGkuYXBpLkNvbXBpbGF0aW9u7frgw2rooEICAAJKAAlzdGFydFRpbWVbAAdvdXRwdXRzdAAaW0x4c2J0aS9hcGkvT3V0cHV0U2V0dGluZzt4cAAAAUuGLyYWdXIAGltMeHNidGkuYXBpLk91dHB1dFNldHRpbmc7f2rC86eHpUICAAB4cAAAAAFzcgAXeHNidGkuYXBpLk91dHB1dFNldHRpbmd62ZpHdPsdewIAAkwAD291dHB1dERpcmVjdG9yeXEAfgAcTAAPc291cmNlRGlyZWN0b3J5cQB+ABx4cHQAYS9Vc2Vycy9saW5mZW5nY2hpL2dpdC9hbWFuZHJvaWQvc2lyZXVtLWFtYW5kcm9pZC1idWlsZC9wcm9qZWN0L3RhcmdldC9zY2FsYS0yLjEwL3NidC0wLjEzL2NsYXNzZXN0AAEvdXIAAltCrPMX+AYIVOACAAB4cAAAABRVPgJB5POVX/wGY7BuszpWeduFhA==
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/JUnitXmlTestsListener.scala -> 
+rO0ABXNyABB4c2J0aS5hcGkuU291cmNlFlpwRASfbtoCAAZJAAdhcGlIYXNoWgAIaGFzTWFjcm9MABhfaW50ZXJuYWxPbmx5X25hbWVIYXNoZXN0ACRMeHNidGkvYXBpL19pbnRlcm5hbE9ubHlfTmFtZUhhc2hlcztMAANhcGl0ABVMeHNidGkvYXBpL1NvdXJjZUFQSTtMAAtjb21waWxhdGlvbnQAF0x4c2J0aS9hcGkvQ29tcGlsYXRpb247WwAEaGFzaHQAAltCeHB/sgHmAHNyACJ4c2J0aS5hcGkuX2ludGVybmFsT25seV9OYW1lSGFzaGVzVNq+mfrU7EwCAAJbAA9pbXBsaWNpdE1lbWJlcnN0ACNbTHhzYnRpL2FwaS9faW50ZXJuYWxPbmx5X05hbWVIYXNoO1sADnJlZ3VsYXJNZW1iZXJzcQB+AAd4cHVyACNbTHhzYnRpLmFwaS5faW50ZXJuYWxPbmx5X05hbWVIYXNoO0lagLbdlov0AgAAeHAAAAAAdXEAfgAJAAAAAHNyABN4c2J0aS5hcGkuU291cmNlQVBJuV6n+SkjOKQCAAJbAAtkZWZpbml0aW9uc3QAF1tMeHNidGkvYXBpL0RlZmluaXRpb247WwAIcGFja2FnZXN0ABRbTHhzYnRpL2FwaS9QYWNrYWdlO3hwdXIAF1tMeHNidGkuYXBpLkRlZmluaXRpb247iMlc57TjXg4CAAB4cAAAAAFzcgATeHNidGkuYXBpLkNsYXNzTGlrZYM0HKHfsJdsAgAETAAOZGVmaW5pdGlvblR5cGV0ABpMeHNidGkvYXBpL0RlZmluaXRpb25UeXBlO1sAEHNhdmVkQW5ub3RhdGlvbnN0ABNbTGphdmEvbGFuZy9TdHJpbmc7TAAIc2VsZlR5cGV0ABBMeHNidGkvYXBpL0xhenk7TAAJc3RydWN0dXJlcQB+ABV4cgAheHNidGkuYXBpLlBhcmFtZXRlcml6ZWREZWZpbml0aW9u+RFusdVQPOICAAFbAA50eXBlUGFyYW1ldGVyc3QAGltMeHNidGkvYXBpL1R5cGVQYXJhbWV0ZXI7eHIAFHhzYnRpLmFwaS5EZWZpbml0aW9uhyob6HFC40YCAARMAAZhY2Nlc3N0ABJMeHNidGkvYXBpL0FjY2VzcztbAAthbm5vdGF0aW9uc3QAF1tMeHNidGkvYXBpL0Fubm90YXRpb247TAAJbW9kaWZpZXJzdAAVTHhzYnRpL2FwaS9Nb2RpZmllcnM7TAAEbmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwc3IAEHhzYnRpLmFwaS5QdWJsaWO6WD2ubC1gQgIAAHhyABB4c2J0aS5hcGkuQWNjZXNz3WKa+B1jMUgCAAB4cHVyABdbTHhzYnRpLmFwaS5Bbm5vdGF0aW9uO+uX6xkQ9o1IAgAAeHAAAAAAc3IAE3hzYnRpLmFwaS5Nb2RpZmllcnPHERMhaZzcJAIAAUIABWZsYWdzeHAAdAAnZXUuaGVua2VsbWFubi5zYnQuSlVuaXRYbWxUZXN0c0xpc3RlbmVydXIAGltMeHNidGkuYXBpLlR5cGVQYXJhbWV0ZXI72W0mDyid8rYCAAB4cAAAAAB+cgAYeHNidGkuYXBpLkRlZmluaXRpb25UeXBlAAAAAAAAAAASAAB4cgAOamF2YS5sYW5nLkVudW0AAAAAAAAAABIAAHhwdAAIQ2xhc3NEZWZ1cgATW0xqYXZhLmxhbmcuU3RyaW5nO63SVufpHXtHAgAAeHAAAAAAc3IAE3hzYnRpLlNhZmVMYXp5JEltcGxQAi6Tl5dAPwIAA1oACGJpdG1hcCQwTAACX3R0ABJMamF2YS9sYW5nL09iamVjdDtMAARldmFsdAARTHNjYWxhL0Z1bmN0aW9uMDt4cgAWeHNidGkuYXBpLkFic3RyYWN0TGF6edN3tQFfu+egAgAAeHAAcHNyACB4c2J0aS5TYWZlTGF6eSQkYW5vbmZ1biRzdHJpY3QkMQAAAAAAAAAAAgABTAAHdmFsdWUkMXEAfgAveHBzcgATeHNidGkuYXBpLkVtcHR5VHlwZbz9nkZJO4kkAgAAeHIAFHhzYnRpLmFwaS5TaW1wbGVUeXBlcnhiiCEjv0ACAAB4cgAOeHNidGkuYXBpLlR5cGU/atkhFkmqygIAAHhwc3EAfgAuAHBzcQB+ADNzcgATeHNidGkuYXBpLlN0cnVjdHVyZamq+YCTb9gAAgADTAAIZGVjbGFyZWRxAH4AFUwACWluaGVyaXRlZHEAfgAVTAAHcGFyZW50c3EAfgAVeHEAfgA3c3EAfgAuAHBzcQB+ADN1cQB+ABAAAAAAc3EAfgAuAHBzcQB+ADN1cQB+ABAAAAAAc3EAfgAuAHBzcQB+ADN1cgARW0x4c2J0aS5hcGkuVHlwZTt0/6Vae/npQQIAAHhwAAAABHNyABR4c2J0aS5hcGkuUHJvamVjdGlvbvPSjVTpRaQtAgACTAACaWRxAH4AHEwABnByZWZpeHQAFkx4c2J0aS9hcGkvU2ltcGxlVHlwZTt4cQB+ADZ0AA1UZXN0c0xpc3RlbmVyc3IAE3hzYnRpLmFwaS5TaW5nbGV0b278p1/4z1bkRgIAAUwABHBhdGh0ABBMeHNidGkvYXBpL1BhdGg7eHEAfgA2c3IADnhzYnRpLmFwaS5QYXRomz1cCM6lJ4QCAAFbAApjb21wb25lbnRzdAAaW0x4c2J0aS9hcGkvUGF0aENvbXBvbmVudDt4cHVyABpbTHhzYnRpLmFwaS5QYXRoQ29tcG9uZW50O0PaCXQtZxZ0AgAAeHAAAAACc3IADHhzYnRpLmFwaS5JZJgybIs3U8RAAgABTAACaWRxAH4AHHhyABd4c2J0aS5hcGkuUGF0aENvbXBvbmVudF+aIlsuhp+8AgAAeHB0AANzYnRzcgAOeHNidGkuYXBpLlRoaXPbCe2mzFpAXAIAAHhxAH4AVHNxAH4AR3QAElRlc3RSZXBvcnRMaXN0ZW5lcnEAfgBNc3EAfgBHdAAGT2JqZWN0c3EAfgBLc3EAfgBOdXEAfgBRAAAAA3NxAH4AU3QABGphdmFzcQB+AFN0AARsYW5ncQB+AFhzcQB+AEd0AANBbnlzcQB+AEtzcQB+AE51cQB+AFEAAAACc3EAfgBTdAAFc2NhbGFxAH4AWHVyABRbTHhzYnRpLmFwaS5QYWNrYWdlO1sTGTdwpyehAgAAeHAAAAADc3IAEXhzYnRpLmFwaS5QYWNrYWdlflmP9q7OOVgCAAFMAARuYW1lcQB+ABx4cHQAEWV1LmhlbmtlbG1hbm4uc2J0c3EAfgBtdAANZXUuaGVua2VsbWFubnNxAH4AbXQAAmV1c3IAFXhzYnRpLmFwaS5Db21waWxhdGlvbu364MNq6KBCAgACSgAJc3RhcnRUaW1lWwAHb3V0cHV0c3QAGltMeHNidGkvYXBpL091dHB1dFNldHRpbmc7eHAAAAFLhi8mFnVyABpbTHhzYnRpLmFwaS5PdXRwdXRTZXR0aW5nO39qwvOnh6VCAgAAeHAAAAABc3IAF3hzYnRpLmFwaS5PdXRwdXRTZXR0aW5netmaR3T7HXsCAAJMAA9vdXRwdXREaXJlY3RvcnlxAH4AHEwAD3NvdXJjZURpcmVjdG9yeXEAfgAceHB0AGEvVXNlcnMvbGluZmVuZ2NoaS9naXQvYW1hbmRyb2lkL3NpcmV1bS1hbWFuZHJvaWQtYnVpbGQvcHJvamVjdC90YXJnZXQvc2NhbGEtMi4xMC9zYnQtMC4xMy9jbGFzc2VzdAABL3VyAAJbQqzzF/gGCFTgAgAAeHAAAAAUI1NN4tB+w+zOAWIfacwNLDsEnoU=
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/ProjectInfo.scala -> 
+rO0ABXNyABB4c2J0aS5hcGkuU291cmNlFlpwRASfbtoCAAZJAAdhcGlIYXNoWgAIaGFzTWFjcm9MABhfaW50ZXJuYWxPbmx5X25hbWVIYXNoZXN0ACRMeHNidGkvYXBpL19pbnRlcm5hbE9ubHlfTmFtZUhhc2hlcztMAANhcGl0ABVMeHNidGkvYXBpL1NvdXJjZUFQSTtMAAtjb21waWxhdGlvbnQAF0x4c2J0aS9hcGkvQ29tcGlsYXRpb247WwAEaGFzaHQAAltCeHAW+CM8AHNyACJ4c2J0aS5hcGkuX2ludGVybmFsT25seV9OYW1lSGFzaGVzVNq+mfrU7EwCAAJbAA9pbXBsaWNpdE1lbWJlcnN0ACNbTHhzYnRpL2FwaS9faW50ZXJuYWxPbmx5X05hbWVIYXNoO1sADnJlZ3VsYXJNZW1iZXJzcQB+AAd4cHVyACNbTHhzYnRpLmFwaS5faW50ZXJuYWxPbmx5X05hbWVIYXNoO0lagLbdlov0AgAAeHAAAAAAdXEAfgAJAAAAAHNyABN4c2J0aS5hcGkuU291cmNlQVBJuV6n+SkjOKQCAAJbAAtkZWZpbml0aW9uc3QAF1tMeHNidGkvYXBpL0RlZmluaXRpb247WwAIcGFja2FnZXN0ABRbTHhzYnRpL2FwaS9QYWNrYWdlO3hwdXIAF1tMeHNidGkuYXBpLkRlZmluaXRpb247iMlc57TjXg4CAAB4cAAAAAJzcgATeHNidGkuYXBpLkNsYXNzTGlrZYM0HKHfsJdsAgAETAAOZGVmaW5pdGlvblR5cGV0ABpMeHNidGkvYXBpL0RlZmluaXRpb25UeXBlO1sAEHNhdmVkQW5ub3RhdGlvbnN0ABNbTGphdmEvbGFuZy9TdHJpbmc7TAAIc2VsZlR5cGV0ABBMeHNidGkvYXBpL0xhenk7TAAJc3RydWN0dXJlcQB+ABV4cgAheHNidGkuYXBpLlBhcmFtZXRlcml6ZWREZWZpbml0aW9u+RFusdVQPOICAAFbAA50eXBlUGFyYW1ldGVyc3QAGltMeHNidGkvYXBpL1R5cGVQYXJhbWV0ZXI7eHIAFHhzYnRpLmFwaS5EZWZpbml0aW9uhyob6HFC40YCAARMAAZhY2Nlc3N0ABJMeHNidGkvYXBpL0FjY2VzcztbAAthbm5vdGF0aW9uc3QAF1tMeHNidGkvYXBpL0Fubm90YXRpb247TAAJbW9kaWZpZXJzdAAVTHhzYnRpL2FwaS9Nb2RpZmllcnM7TAAEbmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwc3IAEHhzYnRpLmFwaS5QdWJsaWO6WD2ubC1gQgIAAHhyABB4c2J0aS5hcGkuQWNjZXNz3WKa+B1jMUgCAAB4cHVyABdbTHhzYnRpLmFwaS5Bbm5vdGF0aW9uO+uX6xkQ9o1IAgAAeHAAAAAAc3IAE3hzYnRpLmFwaS5Nb2RpZmllcnPHERMhaZzcJAIAAUIABWZsYWdzeHAAdAALUHJvamVjdEluZm91cgAaW0x4c2J0aS5hcGkuVHlwZVBhcmFtZXRlcjvZbSYPKJ3ytgIAAHhwAAAAAH5yABh4c2J0aS5hcGkuRGVmaW5pdGlvblR5cGUAAAAAAAAAABIAAHhyAA5qYXZhLmxhbmcuRW51bQAAAAAAAAAAEgAAeHB0AAZNb2R1bGV1cgATW0xqYXZhLmxhbmcuU3RyaW5nO63SVufpHXtHAgAAeHAAAAAAc3IAE3hzYnRpLlNhZmVMYXp5JEltcGxQAi6Tl5dAPwIAA1oACGJpdG1hcCQwTAACX3R0ABJMamF2YS9sYW5nL09iamVjdDtMAARldmFsdAARTHNjYWxhL0Z1bmN0aW9uMDt4cgAWeHNidGkuYXBpLkFic3RyYWN0TGF6edN3tQFfu+egAgAAeHAAcHNyACB4c2J0aS5TYWZlTGF6eSQkYW5vbmZ1biRzdHJpY3QkMQAAAAAAAAAAAgABTAAHdmFsdWUkMXEAfgAveHBzcgATeHNidGkuYXBpLkVtcHR5VHlwZbz9nkZJO4kkAgAAeHIAFHhzYnRpLmFwaS5TaW1wbGVUeXBlcnhiiCEjv0ACAAB4cgAOeHNidGkuYXBpLlR5cGU/atkhFkmqygIAAHhwc3EAfgAuAHBzcQB+ADNzcgATeHNidGkuYXBpLlN0cnVjdHVyZamq+YCTb9gAAgADTAAIZGVjbGFyZWRxAH4AFUwACWluaGVyaXRlZHEAfgAVTAAHcGFyZW50c3EAfgAVeHEAfgA3c3EAfgAuAHBzcQB+ADN1cQB+ABAAAAAAc3EAfgAuAHBzcQB+ADN1cQB+ABAAAAAAc3EAfgAuAHBzcQB+ADN1cgARW0x4c2J0aS5hcGkuVHlwZTt0/6Vae/npQQIAAHhwAAAABHNyABR4c2J0aS5hcGkuUHJvamVjdGlvbvPSjVTpRaQtAgACTAACaWRxAH4AHEwABnByZWZpeHQAFkx4c2J0aS9hcGkvU2ltcGxlVHlwZTt4cQB+ADZ0AAxTZXJpYWxpemFibGVzcgATeHNidGkuYXBpLlNpbmdsZXRvbvynX/jPVuRGAgABTAAEcGF0aHQAEEx4c2J0aS9hcGkvUGF0aDt4cQB+ADZzcgAOeHNidGkuYXBpLlBhdGibPVwIzqUnhAIAAVsACmNvbXBvbmVudHN0ABpbTHhzYnRpL2FwaS9QYXRoQ29tcG9uZW50O3hwdXIAGltMeHNidGkuYXBpLlBhdGhDb21wb25lbnQ7Q9oJdC1nFnQCAAB4cAAAAAJzcgAMeHNidGkuYXBpLklkmDJsizdTxEACAAFMAAJpZHEAfgAceHIAF3hzYnRpLmFwaS5QYXRoQ29tcG9uZW50X5oiWy6Gn7wCAAB4cHQABXNjYWxhc3IADnhzYnRpLmFwaS5UaGlz2wntpsxaQFwCAAB4cQB+AFRzcQB+AEdxAH4ASnNxAH4AS3NxAH4ATnVxAH4AUQAAAANzcQB+AFN0AARqYXZhc3EAfgBTdAACaW9xAH4AWHNxAH4AR3QABk9iamVjdHNxAH4AS3NxAH4ATnVxAH4AUQAAAANzcQB+AFNxAH4AXnNxAH4AU3QABGxhbmdxAH4AWHNxAH4AR3QAA0FueXEAfgBNc3EAfgAScQB+ACB1cQB+ACEAAAAAc3EAfgAjAHQAC1Byb2plY3RJbmZvdXEAfgAmAAAAAH5xAH4AKHQACENsYXNzRGVmdXEAfgAsAAAAAHNxAH4ALgBwc3EAfgAzcQB+ADhzcQB+AC4AcHNxAH4AM3NxAH4AO3NxAH4ALgBwc3EAfgAzdXEAfgAQAAAAAHNxAH4ALgBwc3EAfgAzdXEAfgAQAAAAAHNxAH4ALgBwc3EAfgAzdXEAfgBFAAAABnNxAH4AR3EAfgBKc3EAfgBLc3EAfgBOdXEAfgBRAAAAAnNxAH4AU3EAfgBWcQB+AFhzcQB+AEdxAH4ASnNxAH4AS3NxAH4ATnVxAH4AUQAAAANzcQB+AFNxAH4AXnNxAH4AU3QAAmlvcQB+AFhzcQB+AEd0AAdQcm9kdWN0cQB+AIJzcQB+AEd0AAZFcXVhbHNxAH4AgnNxAH4AR3EAfgBic3EAfgBLc3EAfgBOdXEAfgBRAAAAA3NxAH4AU3EAfgBec3EAfgBTcQB+AGhxAH4AWHNxAH4AR3EAfgBqcQB+AIJ1cgAUW0x4c2J0aS5hcGkuUGFja2FnZTtbExk3cKcnoQIAAHhwAAAAAHNyABV4c2J0aS5hcGkuQ29tcGlsYXRpb27t+uDDauigQgIAAkoACXN0YXJ0VGltZVsAB291dHB1dHN0ABpbTHhzYnRpL2FwaS9PdXRwdXRTZXR0aW5nO3hwAAABS4YvJhZ1cgAaW0x4c2J0aS5hcGkuT3V0cHV0U2V0dGluZzt/asLzp4elQgIAAHhwAAAAAXNyABd4c2J0aS5hcGkuT3V0cHV0U2V0dGluZ3rZmkd0+x17AgACTAAPb3V0cHV0RGlyZWN0b3J5cQB+ABxMAA9zb3VyY2VEaXJlY3RvcnlxAH4AHHhwdABhL1VzZXJzL2xpbmZlbmdjaGkvZ2l0L2FtYW5kcm9pZC9zaXJldW0tYW1hbmRyb2lkLWJ1aWxkL3Byb2plY3QvdGFyZ2V0L3NjYWxhLTIuMTAvc2J0LTAuMTMvY2xhc3Nlc3QAAS91cgACW0Ks8xf4BghU4AIAAHhwAAAAFL8LUv/42DpyYbzi8Q9Rai1Me4uu
+external apis:
+0 items
+source infos:
+3 items
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/AmandroidBuild.scala -> 
+AAAAAAAAAAEAAAEAAABRADcgIHZhbCBzaXJldW1TZXR0aW5ncyA9IERlZmF1bHRzLmRlZmF1bHRTZXR0aW5ncyArKyBTZXEoAQAACtsBAAAAIAEAICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAQBTL1VzZXJzL2xpbmZlbmdjaGkvZ2l0L2FtYW5kcm9pZC9zaXJldW0tYW1hbmRyb2lkLWJ1aWxkL3Byb2plY3QvQW1hbmRyb2lkQnVpbGQuc2NhbGEBAFMvVXNlcnMvbGluZmVuZ2NoaS9naXQvYW1hbmRyb2lkL3NpcmV1bS1hbWFuZHJvaWQtYnVpbGQvcHJvamVjdC9BbWFuZHJvaWRCdWlsZC5zY2FsYQA+dmFsdWUgZGVmYXVsdFNldHRpbmdzIGluIG9iamVjdCBEZWZhdWx0cyBpcyBkZXByZWNhdGVkOiAwLjEzLjIB
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/JUnitXmlTestsListener.scala -> 
+AAAAAAAAAAA=
+/Users/linfengchi/git/amandroid/sireum-amandroid-build/project/ProjectInfo.scala -> 
+AAAAAAAAAAA=
+compilations:
+1 items
+0 -> rO0ABXNyABV4c2J0aS5hcGkuQ29tcGlsYXRpb27t+uDDauigQgIAAkoACXN0YXJ0VGltZVsAB291dHB1dHN0ABpbTHhzYnRpL2FwaS9PdXRwdXRTZXR0aW5nO3hwAAABS4YvJhZ1cgAaW0x4c2J0aS5hcGkuT3V0cHV0U2V0dGluZzt/asLzp4elQgIAAHhwAAAAAXNyABd4c2J0aS5hcGkuT3V0cHV0U2V0dGluZ3rZmkd0+x17AgACTAAPb3V0cHV0RGlyZWN0b3J5dAASTGphdmEvbGFuZy9TdHJpbmc7TAAPc291cmNlRGlyZWN0b3J5cQB+AAZ4cHQAYS9Vc2Vycy9saW5mZW5nY2hpL2dpdC9hbWFuZHJvaWQvc2lyZXVtLWFtYW5kcm9pZC1idWlsZC9wcm9qZWN0L3RhcmdldC9zY2FsYS0yLjEwL3NidC0wLjEzL2NsYXNzZXN0AAEv

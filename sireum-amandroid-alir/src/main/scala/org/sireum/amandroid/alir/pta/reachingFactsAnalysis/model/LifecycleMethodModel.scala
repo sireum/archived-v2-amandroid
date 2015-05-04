@@ -7,7 +7,7 @@ http://www.eclipse.org/legal/epl-v10.html
 */
 package org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model
 
-import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.JawaMethod
 import org.sireum.util._
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
@@ -17,7 +17,7 @@ import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
 object LifecycleMethodModel {
-	def isLifecycleMethod(p : JawaProcedure) : Boolean = {
+	def isLifecycleMethod(p : JawaMethod) : Boolean = {
 	  p.getSignature match{
 	    case "Landroid/app/Service;.onCreate:()V" |
 	    		 "Landroid/app/Service;.onStart:(Landroid/content/Intent;I)V" |
@@ -33,7 +33,7 @@ object LifecycleMethodModel {
 	  }
 	}
 	
-	def doLifecycleMethodCall(s : ISet[RFAFact], p : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+	def doLifecycleMethodCall(s : ISet[RFAFact], p : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
 	  var newFacts = isetEmpty[RFAFact]
 	  p.getSignature match{
 	    case "Landroid/app/Service;.onCreate:()V" =>
