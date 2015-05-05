@@ -301,7 +301,14 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
      */
     def resolveCall(s : ISet[RFAFact], cj : CallJump, callerContext : Context, icfg : InterproceduralControlFlowGraph[ICFGNode]) : (IMap[ICFGNode, ISet[RFAFact]], ISet[RFAFact]) = {
       ReachingFactsAnalysisHelper.updatePTAResultCallJump(cj, callerContext, s, ptaresult)
-      val calleeSet = ReachingFactsAnalysisHelper.getCalleeSet(cj, callerContext, ptaresult)
+      val sig = cj.getValueAnnotation("signature") match {
+        case Some(s) => s match {
+          case ne: NameExp => ne.name.name
+          case _ => ""
+        }
+        case None => throw new RuntimeException("cannot found annotation 'signature' from: " + cj)
+      }
+      val calleeSet = ReachingFactsAnalysisHelper.getCalleeSet(cj, sig, callerContext, ptaresult)
       val icfgCallnode = icfg.getICFGCallNode(callerContext)
       icfgCallnode.asInstanceOf[ICFGCallNode].setCalleeSet(calleeSet)
       val icfgReturnnode = icfg.getICFGReturnNode(callerContext)

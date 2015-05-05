@@ -92,7 +92,7 @@ object DataLeakage_run {
     GlobalConfig.ICFG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = true
     AndroidReachingFactsAnalysisConfig.parallel = true
-    AndroidReachingFactsAnalysisConfig.resolve_static_init = false
+    AndroidReachingFactsAnalysisConfig.resolve_static_init = true
 
     MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
     val socket = new AmandroidSocket
