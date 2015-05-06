@@ -22,7 +22,7 @@ import org.sireum.jawa.alir.pta.PTAResult
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-object AndroidRFAScopeManager extends ScopeManager{
+class AndroidRFAScopeManager extends ScopeManager{
   private var packages : ISet[String] = isetEmpty
   private var includeMode = true
   def setMode(includeMode : Boolean) = this.includeMode = includeMode
@@ -55,9 +55,5 @@ object AndroidRFAScopeManager extends ScopeManager{
 	      if(rec.getPackageName != null) contains(rec.getPackageName) else false
 	    }
     }
-  }
-  
-  def handleBypass(s : PTAResult, calleeMethod : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
-    (isetEmpty, isetEmpty, true)
   }
 }

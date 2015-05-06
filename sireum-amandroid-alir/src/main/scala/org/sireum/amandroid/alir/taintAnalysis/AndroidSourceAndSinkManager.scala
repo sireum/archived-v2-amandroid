@@ -231,7 +231,7 @@ class DataLeakageAndroidSourceAndSinkManager(appPackageName : String,
   
   private final val TITLE = "DataLeakageAndroidSourceAndSinkManager"
   
-  private def sensitiveData: ISet[String] = Set("android.location.Location")
+  private def sensitiveData: ISet[String] = Set("android.location.Location", "android.content.Intent")
   
   override def isCallbackSource(proc : JawaMethod) : Boolean = {
     if(this.callbackMethods.contains(proc)){
