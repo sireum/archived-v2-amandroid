@@ -107,7 +107,7 @@ object GenGraph {
   private final val TITLE = "GenCallGraph"
   
 	def main(args: Array[String]) {
-	  if(args.size != 20){
+	  if(args.size != 22){
       println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -f [Graph Format: DOT, GraphML, GML] -gt [Graph Type: FULL, SIMPLE_CALL, DETAILED_CALL, API] -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -h [header] -t type[allows: APK, DIR] <source path> <output path>")
       return
     }
