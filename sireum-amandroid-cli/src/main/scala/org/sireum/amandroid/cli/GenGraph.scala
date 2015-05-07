@@ -55,7 +55,7 @@ import org.sireum.jawa.alir.controlFlowGraph.ICFGNormalNode
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 object GenGraphCli {
-	def run(saamode : SireumAmandroidGenGraphMode) {
+	def run(saamode: SireumAmandroidGenGraphMode) {
     val sourceType = saamode.general.typ
     val sourceDir = saamode.srcFile
     val sourceFile = new File(sourceDir)
@@ -69,11 +69,12 @@ object GenGraphCli {
     val msgLevel = saamode.general.msgLevel
     val format = saamode.format
     val graphtyp = saamode.graphtyp
-    forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, outputDir, mem, format, graphtyp, msgLevel)
+    val header = saamode.header
+    forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, outputDir, mem, format, graphtyp, msgLevel, header)
   }
 	
-	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : AnalyzeSource.Type, sourceDir : String, outputDir : String, mem : Int, format : GraphFormat.Type, graphtyp : GraphType.Type, msgLevel : MessageLevel.Type) = {
-    val args : MList[String] = mlistEmpty
+	def forkProcess(nostatic: Boolean, parallel: Boolean, noicc: Boolean, k_context: Int, timeout: Int, typSpec: AnalyzeSource.Type, sourceDir: String, outputDir: String, mem: Int, format: GraphFormat.Type, graphtyp: GraphType.Type, msgLevel: MessageLevel.Type, header: String) = {
+    val args: MList[String] = mlistEmpty
     args += "-s"
     args += (!nostatic).toString
     args += "-par"
@@ -90,6 +91,8 @@ object GenGraphCli {
     args += graphtyp.toString
     args += "-msg"
     args += msgLevel.toString
+    args += "-h"
+    args += header
     args ++= List("-t", typSpec.toString, sourceDir, outputDir)
     org.sireum.jawa.util.JVMUtil.startSecondJVM(GenGraph.getClass(), "-Xmx" + mem + "G", args.toList, true)
   }
@@ -105,7 +108,7 @@ object GenGraph {
   
 	def main(args: Array[String]) {
 	  if(args.size != 20){
-      println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -f [Graph Format: DOT, GraphML, GML] -gt [Graph Type: FULL, SIMPLE_CALL, DETAILED_CALL, API] -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -t type[allows: APK, DIR] <source path> <output path>")
+      println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -f [Graph Format: DOT, GraphML, GML] -gt [Graph Type: FULL, SIMPLE_CALL, DETAILED_CALL, API] -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -h [header] -t type[allows: APK, DIR] <source path> <output path>")
       return
     }
     val static = args(1).toBoolean
@@ -116,9 +119,10 @@ object GenGraph {
     val format = args(11)
     val graphtyp = args(13)
     val msgLevel = args(15)
-    val typ = args(17)
-    val sourcePath = args(18)
-    val outputPath = args(19)
+    val header = args(17)
+    val typ = args(19)
+    val sourcePath = args(20)
+    val outputPath = args(21)
     
     msgLevel match{
       case "NO$" =>
@@ -145,14 +149,14 @@ object GenGraph {
         println("Unexpected type: " + typ)
         return
     }
-		genGraph(apkFileUris, outputPath, static, parallel, icc, k_context, timeout, format, graphtyp)
+		genGraph(apkFileUris, outputPath, static, parallel, icc, k_context, timeout, header, format, graphtyp)
 	}
   
-  def genGraph(apkFileUris : Set[FileResourceUri], outputPath : String, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int, format : String, graphtyp : String) = {
+  def genGraph(apkFileUris: Set[FileResourceUri], outputPath: String, static: Boolean, parallel: Boolean, icc: Boolean, k_context: Int, timeout: Int, header: String, format: String, graphtyp: String) = {
     GlobalConfig.ICFG_CONTEXT_K = k_context
     println("Total apks: " + apkFileUris.size)
     try{
-      var i : Int = 0
+      var i: Int = 0
       JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), GlobalConfig.PILAR_FILE_EXT)
       
       apkFileUris.foreach{
@@ -204,14 +208,14 @@ object GenGraph {
                   case "GraphML$" => "GraphML"
                   case "GML$" => "GML"
                 }
-                icfg.getCallGraph.toSimpleCallGraph(path.getPath, fm)
+                icfg.getCallGraph.toSimpleCallGraph(header, path.getPath, fm)
               case "DETAILED_CALL$" => 
                 val path = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + "/detailed_cg")
                 val fm = format match {
                   case "GraphML$" => "GraphML"
                   case "GML$" => "GML"
                 }
-                icfg.getCallGraph.toDetailedCallGraph(icfg, path.getPath, fm)
+                icfg.getCallGraph.toDetailedCallGraph(header, icfg, path.getPath, fm)
               case "API$" => 
                 val graph = icfg.toApiGraph
                 format match {
@@ -224,8 +228,8 @@ object GenGraph {
             
             println("Done!")
           } catch {
-            case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
-            case e : Throwable => 
+            case te: MyTimeoutException => err_msg_critical(TITLE, te.message)
+            case e: Throwable => 
               CliLogger.logError(new File(outputPath), "Error: " , e)
           } finally {
             Center.reset
@@ -237,7 +241,7 @@ object GenGraph {
           }
       }
     } catch {
-      case e : Throwable => 
+      case e: Throwable => 
         CliLogger.logError(new File(outputPath), "Error: " , e)
 
     }

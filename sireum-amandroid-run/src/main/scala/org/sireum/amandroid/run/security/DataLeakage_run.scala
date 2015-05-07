@@ -53,20 +53,20 @@ object DataLeakage_run {
 
     def onAnalysisSuccess : Unit = {
       if(AppCenter.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
-	      DataLeakageCounter.taintPathFound += 1
-	      DataLeakageCounter.taintPathFoundList += source_apk
-	    }
-		  DataLeakageCounter.haveresult += 1
-		  val msgfile = new File(outputPath + "/msg.txt")
-		  val msgw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(msgfile, true)))
-		  msgw.write("################# " + source_apk + " ################\n")
-		  val tRes = AppCenter.getTaintAnalysisResults
+        DataLeakageCounter.taintPathFound += 1
+        DataLeakageCounter.taintPathFoundList += source_apk
+      }
+      DataLeakageCounter.haveresult += 1
+      val msgfile = new File(outputPath + "/msg.txt")
+      val msgw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(msgfile, true)))
+      msgw.write("################# " + source_apk + " ################\n")
+      val tRes = AppCenter.getTaintAnalysisResults
       tRes.foreach{
         case (rec, res) =>
           msgw.write(rec.getName + "\n")
           msgw.write("Found " + res.getTaintedPaths.size + " path.")
-	        msgw.write(res.toString)
-	        msgw.write("\n\n")
+          msgw.write(res.toString)
+          msgw.write("\n\n")
       }
     }
 
@@ -92,7 +92,7 @@ object DataLeakage_run {
     GlobalConfig.ICFG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = true
     AndroidReachingFactsAnalysisConfig.parallel = true
-    AndroidReachingFactsAnalysisConfig.resolve_static_init = false
+    AndroidReachingFactsAnalysisConfig.resolve_static_init = true
 
     MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
     val socket = new AmandroidSocket
@@ -106,7 +106,7 @@ object DataLeakage_run {
     
     files.foreach{
       file =>
-//        if(file.contains("LocationLeak1"))
+        if(file.contains("FieldSensitivity1"))
         try{
           msg_critical(TITLE, DataLeakageTask(outputPath, file, socket, Some(1000)).run)   
         } catch {
