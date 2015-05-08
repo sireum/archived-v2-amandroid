@@ -15,7 +15,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.BufferedWriter
 import java.io.OutputStreamWriter
-import org.sireum.amandroid.alir.taintAnalysis.DataLeakageAndroidSourceAndSinkManager
+import org.sireum.amandroid.security.communication.CommunicationSourceAndSinkManager
 import org.sireum.jawa.util.MyTimeoutException
 import org.sireum.jawa.util.MyTimer
 import org.sireum.jawa.GlobalConfig
@@ -64,12 +64,13 @@ object CommunicationLeakage_run {
     }
 
     def onPostAnalysis: Unit = {
-      msg_critical(TITLE, CommunicationLeakageCounter.toString)
+     // msg_critical(TITLE, CommunicationLeakageCounter.toString)
     }
     
     def onException(e : Exception) : Unit = {
       e match{
-        case ie : IgnoreException => System.err.println("Ignored!")
+        case ie : IgnoreException => err_msg_critical(TITLE, "Ignored!")
+        case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
         case a => 
           e.printStackTrace()
       }
@@ -100,18 +101,19 @@ object CommunicationLeakage_run {
     files.foreach{
       file =>
         try{
-          msg_critical(TITLE, DataLeakageTask(outputPath, file, socket, Some(10)).run)   
+          msg_critical(TITLE, CommunicationLeakageTask(outputPath, file, socket, Some(1000)).run)   
         } catch {
           case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
           case e : Throwable => e.printStackTrace()
         } finally{
           msg_critical(TITLE, CommunicationLeakageCounter.toString)
           socket.cleanEnv
+          msg_critical(TITLE, "************************************\n")
         }
     }
   }
   
-  private case class DataLeakageTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]) {
+  private case class CommunicationLeakageTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]) {
     def run : String = {
       msg_critical(TITLE, "####" + file + "#####")
       val timer = timeout match {
@@ -122,7 +124,8 @@ object CommunicationLeakage_run {
       val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
       val app_info = new AppInfoCollector(file, outUri, timer)
       app_info.collectInfo
-      val ssm = new DataLeakageAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+      println(AndroidGlobalConfig.CommunicationSinkFilePath)
+      val ssm = new CommunicationSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.CommunicationSinkFilePath)
       socket.plugListener(new CommunicationLeakageListener(file, outputPath))
       socket.runWithDDA(ssm, false, false, timer)
       return "Done!"

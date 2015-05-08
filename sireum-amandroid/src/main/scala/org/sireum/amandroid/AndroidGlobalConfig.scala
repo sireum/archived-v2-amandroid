@@ -27,6 +27,7 @@ object AndroidGlobalConfig {
 	final val android_dex2pilar_dir = AndroidGlobalConfig.amandroid_home + 
       "/dex2pilar/" + {if(OsUtils.isMac) "mac64" else if (OsUtils.isLinux) "linux64" else throw new RuntimeException("Please execute Amandroid on Mac64 or Linux64!")}
   
+  final var CommunicationSinkFilePath = amandroid_home + "/taintAnalysis/sourceAndSinks/CommunicationSourceAndSinks.txt"
   final var SourceAndSinkFilePath = amandroid_home + "/taintAnalysis/sourceAndSinks/TaintSourcesAndSinks.txt"
 	final var PasswordSinkFilePath = amandroid_home +  "/taintAnalysis/sourceAndSinks/PasswordSourcesAndSinks.txt"
 	final var IntentInjectionSinkFilePath = amandroid_home + "/taintAnalysis/sourceAndSinks/IntentInjectionSourcesAndSinks.txt"

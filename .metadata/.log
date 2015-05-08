@@ -1,0 +1,2042 @@
+!SESSION 2015-05-08 12:48:55.875 -----------------------------------------------
+eclipse.buildId=4.4.2.M20150204-1700
+java.version=1.8.0_45
+java.vendor=Oracle Corporation
+BootLoader constants: OS=macosx, ARCH=x86_64, WS=cocoa, NL=zh_CN
+Framework arguments:  --launcher.defaultAction openFile
+Command-line arguments:  --launcher.defaultAction openFile -clean
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.549
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/antlr4ide/eclipse/features/antlr4ide.sdk_0.3.5.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.589
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/antlr4ide/eclipse/features/antlr4ide.sdk_0.3.5.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.601
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/asm/eclipse/features/de.loskutov.BytecodeOutline.feature_2.4.3.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.614
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/asm/eclipse/features/de.loskutov.BytecodeOutline.feature_2.4.3.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.918
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.autotools.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.925
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.autotools_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.926
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.build.crossgcc_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.927
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.bupc_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.927
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.lrparser.feature_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.928
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.lrparser.sdk_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.928
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.lrparser.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.928
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.parser.upc.feature_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.929
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.parser.upc.sdk_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.929
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.parser.upc.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.932
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.debug.gdbjtag_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.932
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.debug.standalone.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.933
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.debug.standalone_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.933
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.debug.ui.memory.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.933
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.debug.ui.memory_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.934
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.examples.dsf_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.934
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gdb.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.934
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gdb_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.935
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.build.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.935
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.build_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.935
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.debug.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.936
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.debug_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.936
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.dsf.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.937
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.dsf_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.937
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.multicorevisualizer_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.940
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.launch.remote_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.941
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.managedbuilder.llvm_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.942
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.msw_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.942
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.native.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.943
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.native_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.947
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.platform.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.947
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.platform_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.948
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.qt_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.949
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.remote_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.949
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.sdk_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.950
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.testsrunner.feature_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.950
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.testsrunner.source.feature_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.950
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.util_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.951
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.visualizer_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.951
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.xlc.feature_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.952
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.xlc.sdk_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.952
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.xlc.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:07.952
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.107
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.autotools.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.108
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.autotools_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.108
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.build.crossgcc_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.109
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.bupc_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.109
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.lrparser.feature_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.110
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.lrparser.sdk_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.110
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.lrparser.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.111
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.parser.upc.feature_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.111
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.parser.upc.sdk_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.111
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.parser.upc.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.112
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.debug.gdbjtag_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.112
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.debug.standalone.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.112
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.debug.standalone_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.113
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.debug.ui.memory.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.113
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.debug.ui.memory_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.113
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.examples.dsf_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.114
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gdb.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.114
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gdb_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.114
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.build.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.114
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.build_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.115
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.debug.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.115
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.debug_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.116
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.dsf.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.116
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.dsf_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.116
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.multicorevisualizer_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.117
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.launch.remote_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.117
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.managedbuilder.llvm_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.117
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.msw_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.118
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.native.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.118
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.native_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.118
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.platform.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.118
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.platform_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.119
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.qt_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.119
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.remote_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.119
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.sdk_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.120
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.testsrunner.feature_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.120
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.testsrunner.source.feature_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.121
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.util_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.121
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.visualizer_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.121
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.xlc.feature_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.122
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.xlc.sdk_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.122
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.xlc.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.123
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.134
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/colortheme/eclipse/features/com.github.eclipsecolortheme.feature_0.14.0.201407150859.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.143
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/colortheme/eclipse/features/com.github.eclipsecolortheme.feature_0.14.0.201407150859.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.642
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/easyshell/eclipse/features/com.tetrade.eclipse.plugins.easyshell.feature_1.4.2.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.650
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/easyshell/eclipse/features/com.tetrade.eclipse.plugins.easyshell.feature_1.4.2.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.665
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/eclemma/eclipse/features/com.mountainminds.eclemma.feature_2.3.2.201409141915.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.676
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/eclemma/eclipse/features/com.mountainminds.eclemma.feature_2.3.2.201409141915.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.682
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/eclipse-fonts/eclipse/features/FontsFeature_1.0.4.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.689
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/eclipse-fonts/eclipse/features/FontsFeature_1.0.4.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.739
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.egit.mylyn_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.739
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.egit.source_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.740
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.egit_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.740
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit.http.apache_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.740
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit.java7_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.740
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit.pgm.source_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.741
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit.pgm_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.741
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit.source_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.741
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.763
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.egit.mylyn_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.764
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.egit.source_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.764
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.egit_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.764
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit.http.apache_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.765
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit.java7_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.765
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit.pgm.source_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.765
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit.pgm_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.765
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit.source_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.766
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.core 4 0 2015-05-08 12:49:08.770
+!MESSAGE Provisioning exception
+!STACK 1
+org.eclipse.equinox.p2.core.ProvisionException: No repository found at file:/Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/emf/.
+	at org.eclipse.equinox.internal.p2.repository.helpers.AbstractRepositoryManager.fail(AbstractRepositoryManager.java:395)
+	at org.eclipse.equinox.internal.p2.repository.helpers.AbstractRepositoryManager.loadRepository(AbstractRepositoryManager.java:692)
+	at org.eclipse.equinox.internal.p2.metadata.repository.MetadataRepositoryManager.loadRepository(MetadataRepositoryManager.java:96)
+	at org.eclipse.equinox.internal.p2.metadata.repository.MetadataRepositoryManager.loadRepository(MetadataRepositoryManager.java:92)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.Activator.loadMetadataRepository(Activator.java:99)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.DropinsRepositoryListener.getMetadataRepository(DropinsRepositoryListener.java:233)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.DropinsRepositoryListener.addRepository(DropinsRepositoryListener.java:122)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.DropinsRepositoryListener.added(DropinsRepositoryListener.java:96)
+	at org.eclipse.equinox.internal.provisional.p2.directorywatcher.DirectoryWatcher.processFile(DirectoryWatcher.java:197)
+	at org.eclipse.equinox.internal.provisional.p2.directorywatcher.DirectoryWatcher.scanDirectories(DirectoryWatcher.java:160)
+	at org.eclipse.equinox.internal.provisional.p2.directorywatcher.DirectoryWatcher.poll(DirectoryWatcher.java:108)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.Activator.watchDropins(Activator.java:542)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.Activator.start(Activator.java:172)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:771)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:1)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.startActivator(BundleContextImpl.java:764)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.start(BundleContextImpl.java:721)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle.startWorker0(EquinoxBundle.java:936)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle$EquinoxModule.startWorker(EquinoxBundle.java:319)
+	at org.eclipse.osgi.container.Module.doStart(Module.java:571)
+	at org.eclipse.osgi.container.Module.start(Module.java:439)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1582)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1562)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.doContainerStartLevel(ModuleContainer.java:1533)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1476)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:230)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:340)
+!SUBENTRY 1 org.eclipse.equinox.p2.metadata.repository 4 1000 2015-05-08 12:49:08.772
+!MESSAGE No repository found at file:/Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/emf/.
+
+!ENTRY org.eclipse.equinox.p2.core 4 0 2015-05-08 12:49:08.775
+!MESSAGE Provisioning exception
+!STACK 1
+org.eclipse.equinox.p2.core.ProvisionException: No repository found at file:/Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/emf/.
+	at org.eclipse.equinox.internal.p2.repository.helpers.AbstractRepositoryManager.fail(AbstractRepositoryManager.java:395)
+	at org.eclipse.equinox.internal.p2.repository.helpers.AbstractRepositoryManager.loadRepository(AbstractRepositoryManager.java:692)
+	at org.eclipse.equinox.internal.p2.artifact.repository.ArtifactRepositoryManager.loadRepository(ArtifactRepositoryManager.java:104)
+	at org.eclipse.equinox.internal.p2.artifact.repository.ArtifactRepositoryManager.loadRepository(ArtifactRepositoryManager.java:100)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.Activator.loadArtifactRepository(Activator.java:142)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.DropinsRepositoryListener.getArtifactRepository(DropinsRepositoryListener.java:260)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.DropinsRepositoryListener.addRepository(DropinsRepositoryListener.java:123)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.DropinsRepositoryListener.added(DropinsRepositoryListener.java:96)
+	at org.eclipse.equinox.internal.provisional.p2.directorywatcher.DirectoryWatcher.processFile(DirectoryWatcher.java:197)
+	at org.eclipse.equinox.internal.provisional.p2.directorywatcher.DirectoryWatcher.scanDirectories(DirectoryWatcher.java:160)
+	at org.eclipse.equinox.internal.provisional.p2.directorywatcher.DirectoryWatcher.poll(DirectoryWatcher.java:108)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.Activator.watchDropins(Activator.java:542)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.Activator.start(Activator.java:172)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:771)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:1)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.startActivator(BundleContextImpl.java:764)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.start(BundleContextImpl.java:721)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle.startWorker0(EquinoxBundle.java:936)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle$EquinoxModule.startWorker(EquinoxBundle.java:319)
+	at org.eclipse.osgi.container.Module.doStart(Module.java:571)
+	at org.eclipse.osgi.container.Module.start(Module.java:439)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1582)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1562)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.doContainerStartLevel(ModuleContainer.java:1533)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1476)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:230)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:340)
+!SUBENTRY 1 org.eclipse.equinox.p2.artifact.repository 4 1000 2015-05-08 12:49:08.775
+!MESSAGE No repository found at file:/Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/emf/.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.930
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/objectaid/eclipse/features/com.objectaid.uml.addon_1.1.8.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.930
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/objectaid/eclipse/features/com.objectaid.uml.cls_1.1.8.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.931
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/objectaid/eclipse/features/com.objectaid.uml.seq_1.1.8.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.931
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/objectaid/eclipse/features/org.apache.batik_1.6.0.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.956
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/objectaid/eclipse/features/com.objectaid.uml.addon_1.1.8.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.957
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/objectaid/eclipse/features/com.objectaid.uml.cls_1.1.8.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.957
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/objectaid/eclipse/features/com.objectaid.uml.seq_1.1.8.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:08.958
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/objectaid/eclipse/features/org.apache.batik_1.6.0.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.120
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/resteditor/eclipse/features/org.isandlatech.theme.mapper_1.0.0.201110101040.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.121
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/resteditor/eclipse/features/org.psem2m.eclipse.rest.editor_1.0.5.201110101040.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.128
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/resteditor/eclipse/features/org.isandlatech.theme.mapper_1.0.0.201110101040.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.128
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/resteditor/eclipse/features/org.psem2m.eclipse.rest.editor_1.0.5.201110101040.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.216
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.play2.feature_0.4.6.v-2_11-201503032139-4d44f99.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.216
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.play2.source.feature_0.4.6.v-2_11-201503032139-4d44f99.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.217
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sbt.feature_4.0.0.201503031935.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.217
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.scala211.feature_4.0.0.201503031935.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.217
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.scala211.source.feature_4.0.0.201503031935.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.217
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.dev.feature_4.0.0.v-2_11-201503031937-b2bbad6.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.217
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.feature_4.0.0.v-2_11-201503031937-b2bbad6.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.218
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.scalatest.feature_2.9.3.v-4-2_11-201503120831-a29ebef.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.218
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.scalatest.source.feature_2.9.3.v-4-2_11-201503120831-a29ebef.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.218
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.source.feature_4.0.0.v-2_11-201503031937-b2bbad6.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.218
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.weaving.feature_4.0.0.v-2_11-201503031937-b2bbad6.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.219
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala.tools.eclipse.search.feature_0.2.4.v-2_11-201503032143-77c20d5.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.219
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala.tools.eclipse.search.source.feature_0.2.4.v-2_11-201503032143-77c20d5.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.219
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scalaide.worksheet.feature_0.2.6.v-2_11-201503032135-8101792.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.219
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scalaide.worksheet.source.feature_0.2.6.v-2_11-201503032135-8101792.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.245
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.play2.feature_0.4.6.v-2_11-201503032139-4d44f99.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.245
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.play2.source.feature_0.4.6.v-2_11-201503032139-4d44f99.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.246
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sbt.feature_4.0.0.201503031935.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.246
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.scala211.feature_4.0.0.201503031935.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.246
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.scala211.source.feature_4.0.0.201503031935.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.247
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.dev.feature_4.0.0.v-2_11-201503031937-b2bbad6.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.247
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.feature_4.0.0.v-2_11-201503031937-b2bbad6.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.247
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.scalatest.feature_2.9.3.v-4-2_11-201503120831-a29ebef.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.248
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.scalatest.source.feature_2.9.3.v-4-2_11-201503120831-a29ebef.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.248
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.source.feature_4.0.0.v-2_11-201503031937-b2bbad6.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.248
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.weaving.feature_4.0.0.v-2_11-201503031937-b2bbad6.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.248
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala.tools.eclipse.search.feature_0.2.4.v-2_11-201503032143-77c20d5.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.249
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala.tools.eclipse.search.source.feature_0.2.4.v-2_11-201503032143-77c20d5.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.249
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scalaide.worksheet.feature_0.2.6.v-2_11-201503032135-8101792.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.249
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scalaide.worksheet.source.feature_0.2.6.v-2_11-201503032135-8101792.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.292
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.m2e.sources_2.0.4.I20150123-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.292
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.m2e_2.0.4.I20150123-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.293
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.mylyn.sources_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.293
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.mylyn_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.293
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.nl1.sources_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.293
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.nl1_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.293
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.resource.ignore.rules.jdt.sources_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.294
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.resource.ignore.rules.jdt_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.294
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.revision.graph.sources_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.294
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.revision.graph_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.294
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.source_2.0.4.I20150123-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.295
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.sources_2.0.4.I20150123-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.295
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn_2.0.4.I20150123-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.295
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl17.sources_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.295
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl17.win32_4.0.2.I20140528-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.295
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl17.win64_4.0.2.I20140528-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.296
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl17_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.296
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl18.sources_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.296
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl18.win32_4.1.2.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.296
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl18.win64_4.1.2.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.296
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl18_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.296
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.source_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.297
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.sources_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.297
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.svnkit17.sources_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.297
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.svnkit17_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.297
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.svnkit18.sources_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.298
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.svnkit18_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.298
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.312
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.m2e.sources_2.0.4.I20150123-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.313
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.m2e_2.0.4.I20150123-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.313
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.mylyn.sources_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.313
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.mylyn_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.314
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.nl1.sources_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.314
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.nl1_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.314
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.resource.ignore.rules.jdt.sources_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.314
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.resource.ignore.rules.jdt_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.315
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.revision.graph.sources_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.315
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.revision.graph_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.315
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.source_2.0.4.I20150123-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.316
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.sources_2.0.4.I20150123-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.316
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn_2.0.4.I20150123-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.316
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl17.sources_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.317
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl17.win32_4.0.2.I20140528-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.317
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl17.win64_4.0.2.I20140528-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.317
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl17_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.317
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl18.sources_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.318
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl18.win32_4.1.2.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.318
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl18.win64_4.1.2.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.318
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl18_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.318
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.source_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.318
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.sources_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.319
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.svnkit17.sources_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.319
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.svnkit17_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.319
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.svnkit18.sources_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.319
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.svnkit18_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.320
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.498
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.cdt.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.499
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.cdt.sdk.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.499
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.core.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.499
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.core.sdk.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.500
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.feature_1.2.0.201405271224.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.500
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.rse.feature_1.2.0.201405271224.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.501
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.rse.sdk.feature_1.2.0.201405271224.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.501
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.sdk.feature_1.2.0.201405271224.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.501
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.feature_1.2.0.201406042322.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.502
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.sdk.feature_1.2.0.201406042322.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.502
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.core.feature_1.2.0.201406031211.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.502
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.core.sdk.feature_1.2.0.201406031211.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.503
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.503
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.launch.cdt.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.503
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.launch.cdt.sdk.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.504
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.sdk.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.504
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.terminals.feature_1.2.0.201406042322.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.504
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.terminals.sdk.feature_1.2.0.201406042322.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.560
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.cdt.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.561
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.cdt.sdk.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.561
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.core.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.562
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.core.sdk.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.562
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.feature_1.2.0.201405271224.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.562
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.rse.feature_1.2.0.201405271224.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.562
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.rse.sdk.feature_1.2.0.201405271224.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.563
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.sdk.feature_1.2.0.201405271224.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.563
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.feature_1.2.0.201406042322.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.564
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.sdk.feature_1.2.0.201406042322.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.564
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.core.feature_1.2.0.201406031211.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.564
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.core.sdk.feature_1.2.0.201406031211.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.564
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.565
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.launch.cdt.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.565
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.launch.cdt.sdk.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.565
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.sdk.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.566
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.terminals.feature_1.2.0.201406042322.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.566
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.terminals.sdk.feature_1.2.0.201406042322.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.626
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.eclipse.cdt.feature_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.627
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.eclipse.jdt.feature_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.627
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.eclipse.pydev.feature_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.627
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.argtextobj_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.628
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.clangformat_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.628
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.exchange_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.628
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.ipmotion_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.628
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.linetextobj_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.629
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.methodtextobj_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.629
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.splitEditor_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.629
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.surround_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.629
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.642
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.eclipse.cdt.feature_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.643
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.eclipse.jdt.feature_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.643
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.eclipse.pydev.feature_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.644
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.argtextobj_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.644
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.clangformat_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.644
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.exchange_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.644
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.ipmotion_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.645
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.linetextobj_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.645
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.methodtextobj_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.645
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.splitEditor_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.645
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.surround_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.646
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.699
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.core.feature_1.7.0.r44x201405021445.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.699
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.core.java.feature_1.7.0.r44x201405021448.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.699
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.core.ui.feature_1.7.0.r44x201405021455.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.700
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.core.xml.feature_1.7.0.r44x201405021458.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.700
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.doc.user.feature_1.7.0.r44x201405021506.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.700
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.layout.group.feature_1.7.0.r44x201405021517.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.701
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.rcp.doc.user.feature_1.7.0.r44x201405030426.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.701
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.rcp.feature_1.7.0.r44x201405021526.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.701
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.rcp.SWT_AWT_support_1.7.0.r44x201405021546.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.702
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.swing.doc.user.feature_1.7.0.r44x201405030444.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.702
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.swing.feature_1.7.0.r44x201405021531.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.703
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.swt.feature_1.7.0.r44x201405021519.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.703
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.xwt.feature_1.7.0.r44x201405021548.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.730
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.core.feature_1.7.0.r44x201405021445.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.730
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.core.java.feature_1.7.0.r44x201405021448.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.730
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.core.ui.feature_1.7.0.r44x201405021455.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.731
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.core.xml.feature_1.7.0.r44x201405021458.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.731
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.doc.user.feature_1.7.0.r44x201405021506.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.731
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.layout.group.feature_1.7.0.r44x201405021517.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.731
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.rcp.doc.user.feature_1.7.0.r44x201405030426.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.732
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.rcp.feature_1.7.0.r44x201405021526.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.732
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.rcp.SWT_AWT_support_1.7.0.r44x201405021546.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.732
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.swing.doc.user.feature_1.7.0.r44x201405030444.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.732
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.swing.feature_1.7.0.r44x201405021531.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.733
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.swt.feature_1.7.0.r44x201405021519.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 12:49:09.733
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.xwt.feature_1.7.0.r44x201405021548.jar.
+
+!ENTRY org.eclipse.core.net 1 0 2015-05-08 12:49:59.775
+!MESSAGE System property http.nonProxyHosts has been set to local|*.local|169.254/16|*.169.254/16 by an external source. This value will be overwritten using the values from the preferences
+
+!ENTRY org.eclipse.jface 2 0 2015-05-08 12:50:00.271
+!MESSAGE Keybinding conflicts occurred.  They may interfere with normal accelerator operation.
+!SUBENTRY 1 org.eclipse.jface 2 0 2015-05-08 12:50:00.271
+!MESSAGE A conflict occurred for ALT+CTRL+T:
+Binding(ALT+CTRL+T,
+	ParameterizedCommand(Command(org.eclipse.tcf.te.ui.terminals.command.launchToolbar,Open Terminal,
+		,
+		Category(org.eclipse.tcf.te.ui.commands.category,Target Explorer Commands,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@2f39d59c,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+Binding(ALT+CTRL+T,
+	ParameterizedCommand(Command(org.eclipse.team.svn.ui.command.EditPropertiesCommand,Show Properties,
+		,
+		Category(org.eclipse.team.svn.ui.command.category,SVN,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@3b459bd8,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2015-05-08 12:50:00.271
+!MESSAGE A conflict occurred for ALT+COMMAND+R:
+Binding(ALT+COMMAND+R,
+	ParameterizedCommand(Command(org.python.pydev.debug.setnext,Set Next Statement,
+		,
+		Category(org.python.pydev.ui.category.run,PyDev - Run,Python run category,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@372900f0,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+Binding(ALT+COMMAND+R,
+	ParameterizedCommand(Command(org.eclipse.jdt.ui.edit.text.java.rename.element,Rename - Refactoring ,
+		Rename the selected element,
+		Category(org.eclipse.jdt.ui.category.refactoring,Refactor - Java,Java Refactoring Actions,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@3c378340,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,cocoa,system)
+!SESSION 2015-05-08 13:05:05.298 -----------------------------------------------
+eclipse.buildId=4.4.2.M20150204-1700
+java.version=1.8.0_45
+java.vendor=Oracle Corporation
+BootLoader constants: OS=macosx, ARCH=x86_64, WS=cocoa, NL=zh_CN
+Framework arguments:  --launcher.defaultAction openFile
+Command-line arguments:  --launcher.defaultAction openFile -clean
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.133
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/antlr4ide/eclipse/features/antlr4ide.sdk_0.3.5.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.165
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/antlr4ide/eclipse/features/antlr4ide.sdk_0.3.5.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.175
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/asm/eclipse/features/de.loskutov.BytecodeOutline.feature_2.4.3.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.185
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/asm/eclipse/features/de.loskutov.BytecodeOutline.feature_2.4.3.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.455
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.autotools.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.463
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.autotools_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.464
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.build.crossgcc_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.464
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.bupc_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.464
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.lrparser.feature_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.465
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.lrparser.sdk_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.465
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.lrparser.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.466
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.parser.upc.feature_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.466
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.parser.upc.sdk_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.467
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.parser.upc.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.467
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.debug.gdbjtag_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.468
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.debug.standalone.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.468
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.debug.standalone_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.469
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.debug.ui.memory.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.469
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.debug.ui.memory_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.470
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.examples.dsf_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.470
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gdb.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.471
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gdb_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.471
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.build.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.471
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.build_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.472
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.debug.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.472
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.debug_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.473
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.dsf.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.473
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.dsf_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.473
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.multicorevisualizer_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.474
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.launch.remote_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.474
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.managedbuilder.llvm_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.474
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.msw_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.474
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.native.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.475
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.native_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.475
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.platform.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.475
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.platform_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.475
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.qt_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.476
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.remote_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.476
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.sdk_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.476
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.testsrunner.feature_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.476
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.testsrunner.source.feature_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.477
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.util_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.477
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.visualizer_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.477
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.xlc.feature_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.478
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.xlc.sdk_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.478
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.xlc.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.479
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.628
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.autotools.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.628
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.autotools_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.628
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.build.crossgcc_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.629
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.bupc_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.629
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.lrparser.feature_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.630
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.lrparser.sdk_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.630
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.lrparser.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.630
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.parser.upc.feature_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.631
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.parser.upc.sdk_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.631
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.core.parser.upc.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.631
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.debug.gdbjtag_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.632
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.debug.standalone.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.632
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.debug.standalone_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.633
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.debug.ui.memory.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.633
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.debug.ui.memory_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.634
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.examples.dsf_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.634
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gdb.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.635
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gdb_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.635
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.build.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.635
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.build_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.636
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.debug.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.636
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.debug_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.637
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.dsf.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.637
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.dsf_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.637
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.gnu.multicorevisualizer_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.638
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.launch.remote_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.638
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.managedbuilder.llvm_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.639
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.msw_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.639
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.native.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.640
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.native_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.640
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.platform.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.640
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.platform_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.641
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.qt_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.641
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.remote_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.642
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.sdk_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.642
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.testsrunner.feature_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.642
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.testsrunner.source.feature_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.643
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.util_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.643
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.visualizer_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.644
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.xlc.feature_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.644
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.xlc.sdk_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.645
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt.xlc.source_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.645
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/cdt/eclipse/features/org.eclipse.cdt_8.6.0.201502131403.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.656
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/colortheme/eclipse/features/com.github.eclipsecolortheme.feature_0.14.0.201407150859.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:16.662
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/colortheme/eclipse/features/com.github.eclipsecolortheme.feature_0.14.0.201407150859.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.110
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/easyshell/eclipse/features/com.tetrade.eclipse.plugins.easyshell.feature_1.4.2.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.119
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/easyshell/eclipse/features/com.tetrade.eclipse.plugins.easyshell.feature_1.4.2.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.134
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/eclemma/eclipse/features/com.mountainminds.eclemma.feature_2.3.2.201409141915.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.146
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/eclemma/eclipse/features/com.mountainminds.eclemma.feature_2.3.2.201409141915.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.152
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/eclipse-fonts/eclipse/features/FontsFeature_1.0.4.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.162
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/eclipse-fonts/eclipse/features/FontsFeature_1.0.4.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.203
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.egit.mylyn_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.204
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.egit.source_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.204
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.egit_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.205
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit.http.apache_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.205
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit.java7_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.205
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit.pgm.source_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.205
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit.pgm_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.206
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit.source_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.206
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.227
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.egit.mylyn_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.227
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.egit.source_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.228
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.egit_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.228
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit.http.apache_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.228
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit.java7_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.229
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit.pgm.source_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.229
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit.pgm_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.229
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit.source_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.230
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/egit/eclipse/features/org.eclipse.jgit_3.6.2.201501210735-r.jar.
+
+!ENTRY org.eclipse.equinox.p2.core 4 0 2015-05-08 13:05:17.235
+!MESSAGE Provisioning exception
+!STACK 1
+org.eclipse.equinox.p2.core.ProvisionException: No repository found at file:/Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/emf/.
+	at org.eclipse.equinox.internal.p2.repository.helpers.AbstractRepositoryManager.fail(AbstractRepositoryManager.java:395)
+	at org.eclipse.equinox.internal.p2.repository.helpers.AbstractRepositoryManager.loadRepository(AbstractRepositoryManager.java:692)
+	at org.eclipse.equinox.internal.p2.metadata.repository.MetadataRepositoryManager.loadRepository(MetadataRepositoryManager.java:96)
+	at org.eclipse.equinox.internal.p2.metadata.repository.MetadataRepositoryManager.loadRepository(MetadataRepositoryManager.java:92)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.Activator.loadMetadataRepository(Activator.java:99)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.DropinsRepositoryListener.getMetadataRepository(DropinsRepositoryListener.java:233)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.DropinsRepositoryListener.addRepository(DropinsRepositoryListener.java:122)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.DropinsRepositoryListener.added(DropinsRepositoryListener.java:96)
+	at org.eclipse.equinox.internal.provisional.p2.directorywatcher.DirectoryWatcher.processFile(DirectoryWatcher.java:197)
+	at org.eclipse.equinox.internal.provisional.p2.directorywatcher.DirectoryWatcher.scanDirectories(DirectoryWatcher.java:160)
+	at org.eclipse.equinox.internal.provisional.p2.directorywatcher.DirectoryWatcher.poll(DirectoryWatcher.java:108)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.Activator.watchDropins(Activator.java:542)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.Activator.start(Activator.java:172)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:771)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:1)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.startActivator(BundleContextImpl.java:764)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.start(BundleContextImpl.java:721)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle.startWorker0(EquinoxBundle.java:936)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle$EquinoxModule.startWorker(EquinoxBundle.java:319)
+	at org.eclipse.osgi.container.Module.doStart(Module.java:571)
+	at org.eclipse.osgi.container.Module.start(Module.java:439)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1582)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1562)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.doContainerStartLevel(ModuleContainer.java:1533)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1476)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:230)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:340)
+!SUBENTRY 1 org.eclipse.equinox.p2.metadata.repository 4 1000 2015-05-08 13:05:17.236
+!MESSAGE No repository found at file:/Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/emf/.
+
+!ENTRY org.eclipse.equinox.p2.core 4 0 2015-05-08 13:05:17.240
+!MESSAGE Provisioning exception
+!STACK 1
+org.eclipse.equinox.p2.core.ProvisionException: No repository found at file:/Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/emf/.
+	at org.eclipse.equinox.internal.p2.repository.helpers.AbstractRepositoryManager.fail(AbstractRepositoryManager.java:395)
+	at org.eclipse.equinox.internal.p2.repository.helpers.AbstractRepositoryManager.loadRepository(AbstractRepositoryManager.java:692)
+	at org.eclipse.equinox.internal.p2.artifact.repository.ArtifactRepositoryManager.loadRepository(ArtifactRepositoryManager.java:104)
+	at org.eclipse.equinox.internal.p2.artifact.repository.ArtifactRepositoryManager.loadRepository(ArtifactRepositoryManager.java:100)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.Activator.loadArtifactRepository(Activator.java:142)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.DropinsRepositoryListener.getArtifactRepository(DropinsRepositoryListener.java:260)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.DropinsRepositoryListener.addRepository(DropinsRepositoryListener.java:123)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.DropinsRepositoryListener.added(DropinsRepositoryListener.java:96)
+	at org.eclipse.equinox.internal.provisional.p2.directorywatcher.DirectoryWatcher.processFile(DirectoryWatcher.java:197)
+	at org.eclipse.equinox.internal.provisional.p2.directorywatcher.DirectoryWatcher.scanDirectories(DirectoryWatcher.java:160)
+	at org.eclipse.equinox.internal.provisional.p2.directorywatcher.DirectoryWatcher.poll(DirectoryWatcher.java:108)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.Activator.watchDropins(Activator.java:542)
+	at org.eclipse.equinox.internal.p2.reconciler.dropins.Activator.start(Activator.java:172)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:771)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:1)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.startActivator(BundleContextImpl.java:764)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.start(BundleContextImpl.java:721)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle.startWorker0(EquinoxBundle.java:936)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle$EquinoxModule.startWorker(EquinoxBundle.java:319)
+	at org.eclipse.osgi.container.Module.doStart(Module.java:571)
+	at org.eclipse.osgi.container.Module.start(Module.java:439)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1582)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1562)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.doContainerStartLevel(ModuleContainer.java:1533)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1476)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:230)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:340)
+!SUBENTRY 1 org.eclipse.equinox.p2.artifact.repository 4 1000 2015-05-08 13:05:17.240
+!MESSAGE No repository found at file:/Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/emf/.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.404
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/objectaid/eclipse/features/com.objectaid.uml.addon_1.1.8.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.404
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/objectaid/eclipse/features/com.objectaid.uml.cls_1.1.8.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.405
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/objectaid/eclipse/features/com.objectaid.uml.seq_1.1.8.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.405
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/objectaid/eclipse/features/org.apache.batik_1.6.0.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.429
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/objectaid/eclipse/features/com.objectaid.uml.addon_1.1.8.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.430
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/objectaid/eclipse/features/com.objectaid.uml.cls_1.1.8.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.430
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/objectaid/eclipse/features/com.objectaid.uml.seq_1.1.8.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.430
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/objectaid/eclipse/features/org.apache.batik_1.6.0.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.492
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/resteditor/eclipse/features/org.isandlatech.theme.mapper_1.0.0.201110101040.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.492
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/resteditor/eclipse/features/org.psem2m.eclipse.rest.editor_1.0.5.201110101040.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.501
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/resteditor/eclipse/features/org.isandlatech.theme.mapper_1.0.0.201110101040.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.501
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/resteditor/eclipse/features/org.psem2m.eclipse.rest.editor_1.0.5.201110101040.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.590
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.play2.feature_0.4.6.v-2_11-201503032139-4d44f99.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.590
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.play2.source.feature_0.4.6.v-2_11-201503032139-4d44f99.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.591
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sbt.feature_4.0.0.201503031935.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.591
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.scala211.feature_4.0.0.201503031935.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.591
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.scala211.source.feature_4.0.0.201503031935.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.591
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.dev.feature_4.0.0.v-2_11-201503031937-b2bbad6.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.592
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.feature_4.0.0.v-2_11-201503031937-b2bbad6.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.592
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.scalatest.feature_2.9.3.v-4-2_11-201503120831-a29ebef.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.592
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.scalatest.source.feature_2.9.3.v-4-2_11-201503120831-a29ebef.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.593
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.source.feature_4.0.0.v-2_11-201503031937-b2bbad6.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.593
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.weaving.feature_4.0.0.v-2_11-201503031937-b2bbad6.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.593
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala.tools.eclipse.search.feature_0.2.4.v-2_11-201503032143-77c20d5.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.594
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala.tools.eclipse.search.source.feature_0.2.4.v-2_11-201503032143-77c20d5.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.594
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scalaide.worksheet.feature_0.2.6.v-2_11-201503032135-8101792.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.595
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scalaide.worksheet.source.feature_0.2.6.v-2_11-201503032135-8101792.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.623
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.play2.feature_0.4.6.v-2_11-201503032139-4d44f99.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.624
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.play2.source.feature_0.4.6.v-2_11-201503032139-4d44f99.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.624
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sbt.feature_4.0.0.201503031935.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.624
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.scala211.feature_4.0.0.201503031935.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.625
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.scala211.source.feature_4.0.0.201503031935.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.625
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.dev.feature_4.0.0.v-2_11-201503031937-b2bbad6.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.625
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.feature_4.0.0.v-2_11-201503031937-b2bbad6.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.626
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.scalatest.feature_2.9.3.v-4-2_11-201503120831-a29ebef.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.626
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.scalatest.source.feature_2.9.3.v-4-2_11-201503120831-a29ebef.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.627
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.source.feature_4.0.0.v-2_11-201503031937-b2bbad6.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.627
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala-ide.sdt.weaving.feature_4.0.0.v-2_11-201503031937-b2bbad6.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.627
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala.tools.eclipse.search.feature_0.2.4.v-2_11-201503032143-77c20d5.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.628
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scala.tools.eclipse.search.source.feature_0.2.4.v-2_11-201503032143-77c20d5.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.628
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scalaide.worksheet.feature_0.2.6.v-2_11-201503032135-8101792.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.629
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/sireumdev/eclipse-plugins-scala/eclipse/features/org.scalaide.worksheet.source.feature_0.2.6.v-2_11-201503032135-8101792.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.668
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.m2e.sources_2.0.4.I20150123-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.669
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.m2e_2.0.4.I20150123-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.669
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.mylyn.sources_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.669
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.mylyn_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.670
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.nl1.sources_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.670
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.nl1_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.670
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.resource.ignore.rules.jdt.sources_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.670
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.resource.ignore.rules.jdt_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.671
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.revision.graph.sources_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.671
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.revision.graph_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.672
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.source_2.0.4.I20150123-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.672
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.sources_2.0.4.I20150123-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.672
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn_2.0.4.I20150123-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.673
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl17.sources_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.673
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl17.win32_4.0.2.I20140528-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.673
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl17.win64_4.0.2.I20140528-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.673
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl17_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.674
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl18.sources_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.674
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl18.win32_4.1.2.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.674
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl18.win64_4.1.2.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.675
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl18_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.675
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.source_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.675
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.sources_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.676
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.svnkit17.sources_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.676
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.svnkit17_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.676
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.svnkit18.sources_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.677
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.svnkit18_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.677
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.701
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.m2e.sources_2.0.4.I20150123-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.701
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.m2e_2.0.4.I20150123-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.702
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.mylyn.sources_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.702
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.mylyn_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.702
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.nl1.sources_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.703
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.nl1_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.703
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.resource.ignore.rules.jdt.sources_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.704
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.resource.ignore.rules.jdt_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.704
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.revision.graph.sources_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.704
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.revision.graph_2.0.3.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.705
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.source_2.0.4.I20150123-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.705
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn.sources_2.0.4.I20150123-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.706
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.eclipse.team.svn_2.0.4.I20150123-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.706
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl17.sources_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.706
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl17.win32_4.0.2.I20140528-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.706
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl17.win64_4.0.2.I20140528-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.707
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl17_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.707
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl18.sources_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.707
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl18.win32_4.1.2.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.708
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl18.win64_4.1.2.I20141224-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.708
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.javahl18_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.708
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.source_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.708
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.sources_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.709
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.svnkit17.sources_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.709
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.svnkit17_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.709
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.svnkit18.sources_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.709
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector.svnkit18_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.710
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/subversive/eclipse/features/org.polarion.eclipse.team.svn.connector_4.1.3.I20150214-1700.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.894
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.cdt.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.903
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.cdt.sdk.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.903
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.core.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.904
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.core.sdk.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.904
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.feature_1.2.0.201405271224.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.905
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.rse.feature_1.2.0.201405271224.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.905
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.rse.sdk.feature_1.2.0.201405271224.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.906
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.sdk.feature_1.2.0.201405271224.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.906
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.feature_1.2.0.201406042322.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.906
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.sdk.feature_1.2.0.201406042322.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.907
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.core.feature_1.2.0.201406031211.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.907
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.core.sdk.feature_1.2.0.201406031211.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.907
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.908
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.launch.cdt.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.908
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.launch.cdt.sdk.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.909
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.sdk.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.909
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.terminals.feature_1.2.0.201406042322.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.909
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.terminals.sdk.feature_1.2.0.201406042322.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.961
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.cdt.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.961
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.cdt.sdk.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.962
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.core.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.962
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.core.sdk.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.962
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.feature_1.2.0.201405271224.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.962
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.rse.feature_1.2.0.201405271224.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.962
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.rse.sdk.feature_1.2.0.201405271224.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.963
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.sdk.feature_1.2.0.201405271224.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.963
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.feature_1.2.0.201406042322.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.963
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.sdk.feature_1.2.0.201406042322.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.964
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.core.feature_1.2.0.201406031211.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.964
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.core.sdk.feature_1.2.0.201406031211.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.964
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.965
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.launch.cdt.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.965
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.launch.cdt.sdk.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.965
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.tcf.sdk.feature_1.2.0.201405271222.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.966
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.terminals.feature_1.2.0.201406042322.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.967
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/tcf/eclipse/features/org.eclipse.tcf.te.terminals.sdk.feature_1.2.0.201406042322.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.996
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.eclipse.cdt.feature_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.997
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.eclipse.jdt.feature_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.997
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.eclipse.pydev.feature_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.997
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.argtextobj_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.998
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.clangformat_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.998
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.exchange_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.998
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.ipmotion_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.999
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.linetextobj_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.999
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.methodtextobj_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.999
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.splitEditor_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:17.999
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.surround_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.000
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.013
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.eclipse.cdt.feature_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.014
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.eclipse.jdt.feature_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.014
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.eclipse.pydev.feature_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.014
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.argtextobj_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.014
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.clangformat_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.014
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.exchange_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.015
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.ipmotion_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.015
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.linetextobj_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.015
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.methodtextobj_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.015
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.splitEditor_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.016
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper.plugin.surround_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.016
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/vrapper/eclipse/features/net.sourceforge.vrapper_0.52.1.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.066
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.core.feature_1.7.0.r44x201405021445.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.067
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.core.java.feature_1.7.0.r44x201405021448.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.068
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.core.ui.feature_1.7.0.r44x201405021455.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.068
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.core.xml.feature_1.7.0.r44x201405021458.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.083
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.doc.user.feature_1.7.0.r44x201405021506.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.084
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.layout.group.feature_1.7.0.r44x201405021517.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.099
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.rcp.doc.user.feature_1.7.0.r44x201405030426.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.100
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.rcp.feature_1.7.0.r44x201405021526.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.100
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.rcp.SWT_AWT_support_1.7.0.r44x201405021546.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.100
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.swing.doc.user.feature_1.7.0.r44x201405030444.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.101
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.swing.feature_1.7.0.r44x201405021531.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.101
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.swt.feature_1.7.0.r44x201405021519.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.101
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.xwt.feature_1.7.0.r44x201405021548.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.125
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.core.feature_1.7.0.r44x201405021445.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.125
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.core.java.feature_1.7.0.r44x201405021448.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.125
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.core.ui.feature_1.7.0.r44x201405021455.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.126
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.core.xml.feature_1.7.0.r44x201405021458.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.126
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.doc.user.feature_1.7.0.r44x201405021506.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.126
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.layout.group.feature_1.7.0.r44x201405021517.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.126
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.rcp.doc.user.feature_1.7.0.r44x201405030426.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.126
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.rcp.feature_1.7.0.r44x201405021526.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.127
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.rcp.SWT_AWT_support_1.7.0.r44x201405021546.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.127
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.swing.doc.user.feature_1.7.0.r44x201405030444.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.127
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.swing.feature_1.7.0.r44x201405021531.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.127
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.swt.feature_1.7.0.r44x201405021519.jar.
+
+!ENTRY org.eclipse.equinox.p2.publisher.eclipse 4 0 2015-05-08 13:05:18.127
+!MESSAGE Unable to acquire PluginConverter service during generation for: /Users/linfengchi/Downloads/Sireum/Sireum/apps/eclipsebase/windowbuilder/eclipse/features/org.eclipse.wb.xwt.feature_1.7.0.r44x201405021548.jar.
+
+!ENTRY org.eclipse.core.net 1 0 2015-05-08 13:06:16.026
+!MESSAGE System property http.nonProxyHosts has been set to local|*.local|169.254/16|*.169.254/16 by an external source. This value will be overwritten using the values from the preferences
+
+!ENTRY org.eclipse.jface 2 0 2015-05-08 13:06:16.594
+!MESSAGE Keybinding conflicts occurred.  They may interfere with normal accelerator operation.
+!SUBENTRY 1 org.eclipse.jface 2 0 2015-05-08 13:06:16.594
+!MESSAGE A conflict occurred for ALT+COMMAND+R:
+Binding(ALT+COMMAND+R,
+	ParameterizedCommand(Command(org.python.pydev.debug.setnext,Set Next Statement,
+		,
+		Category(org.python.pydev.ui.category.run,PyDev - Run,Python run category,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@6bc145ea,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+Binding(ALT+COMMAND+R,
+	ParameterizedCommand(Command(org.eclipse.jdt.ui.edit.text.java.rename.element,Rename - Refactoring ,
+		Rename the selected element,
+		Category(org.eclipse.jdt.ui.category.refactoring,Refactor - Java,Java Refactoring Actions,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@a5c570,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,cocoa,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2015-05-08 13:06:16.594
+!MESSAGE A conflict occurred for ALT+CTRL+T:
+Binding(ALT+CTRL+T,
+	ParameterizedCommand(Command(org.eclipse.tcf.te.ui.terminals.command.launchToolbar,Open Terminal,
+		,
+		Category(org.eclipse.tcf.te.ui.commands.category,Target Explorer Commands,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@72324f19,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+Binding(ALT+CTRL+T,
+	ParameterizedCommand(Command(org.eclipse.team.svn.ui.command.EditPropertiesCommand,Show Properties,
+		,
+		Category(org.eclipse.team.svn.ui.command.category,SVN,null,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@238db45,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
