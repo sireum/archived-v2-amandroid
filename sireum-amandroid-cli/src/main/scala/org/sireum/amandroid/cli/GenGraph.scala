@@ -169,7 +169,7 @@ object GenGraph {
             val apkName = apkFileUri.substring(apkFileUri.lastIndexOf("/") + 1, apkFileUri.lastIndexOf("."))
             
             val outputUri = FileUtil.toUri(outputPath)
-        		val outUri = AmDecoder.decode(apkFileUri, outputUri)
+            val outUri = AmDecoder.decode(apkFileUri, outputUri)
             val fileandout = (apkFileUri, outUri + "classes")
         
         		// convert the dex file to the "pilar" form
@@ -191,7 +191,7 @@ object GenGraph {
 
             val icfg = InterproceduralSuperSpark(pros, timer).icfg
             val file = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ".txt")
-      	    val w = new FileOutputStream(file)
+            val w = new FileOutputStream(file)
             val zips = new BufferedOutputStream(w)
             val zipw = new BufferedWriter(new OutputStreamWriter(zips, "UTF-8"))
             
@@ -222,22 +222,21 @@ object GenGraph {
                   case "GraphML$" => graph.toGraphML(zipw)
                   case "GML$" => graph.toGML(zipw)
                 }
-            }
-      	    zipw.close()
-      	    println(apkName + " result stored!")
-            
-            println("Done!")
-          } catch {
-            case te: MyTimeoutException => err_msg_critical(TITLE, te.message)
-            case e: Throwable => 
-              CliLogger.logError(new File(outputPath), "Error: " , e)
-          } finally {
-            Center.reset
-          	AppCenter.reset
-          	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
-          	JawaCodeSource.clearAppClassCodes
-          	System.gc()
-            System.gc()
+           }
+           zipw.close()
+           println(apkName + " result stored!")
+           println("Done!")
+         } catch {
+           case te: MyTimeoutException => err_msg_critical(TITLE, te.message)
+           case e: Throwable => 
+             CliLogger.logError(new File(outputPath), "Error: " , e)
+         } finally {
+           Center.reset
+           AppCenter.reset
+           // before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
+           JawaCodeSource.clearAppClassCodes
+           System.gc()
+           System.gc()
           }
       }
     } catch {

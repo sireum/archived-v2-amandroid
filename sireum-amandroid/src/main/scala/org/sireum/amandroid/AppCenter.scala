@@ -18,6 +18,7 @@ import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralMonotoneDataFlowAnalysisResult
 import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.jawa.MessageCenter._
 
 /**
  * this is an object, which hold information of apps. e.g. components, intent-filter database, etc.
@@ -26,7 +27,7 @@ import org.sireum.jawa.alir.pta.PTAResult
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a> 
  */
 object AppCenter {
-    
+  private final val TITLE = "AppCenter"
   private val activities: MSet[JawaClass] = msetEmpty
   private val services: MSet[JawaClass] = msetEmpty
   private val receivers: MSet[JawaClass] = msetEmpty
@@ -47,7 +48,7 @@ object AppCenter {
       case se if se.isChildOf(AndroidConstants.SERVICE) => this.addService(se)
       case re if re.isChildOf(AndroidConstants.RECEIVER) => this.addReceiver(re)
       case pr if pr.isChildOf(AndroidConstants.PROVIDER) => this.addProvider(pr)
-      case a => throw new RuntimeException("Seriously, how it's possible to have " + a)
+      case a => err_msg_critical(TITLE, "Seriously, how it's possible to have " + a)
     }
   }
 	
