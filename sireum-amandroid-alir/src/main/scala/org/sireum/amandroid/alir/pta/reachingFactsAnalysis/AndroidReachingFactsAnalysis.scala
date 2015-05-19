@@ -42,7 +42,6 @@ import org.sireum.jawa.alir.dataFlowAnalysis.CallResolver
 import org.sireum.jawa.alir.dataFlowAnalysis.NodeListener
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralMonotoneDataFlowAnalysisResult
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
-import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
