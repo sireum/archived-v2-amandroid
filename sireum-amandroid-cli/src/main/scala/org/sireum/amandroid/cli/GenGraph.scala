@@ -237,7 +237,7 @@ object GenGraph {
            JawaCodeSource.clearAppClassCodes
            System.gc()
            System.gc()
-          }
+         }
       }
     } catch {
       case e: Throwable => 
