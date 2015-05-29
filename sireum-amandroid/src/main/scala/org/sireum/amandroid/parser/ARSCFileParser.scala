@@ -12,6 +12,8 @@ import java.io.IOException
 import org.sireum.util._
 import org.sireum.jawa.util.ResourceRetriever
 import org.sireum.jawa.MessageCenter._
+import java.io.File
+import java.net.URI
 
 /**
  * Parser for reading out the contents of Android's resource.arsc file.
@@ -23,7 +25,7 @@ import org.sireum.jawa.MessageCenter._
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
-class ARSCFileParser extends AbstractAndroidXMLParser {
+class ARSCFileParser {
 	final val TITLE = "ARSCFileParser"
 	private final val DEBUG = false
 
@@ -740,7 +742,7 @@ class ARSCFileParser extends AbstractAndroidXMLParser {
 	def ARSCFileParser = {}
 
 	def parse(apkUri : FileResourceUri) = {
-		this.handleAndroidXMLFiles(apkUri, Set("resources.arsc"), new AndroidXMLHandler() {
+		AbstractAndroidXMLParser.handleAndroidXMLFiles(new File(new URI(apkUri)), Set("resources.arsc"), new AndroidXMLHandler() {
 			
 			@Override
 			def handleXMLFile(fileName : String, fileNameFilter : Set[String], stream : InputStream) = {

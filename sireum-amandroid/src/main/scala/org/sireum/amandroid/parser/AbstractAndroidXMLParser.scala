@@ -26,7 +26,7 @@ import java.net.URI
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
-abstract class AbstractAndroidXMLParser {
+object AbstractAndroidXMLParser {
 	/**
 	 * Opens the given apk file and provides the given handler with a stream for
 	 * accessing the contained resource manifest files
@@ -38,13 +38,13 @@ abstract class AbstractAndroidXMLParser {
 	 * adapted from Steven Arzt
 	 * modified by: Fengguo Wei, Sankardas Roy
 	 */
-	protected def handleAndroidXMLFiles(apkUri : FileResourceUri, fileNameFilter : Set[String],
+	def handleAndroidXMLFiles(apk : File, fileNameFilter : Set[String],
 			handler : AndroidXMLHandler) = {
 
 		try {
 			var archive : ZipInputStream = null
 			try {
-				archive = new ZipInputStream(new FileInputStream(new File(new URI(apkUri))))
+				archive = new ZipInputStream(new FileInputStream(apk))
 				var entry : ZipEntry = null
 				entry = archive.getNextEntry()
 				while (entry != null) {

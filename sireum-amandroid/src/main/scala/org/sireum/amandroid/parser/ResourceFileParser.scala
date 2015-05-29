@@ -14,6 +14,8 @@ import pxb.android.axml.AxmlReader
 import java.io.ByteArrayOutputStream
 import org.sireum.util._
 import java.io.InputStream
+import java.io.File
+import java.net.URI
 
 /**
  * Parser for analyzing the resource XML files inside an android application
@@ -21,7 +23,7 @@ import java.io.InputStream
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
-class ResourceFileParser extends AbstractAndroidXMLParser {
+class ResourceFileParser {
 	final val TITLE = "ResourceFileParser"
 	private final val DEBUG = false
 	
@@ -71,7 +73,7 @@ class ResourceFileParser extends AbstractAndroidXMLParser {
 	 * @param fileName The APK file
 	 */
 	def parseResourceFile(apkUri : FileResourceUri) {
-				handleAndroidXMLFiles(apkUri, null, new AndroidXMLHandler() {
+				AbstractAndroidXMLParser.handleAndroidXMLFiles(new File(new URI(apkUri)), null, new AndroidXMLHandler() {
 					
 					override def handleXMLFile(fileName : String, fileNameFilter : Set[String], stream : InputStream) : Unit = {
 						// We only process valid layout XML files

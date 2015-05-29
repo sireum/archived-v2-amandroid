@@ -17,6 +17,8 @@ import org.sireum.jawa.Center
 import org.sireum.jawa.JawaClass
 import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.util.ResourceRetriever
+import java.io.File
+import java.net.URI
 
 /**
  * Parser for analyzing the layout XML files inside an android application
@@ -26,7 +28,7 @@ import org.sireum.jawa.util.ResourceRetriever
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
-class LayoutFileParser extends AbstractAndroidXMLParser {
+class LayoutFileParser {
 	final val TITLE = "LayoutFileParser"
 	private final val DEBUG = false
 	
@@ -163,7 +165,7 @@ class LayoutFileParser extends AbstractAndroidXMLParser {
 	 * @param fileName The APK file in which to look for user controls
 	 */
 	def parseLayoutFile(apkUri: FileResourceUri, classes: Set[String]) {
-				handleAndroidXMLFiles(apkUri, null, new AndroidXMLHandler() {
+				AbstractAndroidXMLParser.handleAndroidXMLFiles(new File(new URI(apkUri)), null, new AndroidXMLHandler() {
 					
 					override def handleXMLFile(fileName: String, fileNameFilter: Set[String], stream: InputStream): Unit = {
 						// We only process valid layout XML files
