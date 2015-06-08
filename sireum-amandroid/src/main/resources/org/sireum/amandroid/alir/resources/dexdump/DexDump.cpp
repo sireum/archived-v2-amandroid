@@ -758,19 +758,19 @@ void dumpInterface(const DexFile* pDexFile, const DexTypeItem* pTypeItem,
       if(flag==1)
         { 
 			printf(", %s",descriptorToDot(interfaceName));
-			fprintf(pFp, ", %s", toPilar(descriptorToDot(interfaceName)));
+			fprintf(pFp, ", %s @type interface", toPilar(descriptorToDot(interfaceName)));
 			
 		}
       else if(flag==2)
         { 
 			printf(" %s,",descriptorToDot(interfaceName));
-			fprintf(pFp, " %s,",toPilar(descriptorToDot(interfaceName)));
+			fprintf(pFp, " %s @type interface,",toPilar(descriptorToDot(interfaceName)));
 			
 		}
       else if(flag==0)
         { 
 			printf(" %s",descriptorToDot(interfaceName));
-			fprintf(pFp, " %s",toPilar(descriptorToDot(interfaceName)));
+			fprintf(pFp, " %s @type interface",toPilar(descriptorToDot(interfaceName)));
 			
 		}
         //******************* kui's modification ends  *******************
@@ -3163,7 +3163,7 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 									   char regNamebuff[20];
 									   sprintf(regNamebuff, " v%d", startReg);
 									   strcat(paraThis, regNamebuff);
-									   strcat(paraThis, " @type `this`");
+									   strcat(paraThis, " @type this");
 									   thisFlag = 1;
 									   t1->paramFlag = true; // the corresponding element of locVarList is set as a parameter so that we can identify it in dumpLocals() 
 									   // note there can be more than one "this" in locVarList; we break out after the 1st one. we assume the 1st one has the first scope.
@@ -3182,7 +3182,7 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 					  char regNamebuff[20];
 					  sprintf(regNamebuff, " v%d", startReg);
 					  strcat(paraThis, regNamebuff);
-					  strcat(paraThis, " @type `this`");
+					  strcat(paraThis, " @type this");
 					  thisFlag = 1;
                      }
                   // now print other params 
@@ -3254,7 +3254,7 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
                         sprintf(buffer, " v%d", startReg++);
                         strcat(para,buffer);
                         if(objectParamFlag==1)
-							strcat(para, " @type `object`");
+							strcat(para, " @type object");
 
                         if(*base !=')') strcat(para,", ");
                      }
@@ -3278,7 +3278,7 @@ void dumpMethod(DexFile* pDexFile, const DexMethod* pDexMethod, int i, char* own
 			 strcat(paraTotal, paraThis);
 			 strcat(paraTotal, para);
 
-              fprintf(pFp, "    procedure %s `%s.%s` (%s) @owner %s @signature `%s.%s:%s` @Access `%s` {\n",
+              fprintf(pFp, "    procedure %s `%s.%s` (%s) @owner %s @signature `%s.%s:%s` @Access %s {\n",
 			            toPilar(rtype), owner, name, paraTotal, toPilar(owner), backDescriptor, name, typeDescriptor, accessStr); // not in dexdump
              free(rtype);
              free(para);
@@ -3635,7 +3635,7 @@ void dumpClass(DexFile* pDexFile, int idx, char** pLastPackage)
 		  fprintf(pFp, "record %s ", toPilar(descriptorToDot(classDescriptor))); // not in dexdump
 		  if(!((pClassDef->accessFlags)&ACC_INTERFACE)==0)  fprintf(pFp, " @type interface");
 		  else fprintf(pFp, " @type class"); // not in dexdump
-		  fprintf(pFp, " @AccessFlag %s  extends %s",accessStr,toPilar(descriptorToDot(superclassDescriptor))); // not in dexdump
+		  fprintf(pFp, " @AccessFlag %s  extends %s @type class",accessStr,toPilar(descriptorToDot(superclassDescriptor))); // not in dexdump
 		  if (pInterfaces != NULL) {
 			for (i = 0; i < (int) pInterfaces->size; i++)
 				dumpInterface(pDexFile, dexGetTypeItem(pInterfaces, i), i,1);
