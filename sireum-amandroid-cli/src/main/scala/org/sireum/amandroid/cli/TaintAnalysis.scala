@@ -200,25 +200,14 @@ object TanitAnalysis{
 
     def onTimeout: Unit = {
       System.err.println("Timeout!")
+      savePartialResults()
     }
 
     def onAnalysisSuccess: Unit = {
-      val appData = DataCollector.collect
-    	MetricRepo.collect(appData)
-
-    	val apkName = source_apk.substring(source_apk.lastIndexOf("/"), source_apk.lastIndexOf("."))
-    	val appDataDirFile = new File(output_dir + "/" + apkName)
-    	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
-    	
-    	val environmentModel = new PrintWriter(appDataDirFile + "/EnvironmentModel.txt")
-    	val envString = app_info.getEnvString
-	    environmentModel.print(envString)
-	    environmentModel.close()
-    	
-    	val analysisResult = new PrintWriter(appDataDirFile + "/TaintResult.txt")
-	    analysisResult.print(appData.toString)
-	    analysisResult.close()
+      msg_critical(TITLE, "Saving results of Taint Analysis ...") 
+      saveResults();
     }
+    
 
     def onPostAnalysis: Unit = {
     }
@@ -229,6 +218,30 @@ object TanitAnalysis{
         case a => 
           CliLogger.logError(new File(output_dir), "Error: " , e)
       }
+      savePartialResults();
+    }
+    
+    def savePartialResults() = {
+      msg_critical(TITLE, "Saving partial results of Taint Analysis ...")
+      saveResults();
+    }
+    
+    def saveResults() = {
+      val appData = DataCollector.collect
+      MetricRepo.collect(appData)
+
+      val apkName = source_apk.substring(source_apk.lastIndexOf("/"), source_apk.lastIndexOf("."))
+      val appDataDirFile = new File(output_dir + "/" + apkName)
+      if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
+      
+      val environmentModel = new PrintWriter(appDataDirFile + "/EnvironmentModel.txt")
+      val envString = app_info.getEnvString
+      environmentModel.print(envString)
+      environmentModel.close()
+      
+      val analysisResult = new PrintWriter(appDataDirFile + "/TaintResult.txt")
+      analysisResult.print(appData.toString)
+      analysisResult.close()
     }
   }
   
