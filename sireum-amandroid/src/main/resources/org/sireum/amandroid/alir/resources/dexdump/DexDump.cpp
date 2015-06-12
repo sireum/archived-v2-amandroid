@@ -1202,14 +1202,12 @@ static char* indexString(DexFile* pDexFile,
               case 0x6b:
               case 0x6c:
               case 0x6d:
-                outSize = snprintf(buf, bufSize, "`@@%s.%s` ",                   // @@ identifies global/static variables in pilar
-                    descriptorToDot(fieldInfo.classDescriptor), fieldInfo.name);
-                                        //descriptorToDot(fieldInfo.signature));
+                outSize = snprintf(buf, bufSize, "`@@%s.%s` `%s`",                   // @@ identifies global/static variables in pilar
+                    descriptorToDot(fieldInfo.classDescriptor), fieldInfo.name, descriptorToDot(fieldInfo.signature));
                 break;
               default:
-                outSize = snprintf(buf, bufSize, ".`%s.%s` ",
-                    descriptorToDot( fieldInfo.classDescriptor), fieldInfo.name);
-                        //descriptorToDot(fieldInfo.signature));
+                outSize = snprintf(buf, bufSize, "`%s.%s` `%s`",
+                    descriptorToDot( fieldInfo.classDescriptor), fieldInfo.name, descriptorToDot(fieldInfo.signature));
               }
             } else {
                 outSize = snprintf(buf, bufSize, "<field?> // field@%0*x",
@@ -1438,6 +1436,10 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
         indexBuf = indexString(pDexFile, pDecInsn,
                 indexBufChars, sizeof(indexBufChars));
     }
+
+    char *fieldName;
+	char *type;
+	char *search = " ";
 
     switch (dexGetFormatFromOpcode(pDecInsn->opcode)) {
     case kFmt10x:        // op
@@ -2363,49 +2365,77 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
 
          //iget
              case 0x52:
-              outIget(pDecInsn->vA, pDecInsn->vB, indexBuf); //  printf("v%d:=v%d%s;", pDecInsn->vA, pDecInsn->vB, indexBuf);
+            	  fieldName = strtok(indexBuf, search);
+            	  type = strtok(NULL, search);
+              outIget(pDecInsn->vA, pDecInsn->vB, fieldName, type); //  printf("v%d:=v%d%s;", pDecInsn->vA, pDecInsn->vB, indexBuf);
               break;
              case 0x53:
-              outIgetWide(pDecInsn->vA, pDecInsn->vB, indexBuf); //  printf("v%d:=v%d%s  @wide;", pDecInsn->vA, pDecInsn->vB, indexBuf);
+			  fieldName = strtok(indexBuf, search);
+			  type = strtok(NULL, search);
+              outIgetWide(pDecInsn->vA, pDecInsn->vB, fieldName, type); //  printf("v%d:=v%d%s  @wide;", pDecInsn->vA, pDecInsn->vB, indexBuf);
               break;
              case 0x54:
-              outIgetObject(pDecInsn->vA, pDecInsn->vB, indexBuf); //  printf("v%d:=v%d%s  @object;", pDecInsn->vA, pDecInsn->vB, indexBuf);
+			  fieldName = strtok(indexBuf, search);
+			  type = strtok(NULL, search);
+              outIgetObject(pDecInsn->vA, pDecInsn->vB, fieldName, type); //  printf("v%d:=v%d%s  @object;", pDecInsn->vA, pDecInsn->vB, indexBuf);
               break;
              case 0x55:
-              outIgetBool(pDecInsn->vA, pDecInsn->vB, indexBuf); //  printf("v%d:=v%d%s  @boolean;", pDecInsn->vA, pDecInsn->vB, indexBuf);
+			  fieldName = strtok(indexBuf, search);
+			  type = strtok(NULL, search);
+              outIgetBool(pDecInsn->vA, pDecInsn->vB, fieldName, type); //  printf("v%d:=v%d%s  @boolean;", pDecInsn->vA, pDecInsn->vB, indexBuf);
               break;
              case 0x56:
-               outIgetByte(pDecInsn->vA, pDecInsn->vB, indexBuf); //  printf("v%d:=v%d%s  @byte;", pDecInsn->vA, pDecInsn->vB, indexBuf);
+			   fieldName = strtok(indexBuf, search);
+			   type = strtok(NULL, search);
+               outIgetByte(pDecInsn->vA, pDecInsn->vB, fieldName, type); //  printf("v%d:=v%d%s  @byte;", pDecInsn->vA, pDecInsn->vB, indexBuf);
                break;
              case 0x57:
-               outIgetChar(pDecInsn->vA, pDecInsn->vB, indexBuf); //  printf("v%d:=v%d%s  @char;", pDecInsn->vA, pDecInsn->vB, indexBuf);
+			   fieldName = strtok(indexBuf, search);
+			   type = strtok(NULL, search);
+               outIgetChar(pDecInsn->vA, pDecInsn->vB, fieldName, type); //  printf("v%d:=v%d%s  @char;", pDecInsn->vA, pDecInsn->vB, indexBuf);
                break;
              case 0x58:
-              outIgetShort(pDecInsn->vA, pDecInsn->vB, indexBuf); //  printf("v%d:=v%d%s  @short;", pDecInsn->vA, pDecInsn->vB, indexBuf);
+			   fieldName = strtok(indexBuf, search);
+			   type = strtok(NULL, search);
+               outIgetShort(pDecInsn->vA, pDecInsn->vB, fieldName, type); //  printf("v%d:=v%d%s  @short;", pDecInsn->vA, pDecInsn->vB, indexBuf);
               break;
 		  
            //iput
               case 0x59:
-                outIput(pDecInsn->vB,indexBuf,pDecInsn->vA); // printf("v%d%s :=v%d;", pDecInsn->vB,indexBuf,pDecInsn->vA);
+			    fieldName = strtok(indexBuf, search);
+			    type = strtok(NULL, search);
+                outIput(pDecInsn->vB, fieldName, pDecInsn->vA, type); // printf("v%d%s :=v%d;", pDecInsn->vB,indexBuf,pDecInsn->vA);
                 break;
               case 0x5a:
-               outIputWide(pDecInsn->vB,indexBuf,pDecInsn->vA); // printf("v%d%s :=v%d @wide;", pDecInsn->vB,indexBuf,pDecInsn->vA);
-               break;
+			    fieldName = strtok(indexBuf, search);
+			    type = strtok(NULL, search);
+                outIputWide(pDecInsn->vB, fieldName, pDecInsn->vA, type); // printf("v%d%s :=v%d @wide;", pDecInsn->vB,indexBuf,pDecInsn->vA);
+                break;
               case 0x5b:
-              outIputObject(pDecInsn->vB,indexBuf,pDecInsn->vA); // printf("v%d%s :=v%d @object;", pDecInsn->vB,indexBuf,pDecInsn->vA);
-              break;
+			    fieldName = strtok(indexBuf, search);
+			    type = strtok(NULL, search);
+                outIputObject(pDecInsn->vB, fieldName, pDecInsn->vA, type); // printf("v%d%s :=v%d @object;", pDecInsn->vB,indexBuf,pDecInsn->vA);
+                break;
               case 0x5c:
-                outIputBool(pDecInsn->vB,indexBuf,pDecInsn->vA); // printf("v%d%s :=v%d @boolean;", pDecInsn->vB,indexBuf,pDecInsn->vA);
+			    fieldName = strtok(indexBuf, search);
+			    type = strtok(NULL, search);
+                outIputBool(pDecInsn->vB, fieldName, pDecInsn->vA, type); // printf("v%d%s :=v%d @boolean;", pDecInsn->vB,indexBuf,pDecInsn->vA);
                 break;
               case 0x5d:
-               outIputByte(pDecInsn->vB,indexBuf,pDecInsn->vA); // printf("v%d%s :=v%d @byte;", pDecInsn->vB,indexBuf,pDecInsn->vA);
-               break;
+			    fieldName = strtok(indexBuf, search);
+			    type = strtok(NULL, search);
+                outIputByte(pDecInsn->vB, fieldName, pDecInsn->vA, type); // printf("v%d%s :=v%d @byte;", pDecInsn->vB,indexBuf,pDecInsn->vA);
+                break;
              case 0x5e:
-              outIputChar(pDecInsn->vB,indexBuf,pDecInsn->vA); // printf("v%d%s :=v%d @char;", pDecInsn->vB,indexBuf,pDecInsn->vA);
-              break;
+			   fieldName = strtok(indexBuf, search);
+			   type = strtok(NULL, search);
+               outIputChar(pDecInsn->vB, fieldName, pDecInsn->vA, type); // printf("v%d%s :=v%d @char;", pDecInsn->vB,indexBuf,pDecInsn->vA);
+               break;
              case 0x5f:
-              outIputShort(pDecInsn->vB,indexBuf,pDecInsn->vA); // printf("v%d%s :=v%d @short;", pDecInsn->vB,indexBuf,pDecInsn->vA);
-              break;
+			   fieldName = strtok(indexBuf, search);
+			   type = strtok(NULL, search);
+               outIputShort(pDecInsn->vB, fieldName, pDecInsn->vA, type); // printf("v%d%s :=v%d @short;", pDecInsn->vB,indexBuf,pDecInsn->vA);
+               break;
       
 
              default:
@@ -2446,25 +2476,37 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
 
             //iget
              case 0xf2:
-              outIgetQuick(pDecInsn->vA, pDecInsn->vB, indexBuf); 
-              break;
+			   fieldName = strtok(indexBuf, search);
+			   type = strtok(NULL, search);
+               outIgetQuick(pDecInsn->vA, pDecInsn->vB, fieldName, type);
+               break;
              case 0xf3:
-              outIgetWideQuick(pDecInsn->vA, pDecInsn->vB, indexBuf); 
-              break;
+			   fieldName = strtok(indexBuf, search);
+			   type = strtok(NULL, search);
+               outIgetWideQuick(pDecInsn->vA, pDecInsn->vB, fieldName, type);
+               break;
              case 0xf4:
-              outIgetObjectQuick(pDecInsn->vA, pDecInsn->vB, indexBuf); 
-              break;
+			   fieldName = strtok(indexBuf, search);
+			   type = strtok(NULL, search);
+               outIgetObjectQuick(pDecInsn->vA, pDecInsn->vB, fieldName, type);
+               break;
 
             //iput
               case 0xf5:
-                outIputQuick(pDecInsn->vB,indexBuf,pDecInsn->vA); 
+			    fieldName = strtok(indexBuf, search);
+			    type = strtok(NULL, search);
+                outIputQuick(pDecInsn->vB,fieldName,pDecInsn->vA,type);
                 break;
               case 0xf6:
-               outIputWideQuick(pDecInsn->vB,indexBuf,pDecInsn->vA); 
-               break;
+			    fieldName = strtok(indexBuf, search);
+			    type = strtok(NULL, search);
+                outIputWideQuick(pDecInsn->vB,fieldName,pDecInsn->vA,type);
+                break;
               case 0xf7:
-               outIputObjectQuick(pDecInsn->vB,indexBuf,pDecInsn->vA); 
-               break;
+			    fieldName = strtok(indexBuf, search);
+			    type = strtok(NULL, search);
+                outIputObjectQuick(pDecInsn->vB,fieldName,pDecInsn->vA,type);
+                break;
          
              default:
 			  fprintf(pFp, " 22cs????");
