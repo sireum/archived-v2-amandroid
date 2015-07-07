@@ -23,7 +23,7 @@ import org.sireum.jawa.GlobalConfig
 
 object CommunicationLeakage_run {
   private final val TITLE = "CommunicationLeakage_run"
-  MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
+  MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
   object CommunicationLeakageCounter {
     var total = 0
     var haveresult = 0
@@ -86,7 +86,7 @@ object CommunicationLeakage_run {
     GlobalConfig.ICFG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = true
     AndroidReachingFactsAnalysisConfig.parallel = true
-    AndroidReachingFactsAnalysisConfig.resolve_static_init = false
+    AndroidReachingFactsAnalysisConfig.resolve_static_init = true
 
     MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
     val socket = new AmandroidSocket
@@ -100,6 +100,7 @@ object CommunicationLeakage_run {
     
     files.foreach{
       file =>
+        //if(file.contains("FieldSensitivity1"))
         try{
           msg_critical(TITLE, CommunicationLeakageTask(outputPath, file, socket, Some(1000)).run)   
         } catch {
