@@ -50,10 +50,8 @@ import org.sireum.jawa.util.MyTimeoutException
  */
 object TaintAnalyzeCli {
   private final val TITLE = "TaintAnalyzeCli"
-	def run(saamode : SireumAmandroidTaintAnalysisMode) {
-    val sourceType = saamode.general.typ match{
-      case AnalyzeSource.APK => "APK"
-      case AnalyzeSource.DIR => "DIR"}
+	def run(saamode: SireumAmandroidTaintAnalysisMode) {
+    val sourceType = saamode.general.typ
     val sourceDir = saamode.srcFile
     val sourceFile = new File(sourceDir)
     val sasDir = saamode.sasFile
@@ -68,8 +66,8 @@ object TaintAnalyzeCli {
     forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, sasDir, outputDir, mem, msgLevel)
   }
 	
-	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : String, sourceDir : String, sasDir : String, outputDir : String, mem : Int, msgLevel : MessageLevel.Type) = {
-	  val args : MList[String] = mlistEmpty
+	def forkProcess(nostatic: Boolean, parallel: Boolean, noicc: Boolean, k_context: Int, timeout: Int, typSpec: AnalyzeSource.Type, sourceDir: String, sasDir: String, outputDir: String, mem: Int, msgLevel: MessageLevel.Type) = {
+	  val args: MList[String] = mlistEmpty
 	  args += "-s"
 	  args += (!nostatic).toString
 	  args += "-par"
@@ -82,7 +80,7 @@ object TaintAnalyzeCli {
 	  args += timeout.toString
 	  args += "-msg"
 	  args += msgLevel.toString
-	  args ++= List("-t", typSpec, sourceDir, sasDir, outputDir)
+	  args ++= List("-t", typSpec.toString, sourceDir, sasDir, outputDir)
     org.sireum.jawa.util.JVMUtil.startSecondJVM(TanitAnalysis.getClass(), "-Xmx" + mem + "G", args.toList, true)
   }
 }
@@ -124,10 +122,10 @@ object TanitAnalysis{
 	  }
 	  
 	  val apkFileUris = typ match{
-      case "APK" =>
+      case "APK$" =>
         require(sourcePath.endsWith(".apk"))
         Set(FileUtil.toUri(sourcePath))
-      case "DIR" =>
+      case "DIR$" =>
         require(new File(sourcePath).isDirectory())
         FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
       case _ => 
@@ -137,7 +135,7 @@ object TanitAnalysis{
 		taintAnalyze(apkFileUris, sasFilePath, outputPath, static, parallel, icc, k_context, timeout)
 	}
   
-  def taintAnalyze(apkFileUris : Set[FileResourceUri], sasFilePath : String, outputPath : String, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int) = {
+  def taintAnalyze(apkFileUris: Set[FileResourceUri], sasFilePath: String, outputPath: String, static: Boolean, parallel: Boolean, icc: Boolean, k_context: Int, timeout: Int) = {
     AndroidGlobalConfig.SourceAndSinkFilePath = sasFilePath
     GlobalConfig.ICFG_CONTEXT_K = k_context
     AndroidReachingFactsAnalysisConfig.parallel = parallel
@@ -151,7 +149,7 @@ object TanitAnalysis{
       val socket = new AmandroidSocket
       socket.preProcess
       
-      var i : Int = 0
+      var i: Int = 0
       
       apkFileUris.foreach{
         file =>
@@ -160,23 +158,23 @@ object TanitAnalysis{
             msg_critical(TITLE, "Analyzing #" + i + ":" + file)
             msg_critical(TITLE, TaintTask(outputPath, file, socket, parallel, Some(timeout*60)).run)   
           } catch {
-            case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
-            case e : Throwable =>
+            case te: MyTimeoutException => err_msg_critical(TITLE, te.message)
+            case e: Throwable =>
               CliLogger.logError(new File(outputPath), "Error: " , e)
           } finally{
             socket.cleanEnv
           }
       }
     } catch {
-      case e : Throwable => 
+      case e: Throwable => 
         CliLogger.logError(new File(outputPath), "Error: " , e)
 
     }
 	  
 	}
   
-  private case class TaintTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, parallel : Boolean, timeout : Option[Int]) {
-    def run : String = {
+  private case class TaintTask(outputPath: String, file: FileResourceUri, socket: AmandroidSocket, parallel: Boolean, timeout: Option[Int]) {
+    def run: String = {
       val timer = timeout match {
         case Some(t) => Some(new MyTimer(t))
         case None => None
@@ -192,7 +190,7 @@ object TanitAnalysis{
     }
   }
   
-  private class TaintListener(source_apk : FileResourceUri, output_dir : String, app_info : AppInfoCollector) extends AmandroidSocketListener {
+  private class TaintListener(source_apk: FileResourceUri, output_dir: String, app_info: AppInfoCollector) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
     }
 
@@ -200,37 +198,50 @@ object TanitAnalysis{
       eps
     }
 
-    def onTimeout : Unit = {
+    def onTimeout: Unit = {
       System.err.println("Timeout!")
+      savePartialResults()
     }
 
-    def onAnalysisSuccess : Unit = {
-      val appData = DataCollector.collect
-    	MetricRepo.collect(appData)
-
-    	val apkName = source_apk.substring(source_apk.lastIndexOf("/"), source_apk.lastIndexOf("."))
-    	val appDataDirFile = new File(output_dir + "/" + apkName)
-    	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
-    	
-    	val environmentModel = new PrintWriter(appDataDirFile + "/EnvironmentModel.txt")
-    	val envString = app_info.getEnvString
-	    environmentModel.print(envString)
-	    environmentModel.close()
-    	
-    	val analysisResult = new PrintWriter(appDataDirFile + "/TaintResult.txt")
-	    analysisResult.print(appData.toString)
-	    analysisResult.close()
+    def onAnalysisSuccess: Unit = {
+      msg_critical(TITLE, "Saving results of Taint Analysis ...") 
+      saveResults();
     }
+    
 
     def onPostAnalysis: Unit = {
     }
     
-    def onException(e : Exception) : Unit = {
+    def onException(e: Exception): Unit = {
       e match{
-        case ie : IgnoreException => System.err.println("Ignored!")
+        case ie: IgnoreException => System.err.println("Ignored!")
         case a => 
           CliLogger.logError(new File(output_dir), "Error: " , e)
       }
+      savePartialResults();
+    }
+    
+    def savePartialResults() = {
+      msg_critical(TITLE, "Saving partial results of Taint Analysis ...")
+      saveResults();
+    }
+    
+    def saveResults() = {
+      val appData = DataCollector.collect
+      MetricRepo.collect(appData)
+
+      val apkName = source_apk.substring(source_apk.lastIndexOf("/"), source_apk.lastIndexOf("."))
+      val appDataDirFile = new File(output_dir + "/" + apkName)
+      if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
+      
+      val environmentModel = new PrintWriter(appDataDirFile + "/EnvironmentModel.txt")
+      val envString = app_info.getEnvString
+      environmentModel.print(envString)
+      environmentModel.close()
+      
+      val analysisResult = new PrintWriter(appDataDirFile + "/TaintResult.txt")
+      analysisResult.print(appData.toString)
+      analysisResult.close()
     }
   }
   

@@ -34,6 +34,8 @@ import org.sireum.util.FileResourceUri
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.decompile.AmDecoder
 import org.sireum.jawa.util.MyTimer
+import org.sireum.jawa.ScopeManager
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAScopeManager
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -114,14 +116,19 @@ class AmandroidSocket {
     			    
     	if(myListener_opt.isDefined) 
 	    	entryPoints = myListener_opt.get.entryPointFilter(entryPoints)
-  	    	
+  	  
+      ScopeManager.setScopeManager(new AndroidRFAScopeManager)
+        
 	    {if(parallel) entryPoints.par else entryPoints}.foreach{
     	  ep =>
     	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
     	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
     	    val idfg = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, timer)
     	    AppCenter.addIDFG(ep.getDeclaringClass, idfg)
-          
+//<<<<<<< HEAD
+//          
+//=======
+//>>>>>>> 6ef60fb9a86f699ca2273c59d66fbd725218c236
     	    msg_critical(TITLE, "processed-->" + idfg.icfg.getProcessed.size)
     	    val iddResult = InterproceduralDataDependenceAnalysis(idfg)
     	    AppCenter.addIDDG(ep.getDeclaringClass, iddResult)
@@ -156,6 +163,8 @@ class AmandroidSocket {
     	if(myListener_opt.isDefined) 
 	    	entryPoints = myListener_opt.get.entryPointFilter(entryPoints)
   
+      ScopeManager.setScopeManager(new AndroidRFAScopeManager)
+        
     	{if(parallel) entryPoints.par else entryPoints}.foreach{
     	  ep =>
     	    msg_critical(TITLE, "--------------Component " + ep + "--------------")

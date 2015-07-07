@@ -322,10 +322,36 @@ object ComponentNameModel {
 						      }
 		            case pstr1 @ PTAPointStringInstance(c) => 
 		              err_msg_detail(TITLE, "Init ComponentName.mPackage use point string: " + pv1)
-		              var facts = isetEmpty[RFAFact]
-		              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr1)
-		              facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), pstr1)
-		              facts
+                  if(param2Value.isEmpty){
+                    isetEmpty[RFAFact]
+                  } else {
+                    param2Value.map{
+                      pv2 =>
+                        pv2 match{
+                          case cstr2 @ PTAConcreteStringInstance(text, c) =>
+                            val recordType = StringFormConverter.formatClassNameToType(text)
+                            val rec = Center.resolveClass(recordType.name, Center.ResolveLevel.HIERARCHY)
+                            val claStr = PTAConcreteStringInstance(recordType.name, c)
+                            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
+                            var facts = isetEmpty[RFAFact]
+                            facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
+                            facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), claStr)
+                            facts
+                          case pstr2 @ PTAPointStringInstance(c) => 
+                            err_msg_detail(TITLE, "Init ComponentName.mClass use point string: " + pv2)
+                            var facts = isetEmpty[RFAFact]
+                            facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr2)
+                            facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), pstr2)
+                            facts
+                          case _ =>
+                            err_msg_detail(TITLE, "Init ComponentName.mClass use Unknown instance: " + pv2)
+                            var facts = isetEmpty[RFAFact]
+                            facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pv2)
+                            facts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), pv2)
+                            facts
+                        }
+                    }.reduce(iunion[RFAFact])
+                  }
 		            case _ =>
 		              err_msg_detail(TITLE, "Init ComponentName.mPackage use Unknown instance: " + pv1)
 		              var facts = isetEmpty[RFAFact]

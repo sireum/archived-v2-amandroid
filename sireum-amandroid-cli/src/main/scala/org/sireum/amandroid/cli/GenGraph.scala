@@ -107,7 +107,11 @@ object GenGraph {
   private final val TITLE = "GenCallGraph"
   
 	def main(args: Array[String]) {
-	  if(args.size != 20){
+//<<<<<<< HEAD
+//	  if(args.size != 20){
+//=======
+	  if(args.size != 22){
+//>>>>>>> 6ef60fb9a86f699ca2273c59d66fbd725218c236
       println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -f [Graph Format: DOT, GraphML, GML] -gt [Graph Type: FULL, SIMPLE_CALL, DETAILED_CALL, API] -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -h [header] -t type[allows: APK, DIR] <source path> <output path>")
       return
     }
@@ -169,7 +173,11 @@ object GenGraph {
             val apkName = apkFileUri.substring(apkFileUri.lastIndexOf("/") + 1, apkFileUri.lastIndexOf("."))
             
             val outputUri = FileUtil.toUri(outputPath)
-        		val outUri = AmDecoder.decode(apkFileUri, outputUri)
+//<<<<<<< HEAD
+//        		val outUri = AmDecoder.decode(apkFileUri, outputUri)
+//=======
+            val outUri = AmDecoder.decode(apkFileUri, outputUri)
+//>>>>>>> 6ef60fb9a86f699ca2273c59d66fbd725218c236
             val fileandout = (apkFileUri, outUri + "classes")
         
         		// convert the dex file to the "pilar" form
@@ -191,7 +199,7 @@ object GenGraph {
 
             val icfg = InterproceduralSuperSpark(pros, timer).icfg
             val file = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ".txt")
-      	    val w = new FileOutputStream(file)
+            val w = new FileOutputStream(file)
             val zips = new BufferedOutputStream(w)
             val zipw = new BufferedWriter(new OutputStreamWriter(zips, "UTF-8"))
             
@@ -222,23 +230,23 @@ object GenGraph {
                   case "GraphML$" => graph.toGraphML(zipw)
                   case "GML$" => graph.toGML(zipw)
                 }
-            }
-      	    zipw.close()
-      	    println(apkName + " result stored!")
-            
-            println("Done!")
-          } catch {
-            case te: MyTimeoutException => err_msg_critical(TITLE, te.message)
-            case e: Throwable => 
-              CliLogger.logError(new File(outputPath), "Error: " , e)
-          } finally {
-            Center.reset
-          	AppCenter.reset
-          	// before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
-          	JawaCodeSource.clearAppClassCodes
-          	System.gc()
-            System.gc()
-          }
+           }
+           zipw.close()
+           println(apkName + " result stored!")
+           println("Done!")
+         } catch {
+           case te: MyTimeoutException => err_msg_critical(TITLE, te.message)
+           case e: Throwable => 
+             CliLogger.logError(new File(outputPath), "Error: " , e)
+         } finally {
+           Center.reset
+           AppCenter.reset
+           // before starting the analysis of the current app, first clear the previous app's records' code from the AmandroidCodeSource
+           JawaCodeSource.clearAppClassCodes
+           System.gc()
+           System.gc()
+         }
+//>>>>>>> 6ef60fb9a86f699ca2273c59d66fbd725218c236
       }
     } catch {
       case e: Throwable => 

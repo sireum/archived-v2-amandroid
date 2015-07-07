@@ -136,7 +136,7 @@ object OAuthTokenTracking_run {
       return
     }
     
-    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
+    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
     
     GlobalConfig.ICFG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false

@@ -35,6 +35,7 @@ class OAuthSourceAndSinkManager(appPackageName : String,
     												layoutControls : Map[Int, LayoutControl], 
     												callbackMethods : ISet[JawaMethod], 
     												sasFilePath : String) extends AndroidSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
+  
   private final val TITLE = "OAuthSourceAndSinkManager"
     
   override def isSource(calleeMethod : JawaMethod, callerMethod : JawaMethod, callerLoc : JumpLocation) = false
@@ -54,7 +55,7 @@ class OAuthSourceAndSinkManager(appPackageName : String,
 	        as.rhs match {
 	          case le : LiteralExp =>
 	            if(le.typ.name.equals("STRING")){
-	              if(le.text.equals("access_token"))
+	              if(le.text.contains("content://call_log/calls"))
 	                flag = true
 	            }
 	            false

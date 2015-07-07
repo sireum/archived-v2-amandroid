@@ -94,7 +94,7 @@ object DataLeakage_run {
     AndroidReachingFactsAnalysisConfig.parallel = true
     AndroidReachingFactsAnalysisConfig.resolve_static_init = true
 
-    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
+    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
     val socket = new AmandroidSocket
     socket.preProcess
     
@@ -106,7 +106,11 @@ object DataLeakage_run {
     
     files.foreach{
       file =>
-        if(file.contains("FieldSensitivity1"))
+//<<<<<<< HEAD
+        //if(file.contains("FieldSensitivity1"))
+//=======
+//        if(file.contains("FieldSensitivity1"))
+//>>>>>>> 6ef60fb9a86f699ca2273c59d66fbd725218c236
         try{
           msg_critical(TITLE, DataLeakageTask(outputPath, file, socket, Some(1000)).run)   
         } catch {

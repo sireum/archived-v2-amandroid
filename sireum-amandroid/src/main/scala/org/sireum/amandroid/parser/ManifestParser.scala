@@ -28,7 +28,11 @@ final case class ComponentInfo(name: String, typ: String, exported: Boolean, ena
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-class ManifestParser extends AbstractAndroidXMLParser{
+//<<<<<<< HEAD
+//class ManifestParser extends AbstractAndroidXMLParser{
+//=======
+class ManifestParser{
+//>>>>>>> 6ef60fb9a86f699ca2273c59d66fbd725218c236
   private val componentInfos: MSet[ComponentInfo] = msetEmpty
 	private val components: MMap[String, String] = mmapEmpty
 	private var packageName = ""
@@ -59,6 +63,7 @@ class ManifestParser extends AbstractAndroidXMLParser{
 	 */
 	
 	def toPilarClass(str: String): String = str
+//<<<<<<< HEAD
 	
 //	def loadManifestFile(apkUri: FileResourceUri) = {
 //		handleAndroidXMLFiles(apkUri, Set("AndroidManifest.xml"), new AndroidXMLHandler() {
@@ -242,6 +247,8 @@ class ManifestParser extends AbstractAndroidXMLParser{
 //				return AXMLPrinter.getAttributeValue(parser, i)
 //		return null
 //	}
+//=======
+//>>>>>>> 6ef60fb9a86f699ca2273c59d66fbd725218c236
   
 	def loadClassesFromTextManifest(manifestIS: InputStream) = {
 		try {

@@ -20,6 +20,7 @@ import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAScopeManager
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.model.ModelCallHandler
 import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.jawa.ScopeManager
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -41,7 +42,11 @@ object AndroidModelCallHandler extends ModelCallHandler{
 	  FrameworkMethodsModel.isFrameworkMethods(calleeMethod) ||
 	  ActivityModel.isActivity(r) ||
 	  super.isModelCall(calleeMethod) ||
-	  AndroidRFAScopeManager.shouldBypass(r)
+//<<<<<<< HEAD
+	//  AndroidRFAScopeManager.shouldBypass(r)
+//=======
+	  ScopeManager.getCurrentScopeManager.shouldBypass(r)
+//>>>>>>> 6ef60fb9a86f699ca2273c59d66fbd725218c236
   }
   
   def isICCCall(calleeMethod : JawaMethod) : Boolean = {
@@ -62,7 +67,11 @@ object AndroidModelCallHandler extends ModelCallHandler{
 	  else if(FrameworkMethodsModel.isFrameworkMethods(calleeMethod)) FrameworkMethodsModel.doFrameworkMethodsModelCall(s, calleeMethod, args, retVars, currentContext)
 	  else if(ActivityModel.isActivity(r)) ActivityModel.doActivityCall(s, calleeMethod, args, retVars, currentContext)
 	  else if(super.isModelCall(calleeMethod)) super.caculateResult(s, calleeMethod, args, retVars, currentContext)
-	  else if(AndroidRFAScopeManager.shouldBypass(r)) AndroidRFAScopeManager.handleBypass(s, calleeMethod, args, retVars, currentContext)
+//<<<<<<< HEAD
+	//  else if(AndroidRFAScopeManager.shouldBypass(r)) AndroidRFAScopeManager.handleBypass(s, calleeMethod, args, retVars, currentContext)
+//=======
+	  else if(ScopeManager.getCurrentScopeManager.shouldBypass(r)) BypassedModel.handleBypass(s, calleeMethod, args, retVars, currentContext)
+//>>>>>>> 6ef60fb9a86f699ca2273c59d66fbd725218c236
 	  else throw new RuntimeException("given callee is not a model call: " + calleeMethod)
 	}
 	

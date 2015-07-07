@@ -23,7 +23,7 @@ object AmDecoder {
    *  Decode apk file and return outputpath
    *  @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
    */
-  def decode(sourcePathUri : FileResourceUri, outputUri : FileResourceUri) : FileResourceUri = {
+  def decode(sourcePathUri : FileResourceUri, outputUri : FileResourceUri, createFolder: Boolean = true) : FileResourceUri = {
     // make it as quiet mode
     val logger = Logger.getLogger("")
     logger.getHandlers().foreach {
@@ -33,8 +33,13 @@ object AmDecoder {
     LogManager.getLogManager().reset();
 
     val apkFile = FileUtil.toFile(sourcePathUri)
-    val dirName = apkFile.getName().substring(0, apkFile.getName().lastIndexOf("."))
-    val outputDir = new File(new URI(outputUri + "/" + dirName))
+    val outputDir = 
+      if(createFolder){
+        val dirName = apkFile.getName().substring(0, apkFile.getName().lastIndexOf("."))
+        new File(new URI(outputUri + "/" + dirName))
+      } else {
+        new File(new URI(outputUri))
+      }
     try{
       val decoder = new ApkDecoder
       decoder.setDecodeSources(0x0000) // DECODE_SOURCES_NONE = 0x0000
