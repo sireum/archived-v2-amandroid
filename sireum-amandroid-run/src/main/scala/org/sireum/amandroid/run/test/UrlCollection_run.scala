@@ -8,13 +8,10 @@ http://www.eclipse.org/legal/epl-v10.html
 package org.sireum.amandroid.run.test
 
 import org.sireum.util._
-import org.sireum.jawa.MessageCenter._
 import java.io.File
 import java.net.URI
 import org.sireum.jawa.util.APKFileResolver
 import org.sireum.amandroid.decompile.Dex2PilarConverter
-import org.sireum.jawa.JawaCodeSource
-import org.sireum.jawa.GlobalConfig
 import org.sireum.jawa.DefaultLibraryAPISummary
 import org.sireum.jawa.util.URLInString
 import java.io.PrintWriter
@@ -22,9 +19,12 @@ import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.amandroid.parser.ResourceFileParser
 import org.sireum.amandroid.parser.ARSCFileParser
 import java.io.FileWriter
-import org.sireum.jawa.MessageCenter
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.security.AmandroidSocket
+import org.sireum.jawa.DefaultReporter
+import org.sireum.jawa.Global
+import org.sireum.amandroid.Apk
+import org.sireum.jawa.Constants
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -38,44 +38,48 @@ object UrlCollection_run {
       System.err.print("Usage: source_path output_path")
       return
     }
-    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
+//    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
     val outputpath = args(1)
     val outputUri = FileUtil.toUri(outputpath)
     val sourcePath = args(0)
-    val socket = new AmandroidSocket
+    
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
 //    val results : MMap[String, (Set[String], Set[String])] = mmapEmpty
     files.foreach{
       file =>
-        msg_critical(TITLE, "####" + file + "#####")
+        val reporter = new DefaultReporter
+        val global = new Global(file, reporter)
+        val apk = new Apk(file)
+        val socket = new AmandroidSocket(global, apk)
+        reporter.echo(TITLE, "####" + file + "#####")
         try{
-          val outUri = socket.loadApk(file, outputpath, AndroidLibraryAPISummary)
-          val man = AppInfoCollector.analyzeManifest(outUri + "AndroidManifest.xml")
+          val outUri = socket.loadApk(outputpath, AndroidLibraryAPISummary)
+          val man = AppInfoCollector.analyzeManifest(reporter, outUri + "AndroidManifest.xml")
           
           val strs = msetEmpty[String]
-        	val rfp = new ResourceFileParser
-        	rfp.parseResourceFile(file)
-        	strs ++= rfp.getAllStrings
-        	val arsc = new ARSCFileParser
-        	arsc.parse(file)
-        	strs ++= arsc.getGlobalStringPool.map(_._2)
+          val rfp = new ResourceFileParser
+          rfp.parseResourceFile(file)
+          strs ++= rfp.getAllStrings
+          val arsc = new ARSCFileParser
+          arsc.parse(file)
+          strs ++= arsc.getGlobalStringPool.map(_._2)
           
           val srcFile = new File(new URI(file))
-        	val dexFile = APKFileResolver.getDexFile(file, FileUtil.toUri(srcFile.getParentFile()))
-        	
-        	// convert the dex file to the "pilar" form
-        	val pilarRootUri = Dex2PilarConverter.convert(dexFile, FileUtil.toUri(srcFile.getParentFile()))
-        	val pilarFile = new File(new URI(pilarRootUri))
-        	//store the app's pilar code in AmandroidCodeSource which is organized record by record.
-        	JawaCodeSource.load(pilarRootUri, GlobalConfig.PILAR_FILE_EXT, DefaultLibraryAPISummary)
-        	val codes = JawaCodeSource.getAppClassCodes
-        	val code_urls : Set[String] =
-          	if(!codes.isEmpty){
-            	codes.map{
-                case (name, code) =>
-                  URLInString.extract(code)
+          val dexFile = APKFileResolver.getDexFile(file, FileUtil.toUri(srcFile.getParentFile()))
+        
+          // convert the dex file to the "pilar" form
+          val pilarRootUri = Dex2PilarConverter.convert(dexFile, FileUtil.toUri(srcFile.getParentFile()))
+          val pilarFile = new File(new URI(pilarRootUri))
+          //store the app's pilar code in AmandroidCodeSource which is organized record by record.
+          global.load(pilarRootUri, Constants.PILAR_FILE_EXT, DefaultLibraryAPISummary)
+          val codes = global.getApplicationClassCodes
+          val code_urls : Set[String] =
+            if(!codes.isEmpty){
+              codes.map{
+                case (name, source) =>
+                  URLInString.extract(source.code)
               }.reduce(iunion[String])
-          	} else isetEmpty[String]
+            } else isetEmpty[String]
           val res_urls : Set[String] =
             if(!strs.isEmpty){
               strs.map{
@@ -101,13 +105,12 @@ object UrlCollection_run {
             sos.write("\n\n")
           } finally {
             sos.close()
-            JawaCodeSource.clearAppClassCodes
-    	    	APKFileResolver.deleteOutputs(file, outputUri)
-    	    	System.gc
+            APKFileResolver.deleteOutputs(file, outputUri)
+            System.gc
           }
         } catch {
           case e : Exception =>
-            err_msg_critical(TITLE, e.getMessage())
+            reporter.error(TITLE, e.getMessage())
         }
     }
     

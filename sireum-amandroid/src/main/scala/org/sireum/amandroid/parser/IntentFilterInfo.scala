@@ -8,8 +8,8 @@ http://www.eclipse.org/legal/epl-v10.html
 package org.sireum.amandroid.parser
 
 import org.sireum.jawa.JawaClass
-import org.sireum.jawa.Center
 import org.sireum.util._
+import org.sireum.jawa.ObjectType
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -19,7 +19,7 @@ class IntentFilterDataBase {
   /**
    * Map from record name to it's intent filter information
    */
-  private val intentFmap: MMap[String, Set[IntentFilter]] = mmapEmpty
+  private val intentFmap: MMap[ObjectType, Set[IntentFilter]] = mmapEmpty
   def updateIntentFmap(intentFilter: IntentFilter) = {
     this.intentFmap += (intentFilter.getHolder -> (this.intentFmap.getOrElse(intentFilter.getHolder, Set()) + intentFilter))
   }
@@ -33,11 +33,11 @@ class IntentFilterDataBase {
         }
     }
   }
-  def containsClass(r: JawaClass): Boolean = containsClass(r.getName)
-  def containsClass(name: String): Boolean = this.intentFmap.contains(name)
-  def getIntentFmap(): IMap[String, Set[IntentFilter]] = intentFmap.toMap
-  def getIntentFilters(r: JawaClass): ISet[IntentFilter] = getIntentFilters(r.getName)
-  def getIntentFilters(name: String): ISet[IntentFilter] = this.intentFmap.getOrElse(name, Set())
+  def containsClass(r: JawaClass): Boolean = containsClass(r.getType)
+  def containsClass(compTyp: ObjectType): Boolean = this.intentFmap.contains(compTyp)
+  def getIntentFmap(): IMap[ObjectType, Set[IntentFilter]] = intentFmap.toMap
+  def getIntentFilters(r: JawaClass): ISet[IntentFilter] = getIntentFilters(r.getType)
+  def getIntentFilters(compTyp: ObjectType): ISet[IntentFilter] = this.intentFmap.getOrElse(compTyp, Set())
   def getIntentFiltersActions(r: JawaClass): ISet[String] = {
     val intentFilterS: ISet[IntentFilter] = getIntentFilters(r)
     val actions: MSet[String] = msetEmpty
@@ -58,7 +58,7 @@ class IntentFilterDataBase {
 
 
 
-class IntentFilter(holder: String) {
+class IntentFilter(holder: ObjectType) {
 	private val actions: MSet[String] = msetEmpty
 	private val categories: MSet[String] = msetEmpty
 	private val data = new Data

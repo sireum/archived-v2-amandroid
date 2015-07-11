@@ -8,18 +8,18 @@ http://www.eclipse.org/legal/epl-v10.html
 package org.sireum.amandroid.run.security
 
 import org.sireum.amandroid.security._
-import org.sireum.jawa.MessageCenter._
 import org.sireum.util.FileUtil
 import org.sireum.amandroid.security.apiMisuse.InterestingApiCollector
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
-import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.security.apiMisuse.CryptographicMisuse
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.util.MyTimer
 import org.sireum.jawa.util.MyTimeoutException
-import org.sireum.jawa.GlobalConfig
+import org.sireum.jawa.DefaultReporter
+import org.sireum.jawa.Global
+import org.sireum.amandroid.Apk
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -35,7 +35,7 @@ object CryptoMisuse_run {
     override def toString : String = "total: " + total + ", oversize: " + oversize + ", haveResult: " + haveresult
   }
   
-  private class CryptoMisuseListener extends AmandroidSocketListener {
+  private class CryptoMisuseListener(global: Global) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
       CryptoMisuseCounter.total += 1
     }
@@ -51,7 +51,7 @@ object CryptoMisuse_run {
     }
 
     def onPostAnalysis: Unit = {
-      msg_critical(TITLE, CryptoMisuseCounter.toString)
+      global.reporter.echo(TITLE, CryptoMisuseCounter.toString)
     }
     
     def onException(e : Exception) : Unit = {
@@ -69,10 +69,7 @@ object CryptoMisuse_run {
       return
     }
     
-    val socket = new AmandroidSocket
-    socket.preProcess
-    
-    GlobalConfig.ICFG_CONTEXT_K = 1
+//    GlobalConfig.ICFG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
 //    AndroidReachingFactsAnalysisConfig.timeout = 5
@@ -83,36 +80,40 @@ object CryptoMisuse_run {
     
     files.foreach{
       file =>
-        try{
-          msg_critical(TITLE, CryptoMisuseTask(outputPath, file, socket, Some(500)).run)
+        val reporter = new DefaultReporter
+        val global = new Global(file, reporter)
+        val apk = new Apk(file)
+        val socket = new AmandroidSocket(global, apk)
+        try {
+          reporter.echo(TITLE, CryptoMisuseTask(global, apk, outputPath, file, socket, Some(500)).run)
         } catch {
-          case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
+          case te : MyTimeoutException => reporter.error(TITLE, te.message)
           case e : Throwable => e.printStackTrace()
         } finally {
-          msg_critical(TITLE, CryptoMisuseCounter.toString)
+          reporter.echo(TITLE, CryptoMisuseCounter.toString)
           socket.cleanEnv
         }
     }
   }
   
-  private case class CryptoMisuseTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]){
+  private case class CryptoMisuseTask(global: Global, apk: Apk, outputPath : String, file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]){
     def run() : String = {
-      msg_critical(TITLE, "####" + file + "#####")
+      global.reporter.echo(TITLE, "####" + file + "#####")
       val timer = timeout match {
         case Some(t) => Some(new MyTimer(t))
         case None => None
       }
       if(timer.isDefined) timer.get.start
-      val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-      val app_info = new InterestingApiCollector(file, outUri, timer)
+      val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary)
+      val app_info = new InterestingApiCollector(global, apk, outUri, timer)
       app_info.collectInfo
-      socket.plugListener(new CryptoMisuseListener)
+      socket.plugListener(new CryptoMisuseListener(global))
       socket.runWithoutDDA(false, true, timer)
       
-      val idfgs = AppCenter.getIDFGs
+      val idfgs = apk.getIDFGs
       idfgs.foreach{
         case (rec, idfg) =>
-          CryptographicMisuse(idfg)
+          CryptographicMisuse(global, idfg)
       }
       return "Done!"
     }

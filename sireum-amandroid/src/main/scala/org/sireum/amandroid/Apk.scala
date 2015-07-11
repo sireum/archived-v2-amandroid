@@ -18,7 +18,8 @@ import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralMonotoneDataFlowAnalysisResult
 import org.sireum.jawa.alir.pta.PTAResult
-import org.sireum.jawa.MessageCenter._
+import org.sireum.jawa.ObjectType
+import org.sireum.jawa.io.NoPosition
 
 /**
  * this is an object, which hold information of apps. e.g. components, intent-filter database, etc.
@@ -26,8 +27,8 @@ import org.sireum.jawa.MessageCenter._
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a> 
  */
-object AppCenter {
-  private final val TITLE = "AppCenter"
+case class Apk(nameUri: FileResourceUri) {
+  private final val TITLE = "Apk"
   private val activities: MSet[JawaClass] = msetEmpty
   private val services: MSet[JawaClass] = msetEmpty
   private val receivers: MSet[JawaClass] = msetEmpty
@@ -44,11 +45,11 @@ object AppCenter {
 	
 	def setComponents(comps: ISet[JawaClass]) = this.synchronized{
     comps.foreach{
-      case ac if ac.isChildOf(AndroidConstants.ACTIVITY) => this.addActivity(ac)
-      case se if se.isChildOf(AndroidConstants.SERVICE) => this.addService(se)
-      case re if re.isChildOf(AndroidConstants.RECEIVER) => this.addReceiver(re)
-      case pr if pr.isChildOf(AndroidConstants.PROVIDER) => this.addProvider(pr)
-      case a => err_msg_critical(TITLE, "Seriously, how it's possible to have " + a)
+      case ac if ac.isChildOf(new ObjectType(AndroidConstants.ACTIVITY)) => this.addActivity(ac)
+      case se if se.isChildOf(new ObjectType(AndroidConstants.SERVICE)) => this.addService(se)
+      case re if re.isChildOf(new ObjectType(AndroidConstants.RECEIVER)) => this.addReceiver(re)
+      case pr if pr.isChildOf(new ObjectType(AndroidConstants.PROVIDER)) => this.addProvider(pr)
+      case a => a.global.reporter.error(NoPosition, "Unexpected component: " + a)
     }
   }
 	

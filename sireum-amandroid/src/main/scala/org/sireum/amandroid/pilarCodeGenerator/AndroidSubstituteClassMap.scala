@@ -8,19 +8,20 @@ http://www.eclipse.org/legal/epl-v10.html
 package org.sireum.amandroid.pilarCodeGenerator
 
 import org.sireum.util._
+import org.sireum.jawa.ObjectType
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
 object AndroidSubstituteClassMap {
-	def getSubstituteClassMap : IMap[String, String] = {
-	  val map : MMap[String, String] = mmapEmpty
-	  map.put("android.content.Context", "android.content.ContextWrapper")
-    map.put("android.view.Menu", "com.android.internal.view.menu.MenuBuilder")
-    map.put("android.content.SharedPreferences", "android.app.SharedPreferencesImpl")
-    map.put("android.os.IBinder", " android.os.Binder")
-    map.put("android.hardware.display.IDisplayManager", "android.hardware.display.DisplayManager")
+	def getSubstituteClassMap : IMap[ObjectType, ObjectType] = {
+	  val map : MMap[ObjectType, ObjectType] = mmapEmpty
+	  map.put(new ObjectType("android.content.Context"), new ObjectType("android.content.ContextWrapper"))
+    map.put(new ObjectType("android.view.Menu"), new ObjectType("com.android.internal.view.menu.MenuBuilder"))
+    map.put(new ObjectType("android.content.SharedPreferences"), new ObjectType("android.app.SharedPreferencesImpl"))
+    map.put(new ObjectType("android.os.IBinder"), new ObjectType("android.os.Binder"))
+    map.put(new ObjectType("android.hardware.display.IDisplayManager"), new ObjectType("android.hardware.display.DisplayManager"))
 	  map.toMap
 	}
 }

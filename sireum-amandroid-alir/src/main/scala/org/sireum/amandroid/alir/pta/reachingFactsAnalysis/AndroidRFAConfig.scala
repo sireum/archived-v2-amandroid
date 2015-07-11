@@ -11,13 +11,11 @@ import org.sireum.util._
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.jawa.JawaMethod
 import org.sireum.amandroid.AndroidConstants
-import org.sireum.jawa.NormalType
 import org.sireum.jawa.alir.Context
-import org.sireum.jawa.GlobalConfig
 import org.sireum.jawa.JawaClass
-import org.sireum.jawa.Center
 import org.sireum.jawa.alir.pta.PTAInstance
 import org.sireum.jawa.alir.pta.VarSlot
+import org.sireum.jawa.ObjectType
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -29,12 +27,12 @@ object AndroidRFAConfig {
    * the generated fact says that the param Intent is generated at the Center.
    */
 	def getInitialFactsForMainEnvironment(dm : JawaMethod) : ISet[RFAFact] = {
-	  require(dm.getShortName == AndroidConstants.MAINCOMP_ENV || dm.getShortName == AndroidConstants.COMP_ENV)
+	  require(dm.getName == AndroidConstants.MAINCOMP_ENV || dm.getName == AndroidConstants.COMP_ENV)
 	  var result = isetEmpty[RFAFact]
-	  val intentSlot = VarSlot(dm.getParamName(0))
-	  val context : Context = new Context(GlobalConfig.ICFG_CONTEXT_K)
-	  context.setContext("EntryPoint", "L0000")
-	  val intentValue = PTAInstance(NormalType(AndroidConstants.INTENT, 0), context.copy)
+	  val intentSlot = VarSlot(dm.getParamName(0), false)
+	  val context : Context = new Context(1) // FIXME resolve hard coded k context
+	  context.setContext(dm.getSignature, "L0000")
+	  val intentValue = PTAInstance(ObjectType(AndroidConstants.INTENT, 0), context.copy, false)
 	  result += RFAFact(intentSlot, intentValue)
 //	  val mActionSlot = FieldSlot(intentValue, AndroidConstants.INTENT_ACTION)
 //	  val mActionValue = RFAConcreteStringInstance(AndroidConstants.ACTION_MAIN, context.copy)

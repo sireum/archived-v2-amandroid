@@ -12,14 +12,11 @@ import org.sireum.option.AnalyzeSource
 import java.io.File
 import org.sireum.util._
 import org.sireum.option.MessageLevel
-import org.sireum.jawa.MessageCenter
-import org.sireum.jawa.MessageCenter._
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.amandroid.cli.util.CliLogger
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.security.apiMisuse.InterestingApiCollector
-import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.security.apiMisuse.CryptographicConstants
 import org.sireum.amandroid.alir.dataRecorder.DataCollector
 import java.io.PrintWriter
@@ -28,7 +25,6 @@ import org.sireum.amandroid.security.AmandroidSocketListener
 import org.sireum.amandroid.security.apiMisuse.CryptographicMisuse
 import org.sireum.jawa.util.MyTimer
 import org.sireum.jawa.util.MyTimeoutException
-import org.sireum.jawa.GlobalConfig
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 
 
@@ -130,10 +126,7 @@ object CryptoMisuse {
     AndroidReachingFactsAnalysisConfig.resolve_static_init = static
     println("Total apks: " + apkFileUris.size)
 
-    try{
-      val socket = new AmandroidSocket
-      socket.preProcess
-          
+    try{  
       var i : Int = 0
       
       apkFileUris.foreach{

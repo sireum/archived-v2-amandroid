@@ -18,7 +18,7 @@ import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
  */ 
 object LifecycleMethodModel {
 	def isLifecycleMethod(p : JawaMethod) : Boolean = {
-	  p.getSignature match{
+	  p.getSignature.signature match{
 	    case "Landroid/app/Service;.onCreate:()V" |
 	    		 "Landroid/app/Service;.onStart:(Landroid/content/Intent;I)V" |
 	    		 "Landroid/app/Service;.onStartCommand:(Landroid/content/Intent;II)I" |
@@ -35,7 +35,7 @@ object LifecycleMethodModel {
 	
 	def doLifecycleMethodCall(s : ISet[RFAFact], p : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
 	  var newFacts = isetEmpty[RFAFact]
-	  p.getSignature match{
+	  p.getSignature.signature match{
 	    case "Landroid/app/Service;.onCreate:()V" =>
 	    case "Landroid/app/Service;.onStart:(Landroid/content/Intent;I)V" =>
 	    case "Landroid/app/Service;.onStartCommand:(Landroid/content/Intent;II)I" =>

@@ -14,7 +14,6 @@ import java.io.File
 import java.util.logging.Logger
 import java.util.logging.LogManager
 import brut.androlib.err.CantFindFrameworkResException
-import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.util.IgnoreException
 
 object AmDecoder {
@@ -40,7 +39,7 @@ object AmDecoder {
       } else {
         new File(new URI(outputUri))
       }
-    try{
+    try {
       val decoder = new ApkDecoder
       decoder.setDecodeSources(0x0000) // DECODE_SOURCES_NONE = 0x0000
       decoder.setApkFile(apkFile)
@@ -49,7 +48,7 @@ object AmDecoder {
       decoder.decode()
     } catch {
       case fe : CantFindFrameworkResException =>
-        err_msg_critical(TITLE, "Can't find framework resources for package of id: " + fe.getPkgId + ". You must install proper framework files, see apk-tool website for more info.")
+//        err_msg_critical(TITLE, "Can't find framework resources for package of id: " + fe.getPkgId + ". You must install proper framework files, see apk-tool website for more info.")
         throw new IgnoreException
     }
     FileUtil.toUri(outputDir)

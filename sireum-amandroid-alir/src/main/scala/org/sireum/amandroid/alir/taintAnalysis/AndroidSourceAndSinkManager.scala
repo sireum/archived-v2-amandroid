@@ -15,18 +15,14 @@ import org.sireum.amandroid.parser.LayoutControl
 import org.sireum.amandroid.parser.ARSCFileParser
 import java.util.regex.Pattern
 import java.util.regex.Matcher
-import org.sireum.jawa.Center
-import org.sireum.jawa.util.StringFormConverter
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.pilar.ast.LocationDecl
 import org.sireum.jawa.alir.util.ExplicitValueFinder
 import org.sireum.pilar.ast.JumpLocation
-import org.sireum.jawa.MessageCenter._
 import java.io.File
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterProceduralDataDependenceGraph
-import org.sireum.amandroid.AppCenter
 import org.sireum.pilar.ast._
 import java.io.InputStreamReader
 import java.io.FileInputStream
@@ -35,6 +31,9 @@ import org.sireum.jawa.alir.taintAnalysis.SourceAndSinkManager
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentCommunicationModel
 import org.sireum.jawa.alir.pta.VarSlot
+import org.sireum.jawa.Signature
+import org.sireum.amandroid.Apk
+import org.sireum.jawa.Global
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -54,27 +53,29 @@ object SourceAndSinkCategory {
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-abstract class AndroidSourceAndSinkManager(appPackageName : String, 
-    												layoutControls : Map[Int, LayoutControl], 
-    												callbackMethods : ISet[JawaMethod], 
-    												sasFilePath : String) extends SourceAndSinkManager{
+abstract class AndroidSourceAndSinkManager(
+    global: Global,
+    apk: Apk,
+    layoutControls: Map[Int, LayoutControl], 
+    callbackMethods: ISet[JawaMethod], 
+    sasFilePath: String) extends SourceAndSinkManager{
   
   private final val TITLE = "BasicSourceAndSinkManager"
   
   /**
    * it's a map from source API sig to it's category
    */
-	protected var sources : IMap[String, String] = imapEmpty
-	/**
+  protected var sources: IMap[String, String] = imapEmpty
+  /**
    * it's a map from sink API sig to it's category
    */
-	protected var sinks : IMap[String, String] = imapEmpty
-	/**
+  protected var sinks: IMap[String, String] = imapEmpty
+  /**
    * it's a map from API sig to its required permission
    */
-	protected var apiPermissions : IMap[String, ISet[String]] = imapEmpty
+  protected var apiPermissions: IMap[String, ISet[String]] = imapEmpty
 
-  SSParser.parse(sasFilePath) match{
+  SSParser.parse(sasFilePath) match {
     case (sources, sinks) => 
       sources.foreach{
         case (sig, ps) =>
@@ -86,100 +87,102 @@ abstract class AndroidSourceAndSinkManager(appPackageName : String,
           this.sinks += (sig -> SourceAndSinkCategory.API_SINK)
           this.apiPermissions += (sig -> ps)
       }
-      msg_detail(TITLE, "source size: " + this.sources.size + " sink size: " + this.sinks.size)
+//      msg_detail(TITLE, "source size: " + this.sources.size + " sink size: " + this.sinks.size)
   }
-	
-	private def matchs(method : JawaMethod, methodpool : ISet[String]) : Boolean = methodpool.contains(method.getSignature)
-	
-	def isSourceMethod(method : JawaMethod) = matchs(method, this.sources.map(s=>s._1).toSet)
-	
-	def isSinkMethod(method : JawaMethod) = matchs(method, this.sinks.map(s=>s._1).toSet)
-	
-	def isSource(calleeMethod : JawaMethod, callerMethod : JawaMethod, callerLoc : JumpLocation) : Boolean = {
-	  if(isSourceMethod(calleeMethod)) return true
-	  if(isUISource(calleeMethod, callerMethod, callerLoc)) return true
-	  false
-	}
-	
-	def isSource(loc : LocationDecl, ptaresult : PTAResult) : Boolean = false
-	
-	def isSink(loc : LocationDecl, ptaresult : PTAResult) : Boolean = false
-	
-	def addSource(source : String, category : String) = {
-	  this.sources += (source -> category)
-	  this.apiPermissions += (source -> this.apiPermissions.getOrElse(source, isetEmpty))
-	}
-	
-	def addSink(sink : String, category : String) = {
-	  this.sinks += (sink -> category)
-	  this.apiPermissions += (sink -> this.apiPermissions.getOrElse(sink, isetEmpty))
-	}
-	
-	def isCallbackSource(proc : JawaMethod) : Boolean
-	def isUISource(calleeMethod : JawaMethod, callerMethod : JawaMethod, callerLoc : JumpLocation) : Boolean
-	def isIccSink(invNode : ICFGInvokeNode, s : PTAResult) : Boolean
-	def isIccSource(entNode : ICFGNode, iddgEntNode : ICFGNode) : Boolean
-	
-	def getSourceSigs : ISet[String] = this.sources.map{_._1}.toSet
-	def getSinkSigs : ISet[String] = this.sinks.map{_._1}.toSet
-	def getInterestedSigs : ISet[String] = getSourceSigs ++ getSinkSigs
-	
+
+  private def matchs(method: JawaMethod, methodpool: ISet[String]): Boolean = methodpool.contains(method.getSignature.signature)
+
+  def isSourceMethod(method: JawaMethod) = matchs(method, this.sources.map(s=>s._1).toSet)
+
+  def isSinkMethod(method: JawaMethod) = matchs(method, this.sinks.map(s=>s._1).toSet)
+
+  def isSource(calleeMethod: JawaMethod, callerMethod: JawaMethod, callerLoc: JumpLocation): Boolean = {
+    if(isSourceMethod(calleeMethod)) return true
+    if(isUISource(calleeMethod, callerMethod, callerLoc)) return true
+    false
+  }
+
+  def isSource(loc: LocationDecl, ptaresult: PTAResult): Boolean = false
+
+  def isSink(loc: LocationDecl, ptaresult: PTAResult): Boolean = false
+
+  def addSource(source: String, category: String) = {
+    this.sources += (source -> category)
+    this.apiPermissions += (source -> this.apiPermissions.getOrElse(source, isetEmpty))
+  }
+
+  def addSink(sink: String, category: String) = {
+    this.sinks += (sink -> category)
+    this.apiPermissions += (sink -> this.apiPermissions.getOrElse(sink, isetEmpty))
+  }
+
+  def isCallbackSource(proc: JawaMethod): Boolean
+  def isUISource(calleeMethod: JawaMethod, callerMethod: JawaMethod, callerLoc: JumpLocation): Boolean
+  def isIccSink(invNode: ICFGInvokeNode, s: PTAResult): Boolean
+  def isIccSource(entNode: ICFGNode, iddgEntNode: ICFGNode): Boolean
+
+  def getSourceSigs: ISet[String] = this.sources.map{_._1}.toSet
+  def getSinkSigs: ISet[String] = this.sinks.map{_._1}.toSet
+  def getInterestedSigs: ISet[String] = getSourceSigs ++ getSinkSigs
+
 }
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-class DefaultAndroidSourceAndSinkManager(appPackageName : String, 
-    												layoutControls : Map[Int, LayoutControl], 
-    												callbackMethods : ISet[JawaMethod], 
-    												sasFilePath : String) extends AndroidSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
-	
+class DefaultAndroidSourceAndSinkManager(
+    global: Global,
+    apk: Apk, 
+    layoutControls: Map[Int, LayoutControl], 
+    callbackMethods: ISet[JawaMethod], 
+    sasFilePath: String) extends AndroidSourceAndSinkManager(global, apk, layoutControls, callbackMethods, sasFilePath){
+
   private final val TITLE = "DefaultSourceAndSinkManager"
   
-	def isCallbackSource(proc : JawaMethod) : Boolean = {
-	  if(this.callbackMethods.contains(proc) && proc.getParamNames.size > 1) true
-	  else false
-	}
-	
-	def isUISource(calleeMethod : JawaMethod, callerMethod : JawaMethod, callerLoc : JumpLocation) : Boolean = {
-	  if(calleeMethod.getSignature == AndroidConstants.ACTIVITY_FINDVIEWBYID || calleeMethod.getSignature == AndroidConstants.VIEW_FINDVIEWBYID){
-	    val nums = ExplicitValueFinder.findExplicitIntValueForArgs(callerMethod, callerLoc, 1)
-	    nums.foreach{
-	      num =>
-	        this.layoutControls.get(num) match{
-	          case Some(control) =>
-	            return control.isSensitive
-	          case None =>
-	            err_msg_normal(TITLE, "Layout control with ID " + num + " not found.")
-	        }
-	    }
-	  }
-	  false
-	}
-	
-	def isIccSink(invNode : ICFGInvokeNode, s : PTAResult) : Boolean = {
+  def isCallbackSource(proc: JawaMethod): Boolean = {
+    if(this.callbackMethods.contains(proc) && proc.getParamNames.size > 1) true
+    else false
+  }
+
+  def isUISource(calleeMethod: JawaMethod, callerMethod: JawaMethod, callerLoc: JumpLocation): Boolean = {
+    if(calleeMethod.getSignature.signature == AndroidConstants.ACTIVITY_FINDVIEWBYID || calleeMethod.getSignature.signature == AndroidConstants.VIEW_FINDVIEWBYID){
+      val nums = ExplicitValueFinder.findExplicitIntValueForArgs(callerMethod, callerLoc, 1)
+      nums.foreach{
+        num =>
+          this.layoutControls.get(num) match{
+            case Some(control) =>
+              return control.isSensitive
+            case None =>
+              calleeMethod.getDeclaringClass.global.reporter.echo(TITLE, "Layout control with ID " + num + " not found.")
+          }
+      }
+    }
+    false
+  }
+
+  def isIccSink(invNode: ICFGInvokeNode, s: PTAResult): Boolean = {
     var sinkflag = false
     val calleeSet = invNode.getCalleeSet
     calleeSet.foreach{
       callee =>
         if(InterComponentCommunicationModel.isIccOperation(callee.callee)){
-          val args = Center.getMethodWithoutFailing(invNode.getOwner).getMethodBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
-              case te : TupleExp =>
-                te.exps.map{
-			            exp =>
-			              exp match{
-					            case ne : NameExp => ne.name.name
-					            case _ => exp.toString()
-					          }
-			          }.toList
-              case a => throw new RuntimeException("wrong exp type: " + a)
-            }
-          val intentSlot = VarSlot(args(1))
+          val args = global.getMethod(invNode.getOwner).get.getBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match {
+            case te: TupleExp =>
+              te.exps.map{
+                exp =>
+                  exp match{
+                    case ne: NameExp => ne.name.name
+                    case _ => exp.toString()
+                  }
+              }.toList
+            case a => throw new RuntimeException("wrong exp type: " + a)
+          }
+          val intentSlot = VarSlot(args(1), false)
           val intentValues = s.pointsToSet(intentSlot, invNode.getContext)
           val intentContents = IntentHelper.getIntentContents(s, intentValues, invNode.getContext)
           val compType = AndroidConstants.getIccCallType(callee.callee.getSubSignature)
-          val comMap = IntentHelper.mappingIntents(intentContents, compType)
+          val comMap = IntentHelper.mappingIntents(global, apk, intentContents, compType)
           comMap.foreach{
             case (_, coms) =>
               if(coms.isEmpty) sinkflag = true
@@ -195,26 +198,26 @@ class DefaultAndroidSourceAndSinkManager(appPackageName : String,
         }
     }
     sinkflag
-	}
+  }
   
-  def isIccSource(entNode : ICFGNode, iddgEntNode : ICFGNode) : Boolean = {
+  def isIccSource(entNode: ICFGNode, iddgEntNode: ICFGNode): Boolean = {
     var sourceflag = false
 //    val reachableSinks = sinkNodes.filter{sinN => iddg.findPath(entNode, sinN) != null}
 //    if(!reachableSinks.isEmpty){
-//	    val sinkMethods = reachableSinks.filter(_.isInstanceOf[ICFGCallNode]).map(_.asInstanceOf[ICFGCallNode].getCalleeSet).reduce(iunion[Callee])
-//	    require(!sinkMethods.isEmpty)
-//	    val neededPermissions = sinkMethods.map(sin => this.apiPermissions.getOrElse(sin.calleeMethod.getSignature, isetEmpty)).reduce(iunion[String])
-//	    val infos = AppCenter.getAppInfo.getComponentInfos
-//	    infos.foreach{
-//	      info =>
-//	        if(info.name == entNode.getOwner.getDeclaringClass.getName){
-//	          if(info.exported == true){
-//	            if(info.permission.isDefined){
-//	              sourceflag = !(neededPermissions - info.permission.get).isEmpty
-//	            }
-//	          }
-//	        }
-//	    }
+//    val sinkMethods = reachableSinks.filter(_.isInstanceOf[ICFGCallNode]).map(_.asInstanceOf[ICFGCallNode].getCalleeSet).reduce(iunion[Callee])
+//    require(!sinkMethods.isEmpty)
+//    val neededPermissions = sinkMethods.map(sin => this.apiPermissions.getOrElse(sin.calleeMethod.getSignature, isetEmpty)).reduce(iunion[String])
+//    val infos = AppCenter.getAppInfo.getComponentInfos
+//    infos.foreach{
+//      info =>
+//        if(info.name == entNode.getOwner.getDeclaringClass.getName){
+//          if(info.exported == true){
+//            if(info.permission.isDefined){
+//              sourceflag = !(neededPermissions - info.permission.get).isEmpty
+//            }
+//          }
+//        }
+//    }
 //    }
     sourceflag
   }
@@ -224,16 +227,18 @@ class DefaultAndroidSourceAndSinkManager(appPackageName : String,
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-class DataLeakageAndroidSourceAndSinkManager(appPackageName : String, 
-                            layoutControls : Map[Int, LayoutControl], 
-                            callbackMethods : ISet[JawaMethod], 
-                            sasFilePath : String) extends DefaultAndroidSourceAndSinkManager(appPackageName, layoutControls, callbackMethods, sasFilePath){
+class DataLeakageAndroidSourceAndSinkManager(
+    global: Global,
+    apk: Apk, 
+    layoutControls: Map[Int, LayoutControl], 
+    callbackMethods: ISet[JawaMethod], 
+    sasFilePath: String) extends DefaultAndroidSourceAndSinkManager(global, apk, layoutControls, callbackMethods, sasFilePath){
   
   private final val TITLE = "DataLeakageAndroidSourceAndSinkManager"
   
   private def sensitiveData: ISet[String] = Set("android.location.Location", "android.content.Intent")
   
-  override def isCallbackSource(proc : JawaMethod) : Boolean = {
+  override def isCallbackSource(proc: JawaMethod): Boolean = {
     if(this.callbackMethods.contains(proc)){
       if(proc.getParamTypes.exists { pt => sensitiveData.contains(pt.name) }) true
       else false
@@ -248,12 +253,12 @@ class DataLeakageAndroidSourceAndSinkManager(appPackageName : String,
  */ 
 object SSParser{
   
-	private val regex = "([^\\s]+)\\s+(.+)?\\s*->\\s+(.+)"
-  def parse(filePath : String) : (IMap[String, ISet[String]], IMap[String, ISet[String]]) = {
-	  def readFile : BufferedReader = new BufferedReader(new FileReader(filePath))
-    var sources : IMap[String, ISet[String]] = imapEmpty
-    var sinks : IMap[String, ISet[String]] = imapEmpty
-    val p : Pattern = Pattern.compile(regex)
+  private val regex = "([^\\s]+)\\s+(.+)?\\s*->\\s+(.+)"
+  def parse(filePath: String): (IMap[String, ISet[String]], IMap[String, ISet[String]]) = {
+    def readFile: BufferedReader = new BufferedReader(new FileReader(filePath))
+    var sources: IMap[String, ISet[String]] = imapEmpty
+    var sinks: IMap[String, ISet[String]] = imapEmpty
+    val p: Pattern = Pattern.compile(regex)
     val rdr = readFile
     var line = rdr.readLine()
     while(line != null){
@@ -274,11 +279,11 @@ object SSParser{
     (sources, sinks)
   }
   
-  def parseLine(m : Matcher) : (String, String, ISet[String]) = {
+  def parseLine(m: Matcher): (String, String, ISet[String]) = {
     require(m.group(1) != null && m.group(3) != null)
     val apiSig = m.group(1)
     val rawps = m.group(2)
-    var permissions : ISet[String] = isetEmpty
+    var permissions: ISet[String] = isetEmpty
     if(rawps != null){
       permissions ++= rawps.split(" ")
     }

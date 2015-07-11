@@ -11,54 +11,52 @@ import org.sireum.jawa.JawaClass
 import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.util._
 import org.sireum.jawa.util.IgnoreException
-import org.sireum.jawa.Center
-import org.sireum.jawa.MessageCenter._
 import org.sireum.amandroid.AndroidConstants
-import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.util.MyTimer
+import org.sireum.jawa.Global
+import org.sireum.amandroid.Apk
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-class SensitiveViewCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, timer : Option[MyTimer]) extends AppInfoCollector(apkUri, outputUri, timer) {
+class SensitiveViewCollector(global: Global, apk: Apk, outputUri: FileResourceUri, timer: Option[MyTimer]) extends AppInfoCollector(global, apk, outputUri, timer) {
   
   private final val TITLE = "SensitiveViewCollector"
   
-	private var sensitiveLayoutContainers : Set[JawaClass] = Set()
-	def getSensitiveLayoutContainers = this.sensitiveLayoutContainers
-	
-	override def collectInfo : Unit = {
-	  val manifestUri = outputUri + "/AndroidManifest.xml"
-    val mfp = AppInfoCollector.analyzeManifest(manifestUri)
-	  this.appPackageName = mfp.getPackageName
-		this.componentInfos ++= mfp.getComponentInfos
-		this.uses_permissions ++= mfp.getPermissions
-		this.intentFdb.merge(mfp.getIntentDB)
-		
-	  val afp = AppInfoCollector.analyzeARSC(apkUri)
-		val lfp = AppInfoCollector.analyzeLayouts(apkUri, mfp)
-		this.layoutControls ++= lfp.getUserControls
-		if(!this.layoutControls.exists(p => p._2.isSensitive)) throw new IgnoreException
-		
-		val ra = AppInfoCollector.reachabilityAnalysis(mfp, timer)
-		this.sensitiveLayoutContainers = ra.getSensitiveLayoutContainer(layoutControls.toMap)
-		val callbacks = AppInfoCollector.analyzeCallback(afp, lfp, ra)
-		this.callbackMethods ++= callbacks
-		var components = isetEmpty[JawaClass]
+  private var sensitiveLayoutContainers: Set[JawaClass] = Set()
+  def getSensitiveLayoutContainers = this.sensitiveLayoutContainers
+
+  override def collectInfo: Unit = {
+    val manifestUri = outputUri + "/AndroidManifest.xml"
+    val mfp = AppInfoCollector.analyzeManifest(global.reporter, manifestUri)
+    this.appPackageName = mfp.getPackageName
+    this.componentInfos ++= mfp.getComponentInfos
+    this.uses_permissions ++= mfp.getPermissions
+    this.intentFdb.merge(mfp.getIntentDB)
+
+    val afp = AppInfoCollector.analyzeARSC(global.reporter, apkUri)
+    val lfp = AppInfoCollector.analyzeLayouts(global, apkUri, mfp)
+    this.layoutControls ++= lfp.getUserControls
+    if(!this.layoutControls.exists(p => p._2.isSensitive)) throw new IgnoreException
+
+    val ra = AppInfoCollector.reachabilityAnalysis(global, mfp, timer)
+    this.sensitiveLayoutContainers = ra.getSensitiveLayoutContainer(layoutControls.toMap)
+    val callbacks = AppInfoCollector.analyzeCallback(global.reporter, afp, lfp, ra)
+    this.callbackMethods ++= callbacks
+    var components = isetEmpty[JawaClass]
     mfp.getComponentInfos.foreach{
       f => 
-        val record = Center.resolveClass(f.name, Center.ResolveLevel.HIERARCHY)
+        val record = global.getClassOrResolve(f.compType)
         if(!record.isUnknown && record.isApplicationClass){
-	        components += record
-	        val clCounter = generateEnvironment(record, if(f.exported)AndroidConstants.MAINCOMP_ENV else AndroidConstants.COMP_ENV, codeLineCounter)
-	        codeLineCounter = clCounter
+          components += record
+          val clCounter = generateEnvironment(record, if(f.exported)AndroidConstants.MAINCOMP_ENV else AndroidConstants.COMP_ENV, codeLineCounter)
+          codeLineCounter = clCounter
         }
     }
-		
-		AppCenter.setComponents(components)
-		AppCenter.updateIntentFilterDB(this.intentFdb)
-		AppCenter.setAppInfo(this)
-		msg_normal(TITLE, "Entry point calculation done.")
-	}
+
+    apk.setComponents(components)
+    apk.updateIntentFilterDB(this.intentFdb)
+    apk.setAppInfo(this)
+  }
 }

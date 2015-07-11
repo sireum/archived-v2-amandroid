@@ -7,11 +7,9 @@ http://www.eclipse.org/legal/epl-v10.html
 */
 package org.sireum.amandroid.alir.dataRecorder
 
-import org.sireum.amandroid.AppCenter
 import org.sireum.util._
 import org.sireum.amandroid.parser.IntentFilter
 import org.sireum.jawa.alir.taintAnalysis.TaintAnalysisResult
-import org.sireum.jawa.Center
 import org.stringtemplate.v4.STGroupFile
 import java.util.ArrayList
 import org.sireum.jawa.alir.controlFlowGraph.ICFGCallNode
@@ -24,6 +22,9 @@ import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentC
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.amandroid.AndroidConstants
+import org.sireum.amandroid.Apk
+import org.sireum.jawa.Global
+import org.sireum.jawa.Signature
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -120,13 +121,13 @@ object DataCollector {
     }
   }
   
-  final case class IccInfo(procs : ISet[String],
+  final case class IccInfo(procs : ISet[Signature],
       										 context : Context,
       										 intents : ISet[Intent]){
     override def toString : String = {
       val iccInfo = template.getInstanceOf("IccInfo")
       val procStrings = new ArrayList[String]
-      procs.foreach(procStrings.add(_))
+      procs.foreach{proc => procStrings.add(proc.signature)}
       iccInfo.add("procs", procStrings)
       iccInfo.add("context", context)
       val intentStrings = new ArrayList[String]
@@ -305,25 +306,25 @@ object DataCollector {
     }
   }
   
-	def collect = {
-	  val appInfo = AppCenter.getAppInfo
+	def collect(global: Global, apk: Apk) = {
+	  val appInfo = apk.getAppInfo
 	  val appName = appInfo.getAppName
 	  val uses_permissions = appInfo.getUsesPermissions
 	  val compInfos = appInfo.getComponentInfos
-	  val intentFDB = AppCenter.getIntentFilterDB
+	  val intentFDB = apk.getIntentFilterDB
 	  val compDatas = compInfos.map{
 	    comp =>
-	      val compName = comp.name
-	      val compRec = Center.getClass(compName)
+	      val compTyp = comp.compType
+	      val compRec = global.getClassOrResolve(compTyp)
 	      val typ = comp.typ
 	      val exported = comp.exported
 	      val protectPermission = comp.permission
-	      val intentFilters = intentFDB.getIntentFilters(compName)
+	      val intentFilters = intentFDB.getIntentFilters(compTyp)
 	      var iccInfos = isetEmpty[IccInfo]
 	      var taintResult : Option[TaintAnalysisResult] = None
 	      if(!compRec.isUnknown){
-	        if(AppCenter.hasIDFG(compRec)){
-			      val InterProceduralDataFlowGraph(icfg, ptaresult) = AppCenter.getIDFG(compRec)
+	        if(apk.hasIDFG(compRec)){
+			      val InterProceduralDataFlowGraph(icfg, ptaresult) = apk.getIDFG(compRec)
 			      val iccNodes = icfg.nodes.filter{
 			        	node =>
 			        	  node.isInstanceOf[ICFGCallNode] && node.asInstanceOf[ICFGCallNode].getCalleeSet.exists(c => InterComponentCommunicationModel.isIccOperation(c.callee))
@@ -331,8 +332,8 @@ object DataCollector {
 			      iccInfos =
 				      iccNodes.map{
 				        iccNode =>
-                  val iccMethod = Center.getMethodWithoutFailing(iccNode.getOwner)
-						      val args = iccMethod.getMethodBody.location(iccNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
+                  val iccMethod = global.getMethod(iccNode.getOwner).get
+						      val args = iccMethod.getBody.location(iccNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
 			              case te : TupleExp =>
 			                te.exps.map{
 						            exp =>
@@ -343,23 +344,23 @@ object DataCollector {
 						          }.toList
 			              case a => throw new RuntimeException("wrong exp type: " + a)
 			            }
-								  val intentSlot = VarSlot(args(1))
-								  val intentValues = ptaresult.pointsToSet(intentSlot, iccNode.context)
-								  val intentcontents = IntentHelper.getIntentContents(ptaresult, intentValues, iccNode.getContext)
+								  val intentSlot = VarSlot(args(1), false)
+                  val intentValues = ptaresult.pointsToSet(intentSlot, iccNode.context)
+                  val intentcontents = IntentHelper.getIntentContents(ptaresult, intentValues, iccNode.getContext)
                   val compType = AndroidConstants.getIccCallType(iccNode.getCalleeSet.head.callee.getSubSignature)
-								  val comMap = IntentHelper.mappingIntents(intentcontents, compType)
-								  val intents = intentcontents.map(ic=>Intent(ic.componentNames, ic.actions, ic.categories, ic.datas, ic.types, ic.preciseExplicit, ic.preciseImplicit, comMap(ic).map(c=>(c._1.getName, c._2.toString()))))
-								  IccInfo(iccNode.getCalleeSet.map(_.callee.getSignature), iccNode.getContext, intents)
-				      }.toSet
-			      taintResult = if(AppCenter.hasTaintAnalysisResult(compRec)) Some(AppCenter.getTaintAnalysisResult(compRec)) else None
-		      }
-	      }
-	      ComponentData(compName, typ, exported, protectPermission, intentFilters, iccInfos, taintResult)
-	  }
-	  val drcompDatas = AppCenter.getDynamicRegisteredReceivers.map{
-	      case comp =>
-	        DynamicRegisteredComponentData(comp.getName, "receiver", None, intentFDB.getIntentFilters(comp))
-	    }.toSet
-	  AppData(appName, uses_permissions.toSet, compDatas.toSet, drcompDatas)
-	}
+                  val comMap = IntentHelper.mappingIntents(global, apk, intentcontents, compType)
+                  val intents = intentcontents.map(ic=>Intent(ic.componentNames, ic.actions, ic.categories, ic.datas, ic.types, ic.preciseExplicit, ic.preciseImplicit, comMap(ic).map(c=>(c._1.getName, c._2.toString()))))
+                  IccInfo(iccNode.getCalleeSet.map(_.callee.getSignature), iccNode.getContext, intents)
+              }.toSet
+              taintResult = if(apk.hasTaintAnalysisResult(compRec)) Some(apk.getTaintAnalysisResult(compRec)) else None
+          }
+      }
+      ComponentData(compTyp.jawaName, typ, exported, protectPermission, intentFilters, iccInfos, taintResult)
+    }
+    val drcompDatas = apk.getDynamicRegisteredReceivers.map{
+      case comp =>
+        DynamicRegisteredComponentData(comp.getName, "receiver", None, intentFDB.getIntentFilters(comp))
+    }.toSet
+    AppData(appName, uses_permissions.toSet, compDatas.toSet, drcompDatas)
+  }
 }

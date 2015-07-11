@@ -17,12 +17,13 @@ import java.io.IOException
 import javax.xml.parsers.ParserConfigurationException
 import org.xml.sax.SAXException
 import brut.androlib.res.decoder.AXmlResourceParser
+import org.sireum.jawa.ObjectType
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-final case class ComponentInfo(name: String, typ: String, exported: Boolean, enabled: Boolean, permission: Option[String])
+final case class ComponentInfo(compType: ObjectType, typ: String, exported: Boolean, enabled: Boolean, permission: Option[String])
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -30,53 +31,52 @@ final case class ComponentInfo(name: String, typ: String, exported: Boolean, ena
  */ 
 class ManifestParser{
   private val componentInfos: MSet[ComponentInfo] = msetEmpty
-	private val components: MMap[String, String] = mmapEmpty
-	private var packageName = ""
-	private val permissions: MSet[String] = msetEmpty
-	private val intentFdb: IntentFilterDataBase = new IntentFilterDataBase
-	private var currentComponent: String = null
-	private var applicationPermission: String = null
-	private val componentPermission: MMap[String, String] = mmapEmpty
-	private val componentExported: MMap[String, String] = mmapEmpty
-  private val componentEnabled: MMap[String, String] = mmapEmpty
-	private var currentIntentFilter: IntentFilter = null
-	
-	private var minSdkVersion = 0
-	private var targetSdkVersion = 0
-	private var maxSdkVersion = 0
-	
-	private def buildIntentDB(intentFilter: IntentFilter) = {
-	  intentFdb.updateIntentFmap(intentFilter)
-	}
-	/**
-	 * Opens the given apk file and provides the given handler with a stream for
-	 * accessing the contained android manifest file
-	 * @param apk The apk file to process
-	 * @param handler The handler for processing the apk file
-	 * 
-	 * adapted from Steven Arzt
-	 * 
-	 */
-	
-	def toPilarClass(str: String): String = str
+  private val components: MMap[ObjectType, String] = mmapEmpty
+  private var packageName = ""
+  private val permissions: MSet[String] = msetEmpty
+  private val intentFdb: IntentFilterDataBase = new IntentFilterDataBase
+  private var currentComponent: ObjectType = null
+  private var applicationPermission: String = null
+  private val componentPermission: MMap[ObjectType, String] = mmapEmpty
+  private val componentExported: MMap[ObjectType, String] = mmapEmpty
+  private val componentEnabled: MMap[ObjectType, String] = mmapEmpty
+  private var currentIntentFilter: IntentFilter = null
+
+  private var minSdkVersion = 0
+  private var targetSdkVersion = 0
+  private var maxSdkVersion = 0
+
+  private def buildIntentDB(intentFilter: IntentFilter) = {
+    intentFdb.updateIntentFmap(intentFilter)
+  }
+  /**
+   * Opens the given apk file and provides the given handler with a stream for
+   * accessing the contained android manifest file
+   * @param apk The apk file to process
+   * @param handler The handler for processing the apk file
+   * 
+   * adapted from Steven Arzt
+   * 
+   */
+  def toPilarClass(str: String): ObjectType = new ObjectType(str)
   
-	def loadClassesFromTextManifest(manifestIS: InputStream) = {
-		try {
-			val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-			val doc = db.parse(manifestIS)
-			var applicationEnabled = true
-			val rootElement = doc.getDocumentElement()
-			this.packageName = rootElement.getAttribute("package")
-			
+  def loadClassesFromTextManifest(manifestIS: InputStream) = {
+    try {
+      val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+      val doc = db.parse(manifestIS)
+      var applicationEnabled = true
+      val rootElement = doc.getDocumentElement()
+      this.packageName = rootElement.getAttribute("package")
+  
       val permissions = rootElement.getElementsByTagName("uses-permission")
       for (i <- 0 to permissions.getLength() - 1) {
         val permission = permissions.item(i).asInstanceOf[Element]
         this.permissions += permission.getAttribute("android:name")
       }
       
-			val appsElement = rootElement.getElementsByTagName("application")
-			for (appIdx <- 0 to appsElement.getLength() - 1) {
-				val appElement: Element = appsElement.item(appIdx).asInstanceOf[Element]
+      val appsElement = rootElement.getElementsByTagName("application")
+      for (appIdx <- 0 to appsElement.getLength() - 1) {
+        val appElement: Element = appsElement.item(appIdx).asInstanceOf[Element]
         // Check whether the application is disabled
         val enabled = appElement.getAttribute("android:enabled")
         applicationEnabled = (enabled.isEmpty() || !enabled.equals("false"))
@@ -84,67 +84,64 @@ class ManifestParser{
         if(!appperm.isEmpty())
           this.applicationPermission = appperm
         if(applicationEnabled){
-  				val activities = appElement.getElementsByTagName("activity")
-  				val receivers = appElement.getElementsByTagName("receiver")
-  				val services  = appElement.getElementsByTagName("service")
+          val activities = appElement.getElementsByTagName("activity")
+          val receivers = appElement.getElementsByTagName("receiver")
+          val services  = appElement.getElementsByTagName("service")
           val providers = appElement.getElementsByTagName("provider")
-  				
-  				for (i <- 0 to activities.getLength() - 1) {
-  					val activity = activities.item(i).asInstanceOf[Element]
-  					loadManifestEntry(activity, "activity", this.packageName)
-  				}
-  				for (i <- 0 to receivers.getLength() - 1) {
-  					val receiver = receivers.item(i).asInstanceOf[Element]
-  					loadManifestEntry(receiver, "receiver", this.packageName)
-  				}
-  				for (i <- 0 to services.getLength() - 1) {
-  					val service = services.item(i).asInstanceOf[Element]
-  					loadManifestEntry(service, "service", this.packageName)
-  				}
+      
+          for (i <- 0 to activities.getLength() - 1) {
+            val activity = activities.item(i).asInstanceOf[Element]
+            loadManifestEntry(activity, "activity", this.packageName)
+          }
+          for (i <- 0 to receivers.getLength() - 1) {
+            val receiver = receivers.item(i).asInstanceOf[Element]
+            loadManifestEntry(receiver, "receiver", this.packageName)
+          }
+          for (i <- 0 to services.getLength() - 1) {
+            val service = services.item(i).asInstanceOf[Element]
+            loadManifestEntry(service, "service", this.packageName)
+          }
           for (i <- 0 to providers.getLength() - 1) {
             val provider = providers.item(i).asInstanceOf[Element]
             loadManifestEntry(provider, "provider", this.packageName)
           }
         }
-				
-			}
+      }
       this.components.foreach{
-        case (name, typ) =>
-          val exported = this.componentExported.get(name) match {
+        case (compType, typ) =>
+          val exported = this.componentExported.get(compType) match {
             case Some(tag) => 
               tag match{
                 case "false" => false
                 case _ => true
               }
             case None =>
-              {
-                /**
-                 * from: http://developer.android.com/guide/topics/manifest/provider-element.html
-                 * For activity, receiver and service:
-                 * The default value depends on whether the activity contains intent filters.
-                 * The absence of any filters means that the activity can be invoked only by
-                 * specifying its exact class name. This implies that the activity is intended
-                 * only for application-internal use (since others would not know the class name).
-                 * So in this case, the default value is "false". On the other hand, the presence
-                 * of at least one filter implies that the activity is intended for external use,
-                 * so the default value is "true".
-                 */
-                if(typ == "activity" || typ == "receiver" || typ == "service"){
-                  !this.intentFdb.getIntentFilters(name).isEmpty
-                } 
-                /**
-                 * from: http://developer.android.com/guide/topics/manifest/provider-element.html
-                 * For provider:
-                 * The default value is "true" for applications that set either android:minSdkVersion
-                 * or android:targetSdkVersion to "16" or lower. For applications that set either of
-                 * these attributes to "17" or higher, the default is "false".
-                 */
-                else if(typ == "provider") {
-                  this.minSdkVersion <= 16 || this.targetSdkVersion <= 16
-                } else throw new RuntimeException("Wrong component type: " + typ)
-              }
+              /**
+               * from: http://developer.android.com/guide/topics/manifest/provider-element.html
+               * For activity, receiver and service:
+               * The default value depends on whether the activity contains intent filters.
+               * The absence of any filters means that the activity can be invoked only by
+               * specifying its exact class name. This implies that the activity is intended
+               * only for application-internal use (since others would not know the class name).
+               * So in this case, the default value is "false". On the other hand, the presence
+               * of at least one filter implies that the activity is intended for external use,
+               * so the default value is "true".
+               */
+              if(typ == "activity" || typ == "receiver" || typ == "service"){
+                !this.intentFdb.getIntentFilters(compType).isEmpty
+              } 
+              /**
+               * from: http://developer.android.com/guide/topics/manifest/provider-element.html
+               * For provider:
+               * The default value is "true" for applications that set either android:minSdkVersion
+               * or android:targetSdkVersion to "16" or lower. For applications that set either of
+               * these attributes to "17" or higher, the default is "false".
+               */
+              else if(typ == "provider") {
+                this.minSdkVersion <= 16 || this.targetSdkVersion <= 16
+              } else throw new RuntimeException("Wrong component type: " + typ)
           }
-          val enabled = this.componentEnabled.get(name) match {
+          val enabled = this.componentEnabled.get(compType) match {
             case Some(tag) => 
               tag match{
                 case "false" => false
@@ -153,26 +150,26 @@ class ManifestParser{
             case None =>
               true
           }
-          val permission = this.componentPermission.getOrElse(name, this.applicationPermission)
+          val permission = this.componentPermission.getOrElse(compType, this.applicationPermission)
           val compermission = if(permission != null && !permission.isEmpty()) Some(permission) else None
-          this.componentInfos += ComponentInfo(name, typ, exported, enabled, compermission)
+          this.componentInfos += ComponentInfo(compType, typ, exported, enabled, compermission)
       }
-		}
-		catch {
-		  case ex: IOException =>
-				System.err.println("Could not parse manifest: " + ex.getMessage())
-				ex.printStackTrace()
-		  case ex: ParserConfigurationException =>
-				System.err.println("Could not parse manifest: " + ex.getMessage())
-				ex.printStackTrace()
-		  case ex: SAXException =>
-				System.err.println("Could not parse manifest: " + ex.getMessage())
-				ex.printStackTrace()
-		}
-	}
-	
-	private def loadManifestEntry(comp: Element, baseClass: String, packageName: String) = {
-		val className = comp.getAttribute("android:name")		
+    } catch {
+      case ex: IOException =>
+        System.err.println("Could not parse manifest: " + ex.getMessage())
+        ex.printStackTrace()
+      case ex: ParserConfigurationException =>
+        System.err.println("Could not parse manifest: " + ex.getMessage())
+        ex.printStackTrace()
+      case ex: SAXException =>
+        System.err.println("Could not parse manifest: " + ex.getMessage())
+        ex.printStackTrace()
+    }
+  }
+
+  private def loadManifestEntry(comp: Element, baseClass: String, packageName: String) = {
+    val className = comp.getAttribute("android:name")
+    val classType = new ObjectType(className)
     if (className.startsWith(".")){
       this.currentComponent = toPilarClass(this.packageName + className)
       this.components += (this.currentComponent -> baseClass)
@@ -191,15 +188,15 @@ class ManifestParser{
     }
     val permission = comp.getAttribute("android:permission")
     if (!permission.isEmpty()){
-      this.componentPermission += (className -> permission)
+      this.componentPermission += (classType -> permission)
     }
     val exported = comp.getAttribute("android:exported")
     if(!exported.isEmpty()){
-      this.componentExported += (className -> exported)
+      this.componentExported += (classType -> exported)
     }
     val enabled = comp.getAttribute("android:enabled")
     if(!enabled.isEmpty()){
-      this.componentEnabled += (className -> enabled)
+      this.componentEnabled += (classType -> enabled)
     }
     val intentfs = comp.getElementsByTagName("intent-filter")
     for (i <- 0 to intentfs.getLength() - 1) {
@@ -244,15 +241,15 @@ class ManifestParser{
     }
     
     
-	}
+  }
 
-	def getComponentClasses: ISet[String] = this.components.map(_._1).toSet
-	
-	def getComponentInfos: ISet[ComponentInfo] = this.componentInfos.toSet
-	
-	def getPermissions: ISet[String] = this.permissions.toSet
+  def getComponentClasses: ISet[ObjectType] = this.components.map(_._1).toSet
 
-	def getPackageName = this.packageName
-	
-	def getIntentDB = this.intentFdb
+  def getComponentInfos: ISet[ComponentInfo] = this.componentInfos.toSet
+
+  def getPermissions: ISet[String] = this.permissions.toSet
+
+  def getPackageName = this.packageName
+
+  def getIntentDB = this.intentFdb
 }

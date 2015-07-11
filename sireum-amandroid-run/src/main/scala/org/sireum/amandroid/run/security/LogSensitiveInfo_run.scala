@@ -8,11 +8,9 @@ http://www.eclipse.org/legal/epl-v10.html
 package org.sireum.amandroid.run.security
 
 import org.sireum.amandroid.security._
-import org.sireum.jawa.MessageCenter._
 import org.sireum.util.FileUtil
 import org.sireum.amandroid.security.apiMisuse.InterestingApiCollector
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
-import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.security.apiMisuse.LogSensitiveInfo
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.util.IgnoreException
@@ -21,7 +19,9 @@ import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.util.MyTimer
 import org.sireum.jawa.util.MyTimeoutException
-import org.sireum.jawa.GlobalConfig
+import org.sireum.jawa.Global
+import org.sireum.jawa.DefaultReporter
+import org.sireum.amandroid.Apk
 
 /**
  * 
@@ -37,7 +37,7 @@ object LogSensitiveInfo_run {
     override def toString : String = "total: " + total + ", oversize: " + oversize + ", haveResult: " + haveresult
   }
   
-  private class LogSensitiveInfoListener extends AmandroidSocketListener {
+  private class LogSensitiveInfoListener(global: Global) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
       LogSensitiveInfoCounter.total += 1
     }
@@ -53,7 +53,7 @@ object LogSensitiveInfo_run {
     }
 
     def onPostAnalysis: Unit = {
-      msg_critical(TITLE, LogSensitiveInfoCounter.toString)
+      global.reporter.echo(TITLE, LogSensitiveInfoCounter.toString)
     }
     
     def onException(e : Exception) : Unit = {
@@ -71,10 +71,7 @@ object LogSensitiveInfo_run {
       return
     }
     
-    val socket = new AmandroidSocket
-    socket.preProcess
-    
-    GlobalConfig.ICFG_CONTEXT_K = 1
+//    GlobalConfig.ICFG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = true;
 
@@ -85,38 +82,42 @@ object LogSensitiveInfo_run {
     
     files.foreach{
       file =>
+        val reporter = new DefaultReporter
+        val global = new Global(file, reporter)
+        val apk = new Apk(file)
+        val socket = new AmandroidSocket(global, apk)
         try{
-          msg_critical(TITLE, LogSensitiveInfoTask(outputPath, file, socket, Some(500)).run)   
+          reporter.echo(TITLE, LogSensitiveInfoTask(global, apk, outputPath, file, socket, Some(500)).run)   
         } catch {
-          case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
+          case te : MyTimeoutException => reporter.error(TITLE, te.message)
           case e : Throwable => e.printStackTrace()
         } finally{
-          msg_critical(TITLE, LogSensitiveInfoCounter.toString)
+          reporter.echo(TITLE, LogSensitiveInfoCounter.toString)
           socket.cleanEnv
         }
     }
   }
   
-  private case class LogSensitiveInfoTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]){
+  private case class LogSensitiveInfoTask(global: Global, apk: Apk, outputPath : String, file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]){
     def run : String = {
-      msg_critical(TITLE, "####" + file + "#####")
+      global.reporter.echo(TITLE, "####" + file + "#####")
       val timer = timeout match {
         case Some(t) => Some(new MyTimer(t))
         case None => None
       }
       if(timer.isDefined) timer.get.start
-      val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-      val app_info = new InterestingApiCollector(file, outUri, timer)
+      val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary)
+      val app_info = new InterestingApiCollector(global, apk, outUri, timer)
       app_info.collectInfo
-      socket.plugListener(new LogSensitiveInfoListener)
-      val ssm = new DefaultAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+      socket.plugListener(new LogSensitiveInfoListener(global))
+      val ssm = new DefaultAndroidSourceAndSinkManager(global, apk, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
       // socket.runWithoutDDA(false, true)
       socket.runWithDDA(ssm, false, true, timer)
        
-      val idfgs = AppCenter.getIDFGs
+      val idfgs = apk.getIDFGs
       idfgs.foreach{
         case (rec, idfg) =>
-          LogSensitiveInfo(idfg)
+          LogSensitiveInfo(global, idfg)
       }
       return "Done!"
     }

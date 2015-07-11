@@ -8,7 +8,6 @@ http://www.eclipse.org/legal/epl-v10.html
 package org.sireum.amandroid.alir.dataRecorder
 
 import org.sireum.amandroid.appInfo.AppInfoCollector
-import org.sireum.jawa.Center
 import org.sireum.util._
 import org.sireum.jawa.JawaClass
 import org.sireum.amandroid.security.AndroidProblemCategories
