@@ -133,13 +133,13 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
         rhs match{
           case ne: NewExp =>
             var recName: ResourceUri = ""
-              var dimensions = 0
-              ne.typeSpec match {
-                case nt: NamedTypeSpec => 
-                  dimensions = ne.dims.size + ne.typeFragments.size
-                  recName = nt.name.name
-                case _ =>
-              }
+            var dimensions = 0
+            ne.typeSpec match {
+              case nt: NamedTypeSpec => 
+                dimensions = ne.dims.size + ne.typeFragments.size
+                recName = nt.name.name
+              case _ =>
+            }
             val typ = ObjectType(recName, dimensions)
             checkClass(typ, s, currentNode)
           case ne: NameExp =>
@@ -401,7 +401,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
             val slot = VarSlot(exp.asInstanceOf[NameExp].name.name, false)
             var value = ptaresult.pointsToSet(slot, callerContext)
             calleeFacts ++= value.map{r => RFAFact(slot, r)}
-          calleeFacts ++= ReachingFactsAnalysisHelper.getRelatedHeapFacts(value, s)
+            calleeFacts ++= ReachingFactsAnalysisHelper.getRelatedHeapFacts(value, s)
           }
           calleeFacts
         case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
@@ -428,12 +428,12 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
               if(typ != "static" && i == 0){
                 value = 
                   value.filter{
-                  r =>
+                    r =>
                       !r.isNull && !r.isInstanceOf[UnknownInstance] && shouldPass(r, callee, typ)
                   }
               } 
               calleeFacts ++= value.map{r => RFAFact(slot, r)}
-          calleeFacts ++= ReachingFactsAnalysisHelper.getRelatedHeapFacts(value, s)
+              calleeFacts ++= ReachingFactsAnalysisHelper.getRelatedHeapFacts(value, s)
             }
           }
           calleeFacts

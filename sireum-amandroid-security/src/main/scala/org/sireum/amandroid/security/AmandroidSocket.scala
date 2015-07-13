@@ -27,13 +27,13 @@ import org.sireum.amandroid.alir.taintAnalysis.AndroidSourceAndSinkManager
 import org.sireum.jawa.JawaMethod
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.alir.Context
-import org.sireum.amandroid.decompile.AmDecoder
 import org.sireum.jawa.util.MyTimer
 import org.sireum.jawa.ScopeManager
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAScopeManager
 import org.sireum.jawa.Global
 import org.sireum.jawa.Constants
 import org.sireum.amandroid.Apk
+import org.siruem.amandroid.decompile.ApkDecompiler
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -71,8 +71,10 @@ class AmandroidSocket(global: Global, apk: Apk) {
   }
   
   def loadApk(output_path: String, lib_sum: LibraryAPISummary): FileResourceUri = {
-    val resultDir = new File(output_path + "/APKs/")
-    val out = AmDecoder.decode(apk.nameUri, FileUtil.toUri(resultDir))
+    val apkFile = FileUtil.toFile(apk.nameUri)
+    val name = apkFile.getName.substring(0, apkFile.getName().lastIndexOf("."))
+    val resultDir = new File(output_path + "/" + name)
+    val (out, _) = ApkDecompiler.decompile(apkFile, resultDir, true)
 // convert the dex file to the "pilar" form
     val file = (apk.nameUri, out + "/classes")
     if(FileUtil.toFile(apk.nameUri).exists()) {

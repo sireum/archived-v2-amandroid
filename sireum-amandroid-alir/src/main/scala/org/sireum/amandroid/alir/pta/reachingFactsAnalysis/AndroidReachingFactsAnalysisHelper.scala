@@ -21,20 +21,20 @@ import org.sireum.jawa.Global
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
 object AndroidReachingFactsAnalysisHelper {
-	
-	def isModelCall(calleeMethod : JawaMethod) : Boolean = {
+
+  def isModelCall(calleeMethod: JawaMethod): Boolean = {
     AndroidModelCallHandler.isModelCall(calleeMethod)
   }
   
-  def doModelCall(s : PTAResult, calleeMethod : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context, apk: Apk) : (ISet[RFAFact], ISet[RFAFact]) = {
+  def doModelCall(s: PTAResult, calleeMethod: JawaMethod, args: List[String], retVars: Seq[String], currentContext: Context, apk: Apk): (ISet[RFAFact], ISet[RFAFact]) = {
     AndroidModelCallHandler.doModelCall(s, calleeMethod, args, retVars, currentContext, Some(apk))
   }
   
-  def isICCCall(calleeMethod : JawaMethod) : Boolean = {
+  def isICCCall(calleeMethod: JawaMethod): Boolean = {
     AndroidModelCallHandler.isICCCall(calleeMethod)
   }
   
-  def doICCCall(apk: Apk, s : PTAResult, calleeMethod : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[JawaMethod]) = {
+  def doICCCall(apk: Apk, s: PTAResult, calleeMethod: JawaMethod, args: List[String], retVars: Seq[String], currentContext: Context): (ISet[RFAFact], ISet[JawaMethod]) = {
     AndroidModelCallHandler.doICCCall(apk: Apk, s, calleeMethod, args, retVars, currentContext)
   }
 }

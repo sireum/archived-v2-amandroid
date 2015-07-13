@@ -26,20 +26,20 @@ object AndroidRFAConfig {
    * generates and returns the initial facts corresponding to the "Intent" parameter of a dummyMain 
    * the generated fact says that the param Intent is generated at the Center.
    */
-	def getInitialFactsForMainEnvironment(dm : JawaMethod) : ISet[RFAFact] = {
-	  require(dm.getName == AndroidConstants.MAINCOMP_ENV || dm.getName == AndroidConstants.COMP_ENV)
-	  var result = isetEmpty[RFAFact]
-	  val intentSlot = VarSlot(dm.getParamName(0), false)
-	  val context : Context = new Context(1) // FIXME resolve hard coded k context
-	  context.setContext(dm.getSignature, "L0000")
-	  val intentValue = PTAInstance(ObjectType(AndroidConstants.INTENT, 0), context.copy, false)
-	  result += RFAFact(intentSlot, intentValue)
-//	  val mActionSlot = FieldSlot(intentValue, AndroidConstants.INTENT_ACTION)
-//	  val mActionValue = RFAConcreteStringInstance(AndroidConstants.ACTION_MAIN, context.copy)
-//	  result += RFAFact(mActionSlot, mActionValue)
-//	  val mCategoriesSlot = FieldSlot(intentValue, AndroidConstants.INTENT_CATEGORIES)
-//	  val mCategoriesValue = RFAConcreteStringInstance(AndroidConstants.CATEGORY_LAUNCHER, context.copy)
-//	  result += RFAFact(mCategoriesSlot, mCategoriesValue)
-	  result
-	}
+  def getInitialFactsForMainEnvironment(dm : JawaMethod) : ISet[RFAFact] = {
+    require(dm.getName == AndroidConstants.MAINCOMP_ENV || dm.getName == AndroidConstants.COMP_ENV)
+    var result = isetEmpty[RFAFact]
+    val intentSlot = VarSlot(dm.getParamName(0), false)
+    val context : Context = new Context(1) // FIXME resolve hard coded k context
+    context.setContext(dm.getSignature, "L0000")
+    val intentValue = PTAInstance(ObjectType(AndroidConstants.INTENT, 0), context.copy, false)
+    result += RFAFact(intentSlot, intentValue)
+//  val mActionSlot = FieldSlot(intentValue, AndroidConstants.INTENT_ACTION)
+//  val mActionValue = RFAConcreteStringInstance(AndroidConstants.ACTION_MAIN, context.copy)
+//  result += RFAFact(mActionSlot, mActionValue)
+//  val mCategoriesSlot = FieldSlot(intentValue, AndroidConstants.INTENT_CATEGORIES)
+//  val mCategoriesValue = RFAConcreteStringInstance(AndroidConstants.CATEGORY_LAUNCHER, context.copy)
+//  result += RFAFact(mCategoriesSlot, mCategoriesValue)
+    result
+  }
 }

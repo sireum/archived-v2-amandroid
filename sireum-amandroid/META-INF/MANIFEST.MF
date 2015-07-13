@@ -4,7 +4,9 @@ Bundle-Name: Sireum Amandroid
 Bundle-SymbolicName: sireum-amandroid
 Bundle-Version: 1.0
 Bundle-ClassPath: lib/apktool.jar,
- lib/axml.jar
+ lib/axml.jar,
+ lib/AXMLPrinter2.jar,
+ .
 Export-Package: android.content.res,
  android.util,
  brut.androlib,
@@ -130,4 +132,5 @@ Export-Package: android.content.res,
 Bundle-Vendor: sireum.org
 Require-Bundle: org.sireum;bundle-version="2.0.0",
  sireum-jawa;bundle-version="1.0.0",
- sireum-jawa-alir;bundle-version="1.0.0"
+ sireum-jawa-alir;bundle-version="1.0.0",
+ sireum-jawa-compiler;bundle-version="1.0.0"
