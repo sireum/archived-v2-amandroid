@@ -1,8 +1,7 @@
-package org.siruem.amandroid.decompile
+package org.sireum.amandroid.decompile
 
 import java.io.File
 import org.sireum.util._
-import org.sireum.amandroid.decompile.Dex2PilarConverter
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.sjc.util.MyFileUtil
 import org.sireum.jawa.sjc.refactoring.RefactorJawa
@@ -11,7 +10,6 @@ import org.sireum.amandroid.parser.ManifestParser
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.io.FgSourceFile
 import org.sireum.jawa.io.PlainFile
-import org.sireum.amandroid.decompile.AmDecoder
 
 object ApkDecompiler {
   def decompile(apk: File, projectLocation: File, removeSupportGen: Boolean): (FileResourceUri, ISet[String]) = {

@@ -33,7 +33,7 @@ import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAScopeManage
 import org.sireum.jawa.Global
 import org.sireum.jawa.Constants
 import org.sireum.amandroid.Apk
-import org.siruem.amandroid.decompile.ApkDecompiler
+import org.sireum.amandroid.decompile.ApkDecompiler
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -76,11 +76,10 @@ class AmandroidSocket(global: Global, apk: Apk) {
     val resultDir = new File(output_path + "/" + name)
     val (out, _) = ApkDecompiler.decompile(apkFile, resultDir, true)
 // convert the dex file to the "pilar" form
-    val file = (apk.nameUri, out + "/classes")
-    if(FileUtil.toFile(apk.nameUri).exists()) {
-      val pilarRootUri = Dex2PilarConverter.convert(file._1, file._2)
+    val fileUri = out + "/src"
+    if(FileUtil.toFile(fileUri).exists()) {
       //store the app's pilar code in AmandroidCodeSource which is organized record by record.
-      global.load(pilarRootUri, Constants.PILAR_FILE_EXT, lib_sum)
+      global.load(fileUri, Constants.PILAR_FILE_EXT, lib_sum)
     }
     out
   }
