@@ -494,7 +494,7 @@ static char* pilarExtName(const char* str)
 #define  outIgetChar(x, y, z, t)      	fprintf(pFp,"v%d:= v%d.%s  @kind char @type ^%s;",x, y, z, toPilar(t))
 #define  outIgetShort(x, y, z, t)     	fprintf(pFp,"v%d:= v%d.%s  @kind short @type ^%s;", x, y, z, toPilar(t))
         
-#define  outIgetQuick(x, y, z, t)       fprintf(pFp,"v%d:= v%d.%s  @kind ing @type ^%s;", x, y, z, toPilar(t))
+#define  outIgetQuick(x, y, z, t)       fprintf(pFp,"v%d:= v%d.%s  @kind int @type ^%s;", x, y, z, toPilar(t))
 #define  outIgetWideQuick(x, y, z, t)   fprintf(pFp,"v%d:= v%d.%s  @kind long @type ^%s;", x, y, z, toPilar(t))
 #define  outIgetObjectQuick(x, y, z, t) fprintf(pFp,"v%d:= v%d.%s  @kind object @type ^%s;",x, y, z, toPilar(t))
 		
