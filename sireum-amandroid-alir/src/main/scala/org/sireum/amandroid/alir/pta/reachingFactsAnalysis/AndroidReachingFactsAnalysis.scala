@@ -149,12 +149,12 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
               checkClass(recTyp, s, currentNode)
             }
           case ce: CallExp =>
-            val typ = a.getValueAnnotation("type") match {
+            val typ = a.getValueAnnotation("kind") match {
               case Some(s) => s match {
                 case ne: NameExp => ne.name.name
                 case _ => ""
               }
-              case None => throw new RuntimeException("cannot found annotation 'type' from: " + a)
+              case None => throw new RuntimeException("cannot found annotation 'kind' from: " + a)
             }
             val signature = ASTUtil.getSignature(a).get
             val recTyp = signature.getClassType
@@ -329,9 +329,9 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
       calleeSet.foreach{
         callee =>
           val calleep = callee.callee
+          println(calleep)
           if(AndroidReachingFactsAnalysisHelper.isICCCall(calleep) || AndroidReachingFactsAnalysisHelper.isModelCall(calleep)){
             pureNormalFlag = false
-            
             if(AndroidReachingFactsAnalysisHelper.isICCCall(calleep)) {
               if(AndroidReachingFactsAnalysisConfig.resolve_icc){
                 val factsForCallee = getFactsForICCTarget(s, cj, calleep, callerContext)
@@ -410,12 +410,12 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
     
     private def getFactsForCallee(s: ISet[RFAFact], cj: CallJump, callee: JawaMethod, callerContext: Context): ISet[RFAFact] = {
       var calleeFacts = isetEmpty[RFAFact]
-      val typ = cj.getValueAnnotation("type") match {
+      val typ = cj.getValueAnnotation("kind") match {
           case Some(s) => s match {
             case ne: NameExp => ne.name.name
             case _ => ""
           }
-          case None => throw new RuntimeException("cannot found annotation 'type' from: " + cj)
+          case None => throw new RuntimeException("cannot found annotation 'kind' from: " + cj)
         }
       calleeFacts ++= ReachingFactsAnalysisHelper.getGlobalFacts(s)
       cj.callExp.arg match{

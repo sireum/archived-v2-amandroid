@@ -261,7 +261,7 @@ class AndroidEnvironmentGenerator(global: Global) extends MethodGenerator(global
     val va = generateInstanceCreation(r.getType, codefg)
     localVarsForClasses += (r.getType -> va)
     generateClassConstructor(r, constructionStack, codefg)
-    createFieldSetStmt(localVarsForClasses(clazz.getType), "android.content.ContextWrapper.mBase", va, List("object"), codefg)
+    createFieldSetStmt(localVarsForClasses(clazz.getType), "android.content.ContextWrapper.mBase", va, List("object"), "android.content.Context", codefg)
   
   
     // 1. onCreate:
@@ -327,7 +327,7 @@ class AndroidEnvironmentGenerator(global: Global) extends MethodGenerator(global
     val va = generateInstanceCreation(r.getType, codefg)
     localVarsForClasses += (r.getType -> va)
     generateClassConstructor(r, constructionStack, codefg)
-    createFieldSetStmt(localVarsForClasses(clazz.getType), "android.view.ContextThemeWrapper.mBase", va, List("object"), codefg)
+    createFieldSetStmt(localVarsForClasses(clazz.getType), "android.view.ContextThemeWrapper.mBase", va, List("object"), "android.content.Context", codefg)
     
     generateMethodCall(AndroidEntryPointConstants.ACTIVITY_SETINTENT_SIG, "virtual", localVarsForClasses(clazz.getType), constructionStack, codefg)
   

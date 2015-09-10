@@ -76,7 +76,6 @@ class LayoutFileParser(global: Global) {
   private def isViewClass(theClass: JawaClass): Boolean = {
     if (theClass == null)
       return false
-
     // To make sure that nothing all wonky is going on here, we
     // check the hierarchy to find the android view class
     global.getClassHierarchy.getAllSuperClassesOf(theClass).foreach{
@@ -134,7 +133,7 @@ class LayoutFileParser(global: Global) {
       } else if (tempName.equals("layout") && typ == AxmlVisitor.TYPE_REFERENCE) {
         includes.getOrElseUpdate(layoutFile, msetEmpty) += obj.asInstanceOf[Int]
       } else {
-        global.reporter.echo(TITLE, "Found unrecognized XML attribute:  " + tempName)
+//        global.reporter.echo(TITLE, "Found unrecognized XML attribute:  " + tempName)
       }
     }
   

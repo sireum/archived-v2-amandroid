@@ -132,7 +132,7 @@ object DataLeakage_run {
       }
       if(timer.isDefined) timer.get.start
       val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary)
-      val app_info = new AppInfoCollector(global, apk, outUri, timer)
+      val app_info = new AppInfoCollector(global, apk, outUri, None)
       app_info.collectInfo
       val ssm = new DataLeakageAndroidSourceAndSinkManager(global, apk, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
       socket.plugListener(new DataLeakageListener(global, apk, outputPath))
