@@ -43,6 +43,7 @@ import org.sireum.jawa.util.ASTUtil
 import org.sireum.jawa.alir.dataFlowAnalysis.PstProvider
 import org.sireum.jawa.Signature
 import org.sireum.pilar.symbol.ProcedureSymbolTable
+import org.sireum.jawa.FieldFQN
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -71,9 +72,10 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
     val icfg = new InterproceduralControlFlowGraph[ICFGNode]
     this.icfg = icfg
     icfg.collectCfgToBaseGraph(entryPointProc, initContext, true)
-    val iota: ISet[RFAFact] = initialFacts + RFAFact(VarSlot("@@RFAiota", false), UnknownInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, initContext.copy))
+    val iota: ISet[RFAFact] = initialFacts + RFAFact(StaticFieldSlot(FieldFQN(ObjectType("Analysis", 0), "RFAiota", JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE)), UnknownInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, initContext.copy))
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](icfg,
       true, true, false, AndroidReachingFactsAnalysisConfig.parallel, gen, kill, callr, ppr, iota, initial, timer, switchAsOrderedMatch, Some(nl))
+//    icfg.toDot(new PrintWriter(System.out))
     InterProceduralDataFlowGraph(icfg, ptaresult)
   }
   
@@ -194,7 +196,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
             case ce: CastExp => result = true
             case _ =>
           }
-          a.getValueAnnotation("type") match {
+          a.getValueAnnotation("kind") match {
             case Some(e) => 
               e match{
                 case ne: NameExp => result = (ne.name.name == "object")
@@ -325,19 +327,18 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
           }.toList
         case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
       }
-      
       calleeSet.foreach{
         callee =>
           val calleep = callee.callee
-          println(calleep)
           if(AndroidReachingFactsAnalysisHelper.isICCCall(calleep) || AndroidReachingFactsAnalysisHelper.isModelCall(calleep)){
             pureNormalFlag = false
             if(AndroidReachingFactsAnalysisHelper.isICCCall(calleep)) {
               if(AndroidReachingFactsAnalysisConfig.resolve_icc){
                 val factsForCallee = getFactsForICCTarget(s, cj, calleep, callerContext)
-                returnFacts --= factsForCallee
+                returnFacts --= factsForCallee -- ReachingFactsAnalysisHelper.getGlobalFacts(s) // don't remove global facts for ICC call
                 val (retFacts, targets) = AndroidReachingFactsAnalysisHelper.doICCCall(apk, ptaresult, calleep, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)
                 tmpReturnFacts ++= retFacts
+                
                 targets.foreach{
                   target =>
                     if(!icfg.isProcessed(target.getSignature, callerContext)){
@@ -388,12 +389,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
     
     private def getFactsForICCTarget(s: ISet[RFAFact], cj: CallJump, callee: JawaMethod, callerContext: Context): ISet[RFAFact] = {
       var calleeFacts = isetEmpty[RFAFact]
-      s.foreach{case RFAFact(slot, v) => 
-        if(slot.isInstanceOf[StaticFieldSlot]){
-          calleeFacts += RFAFact(slot, v)
-          calleeFacts ++= ReachingFactsAnalysisHelper.getRelatedHeapFacts(isetEmpty[Instance] + v, s)
-        }
-      }
+      calleeFacts ++= ReachingFactsAnalysisHelper.getGlobalFacts(s)
       cj.callExp.arg match{
         case te: TupleExp => 
           val exp = te.exps(1) //assume intent always the first arg
@@ -417,6 +413,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
           }
           case None => throw new RuntimeException("cannot found annotation 'kind' from: " + cj)
         }
+      
       calleeFacts ++= ReachingFactsAnalysisHelper.getGlobalFacts(s)
       cj.callExp.arg match{
         case te: TupleExp => 
@@ -509,7 +506,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
     }
     
     def mapFactsToICCTarget(factsToCallee: ISet[RFAFact], cj: CallJump, calleeMethod: ProcedureDecl): ISet[RFAFact] = {
-      val varFacts = factsToCallee.filter(f=>f.s.isInstanceOf[StaticFieldSlot]).map{f=>RFAFact(f.s.asInstanceOf[VarSlot], f.v)}
+      val varFacts = factsToCallee.filter(f=>f.s.isInstanceOf[VarSlot]).map{f=>RFAFact(f.s.asInstanceOf[VarSlot], f.v)}
       cj.callExp.arg match{
         case te: TupleExp =>
           val argSlot = te.exps(1) match{
