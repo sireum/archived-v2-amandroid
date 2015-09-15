@@ -26,6 +26,7 @@ import org.sireum.amandroid.Apk
 import org.sireum.amandroid.security.AmandroidSocketListener
 import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.jawa.PrintReporter
+import org.sireum.jawa.MsgLevel
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -103,29 +104,29 @@ object DataLeakage_run {
     
     files.foreach{
       file =>
-        val reporter = new PrintReporter
+        val reporter = new PrintReporter(MsgLevel.ERROR)
         val global = new Global(file, reporter)
-        global.setJavaLib("/Users/fgwei/Library/Android/sdk/platforms/android-21/android.jar")
+        global.setJavaLib("/Users/fgwei/Library/Android/sdk/platforms/android-21/android.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v4/android-support-v4.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v13/android-support-v13.jar")
         val apk = new Apk(file)
         val socket = new AmandroidSocket(global, apk)
         
-//        if(file.contains("FieldSensitivity1"))
+        if(file.contains("Loop1.apk"))
         try {
           reporter.echo(TITLE, DataLeakageTask(global, apk, outputPath, file, socket, Some(1000)).run)   
         } catch {
           case te: MyTimeoutException => reporter.error(TITLE, te.message)
           case e: Throwable => e.printStackTrace()
         } finally {
-          reporter.echo(TITLE, DataLeakageCounter.toString)
+          println(TITLE + " " + DataLeakageCounter.toString)
           socket.cleanEnv
-          reporter.echo(TITLE, "************************************\n")
+          println(TITLE + " ************************************\n")
         }
     }
   }
   
   private case class DataLeakageTask(global: Global, apk: Apk, outputPath: String, file: FileResourceUri, socket: AmandroidSocket, timeout: Option[Int]) {
     def run: String = {
-      global.reporter.echo(TITLE, "####" + file + "#####")
+      println(TITLE + " ####" + file + "#####")
       val timer = timeout match {
         case Some(t) => Some(new MyTimer(t))
         case None => None

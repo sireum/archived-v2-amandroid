@@ -211,7 +211,7 @@ class LayoutFileParser(global: Global) {
           global.reporter.echo(TITLE, "Found " + userControls.size + " layout controls in file " + fileName)
         } catch {
           case ex: Exception =>
-            global.reporter.error(TITLE, "Could not read binary XML file: " + ex.getMessage())
+            global.reporter.echo(TITLE, "Could not read binary XML file: " + ex.getMessage())
         }
       }
     })
