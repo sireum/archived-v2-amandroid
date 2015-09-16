@@ -140,8 +140,8 @@ object AndroidDataDependentTaintAnalysis {
     tar.sinkNodes = sinkNodes
     
     if(!tar.getTaintedPaths.isEmpty){
-      println(TITLE, "Found " + tar.getTaintedPaths.size + " path.")
-      println(TITLE, tar.toString)
+      System.err.println(TITLE, "Found " + tar.getTaintedPaths.size + " path.")
+      System.err.println(TITLE, tar.toString)
     }
     tar
   }

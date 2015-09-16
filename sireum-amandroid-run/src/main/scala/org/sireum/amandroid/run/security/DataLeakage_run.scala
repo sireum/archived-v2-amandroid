@@ -110,7 +110,7 @@ object DataLeakage_run {
         val apk = new Apk(file)
         val socket = new AmandroidSocket(global, apk)
         
-        if(file.contains("Loop1.apk"))
+//        if(file.contains("AnonymousClass1"))
         try {
           reporter.echo(TITLE, DataLeakageTask(global, apk, outputPath, file, socket, Some(1000)).run)   
         } catch {

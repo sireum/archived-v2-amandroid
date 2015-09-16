@@ -132,7 +132,7 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[ObjectType], 
     while(!worklist.isEmpty){
       worklist.foreach{
         case (item, comp) =>
-        collectCallbackMethodsInAppSource(item, comp)
+          collectCallbackMethodsInAppSource(item, comp)
       }
       processed ++= worklist
       worklist.clear
@@ -294,30 +294,33 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[ObjectType], 
     points.foreach{
       p =>
         p match {
-          case pi: PointI =>
-            val sig = pi.sig
-            val params = sig.getParameterTypes
-            params.foreach{
-              param =>
-                val typ = param.typ
-                if(this.androidCallbacks.contains(typ)){
-                  val typRecOpt = global.tryLoadClass(param.asInstanceOf[ObjectType])
-                  typRecOpt match{
-                    case Some(typRec) =>
-                      val hier = global.getClassHierarchy
-                      if(typRec.isInterface){
-                        val impls = hier.getAllImplementersOf(typRec)
-                        if(!impls.isEmpty){
-                          callbackClasses ++= impls.map{
-                            impl =>
-                              hier.getAllSubClassesOfIncluding(impl)
-                          }.reduce(iunion[JawaClass]) 
-                        }
-                      } else {
-                        callbackClasses ++= hier.getAllSubClassesOfIncluding(typRec)
+          case pc: PointCall =>
+            pc.rhs match {
+              case pi: Point with Invoke =>
+                val sig = pi.sig
+                val params = sig.getParameterTypes
+                params.foreach{
+                  param =>
+                    val typ = param.typ
+                    if(this.androidCallbacks.contains(typ)){
+                      val typRecOpt = global.tryLoadClass(param.asInstanceOf[ObjectType])
+                      typRecOpt match{
+                        case Some(typRec) =>
+                          val hier = global.getClassHierarchy
+                          if(typRec.isInterface){
+                            val impls = hier.getAllImplementersOf(typRec)
+                            if(!impls.isEmpty){
+                              callbackClasses ++= impls.map{
+                                impl =>
+                                  hier.getAllSubClassesOfIncluding(impl)
+                              }.reduce(iunion[JawaClass]) 
+                            }
+                          } else {
+                            callbackClasses ++= hier.getAllSubClassesOfIncluding(typRec)
+                          }
+                        case None =>
                       }
-                    case None =>
-                  }
+                    }
                 }
             }
           case _ =>
@@ -341,7 +344,6 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[ObjectType], 
   }
 
   private def analyzeClassInterfaceCallbacks(baseClass: JawaClass, clazz: JawaClass, lifecycleElement: JawaClass):Unit = { 
-    
     // We cannot create instances of abstract classes anyway, so there is no
     // reason to look for interface implementations
     if (!baseClass.isConcrete)

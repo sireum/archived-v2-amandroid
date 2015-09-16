@@ -415,7 +415,7 @@ static char* pilarExtName(const char* str)
  #define  outCheckCast(x, y, z)    fprintf(pFp,"v%d:= (%s)v%d  @kind object;", x, toPilar(y), z)
  #define  outInstanceOf(x, y, z)   fprintf(pFp,"v%d:= v%d instanceof %s;", x, y, toPilar(z))
 // #define  outArrayLen(x, y)        fprintf(pFp,"v%d:= v%d.length;", x, y)
- #define  outArrayLen(x, y)        fprintf(pFp,"v%d:= v%d.length @kind int;", x, y)
+ #define  outArrayLen(x, y)        fprintf(pFp,"v%d:= v%d.length @kind int @type ^`int`;", x, y)
  #define  outNewIns(x, y)          fprintf(pFp,"v%d:= new %s;", x, toPilar(y))
  #define  outNewArray(x, y)        fprintf(pFp,"v%d:= new %s;", x, toPilarS(y))
 
