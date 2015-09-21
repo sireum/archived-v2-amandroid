@@ -76,7 +76,7 @@ class PasswordSourceAndSinkManager(
               }.toList
             case a => throw new RuntimeException("wrong exp type: " + a)
           }
-          val intentSlot = VarSlot(args(1), false)
+          val intentSlot = VarSlot(args(1), false, true)
           val intentValues = ptaresult.pointsToSet(intentSlot, invNode.getContext)
           val intentContents = IntentHelper.getIntentContents(ptaresult, intentValues, invNode.getContext)
           val compType = AndroidConstants.getIccCallType(callee.callee.getSubSignature)

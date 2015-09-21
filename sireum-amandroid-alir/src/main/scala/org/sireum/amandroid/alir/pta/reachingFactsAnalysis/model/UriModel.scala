@@ -92,12 +92,12 @@ object UriModel {
    */
   private def uriParse(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >0)
-	  val strSlot = VarSlot(args(0), false)
+	  val strSlot = VarSlot(args(0), false, true)
 	  val strValue = s.pointsToSet(strSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
     val stringUriIns = PTAInstance(ObjectType(AndroidConstants.URI_STRING_URI, 0), currentContext, false)
-    newfacts += RFAFact(VarSlot(retVar, false), stringUriIns)
+    newfacts += RFAFact(VarSlot(retVar, false, false), stringUriIns)
     strValue.map{
       sv =>
         sv match{

@@ -229,7 +229,7 @@ object AndroidDataDependentTaintAnalysis {
     val calleeSet = callArgNode.getCalleeSet
     calleeSet.foreach{
       callee =>
-        val argSlot = VarSlot(callArgNode.argName, false)
+        val argSlot = VarSlot(callArgNode.argName, false, true)
         val argValue = ptaresult.pointsToSet(argSlot, callArgNode.getContext)
         val argRelatedValue = ptaresult.getRelatedHeapInstances(argValue, callArgNode.getContext)
         argRelatedValue.foreach{

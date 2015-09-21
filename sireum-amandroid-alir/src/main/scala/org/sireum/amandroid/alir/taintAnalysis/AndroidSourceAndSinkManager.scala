@@ -178,7 +178,7 @@ class DefaultAndroidSourceAndSinkManager(
               }.toList
             case a => throw new RuntimeException("wrong exp type: " + a)
           }
-          val intentSlot = VarSlot(args(1), false)
+          val intentSlot = VarSlot(args(1), false, true)
           val intentValues = s.pointsToSet(intentSlot, invNode.getContext)
           val intentContents = IntentHelper.getIntentContents(s, intentValues, invNode.getContext)
           val compType = AndroidConstants.getIccCallType(callee.callee.getSubSignature)

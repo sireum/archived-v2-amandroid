@@ -86,7 +86,7 @@ object CryptographicMisuse {
           case _ =>
         }
         require(argNames.isDefinedAt(0))
-        val argSlot = VarSlot(argNames(0), false)
+        val argSlot = VarSlot(argNames(0), false, true)
         val argValue = ptaresult.pointsToSet(argSlot, node.context)
         argValue.foreach{
           ins =>

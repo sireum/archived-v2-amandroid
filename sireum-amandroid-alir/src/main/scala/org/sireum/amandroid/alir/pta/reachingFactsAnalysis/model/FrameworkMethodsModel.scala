@@ -89,11 +89,11 @@ object FrameworkMethodsModel {
   private def registerReceiver(global: Global, apk: Apk, s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
     val result = msetEmpty[RFAFact]
     require(args.size > 2)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
-    val receiverSlot = VarSlot(args(1), false)
+    val receiverSlot = VarSlot(args(1), false, true)
     val receiverValue = s.pointsToSet(receiverSlot, currentContext)
-    val filterSlot = VarSlot(args(2), false)
+    val filterSlot = VarSlot(args(2), false, true)
     val filterValue = s.pointsToSet(filterSlot, currentContext)
     val iDB = new IntentFilterDataBase
     receiverValue.foreach {
@@ -144,7 +144,7 @@ object FrameworkMethodsModel {
 	private def getSystemService(global: Global, s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
 	  var result = isetEmpty[RFAFact]
     require(args.size >1)
-    val paramSlot = VarSlot(args(1), false)
+    val paramSlot = VarSlot(args(1), false, true)
 	  val paramValue = s.pointsToSet(paramSlot, currentContext)
 	  paramValue.foreach{
 	    str =>

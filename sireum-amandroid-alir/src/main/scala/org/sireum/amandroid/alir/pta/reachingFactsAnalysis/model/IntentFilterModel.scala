@@ -102,9 +102,9 @@ object IntentFilterModel {
 	 */
 	private def intentFilterInitWithAction(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
 	  val thisValue = s.pointsToSet(thisSlot, currentContext)
-	  val actionSlot = VarSlot(args(1), false)
+	  val actionSlot = VarSlot(args(1), false, true)
 	  val actionValue = s.pointsToSet(actionSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]

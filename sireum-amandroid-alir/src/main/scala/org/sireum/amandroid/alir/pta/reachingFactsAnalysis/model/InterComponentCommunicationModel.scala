@@ -43,7 +43,7 @@ object InterComponentCommunicationModel {
 
   def doIccCall(apk: Apk, s : PTAResult, calleeMethod : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[JawaMethod]) = {
     require(args.size > 1)
-    val intentSlot = VarSlot(args(1), false)
+    val intentSlot = VarSlot(args(1), false, true)
     val intentValues = s.pointsToSet(intentSlot, currentContext)
     val intentcontents = IntentHelper.getIntentContents(s, intentValues, currentContext)
     val compType: AndroidConstants.CompType.Value = AndroidConstants.getIccCallType(calleeMethod.getSubSignature)

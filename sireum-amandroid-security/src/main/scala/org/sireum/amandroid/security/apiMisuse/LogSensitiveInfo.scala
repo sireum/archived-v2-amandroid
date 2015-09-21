@@ -110,7 +110,7 @@ object LogSensitiveInfo {
           case _ =>
         }
         require(argNames.isDefinedAt(0))
-        val argSlot = VarSlot(argNames(0), false)
+        val argSlot = VarSlot(argNames(0), false, true)
         /*val argValue = rfaFacts.filter(p=>argSlot == p.s).map(_.v)
         argValue.foreach{
           ins =>

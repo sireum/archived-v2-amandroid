@@ -440,9 +440,9 @@ object IntentModel {
    */
   private def intentInitWithIntent(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
-    val paramSlot = VarSlot(args(1), false)
+    val paramSlot = VarSlot(args(1), false, true)
     val paramValue = s.pointsToSet(paramSlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
@@ -504,9 +504,9 @@ object IntentModel {
    */
   private def intentInitWithAction(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
-    val actionSlot = VarSlot(args(1), false)
+    val actionSlot = VarSlot(args(1), false, true)
     val actionValue = s.pointsToSet(actionSlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
@@ -532,11 +532,11 @@ object IntentModel {
    */
   private def intentInitWithActionAndData(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
-    val actionSlot = VarSlot(args(1), false)
+    val actionSlot = VarSlot(args(1), false, true)
     val actionValue = s.pointsToSet(actionSlot, currentContext)
-    val dataSlot = VarSlot(args(2), false)
+    val dataSlot = VarSlot(args(2), false, true)
     val dataValue = s.pointsToSet(dataSlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
@@ -570,13 +570,13 @@ object IntentModel {
    */
   private def intentInitWithActionDataAndComponent(global: Global, s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >4)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
-    val actionSlot = VarSlot(args(1), false)
+    val actionSlot = VarSlot(args(1), false, true)
     val actionValue = s.pointsToSet(actionSlot, currentContext)
-    val dataSlot = VarSlot(args(2), false)
+    val dataSlot = VarSlot(args(2), false, true)
     val dataValue = s.pointsToSet(dataSlot, currentContext)
-    val classSlot = VarSlot(args(4), false)
+    val classSlot = VarSlot(args(4), false, true)
     val classValue = s.pointsToSet(classSlot, currentContext)
   
     val clazzNames = 
@@ -648,9 +648,9 @@ object IntentModel {
    */
   private def intentInitWithCC(global: Global, s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
-    val param2Slot = VarSlot(args(2), false)
+    val param2Slot = VarSlot(args(2), false, true)
     val param2Value = s.pointsToSet(param2Slot, currentContext)
     val clazzNames = 
       param2Value.map{
@@ -701,9 +701,9 @@ object IntentModel {
    */
   private def intentAddCategory(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
-    val categorySlot = VarSlot(args(1), false)
+    val categorySlot = VarSlot(args(1), false, true)
     val categoryValue = s.pointsToSet(categorySlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
@@ -731,7 +731,7 @@ object IntentModel {
                 }
             }
         }
-        newfacts += RFAFact(VarSlot(retVar, false), tv)
+        newfacts += RFAFact(VarSlot(retVar, false, false), tv)
     } 
     (newfacts, delfacts)
   }
@@ -741,13 +741,13 @@ object IntentModel {
    */
   private def intentClone(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >0)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
     thisValue.foreach{
       tv =>
-        newfacts += RFAFact(VarSlot(retVar, false), tv.clone(currentContext))
+        newfacts += RFAFact(VarSlot(retVar, false, false), tv.clone(currentContext))
     }
     (newfacts, delfacts)
   }
@@ -758,9 +758,9 @@ object IntentModel {
    */
   private def intentSetAction(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
-    val actionSlot = VarSlot(args(1), false)
+    val actionSlot = VarSlot(args(1), false, true)
     val actionValue = s.pointsToSet(actionSlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
@@ -780,7 +780,7 @@ object IntentModel {
                 }
             }
         }
-        newfacts += RFAFact(VarSlot(retVar, false), tv)
+        newfacts += RFAFact(VarSlot(retVar, false, false), tv)
     }
     (newfacts, delfacts)
   }
@@ -791,9 +791,9 @@ object IntentModel {
    */
   private def intentSetClass(global: Global, s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue =s.pointsToSet(thisSlot, currentContext)
-    val param2Slot = VarSlot(args(2), false)
+    val param2Slot = VarSlot(args(2), false, true)
     val param2Value = s.pointsToSet(param2Slot, currentContext)
     val clazzNames = 
       param2Value.map{
@@ -811,7 +811,7 @@ object IntentModel {
       tv =>
         val mComponentSlot = FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_COMPONENT))
         newfacts += RFAFact(mComponentSlot, componentNameIns)
-        newfacts += RFAFact(VarSlot(retVar, false), tv)
+        newfacts += RFAFact(VarSlot(retVar, false, false), tv)
     }
     clazzNames.foreach{
       sIns =>
@@ -846,9 +846,9 @@ object IntentModel {
    */
   private def intentSetClassName(global: Global, s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
-    val clazzSlot = VarSlot(args(2), false)
+    val clazzSlot = VarSlot(args(2), false, true)
     val clazzValue = s.pointsToSet(clazzSlot, currentContext)
     val componentNameIns = PTAInstance(ObjectType(AndroidConstants.COMPONENTNAME, 0), currentContext, false)
     var newfacts = isetEmpty[RFAFact]
@@ -857,7 +857,7 @@ object IntentModel {
       tv =>
         val mComponentSlot = FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_COMPONENT))
         newfacts += RFAFact(mComponentSlot, componentNameIns)
-        newfacts += RFAFact(VarSlot(retVar, false), tv)
+        newfacts += RFAFact(VarSlot(retVar, false, false), tv)
     }
     clazzValue.map{
       name =>
@@ -892,9 +892,9 @@ object IntentModel {
    */
   private def intentSetComponent(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
-    val componentSlot = VarSlot(args(1), false)
+    val componentSlot = VarSlot(args(1), false, true)
     val componentValue = s.pointsToSet(componentSlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
@@ -907,7 +907,7 @@ object IntentModel {
                 newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_COMPONENT)), component)
             }
         }
-        newfacts += RFAFact(VarSlot(retVar, false), tv)
+        newfacts += RFAFact(VarSlot(retVar, false, false), tv)
     }
     (newfacts, delfacts)
   }
@@ -917,9 +917,9 @@ object IntentModel {
    */
   private def intentSetData(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
-    val dataSlot = VarSlot(args(1), false)
+    val dataSlot = VarSlot(args(1), false, true)
     val dataValue = s.pointsToSet(dataSlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
@@ -932,7 +932,7 @@ object IntentModel {
                 newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_URI_DATA)), data)
             }
         }
-        newfacts += RFAFact(VarSlot(retVar, false), tv)
+        newfacts += RFAFact(VarSlot(retVar, false, false), tv)
     }
     (newfacts, delfacts)
   }
@@ -942,11 +942,11 @@ object IntentModel {
    */
   private def intentSetDataAndType(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
-    val dataSlot = VarSlot(args(1), false)
+    val dataSlot = VarSlot(args(1), false, true)
     val dataValue = s.pointsToSet(dataSlot, currentContext)
-    val typeSlot = VarSlot(args(2), false)
+    val typeSlot = VarSlot(args(2), false, true)
     val typeValue = s.pointsToSet(typeSlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
@@ -966,7 +966,7 @@ object IntentModel {
                 newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_MTYPE)), typ)
             }
         }
-        newfacts += RFAFact(VarSlot(retVar, false), tv)
+        newfacts += RFAFact(VarSlot(retVar, false, false), tv)
     }
     (newfacts, delfacts)
   }
@@ -976,9 +976,9 @@ object IntentModel {
    */
   private def intentSetType(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
-    val typeSlot = VarSlot(args(1), false)
+    val typeSlot = VarSlot(args(1), false, true)
     val typeValue = s.pointsToSet(typeSlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
@@ -991,7 +991,7 @@ object IntentModel {
                 newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_MTYPE)), typ)
             }
         }
-        newfacts += RFAFact(VarSlot(retVar, false), tv)
+        newfacts += RFAFact(VarSlot(retVar, false, false), tv)
     }
     (newfacts, delfacts)
   }
@@ -1001,9 +1001,9 @@ object IntentModel {
    */
   private def intentSetPackage(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
-    val packageSlot = VarSlot(args(1), false)
+    val packageSlot = VarSlot(args(1), false, true)
     val packageValue = s.pointsToSet(packageSlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
@@ -1023,7 +1023,7 @@ object IntentModel {
               }
           }
       }
-      newfacts += RFAFact(VarSlot(retVar, false), tv)
+      newfacts += RFAFact(VarSlot(retVar, false, false), tv)
     }
     (newfacts, delfacts)
   }
@@ -1033,13 +1033,13 @@ object IntentModel {
    */
   private def intentSetFlags(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
     thisValue.foreach{
       tv =>
-        newfacts += RFAFact(VarSlot(retVar, false), tv)
+        newfacts += RFAFact(VarSlot(retVar, false, false), tv)
     }
     (newfacts, delfacts)
   }
@@ -1049,11 +1049,11 @@ object IntentModel {
    */
   private def intentPutExtra(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
-    val keySlot = VarSlot(args(1), false)
+    val keySlot = VarSlot(args(1), false, true)
     val keyValue = s.pointsToSet(keySlot, currentContext)
-    val valueSlot = VarSlot(args(2), false)
+    val valueSlot = VarSlot(args(2), false, true)
     val valueValue = s.pointsToSet(valueSlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
@@ -1080,7 +1080,7 @@ object IntentModel {
             }
             newfacts ++= entries.map(e => RFAFact(FieldSlot(mev, "entries"), e))
         }
-        newfacts += RFAFact(VarSlot(retVar, false), tv)
+        newfacts += RFAFact(VarSlot(retVar, false, false), tv)
     }
     (newfacts, delfacts)
   }
@@ -1090,7 +1090,7 @@ object IntentModel {
    */
   private def intentGetExtras(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >0)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
@@ -1099,9 +1099,9 @@ object IntentModel {
         val mExtraSlot = FieldSlot(ins, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_EXTRAS))
         val mExtraValue = s.pointsToSet(mExtraSlot, currentContext)
         if(!mExtraValue.isEmpty){
-          newfacts ++= mExtraValue.map{mev => RFAFact(VarSlot(retVar, false), mev)}
+          newfacts ++= mExtraValue.map{mev => RFAFact(VarSlot(retVar, false, false), mev)}
         } else {
-          newfacts += (RFAFact(VarSlot(retVar, false), UnknownInstance(JavaKnowledge.getTypeFromName(AndroidConstants.BUNDLE).asInstanceOf[ObjectType], currentContext)))
+          newfacts += (RFAFact(VarSlot(retVar, false, false), UnknownInstance(JavaKnowledge.getTypeFromName(AndroidConstants.BUNDLE).asInstanceOf[ObjectType], currentContext)))
         }
     }
     (newfacts, delfacts)
@@ -1112,9 +1112,9 @@ object IntentModel {
    */
   private def intentGetExtra(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
-    val keySlot = VarSlot(args(1), false)
+    val keySlot = VarSlot(args(1), false, true)
     val keyValue = s.pointsToSet(keySlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
@@ -1132,17 +1132,17 @@ object IntentModel {
           v =>
             require(v.isInstanceOf[PTATupleInstance])
             if(keys.contains(v.asInstanceOf[PTATupleInstance].left.asInstanceOf[PTAConcreteStringInstance].string)){
-              newfacts += (RFAFact(VarSlot(retVar, false), v.asInstanceOf[PTATupleInstance].right))
+              newfacts += (RFAFact(VarSlot(retVar, false, false), v.asInstanceOf[PTATupleInstance].right))
             }
         }
       } else if(!entValue.isEmpty) {
         entValue.foreach{
           v =>
             require(v.isInstanceOf[PTATupleInstance])
-            newfacts += (RFAFact(VarSlot(retVar, false), v.asInstanceOf[PTATupleInstance].right))
+            newfacts += (RFAFact(VarSlot(retVar, false, false), v.asInstanceOf[PTATupleInstance].right))
         }
       } else {
-        newfacts += (RFAFact(VarSlot(retVar, false), UnknownInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, currentContext)))
+        newfacts += (RFAFact(VarSlot(retVar, false, false), UnknownInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, currentContext)))
       }
     }
     (newfacts, delfacts)
@@ -1153,11 +1153,11 @@ object IntentModel {
    */
   private def intentGetExtraWithDefault(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
-    val keySlot = VarSlot(args(1), false)
+    val keySlot = VarSlot(args(1), false, true)
     val keyValue = s.pointsToSet(keySlot, currentContext)
-    val defaultSlot = VarSlot(args(2), false)
+    val defaultSlot = VarSlot(args(2), false, true)
     val defaultValue = s.pointsToSet(defaultSlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
@@ -1175,21 +1175,21 @@ object IntentModel {
           v =>
             require(v.isInstanceOf[PTATupleInstance])
             if(keys.contains(v.asInstanceOf[PTATupleInstance].left.asInstanceOf[PTAConcreteStringInstance].string)){
-              newfacts += (RFAFact(VarSlot(retVar, false), v.asInstanceOf[PTATupleInstance].right))
+              newfacts += (RFAFact(VarSlot(retVar, false, false), v.asInstanceOf[PTATupleInstance].right))
             }
         }
       } else if(!entValue.isEmpty) {
         entValue.foreach{
           v =>
             require(v.isInstanceOf[PTATupleInstance])
-            newfacts += (RFAFact(VarSlot(retVar, false), v.asInstanceOf[PTATupleInstance].right))
+            newfacts += (RFAFact(VarSlot(retVar, false, false), v.asInstanceOf[PTATupleInstance].right))
         }
       } else {
-        newfacts += (RFAFact(VarSlot(retVar, false), UnknownInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, currentContext)))
+        newfacts += (RFAFact(VarSlot(retVar, false, false), UnknownInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, currentContext)))
       }
     }
     if(newfacts.isEmpty){
-      newfacts ++= defaultValue.map(RFAFact(VarSlot(retVar, false), _))
+      newfacts ++= defaultValue.map(RFAFact(VarSlot(retVar, false, false), _))
     }
     (newfacts, delfacts)
   }

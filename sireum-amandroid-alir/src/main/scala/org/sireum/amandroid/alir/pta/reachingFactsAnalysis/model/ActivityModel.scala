@@ -262,9 +262,9 @@ object ActivityModel {
 	
 	private def setIntent(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
 	  val thisValue = s.pointsToSet(thisSlot, currentContext)
-	  val intentSlot = VarSlot(args(1), false)
+	  val intentSlot = VarSlot(args(1), false, true)
 	  val intentValue = s.pointsToSet(intentSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
@@ -283,7 +283,7 @@ object ActivityModel {
 	
 	private def getIntent(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >0)
-    val thisSlot = VarSlot(args(0), false)
+    val thisSlot = VarSlot(args(0), false, true)
 	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
@@ -301,7 +301,7 @@ object ActivityModel {
 //        	  if(fields.contains("ALL")) mIntentValue += UnknownInstance(new NormalType(AndroidConstants.INTENT), defsite)
 //        	  if(fields.contains(AndroidConstants.ACTIVITY_INTENT)) mIntentValue += UnknownInstance(new NormalType(AndroidConstants.INTENT), defsite)
 //      	}
-	      newfacts ++= mIntentValue.map(miv=> RFAFact(VarSlot(retVar, false), miv))
+	      newfacts ++= mIntentValue.map(miv=> RFAFact(VarSlot(retVar, false, false), miv))
 	  }
     (newfacts, delfacts)
   }

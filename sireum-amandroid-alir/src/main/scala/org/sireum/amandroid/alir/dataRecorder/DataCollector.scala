@@ -348,7 +348,7 @@ object DataCollector {
                       }.toList
                     case a => throw new RuntimeException("wrong exp type: " + a)
                   }
-                  val intentSlot = VarSlot(args(1), false)
+                  val intentSlot = VarSlot(args(1), false, true)
                   val intentValues = ptaresult.pointsToSet(intentSlot, iccNode.context)
                   val intentcontents = IntentHelper.getIntentContents(ptaresult, intentValues, iccNode.getContext)
                   val compType = AndroidConstants.getIccCallType(iccNode.getCalleeSet.head.callee.getSubSignature)
