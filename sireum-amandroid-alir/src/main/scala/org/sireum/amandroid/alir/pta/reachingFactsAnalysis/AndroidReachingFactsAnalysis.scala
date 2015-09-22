@@ -122,7 +122,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
       lhs=>
         lhs match{
           case ne: NameExp =>
-            val slot = ReachingFactsAnalysisHelper.getNameSlotFromNameExp(ne, typ, false, false)
+            val slot = ReachingFactsAnalysisHelper.getNameSlotFromNameExp(ne, typ, false, false, global)
             if(slot.isInstanceOf[StaticFieldSlot]){ 
               val recTyp = slot.asInstanceOf[StaticFieldSlot].fqn.owner
               checkClass(recTyp, s, currentNode)
@@ -145,7 +145,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
             val typ = ObjectType(recName, dimensions)
             checkClass(typ, s, currentNode)
           case ne: NameExp =>
-            val slot = ReachingFactsAnalysisHelper.getNameSlotFromNameExp(ne, typ, false, false)
+            val slot = ReachingFactsAnalysisHelper.getNameSlotFromNameExp(ne, typ, false, false, global)
             if(slot.isInstanceOf[StaticFieldSlot]){ 
               val recTyp = JavaKnowledge.getClassTypeFromFieldFQN(ne.name.name)
               checkClass(recTyp, s, currentNode)
@@ -216,9 +216,9 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
       if(isInterestingAssignment(a)) {
         val lhss = PilarAstHelper.getLHSs(a)
         val rhss = PilarAstHelper.getRHSs(a)
-        val slots = ReachingFactsAnalysisHelper.processLHSs(lhss, typ, currentNode.getContext, ptaresult)
+        val slots = ReachingFactsAnalysisHelper.processLHSs(lhss, typ, currentNode.getContext, ptaresult, global)
         checkAndLoadClasses(lhss, rhss, a, s, currentNode)
-        val values = ReachingFactsAnalysisHelper.processRHSs(rhss, typ, currentNode.getContext, ptaresult) 
+        val values = ReachingFactsAnalysisHelper.processRHSs(rhss, typ, currentNode.getContext, ptaresult, global) 
         slots.foreach {
           case(i, smap) =>
               smap.foreach{
@@ -271,10 +271,10 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
       val typ = ASTUtil.getType(a)
       var result = s
       val rhss = PilarAstHelper.getRHSs(a)
-      ReachingFactsAnalysisHelper.updatePTAResultRHSs(rhss, typ, currentNode.getContext, s, ptaresult)
+      ReachingFactsAnalysisHelper.updatePTAResultRHSs(rhss, typ, currentNode.getContext, s, ptaresult, global)
       val lhss = PilarAstHelper.getLHSs(a)
       ReachingFactsAnalysisHelper.updatePTAResultLHSs(lhss, currentNode.getContext, s, ptaresult)
-      val slotsWithMark = ReachingFactsAnalysisHelper.processLHSs(lhss, typ, currentNode.getContext, ptaresult).values.flatten.toSet
+      val slotsWithMark = ReachingFactsAnalysisHelper.processLHSs(lhss, typ, currentNode.getContext, ptaresult, global).values.flatten.toSet
       for (rdf @ RFAFact(slot, value) <- s) {
         //if it is a strong definition, we can kill the existing definition
         if (slotsWithMark.contains(slot, true)) {
@@ -286,7 +286,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
     }
 
     def apply(s: ISet[RFAFact], e: Exp, currentNode: ICFGLocNode): ISet[RFAFact] = {
-      ReachingFactsAnalysisHelper.updatePTAResultExp(e, None, currentNode.getContext, s, ptaresult) //FIXME double check the None here
+      ReachingFactsAnalysisHelper.updatePTAResultExp(e, None, currentNode.getContext, s, ptaresult, global) //FIXME double check the None here
       s
     }
     def apply(s: ISet[RFAFact], a: Action, currentNode: ICFGLocNode): ISet[RFAFact] = s
@@ -383,7 +383,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
           }
       }
       val lhss = PilarAstHelper.getLHSs(cj)
-      val slotsWithMark = ReachingFactsAnalysisHelper.processLHSs(lhss, None, callerContext, ptaresult).values.flatten.toSet
+      val slotsWithMark = ReachingFactsAnalysisHelper.processLHSs(lhss, None, callerContext, ptaresult, global).values.flatten.toSet
       for (rdf @ RFAFact(slot, value) <- s) {
         //if it is a strong definition, we can kill the existing definition
         if (slotsWithMark.contains(slot, true)) {

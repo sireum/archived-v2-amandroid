@@ -90,7 +90,7 @@ abstract class AndroidSourceAndSinkManager(
 //      msg_detail(TITLE, "source size: " + this.sources.size + " sink size: " + this.sinks.size)
   }
 
-  private def matchs(method: JawaMethod, methodpool: ISet[String]): Boolean = methodpool.contains(method.getSignature.signature)
+  private def matchs(method: JawaMethod, methodpool: ISet[String]): Boolean = methodpool.contains(method.getSignature.signature.replaceAll("\\*", ""))
 
   def isSourceMethod(method: JawaMethod) = matchs(method, this.sources.map(s=>s._1).toSet)
 
