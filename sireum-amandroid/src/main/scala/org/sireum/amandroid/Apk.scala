@@ -20,6 +20,7 @@ import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralMonotoneDataFlowAnal
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.ObjectType
 import org.sireum.jawa.io.NoPosition
+import org.sireum.jawa.JawaMethod
 
 /**
  * this is an object, which hold information of apps. e.g. components, intent-filter database, etc.
@@ -38,11 +39,25 @@ case class Apk(nameUri: FileResourceUri) {
 	
 	private val intentFdb: IntentFilterDataBase = new IntentFilterDataBase()
 	
+  private val rpcMethods: MMap[JawaClass, MSet[JawaMethod]] = mmapEmpty
+  
 	def addActivity(activity: JawaClass) = this.synchronized{this.activities += activity}
   def addService(service: JawaClass) = this.synchronized{this.services += service}
   def addReceiver(receiver: JawaClass) = this.synchronized{this.receivers += receiver}
   def addProvider(provider: JawaClass) = this.synchronized{this.providers += provider}
+  
+  def addRpcMethod(comp: JawaClass, rpc: JawaMethod) = rpcMethods.getOrElseUpdate(comp, msetEmpty) += rpc
+  def addRpcMethods(comp: JawaClass, rpcs: ISet[JawaMethod]) = rpcMethods.getOrElseUpdate(comp, msetEmpty) ++= rpcs
+  def getRpcMethods(comp: JawaClass): ISet[JawaMethod] = rpcMethods.getOrElse(comp, msetEmpty).toSet
 	
+  def getComponentType(comp: JawaClass): Option[AndroidConstants.CompType.Value] = {
+    if(activities.contains(comp)) Some(AndroidConstants.CompType.ACTIVITY)
+    else if(services.contains(comp)) Some(AndroidConstants.CompType.SERVICE)
+    else if(receivers.contains(comp)) Some(AndroidConstants.CompType.RECEIVER)
+    else if(providers.contains(comp)) Some(AndroidConstants.CompType.PROVIDER)
+    else None
+  }
+  
 	def setComponents(comps: ISet[JawaClass]) = this.synchronized{
     comps.foreach{
       case ac if ac.isChildOf(new ObjectType(AndroidConstants.ACTIVITY)) => this.addActivity(ac)

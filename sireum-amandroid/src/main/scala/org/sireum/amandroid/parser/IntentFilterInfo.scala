@@ -247,13 +247,13 @@ class Data{
     }
     if(pathPrefix != null){
 	    this.pathPrefixs += pathPrefix
-	}
-	if(pathPattern != null){
-	    this.pathPatterns += pathPattern
-	}
-	if(mimeType != null){
-	    this.mimeTypes += mimeType
-	}
+    	}
+    	if(pathPattern != null){
+    	    this.pathPatterns += pathPattern
+    	}
+    	if(mimeType != null){
+    	    this.mimeTypes += mimeType
+    	}
   }
   
   def addScheme(scheme: String) ={

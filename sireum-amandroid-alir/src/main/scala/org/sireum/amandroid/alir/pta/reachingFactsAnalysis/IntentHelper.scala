@@ -34,8 +34,8 @@ object IntentHelper {
   val DEBUG = false
   
   object IntentType extends Enumeration {
-  val EXPLICIT, IMPLICIT = Value
-}
+    val EXPLICIT, IMPLICIT = Value
+  }
   
   final case class IntentContent(
       componentNames: ISet[String], 
@@ -168,13 +168,13 @@ object IntentHelper {
         } else if(!ic.preciseImplicit) {
           compType match {
             case AndroidConstants.CompType.ACTIVITY =>
-              components ++= apk.getActivities.map((_, IntentType.IMPLICIT))
+              components ++= apk.getActivities.filter(ep => !apk.getIntentFilterDB.getIntentFilters(ep).isEmpty).map((_, IntentType.IMPLICIT))
             case AndroidConstants.CompType.SERVICE =>
-              components ++= apk.getServices.map((_, IntentType.IMPLICIT))
+              components ++= apk.getServices.filter(ep => !apk.getIntentFilterDB.getIntentFilters(ep).isEmpty).map((_, IntentType.IMPLICIT))
             case AndroidConstants.CompType.RECEIVER =>
-              components ++= apk.getReceivers.map((_, IntentType.IMPLICIT))
+              components ++= apk.getReceivers.filter(ep => !apk.getIntentFilterDB.getIntentFilters(ep).isEmpty).map((_, IntentType.IMPLICIT))
             case AndroidConstants.CompType.PROVIDER =>
-              components ++= apk.getProviders.map((_, IntentType.IMPLICIT))
+              components ++= apk.getProviders.filter(ep => !apk.getIntentFilterDB.getIntentFilters(ep).isEmpty).map((_, IntentType.IMPLICIT))
           }
         }
         ic.componentNames.foreach{
@@ -182,12 +182,12 @@ object IntentHelper {
             val targetRec = global.getClassOrResolve(new ObjectType(targetRecName))
             components += ((targetRec, IntentType.EXPLICIT))
         }
-        components ++= findComponents(global, apk, ic.actions, ic.categories, ic.datas, ic.types).map((_, IntentType.IMPLICIT))
+        components ++= findComponents(apk, ic.actions, ic.categories, ic.datas, ic.types).map((_, IntentType.IMPLICIT))
         (ic, components.toSet)
     }.toMap
   }
 
-  private def findComponents(global: Global, apk: Apk, actions: Set[String], categories: Set[String], datas: Set[UriData], mTypes:Set[String]): ISet[JawaClass] = {
+  def findComponents(apk: Apk, actions: Set[String], categories: Set[String], datas: Set[UriData], mTypes:Set[String]): ISet[JawaClass] = {
     var components: ISet[JawaClass] = isetEmpty
     if(actions.isEmpty){
       if(datas.isEmpty){

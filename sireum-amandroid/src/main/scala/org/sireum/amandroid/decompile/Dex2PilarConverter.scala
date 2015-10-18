@@ -24,29 +24,33 @@ object Dex2PilarConverter {
     if(!dex2pilarFile.exists()) throw new RuntimeException("Could not find dex2pilar from: " + AndroidGlobalConfig.android_dex2pilar_dir)
   }
   
-	val dexdumputil = Util(dex2pilarFile)
-	
-	def convert(f : FileResourceUri, out : FileResourceUri) : FileResourceUri = {
-	  if (f.endsWith("apk") || f.endsWith("dex") || f.endsWith("odex")) {
-      val input = new URI(f)
-      val output = new URI(out)
-      val args = ilist("/bin/bash", "-c",
-        dexdumputil.dexdump.getAbsolutePath() + " -d -f -h -p " + "-o " + output.getPath + " " + input.getPath() + " > /dev/null")
-      val clOutput = new Exec().run(200000, args, None, None)  // check last argument
-      if(clOutput.toString().contains("error")) throw new RuntimeException("Error on running: " + dex2pilarFile + "\n  Message: " + clOutput.toString())
-      out // check if little type mismatch
-    } else throw new RuntimeException("Given file is not a decompilable file: " + f)
-	}
+  val dexdumputil = Util(dex2pilarFile)
+
+  def convert(fs: Set[FileResourceUri], out: FileResourceUri): FileResourceUri = {
+    fs foreach {
+      f =>
+        if (f.endsWith("apk") || f.endsWith("dex") || f.endsWith("odex")) {
+          val input = new URI(f)
+          val output = new URI(out)
+          val args = ilist("/bin/bash", "-c",
+            dexdumputil.dexdump.getAbsolutePath() + " -d -f -h -p " + "-o " + output.getPath + " " + input.getPath() + " > /dev/null")
+          val clOutput = new Exec().run(200000, args, None, None)  // check last argument
+          if(clOutput.toString().contains("error")) throw new RuntimeException("Error on running: " + dex2pilarFile + "\n  Message: " + clOutput.toString())
+           // check if little type mismatch
+        } else throw new RuntimeException("Given file is not a decompilable file: " + f)
+    }
+    out
+  }
 }
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-case class Util(dexdump : File) {
+case class Util(dexdump: File) {
 
-  def copy(srcUri : FileResourceUri, destUri : FileResourceUri) {
-      def copyFile(f : File) {
+  def copy(srcUri: FileResourceUri, destUri: FileResourceUri) {
+      def copyFile(f: File) {
         try {
           val fin = new FileInputStream(f)
           val dest = new File(new File(new URI(destUri)), f.getName())
@@ -60,7 +64,7 @@ case class Util(dexdump : File) {
           fin.close
           fout.close
         } catch {
-          case e : Exception =>
+          case e: Exception =>
             e.printStackTrace()
         }
       }
@@ -77,7 +81,7 @@ case class Util(dexdump : File) {
     }
   }
 
-  def cleanDir(dirUri : FileResourceUri) {
+  def cleanDir(dirUri: FileResourceUri) {
     val dir = new File(new URI(dirUri))
 
     if (dir.exists)

@@ -277,7 +277,7 @@ object AdLibCounting {
           val apkFile = new File(new URI(file))
           
           val dexFileUri = APKFileResolver.getDexFile(file, outputUri)
-          val pilarRootUri = Dex2PilarConverter.convert(dexFileUri, outputUri)
+          val pilarRootUri = Dex2PilarConverter.convert(Set(dexFileUri), outputUri)
      
           val pilarFile = new File(new URI(pilarRootUri))
       

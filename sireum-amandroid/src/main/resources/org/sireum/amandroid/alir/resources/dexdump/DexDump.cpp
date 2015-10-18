@@ -1161,26 +1161,30 @@ static char* indexString(DexFile* pDexFile,
                 width, index);
         break;
     case kIndexTypeRef:
-        outSize = snprintf(buf, bufSize, "%s",
-             descriptorToDot(getClassDescriptor(pDexFile, index)));
+    		if (index < pDexFile->pHeader->typeIdsSize) {
+			outSize = snprintf(buf, bufSize, "%s",
+					descriptorToDot(getClassDescriptor(pDexFile, index)));
+		} else {
+			outSize = snprintf(buf, bufSize, "<type?>");
+		}
         break;
     case kIndexStringRef:
-        outSize = snprintf(buf, bufSize, "\"%s\"",
-                dexStringById(pDexFile, index));
+    		if (index < pDexFile->pHeader->stringIdsSize) {
+			outSize = snprintf(buf, bufSize, "\"%s\"",
+							   dexStringById(pDexFile, index));
+		} else {
+			outSize = snprintf(buf, bufSize, "<string?>");
+		}
         break;
     case kIndexMethodRef:
         {
-            FieldMethodInfo methInfo;
-            if (getMethodInfo(pDexFile, index, &methInfo)) {
-              {
-                outSize = snprintf(buf, bufSize, "%s", toPilar(methInfo.name));
-                free((void *) methInfo.signature);
-              }
-                    //,descriptorToDot(methInfo.classDescriptor));
-            } else {
-                outSize = snprintf(buf, bufSize, "<method?> // method@%0*x",
-                        width, index);
-            }
+        		FieldMethodInfo methInfo;
+			if (getMethodInfo(pDexFile, index, &methInfo)) {
+				outSize = snprintf(buf, bufSize, "%s", toPilar(methInfo.name));
+				free((void *) methInfo.signature);
+			} else {
+				outSize = snprintf(buf, bufSize, "<method?>");
+			}
         }
         break;
     case kIndexFieldRef:
@@ -1202,6 +1206,7 @@ static char* indexString(DexFile* pDexFile,
               case 0x6b:
               case 0x6c:
               case 0x6d:
+              case 0xeb:
                 outSize = snprintf(buf, bufSize, "`@@%s.%s` %s",                   // @@ identifies global/static variables in pilar
                     descriptorToDot(fieldInfo.classDescriptor), fieldInfo.name, descriptorToDot(fieldInfo.signature));
                 break;
@@ -1210,7 +1215,7 @@ static char* indexString(DexFile* pDexFile,
                     descriptorToDot( fieldInfo.classDescriptor), fieldInfo.name, descriptorToDot(fieldInfo.signature));
               }
             } else {
-                outSize = snprintf(buf, bufSize, "<field?> // field@%0*x",
+                outSize = snprintf(buf, bufSize, "`<field?>` Unknown",
                         width, index);
             }
         }
@@ -1286,82 +1291,62 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
             fputs("     ", stdout);
         }
     }
-
-  // ****** sankar: the above block ends *******
-
+    // ****** sankar: the above block ends *******
     if (pDecInsn->opcode == OP_NOP) {
         u2 instr = get2LE((const u1*) &insns[insnIdx]);
-
-
         if (instr == kPackedSwitchSignature) {
-
-           printf("|%04x: packed-switch-data (%d units)",   insnIdx, insnWidth); // not in pilar
-
-           // ******* sankar starts ********
-
-		     struct Op31t* temp = (struct Op31t*)list[l31t];
-		     assert(temp);
-
+            printf("|%04x: packed-switch-data (%d units)",   insnIdx, insnWidth); // not in pilar
+            // ******* sankar starts ********
+            struct Op31t* temp = (struct Op31t*)list[l31t];
+            assert(temp);
              // extra check to test if the appearance of switch  statements was in the same sequence as the appearance of the corresponding data-tables in the code later
-          
-              assert(insnIdx == (temp->insnIdx + temp->vB)); // if passes, then it is in ok sequence
-               
-		       //  printf("\n test; currInsnIdx = %04x, l31t = %d, storedInsnIdx = %04x, stored->vA= %d, and stored->vB = %04x \n", insnIdx, l31t, list[l31t].insnIdx, list[l31t].vA, list[l31t].vB);
+            assert(insnIdx == (temp->insnIdx + temp->vB)); // if passes, then it is in ok sequence
+            //  printf("\n test; currInsnIdx = %04x, l31t = %d, storedInsnIdx = %04x, stored->vA= %d, and stored->vB = %04x \n", insnIdx, l31t, list[l31t].insnIdx, list[l31t].vA, list[l31t].vB);
+            // extra check ends
 
-		      // extra check ends
-
-              fprintf(pFp, "switch v%d\n", temp->vA);
-              const u1* bytePtr = (const u1*) &insns[insnIdx+2];
-              int minValue=(bytePtr[0] & 0xFF) |((bytePtr[1] & 0xFF) << 8) |((bytePtr[2] & 0xFF) << 16) |(bytePtr[3] << 24);
-              for (i = 4; i < insnWidth; i+=2,minValue++) {
-                  const u1* bytePtr = (const u1*) &insns[insnIdx+i];
-                     fprintf(pFp, "                 | %d => goto L%06x\n", minValue,
-                    		 ((u1*)insns - pDexFile->baseAddr) +(((bytePtr[0] & 0xFF) |((bytePtr[1] & 0xFF) << 8) |((bytePtr[2] & 0xFF) << 16) |(bytePtr[3] << 24))+ temp->insnIdx)*2);
-               }
-              fprintf(pFp, "                 | else => goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(temp->insnIdx+3)*2);
-              ++l31t;
-           // ********* sankar ends *********
-
+            fprintf(pFp, "switch v%d\n", temp->vA);
+            const u1* bytePtr = (const u1*) &insns[insnIdx+2];
+            int minValue=(bytePtr[0] & 0xFF) |((bytePtr[1] & 0xFF) << 8) |((bytePtr[2] & 0xFF) << 16) |(bytePtr[3] << 24);
+            for (i = 4; i < insnWidth; i+=2,minValue++) {
+                const u1* bytePtr = (const u1*) &insns[insnIdx+i];
+                fprintf(pFp, "                 | %d => goto L%06x\n", minValue,
+                        ((u1*)insns - pDexFile->baseAddr) +(((bytePtr[0] & 0xFF) |((bytePtr[1] & 0xFF) << 8) |((bytePtr[2] & 0xFF) << 16) |(bytePtr[3] << 24))+ temp->insnIdx)*2);
+            }
+            fprintf(pFp, "                 | else => goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(temp->insnIdx+3)*2);
+            ++l31t;
+            // ********* sankar ends *********
         } else if (instr == kSparseSwitchSignature) {
-
             printf("|%04x: sparse-switch-data (%d units)",  insnIdx, insnWidth); // not in pilar
-
             // ******** sankar starts ********
-		     struct Op31t* temp = (struct Op31t*)list[l31t];
-		     assert(temp);
-
-             // extra check to test if the appearance of switch statements was in the same sequence as the appearance of the corresponding data-tables in the code later
+            struct Op31t* temp = (struct Op31t*)list[l31t];
+            assert(temp);
+            // extra check to test if the appearance of switch statements was in the same sequence as the appearance of the corresponding data-tables in the code later
           
-              assert(insnIdx == (temp->insnIdx + temp->vB)); // if passes, then it is in ok sequence
+            assert(insnIdx == (temp->insnIdx + temp->vB)); // if passes, then it is in ok sequence
                
-		       //  printf("\n test; currInsnIdx = %04x, l31t = %d, storedInsnIdx = %04x, stored->vA= %d, and stored->vB = %04x \n", insnIdx, l31t, list[l31t].insnIdx, list[l31t].vA, list[l31t].vB);
+            //  printf("\n test; currInsnIdx = %04x, l31t = %d, storedInsnIdx = %04x, stored->vA= %d, and stored->vB = %04x \n", insnIdx, l31t, list[l31t].insnIdx, list[l31t].vA, list[l31t].vB);
 
-		      // extra check ends
+            // extra check ends
 
-              fprintf(pFp, "switch v%d\n", temp->vA);
-              const u1* bytePtr = (const u1*) &insns[insnIdx+1];
-              int size=(bytePtr[0] & 0xFF) | ((bytePtr[1] & 0xFF) << 8);
-              int counter=0;
-              for (i = 2; counter < size; i+=2,++counter) {
-                   const u1* bytePtr = (const u1*) &insns[insnIdx+i];
-                    fprintf(pFp, "                 | %d => goto L%06x\n",
+            fprintf(pFp, "switch v%d\n", temp->vA);
+            const u1* bytePtr = (const u1*) &insns[insnIdx+1];
+            int size=(bytePtr[0] & 0xFF) | ((bytePtr[1] & 0xFF) << 8);
+            int counter=0;
+            for (i = 2; counter < size; i+=2,++counter) {
+                const u1* bytePtr = (const u1*) &insns[insnIdx+i];
+                fprintf(pFp, "                 | %d => goto L%06x\n",
                     (bytePtr[0] & 0xFF) |((bytePtr[1] & 0xFF) << 8) |((bytePtr[2] & 0xFF) << 16) |(bytePtr[3] << 24),
                     ((u1*)insns - pDexFile->baseAddr) + (((bytePtr[size*4] & 0xFF) |((bytePtr[size*4+1] & 0xFF) << 8) |((bytePtr[size*4+2] & 0xFF) << 16) |(bytePtr[size*4+3] << 24))+ temp->insnIdx)*2);
-              }
-                     fprintf(pFp, "                 | else => goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(temp->insnIdx+3)*2);
-                     ++l31t;
-           // *********** sankar ends **************
-
+            }
+            fprintf(pFp, "                 | else => goto L%06x;",((u1*)insns - pDexFile->baseAddr) +(temp->insnIdx+3)*2);
+            ++l31t;
+            // *********** sankar ends **************
         } else if (instr == kArrayDataSignature) {
-
           printf("|%04x: array-data (%d units)", insnIdx, insnWidth); // not in pilar
-
           // ********** sankar starts ******************
 		     struct Op31t* temp = (struct Op31t*)list[l31t];
 		     assert(temp);
-
              // extra check to test if the appearance of fill-array statements was in the same sequence as the appearance of the corresponding data-tables in the code later
-          
               assert(insnIdx == (temp->insnIdx + temp->vB)); // if passes, then it is in ok sequence
                
 		       //  printf("\n test; currInsnIdx = %04x, l31t = %d, storedInsnIdx = %04x, stored->vA= %d, and stored->vB = %04x \n", insnIdx, l31t, list[l31t].insnIdx, list[l31t].vA, list[l31t].vB);
@@ -1425,12 +1410,9 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
             printf("|%04x: nop // spacer", insnIdx);
             // fprintf(pFp, "|%04x: nop // spacer", insnIdx); // fengguo was getting error if not uncommented
         }
-    } 
-	
+    }
 	else {   // sankar includes the remaining of this method (a LOT of lines) as part of this else block
-
        printf("|%04x: %s", insnIdx, dexGetOpcodeName(pDecInsn->opcode)); // not in pilar
-    
 
     if (pDecInsn->indexType != kIndexNone) {
         indexBuf = indexString(pDexFile, pDecInsn,
@@ -1902,7 +1884,7 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
 
         switch(pDecInsn->opcode){
              case 0x1a:
-
+             case 0x1b:
              {
                // find escape characters
                const char *Str = dexStringById(pDexFile, pDecInsn->vB);
@@ -1979,6 +1961,7 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
                outSput(fieldName, pDecInsn->vA, type); // printf("%s:=v%d;", indexBuf, pDecInsn->vA);
                break;
              case 0x68:
+             case 0xeb:
             	   fieldName = strtok(indexBuf, search);
             	   type = strtok(NULL, search);
                outSputWide(fieldName, pDecInsn->vA, type); //  printf("%s:=v%d  @wide;", indexBuf, pDecInsn->vA);
@@ -2023,22 +2006,8 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
 	    switch(pDecInsn->opcode){
             case 0x1b:
              {
-               // find escape characters
-              const char *Str = dexStringById(pDexFile, pDecInsn->vB);
-              char newStr [(int)strlen(Str)+100];
-              int m=0,n=0;
-
-              while( m<=(int)strlen(Str)){
-        	    if(Str[m]=='\n'||Str[m]=='\r') ++m;
-        	    else if(Str[m]=='\\'||Str[m]=='"')
-        	    	 {
-        		       newStr[n++]='\\';
-        		       newStr[n++]=Str[m++];
-        		     }
-        	    else newStr[n++]=Str[m++];
-               }
                //newStr[n]='\0';
-               outConstString(pDecInsn->vA, newStr); // printf("v%d:=\"%s\";", pDecInsn->vA,newStr);
+               outConstString(pDecInsn->vA, indexBuf); // printf("v%d:=\"%s\";", pDecInsn->vA,newStr);
              }
              break;
 
@@ -2468,7 +2437,16 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
                outIputShort(pDecInsn->vB, fieldName, pDecInsn->vA, type); // printf("v%d%s :=v%d @short;", pDecInsn->vB,indexBuf,pDecInsn->vA);
                break;
       
-
+             case 0xe4:
+            	 	 fieldName = "quick";
+            	 	 type = "quick";
+            	 	 outIputQuick(pDecInsn->vA, pDecInsn->vB, fieldName, type);
+            	 	 break;
+             case 0xe8:
+            	 	 fieldName = "quick";
+				 type = "quick";
+				 outIgetQuick(pDecInsn->vA, pDecInsn->vB, fieldName, type);
+				 break;
              default:
 			  fprintf(pFp, " 22c????");
 			  break;
@@ -2507,35 +2485,35 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
 
             //iget
              case 0xf2:
-			   fieldName = strtok(indexBuf, search);
-			   type = strtok(NULL, search);
+			   fieldName = "quick";
+			   type = "quick";
                outIgetQuick(pDecInsn->vA, pDecInsn->vB, fieldName, type);
                break;
              case 0xf3:
-			   fieldName = strtok(indexBuf, search);
-			   type = strtok(NULL, search);
+            	   fieldName = "quick";
+            	   type = "quick";
                outIgetWideQuick(pDecInsn->vA, pDecInsn->vB, fieldName, type);
                break;
              case 0xf4:
-			   fieldName = strtok(indexBuf, search);
-			   type = strtok(NULL, search);
+            	   fieldName = "quick";
+            	   type = "quick";
                outIgetObjectQuick(pDecInsn->vA, pDecInsn->vB, fieldName, type);
                break;
 
             //iput
               case 0xf5:
-			    fieldName = strtok(indexBuf, search);
-			    type = strtok(NULL, search);
+            	    fieldName = "quick";
+            	  	type = "quick";
                 outIputQuick(pDecInsn->vB,fieldName,pDecInsn->vA,type);
                 break;
               case 0xf6:
-			    fieldName = strtok(indexBuf, search);
-			    type = strtok(NULL, search);
+			    fieldName = "quick";
+			    type = "quick";
                 outIputWideQuick(pDecInsn->vB,fieldName,pDecInsn->vA,type);
                 break;
               case 0xf7:
-			    fieldName = strtok(indexBuf, search);
-			    type = strtok(NULL, search);
+			    fieldName = "quick";
+			    type = "quick";
                 outIputObjectQuick(pDecInsn->vB,fieldName,pDecInsn->vA,type);
                 break;
          
@@ -2677,7 +2655,6 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
             }
             printf("}, %s", indexBuf); // not in pilar
         }
-
 	    /**** sankar starts ****/
 	    switch(pDecInsn->opcode){
 
@@ -2697,32 +2674,15 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
 		    outInvokeStatic(pDexFile, pDecInsn, indexBuf);
             break;
            case 0x72:
-            /*
-	        	{
-                    FieldMethodInfo methInfo;
-                     if (getMethodInfo(pDexFile, pDecInsn->vB, &methInfo)) {
-                    printf("call temp:= %s(", indexBuf);
-                      for (i = 0; i < (int) pDecInsn->vA; i++) {
-                       if (i == 0)
-                         printf("v%d", pDecInsn->arg[i]);
-                      else
-                         printf(", v%d", pDecInsn->arg[i]);
-                              }
-                      printf(") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @kind interface;",methInfo.classDescriptor, methInfo.name,
-                                         methInfo.signature,descriptorToDot(methInfo.classDescriptor));
-                   }
-                } */
-	    	  outInvokeInterface(pDexFile, pDecInsn, indexBuf);
-              break;
-
-             case 0xf0:
-			  outInvokeObjectInitRange(pDexFile, pDecInsn, indexBuf); 
-              break;
-
-             default:
-			  fprintf(pFp, " 35c????");
-			  break;
-              }
+	    	     outInvokeInterface(pDexFile, pDecInsn, indexBuf);
+             break;
+           case 0xf0:
+			 outInvokeObjectInitRange(pDexFile, pDecInsn, indexBuf);
+             break;
+           default:
+			 fprintf(pFp, " 35c????");
+			 break;
+        }
 	    /**** sankar ends *****/
         break;
 
@@ -2738,7 +2698,6 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
             }
             printf("}, %s", indexBuf); // not in pilar
         }
-
 	    /**** sankar starts ****/
 	    switch(pDecInsn->opcode){
 
@@ -2785,7 +2744,6 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
             }
             printf("}, %s", indexBuf);
         }  // not in pilar
-
 	    /**** sankar starts ****/
 	    switch(pDecInsn->opcode){
 
@@ -3007,7 +2965,6 @@ void dumpInstruction(DexFile* pDexFile, const DexCode* pCode, int insnIdx,
    }
    putchar('\n');
    fprintf(pFp, "\n"); // sankar
-
    if (indexBuf != indexBufChars) {
         free(indexBuf);
    }

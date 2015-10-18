@@ -14,9 +14,9 @@ import org.sireum.jawa.io.PlainFile
 object ApkDecompiler {
   def decompile(apk: File, projectLocation: File, removeSupportGen: Boolean): (FileResourceUri, ISet[String]) = {
     val out = AmDecoder.decode(FileUtil.toUri(apk), FileUtil.toUri(projectLocation), false)
-    val dexFile = out + "/classes.dex"
+    val dexFiles = FileUtil.listFiles(out, ".dex", true)
     if(FileUtil.toFile(out).exists()) {
-      val src = Dex2PilarConverter.convert(dexFile, out + "/src")
+      val src = Dex2PilarConverter.convert(dexFiles.toSet, out + "/src")
       if(removeSupportGen) return (out, removeSupportLibAndGen(src, ManifestParser.loadPackageName(apk)))
     }
     (out, isetEmpty)

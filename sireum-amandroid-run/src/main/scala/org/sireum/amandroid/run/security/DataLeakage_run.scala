@@ -104,7 +104,7 @@ object DataLeakage_run {
     
     files.foreach{
       file =>
-        val reporter = new PrintReporter(MsgLevel.ERROR)
+        val reporter = new PrintReporter(MsgLevel.INFO)
         val global = new Global(file, reporter)
         global.setJavaLib("/Users/fgwei/Library/Android/sdk/platforms/android-21/android.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v4/android-support-v4.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v13/android-support-v13.jar")
         val apk = new Apk(file)

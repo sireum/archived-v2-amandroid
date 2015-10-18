@@ -1,0 +1,118 @@
+group PilarModelGenerator;
+
+delimiters "$", "$"
+
+RecordDecl(recName, annotations, extends, attributes, globals, procedures) ::= <<
+record `$recName$` $annotations ; separator=" "$$if(extends)$ extends $extends ; separator=", "$$endif$ {
+  $attributes ; separator="\n"$
+}
+$globals ; separator="\n"$
+$procedures ; separator="\n"$
+>>
+
+ExtendsAndImpliments(recName, annotations) ::= <<
+`$recName$` $annotations ; separator=" "$
+>>
+
+Type(baseTyp, dimensions) ::= <<
+`$baseTyp$`$dimensions ; separator=""$
+>>
+
+AttributeDecl(attrTyp, attrName, annotations) ::= <<
+$attrTyp$ `$attrName$` $annotations ; separator=" "$;
+>>
+
+GlobalDecl(globalTyp, globalName, annotations) ::= <<
+global $globalTyp$ `$globalName$` $annotations ; separator=" "$;
+>>
+
+ProcedureDecl(retTyp, procedureName, params, annotations, localVars, body, catchClauses) ::= <<
+procedure $retTyp$ `$procedureName$`($params ; separator=", "$) $annotations ; separator=" "$ {
+  $localVars$
+	
+  $body$
+  $catchClauses$
+}
+>>
+
+Param(paramTyp, paramName, annotations) ::= <<
+$paramTyp$ $paramName$ $annotations ; separator=" "$
+>>
+
+LocalVars(locals) ::= <<
+  temp;
+  $locals ; separator="\n"$
+>>
+
+LocalVar(typ, name) ::= <<
+`$typ$` $name$;
+>>
+
+ParamVar(typ, name, annotations) ::= <<
+`$typ$` $name$ $annotations ; separator=" "$
+>>
+
+Annotation(flag, value) ::= <<
+@$flag$ $value$
+>>
+
+Body(codeFragments) ::= <<
+$codeFragments ; separator="\n"$
+>>
+
+CodeFragment(label, codes) ::= <<
+#$label$.
+$codes ; separator="\n"$
+>>
+
+Code(num, code) ::= <<
+#L$num$. $code$;
+>>
+
+Label(num) ::= <<
+Label$num$
+>>
+
+IfStmt(cond, label) ::= <<
+if $cond$ then goto $label$
+>>
+
+GotoStmt(label) ::= <<
+goto $label$
+>>
+
+ReturnStmt(variable) ::= <<
+return $variable$
+>>
+
+AssignmentStmt(lhs, rhs, annotations) ::= <<
+$lhs$:= $rhs$ $annotations ; separator=" "$
+>>
+
+CondExp(lhs, rhs) ::= <<
+$lhs$ == $rhs$ 
+>>
+
+NewExp(name) ::= <<
+new `$name$`
+>>
+
+InvokeStmtWithReturn(funcName, params, annotations) ::= <<
+call temp:= `$funcName$`($params ; separator=", "$) $annotations ; separator=" "$
+>>
+
+InvokeStmtWithoutReturn(funcName, params, annotations) ::= <<
+call `$funcName$`($params ; separator=", "$) $annotations ; separator=" "$
+>>
+
+FieldAccessExp(base, field) ::= <<
+$base$.`$field$`
+>>
+
+CatchClauses(catchs) ::= <<
+$catchs ; separator=" "$
+>>
+
+Catch(catchTyp, fromLoc, toLoc, targetLoc) ::= <<
+catch $catchTyp$ @[$fromLoc$..$toLoc$] goto $targetLoc$;
+>>

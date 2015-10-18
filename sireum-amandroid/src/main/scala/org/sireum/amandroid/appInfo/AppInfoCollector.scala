@@ -95,7 +95,7 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
     this.envProcMap.foreach{
       case (k, v) =>
         sb.append("*********************** Environment for " + k + " ************************\n")
-        sb.append(v + "\n\n") //FIXME
+        sb.append(v + "\n\n")
     }
     sb.toString.intern()
   }
@@ -153,6 +153,20 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
       }
     }
   }
+  
+  /**
+   * Get rpc method list for Android component
+   * originally designed by Sankardas Roy, modified by Fengguo Wei
+   */
+  def getRpcMethods(comp: JawaClass): ISet[JawaMethod] = {
+    if(apk.getServices.contains(comp)){
+      comp.getMethods.filter { 
+        method => 
+          !(method.isConstructor || AndroidEntryPointConstants.getServiceLifecycleMethods().contains(method.getSubSignature)
+              || method.getName == AndroidConstants.MAINCOMP_ENV || method.getName == AndroidConstants.COMP_ENV) 
+      }
+    } else isetEmpty
+  }
 
   def collectInfo: Unit = {
     val manifestUri = outputUri + "AndroidManifest.xml"
@@ -173,13 +187,18 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
     mfp.getComponentInfos.foreach{
       f =>
         if(f.enabled){
-          val record = global.getClassOrResolve(f.compType)
-          if(!record.isUnknown && record.isApplicationClass){
-            components += record
-            val clCounter = generateEnvironment(record, if(f.exported)AndroidConstants.MAINCOMP_ENV else AndroidConstants.COMP_ENV, codeLineCounter)
+          val comp = global.getClassOrResolve(f.compType)
+          if(!comp.isUnknown && comp.isApplicationClass){
+            components += comp
+            val clCounter = generateEnvironment(comp, if(f.exported)AndroidConstants.MAINCOMP_ENV else AndroidConstants.COMP_ENV, codeLineCounter)
             codeLineCounter = clCounter
           }
         }
+    }
+    components.foreach {
+      comp =>
+        val rpcs = getRpcMethods(comp)
+        apk.addRpcMethods(comp, rpcs)
     }
     apk.setComponents(components)
     apk.updateIntentFilterDB(this.intentFdb)
