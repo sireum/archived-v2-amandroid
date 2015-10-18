@@ -62,6 +62,7 @@ object AndroidConstants {
   def isServiceIccMethod(subSig: String): Boolean = iccMethods_service.contains(subSig)
   def isReceiverIccMethod(subSig: String): Boolean = iccMethods_receiver.contains(subSig)
   def isProviderIccMethod(subSig: String): Boolean = false
+  def isIccMethod(subSig: String): Boolean = iccMethods.contains(subSig)
 
   def getIccCallType(calleeSubsig: String): AndroidConstants.CompType.Value = calleeSubsig match {
     case m if AndroidConstants.isActivityIccMethod(m) => AndroidConstants.CompType.ACTIVITY

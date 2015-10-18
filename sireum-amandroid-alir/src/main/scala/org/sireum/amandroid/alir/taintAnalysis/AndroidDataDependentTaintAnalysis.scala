@@ -151,7 +151,7 @@ object AndroidDataDependentTaintAnalysis {
       node: IDDGNode, 
       ptaresult: PTAResult, 
       ssm: AndroidSourceAndSinkManager, 
-      iddg: InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node]) = {
+      iddg: DataDependenceBaseGraph[InterproceduralDataDependenceAnalysis.Node]) = {
     val sources = msetEmpty[TaintNode]
     val sinks = msetEmpty[TaintNode]
     node match{
@@ -225,7 +225,7 @@ object AndroidDataDependentTaintAnalysis {
     (sources.toSet, sinks.toSet)
   }
   
-  def extendIDDGForSinkApis(iddg: InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node], callArgNode: IDDGCallArgNode, ptaresult: PTAResult) = {
+  def extendIDDGForSinkApis(iddg: DataDependenceBaseGraph[InterproceduralDataDependenceAnalysis.Node], callArgNode: IDDGCallArgNode, ptaresult: PTAResult) = {
     val calleeSet = callArgNode.getCalleeSet
     calleeSet.foreach{
       callee =>

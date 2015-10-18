@@ -75,10 +75,10 @@ class AmandroidSocket(global: Global, apk: Apk) {
     val name = apkFile.getName.substring(0, apkFile.getName().lastIndexOf("."))
     val resultDir = new File(output_path + "/" + name)
     val (out, _) = ApkDecompiler.decompile(apkFile, resultDir, true)
-// convert the dex file to the "pilar" form
+    // convert the dex file to the "pilar" form
     val fileUri = out + "/src"
     if(FileUtil.toFile(fileUri).exists()) {
-      //store the app's pilar code in AmandroidCodeSource which is organized record by record.
+      //store the app's pilar code in AmandroidCodeSource which is organized class by class.
       global.load(fileUri, Constants.PILAR_FILE_EXT, lib_sum)
     }
     out
@@ -124,7 +124,7 @@ class AmandroidSocket(global: Global, apk: Apk) {
           global.reporter.echo(TITLE, "processed-->" + idfg.icfg.getProcessed.size)
           val iddResult = InterproceduralDataDependenceAnalysis(global, idfg)
           apk.addIDDG(ep.getDeclaringClass, iddResult)
-          val tar = AndroidDataDependentTaintAnalysis(global, iddResult, idfg.ptaresult, ssm)    
+          val tar = AndroidDataDependentTaintAnalysis(global, iddResult, idfg.ptaresult, ssm)
           apk.addTaintAnalysisResult(ep.getDeclaringClass, tar)
       }
       if(myListener_opt.isDefined) myListener_opt.get.onAnalysisSuccess

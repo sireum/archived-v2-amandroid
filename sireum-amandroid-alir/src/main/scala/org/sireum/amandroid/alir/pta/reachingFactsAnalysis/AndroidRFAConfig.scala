@@ -30,7 +30,7 @@ object AndroidRFAConfig {
     require(dm.getName == AndroidConstants.MAINCOMP_ENV || dm.getName == AndroidConstants.COMP_ENV)
     var result = isetEmpty[RFAFact]
     val intentSlot = VarSlot(dm.getParamName(0), false, false)
-    val context : Context = new Context(1) // FIXME resolve hard coded k context
+    val context : Context = new Context
     context.setContext(dm.getSignature, "L0000")
     val intentValue = PTAInstance(ObjectType(AndroidConstants.INTENT, 0), context.copy, false)
     result += RFAFact(intentSlot, intentValue)

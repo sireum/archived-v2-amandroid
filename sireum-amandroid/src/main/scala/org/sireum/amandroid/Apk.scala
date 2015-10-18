@@ -49,6 +49,7 @@ case class Apk(nameUri: FileResourceUri) {
   def addRpcMethod(comp: JawaClass, rpc: JawaMethod) = rpcMethods.getOrElseUpdate(comp, msetEmpty) += rpc
   def addRpcMethods(comp: JawaClass, rpcs: ISet[JawaMethod]) = rpcMethods.getOrElseUpdate(comp, msetEmpty) ++= rpcs
   def getRpcMethods(comp: JawaClass): ISet[JawaMethod] = rpcMethods.getOrElse(comp, msetEmpty).toSet
+  def getRpcMethods: ISet[JawaMethod] = rpcMethods.flatMap(_._2).toSet
 	
   def getComponentType(comp: JawaClass): Option[AndroidConstants.CompType.Value] = {
     if(activities.contains(comp)) Some(AndroidConstants.CompType.ACTIVITY)
@@ -127,7 +128,7 @@ case class Apk(nameUri: FileResourceUri) {
   def getIDDG(key: JawaClass) = this.iddaResults.getOrElse(key, throw new RuntimeException("Doesn't have idda result for given record: " + key))
   def getIDDGs = this.iddaResults
 	
-  private var taintResults: IMap[JawaClass, TaintAnalysisResult] = imapEmpty
+  private val taintResults: MMap[JawaClass, TaintAnalysisResult] = mmapEmpty
   
   def addTaintAnalysisResult(key: JawaClass, tar: TaintAnalysisResult) = this.synchronized(this.taintResults += (key -> tar))
   def hasTaintAnalysisResult(key: JawaClass) = this.taintResults.contains(key)
@@ -144,6 +145,6 @@ case class Apk(nameUri: FileResourceUri) {
 	  this.appInfoOpt = None
 	  this.idfgResults.clear
 	  this.iddaResults.clear
-	  this.taintResults = imapEmpty
+	  this.taintResults.clear()
   }
 }

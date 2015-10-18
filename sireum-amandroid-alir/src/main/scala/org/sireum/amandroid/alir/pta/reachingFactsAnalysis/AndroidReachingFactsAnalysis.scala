@@ -675,7 +675,7 @@ object AndroidReachingFactsAnalysis {
       initialFacts: ISet[RFAFact] = isetEmpty,
       clm: ClassLoadManager,
       timer: Option[MyTimer],
-      initContext: Context = new Context(1), // FIXME hard coded k context
+      initContext: Context = new Context,
       switchAsOrderedMatch: Boolean = false): InterProceduralDataFlowGraph
     = new AndroidReachingFactsAnalysisBuilder(global, apk, clm).build(entryPointProc, initialFacts, timer, initContext, switchAsOrderedMatch)
 }
