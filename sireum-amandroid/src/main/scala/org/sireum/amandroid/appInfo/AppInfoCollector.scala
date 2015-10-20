@@ -38,6 +38,7 @@ import org.sireum.jawa.Signature
 import org.sireum.jawa.ObjectType
 import org.sireum.amandroid.Apk
 import org.sireum.jawa.Reporter
+import org.sireum.amandroid.parser.ComponentInfo
 
 /**
  * It takes the apkUri and outputDir as input parameters.
@@ -86,7 +87,7 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
   }
 
   def getIntentDB = this.intentFdb
-  def getEntryPoints: ISet[ObjectType] = this.componentInfos.map(_.compType).toSet
+  def getEntryPoints: ISet[ObjectType] = this.componentInfos.filter(_.enabled).map(_.compType).toSet
 
   def getComponentInfos = this.componentInfos
   def getEnvMap = this.envProcMap
@@ -131,7 +132,7 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
     dmGen.getCodeCounter
   }
 
-  def dynamicRegisterReceiver(comRec: JawaClass, iDB: IntentFilterDataBase) = {
+  def dynamicRegisterReceiver(comRec: JawaClass, iDB: IntentFilterDataBase, permission: ISet[String]) = {
     this.synchronized{
       if(!comRec.declaresMethodByName(AndroidConstants.COMP_ENV)){
         global.reporter.echo(TITLE, "*************Dynamically Register Component**************")
@@ -147,6 +148,7 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
         global.reporter.echo(TITLE, "Found " + this.callbackMethods.size + " callback methods")
         val clCounter = generateEnvironment(comRec, AndroidConstants.COMP_ENV, this.codeLineCounter)
         this.codeLineCounter = clCounter
+        this.componentInfos += ComponentInfo(comRec.getType, "receiver", true, true, permission)
         apk.addDynamicRegisteredReceiver(comRec)
         apk.updateIntentFilterDB(iDB)
         global.reporter.echo(TITLE, "~~~~~~~~~~~~~~~~~~~~~~~~~Done~~~~~~~~~~~~~~~~~~~~~~~~~~")

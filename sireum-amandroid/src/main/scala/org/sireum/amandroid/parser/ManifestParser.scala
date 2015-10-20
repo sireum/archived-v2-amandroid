@@ -28,7 +28,7 @@ import org.sireum.amandroid.util.TypedValue
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-final case class ComponentInfo(compType: ObjectType, typ: String, exported: Boolean, enabled: Boolean, permission: Option[String])
+final case class ComponentInfo(compType: ObjectType, typ: String, exported: Boolean, enabled: Boolean, permission: ISet[String])
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -156,7 +156,7 @@ class ManifestParser{
               true
           }
           val permission = this.componentPermission.getOrElse(compType, this.applicationPermission)
-          val compermission = if(permission != null && !permission.isEmpty()) Some(permission) else None
+          val compermission: ISet[String] = if(permission != null && !permission.isEmpty()) Set(permission) else Set()
           this.componentInfos += ComponentInfo(compType, typ, exported, enabled, compermission)
       }
     } catch {

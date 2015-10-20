@@ -29,7 +29,7 @@ object ComponentSummaryTable {
   }
 }
 
-class ComponentSummaryTable(component: JawaClass) {
+class ComponentSummaryTable(val component: JawaClass) {
   import ComponentSummaryTable._
   
   private val table: IMap[CHANNELS.Value, CSTContent] = Map(
@@ -43,8 +43,8 @@ class ComponentSummaryTable(component: JawaClass) {
 }
 
 trait CSTContent {
-  def asCaller: IMap[ICFGNode, CSTCaller]
-  def asCallee: IMap[ICFGNode, CSTCallee]
+  def asCaller: ISet[(ICFGNode, CSTCaller)]
+  def asCallee: ISet[(ICFGNode, CSTCallee)]
 }
 
 trait CSTCaller {
@@ -56,12 +56,12 @@ trait CSTCallee {
 }
 
 class ICC_Summary extends CSTContent {
-  private def callers: MMap[ICFGNode, ICCCaller] = mmapEmpty
-  private def callees: MMap[ICFGNode, ICCCallee] = mmapEmpty
-  def addCaller(node: ICFGNode, caller: ICCCaller) = callers(node) = caller
-  def addCallee(node: ICFGNode, callee: ICCCallee) = callees(node) = callee
-  def asCaller: IMap[ICFGNode, ICCCaller] = callers.toMap
-  def asCallee: IMap[ICFGNode, ICCCallee] = callees.toMap
+  private val callers: MSet[(ICFGNode, ICCCaller)] = msetEmpty
+  private val callees: MSet[(ICFGNode, ICCCallee)] = msetEmpty
+  def addCaller(node: ICFGNode, caller: ICCCaller) = callers += ((node, caller))
+  def addCallee(node: ICFGNode, callee: ICCCallee) = callees += ((node, callee))
+  def asCaller: ISet[(ICFGNode, CSTCaller)] = callers.toSet
+  def asCallee: ISet[(ICFGNode, CSTCallee)] = callees.toSet
 }
 
 case class ICCCaller(compTyp: AndroidConstants.CompType.Value, intent: IntentContent) extends CSTCaller
@@ -74,12 +74,12 @@ case class ICCCallee(apk: Apk, component: JawaClass, compTyp: AndroidConstants.C
           if (!icc_caller.intent.preciseExplicit) true
           else if (!icc_caller.intent.preciseImplicit && !filter.isEmpty) true
           else if (icc_caller.intent.componentNames.exists(name => name == component.getName)) true
-          else if (!IntentHelper.findComponents(
+          else if (IntentHelper.findComponents(
               apk, 
               icc_caller.intent.actions, 
               icc_caller.intent.categories, 
               icc_caller.intent.datas, 
-              icc_caller.intent.types).isEmpty) true
+              icc_caller.intent.types).contains(component)) true
           else false
         } else false
       case _ => false
@@ -88,12 +88,12 @@ case class ICCCallee(apk: Apk, component: JawaClass, compTyp: AndroidConstants.C
 }
 
 class RPC_Summary extends CSTContent {
-  private def callers: MMap[ICFGNode, RPCCaller] = mmapEmpty
-  private def callees: MMap[ICFGNode, RPCCallee] = mmapEmpty
-  def addCaller(node: ICFGNode, caller: RPCCaller) = callers(node) = caller
-  def addCallee(node: ICFGNode, callee: RPCCallee) = callees(node) = callee
-  def asCaller: IMap[ICFGNode, CSTCaller] = callers.toMap
-  def asCallee: IMap[ICFGNode, CSTCallee] = callees.toMap
+  private val callers: MSet[(ICFGNode, RPCCaller)] = msetEmpty
+  private val callees: MSet[(ICFGNode, RPCCallee)] = msetEmpty
+  def addCaller(node: ICFGNode, caller: RPCCaller) = callers += ((node, caller))
+  def addCallee(node: ICFGNode, callee: RPCCallee) = callees += ((node, callee))
+  def asCaller: ISet[(ICFGNode, CSTCaller)] = callers.toSet
+  def asCallee: ISet[(ICFGNode, CSTCallee)] = callees.toSet
 }
 
 case class RPCCaller(method: JawaMethod, pts: PTAResult.PTSMap) extends CSTCaller
@@ -109,12 +109,12 @@ case class RPCCallee(method: JawaMethod) extends CSTCallee {
 }
 
 class Storage_Summary extends CSTContent {
-  private def callers: MMap[ICFGNode, StorageCaller] = mmapEmpty
-  private def callees: MMap[ICFGNode, StorageCallee] = mmapEmpty
-  def addCaller(node: ICFGNode, caller: StorageCaller) = callers(node) = caller
-  def addCallee(node: ICFGNode, callee: StorageCallee) = callees(node) = callee
-  def asCaller: IMap[ICFGNode, CSTCaller] = callers.toMap
-  def asCallee: IMap[ICFGNode, CSTCallee] = callees.toMap
+  private val callers: MSet[(ICFGNode, StorageCaller)] = msetEmpty
+  private val callees: MSet[(ICFGNode, StorageCallee)] = msetEmpty
+  def addCaller(node: ICFGNode, caller: StorageCaller) = callers += ((node, caller))
+  def addCallee(node: ICFGNode, callee: StorageCallee) = callees += ((node, callee))
+  def asCaller: ISet[(ICFGNode, CSTCaller)] = callers.toSet
+  def asCallee: ISet[(ICFGNode, CSTCallee)] = callees.toSet
 }
 
 case class StorageCaller() extends CSTCaller

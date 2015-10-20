@@ -244,7 +244,7 @@ object DataCollector {
       name: String,
       typ: String,
       exported: Boolean,
-      protectPermission: Option[String],
+      protectPermission: ISet[String],
       intentFilters: ISet[IntentFilter],
       iccInfos: ISet[IccInfo],
       taintResultOpt: Option[TaintAnalysisResult]){
@@ -253,7 +253,10 @@ object DataCollector {
       compData.add("compName", name)
       compData.add("typ", typ)
       compData.add("exported", exported)
-      compData.add("protectPermission", protectPermission.getOrElse(null))
+      val permissions = new ArrayList[String]
+      import collection.JavaConversions._
+      permissions ++= protectPermission
+      compData.add("protectPermission", permissions)
       compData.add("intentFilters", getIntentFilterStrings(intentFilters))
       val iccInfoStrings = new ArrayList[String]
       iccInfos.foreach(iccinfo => iccInfoStrings.add(iccinfo.toString))
@@ -265,7 +268,7 @@ object DataCollector {
           sn =>
             val ssInfo = template.getInstanceOf("SourceSinkInfo")
             val descriptorStrings: ArrayList[String] = new ArrayList[String]
-            sn.getDescriptors.foreach(f=>descriptorStrings.add(f.toString()))
+            descriptorStrings.add(sn.getDescriptor.toString())
             ssInfo.add("descriptors", descriptorStrings)
             sourceStrings.add(ssInfo.render())
         }
@@ -274,7 +277,7 @@ object DataCollector {
           sn =>
             val ssInfo = template.getInstanceOf("SourceSinkInfo")
             val descriptorStrings: ArrayList[String] = new ArrayList[String]
-            sn.getDescriptors.foreach(f=>descriptorStrings.add(f.toString()))
+            descriptorStrings.add(sn.getDescriptor.toString())
             ssInfo.add("descriptors", descriptorStrings)
             sinkStrings.add(ssInfo.render())
         }
@@ -287,12 +290,12 @@ object DataCollector {
             val path = template.getInstanceOf("TaintPath")
             val sourcessInfo = template.getInstanceOf("SourceSinkInfo")
             val sourceDescriptorStrings: ArrayList[String] = new ArrayList[String]
-            taintPath.getSource.getDescriptors.foreach(f=>sourceDescriptorStrings.add(f.toString()))
+            sourceDescriptorStrings.add(taintPath.getSource.getDescriptor.toString())
             sourcessInfo.add("descriptors", sourceDescriptorStrings)
             path.add("source", sourcessInfo)
             val sinkssInfo = template.getInstanceOf("SourceSinkInfo")
             val sinkDescriptorStrings: ArrayList[String] = new ArrayList[String]
-            taintPath.getSink.getDescriptors.foreach(f=>sinkDescriptorStrings.add(f.toString()))
+            sinkDescriptorStrings.add(taintPath.getSink.getDescriptor.toString())
             sinkssInfo.add("descriptors", sinkDescriptorStrings)
             path.add("sink", sinkssInfo)
             val typStrings: ArrayList[String] = new ArrayList[String]
@@ -328,7 +331,7 @@ object DataCollector {
         var taintResult: Option[TaintAnalysisResult] = None
         if(!compRec.isUnknown){
           if(apk.hasIDFG(compRec)){
-            val InterProceduralDataFlowGraph(icfg, ptaresult) = apk.getIDFG(compRec)
+            val InterProceduralDataFlowGraph(icfg, ptaresult) = apk.getIDFG(compRec).get
             val iccNodes = icfg.nodes.filter{
               node =>
                 node.isInstanceOf[ICFGCallNode] && node.asInstanceOf[ICFGCallNode].getCalleeSet.exists(c => InterComponentCommunicationModel.isIccOperation(c.callee))
@@ -356,7 +359,7 @@ object DataCollector {
                   val intents = intentcontents.map(ic=>Intent(ic.componentNames, ic.actions, ic.categories, ic.datas, ic.types, ic.preciseExplicit, ic.preciseImplicit, comMap(ic).map(c=>(c._1.getName, c._2.toString()))))
                   IccInfo(iccNode.getCalleeSet.map(_.callee.getSignature), iccNode.getContext, intents)
               }.toSet
-              taintResult = if(apk.hasTaintAnalysisResult(compRec)) Some(apk.getTaintAnalysisResult(compRec)) else None
+              taintResult = apk.getTaintAnalysisResult(compRec)
           }
       }
       ComponentData(compTyp.jawaName, typ, exported, protectPermission, intentFilters, iccInfos, taintResult)

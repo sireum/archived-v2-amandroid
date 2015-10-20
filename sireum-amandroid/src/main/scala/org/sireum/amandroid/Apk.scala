@@ -10,17 +10,16 @@ package org.sireum.amandroid
 import org.sireum.util._
 import org.sireum.jawa.JawaClass
 import org.sireum.jawa.alir.controlFlowGraph._
-import org.sireum.jawa.alir.taintAnalysis.TaintAnalysisResult
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceInfo
 import org.sireum.amandroid.parser.IntentFilterDataBase
 import org.sireum.amandroid.appInfo.AppInfoCollector
-import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
-import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralMonotoneDataFlowAnalysisResult
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.ObjectType
 import org.sireum.jawa.io.NoPosition
 import org.sireum.jawa.JawaMethod
+import org.sireum.jawa.alir.taintAnalysis.TaintAnalysisResult
+import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 
 /**
  * this is an object, which hold information of apps. e.g. components, intent-filter database, etc.
@@ -117,23 +116,23 @@ case class Apk(nameUri: FileResourceUri) {
   private val idfgResults: MMap[JawaClass, InterProceduralDataFlowGraph] = mmapEmpty
   
   def addIDFG(key: JawaClass, idfg: InterProceduralDataFlowGraph) = this.synchronized(this.idfgResults += (key -> idfg))
-  def hasIDFG(key: JawaClass) = this.idfgResults.contains(key)
-  def getIDFG(key: JawaClass) = this.idfgResults.getOrElse(key, throw new RuntimeException("Doesn't have irfa result for given record: " + key))
-  def getIDFGs = this.idfgResults
+  def hasIDFG(key: JawaClass): Boolean = this.synchronized(this.idfgResults.contains(key))
+  def getIDFG(key: JawaClass): Option[InterProceduralDataFlowGraph] = this.synchronized(this.idfgResults.get(key))
+  def getIDFGs = this.idfgResults.toMap
   
   private val iddaResults: MMap[JawaClass, InterproceduralDataDependenceInfo] = mmapEmpty
   
   def addIDDG(key: JawaClass, iddi: InterproceduralDataDependenceInfo) = this.synchronized(this.iddaResults += (key -> iddi))
-  def hasIDDG(key: JawaClass) = this.iddaResults.contains(key)
-  def getIDDG(key: JawaClass) = this.iddaResults.getOrElse(key, throw new RuntimeException("Doesn't have idda result for given record: " + key))
-  def getIDDGs = this.iddaResults
-	
+  def hasIDDG(key: JawaClass): Boolean = this.iddaResults.contains(key)
+  def getIDDG(key: JawaClass): Option[InterproceduralDataDependenceInfo] = this.synchronized(this.iddaResults.get(key))
+  def getIDDGs = this.iddaResults.toMap
+  
   private val taintResults: MMap[JawaClass, TaintAnalysisResult] = mmapEmpty
   
-  def addTaintAnalysisResult(key: JawaClass, tar: TaintAnalysisResult) = this.synchronized(this.taintResults += (key -> tar))
-  def hasTaintAnalysisResult(key: JawaClass) = this.taintResults.contains(key)
-  def getTaintAnalysisResult(key: JawaClass) = this.taintResults.getOrElse(key, throw new RuntimeException("Doesn't have taint result for given record: " + key))
-  def getTaintAnalysisResults = this.taintResults
+  def setTaintAnalysisResult(key: JawaClass, tar: TaintAnalysisResult) = this.synchronized(this.taintResults(key) = tar)
+  def hasTaintAnalysisResult(key: JawaClass): Boolean = taintResults.contains(key)
+  def getTaintAnalysisResult(key: JawaClass): Option[TaintAnalysisResult] = this.taintResults.get(key)
+  def getTaintAnalysisResults = this.taintResults.toMap
   
   def reset = {
     this.activities.clear()
@@ -145,6 +144,6 @@ case class Apk(nameUri: FileResourceUri) {
 	  this.appInfoOpt = None
 	  this.idfgResults.clear
 	  this.iddaResults.clear
-	  this.taintResults.clear()
+	  this.taintResults.clear
   }
 }

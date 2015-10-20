@@ -69,7 +69,7 @@ abstract class AndroidSourceAndSinkManager(
   /**
    * it's a map from sink API sig to it's category
    */
-  protected var sinks: IMap[String, String] = imapEmpty
+  protected var sinks: IMap[String, (ISet[Int], String)] = imapEmpty
   /**
    * it's a map from API sig to its required permission
    */
@@ -83,18 +83,24 @@ abstract class AndroidSourceAndSinkManager(
           this.apiPermissions += (sig -> ps)
       }
       sinks.foreach{
-        case (sig, ps) =>
-          this.sinks += (sig -> SourceAndSinkCategory.API_SINK)
+        case (sig, (poss, ps)) =>
+          this.sinks += (sig -> (poss, SourceAndSinkCategory.API_SINK))
           this.apiPermissions += (sig -> ps)
       }
 //      msg_detail(TITLE, "source size: " + this.sources.size + " sink size: " + this.sinks.size)
   }
 
-  private def matchs(method: JawaMethod, methodpool: ISet[String]): Boolean = methodpool.contains(method.getSignature.signature.replaceAll("\\*", ""))
+  private def matchs(method: JawaMethod, position: Option[Int], methodpool: ISet[(String, ISet[Int])]): Boolean = methodpool.exists{
+    case (sig, poss) =>
+      (sig == method.getSignature.signature.replaceAll("\\*", "")) &&
+      (poss.isEmpty ||
+      !position.isDefined ||
+      poss.contains(position.get))
+  }
 
-  def isSourceMethod(method: JawaMethod) = matchs(method, this.sources.map(s=>s._1).toSet)
+  def isSourceMethod(method: JawaMethod) = matchs(method, None, this.sources.map(s=>(s._1, isetEmpty[Int])).toSet)
 
-  def isSinkMethod(method: JawaMethod) = matchs(method, this.sinks.map(s=>s._1).toSet)
+  def isSink(method: JawaMethod, position: Int) = matchs(method, Some(position), this.sinks.map(s=>(s._1, s._2._1)).toSet)
 
   def isSource(calleeMethod: JawaMethod, callerMethod: JawaMethod, callerLoc: JumpLocation): Boolean = {
     if(isSourceMethod(calleeMethod)) return true
@@ -111,8 +117,8 @@ abstract class AndroidSourceAndSinkManager(
     this.apiPermissions += (source -> this.apiPermissions.getOrElse(source, isetEmpty))
   }
 
-  def addSink(sink: String, category: String) = {
-    this.sinks += (sink -> category)
+  def addSink(sink: String, positions: ISet[Int], category: String) = {
+    this.sinks += (sink -> (positions, category))
     this.apiPermissions += (sink -> this.apiPermissions.getOrElse(sink, isetEmpty))
   }
 
@@ -252,42 +258,55 @@ class DataLeakageAndroidSourceAndSinkManager(
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
 object SSParser{
+  final val TITLE = "SSParser"
+  final val DEBUG = false
   
-  private val regex = "([^\\s]+)\\s+(.+)?\\s*->\\s+(.+)"
-  def parse(filePath: String): (IMap[String, ISet[String]], IMap[String, ISet[String]]) = {
+  private val regex = "([^\\s]+)\\s+(.+)?\\s*->\\s+([^\\s]+)\\s*(.+)?"
+  def parse(filePath: String): (IMap[String, ISet[String]], IMap[String, (ISet[Int], ISet[String])]) = {
     def readFile: BufferedReader = new BufferedReader(new FileReader(filePath))
-    var sources: IMap[String, ISet[String]] = imapEmpty
-    var sinks: IMap[String, ISet[String]] = imapEmpty
+    val sources: MMap[String, ISet[String]] = mmapEmpty
+    val sinks: MMap[String, (ISet[Int], ISet[String])] = mmapEmpty
     val p: Pattern = Pattern.compile(regex)
     val rdr = readFile
     var line = rdr.readLine()
     while(line != null){
+      try{
       val m = p.matcher(line)
       if(m.find()){
-        val (tag, apiSig, permissions) = parseLine(m)
+        val (tag, apiSig, positions, permissions) = parseLine(m)
         tag match{
           case "_SOURCE_" => sources += (apiSig -> permissions)
-          case "_SINK_" => sinks += (apiSig -> permissions)
+          case "_SINK_" => sinks += (apiSig -> (positions, permissions))
           case "_NONE_" =>
           case _ => throw new RuntimeException("Not expected tag: " + tag)
         }
       } else {
         throw new RuntimeException("Did not match the regex: " + line)
       }
+      } catch {
+        case ex: Exception =>
+          if(DEBUG) ex.printStackTrace()
+          System.err.println(TITLE + " exception occurs: " + ex.getMessage)
+      }
       line = rdr.readLine()
     }
-    (sources, sinks)
+    (sources.toMap, sinks.toMap)
   }
   
-  def parseLine(m: Matcher): (String, String, ISet[String]) = {
+  def parseLine(m: Matcher): (String, String, ISet[Int], ISet[String]) = {
     require(m.group(1) != null && m.group(3) != null)
     val apiSig = m.group(1)
     val rawps = m.group(2)
-    var permissions: ISet[String] = isetEmpty
-    if(rawps != null){
+    val permissions: MSet[String] = msetEmpty
+    if(rawps != null) {
       permissions ++= rawps.split(" ")
     }
     val tag = m.group(3)
-    (tag, apiSig, permissions)
+    val rawpos = m.group(4)
+    val positions: MSet[Int] = msetEmpty
+    if(rawpos != null) {
+      positions ++= rawpos.split("\\|").map(_.toInt)
+    }
+    (tag, apiSig, positions.toSet, permissions.toSet)
   }
 }

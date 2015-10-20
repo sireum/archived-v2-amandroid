@@ -31,65 +31,99 @@ import org.sireum.amandroid.alir.taintAnalysis.AndroidDataDependentTaintAnalysis
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceInfo
 import org.sireum.jawa.alir.dataDependenceAnalysis.DefaultInterproceduralDataDependenceInfo
 import org.sireum.amandroid.alir.taintAnalysis.AndroidSourceAndSinkManager
+import org.sireum.jawa.alir.taintAnalysis.TaintAnalysisResult
+import org.sireum.jawa.ObjectType
+import org.sireum.jawa.alir.dataDependenceAnalysis.IDDGCallArgNode
+import org.sireum.jawa.alir.pta.VarSlot
 
 /**
  * @author fgwei
  */
-class ComponentBasedAnalysis(global: Global, apk: Apk) {
+class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
   private final val TITLE = "ComponentBasedAnalysis"
   private final val DEBUG = true
   
   import ComponentSummaryTable._
   
-  def phase1(parallel: Boolean, timer: Option[MyTimer]): IMap[JawaClass, ComponentSummaryTable] = {
+  /**
+   * ComponentBasedAnalysis phase1 is doing intra component analysis for one giving apk.
+   */
+  def phase1(apk: Apk, parallel: Boolean, timer: Option[MyTimer]) = {
+    println(TITLE + ":" + "-------Phase 1-------")
     AndroidReachingFactsAnalysisConfig.resolve_icc = false // We don't want to resolve ICC at this phase
-    val components = apk.getAppInfo.getEntryPoints
+    var components = apk.getComponents
+    val problematicComp: MSet[JawaClass] = msetEmpty
+    val worklist: MList[JawaClass] = mlistEmpty ++ components
+    
+    while(!worklist.isEmpty) {
+      val component = worklist.remove(0)
+      println(TITLE + ":" + "-------Analyze component " + component + "--------------")
+      try{
+        // do pta on this component
+        apk.getAppInfo.getEnvMap.get(component) match {
+          case Some(ep) =>
+            val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
+            val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager, timer)
+            yard.addIDFG(component, idfg)
+            // do dda on this component
+            val iddResult = InterproceduralDataDependenceAnalysis(global, idfg)
+            yard.addIDDG(component, iddResult)
+          case None =>
+            problematicComp += component
+            global.reporter.error(TITLE, "Component " + component + " did not have environment! Some package or name mismatch maybe in the Manifestfile.")
+        }
+      } catch {
+        case ex: Exception =>
+          problematicComp += component
+          if(DEBUG) ex.printStackTrace()
+          global.reporter.error(TITLE, "Analyzing component " + component + " has error: " + ex.getMessage)
+      }
+      worklist ++= (apk.getComponents -- components)
+      components = apk.getComponents
+    }
+    components = components -- problematicComp
     val summaryTables: MMap[JawaClass, ComponentSummaryTable] = mmapEmpty
     
     {if(parallel) components.par else components}.foreach {
-      comp =>
-        println(TITLE, "-------Phase 1-------Component " + comp + "--------------")
+      component =>
+        println(TITLE + ":" + "-------Collect Info for Component " + component + "--------------")
         try {
-          val component: JawaClass = global.getClassOrResolve(comp)
-          // do pta on this component
-          val ep = apk.getAppInfo.getEnvMap(component)
-          val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-          val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager, timer)
-          apk.addIDFG(component, idfg)
-          
-          // do dda on this component
-          val iddResult = InterproceduralDataDependenceAnalysis(global, idfg)
-          apk.addIDDG(component, iddResult)
-          
           // build summary table
-          val summaryTable = buildComponentSummaryTable(component, idfg)
-          summaryTables(component) = summaryTable
+          val summaryTable = buildComponentSummaryTable(component)
+          yard.addSummaryTable(component, summaryTable)
         } catch {
           case ex: Exception =>
+            problematicComp += component
             if(DEBUG) ex.printStackTrace()
-            global.reporter.error(TITLE, ex.getMessage)
+            global.reporter.error(TITLE, "Collect Info for Component " + component + " has error: " + ex.getMessage)
         }
     }
-    summaryTables.toMap
   }
   
-  def phase2(parallel: Boolean, summaryTables: IMap[JawaClass, ComponentSummaryTable]): InterproceduralDataDependenceInfo = {
-    val components = apk.getAppInfo.getEntryPoints
+  def phase2(apks: ISet[Apk], parallel: Boolean): (ISet[Apk], InterproceduralDataDependenceInfo) = {
+    val components = apks.map(_.getComponents).fold(Set[JawaClass]())(iunion _)
+    println(TITLE + ":" + "-------Phase 2-------" + apks.size + s" apk${if(apks.size > 1)"s"else""} " + components.size + s" component${if(components.size > 1)"s"else""}-------")
     val mddg = new MultiDataDependenceGraph[IDDGNode]
-    val iccChannels = summaryTables.map(_._2.get[ICC_Summary](CHANNELS.ICC_CHANNEL))
+    val summaryTables = components.map(yard.getSummaryTable(_)).flatten
+    val summaryMap = summaryTables.map(st => (st.component, st)).toMap
+    val iccChannels = summaryTables.map(_.get[ICC_Summary](CHANNELS.ICC_CHANNEL))
     val allIccCallees = iccChannels.map(_.asCallee).reduceOption{_ ++ _}.getOrElse(imapEmpty)
-    val rpcChannels = summaryTables.map(_._2.get[RPC_Summary](CHANNELS.RPC_CHANNEL))
+    val rpcChannels = summaryTables.map(_.get[RPC_Summary](CHANNELS.RPC_CHANNEL))
     val allRpcCallees = rpcChannels.map(_.asCallee).reduceOption{_ ++ _}.getOrElse(imapEmpty)
     
+    components.foreach{
+      component =>
+        yard.getIDDG(component) match {
+          case Some(iddg) => mddg.addGraph(iddg.getIddg)
+          case None =>
+        }
+    }
+    
     {if(parallel) components.par else components}.foreach {
-      comp =>
-        println(TITLE, "-------Phase 2-------Component " + comp + "--------------")
+      component =>
+        println(TITLE + ":" + "-------Link data dependence for component " + component + "--------------")
         try {
-          val component: JawaClass = global.getClassOrResolve(comp)
-          val iddg = apk.getIDDG(component).getIddg
-          mddg.addGraph(iddg)
-          
-          val summaryTable = summaryTables(component)
+          val summaryTable = summaryMap.getOrElse(component, throw new RuntimeException("Summary table does not exist for " + component))
           
           // link the icc edges
           val icc_summary: ICC_Summary = summaryTable.get(CHANNELS.ICC_CHANNEL)
@@ -111,21 +145,39 @@ class ComponentBasedAnalysis(global: Global, apk: Apk) {
             global.reporter.error(TITLE, ex.getMessage)
         }
     }
-    new DefaultInterproceduralDataDependenceInfo(mddg)
+    (apks, new DefaultInterproceduralDataDependenceInfo(mddg))
   }
   
-  def phase3(iddResult: InterproceduralDataDependenceInfo, ssm: AndroidSourceAndSinkManager) = {
-    println(TITLE, "-------Phase 3-------")
-    if(!apk.getIDFGs.isEmpty) {
-      val ptaresult = apk.getIDFGs.map(_._2.ptaresult).reduce(_.merge(_))
-      val tar = AndroidDataDependentTaintAnalysis(global, iddResult, ptaresult, ssm)
-      
-    }
+  def phase3(iddResult: (ISet[Apk], InterproceduralDataDependenceInfo), ssm: AndroidSourceAndSinkManager): Option[TaintAnalysisResult] = {
+    val apks = iddResult._1
+    val components = apks.map(_.getComponents).fold(Set[JawaClass]())(iunion _)
+    println(TITLE + ":" + "-------Phase 3-------" + apks.size + s" apk${if(apks.size > 1)"s"else""} " + components.size + s" component${if(components.size > 1)"s"else""}-------")
+    val idfgs = components.map(yard.getIDFG(_)).flatten
+    if(!idfgs.isEmpty) {
+      try {
+        val ptaresult = idfgs.map(_.ptaresult).reduce(_.merge(_))
+        val tar = AndroidDataDependentTaintAnalysis(global, iddResult._2, ptaresult, ssm)
+        Some(tar)
+      } catch {
+        case ex: Exception =>
+            if(DEBUG) ex.printStackTrace()
+            global.reporter.error(TITLE, ex.getMessage)
+            None
+      }
+    } else None
   }
   
-  private def buildComponentSummaryTable(component: JawaClass, idfg: InterProceduralDataFlowGraph): ComponentSummaryTable = {
+  private def buildComponentSummaryTable(component: JawaClass): ComponentSummaryTable = {
     val summaryTable: ComponentSummaryTable = new ComponentSummaryTable(component)
-    
+    val apkOpt: Option[Apk] = yard.getOwnerApk(component)
+    if(!apkOpt.isDefined) return summaryTable
+    val apk = apkOpt.get
+    val idfgOpt = yard.getIDFG(component)
+    if(!idfgOpt.isDefined) return summaryTable
+    val idfg = idfgOpt.get
+    val iddgOpt = yard.getIDDG(component)
+    if(!iddgOpt.isDefined) return summaryTable
+    val iddg = iddgOpt.get.getIddg
     // Add component as icc callee
     val filters = apk.getIntentFilterDB.getIntentFilters(component)
     val icc_summary: ICC_Summary = summaryTable.get(CHANNELS.ICC_CHANNEL)
@@ -153,10 +205,8 @@ class ComponentBasedAnalysis(global: Global, apk: Apk) {
                 if(AndroidConstants.isIccMethod(calleep.getSubSignature)) {
                   // add component as icc caller
                   val callTyp = AndroidConstants.getIccCallType(calleep.getSubSignature)
-                  val intentValues: ISet[Instance] = ptsmap.flatMap(_._2).filter{
-                    ins => 
-                      ins.typ.name == AndroidConstants.INTENT
-                  }.toSet
+                  val intentSlot = VarSlot(iddg.getIDDGCallArgNode(cn, 1).asInstanceOf[IDDGCallArgNode].argName, false, true)
+                  val intentValues: ISet[Instance] = ptsmap.getOrElse(intentSlot, isetEmpty)
                   val intentcontents = IntentHelper.getIntentContents(idfg.ptaresult, intentValues, cn.context)
                   val icc_summary: ICC_Summary = summaryTable.get(CHANNELS.ICC_CHANNEL)
                   intentcontents foreach {

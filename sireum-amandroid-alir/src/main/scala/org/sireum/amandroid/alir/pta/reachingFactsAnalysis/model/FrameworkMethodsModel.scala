@@ -95,6 +95,12 @@ object FrameworkMethodsModel {
     val receiverValue = s.pointsToSet(receiverSlot, currentContext)
     val filterSlot = VarSlot(args(2), false, true)
     val filterValue = s.pointsToSet(filterSlot, currentContext)
+    val permissionSlotOpt = 
+      if(args.contains(3)) Some(VarSlot(args(3), false, true))
+      else None
+    val permissionValueOpt = 
+      if(permissionSlotOpt.isDefined) Some(s.pointsToSet(permissionSlotOpt.get, currentContext))
+      else None
     val iDB = new IntentFilterDataBase
     receiverValue.foreach {
       rv =>
@@ -128,10 +134,22 @@ object FrameworkMethodsModel {
                     }
                 }
             }
+            val permission: MSet[String] = msetEmpty
+            permissionValueOpt.foreach {
+              pvs =>
+                pvs foreach {
+                  pv =>
+                    pv match {
+                      case cstr @ PTAConcreteStringInstance(text, c) =>
+                        permission += text
+                      case _ =>
+                    }
+                }
+            }
             iDB.updateIntentFmap(intentF)
             val appinfo = apk.getAppInfo
             if(!appinfo.hasEnv(comRec)){
-              appinfo.dynamicRegisterReceiver(comRec, iDB)
+              appinfo.dynamicRegisterReceiver(comRec, iDB, permission.toSet)
             } else {
               apk.updateIntentFilterDB(iDB)
             }

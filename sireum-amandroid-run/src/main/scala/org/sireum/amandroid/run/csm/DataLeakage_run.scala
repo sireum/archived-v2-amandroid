@@ -32,6 +32,7 @@ import org.sireum.amandroid.decompile.ApkDecompiler
 import org.sireum.amandroid.alir.componentSummary.ComponentBasedAnalysis
 import org.sireum.jawa.ScopeManager
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAScopeManager
+import org.sireum.amandroid.alir.componentSummary.ApkYard
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -45,48 +46,8 @@ object DataLeakage_run {
     var haveresult = 0
     var taintPathFound = 0
     var taintPathFoundList = Set[String]()
-    override def toString: String = "total: " + total + ", haveResult: " + haveresult + ", taintPathFound: " + taintPathFound
-  }
-  
-  private class DataLeakageListener(global: Global, apk: Apk, outputPath: String) extends AmandroidSocketListener {
-    def onPreAnalysis: Unit = {
-      DataLeakageCounter.total += 1
-    }
-
-    def entryPointFilter(eps: Set[org.sireum.jawa.JawaMethod]): Set[org.sireum.jawa.JawaMethod] = {
-      eps//.filter { ep => ep.getSignature.contains("envMain") }
-    }
-
-    def onAnalysisSuccess: Unit = {
-      if(apk.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
-        DataLeakageCounter.taintPathFound += 1
-        DataLeakageCounter.taintPathFoundList += apk.nameUri
-      }
-      DataLeakageCounter.haveresult += 1
-      val msgfile = new File(outputPath + "/msg.txt")
-      val msgw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(msgfile, true)))
-      msgw.write("################# " + apk.nameUri + " ################\n")
-      val tRes = apk.getTaintAnalysisResults
-      tRes.foreach{
-        case (rec, res) =>
-          msgw.write(rec.getName + "\n")
-          msgw.write("Found " + res.getTaintedPaths.size + " path.")
-          msgw.write(res.toString)
-          msgw.write("\n\n")
-      }
-    }
-
-    def onPostAnalysis: Unit = {
-    }
-    
-    def onException(e: Exception): Unit = {
-      e match{
-        case ie: IgnoreException => global.reporter.echo(TITLE, "Ignored!")
-        case te: MyTimeoutException => global.reporter.echo(TITLE, te.message)
-        case a => 
-          e.printStackTrace()
-      }
-    }
+    var totalPath = 0
+    override def toString: String = "total: " + total + ", haveResult: " + haveresult + ", taintPathFound: " + taintPathFound + ", totalPath: " + totalPath
   }
   
   def main(args: Array[String]): Unit = {
@@ -96,27 +57,24 @@ object DataLeakage_run {
     }
     
 //    GlobalConfig.ICFG_CONTEXT_K = 1
-    AndroidReachingFactsAnalysisConfig.resolve_icc = true
-    AndroidReachingFactsAnalysisConfig.parallel = true
     AndroidReachingFactsAnalysisConfig.resolve_static_init = true
 
 //    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
     
     val sourcePath = args(0)
     val outputPath = args(1)
-    
+    val outputUri = FileUtil.toUri(outputPath)
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
-    
+//      .filter(_.contains("IntentSink1"))
     files.foreach{
       file =>
-        val reporter = new PrintReporter(MsgLevel.INFO)
+        DataLeakageCounter.total += 1
+        val reporter = new PrintReporter(MsgLevel.ERROR)
         val global = new Global(file, reporter)
         global.setJavaLib("/Users/fgwei/Library/Android/sdk/platforms/android-21/android.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v4/android-support-v4.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v13/android-support-v13.jar")
-        val apk = new Apk(file)
-        
-//        if(file.contains("ApplicationLifecycle1"))
         try {
-          reporter.echo(TITLE, DataLeakageTask(global, apk, outputPath, file, Some(1000)).run)   
+          reporter.echo(TITLE, DataLeakageTask(global, outputUri, file, Some(1000)).run)
+          DataLeakageCounter.haveresult += 1
         } catch {
           case te: MyTimeoutException => reporter.error(TITLE, te.message)
           case e: Throwable => e.printStackTrace()
@@ -128,32 +86,30 @@ object DataLeakage_run {
     }
   }
   
-  private case class DataLeakageTask(global: Global, apk: Apk, outputPath: String, file: FileResourceUri, timeout: Option[Int]) {
+  private case class DataLeakageTask(global: Global, outputUri: FileResourceUri, file: FileResourceUri, timeout: Option[Int]) {
     def run: String = {
-      println(TITLE + " ####" + file + "#####")
+      println(TITLE + " #####" + file + "#####")
       ScopeManager.setScopeManager(new AndroidRFAScopeManager)
       val timer = timeout match {
         case Some(t) => Some(new MyTimer(t))
         case None => None
       }
       if(timer.isDefined) timer.get.start
-      val apkFile = FileUtil.toFile(apk.nameUri)
-      val name = apkFile.getName.substring(0, apkFile.getName().lastIndexOf("."))
-      val resultDir = new File(outputPath + "/" + name)
-      val (outUri, _) = ApkDecompiler.decompile(apkFile, resultDir, true)
-      // convert the dex file to the "pilar" form
-      val fileUri = outUri + "/src"
-      if(FileUtil.toFile(fileUri).exists()) {
-        //store the app's pilar code in AmandroidCodeSource which is organized class by class.
-        global.load(fileUri, Constants.PILAR_FILE_EXT, AndroidLibraryAPISummary)
+      val apkYard = new ApkYard(global)
+      val apk: Apk = apkYard.loadApk(file, outputUri)
+      val ssm = new DataLeakageAndroidSourceAndSinkManager(global, apk, apk.getAppInfo.getLayoutControls, apk.getAppInfo.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+      val cba = new ComponentBasedAnalysis(global, apkYard)
+      cba.phase1(apk, false, timer)
+      val iddResult = cba.phase2(Set(apk), false)
+      val tar = cba.phase3(iddResult, ssm)
+      tar.foreach{
+        t =>
+          val size = t.getTaintedPaths.size
+          if(size > 0){
+            DataLeakageCounter.taintPathFound += 1
+            DataLeakageCounter.totalPath += size
+          }
       }
-      val app_info = new AppInfoCollector(global, apk, outUri, None)
-      app_info.collectInfo
-      val ssm = new DataLeakageAndroidSourceAndSinkManager(global, apk, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-      val cba = new ComponentBasedAnalysis(global, apk)
-      val summaryTables = cba.phase1(false, timer)
-      val iddResult = cba.phase2(false, summaryTables)
-      cba.phase3(iddResult, ssm)
       return "Done!"
     }
   }

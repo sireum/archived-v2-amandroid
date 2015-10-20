@@ -710,7 +710,12 @@ object IntentModel {
     thisValue.map {
       tv =>
         val mCategorySlot = FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_CATEGORIES))
-        val mCategoryValue = s.pointsToSet(mCategorySlot, currentContext)
+        var mCategoryValue = s.pointsToSet(mCategorySlot, currentContext)
+        if(mCategoryValue.isEmpty) {
+          val hashsetIns = PTAInstance(ObjectType("java.util.HashSet", 0), currentContext, false)
+          mCategoryValue += hashsetIns
+          newfacts += RFAFact(mCategorySlot, hashsetIns)
+        }
         mCategoryValue.foreach{
           cv => 
             var hashsetIns = cv
@@ -732,7 +737,7 @@ object IntentModel {
             }
         }
         newfacts += RFAFact(VarSlot(retVar, false, false), tv)
-    } 
+    }
     (newfacts, delfacts)
   }
 

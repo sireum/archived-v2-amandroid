@@ -38,10 +38,10 @@ object ApkReport_run {
     def onTimeout: Unit = {}
 
     def onAnalysisSuccess: Unit = {
-      apk.getIDFGs.foreach{
-        res =>
-          val idfg = res._2
-      }
+//      apk.getIDFGs.foreach{
+//        res =>
+//          val idfg = res._2
+//      }
     }
 
     def onPostAnalysis: Unit = {

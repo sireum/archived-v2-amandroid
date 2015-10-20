@@ -6,7 +6,7 @@ import org.sireum.jawa.ObjectType
 
 class ReportGen(apk_name: String) {
   
-  case class CompInfo(compTyp: ObjectType, typ: String, exported: Boolean, permission: Option[String] = None) {
+  case class CompInfo(compTyp: ObjectType, typ: String, exported: Boolean, permission: ISet[String] = isetEmpty) {
     val intentFilters: MSet[IntentFilter] = msetEmpty
     def addIntentFilter(actions: ISet[String], categories: ISet[String], data: Data) =
       intentFilters += IntentFilter(actions, categories, data)
@@ -19,15 +19,15 @@ class ReportGen(apk_name: String) {
   val comps: MSet[CompInfo] = msetEmpty
   val urls: MSet[String] = msetEmpty
   
-  def genComp(compTyp: ObjectType, typ: String, exported: Boolean, permission: Option[String] = None): CompInfo =
+  def genComp(compTyp: ObjectType, typ: String, exported: Boolean, permission: ISet[String] = isetEmpty): CompInfo =
     CompInfo(compTyp, typ, exported, permission)
 
   override def toString: String = {
     def appendComp(comp: CompInfo, b: StringBuilder) = {
       b.append("\n" + comp.compTyp + "\n")
       b.append("exported: " + comp.exported + "\n")
-      if(comp.permission.isDefined)
-        b.append("permission: " + comp.permission.get + "\n")
+      if(!comp.permission.isEmpty)
+        b.append("permission: " + comp.permission + "\n")
       if(!comp.intentFilters.isEmpty){
         b.append("IntentFilters: \n")
         var n = 0

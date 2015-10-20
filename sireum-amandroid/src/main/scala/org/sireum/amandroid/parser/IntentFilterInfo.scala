@@ -10,6 +10,7 @@ package org.sireum.amandroid.parser
 import org.sireum.jawa.JawaClass
 import org.sireum.util._
 import org.sireum.jawa.ObjectType
+import org.apache.commons.lang3.StringEscapeUtils
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -175,7 +176,7 @@ class Data{
           }
       }
     }
-      
+//    println(dataTest, typeTest)
     dataTest && typeTest
   }
   def matchWith(uriData:UriData):Boolean = {
@@ -217,7 +218,7 @@ class Data{
 	                }
 	                this.pathPatterns.foreach{
 	                  pattern =>
-	                    if(path.matches(pattern)) pathPatternTest = true
+	                    if(path.matches(StringEscapeUtils.unescapeJava(pattern))) pathPatternTest = true
 	                }
 	              }
 	            }
