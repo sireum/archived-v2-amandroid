@@ -83,7 +83,7 @@ class PilarStyleCodeGenerator(
       }
       currentOutput = ps
       val code = generateRecord(classIdx)
-      println(code)
+//      println(code)
 //      if(dexClassDefsBlock.isInterface(classIdx))
 //        ps.println(".interface " + dexClassDefsBlock.getClassName(classIdx))
 //      else
@@ -162,7 +162,7 @@ class PilarStyleCodeGenerator(
     annot.add("value", value)
   }
   
-  private def generateType(typ: JawaType): ST = {
+  def generateType(typ: JawaType): ST = {
     val typTemplate = template.getInstanceOf("Type")
     typTemplate.add("baseTyp", typ.typ)
     val dimensions: ArrayList[String] = new ArrayList[String]
@@ -346,6 +346,7 @@ class PilarStyleCodeGenerator(
     if(!AccessFlag.isAbstract(AccessFlag.getAccessFlags(accessFlags)) &&
         !AccessFlag.isNative(AccessFlag.getAccessFlags(accessFlags)))
       procTemplate.add("localVars", generateLocalVars(regSize - params.size()))
+    procTemplate.add("body", generateBody(dexMethodHeadParser))
     procTemplate
   }
   
@@ -361,7 +362,25 @@ class PilarStyleCodeGenerator(
     localVarsTemplate
   }
   
-//  private def generateBody()
+  private def generateBody(dexMethodHeadParser: DexMethodHeadParser): ST = {
+    val bodyTemplate: ST = template.getInstanceOf("Body")
+    val startPos: Long = dexMethodHeadParser.getInstructionBase()
+    val endPos: Long = dexMethodHeadParser.getInstructionEnd()
+    val instructionParser = 
+      new DexInstructionToPilarParser(
+          this,
+          dexSignatureBlock, 
+          dexStringIdsBlock, 
+          dexTypeIdsBlock, 
+          dexFieldIdsBlock, 
+          dexMethodIdsBlock, 
+          dexOffsetResolver)
+    instructionParser.setDumpFile(dump.getOrElse(null))
+    instructionParser.setRandomAccessFile(file)
+    instructionParser.setDumpOff()
+    instructionParser.parse()
+    bodyTemplate
+  }
   
   private def getFieldType(fieldWithType: String): JawaType = {
     val fieldTypeStr = fieldWithType.split(" ").last

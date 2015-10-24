@@ -119,7 +119,7 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
     dmGen.setComponentInfos(this.componentInfos.toSet)
     dmGen.setCodeCounter(codeCtr)
     var callbackMethodSigs: Map[ObjectType, Set[Signature]] = Map()
-    this.callbackMethods.foreach{
+    this.callbackMethods.foreach {
       case (record, procs) =>
         procs.foreach{
           p =>
@@ -186,7 +186,7 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
     this.callbackMethods ++= callbacks
 
     var components = isetEmpty[JawaClass]
-    mfp.getComponentInfos.foreach{
+    mfp.getComponentInfos.foreach {
       f =>
         if(f.enabled){
           val comp = global.getClassOrResolve(f.compType)

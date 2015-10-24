@@ -120,12 +120,12 @@ class AmandroidSocket(global: Global, apk: Apk) {
           global.reporter.echo(TITLE, "--------------Component " + ep + "--------------")
           val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
           val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager, timer)
-//          apk.addIDFG(ep.getDeclaringClass, idfg)
+          apk.addIDFG(ep.getDeclaringClass, idfg)
           global.reporter.echo(TITLE, "processed-->" + idfg.icfg.getProcessed.size)
           val iddResult = InterproceduralDataDependenceAnalysis(global, idfg)
-//          apk.addIDDG(ep.getDeclaringClass, iddResult)
+          apk.addIDDG(ep.getDeclaringClass, iddResult)
           val tar = AndroidDataDependentTaintAnalysis(global, iddResult, idfg.ptaresult, ssm)
-//          apk.addTaintAnalysisResult(ep.getDeclaringClass, tar)
+          apk.addTaintAnalysisResult(ep.getDeclaringClass, tar)
       }
       if(myListener_opt.isDefined) myListener_opt.get.onAnalysisSuccess
     } catch {
@@ -146,7 +146,7 @@ class AmandroidSocket(global: Global, apk: Apk) {
       // before starting the analysis of the current app, first reset the Center which may still hold info (of the resolved records) from the previous analysis
 
       var entryPoints = global.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
-  
+      
       if(!public_only)
         entryPoints ++= global.getEntryPoints(AndroidConstants.COMP_ENV)
     
@@ -160,10 +160,10 @@ class AmandroidSocket(global: Global, apk: Apk) {
           global.reporter.echo(TITLE, "--------------Component " + ep + "--------------")
           val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
           val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager, timer)
-//          apk.addIDFG(ep.getDeclaringClass, idfg)
+          apk.addIDFG(ep.getDeclaringClass, idfg)
           global.reporter.echo(TITLE, "processed-->" + idfg.icfg.getProcessed.size)
           val iddResult = InterproceduralDataDependenceAnalysis(global, idfg)
-//          apk.addIDDG(ep.getDeclaringClass, iddResult)
+          apk.addIDDG(ep.getDeclaringClass, iddResult)
       }
       if(myListener_opt.isDefined) myListener_opt.get.onAnalysisSuccess
     } catch {

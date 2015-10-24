@@ -129,7 +129,7 @@ case class Apk(nameUri: FileResourceUri) {
   
   private val taintResults: MMap[JawaClass, TaintAnalysisResult] = mmapEmpty
   
-  def setTaintAnalysisResult(key: JawaClass, tar: TaintAnalysisResult) = this.synchronized(this.taintResults(key) = tar)
+  def addTaintAnalysisResult(key: JawaClass, tar: TaintAnalysisResult) = this.synchronized(this.taintResults(key) = tar)
   def hasTaintAnalysisResult(key: JawaClass): Boolean = taintResults.contains(key)
   def getTaintAnalysisResult(key: JawaClass): Option[TaintAnalysisResult] = this.taintResults.get(key)
   def getTaintAnalysisResults = this.taintResults.toMap

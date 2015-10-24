@@ -27,6 +27,9 @@ import org.sireum.jawa.util.MyTimeoutException
 import org.sireum.jawa.DefaultReporter
 import org.sireum.jawa.Global
 import org.sireum.amandroid.Apk
+import org.sireum.jawa.PrintReporter
+import org.sireum.jawa.MsgLevel
+import org.sireum.jawa.ObjectType
 
 
 /**
@@ -54,7 +57,7 @@ object Icc_run {
         case (rName, source) =>
           iccSigs.exists(source.code.contains(_))
       })
-        IccCounter.haveIcc += 1
+      IccCounter.haveIcc += 1
   
       codes.foreach{
         case (rName, source) =>
@@ -65,8 +68,8 @@ object Icc_run {
     def entryPointFilter(eps: Set[org.sireum.jawa.JawaMethod]): Set[org.sireum.jawa.JawaMethod] = {
       val res = eps.filter(e=>app_info.getIccContainers.contains(e.getDeclaringClass))
       if(!res.isEmpty){
-      IccCounter.foundIccContainer += 1
-    }
+        IccCounter.foundIccContainer += 1
+      }
       res
     }
 
@@ -79,6 +82,7 @@ object Icc_run {
       val apkName = apk.nameUri.substring(apk.nameUri.lastIndexOf("/"), apk.nameUri.lastIndexOf("."))
       val appDataDirFile = new File(outputDir + "/" + apkName)
       if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
+      println(appData.toString())
       val out = new PrintWriter(appDataDirFile + "/AppData.txt")
       out.print(appData.toString)
       out.close()
@@ -117,10 +121,11 @@ object Icc_run {
     
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
     
-    files.foreach{
+    files.filter(_.contains("ActivityCommunication6")).foreach{
       file =>
-        val reporter = new DefaultReporter
+        val reporter = new PrintReporter(MsgLevel.ERROR)
         val global = new Global(file, reporter)
+        global.setJavaLib("/Users/fgwei/Library/Android/sdk/platforms/android-21/android.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v4/android-support-v4.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v13/android-support-v13.jar")
         val apk = new Apk(file)
         val socket = new AmandroidSocket(global, apk)
         try{
@@ -147,7 +152,7 @@ object Icc_run {
       val app_info = new IccCollector(global, apk, outUri, timer)
       app_info.collectInfo
       socket.plugListener(new IccListener(global, apk, app_info))
-      socket.runWithoutDDA(false, true, timer)
+      socket.runWithoutDDA(false, false, timer)
       return "Done!"
     }
   }

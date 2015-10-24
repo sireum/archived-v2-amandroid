@@ -8,6 +8,7 @@ http://www.eclipse.org/legal/epl-v10.html
 package org.sireum.amandroid.dedex
 
 import org.sireum.util._
+import org.sireum.jawa.Signature
 
 /**
  * @author fgwei
@@ -30,10 +31,14 @@ trait DexConstants {
       ONEREGFIELD_READ_WIDE,
       ONEREGFIELD_READ_OBJECT,
       ONEREGFIELD_WRITE,
+      ONEREGFIELD_WRITE_WIDE,
+      ONEREGFIELD_WRITE_OBJECT,
       TWOREGSFIELD_READ,
       TWOREGSFIELD_READ_WIDE,
       TWOREGSFIELD_READ_OBJECT,
       TWOREGSFIELD_WRITE,
+      TWOREGSFIELD_WRITE_WIDE,
+      TWOREGSFIELD_WRITE_OBJECT,
       NOPARAMETER,
       REGCONST16,
       REGCONST16_WIDE,
@@ -168,8 +173,8 @@ trait DexConstants {
     InstructionType.TWOREGSFIELD_READ,                  // 57
     InstructionType.TWOREGSFIELD_READ,                  // 58
     InstructionType.TWOREGSFIELD_WRITE,                 // 59
-    InstructionType.TWOREGSFIELD_WRITE,                 // 5a
-    InstructionType.TWOREGSFIELD_WRITE,                 // 5b
+    InstructionType.TWOREGSFIELD_WRITE_WIDE,            // 5a
+    InstructionType.TWOREGSFIELD_WRITE_OBJECT,          // 5b
     InstructionType.TWOREGSFIELD_WRITE,                 // 5c
     InstructionType.TWOREGSFIELD_WRITE,                 // 5d
     InstructionType.TWOREGSFIELD_WRITE,                 // 5e
@@ -182,8 +187,8 @@ trait DexConstants {
     InstructionType.ONEREGFIELD_READ,                   // 65
     InstructionType.ONEREGFIELD_READ,                   // 66
     InstructionType.ONEREGFIELD_WRITE,                  // 67
-    InstructionType.ONEREGFIELD_WRITE,                  // 68
-    InstructionType.ONEREGFIELD_WRITE,                  // 69
+    InstructionType.ONEREGFIELD_WRITE_WIDE,             // 68
+    InstructionType.ONEREGFIELD_WRITE_OBJECT,           // 69
     InstructionType.ONEREGFIELD_WRITE,                  // 6a
     InstructionType.ONEREGFIELD_WRITE,                  // 6b
     InstructionType.ONEREGFIELD_WRITE,                  // 6c
@@ -311,9 +316,9 @@ trait DexConstants {
     InstructionType.ONEREGFIELD_WRITE,                  // e6
     InstructionType.TWOREGSFIELD_READ_OBJECT,           // e7
     InstructionType.TWOREGSFIELD_READ_WIDE,             // e8
-    InstructionType.TWOREGSFIELD_WRITE,                 // e9
+    InstructionType.TWOREGSFIELD_WRITE_WIDE,            // e9
     InstructionType.ONEREGFIELD_READ_WIDE,              // ea
-    InstructionType.ONEREGFIELD_WRITE,                  // eb
+    InstructionType.ONEREGFIELD_WRITE_WIDE,             // eb
     InstructionType.UNKNOWN_INSTRUCTION,                // ec
     InstructionType.UNKNOWN_INSTRUCTION,                // ed
     InstructionType.INLINEMETHODINVOKE,                 // ee
@@ -330,9 +335,9 @@ trait DexConstants {
     InstructionType.QUICKMETHODINVOKE_RANGE,            // f9
     InstructionType.QUICKMETHODINVOKE,                  // fa
     InstructionType.QUICKMETHODINVOKE_RANGE,            // fb
-    InstructionType.TWOREGSFIELD_WRITE,                 // fc
+    InstructionType.TWOREGSFIELD_WRITE_OBJECT,          // fc
     InstructionType.ONEREGFIELD_READ_OBJECT,            // fd
-    InstructionType.ONEREGFIELD_WRITE,                  // fe
+    InstructionType.ONEREGFIELD_WRITE_OBJECT,           // fe
     InstructionType.UNKNOWN_INSTRUCTION                 // ff
   )
 
@@ -592,4 +597,271 @@ trait DexConstants {
   final val SGET_OBJECT_VOLATILE = 0xfd
   final val SPUT_OBJECT_VOLATILE = 0xfe
   // unused_FF
+  
+  def nop = "@nop" // 0x00
+  def move(x: Int, y: Int) = "v%d:= v%d;".format(x, y) // 0x1, 0x2, 0x3
+  def moveWide(x: Int, y: Int) = "v%d:= v%d  @kind long;".format(x, y) // 0x4, 0x5, 0x6
+  def moveObject(x: Int, y: Int) = "v%d:= v%d  @kind object;".format(x, y) // 0x7, 0x8, 0x9
+  def moveResult(x: Int) = "v%d:= temp;".format(x) // 0xa
+  def moveResultWide(x: Int) = "v%d:= temp  @kind long;".format(x) // 0xb
+  def moveResultObject(x: Int) = "v%d:= temp  @kind object;".format(x) // 0xc
+  def moveExc(x: Int) = "v%d:= Exception  @kind object;".format(x) // 0xd
+  def returnVoid = "return  @kind void;" // 0xe
+  def `return`(x: Int) = "return v%d;".format(x)  // 0xf
+  def returnWide(x: Int) = "return v%d  @kind long;".format(x) // 0x10
+  def returnObj(x: Int) = "return v%d  @kind object;".format(x) // 0x11
+  def const4(x: Int, y: Int) = "v%d:= %dI  @kind int;".format(x, y) // 0x12
+  def const16(x: Int, y: Int) = "v%d:= %dI  @kind int;".format(x, y) // 0x13
+  def const(x: Int, y: Int) = "v%d:= %dI  @kind int;".format(x, y) // 0x14
+  def constHigh16(x: Int, y: Int) = "v%d:= %dI  @kind int;".format(x, y) // 0x15
+  def constWide16(x: Int, y: Int) = "v%d:= %dI  @kind int;".format(x, y) // 0x16
+  def constWide32(x: Int, y: Int) = "v%d:= %fF  @kind float;".format(x, y) // 0x17
+  def constWide(x: Int, y: Int) = "v%d:= %fD  @kind double;".format(x, y) // 0x18
+  def constWideHigh16(x: Int, y: Int) = "v%d:= %lldL  @kind long;".format(x, y) // 0x19
+  def constString(x: Int, str: String) = "v%d:= \"%s\" @kind object;".format(x, str)  // 0x1a, 0x1b
+  def constClass(x: Int, typ: String) = "v%d:= constclass @type ^%s @kind object;".format(x, typ) // 0x1c
+  def monitorEnter(x: Int) = "@monitorenter v%d".format(x) // 0x1d
+  def monitorExit(x: Int) = "@monitorexit v%d".format(x) // 0x1e
+  def checkCast(x: Int, typ: String, z: Int) = "v%d:= (%s)v%d  @kind object;".format(x, typ, z) // 0x1f
+  def instanceOf(x: Int, y: Int, typ: String) = "v%d:= instanceof @variable v%d @type ^%s @kind boolean;".format(x, y, typ) // 0x20
+  def arrayLen(x: Int, y: Int) = "v%d:= length @variable v%d @kind int;".format(x, y) // 0x21
+  def newIns(x: Int, typ: String) = "v%d:= new %s;".format(x, typ) // 0x22
+  def newArray(x: Int, basetyp: String, y: Int) = "v%d:= new %s[v%d];".format(x, basetyp, y) // 0x23
+  def filledNewArray(baseTyp: String, regs: IList[Int]) = s"temp:= new $baseTyp[${regs.map("v" + _).mkString(", ")}]" // 0x24
+  def filledNewArrayRange(baseTyp: String, regbase: Int, regsize: Int) = s"temp:= new $baseTyp[${(0 to regsize - 1).map(i => "v" + (regbase + i)).mkString(", ")}]" // 0x25
+  def fillArrData(target: Long) = "goto L%06x;".format(target) // 0x26
+  def `throw`(x: Int) = "throw v%d;".format(x) // 0x27
+  def goto(target: Long) = "goto L%06x;".format(target) // 0x28, 0x29, 0x2a
+  def switch(target: Long) = "goto L%06x;".format(target) // 0x2b, 0x2c
+  def fcmpl(x: Int, y: Int, z: Int) = "v%d:= fcmpl(v%d,v%d);".format(x, y, z) // 0x2d
+  def fcmpg(x: Int, y: Int, z: Int) = "v%d:= fcmpg(v%d,v%d);".format(x, y, z) // 0x2e
+  def dcmpl(x: Int, y: Int, z: Int) = "v%d:= dcmpl(v%d,v%d);".format(x, y, z) // 0x2f
+  def dcmpg(x: Int, y: Int, z: Int) = "v%d:= dcmpg(v%d,v%d);".format(x, y, z) // 0x30
+  def lcmp(x: Int, y: Int, z: Int) = "v%d:= lcmp(v%d,v%d);".format(x, y, z) // 0x31
+  def ifEq(x: Int, y: Int, target: Long) = "if v%d == v%d then goto L%06x;".format(x, y, target) // 0x32
+  def ifNq(x: Int, y: Int, target: Long) = "if v%d != v%d then goto L%06x;".format(x, y, target) // 0x33
+  def ifLt(x: Int, y: Int, target: Long) = "if v%d < v%d then goto L%06x;".format(x, y, target) // 0x34
+  def ifGe(x: Int, y: Int, target: Long) = "if v%d >= v%d then goto L%06x;".format(x, y, target) // 0x35
+  def ifGt(x: Int, y: Int, target: Long) = "if v%d > v%d then goto L%06x;".format(x, y, target) // 0x36
+  def ifLe(x: Int, y: Int, target: Long) = "if v%d <= v%d then goto L%06x;".format(x, y, target) // 0x37
+  def ifEqz(x: Int, target: Long) = "if v%d == 0 then goto L%06x;".format(x, target) // 0x38
+  def ifNez(x: Int, target: Long) = "if v%d != 0 then goto L%06x;".format(x, target) // 0x39
+  def ifLtz(x: Int, target: Long) = "if v%d < 0 then goto L%06x;".format(x, target) // 0x3a
+  def ifGez(x: Int, target: Long) = "if v%d >= 0 then goto L%06x;".format(x, target) // 0x3b
+  def ifGtz(x: Int, target: Long) = "if v%d > 0 then goto L%06x;".format(x, target) // 0x3c
+  def ifLez(x: Int, target: Long) = "if v%d <= 0 then goto L%06x;".format(x, target) // 0x3d
+  // unused 0x3e to 0x43
+  def aget(x: Int, y: Int, z: Int) = "v%d:= v%d[v%d]  @kind int;".format(x, y, z) // 0x44
+  def agetWide(x: Int, y: Int, z: Int) = "v%d:= v%d[v%d]  @kind long;".format(x, y, z) // 0x45
+  def agetObject(x: Int, y: Int, z: Int) = "v%d:= v%d[v%d]  @kind object;".format(x, y, z) // 0x46
+  def agetBool(x: Int, y: Int, z: Int) = "v%d:= v%d[v%d]  @kind boolean;".format(x, y, z) // 0x47
+  def agetByte(x: Int, y: Int, z: Int) = "v%d:= v%d[v%d]  @kind byte;".format(x, y, z) // 0x48
+  def agetChar(x: Int, y: Int, z: Int) = "v%d:= v%d[v%d]  @kind char;".format(x, y, z) // 0x49
+  def agetShort(x: Int, y: Int, z: Int) = "v%d:= v%d[v%d]  @kind short;".format(x, y, z) // 0x4a
+  def aput(x: Int, y: Int, z: Int) = "v%d[v%d]:= v%d  @kind int;".format(x, y, z) // 0x4b
+  def aputWide(x: Int, y: Int, z: Int) = "v%d[v%d]:= v%d  @kind long;".format(x, y, z) // 0x4c
+  def aputObject(x: Int, y: Int, z: Int) = "v%d[v%d]:= v%d  @kind object;".format(x, y, z) // 0x4d
+  def aputBool(x: Int, y: Int, z: Int) = "v%d[v%d]:= v%d  @kind boolean;".format(x, y, z) // 0x4e
+  def aputByte(x: Int, y: Int, z: Int) = "v%d[v%d]:= v%d  @kind byte;".format(x, y, z) // 0x4f
+  def aputChar(x: Int, y: Int, z: Int) = "v%d[v%d]:= v%d  @kind char;".format(x, y, z) // 0x50
+  def aputShort(x: Int, y: Int, z: Int) = "v%d[v%d]:= v%d  @kind short;".format(x, y, z) // 0x51
+  def iget(x: Int, y: Int, field: String, typ: String) = "v%d:= v%d.`%s`  @kind int @type ^%s;".format(x, y, field, typ) // 0x52
+  def igetWide(x: Int, y: Int, field: String, typ: String) = "v%d:= v%d.`%s`  @kind long @type ^%s;".format(x, y, field, typ) // 0x53
+  def igetObject(x: Int, y: Int, field: String, typ: String) = "v%d:= v%d.`%s`  @kind object @type ^%s;".format(x, y, field, typ) // 0x54
+  def igetBool(x: Int, y: Int, field: String, typ: String) = "v%d:= v%d.`%s`  @kind boolean @type ^%s;".format(x, y, field, typ) // 0x55
+  def igetByte(x: Int, y: Int, field: String, typ: String) = "v%d:= v%d.`%s`  @kind byte @type ^%s;".format(x, y, field, typ) // 0x56
+  def igetChar(x: Int, y: Int, field: String, typ: String) = "v%d:= v%d.`%s`  @kind char @type ^%s;".format(x, y, field, typ) // 0x57
+  def igetShort(x: Int, y: Int, field: String, typ: String) = "v%d:= v%d.`%s`  @kind short @type ^%s;".format(x, y, field, typ) // 0x58
+  def iput(x: Int, field: String, y: Int, typ: String) = "v%d.`%s`:= v%d  @kind int @type ^%s;".format(x, field, y, typ) // 0x59
+  def iputWide(x: Int, field: String, y: Int, typ: String) = "v%d.`%s`:= v%d  @kind long @type ^%s;".format(x, field, y, typ) // 0x5a
+  def iputObject(x: Int, field: String, y: Int, typ: String) = "v%d.`%s`:= v%d  @kind object @type ^%s;".format(x, field, y, typ) // 0x5b
+  def iputBool(x: Int, field: String, y: Int, typ: String) = "v%d.`%s`:= v%d  @kind boolean @type ^%s;".format(x, field, y, typ) // 0x5c
+  def iputByte(x: Int, field: String, y: Int, typ: String) = "v%d.`%s`:= v%d  @kind byte @type ^%s;".format(x, field, y, typ) // 0x5d
+  def iputChar(x: Int, field: String, y: Int, typ: String) = "v%d.`%s`:= v%d  @kind char @type ^%s;".format(x, field, y, typ) // 0x5e
+  def iputShort(x: Int, field: String, y: Int, typ: String) = "v%d.`%s`:= v%d  @kind short @type ^%s;".format(x, field, y, typ) // 0x5f
+  def sget(x: Int, field: String, typ: String) = "v%d:= `@@%s`  @kind int @type ^%s;".format(x, field, typ) // 0x60
+  def sgetWide(x: Int, field: String, typ: String) = "v%d:= `@@%s`  @kind long @type ^%s;".format(x, field, typ) // 0x61
+  def sgetObject(x: Int, field: String, typ: String) = "v%d:= `@@%s`  @kind object @type ^%s;".format(x, field, typ) // 0x62
+  def sgetBool(x: Int, field: String, typ: String) = "v%d:= `@@%s`  @kind boolean @type ^%s;".format(x, field, typ) // 0x63
+  def sgetByte(x: Int, field: String, typ: String) = "v%d:= `@@%s`  @kind byte @type ^%s;".format(x, field, typ) // 0x64
+  def sgetChar(x: Int, field: String, typ: String) = "v%d:= `@@%s`  @kind char @type ^%s;".format(x, field, typ) // 0x65
+  def sgetShort(x: Int, field: String, typ: String) = "v%d:= `@@%s`  @kind short @type ^%s;".format(x, field, typ) // 0x66
+  def sput(field: String, x: Int, typ: String) = "`@@%s`:= v%d  @kind int @type ^%s;".format(field, x, typ) // 0x67
+  def sputWide(field: String, x: Int, typ: String) = "`@@%s`:= v%d  @kind long @type ^%s;".format(field, x, typ) // 0x68
+  def sputObject(field: String, x: Int, typ: String) = "`@@%s`:= v%d  @kind object @type ^%s;".format(field, x, typ) // 0x69
+  def sputBool(field: String, x: Int, typ: String) = "`@@%s`:= v%d  @kind boolean @type ^%s;".format(field, x, typ) // 0x6a
+  def sputByte(field: String, x: Int, typ: String) = "`@@%s`:= v%d  @kind byte @type ^%s;".format(field, x, typ) // 0x6b
+  def sputChar(field: String, x: Int, typ: String) = "`@@%s`:= v%d  @kind char @type ^%s;".format(field, x, typ) // 0x6c
+  def sputShort(field: String, x: Int, typ: String) = "`@@%s`:= v%d  @kind short @type ^%s;".format(field, x, typ) // 0x6d
+  def invokeVirtual(className: String, methodName: String, args: IList[Int], sig: Signature, classTyp: String) = s"call temp:=  `$className.$methodName`(${args.map("v" + _).mkString(", ")}) @signature `$sig` @classDescriptor ^$classTyp @kind virtual;" // 0x6e
+  def invokeSuper(className: String, methodName: String, args: IList[Int], sig: Signature, classTyp: String) = s"call temp:=  `$className.$methodName`(${args.map("v" + _).mkString(", ")}) @signature `$sig` @classDescriptor ^$classTyp @kind super;" // 0x6f
+  def invokeDirect(className: String, methodName: String, args: IList[Int], sig: Signature, classTyp: String) = s"call temp:=  `$className.$methodName`(${args.map("v" + _).mkString(", ")}) @signature `$sig` @classDescriptor ^$classTyp @kind direct;" // 0x70
+  def invokeStatic(className: String, methodName: String, args: IList[Int], sig: Signature, classTyp: String) = s"call temp:=  `$className.$methodName`(${args.map("v" + _).mkString(", ")}) @signature `$sig` @classDescriptor ^$classTyp @kind static;" // 0x71
+  def invokeInterface(className: String, methodName: String, args: IList[Int], sig: Signature, classTyp: String) = s"call temp:=  `$className.$methodName`(${args.map("v" + _).mkString(", ")}) @signature `$sig` @classDescriptor ^$classTyp @kind interface;" // 0x72
+  // unused 0x73
+  def invokeVirtualRange(className: String, methodName: String, argbase: Int, argsize: Int, sig: Signature, classTyp: String) = s"call temp:=  `$className.$methodName`(${(0 to argsize - 1).map(i => "v" + (argbase + i)).mkString(", ")}) @signature `$sig` @classDescriptor ^$classTyp @kind virtual;" // 0x74
+  def invokeSuperRange(className: String, methodName: String, argbase: Int, argsize: Int, sig: Signature, classTyp: String) = s"call temp:=  `$className.$methodName`(${(0 to argsize - 1).map(i => "v" + (argbase + i)).mkString(", ")}}) @signature `$sig` @classDescriptor ^$classTyp @kind super;" // 0x75
+  def invokeDirectRange(className: String, methodName: String, argbase: Int, argsize: Int, sig: Signature, classTyp: String) = s"call temp:=  `$className.$methodName`(${(0 to argsize - 1).map(i => "v" + (argbase + i)).mkString(", ")}}) @signature `$sig` @classDescriptor ^$classTyp @kind direct;" // 0x76
+  def invokeStaticRange(className: String, methodName: String, argbase: Int, argsize: Int, sig: Signature, classTyp: String) = s"call temp:=  `$className.$methodName`(${(0 to argsize - 1).map(i => "v" + (argbase + i)).mkString(", ")}}) @signature `$sig` @classDescriptor ^$classTyp @kind static;" // 0x77
+  def invokeInterfaceRange(className: String, methodName: String, argbase: Int, argsize: Int, sig: Signature, classTyp: String) = s"call temp:=  `$className.$methodName`(${(0 to argsize - 1).map(i => "v" + (argbase + i)).mkString(", ")}}) @signature `$sig` @classDescriptor ^$classTyp @kind interface;" // 0x78
+  // unused 0x79 0x7a
+  def unopNegInt(x: Int, y: Int) = "v%d:= -v%d  @kind int;".format(x, y) // 0x7b
+  def unopNotInt(x: Int, y: Int) = "v%d:= ~v%d  @kind int;".format(x, y) // 0x7c
+  def unopNegLong(x: Int, y: Int) = "v%d:= -v%d  @kind long;".format(x, y) // 0x7d
+  def unopNotLong(x: Int, y: Int) = "v%d:= ~v%d  @kind long;".format(x, y) // 0x7e
+  def unopNegFloat(x: Int, y: Int) = "v%d:= -v%d  @kind float;".format(x, y) // 0x7f
+  def unopNegDouble(x: Int, y: Int) = "v%d:= -v%d  @kind double;".format(x, y) // 0x80
+  def unopInt2Long(x: Int, y: Int) = "v%d:= (long)v%d  @kind i2l;".format(x, y) // 0x81
+  def unopInt2Float(x: Int, y: Int) = "v%d:= (float)v%d  @kind i2f;".format(x, y) // 0x82
+  def unopInt2Double(x: Int, y: Int) = "v%d:= (double)v%d  @kind i2d;".format(x, y) // 0x83
+  def unopLong2Int(x: Int, y: Int)  = "v%d:= (int)v%d  @kind l2i;".format(x, y) // 0x84
+  def unopLong2Float(x: Int, y: Int) = "v%d:= (float)v%d  @kind l2f;".format(x, y) // 0x85
+  def unopLong2Double(x: Int, y: Int) = "v%d:= (double)v%d  @kind l2d;".format(x, y) // 0x86
+  def unopFloat2Int(x: Int, y: Int) = "v%d:= (int)v%d  @kind f2i;".format(x, y) // 0x87
+  def unopFloat2Long(x: Int, y: Int) = "v%d:= (long)v%d  @kind f2l;".format(x, y) // 0x88
+  def unopFloat2Double(x: Int, y: Int) = "v%d:= (double)v%d  @kind f2d;".format(x, y) // 0x89
+  def unopDouble2Int(x: Int, y: Int) = "v%d:= (int)v%d  @kind d2i;".format(x, y) // 0x8a
+  def unopDouble2Long(x: Int, y: Int) = "v%d:= (long)v%d  @kind d2l;".format(x, y) // 0x8b
+  def unopDouble2Float(x: Int, y: Int) = "v%d:= (float)v%d  @kind d2f;".format(x, y) // 0x8c
+  def unopInt2Byte(x: Int, y: Int)  = "v%d:= (byte)v%d  @kind i2b;".format(x, y) // 0x8d
+  def unopInt2Char(x: Int, y: Int)  = "v%d:= (char)v%d  @kind i2c;".format(x, y) // 0x8e
+  def unopInt2short(x: Int, y: Int) = "v%d:= (short)v%d  @kind i2s;".format(x, y) // 0x8f
+  def addInt(x: Int, y: Int, z: Int) = "v%d:= v%d + v%d  @kind int;".format(x, y, z) // 0x90
+  def subInt(x: Int, y: Int, z: Int) = "v%d:= v%d - v%d  @kind int;".format(x, y, z) // 0x91
+  def mulInt(x: Int, y: Int, z: Int) = "v%d:= v%d * v%d  @kind int;".format(x, y, z) // 0x92
+  def divInt(x: Int, y: Int, z: Int) = "v%d:= v%d / v%d  @kind int;".format(x, y, z) // 0x93
+  def remInt(x: Int, y: Int, z: Int) = "v%d:= v%d %% v%d  @kind int;".format(x, y, z) // 0x94
+  def andInt(x: Int, y: Int, z: Int) = "v%d:= v%d ^& v%d  @kind int;".format(x, y, z) // 0x95
+  def orInt(x: Int, y: Int, z: Int) = "v%d:= v%d ^| v%d  @kind int;".format(x, y, z) // 0x96
+  def xorInt(x: Int, y: Int, z: Int) = "v%d:= v%d ^~ v%d  @kind int;".format(x, y, z) // 0x97
+  def shlInt(x: Int, y: Int, z: Int) = "v%d:= v%d ^< v%d  @kind int;".format(x, y, z) // 0x98
+  def shrInt(x: Int, y: Int, z: Int) = "v%d:= v%d ^> v%d  @kind int;".format(x, y, z) // 0x99
+  def ushrInt(x: Int, y: Int, z: Int) = "v%d:= v%d ^>> v%d  @kind int;".format(x, y, z) // 0x9a
+  def addLong(x: Int, y: Int, z: Int) = "v%d:= v%d + v%d  @kind long;".format(x, y, z) // 0x9b
+  def subLong(x: Int, y: Int, z: Int) = "v%d:= v%d - v%d  @kind long;".format(x, y, z) // 0x9c
+  def mulLong(x: Int, y: Int, z: Int) = "v%d:= v%d * v%d  @kind long;".format(x, y, z) // 0x9d
+  def divLong(x: Int, y: Int, z: Int) = "v%d:= v%d / v%d  @kind long;".format(x, y, z) // 0x9e
+  def remLong(x: Int, y: Int, z: Int) = "v%d:= v%d %% v%d  @kind long;".format(x, y, z) // 0x9f
+  def andLong(x: Int, y: Int, z: Int) = "v%d:= v%d ^& v%d  @kind long;".format(x, y, z) // 0xa0
+  def orLong(x: Int, y: Int, z: Int) = "v%d:= v%d ^| v%d  @kind long;".format(x, y, z) // 0xa1
+  def xorLong(x: Int, y: Int, z: Int) = "v%d:= v%d ^~ v%d  @kind long;".format(x, y, z) // 0xa2
+  def shlLong(x: Int, y: Int, z: Int) = "v%d:= v%d ^< v%d  @kind long;".format(x, y, z) // 0xa3
+  def shrLong(x: Int, y: Int, z: Int) = "v%d:= v%d ^> v%d  @kind long;".format(x, y, z) // 0xa4
+  def ushrLong(x: Int, y: Int, z: Int) = "v%d:= v%d ^>> v%d  @kind long;".format(x, y, z) // 0xa5
+  def addFloat(x: Int, y: Int, z: Int) = "v%d:= v%d + v%d  @kind float;".format(x, y, z) // 0xa6
+  def subFloat(x: Int, y: Int, z: Int) = "v%d:= v%d - v%d  @kind float;".format(x, y, z) // 0xa7
+  def mulFloat(x: Int, y: Int, z: Int) = "v%d:= v%d * v%d  @kind float;".format(x, y, z) // 0xa8
+  def divFloat(x: Int, y: Int, z: Int) = "v%d:= v%d / v%d  @kind float;".format(x, y, z) // 0xa9
+  def remFloat(x: Int, y: Int, z: Int) = "v%d:= v%d %% v%d  @kind float;".format(x, y, z) // 0xaa
+  def addDouble(x: Int, y: Int, z: Int) = "v%d:= v%d + v%d  @kind double;".format(x, y, z) // 0xab
+  def subDouble(x: Int, y: Int, z: Int) = "v%d:= v%d - v%d  @kind double;".format(x, y, z) // 0xac
+  def mulDouble(x: Int, y: Int, z: Int) = "v%d:= v%d * v%d  @kind double;".format(x, y, z) // 0xad
+  def divDouble(x: Int, y: Int, z: Int) = "v%d:= v%d / v%d  @kind double;".format(x, y, z) // 0xae
+  def remDouble(x: Int, y: Int, z: Int) = "v%d:= v%d %% v%d  @kind double;".format(x, y, z) // 0xaf
+  def addInt2addr(x: Int, y: Int, z: Int) = "v%d:= v%d + v%d  @kind int;".format(x, y, z) // 0xb0
+  def subInt2addr(x: Int, y: Int, z: Int) = "v%d:= v%d - v%d  @kind int;".format(x, y, z) // 0xb1
+  def mulInt2addr(x: Int, y: Int, z: Int) = "v%d:= v%d * v%d  @kind int;".format(x, y, z) // 0xb2
+  def divInt2addr(x: Int, y: Int, z: Int) = "v%d:= v%d / v%d  @kind int;".format(x, y, z) // 0xb3
+  def remInt2addr(x: Int, y: Int, z: Int) = "v%d:= v%d %% v%d  @kind int;".format(x, y, z) // 0xb4
+  def andInt2addr(x: Int, y: Int, z: Int) = "v%d:= v%d ^& v%d  @kind int;".format(x, y, z) // 0xb5
+  def orInt2addr(x: Int, y: Int, z: Int)  = "v%d:= v%d ^| v%d  @kind int;".format(x, y, z) // 0xb6
+  def xorInt2addr(x: Int, y: Int, z: Int) = "v%d:= v%d ^~ v%d  @kind int;".format(x, y, z) // 0xb7
+  def shlInt2addr(x: Int, y: Int, z: Int) = "v%d:= v%d ^< v%d  @kind int;".format(x, y, z) // 0xb8
+  def shrInt2addr(x: Int, y: Int, z: Int) = "v%d:= v%d ^> v%d  @kind int;".format(x, y, z) // 0xb9
+  def ushrInt2addr(x: Int, y: Int, z: Int) = "v%d:= v%d ^>> v%d  @kind int;".format(x, y, z) // 0xba
+  def addLong2addr(x: Int, y: Int, z: Int) = "v%d:= v%d + v%d  @kind long;".format(x, y, z) // 0xbb
+  def subLong2addr(x: Int, y: Int, z: Int) = "v%d:= v%d - v%d  @kind long;".format(x, y, z) // 0xbc
+  def mulLong2addr(x: Int, y: Int, z: Int) = "v%d:= v%d * v%d  @kind long;".format(x, y, z) // 0xbd
+  def divLong2addr(x: Int, y: Int, z: Int) = "v%d:= v%d / v%d  @kind long;".format(x, y, z) // 0xbe
+  def remLong2addr(x: Int, y: Int, z: Int) = "v%d:= v%d %% v%d  @kind long;".format(x, y, z) // 0xbf
+  def andLong2addr(x: Int, y: Int, z: Int) = "v%d:= v%d ^& v%d  @kind long;".format(x, y, z) // 0xc0
+  def orLong2addr(x: Int, y: Int, z: Int) = "v%d:= v%d ^| v%d  @kind long;".format(x, y, z) // 0xc1
+  def xorLong2addr(x: Int, y: Int, z: Int) = "v%d:= v%d ^~ v%d  @kind long;".format(x, y, z) // 0xc2
+  def shlLong2addr(x: Int, y: Int, z: Int) = "v%d:= v%d ^< v%d  @kind long;".format(x, y, z) // 0xc3
+  def shrLong2addr(x: Int, y: Int, z: Int) = "v%d:= v%d ^> v%d  @kind long;".format(x, y, z) // 0xc4
+  def ushrLong2addr(x: Int, y: Int, z: Int) = "v%d:= v%d ^>> v%d  @kind long;".format(x, y, z) // 0xc5
+  def addFloat2addr(x: Int, y: Int, z: Int) = "v%d:= v%d + v%d  @kind float;".format(x, y, z) // 0xc6
+  def subFloat2addr(x: Int, y: Int, z: Int) = "v%d:= v%d - v%d  @kind float;".format(x, y, z) // 0xc7
+  def mulFloat2addr(x: Int, y: Int, z: Int) = "v%d:= v%d * v%d  @kind float;".format(x, y, z) // 0xc8
+  def divFloat2addr(x: Int, y: Int, z: Int) = "v%d:= v%d / v%d  @kind float;".format(x, y, z) // 0xc9
+  def remFloat2addr(x: Int, y: Int, z: Int) = "v%d:= v%d %% v%d  @kind float;".format(x, y, z) // 0xca
+  def addDouble2addr(x: Int, y: Int, z: Int) = "v%d:= v%d + v%d  @kind double;".format(x, y, z) // 0xcb
+  def subDouble2addr(x: Int, y: Int, z: Int) = "v%d:= v%d - v%d  @kind double;".format(x, y, z) // 0xcc
+  def mulDouble2addr(x: Int, y: Int, z: Int) = "v%d:= v%d * v%d  @kind double;".format(x, y, z) // 0xcd
+  def divDouble2addr(x: Int, y: Int, z: Int) = "v%d:= v%d / v%d  @kind double;".format(x, y, z) // 0xce
+  def remDouble2addr(x: Int, y: Int, z: Int) = "v%d:= v%d %% v%d  @kind double;".format(x, y, z) // 0xcf
+  def addLit16(x: Int, y: Int, z: Int) = "v%d:= v%d + %d  @kind int;".format(x, y, z) // 0xd0
+  def subLit16(x: Int, y: Int, z: Int) = "v%d:= v%d - %d  @kind int;".format(x, y, z) // 0xd1
+  def mulLit16(x: Int, y: Int, z: Int) = "v%d:= v%d * %d  @kind int;".format(x, y, z) // 0xd2
+  def divLit16(x: Int, y: Int, z: Int) = "v%d:= v%d / %d  @kind int;".format(x, y, z) // 0xd3
+  def remLit16(x: Int, y: Int, z: Int) = "v%d:= v%d %% %d  @kind int;".format(x, y, z) // 0xd4
+  def andLit16(x: Int, y: Int, z: Int) = "v%d:= v%d ^& %d  @kind int;".format(x, y, z) // 0xd5
+  def orLit16(x: Int, y: Int, z: Int) = "v%d:= v%d ^| %d  @kind int;".format(x, y, z) // 0xd6
+  def xorLit16(x: Int, y: Int, z: Int) = "v%d:= v%d ^~ %d  @kind int;".format(x, y, z) // 0xd7
+  def addLit8(x: Int, y: Int, z: Int) = "v%d:= v%d + %d  @kind int;".format(x, y, z) // 0xd8
+  def subLit8(x: Int, y: Int, z: Int) = "v%d:= v%d - %d  @kind int;".format(x, y, z) // 0xd9
+  def mulLit8(x: Int, y: Int, z: Int) = "v%d:= v%d * %d  @kind int;".format(x, y, z) // 0xda
+  def divLit8(x: Int, y: Int, z: Int) = "v%d:= v%d / %d  @kind int;".format(x, y, z) // 0xdb
+  def remLit8(x: Int, y: Int, z: Int) = "v%d:= v%d %% %d  @kind int;".format(x, y, z) // 0xdc
+  def andLit8(x: Int, y: Int, z: Int) = "v%d:= v%d ^& %d  @kind int;".format(x, y, z) // 0xdd
+  def orLit8(x: Int, y: Int, z: Int) = "v%d:= v%d ^| %d  @kind int;".format(x, y, z) // 0xde
+  def xorLit8(x: Int, y: Int, z: Int) = "v%d:= v%d ^~ %d  @kind int;".format(x, y, z) // 0xdf
+  def shlLit8(x: Int, y: Int, z: Int) = "v%d:= v%d ^< %d  @kind int;".format(x, y, z) // 0xe0
+  def shrLit8(x: Int, y: Int, z: Int) = "v%d:= v%d ^> %d  @kind int;".format(x, y, z) // 0xe1
+  def ushrLit8(x: Int, y: Int, z: Int) = "v%d:= v%d ^>> %d  @kind int;".format(x, y, z) // 0xe2
+  def igetVolatile(x: Int, y: Int, field: String, typ: String) = "v%d:= v%d.`%s`  @kind int @type ^%s;".format(x, y, field, typ) // 0xe3
+  def iputVolatile(x: Int, field: String, y: Int, typ: String) = "v%d.`%s`:= v%d  @kind int @type ^%s;".format(x, field, y, typ) // 0xe4
+  def sgetVolatile(x: Int, field: String, typ: String) = "v%d:= `@@%s`  @kind int @type ^%s;".format(x, field, typ) // 0xe5
+  def sputVolatile(field: String, x: Int, typ: String) = "`@@%s`:= v%d  @kind int @type ^%s;".format(field, x, typ) // 0xe6
+  def igetObjectVolatile(x: Int, y: Int, field: String, typ: String) = "v%d:= v%d.`%s`  @kind object @type ^%s;".format(x, y, field, typ) // 0xe7
+  def igetWideVolatile(x: Int, y: Int, field: String, typ: String) = "v%d:= v%d.`%s`  @kind long @type ^%s;".format(x, y, field, typ) // 0xe8
+  def iputWideVolatile(x: Int, field: String, y: Int, typ: String) = "v%d.`%s`:= v%d  @kind long @type ^%s;".format(x, field, y, typ) // 0xe9
+  def sgetWideVolatile(x: Int, field: String, typ: String) = "v%d:= `@@%s`  @kind long @type ^%s;".format(x, field, typ) // 0xea
+  def sputWideVolatile(field: String, x: Int, typ: String) = "`@@%s`:= v%d  @kind long @type ^%s;".format(field, x, typ) // 0xeb
+  // unused 0xec 0xed
+  def executeInline(className: String, methodName: String, args: IList[Int], sig: Signature, classTyp: String) = // 0xee
+    s"call temp:=  `$className.$methodName`(${args.map("v" + _).mkString(", ")}) @signature `$sig` @classDescriptor ^$classTyp @kind static;"
+  def executeInline(args: IList[Int], inlineOffset: Int) = s"@invoke execute_inline @args (${args.map("v" + _).mkString(", ")}) @inline_offset ${"0x%x".format(inlineOffset)}" // 0xee
+  def executeInlineRange(className: String, methodName: String, argbase: Int, argsize: Int, sig: Signature, classTyp: String) = // 0xef
+    s"call temp:=  `$className.$methodName`(${(0 to argsize - 1).map(i => "v" + (argbase + i)).mkString(", ")}) @signature `$sig` @classDescriptor ^$classTyp @kind direct;"
+  def executeInlineRange(argbase: Int, argsize: Int, inlineOffset: Int) = s"@invoke execute_inline_range @args (${(0 to argsize - 1).map(i => "v" + (argbase + i)).mkString(", ")}) @inline_offset ${"0x%x".format(inlineOffset)}" // 0xef
+  def invokeObjectInit(className: String, methodName: String, args: IList[Int], sig: Signature, classTyp: String) = s"call temp:=  `$className.$methodName`(${args.map("v" + _).mkString(", ")}) @signature `$sig` @classDescriptor ^$classTyp @kind direct;" // 0xf0
+  def returnVoidBarrier = "return  @kind void;" // 0xf1
+  def igetQuick(x: Int, y: Int, field: String, typ: String, resolved: Boolean) = // 0xf2
+    if(!resolved) "@get iget_quick"
+    else "v%d:= v%d.`%s`  @kind int @type ^%s;".format(x, y, field, typ)
+  def igetWideQuick(x: Int, y: Int, field: String, typ: String, resolved: Boolean) = // 0xf3
+    if(!resolved) "@get iget_wide_quick"
+    else "v%d:= v%d.`%s`  @kind long @type ^%s;".format(x, y, field, typ)
+  def igetObjectQuick(x: Int, y: Int, field: String, typ: String, resolved: Boolean) = // 0xf4
+    if(!resolved) "@get iget_object_quick"
+    else "v%d:= v%d.`%s`  @kind object @type ^%s;".format(x, y, field, typ)
+  def iputQuick(x: Int, field: String, y: Int, typ: String, resolved: Boolean) = // 0xf5
+    if(!resolved) "@put iput_quick"
+    else "v%d.`%s`:= v%d  @kind int @type ^%s;".format(x, field, y, typ)
+  def iputWideQuick(x: Int, field: String, y: Int, typ: String, resolved: Boolean) = // 0xf6
+    if(!resolved) "@put iput_wide_quick"
+    else "v%d.`%s`:= v%d  @kind long @type ^%s;".format(x, field, y, typ)
+  def iputObjectQuick(x: Int, field: String, y: Int, typ: String, resolved: Boolean) = // 0xf7
+    if(!resolved) "@put iput_object_quick"
+    else "v%d.`%s`:= v%d  @kind object @type ^%s;".format(x, field, y, typ)
+  def invokeVirtualQuick(className: String, methodName: String, args: IList[Int], sig: Signature, classTyp: String) = // 0xf8
+    s"call temp:=  `$className.$methodName`(${args.map("v" + _).mkString(", ")}) @signature `$sig` @classDescriptor ^$classTyp @kind virtual;"
+  def invokeVirtualQuick(args: IList[Int], vtableOffset: Int) = s"@invoke virtual_quick @args (${args.map("v" + _).mkString(", ")}) @vtable_offset ${"0x%x".format(vtableOffset)}" // 0xf8
+  def invokeVirtualQuickRange(className: String, methodName: String, argbase: Int, argsize: Int, sig: Signature, classTyp: String) = // 0xf9
+    s"call temp:=  `$className.$methodName`(${(0 to argsize - 1).map(i => "v" + (argbase + i)).mkString(", ")}) @signature `$sig` @classDescriptor ^$classTyp @kind virtual;"
+  def invokeVirtualQuickRange(argbase: Int, argsize: Int, vtableOffset: Int) = s"@invoke virtual_quick_range @args (${(0 to argsize - 1).map(i => "v" + (argbase + i)).mkString(", ")}) @vtable_offset ${"0x%x".format(vtableOffset)}" // 0xf9
+  def invokeSuperQuick(className: String, methodName: String, args: IList[Int], sig: Signature, classTyp: String) = // 0xfa
+    s"call temp:=  `$className.$methodName`(${args.map("v" + _).mkString(", ")}) @signature `$sig` @classDescriptor ^$classTyp @kind super;"
+  def invokeSuperQuick(args: IList[Int], vtableOffset: Int) = s"@invoke super_quick @args (${args.map("v" + _).mkString(", ")}) @vtable_offset ${"0x%x".format(vtableOffset)}" // 0xfa
+  def invokeSuperQuickRange(className: String, methodName: String, argbase: Int, argsize: Int, sig: Signature, classTyp: String) = // 0xfb
+    s"call temp:=  `$className.$methodName`(${(0 to argsize - 1).map(i => "v" + (argbase + i)).mkString(", ")}) @signature `$sig` @classDescriptor ^$classTyp @kind super;"
+  def invokeSuperQuickRange(argbase: Int, argsize: Int, vtableOffset: Int) = s"@invoke super_quick_range @args (${(0 to argsize - 1).map(i => "v" + (argbase + i)).mkString(", ")}) @vtable_offset ${"0x%x".format(vtableOffset)}" // 0xfb
+  def iputObjectVolatile(x: Int, field: String, y: Int, typ: String) = "v%d.`%s`:= v%d  @kind object @type ^%s;".format(x, field, y, typ) // 0xfc
+  def sgetObjectVolatile(x: Int, field: String, typ: String) = "v%d:= `@@%s`  @kind object @type ^%s;".format(x, field, typ) // 0xfd
+  def sputObjectVolatile(field: String, x: Int, typ: String) = "`@@%s`:= v%d  @kind object @type ^%s;".format(field, x, typ) // 0xfe
+  //unused 0xff
+  
+  // Codes of instructions that terminate the call flow
+  final val terminateInstructions: IList[Int] = List(0x0E, 0x0F, 0x10, 0x11, 0x27, 0xF1)
 }

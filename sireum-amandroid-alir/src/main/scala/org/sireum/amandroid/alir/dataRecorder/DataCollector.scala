@@ -330,7 +330,7 @@ object DataCollector {
         var iccInfos = isetEmpty[IccInfo]
         var taintResult: Option[TaintAnalysisResult] = None
         if(!compRec.isUnknown){
-          if(apk.hasIDFG(compRec)){
+          if(apk.hasIDFG(compRec)) {
             val InterProceduralDataFlowGraph(icfg, ptaresult) = apk.getIDFG(compRec).get
             val iccNodes = icfg.nodes.filter{
               node =>

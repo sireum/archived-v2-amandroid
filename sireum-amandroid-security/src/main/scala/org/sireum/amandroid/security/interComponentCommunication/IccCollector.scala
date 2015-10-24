@@ -52,7 +52,7 @@ class IccCollector(global: Global, apk: Apk, outputUri: FileResourceUri, timer: 
         }
     }
     ra.initWithEnv
-    val sensitiveAPISigs = AndroidConstants.getDynRegisterMethods
+    val sensitiveAPISigs = AndroidConstants.getIccMethods
     this.iccContainers = sensitiveAPISigs.map(ra.getSensitiveAPIContainer(_)).reduce(iunion[JawaClass])
     apk.setComponents(components)
     apk.updateIntentFilterDB(this.intentFdb)

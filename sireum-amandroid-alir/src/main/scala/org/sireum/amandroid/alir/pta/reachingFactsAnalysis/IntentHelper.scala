@@ -66,7 +66,6 @@ object IntentHelper {
                 else preciseExplicit = false
             }
         }
-        
         var actions: ISet[String] = isetEmpty[String]
         val acFieldSlot = FieldSlot(intentIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION))
         s.pointsToSet(acFieldSlot, currentContext).foreach{
