@@ -128,8 +128,8 @@ object IntentInjection_run {
   }
   
   def main(args: Array[String]): Unit = {
-    if(args.size != 2){
-      System.err.print("Usage: source_path output_path")
+    if(args.size < 2){
+      System.err.print("Usage: source_path output_path [dependence_path]")
       return
     }
 //    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
@@ -140,7 +140,7 @@ object IntentInjection_run {
     
     val sourcePath = args(0)
     val outputPath = args(1)
-    
+    val dpsuri = try{Some(FileUtil.toUri(args(2)))} catch {case e: Exception => None}
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
     
     files.foreach{
@@ -150,7 +150,7 @@ object IntentInjection_run {
         val apk = new Apk(file)
         val socket = new AmandroidSocket(global, apk)
         try{
-          reporter.echo(TITLE, IntentInjectionTask(global, apk, outputPath, file, socket, Some(500)).run)   
+          reporter.echo(TITLE, IntentInjectionTask(global, apk, outputPath, dpsuri, file, socket, Some(500)).run)   
         } catch {
           case te: MyTimeoutException => reporter.error(TITLE, te.message)
           case e: Throwable => e.printStackTrace()
@@ -161,7 +161,7 @@ object IntentInjection_run {
     }
   }
   
-  private case class IntentInjectionTask(global: Global, apk: Apk, outputPath: String, file: FileResourceUri, socket: AmandroidSocket, timeout: Option[Int]) {
+  private case class IntentInjectionTask(global: Global, apk: Apk, outputPath: String, dpsuri: Option[FileResourceUri], file: FileResourceUri, socket: AmandroidSocket, timeout: Option[Int]) {
     def run: String = {
       global.reporter.echo(TITLE, "####" + file + "#####")
       val timer = timeout match {
@@ -169,7 +169,7 @@ object IntentInjection_run {
         case None => None
       }
       if(timer.isDefined) timer.get.start
-      val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary)
+      val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false)
       val app_info = new IntentInjectionCollector(global, apk, outUri, timer)
       app_info.collectInfo
       val ssm = new IntentInjectionSourceAndSinkManager(global, apk, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)

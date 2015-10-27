@@ -284,7 +284,7 @@ object AppInfoCollector {
                   }
               }
           } else {
-            reporter.echo(TITLE, "Unexpected resource type for layout class: " + resource.getType)
+            reporter.echo(TITLE, "Unexpected resource type for layout class: " + resource)
           }
       }
     }

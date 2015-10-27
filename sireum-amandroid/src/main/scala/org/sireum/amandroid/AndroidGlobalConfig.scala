@@ -22,10 +22,10 @@ object AndroidGlobalConfig {
     else if(System.getenv(SIREUM_HOME) != null) System.getenv(SIREUM_HOME) + "/apps/amandroid"
     else throw new RuntimeException("Please set env variable SIREUM_HOME!")
 //	if(amandroid_home == null) throw new RuntimeException("Please set env variable AMANDROID_HOME!")  
-	final val android_lib_dir = amandroid_home + "/androidlib/5.0"
+//	final val android_lib_dir = amandroid_home + "/androidlib/5.0"
 	final val android_libsummary_dir = amandroid_home + "/LibSummary"
-	final val android_dex2pilar_dir = AndroidGlobalConfig.amandroid_home + 
-      "/dex2pilar/" + {if(OsUtils.isMac) "mac64" else if (OsUtils.isLinux) "linux64" else throw new RuntimeException("Please execute Amandroid on Mac64 or Linux64!")}
+//	final val android_dex2pilar_dir = AndroidGlobalConfig.amandroid_home + 
+//      "/dex2pilar/" + {if(OsUtils.isMac) "mac64" else if (OsUtils.isLinux) "linux64" else throw new RuntimeException("Please execute Amandroid on Mac64 or Linux64!")}
   
   final var SourceAndSinkFilePath = amandroid_home + "/taintAnalysis/sourceAndSinks/TaintSourcesAndSinks.txt"
 	final var PasswordSinkFilePath = amandroid_home +  "/taintAnalysis/sourceAndSinks/PasswordSourcesAndSinks.txt"

@@ -259,14 +259,15 @@ object AdLibCounting {
   }
   
   def main(args: Array[String]): Unit = {
-    if(args.size != 1){
-      System.err.print("Usage: source_path")
+    if(args.size < 1){
+      System.err.print("Usage: source_path [dependence_path]")
       return
     }
     
 //    JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), Constants.PILAR_FILE_EXT)
     val outputUri = FileUtil.toUri("/Volumes/ArgusGroup/Stash/outputs/adlib")
     val sourcePath = args(0)
+    val dpsuri = try{Some(FileUtil.toUri(args(1)))} catch {case e: Exception => None}
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
     files.foreach{
       file =>
@@ -277,7 +278,7 @@ object AdLibCounting {
           val apkFile = new File(new URI(file))
           
           val dexFileUri = APKFileResolver.getDexFile(file, outputUri)
-          val pilarRootUri = Dex2PilarConverter.convert(Set(dexFileUri), outputUri)
+          val pilarRootUri = Dex2PilarConverter.convert(Set(dexFileUri), outputUri, dpsuri, false, false)
      
           val pilarFile = new File(new URI(pilarRootUri))
       

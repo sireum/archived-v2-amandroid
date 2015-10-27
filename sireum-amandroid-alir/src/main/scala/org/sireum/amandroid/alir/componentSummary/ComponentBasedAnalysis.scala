@@ -81,6 +81,9 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
       worklist ++= (apk.getComponents -- components)
       components = apk.getComponents
     }
+    apk.getComponents.foreach{
+      comp => yard.addComponent(comp, apk)
+    }
     components = components -- problematicComp
     val summaryTables: MMap[JawaClass, ComponentSummaryTable] = mmapEmpty
     
@@ -178,6 +181,7 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
     val iddgOpt = yard.getIDDG(component)
     if(!iddgOpt.isDefined) return summaryTable
     val iddg = iddgOpt.get.getIddg
+    
     // Add component as icc callee
     val filters = apk.getIntentFilterDB.getIntentFilters(component)
     val icc_summary: ICC_Summary = summaryTable.get(CHANNELS.ICC_CHANNEL)

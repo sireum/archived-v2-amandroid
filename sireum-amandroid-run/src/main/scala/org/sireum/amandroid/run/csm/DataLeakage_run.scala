@@ -51,8 +51,8 @@ object DataLeakage_run {
   }
   
   def main(args: Array[String]): Unit = {
-    if(args.size != 2) {
-      System.err.print("Usage: source_path output_path")
+    if(args.size < 2) {
+      System.err.print("Usage: source_path output_path [dependence_path]")
       return
     }
     
@@ -64,8 +64,9 @@ object DataLeakage_run {
     val sourcePath = args(0)
     val outputPath = args(1)
     val outputUri = FileUtil.toUri(outputPath)
+    val dpsuri = try{Some(FileUtil.toUri(args(1)))} catch {case e: Exception => None}
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
-//      .filter(_.contains("IntentSink1"))
+      .filter(_.contains("PlayStore1"))
     files.foreach{
       file =>
         DataLeakageCounter.total += 1
@@ -73,7 +74,7 @@ object DataLeakage_run {
         val global = new Global(file, reporter)
         global.setJavaLib("/Users/fgwei/Library/Android/sdk/platforms/android-21/android.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v4/android-support-v4.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v13/android-support-v13.jar")
         try {
-          reporter.echo(TITLE, DataLeakageTask(global, outputUri, file, Some(1000)).run)
+          reporter.echo(TITLE, DataLeakageTask(global, outputUri, dpsuri, file, Some(1000)).run)
           DataLeakageCounter.haveresult += 1
         } catch {
           case te: MyTimeoutException => reporter.error(TITLE, te.message)
@@ -86,7 +87,7 @@ object DataLeakage_run {
     }
   }
   
-  private case class DataLeakageTask(global: Global, outputUri: FileResourceUri, file: FileResourceUri, timeout: Option[Int]) {
+  private case class DataLeakageTask(global: Global, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], file: FileResourceUri, timeout: Option[Int]) {
     def run: String = {
       println(TITLE + " #####" + file + "#####")
       ScopeManager.setScopeManager(new AndroidRFAScopeManager)
@@ -96,7 +97,7 @@ object DataLeakage_run {
       }
       if(timer.isDefined) timer.get.start
       val apkYard = new ApkYard(global)
-      val apk: Apk = apkYard.loadApk(file, outputUri)
+      val apk: Apk = apkYard.loadApk(file, outputUri, dpsuri, false, false)
       val ssm = new DataLeakageAndroidSourceAndSinkManager(global, apk, apk.getAppInfo.getLayoutControls, apk.getAppInfo.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
       val cba = new ComponentBasedAnalysis(global, apkYard)
       cba.phase1(apk, false, timer)

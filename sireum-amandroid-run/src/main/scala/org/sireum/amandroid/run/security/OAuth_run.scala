@@ -167,14 +167,14 @@ object OAuth_run {
   }
   
   def main(args: Array[String]): Unit = {
-    if(args.size != 2){
-      System.err.print("Usage: source_path output_path")
+    if(args.size < 2){
+      System.err.print("Usage: source_path output_path [dependence_path]")
       return
     }
     
     val sourcePath = args(0)
     val outputPath = args(1)
-    
+    val dpsuri = try{Some(FileUtil.toUri(args(2)))} catch {case e: Exception => None}
 //    JawaCodeSource.preLoad(FileUtil.toUri(AndroidGlobalConfig.android_lib_dir), GlobalConfig.PILAR_FILE_EXT)
     LibSideEffectProvider.init(new File(AndroidGlobalConfig.android_libsummary_dir + "/AndroidLibSideEffectResult.xml.zip"))
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
@@ -192,7 +192,7 @@ object OAuth_run {
           val dexFile = APKFileResolver.getDexFile(file, FileUtil.toUri(srcFile.getParentFile()))
           
           // convert the dex file to the "pilar" form
-          val pilarFileUri = Dex2PilarConverter.convert(Set(dexFile), FileUtil.toUri(srcFile.getParentFile()))
+          val pilarFileUri = Dex2PilarConverter.convert(Set(dexFile), FileUtil.toUri(srcFile.getParentFile()), dpsuri, false, false)
         
           //store the app's pilar code in AmandroidCodeSource which is organized record by record.
           global.load(pilarFileUri, Constants.PILAR_FILE_EXT, AndroidLibraryAPISummary)

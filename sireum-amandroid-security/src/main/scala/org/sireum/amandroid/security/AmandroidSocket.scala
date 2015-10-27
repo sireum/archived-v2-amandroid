@@ -70,11 +70,11 @@ class AmandroidSocket(global: Global, apk: Apk) {
     myListener_opt = Some(listener)
   }
   
-  def loadApk(output_path: String, lib_sum: LibraryAPISummary): FileResourceUri = {
+  def loadApk(output_path: String, lib_sum: LibraryAPISummary, dpsuri: Option[FileResourceUri], dexLog: Boolean, debugMode: Boolean): FileResourceUri = {
     val apkFile = FileUtil.toFile(apk.nameUri)
     val name = apkFile.getName.substring(0, apkFile.getName().lastIndexOf("."))
     val resultDir = new File(output_path + "/" + name)
-    val (out, _) = ApkDecompiler.decompile(apkFile, resultDir, true)
+    val (out, _) = ApkDecompiler.decompile(apkFile, resultDir, dpsuri, dexLog, debugMode, true)
     // convert the dex file to the "pilar" form
     val fileUri = out + "/src"
     if(FileUtil.toFile(fileUri).exists()) {

@@ -12,11 +12,11 @@ import org.sireum.jawa.io.FgSourceFile
 import org.sireum.jawa.io.PlainFile
 
 object ApkDecompiler {
-  def decompile(apk: File, projectLocation: File, removeSupportGen: Boolean): (FileResourceUri, ISet[String]) = {
+  def decompile(apk: File, projectLocation: File, dpsuri: Option[FileResourceUri], dexLog: Boolean, debugMode: Boolean, removeSupportGen: Boolean): (FileResourceUri, ISet[String]) = {
     val out = AmDecoder.decode(FileUtil.toUri(apk), FileUtil.toUri(projectLocation), false)
     val dexFiles = FileUtil.listFiles(out, ".dex", true)
     if(FileUtil.toFile(out).exists()) {
-      val src = Dex2PilarConverter.convert(dexFiles.toSet, out + "/src")
+      val src = Dex2PilarConverter.convert(dexFiles.toSet, out + "/src", dpsuri, dexLog, debugMode)
       if(removeSupportGen) return (out, removeSupportLibAndGen(src, ManifestParser.loadPackageName(apk)))
     }
     (out, isetEmpty)

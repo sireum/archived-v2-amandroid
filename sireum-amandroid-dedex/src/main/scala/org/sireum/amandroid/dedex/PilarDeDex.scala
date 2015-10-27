@@ -130,8 +130,8 @@ class PilarDeDex {
           dexMethodIdsBlock,
           dexClassDefsBlock,
           dexOffsetResolver,
-          targetDirUri,
           raf,
+          targetDirUri,
           dexLogStream)
       pscg.generate
       raf.close()

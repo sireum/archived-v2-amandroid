@@ -125,13 +125,13 @@ object PasswordTracking_run {
   }
   
   def main(args: Array[String]): Unit = {
-    if(args.size != 2){
-      System.err.print("Usage: source_path output_path")
+    if(args.size < 2){
+      System.err.print("Usage: source_path output_path [dependence_path]")
       return
     }
     val sourcePath = args(0)
     val outputPath = args(1)
-    
+    val dpsuri = try{Some(FileUtil.toUri(args(2)))} catch {case e: Exception => None}
 //    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
 //    GlobalConfig.ICFG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = true
@@ -147,7 +147,7 @@ object PasswordTracking_run {
         val apk = new Apk(file)
         val socket = new AmandroidSocket(global, apk)
         try{
-          reporter.echo(TITLE, PasswordTrackingTask(global, apk, outputPath, file, socket, Some(10)).run)   
+          reporter.echo(TITLE, PasswordTrackingTask(global, apk, outputPath, dpsuri, file, socket, Some(10)).run)   
         } catch {
           case te : MyTimeoutException => reporter.error(TITLE, te.message)
           case e : Throwable => e.printStackTrace()
@@ -158,7 +158,7 @@ object PasswordTracking_run {
     }
   }
   
-  private case class PasswordTrackingTask(global: Global, apk: Apk, outputPath : String, file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]) {
+  private case class PasswordTrackingTask(global: Global, apk: Apk, outputPath : String, dpsuri: Option[FileResourceUri], file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]) {
     def run : String = {
       global.reporter.echo(TITLE, "####" + file + "#####")
       val timer = timeout match {
@@ -166,7 +166,7 @@ object PasswordTracking_run {
         case None => None
       }
       if(timer.isDefined) timer.get.start
-      val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary)
+      val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false)
       val app_info = new SensitiveViewCollector(global, apk, outUri, timer)
       app_info.collectInfo
       if(app_info.getLayoutControls.exists(p => p._2.isSensitive == true)){

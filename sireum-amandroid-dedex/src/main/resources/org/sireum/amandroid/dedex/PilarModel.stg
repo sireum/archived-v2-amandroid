@@ -114,7 +114,7 @@ temp:= new $baseTyp$[$args ; separator=", "$]
 >>
 
 CatchClauses(catchs) ::= <<
-$catchs ; separator=" "$
+$catchs ; separator="\n"$
 >>
 
 Catch(catchTyp, fromLoc, toLoc, targetLoc) ::= <<
