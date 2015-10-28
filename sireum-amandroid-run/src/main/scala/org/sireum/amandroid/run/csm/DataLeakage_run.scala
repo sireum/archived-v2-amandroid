@@ -66,13 +66,13 @@ object DataLeakage_run {
     val outputUri = FileUtil.toUri(outputPath)
     val dpsuri = try{Some(FileUtil.toUri(args(1)))} catch {case e: Exception => None}
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
-      .filter(_.contains("PlayStore1"))
+//      .filter(_.contains("Merge"))
     files.foreach{
       file =>
         DataLeakageCounter.total += 1
         val reporter = new PrintReporter(MsgLevel.ERROR)
         val global = new Global(file, reporter)
-        global.setJavaLib("/Users/fgwei/Library/Android/sdk/platforms/android-21/android.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v4/android-support-v4.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v13/android-support-v13.jar")
+        global.setJavaLib("/Users/fgwei/Library/Android/sdk/platforms/android-21/android.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v4/android-support-v4.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v13/android-support-v13.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v7/appcompat/libs/android-support-v7-appcompat.jar")
         try {
           reporter.echo(TITLE, DataLeakageTask(global, outputUri, dpsuri, file, Some(1000)).run)
           DataLeakageCounter.haveresult += 1

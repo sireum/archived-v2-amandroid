@@ -192,7 +192,7 @@ object OAuth_run {
           val dexFile = APKFileResolver.getDexFile(file, FileUtil.toUri(srcFile.getParentFile()))
           
           // convert the dex file to the "pilar" form
-          val pilarFileUri = Dex2PilarConverter.convert(Set(dexFile), FileUtil.toUri(srcFile.getParentFile()), dpsuri, false, false)
+          val pilarFileUri = Dex2PilarConverter.convert(Set(dexFile), FileUtil.toUri(srcFile.getParentFile()), dpsuri, _ => true, false, false)
         
           //store the app's pilar code in AmandroidCodeSource which is organized record by record.
           global.load(pilarFileUri, Constants.PILAR_FILE_EXT, AndroidLibraryAPISummary)

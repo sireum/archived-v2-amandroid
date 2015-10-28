@@ -38,7 +38,7 @@ class DedexTestFramework extends TestFramework {
       println("#####" + title + "#####")
       val pdd = new PilarDeDex
       val dpsuri = FileUtil.toUri("/Users/fgwei/Downloads/dedexer/system/deps")
-      pdd.decompile(srcRes, None, Some(dpsuri), false, true)
+      pdd.decompile(srcRes, None, Some(dpsuri), _ => true, false, true)
     }
   }
 

@@ -53,6 +53,15 @@ case class PackedSwitchTask(reg: Int, defaultTarget: Long, instrParser: DexInstr
     instrParser.setFilePosition(endTablePosition)
     List(code.toString())
   }
+  
+  def isValid: Boolean = {
+    val origPos = instrParser.getFilePosition()
+    instrParser.setFilePosition(offset)
+    val tableType = instrParser.read16Bit()
+    instrParser.setFilePosition(origPos)
+    if(tableType != 0x100) false
+    else true
+  }
 
   // Reads the jump table and returns the offsets (compared to the jump instruction base)
   // as array of longs

@@ -44,6 +44,7 @@ class PilarStyleCodeGenerator(
     file: RandomAccessFile,
     outputDir: Option[FileResourceUri],
     dump: Option[PrintStream],
+    filter: (ObjectType => Boolean),
     regTraceLog: Boolean = false,
     regTracing: Boolean = true) {
   
@@ -52,7 +53,7 @@ class PilarStyleCodeGenerator(
   private final val DEBUG_REGTRACE = false
   private final val DEBUG_MERGE = false
   private final val DEBUG_FLOW = false
-  private final val REVISIT_LIMIT = 100
+  private final val REVISIT_LIMIT = 20
   
   protected val template = new STGroupFile("org/sireum/amandroid/dedex/PilarModel.stg")
   private var procDeclTemplate = template.getInstanceOf("ProcedureDecl")
@@ -63,24 +64,29 @@ class PilarStyleCodeGenerator(
     while(classreader.hasNext()) {
       val classIdx = classreader.next().intValue()
       val className = dexClassDefsBlock.getClassNameOnly(classIdx)
-      val outputStream = outputDir match {
-        case Some(od) =>
-          val targetFile = FileUtil.toFile(od + "/" + className + ".pilar" )
-          val parent = targetFile.getParentFile()
-          if(parent != null)
-            parent.mkdirs()
-          new PrintStream(targetFile)
-        case None =>
-          new PrintStream(System.out)
+      val recName: String = toPilarRecordName(dexClassDefsBlock.getClassNameOnly(classIdx))
+      val recType: ObjectType = new ObjectType(recName)
+      if(filter(recType)) {
+        val outputStream = outputDir match {
+          case Some(od) =>
+            val targetFile = FileUtil.toFile(od + "/" + className + ".pilar" )
+            val parent = targetFile.getParentFile()
+            if(parent != null)
+              parent.mkdirs()
+            new PrintStream(targetFile)
+          case None =>
+            new PrintStream(System.out)
+        }
+        if(DEBUG_FLOW)
+          println("Processing " + className)
+        if(dump.isDefined) {
+          dump.get.println("--------------------------------------")
+          dump.get.println("Class: " + className)
+        }
+        val code = generateRecord(classIdx)
+        outputStream.println(code)
+        outputStream.close()
       }
-      if(DEBUG_FLOW)
-        println("Processing " + className)
-      if(dump.isDefined) {
-        dump.get.println("--------------------------------------")
-        dump.get.println("Class: " + className)
-      }
-      val code = generateRecord(classIdx)
-      outputStream.println(code)
     }
   }
   
@@ -284,6 +290,8 @@ class PilarStyleCodeGenerator(
       val (body, tryCatch) = generateBody(procName, dexMethodHeadParser, initRegMap)
       procTemplate.add("body", body)
       procTemplate.add("catchClauses", tryCatch)
+    } else {
+      procTemplate.add("body", "# return;")
     }
     procTemplate
   }
@@ -445,7 +453,7 @@ class PilarStyleCodeGenerator(
             if(DEBUG_FLOW)
               println("Flow: before parse")
             try {
-              instructionParser.parse()
+              instructionParser.doparse(startPos, endPos)
             } catch {
               case ex: Exception =>
                 if(DEBUG_FLOW)
@@ -492,15 +500,15 @@ class PilarStyleCodeGenerator(
                 }
               }
               // we go to forkData[0], push the rest of the addresses to the visit stack
-              forkData foreach{
-                target =>
-                  if(DEBUG_FLOW)
-                    println("Flow: processing forkData[" + forkData.indexOf(target) + "]: target: 0x" + java.lang.Long.toHexString(target))
-                  if((target >= startPos) && (target <= endPos)) {
-                    val currentRegMap: IMap[Integer, JawaType] = instructionParser.getRegisterMap
-                    visitStack.push(VisitStackEntry(target, currentRegMap, None))
-                  }
-              }     
+              for(i <- baseIndex to forkData.length - 1) {
+                val target = forkData(i)
+                if(DEBUG_FLOW)
+                  println("Flow: processing forkData[" + forkData.indexOf(target) + "]: target: 0x" + java.lang.Long.toHexString(target))
+                if((target >= startPos) && (target <= endPos)) {
+                  val currentRegMap: IMap[Integer, JawaType] = instructionParser.getRegisterMap
+                  visitStack.push(VisitStackEntry(target, currentRegMap, None))
+                }
+              }
               if(forkStatus == DexInstructionToPilarParser.ForkStatus.FORK_UNCONDITIONALLY)
                 instructionParser.setFilePosition(forkData(0))
             }
@@ -546,14 +554,14 @@ class PilarStyleCodeGenerator(
           parseFlag = task.get.getParseFlag(actualPosition)
         } catch {
           case ex: IOException =>
-            println("*** ERROR ***: " + ex.getMessage())
+            System.err.println("*** ERROR ***: " + ex.getMessage())
         }
       }
       if(!parseFlag) {
         // Let's check whether the first pass visited this region. If not, turn it into data block
         var visitOffset: Int = (actualPosition - startPos).asInstanceOf[Int]
         if(visitSet.get(visitOffset)) {
-          val code = instructionParser.doparse()
+          val code = instructionParser.doparse(startPos, endPos)
           codes += code
         } else {
           if(dump.isDefined)
@@ -591,7 +599,7 @@ class PilarStyleCodeGenerator(
         task.get.renderTask(endPos)
       } catch {
         case ex: IOException =>
-          println("*** ERROR ***: " + ex.getMessage())
+          System.err.println("*** ERROR ***: " + ex.getMessage())
       }
     }
     // Run the post-second pass processing

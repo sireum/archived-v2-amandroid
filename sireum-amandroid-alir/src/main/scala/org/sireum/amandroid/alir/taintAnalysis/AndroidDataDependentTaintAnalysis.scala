@@ -68,11 +68,16 @@ object AndroidDataDependentTaintAnalysis {
       this.typs foreach (typ => sb.append(typ + " "))
       sb.append("\n")
       sb.append(srcN.getDescriptor + "\n\t-> " + sinN.getDescriptor + "\n")
-      path.tail.reverse.foreach{
-        edge =>
-          sb.append(edge.target.getContext + "\n\t-> ")
+      if(path.size > 1) {
+        path.tail.reverse.foreach{
+          edge =>
+            sb.append(edge.target.getContext + "\n\t-> ")
+        }
+        sb.append(path.head.source.getContext + "\n")
+      } else {
+        sb.append(path.head.target.getContext + "\n\t-> ")
+        sb.append(path.head.source.getContext + "\n")
       }
-      sb.append(path.head.source.getContext + "\n")
       sb.toString().intern
     }
   }

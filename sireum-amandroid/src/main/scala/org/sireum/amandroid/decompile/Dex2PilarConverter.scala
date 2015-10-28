@@ -13,19 +13,20 @@ import java.net.URI
 import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.jawa.util.OsUtils
 import org.sireum.amandroid.dedex.PilarDeDex
+import org.sireum.jawa.ObjectType
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
 object Dex2PilarConverter {
-  def convert(fs: Set[FileResourceUri], out: FileResourceUri, dpsuri: Option[FileResourceUri], dexLog: Boolean, debugMode: Boolean): FileResourceUri = {
+  def convert(fs: Set[FileResourceUri], out: FileResourceUri, dpsuri: Option[FileResourceUri], recordFilter: (ObjectType => Boolean), dexLog: Boolean, debugMode: Boolean): FileResourceUri = {
     ConverterUtil.cleanDir(out)
     fs foreach {
       f =>
         try {
           val pdd = new PilarDeDex
-          pdd.decompile(f, Some(out), dpsuri, dexLog, debugMode)
+          pdd.decompile(f, Some(out), dpsuri, recordFilter, dexLog, debugMode)
         } catch {
           case ex: Exception =>
             System.err.println("Given file is not a decompilable file: " + f)

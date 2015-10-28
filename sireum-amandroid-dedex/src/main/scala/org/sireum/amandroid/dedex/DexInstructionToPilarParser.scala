@@ -100,6 +100,7 @@ class DexInstructionToPilarParser(
         task.doTask(secondPass)
       } catch {
         case ex: Exception =>
+          ex.printStackTrace()
           println("task error (secondPass=" + secondPass + ") " + ex.getMessage())
       }
     }
@@ -273,18 +274,17 @@ class DexInstructionToPilarParser(
     (strs(0).replaceAll("/", "."), JavaKnowledge.formatSignatureToType(strs(1)))
   }
 
-  def parse(): Unit = {
-    doparse
+  def parse: Unit = {
   }
   
-  def doparse(): String = {
+  def doparse(startPos: Long, endPos: Long): String = {
     val instrBase: Long = getFilePosition
     val instrCode = read8Bit()
     val instrType = instructionTypes(instrCode)
     val instrText = new StringBuilder()
     val insttAddress: String = "#L%06x.  ".format(instrBase)
     instrText.append(insttAddress)
-    
+    def inRange: (Long => Boolean) = (pos => startPos <= pos && pos <= endPos)
     forkStatus = initialForkStatus(instrCode)
     forkData.clear
     affectedRegisters.clear
@@ -791,16 +791,19 @@ class DexInstructionToPilarParser(
         val offset = readSigned32Bit()
         val target: Long = instrBase + (offset * 2L)
         affectedRegisters.insert(0, reg)
-        val code = instrCode match {
-          case FILL_ARRAY_DATA => fillArrData(target)
-          case _ => "@UNKNOWN_FILLARRAYDATA 0x%x".format(instrCode)
-        }
-        instrText.append(code)
-        if(!secondPass) {
-          val fillArrayTask = new FillArrayDataTask(reg, getFilePosition, this, instrBase, target)
-          tasks += fillArrayTask
-        }
-        updateLowestDataBlock(target)
+        val fillArrayTask = new FillArrayDataTask(reg, getFilePosition, this, instrBase, target)
+        val valid = fillArrayTask.isValid
+        if(valid) {
+          val code = instrCode match {
+            case FILL_ARRAY_DATA => fillArrData(target)
+            case _ => "@UNKNOWN_FILLARRAYDATA 0x%x".format(instrCode)
+          }
+          instrText.append(code)
+          if(!secondPass) {
+            tasks += fillArrayTask
+          }
+          updateLowestDataBlock(target)
+        } else instrText.append("@INVALID_FILLARRAYDATA")
       // The instruction is followed by one byte storing a register index and a 
       // field id index as a 16-bit value. The instruction reads that field into
       // a single-length, double-length, reference register
@@ -1097,40 +1100,50 @@ class DexInstructionToPilarParser(
       // to a packed-switch table
       case InstructionType.PACKEDSWITCH =>
         val reg = read8Bit()
-        val offset = readSigned32Bit()
+        val offset = read32Bit()
         val target = instrBase + (offset * 2L)
         affectedRegisters += reg
-        val code = instrCode match {
-          case PACKED_SWITCH => switch(target)
-          case _ => "@UNKNOWN_PACKEDSWITCH 0x%x".format(instrCode)
+        val packedSwitchTask = new PackedSwitchTask(reg, getFilePosition, this, instrBase, target)
+        val valid = packedSwitchTask.isValid
+        if(valid) {
+          val code = instrCode match {
+            case PACKED_SWITCH => switch(target)
+            case _ => "@UNKNOWN_PACKEDSWITCH 0x%x".format(instrCode)
+          }
+          instrText.append(code)
+          if(!secondPass) {
+            tasks += packedSwitchTask
+            forkData ++= packedSwitchTask.readJumpTable()
+            forkStatus = ForkStatus.FORK_AND_CONTINUE
+          }
+          updateLowestDataBlock(target)
+        } else {
+          instrText.append("@INVALID_PACKEDSWITCH")
         }
-        instrText.append(code)
-        if(!secondPass) {
-          val packedSwitchTask = new PackedSwitchTask(reg, getFilePosition, this, instrBase, target)
-          tasks += packedSwitchTask
-          forkData ++= packedSwitchTask.readJumpTable()
-          forkStatus = ForkStatus.FORK_AND_CONTINUE
-        }
-        updateLowestDataBlock(target)
       // The instruction is followed by a register index and a 32 bit signed offset pointing
       // to a sparse-switch table
       case InstructionType.SPARSESWITCH =>
         val reg = read8Bit()
-        val offset = readSigned32Bit()
+        val offset = read32Bit()
         val target = instrBase + (offset * 2L)
         affectedRegisters += reg
-        val code = instrCode match {
-          case SPARSE_SWITCH => switch(target)
-          case _ => "@UNKNOWN_SPARSESWITCH 0x%x".format(instrCode)
+        val sparseSwitchTask = new SparseSwitchTask(reg, getFilePosition, this, instrBase, target)
+        val valid = sparseSwitchTask.isValid
+        if(valid) {
+          val code = instrCode match {
+            case SPARSE_SWITCH => switch(target)
+            case _ => "@UNKNOWN_SPARSESWITCH 0x%x".format(instrCode)
+          }
+          instrText.append(code)
+          if(!secondPass) {
+            tasks += sparseSwitchTask
+            forkData ++= sparseSwitchTask.readJumpTable()
+            forkStatus = ForkStatus.FORK_AND_CONTINUE
+          }
+          updateLowestDataBlock(target)
+        } else {
+          instrText.append("@INVALID_SPARSESWITCH")
         }
-        instrText.append(code)
-        if(!secondPass) {
-          val sparseSwitchTask = new SparseSwitchTask(reg, getFilePosition, this, instrBase, target)
-          tasks += sparseSwitchTask
-          forkData ++= sparseSwitchTask.readJumpTable()
-          forkStatus = ForkStatus.FORK_AND_CONTINUE
-        }
-        updateLowestDataBlock(target)
       // The instruction is followed by one register index and moves the result into that
       // one register
       case InstructionType.MOVERESULT =>
@@ -1162,13 +1175,15 @@ class DexInstructionToPilarParser(
       // The instruction is followed by a 8-bit signed offset
       case InstructionType.OFFSET8 =>
         val target = calculateTarget(instrBase)
-        val code = instrCode match {
-          case GOTO => goto(target)
-          case _ => "@UNKNOWN_OFFSET8 0x%x".format(instrCode)
-        }
-        instrText.append(code)
-        forkData += target
-        forkStatus = ForkStatus.FORK_UNCONDITIONALLY
+        if(inRange(target)){
+          val code = instrCode match {
+            case GOTO => goto(target)
+            case _ => "@UNKNOWN_OFFSET8 0x%x".format(instrCode)
+          }
+          instrText.append(code)
+          forkData += target
+          forkStatus = ForkStatus.FORK_UNCONDITIONALLY
+        } else instrText.append("@INVALID_OFFSET8")
       // Checks whether a reference in a certain register can be casted to a certain
       // type. As a side effect, the type of the value in the register will be changed
       // to that of the check cast type.
@@ -1222,54 +1237,60 @@ class DexInstructionToPilarParser(
       // The instruction is followed by one byte with register index and one signed
       // 16 bit offset
       case InstructionType.REGOFFSET16 =>
-        val reg = read8Bit();
-        val target = calculateTarget16Bit(instrBase)
-        val code = instrCode match {
-          case IF_EQZ => ifEqz(reg, target)
-          case IF_NEZ => ifNez(reg, target)
-          case IF_LTZ => ifLtz(reg, target)
-          case IF_GEZ => ifGez(reg, target)
-          case IF_GTZ => ifGtz(reg, target)
-          case IF_LEZ => ifLez(reg, target)
-          case _ => "@UNKNOWN_REGOFFSET16 0x%x".format(instrCode)
-        }
-        instrText.append(code)
-        forkData += target
-        forkStatus = ForkStatus.FORK_AND_CONTINUE
+        val reg = read8Bit()
         affectedRegisters += reg
+        val target = calculateTarget16Bit(instrBase)
+        if(inRange(target)){
+          val code = instrCode match {
+            case IF_EQZ => ifEqz(reg, target)
+            case IF_NEZ => ifNez(reg, target)
+            case IF_LTZ => ifLtz(reg, target)
+            case IF_GEZ => ifGez(reg, target)
+            case IF_GTZ => ifGtz(reg, target)
+            case IF_LEZ => ifLez(reg, target)
+            case _ => "@UNKNOWN_REGOFFSET16 0x%x".format(instrCode)
+          }
+          instrText.append(code)
+          forkData += target
+          forkStatus = ForkStatus.FORK_AND_CONTINUE
+        } else instrText.append("@INVALID_REGOFFSET16")
       // The instruction is followed by one padding byte and one signed
       // 16 bit offset
       case InstructionType.OFFSET16 =>
         val padding = read8Bit()
         val target = calculateTarget16Bit(instrBase)
-        val code = instrCode match {
-          case GOTO_16 => goto(target)
-          case _ => "@UNKNOWN_OFFSET16 0x%x".format(instrCode)
-        }
-        instrText.append(code)
-        forkData += target
-        forkStatus = ForkStatus.FORK_UNCONDITIONALLY
+        if(inRange(target)){
+          val code = instrCode match {
+            case GOTO_16 => goto(target)
+            case _ => "@UNKNOWN_OFFSET16 0x%x".format(instrCode)
+          }
+          instrText.append(code)
+          forkData += target
+          forkStatus = ForkStatus.FORK_UNCONDITIONALLY
+        } else instrText.append("@INVALID_OFFSET16")
       // The instruction is followed by one byte with two register indexes on the high and low
       // 4 bits and one signed 16 bit offset
       case InstructionType.TWOREGSOFFSET16 =>
         val b1 = read8Bit()
         val reg1 = b1 & 0xF
         val reg2 = (b1 & 0xF0) >> 4
-        val target = calculateTarget16Bit(instrBase)
-        val code = instrCode match {
-          case IF_EQ => ifEq(reg1, reg2, target)
-          case IF_NE => ifNq(reg1, reg2, target)
-          case IF_LT => ifLt(reg1, reg2, target)
-          case IF_GE => ifGe(reg1, reg2, target)
-          case IF_GT => ifGt(reg1, reg2, target)
-          case IF_LE => ifLe(reg1, reg2, target)
-          case _ => "@UNKNOWN_TWOREGSOFFSET16 0x%x".format(instrCode)
-        }
-        instrText.append(code)
         affectedRegisters += reg1
         affectedRegisters += reg2
-        forkData += target
-        forkStatus = ForkStatus.FORK_AND_CONTINUE
+        val target = calculateTarget16Bit(instrBase)
+        if(inRange(target)){
+          val code = instrCode match {
+            case IF_EQ => ifEq(reg1, reg2, target)
+            case IF_NE => ifNq(reg1, reg2, target)
+            case IF_LT => ifLt(reg1, reg2, target)
+            case IF_GE => ifGe(reg1, reg2, target)
+            case IF_GT => ifGt(reg1, reg2, target)
+            case IF_LE => ifLe(reg1, reg2, target)
+            case _ => "@UNKNOWN_TWOREGSOFFSET16 0x%x".format(instrCode)
+          }
+          instrText.append(code)
+          forkData += target
+          forkStatus = ForkStatus.FORK_AND_CONTINUE
+        } else instrText.append("@INVALID_TWOREGSOFFSET16")
       // One byte follows the instruction, two register indexes on the high and low 4 bits. The second
       // register overwrites the first
       case InstructionType.MOVE | InstructionType.MOVE_OBJECT =>

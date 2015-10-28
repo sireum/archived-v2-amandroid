@@ -617,7 +617,7 @@ trait DexConstants {
   def constWide16(x: Int, y: Int) = "v%d:= %dI  @kind int;".format(x, y) // 0x16
   def constWide32(x: Int, y: Long) = "v%d:= %fF  @kind float;".format(x, y) // 0x17
   def constWide(x: Int, y: Long) = "v%d:= %fD  @kind double;".format(x, y) // 0x18
-  def constWideHigh16(x: Int, y: Int) = "v%d:= %lldL  @kind long;".format(x, y) // 0x19
+  def constWideHigh16(x: Int, y: Long) = "v%d:= %dL  @kind long;".format(x, y) // 0x19
   def constString(x: Int, str: String) = "v%d:= \"%s\" @kind object;".format(x, str)  // 0x1a, 0x1b
   def constClass(x: Int, typ: String) = "v%d:= constclass @type ^%s @kind object;".format(x, typ) // 0x1c
   def monitorEnter(x: Int) = "@monitorenter v%d".format(x) // 0x1d
@@ -627,8 +627,8 @@ trait DexConstants {
   def arrayLen(x: Int, y: Int) = "v%d:= length @variable v%d @kind int;".format(x, y) // 0x21
   def newIns(x: Int, typ: String) = "v%d:= new %s;".format(x, typ) // 0x22
   def newArray(x: Int, basetyp: String, y: Int) = "v%d:= new %s[v%d];".format(x, basetyp, y) // 0x23
-  def filledNewArray(baseTyp: String, regs: IList[Int]) = s"temp:= new $baseTyp[${regs.map("v" + _).mkString(", ")}]" // 0x24
-  def filledNewArrayRange(baseTyp: String, regbase: Int, regsize: Int) = s"temp:= new $baseTyp[${(0 to regsize - 1).map(i => "v" + (regbase + i)).mkString(", ")}]" // 0x25
+  def filledNewArray(baseTyp: String, regs: IList[Int]) = s"temp:= new $baseTyp[${regs.map("v" + _).mkString(", ")}];" // 0x24
+  def filledNewArrayRange(baseTyp: String, regbase: Int, regsize: Int) = s"temp:= new $baseTyp[${(0 to regsize - 1).map(i => "v" + (regbase + i)).mkString(", ")}];" // 0x25
   def fillArrData(target: Long) = "goto L%06x;".format(target) // 0x26
   def `throw`(x: Int) = "throw v%d;".format(x) // 0x27
   def goto(target: Long) = "goto L%06x;".format(target) // 0x28, 0x29, 0x2a
@@ -821,36 +821,36 @@ trait DexConstants {
   // unused 0xec 0xed
   def executeInline(className: String, methodName: String, args: IList[Int], sig: Signature, classTyp: String) = // 0xee
     s"call temp:=  `$className.$methodName`(${args.map("v" + _).mkString(", ")}) @signature `$sig` @classDescriptor ^$classTyp @kind static;"
-  def executeInline(args: IList[Int], inlineOffset: Int) = s"@invoke execute_inline @args (${args.map("v" + _).mkString(", ")}) @inline_offset ${"0x%x".format(inlineOffset)}" // 0xee
+  def executeInline(args: IList[Int], inlineOffset: Int) = s"@invoke execute_inline ${args.map(arg => s"@arg${args.indexOf(arg)} v$arg").mkString(" ")} @inline_offset ${"0x%x".format(inlineOffset)}" // 0xee
   def executeInlineRange(className: String, methodName: String, argbase: Int, argsize: Int, sig: Signature, classTyp: String) = // 0xef
     s"call temp:=  `$className.$methodName`(${(0 to argsize - 1).map(i => "v" + (argbase + i)).mkString(", ")}) @signature `$sig` @classDescriptor ^$classTyp @kind direct;"
-  def executeInlineRange(argbase: Int, argsize: Int, inlineOffset: Int) = s"@invoke execute_inline_range @args (${(0 to argsize - 1).map(i => "v" + (argbase + i)).mkString(", ")}) @inline_offset ${"0x%x".format(inlineOffset)}" // 0xef
+  def executeInlineRange(argbase: Int, argsize: Int, inlineOffset: Int) = s"@invoke execute_inline_range @args ${(0 to argsize - 1).map(i => "@arg" + i + " v" + (argbase + i)).mkString(" ")} @inline_offset ${"0x%x".format(inlineOffset)}" // 0xef
   def invokeObjectInit(className: String, methodName: String, args: IList[Int], sig: Signature, classTyp: String) = s"call temp:=  `$className.$methodName`(${args.map("v" + _).mkString(", ")}) @signature `$sig` @classDescriptor ^$classTyp @kind direct;" // 0xf0
   def returnVoidBarrier = "return  @kind void;" // 0xf1
   def igetQuick(x: Int, y: Int, field: String, typ: String) = "v%d:= v%d.`%s`  @kind int @type ^%s;".format(x, y, field, typ) // 0xf2
-  def igetQuick(x: Int, y: Int, vtableOffset: Int) = "@fieldAccess iget_quick @args (v%d, v%d) @vtable_offset 0x%x".format(x, y, vtableOffset) // 0xf2
+  def igetQuick(x: Int, y: Int, vtableOffset: Int) = "@fieldAccess iget_quick @lhsreg v%d @basereg v%d @vtable_offset 0x%x".format(x, y, vtableOffset) // 0xf2
   def igetWideQuick(x: Int, y: Int, field: String, typ: String) = "v%d:= v%d.`%s`  @kind long @type ^%s;".format(x, y, field, typ) // 0xf3
-  def igetWideQuick(x: Int, y: Int, vtableOffset: Int) = "@fieldAccess iget_wide_quick @args (v%d, v%d) @vtable_offset 0x%x".format(x, y, vtableOffset) // 0xf3
+  def igetWideQuick(x: Int, y: Int, vtableOffset: Int) = "@fieldAccess iget_wide_quick @lhsreg v%d @basereg v%d @vtable_offset 0x%x".format(x, y, vtableOffset) // 0xf3
   def igetObjectQuick(x: Int, y: Int, field: String, typ: String) = "v%d:= v%d.`%s`  @kind object @type ^%s;".format(x, y, field, typ) // 0xf4
-  def igetObjectQuick(x: Int, y: Int, vtableOffset: Int) = "@fieldAccess iget_object_quick @args (v%d, v%d) @vtable_offset 0x%x".format(x, y, vtableOffset) // 0xf4
+  def igetObjectQuick(x: Int, y: Int, vtableOffset: Int) = "@fieldAccess iget_object_quick @lhsreg v%d @basereg v%d @vtable_offset 0x%x".format(x, y, vtableOffset) // 0xf4
   def iputQuick(x: Int, field: String, y: Int, typ: String) = "v%d.`%s`:= v%d  @kind int @type ^%s;".format(x, field, y, typ) // 0xf5
-  def iputQuick(x: Int, y: Int, vtableOffset: Int) = "@fieldStore iput_quick @args (v%d, v%d) @vtable_offset 0x%x".format(x, y, vtableOffset) // 0xf5
+  def iputQuick(x: Int, y: Int, vtableOffset: Int) = "@fieldStore iput_quick @basereg v%d @rhsreg v%d @vtable_offset 0x%x".format(x, y, vtableOffset) // 0xf5
   def iputWideQuick(x: Int, field: String, y: Int, typ: String) = "v%d.`%s`:= v%d  @kind long @type ^%s;".format(x, field, y, typ) // 0xf6 
-  def iputWideQuick(x: Int, y: Int, vtableOffset: Int) = "@fieldStore iput_wide_quick @args (v%d, v%d) @vtable_offset 0x%x".format(x, y, vtableOffset) // 0xf6
+  def iputWideQuick(x: Int, y: Int, vtableOffset: Int) = "@fieldStore iput_wide_quick @basereg v%d @rhsreg v%d @vtable_offset 0x%x".format(x, y, vtableOffset) // 0xf6
   def iputObjectQuick(x: Int, field: String, y: Int, typ: String) = "v%d.`%s`:= v%d  @kind object @type ^%s;".format(x, field, y, typ) // 0xf7
-  def iputObjectQuick(x: Int, y: Int, vtableOffset: Int) = "@fieldStore iput_object_quick @args (v%d, v%d) @vtable_offset 0x%x".format(x, y, vtableOffset) // 0xf7
+  def iputObjectQuick(x: Int, y: Int, vtableOffset: Int) = "@fieldStore iput_object_quick @basereg v%d @rhsreg v%d @vtable_offset 0x%x".format(x, y, vtableOffset) // 0xf7
   def invokeVirtualQuick(className: String, methodName: String, args: IList[Int], sig: Signature, classTyp: String) = // 0xf8
     s"call temp:=  `$className.$methodName`(${args.map("v" + _).mkString(", ")}) @signature `$sig` @classDescriptor ^$classTyp @kind virtual;"
-  def invokeVirtualQuick(args: IList[Int], vtableOffset: Int) = s"@invoke virtual_quick @args (${args.map("v" + _).mkString(", ")}) @vtable_offset ${"0x%x".format(vtableOffset)}" // 0xf8
+  def invokeVirtualQuick(args: IList[Int], vtableOffset: Int) = s"@invoke virtual_quick ${args.map(arg => s"@arg${args.indexOf(arg)} v$arg").mkString(" ")} @vtable_offset ${"0x%x".format(vtableOffset)}" // 0xf8
   def invokeVirtualQuickRange(className: String, methodName: String, argbase: Int, argsize: Int, sig: Signature, classTyp: String) = // 0xf9
     s"call temp:=  `$className.$methodName`(${(0 to argsize - 1).map(i => "v" + (argbase + i)).mkString(", ")}) @signature `$sig` @classDescriptor ^$classTyp @kind virtual;"
-  def invokeVirtualQuickRange(argbase: Int, argsize: Int, vtableOffset: Int) = s"@invoke virtual_quick_range @args (${(0 to argsize - 1).map(i => "v" + (argbase + i)).mkString(", ")}) @vtable_offset ${"0x%x".format(vtableOffset)}" // 0xf9
+  def invokeVirtualQuickRange(argbase: Int, argsize: Int, vtableOffset: Int) = s"@invoke virtual_quick_range ${(0 to argsize - 1).map(i => "@arg" + i + " v" + (argbase + i)).mkString(" ")} @vtable_offset ${"0x%x".format(vtableOffset)}" // 0xf9
   def invokeSuperQuick(className: String, methodName: String, args: IList[Int], sig: Signature, classTyp: String) = // 0xfa
     s"call temp:=  `$className.$methodName`(${args.map("v" + _).mkString(", ")}) @signature `$sig` @classDescriptor ^$classTyp @kind super;"
-  def invokeSuperQuick(args: IList[Int], vtableOffset: Int) = s"@invoke super_quick @args (${args.map("v" + _).mkString(", ")}) @vtable_offset ${"0x%x".format(vtableOffset)}" // 0xfa
+  def invokeSuperQuick(args: IList[Int], vtableOffset: Int) = s"@invoke super_quick ${args.map(arg => s"@arg${args.indexOf(arg)} v$arg").mkString(" ")} @vtable_offset ${"0x%x".format(vtableOffset)}" // 0xfa
   def invokeSuperQuickRange(className: String, methodName: String, argbase: Int, argsize: Int, sig: Signature, classTyp: String) = // 0xfb
     s"call temp:=  `$className.$methodName`(${(0 to argsize - 1).map(i => "v" + (argbase + i)).mkString(", ")}) @signature `$sig` @classDescriptor ^$classTyp @kind super;"
-  def invokeSuperQuickRange(argbase: Int, argsize: Int, vtableOffset: Int) = s"@invoke super_quick_range @args (${(0 to argsize - 1).map(i => "v" + (argbase + i)).mkString(", ")}) @vtable_offset ${"0x%x".format(vtableOffset)}" // 0xfb
+  def invokeSuperQuickRange(argbase: Int, argsize: Int, vtableOffset: Int) = s"@invoke super_quick_range ${(0 to argsize - 1).map(i => "@arg" + i + " v" + (argbase + i)).mkString(" ")} @vtable_offset ${"0x%x".format(vtableOffset)}" // 0xfb
   def iputObjectVolatile(x: Int, field: String, y: Int, typ: String) = "v%d.`%s`:= v%d  @kind object @type ^%s;".format(x, field, y, typ) // 0xfc
   def sgetObjectVolatile(x: Int, field: String, typ: String) = "v%d:= `@@%s`  @kind object @type ^%s;".format(x, field, typ) // 0xfd
   def sputObjectVolatile(field: String, x: Int, typ: String) = "`@@%s`:= v%d  @kind object @type ^%s;".format(field, x, typ) // 0xfe

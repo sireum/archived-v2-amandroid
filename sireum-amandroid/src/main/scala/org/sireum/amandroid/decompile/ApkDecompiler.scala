@@ -10,16 +10,45 @@ import org.sireum.amandroid.parser.ManifestParser
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.io.FgSourceFile
 import org.sireum.jawa.io.PlainFile
+import org.sireum.jawa.ObjectType
 
 object ApkDecompiler {
+  
   def decompile(apk: File, projectLocation: File, dpsuri: Option[FileResourceUri], dexLog: Boolean, debugMode: Boolean, removeSupportGen: Boolean): (FileResourceUri, ISet[String]) = {
     val out = AmDecoder.decode(FileUtil.toUri(apk), FileUtil.toUri(projectLocation), false)
+    val dependencies: MSet[String] = msetEmpty
     val dexFiles = FileUtil.listFiles(out, ".dex", true)
-    if(FileUtil.toFile(out).exists()) {
-      val src = Dex2PilarConverter.convert(dexFiles.toSet, out + "/src", dpsuri, dexLog, debugMode)
-      if(removeSupportGen) return (out, removeSupportLibAndGen(src, ManifestParser.loadPackageName(apk)))
+    val recordFilter: (ObjectType => Boolean) = {
+      ot =>
+        if(removeSupportGen) {
+          if(ot.name.startsWith("android.support.v4")){
+            dependencies += AndroidConstants.MAVEN_SUPPORT_V4
+            false
+          } else if (ot.name.startsWith("android.support.v13")) {
+            dependencies += AndroidConstants.MAVEN_SUPPORT_V13
+            false
+          } else if (ot.name.startsWith("android.support.v7")){
+            dependencies += AndroidConstants.MAVEN_APPCOMPAT
+            false
+          } else true
+        } else true
     }
-    (out, isetEmpty)
+    if(FileUtil.toFile(out).exists()) {
+      val src = Dex2PilarConverter.convert(dexFiles.toSet, out + "/src", dpsuri, recordFilter, dexLog, debugMode)
+      /**
+       * refactor phase
+       */
+      FileUtil.listFiles(src, "pilar", true) foreach {
+        f =>
+          val code = new FgSourceFile(new PlainFile(FileUtil.toFile(f))).code
+          val newcode = RefactorJawa(code)
+          val file = FileUtil.toFile(f)
+          val fw = new FileWriter(file, false)
+          fw.write(newcode)
+          fw.close()
+      }
+    }
+    (out, dependencies.toSet)
   }
   
   def removeSupportLibAndGen(src: FileResourceUri, pkg: String): ISet[String] = {
@@ -36,7 +65,7 @@ object ApkDecompiler {
           } else if (f.getAbsolutePath.endsWith("/android/support/v13")) {
             worklist += f
             dependencies += AndroidConstants.MAVEN_SUPPORT_V13
-          } else if (f.getAbsolutePath.endsWith("/android/support/v7/appcompat")){
+          } else if (f.getAbsolutePath.endsWith("/android/support/v7")){
             worklist += f
             dependencies += AndroidConstants.MAVEN_APPCOMPAT
           }

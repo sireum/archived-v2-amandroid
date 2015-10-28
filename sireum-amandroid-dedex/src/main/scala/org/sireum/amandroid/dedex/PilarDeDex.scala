@@ -13,6 +13,7 @@ import java.io.PrintStream
 import hu.uw.pallergabor.dedexer._
 import java.io.File
 import java.io.IOException
+import org.sireum.jawa.ObjectType
 
 /**
  * @author fgwei
@@ -28,6 +29,7 @@ class PilarDeDex {
       sourceFileUri: FileResourceUri,
       targetDirUri: Option[FileResourceUri],
       depsDirUri: Option[FileResourceUri],
+      recordFilter: (ObjectType => Boolean),
       dexlog: Boolean,
       debugMode: Boolean): Unit = {
     try{
@@ -132,7 +134,8 @@ class PilarDeDex {
           dexOffsetResolver,
           raf,
           targetDirUri,
-          dexLogStream)
+          dexLogStream,
+          recordFilter)
       pscg.generate
       raf.close()
     } catch {
@@ -191,9 +194,10 @@ class PilarDeDex {
 object PilarDeDex {
   def main(args: Array[String]): Unit = {
     val srcRes = args(0)
+    val dpsPath = args(1)
     val srcResUri = FileUtil.toUri(srcRes)
     val pdd = new PilarDeDex
-    val dpsuri = FileUtil.toUri("/Users/fgwei/Downloads/dedexer/system/deps")
-    pdd.decompile(srcResUri, None, Some(dpsuri), false, true)
+    val dpsuri = FileUtil.toUri(dpsPath)
+    pdd.decompile(srcResUri, None, Some(dpsuri), ((_) => true), false, true)
   }
 }

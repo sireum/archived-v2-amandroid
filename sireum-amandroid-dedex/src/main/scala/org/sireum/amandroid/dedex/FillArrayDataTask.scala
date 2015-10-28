@@ -24,6 +24,15 @@ case class FillArrayDataTask(reg: Int, target: Long, instrParser: DexInstruction
   def doTask(isSecondPass: Boolean): Unit = {
     instrParser.placeTask(offset, this)
   }
+  
+  def isValid: Boolean = {
+    val origPos = instrParser.getFilePosition()
+    instrParser.setFilePosition(offset)
+    val tableType = instrParser.read16Bit()
+    instrParser.setFilePosition(origPos)
+    if(tableType != 0x300) false
+    else true
+  }
 
   def renderTask(position: Long): IList[String] = {
     val codes: MList[String] = mlistEmpty

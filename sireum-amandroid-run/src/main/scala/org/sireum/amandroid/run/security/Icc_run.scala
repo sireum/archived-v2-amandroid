@@ -121,7 +121,7 @@ object Icc_run {
     val dpsuri = try{Some(FileUtil.toUri(args(2)))} catch {case e: Exception => None}
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
     
-    files.filter(_.contains("ActivityCommunication6")).foreach{
+    files.foreach{
       file =>
         val reporter = new PrintReporter(MsgLevel.ERROR)
         val global = new Global(file, reporter)
