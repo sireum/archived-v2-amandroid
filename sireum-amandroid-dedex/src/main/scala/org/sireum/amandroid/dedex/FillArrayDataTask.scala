@@ -72,7 +72,7 @@ case class FillArrayDataTask(reg: Int, target: Long, instrParser: DexInstruction
     code1.append(") @kind object;")
     codes += code1.toString()
     val code2: StringBuilder = new StringBuilder
-    code2.append("#L%06x.  ".format(instrParser.getFilePosition))
+    code2.append("#L%06x.  ".format(instrParser.getFilePosition - 1))
     code2.append("goto L%06x;".format(target))
     codes += code2.toString()
     codes.toList
