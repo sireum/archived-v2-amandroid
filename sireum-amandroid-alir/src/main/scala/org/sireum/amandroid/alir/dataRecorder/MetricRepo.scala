@@ -90,30 +90,30 @@ object MetricRepo {
 			              compType match{
 			                case "activity" =>
 			                  problemType match{
-			                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => activityHijacking += 1
+			                    case AndroidProblemCategories.VUL_INFORMATION_LEAK => activityHijacking += 1
 			                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => activityLaunch += 1
-			                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
+			                    case AndroidProblemCategories.MAL_INFORMATION_LEAK => maliciousness += 1
 			                    case AndroidProblemCategories.VUL_CONFUSED_DEPUTY => 
 			                  }
 			                case "service" =>
 			                  problemType match{
-			                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => serviceHijacking += 1
+			                    case AndroidProblemCategories.VUL_INFORMATION_LEAK => serviceHijacking += 1
 			                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => serviceLaunch += 1
-			                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
+			                    case AndroidProblemCategories.MAL_INFORMATION_LEAK => maliciousness += 1
 			                    case AndroidProblemCategories.VUL_CONFUSED_DEPUTY => 
 			                  }
 			                case "receiver" =>
 			                  problemType match{
-			                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => broadcastReceiverTheft += 1
+			                    case AndroidProblemCategories.VUL_INFORMATION_LEAK => broadcastReceiverTheft += 1
 			                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => broadcastReceiverInjection += 1
-			                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
+			                    case AndroidProblemCategories.MAL_INFORMATION_LEAK => maliciousness += 1
 			                    case AndroidProblemCategories.VUL_CONFUSED_DEPUTY => 
 			                  }
 			                case "provider" =>
 			                  problemType match{
-			                    case AndroidProblemCategories.VUL_INFOMATION_LEAK => contentProviderInfoLeak += 1
+			                    case AndroidProblemCategories.VUL_INFORMATION_LEAK => contentProviderInfoLeak += 1
 			                    case AndroidProblemCategories.VUL_CAPABILITY_LEAK => contentProviderCapabilityLeak += 1
-			                    case AndroidProblemCategories.MAL_INFOMATION_LEAK => maliciousness += 1
+			                    case AndroidProblemCategories.MAL_INFORMATION_LEAK => maliciousness += 1
 			                    case AndroidProblemCategories.VUL_CONFUSED_DEPUTY => 
 			                  }
 			              }
@@ -140,7 +140,7 @@ object MetricRepo {
 	  sb.append("Activity Hijacking: " + this.activityHijacking + "\n")
 	  sb.append("Service Hijacking: " + this.serviceHijacking + "\n")
 	  sb.append("BroadcastReceiver Theft: " + this.broadcastReceiverTheft + "\n")
-	  sb.append("ContentProvider Infomation Leak: " + this.contentProviderInfoLeak + "\n")
+	  sb.append("ContentProvider Information Leak: " + this.contentProviderInfoLeak + "\n")
 	  sb.append("Activity Launch: " + this.activityLaunch + "\n")
 	  sb.append("Service Launch: " + this.serviceLaunch + "\n")
 	  sb.append("BroadcastReceiver Injection: " + this.broadcastReceiverInjection + "\n")
