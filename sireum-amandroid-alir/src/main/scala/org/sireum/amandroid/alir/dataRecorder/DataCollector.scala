@@ -25,6 +25,8 @@ import org.sireum.amandroid.AndroidConstants
 import org.sireum.amandroid.Apk
 import org.sireum.jawa.Global
 import org.sireum.jawa.Signature
+import org.sireum.jawa.alir.interProcedural.InterProceduralNode
+import org.sireum.alir.AlirEdge
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -247,7 +249,7 @@ object DataCollector {
       protectPermission: ISet[String],
       intentFilters: ISet[IntentFilter],
       iccInfos: ISet[IccInfo],
-      taintResultOpt: Option[TaintAnalysisResult]){
+      taintResultOpt: Option[TaintAnalysisResult[InterProceduralNode, AlirEdge[InterProceduralNode]]]){
     override def toString: String = {
       val compData = template.getInstanceOf("ComponentData")
       compData.add("compName", name)
@@ -268,7 +270,7 @@ object DataCollector {
           sn =>
             val ssInfo = template.getInstanceOf("SourceSinkInfo")
             val descriptorStrings: ArrayList[String] = new ArrayList[String]
-            descriptorStrings.add(sn.getDescriptor.toString())
+            descriptorStrings.add(sn.descriptor.toString())
             ssInfo.add("descriptors", descriptorStrings)
             sourceStrings.add(ssInfo.render())
         }
@@ -277,7 +279,7 @@ object DataCollector {
           sn =>
             val ssInfo = template.getInstanceOf("SourceSinkInfo")
             val descriptorStrings: ArrayList[String] = new ArrayList[String]
-            descriptorStrings.add(sn.getDescriptor.toString())
+            descriptorStrings.add(sn.descriptor.toString())
             ssInfo.add("descriptors", descriptorStrings)
             sinkStrings.add(ssInfo.render())
         }
@@ -290,12 +292,12 @@ object DataCollector {
             val path = template.getInstanceOf("TaintPath")
             val sourcessInfo = template.getInstanceOf("SourceSinkInfo")
             val sourceDescriptorStrings: ArrayList[String] = new ArrayList[String]
-            sourceDescriptorStrings.add(taintPath.getSource.getDescriptor.toString())
+            sourceDescriptorStrings.add(taintPath.getSource.descriptor.toString())
             sourcessInfo.add("descriptors", sourceDescriptorStrings)
             path.add("source", sourcessInfo)
             val sinkssInfo = template.getInstanceOf("SourceSinkInfo")
             val sinkDescriptorStrings: ArrayList[String] = new ArrayList[String]
-            sinkDescriptorStrings.add(taintPath.getSink.getDescriptor.toString())
+            sinkDescriptorStrings.add(taintPath.getSink.descriptor.toString())
             sinkssInfo.add("descriptors", sinkDescriptorStrings)
             path.add("sink", sinkssInfo)
             val typStrings: ArrayList[String] = new ArrayList[String]
@@ -328,7 +330,7 @@ object DataCollector {
         val protectPermission = comp.permission
         val intentFilters = intentFDB.getIntentFilters(compTyp)
         var iccInfos = isetEmpty[IccInfo]
-        var taintResult: Option[TaintAnalysisResult] = None
+        var taintResult: Option[TaintAnalysisResult[InterProceduralNode, AlirEdge[InterProceduralNode]]] = None
         if(!compRec.isUnknown){
           if(apk.hasIDFG(compRec)) {
             val InterProceduralDataFlowGraph(icfg, ptaresult) = apk.getIDFG(compRec).get

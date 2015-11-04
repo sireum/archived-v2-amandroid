@@ -20,6 +20,8 @@ import org.sireum.jawa.io.NoPosition
 import org.sireum.jawa.JawaMethod
 import org.sireum.jawa.alir.taintAnalysis.TaintAnalysisResult
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
+import org.sireum.jawa.alir.interProcedural.InterProceduralNode
+import org.sireum.alir.AlirEdge
 
 /**
  * this is an object, which hold information of apps. e.g. components, intent-filter database, etc.
@@ -127,11 +129,11 @@ case class Apk(nameUri: FileResourceUri) {
   def getIDDG(key: JawaClass): Option[InterproceduralDataDependenceInfo] = this.synchronized(this.iddaResults.get(key))
   def getIDDGs = this.iddaResults.toMap
   
-  private val taintResults: MMap[JawaClass, TaintAnalysisResult] = mmapEmpty
+  private val taintResults: MMap[JawaClass, TaintAnalysisResult[InterProceduralNode, AlirEdge[InterProceduralNode]]] = mmapEmpty
   
-  def addTaintAnalysisResult(key: JawaClass, tar: TaintAnalysisResult) = this.synchronized(this.taintResults(key) = tar)
+  def addTaintAnalysisResult(key: JawaClass, tar: TaintAnalysisResult[InterProceduralNode, AlirEdge[InterProceduralNode]]) = this.synchronized(this.taintResults(key) = tar)
   def hasTaintAnalysisResult(key: JawaClass): Boolean = taintResults.contains(key)
-  def getTaintAnalysisResult(key: JawaClass): Option[TaintAnalysisResult] = this.taintResults.get(key)
+  def getTaintAnalysisResult(key: JawaClass): Option[TaintAnalysisResult[InterProceduralNode, AlirEdge[InterProceduralNode]]] = this.taintResults.get(key)
   def getTaintAnalysisResults = this.taintResults.toMap
   
   def reset = {

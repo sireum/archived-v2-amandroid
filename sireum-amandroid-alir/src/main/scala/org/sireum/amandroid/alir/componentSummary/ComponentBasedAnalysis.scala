@@ -35,6 +35,9 @@ import org.sireum.jawa.alir.taintAnalysis.TaintAnalysisResult
 import org.sireum.jawa.ObjectType
 import org.sireum.jawa.alir.dataDependenceAnalysis.IDDGCallArgNode
 import org.sireum.jawa.alir.pta.VarSlot
+import java.io.PrintWriter
+import org.sireum.jawa.alir.interProcedural.InterProceduralNode
+import org.sireum.alir.AlirEdge
 
 /**
  * @author fgwei
@@ -121,6 +124,7 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
           case None =>
         }
     }
+//    mddg.toDot(new PrintWriter(System.out))
     
     {if(parallel) components.par else components}.foreach {
       component =>
@@ -151,7 +155,7 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
     (apks, new DefaultInterproceduralDataDependenceInfo(mddg))
   }
   
-  def phase3(iddResult: (ISet[Apk], InterproceduralDataDependenceInfo), ssm: AndroidSourceAndSinkManager): Option[TaintAnalysisResult] = {
+  def phase3(iddResult: (ISet[Apk], InterproceduralDataDependenceInfo), ssm: AndroidSourceAndSinkManager): Option[TaintAnalysisResult[AndroidDataDependentTaintAnalysis.Node, InterproceduralDataDependenceAnalysis.Edge]] = {
     val apks = iddResult._1
     val components = apks.map(_.getComponents).fold(Set[JawaClass]())(iunion _)
     println(TITLE + ":" + "-------Phase 3-------" + apks.size + s" apk${if(apks.size > 1)"s"else""} " + components.size + s" component${if(components.size > 1)"s"else""}-------")

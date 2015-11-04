@@ -18,6 +18,8 @@ import org.sireum.jawa.Global
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.jawa.Constants
 import org.sireum.amandroid.appInfo.AppInfoCollector
+import org.sireum.jawa.alir.interProcedural.InterProceduralNode
+import org.sireum.alir.AlirEdge
 
 /**
  * @author fgwei
@@ -76,10 +78,10 @@ class ApkYard(global: Global) {
   def getSummaryTable(key: JawaClass): Option[ComponentSummaryTable] = this.synchronized(this.summaryTables.get(key))
   def getSummaryTables = this.summaryTables.toMap
   
-  private var taintResult: Option[TaintAnalysisResult] = None
+  private var taintResult: Option[TaintAnalysisResult[InterProceduralNode, AlirEdge[InterProceduralNode]]] = None
   
-  def setTaintAnalysisResult(tar: TaintAnalysisResult) = this.synchronized(this.taintResult = Option(tar))
+  def setTaintAnalysisResult(tar: TaintAnalysisResult[InterProceduralNode, AlirEdge[InterProceduralNode]]) = this.synchronized(this.taintResult = Option(tar))
   def hasTaintAnalysisResult: Boolean = taintResult.isDefined
-  def getTaintAnalysisResult: Option[TaintAnalysisResult] = this.taintResult
+  def getTaintAnalysisResult: Option[TaintAnalysisResult[InterProceduralNode, AlirEdge[InterProceduralNode]]] = this.taintResult
   
 }

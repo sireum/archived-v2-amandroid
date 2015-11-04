@@ -193,14 +193,14 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
           case ne: NewExp => result = true
           case ce: CastExp => result = true
           case _ =>
-        }
-        a.getValueAnnotation("kind") match {
-          case Some(e) => 
-            e match{
-              case ne: NameExp => result = (ne.name.name == "object")
-              case _ =>
+            a.getValueAnnotation("kind") match {
+              case Some(e) => 
+                e match{
+                  case ne: NameExp => result = (ne.name.name == "object")
+                  case _ =>
+                }
+              case None => 
             }
-          case None => 
         }
       case cj: CallJump => result = true
       case _ =>
@@ -303,7 +303,8 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
     /**
      * It returns the facts for each callee entry node and caller return node
      */
-    def resolveCall(s: ISet[RFAFact], cj: CallJump, callerContext: Context, icfg: InterproceduralControlFlowGraph[ICFGNode]): (IMap[ICFGNode, ISet[RFAFact]], ISet[RFAFact]) = {
+    def resolveCall(s: ISet[RFAFact], cj: CallJump, callerNode: ICFGNode, icfg: InterproceduralControlFlowGraph[ICFGNode]): (IMap[ICFGNode, ISet[RFAFact]], ISet[RFAFact]) = {
+      val callerContext = callerNode.getContext
       ReachingFactsAnalysisHelper.updatePTAResultCallJump(cj, callerContext, s, ptaresult)
       val sig = ASTUtil.getSignature(cj).get
       val calleeSet = ReachingFactsAnalysisHelper.getCalleeSet(global, cj, sig, callerContext, ptaresult)
@@ -390,8 +391,25 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
           killSet += rdf
         }
       }
-      returnFacts = returnFacts -- killSet ++ genSet
-      returnFacts foreach ( f => ptaresult.addInstance(f.s, callerContext, f.v))
+      val gen: ISet[RFAFact] = genSet.map {
+        case RFAFact(s, v) =>
+          val news = s match {
+            case VarSlot(a, b, true) => VarSlot(a, b, false)
+            case a => a
+          }
+          RFAFact(news, v)
+      }.toSet
+      val kill: ISet[RFAFact] = killSet.map {
+        case RFAFact(s, v) =>
+          val news = s match {
+            case VarSlot(a, b, true) => VarSlot(a, b, false)
+            case a => a
+          }
+          RFAFact(news, v)
+      }.toSet
+      
+      returnFacts = returnFacts -- kill ++ gen
+      genSet foreach (f => ptaresult.addInstance(f.s, callerContext, f.v))
       (calleeFactsMap, returnFacts)
     }
     
@@ -531,6 +549,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
     
     def getAndMapFactsForCaller(calleeS: ISet[RFAFact], callerNode: ICFGNode, calleeExitNode: ICFGVirtualNode): ISet[RFAFact] ={
       val result = msetEmpty[RFAFact]
+      val kill = msetEmpty[RFAFact]
       /**
        * adding global facts to result
        */
@@ -589,21 +608,6 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
               }
             case _ =>
           }
-          lhsSlots.foreach {
-            lhsSlot =>
-              var values: ISet[Instance] = isetEmpty
-              retSlots.foreach {
-                retSlotList =>
-                  calleeVarFacts.foreach{
-                    case (s, v) =>
-                      if(s == retSlotList(lhsSlots.indexOf(lhsSlot))){
-                        values += v
-                      }
-                  }
-              }
-              result ++= values.map(v => RFAFact(lhsSlot, v))
-              result ++= ReachingFactsAnalysisHelper.getRelatedHeapFacts(values, calleeS)
-          }
           cj.callExp.arg match{
             case te: TupleExp => 
               val argSlots = te.exps.map{
@@ -626,9 +630,36 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
               }
             case _ => throw new RuntimeException("wrong exp type: " + cj.callExp.arg)
           }
+          // kill the strong update for caller return node
+          val lhss = PilarAstHelper.getLHSs(cj)
+          val slotsWithMark = ReachingFactsAnalysisHelper.processLHSs(lhss, None, callerNode.getContext, ptaresult, global).values.flatten.toSet
+          for (rdf @ RFAFact(slot, value) <- result) {
+            //if it is a strong definition, we can kill the existing definition
+            if (slotsWithMark.exists{case (s, st) => s.getId == slot.getId && st == true}) {
+              val news = slot match {
+                case VarSlot(a, b, true) => VarSlot(a, b, false)
+                case a => a
+              }
+              kill += RFAFact(news, value)
+            }
+          }
+          lhsSlots.foreach {
+            lhsSlot =>
+              var values: ISet[Instance] = isetEmpty
+              retSlots.foreach {
+                retSlotList =>
+                  calleeVarFacts.foreach{
+                    case (s, v) =>
+                      if(s == retSlotList(lhsSlots.indexOf(lhsSlot))){
+                        values += v
+                      }
+                  }
+              }
+              result ++= values.map(v => RFAFact(lhsSlot, v))
+              result ++= ReachingFactsAnalysisHelper.getRelatedHeapFacts(values, calleeS)
+          }
         case cnn: ICFGNode =>
       }
-      
       /**
        * update pstresult with caller's return node and it's points-to info
        */
@@ -641,7 +672,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
             case VarSlot(a, b, true) => RFAFact(VarSlot(a, b, false), rFact.v)
             case a => rFact
           }
-      }.toSet
+      }.toSet -- kill
     }
     
   }

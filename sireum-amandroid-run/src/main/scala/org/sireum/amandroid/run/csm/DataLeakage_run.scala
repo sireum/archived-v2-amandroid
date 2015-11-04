@@ -66,7 +66,7 @@ object DataLeakage_run {
     val outputUri = FileUtil.toUri(outputPath)
     val dpsuri = try{Some(FileUtil.toUri(args(1)))} catch {case e: Exception => None}
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
-//      .filter(_.contains("Merge"))
+//      .filter(_.contains("LocationLeak2"))
     files.foreach{
       file =>
         DataLeakageCounter.total += 1

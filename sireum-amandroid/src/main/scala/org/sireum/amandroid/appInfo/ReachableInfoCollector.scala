@@ -47,7 +47,7 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[ObjectType], 
   def updateReachableMap(compProcMap: IMap[JawaClass, Set[JawaMethod]]): Boolean = {
     var flag = false
     compProcMap.foreach{
-      case(comp, procs) => 
+      case(comp, procs) =>
         val tmpReachableMethods = ReachabilityAnalysis.getReachableMethods(global, procs, timer)
         val oldReachableMethods = reachableMap.getOrElse(comp, Set())
         val newReachableMethods = tmpReachableMethods -- oldReachableMethods
@@ -189,7 +189,7 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[ObjectType], 
    */
   private def collectCallbackMethodsInAppSource(clazz: JawaClass, lifecycleElement: JawaClass) {
     // Check for callback handlers implemented via interfaces
-    val procs = this.reachableMap(lifecycleElement) 
+    val procs = this.reachableMap(lifecycleElement)
     analyzeReachableMethods(procs, lifecycleElement)
     // Check for method overrides
     analyzeMethodOverrideCallbacks(clazz, lifecycleElement)
@@ -378,7 +378,7 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[ObjectType], 
    * callback method belongs
    */
   private def checkAndAddMethod(proc: JawaMethod, lifecycleElement: JawaClass) = {
-    if(!proc.getName.startsWith("android.")){
+    if(!proc.getFullName.startsWith("android.")){
       this.callbackMethods += (lifecycleElement -> (this.callbackMethods.getOrElse(lifecycleElement, isetEmpty) + proc))
     }
   }

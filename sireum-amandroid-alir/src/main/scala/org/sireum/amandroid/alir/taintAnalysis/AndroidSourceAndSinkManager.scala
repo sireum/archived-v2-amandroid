@@ -34,6 +34,13 @@ import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.jawa.Signature
 import org.sireum.amandroid.Apk
 import org.sireum.jawa.Global
+import org.sireum.jawa.alir.interProcedural.InterProceduralNode
+import org.sireum.jawa.alir.taintAnalysis.TaintNode
+import org.sireum.jawa.alir.taintAnalysis.TaintSource
+import org.sireum.jawa.alir.taintAnalysis.TaintSink
+import org.sireum.jawa.alir.dataDependenceAnalysis._
+import org.sireum.jawa.alir.taintAnalysis.TagTaintDescriptor
+import org.sireum.jawa.alir.taintAnalysis.TypeTaintDescriptor
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -61,46 +68,15 @@ abstract class AndroidSourceAndSinkManager(
     sasFilePath: String) extends SourceAndSinkManager{
   
   private final val TITLE = "BasicSourceAndSinkManager"
-  
-  /**
-   * it's a map from source API sig to it's category
-   */
-  protected var sources: IMap[String, String] = imapEmpty
-  /**
-   * it's a map from sink API sig to it's category
-   */
-  protected var sinks: IMap[String, (ISet[Int], String)] = imapEmpty
-  /**
-   * it's a map from API sig to its required permission
-   */
-  protected var apiPermissions: IMap[String, ISet[String]] = imapEmpty
 
-  SSParser.parse(sasFilePath) match {
-    case (sources, sinks) => 
-      sources.foreach{
-        case (sig, ps) =>
-          this.sources += (sig -> SourceAndSinkCategory.API_SOURCE)
-          this.apiPermissions += (sig -> ps)
-      }
-      sinks.foreach{
-        case (sig, (poss, ps)) =>
-          this.sinks += (sig -> (poss, SourceAndSinkCategory.API_SINK))
-          this.apiPermissions += (sig -> ps)
-      }
-//      msg_detail(TITLE, "source size: " + this.sources.size + " sink size: " + this.sinks.size)
+  private def matchs(method: JawaMethod, methodpool: ISet[String]): Boolean = methodpool.exists{
+    sig =>
+      sig == method.getSignature.signature.replaceAll("\\*", "")
   }
 
-  private def matchs(method: JawaMethod, position: Option[Int], methodpool: ISet[(String, ISet[Int])]): Boolean = methodpool.exists{
-    case (sig, poss) =>
-      (sig == method.getSignature.signature.replaceAll("\\*", "")) &&
-      (poss.isEmpty ||
-      !position.isDefined ||
-      poss.contains(position.get))
-  }
+  def isSourceMethod(method: JawaMethod) = matchs(method, this.sources.map(s => s._1).toSet)
 
-  def isSourceMethod(method: JawaMethod) = matchs(method, None, this.sources.map(s=>(s._1, isetEmpty[Int])).toSet)
-
-  def isSink(method: JawaMethod, position: Int) = matchs(method, Some(position), this.sinks.map(s=>(s._1, s._2._1)).toSet)
+  def isSink(method: JawaMethod) = matchs(method, this.sinks.map(s => s._1).toSet)
 
   def isSource(calleeMethod: JawaMethod, callerMethod: JawaMethod, callerLoc: JumpLocation): Boolean = {
     if(isSourceMethod(calleeMethod)) return true
@@ -111,16 +87,6 @@ abstract class AndroidSourceAndSinkManager(
   def isSource(loc: LocationDecl, ptaresult: PTAResult): Boolean = false
 
   def isSink(loc: LocationDecl, ptaresult: PTAResult): Boolean = false
-
-  def addSource(source: String, category: String) = {
-    this.sources += (source -> category)
-    this.apiPermissions += (source -> this.apiPermissions.getOrElse(source, isetEmpty))
-  }
-
-  def addSink(sink: String, positions: ISet[Int], category: String) = {
-    this.sinks += (sink -> (positions, category))
-    this.apiPermissions += (sink -> this.apiPermissions.getOrElse(sink, isetEmpty))
-  }
 
   def isCallbackSource(proc: JawaMethod): Boolean
   def isUISource(calleeMethod: JawaMethod, callerMethod: JawaMethod, callerLoc: JumpLocation): Boolean
@@ -145,6 +111,144 @@ class DefaultAndroidSourceAndSinkManager(
     sasFilePath: String) extends AndroidSourceAndSinkManager(global, apk, layoutControls, callbackMethods, sasFilePath){
 
   private final val TITLE = "DefaultSourceAndSinkManager"
+  
+  def getSourceAndSinkNode[N <: InterProceduralNode](node: N, ptaresult: PTAResult): (ISet[TaintSource[N]], ISet[TaintSink[N]]) = {
+    node match {
+      case icfgN: ICFGNode => handleICFGNode(icfgN, ptaresult)
+      case iddgN: IDDGNode => handleIDFGNode(iddgN, ptaresult)
+      case _ => (isetEmpty, isetEmpty)
+    }
+  }
+  
+  private def getSourceTags(calleep: JawaMethod): ISet[String] = {
+    this.sources.filter(_._1 == calleep.getSignature.signature.replaceAll("\\*", "")).map(_._2).fold(isetEmpty)(iunion _)
+  }
+  
+  private def getSinkTags(calleep: JawaMethod): ISet[String] = {
+    this.sinks.filter(_._1 == calleep.getSignature.signature.replaceAll("\\*", "")).map(_._2._2).fold(isetEmpty)(iunion _)
+  }
+  
+  private def handleICFGNode[N <: InterProceduralNode](icfgN: ICFGNode, ptaresult: PTAResult): (ISet[TaintSource[N]], ISet[TaintSink[N]]) = {
+    val sources = msetEmpty[TaintSource[N]]
+    val sinks = msetEmpty[TaintSink[N]]
+    val gNode = icfgN.asInstanceOf[N]
+    icfgN match {
+      case invNode: ICFGInvokeNode =>
+        val calleeSet = invNode.getCalleeSet
+        calleeSet.foreach{
+          callee =>
+            val calleep = callee.callee
+            val calleesig = calleep.getSignature
+            val caller = global.getMethod(invNode.getOwner).get
+            val jumpLoc = caller.getBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
+            if(this.isSource(calleep, caller, jumpLoc)) {
+              val tags = getSourceTags(calleep)
+              global.reporter.echo(TITLE, "found source: " + calleep + "@" + invNode.getContext + " " + tags)
+              val tn = TaintSource(gNode, TagTaintDescriptor(calleesig.signature, isetEmpty, SourceAndSinkCategory.API_SOURCE, tags))
+              sources += tn
+            }
+            if(this.isSink(calleep)) {
+              val tags = getSinkTags(calleep)
+              global.reporter.echo(TITLE, "found sink: " + calleep + "@" + invNode.getContext + " " + tags)
+              val poss = this.sinks.filter(_._1 == calleesig.signature.replaceAll("\\*", "")).map(_._2._1).fold(isetEmpty)(iunion _)
+              val tn = TaintSink(gNode, TagTaintDescriptor(calleesig.signature, poss, SourceAndSinkCategory.API_SINK, tags))
+              sinks += tn
+            }
+            if(invNode.isInstanceOf[ICFGCallNode] && this.isIccSink(invNode.asInstanceOf[ICFGCallNode], ptaresult)) {
+              global.reporter.echo(TITLE, "found icc sink: " + invNode)
+              val tn = TaintSink(gNode, TagTaintDescriptor(invNode.getLocUri, Set(1), SourceAndSinkCategory.ICC_SINK, Set("ICC")))
+              sinks += tn
+            }
+        }
+      case entNode: ICFGEntryNode =>
+        if(this.isIccSource(entNode)){
+          global.reporter.echo(TITLE, "found icc source: " + entNode)
+          val tn = TaintSource(gNode, TagTaintDescriptor(entNode.getOwner.signature, isetEmpty, SourceAndSinkCategory.ICC_SOURCE, Set("ICC")))
+          sources += tn
+        }
+        if(this.isCallbackSource(global.getMethod(entNode.getOwner).get)){
+          global.reporter.echo(TITLE, "found callback source: " + entNode)
+          val tn = TaintSource(gNode, TagTaintDescriptor(entNode.getOwner.signature, isetEmpty, SourceAndSinkCategory.CALLBACK_SOURCE, Set("CALL_BACK")))
+          sources += tn
+        }
+      case normalNode: ICFGNormalNode =>
+        val owner = global.getMethod(normalNode.getOwner).get
+        val loc = owner.getBody.location(normalNode.getLocIndex)
+        if(this.isSource(loc, ptaresult)){
+          global.reporter.echo(TITLE, "found simple statement source: " + normalNode)
+          val tn = TaintSource(gNode, TagTaintDescriptor(normalNode.getOwner.signature, isetEmpty, SourceAndSinkCategory.STMT_SOURCE, isetEmpty))
+          sources += tn
+        }
+        if(this.isSink(loc, ptaresult)){
+          global.reporter.echo(TITLE, "found simple statement sink: " + normalNode)
+          val tn = TaintSink(gNode, TagTaintDescriptor(normalNode.getOwner.signature, isetEmpty, SourceAndSinkCategory.STMT_SINK, isetEmpty))
+          sinks += tn
+        }
+      case _ =>
+    }
+    (sources.toSet, sinks.toSet)
+  }
+  
+  private def handleIDFGNode[N <: InterProceduralNode](iddgN: IDDGNode, ptaresult: PTAResult): (ISet[TaintSource[N]], ISet[TaintSink[N]]) = {
+    val sources = msetEmpty[TaintSource[N]]
+    val sinks = msetEmpty[TaintSink[N]]
+    val gNode = iddgN.asInstanceOf[N]
+    iddgN match {
+      case invNode: IDDGInvokeNode =>
+        val calleeSet = invNode.getCalleeSet
+        calleeSet.foreach{
+          callee =>
+            val calleesig = callee.callee.getSignature
+            val calleep = callee.callee
+            val caller = global.getMethod(invNode.getOwner).get
+            val jumpLoc = caller.getBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
+            if(this.isSource(calleep, caller, jumpLoc)){
+              global.reporter.echo(TITLE, "found source: " + calleep + "@" + invNode.getContext)
+              val tn = TaintSource(gNode, TypeTaintDescriptor(calleep.getSignature.signature, None, SourceAndSinkCategory.API_SOURCE))
+              sources += tn
+            }
+            if(invNode.isInstanceOf[IDDGCallArgNode] && this.isSink(calleep)){
+              val poss = this.sinks.filter(_._1 == calleep.getSignature.signature.replaceAll("\\*", "")).map(_._2._1).fold(isetEmpty)(iunion _)
+              if(poss.isEmpty || poss.contains(invNode.asInstanceOf[IDDGCallArgNode].position)) {
+                global.reporter.echo(TITLE, "found sink: " + calleep + "@" + invNode.getContext + " " + invNode.asInstanceOf[IDDGCallArgNode].position)
+                val tn = TaintSink(gNode, TypeTaintDescriptor(calleep.getSignature.signature, Some(invNode.asInstanceOf[IDDGCallArgNode].position), SourceAndSinkCategory.API_SINK))
+                sinks += tn
+              }
+            }
+            if(invNode.isInstanceOf[IDDGCallArgNode] && invNode.asInstanceOf[IDDGCallArgNode].position == 1 && this.isIccSink(invNode.getICFGNode.asInstanceOf[ICFGCallNode], ptaresult)){
+              global.reporter.echo(TITLE, "found icc sink: " + invNode)
+              val tn = TaintSink(gNode, TypeTaintDescriptor(invNode.getLocUri, Some(1), SourceAndSinkCategory.ICC_SINK))
+              sinks += tn
+            }
+        }
+      case entNode: IDDGEntryParamNode =>
+        if(this.isIccSource(entNode.getICFGNode)){
+          global.reporter.echo(TITLE, "found icc source: " + entNode)
+          val tn = TaintSource(gNode, TypeTaintDescriptor(entNode.getOwner.signature, None, SourceAndSinkCategory.ICC_SOURCE))
+          sources += tn
+        }
+        if(entNode.position > 0 && this.isCallbackSource(global.getMethod(entNode.getOwner).get)){
+          global.reporter.echo(TITLE, "found callback source: " + entNode)
+          val tn = TaintSource(gNode, TypeTaintDescriptor(entNode.getOwner.signature, None, SourceAndSinkCategory.CALLBACK_SOURCE))
+          sources += tn
+        }
+      case normalNode: IDDGNormalNode =>
+        val owner = global.getMethod(normalNode.getOwner).get
+        val loc = owner.getBody.location(normalNode.getLocIndex)
+        if(this.isSource(loc, ptaresult)){
+          global.reporter.echo(TITLE, "found simple statement source: " + normalNode)
+          val tn = TaintSource(gNode, TypeTaintDescriptor(normalNode.getOwner.signature, None, SourceAndSinkCategory.STMT_SOURCE))
+          sources += tn
+        }
+        if(this.isSink(loc, ptaresult)){
+          global.reporter.echo(TITLE, "found simple statement sink: " + normalNode)
+          val tn = TaintSink(gNode, TypeTaintDescriptor(normalNode.getOwner.signature, None, SourceAndSinkCategory.STMT_SINK))
+          sinks += tn
+        }
+      case _ =>
+    }
+    (sources.toSet, sinks.toSet)
+  }
   
   def isCallbackSource(proc: JawaMethod): Boolean = {
     if(this.callbackMethods.contains(proc) && proc.getParamNames.size > 1) true
@@ -206,7 +310,7 @@ class DefaultAndroidSourceAndSinkManager(
     sinkflag
   }
   
-  def isIccSource(entNode: ICFGNode, iddgEntNode: ICFGNode): Boolean = {
+  def isIccSource(entNode: ICFGNode): Boolean = {
     var sourceflag = false
 //    val reachableSinks = sinkNodes.filter{sinN => iddg.findPath(entNode, sinN) != null}
 //    if(!reachableSinks.isEmpty){
@@ -250,63 +354,5 @@ class DataLeakageAndroidSourceAndSinkManager(
       else false
     }
     else false
-  }
-}
-
-/**
- * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
- * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
- */ 
-object SSParser{
-  final val TITLE = "SSParser"
-  final val DEBUG = false
-  
-  private val regex = "([^\\s]+)\\s+(.+)?\\s*->\\s+([^\\s]+)\\s*(.+)?"
-  def parse(filePath: String): (IMap[String, ISet[String]], IMap[String, (ISet[Int], ISet[String])]) = {
-    def readFile: BufferedReader = new BufferedReader(new FileReader(filePath))
-    val sources: MMap[String, ISet[String]] = mmapEmpty
-    val sinks: MMap[String, (ISet[Int], ISet[String])] = mmapEmpty
-    val p: Pattern = Pattern.compile(regex)
-    val rdr = readFile
-    var line = rdr.readLine()
-    while(line != null){
-      try{
-      val m = p.matcher(line)
-      if(m.find()){
-        val (tag, apiSig, positions, permissions) = parseLine(m)
-        tag match{
-          case "_SOURCE_" => sources += (apiSig -> permissions)
-          case "_SINK_" => sinks += (apiSig -> (positions, permissions))
-          case "_NONE_" =>
-          case _ => throw new RuntimeException("Not expected tag: " + tag)
-        }
-      } else {
-        throw new RuntimeException("Did not match the regex: " + line)
-      }
-      } catch {
-        case ex: Exception =>
-          if(DEBUG) ex.printStackTrace()
-          System.err.println(TITLE + " exception occurs: " + ex.getMessage)
-      }
-      line = rdr.readLine()
-    }
-    (sources.toMap, sinks.toMap)
-  }
-  
-  def parseLine(m: Matcher): (String, String, ISet[Int], ISet[String]) = {
-    require(m.group(1) != null && m.group(3) != null)
-    val apiSig = m.group(1)
-    val rawps = m.group(2)
-    val permissions: MSet[String] = msetEmpty
-    if(rawps != null) {
-      permissions ++= rawps.split(" ")
-    }
-    val tag = m.group(3)
-    val rawpos = m.group(4)
-    val positions: MSet[Int] = msetEmpty
-    if(rawpos != null) {
-      positions ++= rawpos.split("\\|").map(_.toInt)
-    }
-    (tag, apiSig, positions.toSet, permissions.toSet)
   }
 }

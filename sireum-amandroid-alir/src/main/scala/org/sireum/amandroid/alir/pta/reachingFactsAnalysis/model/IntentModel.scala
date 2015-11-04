@@ -79,7 +79,7 @@ object IntentModel {
       case "Landroid/content/Intent;.getAction:()Ljava/lang/String;" =>  //public
       case "Landroid/content/Intent;.getBooleanArrayExtra:(Ljava/lang/String;)[Z" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, PrimitiveType("boolean")) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getBooleanExtra:(Ljava/lang/String;Z)Z" =>  //public
         require(retVars.size == 1)
@@ -87,11 +87,11 @@ object IntentModel {
         byPassFlag = false
       case "Landroid/content/Intent;.getBundleExtra:(Ljava/lang/String;)Landroid/os/Bundle;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType(AndroidConstants.BUNDLE, 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getByteArrayExtra:(Ljava/lang/String;)[B" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("byte", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getByteExtra:(Ljava/lang/String;B)B" =>  //public
         require(retVars.size == 1)
@@ -100,7 +100,7 @@ object IntentModel {
       case "Landroid/content/Intent;.getCategories:()Ljava/util/Set;" =>  //public
       case "Landroid/content/Intent;.getCharArrayExtra:(Ljava/lang/String;)[C" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("char", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getCharExtra:(Ljava/lang/String;C)C" =>  //public
         require(retVars.size == 1)
@@ -108,15 +108,15 @@ object IntentModel {
         byPassFlag = false
       case "Landroid/content/Intent;.getCharSequenceArrayExtra:(Ljava/lang/String;)[Ljava/lang/CharSequence;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("java.lang.CharSequence", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getCharSequenceArrayListExtra:(Ljava/lang/String;)Ljava/util/ArrayList;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("java.util.ArrayList", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getCharSequenceExtra:(Ljava/lang/String;)Ljava/lang/CharSequence;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("java.lang.CharSequence", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getClipData:()Landroid/content/ClipData;" =>  //public
       case "Landroid/content/Intent;.getComponent:()Landroid/content/ComponentName;" =>  //public
@@ -124,7 +124,7 @@ object IntentModel {
       case "Landroid/content/Intent;.getDataString:()Ljava/lang/String;" =>  //public
       case "Landroid/content/Intent;.getDoubleArrayExtra:(Ljava/lang/String;)[D" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("double", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getDoubleExtra:(Ljava/lang/String;D)D" =>  //public
         require(retVars.size == 1)
@@ -132,7 +132,7 @@ object IntentModel {
         byPassFlag = false
       case "Landroid/content/Intent;.getExtra:(Ljava/lang/String;)Ljava/lang/Object;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("java.lang.Object", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getExtra:(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;" =>  //public
         require(retVars.size == 1)
@@ -145,7 +145,7 @@ object IntentModel {
       case "Landroid/content/Intent;.getFlags:()I" =>  //public
       case "Landroid/content/Intent;.getFloatArrayExtra:(Ljava/lang/String;)[F" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("float", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getFloatExtra:(Ljava/lang/String;F)F" =>  //public
         require(retVars.size == 1)
@@ -153,11 +153,11 @@ object IntentModel {
         byPassFlag = false
       case "Landroid/content/Intent;.getIBinderExtra:(Ljava/lang/String;)Landroid/os/IBinder;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("android.os.Binder", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getIntArrayExtra:(Ljava/lang/String;)[I" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("int", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getIntExtra:(Ljava/lang/String;I)I" =>  //public
         require(retVars.size == 1)
@@ -165,19 +165,19 @@ object IntentModel {
         byPassFlag = false
       case "Landroid/content/Intent;.getIntegerArrayListExtra:(Ljava/lang/String;)Ljava/util/ArrayList;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("java.lang.ArrayList", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getIntent:(Ljava/lang/String;)Landroid/content/Intent;" =>  //public static
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("android.content.Intent", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getIntentOld:(Ljava/lang/String;)Landroid/content/Intent;" =>  //public static
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("android.content.Intent", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getLongArrayExtra:(Ljava/lang/String;)[J" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("long", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getLongExtra:(Ljava/lang/String;J)J" =>  //public
         require(retVars.size == 1)
@@ -186,25 +186,25 @@ object IntentModel {
       case "Landroid/content/Intent;.getPackage:()Ljava/lang/String;" =>  //public
       case "Landroid/content/Intent;.getParcelableArrayExtra:(Ljava/lang/String;)[Landroid/os/Parcelable;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("android.os.Parcelable", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getParcelableArrayListExtra:(Ljava/lang/String;)Ljava/util/ArrayList;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("java.util.ArrayList", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getParcelableExtra:(Ljava/lang/String;)Landroid/os/Parcelable;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("android.os.Parcelable", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getScheme:()Ljava/lang/String;" =>  //public
       case "Landroid/content/Intent;.getSelector:()Landroid/content/Intent;" =>  //public
       case "Landroid/content/Intent;.getSerializableExtra:(Ljava/lang/String;)Ljava/io/Serializable;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("java.io.Serializable", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getShortArrayExtra:(Ljava/lang/String;)[S" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("short", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getShortExtra:(Ljava/lang/String;S)S" =>  //public
         require(retVars.size == 1)
@@ -213,15 +213,15 @@ object IntentModel {
       case "Landroid/content/Intent;.getSourceBounds:()Landroid/graphics/Rect;" =>  //public
       case "Landroid/content/Intent;.getStringArrayExtra:(Ljava/lang/String;)[Ljava/lang/String;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("java.lang.String", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getStringArrayListExtra:(Ljava/lang/String;)Ljava/util/ArrayList;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("java.util.ArrayList", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getStringExtra:(Ljava/lang/String;)Ljava/lang/String;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("java.lang.String", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getType:()Ljava/lang/String;" =>  //public
       case "Landroid/content/Intent;.hasCategory:(Ljava/lang/String;)Z" =>  //public
@@ -1115,7 +1115,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.getExtra:(Ljava/lang/String;)Ljava/lang/Object;
    */
-  private def intentGetExtra(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentGetExtra(s : PTAResult, args : List[String], retVar : String, currentContext : Context, desiredReturnTyp: JawaType) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -1130,8 +1130,9 @@ object IntentModel {
           isetEmpty
         else
           mExtraValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
-    
-      if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
+      if(entValue.isEmpty && desiredReturnTyp.isInstanceOf[ObjectType]) {
+        newfacts += (RFAFact(VarSlot(retVar, false, false), UnknownInstance(desiredReturnTyp.asInstanceOf[ObjectType], currentContext)))
+      } else if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty) {
         val keys = keyValue.map{k => k.asInstanceOf[PTAConcreteStringInstance].string}
         entValue.foreach{
           v =>
@@ -1141,7 +1142,7 @@ object IntentModel {
             }
         }
       } else if(!entValue.isEmpty) {
-        entValue.foreach{
+        entValue.foreach {
           v =>
             require(v.isInstanceOf[PTATupleInstance])
             newfacts += (RFAFact(VarSlot(retVar, false, false), v.asInstanceOf[PTATupleInstance].right))
@@ -1172,8 +1173,7 @@ object IntentModel {
         if(mExtraValue.isEmpty)
           isetEmpty
         else
-        mExtraValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
-    
+          mExtraValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
       if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
         val keys = keyValue.map{k => k.asInstanceOf[PTAConcreteStringInstance].string}
         entValue.foreach{

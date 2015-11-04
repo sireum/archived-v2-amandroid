@@ -22,6 +22,8 @@ import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.jawa.Signature
 import org.sireum.jawa.Global
+import org.sireum.jawa.alir.taintAnalysis.TaintSource
+import org.sireum.jawa.alir.taintAnalysis.TaintSink
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -31,29 +33,9 @@ object AndroidDataDependentTaintAnalysis {
   final val TITLE = "AndroidDataDependentTaintAnalysis"
   type Node = InterproceduralDataDependenceAnalysis.Node
   
-  case class Td(desc: String, position: Option[Int], typ: String) extends TaintDescriptor {
-    override def toString: String = s"$typ: $desc ${if(position.isDefined) position.get.toString else ""}"
-  }
-    
-  case class TaintSource(node: InterproceduralDataDependenceAnalysis.Node, descriptor: TaintDescriptor) extends TaintNode {
-    def getNode = node
-    def getDescriptor = this.descriptor
-    def isSource = true
-    def isSink = false
-    def isSame(tn: TaintNode): Boolean = getDescriptor == tn.getDescriptor && getNode.getContext.getCurrentLocUri == tn.getNode.getContext.getCurrentLocUri
-  }
-  
-  case class TaintSink(node: InterproceduralDataDependenceAnalysis.Node, descriptor: TaintDescriptor) extends TaintNode {
-    def getNode = node
-    def getDescriptor = this.descriptor
-    def isSource = false
-    def isSink = true
-    def isSame(tn: TaintNode): Boolean = getDescriptor == tn.getDescriptor && getNode.getContext.getCurrentLocUri == tn.getNode.getContext.getCurrentLocUri
-  }
-  
-  case class Tp(path: IList[InterproceduralDataDependenceAnalysis.Edge]) extends TaintPath {
-    var srcN: TaintSource = null
-    var sinN: TaintSink = null
+  case class Tp(path: IList[InterproceduralDataDependenceAnalysis.Edge]) extends TaintPath[Node, InterproceduralDataDependenceAnalysis.Edge] {
+    var srcN: TaintSource[Node] = null
+    var sinN: TaintSink[Node] = null
     val typs: MSet[String] = msetEmpty
     def getSource = srcN
     def getSink = sinN
@@ -61,13 +43,13 @@ object AndroidDataDependentTaintAnalysis {
     def getPath: IList[InterproceduralDataDependenceAnalysis.Edge] = {
       path.reverse.map(edge=> new InterproceduralDataDependenceAnalysis.Edge(edge.owner, edge.target, edge.source))
     }
-    def isSame(tp: TaintPath): Boolean = getSource.isSame(tp.getSource) && getSink.isSame(tp.getSink)
+    def isSame(tp: TaintPath[Node, InterproceduralDataDependenceAnalysis.Edge]): Boolean = getSource.isSame(tp.getSource) && getSink.isSame(tp.getSink)
     override def toString: String = {
       val sb = new StringBuilder
       sb.append("Taint path: ")
       this.typs foreach (typ => sb.append(typ + " "))
       sb.append("\n")
-      sb.append(srcN.getDescriptor + "\n\t-> " + sinN.getDescriptor + "\n")
+      sb.append(srcN.descriptor + "\n\t-> " + sinN.descriptor + "\n")
       if(path.size > 1) {
         path.tail.reverse.foreach{
           edge =>
@@ -82,25 +64,25 @@ object AndroidDataDependentTaintAnalysis {
     }
   }
   
-  case class Tar(iddi: InterproceduralDataDependenceInfo) extends TaintAnalysisResult{
-    var sourceNodes: ISet[TaintSource] = isetEmpty
-    var sinkNodes: ISet[TaintSink] = isetEmpty
+  case class Tar(iddi: InterproceduralDataDependenceInfo) extends TaintAnalysisResult[Node, InterproceduralDataDependenceAnalysis.Edge] {
+    var sourceNodes: ISet[TaintSource[Node]] = isetEmpty
+    var sinkNodes: ISet[TaintSink[Node]] = isetEmpty
     
-    def getSourceNodes: ISet[TaintNode] = this.sourceNodes.toSet
-    def getSinkNodes: ISet[TaintNode] = this.sinkNodes.toSet
-    def getTaintedPaths: ISet[TaintPath] = {
-      var tps: ISet[TaintPath] = isetEmpty
+    def getSourceNodes: ISet[TaintNode[Node]] = this.sourceNodes.toSet
+    def getSinkNodes: ISet[TaintNode[Node]] = this.sinkNodes.toSet
+    def getTaintedPaths: ISet[TaintPath[Node, InterproceduralDataDependenceAnalysis.Edge]] = {
+      var tps: ISet[TaintPath[Node, InterproceduralDataDependenceAnalysis.Edge]] = isetEmpty
       sinkNodes.foreach {
         sinN =>
           sourceNodes.foreach {
             srcN =>
-              val path = iddi.getDependentPath(sinN.getNode, srcN.getNode)
+              val path = iddi.getDependentPath(sinN.node, srcN.node)
               if(path != null){
                 val tp = Tp(path)
                 tp.srcN = srcN
                 tp.sinN = sinN
-                val srcTyp = srcN.getDescriptor.typ
-                val sinTyp = sinN.getDescriptor.typ
+                val srcTyp = srcN.descriptor.typ
+                val sinTyp = sinN.descriptor.typ
                 if(srcTyp == SourceAndSinkCategory.API_SOURCE || srcTyp == SourceAndSinkCategory.CALLBACK_SOURCE){
                   if(sinTyp == SourceAndSinkCategory.API_SINK) tp.typs += AndroidProblemCategories.MAL_INFOMATION_LEAK
                   else if(sinTyp == SourceAndSinkCategory.ICC_SINK) tp.typs += AndroidProblemCategories.VUL_INFOMATION_LEAK
@@ -128,19 +110,24 @@ object AndroidDataDependentTaintAnalysis {
     }
   }
     
-  def apply(global: Global, iddi: InterproceduralDataDependenceInfo, ptaresult: PTAResult, ssm: AndroidSourceAndSinkManager): TaintAnalysisResult
+  def apply(global: Global, iddi: InterproceduralDataDependenceInfo, ptaresult: PTAResult, ssm: AndroidSourceAndSinkManager): TaintAnalysisResult[Node, InterproceduralDataDependenceAnalysis.Edge]
     = build(global, iddi, ptaresult, ssm)
   
-  def build(global: Global, iddi: InterproceduralDataDependenceInfo, ptaresult: PTAResult, ssm: AndroidSourceAndSinkManager): TaintAnalysisResult = {
-    var sourceNodes: ISet[TaintSource] = isetEmpty
-    var sinkNodes: ISet[TaintSink] = isetEmpty
+  def build(global: Global, iddi: InterproceduralDataDependenceInfo, ptaresult: PTAResult, ssm: AndroidSourceAndSinkManager): TaintAnalysisResult[Node, InterproceduralDataDependenceAnalysis.Edge] = {
+    var sourceNodes: ISet[TaintSource[Node]] = isetEmpty
+    var sinkNodes: ISet[TaintSink[Node]] = isetEmpty
     
     val iddg = iddi.getIddg
     iddg.nodes.foreach{
       node =>
-        val (src, sin) = getSourceAndSinkNode(global, node, ptaresult, ssm, iddg)
+        val (src, sin) = ssm.getSourceAndSinkNode(node, ptaresult)
         sourceNodes ++= src
         sinkNodes ++= sin
+    }
+    sinkNodes foreach {
+      sinN =>
+        if(sinN.node.isInstanceOf[IDDGCallArgNode])
+          extendIDDGForSinkApis(iddg, sinN.node.asInstanceOf[IDDGCallArgNode], ptaresult)
     }
     val tar = Tar(iddi)
     tar.sourceNodes = sourceNodes
@@ -153,72 +140,7 @@ object AndroidDataDependentTaintAnalysis {
     tar
   }
   
-  def getSourceAndSinkNode(
-      global: Global, 
-      node: IDDGNode, 
-      ptaresult: PTAResult, 
-      ssm: AndroidSourceAndSinkManager, 
-      iddg: DataDependenceBaseGraph[InterproceduralDataDependenceAnalysis.Node]): (ISet[TaintSource], ISet[TaintSink]) = {
-    val sources = msetEmpty[TaintSource]
-    val sinks = msetEmpty[TaintSink]
-    node match{
-      case invNode: IDDGInvokeNode =>
-        val calleeSet = invNode.getCalleeSet
-        calleeSet.foreach{
-          callee =>
-            val calleesig = callee.callee.getSignature
-            val calleep = callee.callee
-            val caller = global.getMethod(invNode.getOwner).get
-            val jumpLoc = caller.getBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
-
-            if(invNode.isInstanceOf[IDDGVirtualBodyNode] && ssm.isSource(calleep, caller, jumpLoc)){
-              global.reporter.echo(TITLE, "found source: " + calleep + "@" + invNode.getContext)
-              val tn = TaintSource(invNode, Td(calleep.getSignature.signature, None, SourceAndSinkCategory.API_SOURCE))
-              sources += tn
-            }
-            if(invNode.isInstanceOf[IDDGCallArgNode] && ssm.isSink(calleep, invNode.asInstanceOf[IDDGCallArgNode].position)){
-              global.reporter.echo(TITLE, "found sink: " + calleep + "@" + invNode.getContext)
-              extendIDDGForSinkApis(iddg, invNode.asInstanceOf[IDDGCallArgNode], ptaresult)
-              val tn = TaintSink(invNode, Td(calleep.getSignature.signature, Some(invNode.asInstanceOf[IDDGCallArgNode].position), SourceAndSinkCategory.API_SINK))
-              sinks += tn
-            }
-            if(invNode.isInstanceOf[IDDGCallArgNode] && invNode.asInstanceOf[IDDGCallArgNode].position == 1 && ssm.isIccSink(invNode.getICFGNode.asInstanceOf[ICFGCallNode], ptaresult)){
-              global.reporter.echo(TITLE, "found icc sink: " + invNode)
-              extendIDDGForSinkApis(iddg, invNode.asInstanceOf[IDDGCallArgNode], ptaresult)
-              val tn = TaintSink(invNode, Td(invNode.getLocUri, Some(1), SourceAndSinkCategory.ICC_SINK))
-              sinks += tn
-            }
-        }
-      case entNode: IDDGEntryParamNode =>
-        if(ssm.isIccSource(entNode.getICFGNode, iddg.entryNode.getICFGNode)){
-          global.reporter.echo(TITLE, "found icc source: " + iddg.entryNode)
-          val tn = TaintSource(iddg.entryNode, Td(iddg.entryNode.getOwner.signature, None, SourceAndSinkCategory.ICC_SOURCE))
-          sources += tn
-        }
-        if(entNode.position > 0 && ssm.isCallbackSource(global.getMethod(entNode.getOwner).get)){
-          global.reporter.echo(TITLE, "found callback source: " + entNode)
-          val tn = TaintSource(entNode, Td(entNode.getOwner.signature, None, SourceAndSinkCategory.CALLBACK_SOURCE))
-          sources += tn
-        }
-      case normalNode: IDDGNormalNode =>
-        val owner = global.getMethod(normalNode.getOwner).get
-        val loc = owner.getBody.location(normalNode.getLocIndex)
-        if(ssm.isSource(loc, ptaresult)){
-          global.reporter.echo(TITLE, "found simple statement source: " + normalNode)
-          val tn = TaintSource(normalNode, Td(normalNode.getOwner.signature, None, SourceAndSinkCategory.STMT_SOURCE))
-          sources += tn
-        }
-        if(ssm.isSink(loc, ptaresult)){
-          global.reporter.echo(TITLE, "found simple statement sink: " + normalNode)
-          val tn = TaintSink(normalNode, Td(normalNode.getOwner.signature, None, SourceAndSinkCategory.STMT_SINK))
-          sinks += tn
-        }
-      case _ =>
-    }
-    (sources.toSet, sinks.toSet)
-  }
-  
-  def extendIDDGForSinkApis(iddg: DataDependenceBaseGraph[InterproceduralDataDependenceAnalysis.Node], callArgNode: IDDGCallArgNode, ptaresult: PTAResult) = {
+  private def extendIDDGForSinkApis(iddg: DataDependenceBaseGraph[InterproceduralDataDependenceAnalysis.Node], callArgNode: IDDGCallArgNode, ptaresult: PTAResult) = {
     val calleeSet = callArgNode.getCalleeSet
     calleeSet.foreach{
       callee =>
