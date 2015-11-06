@@ -100,6 +100,9 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
           val summaryTable = buildComponentSummaryTable(component)
           yard.addSummaryTable(component, summaryTable)
         } catch {
+          case te: MyTimeoutException =>
+            problematicComp += component
+            global.reporter.error(TITLE, "Timeout for " + component)
           case ex: Exception =>
             problematicComp += component
             if(DEBUG) ex.printStackTrace()
