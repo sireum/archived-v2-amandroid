@@ -38,13 +38,15 @@ import org.sireum.jawa.alir.pta.VarSlot
 import java.io.PrintWriter
 import org.sireum.jawa.alir.interProcedural.InterProceduralNode
 import org.sireum.alir.AlirEdge
+import org.sireum.amandroid.AndroidGlobalConfig
+import org.sireum.jawa.util.MyTimeoutException
 
 /**
  * @author fgwei
  */
 class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
   private final val TITLE = "ComponentBasedAnalysis"
-  private final val DEBUG = true
+  private final val DEBUG = false
   
   import ComponentSummaryTable._
   
@@ -159,6 +161,7 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
     val apks = iddResult._1
     val components = apks.map(_.getComponents).fold(Set[JawaClass]())(iunion _)
     println(TITLE + ":" + "-------Phase 3-------" + apks.size + s" apk${if(apks.size > 1)"s"else""} " + components.size + s" component${if(components.size > 1)"s"else""}-------")
+    ssm.parse(AndroidGlobalConfig.SourceAndSinkFilePath)
     val idfgs = components.map(yard.getIDFG(_)).flatten
     if(!idfgs.isEmpty) {
       try {

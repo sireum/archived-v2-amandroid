@@ -615,10 +615,11 @@ trait DexConstants {
   def const(x: Int, y: Long) = "v%d:= %dI  @kind int;".format(x, y) // 0x14
   def constHigh16(x: Int, y: Int) = "v%d:= %dI  @kind int;".format(x, y) // 0x15
   def constWide16(x: Int, y: Int) = "v%d:= %dI  @kind int;".format(x, y) // 0x16
-  def constWide32(x: Int, y: Long) = "v%d:= %fF  @kind float;".format(x, y) // 0x17
-  def constWide(x: Int, y: Long) = "v%d:= %fD  @kind double;".format(x, y) // 0x18
+  def constWide32(x: Int, y: Long) = "v%d:= %dF  @kind float;".format(x, y) // 0x17
+  def constWide(x: Int, y: Long) = "v%d:= %dL  @kind long;".format(x, y) // 0x18
   def constWideHigh16(x: Int, y: Long) = "v%d:= %dL  @kind long;".format(x, y) // 0x19
   def constString(x: Int, str: String) = "v%d:= \"%s\" @kind object;".format(x, str)  // 0x1a, 0x1b
+  def constMString(x: Int, str: String) = "v%d:= \n\"\"\"%s\n\"\"\" @kind object;".format(x, str)  // 0x1a, 0x1b
   def constClass(x: Int, typ: String) = "v%d:= constclass @type ^%s @kind object;".format(x, typ) // 0x1c
   def monitorEnter(x: Int) = "@monitorenter v%d".format(x) // 0x1d
   def monitorExit(x: Int) = "@monitorexit v%d".format(x) // 0x1e

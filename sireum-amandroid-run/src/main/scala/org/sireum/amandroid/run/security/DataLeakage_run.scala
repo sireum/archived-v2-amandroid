@@ -27,6 +27,7 @@ import org.sireum.amandroid.security.AmandroidSocketListener
 import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.jawa.PrintReporter
 import org.sireum.jawa.MsgLevel
+import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -53,7 +54,7 @@ object DataLeakage_run {
     }
 
     def onAnalysisSuccess: Unit = {
-      if(apk.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
+      if(apk.getTaintAnalysisResults[InterproceduralDataDependenceAnalysis.Node, InterproceduralDataDependenceAnalysis.Edge].exists(!_._2.getTaintedPaths.isEmpty)){
         DataLeakageCounter.taintPathFound += 1
         DataLeakageCounter.taintPathFoundList += apk.nameUri
       }

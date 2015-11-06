@@ -24,6 +24,7 @@ import org.sireum.jawa.util.MyTimeoutException
 import org.sireum.jawa.Global
 import org.sireum.amandroid.Apk
 import org.sireum.jawa.DefaultReporter
+import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -92,7 +93,7 @@ object PasswordTracking_run {
     }
 
     def onAnalysisSuccess : Unit = {
-      if(apk.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
+      if(apk.getTaintAnalysisResults[InterproceduralDataDependenceAnalysis.Node, InterproceduralDataDependenceAnalysis.Edge].exists(!_._2.getTaintedPaths.isEmpty)){
         PasswordCounter.taintPathFound += 1
         PasswordCounter.taintPathFoundList += apk.nameUri
       }

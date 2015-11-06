@@ -18,6 +18,7 @@ import org.sireum.jawa.util.MyTimer
 import org.sireum.jawa.DefaultReporter
 import org.sireum.jawa.Global
 import org.sireum.amandroid.Apk
+import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
 
 object CommunicationLeakage_run {
   private final val TITLE = "CommunicationLeakage_run"
@@ -43,7 +44,7 @@ object CommunicationLeakage_run {
     def onTimeout: Unit = {}
 
     def onAnalysisSuccess: Unit = {
-      if(apk.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
+      if(apk.getTaintAnalysisResults[InterproceduralDataDependenceAnalysis.Node, InterproceduralDataDependenceAnalysis.Edge].exists(!_._2.getTaintedPaths.isEmpty)){
         CommunicationLeakageCounter.taintPathFound += 1
         CommunicationLeakageCounter.taintPathFoundList += apk.nameUri
       }

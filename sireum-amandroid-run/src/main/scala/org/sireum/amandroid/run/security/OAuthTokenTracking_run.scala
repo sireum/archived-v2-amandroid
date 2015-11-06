@@ -29,6 +29,7 @@ import org.sireum.jawa.util.MyTimeoutException
 import org.sireum.jawa.DefaultReporter
 import org.sireum.jawa.Global
 import org.sireum.amandroid.Apk
+import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
 
 
 /**
@@ -97,7 +98,7 @@ object OAuthTokenTracking_run {
     def onTimeout : Unit = {}
 
     def onAnalysisSuccess : Unit = {
-      if(apk.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
+      if(apk.getTaintAnalysisResults[InterproceduralDataDependenceAnalysis.Node, InterproceduralDataDependenceAnalysis.Edge].exists(!_._2.getTaintedPaths.isEmpty)){
         OAuthTokenCounter.taintPathFound += 1
         OAuthTokenCounter.taintPathFoundList += apk.nameUri
       }

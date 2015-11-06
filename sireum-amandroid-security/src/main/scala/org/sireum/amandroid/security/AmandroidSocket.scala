@@ -104,6 +104,7 @@ class AmandroidSocket(global: Global, apk: Apk) {
       timer: Option[MyTimer]) = {    
     try {
       if(myListener_opt.isDefined) myListener_opt.get.onPreAnalysis
+      ssm.parse(AndroidGlobalConfig.SourceAndSinkFilePath)
   
       var entryPoints = global.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
   

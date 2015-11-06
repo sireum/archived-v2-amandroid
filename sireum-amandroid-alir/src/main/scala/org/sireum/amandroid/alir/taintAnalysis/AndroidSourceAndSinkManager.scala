@@ -69,49 +69,6 @@ abstract class AndroidSourceAndSinkManager(
   
   private final val TITLE = "BasicSourceAndSinkManager"
 
-  private def matchs(method: JawaMethod, methodpool: ISet[String]): Boolean = methodpool.exists{
-    sig =>
-      sig == method.getSignature.signature.replaceAll("\\*", "")
-  }
-
-  def isSourceMethod(method: JawaMethod) = matchs(method, this.sources.map(s => s._1).toSet)
-
-  def isSink(method: JawaMethod) = matchs(method, this.sinks.map(s => s._1).toSet)
-
-  def isSource(calleeMethod: JawaMethod, callerMethod: JawaMethod, callerLoc: JumpLocation): Boolean = {
-    if(isSourceMethod(calleeMethod)) return true
-    if(isUISource(calleeMethod, callerMethod, callerLoc)) return true
-    false
-  }
-
-  def isSource(loc: LocationDecl, ptaresult: PTAResult): Boolean = false
-
-  def isSink(loc: LocationDecl, ptaresult: PTAResult): Boolean = false
-
-  def isCallbackSource(proc: JawaMethod): Boolean
-  def isUISource(calleeMethod: JawaMethod, callerMethod: JawaMethod, callerLoc: JumpLocation): Boolean
-  def isIccSink(invNode: ICFGInvokeNode, s: PTAResult): Boolean
-  def isIccSource(entNode: ICFGNode, iddgEntNode: ICFGNode): Boolean
-
-  def getSourceSigs: ISet[String] = this.sources.map{_._1}.toSet
-  def getSinkSigs: ISet[String] = this.sinks.map{_._1}.toSet
-  def getInterestedSigs: ISet[String] = getSourceSigs ++ getSinkSigs
-
-}
-
-/**
- * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
- * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
- */ 
-class DefaultAndroidSourceAndSinkManager(
-    global: Global,
-    apk: Apk, 
-    layoutControls: Map[Int, LayoutControl], 
-    callbackMethods: ISet[JawaMethod], 
-    sasFilePath: String) extends AndroidSourceAndSinkManager(global, apk, layoutControls, callbackMethods, sasFilePath){
-
-  private final val TITLE = "DefaultSourceAndSinkManager"
-  
   def getSourceAndSinkNode[N <: InterProceduralNode](node: N, ptaresult: PTAResult): (ISet[TaintSource[N]], ISet[TaintSink[N]]) = {
     node match {
       case icfgN: ICFGNode => handleICFGNode(icfgN, ptaresult)
@@ -161,7 +118,7 @@ class DefaultAndroidSourceAndSinkManager(
             }
         }
       case entNode: ICFGEntryNode =>
-        if(this.isIccSource(entNode)){
+        if(this.isIccSource(entNode, entNode)){
           global.reporter.echo(TITLE, "found icc source: " + entNode)
           val tn = TaintSource(gNode, TagTaintDescriptor(entNode.getOwner.signature, isetEmpty, SourceAndSinkCategory.ICC_SOURCE, Set("ICC")))
           sources += tn
@@ -222,7 +179,7 @@ class DefaultAndroidSourceAndSinkManager(
             }
         }
       case entNode: IDDGEntryParamNode =>
-        if(this.isIccSource(entNode.getICFGNode)){
+        if(this.isIccSource(entNode.getICFGNode, entNode.getICFGNode)){
           global.reporter.echo(TITLE, "found icc source: " + entNode)
           val tn = TaintSource(gNode, TypeTaintDescriptor(entNode.getOwner.signature, None, SourceAndSinkCategory.ICC_SOURCE))
           sources += tn
@@ -249,6 +206,51 @@ class DefaultAndroidSourceAndSinkManager(
     }
     (sources.toSet, sinks.toSet)
   }
+  
+  private def matchs(method: JawaMethod, methodpool: ISet[String]): Boolean = methodpool.exists{
+    sig =>
+      sig == method.getSignature.signature.replaceAll("\\*", "")
+  }
+
+  def isSourceMethod(method: JawaMethod) = matchs(method, this.sources.map(s => s._1).toSet)
+
+  def isSink(method: JawaMethod) = matchs(method, this.sinks.map(s => s._1).toSet)
+
+  def isSource(calleeMethod: JawaMethod, callerMethod: JawaMethod, callerLoc: JumpLocation): Boolean = {
+    if(isSourceMethod(calleeMethod)) return true
+    if(isUISource(calleeMethod, callerMethod, callerLoc)) return true
+    false
+  }
+
+  def isSource(loc: LocationDecl, ptaresult: PTAResult): Boolean = false
+
+  def isSink(loc: LocationDecl, ptaresult: PTAResult): Boolean = false
+
+  def isCallbackSource(proc: JawaMethod): Boolean
+  def isUISource(calleeMethod: JawaMethod, callerMethod: JawaMethod, callerLoc: JumpLocation): Boolean
+  def isIccSink(invNode: ICFGInvokeNode, s: PTAResult): Boolean
+  def isIccSource(entNode: ICFGNode, iddgEntNode: ICFGNode): Boolean
+
+  def getSourceSigs: ISet[String] = this.sources.map{_._1}.toSet
+  def getSinkSigs: ISet[String] = this.sinks.map{_._1}.toSet
+  def getInterestedSigs: ISet[String] = getSourceSigs ++ getSinkSigs
+
+}
+
+/**
+ * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
+ * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ */ 
+class DefaultAndroidSourceAndSinkManager(
+    global: Global,
+    apk: Apk, 
+    layoutControls: Map[Int, LayoutControl], 
+    callbackMethods: ISet[JawaMethod], 
+    sasFilePath: String) extends AndroidSourceAndSinkManager(global, apk, layoutControls, callbackMethods, sasFilePath){
+
+  private final val TITLE = "DefaultSourceAndSinkManager"
+  
+  
   
   def isCallbackSource(proc: JawaMethod): Boolean = {
     if(this.callbackMethods.contains(proc) && proc.getParamNames.size > 1) true
@@ -310,7 +312,7 @@ class DefaultAndroidSourceAndSinkManager(
     sinkflag
   }
   
-  def isIccSource(entNode: ICFGNode): Boolean = {
+  def isIccSource(entNode: ICFGNode, iddgEntNode: ICFGNode): Boolean = {
     var sourceflag = false
 //    val reachableSinks = sinkNodes.filter{sinN => iddg.findPath(entNode, sinN) != null}
 //    if(!reachableSinks.isEmpty){
