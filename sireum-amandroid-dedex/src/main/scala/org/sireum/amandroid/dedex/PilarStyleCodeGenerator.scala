@@ -69,7 +69,12 @@ class PilarStyleCodeGenerator(
       if(filter(recType)) {
         val outputStream = outputDir match {
           case Some(od) =>
-            val targetFile = FileUtil.toFile(od + "/" + className + ".pilar" )
+            var targetFile = FileUtil.toFile(od + "/" + className + ".pilar")
+            var i = 0
+            while(targetFile.exists()){
+              i += 1
+              targetFile = new File(od + "/" + className + "." + i + ".pilar")
+            }
             val parent = targetFile.getParentFile()
             if(parent != null)
               parent.mkdirs()
@@ -562,7 +567,7 @@ class PilarStyleCodeGenerator(
         var visitOffset: Int = (actualPosition - startPos).asInstanceOf[Int]
         if(visitSet.get(visitOffset)) {
           val code = instructionParser.doparse(startPos, endPos)
-          codes += code
+          codes ++= code
         } else {
           if(dump.isDefined)
             dump.get.println("L%06x".format(instructionParser.getFilePosition()))
@@ -596,7 +601,7 @@ class PilarStyleCodeGenerator(
     val task = instructionParser.getTaskForAddress(endPos)
     if(task.isDefined) {
       try {
-        task.get.renderTask(endPos)
+        codes ++= task.get.renderTask(endPos)
       } catch {
         case ex: IOException =>
           System.err.println("*** ERROR ***: " + ex.getMessage())
@@ -747,8 +752,10 @@ class PilarStyleCodeGenerator(
     for(i <- dtcb.getTriesSize() - 1 to 0 by - 1) {
       val start: Long = dtcb.getTryStartOffset(i)
       val end: Long = dtcb.getTryEndOffset(i)
-      val startLabel: String = "L%06x".format(start)
-      val endLabel: String = "L%06x".format(end)
+      val startLabel: String = "Try_start" + i
+      val endLabel: String = "Try_end" + i
+      instructionParser.placeTask(start, LabelTask(startLabel, instructionParser))
+      instructionParser.placeTask(end, LabelTask(endLabel, instructionParser))
       for(n <- 0 to dtcb.getTryHandlersSize(i) - 1) {
         val catchTemplate: ST = template.getInstanceOf("Catch")
         val excpT: String = "L" + dtcb.getTryHandlerType(i, n) + ";"

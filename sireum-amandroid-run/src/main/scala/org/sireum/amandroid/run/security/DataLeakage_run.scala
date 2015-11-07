@@ -92,9 +92,9 @@ object DataLeakage_run {
     }
     
 //    GlobalConfig.ICFG_CONTEXT_K = 1
-    AndroidReachingFactsAnalysisConfig.resolve_icc = true
-    AndroidReachingFactsAnalysisConfig.parallel = true
-    AndroidReachingFactsAnalysisConfig.resolve_static_init = true
+    AndroidReachingFactsAnalysisConfig.resolve_icc = false
+    AndroidReachingFactsAnalysisConfig.parallel = false
+    AndroidReachingFactsAnalysisConfig.resolve_static_init = false
 
 //    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
     
@@ -107,7 +107,7 @@ object DataLeakage_run {
       file =>
         val reporter = new PrintReporter(MsgLevel.INFO)
         val global = new Global(file, reporter)
-        global.setJavaLib("/Users/fgwei/Library/Android/sdk/platforms/android-21/android.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v4/android-support-v4.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v13/android-support-v13.jar")
+        global.setJavaLib("/Users/fgwei/Library/Android/sdk/platforms/android-21/android.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v4/android-support-v4.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v13/android-support-v13.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v7/appcompat/libs/android-support-v7-appcompat.jar")
         val apk = new Apk(file)
         val socket = new AmandroidSocket(global, apk)
         

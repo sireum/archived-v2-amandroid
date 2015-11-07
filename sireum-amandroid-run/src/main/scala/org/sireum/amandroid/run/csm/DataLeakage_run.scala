@@ -33,6 +33,7 @@ import org.sireum.amandroid.alir.componentSummary.ComponentBasedAnalysis
 import org.sireum.jawa.ScopeManager
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAScopeManager
 import org.sireum.amandroid.alir.componentSummary.ApkYard
+import org.sireum.jawa.util.PerComponentTimer
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -74,7 +75,7 @@ object DataLeakage_run {
         val global = new Global(file, reporter)
         global.setJavaLib("/Users/fgwei/Library/Android/sdk/platforms/android-21/android.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v4/android-support-v4.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v13/android-support-v13.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v7/appcompat/libs/android-support-v7-appcompat.jar")
         try {
-          reporter.echo(TITLE, DataLeakageTask(global, outputUri, dpsuri, file, Some(1000)).run)
+          reporter.echo(TITLE, DataLeakageTask(global, outputUri, dpsuri, file, Some(200, true)).run)
           DataLeakageCounter.haveresult += 1
         } catch {
           case te: MyTimeoutException => reporter.error(TITLE, te.message)
@@ -87,12 +88,15 @@ object DataLeakage_run {
     }
   }
   
-  private case class DataLeakageTask(global: Global, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], file: FileResourceUri, timeout: Option[Int]) {
+  /**
+   * Timer is a option of tuple, left is the time second you want to timer, right is whether use this timer for each of the components during analyze.
+   */
+  private case class DataLeakageTask(global: Global, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], file: FileResourceUri, timeout: Option[(Int, Boolean)]) {
     def run: String = {
       println(TITLE + " #####" + file + "#####")
       ScopeManager.setScopeManager(new AndroidRFAScopeManager)
       val timer = timeout match {
-        case Some(t) => Some(new MyTimer(t))
+        case Some((t, p)) => Some(if(p) new PerComponentTimer(t) else new MyTimer(t))
         case None => None
       }
       if(timer.isDefined) timer.get.start

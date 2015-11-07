@@ -280,7 +280,8 @@ class DexInstructionToPilarParser(
   def parse: Unit = {
   }
   
-  def doparse(startPos: Long, endPos: Long): String = {
+  def doparse(startPos: Long, endPos: Long): Option[String] = {
+    var genCode = true
     val instrBase: Long = getFilePosition
     val instrCode = read8Bit()
     val instrType = instructionTypes(instrCode)
@@ -935,7 +936,9 @@ class DexInstructionToPilarParser(
         case InstructionType.NOPARAMETER =>
           val b = read8Bit()
           val code = instrCode match {
-            case NOP => nop
+            case NOP => 
+              genCode = false
+              nop
             case RETURN_VOID => returnVoid
             case RETURN_VOID_BARRIER => returnVoidBarrier
             case _ => "@UNKNOWN_NOPARAMETER 0x%x".format(instrCode)
@@ -1710,6 +1713,8 @@ class DexInstructionToPilarParser(
       case e: Exception =>
         System.err.println(TITLE + " error:" + e.getMessage)
     }
-    instrText.toString().intern()
+    if(genCode)
+      Some(instrText.toString().intern())
+    else None
   }
 }

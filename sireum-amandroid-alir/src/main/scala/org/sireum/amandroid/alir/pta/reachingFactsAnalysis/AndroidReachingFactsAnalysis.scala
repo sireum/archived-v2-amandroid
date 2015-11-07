@@ -146,8 +146,9 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
             checkClass(typ, s, currentNode)
           case ne: NameExp =>
             val slot = ReachingFactsAnalysisHelper.getNameSlotFromNameExp(ne, typ, false, false, global)
-            if(slot.isInstanceOf[StaticFieldSlot]){ 
-              val recTyp = JavaKnowledge.getClassTypeFromFieldFQN(ne.name.name)
+            if(slot.isInstanceOf[StaticFieldSlot]){
+              val fqn = ne.name.name.replaceAll("@@", "")
+              val recTyp = JavaKnowledge.getClassTypeFromFieldFQN(fqn)
               checkClass(recTyp, s, currentNode)
             }
           case ce: CallExp =>
