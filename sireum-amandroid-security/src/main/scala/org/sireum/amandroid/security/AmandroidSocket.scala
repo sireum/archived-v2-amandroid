@@ -34,6 +34,8 @@ import org.sireum.jawa.Global
 import org.sireum.jawa.Constants
 import org.sireum.amandroid.Apk
 import org.sireum.amandroid.decompile.ApkDecompiler
+import org.sireum.jawa.util.MyTimeoutException
+import org.sireum.jawa.util.PerComponentTimer
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -158,13 +160,22 @@ class AmandroidSocket(global: Global, apk: Apk) {
         
       {if(parallel) entryPoints.par else entryPoints}.foreach{
         ep =>
-          global.reporter.echo(TITLE, "--------------Component " + ep + "--------------")
-          val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-          val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager, timer)
-          apk.addIDFG(ep.getDeclaringClass, idfg)
-          global.reporter.echo(TITLE, "processed-->" + idfg.icfg.getProcessed.size)
-          val iddResult = InterproceduralDataDependenceAnalysis(global, idfg)
-          apk.addIDDG(ep.getDeclaringClass, iddResult)
+          try {
+            val timertouse =
+              if(timer.isDefined && timer.get.isInstanceOf[PerComponentTimer]){
+                timer.get.start
+                timer
+              } else timer
+            global.reporter.echo(TITLE, "--------------Component " + ep + "--------------")
+            val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
+            val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager, timertouse)
+            apk.addIDFG(ep.getDeclaringClass, idfg)
+            global.reporter.echo(TITLE, "processed-->" + idfg.icfg.getProcessed.size)
+            val iddResult = InterproceduralDataDependenceAnalysis(global, idfg)
+            apk.addIDDG(ep.getDeclaringClass, iddResult)
+          } catch {
+            case te: MyTimeoutException => global.reporter.error(TITLE, ep + ":" + te.message)
+          }
       }
       if(myListener_opt.isDefined) myListener_opt.get.onAnalysisSuccess
     } catch {

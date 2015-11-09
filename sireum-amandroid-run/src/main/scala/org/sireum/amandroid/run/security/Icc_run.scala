@@ -30,6 +30,7 @@ import org.sireum.amandroid.Apk
 import org.sireum.jawa.PrintReporter
 import org.sireum.jawa.MsgLevel
 import org.sireum.jawa.ObjectType
+import org.sireum.jawa.util.PerComponentTimer
 
 
 /**
@@ -72,8 +73,6 @@ object Icc_run {
       }
       res
     }
-
-    def onTimeout: Unit = {}
 
     def onAnalysisSuccess: Unit = {
       val appData = DataCollector.collect(global, apk)
@@ -129,7 +128,7 @@ object Icc_run {
         val apk = new Apk(file)
         val socket = new AmandroidSocket(global, apk)
         try{
-          reporter.echo(TITLE, IccTask(global, apk, outputPath, dpsuri, file, socket, Some(500)).run)   
+          reporter.echo(TITLE, IccTask(global, apk, outputPath, dpsuri, file, socket, Some(500, true)).run)   
         } catch {
           case te: MyTimeoutException => reporter.error(TITLE, te.message)
           case e: Throwable => e.printStackTrace()
@@ -140,11 +139,11 @@ object Icc_run {
     }
   }
   
-  private case class IccTask(global: Global, apk: Apk, outputPath: String, dpsuri: Option[FileResourceUri], file: FileResourceUri, socket: AmandroidSocket, timeout: Option[Int]){
+  private case class IccTask(global: Global, apk: Apk, outputPath: String, dpsuri: Option[FileResourceUri], file: FileResourceUri, socket: AmandroidSocket, timeout: Option[(Int, Boolean)]){
     def run: String = {
       global.reporter.echo(TITLE, "####" + file + "#####")
       val timer = timeout match {
-        case Some(t) => Some(new MyTimer(t))
+        case Some((t, p)) => Some(if(p) new PerComponentTimer(t) else new MyTimer(t))
         case None => None
       }
       if(timer.isDefined) timer.get.start

@@ -64,10 +64,10 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
     
     while(!worklist.isEmpty) {
       val timertouse =
-      if(timer.isDefined && timer.get.isInstanceOf[PerComponentTimer]){
-        timer.get.start
-        timer
-      } else timer
+        if(timer.isDefined && timer.get.isInstanceOf[PerComponentTimer]){
+          timer.get.start
+          timer
+        } else timer
       val component = worklist.remove(0)
       println(TITLE + ":" + "-------Analyze component " + component + "--------------")
       try{
