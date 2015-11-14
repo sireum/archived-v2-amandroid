@@ -22,23 +22,24 @@ object AmDecoder {
    *  Decode apk file and return outputpath
    *  @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
    */
-  def decode(sourcePathUri : FileResourceUri, outputUri : FileResourceUri, createFolder: Boolean = true) : FileResourceUri = {
+  def decode(sourcePathUri : FileResourceUri, outputUri : FileResourceUri, createFolder: Boolean = true, forceDelete: Boolean = true) : FileResourceUri = {
     // make it as quiet mode
     val logger = Logger.getLogger("")
     logger.getHandlers().foreach {
       h =>
         logger.removeHandler(h)
     }
-    LogManager.getLogManager().reset();
+    LogManager.getLogManager().reset()
 
     val apkFile = FileUtil.toFile(sourcePathUri)
     val outputDir = 
       if(createFolder){
-        val dirName = apkFile.getName().substring(0, apkFile.getName().lastIndexOf("."))
+        val dirName = try{apkFile.getName().substring(0, apkFile.getName().lastIndexOf("."))} catch {case e: Exception => apkFile.getName()}
         new File(new URI(outputUri + "/" + dirName))
       } else {
         new File(new URI(outputUri))
       }
+    if(outputDir.exists() && !forceDelete) return FileUtil.toUri(outputDir)
     try {
       val decoder = new ApkDecoder
       decoder.setDecodeSources(0x0000) // DECODE_SOURCES_NONE = 0x0000
@@ -47,9 +48,10 @@ object AmDecoder {
       decoder.setForceDelete(true)
       decoder.decode()
     } catch {
-      case fe : CantFindFrameworkResException =>
-//        err_msg_critical(TITLE, "Can't find framework resources for package of id: " + fe.getPkgId + ". You must install proper framework files, see apk-tool website for more info.")
-        throw new IgnoreException
+      case fe: CantFindFrameworkResException =>
+        System.err.println(TITLE + ": Can't find framework resources for package of id: " + fe.getPkgId + ". You must install proper framework files, see apk-tool website for more info.")
+      case e: Exception =>
+        System.err.println(TITLE + ": " + e)
     }
     FileUtil.toUri(outputDir)
   }

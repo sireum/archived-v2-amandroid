@@ -47,6 +47,7 @@ class DexInstructionToPilarParser(
     dexOffsetResolver: DexOffsetResolver) extends DexParser with DexConstants {
   
   final val TITLE = "DexInstructionToPilarParser"
+  final val DEBUG = false
   
   import DexInstructionToPilarParser._
   /**
@@ -1065,6 +1066,17 @@ class DexInstructionToPilarParser(
           instrText.append(code)
           val arrayType = regMap.get(new Integer(reg2))
           val elementType: JawaType = arrayType match {
+            case Some(typ) if typ == null =>
+              instrCode match {
+                case AGET => PrimitiveType("int")
+                case AGET_WIDE => PrimitiveType("long")
+                case AGET_OBJECT => JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE.toUnknown
+                case AGET_BOOLEAN => PrimitiveType("boolean")
+                case AGET_BYTE => PrimitiveType("byte")
+                case AGET_CHAR => PrimitiveType("char")
+                case AGET_SHORT => PrimitiveType("short")
+                case _ => PrimitiveType("int")
+              }
             // should mostly come here
             case Some(typ) if typ.dimensions > 0 => JawaType.generateType(typ.typ, typ.dimensions - 1)
             // some problem might happened
@@ -1711,7 +1723,7 @@ class DexInstructionToPilarParser(
       }
     } catch {
       case e: Exception =>
-        System.err.println(TITLE + " error:" + e.getMessage)
+        if(DEBUG) System.err.println(TITLE + " error:" + e)
     }
     if(genCode)
       Some(instrText.toString().intern())

@@ -68,8 +68,8 @@ object AndroidDataDependentTaintAnalysis {
     var sourceNodes: ISet[TaintSource[Node]] = isetEmpty
     var sinkNodes: ISet[TaintSink[Node]] = isetEmpty
     
-    def getSourceNodes: ISet[TaintNode[Node]] = this.sourceNodes.toSet
-    def getSinkNodes: ISet[TaintNode[Node]] = this.sinkNodes.toSet
+    def getSourceNodes: ISet[TaintSource[Node]] = this.sourceNodes.toSet
+    def getSinkNodes: ISet[TaintSink[Node]] = this.sinkNodes.toSet
     def getTaintedPaths: ISet[TaintPath[Node, InterproceduralDataDependenceAnalysis.Edge]] = {
       var tps: ISet[TaintPath[Node, InterproceduralDataDependenceAnalysis.Edge]] = isetEmpty
       sinkNodes.foreach {

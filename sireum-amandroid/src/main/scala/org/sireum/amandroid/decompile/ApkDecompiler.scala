@@ -11,11 +11,14 @@ import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.io.FgSourceFile
 import org.sireum.jawa.io.PlainFile
 import org.sireum.jawa.ObjectType
+import org.sireum.jawa.Reporter
 
 object ApkDecompiler {
+  final val TITLE = "ApkDecompiler"
+  final val DEBUG = false
   
-  def decompile(apk: File, projectLocation: File, dpsuri: Option[FileResourceUri], dexLog: Boolean, debugMode: Boolean, removeSupportGen: Boolean): (FileResourceUri, ISet[String]) = {
-    val out = AmDecoder.decode(FileUtil.toUri(apk), FileUtil.toUri(projectLocation), false)
+  def decompile(apk: File, projectLocation: File, dpsuri: Option[FileResourceUri], reporter: Reporter, dexLog: Boolean, debugMode: Boolean, removeSupportGen: Boolean, refector: Boolean, forceDelete: Boolean): (FileResourceUri, ISet[String]) = {
+    val out = AmDecoder.decode(FileUtil.toUri(apk), FileUtil.toUri(projectLocation), false, forceDelete)
     val dependencies: MSet[String] = msetEmpty
     val dexFiles = FileUtil.listFiles(out, ".dex", true)
     val pkg = ManifestParser.loadPackageName(apk)
@@ -41,18 +44,20 @@ object ApkDecompiler {
         } else true
     }
     if(FileUtil.toFile(out).exists()) {
-      val src = Dex2PilarConverter.convert(dexFiles.toSet, out + "/src", dpsuri, recordFilter, dexLog, debugMode)
-      /**
-       * refactor phase
-       */
-      FileUtil.listFiles(src, "pilar", true) foreach {
-        f =>
-          val code = new FgSourceFile(new PlainFile(FileUtil.toFile(f))).code
-          val newcode = RefactorJawa(code)
-          val file = FileUtil.toFile(f)
-          val fw = new FileWriter(file, false)
-          fw.write(newcode)
-          fw.close()
+      val src = Dex2PilarConverter.convert(dexFiles.toSet, out + "/src", dpsuri, recordFilter, dexLog, debugMode, forceDelete)
+      if(refector){
+        /**
+         * refactor phase
+         */
+        FileUtil.listFiles(src, "pilar", true) foreach {
+          f =>
+            val code = new FgSourceFile(new PlainFile(FileUtil.toFile(f))).code
+            val newcode = RefactorJawa(code)
+            val file = FileUtil.toFile(f)
+            val fw = new FileWriter(file, false)
+            fw.write(newcode)
+            fw.close()
+        }
       }
     }
     (out, dependencies.toSet)

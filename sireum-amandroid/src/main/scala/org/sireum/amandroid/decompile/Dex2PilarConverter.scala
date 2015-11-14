@@ -20,7 +20,8 @@ import org.sireum.jawa.ObjectType
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
 object Dex2PilarConverter {
-  def convert(fs: Set[FileResourceUri], out: FileResourceUri, dpsuri: Option[FileResourceUri], recordFilter: (ObjectType => Boolean), dexLog: Boolean, debugMode: Boolean): FileResourceUri = {
+  def convert(fs: Set[FileResourceUri], out: FileResourceUri, dpsuri: Option[FileResourceUri], recordFilter: (ObjectType => Boolean), dexLog: Boolean, debugMode: Boolean, forceDelete: Boolean): FileResourceUri = {
+    if(!forceDelete && FileUtil.toFile(out).exists()) return out
     ConverterUtil.cleanDir(out)
     fs foreach {
       f =>

@@ -99,13 +99,15 @@ abstract class AndroidSourceAndSinkManager(
             val caller = global.getMethod(invNode.getOwner).get
             val jumpLoc = caller.getBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
             if(this.isSource(calleep, caller, jumpLoc)) {
-              val tags = getSourceTags(calleep)
+              var tags = getSourceTags(calleep)
+              if(tags.isEmpty) tags += "ANY"
               global.reporter.echo(TITLE, "found source: " + calleep + "@" + invNode.getContext + " " + tags)
               val tn = TaintSource(gNode, TagTaintDescriptor(calleesig.signature, isetEmpty, SourceAndSinkCategory.API_SOURCE, tags))
               sources += tn
             }
             if(this.isSink(calleep)) {
-              val tags = getSinkTags(calleep)
+              var tags = getSinkTags(calleep)
+              if(tags.isEmpty) tags += "ANY"
               global.reporter.echo(TITLE, "found sink: " + calleep + "@" + invNode.getContext + " " + tags)
               val poss = this.sinks.filter(_._1 == calleesig.signature.replaceAll("\\*", "")).map(_._2._1).fold(isetEmpty)(iunion _)
               val tn = TaintSink(gNode, TagTaintDescriptor(calleesig.signature, poss, SourceAndSinkCategory.API_SINK, tags))
@@ -133,12 +135,12 @@ abstract class AndroidSourceAndSinkManager(
         val loc = owner.getBody.location(normalNode.getLocIndex)
         if(this.isSource(loc, ptaresult)){
           global.reporter.echo(TITLE, "found simple statement source: " + normalNode)
-          val tn = TaintSource(gNode, TagTaintDescriptor(normalNode.getOwner.signature, isetEmpty, SourceAndSinkCategory.STMT_SOURCE, isetEmpty))
+          val tn = TaintSource(gNode, TagTaintDescriptor(normalNode.getOwner.signature, isetEmpty, SourceAndSinkCategory.STMT_SOURCE, isetEmpty + "ANY"))
           sources += tn
         }
         if(this.isSink(loc, ptaresult)){
           global.reporter.echo(TITLE, "found simple statement sink: " + normalNode)
-          val tn = TaintSink(gNode, TagTaintDescriptor(normalNode.getOwner.signature, isetEmpty, SourceAndSinkCategory.STMT_SINK, isetEmpty))
+          val tn = TaintSink(gNode, TagTaintDescriptor(normalNode.getOwner.signature, isetEmpty, SourceAndSinkCategory.STMT_SINK, isetEmpty + "ANY"))
           sinks += tn
         }
       case _ =>

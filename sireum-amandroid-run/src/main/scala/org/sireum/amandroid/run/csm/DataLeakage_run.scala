@@ -101,7 +101,7 @@ object DataLeakage_run {
       }
       if(timer.isDefined) timer.get.start
       val apkYard = new ApkYard(global)
-      val apk: Apk = apkYard.loadApk(file, outputUri, dpsuri, false, false)
+      val apk: Apk = apkYard.loadApk(file, outputUri, dpsuri, false, false, true)
       val ssm = new DataLeakageAndroidSourceAndSinkManager(global, apk, apk.getAppInfo.getLayoutControls, apk.getAppInfo.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
       val cba = new ComponentBasedAnalysis(global, apkYard)
       cba.phase1(apk, false, timer)

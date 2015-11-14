@@ -38,12 +38,12 @@ class ApkYard(global: Global) {
   def getOwnerApk(component: JawaClass): Option[Apk] = this.synchronized(componentToApkMap.get(component))
   def getComponentToApkMap = this.componentToApkMap.toMap
   
-  def loadApk(nameUri: FileResourceUri, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], dexLog: Boolean, debugMode: Boolean): Apk = {
+  def loadApk(nameUri: FileResourceUri, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], dexLog: Boolean, debugMode: Boolean, refactor: Boolean, forceDelete: Boolean = true): Apk = {
     val apk = new Apk(nameUri)
     val apkFile = FileUtil.toFile(nameUri)
-    val name = apkFile.getName.substring(0, apkFile.getName().lastIndexOf("."))
+    val name = try{apkFile.getName.substring(0, apkFile.getName().lastIndexOf(".apk"))} catch {case e: Exception => apkFile.getName}
     val resultDir = FileUtil.toFile(outputUri + "/" + name)
-    val (outUri, _) = ApkDecompiler.decompile(apkFile, resultDir, dpsuri, dexLog, debugMode, true)
+    val (outUri, _) = ApkDecompiler.decompile(apkFile, resultDir, dpsuri, global.reporter, dexLog, debugMode, true, refactor, forceDelete)
     // convert the dex file to the "pilar" form
     val fileUri = outUri + "/src"
     if(FileUtil.toFile(fileUri).exists()) {
