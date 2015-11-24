@@ -68,21 +68,20 @@ object TaintAnalyzeCli {
     val timeout = saamode.analysis.timeout
     val mem = saamode.general.mem
     val debug = saamode.general.debug
-    val sas = saamode.sas
     val module = saamode.module match {
       case AnalysisModule.DATA_LEAKAGE => "DATA_LEAKAGE"
       case AnalysisModule.INTENT_INJECTION => "INTENT_INJECTION"
       case AnalysisModule.PASSWORD_TRACKING => "PASSWORD_TRACKING"
     }
-    forkProcess(module, timeout, sourceDir, outputDir, sas, mem, debug)
+    forkProcess(module, timeout, sourceDir, outputDir, mem, debug)
   }
 
-  def forkProcess(module: String, timeout: Int, sourceDir: String, outputDir: String, sas: String, mem: Int, debug: Boolean) = {
+  def forkProcess(module: String, timeout: Int, sourceDir: String, outputDir: String, mem: Int, debug: Boolean) = {
     val args: MList[String] = mlistEmpty
     args += module
     args += timeout.toString
     args += debug.toString
-    args ++= List(sourceDir, sas, outputDir)
+    args ++= List(sourceDir, outputDir)
     org.sireum.jawa.util.JVMUtil.startSecondJVM(TanitAnalysis.getClass(), "-Xmx" + mem + "G", args.toList, true)
   }
 }
@@ -93,8 +92,8 @@ object TaintAnalyzeCli {
 object TanitAnalysis{
   private final val TITLE = "TaintAnalysis"
   def main(args: Array[String]) {
-    if(args.size != 6){
-      println("Usage: <module: DATA_LEAKAGE, INTENT_INJECTION, PASSWORD_TRACKING> <timeout minutes> <debug> <source path> <Source and sink list file path> <output path>")
+    if(args.size != 5){
+      println("Usage: <module: DATA_LEAKAGE, INTENT_INJECTION, PASSWORD_TRACKING> <timeout minutes> <debug> <source path> <output path>")
       return
     }
     
@@ -102,8 +101,7 @@ object TanitAnalysis{
     val timeout = args(1).toInt * 60
     val debug = args(2).toBoolean
     val sourcePath = args(3)
-    val sas = args(4)
-    val outputPath = args(5)
+    val outputPath = args(4)
     
     val dpsuri = AndroidGlobalConfig.dependence_dir.map(FileUtil.toUri(_))
     val liblist = AndroidGlobalConfig.lib_files
@@ -111,7 +109,7 @@ object TanitAnalysis{
     val parallel = AndroidGlobalConfig.parallel
     val k_context = AndroidGlobalConfig.k_context
     val pct = AndroidGlobalConfig.per_component
-    val sasFilePath = if(sas != "") sas else AndroidGlobalConfig.sas_file
+    val sasFilePath = AndroidGlobalConfig.sas_file
   
     val apkFileUris: MSet[FileResourceUri] = msetEmpty
     val fileOrDir = new File(sourcePath)
