@@ -4,24 +4,23 @@ import java.io.File
 import org.sireum.util._
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.sjc.util.MyFileUtil
-import org.sireum.jawa.sjc.refactoring.RefactorJawa
 import java.io.FileWriter
 import org.sireum.amandroid.parser.ManifestParser
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.io.FgSourceFile
 import org.sireum.jawa.io.PlainFile
 import org.sireum.jawa.ObjectType
-import org.sireum.jawa.Reporter
 
 object ApkDecompiler {
   final val TITLE = "ApkDecompiler"
   final val DEBUG = false
   
-  def decompile(apk: File, projectLocation: File, dpsuri: Option[FileResourceUri], reporter: Reporter, dexLog: Boolean, debugMode: Boolean, removeSupportGen: Boolean, refector: Boolean, forceDelete: Boolean): (FileResourceUri, ISet[String]) = {
-    val out = AmDecoder.decode(FileUtil.toUri(apk), FileUtil.toUri(projectLocation), false, forceDelete)
+  def decodeApk(apkUri: FileResourceUri, outputUri: FileResourceUri, forceDelete: Boolean): FileResourceUri = {
+    AmDecoder.decode(apkUri, outputUri, true, forceDelete)
+  }
+  
+  def decompileDex(dexUri: FileResourceUri, outUri: FileResourceUri, dpsuri: Option[FileResourceUri], pkg: String, dexLog: Boolean, debugMode: Boolean, removeSupportGen: Boolean, forceDelete: Boolean): (String, ISet[String]) = {
     val dependencies: MSet[String] = msetEmpty
-    val dexFiles = FileUtil.listFiles(out, ".dex", true)
-    val pkg = ManifestParser.loadPackageName(apk)
     val recordFilter: (ObjectType => Boolean) = {
       ot =>
         if(removeSupportGen) {
@@ -43,23 +42,28 @@ object ApkDecompiler {
           } else true
         } else true
     }
-    if(FileUtil.toFile(out).exists()) {
-      val src = Dex2PilarConverter.convert(dexFiles.toSet, out + "/src", dpsuri, recordFilter, dexLog, debugMode, forceDelete)
-      if(refector){
-        /**
-         * refactor phase
-         */
-        FileUtil.listFiles(src, "pilar", true) foreach {
-          f =>
-            val code = new FgSourceFile(new PlainFile(FileUtil.toFile(f))).code
-            val newcode = RefactorJawa(code)
-            val file = FileUtil.toFile(f)
-            val fw = new FileWriter(file, false)
-            fw.write(newcode)
-            fw.close()
-        }
+    val srcFolder: String = "src/" + {
+      if(dexUri.startsWith(outUri)) dexUri.replace(outUri, "").replace(".dex", "").replace(".odex", "")
+      else dexUri.substring(dexUri.lastIndexOf("/") + 1, dexUri.lastIndexOf("."))
+    }.replaceAll("/", "_")
+    val src = Dex2PilarConverter.convert(dexUri, s"$outUri${if(!srcFolder.startsWith("/")) "/"}$srcFolder", dpsuri, recordFilter, dexLog, debugMode, forceDelete)
+    (srcFolder, dependencies.toSet)
+  }
+  
+  def decompile(apk: File, outputLocation: File, dpsuri: Option[FileResourceUri], dexLog: Boolean, debugMode: Boolean, removeSupportGen: Boolean, forceDelete: Boolean): (FileResourceUri, ISet[String], ISet[String]) = {
+    val outUri = decodeApk(FileUtil.toUri(apk), FileUtil.toUri(outputLocation), forceDelete)
+    val pkg = ManifestParser.loadPackageName(apk)
+    val srcFolders: MSet[String] = msetEmpty
+    val dependencies: MSet[String] = msetEmpty
+    if(FileUtil.toFile(outUri).exists()) {
+      val dexUris = FileUtil.listFiles(outUri, "dex", true)
+      dexUris.foreach {
+        dexUri =>
+          val (sf, dependent) = decompileDex(dexUri, outUri, dpsuri, pkg, dexLog, debugMode, removeSupportGen, forceDelete)
+          srcFolders += sf
+          dependencies ++= dependent
       }
     }
-    (out, dependencies.toSet)
+    (outUri, srcFolders.toSet, dependencies.toSet)
   }
 }

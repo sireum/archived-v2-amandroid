@@ -107,7 +107,7 @@ object DataLeakage_run {
       file =>
         val reporter = new PrintReporter(MsgLevel.INFO)
         val global = new Global(file, reporter)
-        global.setJavaLib("/Users/fgwei/Library/Android/sdk/platforms/android-21/android.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v4/android-support-v4.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v13/android-support-v13.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v7/appcompat/libs/android-support-v7-appcompat.jar")
+        global.setJavaLib(AndroidGlobalConfig.lib_files)
         val apk = new Apk(file)
         val socket = new AmandroidSocket(global, apk)
         
@@ -136,7 +136,7 @@ object DataLeakage_run {
       val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false)
       val app_info = new AppInfoCollector(global, apk, outUri, None)
       app_info.collectInfo
-      val ssm = new DataLeakageAndroidSourceAndSinkManager(global, apk, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+      val ssm = new DataLeakageAndroidSourceAndSinkManager(global, apk, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.sas_file)
       socket.plugListener(new DataLeakageListener(global, apk, outputPath))
       socket.runWithDDA(ssm, false, false, timer)
       return "Done!"

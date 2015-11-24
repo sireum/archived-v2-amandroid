@@ -40,7 +40,6 @@ $paramTyp$ $paramName$ $annotations ; separator=" "$
 >>
 
 LocalVars(locals) ::= <<
-  temp;
   $locals ; separator="\n"$
 >>
 

@@ -90,7 +90,11 @@ class PilarStyleCodeGenerator(
         }
         val code = generateRecord(classIdx)
         outputStream.println(code)
-        outputStream.close()
+        outputDir match {
+          case Some(t) => outputStream.close()
+          case _ =>
+        }
+        
       }
     }
   }
@@ -230,25 +234,28 @@ class PilarStyleCodeGenerator(
       else getAccessString(dexClassDefsBlock.getVirtualMethodName(classIdx, methodIdx), skip = 1, false, isConstructor)
     var thisOpt: Option[(String, ObjectType)] = None
     val initRegMap: MMap[Integer, JawaType] = mmapEmpty
-    val paramRegs: MList[Int] = mlistEmpty
+    val localvars: MMap[String, (JawaType, Boolean)] = mmapEmpty
     if(!AccessFlag.isStatic(AccessFlag.getAccessFlags(accessFlags))) {
       var thisReg = 0
       if(parmRegs.size() < 2)   // no parameters - "this" is in the last register
         thisReg = regSize - 1
       else
         thisReg = parmRegs.get(0).asInstanceOf[Integer].intValue() - 1
-      paramRegs += thisReg
-      val thisName = "v" + thisReg
+      var thisName = recTyp.typ.substring(recTyp.typ.lastIndexOf(".") + 1) + {if(recTyp.dimensions > 0)"_arr" + recTyp.dimensions else ""} + "_v" + thisReg
+      if(localvars.contains(thisName) && localvars(thisName)._1 != recTyp) thisName = "a" + thisName
+      localvars(thisName) = ((recTyp, true))
       thisOpt = Some((thisName, recTyp))
       initRegMap(new Integer(thisReg)) = recTyp
     }
     val paramList: MList[(String, JawaType)] = mlistEmpty
     for(i <- 0 to parmRegs.size() - 1 by + 2) {
-      paramRegs += parmRegs.get(i).asInstanceOf[Integer]
-      val paramName = "v" + parmRegs.get(i).asInstanceOf[Integer]
+      val paramReg = parmRegs.get(i).asInstanceOf[Integer]
       val paramTyp: JawaType = JavaKnowledge.formatSignatureToType(parmRegs.get(i+1).asInstanceOf[String])
+      var paramName = paramTyp.typ.substring(paramTyp.typ.lastIndexOf(".") + 1) + {if(paramTyp.dimensions > 0)"_arr" + paramTyp.dimensions else ""} + "_v" + paramReg
+      if(localvars.contains(paramName) && localvars(paramName)._1 != paramTyp) paramName = "a" + paramName
+      localvars(paramName) = ((paramTyp, true))
       paramList += ((paramName, paramTyp))
-      initRegMap(parmRegs.get(i).asInstanceOf[Integer]) = paramTyp
+      initRegMap(paramReg) = paramTyp
     }
     val sig: Signature = 
       if(isDirect) JavaKnowledge.genSignature(recTyp, dexClassDefsBlock.getDirectMethodShortName(classIdx, methodIdx), paramList.map(_._2).toList, retTyp)
@@ -291,8 +298,8 @@ class PilarStyleCodeGenerator(
     procTemplate.add("annotations", procAnnotations)
     if(!AccessFlag.isAbstract(AccessFlag.getAccessFlags(accessFlags)) &&
         !AccessFlag.isNative(AccessFlag.getAccessFlags(accessFlags))) {
-      procTemplate.add("localVars", generateLocalVars(regSize, paramRegs.toList))
-      val (body, tryCatch) = generateBody(procName, dexMethodHeadParser, initRegMap)
+      val (body, tryCatch) = generateBody(sig, procName, dexMethodHeadParser, initRegMap, localvars)
+      procTemplate.add("localVars", generateLocalVars(localvars.toMap))
       procTemplate.add("body", body)
       procTemplate.add("catchClauses", tryCatch)
     } else {
@@ -301,27 +308,28 @@ class PilarStyleCodeGenerator(
     procTemplate
   }
   
-  private def generateLocalVars(regSize: Int, paramRegs: IList[Int]): ST = {
+  private def generateLocalVars(localvars: IMap[String, (JawaType, Boolean)]): ST = {
     val localVarsTemplate: ST = template.getInstanceOf("LocalVars")
     val locals: ArrayList[String] = new ArrayList[String]
-    if(regSize > 0)
-      for(i <- 0 to regSize - 1) {
-        if(!paramRegs.contains(i)) {
-          val regName = "v" + i + ";"
+    localvars.foreach {
+      case (name, (typ, param)) =>
+        if(!param) {
+          val regName = generateType(typ).render() + " " + name + ";"
           locals += regName
         }
-      }
+    }
     localVarsTemplate.add("locals", locals)
     localVarsTemplate
   }
   
-  private def generateBody(procName: String, dexMethodHeadParser: DexMethodHeadParser, initRegMap: MMap[Integer, JawaType]): (ST, ST) = {    
+  private def generateBody(sig: Signature, procName: String, dexMethodHeadParser: DexMethodHeadParser, initRegMap: MMap[Integer, JawaType], localvars: MMap[String, (JawaType, Boolean)]): (ST, ST) = {    
     val bodyTemplate: ST = template.getInstanceOf("Body")
     val startPos: Long = dexMethodHeadParser.getInstructionBase()
     val endPos: Long = dexMethodHeadParser.getInstructionEnd()
     val codes: ArrayList[String] = new ArrayList[String]
     val instructionParser = 
       new DexInstructionToPilarParser(
+          sig,
           this,
           dexSignatureBlock, 
           dexStringIdsBlock, 
@@ -386,6 +394,7 @@ class PilarStyleCodeGenerator(
     instructionParser.setFilePosition(dexMethodHeadParser.getInstructionBase())
     instructionParser.setPass(false)
     instructionParser.setRegisterMap(initRegMap.toMap)
+    instructionParser.setLocalVars(localvars.toMap)
     breakable{ // 1
       do {
         var filePos: Long = instructionParser.getFilePosition()
@@ -463,7 +472,7 @@ class PilarStyleCodeGenerator(
               case ex: Exception =>
                 if(DEBUG_FLOW)
                   println("Flow: hit unknown instruction")
-              break
+                break
             }
             if(DEBUG_FLOW)
               println("Flow: after parse")
@@ -609,6 +618,7 @@ class PilarStyleCodeGenerator(
     }
     // Run the post-second pass processing
     instructionParser.postPassProcessing(true)
+    localvars ++= instructionParser.getLocalVars
     bodyTemplate.add("codeFragments", codes)
     (bodyTemplate, catchsTemplate)
   }
@@ -754,8 +764,8 @@ class PilarStyleCodeGenerator(
       val end: Long = dtcb.getTryEndOffset(i)
       val startLabel: String = "Try_start" + i
       val endLabel: String = "Try_end" + i
-      instructionParser.placeTask(start, LabelTask(startLabel, instructionParser))
-      instructionParser.placeTask(end, LabelTask(endLabel, instructionParser))
+      instructionParser.placeTask(start, LabelTask(startLabel, instructionParser, 0))
+      instructionParser.placeTask(end, LabelTask(endLabel, instructionParser, 1))
       for(n <- 0 to dtcb.getTryHandlersSize(i) - 1) {
         val catchTemplate: ST = template.getInstanceOf("Catch")
         val excpT: String = "L" + dtcb.getTryHandlerType(i, n) + ";"
@@ -769,7 +779,7 @@ class PilarStyleCodeGenerator(
           saveExceptionHandlerMapMarker(procName, exceptionHandlerList.get, start, end, handlerOffset, excpType, initRegMap)
         }
         writeTryCatchBlock(catchTemplate, startLabel, endLabel, excpType, handlerLabel)
-        catchs += catchTemplate
+        catchs.add(0, catchTemplate)
       }
     }
     catchsTemplate.add("catchs", catchs)

@@ -12,7 +12,7 @@ import org.sireum.util._
 /**
  * @author fgwei
  */
-case class LabelTask(label: String, instrParser: DexInstructionToPilarParser) extends PilarDedexerTask {
+case class LabelTask(label: String, instrParser: DexInstructionToPilarParser, priority: Int) extends PilarDedexerTask {
   def base = 0
   def offset = 0
   
@@ -27,5 +27,5 @@ case class LabelTask(label: String, instrParser: DexInstructionToPilarParser) ex
 
   override def toString: String = label
 
-  override def getPriority: Int = MIN_PRIORITY+100        // always first
+  override def getPriority: Int = MIN_PRIORITY + 100 + priority      // always first
 }

@@ -18,7 +18,7 @@ import org.sireum.amandroid.test.framework.dedex.DedexTestFramework
 @RunWith(classOf[JUnitRunner])
 class DedexTest extends DedexTestFramework {
   DexExamples.goodModelFiles.
-//  filter { s => s.endsWith("input.odex") }.
+//  filter { s => s.endsWith("exceptiontest.dex") }.
   foreach { resfile =>
     Analyzing title resfile file resfile
   }

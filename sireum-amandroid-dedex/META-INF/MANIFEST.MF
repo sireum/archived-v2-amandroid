@@ -7,6 +7,6 @@ Bundle-Vendor: sireum.org
 Require-Bundle: org.sireum;bundle-version="2.0.0",
  sireum-jawa;bundle-version="1.0.0"
 Bundle-ClassPath: .,
- lib/ddx1.26.jar
+ lib/ddx.jar
 Export-Package: hu.uw.pallergabor.dedexer,
  org.sireum.amandroid.dedex

@@ -13,7 +13,7 @@ import org.sireum.util._
 /**
  * @author fgwei
  */
-case class FillArrayDataTask(reg: Int, target: Long, instrParser: DexInstructionToPilarParser, base: Long, offset: Long) extends PilarDedexerTask {
+case class FillArrayDataTask(regName: String, target: Long, instrParser: DexInstructionToPilarParser, base: Long, offset: Long) extends PilarDedexerTask {
   override def equals(o: PilarDedexerTask): Boolean = {
     o match {
       case fadt: FillArrayDataTask => super.equals(fadt)
@@ -46,7 +46,7 @@ case class FillArrayDataTask(reg: Int, target: Long, instrParser: DexInstruction
                   java.lang.Long.toHexString(instrParser.getFilePosition() - 2))
     val bytesPerElement = instrParser.read16Bit()
     val numberOfElements = instrParser.read32Bit()
-    code1.append("v%d:= ".format(reg))
+    code1.append("%s:= ".format(regName))
     code1.append("(")
     for(l <- 0L to numberOfElements - 1L) {
       val element = new StringBuilder()

@@ -69,11 +69,11 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
           timer
         } else timer
       val component = worklist.remove(0)
-      println(TITLE + ":" + "-------Analyze component " + component + "--------------")
+      println("-------Analyze component " + component + "--------------")
       try{
         // do pta on this component
         apk.getAppInfo.getEnvMap.get(component) match {
-          case Some(ep) =>
+          case Some((ep, _)) =>
             val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
             val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager, timertouse)
             yard.addIDFG(component, idfg)
@@ -104,7 +104,7 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
     
     {if(parallel) components.par else components}.foreach {
       component =>
-        println(TITLE + ":" + "-------Collect Info for Component " + component + "--------------")
+        println("-------Collect Info for Component " + component + "--------------")
         try {
           // build summary table
           val summaryTable = buildComponentSummaryTable(component)
@@ -136,11 +136,10 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
           case None =>
         }
     }
-//    mddg.toDot(new PrintWriter(System.out))
     
     {if(parallel) components.par else components}.foreach {
       component =>
-        println(TITLE + ":" + "-------Link data dependence for component " + component + "--------------")
+        println("-------Link data dependence for component " + component + "--------------")
         try {
           val summaryTable = summaryMap.getOrElse(component, throw new RuntimeException("Summary table does not exist for " + component))
           
@@ -151,6 +150,7 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
               val icc_callees = allIccCallees.filter(_._2.matchWith(icc_caller))
               icc_callees foreach {
                 case (calleenode, icc_callee) =>
+                  println(component + " --icc--> " + calleenode.getOwner.getClassName)
                   val caller_position: Int = 1
                   val callee_position: Int = 0
                   val callerDDGNode = mddg.getIDDGCallArgNode(callernode.asInstanceOf[ICFGCallNode], caller_position)
@@ -164,6 +164,7 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
             global.reporter.error(TITLE, ex.getMessage)
         }
     }
+//    mddg.toDot(new PrintWriter(System.out))
     (apks, new DefaultInterproceduralDataDependenceInfo(mddg))
   }
   
@@ -171,7 +172,6 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
     val apks = iddResult._1
     val components = apks.map(_.getComponents).fold(Set[JawaClass]())(iunion _)
     println(TITLE + ":" + "-------Phase 3-------" + apks.size + s" apk${if(apks.size > 1)"s"else""} " + components.size + s" component${if(components.size > 1)"s"else""}-------")
-    ssm.parse(AndroidGlobalConfig.SourceAndSinkFilePath)
     val idfgs = components.map(yard.getIDFG(_)).flatten
     if(!idfgs.isEmpty) {
       try {

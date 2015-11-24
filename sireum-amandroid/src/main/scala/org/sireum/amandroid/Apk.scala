@@ -22,6 +22,42 @@ import org.sireum.jawa.alir.taintAnalysis.TaintAnalysisResult
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 import org.sireum.jawa.alir.interProcedural.InterProceduralNode
 import org.sireum.alir.AlirEdge
+import java.util.zip.ZipInputStream
+import java.io.FileInputStream
+import java.util.zip.ZipEntry
+
+object Apk {
+  def isValidApk(nameUri: FileResourceUri): Boolean = {
+    class FindManifest extends Exception
+    val file = FileUtil.toFile(nameUri)
+    file match {
+      case dir if dir.isDirectory() => false
+      case _ => 
+        var valid: Boolean = false
+        var archive : ZipInputStream = null
+        try {
+          archive = new ZipInputStream(new FileInputStream(file))
+          var entry: ZipEntry = null
+          entry = archive.getNextEntry()
+          while (entry != null) {
+            val entryName = entry.getName()
+            if(entryName == "AndroidManifest.xml"){
+              valid = true
+              throw new FindManifest 
+            }
+            entry = archive.getNextEntry()
+          }
+        } catch {
+          case e: Exception =>
+        } finally {
+          if (archive != null)
+            archive.close()
+        }
+        valid
+    }
+  }
+}
+
 
 /**
  * this is an object, which hold information of apps. e.g. components, intent-filter database, etc.
@@ -30,6 +66,8 @@ import org.sireum.alir.AlirEdge
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a> 
  */
 case class Apk(nameUri: FileResourceUri) {
+  import Apk._
+  require(isValidApk(nameUri))
   private final val TITLE = "Apk"
   private val activities: MSet[JawaClass] = msetEmpty
   private val services: MSet[JawaClass] = msetEmpty
@@ -66,7 +104,7 @@ case class Apk(nameUri: FileResourceUri) {
       case se if se.isChildOf(new ObjectType(AndroidConstants.SERVICE)) => this.addService(se)
       case re if re.isChildOf(new ObjectType(AndroidConstants.RECEIVER)) => this.addReceiver(re)
       case pr if pr.isChildOf(new ObjectType(AndroidConstants.PROVIDER)) => this.addProvider(pr)
-      case a => a.global.reporter.error(NoPosition, "Unexpected component: " + a)
+      case a => a.global.reporter.error(TITLE, "Unexpected component: " + a)
     }
   }
 	

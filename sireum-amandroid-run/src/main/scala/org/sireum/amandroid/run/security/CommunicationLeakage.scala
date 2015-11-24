@@ -98,6 +98,7 @@ object CommunicationLeakage_run {
       file =>
         val reporter = new DefaultReporter
         val global = new Global(file, reporter)
+        global.setJavaLib(AndroidGlobalConfig.lib_files)
         val apk = new Apk(file)
         val socket = new AmandroidSocket(global, apk)
         try{
@@ -123,7 +124,7 @@ object CommunicationLeakage_run {
       val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false)
       val app_info = new AppInfoCollector(global, apk, outUri, timer)
       app_info.collectInfo
-      val ssm = new DataLeakageAndroidSourceAndSinkManager(global, apk, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+      val ssm = new DataLeakageAndroidSourceAndSinkManager(global, apk, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.sas_file)
       socket.plugListener(new CommunicationLeakageListener(global, apk, outputPath))
       socket.runWithDDA(ssm, false, false, timer)
       return "Done!"

@@ -53,12 +53,12 @@ object AndroidDataDependentTaintAnalysis {
       if(path.size > 1) {
         path.tail.reverse.foreach{
           edge =>
-            sb.append(edge.target.getContext + "\n\t-> ")
+            sb.append(edge.target + "\n\t-> ")
         }
-        sb.append(path.head.source.getContext + "\n")
-      } else {
-        sb.append(path.head.target.getContext + "\n\t-> ")
-        sb.append(path.head.source.getContext + "\n")
+        sb.append(path.head.source + "\n")
+      } else if(path.size == 1) {
+        sb.append(path.head.target + "\n\t-> ")
+        sb.append(path.head.source + "\n")
       }
       sb.toString().intern
     }
@@ -77,7 +77,7 @@ object AndroidDataDependentTaintAnalysis {
           sourceNodes.foreach {
             srcN =>
               val path = iddi.getDependentPath(sinN.node, srcN.node)
-              if(path != null){
+              if(!path.isEmpty){
                 val tp = Tp(path)
                 tp.srcN = srcN
                 tp.sinN = sinN
@@ -133,8 +133,9 @@ object AndroidDataDependentTaintAnalysis {
     tar.sourceNodes = sourceNodes
     tar.sinkNodes = sinkNodes
     
-    if(!tar.getTaintedPaths.isEmpty){
-      System.err.println(TITLE + " found " + tar.getTaintedPaths.size + s" path${if(tar.getTaintedPaths.size > 1)"s" else ""}.")
+    val tps = tar.getTaintedPaths
+    if(!tps.isEmpty){
+      System.err.println(TITLE + " found " + tps.size + s" path${if(tps.size > 1)"s" else ""}.")
       System.err.println(tar.toString)
     }
     tar

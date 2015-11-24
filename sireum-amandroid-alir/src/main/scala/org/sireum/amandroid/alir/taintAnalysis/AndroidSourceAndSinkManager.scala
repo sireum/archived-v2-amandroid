@@ -65,10 +65,10 @@ abstract class AndroidSourceAndSinkManager(
     apk: Apk,
     layoutControls: Map[Int, LayoutControl], 
     callbackMethods: ISet[JawaMethod], 
-    sasFilePath: String) extends SourceAndSinkManager{
+    val sasFilePath: String) extends SourceAndSinkManager{
   
   private final val TITLE = "BasicSourceAndSinkManager"
-
+  parse
   def getSourceAndSinkNode[N <: InterProceduralNode](node: N, ptaresult: PTAResult): (ISet[TaintSource[N]], ISet[TaintSink[N]]) = {
     node match {
       case icfgN: ICFGNode => handleICFGNode(icfgN, ptaresult)
@@ -161,7 +161,7 @@ abstract class AndroidSourceAndSinkManager(
             val calleep = callee.callee
             val caller = global.getMethod(invNode.getOwner).get
             val jumpLoc = caller.getBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
-            if(this.isSource(calleep, caller, jumpLoc)){
+            if(invNode.isInstanceOf[IDDGVirtualBodyNode] && this.isSource(calleep, caller, jumpLoc)){
               global.reporter.echo(TITLE, "found source: " + calleep + "@" + invNode.getContext)
               val tn = TaintSource(gNode, TypeTaintDescriptor(calleep.getSignature.signature, None, SourceAndSinkCategory.API_SOURCE))
               sources += tn

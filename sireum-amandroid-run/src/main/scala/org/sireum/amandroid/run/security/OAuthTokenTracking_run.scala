@@ -151,6 +151,7 @@ object OAuthTokenTracking_run {
       file =>
         val reporter = new DefaultReporter
         val global = new Global(file, reporter)
+        global.setJavaLib(AndroidGlobalConfig.lib_files)
         val apk = new Apk(file)
         val socket = new AmandroidSocket(global, apk)
         try{
@@ -176,7 +177,7 @@ object OAuthTokenTracking_run {
       val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false)
       val app_info = new OauthTokenContainerCollector(global, apk, outUri, timer)
       app_info.collectInfo
-      val ssm = new OAuthSourceAndSinkManager(global, apk, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+      val ssm = new OAuthSourceAndSinkManager(global, apk, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.sas_file)
       socket.plugListener(new OAuthTokenTrackingListener(global, apk, app_info))
       socket.runWithDDA(ssm, false, true, timer)
       return "Done!"

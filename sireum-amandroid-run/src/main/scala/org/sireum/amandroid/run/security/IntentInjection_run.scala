@@ -148,6 +148,7 @@ object IntentInjection_run {
       file =>
         val reporter = new DefaultReporter
         val global = new Global(file, reporter)
+        global.setJavaLib(AndroidGlobalConfig.lib_files)
         val apk = new Apk(file)
         val socket = new AmandroidSocket(global, apk)
         try{

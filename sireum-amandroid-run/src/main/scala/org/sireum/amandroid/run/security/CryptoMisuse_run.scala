@@ -20,6 +20,7 @@ import org.sireum.jawa.util.MyTimeoutException
 import org.sireum.jawa.DefaultReporter
 import org.sireum.jawa.Global
 import org.sireum.amandroid.Apk
+import org.sireum.amandroid.AndroidGlobalConfig
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -82,6 +83,7 @@ object CryptoMisuse_run {
       file =>
         val reporter = new DefaultReporter
         val global = new Global(file, reporter)
+        global.setJavaLib(AndroidGlobalConfig.lib_files)
         val apk = new Apk(file)
         val socket = new AmandroidSocket(global, apk)
         try {
@@ -96,7 +98,7 @@ object CryptoMisuse_run {
     }
   }
   
-  private case class CryptoMisuseTask(global: Global, apk: Apk, outputPath : String, dpsuri: Option[FileResourceUri], file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]){
+  private case class CryptoMisuseTask(global: Global, apk: Apk, outputPath : String, dpsuri: Option[FileResourceUri], file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]) {
     def run() : String = {
       global.reporter.echo(TITLE, "####" + file + "#####")
       val timer = timeout match {

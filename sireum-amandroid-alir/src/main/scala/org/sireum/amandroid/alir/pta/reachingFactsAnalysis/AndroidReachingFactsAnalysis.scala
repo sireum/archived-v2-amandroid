@@ -367,9 +367,9 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
             calleeFactsMap += (icfg.entryNode(calleep.getSignature, callerContext) -> mapFactsToCallee(factsForCallee, callerContext, cj, calleep))
           }
       }
-      if(!pureNormalFlag){
-        if(!icfg.hasEdge(icfgCallnode, icfgReturnnode)){
-          icfg.addEdge(icfgCallnode, icfgReturnnode)
+      if(pureNormalFlag) {
+        if(icfg.hasEdge(icfgCallnode, icfgReturnnode)) {
+          icfg.deleteEdge(icfgCallnode, icfgReturnnode)
         }
       }
       

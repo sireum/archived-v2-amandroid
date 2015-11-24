@@ -20,6 +20,8 @@ import org.sireum.jawa.Constants
 import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.jawa.alir.interProcedural.InterProceduralNode
 import org.sireum.alir.AlirEdge
+import org.sireum.amandroid.appInfo.ClassInfoProvider
+import org.sireum.jawa.util.MyTimer
 
 /**
  * @author fgwei
@@ -38,19 +40,22 @@ class ApkYard(global: Global) {
   def getOwnerApk(component: JawaClass): Option[Apk] = this.synchronized(componentToApkMap.get(component))
   def getComponentToApkMap = this.componentToApkMap.toMap
   
-  def loadApk(nameUri: FileResourceUri, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], dexLog: Boolean, debugMode: Boolean, refactor: Boolean, forceDelete: Boolean = true): Apk = {
+  def loadApk(nameUri: FileResourceUri, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], cip: ClassInfoProvider, dexLog: Boolean, debugMode: Boolean, forceDelete: Boolean = true, timer: Option[MyTimer]): Apk = {
     val apk = new Apk(nameUri)
     val apkFile = FileUtil.toFile(nameUri)
-    val name = try{apkFile.getName.substring(0, apkFile.getName().lastIndexOf(".apk"))} catch {case e: Exception => apkFile.getName}
-    val resultDir = FileUtil.toFile(outputUri + "/" + name)
-    val (outUri, _) = ApkDecompiler.decompile(apkFile, resultDir, dpsuri, global.reporter, dexLog, debugMode, true, refactor, forceDelete)
+//    val name = try{apkFile.getName.substring(0, apkFile.getName().lastIndexOf(".apk"))} catch {case e: Exception => apkFile.getName}
+    val resultDir = FileUtil.toFile(outputUri)
+    val (outUri, srcs, _) = ApkDecompiler.decompile(apkFile, resultDir, dpsuri, dexLog, debugMode, true, forceDelete)
     // convert the dex file to the "pilar" form
-    val fileUri = outUri + "/src"
-    if(FileUtil.toFile(fileUri).exists()) {
-      //store the app's pilar code in AmandroidCodeSource which is organized class by class.
-      global.load(fileUri, Constants.PILAR_FILE_EXT, AndroidLibraryAPISummary)
+    srcs foreach {
+      src =>
+        val fileUri = outUri + "/" + src
+        if(FileUtil.toFile(fileUri).exists()) {
+          //store the app's pilar code in AmandroidCodeSource which is organized class by class.
+          global.load(fileUri, Constants.PILAR_FILE_EXT, AndroidLibraryAPISummary)
+        }
     }
-    val app_info = new AppInfoCollector(global, apk, outUri, None)
+    val app_info = cip.getAppInfoCollector(global, apk, outUri, timer)
     app_info.collectInfo
     addApk(apk)
     apk.getComponents.foreach(addComponent(_, apk))

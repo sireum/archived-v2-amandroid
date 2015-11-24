@@ -13,7 +13,7 @@ import java.io.IOException
 /**
  * @author fgwei
  */
-case class PackedSwitchTask(reg: Int, defaultTarget: Long, instrParser: DexInstructionToPilarParser, base: Long, offset: Long) extends PilarDedexerTask {
+case class PackedSwitchTask(regName: String, defaultTarget: Long, instrParser: DexInstructionToPilarParser, base: Long, offset: Long) extends PilarDedexerTask {
   
   private var tableLength: Long = 0L
   private var low: Int = 0
@@ -44,7 +44,7 @@ case class PackedSwitchTask(reg: Int, defaultTarget: Long, instrParser: DexInstr
   def renderTask(position: Long): IList[String] = {
     val code: StringBuilder = new StringBuilder
     code.append("#L%06x.  ".format(instrParser.getFilePosition))
-    code.append("switch v%d\n".format(reg))
+    code.append("switch %s\n".format(regName))
     for(i <- 0 to labels.size - 1) {
       code.append("                | %d => goto %s\n".format(low + i, labels(i)))
     }

@@ -72,18 +72,21 @@ class AmandroidSocket(global: Global, apk: Apk) {
     myListener_opt = Some(listener)
   }
   
-  def loadApk(output_path: String, lib_sum: LibraryAPISummary, dpsuri: Option[FileResourceUri], dexLog: Boolean, debugMode: Boolean, refactor: Boolean = true, forceDelete: Boolean = true): FileResourceUri = {
+  def loadApk(output_path: String, lib_sum: LibraryAPISummary, dpsuri: Option[FileResourceUri], dexLog: Boolean, debugMode: Boolean, forceDelete: Boolean = true): FileResourceUri = {
     val apkFile = FileUtil.toFile(apk.nameUri)
-    val name = try{apkFile.getName.substring(0, apkFile.getName().lastIndexOf(".apk"))} catch {case e: Exception => apkFile.getName}
-    val resultDir = new File(output_path + "/" + name)
-    val (out, _) = ApkDecompiler.decompile(apkFile, resultDir, dpsuri, global.reporter, dexLog, debugMode, true, refactor, forceDelete)
+//    val name = try{apkFile.getName.substring(0, apkFile.getName().lastIndexOf(".apk"))} catch {case e: Exception => apkFile.getName}
+    val resultDir = new File(output_path)
+    val (outUri, srcs, _) = ApkDecompiler.decompile(apkFile, resultDir, dpsuri, dexLog, debugMode, true, forceDelete)
     // convert the dex file to the "pilar" form
-    val fileUri = out + "/src"
-    if(FileUtil.toFile(fileUri).exists()) {
-      //store the app's pilar code in AmandroidCodeSource which is organized class by class.
-      global.load(fileUri, Constants.PILAR_FILE_EXT, lib_sum)
+    srcs foreach {
+      src =>
+        val fileUri = outUri + "/" + src
+        if(FileUtil.toFile(fileUri).exists()) {
+          //store the app's pilar code in AmandroidCodeSource which is organized class by class.
+          global.load(fileUri, Constants.PILAR_FILE_EXT, lib_sum)
+        }
     }
-    out
+    outUri
   }
   
   /**
@@ -106,7 +109,6 @@ class AmandroidSocket(global: Global, apk: Apk) {
       timer: Option[MyTimer]) = {    
     try {
       if(myListener_opt.isDefined) myListener_opt.get.onPreAnalysis
-      ssm.parse(AndroidGlobalConfig.SourceAndSinkFilePath)
   
       var entryPoints = global.getEntryPoints(AndroidConstants.MAINCOMP_ENV)
   

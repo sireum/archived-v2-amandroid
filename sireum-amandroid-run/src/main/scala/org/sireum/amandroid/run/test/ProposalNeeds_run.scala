@@ -14,6 +14,7 @@ import org.sireum.jawa.Global
 import org.sireum.amandroid.Apk
 import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
+import org.sireum.amandroid.AndroidGlobalConfig
 
 /**
  * @author fgwei
@@ -39,23 +40,23 @@ object ProposalNeeds_run {
     val sourcePath = args(0)
     val outputPath = args(1)
     val dpsuri = try{Some(FileUtil.toUri(args(2)))} catch {case e: Exception => None}
-    val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), "", true).toSet
+    val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), "", true).filter(Apk.isValidApk(_)).toSet
     files.foreach{
       file =>
         println("Processing " + file)
         ProposalNeedsCounter.total += 1
         val reporter = new PrintReporter(MsgLevel.ERROR)
         val global = new Global(file, reporter)
-        global.setJavaLib("/Users/fgwei/Library/Android/sdk/platforms/android-21/android.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v4/android-support-v4.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v13/android-support-v13.jar")
+        global.setJavaLib(AndroidGlobalConfig.lib_files)
         val apk = new Apk(file)
         val socket = new AmandroidSocket(global, apk)
         try{
-          val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false, false, false) 
+          val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false, true) 
           var dynamicLoading = false
           var reflection = false
           var nativecode = false
           val code = global.getApplicationClassCodes.filter{
-            case (typ, _) =>
+            case (typ, c) =>
               val res = 
               !typ.name.startsWith("com.amazon.") &&
               !typ.name.startsWith("com.google.") &&

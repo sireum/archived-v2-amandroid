@@ -20,20 +20,15 @@ import org.sireum.jawa.ObjectType
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
 object Dex2PilarConverter {
-  def convert(fs: Set[FileResourceUri], out: FileResourceUri, dpsuri: Option[FileResourceUri], recordFilter: (ObjectType => Boolean), dexLog: Boolean, debugMode: Boolean, forceDelete: Boolean): FileResourceUri = {
+  def convert(f: FileResourceUri, out: FileResourceUri, dpsuri: Option[FileResourceUri], recordFilter: (ObjectType => Boolean), dexLog: Boolean, debugMode: Boolean, forceDelete: Boolean): FileResourceUri = {
     if(!forceDelete && FileUtil.toFile(out).exists()) return out
     ConverterUtil.cleanDir(out)
-    fs foreach {
-      f =>
-        try {
-          val pdd = new PilarDeDex
-          pdd.decompile(f, Some(out), dpsuri, recordFilter, dexLog, debugMode)
-        } catch {
-          case ex: Exception =>
-            System.err.println("Given file is not a decompilable file: " + f)
-        } finally {
-          
-        }
+    try {
+      val pdd = new PilarDeDex
+      pdd.decompile(f, Some(out), dpsuri, recordFilter, dexLog, debugMode)
+    } catch {
+      case ex: Exception =>
+        System.err.println("Given file is not a decompilable file: " + f)
     }
     out
   }

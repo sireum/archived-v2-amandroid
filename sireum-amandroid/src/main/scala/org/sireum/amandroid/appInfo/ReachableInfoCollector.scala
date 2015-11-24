@@ -288,6 +288,9 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[ObjectType], 
     if(!proc.isConcrete)
       return
     
+    if(!proc.getDeclaringClass.isApplicationClass)
+      return
+      
     val callbackClasses: MSet[JawaClass] = msetEmpty
     val body = proc.getBody
     val points = new PointsCollector().points(proc.getSignature, body)

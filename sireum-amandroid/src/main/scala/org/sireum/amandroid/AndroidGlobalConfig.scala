@@ -8,6 +8,9 @@ http://www.eclipse.org/legal/epl-v10.html
 package org.sireum.amandroid
 
 import org.sireum.jawa.util.OsUtils
+import java.io.File
+import java.io.FileWriter
+import org.ini4j.Wini
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -21,14 +24,60 @@ object AndroidGlobalConfig {
     if(System.getenv(AMANDROID_HOME) != null) System.getenv(AMANDROID_HOME)
     else if(System.getenv(SIREUM_HOME) != null) System.getenv(SIREUM_HOME) + "/apps/amandroid"
     else throw new RuntimeException("Please set env variable SIREUM_HOME!")
-//	if(amandroid_home == null) throw new RuntimeException("Please set env variable AMANDROID_HOME!")  
-//	final val android_lib_dir = amandroid_home + "/androidlib/5.0"
-	final val android_libsummary_dir = amandroid_home + "/LibSummary"
-//	final val android_dex2pilar_dir = AndroidGlobalConfig.amandroid_home + 
-//      "/dex2pilar/" + {if(OsUtils.isMac) "mac64" else if (OsUtils.isLinux) "linux64" else throw new RuntimeException("Please execute Amandroid on Mac64 or Linux64!")}
   
-  final var SourceAndSinkFilePath = amandroid_home + "/taintAnalysis/sourceAndSinks/TaintSourcesAndSinks.txt"
-	final var PasswordSinkFilePath = amandroid_home +  "/taintAnalysis/sourceAndSinks/PasswordSourcesAndSinks.txt"
-	final var IntentInjectionSinkFilePath = amandroid_home + "/taintAnalysis/sourceAndSinks/IntentInjectionSourcesAndSinks.txt"
+  private val SourceAndSinkFilePath = amandroid_home + "/taintAnalysis/sourceAndSinks/TaintSourcesAndSinks.txt"
+	final val PasswordSinkFilePath = amandroid_home +  "/taintAnalysis/sourceAndSinks/PasswordSourcesAndSinks.txt"
+	final val IntentInjectionSinkFilePath = amandroid_home + "/taintAnalysis/sourceAndSinks/IntentInjectionSourcesAndSinks.txt"
 
+  private val defaultLibFiles = 
+    amandroid_home + "/androidLib/android-21/android.jar:" +
+    amandroid_home + "/androidLib/support/v4/android-support-v4.jar:" +
+    amandroid_home + "/androidLib/support/v13/android-support-v13.jar:" +
+    amandroid_home + "/androidLib/support/v7/android-support-v7-appcompat.jar"
+  
+  final val iniFile = new File(amandroid_home + "/config.ini")
+  iniFile.getParentFile.mkdirs()
+  if(!iniFile.exists()) initIni
+  
+  private val ini = new Wini(iniFile)
+  val dependence_dir: Option[String] = Option(ini.get("general", "dependence_dir", classOf[String]))
+  val debug: Boolean = ini.get("general", "debug", classOf[Boolean])
+  val lib_files: String = Option(ini.get("general", "lib_files", classOf[String])).getOrElse(defaultLibFiles)
+  val static_init: Boolean = ini.get("analysis", "static_init", classOf[Boolean])
+  val parallel: Boolean = ini.get("analysis", "parallel", classOf[Boolean])
+  val k_context: Int = ini.get("analysis", "k_context", classOf[Int])
+  val sas_file: String = Option(ini.get("analysis", "sas_file", classOf[String])).getOrElse(SourceAndSinkFilePath)
+  val per_component: Boolean = ini.get("timer", "per_component", classOf[Boolean])
+  private def initIni = {
+    val w = new FileWriter(iniFile)
+    val inicontent =
+"""
+; General configuration for amandroid
+[general]
+ ; Dependence directory for odex resolution.
+;dependence_dir = /path
+ ; Output debug information
+ debug = false
+ ; Java Library jar files
+;lib_files = /path/lib1.jar:/path/lib2.jar
+
+; Configuration for data flow analysis
+[analysis]
+ ; Handle static initializer
+ static_init = false
+ parallel = false
+ ; Context length for k-context sensitive analysis
+ k_context = 1
+ ; Source and sink list file
+;sas_file = /path/sas.txt 
+
+; Timer setting
+[timer]
+ ; Apply timer for analysis each component.
+ per_component = true
+"""
+    w.write(inicontent)
+    w.flush()
+    w.close()
+  }
 }

@@ -14,5 +14,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-option"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-pilar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-util"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sireum-amandroid-dedex"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sireum-jawa-compiler"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

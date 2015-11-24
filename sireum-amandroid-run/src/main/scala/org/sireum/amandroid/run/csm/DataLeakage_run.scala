@@ -34,6 +34,8 @@ import org.sireum.jawa.ScopeManager
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAScopeManager
 import org.sireum.amandroid.alir.componentSummary.ApkYard
 import org.sireum.jawa.util.PerComponentTimer
+import org.sireum.amandroid.util.ApkFileUtil
+import org.sireum.amandroid.appInfo.ClassInfoProvider
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -66,16 +68,16 @@ object DataLeakage_run {
     val outputPath = args(1)
     val outputUri = FileUtil.toUri(outputPath)
     val dpsuri = try{Some(FileUtil.toUri(args(1)))} catch {case e: Exception => None}
-    val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
-//      .filter(_.contains("LocationLeak2"))
+    val files = ApkFileUtil.getApks(FileUtil.toUri(sourcePath), true)
+//      .filter(_.contains("AndroidSpecific_PrivateDataLeak3"))
     files.foreach{
       file =>
         DataLeakageCounter.total += 1
         val reporter = new PrintReporter(MsgLevel.ERROR)
         val global = new Global(file, reporter)
-        global.setJavaLib("/Users/fgwei/Library/Android/sdk/platforms/android-21/android.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v4/android-support-v4.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v13/android-support-v13.jar:/Users/fgwei/Library/Android/sdk/extras/android/support/v7/appcompat/libs/android-support-v7-appcompat.jar")
+        global.setJavaLib(AndroidGlobalConfig.lib_files)
         try {
-          reporter.echo(TITLE, DataLeakageTask(global, outputUri, dpsuri, file, Some(200, true)).run)
+          reporter.echo(TITLE, DataLeakageTask(global, outputUri, dpsuri, file, Some(300, true)).run)
           DataLeakageCounter.haveresult += 1
         } catch {
           case te: MyTimeoutException => reporter.error(TITLE, te.message)
@@ -101,8 +103,13 @@ object DataLeakage_run {
       }
       if(timer.isDefined) timer.get.start
       val apkYard = new ApkYard(global)
-      val apk: Apk = apkYard.loadApk(file, outputUri, dpsuri, false, false, true)
-      val ssm = new DataLeakageAndroidSourceAndSinkManager(global, apk, apk.getAppInfo.getLayoutControls, apk.getAppInfo.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
+      val cip: ClassInfoProvider = new ClassInfoProvider() {
+        def getAppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, timer: Option[MyTimer]): AppInfoCollector = {
+          new AppInfoCollector(global, apk, outputUri, timer)
+        }
+      }
+      val apk: Apk = apkYard.loadApk(file, outputUri, dpsuri, cip, false, false, true, timer = timer)
+      val ssm = new DataLeakageAndroidSourceAndSinkManager(global, apk, apk.getAppInfo.getLayoutControls, apk.getAppInfo.getCallbackMethods, AndroidGlobalConfig.sas_file)
       val cba = new ComponentBasedAnalysis(global, apkYard)
       cba.phase1(apk, false, timer)
       val iddResult = cba.phase2(Set(apk), false)

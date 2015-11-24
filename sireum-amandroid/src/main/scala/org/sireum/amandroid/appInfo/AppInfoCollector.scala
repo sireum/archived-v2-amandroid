@@ -40,6 +40,10 @@ import org.sireum.amandroid.Apk
 import org.sireum.jawa.Reporter
 import org.sireum.amandroid.parser.ComponentInfo
 
+trait ClassInfoProvider {
+  def getAppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, timer: Option[MyTimer]): AppInfoCollector
+}
+
 /**
  * It takes the apkUri and outputDir as input parameters.
  * 
@@ -61,7 +65,7 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
   /**
    * Map from record name to it's env method code.
    */
-  protected var envProcMap: Map[JawaClass, JawaMethod] = Map()
+  protected var envProcMap: Map[JawaClass, (JawaMethod, String)] = Map()
   def getAppName: String = new File(new URI(apk.nameUri)).getName()
   def getPackageName: String = this.appPackageName
   def getUsesPermissions: ISet[String] = this.uses_permissions.toSet
@@ -69,7 +73,7 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
   def getCallbackMethodMapping: IMap[JawaClass, Set[JawaMethod]] = this.callbackMethods.toMap
   def getCallbackMethods: ISet[JawaMethod] = if(!this.callbackMethods.isEmpty)this.callbackMethods.map(_._2).reduce(iunion[JawaMethod]) else isetEmpty[JawaMethod]
   def printEnvs() =
-    envProcMap.foreach{case(k, v) => println("Environment for " + k + "\n" + v)}
+    envProcMap.foreach{case(k, v) => println("Environment for " + k + "\n" + v._2)}
 
   def printEntrypoints() = {
     if (this.componentInfos == null)
@@ -96,7 +100,7 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
     this.envProcMap.foreach{
       case (k, v) =>
         sb.append("*********************** Environment for " + k + " ************************\n")
-        sb.append(v + "\n\n")
+        sb.append(v._2 + "\n\n")
     }
     sb.toString.intern()
   }
@@ -127,8 +131,8 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
         }
     }
     dmGen.setCallbackFunctions(callbackMethodSigs)
-    val proc = dmGen.generateWithParam(List(new ObjectType(AndroidEntryPointConstants.INTENT_NAME)), envName)
-    this.envProcMap += (record -> proc)
+    val (proc, code) = dmGen.generateWithParam(List(new ObjectType(AndroidEntryPointConstants.INTENT_NAME)), envName)
+    this.envProcMap += (record -> ((proc, code)))
     dmGen.getCodeCounter
   }
 
