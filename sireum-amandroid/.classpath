@@ -16,5 +16,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-jawa-compiler"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sireum-amandroid-dedex"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

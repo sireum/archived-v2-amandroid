@@ -50,7 +50,7 @@ object DecompilerCli {
 object Decompiler {
 	def main(args: Array[String]) {
 	  if(args.size != 3){
-	    println("Usage: [debug] <source path> <output path>")
+	    println("Usage: <debug> <source path> <output path>")
 	    return
 	  }
 	  val debug = args(0).toBoolean

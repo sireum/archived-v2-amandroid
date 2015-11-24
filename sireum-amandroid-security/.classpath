@@ -13,5 +13,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-pilar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-util"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sireum-amandroid-dedex"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sireum-jawa-compiler"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

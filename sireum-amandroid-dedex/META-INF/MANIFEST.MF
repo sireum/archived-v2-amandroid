@@ -2,10 +2,10 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Sireum Amandroid Dedex
 Bundle-SymbolicName: sireum-amandroid-dedex
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 2.0.0
 Bundle-Vendor: sireum.org
 Require-Bundle: org.sireum;bundle-version="2.0.0",
- sireum-jawa;bundle-version="1.0.0"
+ sireum-jawa;bundle-version="2.0.0"
 Bundle-ClassPath: .,
  lib/ddx.jar
 Export-Package: hu.uw.pallergabor.dedexer,
