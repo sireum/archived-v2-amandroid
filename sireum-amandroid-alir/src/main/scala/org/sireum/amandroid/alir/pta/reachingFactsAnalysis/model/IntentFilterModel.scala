@@ -12,14 +12,11 @@ import org.sireum.util._
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
-import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.alir.pta.UnknownInstance
-import org.sireum.jawa.alir.pta.NullInstance
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.FieldSlot
-import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.alir.pta.VarSlot
 
 /**
@@ -36,7 +33,7 @@ object IntentFilterModel {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true
-	  p.getSignature match{
+	  p.getSignature.signature match{
 	    case "Landroid/content/IntentFilter;.<clinit>:()V" =>  //static constructor
 		  case "Landroid/content/IntentFilter;.<init>:()V" =>  //public constructor
 		  case "Landroid/content/IntentFilter;.<init>:(Landroid/content/IntentFilter;)V" =>  //public constructor
@@ -105,29 +102,27 @@ object IntentFilterModel {
 	 */
 	private def intentFilterInitWithAction(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
-    val thisSlot = VarSlot(args(0))
+    val thisSlot = VarSlot(args(0), false, true)
 	  val thisValue = s.pointsToSet(thisSlot, currentContext)
-	  val actionSlot = VarSlot(args(1))
+	  val actionSlot = VarSlot(args(1), false, true)
 	  val actionValue = s.pointsToSet(actionSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
 	      if(thisValue.size == 1){
-          for(v <- s.pointsToSet(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENTFILTER_ACTIONS)), currentContext)){
-            delfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENTFILTER_ACTIONS)), v)
+          for(v <- s.pointsToSet(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENTFILTER_ACTIONS)), currentContext)){
+            delfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENTFILTER_ACTIONS)), v)
           }
 	      }
 	      actionValue.foreach{
 		      acStr =>
 	          acStr match{
 	            case cstr @ PTAConcreteStringInstance(text, c) =>
-	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENTFILTER_ACTIONS)), cstr)
+	              newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENTFILTER_ACTIONS)), cstr)
 	            case pstr @ PTAPointStringInstance(c) => 
-	              err_msg_detail(TITLE, "Init IntentFilter use point string: " + pstr)
-	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENTFILTER_ACTIONS)), pstr)
-	            case ustr @ UnknownInstance(t, c) => 
-	            case ustr @ NullInstance(c) => 
+	              newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENTFILTER_ACTIONS)), pstr)
+	            case ustr @ UnknownInstance(t, c) =>
 	            case _ => throw new RuntimeException("unexpected instance type: " + acStr)
 	          }
 		    }

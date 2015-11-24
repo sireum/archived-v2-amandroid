@@ -15,13 +15,10 @@ import java.io.File
 import org.sireum.amandroid.security.oauth.OauthTokenContainerCollector
 import org.sireum.amandroid.alir.dataRecorder.DataCollector
 import org.sireum.amandroid.alir.dataRecorder.MetricRepo
-import org.sireum.jawa.MessageCenter
-import org.sireum.jawa.MessageCenter._
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.util._
 import org.sireum.amandroid.security.oauth.OAuthSourceAndSinkManager
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
-import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.util.IgnoreException
 import scala.actors.threadpool.Callable
 import scala.actors.threadpool.Executors
@@ -29,7 +26,10 @@ import scala.actors.threadpool.TimeUnit
 import scala.actors.threadpool.TimeoutException
 import org.sireum.jawa.util.MyTimer
 import org.sireum.jawa.util.MyTimeoutException
-import org.sireum.jawa.GlobalConfig
+import org.sireum.jawa.DefaultReporter
+import org.sireum.jawa.Global
+import org.sireum.amandroid.Apk
+import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
 
 
 /**
@@ -59,19 +59,19 @@ object OAuthTokenTracking_run {
     }
     
     def outputRecStatistic = {
-    	val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
+      val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
       val appDataDirFile = new File(outputDir + "/recStatistic")
-    	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
-    	val out = new PrintWriter(appDataDirFile + "/RecStatistic.txt")
+      if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
+      val out = new PrintWriter(appDataDirFile + "/RecStatistic.txt")
       appRec.filter(p=> p._2 >= 5).toSeq.sortBy(_._1).sortBy(_._2).foreach(out.println(_))
       out.close()
     }
     
     def outputInterestingFileNames = {
-    	val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
-    	val appDataDirFile = new File(outputDir + "/interestingApps")
-    	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
-    	val out = new PrintWriter(appDataDirFile + "/interestingApps.txt")
+      val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
+      val appDataDirFile = new File(outputDir + "/interestingApps")
+      if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
+      val out = new PrintWriter(appDataDirFile + "/interestingApps.txt")
       out.println("\n\n\n\nfoundPasswordContainerList:")
       foundOauthContainerList.foreach(out.println(_))
       out.println("\n\n\n\ntaintPathFoundList:")
@@ -80,45 +80,45 @@ object OAuthTokenTracking_run {
     }
   }
   
-  private class OAuthTokenTrackingListener(source_apk : FileResourceUri, app_info : OauthTokenContainerCollector) extends AmandroidSocketListener {
+  private class OAuthTokenTrackingListener(global: Global, apk: Apk, app_info : OauthTokenContainerCollector) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
       OAuthTokenCounter.total += 1
     }
 
     def entryPointFilter(eps: Set[org.sireum.jawa.JawaMethod]): Set[org.sireum.jawa.JawaMethod] = {
       val iacs = app_info.getInterestingContainers(Set("access_token"))
-    	val res = eps.filter(e=>iacs.contains(e.getDeclaringClass))
-    	if(!res.isEmpty){
-    	  OAuthTokenCounter.foundOauthContainer += 1
-    	  OAuthTokenCounter.foundOauthContainerList += source_apk
-    	}
+      val res = eps.filter(e=>iacs.contains(e.getDeclaringClass))
+      if(!res.isEmpty){
+        OAuthTokenCounter.foundOauthContainer += 1
+        OAuthTokenCounter.foundOauthContainerList += apk.nameUri
+      }
       res
     }
 
     def onTimeout : Unit = {}
 
     def onAnalysisSuccess : Unit = {
-      if(AppCenter.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
-	      OAuthTokenCounter.taintPathFound += 1
-	      OAuthTokenCounter.taintPathFoundList += source_apk
-	    }
-      val appData = DataCollector.collect
-    	MetricRepo.collect(appData)
-    	val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
-    	val apkName = source_apk.substring(source_apk.lastIndexOf("/"), source_apk.lastIndexOf("."))
-    	val appDataDirFile = new File(outputDir + "/" + apkName)
-    	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
-    	val out = new PrintWriter(appDataDirFile + "/AppData.txt")
-	    out.print(appData.toString)
-	    out.close()
-	    val mr = new PrintWriter(outputDir + "/MetricInfo.txt")
-		  mr.print(MetricRepo.toString)
-		  mr.close()
-		  OAuthTokenCounter.haveresult += 1
+      if(apk.getTaintAnalysisResults[InterproceduralDataDependenceAnalysis.Node, InterproceduralDataDependenceAnalysis.Edge].exists(!_._2.getTaintedPaths.isEmpty)){
+        OAuthTokenCounter.taintPathFound += 1
+        OAuthTokenCounter.taintPathFoundList += apk.nameUri
+      }
+      val appData = DataCollector.collect(global, apk)
+      MetricRepo.collect(appData)
+      val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
+      val apkName = apk.nameUri.substring(apk.nameUri.lastIndexOf("/"), apk.nameUri.lastIndexOf("."))
+      val appDataDirFile = new File(outputDir + "/" + apkName)
+      if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
+      val out = new PrintWriter(appDataDirFile + "/AppData.txt")
+      out.print(appData.toString)
+      out.close()
+      val mr = new PrintWriter(outputDir + "/MetricInfo.txt")
+      mr.print(MetricRepo.toString)
+      mr.close()
+      OAuthTokenCounter.haveresult += 1
     }
 
     def onPostAnalysis: Unit = {
-      msg_critical(TITLE, OAuthTokenCounter.toString)
+      global.reporter.echo(TITLE, OAuthTokenCounter.toString)
     }
     
     def onException(e : Exception) : Unit = {
@@ -131,53 +131,54 @@ object OAuthTokenTracking_run {
   }
   
   def main(args: Array[String]): Unit = {
-    if(args.size != 2){
-      System.err.print("Usage: source_path output_path")
+    if(args.size < 2){
+      System.err.print("Usage: source_path output_path [dependence_path]")
       return
     }
     
-    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
-    
-    GlobalConfig.ICFG_CONTEXT_K = 1
+//    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
+//    GlobalConfig.ICFG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
 //    AndroidReachingFactsAnalysisConfig.timeout = 10
     
-    val socket = new AmandroidSocket
-    socket.preProcess
-    
     val sourcePath = args(0)
     val outputPath = args(1)
-    
+    val dpsuri = try{Some(FileUtil.toUri(args(2)))} catch {case e: Exception => None}
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
     
     files.foreach{
       file =>
+        val reporter = new DefaultReporter
+        val global = new Global(file, reporter)
+        global.setJavaLib(AndroidGlobalConfig.lib_files)
+        val apk = new Apk(file)
+        val socket = new AmandroidSocket(global, apk)
         try{
-          msg_critical(TITLE, OAuthTokenTrackingTask(outputPath, file, socket, Some(10)).run)   
+          reporter.echo(TITLE, OAuthTokenTrackingTask(global, apk, outputPath, dpsuri, file, socket, Some(10)).run)   
         } catch {
-          case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
+          case te : MyTimeoutException => reporter.error(TITLE, te.message)
           case e : Throwable => e.printStackTrace()
         } finally{
-          msg_critical(TITLE, OAuthTokenCounter.toString)
+          reporter.echo(TITLE, OAuthTokenCounter.toString)
           socket.cleanEnv
         }
     }
   }
   
-  private case class OAuthTokenTrackingTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]){
+  private case class OAuthTokenTrackingTask(global: Global, apk: Apk, outputPath : String, dpsuri: Option[FileResourceUri], file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]){
     def run : String = {
-      msg_critical(TITLE, "####" + file + "#####")
+      global.reporter.echo(TITLE, "####" + file + "#####")
       val timer = timeout match {
         case Some(t) => Some(new MyTimer(t))
         case None => None
       }
       if(timer.isDefined) timer.get.start
-      val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-      val app_info = new OauthTokenContainerCollector(file, outUri, timer)
+      val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false)
+      val app_info = new OauthTokenContainerCollector(global, apk, outUri, timer)
       app_info.collectInfo
-      val ssm = new OAuthSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-      socket.plugListener(new OAuthTokenTrackingListener(file, app_info))
+      val ssm = new OAuthSourceAndSinkManager(global, apk, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.sas_file)
+      socket.plugListener(new OAuthTokenTrackingListener(global, apk, app_info))
       socket.runWithDDA(ssm, false, true, timer)
       return "Done!"
     }

@@ -16,7 +16,6 @@ import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.jawa.alir.pta.FieldSlot
-import org.sireum.jawa.util.StringFormConverter
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -29,7 +28,7 @@ object ActivityModel {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true
-	  p.getSignature match{
+	  p.getSignature.signature match{
 	    case "Landroid/app/Activity;.<clinit>:()V" =>  //static constructor
 		  case "Landroid/app/Activity;.<init>:()V" =>  //public constructor
 		  case "Landroid/app/Activity;.addContentView:(Landroid/view/View;Landroid/view/ViewGroup$LayoutParams;)V" =>  //public
@@ -263,15 +262,15 @@ object ActivityModel {
 	
 	private def setIntent(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
-    val thisSlot = VarSlot(args(0))
+    val thisSlot = VarSlot(args(0), false, true)
 	  val thisValue = s.pointsToSet(thisSlot, currentContext)
-	  val intentSlot = VarSlot(args(1))
+	  val intentSlot = VarSlot(args(1), false, true)
 	  val intentValue = s.pointsToSet(intentSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
-	      val mIntentSlot = FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.ACTIVITY_INTENT))
+	      val mIntentSlot = FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.ACTIVITY_INTENT))
 	      if(thisValue.size == 1){
 	        for (v <- s.pointsToSet(mIntentSlot, currentContext)) {
 		        delfacts += RFAFact(mIntentSlot, v)
@@ -284,13 +283,13 @@ object ActivityModel {
 	
 	private def getIntent(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >0)
-    val thisSlot = VarSlot(args(0))
+    val thisSlot = VarSlot(args(0), false, true)
 	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
 	  thisValue.foreach{
 	    tv =>
-	      val mIntentSlot = FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.ACTIVITY_INTENT))
+	      val mIntentSlot = FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.ACTIVITY_INTENT))
 	      var mIntentValue = s.pointsToSet(mIntentSlot, currentContext)
 //        val mUnknownIntentSlot = FieldSlot(tv, "ALL")
 //        s.pointsToSet(mUnknownIntentSlot, currentContext) foreach {
@@ -302,7 +301,7 @@ object ActivityModel {
 //        	  if(fields.contains("ALL")) mIntentValue += UnknownInstance(new NormalType(AndroidConstants.INTENT), defsite)
 //        	  if(fields.contains(AndroidConstants.ACTIVITY_INTENT)) mIntentValue += UnknownInstance(new NormalType(AndroidConstants.INTENT), defsite)
 //      	}
-	      newfacts ++= mIntentValue.map(miv=> RFAFact(VarSlot(retVar), miv))
+	      newfacts ++= mIntentValue.map(miv=> RFAFact(VarSlot(retVar, false, false), miv))
 	  }
     (newfacts, delfacts)
   }

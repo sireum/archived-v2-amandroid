@@ -7,15 +7,11 @@ http://www.eclipse.org/legal/epl-v10.html
 */
 package org.sireum.amandroid.run.security
 
-import org.sireum.amandroid.security._
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
-import org.sireum.jawa.MessageCenter
-import org.sireum.jawa.MessageCenter._
 import org.sireum.util.FileUtil
 import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.AndroidGlobalConfig
-import org.sireum.amandroid.AppCenter
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.util.IgnoreException
 import java.io.File
@@ -25,7 +21,13 @@ import java.io.OutputStreamWriter
 import org.sireum.amandroid.alir.taintAnalysis.DataLeakageAndroidSourceAndSinkManager
 import org.sireum.jawa.util.MyTimeoutException
 import org.sireum.jawa.util.MyTimer
-import org.sireum.jawa.GlobalConfig
+import org.sireum.jawa.Global
+import org.sireum.amandroid.Apk
+import org.sireum.amandroid.security.AmandroidSocketListener
+import org.sireum.amandroid.security.AmandroidSocket
+import org.sireum.jawa.PrintReporter
+import org.sireum.jawa.MsgLevel
+import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -33,16 +35,16 @@ import org.sireum.jawa.GlobalConfig
  */ 
 object DataLeakage_run {
   private final val TITLE = "DataLeakage_run"
-  MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
+//  MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
   object DataLeakageCounter {
     var total = 0
     var haveresult = 0
     var taintPathFound = 0
     var taintPathFoundList = Set[String]()
-    override def toString : String = "total: " + total + ", haveResult: " + haveresult + ", taintPathFound: " + taintPathFound
+    override def toString: String = "total: " + total + ", haveResult: " + haveresult + ", taintPathFound: " + taintPathFound
   }
   
-  private class DataLeakageListener(source_apk : FileResourceUri, outputPath : String) extends AmandroidSocketListener {
+  private class DataLeakageListener(global: Global, apk: Apk, outputPath: String) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
       DataLeakageCounter.total += 1
     }
@@ -51,32 +53,32 @@ object DataLeakage_run {
       eps//.filter { ep => ep.getSignature.contains("envMain") }
     }
 
-    def onAnalysisSuccess : Unit = {
-      if(AppCenter.getTaintAnalysisResults.exists(!_._2.getTaintedPaths.isEmpty)){
-	      DataLeakageCounter.taintPathFound += 1
-	      DataLeakageCounter.taintPathFoundList += source_apk
-	    }
-		  DataLeakageCounter.haveresult += 1
-		  val msgfile = new File(outputPath + "/msg.txt")
-		  val msgw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(msgfile, true)))
-		  msgw.write("################# " + source_apk + " ################\n")
-		  val tRes = AppCenter.getTaintAnalysisResults
+    def onAnalysisSuccess: Unit = {
+      if(apk.getTaintAnalysisResults[InterproceduralDataDependenceAnalysis.Node, InterproceduralDataDependenceAnalysis.Edge].exists(!_._2.getTaintedPaths.isEmpty)){
+        DataLeakageCounter.taintPathFound += 1
+        DataLeakageCounter.taintPathFoundList += apk.nameUri
+      }
+      DataLeakageCounter.haveresult += 1
+      val msgfile = new File(outputPath + "/msg.txt")
+      val msgw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(msgfile, true)))
+      msgw.write("################# " + apk.nameUri + " ################\n")
+      val tRes = apk.getTaintAnalysisResults
       tRes.foreach{
         case (rec, res) =>
           msgw.write(rec.getName + "\n")
           msgw.write("Found " + res.getTaintedPaths.size + " path.")
-	        msgw.write(res.toString)
-	        msgw.write("\n\n")
+          msgw.write(res.toString)
+          msgw.write("\n\n")
       }
     }
 
     def onPostAnalysis: Unit = {
     }
     
-    def onException(e : Exception) : Unit = {
+    def onException(e: Exception): Unit = {
       e match{
-        case ie : IgnoreException => err_msg_critical(TITLE, "Ignored!")
-        case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
+        case ie: IgnoreException => global.reporter.echo(TITLE, "Ignored!")
+        case te: MyTimeoutException => global.reporter.echo(TITLE, te.message)
         case a => 
           e.printStackTrace()
       }
@@ -84,57 +86,60 @@ object DataLeakage_run {
   }
   
   def main(args: Array[String]): Unit = {
-    if(args.size != 2){
-      System.err.print("Usage: source_path output_path")
+    if(args.size < 2) {
+      System.err.print("Usage: source_path output_path [dependence_path]")
       return
     }
     
-    GlobalConfig.ICFG_CONTEXT_K = 1
-    AndroidReachingFactsAnalysisConfig.resolve_icc = true
-    AndroidReachingFactsAnalysisConfig.parallel = true
-    AndroidReachingFactsAnalysisConfig.resolve_static_init = true
+//    GlobalConfig.ICFG_CONTEXT_K = 1
+    AndroidReachingFactsAnalysisConfig.resolve_icc = false
+    AndroidReachingFactsAnalysisConfig.parallel = false
+    AndroidReachingFactsAnalysisConfig.resolve_static_init = false
 
-    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
-    val socket = new AmandroidSocket
-    socket.preProcess
+//    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
     
     val sourcePath = args(0)
     val outputPath = args(1)
-    
-    
+    val dpsuri = try{Some(FileUtil.toUri(args(2)))} catch {case e: Exception => None}
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
     
     files.foreach{
       file =>
-//        if(file.contains("FieldSensitivity1"))
-        try{
-          msg_critical(TITLE, DataLeakageTask(outputPath, file, socket, Some(1000)).run)   
+        val reporter = new PrintReporter(MsgLevel.INFO)
+        val global = new Global(file, reporter)
+        global.setJavaLib(AndroidGlobalConfig.lib_files)
+        val apk = new Apk(file)
+        val socket = new AmandroidSocket(global, apk)
+        
+//        if(file.contains("ActivityCommunication6"))
+        try {
+          reporter.echo(TITLE, DataLeakageTask(global, apk, outputPath, dpsuri, file, socket, Some(1000)).run)   
         } catch {
-          case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
-          case e : Throwable => e.printStackTrace()
-        } finally{
-          msg_critical(TITLE, DataLeakageCounter.toString)
+          case te: MyTimeoutException => reporter.error(TITLE, te.message)
+          case e: Throwable => e.printStackTrace()
+        } finally {
+          println(TITLE + " " + DataLeakageCounter.toString)
           socket.cleanEnv
-          msg_critical(TITLE, "************************************\n")
+          println(TITLE + " ************************************\n")
         }
     }
   }
   
-  private case class DataLeakageTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]) {
-    def run : String = {
-      msg_critical(TITLE, "####" + file + "#####")
+  private case class DataLeakageTask(global: Global, apk: Apk, outputPath: String, dpsuri: Option[FileResourceUri], file: FileResourceUri, socket: AmandroidSocket, timeout: Option[Int]) {
+    def run: String = {
+      println(TITLE + " ####" + file + "#####")
       val timer = timeout match {
         case Some(t) => Some(new MyTimer(t))
         case None => None
       }
       if(timer.isDefined) timer.get.start
-      val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-      val app_info = new AppInfoCollector(file, outUri, timer)
+      val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false)
+      val app_info = new AppInfoCollector(global, apk, outUri, None)
       app_info.collectInfo
-      val ssm = new DataLeakageAndroidSourceAndSinkManager(app_info.getPackageName, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.SourceAndSinkFilePath)
-      socket.plugListener(new DataLeakageListener(file, outputPath))
+      val ssm = new DataLeakageAndroidSourceAndSinkManager(global, apk, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.sas_file)
+      socket.plugListener(new DataLeakageListener(global, apk, outputPath))
       socket.runWithDDA(ssm, false, false, timer)
       return "Done!"
     }
-  }  
+  }
 }

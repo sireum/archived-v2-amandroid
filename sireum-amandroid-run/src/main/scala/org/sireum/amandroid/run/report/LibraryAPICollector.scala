@@ -2,6 +2,7 @@ package org.sireum.amandroid.run.report
 
 import org.sireum.jawa.LibraryAPISummary
 import org.sireum.util._
+import org.sireum.jawa.ObjectType
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -61,10 +62,20 @@ class LibraryAPICollector extends LibraryAPISummary{
   /**
    * check given API name is present in library
    */
-  def isLibraryAPI(apiName : String) : Boolean = {
+  def isLibraryAPI(apiName: String) : Boolean = {
     andoirdPackages.exists{
       prefix => 
         if(apiName.startsWith(prefix)){
+          usedLib += prefix
+          true
+        } else false
+    }
+  }
+  
+  def isLibraryClass(typ: ObjectType): Boolean = {
+    andoirdPackages.exists{
+      prefix => 
+        if(typ.pkg.startsWith(prefix)){
           usedLib += prefix
           true
         } else false

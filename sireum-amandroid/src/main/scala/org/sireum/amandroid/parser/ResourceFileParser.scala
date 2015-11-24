@@ -8,7 +8,6 @@ http://www.eclipse.org/legal/epl-v10.html
 package org.sireum.amandroid.parser
 
 import pxb.android.axml.AxmlVisitor.NodeVisitor
-import org.sireum.jawa.MessageCenter._
 import pxb.android.axml.AxmlVisitor
 import pxb.android.axml.AxmlReader
 import java.io.ByteArrayOutputStream
@@ -36,8 +35,8 @@ class ResourceFileParser {
 	  
 	  override def child(ns : String, name : String) : NodeVisitor = {
 			if (name == null) {
-				err_msg_detail(TITLE, "Encountered a null node name "
-						+ "in file " + resFile + ", skipping node...")
+//				err_msg_detail(TITLE, "Encountered a null node name "
+//						+ "in file " + resFile + ", skipping node...")
 				return null
 			}
 	  	new ResourceParser(resFile)
@@ -80,7 +79,7 @@ class ResourceFileParser {
 						if (!fileName.startsWith("res/"))
 							return
 						if (!fileName.endsWith(".xml")) {
-							err_msg_normal(TITLE, "Skipping file " + fileName + " in resource folder...")
+//							err_msg_normal(TITLE, "Skipping file " + fileName + " in resource folder...")
 							return
 						}
 						//println("filename: " + fileName)
@@ -109,7 +108,7 @@ class ResourceFileParser {
 						}
 						catch {
 						  case ex : Exception =>
-							  err_msg_detail(TITLE, "Could not read binary XML file: " + ex.getMessage())
+//							  err_msg_detail(TITLE, "Could not read binary XML file: " + ex.getMessage())
 						}
 					}
 				})

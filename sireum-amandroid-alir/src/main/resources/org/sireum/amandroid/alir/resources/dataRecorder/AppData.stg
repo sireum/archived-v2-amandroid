@@ -18,7 +18,7 @@ ComponentData(compName, typ, exported, protectPermission, intentFilters, iccInfo
 Entry point name: Component $compName$
   Component type: $typ$
   exported: $exported$
-  Required Permission: $protectPermission$
+  Required Permission: $protectPermission ; separator=", "$
   IntentFilters:
     $intentFilters ; separator="\n"$
   *************************************************************

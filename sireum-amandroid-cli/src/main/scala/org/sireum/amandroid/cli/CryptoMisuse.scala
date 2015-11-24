@@ -8,18 +8,13 @@ http://www.eclipse.org/legal/epl-v10.html
 package org.sireum.amandroid.cli
 
 import org.sireum.option.SireumAmandroidCryptoMisuseMode
-import org.sireum.option.AnalyzeSource
 import java.io.File
 import org.sireum.util._
-import org.sireum.option.MessageLevel
-import org.sireum.jawa.MessageCenter
-import org.sireum.jawa.MessageCenter._
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.amandroid.cli.util.CliLogger
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.security.apiMisuse.InterestingApiCollector
-import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.security.apiMisuse.CryptographicConstants
 import org.sireum.amandroid.alir.dataRecorder.DataCollector
 import java.io.PrintWriter
@@ -28,46 +23,36 @@ import org.sireum.amandroid.security.AmandroidSocketListener
 import org.sireum.amandroid.security.apiMisuse.CryptographicMisuse
 import org.sireum.jawa.util.MyTimer
 import org.sireum.jawa.util.MyTimeoutException
-import org.sireum.jawa.GlobalConfig
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
+import org.sireum.jawa.alir.Context
+import org.sireum.jawa.Global
+import org.sireum.amandroid.Apk
+import org.sireum.amandroid.util.ApkFileUtil
+import org.sireum.jawa.FileReporter
+import org.sireum.jawa.MsgLevel
+import org.sireum.jawa.NoReporter
+import org.sireum.amandroid.AndroidGlobalConfig
 
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 object CryptoMisuseCli {
-	def run(saamode : SireumAmandroidCryptoMisuseMode) {
-    val sourceType = saamode.general.typ match{
-      case AnalyzeSource.APK => "APK"
-      case AnalyzeSource.DIR => "DIR"}
+  def run(saamode: SireumAmandroidCryptoMisuseMode) {
     val sourceDir = saamode.srcFile
-    val sourceFile = new File(sourceDir)
     val outputDir = saamode.analysis.outdir
-    val nostatic = saamode.analysis.noStatic
-    val parallel = saamode.analysis.parallel
-    val noicc = saamode.analysis.noicc
-    val k_context = saamode.analysis.k_context
     val timeout = saamode.analysis.timeout
     val mem = saamode.general.mem
-    val msgLevel = saamode.general.msgLevel
-    forkProcess(nostatic, parallel, noicc, k_context, timeout, sourceType, sourceDir, outputDir, mem, msgLevel)
+    val debug = saamode.general.debug
+    forkProcess(timeout, sourceDir, outputDir, mem, debug)
   }
-	
-	def forkProcess(nostatic : Boolean, parallel : Boolean, noicc : Boolean, k_context : Int, timeout : Int, typSpec : String, sourceDir : String, outputDir : String, mem : Int, msgLevel : MessageLevel.Type) = {
-	  val args : MList[String] = mlistEmpty
-	  args += "-s"
-	  args += (!nostatic).toString
-	  args += "-par"
-	  args += parallel.toString
-	  args += "-i"
-	  args += (!noicc).toString
-	  args += "-k"
-	  args += k_context.toString
-	  args += "-to"
-	  args += timeout.toString
-	  args += "-msg"
-	  args += msgLevel.toString
-	  args ++= List("-t", typSpec, sourceDir, outputDir)
+
+  def forkProcess(timeout: Int, sourceDir: String, outputDir: String, mem: Int, debug: Boolean) = {
+    val args: MList[String] = mlistEmpty
+    args += timeout.toString
+    args += debug.toString
+    args += sourceDir
+    args += outputDir
     org.sireum.jawa.util.JVMUtil.startSecondJVM(CryptoMisuse.getClass(), "-Xmx" + mem + "G", args.toList, true)
   }
 }
@@ -79,106 +64,92 @@ object CryptoMisuse {
   
   private final val TITLE = "CryptoMisuse"
   
-	def main(args: Array[String]) {
-	  if(args.size != 16){
-	    println("Usage: -s [handle static init] -par [parallel] -i [handle icc] -k [k context] -to [timeout minutes] -msg [Message Level: NO, CRITICAL, NORMAL, VERBOSE] -t type[allows: APK, DIR] <source path> <output path>")
-	    return
-	  }
-	  
-	  val static = args(1).toBoolean
-	  val parallel = args(3).toBoolean
-	  val icc = args(5).toBoolean
-	  val k_context = args(7).toInt
-	  val timeout = args(9).toInt
-	  val msgLevel = args(11)
-	  val typ = args(13)
-	  val sourcePath = args(14)
-	  val outputPath = args(15)
-	  
-	  msgLevel match{
-	    case "NO$" =>
-	      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NO
-	    case "CRITICAL$" =>
-	      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
-	    case "NORMAL$" =>
-	      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
-	    case "VERBOSE$" =>
-	      MessageCenter.msglevel = MessageCenter.MSG_LEVEL.VERBOSE
-      case _ => 
-        println("Unexpected msg level: " + msgLevel)
-        return
-	  }
-	  
-	  val apkFileUris = typ match{
-      case "APK" =>
-        require(sourcePath.endsWith(".apk"))
-        Set(FileUtil.toUri(sourcePath))
-      case "DIR" =>
-        require(new File(sourcePath).isDirectory())
-        FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
-      case _ => 
-        println("Unexpected type: " + typ)
-        return
+  def main(args: Array[String]) {
+    if(args.size != 4){
+      println("Usage: <timeout minutes> <debug> <source path> <output path>")
+      return
     }
-		cryptoMisuse(apkFileUris, outputPath, static, parallel, icc, k_context, timeout)
-	}
+    val timeout = args(0).toInt
+    val debug = args(1).toBoolean
+    val sourcePath = args(2)
+    val outputPath = args(3)
+    val dpsuri = AndroidGlobalConfig.dependence_dir.map(FileUtil.toUri(_))
+    val liblist = AndroidGlobalConfig.lib_files
+    val static = AndroidGlobalConfig.static_init
+    val parallel = AndroidGlobalConfig.parallel
+    val k_context = AndroidGlobalConfig.k_context
+    val apkFileUris: MSet[FileResourceUri] = msetEmpty
+    val fileOrDir = new File(sourcePath)
+    fileOrDir match {
+      case dir if dir.isDirectory() =>
+        apkFileUris ++= ApkFileUtil.getApks(FileUtil.toUri(dir), true)
+      case file =>
+        if(Apk.isValidApk(FileUtil.toUri(file)))
+          apkFileUris += FileUtil.toUri(file)
+        else println(file + " is not decompilable.")
+    }
+    cryptoMisuse(apkFileUris.toSet, outputPath, dpsuri, liblist, static, parallel, k_context, timeout, debug)
+  }
   
-  def cryptoMisuse(apkFileUris : Set[FileResourceUri], outputPath : String, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int) = {
-    GlobalConfig.ICFG_CONTEXT_K = k_context
+  def cryptoMisuse(apkFileUris: Set[FileResourceUri], outputPath: String, dpsuri: Option[FileResourceUri], liblist: String, static: Boolean, parallel: Boolean, k_context: Int, timeout: Int, debug: Boolean) = {
+    Context.init_context_length(k_context)
     AndroidReachingFactsAnalysisConfig.parallel = parallel
-    AndroidReachingFactsAnalysisConfig.resolve_icc = icc
     AndroidReachingFactsAnalysisConfig.resolve_static_init = static
     println("Total apks: " + apkFileUris.size)
 
-    try{
-      val socket = new AmandroidSocket
-      socket.preProcess
-          
-      var i : Int = 0
-      
+    try{  
+      var i: Int = 0
       apkFileUris.foreach{
         file =>
           i += 1
           try{
-            msg_critical(TITLE, "Analyzing #" + i + ":" + file)
-            msg_critical(TITLE, CryptoMisuseTask(outputPath, file, socket, parallel, Some(timeout*60)).run)   
+            println("Analyzing #" + i + ":" + file)
+            val reporter = 
+              if(debug) new FileReporter(getOutputDirUri(FileUtil.toUri(outputPath), file), MsgLevel.INFO)
+              else new NoReporter
+            val global = new Global(file, reporter)
+            val apk = new Apk(file)
+            val socket = new AmandroidSocket(global, apk)
+            println(CryptoMisuseTask(global, apk, outputPath, dpsuri, socket, parallel, Some(timeout*60)).run)   
+            if(debug) println("Debug info write into " + reporter.asInstanceOf[FileReporter].f)
           } catch {
-            case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
-            case e : Throwable =>
+            case te: MyTimeoutException => println(te.message)
+            case ie: IgnoreException => println("No crypto api found.")
+            case e: Throwable =>
               CliLogger.logError(new File(outputPath), "Error: " , e)
-          } finally{
-            socket.cleanEnv
           }
       }
     } catch {
-      case e : Throwable => 
+      case e: Throwable => 
         CliLogger.logError(new File(outputPath), "Error: " , e)
 
     }
-	}
+}
   
-  private case class CryptoMisuseTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, parallel : Boolean, timeout : Option[Int]) {
-    def run : String = {
+  private case class CryptoMisuseTask(global: Global, apk: Apk, outputPath: String, dpsuri: Option[FileResourceUri], socket: AmandroidSocket, parallel: Boolean, timeout: Option[Int]) {
+    def run(): String = {
+      global.reporter.echo(TITLE, "####" + apk.nameUri + "#####")
       val timer = timeout match {
         case Some(t) => Some(new MyTimer(t))
         case None => None
       }
       if(timer.isDefined) timer.get.start
-      val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-      val app_info = new InterestingApiCollector(file, outUri, timer)
+      val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false)
+      val app_info = new InterestingApiCollector(global, apk, outUri, timer)
       app_info.collectInfo
-      socket.plugListener(new CryptoMisuseListener(file, outputPath, app_info))
-      socket.runWithoutDDA(false, parallel, timer)
-      val idfgs = AppCenter.getIDFGs
+      socket.plugListener(new CryptoMisuseListener(global, apk, app_info, outUri))
+      socket.runWithoutDDA(false, true, timer)
+      
+      val idfgs = apk.getIDFGs
       idfgs.foreach{
         case (rec, idfg) =>
-          CryptographicMisuse(idfg)
+          CryptographicMisuse(global, idfg)
       }
       return "Done!"
     }
   }
   
-  private class CryptoMisuseListener(source_apk : FileResourceUri, output_dir : String, app_info : InterestingApiCollector) extends AmandroidSocketListener {
+  private class CryptoMisuseListener(global: Global, apk: Apk, app_info: InterestingApiCollector, output_dir: String) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
     }
 
@@ -187,28 +158,34 @@ object CryptoMisuse {
       eps.filter(e=>iacs.contains(e.getDeclaringClass))
     }
 
-    def onAnalysisSuccess : Unit = {
-      val appData = DataCollector.collect
+    def onAnalysisSuccess: Unit = {
+      val appData = DataCollector.collect(global, apk)
 
-    	val apkName = source_apk.substring(source_apk.lastIndexOf("/"), source_apk.lastIndexOf("."))
-    	val appDataDirFile = new File(output_dir + "/" + apkName)
-    	if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
-    	
-    	val environmentModel = new PrintWriter(appDataDirFile + "/EnvironmentModel.txt")
-    	val envString = app_info.getEnvString
-	    environmentModel.print(envString)
-	    environmentModel.close()
+      val appDataDirFile = new File(getOutputDirUri(output_dir, apk.nameUri))
+          
+      if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
+      
+      val envFile = appDataDirFile + "/EnvironmentModel.txt"
+      val environmentModel = new PrintWriter(envFile)
+      val envString = app_info.getEnvString
+      environmentModel.print(envString)
+      environmentModel.close()
+      println("Encironment model write into " + envFile)
     }
 
     def onPostAnalysis: Unit = {
     }
     
-    def onException(e : Exception) : Unit = {
+    def onException(e: Exception): Unit = {
       e match{
-        case ie : IgnoreException => System.err.println("Ignored!")
+        case ie: IgnoreException => System.err.println("Ignored!")
         case a => 
           CliLogger.logError(new File(output_dir), "Error: " , e)
       }
     }
+  }
+  
+  private def getOutputDirUri(outputUri: FileResourceUri, apkUri: FileResourceUri): FileResourceUri = {
+    outputUri + {if(!outputUri.endsWith("/")) "/" else ""} + apkUri.substring(apkUri.lastIndexOf("/") + 1, apkUri.lastIndexOf("."))
   }
 }

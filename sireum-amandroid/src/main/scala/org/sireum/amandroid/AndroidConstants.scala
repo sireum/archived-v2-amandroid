@@ -62,6 +62,7 @@ object AndroidConstants {
   def isServiceIccMethod(subSig: String): Boolean = iccMethods_service.contains(subSig)
   def isReceiverIccMethod(subSig: String): Boolean = iccMethods_receiver.contains(subSig)
   def isProviderIccMethod(subSig: String): Boolean = false
+  def isIccMethod(subSig: String): Boolean = iccMethods.contains(subSig)
 
   def getIccCallType(calleeSubsig: String): AndroidConstants.CompType.Value = calleeSubsig match {
     case m if AndroidConstants.isActivityIccMethod(m) => AndroidConstants.CompType.ACTIVITY
@@ -206,4 +207,8 @@ object AndroidConstants {
     )
 	def getSystemServiceStrings = this.systemServiceStrings
 	
+  // dependency libs
+  final val MAVEN_SUPPORT_V4 = "support-v4"   //$NON-NLS-1$
+  final val MAVEN_SUPPORT_V13 = "support-v13" //$NON-NLS-1$
+  final val MAVEN_APPCOMPAT = "appcompat-v7"  //$NON-NLS-1$
 }
