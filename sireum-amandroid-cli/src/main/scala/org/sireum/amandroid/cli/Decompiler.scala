@@ -42,6 +42,10 @@ object DecompilerCli {
 	  val args = List(debug.toString, sourceDir, outputDir)
     org.sireum.jawa.util.JVMUtil.startSecondJVM(Decompiler.getClass(), "-Xmx" + mem + "G", args, true)
   }
+  
+//  def main(args: Array[String]): Unit = {
+//    org.sireum.jawa.util.JVMUtil.startSecondJVM(Decompiler.getClass(), "-Xmx4G", List(), true)
+//  }
 }
 
 /**
