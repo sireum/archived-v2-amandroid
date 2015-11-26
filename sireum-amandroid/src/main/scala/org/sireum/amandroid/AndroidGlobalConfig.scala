@@ -30,9 +30,9 @@ object AndroidGlobalConfig {
 	final val IntentInjectionSinkFilePath = amandroid_home + "/taintAnalysis/sourceAndSinks/IntentInjectionSourcesAndSinks.txt"
 
   private val defaultLibFiles = 
-    amandroid_home + "/androidSdk/android-21/android.jar:" +
-    amandroid_home + "/androidSdk/support/v4/android-support-v4.jar:" +
-    amandroid_home + "/androidSdk/support/v13/android-support-v13.jar:" +
+    amandroid_home + "/androidSdk/android-21/android.jar" + java.io.File.pathSeparator +
+    amandroid_home + "/androidSdk/support/v4/android-support-v4.jar" + java.io.File.pathSeparator +
+    amandroid_home + "/androidSdk/support/v13/android-support-v13.jar" + java.io.File.pathSeparator +
     amandroid_home + "/androidSdk/support/v7/android-support-v7-appcompat.jar"
   
   final val iniFile = new File(amandroid_home + "/config.ini")
