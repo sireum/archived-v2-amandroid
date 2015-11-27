@@ -36,6 +36,7 @@ import org.sireum.amandroid.Apk
 import org.sireum.amandroid.decompile.ApkDecompiler
 import org.sireum.jawa.util.MyTimeoutException
 import org.sireum.jawa.util.PerComponentTimer
+import org.sireum.amandroid.alir.taintAnalysis.AndroidDataDependentTaintAnalysis.TarApk
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -120,6 +121,8 @@ class AmandroidSocket(global: Global, apk: Apk) {
     
       ScopeManager.setScopeManager(new AndroidRFAScopeManager)
         
+      val tarApk = new TarApk
+      
       {if(parallel) entryPoints.par else entryPoints}.foreach {
         ep =>
           global.reporter.echo(TITLE, "--------------Component " + ep + "--------------")
@@ -130,8 +133,9 @@ class AmandroidSocket(global: Global, apk: Apk) {
           val iddResult = InterproceduralDataDependenceAnalysis(global, idfg)
           apk.addIDDG(ep.getDeclaringClass, iddResult)
           val tar = AndroidDataDependentTaintAnalysis(global, iddResult, idfg.ptaresult, ssm)
-          apk.addTaintAnalysisResult(ep.getDeclaringClass, tar)
+          tarApk.tars += tar
       }
+      apk.addTaintAnalysisResult(tarApk)
       if(myListener_opt.isDefined) myListener_opt.get.onAnalysisSuccess
     } catch {
       case e: Exception => 

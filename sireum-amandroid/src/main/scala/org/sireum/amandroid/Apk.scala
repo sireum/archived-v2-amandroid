@@ -167,12 +167,11 @@ case class Apk(nameUri: FileResourceUri) {
   def getIDDG(key: JawaClass): Option[InterproceduralDataDependenceInfo] = this.synchronized(this.iddaResults.get(key))
   def getIDDGs = this.iddaResults.toMap
   
-  private val taintResults: MMap[JawaClass, Any] = mmapEmpty
+  private var taintResult: Option[Any] = None
   
-  def addTaintAnalysisResult[N <: InterProceduralNode, E <: AlirEdge[N]](key: JawaClass, tar: TaintAnalysisResult[N, E]) = this.synchronized(this.taintResults(key) = tar)
-  def hasTaintAnalysisResult(key: JawaClass): Boolean = taintResults.contains(key)
-  def getTaintAnalysisResult[N <: InterProceduralNode, E <: AlirEdge[N]](key: JawaClass): Option[TaintAnalysisResult[N, E]] = this.taintResults.get(key).asInstanceOf[Option[TaintAnalysisResult[N, E]]]
-  def getTaintAnalysisResults[N <: InterProceduralNode, E <: AlirEdge[N]] = this.taintResults.map{case (k, v) => (k, v.asInstanceOf[TaintAnalysisResult[N, E]])}.toMap
+  def addTaintAnalysisResult[N <: InterProceduralNode, E <: AlirEdge[N]](tar: TaintAnalysisResult[N, E]) = this.synchronized(this.taintResult = Some(tar))
+  def hasTaintAnalysisResult: Boolean = taintResult.isDefined
+  def getTaintAnalysisResult[N <: InterProceduralNode, E <: AlirEdge[N]] = this.taintResult.map{v => v.asInstanceOf[TaintAnalysisResult[N, E]]}
   
   def reset = {
     this.activities.clear()
@@ -184,6 +183,6 @@ case class Apk(nameUri: FileResourceUri) {
 	  this.appInfoOpt = None
 	  this.idfgResults.clear
 	  this.iddaResults.clear
-	  this.taintResults.clear
+	  this.taintResult = None
   }
 }

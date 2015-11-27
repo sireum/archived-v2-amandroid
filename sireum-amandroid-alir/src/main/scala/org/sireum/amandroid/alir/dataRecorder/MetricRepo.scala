@@ -72,52 +72,53 @@ object MetricRepo {
             }
         }
     }
-    appData.dynamicRegisteredComponents.foreach{
-      drComp =>
-        dynamicRegisteredIccTotal += 1
-    }
     appData.components.foreach{
       comp =>
-        val compType = comp.typ
-        if(comp.taintResultOpt.isDefined){
-          comp.taintResultOpt.get.getTaintedPaths.foreach{
-            tp =>
-              tp.getTypes.foreach{
-                problemType =>
-                  compType match {
-                    case "activity" =>
-                      problemType match{
-                        case AndroidProblemCategories.VUL_INFORMATION_LEAK => activityHijacking += 1
-                        case AndroidProblemCategories.VUL_CAPABILITY_LEAK => activityLaunch += 1
-                        case AndroidProblemCategories.MAL_INFORMATION_LEAK => maliciousness += 1
-                        case AndroidProblemCategories.VUL_CONFUSED_DEPUTY => 
-                      }
-                    case "service" =>
-                      problemType match{
-                        case AndroidProblemCategories.VUL_INFORMATION_LEAK => serviceHijacking += 1
-                        case AndroidProblemCategories.VUL_CAPABILITY_LEAK => serviceLaunch += 1
-                        case AndroidProblemCategories.MAL_INFORMATION_LEAK => maliciousness += 1
-                        case AndroidProblemCategories.VUL_CONFUSED_DEPUTY => 
-                      }
-                    case "receiver" =>
-                      problemType match{
-                        case AndroidProblemCategories.VUL_INFORMATION_LEAK => broadcastReceiverTheft += 1
-                        case AndroidProblemCategories.VUL_CAPABILITY_LEAK => broadcastReceiverInjection += 1
-                        case AndroidProblemCategories.MAL_INFORMATION_LEAK => maliciousness += 1
-                        case AndroidProblemCategories.VUL_CONFUSED_DEPUTY => 
-                      }
-                    case "provider" =>
-                      problemType match{
-                        case AndroidProblemCategories.VUL_INFORMATION_LEAK => contentProviderInfoLeak += 1
-                        case AndroidProblemCategories.VUL_CAPABILITY_LEAK => contentProviderCapabilityLeak += 1
-                        case AndroidProblemCategories.MAL_INFORMATION_LEAK => maliciousness += 1
-                        case AndroidProblemCategories.VUL_CONFUSED_DEPUTY => 
-                      }
-                  }
-              }
-          }
-        }
+        if(comp.dynamicReg)
+          dynamicRegisteredIccTotal += 1
     }
+//    appData.components.foreach{
+//      comp =>
+//        val compType = comp.typ
+//        if(comp.taintResultOpt.isDefined){
+//          comp.taintResultOpt.get.getTaintedPaths.foreach{
+//            tp =>
+//              tp.getTypes.foreach{
+//                problemType =>
+//                  compType match {
+//                    case "activity" =>
+//                      problemType match{
+//                        case AndroidProblemCategories.VUL_INFORMATION_LEAK => activityHijacking += 1
+//                        case AndroidProblemCategories.VUL_CAPABILITY_LEAK => activityLaunch += 1
+//                        case AndroidProblemCategories.MAL_INFORMATION_LEAK => maliciousness += 1
+//                        case AndroidProblemCategories.VUL_CONFUSED_DEPUTY => 
+//                      }
+//                    case "service" =>
+//                      problemType match{
+//                        case AndroidProblemCategories.VUL_INFORMATION_LEAK => serviceHijacking += 1
+//                        case AndroidProblemCategories.VUL_CAPABILITY_LEAK => serviceLaunch += 1
+//                        case AndroidProblemCategories.MAL_INFORMATION_LEAK => maliciousness += 1
+//                        case AndroidProblemCategories.VUL_CONFUSED_DEPUTY => 
+//                      }
+//                    case "receiver" =>
+//                      problemType match{
+//                        case AndroidProblemCategories.VUL_INFORMATION_LEAK => broadcastReceiverTheft += 1
+//                        case AndroidProblemCategories.VUL_CAPABILITY_LEAK => broadcastReceiverInjection += 1
+//                        case AndroidProblemCategories.MAL_INFORMATION_LEAK => maliciousness += 1
+//                        case AndroidProblemCategories.VUL_CONFUSED_DEPUTY => 
+//                      }
+//                    case "provider" =>
+//                      problemType match{
+//                        case AndroidProblemCategories.VUL_INFORMATION_LEAK => contentProviderInfoLeak += 1
+//                        case AndroidProblemCategories.VUL_CAPABILITY_LEAK => contentProviderCapabilityLeak += 1
+//                        case AndroidProblemCategories.MAL_INFORMATION_LEAK => maliciousness += 1
+//                        case AndroidProblemCategories.VUL_CONFUSED_DEPUTY => 
+//                      }
+//                  }
+//              }
+//          }
+//        }
+//    }
   }
 
   override def toString : String = {
@@ -133,16 +134,16 @@ object MetricRepo {
     sb.append("Precise mixed ICC calls: " + this.mixedIccPrecise + "  " + {if(this.mixedIccTotal != 0) this.mixedIccPrecise.toFloat/this.mixedIccTotal*100 + "%"} + "\n")
     sb.append("Found mixed ICC targets: " + this.mixedIccTargetFound + "  " + {if(this.mixedIccTotal != 0) this.mixedIccTargetFound.toFloat/this.mixedIccTotal*100 + "%"} + "\n")
     sb.append("Total dynamic register components: " + this.dynamicRegisteredIccTotal + "\n")
-    sb.append("\n\n")
-    sb.append("Activity Hijacking: " + this.activityHijacking + "\n")
-    sb.append("Service Hijacking: " + this.serviceHijacking + "\n")
-    sb.append("BroadcastReceiver Theft: " + this.broadcastReceiverTheft + "\n")
-    sb.append("ContentProvider Infomation Leak: " + this.contentProviderInfoLeak + "\n")
-    sb.append("Activity Launch: " + this.activityLaunch + "\n")
-    sb.append("Service Launch: " + this.serviceLaunch + "\n")
-    sb.append("BroadcastReceiver Injection: " + this.broadcastReceiverInjection + "\n")
-    sb.append("ContentProvider Capability Leak: " + this.contentProviderCapabilityLeak + "\n")
-    sb.append("Malicious: " + this.maliciousness + "\n")
+//    sb.append("\n\n")
+//    sb.append("Activity Hijacking: " + this.activityHijacking + "\n")
+//    sb.append("Service Hijacking: " + this.serviceHijacking + "\n")
+//    sb.append("BroadcastReceiver Theft: " + this.broadcastReceiverTheft + "\n")
+//    sb.append("ContentProvider Infomation Leak: " + this.contentProviderInfoLeak + "\n")
+//    sb.append("Activity Launch: " + this.activityLaunch + "\n")
+//    sb.append("Service Launch: " + this.serviceLaunch + "\n")
+//    sb.append("BroadcastReceiver Injection: " + this.broadcastReceiverInjection + "\n")
+//    sb.append("ContentProvider Capability Leak: " + this.contentProviderCapabilityLeak + "\n")
+//    sb.append("Malicious: " + this.maliciousness + "\n")
     sb.toString
   }
 }

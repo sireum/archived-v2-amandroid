@@ -199,7 +199,7 @@ object TanitAnalysis{
   
   def onAnalysisSuccess(global: Global, apk: Apk, outputUri: FileResourceUri): Unit = {
     val appData = DataCollector.collect(global, apk)
-    MetricRepo.collect(appData)
+//    MetricRepo.collect(appData)
 
     val appDataDirFile = FileUtil.toFile(getOutputDirUri(outputUri, apk.nameUri))
     if(!appDataDirFile.exists()) appDataDirFile.mkdirs()

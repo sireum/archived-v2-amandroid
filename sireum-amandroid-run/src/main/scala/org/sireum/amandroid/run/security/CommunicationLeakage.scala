@@ -44,7 +44,7 @@ object CommunicationLeakage_run {
     def onTimeout: Unit = {}
 
     def onAnalysisSuccess: Unit = {
-      if(apk.getTaintAnalysisResults[InterproceduralDataDependenceAnalysis.Node, InterproceduralDataDependenceAnalysis.Edge].exists(!_._2.getTaintedPaths.isEmpty)){
+      if(apk.getTaintAnalysisResult[InterproceduralDataDependenceAnalysis.Node, InterproceduralDataDependenceAnalysis.Edge].exists(!_.getTaintedPaths.isEmpty)){
         CommunicationLeakageCounter.taintPathFound += 1
         CommunicationLeakageCounter.taintPathFoundList += apk.nameUri
       }
@@ -52,10 +52,9 @@ object CommunicationLeakage_run {
       val msgfile = new File(outputPath + "/msg.txt")
       val msgw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(msgfile, true)))
       msgw.write("################# " + apk.nameUri + " ################\n")
-      val tRes = apk.getTaintAnalysisResults
+      val tRes = apk.getTaintAnalysisResult
       tRes.foreach{
-        case (rec, res) =>
-          msgw.write(rec.getName + "\n")
+        res =>
           msgw.write("Found " + res.getTaintedPaths.size + " path.")
           msgw.write(res.toString)
           msgw.write("\n\n")

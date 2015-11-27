@@ -76,9 +76,11 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
           case Some((ep, _)) =>
             val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
             val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager, timertouse)
+            apk.addIDFG(component, idfg)
             yard.addIDFG(component, idfg)
             // do dda on this component
             val iddResult = InterproceduralDataDependenceAnalysis(global, idfg)
+            apk.addIDDG(component, iddResult)
             yard.addIDDG(component, iddResult)
           case None =>
             problematicComp += component
@@ -177,6 +179,7 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
       try {
         val ptaresult = idfgs.map(_.ptaresult).reduce(_.merge(_))
         val tar = AndroidDataDependentTaintAnalysis(global, iddResult._2, ptaresult, ssm)
+        apks.foreach(_.addTaintAnalysisResult(tar))
         Some(tar)
       } catch {
         case ex: Exception =>

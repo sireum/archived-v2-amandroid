@@ -105,7 +105,7 @@ object DataCollector {
       name: String, 
       uses_permissions: ISet[String],
       components: ISet[ComponentData],
-      dynamicRegisteredComponents: ISet[DynamicRegisteredComponentData]){
+      taintResultOpt: Option[TaintAnalysisResult[InterProceduralNode, AlirEdge[InterProceduralNode]]]){
     override def toString: String = {
       val appData = template.getInstanceOf("AppData")
       appData.add("name", name)
@@ -115,10 +115,63 @@ object DataCollector {
       val comps: ArrayList[String] = new ArrayList[String]
       components.foreach(f=>comps.add(f.toString))
       appData.add("components", comps)
-      if(!dynamicRegisteredComponents.isEmpty){
-        val drcomps: ArrayList[String] = new ArrayList[String]
-        dynamicRegisteredComponents.foreach(f=>drcomps.add(f.toString))
-        appData.add("dynamicRegisteredComponents", drcomps)
+      val taintResultT = template.getInstanceOf("TaintResult")
+      val sourceStrings: ArrayList[String] = new ArrayList[String]
+      if(taintResultOpt.isDefined){
+        taintResultOpt.get.getSourceNodes.foreach{
+          sn =>
+            val ssInfo = template.getInstanceOf("SourceSinkInfo")
+            val descriptorStrings: ArrayList[String] = new ArrayList[String]
+            descriptorStrings.add(sn.descriptor.toString())
+            ssInfo.add("descriptors", descriptorStrings)
+            sourceStrings.add(ssInfo.render())
+        }
+        val sinkStrings: ArrayList[String] = new ArrayList[String]
+        taintResultOpt.get.getSinkNodes.foreach{
+          sn =>
+            val ssInfo = template.getInstanceOf("SourceSinkInfo")
+            val descriptorStrings: ArrayList[String] = new ArrayList[String]
+            descriptorStrings.add(sn.descriptor.toString())
+            ssInfo.add("descriptors", descriptorStrings)
+            sinkStrings.add(ssInfo.render())
+        }
+        taintResultT.add("sources", sourceStrings)
+        taintResultT.add("sinks", sinkStrings)
+        val pathStrings: ArrayList[String] = new ArrayList[String]
+        val taintPaths = taintResultOpt.get.getTaintedPaths
+        taintPaths.foreach{
+          taintPath =>
+            val path = template.getInstanceOf("TaintPath")
+            val sourcessInfo = template.getInstanceOf("SourceSinkInfo")
+            val sourceDescriptorStrings: ArrayList[String] = new ArrayList[String]
+            sourceDescriptorStrings.add(taintPath.getSource.descriptor.toString())
+            sourcessInfo.add("descriptors", sourceDescriptorStrings)
+            path.add("source", sourcessInfo)
+            val sinkssInfo = template.getInstanceOf("SourceSinkInfo")
+            val sinkDescriptorStrings: ArrayList[String] = new ArrayList[String]
+            sinkDescriptorStrings.add(taintPath.getSink.descriptor.toString())
+            sinkssInfo.add("descriptors", sinkDescriptorStrings)
+            path.add("sink", sinkssInfo)
+            val typStrings: ArrayList[String] = new ArrayList[String]
+            taintPath.getTypes.foreach(f=>typStrings.add(f))
+            path.add("typs", typStrings)
+            val pathString: ArrayList[String] = new ArrayList[String]
+            val paths = taintPath.getPath
+            if(paths.size > 1) {
+              paths.tail.foreach{
+                edge =>
+                  pathString.add(edge.target + "  ->")
+              }
+              pathString.add(paths.head.source.toString())
+            } else if(paths.size == 1) {
+              pathString.add(paths.head.target + "  ->")
+              pathString.add(paths.head.source.toString())
+            }
+            path.add("path", pathString)
+            pathStrings.add(path.render())
+        }
+        taintResultT.add("paths", pathStrings)
+        appData.add("taintResult", taintResultT)
       }
       appData.render()
     }
@@ -226,35 +279,21 @@ object DataCollector {
       intent.render()
     }
   }
-  
-  final case class DynamicRegisteredComponentData(
-      name: String,
-      typ: String,
-      protectPermission: Option[String],
-      intentFilters: ISet[IntentFilter]){
-    override def toString: String = {
-      val compData = template.getInstanceOf("DynamicRegisteredComponentData")
-      compData.add("compName", name)
-      compData.add("typ", typ)
-      compData.add("protectPermission", protectPermission.getOrElse(null))
-      compData.add("intentFilters", getIntentFilterStrings(intentFilters))
-      compData.render()
-    }
-  }
      
   final case class ComponentData(
       name: String,
       typ: String,
       exported: Boolean,
+      dynamicReg: Boolean,
       protectPermission: ISet[String],
       intentFilters: ISet[IntentFilter],
-      iccInfos: ISet[IccInfo],
-      taintResultOpt: Option[TaintAnalysisResult[InterProceduralNode, AlirEdge[InterProceduralNode]]]){
+      iccInfos: ISet[IccInfo]){
     override def toString: String = {
       val compData = template.getInstanceOf("ComponentData")
       compData.add("compName", name)
       compData.add("typ", typ)
       compData.add("exported", exported)
+      compData.add("dynamicReg", dynamicReg)
       val permissions = new ArrayList[String]
       import collection.JavaConversions._
       permissions ++= protectPermission
@@ -263,54 +302,6 @@ object DataCollector {
       val iccInfoStrings = new ArrayList[String]
       iccInfos.foreach(iccinfo => iccInfoStrings.add(iccinfo.toString))
       compData.add("iccInfos", iccInfoStrings)
-      val taintResultT = template.getInstanceOf("TaintResult")
-      val sourceStrings: ArrayList[String] = new ArrayList[String]
-      if(taintResultOpt.isDefined){
-        taintResultOpt.get.getSourceNodes.foreach{
-          sn =>
-            val ssInfo = template.getInstanceOf("SourceSinkInfo")
-            val descriptorStrings: ArrayList[String] = new ArrayList[String]
-            descriptorStrings.add(sn.descriptor.toString())
-            ssInfo.add("descriptors", descriptorStrings)
-            sourceStrings.add(ssInfo.render())
-        }
-        val sinkStrings: ArrayList[String] = new ArrayList[String]
-        taintResultOpt.get.getSinkNodes.foreach{
-          sn =>
-            val ssInfo = template.getInstanceOf("SourceSinkInfo")
-            val descriptorStrings: ArrayList[String] = new ArrayList[String]
-            descriptorStrings.add(sn.descriptor.toString())
-            ssInfo.add("descriptors", descriptorStrings)
-            sinkStrings.add(ssInfo.render())
-        }
-        taintResultT.add("sources", sourceStrings)
-        taintResultT.add("sinks", sinkStrings)
-        val pathStrings: ArrayList[String] = new ArrayList[String]
-        val taintPaths = taintResultOpt.get.getTaintedPaths
-        taintPaths.foreach{
-          taintPath =>
-            val path = template.getInstanceOf("TaintPath")
-            val sourcessInfo = template.getInstanceOf("SourceSinkInfo")
-            val sourceDescriptorStrings: ArrayList[String] = new ArrayList[String]
-            sourceDescriptorStrings.add(taintPath.getSource.descriptor.toString())
-            sourcessInfo.add("descriptors", sourceDescriptorStrings)
-            path.add("source", sourcessInfo)
-            val sinkssInfo = template.getInstanceOf("SourceSinkInfo")
-            val sinkDescriptorStrings: ArrayList[String] = new ArrayList[String]
-            sinkDescriptorStrings.add(taintPath.getSink.descriptor.toString())
-            sinkssInfo.add("descriptors", sinkDescriptorStrings)
-            path.add("sink", sinkssInfo)
-            val typStrings: ArrayList[String] = new ArrayList[String]
-            taintPath.getTypes.foreach(f=>typStrings.add(f))
-            path.add("typs", typStrings)
-            val pathString: ArrayList[String] = new ArrayList[String]
-            taintPath.getPath.foreach(f=>pathString.add(f.source + " -> " + f.target))
-            path.add("path", pathString)
-            pathStrings.add(path.render())
-        }
-        taintResultT.add("paths", pathStrings)
-        compData.add("taintResult", taintResultT)
-      }
       compData.render()
     }
   }
@@ -361,15 +352,12 @@ object DataCollector {
                   val intents = intentcontents.map(ic=>Intent(ic.componentNames, ic.actions, ic.categories, ic.datas, ic.types, ic.preciseExplicit, ic.preciseImplicit, comMap(ic).map(c=>(c._1.getName, c._2.toString()))))
                   IccInfo(iccNode.getCalleeSet.map(_.callee.getSignature), iccNode.getContext, intents)
               }.toSet
-              taintResult = apk.getTaintAnalysisResult(compRec)
           }
       }
-      ComponentData(compTyp.jawaName, typ, exported, protectPermission, intentFilters, iccInfos, taintResult)
+      val dynamicReg = apk.getDynamicRegisteredReceivers.contains(compRec)
+      ComponentData(compTyp.jawaName, typ, exported, dynamicReg, protectPermission, intentFilters, iccInfos)
     }
-    val drcompDatas = apk.getDynamicRegisteredReceivers.map{
-      case comp =>
-        DynamicRegisteredComponentData(comp.getName, "receiver", None, intentFDB.getIntentFilters(comp))
-    }.toSet
-    AppData(appName, uses_permissions.toSet, compDatas.toSet, drcompDatas)
+    val taintResult = apk.getTaintAnalysisResult[InterProceduralNode, AlirEdge[InterProceduralNode]]
+    AppData(appName, uses_permissions.toSet, compDatas.toSet, taintResult)
   }
 }

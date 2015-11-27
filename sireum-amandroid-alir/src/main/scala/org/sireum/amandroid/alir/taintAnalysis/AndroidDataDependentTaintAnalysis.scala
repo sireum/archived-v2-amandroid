@@ -64,6 +64,13 @@ object AndroidDataDependentTaintAnalysis {
     }
   }
   
+  class TarApk extends TaintAnalysisResult[Node, InterproceduralDataDependenceAnalysis.Edge] {
+    var tars: MSet[TaintAnalysisResult[Node, InterproceduralDataDependenceAnalysis.Edge]] = msetEmpty
+    def getSourceNodes: ISet[TaintSource[Node]] = tars.map(_.getSourceNodes).fold(isetEmpty)(_ ++ _)
+    def getSinkNodes: ISet[TaintSink[Node]] = tars.map(_.getSinkNodes).fold(isetEmpty)(_ ++ _)
+    def getTaintedPaths: ISet[TaintPath[Node, InterproceduralDataDependenceAnalysis.Edge]] = tars.map(_.getTaintedPaths).fold(isetEmpty)(_ ++ _)
+  }
+  
   case class Tar(iddi: InterproceduralDataDependenceInfo) extends TaintAnalysisResult[Node, InterproceduralDataDependenceAnalysis.Edge] {
     var sourceNodes: ISet[TaintSource[Node]] = isetEmpty
     var sinkNodes: ISet[TaintSink[Node]] = isetEmpty

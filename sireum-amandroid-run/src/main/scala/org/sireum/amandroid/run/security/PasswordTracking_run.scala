@@ -93,7 +93,7 @@ object PasswordTracking_run {
     }
 
     def onAnalysisSuccess : Unit = {
-      if(apk.getTaintAnalysisResults[InterproceduralDataDependenceAnalysis.Node, InterproceduralDataDependenceAnalysis.Edge].exists(!_._2.getTaintedPaths.isEmpty)){
+      if(apk.getTaintAnalysisResult[InterproceduralDataDependenceAnalysis.Node, InterproceduralDataDependenceAnalysis.Edge].exists(!_.getTaintedPaths.isEmpty)){
         PasswordCounter.taintPathFound += 1
         PasswordCounter.taintPathFoundList += apk.nameUri
       }

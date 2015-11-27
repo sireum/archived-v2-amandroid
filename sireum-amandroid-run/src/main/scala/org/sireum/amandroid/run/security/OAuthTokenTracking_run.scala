@@ -98,7 +98,7 @@ object OAuthTokenTracking_run {
     def onTimeout : Unit = {}
 
     def onAnalysisSuccess : Unit = {
-      if(apk.getTaintAnalysisResults[InterproceduralDataDependenceAnalysis.Node, InterproceduralDataDependenceAnalysis.Edge].exists(!_._2.getTaintedPaths.isEmpty)){
+      if(apk.getTaintAnalysisResult[InterproceduralDataDependenceAnalysis.Node, InterproceduralDataDependenceAnalysis.Edge].exists(!_.getTaintedPaths.isEmpty)){
         OAuthTokenCounter.taintPathFound += 1
         OAuthTokenCounter.taintPathFoundList += apk.nameUri
       }
