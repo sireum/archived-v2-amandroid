@@ -166,7 +166,7 @@ object GenGraph {
               eps.map{
                 compName =>
                   val comp = global.resolveToBody(compName)
-                  val procedures = comp.getMethodsByName(AndroidConstants.MAINCOMP_ENV) ++ comp.getMethodsByName(AndroidConstants.COMP_ENV)
+                  val procedures = comp.getDeclaredMethodsByName(AndroidConstants.MAINCOMP_ENV) ++ comp.getDeclaredMethodsByName(AndroidConstants.COMP_ENV)
                   procedures
               }.reduce(iunion[JawaMethod])
 

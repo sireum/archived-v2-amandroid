@@ -397,7 +397,7 @@ class AndroidEnvironmentGenerator(global: Global) extends MethodGenerator(global
     startWhileFragment.addLabel
     codeFragments.add(startWhileFragment)
     val endWhileFragment = new CodeFragmentGenerator
-    val methods = clazz.getMethods
+    val methods = clazz.getDeclaredMethods
     import scala.collection.JavaConversions._
     for(currentMethod <- methods){
       if(entryPoints.contains(currentMethod.getSignature)){ 

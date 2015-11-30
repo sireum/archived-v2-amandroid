@@ -7,7 +7,6 @@ Export-Package: org.sireum.amandroid.alir.dataRecorder,
  org.sireum.amandroid.alir.pta.reachingFactsAnalysis,
  org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model,
  org.sireum.amandroid.alir.resources.dataRecorder,
- org.sireum.amandroid.alir.resources.interProcedural.taintAnalysis,
  org.sireum.amandroid.alir.sideEffectAnalysis,
  org.sireum.amandroid.alir.taintAnalysis
 Bundle-Vendor: sireum.org

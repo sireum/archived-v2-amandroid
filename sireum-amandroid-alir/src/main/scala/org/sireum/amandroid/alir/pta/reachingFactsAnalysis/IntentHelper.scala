@@ -49,7 +49,7 @@ object IntentHelper {
   
   def getIntentContents(s: PTAResult, intentValues: ISet[Instance], currentContext: Context): ISet[IntentContent] = {
     var result = isetEmpty[IntentContent]
-    intentValues.foreach{
+    intentValues.foreach {
       intentIns =>
         var preciseExplicit = true
         var preciseImplicit = true

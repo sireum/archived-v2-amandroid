@@ -166,7 +166,7 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
    */
   def getRpcMethods(comp: JawaClass): ISet[JawaMethod] = {
     if(apk.getServices.contains(comp)){
-      comp.getMethods.filter { 
+      comp.getDeclaredMethods.filter { 
         method => 
           !(method.isConstructor || AndroidEntryPointConstants.getServiceLifecycleMethods().contains(method.getSubSignature)
               || method.getName == AndroidConstants.MAINCOMP_ENV || method.getName == AndroidConstants.COMP_ENV) 
@@ -175,7 +175,7 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
   }
 
   def collectInfo: Unit = {
-    val manifestUri = outputUri + "AndroidManifest.xml"
+    val manifestUri = outputUri + "/AndroidManifest.xml"
     val mfp = AppInfoCollector.analyzeManifest(global.reporter, manifestUri)
     val afp = AppInfoCollector.analyzeARSC(global.reporter, apkUri)
     val lfp = AppInfoCollector.analyzeLayouts(global, apkUri, mfp)
@@ -274,7 +274,7 @@ object AppInfoCollector {
                     breakable{ 
                       while(callbackMethod.isEmpty){
                         if(callbackClass.declaresMethodByName(methodName))
-                          callbackMethod ++= callbackClass.getMethodsByName(methodName)
+                          callbackMethod ++= callbackClass.getDeclaredMethodsByName(methodName)
                         if(callbackClass.hasSuperClass)
                           callbackClass = callbackClass.getSuperClass.get
                         else break

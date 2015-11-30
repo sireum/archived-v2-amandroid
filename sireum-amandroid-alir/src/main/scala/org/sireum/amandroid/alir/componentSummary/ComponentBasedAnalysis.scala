@@ -41,6 +41,8 @@ import org.sireum.alir.AlirEdge
 import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.jawa.util.MyTimeoutException
 import org.sireum.jawa.util.PerComponentTimer
+import org.sireum.jawa.alir.Context
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper.IntentContent
 
 /**
  * @author fgwei
@@ -126,8 +128,8 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
     val mddg = new MultiDataDependenceGraph[IDDGNode]
     val summaryTables = components.map(yard.getSummaryTable(_)).flatten
     val summaryMap = summaryTables.map(st => (st.component, st)).toMap
-    val iccChannels = summaryTables.map(_.get[ICC_Summary](CHANNELS.ICC_CHANNEL))
-    val allIccCallees = iccChannels.map(_.asCallee).reduceOption{_ ++ _}.getOrElse(imapEmpty)
+    val intentChannels = summaryTables.map(_.get[Intent_Summary](CHANNELS.INTENT_CHANNEL))
+    val allIntentCallees = intentChannels.map(_.asCallee).reduceOption{_ ++ _}.getOrElse(imapEmpty)
     val rpcChannels = summaryTables.map(_.get[RPC_Summary](CHANNELS.RPC_CHANNEL))
     val allRpcCallees = rpcChannels.map(_.asCallee).reduceOption{_ ++ _}.getOrElse(imapEmpty)
     
@@ -146,10 +148,10 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
           val summaryTable = summaryMap.getOrElse(component, throw new RuntimeException("Summary table does not exist for " + component))
           
           // link the icc edges
-          val icc_summary: ICC_Summary = summaryTable.get(CHANNELS.ICC_CHANNEL)
-          icc_summary.asCaller foreach {
-            case (callernode, icc_caller) =>
-              val icc_callees = allIccCallees.filter(_._2.matchWith(icc_caller))
+          val intent_summary: Intent_Summary = summaryTable.get(CHANNELS.INTENT_CHANNEL)
+          intent_summary.asCaller foreach {
+            case (callernode, intent_caller) =>
+              val icc_callees = allIntentCallees.filter(_._2.matchWith(intent_caller))
               icc_callees foreach {
                 case (calleenode, icc_callee) =>
                   println(component + " --icc--> " + calleenode.getOwner.getClassName)
@@ -191,63 +193,16 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
   }
   
   private def buildComponentSummaryTable(component: JawaClass): ComponentSummaryTable = {
-    val summaryTable: ComponentSummaryTable = new ComponentSummaryTable(component)
     val apkOpt: Option[Apk] = yard.getOwnerApk(component)
-    if(!apkOpt.isDefined) return summaryTable
+    if(!apkOpt.isDefined) return new ComponentSummaryTable(component)
     val apk = apkOpt.get
     val idfgOpt = yard.getIDFG(component)
-    if(!idfgOpt.isDefined) return summaryTable
+    if(!idfgOpt.isDefined) return new ComponentSummaryTable(component)
     val idfg = idfgOpt.get
-    val iddgOpt = yard.getIDDG(component)
-    if(!iddgOpt.isDefined) return summaryTable
-    val iddg = iddgOpt.get.getIddg
-    
-    // Add component as icc callee
-    val filters = apk.getIntentFilterDB.getIntentFilters(component)
-    val icc_summary: ICC_Summary = summaryTable.get(CHANNELS.ICC_CHANNEL)
-    icc_summary.addCallee(idfg.icfg.entryNode, ICCCallee(apk, component, apk.getComponentType(component).get, filters))
-    
-    val rpcs = apk.getRpcMethods(component)
-    val rpc_summary: RPC_Summary = summaryTable.get(CHANNELS.RPC_CHANNEL)
-    
-    // Collect info from idfg for component as icc caller or rpc caller or others
-    idfg.icfg.nodes foreach {
-      node =>
-        node match {
-          case en: ICFGEntryNode =>
-            rpcs.filter (rpc => rpc.getSignature == en.context.getMethodSig).foreach{
-              rpc =>
-                // Add component as rpc callee
-                rpc_summary.addCallee(en, RPCCallee(rpc))
-            }
-          case cn: ICFGCallNode =>
-            val callees = cn.getCalleeSet
-            callees foreach {
-              callee =>
-                val calleep = callee.callee
-                val ptsmap = idfg.ptaresult.getPTSMap(cn.context)
-                if(AndroidConstants.isIccMethod(calleep.getSubSignature)) {
-                  // add component as icc caller
-                  val callTyp = AndroidConstants.getIccCallType(calleep.getSubSignature)
-                  val intentSlot = VarSlot(iddg.getIDDGCallArgNode(cn, 1).asInstanceOf[IDDGCallArgNode].argName, false, true)
-                  val intentValues: ISet[Instance] = ptsmap.getOrElse(intentSlot, isetEmpty)
-                  val intentcontents = IntentHelper.getIntentContents(idfg.ptaresult, intentValues, cn.context)
-                  val icc_summary: ICC_Summary = summaryTable.get(CHANNELS.ICC_CHANNEL)
-                  intentcontents foreach {
-                    intentcontent =>
-                      icc_summary.addCaller(cn, ICCCaller(callTyp, intentcontent))
-                  }
-                }
-                
-                if(apk.getRpcMethods.contains(calleep)) {
-                  // add component as rpc caller
-                  val rpc_summary: RPC_Summary = summaryTable.get(CHANNELS.RPC_CHANNEL)
-                  rpc_summary.addCaller(cn, RPCCaller(calleep, ptsmap))
-                }
-            }
-          case _ =>
-        }
+    val csp = new ComponentSummaryProvider {
+      def getIntentCaller(idfg: InterProceduralDataFlowGraph, intentValue: ISet[Instance], context: Context): ISet[IntentContent] =
+        IntentHelper.getIntentContents(idfg.ptaresult, intentValue, context)
     }
-    summaryTable
+    ComponentSummaryTable.buildComponentSummaryTable(apk, component, idfg, csp)
   }
 }

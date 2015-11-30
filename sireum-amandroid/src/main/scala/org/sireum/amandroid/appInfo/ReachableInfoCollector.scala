@@ -64,7 +64,7 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[ObjectType], 
     (if(false) entryPointClasses.par else entryPointClasses).foreach {
       compTyp =>
         val comp = global.getClassOrResolve(compTyp)
-        val reachableMethods = ReachabilityAnalysis.getReachableMethods(global, comp.getMethods)
+        val reachableMethods = ReachabilityAnalysis.getReachableMethods(global, comp.getDeclaredMethods)
         reachableMap += (comp -> reachableMethods)
     }
   }
@@ -74,7 +74,7 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[ObjectType], 
     (if(false) entryPointClasses.par else entryPointClasses).foreach {
       compTyp =>
         val comp = global.getClassOrResolve(compTyp)
-        val reachableMethods = ReachabilityAnalysis.getReachableMethods(global, comp.getMethodsByName(AndroidConstants.MAINCOMP_ENV) ++ comp.getMethodsByName(AndroidConstants.COMP_ENV))
+        val reachableMethods = ReachabilityAnalysis.getReachableMethods(global, comp.getDeclaredMethodsByName(AndroidConstants.MAINCOMP_ENV) ++ comp.getDeclaredMethodsByName(AndroidConstants.COMP_ENV))
         reachableMap += (comp -> reachableMethods)
     }
   }
@@ -155,7 +155,7 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[ObjectType], 
     this.entryPointClasses.foreach{
       compTyp =>
         val rec = global.getClassOrResolve(compTyp)
-        procedures ++= rec.getMethods
+        procedures ++= rec.getDeclaredMethods
     }
     procedures.foreach{
       procedure =>
@@ -227,7 +227,7 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[ObjectType], 
         classType = ClassType.ContentProvider;
   
       if (ancestorClass.getName.startsWith("android."))
-        for (procedure <- ancestorClass.getMethods)
+        for (procedure <- ancestorClass.getDeclaredMethods)
           if (!procedure.isConstructor){
             systemMethods.add(procedure.getSubSignature)
           }
@@ -239,7 +239,7 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[ObjectType], 
     for (sClass: JawaClass <- global.getClassHierarchy.getAllSubClassesOfIncluding(record)) {
       val rName = sClass.getName
       if (!rName.startsWith("android.") && !rName.startsWith("com.android."))
-        for (procedure <- sClass.getMethods) {
+        for (procedure <- sClass.getDeclaredMethods) {
           if(!procedure.isStatic){ // static method cannot be overriden
             lifecycleFlag = false
             if (systemMethods.contains(procedure.getSubSignature)){
@@ -365,7 +365,7 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[ObjectType], 
     var x = collectAllInterfaces(clazz)
     for (i <- collectAllInterfaces(clazz)) {
       if(this.androidCallbacks.contains(i.getName)){
-        i.getMethods.foreach{
+        i.getDeclaredMethods.foreach{
           proc =>
             checkAndAddMethod(getMethodFromHierarchy(baseClass, proc.getSubSignature), lifecycleElement)
         }
@@ -393,14 +393,14 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[ObjectType], 
 
   private def getMethodsFromHierarchyByShortName(r :JawaClass, procShortName: String): Set[JawaMethod] = {
     val tmp =
-      if(r.declaresMethodByName(procShortName)) r.getMethodsByName(procShortName)
+      if(r.declaresMethodByName(procShortName)) r.getDeclaredMethodsByName(procShortName)
       else if(r.hasSuperClass) getMethodsFromHierarchyByShortName(r.getSuperClass.get, procShortName)
       else throw new RuntimeException("Could not find procedure: " + procShortName)
     tmp.filter(!_.isStatic)
   }
 
   private def getMethodFromHierarchyByName(r :JawaClass, procName: String): JawaMethod = {
-    if(r.declaresMethodByName(procName)) r.getMethodByName(procName).get
+    if(r.declaresMethodByName(procName)) r.getDeclaredMethodByName(procName).get
     else if(r.hasSuperClass) getMethodFromHierarchyByName(r.getSuperClass.get, procName)
     else throw new RuntimeException("Could not find procedure: " + procName)
   }
