@@ -60,58 +60,58 @@ class IntentFilterDataBase {
 
 
 class IntentFilter(holder: ObjectType) {
-	private val actions: MSet[String] = msetEmpty
-	private val categories: MSet[String] = msetEmpty
-	private val data = new Data
+  private val actions: MSet[String] = msetEmpty
+  private val categories: MSet[String] = msetEmpty
+  private val data = new Data
     /**
      * checks if this filter can accept an intent with (action, categories, uriData, mType)
      */
-	def isMatchWith(action:String, categories: Set[String], uriData:UriData, mType:String):Boolean = {
-	  var actionTest = false
-	  var categoryTest = false
-	  var dataTest = false
-	  if(action == null && categories.isEmpty && uriData == null && mType == null) return false
-	  if(action == null || hasAction(action)){
-	    actionTest = true
-	  }
-	  
-//	  if(hasCategories(categories)){
-//	    categoryTest = true
-//	  }
-	  
-	  //note that in path-insensitive static analysis we had to change the category match subset rule,
-	  //we ensure no false-negative (which means no match is ignored)
-	  if(categories.isEmpty){
-	    categoryTest = true
-	  } else if(!categories.filter(c => this.categories.contains(c)).isEmpty){
-	    categoryTest = true
-	  }
-	  
-	  // note that in android there is some discrepancy regarding data and mType on the Intent side and the Intent Filter side
-	  if(this.data.matchWith(uriData, mType))
-	    dataTest = true
-//	  println("actionTest:" + actionTest + "  categoryTest:" + categoryTest + "  dataTest:" + dataTest)
-	  actionTest && categoryTest && dataTest
-	}
-	
-	def hasAction(action:String):Boolean = {
-	  this.actions.contains(action) || this.actions.contains("ANY")
-	}
-	def hasCategories(categories: Set[String]):Boolean = {
-	  categories.subsetOf(this.categories) || this.categories.contains("ANY")
-	}
-	
-	def addAction(action: String) = actions += action
-	def addCategory(category: String) = categories += category
-	def modData(scheme: String, 
-	    				host: String, 
-	    				port: String, 
-	    				path: String, 
-	    				pathPrefix: String, 
-	    				pathPattern: String,
-	    				mimeType: String) = {
-	  data.add(scheme, host, port, path, pathPrefix, pathPattern, mimeType)
-		
+  def isMatchWith(action:String, categories: Set[String], uriData:UriData, mType:String):Boolean = {
+    var actionTest = false
+    var categoryTest = false
+    var dataTest = false
+    if(action == null && categories.isEmpty && uriData == null && mType == null) return false
+    if(action == null || hasAction(action)){
+      actionTest = true
+    }
+  
+//  if(hasCategories(categories)){
+//    categoryTest = true
+//  }
+  
+  //note that in path-insensitive static analysis we had to change the category match subset rule,
+  //we ensure no false-negative (which means no match is ignored)
+    if(categories.isEmpty){
+      categoryTest = true
+    } else if(!categories.filter(c => this.categories.contains(c)).isEmpty){
+      categoryTest = true
+    }
+  
+  // note that in android there is some discrepancy regarding data and mType on the Intent side and the Intent Filter side
+    if(this.data.matchWith(uriData, mType))
+      dataTest = true
+  //  println("actionTest:" + actionTest + "  categoryTest:" + categoryTest + "  dataTest:" + dataTest)
+    actionTest && categoryTest && dataTest
+  }
+
+  def hasAction(action:String):Boolean = {
+    this.actions.contains(action) || this.actions.contains("ANY")
+  }
+  def hasCategories(categories: Set[String]):Boolean = {
+    categories.subsetOf(this.categories) || this.categories.contains("ANY")
+  }
+
+  def addAction(action: String) = actions += action
+  def addCategory(category: String) = categories += category
+  def modData(
+      scheme: String, 
+      host: String, 
+      port: String, 
+      path: String, 
+      pathPrefix: String, 
+      pathPattern: String,
+      mimeType: String) = {
+    data.add(scheme, host, port, path, pathPrefix, pathPattern, mimeType)
   }
   
   def getActions: ISet[String] = IntentFilter.this.actions.toSet
@@ -197,47 +197,48 @@ class Data{
       }
     } else if(scheme != null && this.schemes.contains(scheme)){
       schemeTest = true
-	    if(this.authorities.isEmpty || this.authorities.filter(a => a.host != null).isEmpty){
-	      authorityTest = true
-	      pathTest = true
-	    } else {
-	      this.authorities.foreach{
-	        case Authority(if_host, if_port) =>
-	          if(if_host == host){
-	            if(if_port == null || if_port == port){
-	              authorityTest = true
-	              if(this.paths.isEmpty && this.pathPrefixs.isEmpty && this.pathPatterns.isEmpty){
-	                pathTest = true
-	                pathPrefixTest = true
-	                pathPatternTest = true
-	              } else if(path != null){
-	                pathTest = this.paths.contains(path)
-	                this.pathPrefixs.foreach{
-	                  pre =>
-	                    if(path.startsWith(pre)) pathPrefixTest = true
-	                }
-	                this.pathPatterns.foreach{
-	                  pattern =>
-	                    if(path.matches(StringEscapeUtils.unescapeJava(pattern))) pathPatternTest = true
-	                }
-	              }
-	            }
-	          }
-	      }
-	    }
+    if(this.authorities.isEmpty || this.authorities.filter(a => a.host != null).isEmpty){
+      authorityTest = true
+      pathTest = true
+    } else {
+      this.authorities.foreach{
+        case Authority(if_host, if_port) =>
+          if(if_host == host){
+            if(if_port == null || if_port == port){
+              authorityTest = true
+              if(this.paths.isEmpty && this.pathPrefixs.isEmpty && this.pathPatterns.isEmpty){
+                pathTest = true
+                pathPrefixTest = true
+                pathPatternTest = true
+              } else if(path != null){
+                pathTest = this.paths.contains(path)
+                this.pathPrefixs.foreach{
+                  pre =>
+                    if(path.startsWith(pre)) pathPrefixTest = true
+                }
+                this.pathPatterns.foreach{
+                  pattern =>
+                    if(path.matches(StringEscapeUtils.unescapeJava(pattern))) pathPatternTest = true
+                }
+              }
+            }
+          }
+      }
+    }
     }
 //    println("schemeTest-->" + schemeTest + " authorityTest-->" + authorityTest + "(pathTest || pathPrefixTest || pathPatternTest)-->" + (pathTest || pathPrefixTest || pathPatternTest))
     schemeTest && authorityTest && (pathTest || pathPrefixTest || pathPatternTest)
   }
   
-  def add(scheme: String, 
-	    				host: String, 
-	    				port: String, 
-	    				path: String, 
-	    				pathPrefix: String, 
-	    				pathPattern: String, 
-	    				mimeType: String) = {
-    if(scheme!= null){
+  def add(
+      scheme: String, 
+      host: String, 
+      port: String, 
+      path: String, 
+      pathPrefix: String, 
+      pathPattern: String, 
+      mimeType: String) = {
+    if(scheme!= null) {
       this.schemes +=scheme
     }
     if(host != null || port != null){
@@ -247,14 +248,14 @@ class Data{
       this.paths +=path
     }
     if(pathPrefix != null){
-	    this.pathPrefixs += pathPrefix
-    	}
-    	if(pathPattern != null){
-    	    this.pathPatterns += pathPattern
-    	}
-    	if(mimeType != null){
-    	    this.mimeTypes += mimeType
-    	}
+      this.pathPrefixs += pathPrefix
+    }
+    if(pathPattern != null){
+      this.pathPatterns += pathPattern
+    }
+    if(mimeType != null){
+      this.mimeTypes += mimeType
+    }
   }
   
   def addScheme(scheme: String) ={
@@ -298,14 +299,13 @@ class UriData{
   private var pathPrefix: String = null
   private var pathPattern: String = null
   
-
-  def set(scheme: String, 
-	    				host: String, 
-	    				port: String, 
-	    				path: String, 
-	    				pathPrefix: String, 
-	    				pathPattern: String
-	    				) = {
+  def set(
+      scheme: String,
+      host: String,
+      port: String,
+      path: String,
+      pathPrefix: String,
+      pathPattern: String) = {
     if(scheme!= null){
       this.scheme =scheme
     }
@@ -319,12 +319,11 @@ class UriData{
       this.path =path
     }
     if(pathPrefix != null){
-	    this.pathPrefix = pathPrefix
-		}
-		if(pathPattern != null){
-		    this.pathPattern = pathPattern
-		}
-	
+      this.pathPrefix = pathPrefix
+    }
+    if(pathPattern != null){
+      this.pathPattern = pathPattern
+    }
   }
   
   def setScheme(scheme: String) ={

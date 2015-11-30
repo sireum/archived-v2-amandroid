@@ -44,8 +44,7 @@ object IntentHelper {
       datas: ISet[UriData], 
       types: ISet[String], 
       preciseExplicit: Boolean,
-      preciseImplicit: Boolean,
-      senderContext: Context)
+      preciseImplicit: Boolean)
   
   def getIntentContents(s: PTAResult, intentValues: ISet[Instance], currentContext: Context): ISet[IntentContent] = {
     var result = isetEmpty[IntentContent]
@@ -113,13 +112,13 @@ object IntentHelper {
             else preciseImplicit = false
         }
         val ic = IntentContent(componentNames, actions, categories, datas, types, 
-             preciseExplicit, preciseImplicit, currentContext)
+             preciseExplicit, preciseImplicit)
         result += ic
     }
     result
   }
 
-  private def populateByUri(data: UriData, uriData: String) = {
+  def populateByUri(data: UriData, uriData: String) = {
     var scheme:String = null
     var host:String = null
     var port:String = null
@@ -219,7 +218,7 @@ object IntentHelper {
   
   private def findComps(apk: Apk, action:String, categories: Set[String], data:UriData, mType:String): ISet[JawaClass] = {
     var components: ISet[JawaClass] = isetEmpty
-    apk.getComponents.foreach{
+    apk.getComponents.foreach {
       ep =>
         val iFilters = apk.getIntentFilterDB.getIntentFilters(ep)
         if(!iFilters.isEmpty){
