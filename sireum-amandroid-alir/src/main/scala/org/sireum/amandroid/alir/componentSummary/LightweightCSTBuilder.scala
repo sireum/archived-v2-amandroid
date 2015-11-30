@@ -28,9 +28,12 @@ import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
  * Hopefully this will be really light weight to build the component based summary table
  * @author fgwei
  */
-class LightweightCSTBuilder(global: Global, apk: Apk, yard: ApkYard, outputUri: FileResourceUri, timer: Option[MyTimer]) extends AppInfoCollector(global, apk, outputUri, timer) {
+class LightweightCSTBuilder(global: Global, apk: Apk, outputUri: FileResourceUri, timer: Option[MyTimer]) extends AppInfoCollector(global, apk, outputUri, timer) {
   
   private val intentContents: MMap[JawaClass, MMap[Instance, MSet[IntentContent]]] = mmapEmpty
+  private val summaryTables: MMap[JawaClass, ComponentSummaryTable] = mmapEmpty
+  
+  def getSummaryTables: IMap[JawaClass, ComponentSummaryTable] = summaryTables.toMap
   
   override def collectInfo: Unit = {
     val manifestUri = outputUri + File.separator + "AndroidManifest.xml"
@@ -397,6 +400,6 @@ class LightweightCSTBuilder(global: Global, apk: Apk, yard: ApkYard, outputUri: 
       }
     }
     val summaryTable = ComponentSummaryTable.buildComponentSummaryTable(apk, component, idfg, csp)
-    yard.addSummaryTable(component, summaryTable)
+    summaryTables(component) = summaryTable
   }
 }

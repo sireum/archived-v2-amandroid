@@ -28,13 +28,13 @@ object ComponentInfo_run {
   
   def main(args: Array[String]): Unit = {
     if(args.size < 2){
-      System.err.print("Usage: source_path output_path [dependence_path]")
+      System.err.print("Usage: source_path output_path")
       return
     }
     val sourcePath = args(0)
     val outputPath = args(1)
     val outputUri = FileUtil.toUri(outputPath)
-    val dpsuri = try{Some(FileUtil.toUri(args(2)))} catch {case e: Exception => None}
+    val dpsuri = AndroidGlobalConfig.dependence_dir.map(FileUtil.toUri(_))
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), "", true).filter(Apk.isValidApk(_)).toSet
     files foreach {
       file =>
@@ -44,12 +44,12 @@ object ComponentInfo_run {
           val reporter = new PrintReporter(MsgLevel.ERROR)
           val global = new Global(file, reporter)
           global.setJavaLib(AndroidGlobalConfig.lib_files)
-          val yard = new ApkYard(global)
           val cip: ClassInfoProvider = new ClassInfoProvider() {
             def getAppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, timer: Option[MyTimer]): AppInfoCollector = {
-              new LightweightCSTBuilder(global, apk, yard, outputUri, timer)
+              new LightweightCSTBuilder(global, apk, outputUri, timer)
             }
           }
+          val yard = new ApkYard(global)
           yard.loadApk(file, outputUri, dpsuri, cip, false, false, true, Some(timer))
         } catch {
           case e: Exception =>
