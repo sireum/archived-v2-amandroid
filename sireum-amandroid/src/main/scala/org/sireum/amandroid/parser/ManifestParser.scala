@@ -28,7 +28,11 @@ import org.sireum.amandroid.util.TypedValue
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-final case class ComponentInfo(compType: ObjectType, typ: String, exported: Boolean, enabled: Boolean, permission: ISet[String])
+final case class ComponentInfo(compType: ObjectType, typ: ComponentType.Value, exported: Boolean, enabled: Boolean, permission: ISet[String])
+
+object ComponentType extends Enumeration {
+  val ACTIVITY, SERVICE, RECEIVER, PROVIDER = Value
+}
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -36,8 +40,9 @@ final case class ComponentInfo(compType: ObjectType, typ: String, exported: Bool
  */ 
 class ManifestParser{
   private val componentInfos: MSet[ComponentInfo] = msetEmpty
-  private val components: MMap[ObjectType, String] = mmapEmpty
+  private val components: MMap[ObjectType, ComponentType.Value] = mmapEmpty
   private var packageName = ""
+  private val headerNames: MSet[String] = msetEmpty
   private val permissions: MSet[String] = msetEmpty
   private val intentFdb: IntentFilterDataBase = new IntentFilterDataBase
   private var currentComponent: ObjectType = null
@@ -72,20 +77,41 @@ class ManifestParser{
       var applicationEnabled = true
       val rootElement = doc.getDocumentElement()
       this.packageName = rootElement.getAttribute("package")
-  
+      val attributes = rootElement.getAttributes
+      if(attributes != null) {
+        for(i <- 0 to attributes.getLength - 1){
+          val attribute = attributes.item(i)
+          if(attribute != null && attribute.toString().startsWith("xmlns:") && attribute.toString().contains("=")) {
+            val headername = attribute.toString().substring(attribute.toString().indexOf(":") + 1, attribute.toString().indexOf("="))
+            headerNames += headername + ":"
+          }
+        }
+      }
+      if(headerNames.isEmpty) headerNames += ""
       val permissions = rootElement.getElementsByTagName("uses-permission")
       for (i <- 0 to permissions.getLength() - 1) {
         val permission = permissions.item(i).asInstanceOf[Element]
-        this.permissions += permission.getAttribute("android:name")
+        headerNames.foreach {
+          header =>
+            this.permissions += permission.getAttribute(header + "name")
+        }
       }
       
       val appsElement = rootElement.getElementsByTagName("application")
       for (appIdx <- 0 to appsElement.getLength() - 1) {
         val appElement: Element = appsElement.item(appIdx).asInstanceOf[Element]
         // Check whether the application is disabled
-        val enabled = appElement.getAttribute("android:enabled")
+        var enabled = ""
+        headerNames.foreach {
+          header =>
+            enabled = appElement.getAttribute(header + "enabled")
+        }
         applicationEnabled = (enabled.isEmpty() || !enabled.equals("false"))
-        val appperm = appElement.getAttribute("android:permission")
+        var appperm = ""
+        headerNames.foreach {
+          header =>
+            appperm = appElement.getAttribute(header + "permission")
+        }
         if(!appperm.isEmpty())
           this.applicationPermission = appperm
         if(applicationEnabled){
@@ -96,19 +122,19 @@ class ManifestParser{
       
           for (i <- 0 to activities.getLength() - 1) {
             val activity = activities.item(i).asInstanceOf[Element]
-            loadManifestEntry(activity, "activity", this.packageName)
+            loadManifestEntry(activity, ComponentType.ACTIVITY, this.packageName)
           }
           for (i <- 0 to receivers.getLength() - 1) {
             val receiver = receivers.item(i).asInstanceOf[Element]
-            loadManifestEntry(receiver, "receiver", this.packageName)
+            loadManifestEntry(receiver, ComponentType.RECEIVER, this.packageName)
           }
           for (i <- 0 to services.getLength() - 1) {
             val service = services.item(i).asInstanceOf[Element]
-            loadManifestEntry(service, "service", this.packageName)
+            loadManifestEntry(service, ComponentType.SERVICE, this.packageName)
           }
           for (i <- 0 to providers.getLength() - 1) {
             val provider = providers.item(i).asInstanceOf[Element]
-            loadManifestEntry(provider, "provider", this.packageName)
+            loadManifestEntry(provider, ComponentType.PROVIDER, this.packageName)
           }
         }
       }
@@ -132,7 +158,7 @@ class ManifestParser{
                * of at least one filter implies that the activity is intended for external use,
                * so the default value is "true".
                */
-              if(typ == "activity" || typ == "receiver" || typ == "service"){
+              if(typ == ComponentType.ACTIVITY || typ == ComponentType.RECEIVER || typ == ComponentType.SERVICE){
                 !this.intentFdb.getIntentFilters(compType).isEmpty
               } 
               /**
@@ -142,7 +168,7 @@ class ManifestParser{
                * or android:targetSdkVersion to "16" or lower. For applications that set either of
                * these attributes to "17" or higher, the default is "false".
                */
-              else if(typ == "provider") {
+              else if(typ == ComponentType.PROVIDER) {
                 this.minSdkVersion <= 16 || this.targetSdkVersion <= 16
               } else throw new RuntimeException("Wrong component type: " + typ)
           }
@@ -171,9 +197,19 @@ class ManifestParser{
         ex.printStackTrace()
     }
   }
+  
+  private def getAttribute(comp: Element, name: String, ret_null: Boolean): String = {
+    var res: String = if(ret_null) null else ""
+    headerNames.foreach {
+      header =>
+        val x = comp.getAttribute(header + name)
+        if(!x.isEmpty()) res = x
+    }
+    res
+  }
 
-  private def loadManifestEntry(comp: Element, baseClass: String, packageName: String) = {
-    val className = comp.getAttribute("android:name")
+  private def loadManifestEntry(comp: Element, baseClass: ComponentType.Value, packageName: String) = {
+    val className = getAttribute(comp, "name", false)
     val classType = new ObjectType(className)
     if (className.startsWith(".")){
       this.currentComponent = toPilarClass(this.packageName + className)
@@ -191,15 +227,15 @@ class ManifestParser{
       this.currentComponent = toPilarClass(className)
       this.components += (this.currentComponent -> baseClass)
     }
-    val permission = comp.getAttribute("android:permission")
+    val permission = getAttribute(comp, "permission", false)
     if (!permission.isEmpty()){
       this.componentPermission += (classType -> permission)
     }
-    val exported = comp.getAttribute("android:exported")
+    val exported = getAttribute(comp, "exported", false)
     if(!exported.isEmpty()){
       this.componentExported += (classType -> exported)
     }
-    val enabled = comp.getAttribute("android:enabled")
+    val enabled = getAttribute(comp, "enabled", false)
     if(!enabled.isEmpty()){
       this.componentEnabled += (classType -> enabled)
     }
@@ -213,7 +249,7 @@ class ManifestParser{
         for (a <- 0 to actions.getLength() - 1) {
           if (this.currentIntentFilter != null){
             val action = actions.item(a).asInstanceOf[Element]
-            val name = action.getAttribute("android:name")
+            val name = getAttribute(action, "name", false)
             val intentF = this.currentIntentFilter
             intentF.addAction(name)              
           }
@@ -222,7 +258,7 @@ class ManifestParser{
         for (c <- 0 to categories.getLength() - 1) {
           if (this.currentIntentFilter != null){
             val category = categories.item(c).asInstanceOf[Element]
-            val name = category.getAttribute("android:name")
+            val name = getAttribute(category, "name", false)
             val intentF = this.currentIntentFilter
             intentF.addCategory(name)              
           }
@@ -231,13 +267,13 @@ class ManifestParser{
         for (d <- 0 to datas.getLength() - 1) {
           if (this.currentIntentFilter != null){
             val data = datas.item(d).asInstanceOf[Element]
-            val scheme = if(data.hasAttribute("android:scheme")) data.getAttribute("android:scheme") else null
-            val host = if(data.hasAttribute("android:host"))data.getAttribute("android:host") else null
-            val port = if(data.hasAttribute("android:port"))data.getAttribute("android:port") else null
-            val path = if(data.hasAttribute("android:path"))data.getAttribute("android:path") else null
-            val pathPrefix = if(data.hasAttribute("android:pathPrefix"))data.getAttribute("android:pathPrefix") else null
-            val pathPattern = if(data.hasAttribute("android:pathPattern"))data.getAttribute("android:pathPattern") else null
-            val mimeType = if(data.hasAttribute("android:mimeType"))data.getAttribute("android:mimeType") else null
+            val scheme = getAttribute(data, "scheme", true)
+            val host = getAttribute(data, "host", true)
+            val port = getAttribute(data, "port", true)
+            val path = getAttribute(data, "path", true)
+            val pathPrefix = getAttribute(data, "pathPrefix", true)
+            val pathPattern = getAttribute(data, "pathPattern", true)
+            val mimeType = getAttribute(data, "mimeType", true)
             val intentF = this.currentIntentFilter
             intentF.modData(scheme, host, port, path, pathPrefix, pathPattern, mimeType)
           }

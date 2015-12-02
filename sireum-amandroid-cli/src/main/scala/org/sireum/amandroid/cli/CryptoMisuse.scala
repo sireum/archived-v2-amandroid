@@ -135,8 +135,8 @@ object CryptoMisuse {
       }
       if(timer.isDefined) timer.get.start
       val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false)
-      val app_info = new InterestingApiCollector(global, apk, outUri, timer)
-      app_info.collectInfo
+      val app_info = new InterestingApiCollector(global, timer)
+      app_info.collectInfo(apk, outUri)
       socket.plugListener(new CryptoMisuseListener(global, apk, app_info, outUri))
       socket.runWithoutDDA(false, true, timer)
       

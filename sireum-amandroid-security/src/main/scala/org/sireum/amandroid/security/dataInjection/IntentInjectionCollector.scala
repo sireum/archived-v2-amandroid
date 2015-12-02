@@ -16,12 +16,14 @@ import org.sireum.amandroid.appInfo.ReachableInfoCollector
 import org.sireum.jawa.util.MyTimer
 import org.sireum.jawa.Global
 import org.sireum.amandroid.Apk
+import java.io.File
+import org.sireum.amandroid.parser.ComponentType
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-class IntentInjectionCollector(global: Global, apk: Apk, outputUri: FileResourceUri, timer: Option[MyTimer]) extends AppInfoCollector(global, apk, outputUri, timer) {
+class IntentInjectionCollector(global: Global, timer: Option[MyTimer]) extends AppInfoCollector(global, timer) {
   private final val TITLE = "IntentInjectionCollector"
   var ra: ReachableInfoCollector = null
   def getInterestingContainers(interestingAPIs: Set[String]) = {
@@ -34,32 +36,32 @@ class IntentInjectionCollector(global: Global, apk: Apk, outputUri: FileResource
     interestingContainers
   }
   
-  override def collectInfo: Unit = {
-  val manifestUri = outputUri + "/AndroidManifest.xml"
+  override def collectInfo(apk: Apk, outputUri: FileResourceUri): Unit = {
+  val manifestUri = outputUri + File.separator + "AndroidManifest.xml"
     val mfp = AppInfoCollector.analyzeManifest(global.reporter, manifestUri)
     this.appPackageName = mfp.getPackageName
     this.componentInfos ++= mfp.getComponentInfos
     this.uses_permissions ++= mfp.getPermissions
     this.intentFdb.merge(mfp.getIntentDB)
 
-    val afp = AppInfoCollector.analyzeARSC(global.reporter, apkUri)
-    val lfp = AppInfoCollector.analyzeLayouts(global, apkUri, mfp)
+    val afp = AppInfoCollector.analyzeARSC(global.reporter, apk.nameUri)
+    val lfp = AppInfoCollector.analyzeLayouts(global, apk.nameUri, mfp)
     this.layoutControls ++= lfp.getUserControls
     this.ra = AppInfoCollector.reachabilityAnalysis(global, mfp, timer)
     val callbacks = AppInfoCollector.analyzeCallback(global.reporter, afp, lfp, ra)
     this.callbackMethods ++= callbacks
-    var components = isetEmpty[JawaClass]
+    val components = msetEmpty[(JawaClass, ComponentType.Value)]
     mfp.getComponentInfos.foreach {
       f => 
         val record = global.getClassOrResolve(f.compType)
         if(!record.isUnknown && record.isApplicationClass){
-          components += record
+          components += ((record, f.typ))
           val clCounter = generateEnvironment(record, if(f.exported)AndroidConstants.MAINCOMP_ENV else AndroidConstants.COMP_ENV, codeLineCounter)
           codeLineCounter = clCounter
         }
     }
 
-    apk.setComponents(components)
+    apk.setComponents(components.toSet)
     apk.updateIntentFilterDB(this.intentFdb)
     apk.setAppInfo(this)
   }

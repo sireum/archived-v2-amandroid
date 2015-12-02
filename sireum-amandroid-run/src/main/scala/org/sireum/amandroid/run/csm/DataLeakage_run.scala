@@ -35,7 +35,6 @@ import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAScopeManage
 import org.sireum.amandroid.alir.componentSummary.ApkYard
 import org.sireum.jawa.util.PerComponentTimer
 import org.sireum.amandroid.util.ApkFileUtil
-import org.sireum.amandroid.appInfo.ClassInfoProvider
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -103,12 +102,8 @@ object DataLeakage_run {
       }
       if(timer.isDefined) timer.get.start
       val apkYard = new ApkYard(global)
-      val cip: ClassInfoProvider = new ClassInfoProvider() {
-        def getAppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, timer: Option[MyTimer]): AppInfoCollector = {
-          new AppInfoCollector(global, apk, outputUri, timer)
-        }
-      }
-      val apk: Apk = apkYard.loadApk(file, outputUri, dpsuri, cip, false, false, true, timer = timer)
+      val app_info = new AppInfoCollector(global, timer)
+      val apk: Apk = apkYard.loadApk(file, outputUri, dpsuri, app_info, false, false, true)
       val ssm = new DataLeakageAndroidSourceAndSinkManager(global, apk, apk.getAppInfo.getLayoutControls, apk.getAppInfo.getCallbackMethods, AndroidGlobalConfig.sas_file)
       val cba = new ComponentBasedAnalysis(global, apkYard)
       cba.phase1(apk, false, timer)

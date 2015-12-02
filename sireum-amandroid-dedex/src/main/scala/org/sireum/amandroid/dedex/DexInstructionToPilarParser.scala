@@ -52,6 +52,7 @@ class DexInstructionToPilarParser(
   final val DEBUG = false
   
   import DexInstructionToPilarParser._
+  import generator._
   /**
    * Key of the method invocation result value in the register map
    */
@@ -299,7 +300,7 @@ class DexInstructionToPilarParser(
         if(typ.isInstanceOf[UndeterminedType]) {
           "v" + reg._2
         } else {
-          var newvar = typ.typ.substring(typ.typ.lastIndexOf(".") + 1) + {if(typ.dimensions > 0)"_arr" + typ.dimensions else ""} + "_v" + reg._2
+          var newvar = typ.typ.substring(typ.typ.lastIndexOf(".") + 1).replaceAll("\\*", "_unknown") + {if(typ.dimensions > 0)"_arr" + typ.dimensions else ""} + "_v" + reg._2
           while(localvars.contains(newvar) && localvars(newvar)._1 != typ) newvar = "a_" + newvar
           if(!localvars.contains(newvar)) localvars(newvar) = (typ, false)
           regTypMap(reg) = (newvar, typ)
@@ -312,7 +313,7 @@ class DexInstructionToPilarParser(
     regTypMap.get((v._1, -1)) match {
       case Some(a) => a._1
       case None =>
-        var newvar = typ.typ.substring(typ.typ.lastIndexOf(".") + 1) + {if(typ.dimensions > 0)"_arr" + typ.dimensions else ""} + "_" + v._2
+        var newvar = typ.typ.substring(typ.typ.lastIndexOf(".") + 1).replaceAll("\\*", "_unknown") + {if(typ.dimensions > 0)"_arr" + typ.dimensions else ""} + "_" + v._2
         while(localvars.contains(newvar) && localvars(newvar)._1 != typ) newvar = "a_" + newvar
         if(!localvars.contains(newvar)) localvars(newvar) = (typ, false)
         regTypMap((v._1, -1)) = (newvar, typ)
@@ -488,8 +489,8 @@ class DexInstructionToPilarParser(
             lastreg = b2 & 0x0F
           }
           val methodidx = read16Bit()
-          val method = dexMethodIdsBlock.getMethod(methodidx)
-          val proto = dexMethodIdsBlock.getProto(methodidx)
+          val method = dexMethodIdsBlock.getMethod(methodidx).escape
+          val proto = dexMethodIdsBlock.getProto(methodidx).escape
           val signature = getSignature(method, proto)
           var regByte = 0
           var byteCounter = 0
@@ -601,7 +602,7 @@ class DexInstructionToPilarParser(
               // the vtable offset 
               if(baseClass.isDefined) {
                 val baseClassName = DexTypeIdsBlock.LTypeToJava(JavaKnowledge.formatTypeToSignature(baseClass.get))
-                var method = dexOffsetResolver.getMethodNameFromOffset(baseClassName, vtableOffset)
+                var method = dexOffsetResolver.getMethodNameFromOffset(baseClassName, vtableOffset).escape
                 if(method != null) {
                   var proto = ""
                   val idx = method.indexOf(',')
@@ -691,7 +692,7 @@ class DexInstructionToPilarParser(
               offsetResolved = true
             }
           } else {
-            var method = DexOffsetResolver.getInlineMethodNameFromIndex(inlineOffset, dexSignatureBlock.getOptVersion())
+            var method = DexOffsetResolver.getInlineMethodNameFromIndex(inlineOffset, dexSignatureBlock.getOptVersion()).escape
             if(method != null) {
               var proto = ""
               val idx = method.indexOf(',')
@@ -766,7 +767,7 @@ class DexInstructionToPilarParser(
           }
           if((byteCounter % 2) != 0)
             read8Bit()         // Align to 16 bit
-          val arrayType = JavaKnowledge.formatSignatureToType(dexTypeIdsBlock.getType(typeidx))
+          val arrayType = JavaKnowledge.formatSignatureToType(dexTypeIdsBlock.getType(typeidx).escape)
           val baseType = JawaType.generateType(arrayType.typ, arrayType.dimensions - 1)
           val baseTypeStr = generator.generateType(baseType).render()
           val regNames = regs.map{
@@ -789,8 +790,8 @@ class DexInstructionToPilarParser(
           val methodidx = read16Bit()
           val argbase = read16Bit()
           val argsize = regno
-          val method = dexMethodIdsBlock.getMethod(methodidx)
-          val proto = dexMethodIdsBlock.getProto(methodidx)
+          val method = dexMethodIdsBlock.getMethod(methodidx).escape
+          val proto = dexMethodIdsBlock.getProto(methodidx).escape
           val signature = getSignature(method, proto)
           val className = signature.getClassName
           val methodName = signature.methodNamePart
@@ -842,7 +843,7 @@ class DexInstructionToPilarParser(
                 baseClass = regMap.get(new Integer(argbase))
                 if(baseClass.isDefined) {
                   val baseClassName = DexTypeIdsBlock.LTypeToJava(JavaKnowledge.formatTypeToSignature(baseClass.get))
-                  var method = dexOffsetResolver.getMethodNameFromOffset(baseClassName, vtableOffset)
+                  var method = dexOffsetResolver.getMethodNameFromOffset(baseClassName, vtableOffset).escape
                   if(method != null) {
                     var proto = ""
                     val idx = method.indexOf(',')
@@ -961,7 +962,7 @@ class DexInstructionToPilarParser(
           val regsize = regno
           for(i <- 0 to regno - 1)
             affectedRegisters.insert(i, regbase + i)
-          val arrayType = JavaKnowledge.formatSignatureToType(dexTypeIdsBlock.getType(typeidx))
+          val arrayType = JavaKnowledge.formatSignatureToType(dexTypeIdsBlock.getType(typeidx).escape)
           val baseType = JawaType.generateType(arrayType.typ, arrayType.dimensions - 1)
           val baseTypeStr = generator.generateType(baseType).render()
           val regs: IList[Int] = (0 to regsize - 1).map(regbase + _).toList
@@ -987,7 +988,7 @@ class DexInstructionToPilarParser(
           val targetreg = regs & 0xF
           val sizeregpos = Position(instrBase, 1)
           val sizereg = (regs & 0xF0) >> 4
-          val arrayType = JavaKnowledge.formatSignatureToType(dexTypeIdsBlock.getType(typeidx))
+          val arrayType = JavaKnowledge.formatSignatureToType(dexTypeIdsBlock.getType(typeidx).escape)
           val baseType = generator.generateType(JawaType.generateType(arrayType.typ, arrayType.dimensions - 1)).render()
           val targetregName = genRegName((targetregpos, targetreg), arrayType)
           val sizeregName = genRegName((sizeregpos, sizereg), resolveRegType((sizeregpos, sizereg), PrimitiveType("int")))
@@ -1532,7 +1533,7 @@ class DexInstructionToPilarParser(
           val regrhspos = Position(instrBase, 1)
           val reg = read8Bit()
           val typeidx = read16Bit()
-          var castType = dexTypeIdsBlock.getClassName(typeidx)
+          var castType = dexTypeIdsBlock.getClassName(typeidx).escape
           if(!castType.startsWith("["))
             castType = "L" + castType + ";"
           val typ = JavaKnowledge.formatSignatureToType(castType)
@@ -1551,7 +1552,7 @@ class DexInstructionToPilarParser(
           val regpos = Position(instrBase, 0)
           val reg = read8Bit()
           val typeidx = read16Bit()
-          val newtyp = "L" + dexTypeIdsBlock.getClassName(typeidx) + ";"
+          val newtyp = "L" + dexTypeIdsBlock.getClassName(typeidx).escape + ";"
           val typ = JavaKnowledge.formatSignatureToType(newtyp)
           val regName = genRegName((regpos, reg), typ)
           val code = instrCode match {
@@ -1570,7 +1571,7 @@ class DexInstructionToPilarParser(
           val reg2pos = Position(instrBase, 1)
           val reg2 = (b1 & 0xF0) >> 4
           val typeidx = read16Bit()
-          var typee = dexTypeIdsBlock.getClassName(typeidx)
+          var typee = dexTypeIdsBlock.getClassName(typeidx).escape
           if(!typee.startsWith("["))
             typee = "L" + typee + ";"
           val typ = JavaKnowledge.formatSignatureToType(typee)
@@ -1905,7 +1906,7 @@ class DexInstructionToPilarParser(
           val regpos = Position(instrBase, 0)
           val reg = read8Bit()
           val typeidx = read16Bit()
-          var classtyp = dexTypeIdsBlock.getClassName(typeidx)
+          var classtyp = dexTypeIdsBlock.getClassName(typeidx).escape
           if(!classtyp.startsWith("["))
             classtyp = "L" + classtyp + ";"
           val typ = JavaKnowledge.formatSignatureToType(classtyp)

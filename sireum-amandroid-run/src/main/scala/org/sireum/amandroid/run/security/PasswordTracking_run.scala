@@ -169,8 +169,8 @@ object PasswordTracking_run {
       }
       if(timer.isDefined) timer.get.start
       val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false)
-      val app_info = new SensitiveViewCollector(global, apk, outUri, timer)
-      app_info.collectInfo
+      val app_info = new SensitiveViewCollector(global, timer)
+      app_info.collectInfo(apk, outUri)
       if(app_info.getLayoutControls.exists(p => p._2.isSensitive == true)){
         PasswordCounter.havePasswordView += 1
         PasswordCounter.havePasswordViewList += file

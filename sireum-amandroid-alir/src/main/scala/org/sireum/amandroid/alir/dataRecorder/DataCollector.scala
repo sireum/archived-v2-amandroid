@@ -27,6 +27,7 @@ import org.sireum.jawa.Global
 import org.sireum.jawa.Signature
 import org.sireum.jawa.alir.interProcedural.InterProceduralNode
 import org.sireum.alir.AlirEdge
+import org.sireum.amandroid.parser.ComponentType
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -282,7 +283,7 @@ object DataCollector {
      
   final case class ComponentData(
       name: String,
-      typ: String,
+      typ: ComponentType.Value,
       exported: Boolean,
       dynamicReg: Boolean,
       protectPermission: ISet[String],
@@ -291,7 +292,13 @@ object DataCollector {
     override def toString: String = {
       val compData = template.getInstanceOf("ComponentData")
       compData.add("compName", name)
-      compData.add("typ", typ)
+      val typstr = typ match {
+        case ComponentType.ACTIVITY => "activity"
+        case ComponentType.SERVICE => "service"
+        case ComponentType.RECEIVER => "receiver"
+        case ComponentType.PROVIDER => "provider"
+      }
+      compData.add("typ", typstr)
       compData.add("exported", exported)
       compData.add("dynamicReg", dynamicReg)
       val permissions = new ArrayList[String]
@@ -308,7 +315,7 @@ object DataCollector {
   
   def collect(global: Global, apk: Apk) = {
     val appInfo = apk.getAppInfo
-    val appName = appInfo.getAppName
+    val appName = apk.getAppName
     val uses_permissions = appInfo.getUsesPermissions
     val compInfos = appInfo.getComponentInfos
     val intentFDB = apk.getIntentFilterDB

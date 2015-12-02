@@ -149,7 +149,7 @@ object FrameworkMethodsModel {
             iDB.updateIntentFmap(intentF)
             val appinfo = apk.getAppInfo
             if(!appinfo.hasEnv(comRec)){
-              appinfo.dynamicRegisterReceiver(comRec, iDB, permission.toSet)
+              appinfo.dynamicRegisterReceiver(apk, comRec, iDB, permission.toSet)
             } else {
               apk.updateIntentFilterDB(iDB)
             }

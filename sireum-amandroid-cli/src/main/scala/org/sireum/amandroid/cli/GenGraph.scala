@@ -158,8 +158,8 @@ object GenGraph {
             }
             // convert the dex file to the "pilar" form
             val apk = new Apk(apkFileUri)
-            val app_info = new AppInfoCollector(global, apk, outUri, timer)
-            app_info.collectInfo
+            val app_info = new AppInfoCollector(global, timer)
+            app_info.collectInfo(apk, outUri)
             
             val eps = app_info.getEntryPoints
             val pros =

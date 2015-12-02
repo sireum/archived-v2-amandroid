@@ -175,8 +175,8 @@ object OAuthTokenTracking_run {
       }
       if(timer.isDefined) timer.get.start
       val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false)
-      val app_info = new OauthTokenContainerCollector(global, apk, outUri, timer)
-      app_info.collectInfo
+      val app_info = new OauthTokenContainerCollector(global, timer)
+      app_info.collectInfo(apk, outUri)
       val ssm = new OAuthSourceAndSinkManager(global, apk, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.sas_file)
       socket.plugListener(new OAuthTokenTrackingListener(global, apk, app_info))
       socket.runWithDDA(ssm, false, true, timer)

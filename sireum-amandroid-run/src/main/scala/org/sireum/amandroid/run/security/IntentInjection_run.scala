@@ -172,8 +172,8 @@ object IntentInjection_run {
       }
       if(timer.isDefined) timer.get.start
       val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false)
-      val app_info = new IntentInjectionCollector(global, apk, outUri, timer)
-      app_info.collectInfo
+      val app_info = new IntentInjectionCollector(global, timer)
+      app_info.collectInfo(apk, outUri)
       val ssm = new IntentInjectionSourceAndSinkManager(global, apk, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)
       socket.plugListener(new IntentInjectionListener(global, apk, app_info, ssm))
       socket.runWithDDA(ssm, true, true, timer)

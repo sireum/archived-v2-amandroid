@@ -52,7 +52,6 @@ import org.sireum.amandroid.security.apiMisuse.InterestingApiCollector
 import org.sireum.amandroid.security.password.SensitiveViewCollector
 import org.sireum.amandroid.security.password.PasswordSourceAndSinkManager
 import org.sireum.amandroid.security.dataInjection.IntentInjectionSourceAndSinkManager
-import org.sireum.amandroid.appInfo.ClassInfoProvider
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.NoReporter
@@ -173,16 +172,12 @@ object TanitAnalysis{
       }
       if(timer.isDefined) timer.get.start
       val apkYard = new ApkYard(global)
-      val cip: ClassInfoProvider = new ClassInfoProvider() {
-        def getAppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, timer: Option[MyTimer]): AppInfoCollector = {
-          module match {
-            case "DATA_LEAKAGE" => new AppInfoCollector(global, apk, outputUri, timer)
-            case "INTENT_INJECTION" => new IntentInjectionCollector(global, apk, outputUri, timer)
-            case "PASSWORD_TRACKING" => new SensitiveViewCollector(global, apk, outputUri, timer)
-          }
-        }
+      val app_info = module match {
+        case "DATA_LEAKAGE" => new AppInfoCollector(global, timer)
+        case "INTENT_INJECTION" => new IntentInjectionCollector(global, timer)
+        case "PASSWORD_TRACKING" => new SensitiveViewCollector(global, timer)
       }
-      val apk: Apk = apkYard.loadApk(file, outputUri, dpsuri, cip, false, false, true, timer = timer)
+      val apk: Apk = apkYard.loadApk(file, outputUri, dpsuri, app_info, false, false, true)
       val ssm = module match {
         case "DATA_LEAKAGE" => new DataLeakageAndroidSourceAndSinkManager(global, apk, apk.getAppInfo.getLayoutControls, apk.getAppInfo.getCallbackMethods, sasFilePath)
         case "INTENT_INJECTION" => new IntentInjectionSourceAndSinkManager(global, apk, apk.getAppInfo.getLayoutControls, apk.getAppInfo.getCallbackMethods, sasFilePath)

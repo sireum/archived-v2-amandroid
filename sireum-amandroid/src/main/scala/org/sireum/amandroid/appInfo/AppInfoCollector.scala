@@ -39,10 +39,7 @@ import org.sireum.jawa.ObjectType
 import org.sireum.amandroid.Apk
 import org.sireum.jawa.Reporter
 import org.sireum.amandroid.parser.ComponentInfo
-
-trait ClassInfoProvider {
-  def getAppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, timer: Option[MyTimer]): AppInfoCollector
-}
+import org.sireum.amandroid.parser.ComponentType
 
 /**
  * It takes the apkUri and outputDir as input parameters.
@@ -50,9 +47,8 @@ trait ClassInfoProvider {
  * adapted from Steven Arzt of the FlowDroid group
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
-class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, timer: Option[MyTimer]) {  
+class AppInfoCollector(global: Global, timer: Option[MyTimer]) {  
   private final val TITLE = "AppInfoCollector"
-  protected val apkUri: String = apk.nameUri
   protected val uses_permissions: MSet[String] = msetEmpty
   protected val callbackMethods: MMap[JawaClass, Set[JawaMethod]] = mmapEmpty
   protected val componentInfos: MSet[ComponentInfo] = msetEmpty
@@ -66,7 +62,6 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
    * Map from record name to it's env method code.
    */
   protected var envProcMap: Map[JawaClass, (JawaMethod, String)] = Map()
-  def getAppName: String = new File(new URI(apk.nameUri)).getName()
   def getPackageName: String = this.appPackageName
   def getUsesPermissions: ISet[String] = this.uses_permissions.toSet
   def getLayoutControls: IMap[Int, LayoutControl] = this.layoutControls.toMap
@@ -93,7 +88,7 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
   def getIntentDB = this.intentFdb
   def getEntryPoints: ISet[ObjectType] = this.componentInfos.filter(_.enabled).map(_.compType).toSet
 
-  def getComponentInfos = this.componentInfos
+  def getComponentInfos = this.componentInfos.toSet
   def getEnvMap = this.envProcMap
   def getEnvString: String = {
     val sb = new StringBuilder
@@ -136,7 +131,7 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
     dmGen.getCodeCounter
   }
 
-  def dynamicRegisterReceiver(comRec: JawaClass, iDB: IntentFilterDataBase, permission: ISet[String]) = {
+  def dynamicRegisterReceiver(apk: Apk, comRec: JawaClass, iDB: IntentFilterDataBase, permission: ISet[String]) = {
     this.synchronized{
       if(!comRec.declaresMethodByName(AndroidConstants.COMP_ENV)){
         global.reporter.echo(TITLE, "*************Dynamically Register Component**************")
@@ -152,7 +147,7 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
         global.reporter.echo(TITLE, "Found " + this.callbackMethods.size + " callback methods")
         val clCounter = generateEnvironment(comRec, AndroidConstants.COMP_ENV, this.codeLineCounter)
         this.codeLineCounter = clCounter
-        this.componentInfos += ComponentInfo(comRec.getType, "receiver", true, true, permission)
+        this.componentInfos += ComponentInfo(comRec.getType, ComponentType.RECEIVER, true, true, permission)
         apk.addDynamicRegisteredReceiver(comRec)
         apk.updateIntentFilterDB(iDB)
         global.reporter.echo(TITLE, "~~~~~~~~~~~~~~~~~~~~~~~~~Done~~~~~~~~~~~~~~~~~~~~~~~~~~")
@@ -164,7 +159,7 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
    * Get rpc method list for Android component
    * originally designed by Sankardas Roy, modified by Fengguo Wei
    */
-  def getRpcMethods(comp: JawaClass): ISet[JawaMethod] = {
+  def getRpcMethods(apk: Apk, comp: JawaClass): ISet[JawaMethod] = {
     if(apk.getServices.contains(comp)){
       comp.getDeclaredMethods.filter { 
         method => 
@@ -174,11 +169,11 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
     } else isetEmpty
   }
 
-  def collectInfo: Unit = {
+  def collectInfo(apk: Apk, outputUri: FileResourceUri): Unit = {
     val manifestUri = outputUri + "/AndroidManifest.xml"
     val mfp = AppInfoCollector.analyzeManifest(global.reporter, manifestUri)
-    val afp = AppInfoCollector.analyzeARSC(global.reporter, apkUri)
-    val lfp = AppInfoCollector.analyzeLayouts(global, apkUri, mfp)
+    val afp = AppInfoCollector.analyzeARSC(global.reporter, apk.nameUri)
+    val lfp = AppInfoCollector.analyzeLayouts(global, apk.nameUri, mfp)
     val ra = AppInfoCollector.reachabilityAnalysis(global, mfp, timer)
     val callbacks = AppInfoCollector.analyzeCallback(global.reporter, afp, lfp, ra)
 
@@ -189,13 +184,13 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
     this.layoutControls ++= lfp.getUserControls
     this.callbackMethods ++= callbacks
 
-    var components = isetEmpty[JawaClass]
+    val components = msetEmpty[(JawaClass, ComponentType.Value)]
     mfp.getComponentInfos.foreach {
       f =>
         if(f.enabled){
           val comp = global.getClassOrResolve(f.compType)
           if(!comp.isUnknown && comp.isApplicationClass){
-            components += comp
+            components += ((comp, f.typ))
             val clCounter = generateEnvironment(comp, if(f.exported)AndroidConstants.MAINCOMP_ENV else AndroidConstants.COMP_ENV, codeLineCounter)
             codeLineCounter = clCounter
           }
@@ -203,10 +198,10 @@ class AppInfoCollector(global: Global, apk: Apk, outputUri: FileResourceUri, tim
     }
     components.foreach {
       comp =>
-        val rpcs = getRpcMethods(comp)
-        apk.addRpcMethods(comp, rpcs)
+        val rpcs = getRpcMethods(apk, comp._1)
+        apk.addRpcMethods(comp._1, rpcs)
     }
-    apk.setComponents(components)
+    apk.setComponents(components.toSet)
     apk.updateIntentFilterDB(this.intentFdb)
     apk.setAppInfo(this)
     global.reporter.echo(TITLE, "Entry point calculation done.")

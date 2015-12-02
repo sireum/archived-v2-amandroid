@@ -22,6 +22,7 @@ import org.sireum.jawa.Global
 import org.sireum.jawa.Signature
 import org.sireum.jawa.ObjectType
 import org.sireum.jawa.JawaType
+import org.sireum.amandroid.parser.ComponentType
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -74,11 +75,10 @@ class AndroidEnvironmentGenerator(global: Global) extends MethodGenerator(global
             ci =>
               if(ci.compType.name == currentClass.getName){
                 ci.typ match{
-                  case "activity" => activity = true
-                  case "service" => service = true
-                  case "receiver" => broadcastReceiver = true
-                  case "provider" => contentProvider = true
-                  case _ =>
+                  case ComponentType.ACTIVITY => activity = true
+                  case ComponentType.SERVICE => service = true
+                  case ComponentType.RECEIVER => broadcastReceiver = true
+                  case ComponentType.PROVIDER => contentProvider = true
                 }
               }
           }

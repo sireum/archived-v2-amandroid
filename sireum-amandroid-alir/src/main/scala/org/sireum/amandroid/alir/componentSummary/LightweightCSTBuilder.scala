@@ -23,50 +23,66 @@ import org.sireum.amandroid.parser.UriData
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.pta.ClassInstance
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
+import org.sireum.jawa.JavaKnowledge
+import org.sireum.jawa.Signature
+import org.sireum.jawa.alir.controlFlowGraph.ICFGExitNode
+import org.sireum.amandroid.parser.ComponentType
 
 /**
  * Hopefully this will be really light weight to build the component based summary table
  * @author fgwei
  */
-class LightweightCSTBuilder(global: Global, apk: Apk, outputUri: FileResourceUri, timer: Option[MyTimer]) extends AppInfoCollector(global, apk, outputUri, timer) {
+class LightweightCSTBuilder(global: Global, timer: Option[MyTimer]) extends AppInfoCollector(global, timer) {
   
   private val intentContents: MMap[JawaClass, MMap[Instance, MSet[IntentContent]]] = mmapEmpty
   private val summaryTables: MMap[JawaClass, ComponentSummaryTable] = mmapEmpty
   
   def getSummaryTables: IMap[JawaClass, ComponentSummaryTable] = summaryTables.toMap
   
-  override def collectInfo: Unit = {
+  override def collectInfo(apk: Apk, outputUri: FileResourceUri): Unit = {
     val manifestUri = outputUri + File.separator + "AndroidManifest.xml"
     val mfp = AppInfoCollector.analyzeManifest(global.reporter, manifestUri)
+    this.appPackageName = mfp.getPackageName
+    this.componentInfos ++= mfp.getComponentInfos
+    this.uses_permissions ++= mfp.getPermissions
     this.intentFdb.merge(mfp.getIntentDB)
-    val components = msetEmpty[JawaClass]
+    val components = msetEmpty[(JawaClass, ComponentType.Value)]
     mfp.getComponentInfos.foreach {
       f =>
         if(f.enabled){
           val comp = global.getClassOrResolve(f.compType)
           if(!comp.isUnknown && comp.isApplicationClass){
-            components += comp
+            components += ((comp, f.typ))
           }
         }
     }
     components.foreach {
       comp =>
-        val rpcs = getRpcMethods(comp)
-        apk.addRpcMethods(comp, rpcs)
+        val rpcs = getRpcMethods(apk, comp._1)
+        apk.addRpcMethods(comp._1, rpcs)
     }
     apk.setComponents(components.toSet)
     apk.updateIntentFilterDB(this.intentFdb)
     apk.setAppInfo(this)
-    buildCST(components.toSet)
+    buildCST(apk, components.toSet)
   }
   
-  private def buildCST(comps: ISet[JawaClass]) = {
+  private def buildCST(apk: Apk, comps: ISet[(JawaClass, ComponentType.Value)]) = {
     comps foreach {
-      comp =>
+      case (comp, typ) =>
         val methods = comp.getDeclaredMethods
         val idfg = InterproceduralSuperSpark(global, methods, timer)
+        val context = new Context
+        val sig = Signature(JavaKnowledge.formatTypeToSignature(comp.getType) + ".ent:()V")
+        context.setContext(sig, comp.getType.name)
+        val entryNode = ICFGEntryNode(context)
+        entryNode.setOwner(sig)
+        idfg.icfg.addEntryNode(entryNode)
+        val exitNode = ICFGExitNode(context)
+        exitNode.setOwner(sig)
+        idfg.icfg.addExitNode(exitNode)
         collectIntentContent(comp, idfg)
-        buildCSTFromIDFG(comp, idfg)
+        buildCSTFromIDFG(apk, comp, idfg)
     }
   }
   
@@ -144,7 +160,7 @@ class LightweightCSTBuilder(global: Global, apk: Apk, outputUri: FileResourceUri
                           case _ => impreciseImplicit ++= thisValue
                         }
                     }
-                    thisValue.map(unresolvedData.getOrElse(_, msetEmpty) ++= dataValue)
+                    thisValue.map(unresolvedData.getOrElseUpdate(_, msetEmpty) ++= dataValue)
                   case "Landroid/content/Intent;.<init>:(Ljava/lang/String;Landroid/net/Uri;Landroid/content/Context;Ljava/lang/Class;)V" =>  //public constructor
                     val thisSlot = VarSlot(args(0), false, true)
                     val thisValue = ptaresult.pointsToSet(thisSlot, currentContext)
@@ -164,7 +180,7 @@ class LightweightCSTBuilder(global: Global, apk: Apk, outputUri: FileResourceUri
                           case _ => impreciseImplicit ++= thisValue
                         }
                     }
-                    thisValue.map(unresolvedData.getOrElse(_, msetEmpty) ++= dataValue)
+                    thisValue.map(unresolvedData.getOrElseUpdate(_, msetEmpty) ++= dataValue)
                     classValue.map{
                       classIns => 
                         classIns match {
@@ -242,7 +258,7 @@ class LightweightCSTBuilder(global: Global, apk: Apk, outputUri: FileResourceUri
                     allIntent ++= thisValue
                     val componentSlot = VarSlot(args(1), false, true)
                     val componentValue = ptaresult.pointsToSet(componentSlot, currentContext)
-                    thisValue.map(unresolvedComp.getOrElse(_, msetEmpty) ++= componentValue)
+                    thisValue.map(unresolvedComp.getOrElseUpdate(_, msetEmpty) ++= componentValue)
                   case "Landroid/content/Intent;.setData:(Landroid/net/Uri;)Landroid/content/Intent;" |
                        "Landroid/content/Intent;.setDataAndNormalize:(Landroid/net/Uri;)Landroid/content/Intent;" =>  //public
                     val thisSlot = VarSlot(args(0), false, true)
@@ -250,7 +266,7 @@ class LightweightCSTBuilder(global: Global, apk: Apk, outputUri: FileResourceUri
                     allIntent ++= thisValue
                     val dataSlot = VarSlot(args(1), false, true)
                     val dataValue = ptaresult.pointsToSet(dataSlot, currentContext)
-                    thisValue.map(unresolvedData.getOrElse(_, msetEmpty) ++= dataValue)
+                    thisValue.map(unresolvedData.getOrElseUpdate(_, msetEmpty) ++= dataValue)
                   case "Landroid/content/Intent;.setDataAndType:(Landroid/net/Uri;Ljava/lang/String;)Landroid/content/Intent;" |
                        "Landroid/content/Intent;.setDataAndTypeAndNormalize:(Landroid/net/Uri;Ljava/lang/String;)Landroid/content/Intent;" =>  //public
                     val thisSlot = VarSlot(args(0), false, true)
@@ -260,7 +276,7 @@ class LightweightCSTBuilder(global: Global, apk: Apk, outputUri: FileResourceUri
                     val dataValue = ptaresult.pointsToSet(dataSlot, currentContext)
                     val typeSlot = VarSlot(args(2), false, true)
                     val typeValue = ptaresult.pointsToSet(typeSlot, currentContext)
-                    thisValue.map(unresolvedData.getOrElse(_, msetEmpty) ++= dataValue)
+                    thisValue.map(unresolvedData.getOrElseUpdate(_, msetEmpty) ++= dataValue)
                     typeValue.map{
                       typeIns => 
                         typeIns match {
@@ -387,7 +403,7 @@ class LightweightCSTBuilder(global: Global, apk: Apk, outputUri: FileResourceUri
     }
   }
   
-  private def buildCSTFromIDFG(component: JawaClass, idfg: InterProceduralDataFlowGraph) = {
+  private def buildCSTFromIDFG(apk: Apk, component: JawaClass, idfg: InterProceduralDataFlowGraph) = {
     val csp = new ComponentSummaryProvider {
       def getIntentCaller(idfg: InterProceduralDataFlowGraph, intentValue: ISet[Instance], context: Context): ISet[IntentContent] = {
         val result = msetEmpty[IntentContent]

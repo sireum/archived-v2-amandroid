@@ -29,6 +29,7 @@ import org.sireum.jawa.Signature
 import org.sireum.jawa.ObjectType
 import org.sireum.amandroid.dedex.DexInstructionToPilarParser.ForkStatus
 import org.sireum.jawa.PrimitiveType
+import org.apache.commons.lang3.StringEscapeUtils
 
 /**
  * @author fgwei
@@ -59,6 +60,10 @@ class PilarStyleCodeGenerator(
   private var procDeclTemplate = template.getInstanceOf("ProcedureDecl")
   private var localVarsTemplate = template.getInstanceOf("LocalVars")
   
+  implicit class EscapeJava(s: String) {
+    def escape: String = StringEscapeUtils.escapeJava(s).replaceAll("\\\\u", "")
+  }
+  
   def generate: Unit = {
     val classreader = dexClassDefsBlock.getClassIterator
     while(classreader.hasNext()) {
@@ -69,11 +74,11 @@ class PilarStyleCodeGenerator(
       if(filter(recType)) {
         val outputStream = outputDir match {
           case Some(od) =>
-            var targetFile = FileUtil.toFile(od + "/" + className + ".pilar")
+            var targetFile = FileUtil.toFile(od + File.separator + className + ".pilar")
             var i = 0
             while(targetFile.exists()){
               i += 1
-              targetFile = new File(od + "/" + className + "." + i + ".pilar")
+              targetFile = new File(od + File.separator + className + "." + i + ".pilar")
             }
             val parent = targetFile.getParentFile()
             if(parent != null)
@@ -107,7 +112,7 @@ class PilarStyleCodeGenerator(
   
   def generateType(typ: JawaType): ST = {
     val typTemplate = template.getInstanceOf("Type")
-    typTemplate.add("baseTyp", typ.typ)
+    typTemplate.add("baseTyp", typ.typ.replaceAll("\\*", ""))
     val dimensions: ArrayList[String] = new ArrayList[String]
     for(i <- 0 to typ.dimensions - 1) dimensions.add("[]")
     typTemplate.add("dimensions", dimensions)
@@ -208,14 +213,14 @@ class PilarStyleCodeGenerator(
   }
   
   private def generateProcedure(classIdx: Int, methodIdx: Int, isDirect: Boolean): ST = {
-    val recName: String = toPilarRecordName(dexClassDefsBlock.getClassNameOnly(classIdx))
+    val recName: String = toPilarRecordName(dexClassDefsBlock.getClassNameOnly(classIdx).escape)
     val recTyp: ObjectType = new ObjectType(recName)
     val retTyp: JawaType = 
-      if(isDirect) getReturnType(dexClassDefsBlock.getDirectMethodName(classIdx, methodIdx))
+      if(isDirect) getReturnType(dexClassDefsBlock.getDirectMethodName(classIdx, methodIdx).escape)
       else getReturnType(dexClassDefsBlock.getVirtualMethodName(classIdx, methodIdx))
     val procName: String = 
-      if(isDirect) recName + "." + dexClassDefsBlock.getDirectMethodShortName(classIdx, methodIdx)
-      else recName + "." + dexClassDefsBlock.getVirtualMethodShortName(classIdx, methodIdx)
+      if(isDirect) recName + "." + dexClassDefsBlock.getDirectMethodShortName(classIdx, methodIdx).escape
+      else recName + "." + dexClassDefsBlock.getVirtualMethodShortName(classIdx, methodIdx).escape
     val pos: Long = 
       if(isDirect) dexClassDefsBlock.getDirectMethodOffset(classIdx, methodIdx)
       else dexClassDefsBlock.getVirtualMethodOffset(classIdx, methodIdx)
@@ -250,7 +255,7 @@ class PilarStyleCodeGenerator(
     val paramList: MList[(String, JawaType)] = mlistEmpty
     for(i <- 0 to parmRegs.size() - 1 by + 2) {
       val paramReg = parmRegs.get(i).asInstanceOf[Integer]
-      val paramTyp: JawaType = JavaKnowledge.formatSignatureToType(parmRegs.get(i+1).asInstanceOf[String])
+      val paramTyp: JawaType = JavaKnowledge.formatSignatureToType(parmRegs.get(i+1).asInstanceOf[String].escape)
       var paramName = paramTyp.typ.substring(paramTyp.typ.lastIndexOf(".") + 1) + {if(paramTyp.dimensions > 0)"_arr" + paramTyp.dimensions else ""} + "_v" + paramReg
       if(localvars.contains(paramName) && localvars(paramName)._1 != paramTyp) paramName = "a" + paramName
       localvars(paramName) = ((paramTyp, true))
@@ -258,15 +263,14 @@ class PilarStyleCodeGenerator(
       initRegMap(paramReg) = paramTyp
     }
     val sig: Signature = 
-      if(isDirect) JavaKnowledge.genSignature(recTyp, dexClassDefsBlock.getDirectMethodShortName(classIdx, methodIdx), paramList.map(_._2).toList, retTyp)
-      else JavaKnowledge.genSignature(recTyp, dexClassDefsBlock.getVirtualMethodShortName(classIdx, methodIdx), paramList.map(_._2).toList, retTyp)
+      if(isDirect) JavaKnowledge.genSignature(recTyp, dexClassDefsBlock.getDirectMethodShortName(classIdx, methodIdx).escape, paramList.map(_._2).toList, retTyp)
+      else JavaKnowledge.genSignature(recTyp, dexClassDefsBlock.getVirtualMethodShortName(classIdx, methodIdx).escape, paramList.map(_._2).toList, retTyp)
     
     val procTemplate = template.getInstanceOf("ProcedureDecl")
     procTemplate.add("retTyp", generateType(retTyp))
     procTemplate.add("procedureName", procName)
     val params: ArrayList[ST] = new ArrayList[ST]
-    if(!AccessFlag.isAbstract(AccessFlag.getAccessFlags(accessFlags)) &&
-        !AccessFlag.isNative(AccessFlag.getAccessFlags(accessFlags))) {
+    if(!AccessFlag.isAbstract(AccessFlag.getAccessFlags(accessFlags))) {
       thisOpt foreach {
         case (thisName, thisTyp) =>
           val paramTemplate = template.getInstanceOf("Param")

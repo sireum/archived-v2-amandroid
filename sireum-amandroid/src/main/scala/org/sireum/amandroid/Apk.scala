@@ -25,6 +25,7 @@ import org.sireum.alir.AlirEdge
 import java.util.zip.ZipInputStream
 import java.io.FileInputStream
 import java.util.zip.ZipEntry
+import org.sireum.amandroid.parser.ComponentType
 
 object Apk {
   def isValidApk(nameUri: FileResourceUri): Boolean = {
@@ -98,13 +99,19 @@ case class Apk(nameUri: FileResourceUri) {
     else None
   }
   
-	def setComponents(comps: ISet[JawaClass]) = this.synchronized{
+	def setComponents(comps: ISet[(JawaClass, ComponentType.Value)]) = this.synchronized{
     comps.foreach{
-      case ac if ac.isChildOf(new ObjectType(AndroidConstants.ACTIVITY)) => this.addActivity(ac)
-      case se if se.isChildOf(new ObjectType(AndroidConstants.SERVICE)) => this.addService(se)
-      case re if re.isChildOf(new ObjectType(AndroidConstants.RECEIVER)) => this.addReceiver(re)
-      case pr if pr.isChildOf(new ObjectType(AndroidConstants.PROVIDER)) => this.addProvider(pr)
-      case a => a.global.reporter.error(TITLE, "Unexpected component: " + a)
+      case (ac, typ) => 
+        typ match {
+          case ComponentType.ACTIVITY =>
+            this.addActivity(ac)
+          case ComponentType.SERVICE =>
+            this.addService(ac)
+          case ComponentType.RECEIVER =>
+            this.addReceiver(ac)
+          case ComponentType.PROVIDER =>
+            this.addProvider(ac)
+        }
     }
   }
 	
@@ -152,6 +159,8 @@ case class Apk(nameUri: FileResourceUri) {
 	    case Some(info) => info
 	    case None => throw new RuntimeException("AppInfo does not exist.")
   	}
+  
+  def getAppName: String = FileUtil.toFile(nameUri).getName
   
   private val idfgResults: MMap[JawaClass, InterProceduralDataFlowGraph] = mmapEmpty
   

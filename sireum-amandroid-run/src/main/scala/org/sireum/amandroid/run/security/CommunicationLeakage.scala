@@ -30,7 +30,7 @@ object CommunicationLeakage_run {
     var taintPathFoundList = Set[String]()
     var leakagetype = Set[String]()
     override def toString: String = "total: " + total + ", haveResult: " + haveresult + ", taintPathFound: " + taintPathFound 
-  }//通讯录、通话记录、短信三种泄露类型
+  }// contact list, phone record, text message three types of leakage
   
   private class CommunicationLeakageListener(global: Global, apk: Apk, outputPath: String) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
@@ -121,8 +121,8 @@ object CommunicationLeakage_run {
       }
       if(timer.isDefined) timer.get.start
       val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false)
-      val app_info = new AppInfoCollector(global, apk, outUri, timer)
-      app_info.collectInfo
+      val app_info = new AppInfoCollector(global, timer)
+      app_info.collectInfo(apk, outUri)
       val ssm = new DataLeakageAndroidSourceAndSinkManager(global, apk, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.sas_file)
       socket.plugListener(new CommunicationLeakageListener(global, apk, outputPath))
       socket.runWithDDA(ssm, false, false, timer)
