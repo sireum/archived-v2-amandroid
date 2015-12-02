@@ -61,6 +61,9 @@ class PilarStyleCodeGenerator(
   private var localVarsTemplate = template.getInstanceOf("LocalVars")
   
   implicit class EscapeJava(s: String) {
+    val pakgEscapeMapping: MMap[String, String] = mmapEmpty
+    val recordEscapeMapping: MMap[ObjectType, String] = mmapEmpty
+    val procedureEscapeMapping: MMap[Signature, String] = mmapEmpty
     def escape: String = StringEscapeUtils.escapeJava(s).replaceAll("\\\\u", "")
   }
   

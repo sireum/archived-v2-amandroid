@@ -164,7 +164,6 @@ object TanitAnalysis{
    */
   private case class TaintTask(module: String, global: Global, sasFilePath: String, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], file: FileResourceUri, parallel: Boolean, timeout: Option[(Int, Boolean)]) {
     def run: String = {
-      println("#####" + file + "#####")
       ScopeManager.setScopeManager(new AndroidRFAScopeManager)
       val timer = timeout match {
         case Some((t, p)) => Some(if(p) new PerComponentTimer(t) else new MyTimer(t))
@@ -195,7 +194,6 @@ object TanitAnalysis{
   def onAnalysisSuccess(global: Global, apk: Apk, outputUri: FileResourceUri): Unit = {
     val appData = DataCollector.collect(global, apk)
 //    MetricRepo.collect(appData)
-
     val appDataDirFile = FileUtil.toFile(getOutputDirUri(outputUri, apk.nameUri))
     if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
     

@@ -35,7 +35,7 @@ object AmDecoder {
     val outputDir = 
       if(createFolder){
         val dirName = try{apkFile.getName().substring(0, apkFile.getName().lastIndexOf("."))} catch {case e: Exception => apkFile.getName()}
-        new File(new URI(outputUri + "/" + dirName))
+        new File(new URI(outputUri + File.separator + dirName))
       } else {
         new File(new URI(outputUri))
       }
