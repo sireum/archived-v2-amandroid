@@ -2,7 +2,7 @@ package org.sireum.amandroid.run.report
 
 import org.sireum.jawa.LibraryAPISummary
 import org.sireum.util._
-import org.sireum.jawa.ObjectType
+import org.sireum.jawa.JawaType
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -72,10 +72,14 @@ class LibraryAPICollector extends LibraryAPISummary{
     }
   }
   
-  def isLibraryClass(typ: ObjectType): Boolean = {
+  def isLibraryClass(typ: JawaType): Boolean = {
+    val pkg = typ.getPackage match {
+      case Some(p) => p.toPkgString(".")
+      case None => ""
+    }
     andoirdPackages.exists{
-      prefix => 
-        if(typ.pkg.startsWith(prefix)){
+      prefix =>
+        if(pkg.startsWith(prefix)){
           usedLib += prefix
           true
         } else false

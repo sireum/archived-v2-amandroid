@@ -12,7 +12,6 @@ import org.sireum.util._
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
-import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.jawa.alir.pta.FieldSlot

@@ -8,7 +8,7 @@ http://www.eclipse.org/legal/epl-v10.html
 package org.sireum.amandroid.util
 
 import org.sireum.jawa.LibraryAPISummary
-import org.sireum.jawa.ObjectType
+import org.sireum.jawa.JawaType
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -73,7 +73,7 @@ object AndroidLibraryAPISummary extends LibraryAPISummary{
     }
   }
   
-  def isLibraryClass(typ: ObjectType): Boolean = {
+  def isLibraryClass(typ: JawaType): Boolean = {
     andoirdPackages.exists{
       prefix => 
         typ.name.startsWith(prefix)

@@ -26,7 +26,7 @@ object FrameworkMethodsModel {
   final val TITLE = "FrameworkMethodsModel"
   
 	def isFrameworkMethods(p : JawaMethod) : Boolean = {
-    val contextRec = p.getDeclaringClass.global.getClassOrResolve(new ObjectType("android.content.Context"))
+    val contextRec = p.getDeclaringClass.global.getClassOrResolve(new JawaType("android.content.Context"))
     if(!p.getDeclaringClass.isInterface && p.getDeclaringClass.global.getClassHierarchy.isClassRecursivelySubClassOfIncluding(p.getDeclaringClass, contextRec)){
       p.getSubSignature match{
         case "setContentView:(I)V" |
@@ -58,7 +58,7 @@ object FrameworkMethodsModel {
         byPassFlag = false
       case "getApplication:()Landroid/app/Application;" =>
         require(retVars.size == 1)
-        ReachingFactsAnalysisHelper.getReturnFact(ObjectType("android.app.Application", 0), retVars(0), currentContext) match{
+        ReachingFactsAnalysisHelper.getReturnFact(new JawaType("android.app.Application"), retVars(0), currentContext) match{
           case Some(f) => newFacts += f
           case None =>
         }
@@ -69,14 +69,14 @@ object FrameworkMethodsModel {
   //      byPassFlag = false
       case "getBaseContext:()Landroid/content/Context;" =>
         require(retVars.size == 1)
-        ReachingFactsAnalysisHelper.getReturnFact(ObjectType("android.app.ContextImpl", 0), retVars(0), currentContext) match{
+        ReachingFactsAnalysisHelper.getReturnFact(new JawaType("android.app.ContextImpl"), retVars(0), currentContext) match{
           case Some(f) => newFacts += f
           case None =>
         }
         byPassFlag = false
       case "getApplicationContext:()Landroid/content/Context;"=>
         require(retVars.size == 1)
-        ReachingFactsAnalysisHelper.getReturnFact(ObjectType("android.app.Application", 0), retVars(0), currentContext) match{
+        ReachingFactsAnalysisHelper.getReturnFact(new JawaType("android.app.Application"), retVars(0), currentContext) match{
           case Some(f) => newFacts += f
           case None =>
         }
@@ -105,7 +105,7 @@ object FrameworkMethodsModel {
     receiverValue.foreach {
       rv =>
         rv match {
-          case ui : UnknownInstance =>
+          case ui if ui.isUnknown =>
           case _ =>
             val intentF = new IntentFilter(rv.typ)
             val comRec = global.getClassOrResolve(rv.typ)

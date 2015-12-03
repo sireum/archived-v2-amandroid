@@ -15,7 +15,6 @@ import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependence
 import org.sireum.amandroid.parser.IntentFilterDataBase
 import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.jawa.alir.pta.PTAResult
-import org.sireum.jawa.ObjectType
 import org.sireum.jawa.io.NoPosition
 import org.sireum.jawa.JawaMethod
 import org.sireum.jawa.alir.taintAnalysis.TaintAnalysisResult

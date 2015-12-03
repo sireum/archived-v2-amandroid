@@ -18,7 +18,6 @@ import java.io.OutputStreamWriter
 import org.sireum.jawa.alir.pta.Instance
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.jawa.JawaClass
-import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.jawa.PilarAstHelper
 import org.sireum.jawa.ExceptionCenter
@@ -35,7 +34,6 @@ import org.sireum.jawa.alir.dataFlowAnalysis.CallResolver
 import org.sireum.jawa.alir.dataFlowAnalysis.NodeListener
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralMonotoneDataFlowAnalysisResult
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
-import org.sireum.jawa.ObjectType
 import org.sireum.jawa.JavaKnowledge
 import org.sireum.jawa.Global
 import org.sireum.amandroid.Apk
@@ -44,6 +42,7 @@ import org.sireum.jawa.alir.dataFlowAnalysis.PstProvider
 import org.sireum.jawa.Signature
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.jawa.FieldFQN
+import org.sireum.jawa.JawaType
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -72,7 +71,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
     val icfg = new InterproceduralControlFlowGraph[ICFGNode]
     this.icfg = icfg
     icfg.collectCfgToBaseGraph(entryPointProc, initContext, true)
-    val iota: ISet[RFAFact] = initialFacts + RFAFact(StaticFieldSlot(FieldFQN(ObjectType("Analysis", 0), "RFAiota", JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE)), UnknownInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, initContext.copy))
+    val iota: ISet[RFAFact] = initialFacts + RFAFact(StaticFieldSlot(FieldFQN(new JawaType("Analysis"), "RFAiota", JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE)), PTAInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE.toUnknown, initContext.copy, false))
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](icfg,
       true, true, false, AndroidReachingFactsAnalysisConfig.parallel, gen, kill, callr, ppr, iota, initial, timer, switchAsOrderedMatch, Some(nl))
 //    icfg.toDot(new PrintWriter(System.out))
@@ -107,7 +106,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
     }
   }
   
-  private def checkClass(recTyp: ObjectType, s: ISet[RFAFact], currentNode: ICFGLocNode): Unit = {
+  private def checkClass(recTyp: JawaType, s: ISet[RFAFact], currentNode: ICFGLocNode): Unit = {
     val rec = global.getClassOrResolve(recTyp)
     checkAndLoadClassFromHierarchy(rec, s, currentNode)
   }
@@ -142,7 +141,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
                 recName = nt.name.name
               case _ =>
             }
-            val typ = ObjectType(recName, dimensions)
+            val typ = new JawaType(recName, dimensions)
             checkClass(typ, s, currentNode)
           case ne: NameExp =>
             val slot = ReachingFactsAnalysisHelper.getNameSlotFromNameExp(ne, typ, false, false, global)
@@ -447,7 +446,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
                 value = 
                   value.filter{
                     r =>
-                      !r.isNull && !r.isInstanceOf[UnknownInstance] && shouldPass(r, callee, typ)
+                      !r.isNull && !r.isUnknown && shouldPass(r, callee, typ)
                   }
               } 
               calleeFacts ++= value.map{r => RFAFact(VarSlot(slot.varName, false, false), r)}

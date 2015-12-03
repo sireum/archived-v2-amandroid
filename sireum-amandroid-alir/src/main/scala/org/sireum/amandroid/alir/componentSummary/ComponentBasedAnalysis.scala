@@ -32,7 +32,6 @@ import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependence
 import org.sireum.jawa.alir.dataDependenceAnalysis.DefaultInterproceduralDataDependenceInfo
 import org.sireum.amandroid.alir.taintAnalysis.AndroidSourceAndSinkManager
 import org.sireum.jawa.alir.taintAnalysis.TaintAnalysisResult
-import org.sireum.jawa.ObjectType
 import org.sireum.jawa.alir.dataDependenceAnalysis.IDDGCallArgNode
 import org.sireum.jawa.alir.pta.VarSlot
 import java.io.PrintWriter

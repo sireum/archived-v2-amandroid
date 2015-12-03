@@ -10,8 +10,6 @@ package org.sireum.amandroid.dedex
 import org.sireum.util._
 import org.sireum.jawa.Signature
 import org.sireum.jawa.JawaType
-import org.sireum.jawa.PrimitiveType
-import org.sireum.jawa.ObjectType
 
 /**
  * @author fgwei
@@ -615,15 +613,15 @@ trait DexConstants {
   def returnObj(x: String) = "return %s  @kind object;".format(x) // 0x11
   def const(x: String, y: Int, typ: JawaType) = {
     typ match {
-      case pt: PrimitiveType =>
-        pt.typ match {
+      case pt if pt.isPrimitive =>
+        pt.jawaName match {
           case "int" => "%s:= %dI;".format(x, y)
           case "long" => "%s:= %dL;".format(x, y)
           case "float" => "%s:= %dF;".format(x, y)
           case "double" => "%s:= %dD;".format(x, y)
           case _ => "%s:= %dI;".format(x, y)
         }
-      case ot: ObjectType =>
+      case ot if ot.isObject =>
         "%s:= null  @kind object;".format(x)
       case _ => "%s:= %dI;".format(x, y)
     }
@@ -631,15 +629,15 @@ trait DexConstants {
   } // 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19
   def constWide(x: String, y: Long, typ: JawaType) = {
     typ match {
-      case pt: PrimitiveType =>
-        pt.typ match {
+      case pt if pt.isPrimitive =>
+        pt.jawaName match {
           case "int" => "%s:= %dI;".format(x, y)
           case "long" => "%s:= %dL;".format(x, y)
           case "float" => "%s:= %dF;".format(x, y)
           case "double" => "%s:= %dD;".format(x, y)
           case _ => "%s:= %dL;".format(x, y)
         }
-      case ot: ObjectType =>
+      case ot if ot.isObject =>
         "%s:= null  @kind object;".format(x)
       case _ => "%s:= %dL;".format(x, y)
     }
@@ -680,13 +678,13 @@ trait DexConstants {
   def ifLe(x: String, y: String, target: Long) = "if %s <= %s then goto L%06x;".format(x, y, target) // 0x37
   def ifEqz(x: String, target: Long, typ: JawaType) = {
     typ match {
-      case ot: ObjectType => "if %s == null then goto L%06x;".format(x, target)
+      case ot if ot.isObject => "if %s == null then goto L%06x;".format(x, target)
       case _ => "if %s == 0 then goto L%06x;".format(x, target)
     }
   } // 0x38
   def ifNez(x: String, target: Long, typ: JawaType) = {
     typ match {
-      case ot: ObjectType => "if %s != null then goto L%06x;".format(x, target)
+      case ot if ot.isObject => "if %s != null then goto L%06x;".format(x, target)
       case _ => "if %s != 0 then goto L%06x;".format(x, target)
     }
   } // 0x39

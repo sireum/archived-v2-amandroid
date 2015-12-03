@@ -26,9 +26,7 @@ import org.sireum.jawa.JawaType
 import org.sireum.jawa.JavaKnowledge
 import org.sireum.jawa.AccessFlag
 import org.sireum.jawa.Signature
-import org.sireum.jawa.ObjectType
 import org.sireum.amandroid.dedex.DexInstructionToPilarParser.ForkStatus
-import org.sireum.jawa.PrimitiveType
 import org.apache.commons.lang3.StringEscapeUtils
 
 /**
@@ -45,7 +43,7 @@ class PilarStyleCodeGenerator(
     file: RandomAccessFile,
     outputDir: Option[FileResourceUri],
     dump: Option[PrintStream],
-    filter: (ObjectType => Boolean),
+    filter: (JawaType => Boolean),
     regTraceLog: Boolean = false,
     regTracing: Boolean = true) {
   
@@ -62,7 +60,7 @@ class PilarStyleCodeGenerator(
   
   implicit class EscapeJava(s: String) {
     val pakgEscapeMapping: MMap[String, String] = mmapEmpty
-    val recordEscapeMapping: MMap[ObjectType, String] = mmapEmpty
+    val recordEscapeMapping: MMap[JawaType, String] = mmapEmpty
     val procedureEscapeMapping: MMap[Signature, String] = mmapEmpty
     def escape: String = StringEscapeUtils.escapeJava(s).replaceAll("\\\\u", "")
   }
@@ -73,7 +71,7 @@ class PilarStyleCodeGenerator(
       val classIdx = classreader.next().intValue()
       val className = dexClassDefsBlock.getClassNameOnly(classIdx)
       val recName: String = toPilarRecordName(dexClassDefsBlock.getClassNameOnly(classIdx))
-      val recType: ObjectType = new ObjectType(recName)
+      val recType: JawaType = new JawaType(recName)
       if(filter(recType)) {
         val outputStream = outputDir match {
           case Some(od) =>
@@ -115,7 +113,7 @@ class PilarStyleCodeGenerator(
   
   def generateType(typ: JawaType): ST = {
     val typTemplate = template.getInstanceOf("Type")
-    typTemplate.add("baseTyp", typ.typ.replaceAll("\\*", ""))
+    typTemplate.add("baseTyp", typ.baseTyp)
     val dimensions: ArrayList[String] = new ArrayList[String]
     for(i <- 0 to typ.dimensions - 1) dimensions.add("[]")
     typTemplate.add("dimensions", dimensions)
@@ -217,7 +215,7 @@ class PilarStyleCodeGenerator(
   
   private def generateProcedure(classIdx: Int, methodIdx: Int, isDirect: Boolean): ST = {
     val recName: String = toPilarRecordName(dexClassDefsBlock.getClassNameOnly(classIdx).escape)
-    val recTyp: ObjectType = new ObjectType(recName)
+    val recTyp: JawaType = new JawaType(recName)
     val retTyp: JawaType = 
       if(isDirect) getReturnType(dexClassDefsBlock.getDirectMethodName(classIdx, methodIdx).escape)
       else getReturnType(dexClassDefsBlock.getVirtualMethodName(classIdx, methodIdx))
@@ -240,7 +238,7 @@ class PilarStyleCodeGenerator(
     val accessFlags = 
       if(isDirect) getAccessString(dexClassDefsBlock.getDirectMethodName(classIdx, methodIdx), skip = 1, false, isConstructor)
       else getAccessString(dexClassDefsBlock.getVirtualMethodName(classIdx, methodIdx), skip = 1, false, isConstructor)
-    var thisOpt: Option[(String, ObjectType)] = None
+    var thisOpt: Option[(String, JawaType)] = None
     val initRegMap: MMap[Integer, JawaType] = mmapEmpty
     val localvars: MMap[String, (JawaType, Boolean)] = mmapEmpty
     if(!AccessFlag.isStatic(AccessFlag.getAccessFlags(accessFlags))) {
@@ -249,7 +247,7 @@ class PilarStyleCodeGenerator(
         thisReg = regSize - 1
       else
         thisReg = parmRegs.get(0).asInstanceOf[Integer].intValue() - 1
-      var thisName = recTyp.typ.substring(recTyp.typ.lastIndexOf(".") + 1) + {if(recTyp.dimensions > 0)"_arr" + recTyp.dimensions else ""} + "_v" + thisReg
+      var thisName = recTyp.baseTyp.substring(recTyp.baseTyp.lastIndexOf(".") + 1) + {if(recTyp.dimensions > 0)"_arr" + recTyp.dimensions else ""} + "_v" + thisReg
       if(localvars.contains(thisName) && localvars(thisName)._1 != recTyp) thisName = "a" + thisName
       localvars(thisName) = ((recTyp, true))
       thisOpt = Some((thisName, recTyp))
@@ -259,7 +257,7 @@ class PilarStyleCodeGenerator(
     for(i <- 0 to parmRegs.size() - 1 by + 2) {
       val paramReg = parmRegs.get(i).asInstanceOf[Integer]
       val paramTyp: JawaType = JavaKnowledge.formatSignatureToType(parmRegs.get(i+1).asInstanceOf[String].escape)
-      var paramName = paramTyp.typ.substring(paramTyp.typ.lastIndexOf(".") + 1) + {if(paramTyp.dimensions > 0)"_arr" + paramTyp.dimensions else ""} + "_v" + paramReg
+      var paramName = paramTyp.baseTyp.substring(paramTyp.baseTyp.lastIndexOf(".") + 1) + {if(paramTyp.dimensions > 0)"_arr" + paramTyp.dimensions else ""} + "_v" + paramReg
       if(localvars.contains(paramName) && localvars(paramName)._1 != paramTyp) paramName = "a" + paramName
       localvars(paramName) = ((paramTyp, true))
       paramList += ((paramName, paramTyp))
@@ -641,7 +639,7 @@ class PilarStyleCodeGenerator(
   }
  
 
-  def writeTryCatchBlock(catchTemplate: ST, startLabel: String, endLabel: String, exception: ObjectType, handlerLabel: String): ST = {
+  def writeTryCatchBlock(catchTemplate: ST, startLabel: String, endLabel: String, exception: JawaType, handlerLabel: String): ST = {
     catchTemplate.add("catchTyp", generateType(exception))
     catchTemplate.add("fromLoc", startLabel)
     catchTemplate.add("toLoc", endLabel)
@@ -699,7 +697,7 @@ class PilarStyleCodeGenerator(
   case class ExceptionHandlerMapEntry(start: Long,
       end: Long,
       handler: Long,
-      exceptionType: ObjectType,
+      exceptionType: JawaType,
       regMap: MMap[Integer, JawaType]) {
 
     def withinRange(pos: Long): Boolean = {
@@ -776,7 +774,7 @@ class PilarStyleCodeGenerator(
       for(n <- 0 to dtcb.getTryHandlersSize(i) - 1) {
         val catchTemplate: ST = template.getInstanceOf("Catch")
         val excpT: String = "L" + dtcb.getTryHandlerType(i, n) + ";"
-        val excpType: ObjectType = JavaKnowledge.formatSignatureToType(excpT).asInstanceOf[ObjectType]
+        val excpType: JawaType = JavaKnowledge.formatSignatureToType(excpT)
         val handlerOffset: Long = dtcb.getTryHandlerOffset(i, n)
         visitStack.push(new VisitStackEntry(handlerOffset, initRegMap.toMap, Some(start)))
         val handlerLabel = "L%06x".format(handlerOffset)
@@ -798,7 +796,7 @@ class PilarStyleCodeGenerator(
       start: Long,
       end: Long,
       handlerOffset: Long,
-      exceptionType: ObjectType,
+      exceptionType: JawaType,
       regMap: MMap[Integer, JawaType]) = {
     val entry = ExceptionHandlerMapEntry(start, end, handlerOffset, exceptionType, regMap)
     exceptionHandlerList.add(entry)
@@ -839,7 +837,7 @@ class PilarStyleCodeGenerator(
         if(excpValue == null) {
           exceptionMap.put(key, currentValue)
         } else if(currentValue != null){
-          if(excpValue.isInstanceOf[PrimitiveType] && currentValue.isInstanceOf[ObjectType]) {
+          if(excpValue.isPrimitive && currentValue.isObject) {
             exceptionMap.put(key, currentValue)
           }
         }
@@ -882,11 +880,11 @@ class PilarStyleCodeGenerator(
               println("Moving old value to new reg trace map")
             newRegTraceMap.put(key, oldValue)
           } else if(oldValue != null && !newValue.equals(oldValue)) {
-            if(DexInstructionParser.TYPE_SINGLE_LENGTH.equals(oldValue) && newValue.isInstanceOf[ObjectType]) {
+            if(DexInstructionParser.TYPE_SINGLE_LENGTH.equals(oldValue) && newValue.isObject) {
               if(DEBUG_MERGE)
                 println("single-length->class: revisit")
               revisit = true
-            } else if(newValue.isInstanceOf[ObjectType] && oldValue.isInstanceOf[ObjectType]) {
+            } else if(newValue.isObject && oldValue.isObject) {
               // newValue and oldValue are both classes, we should find out the youngest common
               // ancestor of these two classes. This is, however, not possible if the disassembler
               // is not processing ODEX files because otherwise the disassembler is only aware

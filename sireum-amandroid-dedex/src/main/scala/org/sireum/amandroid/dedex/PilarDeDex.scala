@@ -13,7 +13,7 @@ import java.io.PrintStream
 import hu.uw.pallergabor.dedexer._
 import java.io.File
 import java.io.IOException
-import org.sireum.jawa.ObjectType
+import org.sireum.jawa.JawaType
 
 /**
  * @author fgwei
@@ -29,7 +29,7 @@ class PilarDeDex {
       sourceFileUri: FileResourceUri,
       targetDirUri: Option[FileResourceUri],
       depsDirUri: Option[FileResourceUri],
-      recordFilter: (ObjectType => Boolean),
+      recordFilter: (JawaType => Boolean),
       dexlog: Boolean,
       debugMode: Boolean): Unit = {
     try{

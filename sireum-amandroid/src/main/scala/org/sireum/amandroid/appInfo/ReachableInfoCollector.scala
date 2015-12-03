@@ -31,7 +31,7 @@ import org.sireum.jawa.util.ASTUtil
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author Sankardas Roy. 
  */
-class ReachableInfoCollector(global: Global, entryPointClasses:Set[ObjectType], timer: Option[MyTimer]) {
+class ReachableInfoCollector(global: Global, entryPointClasses:Set[JawaType], timer: Option[MyTimer]) {
   final val TITLE = "ReachableInfoCollector"
   private final val callbackMethods: MMap[JawaClass, Set[JawaMethod]] = mmapEmpty // a map from an app component to associated callbacks
   private final val layoutClasses: MMap[JawaClass, Set[Int]] = mmapEmpty
@@ -304,9 +304,9 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[ObjectType], 
                 val params = sig.getParameterTypes
                 params.foreach{
                   param =>
-                    val typ = param.typ
+                    val typ = param.baseTyp
                     if(this.androidCallbacks.contains(typ)){
-                      val typRecOpt = global.tryLoadClass(param.asInstanceOf[ObjectType])
+                      val typRecOpt = global.tryLoadClass(param)
                       typRecOpt match{
                         case Some(typRec) =>
                           val hier = global.getClassHierarchy

@@ -9,7 +9,7 @@ import org.sireum.amandroid.parser.ManifestParser
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.io.FgSourceFile
 import org.sireum.jawa.io.PlainFile
-import org.sireum.jawa.ObjectType
+import org.sireum.jawa.JawaType
 
 object ApkDecompiler {
   final val TITLE = "ApkDecompiler"
@@ -21,7 +21,7 @@ object ApkDecompiler {
   
   def decompileDex(dexUri: FileResourceUri, outUri: FileResourceUri, dpsuri: Option[FileResourceUri], pkg: String, dexLog: Boolean, debugMode: Boolean, removeSupportGen: Boolean, forceDelete: Boolean): (String, ISet[String]) = {
     val dependencies: MSet[String] = msetEmpty
-    val recordFilter: (ObjectType => Boolean) = {
+    val recordFilter: (JawaType => Boolean) = {
       ot =>
         if(removeSupportGen) {
           if(ot.name.startsWith("android.support.v4")){

@@ -287,7 +287,10 @@ object AdLibCounting {
           // resolve each record of the app and stores the result in the Center which will be available throughout the analysis.
           global.getApplicationClassCodes.keys foreach{
             k =>
-              val pkg = k.pkg
+              val pkg = k.getPackage match {
+                case Some(p) => p.toPkgString(".")
+                case None => ""
+              }
               if(pkg.contains("adfonic")) Counter.adfonic += file
               if(pkg.contains("winad")) Counter.winad += file
               if(pkg.contains("admarvel")) Counter.admarvel += file

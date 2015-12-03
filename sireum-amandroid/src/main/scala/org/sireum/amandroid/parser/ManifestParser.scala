@@ -18,7 +18,7 @@ import javax.xml.parsers.ParserConfigurationException
 import org.xml.sax.SAXException
 import brut.androlib.res.decoder.{AXmlResourceParser => BrutAXmlResourceParser}
 import android.content.res.{AXmlResourceParser => ResAXmlResourceParser}
-import org.sireum.jawa.ObjectType
+import org.sireum.jawa.JawaType
 import java.io.File
 import java.io.InputStream
 import java.io.IOException
@@ -28,7 +28,7 @@ import org.sireum.amandroid.util.TypedValue
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-final case class ComponentInfo(compType: ObjectType, typ: ComponentType.Value, exported: Boolean, enabled: Boolean, permission: ISet[String])
+final case class ComponentInfo(compType: JawaType, typ: ComponentType.Value, exported: Boolean, enabled: Boolean, permission: ISet[String])
 
 object ComponentType extends Enumeration {
   val ACTIVITY, SERVICE, RECEIVER, PROVIDER = Value
@@ -40,16 +40,16 @@ object ComponentType extends Enumeration {
  */ 
 class ManifestParser{
   private val componentInfos: MSet[ComponentInfo] = msetEmpty
-  private val components: MMap[ObjectType, ComponentType.Value] = mmapEmpty
+  private val components: MMap[JawaType, ComponentType.Value] = mmapEmpty
   private var packageName = ""
   private val headerNames: MSet[String] = msetEmpty
   private val permissions: MSet[String] = msetEmpty
   private val intentFdb: IntentFilterDataBase = new IntentFilterDataBase
-  private var currentComponent: ObjectType = null
+  private var currentComponent: JawaType = null
   private var applicationPermission: String = null
-  private val componentPermission: MMap[ObjectType, String] = mmapEmpty
-  private val componentExported: MMap[ObjectType, String] = mmapEmpty
-  private val componentEnabled: MMap[ObjectType, String] = mmapEmpty
+  private val componentPermission: MMap[JawaType, String] = mmapEmpty
+  private val componentExported: MMap[JawaType, String] = mmapEmpty
+  private val componentEnabled: MMap[JawaType, String] = mmapEmpty
   private var currentIntentFilter: IntentFilter = null
 
   private var minSdkVersion = 0
@@ -68,7 +68,7 @@ class ManifestParser{
    * adapted from Steven Arzt
    * 
    */
-  def toPilarClass(str: String): ObjectType = new ObjectType(str)
+  def toPilarClass(str: String): JawaType = new JawaType(str)
   
   def loadClassesFromTextManifest(manifestIS: InputStream) = {
     try {
@@ -210,7 +210,7 @@ class ManifestParser{
 
   private def loadManifestEntry(comp: Element, baseClass: ComponentType.Value, packageName: String) = {
     val className = getAttribute(comp, "name", false)
-    val classType = new ObjectType(className)
+    val classType = new JawaType(className)
     if (className.startsWith(".")){
       this.currentComponent = toPilarClass(this.packageName + className)
       this.components += (this.currentComponent -> baseClass)
@@ -284,7 +284,7 @@ class ManifestParser{
     
   }
 
-  def getComponentClasses: ISet[ObjectType] = this.components.map(_._1).toSet
+  def getComponentClasses: ISet[JawaType] = this.components.map(_._1).toSet
 
   def getComponentInfos: ISet[ComponentInfo] = this.componentInfos.toSet
 

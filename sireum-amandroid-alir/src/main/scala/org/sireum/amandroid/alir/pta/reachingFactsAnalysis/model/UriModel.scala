@@ -96,7 +96,7 @@ object UriModel {
 	  val strValue = s.pointsToSet(strSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
-    val stringUriIns = PTAInstance(ObjectType(AndroidConstants.URI_STRING_URI, 0), currentContext, false)
+    val stringUriIns = PTAInstance(new JawaType(AndroidConstants.URI_STRING_URI), currentContext, false)
     newfacts += RFAFact(VarSlot(retVar, false, false), stringUriIns)
     strValue.map{
       sv =>

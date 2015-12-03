@@ -13,12 +13,12 @@ import org.sireum.jawa.alir.Context
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.alir.pta.Instance
-import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.jawa.alir.pta.FieldSlot
+import org.sireum.jawa.alir.pta.PTAInstance
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -148,18 +148,18 @@ object ComponentNameModel {
 	    i =>
 	      i match{
 	        case cstr @ PTAConcreteStringInstance(text, c) =>
-	          val recordTyp = new ObjectType(text)
+	          val recordTyp = new JawaType(text)
 	          val recOpt = global.tryLoadClass(recordTyp)
 	          recOpt match{
 	            case Some(rec) =>
-	              PTAConcreteStringInstance(rec.getName, currentContext)
+	              PTAConcreteStringInstance(rec.getName, currentContext.copy)
 	            case None =>
-	              UnknownInstance(recordTyp, currentContext)
+	              PTAInstance(recordTyp.toUnknown, currentContext.copy, false)
 	          }
           case pstr @ PTAPointStringInstance(c) => 
-            PTAPointStringInstance(currentContext)
+            PTAPointStringInstance(currentContext.copy)
           case _ =>
-            UnknownInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, currentContext)
+            PTAInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE.toUnknown, currentContext.copy, false)
         }
     }
   }
@@ -196,16 +196,20 @@ object ComponentNameModel {
               cn =>
                 cn match {
                   case cstr @ PTAConcreteStringInstance(text, c) =>
-                    val recordTyp = new ObjectType(text)
+                    val recordTyp = new JawaType(text)
                     val recOpt = global.tryLoadClass(recordTyp)
                     var facts = isetEmpty[RFAFact]
                     recOpt match {
                       case Some(rec) =>
-                        val pakStr = PTAConcreteStringInstance(rec.getPackage, c)
+                        val packageName = rec.getPackage match {
+                          case Some(pkg) => pkg.toPkgString(".")
+                          case None => ""
+                        }
+                        val pakStr = PTAConcreteStringInstance(packageName, c)
                         facts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
                         facts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
                       case None =>
-                        val unknownIns = UnknownInstance(recordTyp, currentContext)
+                        val unknownIns = PTAInstance(recordTyp.toUnknown, currentContext.copy, false)
                         facts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
                         facts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
                     }
@@ -242,10 +246,14 @@ object ComponentNameModel {
 		        cn =>
 		          cn match{
 		            case cstr @ PTAConcreteStringInstance(text, c) =>
-		              val recordType = JavaKnowledge.getTypeFromName(text).asInstanceOf[ObjectType]
+		              val recordType = JavaKnowledge.getTypeFromName(text)
 		              val rec = global.getClassOrResolve(recordType)
 		              val claStr = PTAConcreteStringInstance(recordType.name, c)
-		              val pakStr = PTAConcreteStringInstance(rec.getPackage, c)
+                  val packageName = rec.getPackage match {
+                    case Some(pkg) => pkg.toPkgString(".")
+                    case None => ""
+                  }
+		              val pakStr = PTAConcreteStringInstance(packageName, c)
 		              var facts = isetEmpty[RFAFact]
 		              facts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
 		              facts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), claStr)
@@ -290,7 +298,7 @@ object ComponentNameModel {
 							        pv2 =>
 							          pv2 match{
 							            case cstr2 @ PTAConcreteStringInstance(text, c) =>
-							              val recordType = JavaKnowledge.getTypeFromName(text).asInstanceOf[ObjectType]
+							              val recordType = JavaKnowledge.getTypeFromName(text)
 							              val claStr = PTAConcreteStringInstance(recordType.name, c)
 							              var facts = isetEmpty[RFAFact]
 							              facts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pv1)
@@ -317,10 +325,14 @@ object ComponentNameModel {
                       pv2 =>
                         pv2 match{
                           case cstr2 @ PTAConcreteStringInstance(text, c) =>
-                            val recordType = JavaKnowledge.getTypeFromName(text).asInstanceOf[ObjectType]
+                            val recordType = JavaKnowledge.getTypeFromName(text)
                             val rec = global.getClassOrResolve(recordType)
                             val claStr = PTAConcreteStringInstance(recordType.name, c)
-                            val pakStr = PTAConcreteStringInstance(rec.getPackage, c)
+                            val packageName = rec.getPackage match {
+                              case Some(pkg) => pkg.toPkgString(".")
+                              case None => ""
+                            }
+                            val pakStr = PTAConcreteStringInstance(packageName, c)
                             var facts = isetEmpty[RFAFact]
                             facts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
                             facts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), claStr)

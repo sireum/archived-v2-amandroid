@@ -12,7 +12,6 @@ import org.sireum.util._
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
-import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.pta.PTAResult
@@ -122,7 +121,7 @@ object IntentFilterModel {
 	              newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENTFILTER_ACTIONS)), cstr)
 	            case pstr @ PTAPointStringInstance(c) => 
 	              newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENTFILTER_ACTIONS)), pstr)
-	            case ustr @ UnknownInstance(t, c) =>
+	            case ustr if ustr.isUnknown =>
 	            case _ => throw new RuntimeException("unexpected instance type: " + acStr)
 	          }
 		    }

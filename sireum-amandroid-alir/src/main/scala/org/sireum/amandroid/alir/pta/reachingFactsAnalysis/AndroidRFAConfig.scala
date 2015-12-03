@@ -15,12 +15,11 @@ import org.sireum.jawa.alir.Context
 import org.sireum.jawa.JawaClass
 import org.sireum.jawa.alir.pta.PTAInstance
 import org.sireum.jawa.alir.pta.VarSlot
-import org.sireum.jawa.ObjectType
 import org.sireum.jawa.alir.pta.FieldSlot
 import org.sireum.jawa.alir.pta.PTATupleInstance
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
 import org.sireum.jawa.JavaKnowledge
-import org.sireum.jawa.alir.pta.UnknownInstance
+import org.sireum.jawa.JawaType
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -37,13 +36,13 @@ object AndroidRFAConfig {
     val intentSlot = VarSlot(dm.getParamName(0), false, false)
     val context : Context = new Context
     context.setContext(dm.getSignature, "L0000")
-    val intentValue = PTAInstance(ObjectType(AndroidConstants.INTENT, 0), context.copy, false)
+    val intentValue = PTAInstance(new JawaType(AndroidConstants.INTENT), context.copy, false)
     result += RFAFact(intentSlot, intentValue)
 //    val entSlot = FieldSlot(intentValue, "entries")
 //    val entValue = PTATupleInstance(PTAPointStringInstance(context.copy), PTAPointStringInstance(context.copy), context.copy)
 //    result += RFAFact(entSlot, entValue)
     val mComponentSlot = FieldSlot(intentValue, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_COMPONENT))
-    val mComponentValue = UnknownInstance(new ObjectType(AndroidConstants.COMPONENTNAME), context.copy)
+    val mComponentValue = PTAInstance(new JawaType(AndroidConstants.COMPONENTNAME).toUnknown, context.copy, false)
     result += RFAFact(mComponentSlot, mComponentValue)
     val mActionSlot = FieldSlot(intentValue, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION))
     val mActionValue = PTAPointStringInstance(context.copy)
@@ -58,7 +57,7 @@ object AndroidRFAConfig {
     val mDataValue = PTAPointStringInstance(context.copy)
     result += RFAFact(mDataSlot, mDataValue)
     val mExtrasSlot = FieldSlot(intentValue, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_EXTRAS))
-    val mExtrasValue = PTATupleInstance(PTAPointStringInstance(context.copy), UnknownInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, context.copy), context.copy)
+    val mExtrasValue = PTATupleInstance(PTAPointStringInstance(context.copy), PTAInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE.toUnknown, context.copy, false), context.copy)
     result += RFAFact(mExtrasSlot, mExtrasValue)
     result
   }

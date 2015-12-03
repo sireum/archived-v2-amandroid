@@ -23,7 +23,7 @@ import org.sireum.jawa.alir.pta.FieldSlot
 import org.sireum.jawa.JavaKnowledge
 import org.sireum.amandroid.Apk
 import org.sireum.jawa.Global
-import org.sireum.jawa.ObjectType
+import org.sireum.jawa.JawaType
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -177,7 +177,7 @@ object IntentHelper {
         }
         ic.componentNames.foreach{
           targetRecName =>
-            val targetRec = global.getClassOrResolve(new ObjectType(targetRecName))
+            val targetRec = global.getClassOrResolve(new JawaType(targetRecName))
             components += ((targetRec, IntentType.EXPLICIT))
         }
         components ++= findComponents(apk, ic.actions, ic.categories, ic.datas, ic.types).map((_, IntentType.IMPLICIT))

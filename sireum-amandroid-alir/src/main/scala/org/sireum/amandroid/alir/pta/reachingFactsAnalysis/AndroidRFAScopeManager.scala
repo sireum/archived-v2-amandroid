@@ -14,7 +14,6 @@ import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.jawa.JawaMethod
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.AndroidConstants
-import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.alir.pta.PTAResult
 
 /**
@@ -49,9 +48,9 @@ class AndroidRFAScopeManager extends ScopeManager{
     (rec.isSystemLibraryClass || rec.isUserLibraryClass) &&
     {
       if(isIncludeMode){
-        if(rec.getPackage != null) !contains(rec.getPackage) else true
+        if(rec.getPackage.isDefined) !contains(rec.getPackage.get.toPkgString(".")) else true
       } else {
-        if(rec.getPackage != null) contains(rec.getPackage) else false
+        if(rec.getPackage.isDefined) contains(rec.getPackage.get.toPkgString(".")) else false
       }
     }
   }

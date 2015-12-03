@@ -17,8 +17,6 @@ import hu.uw.pallergabor.dedexer.DexMethodIdsBlock
 import hu.uw.pallergabor.dedexer.DexOffsetResolver
 import hu.uw.pallergabor.dedexer.UnknownInstructionException
 import org.sireum.jawa.JawaType
-import org.sireum.jawa.ObjectType
-import org.sireum.jawa.PrimitiveType
 import org.sireum.jawa.Signature
 import hu.uw.pallergabor.dedexer.DexClassDefsBlock
 import scala.util.control.Breaks._
@@ -72,7 +70,7 @@ class DexInstructionToPilarParser(
   private val localvars: MMap[String, (JawaType, Boolean)] = mmapEmpty // map from variable -> (typ, isParam)
   def getLocalVars: IMap[String, (JawaType, Boolean)] = localvars.toMap
   private val regTypMap: MMap[(Position, Int), (String, JawaType)] = mmapEmpty
-  private val unresolvedReg: MMap[(Position, Int), UndeterminedType] = mmapEmpty
+  private val unresolvedReg: MMap[(Position, Int), JawaType] = mmapEmpty
   
   def initializePass(secondPass: Boolean) = {
     this.secondPass = secondPass
@@ -177,7 +175,7 @@ class DexInstructionToPilarParser(
     if(!classPart.endsWith(";")) classPart = classPart + ";"
     val methodNamePart: String = methodName.substring(methodName.lastIndexOf("/") + 1)
     val paramSigPart: String = proto.substring(proto.indexOf("("))
-    Signature(classPart + "." + methodNamePart + ":" + paramSigPart)
+    new Signature(classPart + "." + methodNamePart + ":" + paramSigPart)
   }
   
   private def getAffectedRegistersForRegList(
@@ -281,26 +279,28 @@ class DexInstructionToPilarParser(
     (strs(0).replaceAll("/", "."), JavaKnowledge.formatSignatureToType(strs(1)))
   }
 
-  private case class UndeterminedType(reg: (Position, Int), defaultTyp: JawaType) extends JawaType {
-    def typ: String = defaultTyp.typ
-    def name: String = defaultTyp.name
-    def jawaName: String = defaultTyp.jawaName
-    def simpleName: String = defaultTyp.simpleName
-    def canonicalName: String = defaultTyp.canonicalName
-    def dimensions: Int = defaultTyp.dimensions
-    def isArray: Boolean = defaultTyp.isArray
+  val undeterminedKey = "Undetermined_Key"
+  implicit class UndeterminedType(typ: JawaType) {
+    def undetermined(reg: (Position, Int)): JawaType = {
+      val res = new JawaType("UndeterminedType" + (reg, typ).hashCode)
+      res.setProperty(undeterminedKey, (reg, typ))
+      res
+    }
+    def isUndetermined: Boolean = typ ? undeterminedKey
+    def reg: (Position, Int) = typ.getProperty[((Position, Int), JawaType)](undeterminedKey)._1
+    def defaultTyp: JawaType = typ.getProperty[((Position, Int), JawaType)](undeterminedKey)._2
   }
   
-  private case class Position(base: Long, pos: Int)
+  case class Position(base: Long, pos: Int)
   
   private def genRegName(reg: (Position, Int), typ: JawaType): String = {
     regTypMap.get(reg) match {
       case Some(a) => a._1
       case None =>
-        if(typ.isInstanceOf[UndeterminedType]) {
+        if(typ.isUndetermined) {
           "v" + reg._2
         } else {
-          var newvar = typ.typ.substring(typ.typ.lastIndexOf(".") + 1).replaceAll("\\*", "_unknown") + {if(typ.dimensions > 0)"_arr" + typ.dimensions else ""} + "_v" + reg._2
+          var newvar = typ.baseTyp.substring(typ.baseTyp.lastIndexOf(".") + 1) + {if(typ.dimensions > 0)"_arr" + typ.dimensions else ""} + "_v" + reg._2
           while(localvars.contains(newvar) && localvars(newvar)._1 != typ) newvar = "a_" + newvar
           if(!localvars.contains(newvar)) localvars(newvar) = (typ, false)
           regTypMap(reg) = (newvar, typ)
@@ -313,7 +313,7 @@ class DexInstructionToPilarParser(
     regTypMap.get((v._1, -1)) match {
       case Some(a) => a._1
       case None =>
-        var newvar = typ.typ.substring(typ.typ.lastIndexOf(".") + 1).replaceAll("\\*", "_unknown") + {if(typ.dimensions > 0)"_arr" + typ.dimensions else ""} + "_" + v._2
+        var newvar = typ.baseTyp.substring(typ.baseTyp.lastIndexOf(".") + 1) + {if(typ.dimensions > 0)"_arr" + typ.dimensions else ""} + "_" + v._2
         while(localvars.contains(newvar) && localvars(newvar)._1 != typ) newvar = "a_" + newvar
         if(!localvars.contains(newvar)) localvars(newvar) = (typ, false)
         regTypMap((v._1, -1)) = (newvar, typ)
@@ -324,18 +324,14 @@ class DexInstructionToPilarParser(
   private def resolveRegType(reg: (Position, Int), defaultTyp: JawaType): JawaType = {
     val typ = regMap.getOrElseUpdate(new Integer(reg._2), defaultTyp)
     typ match {
-      case ut: UndeterminedType =>
+      case ut if ut.isUndetermined =>
         var restyp = regTypMap.getOrElse(reg, ("", defaultTyp))._2
         restyp match {
-          case ot: ObjectType =>
-            ut.defaultTyp match {
-              case uot: ObjectType =>
-                if(ot != uot) restyp = JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE
-              case _ =>
-            }
+          case ot if ot.isObject =>
+            restyp = JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE
           case _ =>
         }
-        val usetyp = UndeterminedType(ut.reg, restyp)
+        val usetyp = restyp.undetermined(ut.reg)
         unresolvedReg(ut.reg) = usetyp
         unresolvedReg(reg) = usetyp
         regMap(new Integer(reg._2)) = usetyp
@@ -360,7 +356,7 @@ class DexInstructionToPilarParser(
           if(ptyps.isDefinedAt(j)) ptyps(j)
           else JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE
         ptyp match {
-          case PrimitiveType("long") | PrimitiveType("double") =>
+          case pt if pt.jawaName == "long" || pt.jawaName == "double" =>
             if(!nextpass) {
               othargs += ((arg, ptyp))
               nextpass = true
@@ -398,8 +394,9 @@ class DexInstructionToPilarParser(
     if(secondPass) {
       unresolvedReg.foreach {
         case (key, typ) =>
-          val regName = genRegName(key, typ.defaultTyp)
-          regTypMap(key) = (regName, typ.defaultTyp)
+          val t = typ.defaultTyp
+          val regName = genRegName(key, t)
+          regTypMap(key) = (regName, t)
       }
       unresolvedReg.clear
     }
@@ -417,9 +414,9 @@ class DexInstructionToPilarParser(
           val constant = (b1 & 0xF0) >> 4
           val typ =
             if(secondPass) {
-              regTypMap.getOrElse((regpos, reg), ("", PrimitiveType("int")))._2
+              regTypMap.getOrElse((regpos, reg), ("", new JawaType("int")))._2
             } else {
-              val utyp = new UndeterminedType((regpos, reg), PrimitiveType("int"))
+              val utyp = new JawaType("int").undetermined((regpos, reg))
               unresolvedReg.getOrElseUpdate((regpos, reg), utyp)
               utyp
             }
@@ -440,7 +437,7 @@ class DexInstructionToPilarParser(
           val stringidx = read16Bit()
           val string = StringEscapeUtils.escapeJava(dexStringIdsBlock.getString(stringidx))
           val lines = string.lines.size
-          val typ = new ObjectType("java.lang.String")
+          val typ = new JawaType("java.lang.String")
           val regName = genRegName((regpos, reg), typ)
           val code = instrCode match {
             case CONST_STRING => 
@@ -459,7 +456,7 @@ class DexInstructionToPilarParser(
           val stringidx: Int = read32Bit().toInt
           val string = StringEscapeUtils.escapeJava(dexStringIdsBlock.getString(stringidx))
           val lines = string.lines.size
-          val typ = new ObjectType("java.lang.String")
+          val typ = new JawaType("java.lang.String")
           val regName = genRegName((regpos, reg), typ)
           val code = instrCode match {
             case CONST_STRING_JUMBO =>
@@ -514,7 +511,7 @@ class DexInstructionToPilarParser(
           if((byteCounter % 2) != 0)
             read8Bit()         // Align to 16 bit
           val className = signature.getClassName
-          val methodName = signature.methodNamePart
+          val methodName = signature.methodName
           val classTyp = generator.generateType(signature.getClassType).render()
           val retTyp = signature.getReturnType()
           val retVoid = retTyp.name == "void"
@@ -612,7 +609,7 @@ class DexInstructionToPilarParser(
                   }
                   val signature = getSignature(method, proto)
                   val className = signature.getClassName
-                  val methodName = signature.methodNamePart
+                  val methodName = signature.methodName
                   val classTyp = generator.generateType(signature.getClassType).render()
                   val argNames = getArgNames(args.toList, false, signature)
                   val retTyp = signature.getReturnType()
@@ -701,7 +698,7 @@ class DexInstructionToPilarParser(
                 method = method.substring(1, idx)
                 val signature = getSignature(method, proto)
                 val className = signature.getClassName
-                val methodName = signature.methodNamePart
+                val methodName = signature.methodName
                 val classTyp = generator.generateType(signature.getClassType).render()
                 val argNames = getArgNames(args.toList, true, signature)
                 val retTyp = signature.getReturnType()
@@ -768,7 +765,7 @@ class DexInstructionToPilarParser(
           if((byteCounter % 2) != 0)
             read8Bit()         // Align to 16 bit
           val arrayType = JavaKnowledge.formatSignatureToType(dexTypeIdsBlock.getType(typeidx).escape)
-          val baseType = JawaType.generateType(arrayType.typ, arrayType.dimensions - 1)
+          val baseType = JawaType.generateType(arrayType.baseTyp, arrayType.dimensions - 1)
           val baseTypeStr = generator.generateType(baseType).render()
           val regNames = regs.map{
             case reg =>
@@ -794,7 +791,7 @@ class DexInstructionToPilarParser(
           val proto = dexMethodIdsBlock.getProto(methodidx).escape
           val signature = getSignature(method, proto)
           val className = signature.getClassName
-          val methodName = signature.methodNamePart
+          val methodName = signature.methodName
           val classTyp = generator.generateType(signature.getClassType).render()
           val args: IList[(Position, Int)] = (0 to argsize - 1).map(i => (Position(instrBase, i), argbase + i)).toList
           val argNames = getArgNames(args, instrCode == INVOKE_STATIC_RANGE, signature)
@@ -852,7 +849,7 @@ class DexInstructionToPilarParser(
                       method = method.substring(0, idx)
                       val signature = getSignature(method, proto)
                       val className = signature.getClassName
-                      val methodName = signature.methodNamePart
+                      val methodName = signature.methodName
                       val classTyp = generator.generateType(signature.getClassType).render()
                       val args: IList[(Position, Int)] = (0 to argsize - 1).map(i => (Position(instrBase, i), argbase + i)).toList
                       val argNames = getArgNames(args, instrCode == INVOKE_STATIC_RANGE, signature)
@@ -922,7 +919,7 @@ class DexInstructionToPilarParser(
                 method = method.substring(0, idx)
                 val signature = getSignature(method, proto)
                 val className = signature.getClassName
-                val methodName = signature.methodNamePart
+                val methodName = signature.methodName
                 val classTyp = generator.generateType(signature.getClassType).render()
                 val args: IList[(Position, Int)] = (0 to argsize - 1).map(i => (Position(instrBase, i), argbase + i)).toList
                 val argNames = getArgNames(args, instrCode == INVOKE_STATIC_RANGE, signature)
@@ -963,7 +960,7 @@ class DexInstructionToPilarParser(
           for(i <- 0 to regno - 1)
             affectedRegisters.insert(i, regbase + i)
           val arrayType = JavaKnowledge.formatSignatureToType(dexTypeIdsBlock.getType(typeidx).escape)
-          val baseType = JawaType.generateType(arrayType.typ, arrayType.dimensions - 1)
+          val baseType = JawaType.generateType(arrayType.baseTyp, arrayType.dimensions - 1)
           val baseTypeStr = generator.generateType(baseType).render()
           val regs: IList[Int] = (0 to regsize - 1).map(regbase + _).toList
           val regNames = regs.map{
@@ -989,9 +986,9 @@ class DexInstructionToPilarParser(
           val sizeregpos = Position(instrBase, 1)
           val sizereg = (regs & 0xF0) >> 4
           val arrayType = JavaKnowledge.formatSignatureToType(dexTypeIdsBlock.getType(typeidx).escape)
-          val baseType = generator.generateType(JawaType.generateType(arrayType.typ, arrayType.dimensions - 1)).render()
+          val baseType = generator.generateType(JawaType.generateType(arrayType.baseTyp, arrayType.dimensions - 1)).render()
           val targetregName = genRegName((targetregpos, targetreg), arrayType)
-          val sizeregName = genRegName((sizeregpos, sizereg), resolveRegType((sizeregpos, sizereg), PrimitiveType("int")))
+          val sizeregName = genRegName((sizeregpos, sizereg), resolveRegType((sizeregpos, sizereg), new JawaType("int")))
           val code = instrCode match {
             case NEW_ARRAY => newArray(targetregName, baseType, sizeregName)
             case _ => "@UNKNOWN_NEWARRAY 0x%x".format(instrCode)
@@ -1008,7 +1005,7 @@ class DexInstructionToPilarParser(
           val offset = readSigned32Bit()
           val target: Long = instrBase + (offset * 2L)
           affectedRegisters.insert(0, reg)
-          val regName = genRegName((regpos, reg), resolveRegType((regpos, reg), PrimitiveType("int")))
+          val regName = genRegName((regpos, reg), resolveRegType((regpos, reg), new JawaType("int")))
           val fillArrayTask = new FillArrayDataTask(regName, getFilePosition, this, instrBase, target)
           val valid = fillArrayTask.isValid
           if(valid) {
@@ -1173,9 +1170,9 @@ class DexInstructionToPilarParser(
           val constant = read16Bit()
           val typ =
             if(secondPass) {
-              regTypMap.getOrElse((targetregpos, targetreg), ("", PrimitiveType("int")))._2
+              regTypMap.getOrElse((targetregpos, targetreg), ("", new JawaType("int")))._2
             } else {
-              val utyp = new UndeterminedType((targetregpos, targetreg), PrimitiveType("int"))
+              val utyp = new JawaType("int").undetermined((targetregpos, targetreg))
               unresolvedReg.getOrElseUpdate((targetregpos, targetreg), utyp)
               utyp
             }
@@ -1196,9 +1193,9 @@ class DexInstructionToPilarParser(
           val constant = read16Bit()
           val typ =
             if(secondPass) {
-              regTypMap.getOrElse((targetregpos, targetreg), ("", PrimitiveType("long")))._2
+              regTypMap.getOrElse((targetregpos, targetreg), ("", new JawaType("long")))._2
             } else {
-              val utyp = new UndeterminedType((targetregpos, targetreg), PrimitiveType("long"))
+              val utyp = new JawaType("long").undetermined((targetregpos, targetreg))
               unresolvedReg.getOrElseUpdate((targetregpos, targetreg), utyp)
               utyp
             }
@@ -1219,20 +1216,20 @@ class DexInstructionToPilarParser(
           val reg2 = read8Bit()
           val reg3pos = Position(instrBase, 2)
           val reg3 = read8Bit()
-          val typlhs: PrimitiveType = instrCode match {
+          val typlhs: JawaType = instrCode match {
             case ADD_INT | SUB_INT | MUL_INT | DIV_INT | REM_INT |
-                 AND_INT | OR_INT | XOR_INT | SHL_INT | SHR_INT | USHR_INT => PrimitiveType("int")
-            case ADD_FLOAT | SUB_FLOAT | MUL_FLOAT | DIV_FLOAT | REM_FLOAT => PrimitiveType("float")
-            case CMPL_FLOAT | CMPG_FLOAT | CMP_LONG  | CMPL_DOUBLE | CMPG_DOUBLE => PrimitiveType("boolean")
-            case _ => PrimitiveType("int")
+                 AND_INT | OR_INT | XOR_INT | SHL_INT | SHR_INT | USHR_INT => new JawaType("int")
+            case ADD_FLOAT | SUB_FLOAT | MUL_FLOAT | DIV_FLOAT | REM_FLOAT => new JawaType("float")
+            case CMPL_FLOAT | CMPG_FLOAT | CMP_LONG  | CMPL_DOUBLE | CMPG_DOUBLE => new JawaType("boolean")
+            case _ => new JawaType("int")
           }
-          val typrhs: PrimitiveType = instrCode match {
+          val typrhs: JawaType = instrCode match {
             case ADD_INT | SUB_INT | MUL_INT | DIV_INT | REM_INT |
-                 AND_INT | OR_INT | XOR_INT | SHL_INT | SHR_INT | USHR_INT => PrimitiveType("int")
-            case ADD_FLOAT | SUB_FLOAT | MUL_FLOAT | DIV_FLOAT | REM_FLOAT | CMPL_FLOAT | CMPG_FLOAT => PrimitiveType("float")
-            case CMP_LONG => PrimitiveType("long")
-            case CMPL_DOUBLE | CMPG_DOUBLE => PrimitiveType("double")
-            case _ => PrimitiveType("int")
+                 AND_INT | OR_INT | XOR_INT | SHL_INT | SHR_INT | USHR_INT => new JawaType("int")
+            case ADD_FLOAT | SUB_FLOAT | MUL_FLOAT | DIV_FLOAT | REM_FLOAT | CMPL_FLOAT | CMPG_FLOAT => new JawaType("float")
+            case CMP_LONG => new JawaType("long")
+            case CMPL_DOUBLE | CMPG_DOUBLE => new JawaType("double")
+            case _ => new JawaType("int")
           }
           val reg2Name = genRegName((reg2pos, reg2), resolveRegType((reg2pos, reg2), typrhs))
           val reg3Name = genRegName((reg3pos, reg3), resolveRegType((reg3pos, reg3), typrhs))
@@ -1275,11 +1272,11 @@ class DexInstructionToPilarParser(
           val reg2 = read8Bit()
           val reg3pos = Position(instrBase, 2)
           val reg3 = read8Bit()
-          val typ: PrimitiveType = instrCode match {
+          val typ: JawaType = instrCode match {
             case ADD_LONG | SUB_LONG | MUL_LONG | DIV_LONG | REM_LONG |
-                 AND_LONG | OR_LONG | XOR_LONG | SHL_LONG | SHR_LONG | USHR_LONG => PrimitiveType("long")
-            case ADD_DOUBLE | SUB_DOUBLE | MUL_DOUBLE | DIV_DOUBLE | REM_DOUBLE => PrimitiveType("double")
-            case _ => PrimitiveType("long")
+                 AND_LONG | OR_LONG | XOR_LONG | SHL_LONG | SHR_LONG | USHR_LONG => new JawaType("long")
+            case ADD_DOUBLE | SUB_DOUBLE | MUL_DOUBLE | DIV_DOUBLE | REM_DOUBLE => new JawaType("double")
+            case _ => new JawaType("long")
           }
           val reg2Name = genRegName((reg2pos, reg2), resolveRegType((reg2pos, reg2), typ))
           val reg3Name = genRegName((reg3pos, reg3), resolveRegType((reg3pos, reg3), typ))
@@ -1320,29 +1317,26 @@ class DexInstructionToPilarParser(
           val reg3 = read8Bit()
           val arrayType = resolveRegType((reg2pos, reg2), {
             instrCode match {
-              case AGET => ObjectType("int", 1)
-              case AGET_WIDE => ObjectType("long", 1)
-              case AGET_OBJECT => ObjectType(JavaKnowledge.JAVA_TOPLEVEL_OBJECT, 1)
-              case AGET_BOOLEAN => ObjectType("boolean", 1)
-              case AGET_BYTE => ObjectType("byte", 1)
-              case AGET_CHAR => ObjectType("char", 1)
-              case AGET_SHORT => ObjectType("short", 1)
-              case _ => ObjectType("int", 1)
+              case AGET => new JawaType("int", 1)
+              case AGET_WIDE => new JawaType("long", 1)
+              case AGET_OBJECT => new JawaType(JavaKnowledge.JAVA_TOPLEVEL_OBJECT, 1)
+              case AGET_BOOLEAN => new JawaType("boolean", 1)
+              case AGET_BYTE => new JawaType("byte", 1)
+              case AGET_CHAR => new JawaType("char", 1)
+              case AGET_SHORT => new JawaType("short", 1)
+              case _ => new JawaType("int", 1)
             }
           })
           val elementType: JawaType = arrayType match {
             // should mostly come here
-            case typ if typ.dimensions > 0 => JawaType.generateType(typ.typ, typ.dimensions - 1)
+            case typ if typ.dimensions > 0 => JawaType.generateType(typ.baseTyp, typ.dimensions - 1)
             // some problem might happened
             case typ =>
-              typ match {
-                case ot: ObjectType => ot.toUnknown
-                case _ => typ
-              }
+              typ.undetermined((Position(instrBase, 0), reg1))
           }
           val reg1Name = genRegName((reg1pos, reg1), elementType)
           val reg2Name = genRegName((reg2pos, reg2), arrayType)
-          val reg3Name = genRegName((reg3pos, reg3), resolveRegType((reg3pos, reg3), PrimitiveType("int")))
+          val reg3Name = genRegName((reg3pos, reg3), resolveRegType((reg3pos, reg3), new JawaType("int")))
           val code = instrCode match {
             case AGET => aget(reg1Name, reg2Name, reg3Name)
             case AGET_WIDE => agetWide(reg1Name, reg2Name, reg3Name)
@@ -1370,28 +1364,25 @@ class DexInstructionToPilarParser(
           val reg2 = read8Bit()
           val arrayType = resolveRegType((reg1pos, reg1), {
             instrCode match {
-              case APUT => ObjectType("int", 1)
-              case APUT_WIDE => ObjectType("long", 1)
-              case APUT_OBJECT => ObjectType(JavaKnowledge.JAVA_TOPLEVEL_OBJECT, 1)
-              case APUT_BOOLEAN => ObjectType("boolean", 1)
-              case APUT_BYTE => ObjectType("byte", 1)
-              case APUT_CHAR => ObjectType("char", 1)
-              case APUT_SHORT => ObjectType("short", 1)
-              case _ => ObjectType("int", 1)
+              case APUT => new JawaType("int", 1)
+              case APUT_WIDE => new JawaType("long", 1)
+              case APUT_OBJECT => new JawaType(JavaKnowledge.JAVA_TOPLEVEL_OBJECT, 1)
+              case APUT_BOOLEAN => new JawaType("boolean", 1)
+              case APUT_BYTE => new JawaType("byte", 1)
+              case APUT_CHAR => new JawaType("char", 1)
+              case APUT_SHORT => new JawaType("short", 1)
+              case _ => new JawaType("int", 1)
             }
           })
           val elementType: JawaType = arrayType match {
             // should mostly come here
-            case typ if typ.dimensions > 0 => JawaType.generateType(typ.typ, typ.dimensions - 1)
+            case typ if typ.dimensions > 0 => JawaType.generateType(typ.baseTyp, typ.dimensions - 1)
             // some problem might happened
             case typ =>
-              typ match {
-                case ot: ObjectType => ot.toUnknown
-                case _ => typ
-              }
+              typ.undetermined((Position(instrBase, 2), reg3))
           }
           val reg1Name = genRegName((reg1pos, reg1), resolveRegType((reg1pos, reg1), arrayType))
-          val reg2Name = genRegName((reg2pos, reg2), resolveRegType((reg2pos, reg2), PrimitiveType("int")))
+          val reg2Name = genRegName((reg2pos, reg2), resolveRegType((reg2pos, reg2), new JawaType("int")))
           val reg3Name = genRegName((reg3pos, reg3), resolveRegType((reg3pos, reg3), elementType))
           val code = instrCode match {
             case APUT => aput(reg1Name, reg2Name, reg3Name)
@@ -1415,7 +1406,7 @@ class DexInstructionToPilarParser(
           val offset = read32Bit()
           val target = instrBase + (offset * 2L)
           affectedRegisters += reg
-          val regName = genRegName((regpos, reg), resolveRegType((regpos, reg), PrimitiveType("int")))
+          val regName = genRegName((regpos, reg), resolveRegType((regpos, reg), new JawaType("int")))
           val packedSwitchTask = new PackedSwitchTask(regName, getFilePosition, this, instrBase, target)
           val valid = packedSwitchTask.isValid
           if(valid) {
@@ -1441,7 +1432,7 @@ class DexInstructionToPilarParser(
           val offset = read32Bit()
           val target = instrBase + (offset * 2L)
           affectedRegisters += reg
-          val regName = genRegName((regpos, reg), resolveRegType((regpos, reg), PrimitiveType("int")))
+          val regName = genRegName((regpos, reg), resolveRegType((regpos, reg), new JawaType("int")))
           val sparseSwitchTask = new SparseSwitchTask(regName, getFilePosition, this, instrBase, target)
           val valid = sparseSwitchTask.isValid
           if(valid) {
@@ -1467,8 +1458,8 @@ class DexInstructionToPilarParser(
           val reg = read8Bit()
           val typ = resolveRegType((temppos, -1), {
             instrCode match {
-              case MOVE_RESULT => PrimitiveType("int")
-              case MOVE_RESULT_WIDE => PrimitiveType("long")
+              case MOVE_RESULT => new JawaType("int")
+              case MOVE_RESULT_WIDE => new JawaType("long")
               case MOVE_RESULT_OBJECT => JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE
               case MOVE_EXCEPTION => ExceptionCenter.EXCEPTION
               case _ => JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE
@@ -1576,13 +1567,13 @@ class DexInstructionToPilarParser(
             typee = "L" + typee + ";"
           val typ = JavaKnowledge.formatSignatureToType(typee)
           val reg2Name = genRegName((reg2pos, reg2), resolveRegType((reg2pos, reg2), JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE))
-          val reg1Name = genRegName((reg1pos, reg1), PrimitiveType("boolean"))
+          val reg1Name = genRegName((reg1pos, reg1), new JawaType("boolean"))
           val code = instrCode match {
             case INSTANCE_OF => instanceOf(reg1Name, reg2Name, generator.generateType(typ).render())
             case _ => "@UNKNOWN_TWOREGSTYPE 0x%x".format(instrCode)
           }
           instrText.append(code)
-          regMap(new Integer(reg1)) = PrimitiveType("boolean")
+          regMap(new Integer(reg1)) = new JawaType("boolean")
           affectedRegisters += reg1
           affectedRegisters += reg2
         // The instruction is followed by one byte with register index and one signed
@@ -1593,7 +1584,7 @@ class DexInstructionToPilarParser(
           affectedRegisters += reg
           val target = calculateTarget16Bit(instrBase)
           if(inRange(target)){
-            val regTyp = resolveRegType((regpos, reg), PrimitiveType("boolean"))
+            val regTyp = resolveRegType((regpos, reg), new JawaType("boolean"))
             val regName = genRegName((regpos, reg), regTyp)
             val code = instrCode match {
               case IF_EQZ => ifEqz(regName, target, regTyp)
@@ -1635,10 +1626,10 @@ class DexInstructionToPilarParser(
           val target = calculateTarget16Bit(instrBase)
           if(inRange(target)){
             val defaultTyp = regMap.get(new Integer(reg1)) match {
-              case Some(typ) if !typ.isInstanceOf[UndeterminedType] => typ
+              case Some(typ) if !typ.isUndetermined => typ
               case _ => regMap.get(new Integer(reg2)) match {
-                case Some(typ) if !typ.isInstanceOf[UndeterminedType] => typ
-                case _ => PrimitiveType("int")
+                case Some(typ) if !typ.isUndetermined => typ
+                case _ => new JawaType("int")
               }
             }
             val reg1Name = genRegName((reg1pos, reg1), resolveRegType((reg1pos, reg1), defaultTyp))
@@ -1665,8 +1656,8 @@ class DexInstructionToPilarParser(
           val reg2pos = Position(instrBase, 1)
           val reg2 = (b1 & 0xF0) >> 4
           val typ = resolveRegType((reg2pos, reg2), {instrCode match {
-            case MOVE => PrimitiveType("int")
-            case MOVE_WIDE => PrimitiveType("long")
+            case MOVE => new JawaType("int")
+            case MOVE_WIDE => new JawaType("long")
             case MOVE_OBJECT => JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE
             case _ => JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE
           }})
@@ -1694,118 +1685,118 @@ class DexInstructionToPilarParser(
           val reg2pos = Position(instrBase, 2)
           val reg2 = (b1 & 0xF0) >> 4
           val typlhs: JawaType = instrCode match {
-            case ARRAY_LENGTH => PrimitiveType("int")
-            case NEG_INT => PrimitiveType("int")
-            case NEG_LONG => PrimitiveType("long")
-            case NEG_FLOAT => PrimitiveType("float")
-            case NEG_DOUBLE => PrimitiveType("double")
-            case INT_TO_LONG => PrimitiveType("long")
-            case INT_TO_FLOAT => PrimitiveType("float")
-            case INT_TO_DOUBLE => PrimitiveType("double")
-            case LONG_TO_INT => PrimitiveType("int")
-            case LONG_TO_FLOAT => PrimitiveType("float")
-            case LONG_TO_DOUBLE => PrimitiveType("double")
-            case FLOAT_TO_INT => PrimitiveType("int")
-            case FLOAT_TO_LONG => PrimitiveType("long")
-            case FLOAT_TO_DOUBLE => PrimitiveType("double")
-            case DOUBLE_TO_INT => PrimitiveType("int")
-            case DOUBLE_TO_LONG => PrimitiveType("long")
-            case DOUBLE_TO_FLOAT => PrimitiveType("float")
-            case INT_TO_BYTE => PrimitiveType("byte")
-            case INT_TO_CHAR => PrimitiveType("char")
-            case INT_TO_SHORT => PrimitiveType("short")
-            case ADD_INT_2ADDR => PrimitiveType("int")
-            case SUB_INT_2ADDR => PrimitiveType("int")
-            case MUL_INT_2ADDR => PrimitiveType("int")
-            case DIV_INT_2ADDR => PrimitiveType("int")
-            case REM_INT_2ADDR => PrimitiveType("int")
-            case AND_INT_2ADDR => PrimitiveType("int")
-            case OR_INT_2ADDR => PrimitiveType("int")
-            case XOR_INT_2ADDR => PrimitiveType("int")
-            case SHL_INT_2ADDR => PrimitiveType("int")
-            case SHR_INT_2ADDR => PrimitiveType("int")
-            case USHR_INT_2ADDR => PrimitiveType("int")
-            case ADD_LONG_2ADDR => PrimitiveType("long")
-            case SUB_LONG_2ADDR => PrimitiveType("long")
-            case MUL_LONG_2ADDR => PrimitiveType("long")
-            case DIV_LONG_2ADDR => PrimitiveType("long")
-            case REM_LONG_2ADDR => PrimitiveType("long")
-            case AND_LONG_2ADDR => PrimitiveType("long")
-            case OR_LONG_2ADDR => PrimitiveType("long")
-            case XOR_LONG_2ADDR => PrimitiveType("long")
-            case SHL_LONG_2ADDR => PrimitiveType("long")
-            case SHR_LONG_2ADDR => PrimitiveType("long")
-            case USHR_LONG_2ADDR => PrimitiveType("long")
-            case ADD_FLOAT_2ADDR => PrimitiveType("float")
-            case SUB_FLOAT_2ADDR => PrimitiveType("float")
-            case MUL_FLOAT_2ADDR => PrimitiveType("float")
-            case DIV_FLOAT_2ADDR => PrimitiveType("float")
-            case REM_FLOAT_2ADDR => PrimitiveType("float")
-            case ADD_DOUBLE_2ADDR => PrimitiveType("double")
-            case SUB_DOUBLE_2ADDR => PrimitiveType("double")
-            case MUL_DOUBLE_2ADDR => PrimitiveType("double")
-            case DIV_DOUBLE_2ADDR => PrimitiveType("double")
-            case REM_DOUBLE_2ADDR => PrimitiveType("double")
+            case ARRAY_LENGTH => new JawaType("int")
+            case NEG_INT => new JawaType("int")
+            case NEG_LONG => new JawaType("long")
+            case NEG_FLOAT => new JawaType("float")
+            case NEG_DOUBLE => new JawaType("double")
+            case INT_TO_LONG => new JawaType("long")
+            case INT_TO_FLOAT => new JawaType("float")
+            case INT_TO_DOUBLE => new JawaType("double")
+            case LONG_TO_INT => new JawaType("int")
+            case LONG_TO_FLOAT => new JawaType("float")
+            case LONG_TO_DOUBLE => new JawaType("double")
+            case FLOAT_TO_INT => new JawaType("int")
+            case FLOAT_TO_LONG => new JawaType("long")
+            case FLOAT_TO_DOUBLE => new JawaType("double")
+            case DOUBLE_TO_INT => new JawaType("int")
+            case DOUBLE_TO_LONG => new JawaType("long")
+            case DOUBLE_TO_FLOAT => new JawaType("float")
+            case INT_TO_BYTE => new JawaType("byte")
+            case INT_TO_CHAR => new JawaType("char")
+            case INT_TO_SHORT => new JawaType("short")
+            case ADD_INT_2ADDR => new JawaType("int")
+            case SUB_INT_2ADDR => new JawaType("int")
+            case MUL_INT_2ADDR => new JawaType("int")
+            case DIV_INT_2ADDR => new JawaType("int")
+            case REM_INT_2ADDR => new JawaType("int")
+            case AND_INT_2ADDR => new JawaType("int")
+            case OR_INT_2ADDR => new JawaType("int")
+            case XOR_INT_2ADDR => new JawaType("int")
+            case SHL_INT_2ADDR => new JawaType("int")
+            case SHR_INT_2ADDR => new JawaType("int")
+            case USHR_INT_2ADDR => new JawaType("int")
+            case ADD_LONG_2ADDR => new JawaType("long")
+            case SUB_LONG_2ADDR => new JawaType("long")
+            case MUL_LONG_2ADDR => new JawaType("long")
+            case DIV_LONG_2ADDR => new JawaType("long")
+            case REM_LONG_2ADDR => new JawaType("long")
+            case AND_LONG_2ADDR => new JawaType("long")
+            case OR_LONG_2ADDR => new JawaType("long")
+            case XOR_LONG_2ADDR => new JawaType("long")
+            case SHL_LONG_2ADDR => new JawaType("long")
+            case SHR_LONG_2ADDR => new JawaType("long")
+            case USHR_LONG_2ADDR => new JawaType("long")
+            case ADD_FLOAT_2ADDR => new JawaType("float")
+            case SUB_FLOAT_2ADDR => new JawaType("float")
+            case MUL_FLOAT_2ADDR => new JawaType("float")
+            case DIV_FLOAT_2ADDR => new JawaType("float")
+            case REM_FLOAT_2ADDR => new JawaType("float")
+            case ADD_DOUBLE_2ADDR => new JawaType("double")
+            case SUB_DOUBLE_2ADDR => new JawaType("double")
+            case MUL_DOUBLE_2ADDR => new JawaType("double")
+            case DIV_DOUBLE_2ADDR => new JawaType("double")
+            case REM_DOUBLE_2ADDR => new JawaType("double")
             case _ => 
-              if(instrType == InstructionType.TWOREGSPACKED_SINGLE) PrimitiveType("int")
-              else PrimitiveType("long")
+              if(instrType == InstructionType.TWOREGSPACKED_SINGLE) new JawaType("int")
+              else new JawaType("long")
           }
           val typrhs: JawaType = instrCode match {
-            case ARRAY_LENGTH => ObjectType(JavaKnowledge.JAVA_TOPLEVEL_OBJECT, 1)
-            case NEG_INT => PrimitiveType("int")
-            case NEG_LONG => PrimitiveType("long")
-            case NEG_FLOAT => PrimitiveType("float")
-            case NEG_DOUBLE => PrimitiveType("double")
-            case INT_TO_LONG => PrimitiveType("int")
-            case INT_TO_FLOAT => PrimitiveType("int")
-            case INT_TO_DOUBLE => PrimitiveType("int")
-            case LONG_TO_INT => PrimitiveType("long")
-            case LONG_TO_FLOAT => PrimitiveType("long")
-            case LONG_TO_DOUBLE => PrimitiveType("long")
-            case FLOAT_TO_INT => PrimitiveType("float")
-            case FLOAT_TO_LONG => PrimitiveType("float")
-            case FLOAT_TO_DOUBLE => PrimitiveType("float")
-            case DOUBLE_TO_INT => PrimitiveType("double")
-            case DOUBLE_TO_LONG => PrimitiveType("double")
-            case DOUBLE_TO_FLOAT => PrimitiveType("double")
-            case INT_TO_BYTE => PrimitiveType("int")
-            case INT_TO_CHAR => PrimitiveType("int")
-            case INT_TO_SHORT => PrimitiveType("int")
-            case ADD_INT_2ADDR => PrimitiveType("int")
-            case SUB_INT_2ADDR => PrimitiveType("int")
-            case MUL_INT_2ADDR => PrimitiveType("int")
-            case DIV_INT_2ADDR => PrimitiveType("int")
-            case REM_INT_2ADDR => PrimitiveType("int")
-            case AND_INT_2ADDR => PrimitiveType("int")
-            case OR_INT_2ADDR => PrimitiveType("int")
-            case XOR_INT_2ADDR => PrimitiveType("int")
-            case SHL_INT_2ADDR => PrimitiveType("int")
-            case SHR_INT_2ADDR => PrimitiveType("int")
-            case USHR_INT_2ADDR => PrimitiveType("int")
-            case ADD_LONG_2ADDR => PrimitiveType("long")
-            case SUB_LONG_2ADDR => PrimitiveType("long")
-            case MUL_LONG_2ADDR => PrimitiveType("long")
-            case DIV_LONG_2ADDR => PrimitiveType("long")
-            case REM_LONG_2ADDR => PrimitiveType("long")
-            case AND_LONG_2ADDR => PrimitiveType("long")
-            case OR_LONG_2ADDR => PrimitiveType("long")
-            case XOR_LONG_2ADDR => PrimitiveType("long")
-            case SHL_LONG_2ADDR => PrimitiveType("long")
-            case SHR_LONG_2ADDR => PrimitiveType("long")
-            case USHR_LONG_2ADDR => PrimitiveType("long")
-            case ADD_FLOAT_2ADDR => PrimitiveType("float")
-            case SUB_FLOAT_2ADDR => PrimitiveType("float")
-            case MUL_FLOAT_2ADDR => PrimitiveType("float")
-            case DIV_FLOAT_2ADDR => PrimitiveType("float")
-            case REM_FLOAT_2ADDR => PrimitiveType("float")
-            case ADD_DOUBLE_2ADDR => PrimitiveType("double")
-            case SUB_DOUBLE_2ADDR => PrimitiveType("double")
-            case MUL_DOUBLE_2ADDR => PrimitiveType("double")
-            case DIV_DOUBLE_2ADDR => PrimitiveType("double")
-            case REM_DOUBLE_2ADDR => PrimitiveType("double")
+            case ARRAY_LENGTH => new JawaType(JavaKnowledge.JAVA_TOPLEVEL_OBJECT, 1)
+            case NEG_INT => new JawaType("int")
+            case NEG_LONG => new JawaType("long")
+            case NEG_FLOAT => new JawaType("float")
+            case NEG_DOUBLE => new JawaType("double")
+            case INT_TO_LONG => new JawaType("int")
+            case INT_TO_FLOAT => new JawaType("int")
+            case INT_TO_DOUBLE => new JawaType("int")
+            case LONG_TO_INT => new JawaType("long")
+            case LONG_TO_FLOAT => new JawaType("long")
+            case LONG_TO_DOUBLE => new JawaType("long")
+            case FLOAT_TO_INT => new JawaType("float")
+            case FLOAT_TO_LONG => new JawaType("float")
+            case FLOAT_TO_DOUBLE => new JawaType("float")
+            case DOUBLE_TO_INT => new JawaType("double")
+            case DOUBLE_TO_LONG => new JawaType("double")
+            case DOUBLE_TO_FLOAT => new JawaType("double")
+            case INT_TO_BYTE => new JawaType("int")
+            case INT_TO_CHAR => new JawaType("int")
+            case INT_TO_SHORT => new JawaType("int")
+            case ADD_INT_2ADDR => new JawaType("int")
+            case SUB_INT_2ADDR => new JawaType("int")
+            case MUL_INT_2ADDR => new JawaType("int")
+            case DIV_INT_2ADDR => new JawaType("int")
+            case REM_INT_2ADDR => new JawaType("int")
+            case AND_INT_2ADDR => new JawaType("int")
+            case OR_INT_2ADDR => new JawaType("int")
+            case XOR_INT_2ADDR => new JawaType("int")
+            case SHL_INT_2ADDR => new JawaType("int")
+            case SHR_INT_2ADDR => new JawaType("int")
+            case USHR_INT_2ADDR => new JawaType("int")
+            case ADD_LONG_2ADDR => new JawaType("long")
+            case SUB_LONG_2ADDR => new JawaType("long")
+            case MUL_LONG_2ADDR => new JawaType("long")
+            case DIV_LONG_2ADDR => new JawaType("long")
+            case REM_LONG_2ADDR => new JawaType("long")
+            case AND_LONG_2ADDR => new JawaType("long")
+            case OR_LONG_2ADDR => new JawaType("long")
+            case XOR_LONG_2ADDR => new JawaType("long")
+            case SHL_LONG_2ADDR => new JawaType("long")
+            case SHR_LONG_2ADDR => new JawaType("long")
+            case USHR_LONG_2ADDR => new JawaType("long")
+            case ADD_FLOAT_2ADDR => new JawaType("float")
+            case SUB_FLOAT_2ADDR => new JawaType("float")
+            case MUL_FLOAT_2ADDR => new JawaType("float")
+            case DIV_FLOAT_2ADDR => new JawaType("float")
+            case REM_FLOAT_2ADDR => new JawaType("float")
+            case ADD_DOUBLE_2ADDR => new JawaType("double")
+            case SUB_DOUBLE_2ADDR => new JawaType("double")
+            case MUL_DOUBLE_2ADDR => new JawaType("double")
+            case DIV_DOUBLE_2ADDR => new JawaType("double")
+            case REM_DOUBLE_2ADDR => new JawaType("double")
             case _ => 
-              if(instrType == InstructionType.TWOREGSPACKED_SINGLE) PrimitiveType("int")
-              else PrimitiveType("long")
+              if(instrType == InstructionType.TWOREGSPACKED_SINGLE) new JawaType("int")
+              else new JawaType("long")
           }
           val reg2Name = genRegName((reg2pos, reg2), resolveRegType((reg2pos, reg2), typrhs))
           val reg1Name2 = genRegName((reg1pos2, reg1), resolveRegType((reg1pos2, reg1), typrhs))
@@ -1880,7 +1871,7 @@ class DexInstructionToPilarParser(
           val reg2pos = Position(instrBase, 1)
           val reg2 = read8Bit()
           val constant = read8Bit()
-          val typ = PrimitiveType("int")
+          val typ = new JawaType("int")
           val reg2typ = resolveRegType((reg2pos, reg2), typ)
           val reg2Name = genRegName((reg2pos, reg2), reg2typ)
           val reg1Name = genRegName((reg1pos, reg1), typ)
@@ -1910,7 +1901,7 @@ class DexInstructionToPilarParser(
           if(!classtyp.startsWith("["))
             classtyp = "L" + classtyp + ";"
           val typ = JavaKnowledge.formatSignatureToType(classtyp)
-          val typlhs = new ObjectType("java.lang.Class")
+          val typlhs = new JawaType("java.lang.Class")
           val regName = genRegName((regpos, reg), typlhs)
           val code = instrCode match {
             case CONST_CLASS => constClass(regName, generator.generateType(typ).render())
@@ -1925,9 +1916,9 @@ class DexInstructionToPilarParser(
           val constant = read32Bit()
           val typ =
             if(secondPass) {
-              regTypMap.getOrElse((regpos, reg), ("", PrimitiveType("int")))._2
+              regTypMap.getOrElse((regpos, reg), ("", new JawaType("int")))._2
             } else {
-              val utyp = new UndeterminedType((regpos, reg), PrimitiveType("int"))
+              val utyp = new JawaType("int").undetermined((regpos, reg))
               unresolvedReg.getOrElseUpdate((regpos, reg), utyp)
               utyp
             }
@@ -1945,9 +1936,9 @@ class DexInstructionToPilarParser(
           val constant = read32Bit()
           val typ =
             if(secondPass) {
-              regTypMap.getOrElse((regpos, reg), ("", PrimitiveType("float")))._2
+              regTypMap.getOrElse((regpos, reg), ("", new JawaType("float")))._2
             } else {
-              val utyp = new UndeterminedType((regpos, reg), PrimitiveType("float"))
+              val utyp = new JawaType("float").undetermined((regpos, reg))
               unresolvedReg.getOrElseUpdate((regpos, reg), utyp)
               utyp
             }
@@ -1967,9 +1958,9 @@ class DexInstructionToPilarParser(
           val constant = const2 << 32 | const1
           val typ =
             if(secondPass) {
-              regTypMap.getOrElse((regpos, reg), ("", PrimitiveType("double")))._2
+              regTypMap.getOrElse((regpos, reg), ("", new JawaType("double")))._2
             } else {
-              val utyp = new UndeterminedType((regpos, reg), PrimitiveType("double"))
+              val utyp = new JawaType("double").undetermined((regpos, reg))
               unresolvedReg.getOrElseUpdate((regpos, reg), utyp)
               utyp
             }
@@ -1987,9 +1978,9 @@ class DexInstructionToPilarParser(
           val reg2pos = Position(instrBase, 1)
           val reg2 = read16Bit()
           val typ = resolveRegType((reg2pos, reg2), {instrCode match {
-            case MOVE_FROM16 => PrimitiveType("int")
-            case MOVE_WIDE_FROM16 => PrimitiveType("long")
-            case _ => PrimitiveType("int")
+            case MOVE_FROM16 => new JawaType("int")
+            case MOVE_WIDE_FROM16 => new JawaType("long")
+            case _ => new JawaType("int")
           }})
           val reg1Name = genRegName((reg1pos, reg1), typ)
           val reg2Name = genRegName((reg2pos, reg2), typ)
@@ -2025,9 +2016,9 @@ class DexInstructionToPilarParser(
           val reg2pos = Position(instrBase, 1)
           val reg2 = read16Bit()
           val typ = resolveRegType((reg2pos, reg2), {instrCode match {
-            case MOVE_16 => PrimitiveType("int")
-            case MOVE_WIDE_16 => PrimitiveType("long")
-            case _ => PrimitiveType("int")
+            case MOVE_16 => new JawaType("int")
+            case MOVE_WIDE_16 => new JawaType("long")
+            case _ => new JawaType("int")
           }})
           val reg1Name = genRegName((reg1pos, reg1), typ)
           val reg2Name = genRegName((reg2pos, reg2), typ)
@@ -2064,7 +2055,7 @@ class DexInstructionToPilarParser(
           val reg2pos = Position(instrBase, 1)
           val reg2 = (reg & 0xF0) >> 4
           val constant = read16Bit()
-          val typ = resolveRegType((reg2pos, reg2), PrimitiveType("int"))
+          val typ = resolveRegType((reg2pos, reg2), new JawaType("int"))
           val reg1Name = genRegName((reg1pos, reg1), typ)
           val reg2Name = genRegName((reg2pos, reg2), typ)
           val code = instrCode match {
@@ -2095,8 +2086,8 @@ class DexInstructionToPilarParser(
             baseClass = regMap.get(new Integer(reg2))
           var offsetResolved = false
           var fieldTyp: JawaType = 
-            if(instrType == InstructionType.TWOREGSQUICKOFFSET) PrimitiveType("int")
-            else if(instrType == InstructionType.TWOREGSQUICKOFFSET_WIDE) PrimitiveType("long")
+            if(instrType == InstructionType.TWOREGSQUICKOFFSET) new JawaType("int")
+            else if(instrType == InstructionType.TWOREGSQUICKOFFSET_WIDE) new JawaType("long")
             else JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE.toUnknown
           // If in the first pass, we try to resolve the vtable offset and store the result
           // in quickParameterMap. In the second pass, we use the resolved parameters to

@@ -49,7 +49,7 @@ object AndroidEntryPointConstants {
 	final val CONTENTPROVIDER_ONCREATE = "onCreate:()Z"
 	
 	final val INTENT_NAME = "android.content.Intent"
-	final val ACTIVITY_SETINTENT_SIG = Signature("Landroid/app/Activity;.setIntent:(Landroid/content/Intent;)V")
+	final val ACTIVITY_SETINTENT_SIG = new Signature("Landroid/app/Activity;.setIntent:(Landroid/content/Intent;)V")
 	
 	private final val applicationMethods = List(APPLICATION_ONCREATE, APPLICATION_ONTERMINATE)
 	private final val activityMethods = List(ACTIVITY_ONCREATE, ACTIVITY_ONDESTROY, ACTIVITY_ONPAUSE,

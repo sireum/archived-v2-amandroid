@@ -18,7 +18,7 @@ import org.sireum.jawa.util.ResourceRetriever
 import java.io.File
 import java.net.URI
 import org.sireum.jawa.Global
-import org.sireum.jawa.ObjectType
+import org.sireum.jawa.JawaType
 
 /**
  * Parser for analyzing the layout XML files inside an android application
@@ -47,13 +47,13 @@ class LayoutFileParser(global: Global) {
   }
 
   private def getLayoutClass(className: String): JawaClass = {
-    var ar: Option[JawaClass] = global.tryLoadClass(new ObjectType(className))
+    var ar: Option[JawaClass] = global.tryLoadClass(new JawaType(className))
     if(!ar.isDefined || !this.packageName.isEmpty())
-      ar = global.tryLoadClass(new ObjectType(packageName + "." + className))
+      ar = global.tryLoadClass(new JawaType(packageName + "." + className))
     if(!ar.isDefined)
-      ar = global.tryLoadClass(new ObjectType("android.widget." + className))
+      ar = global.tryLoadClass(new JawaType("android.widget." + className))
     if(!ar.isDefined)
-      ar = global.tryLoadClass(new ObjectType("android.webkit." + className))
+      ar = global.tryLoadClass(new JawaType("android.webkit." + className))
     if(!ar.isDefined)
       global.reporter.echo(TITLE, "Could not find layout class " + className)
     ar.getOrElse(null)

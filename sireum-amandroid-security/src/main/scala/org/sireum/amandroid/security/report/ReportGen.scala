@@ -2,11 +2,11 @@ package org.sireum.amandroid.security.report
 
 import org.sireum.util._
 import org.sireum.amandroid.parser.Data
-import org.sireum.jawa.ObjectType
+import org.sireum.jawa.JawaType
 
 class ReportGen(apk_name: String) {
   
-  case class CompInfo(compTyp: ObjectType, typ: String, exported: Boolean, permission: ISet[String] = isetEmpty) {
+  case class CompInfo(compTyp: JawaType, typ: String, exported: Boolean, permission: ISet[String] = isetEmpty) {
     val intentFilters: MSet[IntentFilter] = msetEmpty
     def addIntentFilter(actions: ISet[String], categories: ISet[String], data: Data) =
       intentFilters += IntentFilter(actions, categories, data)
@@ -19,7 +19,7 @@ class ReportGen(apk_name: String) {
   val comps: MSet[CompInfo] = msetEmpty
   val urls: MSet[String] = msetEmpty
   
-  def genComp(compTyp: ObjectType, typ: String, exported: Boolean, permission: ISet[String] = isetEmpty): CompInfo =
+  def genComp(compTyp: JawaType, typ: String, exported: Boolean, permission: ISet[String] = isetEmpty): CompInfo =
     CompInfo(compTyp, typ, exported, permission)
 
   override def toString: String = {

@@ -16,11 +16,11 @@ import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper.IntentCo
 import org.sireum.amandroid.alir.componentSummary.Intent_Summary
 import org.sireum.jawa.JawaClass
 import org.sireum.amandroid.alir.componentSummary.IntentCallee
-import org.sireum.jawa.ObjectType
 import org.sireum.amandroid.alir.componentSummary.IntentCaller
 import org.sireum.amandroid.alir.componentSummary.RPC_Summary
 import org.sireum.amandroid.alir.componentSummary.RPCCaller
 import org.sireum.amandroid.alir.componentSummary.RPCCallee
+import org.sireum.jawa.JawaType
 
 /**
  * @author fgwei
@@ -31,7 +31,7 @@ object ComponentInfo_run {
     var haveresult = 0
     val compMap: MMap[String, Int] = mmapEmpty
     def avgComp: Float = compMap.map(_._2).sum.toFloat / compMap.size.toFloat
-    val compInfoMap: MMap[(String, ObjectType), Component] = mmapEmpty
+    val compInfoMap: MMap[(String, JawaType), Component] = mmapEmpty
     def avgICC: (Float, Float, Float, Float) = {
       var avg_intent_ascaller: Float = 0
       var avg_intent_ascallee: Float = 0
@@ -49,7 +49,7 @@ object ComponentInfo_run {
      ", avgICC: " + avgICC
   }
   
-  case class Component(apk: String, comp: ObjectType) {
+  case class Component(apk: String, comp: JawaType) {
     var intent_ascaller: Int = 0
     var intent_ascallee: Int = 0
     var rpc_ascaller: Int = 0
@@ -66,7 +66,7 @@ object ComponentInfo_run {
     val outputUri = FileUtil.toUri(outputPath)
     val dpsuri = AndroidGlobalConfig.dependence_dir.map(FileUtil.toUri(_))
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), "", true).toSet
-    .filter(_.contains("/Volumes/ArgusGroupFG/Stash/Amandroid/Sources/appspopular/MUSIC_AND_AUDIO/com.maxmpz.audioplayer.apk"))
+//    .filter(_.contains("/Volumes/ArgusGroupFG/Stash/Amandroid/Sources/appspopular/MUSIC_AND_AUDIO/com.maxmpz.audioplayer.apk"))
     files foreach {
       file =>
         if(Apk.isValidApk(file)) {

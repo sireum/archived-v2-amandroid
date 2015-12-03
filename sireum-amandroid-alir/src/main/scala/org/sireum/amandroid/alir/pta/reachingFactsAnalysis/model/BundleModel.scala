@@ -263,7 +263,7 @@ object BundleModel {
   }
 	
 	private def forPair(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
-    val rf = ReachingFactsAnalysisHelper.getReturnFact(ObjectType("android.os.Bundle", 0), retVar, currentContext).get
+    val rf = ReachingFactsAnalysisHelper.getReturnFact(new JawaType("android.os.Bundle"), retVar, currentContext).get
     require(args.size >1)
     val param1Slot = VarSlot(args(0), false, true)
 	  val param1Value = s.pointsToSet(param1Slot, currentContext)
@@ -287,7 +287,7 @@ object BundleModel {
 	  val thisValue = s.pointsToSet(thisSlot, currentContext)
     if(!thisValue.isEmpty){
 	    val strValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
-    	  val rf = ReachingFactsAnalysisHelper.getReturnFact(ObjectType("java.util.HashSet", 0), retVar, currentContext).get
+    	  val rf = ReachingFactsAnalysisHelper.getReturnFact(new JawaType("java.util.HashSet", 0), retVar, currentContext).get
     	  result += rf
     	  result ++= strValue.map{
     	    s => 

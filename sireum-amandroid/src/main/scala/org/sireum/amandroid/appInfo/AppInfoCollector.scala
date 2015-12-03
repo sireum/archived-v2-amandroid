@@ -35,11 +35,11 @@ import java.io.BufferedInputStream
 import org.sireum.jawa.util.MyTimer
 import org.sireum.jawa.Global
 import org.sireum.jawa.Signature
-import org.sireum.jawa.ObjectType
 import org.sireum.amandroid.Apk
 import org.sireum.jawa.Reporter
 import org.sireum.amandroid.parser.ComponentInfo
 import org.sireum.amandroid.parser.ComponentType
+import org.sireum.jawa.JawaType
 
 /**
  * It takes the apkUri and outputDir as input parameters.
@@ -86,7 +86,7 @@ class AppInfoCollector(global: Global, timer: Option[MyTimer]) {
   }
 
   def getIntentDB = this.intentFdb
-  def getEntryPoints: ISet[ObjectType] = this.componentInfos.filter(_.enabled).map(_.compType).toSet
+  def getEntryPoints: ISet[JawaType] = this.componentInfos.filter(_.enabled).map(_.compType).toSet
 
   def getComponentInfos = this.componentInfos.toSet
   def getEnvMap = this.envProcMap
@@ -117,7 +117,7 @@ class AppInfoCollector(global: Global, timer: Option[MyTimer]) {
     dmGen.setCurrentComponent(record.getType)
     dmGen.setComponentInfos(this.componentInfos.toSet)
     dmGen.setCodeCounter(codeCtr)
-    var callbackMethodSigs: Map[ObjectType, Set[Signature]] = Map()
+    var callbackMethodSigs: Map[JawaType, Set[Signature]] = Map()
     this.callbackMethods.foreach {
       case (record, procs) =>
         procs.foreach{
@@ -126,7 +126,7 @@ class AppInfoCollector(global: Global, timer: Option[MyTimer]) {
         }
     }
     dmGen.setCallbackFunctions(callbackMethodSigs)
-    val (proc, code) = dmGen.generateWithParam(List(new ObjectType(AndroidEntryPointConstants.INTENT_NAME)), envName)
+    val (proc, code) = dmGen.generateWithParam(List(new JawaType(AndroidEntryPointConstants.INTENT_NAME)), envName)
     this.envProcMap += (record -> ((proc, code)))
     dmGen.getCodeCounter
   }

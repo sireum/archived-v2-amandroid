@@ -19,7 +19,6 @@ import org.sireum.jawa.alir.pta.PTAInstance
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
 import org.sireum.jawa.alir.pta.PTATupleInstance
 import org.sireum.jawa.alir.pta.ClassInstance
-import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.alir.pta.Instance
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.FieldSlot
@@ -79,7 +78,7 @@ object IntentModel {
       case "Landroid/content/Intent;.getAction:()Ljava/lang/String;" =>  //public
       case "Landroid/content/Intent;.getBooleanArrayExtra:(Ljava/lang/String;)[Z" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, PrimitiveType("boolean")) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("boolean")) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getBooleanExtra:(Ljava/lang/String;Z)Z" =>  //public
         require(retVars.size == 1)
@@ -87,11 +86,11 @@ object IntentModel {
         byPassFlag = false
       case "Landroid/content/Intent;.getBundleExtra:(Ljava/lang/String;)Landroid/os/Bundle;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType(AndroidConstants.BUNDLE, 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType(AndroidConstants.BUNDLE)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getByteArrayExtra:(Ljava/lang/String;)[B" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("byte", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("byte", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getByteExtra:(Ljava/lang/String;B)B" =>  //public
         require(retVars.size == 1)
@@ -100,7 +99,7 @@ object IntentModel {
       case "Landroid/content/Intent;.getCategories:()Ljava/util/Set;" =>  //public
       case "Landroid/content/Intent;.getCharArrayExtra:(Ljava/lang/String;)[C" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("char", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("char", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getCharExtra:(Ljava/lang/String;C)C" =>  //public
         require(retVars.size == 1)
@@ -108,15 +107,15 @@ object IntentModel {
         byPassFlag = false
       case "Landroid/content/Intent;.getCharSequenceArrayExtra:(Ljava/lang/String;)[Ljava/lang/CharSequence;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("java.lang.CharSequence", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("java.lang.CharSequence", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getCharSequenceArrayListExtra:(Ljava/lang/String;)Ljava/util/ArrayList;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("java.util.ArrayList", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("java.util.ArrayList")) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getCharSequenceExtra:(Ljava/lang/String;)Ljava/lang/CharSequence;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("java.lang.CharSequence", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("java.lang.CharSequence")) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getClipData:()Landroid/content/ClipData;" =>  //public
       case "Landroid/content/Intent;.getComponent:()Landroid/content/ComponentName;" =>  //public
@@ -124,7 +123,7 @@ object IntentModel {
       case "Landroid/content/Intent;.getDataString:()Ljava/lang/String;" =>  //public
       case "Landroid/content/Intent;.getDoubleArrayExtra:(Ljava/lang/String;)[D" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("double", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("double", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getDoubleExtra:(Ljava/lang/String;D)D" =>  //public
         require(retVars.size == 1)
@@ -132,7 +131,7 @@ object IntentModel {
         byPassFlag = false
       case "Landroid/content/Intent;.getExtra:(Ljava/lang/String;)Ljava/lang/Object;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("java.lang.Object", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("java.lang.Object")) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getExtra:(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;" =>  //public
         require(retVars.size == 1)
@@ -145,7 +144,7 @@ object IntentModel {
       case "Landroid/content/Intent;.getFlags:()I" =>  //public
       case "Landroid/content/Intent;.getFloatArrayExtra:(Ljava/lang/String;)[F" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("float", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("float", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getFloatExtra:(Ljava/lang/String;F)F" =>  //public
         require(retVars.size == 1)
@@ -153,11 +152,11 @@ object IntentModel {
         byPassFlag = false
       case "Landroid/content/Intent;.getIBinderExtra:(Ljava/lang/String;)Landroid/os/IBinder;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("android.os.Binder", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("android.os.Binder")) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getIntArrayExtra:(Ljava/lang/String;)[I" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("int", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("int", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getIntExtra:(Ljava/lang/String;I)I" =>  //public
         require(retVars.size == 1)
@@ -165,19 +164,19 @@ object IntentModel {
         byPassFlag = false
       case "Landroid/content/Intent;.getIntegerArrayListExtra:(Ljava/lang/String;)Ljava/util/ArrayList;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("java.lang.ArrayList", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("java.lang.ArrayList")) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getIntent:(Ljava/lang/String;)Landroid/content/Intent;" =>  //public static
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("android.content.Intent", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("android.content.Intent")) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getIntentOld:(Ljava/lang/String;)Landroid/content/Intent;" =>  //public static
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("android.content.Intent", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("android.content.Intent")) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getLongArrayExtra:(Ljava/lang/String;)[J" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("long", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("long", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getLongExtra:(Ljava/lang/String;J)J" =>  //public
         require(retVars.size == 1)
@@ -186,25 +185,25 @@ object IntentModel {
       case "Landroid/content/Intent;.getPackage:()Ljava/lang/String;" =>  //public
       case "Landroid/content/Intent;.getParcelableArrayExtra:(Ljava/lang/String;)[Landroid/os/Parcelable;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("android.os.Parcelable", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("android.os.Parcelable", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getParcelableArrayListExtra:(Ljava/lang/String;)Ljava/util/ArrayList;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("java.util.ArrayList", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("java.util.ArrayList")) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getParcelableExtra:(Ljava/lang/String;)Landroid/os/Parcelable;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("android.os.Parcelable", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("android.os.Parcelable")) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getScheme:()Ljava/lang/String;" =>  //public
       case "Landroid/content/Intent;.getSelector:()Landroid/content/Intent;" =>  //public
       case "Landroid/content/Intent;.getSerializableExtra:(Ljava/lang/String;)Ljava/io/Serializable;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("java.io.Serializable", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("java.io.Serializable")) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getShortArrayExtra:(Ljava/lang/String;)[S" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("short", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("short", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getShortExtra:(Ljava/lang/String;S)S" =>  //public
         require(retVars.size == 1)
@@ -213,15 +212,15 @@ object IntentModel {
       case "Landroid/content/Intent;.getSourceBounds:()Landroid/graphics/Rect;" =>  //public
       case "Landroid/content/Intent;.getStringArrayExtra:(Ljava/lang/String;)[Ljava/lang/String;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("java.lang.String", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("java.lang.String", 1)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getStringArrayListExtra:(Ljava/lang/String;)Ljava/util/ArrayList;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("java.util.ArrayList", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("java.util.ArrayList")) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getStringExtra:(Ljava/lang/String;)Ljava/lang/String;" =>  //public
         require(retVars.size == 1)
-        intentGetExtra(s, args, retVars(0), currentContext, ObjectType("java.lang.String", 0)) match{case (n, d) => newFacts ++= n; delFacts ++= d}
+        intentGetExtra(s, args, retVars(0), currentContext, new JawaType("java.lang.String")) match{case (n, d) => newFacts ++= n; delFacts ++= d}
         byPassFlag = false
       case "Landroid/content/Intent;.getType:()Ljava/lang/String;" =>  //public
       case "Landroid/content/Intent;.hasCategory:(Ljava/lang/String;)Z" =>  //public
@@ -584,12 +583,12 @@ object IntentModel {
         value => 
           if(value.isInstanceOf[ClassInstance]){
             PTAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
-          } else if(value.isInstanceOf[UnknownInstance] || value.isNull){
+          } else if(value.isUnknown || value.isNull){
             value
           } else throw new RuntimeException("Unexpected instance type: " + value)
       }
 
-    val componentNameIns = PTAInstance(ObjectType(AndroidConstants.COMPONENTNAME, 0), currentContext, false)
+    val componentNameIns = PTAInstance(new JawaType(AndroidConstants.COMPONENTNAME), currentContext, false)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
     thisValue.foreach{
@@ -619,15 +618,19 @@ object IntentModel {
           sIns =>
             sIns match {
               case cstr @ PTAConcreteStringInstance(text, c) =>
-                val recordTyp = new ObjectType(text)
+                val recordTyp = new JawaType(text)
                 val recOpt = global.tryLoadClass(recordTyp)
                 recOpt match {
                   case Some(rec) =>
-                    val pakStr = PTAConcreteStringInstance(rec.getPackage, c)
+                    val packageName = rec.getPackage match {
+                      case Some(pkg) => pkg.toPkgString(".")
+                      case None => ""
+                    }
+                    val pakStr = PTAConcreteStringInstance(packageName, c)
                     newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
                     newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
                   case None =>
-                    val unknownIns = UnknownInstance(recordTyp, c)
+                    val unknownIns = PTAInstance(recordTyp.toUnknown, c, false)
                     newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
                     newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
                 }
@@ -657,11 +660,11 @@ object IntentModel {
         value => 
           if(value.isInstanceOf[ClassInstance]){
             PTAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
-          } else if(value.isInstanceOf[UnknownInstance] || value.isNull){
+          } else if(value.isUnknown || value.isNull){
             value
           } else throw new RuntimeException("Unexpected instance type: " + value)
       }
-    val componentNameIns = PTAInstance(ObjectType(AndroidConstants.COMPONENTNAME, 0), currentContext, false)
+    val componentNameIns = PTAInstance(new JawaType(AndroidConstants.COMPONENTNAME), currentContext, false)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
     thisValue.map{
@@ -673,15 +676,19 @@ object IntentModel {
       sIns =>
         sIns match {
           case cstr @ PTAConcreteStringInstance(text, c) =>
-            val recordTyp = new ObjectType(text)
+            val recordTyp = new JawaType(text)
             val recOpt = global.tryLoadClass(recordTyp)
             recOpt match{
               case Some(rec) =>
-                val pakStr = PTAConcreteStringInstance(rec.getPackage, c)
+                val packageName = rec.getPackage match {
+                  case Some(pkg) => pkg.toPkgString(".")
+                  case None => ""
+                }
+                val pakStr = PTAConcreteStringInstance(packageName, c)
                 newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
                 newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
               case None =>
-                val unknownIns = UnknownInstance(recordTyp, c)
+                val unknownIns = PTAInstance(recordTyp.toUnknown, c, false)
                 newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
                 newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
             }
@@ -712,7 +719,7 @@ object IntentModel {
         val mCategorySlot = FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_CATEGORIES))
         var mCategoryValue = s.pointsToSet(mCategorySlot, currentContext)
         if(mCategoryValue.isEmpty) {
-          val hashsetIns = PTAInstance(ObjectType("java.util.HashSet", 0), currentContext, false)
+          val hashsetIns = PTAInstance(new JawaType("java.util.HashSet"), currentContext, false)
           mCategoryValue += hashsetIns
           newfacts += RFAFact(mCategorySlot, hashsetIns)
         }
@@ -720,7 +727,7 @@ object IntentModel {
           cv => 
             var hashsetIns = cv
             if(cv.isNull){
-              hashsetIns = PTAInstance(ObjectType("java.util.HashSet", 0), currentContext, false)
+              hashsetIns = PTAInstance(new JawaType("java.util.HashSet"), currentContext, false)
               newfacts += RFAFact(mCategorySlot, hashsetIns)
               delfacts += RFAFact(mCategorySlot, cv)
             }
@@ -805,11 +812,11 @@ object IntentModel {
         value => 
           if(value.isInstanceOf[ClassInstance]){
             PTAConcreteStringInstance(value.asInstanceOf[ClassInstance].getName, currentContext)
-          } else if(value.isInstanceOf[UnknownInstance]){
+          } else if(value.isUnknown){
             value
           } else throw new RuntimeException("Unexpected instance type: " + value)
       }
-    val componentNameIns = PTAInstance(ObjectType(AndroidConstants.COMPONENTNAME, 0), currentContext, false)
+    val componentNameIns = PTAInstance(new JawaType(AndroidConstants.COMPONENTNAME), currentContext, false)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
     thisValue.map{
@@ -822,15 +829,19 @@ object IntentModel {
       sIns =>
         sIns match {
           case cstr @ PTAConcreteStringInstance(text, c) =>
-            val recordTyp = new ObjectType(text)
+            val recordTyp = new JawaType(text)
             val recOpt = global.tryLoadClass(recordTyp)
             recOpt match{
               case Some(rec) =>
-                val pakStr = PTAConcreteStringInstance(rec.getPackage, c)
+                val packageName = rec.getPackage match {
+                  case Some(pkg) => pkg.toPkgString(".")
+                  case None => ""
+                }
+                val pakStr = PTAConcreteStringInstance(packageName, c)
                 newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
                 newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
               case None =>
-                val unknownIns = UnknownInstance(recordTyp, c)
+                val unknownIns = PTAInstance(recordTyp.toUnknown, c, false)
                 newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
                 newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
             }
@@ -855,7 +866,7 @@ object IntentModel {
     val thisValue = s.pointsToSet(thisSlot, currentContext)
     val clazzSlot = VarSlot(args(2), false, true)
     val clazzValue = s.pointsToSet(clazzSlot, currentContext)
-    val componentNameIns = PTAInstance(ObjectType(AndroidConstants.COMPONENTNAME, 0), currentContext, false)
+    val componentNameIns = PTAInstance(new JawaType(AndroidConstants.COMPONENTNAME), currentContext, false)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
     thisValue.map{
@@ -868,15 +879,19 @@ object IntentModel {
       name =>
         name match{
           case cstr @ PTAConcreteStringInstance(text, c) =>
-            val recordTyp = new ObjectType(text)
+            val recordTyp = new JawaType(text)
             val recOpt = global.tryLoadClass(recordTyp)
             recOpt match{
               case Some(rec) =>
-                val pakStr = PTAConcreteStringInstance(rec.getPackage, c)
+                val packageName = rec.getPackage match {
+                  case Some(pkg) => pkg.toPkgString(".")
+                  case None => ""
+                }
+                val pakStr = PTAConcreteStringInstance(packageName, c)
                 newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
                 newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
               case None =>
-                val unknownIns = UnknownInstance(recordTyp, c)
+                val unknownIns = PTAInstance(recordTyp.toUnknown, c, false)
                 newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
                 newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
             }
@@ -1062,7 +1077,7 @@ object IntentModel {
     val valueValue = s.pointsToSet(valueSlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
-    val bundleIns = PTAInstance(ObjectType(AndroidConstants.BUNDLE, 0), currentContext, false)
+    val bundleIns = PTAInstance(new JawaType(AndroidConstants.BUNDLE), currentContext, false)
     thisValue.foreach{
       tv =>
         val mExtraSlot = FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_EXTRAS))
@@ -1106,7 +1121,7 @@ object IntentModel {
         if(!mExtraValue.isEmpty){
           newfacts ++= mExtraValue.map{mev => RFAFact(VarSlot(retVar, false, false), mev)}
         } else {
-          newfacts += (RFAFact(VarSlot(retVar, false, false), UnknownInstance(JavaKnowledge.getTypeFromName(AndroidConstants.BUNDLE).asInstanceOf[ObjectType], currentContext)))
+          newfacts += (RFAFact(VarSlot(retVar, false, false), PTAInstance(JavaKnowledge.getTypeFromName(AndroidConstants.BUNDLE).toUnknown, currentContext.copy, false)))
         }
     }
     (newfacts, delfacts)
@@ -1130,8 +1145,8 @@ object IntentModel {
           isetEmpty
         else
           mExtraValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
-      if(entValue.isEmpty && desiredReturnTyp.isInstanceOf[ObjectType]) {
-        newfacts += (RFAFact(VarSlot(retVar, false, false), UnknownInstance(desiredReturnTyp.asInstanceOf[ObjectType], currentContext)))
+      if(entValue.isEmpty && desiredReturnTyp.isObject) {
+        newfacts += (RFAFact(VarSlot(retVar, false, false), PTAInstance(desiredReturnTyp.toUnknown, currentContext.copy, false)))
       } else if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty) {
         val keys = keyValue.map{k => k.asInstanceOf[PTAConcreteStringInstance].string}
         entValue.foreach{
@@ -1148,7 +1163,7 @@ object IntentModel {
             newfacts += (RFAFact(VarSlot(retVar, false, false), v.asInstanceOf[PTATupleInstance].right))
         }
       } else {
-        newfacts += (RFAFact(VarSlot(retVar, false, false), UnknownInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, currentContext)))
+        newfacts += (RFAFact(VarSlot(retVar, false, false), PTAInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE.toUnknown, currentContext.copy, false)))
       }
     }
     (newfacts, delfacts)
@@ -1190,7 +1205,7 @@ object IntentModel {
             newfacts += (RFAFact(VarSlot(retVar, false, false), v.asInstanceOf[PTATupleInstance].right))
         }
       } else {
-        newfacts += (RFAFact(VarSlot(retVar, false, false), UnknownInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, currentContext)))
+        newfacts += (RFAFact(VarSlot(retVar, false, false), PTAInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE.toUnknown, currentContext.copy, false)))
       }
     }
     if(newfacts.isEmpty){

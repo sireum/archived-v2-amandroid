@@ -73,7 +73,7 @@ class LightweightCSTBuilder(global: Global, timer: Option[MyTimer]) extends AppI
         val methods = comp.getDeclaredMethods
         val idfg = InterproceduralSuperSpark(global, methods, timer)
         val context = new Context
-        val sig = Signature(JavaKnowledge.formatTypeToSignature(comp.getType) + ".ent:()V")
+        val sig = new Signature(JavaKnowledge.formatTypeToSignature(comp.getType) + ".ent:()V")
         context.setContext(sig, comp.getType.name)
         val entryNode = ICFGEntryNode(context)
         entryNode.setOwner(sig)

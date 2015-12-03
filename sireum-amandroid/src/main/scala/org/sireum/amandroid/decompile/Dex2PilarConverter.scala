@@ -13,14 +13,14 @@ import java.net.URI
 import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.jawa.util.OsUtils
 import org.sireum.amandroid.dedex.PilarDeDex
-import org.sireum.jawa.ObjectType
+import org.sireum.jawa.JawaType
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
 object Dex2PilarConverter {
-  def convert(f: FileResourceUri, out: FileResourceUri, dpsuri: Option[FileResourceUri], recordFilter: (ObjectType => Boolean), dexLog: Boolean, debugMode: Boolean, forceDelete: Boolean): FileResourceUri = {
+  def convert(f: FileResourceUri, out: FileResourceUri, dpsuri: Option[FileResourceUri], recordFilter: (JawaType => Boolean), dexLog: Boolean, debugMode: Boolean, forceDelete: Boolean): FileResourceUri = {
     if(!forceDelete && FileUtil.toFile(out).exists()) return out
     ConverterUtil.cleanDir(out)
     try {

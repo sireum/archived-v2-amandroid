@@ -29,7 +29,6 @@ import org.sireum.jawa.Global
 import org.sireum.amandroid.Apk
 import org.sireum.jawa.PrintReporter
 import org.sireum.jawa.MsgLevel
-import org.sireum.jawa.ObjectType
 import org.sireum.jawa.util.PerComponentTimer
 
 

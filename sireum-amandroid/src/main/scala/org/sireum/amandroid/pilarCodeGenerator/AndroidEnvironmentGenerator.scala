@@ -20,7 +20,6 @@ import org.sireum.jawa.pilarCodeGenerator.MethodGenerator
 import org.sireum.amandroid.parser.ComponentInfo
 import org.sireum.jawa.Global
 import org.sireum.jawa.Signature
-import org.sireum.jawa.ObjectType
 import org.sireum.jawa.JawaType
 import org.sireum.amandroid.parser.ComponentType
 
@@ -35,7 +34,7 @@ class AndroidEnvironmentGenerator(global: Global) extends MethodGenerator(global
   def setComponentInfos(componentInfos: Set[ComponentInfo]) = this.componentInfos = componentInfos
   
   def generateInternal(methods: List[Signature]): String = {
-    val classMap: MMap[ObjectType, MList[Signature]] = mmapEmpty
+    val classMap: MMap[JawaType, MList[Signature]] = mmapEmpty
     methods.map{
       method => 
         val clazz = method.getClassType
@@ -257,7 +256,7 @@ class AndroidEnvironmentGenerator(global: Global) extends MethodGenerator(global
     val constructionStack: MSet[JawaType] = msetEmpty ++ this.paramClasses
     createIfStmt(endClassFragment, codefg)
 
-    val r = global.getClassOrResolve(new ObjectType("android.app.ContextImpl"))
+    val r = global.getClassOrResolve(new JawaType("android.app.ContextImpl"))
     val va = generateInstanceCreation(r.getType, codefg)
     localVarsForClasses += (r.getType -> va)
     generateClassConstructor(r, constructionStack, codefg)
@@ -323,7 +322,7 @@ class AndroidEnvironmentGenerator(global: Global) extends MethodGenerator(global
   private def activityLifeCycleGenerator(entryPoints: MList[Signature], clazz: JawaClass, endClassFragment: CodeFragmentGenerator, classLocalVar: String, codefg: CodeFragmentGenerator) = {
     val constructionStack: MSet[JawaType] = msetEmpty ++ this.paramClasses
     createIfStmt(endClassFragment, codefg)
-    val r = global.getClassOrResolve(new ObjectType("android.app.ContextImpl"))
+    val r = global.getClassOrResolve(new JawaType("android.app.ContextImpl"))
     val va = generateInstanceCreation(r.getType, codefg)
     localVarsForClasses += (r.getType -> va)
     generateClassConstructor(r, constructionStack, codefg)

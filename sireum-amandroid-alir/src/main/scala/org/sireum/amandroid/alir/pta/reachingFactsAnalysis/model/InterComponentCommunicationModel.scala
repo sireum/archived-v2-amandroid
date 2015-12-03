@@ -19,7 +19,7 @@ import java.net.URI
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.VarSlot
-import org.sireum.jawa.ObjectType
+import org.sireum.jawa.JawaType
 import org.sireum.amandroid.Apk
 
 /**
@@ -31,7 +31,7 @@ object InterComponentCommunicationModel {
   def isIccOperation(proc : JawaMethod) : Boolean = {
     var flag = false
     val childClass = proc.getDeclaringClass
-    val parentClass = childClass.global.getClassOrResolve(new ObjectType(AndroidConstants.CONTEXT))
+    val parentClass = childClass.global.getClassOrResolve(new JawaType(AndroidConstants.CONTEXT))
     if(!childClass.isInterface && childClass.global.getClassHierarchy.isClassRecursivelySubClassOfIncluding(childClass, parentClass))
       AndroidConstants.getIccMethods.foreach{
         item =>
