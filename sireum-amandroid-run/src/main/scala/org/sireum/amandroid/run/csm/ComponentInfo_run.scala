@@ -66,7 +66,7 @@ object ComponentInfo_run {
     val outputUri = FileUtil.toUri(outputPath)
     val dpsuri = AndroidGlobalConfig.dependence_dir.map(FileUtil.toUri(_))
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), "", true).toSet
-//    .filter(_.contains("/Volumes/ArgusGroupFG/Stash/Amandroid/Sources/appspopular/MUSIC_AND_AUDIO/com.maxmpz.audioplayer.apk"))
+    .filter(_.contains("com.creativemobile.dragracingbe.apk"))
     files foreach {
       file =>
         if(Apk.isValidApk(file)) {

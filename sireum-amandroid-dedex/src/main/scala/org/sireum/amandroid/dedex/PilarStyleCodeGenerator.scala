@@ -72,14 +72,15 @@ class PilarStyleCodeGenerator(
       val className = dexClassDefsBlock.getClassNameOnly(classIdx)
       val recName: String = toPilarRecordName(dexClassDefsBlock.getClassNameOnly(classIdx))
       val recType: JawaType = new JawaType(recName)
-      if(filter(recType)) {
+//      if(filter(recType)) {
+      if(recType.baseTyp == "com.creativemobile.billing.u") {
         val outputStream = outputDir match {
           case Some(od) =>
             var targetFile = FileUtil.toFile(od + File.separator + className + ".pilar")
             var i = 0
             while(targetFile.exists()){
               i += 1
-              targetFile = new File(od + File.separator + className + "." + i + ".pilar")
+              targetFile = FileUtil.toFile(od + File.separator + className + "." + i + ".pilar")
             }
             val parent = targetFile.getParentFile()
             if(parent != null)
@@ -481,14 +482,6 @@ class PilarStyleCodeGenerator(
             }
             if(DEBUG_FLOW)
               println("Flow: after parse")
-            // Now handle the case when the debug variable goes out of scope.
-            // Save the register trace after the instruction if register tracing is enabled
-            if((regTraceMap.isDefined) && (instructionParser.getAffectedRegisters != null)) {
-              if(DEBUG_FLOW)
-                println("Flow: before saveRegTraceMap")
-              if(DEBUG_FLOW)
-                println("Flow: after saveRegTraceMap")
-            }
   
             // Mark that we have visited this place
             val instructionEndPos: Int = (instructionParser.getFilePosition() - startPos).asInstanceOf[Int]
