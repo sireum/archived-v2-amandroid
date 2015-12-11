@@ -23,6 +23,7 @@ import scala.util.control.Breaks._
 import org.sireum.jawa.JavaKnowledge
 import org.apache.commons.lang3.StringEscapeUtils
 import org.sireum.jawa.ExceptionCenter
+import org.sireum.jawa.FieldFQN
 
 object DexInstructionToPilarParser {
   object ForkStatus extends Enumeration {
@@ -36,7 +37,7 @@ object DexInstructionToPilarParser {
 /**
  * @author fgwei
  */
-class DexInstructionToPilarParser(
+case class DexInstructionToPilarParser(
     hostSig: Signature,
     generator: PilarStyleCodeGenerator,
     dexSignatureBlock: DexSignatureBlock,
@@ -44,33 +45,21 @@ class DexInstructionToPilarParser(
     dexTypeIdsBlock: DexTypeIdsBlock,
     dexFieldIdsBlock: DexFieldIdsBlock,
     dexMethodIdsBlock: DexMethodIdsBlock,
-    dexOffsetResolver: DexOffsetResolver) extends DexParser with DexConstants {
+    dexOffsetResolver: DexOffsetResolver) extends DexParser with DedexTypeResolver with DexConstants {
   
   final val TITLE = "DexInstructionToPilarParser"
   final val DEBUG = false
   
   import DexInstructionToPilarParser._
   import generator._
-  /**
-   * Key of the method invocation result value in the register map
-   */
-  final def REGMAP_RESULT_KEY = new Integer(-1)
-
-  private val affectedRegisters: MList[Int] = mlistEmpty
-  private val regMap: MMap[Integer, JawaType] = mmapEmpty
+  import DedexTypeResolver._
+  
   private val labels: MMap[Long, PilarDedexerTask] = mmapEmpty
   private val tasks: MList[PilarDedexerTask] = mlistEmpty
-  private var secondPass = false
+  protected[dedex] var secondPass = false
   private var lowestDataBlock: Long = -1
   private var forkStatus: ForkStatus.Value = null
   private val forkData: MList[Long] = mlistEmpty
-  private val quickParameterMap: MMap[Long, String] = mmapEmpty
-  private final val DEBUG_GETAFFECTEDREGSFORREGLIST = false
-  
-  private val localvars: MMap[String, (JawaType, Boolean)] = mmapEmpty // map from variable -> (typ, isParam)
-  def getLocalVars: IMap[String, (JawaType, Boolean)] = localvars.toMap
-  private val regTypMap: MMap[(Position, Int), (String, JawaType)] = mmapEmpty
-//  private val unresolvedReg: MMap[(Position, Int), JawaType] = mmapEmpty
   
   def initializePass(secondPass: Boolean) = {
     this.secondPass = secondPass
@@ -80,26 +69,6 @@ class DexInstructionToPilarParser(
   def setPass(secondPass: Boolean) = {
     this.secondPass = secondPass
   }
-  
-  /**
-   * Sets the register map. This is used to initialize/restore the map e.g. after branching.
-   * @param regMap The register map to set.
-   */
-  def setRegisterMap(regMap: IMap[Integer, JawaType]): Unit = {
-    this.regMap.clear()
-    this.regMap ++= regMap
-  }
-  
-  def setLocalVars(localvars: IMap[String, (JawaType, Boolean)]) = {
-    this.localvars.clear()
-    this.localvars ++= localvars
-  }
-  
-  /**
-   * Returns the current register map. This maps register numbers to types in the registers.
-   * @return the current register map
-   */
-  def getRegisterMap: IMap[Integer, JawaType] = regMap.toMap
   
   def getForkStatus: ForkStatus.Value = forkStatus
 
@@ -151,12 +120,6 @@ class DexInstructionToPilarParser(
     }
   }
   
-  /**
-   * Returns the registers that the last parsed instruction used/modified.
-   * @return Array with the numbers of the registers in it or null if no registers were affected.
-   */
-  def getAffectedRegisters: IList[Int] = affectedRegisters.toList
-  
   private def initialForkStatus(instrCode: Int): ForkStatus.Value = {
     for(i <- 0 to terminateInstructions.size - 1) {
       if(terminateInstructions(i) == instrCode)
@@ -175,62 +138,8 @@ class DexInstructionToPilarParser(
     if(!classPart.endsWith(";")) classPart = classPart + ";"
     val methodNamePart: String = methodName.substring(methodName.lastIndexOf("/") + 1)
     val paramSigPart: String = proto.substring(proto.indexOf("("))
-    new Signature(classPart + "." + methodNamePart + ":" + paramSigPart)
-  }
-  
-  private def getAffectedRegistersForRegList(
-      registerList: IList[Int],
-      proto: String,
-      notParmReg: Int): IList[Int] = {
-    if(DEBUG_GETAFFECTEDREGSFORREGLIST)
-      println("getAffectedRegistersForRegList: proto: " +
-          proto +
-          "; notParmReg: " +
-          notParmReg +
-          " { " +
-          registerList +
-          " } ")
-    val widthList = DexClassDefsBlock.getMethodParameterWidth(proto)
-    if(DEBUG_GETAFFECTEDREGSFORREGLIST)
-      println("widthList: " + widthList)
-    val affectedRegisters: MList[Int] = mlistEmpty
-    for(i <- 0 to notParmReg - 1)
-      if(i < registerList.size)
-        affectedRegisters += registerList(i).intValue()
-    var regCtr = notParmReg
-    breakable {
-      for(i <- 0 to widthList.size - 1) {
-        if(DEBUG_GETAFFECTEDREGSFORREGLIST)
-          println("i: " + i + " ; regCtr: " + regCtr)
-        if(regCtr >= registerList.size) {
-          if(DEBUG_GETAFFECTEDREGSFORREGLIST)
-            println("reglist/proto mismatch: reglist: " + registerList+" ; proto: "+proto)
-          break
-        }
-        affectedRegisters += registerList(regCtr).intValue()
-        regCtr += 1
-        if(widthList.get(i).booleanValue())
-          regCtr += 1
-      }
-    }
-    affectedRegisters.toList
-  }
-  
-  private def getAffectedRegistersForRange(proto: String, baseReg: Int, thisCount: Int): IList[Int] = {
-    val regOffsets = DexClassDefsBlock.getMethodParameterOffsets(proto, 0)
-    val affectedRegisters: MList[Int] = mlistEmpty
-    if(thisCount > 0)
-      affectedRegisters.insert(0, baseReg)
-    var regOffset = -1
-    var regCount = thisCount
-    for(i <- 0 to regOffsets.size() - 1 by + 2) {
-      val regx = regOffsets.get(i).asInstanceOf[Integer].intValue()
-      if(regOffset == -1)
-        regOffset = -regx + thisCount + baseReg
-      affectedRegisters.insert(regCount, regx + regOffset)
-      regCount += 1
-    }
-    affectedRegisters.toList
+    val sig = new Signature(classPart + "." + methodNamePart + ":" + paramSigPart)
+    sig.signature.resolveProcedure
   }
   
   private def updateLowestDataBlock(address: Long) = {
@@ -238,10 +147,6 @@ class DexInstructionToPilarParser(
       lowestDataBlock = address
     else if( address < lowestDataBlock )
       lowestDataBlock = address
-  }
-
-  private def getLocalVariableType(pos: Position, regNo: Int): Option[JawaType] = {
-    regTypMap.get((pos, regNo)).map(_._2)
   }
   
   private def calculateTarget(instrBase: Long): Long = {
@@ -264,138 +169,11 @@ class DexInstructionToPilarParser(
    * Input will be: "Test3.c Ljava/lang/Class;"
    * Output is: fieldName: Test3.c, type: java.lang.Class
    */
-  private def getFieldNameAndType(field: String): (String, JawaType) = {
+  private def getFieldFQN(field: String): FieldFQN = {
     val strs = field.split(" ")
-    (strs(0).replaceAll("/", "."), JavaKnowledge.formatSignatureToType(strs(1)))
-  }
-
-  private val undeterminedMap: MMap[(Position, Int), MSet[JawaType]] = mmapEmpty
-  implicit class UndeterminedType(typ: JawaType) {
-    private val undetermined_key = "undetermined_key"
-    def undetermined(reg: (Position, Int)): JawaType = {
-      undeterminedMap.getOrElseUpdate(reg, msetEmpty)
-      undeterminedMap(reg) += typ
-      val res = new JawaType("Undetermined+" + reg.hashCode)
-      res.setProperty(undetermined_key, reg)
-      res
-    }
-    def isUndetermined: Boolean = typ ? undetermined_key
-    def reg: (Position, Int) = typ.getProperty(undetermined_key)
-//    def typs: IList[JawaType] = undeterminedMap(typ)._2.toList
-  }
-  
-  case class Position(base: Long, pos: Int)
-  
-  private def genRegName(reg: (Position, Int), typ: JawaType, force: Boolean = false): String = {
-    if(force) {
-      typ match {
-        case ut if ut.isUndetermined =>
-          "v" + reg._2
-        case _ =>
-          var newvar = typ.baseTyp.substring(typ.baseTyp.lastIndexOf(".") + 1) + {if(typ.dimensions > 0)"_arr" + typ.dimensions else ""} + "_v" + reg._2
-          while(localvars.contains(newvar) && localvars(newvar)._1 != typ) newvar = "a_" + newvar
-          if(!localvars.contains(newvar)) localvars(newvar) = (typ, false)
-          regTypMap(reg) = (newvar, typ)
-          newvar
-      }
-    } else {
-      regTypMap.get(reg) match {
-        case Some(a) => a._1
-        case None =>
-          typ match {
-            case ut if ut.isUndetermined =>
-              "v" + reg._2
-            case _ =>
-              var newvar = typ.baseTyp.substring(typ.baseTyp.lastIndexOf(".") + 1) + {if(typ.dimensions > 0)"_arr" + typ.dimensions else ""} + "_v" + reg._2
-              while(localvars.contains(newvar) && localvars(newvar)._1 != typ) newvar = "a_" + newvar
-              if(!localvars.contains(newvar)) localvars(newvar) = (typ, false)
-              regTypMap(reg) = (newvar, typ)
-              newvar
-          }
-      }
-    }
-  }
-  
-  private def genVarName(v: (Position, String), typ: JawaType): String = {
-    regTypMap.get((v._1, -1)) match {
-      case Some(a) => a._1
-      case None =>
-        typ match {
-          case ut if ut.isUndetermined =>
-            "v" + v._2
-          case _ =>
-            var newvar = typ.baseTyp.substring(typ.baseTyp.lastIndexOf(".") + 1) + {if(typ.dimensions > 0)"_arr" + typ.dimensions else ""} + "_" + v._2
-            while(localvars.contains(newvar) && localvars(newvar)._1 != typ) newvar = "a_" + newvar
-            if(!localvars.contains(newvar)) localvars(newvar) = (typ, false)
-            regTypMap((v._1, -1)) = (newvar, typ)
-            newvar
-        }
-    }
-  }
-  
-  private def resolveRegType(reg: (Position, Int), defaultTyp: JawaType): JawaType = {
-    val typ = regMap.getOrElseUpdate(new Integer(reg._2), defaultTyp)
-    typ match {
-      case ut if ut.isUndetermined =>
-        var restyp = regTypMap.getOrElse(reg, ("", defaultTyp))._2
-        restyp match {
-          case ot if ot.isObject =>
-            regMap(new Integer(reg._2)) = restyp.undetermined(ut.reg)
-          case _ =>
-            undeterminedMap -= ut.reg
-            restyp.undetermined(ut.reg)
-            regMap(new Integer(reg._2)) = restyp
-        }
-        restyp
-      case _ =>
-        typ
-    }
-  }
-  
-  private def getArgNames(args: IList[(Position, Int)], isStatic: Boolean, signature: Signature): IList[String] = {
-    var recvarg: Option[(Position, Int)] = None
-    val othargs: MList[((Position, Int), JawaType)] = mlistEmpty
-    val ptyps = signature.getParameterTypes()
-    var j = 0
-    var nextpass = false
-    for(i <- 0 to args.size - 1) {
-      val arg = args(i)
-      if(!isStatic && i == 0) {
-        recvarg = Some(arg)
-      } else {
-        val ptyp =
-          if(ptyps.isDefinedAt(j)) ptyps(j)
-          else JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE
-        ptyp match {
-          case pt if pt.jawaName == "long" || pt.jawaName == "double" =>
-            if(!nextpass) {
-              othargs += ((arg, ptyp))
-              nextpass = true
-            } else {
-              nextpass = false
-              j += 1
-            }
-          case _ =>
-            othargs += ((arg, ptyp))
-            j += 1
-        }
-      }
-    }
-    val res: MList[String] = mlistEmpty
-    res ++= recvarg map(arg => genRegName(arg, resolveRegType(arg, signature.getClassType)))
-    res ++= othargs.map{case (arg, typ) => genRegName(arg, resolveRegType(arg, typ))}
-    res.toList
-  }
-  
-  private def resolveUndetermined(reg: (Position, Int), defaultType: JawaType): IList[JawaType] = {
-    val result: MList[JawaType] = mlistEmpty
-    val typs = undeterminedMap.getOrElse(reg, mlistEmpty :+ defaultType)
-    val haveObject = typs.exists(_.isObject)
-    if(haveObject) result ++= typs.filter(_.isObject)
-    else result ++= typs
-    undeterminedMap -= reg
-    regTypMap -= reg
-    result.toList
+    val fqn = strs(0).replaceAll("/", ".")
+    val typ = JavaKnowledge.formatSignatureToType(strs(1))
+    fqn.resolveAttribute(typ)
   }
   
   def parse: Unit = {
@@ -403,45 +181,33 @@ class DexInstructionToPilarParser(
   
   def doparse(startPos: Long, endPos: Long): IList[String] = {
     val result: MList[String] = mlistEmpty
-    var genCode = true
     val instrBase: Long = getFilePosition
     val instrCode = read8Bit()
     val instrType = instructionTypes(instrCode)
     val instrText = new StringBuilder()
     val insttAddress: String = "#L%06x.  ".format(instrBase)
-    if(!secondPass) println(insttAddress)
     instrText.append(insttAddress)
     def inRange: (Long => Boolean) = (pos => startPos <= pos && pos <= endPos)
     forkStatus = initialForkStatus(instrCode)
     forkData.clear
-    affectedRegisters.clear
-//    if(secondPass) {
-//      unresolvedReg.foreach {
-//        case (key, typ) =>
-//          val t = typ.defaultTyp
-//          val regName = genRegName(key, t)
-//          regTypMap(key) = (regName, t)
-//      }
-//      unresolvedReg.clear
-//    }
-    def handleConst(reg: (Position, Int), defaultType: JawaType, constant: Either[Int, Long]) = {
+    def handleConst(position: Position, reg: Int, defaultType: JawaType, constant: Either[Int, Long]) = {
+      val undetermined = defaultType.undetermined(position)
       val typs: IList[JawaType] =
         if(secondPass) {
-          resolveUndetermined(reg, defaultType)
+          resolveUndetermined(undetermined)
         } else {
-          val typ = defaultType.undetermined(reg)
-          regMap(new Integer(reg._2)) = typ
-          ilistEmpty :+ typ
+          regMap(reg) = undetermined
+          ilistEmpty :+ defaultType
         }
       val typsize = typs.size
       typs foreach {
         typ =>
-          val regName = genRegName(reg, typ, true)
+          val regName = genRegName(reg, DedexJawaType(typ))
           val code = instrCode match {
             case CONST_4 | CONST_16 => const(regName, constant.left.get, typ)
-            case CONST_HIGH16 => const(regName, constant.left.get >> 16, typ)
+            case CONST_HIGH16 => const(regName, (constant.left.get << 16), typ)
             case CONST_WIDE_16 | CONST | CONST_WIDE_32 | CONST_WIDE => constWide(regName, constant.right.get, typ)
-            case CONST_WIDE_HIGH16 => constWide(regName, constant.right.get << 48, typ)
+            case CONST_WIDE_HIGH16 => constWide(regName, (constant.right.get << 48), typ)
             case _ => "@UNKNOWN_REGCONST 0x%x".format(instrCode)
           }
           if(typsize == 1) {
@@ -466,19 +232,23 @@ class DexInstructionToPilarParser(
           val reg = b1 & 0x0F
           val constant = (b1 & 0xF0) >> 4
           val defaultType = new JawaType("int")
-          handleConst((regpos, reg), defaultType, Left(constant))
-          // Moves integer to reg
-          affectedRegisters += reg
+          handleConst(regpos, reg, defaultType, Left(constant))
         // The instruction is followed by a register index byte and a 16-bit index
         // to the string constant table
         case InstructionType.REGSTRINGCONST =>
           val regpos = Position(instrBase, 0)
           val reg = read8Bit()
           val stringidx = read16Bit()
-          val string = StringEscapeUtils.escapeJava(dexStringIdsBlock.getString(stringidx))
+          val rawstring =
+            try{
+              dexStringIdsBlock.getString(stringidx)
+            } catch {
+              case e: Exception => ""
+            }
+          val string = StringEscapeUtils.escapeJava(rawstring)
           val lines = string.lines.size
           val typ = new JawaType("java.lang.String")
-          val regName = genRegName((regpos, reg), typ)
+          val regName = genRegName(reg, DedexJawaType(typ))
           val code = instrCode match {
             case CONST_STRING => 
               if(lines > 1) constMString(regName, string)
@@ -487,17 +257,22 @@ class DexInstructionToPilarParser(
           }
           instrText.append(code)
           // Move String type to reg
-          affectedRegisters += reg
-          regMap(new Integer(reg)) = typ
+          regMap(reg) = DedexJawaType(typ)
         // Basically the same as REGSTRINGCONST but with a 32-bit index
         case InstructionType.REGSTRINGCONST_JUMBO =>
           val regpos = Position(instrBase, 0)
           val reg = read8Bit()
           val stringidx: Int = read32Bit().toInt
-          val string = StringEscapeUtils.escapeJava(dexStringIdsBlock.getString(stringidx))
+          val rawstring =
+            try{
+              dexStringIdsBlock.getString(stringidx)
+            } catch {
+              case e: Exception => ""
+            }
+          val string = StringEscapeUtils.escapeJava(rawstring)
           val lines = string.lines.size
           val typ = new JawaType("java.lang.String")
-          val regName = genRegName((regpos, reg), typ)
+          val regName = genRegName(reg, DedexJawaType(typ))
           val code = instrCode match {
             case CONST_STRING_JUMBO =>
               if(lines > 1) constMString(regName, string)
@@ -506,8 +281,7 @@ class DexInstructionToPilarParser(
           }
           instrText.append(code)
           // Move String type to reg
-          affectedRegisters += reg
-          regMap(new Integer(reg)) = typ
+          regMap(reg) = DedexJawaType(typ)
         // The instruction is followed by one byte whose higher 4 bits store the number of
         // registers to pass to the method invoked. Then a 16-bit method index comes. This is
         // followed by the bytes storing the 4-bit indexes for the invocation 
@@ -526,8 +300,8 @@ class DexInstructionToPilarParser(
             lastreg = b2 & 0x0F
           }
           val methodidx = read16Bit()
-          val method = dexMethodIdsBlock.getMethod(methodidx).escape
-          val proto = dexMethodIdsBlock.getProto(methodidx).escape
+          val method = dexMethodIdsBlock.getMethod(methodidx)
+          val proto = dexMethodIdsBlock.getProto(methodidx)
           val signature = getSignature(method, proto)
           var regByte = 0
           var byteCounter = 0
@@ -558,27 +332,31 @@ class DexInstructionToPilarParser(
           val retName: Option[String] = 
             if(retVoid) None
             else {
-              Some(genVarName((Position(instrBase, -1), "temp"), retTyp)) // return var use position number -1
+              Some(genVarName("temp", DedexJawaType(retTyp)))
             }
-          val code = instrCode match {
-            case INVOKE_VIRTUAL => invokeVirtual(retName, className, methodName, argNames, signature, classTyp)
-            case INVOKE_SUPER => invokeSuper(retName, className, methodName, argNames, signature, classTyp)
-            case INVOKE_DIRECT => invokeDirect(retName, className, methodName, argNames, signature, classTyp)
-            case INVOKE_STATIC => invokeStatic(retName, className, methodName, argNames, signature, classTyp)
-            case INVOKE_INTERFACE => invokeInterface(retName, className, methodName, argNames, signature, classTyp)
-            case INVOKE_DIRECT_EMPTY => invokeObjectInit(retName, className, methodName, argNames, signature, classTyp)
-            case _ => 
-              if(instrType == InstructionType.METHODINVOKE)
-                "@UNKNOWN_METHODINVOKE 0x%x".format(instrCode)
-              else "@UNKNOWN_METHODINVOKE_STATIC 0x%x".format(instrCode)
-          }
-          instrText.append(code)
-          
-          if(retVoid)
+          val argsize = signature.getParameterNum() + {if(instrCode == INVOKE_STATIC) 0 else 1}
+          if(argsize != argNames.size) {
+            instrText.append("@invalide_invoke")
             regMap.remove(REGMAP_RESULT_KEY)
-          else
-            regMap.put(REGMAP_RESULT_KEY, retTyp)
-          affectedRegisters ++= getAffectedRegistersForRegList(args.map(_._2).toList, proto, if(instrType == InstructionType.METHODINVOKE) 1 else 0)
+          } else {
+            val code = instrCode match {
+              case INVOKE_VIRTUAL => invokeVirtual(retName, className, methodName, argNames, signature, classTyp)
+              case INVOKE_SUPER => invokeSuper(retName, className, methodName, argNames, signature, classTyp)
+              case INVOKE_DIRECT => invokeDirect(retName, className, methodName, argNames, signature, classTyp)
+              case INVOKE_STATIC => invokeStatic(retName, className, methodName, argNames, signature, classTyp)
+              case INVOKE_INTERFACE => invokeInterface(retName, className, methodName, argNames, signature, classTyp)
+              case INVOKE_DIRECT_EMPTY => invokeObjectInit(retName, className, methodName, argNames, signature, classTyp)
+              case _ => 
+                if(instrType == InstructionType.METHODINVOKE)
+                  "@UNKNOWN_METHODINVOKE 0x%x".format(instrCode)
+                else "@UNKNOWN_METHODINVOKE_STATIC 0x%x".format(instrCode)
+            }
+            if(retVoid)
+              regMap.remove(REGMAP_RESULT_KEY)
+            else
+              regMap.put(REGMAP_RESULT_KEY, DedexJawaType(retTyp))
+            instrText.append(code)
+          }
         case InstructionType.QUICKMETHODINVOKE =>
           val b2 = read8Bit()
           var regno = (b2 & 0xF0) >> 4
@@ -608,10 +386,15 @@ class DexInstructionToPilarParser(
             args += ((regpos, reg))
             // fetch the base class whose method will be invoked. This is needed
             // for vtable offset resolution.
-            if((!secondPass && (dexOffsetResolver != null)) && (i == 0)) {
-              baseClass = regMap.get(new Integer(reg))
-              if((!baseClass.isDefined) || JavaKnowledge.isJavaPrimitive(baseClass.get))
-                baseClass = getLocalVariableType(regpos, reg)
+            if(i == 0) {
+              baseClass = regMap.get(reg) match {
+                case Some(dt) =>
+                  dt match {
+                    case djt: DedexJawaType => Some(djt.typ)
+                    case _ => None
+                  }
+                case None => None
+              }
             }
           }
           if(lastreg >= 0) {
@@ -621,60 +404,48 @@ class DexInstructionToPilarParser(
           if((byteCounter % 2) != 0)
             read8Bit()         // Align to 16 bit
           var offsetResolved = false
-          // If in the first pass, we try to resolve the vtable offset and store the result
-          // in quickParameterMap. In the second pass, we use the resolved parameters to
-          // finally parse the instruction.
-          if(dexOffsetResolver != null) {
-            if(secondPass) {
-              val key = getFilePosition
-              val code = quickParameterMap.get(key)
-              if(code.isDefined) {
-                instrText.append(code.get)
-                offsetResolved = true
+          // The base class register was tracked - we may even be able to resolve
+          // the vtable offset 
+          if(baseClass.isDefined) {
+            val baseClassName = DexTypeIdsBlock.LTypeToJava(JavaKnowledge.formatTypeToSignature(baseClass.get))
+            var method = dexOffsetResolver.getMethodNameFromOffset(baseClassName, vtableOffset)
+            if(method != null) {
+              var proto = ""
+              val idx = method.indexOf(',')
+              if(idx >= 0) {
+                proto = method.substring(idx + 1)
+                method = method.substring(0, idx)
               }
-            } else {
-              // First pass. Try to resolve the vtable offset and store it if successful for the
-              // second pass.
-              // The base class register was tracked - we may even be able to resolve
-              // the vtable offset 
-              if(baseClass.isDefined) {
-                val baseClassName = DexTypeIdsBlock.LTypeToJava(JavaKnowledge.formatTypeToSignature(baseClass.get))
-                var method = dexOffsetResolver.getMethodNameFromOffset(baseClassName, vtableOffset).escape
-                if(method != null) {
-                  var proto = ""
-                  val idx = method.indexOf(',')
-                  if(idx >= 0) {
-                    proto = method.substring(idx + 1)
-                    method = method.substring(0, idx)
-                  }
-                  val signature = getSignature(method, proto)
-                  val className = signature.getClassName
-                  val methodName = signature.methodName
-                  val classTyp = generator.generateType(signature.getClassType).render()
-                  val argNames = getArgNames(args.toList, false, signature)
-                  val retTyp = signature.getReturnType()
-                  val retVoid = retTyp.name == "void"
-                  val retName: Option[String] = 
-                    if(retVoid) None
-                    else {
-                      Some(genVarName((Position(instrBase, -1), "temp"), retTyp))
-                    }
-                  val code = instrCode match {
+              val signature = getSignature(method, proto)
+              val className = signature.getClassName
+              val methodName = signature.methodName
+              val classTyp = generator.generateType(signature.getClassType).render()
+              val argNames = getArgNames(args.toList, false, signature)
+              val retTyp = signature.getReturnType()
+              val retVoid = retTyp.name == "void"
+              val retName: Option[String] = 
+                if(retVoid) None
+                else {
+                  Some(genVarName("temp", DedexJawaType(retTyp)))
+                }
+              val argsize = signature.getParameterNum() + 1
+              val code = 
+                if(argsize != argNames.size) {
+                  regMap.remove(REGMAP_RESULT_KEY)
+                  "@invalide_invoke_quick"
+                } else {
+                  if(retVoid)
+                    regMap.remove(REGMAP_RESULT_KEY)
+                  else
+                    regMap.put(REGMAP_RESULT_KEY, DedexJawaType(retTyp))
+                  instrCode match {
                     case INVOKE_VIRTUAL_QUICK => invokeVirtualQuick(retName, className, methodName, argNames, signature, classTyp)
                     case INVOKE_SUPER_QUICK => invokeSuperQuick(retName, className, methodName, argNames, signature, classTyp)
                     case _ => "@UNKNOWN_QUICKMETHODINVOKE 0x%x".format(instrCode)
                   }
-                  instrText.append(code)
-                  if(retVoid)
-                    regMap.remove(REGMAP_RESULT_KEY)
-                  else
-                    regMap.put(REGMAP_RESULT_KEY, retTyp)
-                  val key = getFilePosition
-                  quickParameterMap(key) = code
-                  affectedRegisters ++= getAffectedRegistersForRegList(args.map(_._2).toList, proto, 1)
-                  offsetResolved = true
                 }
-              }
+              instrText.append(code)
+              offsetResolved = true
             }
           }
           if(!offsetResolved) {
@@ -685,8 +456,6 @@ class DexInstructionToPilarParser(
             }
             instrText.append(code)
             regMap.remove(REGMAP_RESULT_KEY)
-            for(i <- 0 to args.size - 1)
-              affectedRegisters.insert(i, args(i)._2.intValue())
           }
         case InstructionType.INLINEMETHODINVOKE =>
           val b2 = read8Bit()
@@ -721,47 +490,42 @@ class DexInstructionToPilarParser(
           if((byteCounter % 2) != 0)
             read8Bit()         // Align to 16 bit
           var offsetResolved = false
-          if(secondPass) {
-            val key = getFilePosition
-            val code = quickParameterMap.get(key)
-            if(code.isDefined) {
-              instrText.append(code.get)
-              offsetResolved = true
-            }
-          } else {
-            var method = DexOffsetResolver.getInlineMethodNameFromIndex(inlineOffset, dexSignatureBlock.getOptVersion()).escape
-            if(method != null) {
-              var proto = ""
-              val idx = method.indexOf(',')
-              if( idx >= 0 ) {
-                proto = method.substring(idx + 1)
-                method = method.substring(1, idx)
-                val signature = getSignature(method, proto)
-                val className = signature.getClassName
-                val methodName = signature.methodName
-                val classTyp = generator.generateType(signature.getClassType).render()
-                val argNames = getArgNames(args.toList, true, signature)
-                val retTyp = signature.getReturnType()
-                val retVoid = retTyp.name == "void"
-                val retName: Option[String] = 
-                  if(retVoid) None
-                  else {
-                    Some(genVarName((Position(instrBase, -1), "temp"), retTyp))
-                  }
-                val code = instrCode match {
-                  case EXECUTE_INLINE => executeInline(retName, className, methodName, argNames, signature, classTyp)
-                  case _ => "@UNKNOWN_INLINEMETHODINVOKE 0x%x".format(instrCode)
+          var method = DexOffsetResolver.getInlineMethodNameFromIndex(inlineOffset, dexSignatureBlock.getOptVersion())
+          if(method != null) {
+            var proto = ""
+            val idx = method.indexOf(',')
+            if( idx >= 0 ) {
+              proto = method.substring(idx + 1)
+              method = method.substring(1, idx)
+              val signature = getSignature(method, proto)
+              val className = signature.getClassName
+              val methodName = signature.methodName
+              val classTyp = generator.generateType(signature.getClassType).render()
+              val argNames = getArgNames(args.toList, true, signature)
+              val retTyp = signature.getReturnType()
+              val retVoid = retTyp.name == "void"
+              val retName: Option[String] = 
+                if(retVoid) None
+                else {
+                  Some(genVarName("temp", DedexJawaType(retTyp)))
                 }
-                instrText.append(code)
-                if(retVoid)
+              val argsize = signature.getParameterNum()
+              val code = 
+                if(argsize != argNames.size) {
                   regMap.remove(REGMAP_RESULT_KEY)
-                else
-                  regMap.put(REGMAP_RESULT_KEY, retTyp)
-                val key = getFilePosition
-                quickParameterMap(key) = code
-                affectedRegisters ++= getAffectedRegistersForRegList(args.map(_._2).toList, proto, 1)
-                offsetResolved = true
-              }
+                  "@invalide_inline_method_invoke"
+                } else {
+                  if(retVoid)
+                    regMap.remove(REGMAP_RESULT_KEY)
+                  else
+                    regMap.put(REGMAP_RESULT_KEY, DedexJawaType(retTyp))
+                  instrCode match {
+                    case EXECUTE_INLINE => executeInline(retName, className, methodName, argNames, signature, classTyp)
+                    case _ => "@UNKNOWN_INLINEMETHODINVOKE 0x%x".format(instrCode)
+                  }
+                }
+              instrText.append(code)
+              offsetResolved = true
             }
           }
           if(!offsetResolved){
@@ -770,6 +534,7 @@ class DexInstructionToPilarParser(
               case _ => "@UNKNOWN_INLINEMETHODINVOKE 0x%x".format(instrCode)
             }
             instrText.append(code)
+            regMap.remove(REGMAP_RESULT_KEY)
           }
         case InstructionType.FILLEDARRAY =>
           val b2 = read8Bit()
@@ -795,30 +560,27 @@ class DexInstructionToPilarParser(
             } else
               reg = (regByte & 0xF0) >> 4
             regs += ((regpos, reg))
-            affectedRegisters.insert(i, reg)
           }
           if(lastreg >= 0) {
             val regpos = Position(instrBase, regno)
             regs += ((regpos, lastreg))
-            affectedRegisters.insert(regno - 1, lastreg)
           }
           if((byteCounter % 2) != 0)
             read8Bit()         // Align to 16 bit
-          val arrayType = JavaKnowledge.formatSignatureToType(dexTypeIdsBlock.getType(typeidx).escape)
+          val arrayType = JavaKnowledge.formatSignatureToType(dexTypeIdsBlock.getType(typeidx))
           val baseType = JawaType.generateType(arrayType.baseTyp, arrayType.dimensions - 1)
           val baseTypeStr = generator.generateType(baseType).render()
           val regNames = regs.map{
-            case reg =>
-              val typ = resolveRegType(reg, baseType)
-              genRegName(reg, typ)
+            case (position, reg) =>
+              genRegName(reg, resolveRegType(position, reg, baseType, false))
           }
-          val retName = genVarName((Position(instrBase, -1), "temp"), arrayType)
+          val retName = genVarName("temp", DedexJawaType(arrayType))
           val code = instrCode match {
             case FILLED_NEW_ARRAY => filledNewArray(retName, baseTypeStr, regNames.toList)
             case _ => "@UNKNOWN_FILLEDARRAY 0x%x".format(instrCode)
           }
           instrText.append(code)
-          regMap(REGMAP_RESULT_KEY) = arrayType
+          regMap(REGMAP_RESULT_KEY) = DedexJawaType(arrayType)
         // The instruction is followed by the number of registers to pass, encoded as
         // one byte. Then comes the method index as a 16-bit word which is followed
         // by the first register in the range as a 16-bit word
@@ -827,8 +589,8 @@ class DexInstructionToPilarParser(
           val methodidx = read16Bit()
           val argbase = read16Bit()
           val argsize = regno
-          val method = dexMethodIdsBlock.getMethod(methodidx).escape
-          val proto = dexMethodIdsBlock.getProto(methodidx).escape
+          val method = dexMethodIdsBlock.getMethod(methodidx)
+          val proto = dexMethodIdsBlock.getProto(methodidx)
           val signature = getSignature(method, proto)
           val className = signature.getClassName
           val methodName = signature.methodName
@@ -840,90 +602,83 @@ class DexInstructionToPilarParser(
           val retName: Option[String] = 
             if(retVoid) None
             else {
-              Some(genVarName((Position(instrBase, -1), "temp"), retTyp))
+              Some(genVarName("temp", DedexJawaType(retTyp)))
             }
-          val code = instrCode match {
-            case INVOKE_VIRTUAL_RANGE => invokeVirtual(retName, className, methodName, argNames, signature, classTyp)
-            case INVOKE_SUPER_RANGE => invokeSuper(retName, className, methodName, argNames, signature, classTyp)
-            case INVOKE_DIRECT_RANGE => invokeDirect(retName, className, methodName, argNames, signature, classTyp)
-            case INVOKE_STATIC_RANGE => invokeStatic(retName, className, methodName, argNames, signature, classTyp)
-            case INVOKE_INTERFACE_RANGE => invokeInterface(retName, className, methodName, argNames, signature, classTyp)
-            case _ => 
-              if(instrType == InstructionType.METHODINVOKE_RANGE) "@UNKNOWN_METHODINVOKE_RANGE 0x%x".format(instrCode)
-              else "@UNKNOWN_METHODINVOKE_RANGE_STATIC 0x%x".format(instrCode)
-          }
-          instrText.append(code)
-          if(retVoid)
+          val argnum = signature.getParameterNum() + {if(instrCode == INVOKE_STATIC_RANGE) 0 else 1}
+          if(argnum != argNames.size) {
+            instrText.append("@invalide_invoke_range")
             regMap.remove(REGMAP_RESULT_KEY)
-          else
-            regMap.put(REGMAP_RESULT_KEY, retTyp)
-          affectedRegisters ++= getAffectedRegistersForRange(proto, argbase, if(instrType == InstructionType.METHODINVOKE_RANGE) 1 else 0)
+          } else {
+            val code = instrCode match {
+              case INVOKE_VIRTUAL_RANGE => invokeVirtual(retName, className, methodName, argNames, signature, classTyp)
+              case INVOKE_SUPER_RANGE => invokeSuper(retName, className, methodName, argNames, signature, classTyp)
+              case INVOKE_DIRECT_RANGE => invokeDirect(retName, className, methodName, argNames, signature, classTyp)
+              case INVOKE_STATIC_RANGE => invokeStatic(retName, className, methodName, argNames, signature, classTyp)
+              case INVOKE_INTERFACE_RANGE => invokeInterface(retName, className, methodName, argNames, signature, classTyp)
+              case _ => 
+                if(instrType == InstructionType.METHODINVOKE_RANGE) "@UNKNOWN_METHODINVOKE_RANGE 0x%x".format(instrCode)
+                else "@UNKNOWN_METHODINVOKE_RANGE_STATIC 0x%x".format(instrCode)
+            }
+            instrText.append(code)
+            if(retVoid)
+              regMap.remove(REGMAP_RESULT_KEY)
+            else
+              regMap.put(REGMAP_RESULT_KEY, DedexJawaType(retTyp))
+          }
         case InstructionType.QUICKMETHODINVOKE_RANGE =>
           val regno = read8Bit()
           val vtableOffset = read16Bit()
           val argbase = read16Bit()
           val argsize = regno
           var offsetResolved = false
-          // In the first pass, we resolve the parameter and save it into quickParameterMap. 
-          // In the second pass, we use the saved parameter to parse the instruction.
-          if(dexOffsetResolver != null) {
-            if(secondPass) {
-              val key = getFilePosition
-              val code = quickParameterMap.get(key)
-              if(code.isDefined) {
-                instrText.append(code.get)
-                offsetResolved = true
+          var baseClass: Option[JawaType] = regMap.get(argbase) match {
+            case Some(dt) =>
+              dt match {
+                case djt: DedexJawaType => Some(djt.typ)
+                case _ => None
               }
-            } else {
-              var baseClass: Option[JawaType] = None
-              if(dexOffsetResolver != null) {
-                baseClass = regMap.get(new Integer(argbase))
-                if(baseClass.isDefined) {
-                  val baseClassName = DexTypeIdsBlock.LTypeToJava(JavaKnowledge.formatTypeToSignature(baseClass.get))
-                  var method = dexOffsetResolver.getMethodNameFromOffset(baseClassName, vtableOffset).escape
-                  if(method != null) {
-                    var proto = ""
-                    val idx = method.indexOf(',')
-                    if(idx >= 0) {
-                      proto = method.substring(idx + 1)
-                      method = method.substring(0, idx)
-                      val signature = getSignature(method, proto)
-                      val className = signature.getClassName
-                      val methodName = signature.methodName
-                      val classTyp = generator.generateType(signature.getClassType).render()
-                      val args: IList[(Position, Int)] = (0 to argsize - 1).map(i => (Position(instrBase, i), argbase + i)).toList
-                      val argNames = getArgNames(args, instrCode == INVOKE_STATIC_RANGE, signature)
-                      val retTyp = signature.getReturnType()
-                      val retVoid = retTyp.name == "void"
-                      val retName: Option[String] = 
-                        if(retVoid) None
-                        else {
-                          Some(genVarName((Position(instrBase, -1), "temp"), retTyp))
-                        }
-                      val code = instrCode match {
-                        case INVOKE_VIRTUAL_QUICK_RANGE => invokeVirtualQuick(retName, className, methodName, argNames, signature, classTyp)
-                        case INVOKE_SUPER_QUICK_RANGE => invokeSuperQuick(retName, className, methodName, argNames, signature, classTyp)
-                        case _ => "@UNKNOWN_QUICKMETHODINVOKE_RANGE 0x%x".format(instrCode)
-                      }
-                      instrText.append(code)
-                      if(retVoid)
-                        regMap.remove(REGMAP_RESULT_KEY)
-                      else
-                        regMap.put(REGMAP_RESULT_KEY, retTyp)
-                      val key = getFilePosition
-                      quickParameterMap(key) = code
-                      affectedRegisters ++= getAffectedRegistersForRange(proto, argbase, 1)
-                      offsetResolved = true
-                    }
-                  } else {
-                    // if all symbolic resolution is successful, this inital estimation of
-                    // affected registers will be overwritten by another set derived from
-                    // the method prototype. This is rather a debug measure - there is not much
-                    // point tracing registers if the invoke-quick result types cannot be calculated.
-                    for(i <- 0 to regno - 1)
-                      affectedRegisters.insert(i, argbase + i)
+            case None => None
+          }
+          if(baseClass.isDefined) {
+            val baseClassName = DexTypeIdsBlock.LTypeToJava(JavaKnowledge.formatTypeToSignature(baseClass.get))
+            var method = dexOffsetResolver.getMethodNameFromOffset(baseClassName, vtableOffset)
+            if(method != null) {
+              var proto = ""
+              val idx = method.indexOf(',')
+              if(idx >= 0) {
+                proto = method.substring(idx + 1)
+                method = method.substring(0, idx)
+                val signature = getSignature(method, proto)
+                val className = signature.getClassName
+                val methodName = signature.methodName
+                val classTyp = generator.generateType(signature.getClassType).render()
+                val args: IList[(Position, Int)] = (0 to argsize - 1).map(i => (Position(instrBase, i), argbase + i)).toList
+                val argNames = getArgNames(args, instrCode == INVOKE_STATIC_RANGE, signature)
+                val retTyp = signature.getReturnType()
+                val retVoid = retTyp.name == "void"
+                val retName: Option[String] = 
+                  if(retVoid) None
+                  else {
+                    Some(genVarName("temp", DedexJawaType(retTyp)))
                   }
-                }
+                val argnums = signature.getParameterNum() + 1
+                val code = 
+                  if(argnums != argNames.size) {
+                    regMap.remove(REGMAP_RESULT_KEY)
+                    "@invalide_invoke_quick_range"
+                  } else {
+                    if(retVoid)
+                      regMap.remove(REGMAP_RESULT_KEY)
+                    else
+                      regMap.put(REGMAP_RESULT_KEY, DedexJawaType(retTyp))
+                    instrCode match {
+                      case INVOKE_VIRTUAL_QUICK_RANGE => invokeVirtualQuick(retName, className, methodName, argNames, signature, classTyp)
+                      case INVOKE_SUPER_QUICK_RANGE => invokeSuperQuick(retName, className, methodName, argNames, signature, classTyp)
+                      case _ => "@UNKNOWN_QUICKMETHODINVOKE_RANGE 0x%x".format(instrCode)
+                    }
+                  }
+                instrText.append(code)
+                offsetResolved = true
               }
             }
           }
@@ -942,46 +697,43 @@ class DexInstructionToPilarParser(
           val argbase = read16Bit()
           val argsize = regno
           var offsetResolved = false
-          if(secondPass) {
-            val key = getFilePosition
-            val code = quickParameterMap.get(key)
-            if(code.isDefined) {
-              instrText.append(code.get)
-              offsetResolved = true
-            }
-          } else {
-            var method = DexOffsetResolver.getInlineMethodNameFromIndex(inlineOffset, dexSignatureBlock.getOptVersion())
-            if(method != null) {
-              var proto = ""
-              var idx = method.indexOf(',')
-              if(idx >= 0) {
-                proto = method.substring(idx + 1)
-                method = method.substring(0, idx)
-                val signature = getSignature(method, proto)
-                val className = signature.getClassName
-                val methodName = signature.methodName
-                val classTyp = generator.generateType(signature.getClassType).render()
-                val args: IList[(Position, Int)] = (0 to argsize - 1).map(i => (Position(instrBase, i), argbase + i)).toList
-                val argNames = getArgNames(args, instrCode == INVOKE_STATIC_RANGE, signature)
-                val retTyp = signature.getReturnType()
-                val retVoid = retTyp.name == "void"
-                val retName: Option[String] = 
-                  if(retVoid) None
-                  else {
-                    Some(genVarName((Position(instrBase, -1), "temp"), retTyp))
-                  }
-                val code = instrCode match {
-                  case EXECUTE_INLINE_RANGE => executeInline(retName, className, methodName, argNames, signature, classTyp)
-                  case _ => "@UNKNOWN_INLINEMETHODINVOKE_RANGE 0x%x".format(instrCode)
+          var method = DexOffsetResolver.getInlineMethodNameFromIndex(inlineOffset, dexSignatureBlock.getOptVersion())
+          if(method != null) {
+            var proto = ""
+            var idx = method.indexOf(',')
+            if(idx >= 0) {
+              proto = method.substring(idx + 1)
+              method = method.substring(0, idx)
+              val signature = getSignature(method, proto)
+              val className = signature.getClassName
+              val methodName = signature.methodName
+              val classTyp = generator.generateType(signature.getClassType).render()
+              val args: IList[(Position, Int)] = (0 to argsize - 1).map(i => (Position(instrBase, i), argbase + i)).toList
+              val argNames = getArgNames(args, instrCode == INVOKE_STATIC_RANGE, signature)
+              val retTyp = signature.getReturnType()
+              val retVoid = retTyp.name == "void"
+              val retName: Option[String] = 
+                if(retVoid) None
+                else {
+                  Some(genVarName("temp", DedexJawaType(retTyp)))
                 }
-                instrText.append(code)
-                if(retVoid)
+              val argnums = signature.getParameterNum() + 1
+              val code = 
+                if(argnums != argNames.size) {
                   regMap.remove(REGMAP_RESULT_KEY)
-                else
-                  regMap.put(REGMAP_RESULT_KEY, retTyp)
-                affectedRegisters ++= getAffectedRegistersForRange(proto, argbase, 1)
-                offsetResolved = true
-              }
+                  "@invalide_inline_method_invoke_range"
+                } else {
+                  if(retVoid)
+                    regMap.remove(REGMAP_RESULT_KEY)
+                  else
+                    regMap.put(REGMAP_RESULT_KEY, DedexJawaType(retTyp))
+                  instrCode match {
+                    case EXECUTE_INLINE_RANGE => executeInline(retName, className, methodName, argNames, signature, classTyp)
+                    case _ => "@UNKNOWN_INLINEMETHODINVOKE_RANGE 0x%x".format(instrCode)
+                  }
+                }
+              instrText.append(code)
+              offsetResolved = true
             }
           }
           if(!offsetResolved) {
@@ -997,46 +749,44 @@ class DexInstructionToPilarParser(
           val typeidx = read16Bit()
           val regbase = read16Bit()
           val regsize = regno
-          for(i <- 0 to regno - 1)
-            affectedRegisters.insert(i, regbase + i)
-          val arrayType = JavaKnowledge.formatSignatureToType(dexTypeIdsBlock.getType(typeidx).escape)
+          var arrayType = JavaKnowledge.formatSignatureToType(dexTypeIdsBlock.getType(typeidx))
+          arrayType = arrayType.name.resolveRecord
           val baseType = JawaType.generateType(arrayType.baseTyp, arrayType.dimensions - 1)
           val baseTypeStr = generator.generateType(baseType).render()
           val regs: IList[Int] = (0 to regsize - 1).map(regbase + _).toList
           val regNames = regs.map{
             reg =>
               val regpos = Position(instrBase, regs.indexOf(reg))
-              val typ = resolveRegType((regpos, reg), baseType)
-              genRegName((regpos, reg), typ)
+              genRegName(reg, resolveRegType(regpos, reg, baseType, false))
           }
-          val retName = genVarName((Position(instrBase, -1), "temp"), arrayType)
+          val retName = genVarName("temp", DedexJawaType(arrayType))
           val code = instrCode match {
             case FILLED_NEW_ARRAY_RANGE => filledNewArray(retName, baseTypeStr, regNames)
             case _ => "@UNKNOWN_FILLEDARRAY_RANGE 0x%x".format(instrCode)
           }
           instrText.append(code)
-          regMap(REGMAP_RESULT_KEY) = arrayType
+          regMap(REGMAP_RESULT_KEY) = DedexJawaType(arrayType)
         // The instruction is followed by one byte storing the target and size registers
         // in lower and higher 4 bits then a 16-bit value is the type index
         case InstructionType.NEWARRAY =>
           val regs = read8Bit()
           val typeidx = read16Bit()
-          val targetregpos = Position(instrBase, 0)
-          val targetreg = regs & 0xF
+          val regpos = Position(instrBase, 0)
+          val reg = regs & 0xF
           val sizeregpos = Position(instrBase, 1)
           val sizereg = (regs & 0xF0) >> 4
-          val arrayType = JavaKnowledge.formatSignatureToType(dexTypeIdsBlock.getType(typeidx).escape)
+          var arrayType = JavaKnowledge.formatSignatureToType(dexTypeIdsBlock.getType(typeidx))
+          arrayType = arrayType.jawaName.resolveRecord
           val baseType = generator.generateType(JawaType.generateType(arrayType.baseTyp, arrayType.dimensions - 1)).render()
-          val targetregName = genRegName((targetregpos, targetreg), arrayType)
-          val sizeregName = genRegName((sizeregpos, sizereg), resolveRegType((sizeregpos, sizereg), new JawaType("int")))
+          val regtyp = resolveRegType(regpos, reg, arrayType, true)
+          val targetregName = genRegName(reg, regtyp)
+          val sizeregName = genRegName(sizereg, resolveRegType(sizeregpos, sizereg, new JawaType("int"), false))
           val code = instrCode match {
             case NEW_ARRAY => newArray(targetregName, baseType, sizeregName)
             case _ => "@UNKNOWN_NEWARRAY 0x%x".format(instrCode)
           }
           instrText.append(code)
-          regMap(new Integer(targetreg)) = arrayType
-          affectedRegisters.insert(0, targetreg)
-          affectedRegisters.insert(1, sizereg)
+          regMap(reg) = regtyp
         // The instruction is followed by a register and a 32-bit signed offset that
         // points to the static array data used to fill the array
         case InstructionType.FILLARRAYDATA =>
@@ -1044,8 +794,8 @@ class DexInstructionToPilarParser(
           val reg = read8Bit()
           val offset = readSigned32Bit()
           val target: Long = instrBase + (offset * 2L)
-          affectedRegisters.insert(0, reg)
-          val regName = genRegName((regpos, reg), resolveRegType((regpos, reg), new JawaType("int")))
+          val regtyp = resolveRegType(regpos, reg, new JawaType("int", 1), true)
+          val regName = genRegName(reg, regtyp)
           val fillArrayTask = new FillArrayDataTask(regName, getFilePosition, this, instrBase, target)
           val valid = fillArrayTask.isValid
           if(valid) {
@@ -1059,6 +809,7 @@ class DexInstructionToPilarParser(
             }
             updateLowestDataBlock(target)
           } else instrText.append("@INVALID_FILLARRAYDATA")
+          regMap(reg) = regtyp
         // The instruction is followed by one byte storing a register index and a 
         // field id index as a 16-bit value. The instruction reads that field into
         // a single-length, double-length, reference register
@@ -1067,9 +818,12 @@ class DexInstructionToPilarParser(
           val reg = read8Bit()
           val fieldidx = read16Bit()
           val field = dexFieldIdsBlock.getField(fieldidx)
-          val (fieldName, fieldType) = getFieldNameAndType(field)
+          val fqn = getFieldFQN(field)
+          val fieldType = fqn.typ
+          val fieldName = fqn.fqn
           val typ = generator.generateType(fieldType).render()
-          val regName = genRegName((regpos, reg), fieldType)
+          val regTyp = resolveRegType(regpos, reg, fieldType, true)
+          val regName = genRegName(reg, regTyp)
           val code = instrCode match {
             case SGET => sget(regName, fieldName, typ)
             case SGET_WIDE => sgetWide(regName, fieldName, typ)
@@ -1087,8 +841,7 @@ class DexInstructionToPilarParser(
               else "@UNKNOWN_ONEREGFIELD_READ_OBJECT 0x%x".format(instrCode)
           }
           instrText.append(code)
-          regMap(new Integer(reg)) = fieldType
-          affectedRegisters.insert(0, reg)
+          regMap(reg) = regTyp
         // The instruction is followed by one byte storing a register index and a 
         // field id index as a 16-bit value. The instruction writes that field from a
         // register
@@ -1097,9 +850,11 @@ class DexInstructionToPilarParser(
           val reg = read8Bit()
           val fieldidx = read16Bit()
           val field = dexFieldIdsBlock.getField(fieldidx)
-          val (fieldName, fieldType) = getFieldNameAndType(field)
+          val fqn = getFieldFQN(field)
+          val fieldType = fqn.typ
+          val fieldName = fqn.fqn
           val typ = generator.generateType(fieldType).render()
-          val regName = genRegName((regpos, reg), resolveRegType((regpos, reg), fieldType))
+          val regName = genRegName(reg, resolveRegType(regpos, reg, fieldType, false))
           val code = instrCode match {
             case SPUT => sput(fieldName, regName, typ)
             case SPUT_WIDE => sputWide(fieldName, regName, typ)
@@ -1117,8 +872,6 @@ class DexInstructionToPilarParser(
               else "@UNKNOWN_ONEREGFIELD_WRITE_OBJECT 0x%x".format(instrCode)
           }
           instrText.append(code)
-          regMap(new Integer(reg)) = fieldType
-          affectedRegisters.insert(0, reg)
         // The instruction is followed by one byte, storing two register indexes on
         // the low and high 4 bits and a field id index as a 16-bit value. The instruction
         // reads the value into a single-length, double-length, reference register.
@@ -1130,11 +883,14 @@ class DexInstructionToPilarParser(
           val reg2 = (b1 & 0xF0) >> 4
           val fieldidx = read16Bit()
           val field = dexFieldIdsBlock.getField(fieldidx)
-          val (fieldName, fieldType) = getFieldNameAndType(field)
+          val fqn = getFieldFQN(field)
+          val fieldType = fqn.typ
+          val fieldName = fqn.fqn
           val typ = generator.generateType(fieldType).render()
           val basetyp = JavaKnowledge.getClassTypeFromFieldFQN(fieldName)
-          val reg2Name = genRegName((reg2pos, reg2), resolveRegType((reg2pos, reg2), basetyp))
-          val reg1Name = genRegName((reg1pos, reg1), fieldType)
+          val reg2Name = genRegName(reg2, resolveRegType(reg2pos, reg2, basetyp, false))
+          val reg1typ = resolveRegType(reg1pos, reg1, fieldType, true)
+          val reg1Name = genRegName(reg1, reg1typ)
           val code = instrCode match {
             case IGET => iget(reg1Name, reg2Name, fieldName, typ)
             case IGET_WIDE => igetWide(reg1Name, reg2Name, fieldName, typ)
@@ -1152,9 +908,7 @@ class DexInstructionToPilarParser(
               else "@UNKNOWN_TWOREGSFIELD_READ_OBJECT 0x%x".format(instrCode)
           }
           instrText.append(code)
-          regMap(new Integer(reg1)) = fieldType
-          affectedRegisters.insert(0, reg1)
-          affectedRegisters.insert(1, reg2)
+          regMap(reg1) = reg1typ
         // The instruction is followed by one byte, storing two register indexes on
         // the low and high 4 bits and a field id index as a 16-bit value. The instruction
         // writes to a field from any type of register.
@@ -1166,11 +920,13 @@ class DexInstructionToPilarParser(
           val reg1 = (b1 & 0xF0) >> 4
           val fieldidx = read16Bit()        
           val field = dexFieldIdsBlock.getField(fieldidx)
-          val (fieldName, fieldType) = getFieldNameAndType(field)
+          val fqn = getFieldFQN(field)
+          val fieldType = fqn.typ
+          val fieldName = fqn.fqn
           val typ = generator.generateType(fieldType).render()
           val basetyp = JavaKnowledge.getClassTypeFromFieldFQN(fieldName)
-          val reg1Name = genRegName((reg1pos, reg1), resolveRegType((reg1pos, reg1), basetyp))
-          val reg2Name = genRegName((reg2pos, reg2), resolveRegType((reg2pos, reg2), fieldType))
+          val reg1Name = genRegName(reg1, resolveRegType(reg1pos, reg1, basetyp, true))
+          val reg2Name = genRegName(reg2, resolveRegType(reg2pos, reg2, fieldType, false))
           val code = instrCode match {
             case IPUT => iput(reg1Name, fieldName, reg2Name, typ)
             case IPUT_WIDE => iputWide(reg1Name, fieldName, reg2Name, typ)
@@ -1188,15 +944,11 @@ class DexInstructionToPilarParser(
               else "@UNKNOWN_TWOREGSFIELD_WRITE_OBJECT 0x%x".format(instrCode)
           }
           instrText.append(code)
-          affectedRegisters.insert(0, reg1)
-          affectedRegisters.insert(1, reg2)
         // The instruction is followed by a single byte to make it word-aligned.
         case InstructionType.NOPARAMETER =>
           val b = read8Bit()
           val code = instrCode match {
-            case NOP => 
-              genCode = false
-              nop
+            case NOP => ""
             case RETURN_VOID => returnVoid
             case RETURN_VOID_BARRIER => returnVoidBarrier
             case _ => "@UNKNOWN_NOPARAMETER 0x%x".format(instrCode)
@@ -1205,21 +957,19 @@ class DexInstructionToPilarParser(
         // The instruction is followed by 1 register index and a 16 bit constant. The instruction puts
         // the single-length value into a register
         case InstructionType.REGCONST16 =>
-          val targetregpos = Position(instrBase, 0)
-          val targetreg = read8Bit()
+          val regpos = Position(instrBase, 0)
+          val reg = read8Bit()
           val constant = read16Bit()
           val defaultType = new JawaType("int")
-          handleConst((targetregpos, targetreg), defaultType, Left(constant))
-          affectedRegisters.insert(0, targetreg)
+          handleConst(regpos, reg, defaultType, Left(constant))
         // The instruction is followed by 1 register index and a 16 bit constant. The instruction puts
         // the double-length value into a register
         case InstructionType.REGCONST16_WIDE =>
-          val targetregpos = Position(instrBase, 0)
-          val targetreg = read8Bit()
+          val regpos = Position(instrBase, 0)
+          val reg = read8Bit()
           val constant = read16Bit()
           val defaultType = new JawaType("long")
-          handleConst((targetregpos, targetreg), defaultType, Right(constant))
-          affectedRegisters.insert(0, targetreg)
+          handleConst(regpos, reg, defaultType, Right(constant))
         // The instruction is followed by 3 register indexes on 3 bytes
         case InstructionType.THREEREGS =>
           val reg1pos = Position(instrBase, 0)
@@ -1243,9 +993,9 @@ class DexInstructionToPilarParser(
             case CMPL_DOUBLE | CMPG_DOUBLE => new JawaType("double")
             case _ => new JawaType("int")
           }
-          val reg2Name = genRegName((reg2pos, reg2), resolveRegType((reg2pos, reg2), typrhs))
-          val reg3Name = genRegName((reg3pos, reg3), resolveRegType((reg3pos, reg3), typrhs))
-          val reg1Name = genRegName((reg1pos, reg1), typlhs)
+          val reg2Name = genRegName(reg2, resolveRegType(reg2pos, reg2, typrhs, false))
+          val reg3Name = genRegName(reg3, resolveRegType(reg3pos, reg3, typrhs, false))
+          val reg1Name = genRegName(reg1, DedexJawaType(typlhs))
           val code = instrCode match {
             case CMPL_FLOAT => fcmpl(reg1Name, reg2Name, reg3Name)
             case CMPG_FLOAT => fcmpg(reg1Name, reg2Name, reg3Name)
@@ -1272,10 +1022,7 @@ class DexInstructionToPilarParser(
           }
           instrText.append(code)
           
-          regMap(new Integer(reg1)) = typlhs
-          affectedRegisters.insert(0, reg1)
-          affectedRegisters.insert(1, reg2)
-          affectedRegisters.insert(2, reg3)
+          regMap(reg1) = DedexJawaType(typlhs)
         // The instruction is followed by 3 register indexes on 3 bytes. The result is double-length
         case InstructionType.THREEREGS_WIDE =>
           val reg1pos = Position(instrBase, 0)
@@ -1290,9 +1037,9 @@ class DexInstructionToPilarParser(
             case ADD_DOUBLE | SUB_DOUBLE | MUL_DOUBLE | DIV_DOUBLE | REM_DOUBLE => new JawaType("double")
             case _ => new JawaType("long")
           }
-          val reg2Name = genRegName((reg2pos, reg2), resolveRegType((reg2pos, reg2), typ))
-          val reg3Name = genRegName((reg3pos, reg3), resolveRegType((reg3pos, reg3), typ))
-          val reg1Name = genRegName((reg1pos, reg1), typ)
+          val reg2Name = genRegName(reg2, resolveRegType(reg2pos, reg2, typ, false))
+          val reg3Name = genRegName(reg3, resolveRegType(reg3pos, reg3, typ, false))
+          val reg1Name = genRegName(reg1, DedexJawaType(typ))
           val code = instrCode match {
             case ADD_LONG => addLong(reg1Name, reg2Name, reg3Name)
             case SUB_LONG => subLong(reg1Name, reg2Name, reg3Name)
@@ -1314,10 +1061,7 @@ class DexInstructionToPilarParser(
           }
           instrText.append(code)
           
-          regMap(new Integer(reg1)) = typ
-          affectedRegisters.insert(0, reg1)
-          affectedRegisters.insert(1, reg2)
-          affectedRegisters.insert(2, reg3)
+          regMap(reg1) = DedexJawaType(typ)
         // The instruction is followed by 3 register indexes on 3 bytes.  The second register is supposed
         // to hold a reference to an array. The first register is updated with an element of an array
         case InstructionType.ARRGET =>
@@ -1327,28 +1071,30 @@ class DexInstructionToPilarParser(
           val reg2 = read8Bit()
           val reg3pos = Position(instrBase, 2)
           val reg3 = read8Bit()
-          val arrayType = resolveRegType((reg2pos, reg2), {
-            instrCode match {
-              case AGET => new JawaType("int", 1)
-              case AGET_WIDE => new JawaType("long", 1)
-              case AGET_OBJECT => new JawaType(JavaKnowledge.JAVA_TOPLEVEL_OBJECT, 1)
-              case AGET_BOOLEAN => new JawaType("boolean", 1)
-              case AGET_BYTE => new JawaType("byte", 1)
-              case AGET_CHAR => new JawaType("char", 1)
-              case AGET_SHORT => new JawaType("short", 1)
-              case _ => new JawaType("int", 1)
-            }
-          })
+          val defaultType = instrCode match {
+            case AGET => new JawaType("int", 1)
+            case AGET_WIDE => new JawaType("long", 1)
+            case AGET_OBJECT => new JawaType(JavaKnowledge.JAVA_TOPLEVEL_OBJECT, 1)
+            case AGET_BOOLEAN => new JawaType("boolean", 1)
+            case AGET_BYTE => new JawaType("byte", 1)
+            case AGET_CHAR => new JawaType("char", 1)
+            case AGET_SHORT => new JawaType("short", 1)
+            case _ => new JawaType("int", 1)
+          }
+          val arrayType = resolveRegType(reg2pos, reg2, defaultType, false)
           val elementType: JawaType = arrayType match {
+            case ut: DedexUndeterminedType =>
+              JawaType.generateType(defaultType.baseTyp, defaultType.dimensions - 1)
             // should mostly come here
-            case typ if typ.dimensions > 0 => JawaType.generateType(typ.baseTyp, typ.dimensions - 1)
+            case DedexJawaType(typ) if typ.dimensions > 0 => JawaType.generateType(typ.baseTyp, typ.dimensions - 1)
             // some problem might happened
-            case typ =>
+            case DedexJawaType(typ) =>
               typ
           }
-          val reg1Name = genRegName((reg1pos, reg1), elementType)
-          val reg2Name = genRegName((reg2pos, reg2), arrayType)
-          val reg3Name = genRegName((reg3pos, reg3), resolveRegType((reg3pos, reg3), new JawaType("int")))
+          val reg1typ = resolveRegType(reg1pos, reg1, elementType, true)
+          val reg1Name = genRegName(reg1, reg1typ)
+          val reg2Name = genRegName(reg2, arrayType)
+          val reg3Name = genRegName(reg3, resolveRegType(reg3pos, reg3, new JawaType("int"), false))
           val code = instrCode match {
             case AGET => aget(reg1Name, reg2Name, reg3Name)
             case AGET_WIDE => agetWide(reg1Name, reg2Name, reg3Name)
@@ -1361,10 +1107,7 @@ class DexInstructionToPilarParser(
           }
           instrText.append(code)
           
-          regMap(new Integer(reg1)) = elementType
-          affectedRegisters.insert(0, reg1)
-          affectedRegisters.insert(1, reg2)
-          affectedRegisters.insert(2, reg3)
+          regMap(reg1) = reg1typ
         // The instruction is followed by 3 register indexes on 3 bytes.  The second register is supposed
         // to hold a reference to an array. The content of the first register is put into the array
         case InstructionType.ARRPUT =>
@@ -1374,28 +1117,30 @@ class DexInstructionToPilarParser(
           val reg1 = read8Bit()
           val reg2pos = Position(instrBase, 1)
           val reg2 = read8Bit()
-          val arrayType = resolveRegType((reg1pos, reg1), {
-            instrCode match {
-              case APUT => new JawaType("int", 1)
-              case APUT_WIDE => new JawaType("long", 1)
-              case APUT_OBJECT => new JawaType(JavaKnowledge.JAVA_TOPLEVEL_OBJECT, 1)
-              case APUT_BOOLEAN => new JawaType("boolean", 1)
-              case APUT_BYTE => new JawaType("byte", 1)
-              case APUT_CHAR => new JawaType("char", 1)
-              case APUT_SHORT => new JawaType("short", 1)
-              case _ => new JawaType("int", 1)
-            }
-          })
+          val defaultType = instrCode match {
+            case APUT => new JawaType("int", 1)
+            case APUT_WIDE => new JawaType("long", 1)
+            case APUT_OBJECT => new JawaType(JavaKnowledge.JAVA_TOPLEVEL_OBJECT, 1)
+            case APUT_BOOLEAN => new JawaType("boolean", 1)
+            case APUT_BYTE => new JawaType("byte", 1)
+            case APUT_CHAR => new JawaType("char", 1)
+            case APUT_SHORT => new JawaType("short", 1)
+            case _ => new JawaType("int", 1)
+          }
+          val arrayType = resolveRegType(reg1pos, reg1, defaultType, true)
           val elementType: JawaType = arrayType match {
+            case ut: DedexUndeterminedType =>
+              JawaType.generateType(defaultType.baseTyp, defaultType.dimensions - 1)
             // should mostly come here
-            case typ if typ.dimensions > 0 => JawaType.generateType(typ.baseTyp, typ.dimensions - 1)
+            case DedexJawaType(typ) if typ.dimensions > 0 => JawaType.generateType(typ.baseTyp, typ.dimensions - 1)
             // some problem might happened
-            case typ =>
+            case DedexJawaType(typ) =>
               typ
           }
-          val reg1Name = genRegName((reg1pos, reg1), resolveRegType((reg1pos, reg1), arrayType))
-          val reg2Name = genRegName((reg2pos, reg2), resolveRegType((reg2pos, reg2), new JawaType("int")))
-          val reg3Name = genRegName((reg3pos, reg3), resolveRegType((reg3pos, reg3), elementType))
+          val reg1Name = genRegName(reg1, arrayType)
+          val reg2typ = resolveRegType(reg2pos, reg2, new JawaType("int"), false)
+          val reg2Name = genRegName(reg2, reg2typ)
+          val reg3Name = genRegName(reg3, resolveRegType(reg3pos, reg3, elementType, false))
           val code = instrCode match {
             case APUT => aput(reg1Name, reg2Name, reg3Name)
             case APUT_WIDE => aputWide(reg1Name, reg2Name, reg3Name)
@@ -1407,9 +1152,8 @@ class DexInstructionToPilarParser(
             case _ => "@UNKNOWN_ARRPUT 0x%x".format(instrCode)
           }
           instrText.append(code)
-          affectedRegisters.insert(0, reg1)
-          affectedRegisters.insert(1, reg2)
-          affectedRegisters.insert(2, reg3)
+          regMap(reg1) = arrayType
+          regMap(reg2) = reg2typ
         // The instruction is followed by a register index and a 32 bit signed offset pointing
         // to a packed-switch table
         case InstructionType.PACKEDSWITCH =>
@@ -1417,8 +1161,7 @@ class DexInstructionToPilarParser(
           val reg = read8Bit()
           val offset = read32Bit()
           val target = instrBase + (offset * 2L)
-          affectedRegisters += reg
-          val regName = genRegName((regpos, reg), resolveRegType((regpos, reg), new JawaType("int")))
+          val regName = genRegName(reg, resolveRegType(regpos, reg, new JawaType("int"), false))
           val packedSwitchTask = new PackedSwitchTask(regName, getFilePosition, this, instrBase, target)
           val valid = packedSwitchTask.isValid
           if(valid) {
@@ -1443,8 +1186,7 @@ class DexInstructionToPilarParser(
           val reg = read8Bit()
           val offset = read32Bit()
           val target = instrBase + (offset * 2L)
-          affectedRegisters += reg
-          val regName = genRegName((regpos, reg), resolveRegType((regpos, reg), new JawaType("int")))
+          val regName = genRegName(reg, resolveRegType(regpos, reg, new JawaType("int"), false))
           val sparseSwitchTask = new SparseSwitchTask(regName, getFilePosition, this, instrBase, target)
           val valid = sparseSwitchTask.isValid
           if(valid) {
@@ -1468,33 +1210,39 @@ class DexInstructionToPilarParser(
           val regpos = Position(instrBase, 0)
           val temppos = Position(instrBase, 1)
           val reg = read8Bit()
-          val typ = resolveRegType((temppos, -1), {
-            instrCode match {
-              case MOVE_RESULT => new JawaType("int")
-              case MOVE_RESULT_WIDE => new JawaType("long")
-              case MOVE_RESULT_OBJECT => JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE
-              case MOVE_EXCEPTION => ExceptionCenter.EXCEPTION
-              case _ => JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE
-            }
-          })
-          val regName = genRegName((regpos, reg), typ)
-          val varName = genVarName((temppos, "temp"), typ)
-          val code = instrCode match {
-            case MOVE_RESULT => moveResult(regName, varName)
-            case MOVE_RESULT_WIDE => moveResultWide(regName, varName)
-            case MOVE_RESULT_OBJECT => moveResultObject(regName, varName)
-            case MOVE_EXCEPTION => moveExc(regName, generator.generateType(regTypMap.getOrElse((regpos, reg), ("", typ))._2).render())
-            case _ => "@UNKNOWN_MOVERESULT 0x%x".format(instrCode)
+          instrCode match {
+            case MOVE_RESULT | MOVE_RESULT_WIDE | MOVE_RESULT_OBJECT =>
+              if(!regMap.contains(REGMAP_RESULT_KEY)) {
+                instrText.append("@invalid_move_result")
+              } else {
+                val typ = regMap(REGMAP_RESULT_KEY).asInstanceOf[DedexJawaType].typ
+                val regtyp = resolveRegType(regpos, reg, typ, true)
+                val regName = genRegName(reg, regtyp)
+                val varName = genVarName("temp", regMap(REGMAP_RESULT_KEY))
+                val code = instrCode match {
+                  case MOVE_RESULT => moveResult(regName, varName)
+                  case MOVE_RESULT_WIDE => moveResultWide(regName, varName)
+                  case MOVE_RESULT_OBJECT => moveResultObject(regName, varName)
+                }
+                instrText.append(code)
+                regMap(reg) = regtyp
+              }
+            case MOVE_EXCEPTION =>
+              val exctyp = resolveRegType(temppos, REGMAP_RESULT_KEY, ExceptionCenter.THROWABLE, false)
+              val regtyp = resolveRegType(regpos, reg, exctyp.asInstanceOf[DedexJawaType].typ, true)
+              val regName = genRegName(reg, regtyp)
+              val code = moveExc(regName, generator.generateType(regtyp.asInstanceOf[DedexJawaType].typ).render())
+              instrText.append(code)
+              regMap(reg) = regtyp
+            case _ =>
+              instrText.append("@UNKNOWN_MOVERESULT 0x%x".format(instrCode))
           }
-          instrText.append(code)
-          regMap(new Integer(reg)) = typ
-          affectedRegisters += reg
         // The instruction is followed by one register index
         case InstructionType.ONEREG =>
           val regpos = Position(instrBase, 0)
           val reg = read8Bit()
           val retTyp = hostSig.getReturnType()
-          val regName = genRegName((regpos, reg), resolveRegType((regpos, reg), {
+          val regName = genRegName(reg, resolveRegType(regpos, reg, {
             instrCode match {
               case RETURN => retTyp
               case RETURN_WIDE => retTyp
@@ -1504,7 +1252,7 @@ class DexInstructionToPilarParser(
               case THROW => ExceptionCenter.EXCEPTION
               case _ => JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE
             }
-          }))
+          }, false))
           val code = instrCode match {
             case RETURN => `return`(regName)
             case RETURN_WIDE => returnWide(regName)
@@ -1515,7 +1263,6 @@ class DexInstructionToPilarParser(
             case _ => "@UNKNOWN_ONEREG 0x%x".format(instrCode)
           }
           instrText.append(code)
-          affectedRegisters += reg
         // The instruction is followed by a 8-bit signed offset
         case InstructionType.OFFSET8 =>
           val target = calculateTarget(instrBase)
@@ -1536,35 +1283,42 @@ class DexInstructionToPilarParser(
           val regrhspos = Position(instrBase, 1)
           val reg = read8Bit()
           val typeidx = read16Bit()
-          var castType = dexTypeIdsBlock.getClassName(typeidx).escape
+          var castType = dexTypeIdsBlock.getClassName(typeidx)
           if(!castType.startsWith("["))
             castType = "L" + castType + ";"
-          val typ = JavaKnowledge.formatSignatureToType(castType)
-          val reg2Name = genRegName((regrhspos, reg), resolveRegType((regrhspos, reg), JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE))
-          val reg1Name = genRegName((reglhspos, reg), typ)
+          var typ = JavaKnowledge.formatSignatureToType(castType)
+          typ = typ.jawaName.resolveRecord
+          val reg2Name = genRegName(reg, resolveRegType(regrhspos, reg, JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, false))
+          val reg1Name = genRegName(reg, DedexJawaType(typ))
           val code = instrCode match {
             case CHECK_CAST => checkCast(reg1Name, generator.generateType(typ).render(), reg2Name)
             case _ => "@UNKNOWN_CHECKCAST 0x%x".format(instrCode)
           }
           instrText.append(code)
-          regMap(new Integer(reg)) = typ
-          affectedRegisters.insert(0, reg)
+          regMap(reg) = DedexJawaType(typ)
         // The instruction is followed by one register index byte, then a 
         // 16 bit type index follows. The register is associated with that type
         case InstructionType.NEWINSTANCE =>
           val regpos = Position(instrBase, 0)
           val reg = read8Bit()
           val typeidx = read16Bit()
-          val newtyp = "L" + dexTypeIdsBlock.getClassName(typeidx).escape + ";"
-          val typ = JavaKnowledge.formatSignatureToType(newtyp)
-          val regName = genRegName((regpos, reg), typ)
+          var newtyp =
+            try{
+              dexTypeIdsBlock.getClassName(typeidx)
+            } catch {
+              case e: Exception => "java/lang/Object"
+            }
+          if(!newtyp.startsWith("["))
+            newtyp = "L" + newtyp + ";"
+          val defaultTyp: JawaType = JavaKnowledge.formatSignatureToType(newtyp).jawaName.resolveRecord
+          val regtyp = resolveRegType(regpos, reg, defaultTyp, true)
+          val regName = genRegName(reg, regtyp)
           val code = instrCode match {
-            case NEW_INSTANCE => newIns(regName, generator.generateType(typ).render())
+            case NEW_INSTANCE => newIns(regName, generator.generateType(defaultTyp).render())
             case _ => "@UNKNOWN_NEWINSTANCE 0x%x".format(instrCode)
           }
           instrText.append(code)
-          regMap(new Integer(reg)) = typ
-          affectedRegisters.insert(0, reg)
+          regMap(reg) = regtyp
         // The instruction is followed by one byte with two register indexes on the
         // high and low 4-bits. Then a 16 bit type index follows.
         case InstructionType.TWOREGSTYPE =>
@@ -1574,33 +1328,39 @@ class DexInstructionToPilarParser(
           val reg2pos = Position(instrBase, 1)
           val reg2 = (b1 & 0xF0) >> 4
           val typeidx = read16Bit()
-          var typee = dexTypeIdsBlock.getClassName(typeidx).escape
+          var typee = dexTypeIdsBlock.getClassName(typeidx)
           if(!typee.startsWith("["))
             typee = "L" + typee + ";"
-          val typ = JavaKnowledge.formatSignatureToType(typee)
-          val reg2Name = genRegName((reg2pos, reg2), resolveRegType((reg2pos, reg2), JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE))
-          val reg1Name = genRegName((reg1pos, reg1), new JawaType("boolean"))
+          var typ = JavaKnowledge.formatSignatureToType(typee)
+          typ = typ.jawaName.resolveRecord
+          val reg2Name = genRegName(reg2, resolveRegType(reg2pos, reg2, JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, false))
+          val reg1typ = resolveRegType(reg1pos, reg1, new JawaType("boolean"), true)
+          val reg1Name = genRegName(reg1, reg1typ)
           val code = instrCode match {
             case INSTANCE_OF => instanceOf(reg1Name, reg2Name, generator.generateType(typ).render())
             case _ => "@UNKNOWN_TWOREGSTYPE 0x%x".format(instrCode)
           }
           instrText.append(code)
-          regMap(new Integer(reg1)) = new JawaType("boolean")
-          affectedRegisters += reg1
-          affectedRegisters += reg2
+          regMap(reg1) = reg1typ
         // The instruction is followed by one byte with register index and one signed
         // 16 bit offset
         case InstructionType.REGOFFSET16 =>
           val regpos = Position(instrBase, 0)
           val reg = read8Bit()
-          affectedRegisters += reg
           val target = calculateTarget16Bit(instrBase)
           if(inRange(target)){
-            val regTyp = resolveRegType((regpos, reg), new JawaType("boolean"))
-            val regName = genRegName((regpos, reg), regTyp)
+            val regTyp = instrCode match {
+              case IF_EQZ | IF_NEZ => resolveRegType(regpos, reg, new JawaType("boolean"), false)
+              case _ => resolveRegType(regpos, reg, new JawaType("int"), false)              
+            }
+            val regName = genRegName(reg, regTyp)
+            val isObject: Boolean = regTyp match {
+              case ut: DedexJawaType => ut.typ.isObject
+              case _ => false
+            }
             val code = instrCode match {
-              case IF_EQZ => ifEqz(regName, target, regTyp)
-              case IF_NEZ => ifNez(regName, target, regTyp)
+              case IF_EQZ => ifEqz(regName, target, isObject)
+              case IF_NEZ => ifNez(regName, target, isObject)
               case IF_LTZ => ifLtz(regName, target)
               case IF_GEZ => ifGez(regName, target)
               case IF_GTZ => ifGtz(regName, target)
@@ -1633,19 +1393,17 @@ class DexInstructionToPilarParser(
           val reg1 = b1 & 0xF
           val reg2pos = Position(instrBase, 1)
           val reg2 = (b1 & 0xF0) >> 4
-          affectedRegisters += reg1
-          affectedRegisters += reg2
           val target = calculateTarget16Bit(instrBase)
           if(inRange(target)){
-            val defaultTyp = regMap.get(new Integer(reg1)) match {
-              case Some(typ) if !typ.isUndetermined => typ
-              case _ => regMap.get(new Integer(reg2)) match {
-                case Some(typ) if !typ.isUndetermined => typ
+            val defaultTyp = regMap.get(reg1) match {
+              case Some(DedexJawaType(typ)) => typ
+              case _ => regMap.get(reg2) match {
+                case Some(DedexJawaType(typ)) => typ
                 case _ => new JawaType("int")
               }
             }
-            val reg1Name = genRegName((reg1pos, reg1), resolveRegType((reg1pos, reg1), defaultTyp))
-            val reg2Name = genRegName((reg2pos, reg2), resolveRegType((reg2pos, reg2), defaultTyp))
+            val reg1Name = genRegName(reg1, resolveRegType(reg1pos, reg1, defaultTyp, false))
+            val reg2Name = genRegName(reg2, resolveRegType(reg2pos, reg2, defaultTyp, false))
             val code = instrCode match {
               case IF_EQ => ifEq(reg1Name, reg2Name, target)
               case IF_NE => ifNq(reg1Name, reg2Name, target)
@@ -1667,14 +1425,19 @@ class DexInstructionToPilarParser(
           val reg1 = b1 & 0xF
           val reg2pos = Position(instrBase, 1)
           val reg2 = (b1 & 0xF0) >> 4
-          val typ = resolveRegType((reg2pos, reg2), {instrCode match {
+          val defaultTyp = instrCode match {
             case MOVE => new JawaType("int")
             case MOVE_WIDE => new JawaType("long")
             case MOVE_OBJECT => JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE
             case _ => JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE
-          }})
-          val reg1Name = genRegName((reg1pos, reg1), typ)
-          val reg2Name = genRegName((reg2pos, reg2), typ)
+          }
+          val reg2typ = resolveRegType(reg2pos, reg2, defaultTyp, false)
+          val reg1typ = reg2typ match {
+            case jt: DedexJawaType => resolveRegType(reg1pos, reg1, jt.typ, true)
+            case ut: DedexUndeterminedType => ut.possible(reg1pos, defaultTyp, true)
+          }
+          val reg1Name = genRegName(reg1, reg1typ)
+          val reg2Name = genRegName(reg2, reg2typ)
           val code = instrCode match {
             case MOVE => move(reg1Name, reg2Name)
             case MOVE_WIDE => moveWide(reg1Name, reg2Name)
@@ -1684,9 +1447,7 @@ class DexInstructionToPilarParser(
               else "@UNKNOWN_MOVE_OBJECT 0x%x".format(instrCode)
           }
           instrText.append(code)
-          regMap(new Integer(reg1)) = typ
-          affectedRegisters += reg1
-          affectedRegisters += reg2
+          regMap(reg1) = reg1typ
         // One byte follows the instruction, two register indexes on the high and low 4 bits. The
         // first register will hold a single-length value
         case InstructionType.TWOREGSPACKED_SINGLE | InstructionType.TWOREGSPACKED_DOUBLE =>
@@ -1810,9 +1571,10 @@ class DexInstructionToPilarParser(
               if(instrType == InstructionType.TWOREGSPACKED_SINGLE) new JawaType("int")
               else new JawaType("long")
           }
-          val reg2Name = genRegName((reg2pos, reg2), resolveRegType((reg2pos, reg2), typrhs))
-          val reg1Name2 = genRegName((reg1pos2, reg1), resolveRegType((reg1pos2, reg1), typrhs))
-          val reg1Name = genRegName((reg1pos, reg1), typlhs)
+          val reg2Name = genRegName(reg2, resolveRegType(reg2pos, reg2, typrhs, false))
+          val reg1Name2 = genRegName(reg1, resolveRegType(reg1pos2, reg1, typrhs, false))
+          val reg1typ = resolveRegType(reg1pos, reg1, typlhs, true)
+          val reg1Name = genRegName(reg1, reg1typ)
           val code = instrCode match {
             case ARRAY_LENGTH => arrayLen(reg1Name, reg2Name)
             case NEG_INT => negInt(reg1Name, reg2Name)
@@ -1871,10 +1633,7 @@ class DexInstructionToPilarParser(
               else "@UNKNOWN_TWOREGSPACKED_DOUBLE 0x%x".format(instrCode)
           }
           instrText.append(code)
-          
-          regMap(new Integer(reg1)) = typlhs
-          affectedRegisters += reg1
-          affectedRegisters += reg2
+          regMap(reg1) = reg1typ
         // The instruction is followed by two 8-bit register indexes and one 8-bit
         // literal constant.
         case InstructionType.TWOREGSCONST8 =>
@@ -1884,9 +1643,10 @@ class DexInstructionToPilarParser(
           val reg2 = read8Bit()
           val constant = read8Bit()
           val typ = new JawaType("int")
-          val reg2typ = resolveRegType((reg2pos, reg2), typ)
-          val reg2Name = genRegName((reg2pos, reg2), reg2typ)
-          val reg1Name = genRegName((reg1pos, reg1), typ)
+          val reg2typ = resolveRegType(reg2pos, reg2, typ, false)
+          val reg2Name = genRegName(reg2, reg2typ)
+          val reg1typ = resolveRegType(reg1pos, reg1, typ, true)
+          val reg1Name = genRegName(reg1, reg1typ)
           val code = instrCode match {
             case ADD_INT_LIT8 => addLit8(reg1Name, reg2Name, constant)
             case SUB_INT_LIT8 => subLit8(reg1Name, reg2Name, constant)
@@ -1902,40 +1662,41 @@ class DexInstructionToPilarParser(
             case _ => "@UNKNOWN_TWOREGSCONST8 0x%x".format(instrCode)
           }
           instrText.append(code)
-          regMap(new Integer(reg1)) = typ
-          affectedRegisters += reg1
-          affectedRegisters += reg2
+          regMap(reg1) = reg1typ
         case InstructionType.REGCLASSCONST =>
           val regpos = Position(instrBase, 0)
           val reg = read8Bit()
           val typeidx = read16Bit()
-          var classtyp = dexTypeIdsBlock.getClassName(typeidx).escape
+          var classtyp =
+            try{
+              dexTypeIdsBlock.getClassName(typeidx)
+            } catch {
+              case e: Exception => "java/lang/Object"
+            }
           if(!classtyp.startsWith("["))
             classtyp = "L" + classtyp + ";"
-          val typ = JavaKnowledge.formatSignatureToType(classtyp)
-          val typlhs = new JawaType("java.lang.Class")
-          val regName = genRegName((regpos, reg), typlhs)
+          var typ = JavaKnowledge.formatSignatureToType(classtyp)
+          typ = typ.jawaName.resolveRecord
+          val typlhs = resolveRegType(regpos, reg, new JawaType("java.lang.Class"), true)
+          val regName = genRegName(reg, typlhs)
           val code = instrCode match {
             case CONST_CLASS => constClass(regName, generator.generateType(typ).render())
             case _ => "@UNKNOWN_REGCLASSCONST 0x%x".format(instrCode)
           }
           instrText.append(code)
-          regMap(new Integer(reg)) = typlhs
-          affectedRegisters += reg
+          regMap(reg) = typlhs
         case InstructionType.REGCONST32 =>
           val regpos = Position(instrBase, 0)
           val reg = read8Bit()
           val constant = read32Bit()
           val defaultType = new JawaType("int")
-          handleConst((regpos, reg), defaultType, Right(constant))
-          affectedRegisters += reg
+          handleConst(regpos, reg, defaultType, Right(constant))
         case InstructionType.REGCONST32_WIDE =>
           val regpos = Position(instrBase, 0)
           val reg = read8Bit()
           val constant = read32Bit()
           val defaultType = new JawaType("float")
-          handleConst((regpos, reg), defaultType, Right(constant))
-          affectedRegisters += reg
+          handleConst(regpos, reg, defaultType, Right(constant))
         case InstructionType.REGCONST64 =>
           val regpos = Position(instrBase, 0)
           val reg = read8Bit()
@@ -1943,84 +1704,81 @@ class DexInstructionToPilarParser(
           val const2 = read32Bit()
           val constant = const2 << 32 | const1
           val defaultType = new JawaType("double")
-          handleConst((regpos, reg), defaultType, Right(constant))
-          affectedRegisters += reg
+          handleConst(regpos, reg, defaultType, Right(constant))
         case InstructionType.REG8REG16 =>
           val reg1pos = Position(instrBase, 0)
           val reg1 = read8Bit()
           val reg2pos = Position(instrBase, 1)
           val reg2 = read16Bit()
-          val typ = resolveRegType((reg2pos, reg2), {instrCode match {
+          val defaultTyp = instrCode match {
             case MOVE_FROM16 => new JawaType("int")
             case MOVE_WIDE_FROM16 => new JawaType("long")
             case _ => new JawaType("int")
-          }})
-          val reg1Name = genRegName((reg1pos, reg1), typ)
-          val reg2Name = genRegName((reg2pos, reg2), typ)
+          }
+          val reg1typ = resolveRegType(reg1pos, reg1, defaultTyp, true)
+          val reg2typ = resolveRegType(reg2pos, reg2, defaultTyp, false)
+          val reg1Name = genRegName(reg1, reg1typ)
+          val reg2Name = genRegName(reg2, reg2typ)
           val code = instrCode match {
             case MOVE_FROM16 => move(reg1Name, reg2Name)
             case MOVE_WIDE_FROM16 => moveWide(reg1Name, reg2Name)
             case _ => "@UNKNOWN_REG8REG16 0x%x".format(instrCode)
           }
           instrText.append(code)
-          regMap(new Integer(reg1)) = typ
-          affectedRegisters += reg1
-          affectedRegisters += reg2
+          regMap(reg1) = reg1typ
         case InstructionType.REG8REG16_OBJECT =>
           val reg1pos = Position(instrBase, 0)
           val reg1 = read8Bit()
           val reg2pos = Position(instrBase, 1)
           val reg2 = read16Bit()
-          val typ = resolveRegType((reg2pos, reg2), JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE)
-          val reg1Name = genRegName((reg1pos, reg1), typ)
-          val reg2Name = genRegName((reg2pos, reg2), typ)
+          val reg1typ = resolveRegType(reg1pos, reg1, JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, true)
+          val reg2typ = resolveRegType(reg2pos, reg2, JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, false)
+          val reg1Name = genRegName(reg1, reg1typ)
+          val reg2Name = genRegName(reg2, reg2typ)
           val code = instrCode match {
             case MOVE_OBJECT_FROM16 => moveObject(reg1Name, reg2Name)
             case _ => "@UNKNOWN_REG8REG16 0x%x".format(instrCode)
           }
           instrText.append(code)
-          regMap(new Integer(reg1)) = typ
-          affectedRegisters += reg1
-          affectedRegisters += reg2
+          regMap(reg1) = reg1typ
         case InstructionType.REG16REG16 =>
           val garbage = read8Bit()
           val reg1pos = Position(instrBase, 0)
           val reg1 = read16Bit()
           val reg2pos = Position(instrBase, 1)
           val reg2 = read16Bit()
-          val typ = resolveRegType((reg2pos, reg2), {instrCode match {
+          val defaultTyp = instrCode match {
             case MOVE_16 => new JawaType("int")
             case MOVE_WIDE_16 => new JawaType("long")
             case _ => new JawaType("int")
-          }})
-          val reg1Name = genRegName((reg1pos, reg1), typ)
-          val reg2Name = genRegName((reg2pos, reg2), typ)
+          }
+          val reg1typ = resolveRegType(reg1pos, reg1, defaultTyp, true)
+          val reg2typ = resolveRegType(reg2pos, reg2, defaultTyp, false)
+          val reg1Name = genRegName(reg1, reg1typ)
+          val reg2Name = genRegName(reg2, reg2typ)
           val code = instrCode match {
             case MOVE_16 => move(reg1Name, reg2Name)
             case MOVE_WIDE_16 => moveWide(reg1Name, reg2Name)
             case _ => "@UNKNOWN_REG16REG16 0x%x".format(instrCode)
           }
           instrText.append(code)
-          regMap(new Integer(reg1)) = typ
-          affectedRegisters += reg1
-          affectedRegisters += reg2
+          regMap(reg1) = reg1typ
         case InstructionType.REG16REG16_OBJECT =>
           val garbage = read8Bit()
           val reg1pos = Position(instrBase, 0)
           val reg1 = read16Bit()
           val reg2pos = Position(instrBase, 1)
           val reg2 = read16Bit()
-          val typ = resolveRegType((reg2pos, reg2), JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE)
-          val reg1Name = genRegName((reg1pos, reg1), typ)
-          val reg2Name = genRegName((reg2pos, reg2), typ)
+          val reg1typ = resolveRegType(reg1pos, reg1, JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, true)
+          val reg2typ = resolveRegType(reg2pos, reg2, JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, false)
+          val reg1Name = genRegName(reg1, reg1typ)
+          val reg2Name = genRegName(reg2, reg2typ)
           val code = instrCode match {
             case MOVE_OBJECT_16 => moveObject(reg1Name, reg2Name)
             case _ => "@UNKNOWN_REG16REG16 0x%x".format(instrCode)
           }
           instrText.append(code)
-          regMap(new Integer(reg1)) = typ
-          affectedRegisters += reg1
-          affectedRegisters += reg2
+          regMap(reg1) = reg1typ
         case InstructionType.TWOREGSPACKEDCONST16 =>
           val reg = read8Bit()
           val reg1pos = Position(instrBase, 0)
@@ -2028,9 +1786,10 @@ class DexInstructionToPilarParser(
           val reg2pos = Position(instrBase, 1)
           val reg2 = (reg & 0xF0) >> 4
           val constant = read16Bit()
-          val typ = resolveRegType((reg2pos, reg2), new JawaType("int"))
-          val reg1Name = genRegName((reg1pos, reg1), typ)
-          val reg2Name = genRegName((reg2pos, reg2), typ)
+          val reg1typ = resolveRegType(reg1pos, reg1, new JawaType("int"), true)
+          val reg2typ = resolveRegType(reg2pos, reg2, new JawaType("int"), false)
+          val reg1Name = genRegName(reg1, reg1typ)
+          val reg2Name = genRegName(reg2, reg2typ)
           val code = instrCode match {
             case ADD_INT_LIT16 => addLit16(reg1Name, reg2Name, constant)
             case SUB_INT_LIT16 => subLit16(reg1Name, reg2Name, constant)
@@ -2043,9 +1802,7 @@ class DexInstructionToPilarParser(
             case _ => "@UNKNOWN_TWOREGSPACKEDCONST16 0x%x".format(instrCode)
           }
           instrText.append(code)
-          regMap(new Integer(reg1)) = typ
-          affectedRegisters += reg1
-          affectedRegisters += reg2
+          regMap(reg1) = reg1typ
         // Reads a single-length field into register using quick access
         case InstructionType.TWOREGSQUICKOFFSET | InstructionType.TWOREGSQUICKOFFSET_WIDE | InstructionType.TWOREGSQUICKOFFSET_OBJECT =>
           val reg = read8Bit()
@@ -2054,53 +1811,46 @@ class DexInstructionToPilarParser(
           val reg2pos = Position(instrBase, 1)
           val reg2 = (reg & 0xF0) >> 4
           val vtableOffset = read16Bit()
-          var baseClass: Option[JawaType] = None
-          if(dexOffsetResolver != null)
-            baseClass = regMap.get(new Integer(reg2))
+          var baseClass: Option[JawaType] = regMap.get(reg2) match {
+            case Some(dt) =>
+              dt match {
+                case djt: DedexJawaType => Some(djt.typ)
+                case _ => None
+              }
+            case None => None
+          }
           var offsetResolved = false
-          var fieldTyp: JawaType = 
-            if(instrType == InstructionType.TWOREGSQUICKOFFSET) new JawaType("int")
-            else if(instrType == InstructionType.TWOREGSQUICKOFFSET_WIDE) new JawaType("long")
-            else JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE.toUnknown
+          var reg1typ: DedexType = 
+            if(instrType == InstructionType.TWOREGSQUICKOFFSET) DedexJawaType(new JawaType("int"))
+            else if(instrType == InstructionType.TWOREGSQUICKOFFSET_WIDE) DedexJawaType(new JawaType("long"))
+            else DedexJawaType(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE.toUnknown)
           // If in the first pass, we try to resolve the vtable offset and store the result
           // in quickParameterMap. In the second pass, we use the resolved parameters to
           // finally parse the instruction.
-          if(secondPass) {
-            val key = getFilePosition
-            val code = quickParameterMap.get(key)
-            if(code.isDefined) {
-              instrText.append(code.get)
-              offsetResolved = true
-            }
-          } else {
-            // First pass. Try to resolve the field offset and store it if successful for the
-            // second pass.
-            // The base class register was tracked - we may even be able to resolve
-            // the vtable offset 
-            if(baseClass.isDefined) {
-              val baseClassName = DexTypeIdsBlock.LTypeToJava(JavaKnowledge.formatTypeToSignature(baseClass.get))
-              val field = dexOffsetResolver.getFieldNameFromOffset(baseClassName, vtableOffset)
-              if(field != null) {
-                val key = getFilePosition
-                val (fieldName, fieldType) = getFieldNameAndType(field)
-                fieldTyp = fieldType
-                val typ = generator.generateType(fieldType).render()
-                val basetyp = JavaKnowledge.getClassTypeFromFieldFQN(fieldName)
-                val reg2Name = genRegName((reg2pos, reg2), resolveRegType((reg2pos, reg2), basetyp))
-                val reg1Name = genRegName((reg1pos, reg1), fieldType)
-                val code = instrCode match {
-                  case IGET_QUICK => igetQuick(reg1Name, reg2Name, fieldName, typ)
-                  case IGET_WIDE_QUICK => igetWideQuick(reg1Name, reg2Name, fieldName, typ)
-                  case IGET_OBJECT_QUICK => igetObjectQuick(reg1Name, reg2Name, fieldName, typ)
-                  case _ => 
-                    if(instrType == InstructionType.TWOREGSQUICKOFFSET) "@UNKNOWN_TWOREGSQUICKOFFSET 0x%x".format(instrCode)
-                    else if(instrType == InstructionType.TWOREGSQUICKOFFSET_WIDE) "@UNKNOWN_TWOREGSQUICKOFFSET_WIDE 0x%x".format(instrCode)
-                    else "@UNKNOWN_TWOREGSQUICKOFFSET_OBJECT 0x%x".format(instrCode)
-                }
-                quickParameterMap(key) = code
-                instrText.append(code)
-                offsetResolved = true
+          if(baseClass.isDefined) {
+            val baseClassName = DexTypeIdsBlock.LTypeToJava(JavaKnowledge.formatTypeToSignature(baseClass.get))
+            val field = dexOffsetResolver.getFieldNameFromOffset(baseClassName, vtableOffset)
+            if(field != null) {
+              val key = getFilePosition
+              val fqn = getFieldFQN(field)
+              val fieldType = fqn.typ
+              val fieldName = fqn.fqn
+              val basetyp = fqn.owner
+              val typ = generator.generateType(fieldType).render()
+              val reg1typ = resolveRegType(reg1pos, reg1, fieldType, true)
+              val reg2Name = genRegName(reg2, resolveRegType(reg2pos, reg2, basetyp, false))
+              val reg1Name = genRegName(reg1, reg1typ)
+              val code = instrCode match {
+                case IGET_QUICK => igetQuick(reg1Name, reg2Name, fieldName, typ)
+                case IGET_WIDE_QUICK => igetWideQuick(reg1Name, reg2Name, fieldName, typ)
+                case IGET_OBJECT_QUICK => igetObjectQuick(reg1Name, reg2Name, fieldName, typ)
+                case _ => 
+                  if(instrType == InstructionType.TWOREGSQUICKOFFSET) "@UNKNOWN_TWOREGSQUICKOFFSET 0x%x".format(instrCode)
+                  else if(instrType == InstructionType.TWOREGSQUICKOFFSET_WIDE) "@UNKNOWN_TWOREGSQUICKOFFSET_WIDE 0x%x".format(instrCode)
+                  else "@UNKNOWN_TWOREGSQUICKOFFSET_OBJECT 0x%x".format(instrCode)
               }
+              instrText.append(code)
+              offsetResolved = true
             }
           }
           if(!offsetResolved) {
@@ -2115,9 +1865,7 @@ class DexInstructionToPilarParser(
             }
             instrText.append(code)
           }
-          regMap(new Integer(reg1)) = fieldTyp
-          affectedRegisters += reg1
-          affectedRegisters += reg2
+          regMap(reg1) = reg1typ
         // Writes an object field from a register using quick access
         case InstructionType.TWOREGSQUICKOFFSET_WRITE =>
           val reg = read8Bit()
@@ -2126,48 +1874,35 @@ class DexInstructionToPilarParser(
           val reg2pos = Position(instrBase, 1)
           val reg2 = (reg & 0xF0) >> 4
           val vtableOffset = read16Bit()
-          var baseClass: Option[JawaType] = None
-          if(dexOffsetResolver != null)
-            baseClass = regMap.get(new Integer(reg2))
-          affectedRegisters += reg1
-          affectedRegisters += reg2
-          var offsetResolved = false
-          // If in the first pass, we try to resolve the vtable offset and store the result
-          // in quickParameterMap. In the second pass, we use the resolved parameters to
-          // finally parse the instruction.
-          if(secondPass) {
-            val key = getFilePosition
-            val code = quickParameterMap.get(key)
-            if(code.isDefined) {
-              instrText.append(code.get)
-              offsetResolved = true
-            }
-          } else {
-            // First pass. Try to resolve the field offset and store it if successful for the
-            // second pass.
-            // The base class register was tracked - we may even be able to resolve
-            // the vtable offset 
-            if(baseClass.isDefined) {
-              val baseClassName = DexTypeIdsBlock.LTypeToJava(JavaKnowledge.formatTypeToSignature(baseClass.get))
-              val field = dexOffsetResolver.getFieldNameFromOffset(baseClassName, vtableOffset)
-              if(field != null) {
-                val (fieldName, fieldType) = getFieldNameAndType(field)
-                val key = getFilePosition
-                val typ = generator.generateType(fieldType).render()
-                val basetyp = JavaKnowledge.getClassTypeFromFieldFQN(fieldName)
-                val reg1Name = genRegName((reg1pos, reg1), resolveRegType((reg1pos, reg1), basetyp))
-                val reg2Name = genRegName((reg2pos, reg2), resolveRegType((reg2pos, reg2), fieldType))
-                val code = instrCode match {
-                  case IPUT_QUICK => iputQuick(reg1Name, fieldName, reg2Name, typ)
-                  case IPUT_WIDE_QUICK => iputWideQuick(reg1Name, fieldName, reg2Name, typ)
-                  case IPUT_OBJECT_QUICK => iputObjectQuick(reg1Name, fieldName, reg2Name, typ)
-                  case _ => "@UNKNOWN_TWOREGSQUICKOFFSET_WRITE 0x%x".format(instrCode)
-                }
-                instrText.append(code)
-                quickParameterMap(key) = code
-                instrText.append(code)
-                offsetResolved = true
+          var baseClass: Option[JawaType] = regMap.get(reg1) match {
+            case Some(dt) =>
+              dt match {
+                case djt: DedexJawaType => Some(djt.typ)
+                case _ => None
               }
+            case None => None
+          }
+          var offsetResolved = false
+          if(baseClass.isDefined) {
+            val baseClassName = DexTypeIdsBlock.LTypeToJava(JavaKnowledge.formatTypeToSignature(baseClass.get))
+            val field = dexOffsetResolver.getFieldNameFromOffset(baseClassName, vtableOffset)
+            if(field != null) {
+              val fqn = getFieldFQN(field)
+              val fieldType = fqn.typ
+              val fieldName = fqn.fqn
+              val basetyp = fqn.owner
+              val key = getFilePosition
+              val typ = generator.generateType(fieldType).render()
+              val reg1Name = genRegName(reg1, resolveRegType(reg1pos, reg1, basetyp, true))
+              val reg2Name = genRegName(reg2, resolveRegType(reg2pos, reg2, fieldType, false))
+              val code = instrCode match {
+                case IPUT_QUICK => iputQuick(reg1Name, fieldName, reg2Name, typ)
+                case IPUT_WIDE_QUICK => iputWideQuick(reg1Name, fieldName, reg2Name, typ)
+                case IPUT_OBJECT_QUICK => iputObjectQuick(reg1Name, fieldName, reg2Name, typ)
+                case _ => "@UNKNOWN_TWOREGSQUICKOFFSET_WRITE 0x%x".format(instrCode)
+              }
+              instrText.append(code)
+              offsetResolved = true
             }
           }
           if(!offsetResolved){
@@ -2182,10 +1917,9 @@ class DexInstructionToPilarParser(
       }
     } catch {
       case e: Exception =>
-        if(DEBUG) System.err.println(TITLE + " error:" + e)
+        if(DEBUG) e.printStackTrace()
     }
-    if(genCode)
-      result.+=:(instrText.toString().intern())
+    result.+=:(instrText.toString().intern())
     result.toList
   }
 }

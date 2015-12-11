@@ -69,15 +69,15 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[JawaType], ti
     }
   }
 
-  def initWithEnv = {
-    initAndroidCallbacks
-    (if(false) entryPointClasses.par else entryPointClasses).foreach {
-      compTyp =>
-        val comp = global.getClassOrResolve(compTyp)
-        val reachableMethods = ReachabilityAnalysis.getReachableMethods(global, comp.getDeclaredMethodsByName(AndroidConstants.MAINCOMP_ENV) ++ comp.getDeclaredMethodsByName(AndroidConstants.COMP_ENV))
-        reachableMap += (comp -> reachableMethods)
-    }
-  }
+//  def initWithEnv = {
+//    initAndroidCallbacks
+//    (if(false) entryPointClasses.par else entryPointClasses).foreach {
+//      compTyp =>
+//        val comp = global.getClassOrResolve(compTyp)
+//        val reachableMethods = ReachabilityAnalysis.getReachableMethods(global, comp.getDeclaredMethodsByName(AndroidConstants.MAINCOMP_ENV) ++ comp.getDeclaredMethodsByName(AndroidConstants.COMP_ENV))
+//        reachableMap += (comp -> reachableMethods)
+//    }
+//  }
 
   def getSensitiveLayoutContainer(layoutControls: IMap[Int, LayoutControl]): Set[JawaClass] = {
     val result: MSet[JawaClass] = msetEmpty
@@ -129,8 +129,8 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[JawaType], ti
         val containerClasses = procs.map(_.getDeclaringClass)
         worklist ++= containerClasses.map((_, comp))
     }
-    while(!worklist.isEmpty){
-      worklist.foreach{
+    while(!worklist.isEmpty) {
+      worklist.foreach {
         case (item, comp) =>
           collectCallbackMethodsInAppSource(item, comp)
       }

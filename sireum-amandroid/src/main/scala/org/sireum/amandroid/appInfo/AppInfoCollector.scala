@@ -137,7 +137,8 @@ class AppInfoCollector(global: Global, timer: Option[MyTimer]) {
         global.reporter.echo(TITLE, "*************Dynamically Register Component**************")
         global.reporter.echo(TITLE, "Component name: " + comRec)
         this.intentFdb.merge(iDB)
-        val analysisHelper = new ReachableInfoCollector(global, Set(comRec.getType), timer) 
+        val analysisHelper = new ReachableInfoCollector(global, Set(comRec.getType), timer)
+        analysisHelper.init
         analysisHelper.collectCallbackMethods()
         this.callbackMethods ++= analysisHelper.getCallbackMethods
         analysisHelper.getCallbackMethods.foreach {
@@ -170,7 +171,7 @@ class AppInfoCollector(global: Global, timer: Option[MyTimer]) {
   }
 
   def collectInfo(apk: Apk, outputUri: FileResourceUri): Unit = {
-    val manifestUri = outputUri + "/AndroidManifest.xml"
+    val manifestUri = outputUri + File.separator + "AndroidManifest.xml"
     val mfp = AppInfoCollector.analyzeManifest(global.reporter, manifestUri)
     val afp = AppInfoCollector.analyzeARSC(global.reporter, apk.nameUri)
     val lfp = AppInfoCollector.analyzeLayouts(global, apk.nameUri, mfp)

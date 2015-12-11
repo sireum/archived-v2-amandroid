@@ -28,6 +28,9 @@ import org.sireum.jawa.AccessFlag
 import org.sireum.jawa.Signature
 import org.sireum.amandroid.dedex.DexInstructionToPilarParser.ForkStatus
 import org.apache.commons.lang3.StringEscapeUtils
+import org.sireum.jawa.JawaPackage
+import org.sireum.jawa.FieldFQN
+import org.sireum.amandroid.dedex.DedexTypeResolver._
 
 /**
  * @author fgwei
@@ -43,9 +46,7 @@ class PilarStyleCodeGenerator(
     file: RandomAccessFile,
     outputDir: Option[FileResourceUri],
     dump: Option[PrintStream],
-    filter: (JawaType => Boolean),
-    regTraceLog: Boolean = false,
-    regTracing: Boolean = true) {
+    filter: (JawaType => Boolean)) {
   
   private final val DEBUG_EXCP = false
   private final val DEBUG_REGMAPS = false
@@ -58,29 +59,119 @@ class PilarStyleCodeGenerator(
   private var procDeclTemplate = template.getInstanceOf("ProcedureDecl")
   private var localVarsTemplate = template.getInstanceOf("LocalVars")
   
-  implicit class EscapeJava(s: String) {
-    val pakgEscapeMapping: MMap[String, String] = mmapEmpty
-    val recordEscapeMapping: MMap[JawaType, String] = mmapEmpty
-    val procedureEscapeMapping: MMap[Signature, String] = mmapEmpty
-    def escape: String = StringEscapeUtils.escapeJava(s).replaceAll("\\\\u", "")
+  val pkgNameMapping: MMap[JawaPackage, String] = mmapEmpty
+  val recordNameMapping: MMap[JawaType, String] = mmapEmpty
+  val procedureNameMapping: MMap[String, String] = mmapEmpty
+  val attributeNameMapping: MMap[(String, JawaType), String] = mmapEmpty
+  private var pkgCounter = 0
+  private var recordCounter = 0
+  private var procedureCounter = 0
+  private var attributeCounter = 0
+  implicit class StrangeNameResolver(s: String) {
+    private def haveStrangeCharacter(str: String): Boolean = {
+      StringEscapeUtils.escapeJava(str) != str ||
+      str.split("\\.").exists(_.startsWith("0x"))
+    }
+    def resolveRecord: JawaType = {
+      if(haveStrangeCharacter(s)) {
+        val sb: StringBuilder = new StringBuilder
+        val typ = JavaKnowledge.getTypeFromName(s)
+        val pkgList = typ.baseType.pkg match {
+          case Some(p) => p.getPkgList
+          case None => ilistEmpty
+        }
+        var recname = typ.baseType.name
+        pkgList foreach {
+          pkg =>
+            val pkgname = pkg.name
+            if(pkgNameMapping.contains(pkg)) {
+              sb.append(pkgNameMapping(pkg) + ".")
+            } else if(haveStrangeCharacter(pkgname)) {
+              val newpkgname = "p" + pkgCounter
+              pkgNameMapping(pkg) = newpkgname
+              pkgCounter += 1
+              sb.append(newpkgname + ".")
+            } else sb.append(pkgname + ".")
+        }
+        if(recordNameMapping.contains(typ)) {
+          recname = recordNameMapping(typ)
+        } else if(haveStrangeCharacter(recname)) {
+          recname = "C" + recordCounter
+          recordNameMapping(typ) = recname
+          recordCounter += 1
+        }
+        sb.append(recname)
+        new JawaType(sb.toString(), typ.dimensions)
+      } else JavaKnowledge.getTypeFromName(s)
+    }
+    def resolveProcedure: Signature = {
+      if(haveStrangeCharacter(s)) {
+        val sig = new Signature(s)
+        var rectyp = sig.getClassType
+        rectyp = rectyp.jawaName.resolveRecord
+        var methodName = sig.methodName
+        if(procedureNameMapping.contains(sig.getSubSignature)) {
+          methodName = procedureNameMapping(sig.getSubSignature)
+        } else if(haveStrangeCharacter(methodName)) {
+          methodName = "m" + procedureCounter
+          procedureNameMapping(sig.getSubSignature) = methodName
+          procedureCounter += 1
+        }
+        val proto = new StringBuilder
+        val argTyps = sig.getParameterTypes()
+        proto.append("(")
+        argTyps foreach {
+          argTyp =>
+            val newArgTyp = argTyp.jawaName.resolveRecord
+            val newArgSig = JavaKnowledge.formatTypeToSignature(newArgTyp)
+            proto.append(newArgSig)
+        }
+        proto.append(")")
+        var retTyp = sig.getReturnType()
+        retTyp = retTyp.jawaName.resolveRecord
+        val newRetSig = JavaKnowledge.formatTypeToSignature(retTyp)
+        proto.append(newRetSig)
+        Signature(rectyp, methodName, proto.toString)
+      } else new Signature(s)
+    }
+    def resolveAttribute(typ: JawaType): FieldFQN = {
+      if(haveStrangeCharacter(s) || haveStrangeCharacter(typ.name)) {
+        var recTyp = JavaKnowledge.getClassTypeFromFieldFQN(s)
+        val fieldName = JavaKnowledge.getFieldNameFromFieldFQN(s)
+        var newFieldName = fieldName
+        recTyp = recTyp.jawaName.resolveRecord
+        if(attributeNameMapping.contains((fieldName, typ))) {
+          newFieldName = attributeNameMapping((fieldName, typ))
+        } else if(haveStrangeCharacter(fieldName)) {
+          newFieldName = "f" + attributeCounter
+          attributeNameMapping((fieldName, typ)) = newFieldName
+          attributeCounter += 1
+        }
+        val fieldTyp = typ.jawaName.resolveRecord
+        JavaKnowledge.generateFieldFQN(recTyp, newFieldName, fieldTyp)
+      } else {
+        val recTyp = JavaKnowledge.getClassTypeFromFieldFQN(s)
+        val fieldName = JavaKnowledge.getFieldNameFromFieldFQN(s)
+        JavaKnowledge.generateFieldFQN(recTyp, fieldName, typ)
+      }
+    }
   }
   
   def generate: Unit = {
     val classreader = dexClassDefsBlock.getClassIterator
     while(classreader.hasNext()) {
       val classIdx = classreader.next().intValue()
-      val className = dexClassDefsBlock.getClassNameOnly(classIdx)
-      val recName: String = toPilarRecordName(dexClassDefsBlock.getClassNameOnly(classIdx))
-      val recType: JawaType = new JawaType(recName)
-//      if(filter(recType)) {
-      if(recType.baseTyp == "com.creativemobile.billing.u") {
+      val recType: JawaType = toPilarRecordName(dexClassDefsBlock.getClassNameOnly(classIdx)).resolveRecord
+      val classPath = recType.jawaName.replaceAll("\\.", File.separator)
+      if(filter(recType)) {
+//      if(recType.baseTyp == "com.creativemobile.billing.u") {
         val outputStream = outputDir match {
           case Some(od) =>
-            var targetFile = FileUtil.toFile(od + File.separator + className + ".pilar")
+            var targetFile = FileUtil.toFile(od + File.separator + classPath + ".pilar")
             var i = 0
             while(targetFile.exists()){
               i += 1
-              targetFile = FileUtil.toFile(od + File.separator + className + "." + i + ".pilar")
+              targetFile = FileUtil.toFile(od + File.separator + classPath + "." + i + ".pilar")
             }
             val parent = targetFile.getParentFile()
             if(parent != null)
@@ -90,10 +181,10 @@ class PilarStyleCodeGenerator(
             new PrintStream(System.out)
         }
         if(DEBUG_FLOW)
-          println("Processing " + className)
+          println("Processing " + recType)
         if(dump.isDefined) {
           dump.get.println("--------------------------------------")
-          dump.get.println("Class: " + className)
+          dump.get.println("Class: " + recType)
         }
         val code = generateRecord(classIdx)
         outputStream.println(code)
@@ -123,14 +214,14 @@ class PilarStyleCodeGenerator(
   
   private def generateRecord(classIdx: Int): String = {
     val recTemplate = template.getInstanceOf("RecordDecl")
-    val recName: String = toPilarRecordName(dexClassDefsBlock.getClassNameOnly(classIdx))
+    val recTyp: JawaType = toPilarRecordName(dexClassDefsBlock.getClassNameOnly(classIdx)).resolveRecord
     val isInterface: Boolean = dexClassDefsBlock.isInterface(classIdx)
     val accessFlag: String = getAccessString(dexClassDefsBlock.getClassName(classIdx), skip = 1, isInterface, false)
-    val superClass: Option[String] = Option(toPilarRecordName(dexClassDefsBlock.getSuperClass(classIdx)))
-    val interfaceClasses: MSet[String] = msetEmpty
+    val superClass: Option[JawaType] = Option(dexClassDefsBlock.getSuperClass(classIdx)).map(toPilarRecordName(_).resolveRecord)
+    val interfaceClasses: MSet[JawaType] = msetEmpty
     for(i <- 0 to dexClassDefsBlock.getInterfacesSize(classIdx) - 1)
-      interfaceClasses += toPilarRecordName(dexClassDefsBlock.getInterface(classIdx, i))
-    recTemplate.add("recName", recName)
+      interfaceClasses += toPilarRecordName(dexClassDefsBlock.getInterface(classIdx, i)).resolveRecord
+    recTemplate.add("recName", recTyp.jawaName)
     val recAnnotations = new ArrayList[ST]
     recAnnotations.add(generateAnnotation("kind", if(isInterface) "interface" else "class"))
     recAnnotations.add(generateAnnotation("AccessFlag", accessFlag))
@@ -139,9 +230,9 @@ class PilarStyleCodeGenerator(
     val extendsList: ArrayList[ST] = new ArrayList[ST]
     superClass foreach {
       sc =>
-        if(sc != "java.lang.Object") {
+        if(sc.jawaName != "java.lang.Object") {
           val extOrImpTemplate = template.getInstanceOf("ExtendsAndImpliments")
-          extOrImpTemplate.add("recName", sc)
+          extOrImpTemplate.add("recName", sc.jawaName)
           val extAnnotations = new ArrayList[ST]
           extAnnotations.add(generateAnnotation("kind", "class"))
           extOrImpTemplate.add("annotations", extAnnotations)
@@ -151,7 +242,7 @@ class PilarStyleCodeGenerator(
     interfaceClasses foreach {
       ic =>
         val extOrImpTemplate = template.getInstanceOf("ExtendsAndImpliments")
-        extOrImpTemplate.add("recName", ic)
+        extOrImpTemplate.add("recName", ic.jawaName)
         val impAnnotations = new ArrayList[ST]
         impAnnotations.add(generateAnnotation("kind", "interface"))
         extOrImpTemplate.add("annotations", impAnnotations)
@@ -170,11 +261,11 @@ class PilarStyleCodeGenerator(
     for(fieldIdx <- 0 to dexClassDefsBlock.getInstanceFieldsSize(classIdx) - 1) {
       val attrName = recName + "." + dexClassDefsBlock.getInstanceFieldShortName(classIdx, fieldIdx)
       val attrType = getFieldType(dexClassDefsBlock.getInstanceFieldNameAndType(classIdx, fieldIdx))
+      val fqn = attrName.resolveAttribute(attrType)
       val accessFlag = getAccessString(dexClassDefsBlock.getInstanceField(classIdx, fieldIdx), skip = 2, false, false)
       val attrTemplate = template.getInstanceOf("AttributeDecl")
-      val attrTypeST = generateType(attrType)
-      attrTemplate.add("attrTyp", attrTypeST)
-      attrTemplate.add("attrName", attrName)
+      attrTemplate.add("attrTyp", generateType(fqn.typ))
+      attrTemplate.add("attrName", fqn.fqn)
       val attrAnnotations = new ArrayList[ST]
       attrAnnotations.add(generateAnnotation("AccessFlag", accessFlag))
       attrTemplate.add("annotations", attrAnnotations)
@@ -187,13 +278,13 @@ class PilarStyleCodeGenerator(
     val globals: ArrayList[ST] = new ArrayList[ST]
     val recName: String = toPilarRecordName(dexClassDefsBlock.getClassNameOnly(classIdx))
     for(fieldIdx <- 0 to dexClassDefsBlock.getStaticFieldsSize(classIdx) - 1) {
-      val globalName = "@@" + recName + "." + dexClassDefsBlock.getStaticFieldShortName(classIdx, fieldIdx)
+      val globalName = recName + "." + dexClassDefsBlock.getStaticFieldShortName(classIdx, fieldIdx)
       val globalType = getFieldType(dexClassDefsBlock.getStaticField(classIdx, fieldIdx))
+      val fqn = globalName.resolveAttribute(globalType)
       val accessFlag = getAccessString(dexClassDefsBlock.getStaticField(classIdx, fieldIdx), skip = 2, false, false)
       val globalTemplate = template.getInstanceOf("GlobalDecl")
-      val globalTypeST = generateType(globalType)
-      globalTemplate.add("globalTyp", globalTypeST)
-      globalTemplate.add("globalName", globalName)
+      globalTemplate.add("globalTyp", generateType(fqn.typ))
+      globalTemplate.add("globalName", "@@" + fqn.fqn)
       val globalAnnotations = new ArrayList[ST]
       globalAnnotations.add(generateAnnotation("AccessFlag", accessFlag))
       globalTemplate.add("annotations", globalAnnotations)
@@ -214,15 +305,31 @@ class PilarStyleCodeGenerator(
     procedures
   }
   
-  private def generateProcedure(classIdx: Int, methodIdx: Int, isDirect: Boolean): ST = {
-    val recName: String = toPilarRecordName(dexClassDefsBlock.getClassNameOnly(classIdx).escape)
+  private def getSignature(dexMethodHeadParser: DexMethodHeadParser, paramRegs: ArrayList[_], classIdx: Int, methodIdx: Int, isDirect: Boolean): (Signature, IList[Int]) = {
+    val recName: String = toPilarRecordName(dexClassDefsBlock.getClassNameOnly(classIdx))
     val recTyp: JawaType = new JawaType(recName)
     val retTyp: JawaType = 
-      if(isDirect) getReturnType(dexClassDefsBlock.getDirectMethodName(classIdx, methodIdx).escape)
+      if(isDirect) getReturnType(dexClassDefsBlock.getDirectMethodName(classIdx, methodIdx))
       else getReturnType(dexClassDefsBlock.getVirtualMethodName(classIdx, methodIdx))
     val procName: String = 
-      if(isDirect) recName + "." + dexClassDefsBlock.getDirectMethodShortName(classIdx, methodIdx).escape
-      else recName + "." + dexClassDefsBlock.getVirtualMethodShortName(classIdx, methodIdx).escape
+      if(isDirect) recName + "." + dexClassDefsBlock.getDirectMethodShortName(classIdx, methodIdx)
+      else recName + "." + dexClassDefsBlock.getVirtualMethodShortName(classIdx, methodIdx)
+    val paramList: MList[JawaType] = mlistEmpty
+    val paramRegNumbers: MList[Int] = mlistEmpty
+    for(i <- 0 to paramRegs.size() - 1 by + 2) {
+      val paramReg = paramRegs.get(i).asInstanceOf[Integer]
+      paramRegNumbers += paramReg
+      val paramTyp: JawaType = JavaKnowledge.formatSignatureToType(paramRegs.get(i+1).asInstanceOf[String])
+      paramList += paramTyp
+    }
+    val sig: Signature = 
+      if(isDirect) JavaKnowledge.genSignature(recTyp, dexClassDefsBlock.getDirectMethodShortName(classIdx, methodIdx), paramList.toList, retTyp)
+      else JavaKnowledge.genSignature(recTyp, dexClassDefsBlock.getVirtualMethodShortName(classIdx, methodIdx), paramList.toList, retTyp)
+    val newSig = sig.signature.resolveProcedure
+    (newSig, paramRegNumbers.toList)
+  }
+  
+  private def generateProcedure(classIdx: Int, methodIdx: Int, isDirect: Boolean): ST = {
     val pos: Long = 
       if(isDirect) dexClassDefsBlock.getDirectMethodOffset(classIdx, methodIdx)
       else dexClassDefsBlock.getVirtualMethodOffset(classIdx, methodIdx)
@@ -232,41 +339,43 @@ class PilarStyleCodeGenerator(
     dexMethodHeadParser.setDumpFile(dump.getOrElse(null))
     dexMethodHeadParser.parse(pos)
     val regSize: Int = dexMethodHeadParser.getRegistersSize()
-    val parmRegs = 
+    val paramRegs = 
       if(isDirect) dexClassDefsBlock.getDirectMethodParameterOffsets(classIdx, methodIdx, regSize)
       else dexClassDefsBlock.getVirtualMethodParameterOffsets(classIdx, methodIdx, regSize)
+    val (sig, paramRegNums) = getSignature(dexMethodHeadParser, paramRegs, classIdx, methodIdx, isDirect)
+    val recTyp = sig.classTyp
+    val procName = sig.classTyp.name + "." + sig.methodName
+    val retTyp = sig.getReturnType()
     val isConstructor: Boolean = procName.contains("<init>") || procName.contains("<clinit>")
     val accessFlags = 
       if(isDirect) getAccessString(dexClassDefsBlock.getDirectMethodName(classIdx, methodIdx), skip = 1, false, isConstructor)
       else getAccessString(dexClassDefsBlock.getVirtualMethodName(classIdx, methodIdx), skip = 1, false, isConstructor)
     var thisOpt: Option[(String, JawaType)] = None
-    val initRegMap: MMap[Integer, JawaType] = mmapEmpty
+    val initRegMap: MMap[Int, DedexType] = mmapEmpty
     val localvars: MMap[String, (JawaType, Boolean)] = mmapEmpty
     if(!AccessFlag.isStatic(AccessFlag.getAccessFlags(accessFlags))) {
       var thisReg = 0
-      if(parmRegs.size() < 2)   // no parameters - "this" is in the last register
+      if(paramRegs.size() < 2)   // no parameters - "this" is in the last register
         thisReg = regSize - 1
       else
-        thisReg = parmRegs.get(0).asInstanceOf[Integer].intValue() - 1
+        thisReg = paramRegs.get(0).asInstanceOf[Integer].intValue() - 1
       var thisName = recTyp.baseTyp.substring(recTyp.baseTyp.lastIndexOf(".") + 1) + {if(recTyp.dimensions > 0)"_arr" + recTyp.dimensions else ""} + "_v" + thisReg
       if(localvars.contains(thisName) && localvars(thisName)._1 != recTyp) thisName = "a" + thisName
       localvars(thisName) = ((recTyp, true))
       thisOpt = Some((thisName, recTyp))
-      initRegMap(new Integer(thisReg)) = recTyp
+      initRegMap(thisReg) = DedexJawaType(recTyp)
     }
     val paramList: MList[(String, JawaType)] = mlistEmpty
-    for(i <- 0 to parmRegs.size() - 1 by + 2) {
-      val paramReg = parmRegs.get(i).asInstanceOf[Integer]
-      val paramTyp: JawaType = JavaKnowledge.formatSignatureToType(parmRegs.get(i+1).asInstanceOf[String].escape)
+    val paramTyps = sig.getParameterTypes()
+    for(i <- 0 to paramRegNums.size() - 1) {
+      val paramReg = paramRegNums(i)
+      val paramTyp: JawaType = paramTyps(i)
       var paramName = paramTyp.baseTyp.substring(paramTyp.baseTyp.lastIndexOf(".") + 1) + {if(paramTyp.dimensions > 0)"_arr" + paramTyp.dimensions else ""} + "_v" + paramReg
       if(localvars.contains(paramName) && localvars(paramName)._1 != paramTyp) paramName = "a" + paramName
       localvars(paramName) = ((paramTyp, true))
       paramList += ((paramName, paramTyp))
-      initRegMap(paramReg) = paramTyp
+      initRegMap(paramReg) = DedexJawaType(paramTyp)
     }
-    val sig: Signature = 
-      if(isDirect) JavaKnowledge.genSignature(recTyp, dexClassDefsBlock.getDirectMethodShortName(classIdx, methodIdx).escape, paramList.map(_._2).toList, retTyp)
-      else JavaKnowledge.genSignature(recTyp, dexClassDefsBlock.getVirtualMethodShortName(classIdx, methodIdx).escape, paramList.map(_._2).toList, retTyp)
     
     val procTemplate = template.getInstanceOf("ProcedureDecl")
     procTemplate.add("retTyp", generateType(retTyp))
@@ -298,7 +407,7 @@ class PilarStyleCodeGenerator(
     }
     procTemplate.add("params", params)
     val procAnnotations = new ArrayList[ST]
-    procAnnotations.add(generateAnnotation("owner", "^`" + recName + "`"))
+    procAnnotations.add(generateAnnotation("owner", "^" + generateType(recTyp).render()))
     procAnnotations.add(generateAnnotation("signature", "`" + sig.signature + "`"))
     procAnnotations.add(generateAnnotation("AccessFlag", accessFlags))
     procTemplate.add("annotations", procAnnotations)
@@ -328,7 +437,7 @@ class PilarStyleCodeGenerator(
     localVarsTemplate
   }
   
-  private def generateBody(sig: Signature, procName: String, dexMethodHeadParser: DexMethodHeadParser, initRegMap: MMap[Integer, JawaType], localvars: MMap[String, (JawaType, Boolean)]): (ST, ST) = {    
+  private def generateBody(sig: Signature, procName: String, dexMethodHeadParser: DexMethodHeadParser, initRegMap: MMap[Int, DedexType], localvars: MMap[String, (JawaType, Boolean)]): (ST, ST) = {    
     val bodyTemplate: ST = template.getInstanceOf("Body")
     val startPos: Long = dexMethodHeadParser.getInstructionBase()
     val endPos: Long = dexMethodHeadParser.getInstructionEnd()
@@ -355,27 +464,13 @@ class PilarStyleCodeGenerator(
     // Branches in the execution flow are stored in this stack
     val visitStack = new Stack[VisitStackEntry]()
     
-    // This map stores reg trace strings (suitable for displaying to the user)
-    // per locations (-r flag)
-    var regTraceMap: Option[MMap[Long, String]] = None
     // This map stores the exception block start addresses and the associated exception 
     // handlers
-    var exceptionHandlerEntryPointList: Option[MList[ExceptionHandlerMapEntry]] = None
+    val exceptionHandlerEntryPointList: MList[ExceptionHandlerMapEntry] = mlistEmpty
 
     // This map stores the saved register maps for distinguished locations.
     // Targets of jump instructions are such locations.
-    var registerMaps: Option[MMap[Long, MMap[Integer, JawaType]]] = None
-    // This map stores the counter, how many times a certain distinguished location was visited.
-    // This protects about endless loops when the regmap solution does not converge
-    var overrunCounter: Option[MMap[Long, Integer]] = None
-
-    if(regTraceLog)
-      regTraceMap = Some(mmapEmpty)
-    if(regTracing) {
-      exceptionHandlerEntryPointList = Some(mlistEmpty)
-      registerMaps = Some(mmapEmpty)
-      overrunCounter = Some(mmapEmpty)
-    }
+    val registerMaps: MMap[Long, MMap[Int, MSet[DedexUndeterminedType]]] = mmapEmpty
 
     // Process the try-catch blocks if any. Pushes any exception handlers to the visit stack
     if(DEBUG_FLOW)
@@ -425,49 +520,36 @@ class PilarStyleCodeGenerator(
             val haveBeenHere: Boolean = visitSet.get(basePos)
             
             if(haveBeenHere) {
-              // No register tracing, if we have been here, break
-              if(!registerMaps.isDefined)
-                break
               val posObj: Long = filePos
-              val savedRegMap = registerMaps.get.getOrElse(posObj, null)
+              val savedUndeterminedRegMap = registerMaps.getOrElseUpdate(posObj, mmapEmpty)
               if(DEBUG_REGMAPS)
                 println("regMaps: 0x" + java.lang.Long.toHexString(filePos) + 
                     "; haveBeenHere: 0x" + java.lang.Long.toHexString(filePos) +
-                    "; regmap: [" + savedRegMap + "]")
-              val currentRegMap: MMap[Integer, JawaType] = mmapEmpty ++ instructionParser.getRegisterMap
-              // The location is target of a jump instruction but no register map has been saved.
-              // Save it now and continue.
-              if(registerMaps.get.containsKey(posObj) && savedRegMap == null) {
+                    "; regmap: [" + savedUndeterminedRegMap + "]")
+              val currentUndeterminedRegMap: IMap[Int, DedexUndeterminedType] = instructionParser.getRegisterMap.filter{
+                case (reg, typ) => typ.isInstanceOf[DedexUndeterminedType]
+              }.map{case (reg, ut) => (reg, ut.asInstanceOf[DedexUndeterminedType])}
+              // No undetermined reg, stop.
+              if(!currentUndeterminedRegMap.exists(!_._2.mergepos.contains(posObj))) {
+                break
+              } else {
                 if(DEBUG_REGMAPS)
-                  println("regMaps: saving reg map at 0x" + java.lang.Long.toHexString(filePos) +
-                      " ; reg map: " + currentRegMap)
-                registerMaps.get(posObj) = currentRegMap.clone()
-              } else if(savedRegMap != null) {
-                if(DEBUG_REGMAPS)
-                  println("regMaps: currentRegMap: [" + currentRegMap + "]")
-                if(!overrunCheck(posObj, overrunCounter)) {
-                  if(DEBUG_REGMAPS)
-                    println("regMaps: overrun at 0x" + java.lang.Long.toHexString(filePos))
-                  break
-                }
-                if(!mergeCheckRegTraceMaps(currentRegMap, savedRegMap)) {
+                  println("regMaps: currentUndeterminedRegMap: [" + currentUndeterminedRegMap + "]")
+                if(!mergeCheckRegTraceMaps(posObj, currentUndeterminedRegMap, savedUndeterminedRegMap)) {
                   if(DEBUG_REGMAPS)
                     println("regMaps: break")
                   break
                 }
                 if(DEBUG_REGMAPS)
                   println("regMaps: update")
-                registerMaps.get.put(posObj, currentRegMap.clone())
               }
             }
             // Check if an exception block is starting here. If so, save the register maps for the handler(s)
             // Also, if there is a saved register map for this location, restore the register map from the
             // saved version
-            if(exceptionHandlerEntryPointList.isDefined) {
-              if(DEBUG_FLOW)
-                println("Flow: handleRegMaps, file pos: 0x" + java.lang.Long.toHexString(filePos))
-              handleRegMaps(exceptionHandlerEntryPointList.get.toList, instructionParser)
-            }
+            if(DEBUG_FLOW)
+              println("Flow: handleRegMaps, file pos: 0x" + java.lang.Long.toHexString(filePos))
+            handleRegMaps(exceptionHandlerEntryPointList.toList, instructionParser)
             // Insert debug variables into the register set to handle the case when
             // the debug variable goes into scope ...
             if(DEBUG_FLOW)
@@ -499,25 +581,13 @@ class PilarStyleCodeGenerator(
                 if(forkStatus == DexInstructionToPilarParser.ForkStatus.FORK_UNCONDITIONALLY) 1
                 else 0
               val forkData: IList[Long] = instructionParser.getForkData
-              // Mark the jump target locations that they are target of jump instructions
-              if(registerMaps.isDefined) {
-                forkData foreach{
-                  targetObj =>
-                    if(!registerMaps.get.containsKey(targetObj)) {
-                      if(DEBUG_REGMAPS)
-                        println("regMaps: 0x" + java.lang.Long.toHexString(filePos) +
-                            "; marking 0x" + java.lang.Long.toHexString(targetObj))
-                      registerMaps.get.put(targetObj, null)
-                    }
-                }
-              }
               // we go to forkData[0], push the rest of the addresses to the visit stack
               for(i <- baseIndex to forkData.length - 1) {
                 val target = forkData(i)
                 if(DEBUG_FLOW)
                   println("Flow: processing forkData[" + forkData.indexOf(target) + "]: target: 0x" + java.lang.Long.toHexString(target))
                 if((target >= startPos) && (target <= endPos)) {
-                  val currentRegMap: IMap[Integer, JawaType] = instructionParser.getRegisterMap
+                  val currentRegMap: IMap[Int, DedexType] = instructionParser.getRegisterMap
                   visitStack.push(VisitStackEntry(target, currentRegMap, None))
                 }
               }
@@ -554,6 +624,7 @@ class PilarStyleCodeGenerator(
     // Second pass: generate the code
     instructionParser.setFilePosition(dexMethodHeadParser.getInstructionBase())
     instructionParser.setPass(true)
+    instructionParser.setRegisterMap(initRegMap.toMap)
     var actualPosition: Long = instructionParser.getFilePosition()
     while(actualPosition < endPos) {
       if(DEBUG_FLOW)
@@ -562,7 +633,8 @@ class PilarStyleCodeGenerator(
       var parseFlag = false
       if(task.isDefined) {
         try {
-          codes ++= task.get.renderTask(actualPosition)
+          val code = task.get.renderTask(actualPosition)
+          codes ++= code
           parseFlag = task.get.getParseFlag(actualPosition)
         } catch {
           case ex: IOException =>
@@ -578,28 +650,31 @@ class PilarStyleCodeGenerator(
         } else {
           if(dump.isDefined)
             dump.get.println("L%06x".format(instructionParser.getFilePosition()))
-          // We have run into an unvisited block. Turn it into a byte dump
-          val label: String = DexInstructionParser.labelForAddress(instructionParser.getFilePosition())
-          val element = new StringBuilder()
-          var firstByte = true
+
           actualPosition = instructionParser.getFilePosition()
           breakable{ // 3
             while((actualPosition < endPos) && !visitSet.get(visitOffset)) {
-              visitOffset += 1
               task = instructionParser.getTaskForAddress(actualPosition)
-              if((task.isDefined) && task.get.getParseFlag(actualPosition))
-                break
-              if(!firstByte)
-                element.append(", ")
-              else
-                firstByte = false
-              val b: Int = instructionParser.read8Bit()
-              element.append("0x")
-              element.append(instructionParser.dumpByte(b))
+              if(task.isDefined) {
+                try {
+                  val code = task.get.renderTask(actualPosition)
+                  codes ++= code
+                  parseFlag = task.get.getParseFlag(actualPosition)
+                } catch {
+                  case ex: IOException =>
+                    System.err.println("*** ERROR ***: " + ex.getMessage())
+                } finally {
+                  if(actualPosition == instructionParser.getFilePosition()) {
+                    instructionParser.read8Bit()
+                  }
+                }
+              } else {
+                instructionParser.read8Bit()
+              }
               actualPosition = instructionParser.getFilePosition()
+              visitOffset = (actualPosition - startPos).asInstanceOf[Int]
             }
           } // breakable 3
-          writeByteArray(element.toString())
         }
       }
       actualPosition = instructionParser.getFilePosition()
@@ -622,13 +697,13 @@ class PilarStyleCodeGenerator(
   }
   
   private def getFieldType(fieldWithType: String): JawaType = {
-    val fieldTypeStr = fieldWithType.split(" ").last
-    JavaKnowledge.formatSignatureToType(fieldTypeStr)
+    val fieldTypStr = fieldWithType.split(" ").last
+    JavaKnowledge.formatSignatureToType(fieldTypStr)
   }
   
   private def getReturnType(methodStr: String): JawaType = {
-    val methodTypeStr = methodStr.substring(methodStr.lastIndexOf(")") + 1)
-    JavaKnowledge.formatSignatureToType(methodTypeStr)
+    val retTypStr = methodStr.substring(methodStr.lastIndexOf(")") + 1)
+    JavaKnowledge.formatSignatureToType(retTypStr)
   }
  
 
@@ -676,7 +751,7 @@ class PilarStyleCodeGenerator(
   }
   
   // Visit stack entry. Stores the location to return to and the register map at that location
-  case class VisitStackEntry(location: Long, regMap: IMap[Integer, JawaType], updateLocation: Option[Long]) {
+  case class VisitStackEntry(location: Long, regMap: IMap[Int, DedexType], updateLocation: Option[Long]) {
     override def toString: String = {
       val b = new StringBuilder()
       b.append("VisitStackEntry: 0x" + java.lang.Long.toHexString(location))
@@ -691,7 +766,7 @@ class PilarStyleCodeGenerator(
       end: Long,
       handler: Long,
       exceptionType: JawaType,
-      regMap: MMap[Integer, JawaType]) {
+      regMap: MMap[Int, DedexType]) {
 
     def withinRange(pos: Long): Boolean = {
       (pos >= start) && (pos < end)
@@ -710,7 +785,7 @@ class PilarStyleCodeGenerator(
     }
   }
   
-  private def dumpRegMap(regMap: IMap[Integer, JawaType]): StringBuilder = {
+  private def dumpRegMap(regMap: IMap[Int, DedexType]): StringBuilder = {
     val b = new StringBuilder()
     regMap foreach{
       case (i, value) =>
@@ -726,21 +801,19 @@ class PilarStyleCodeGenerator(
     * interrupt the analyser if a certain location is visited too many times.
     * Returns true if there is no overrun, false otherwise
     */
-  private def overrunCheck(posObj: Long, overrunCounter: Option[MMap[Long, Integer]]): Boolean = {
-    if(!overrunCounter.isDefined)
-      return true
-    var ctr = overrunCounter.get.get(posObj)
-    if(!ctr.isDefined) {
-      ctr = Some(new Integer(1))
-      overrunCounter.get.put(posObj, ctr.get)
-      return true
-    }
-    val ctrv = ctr.get.intValue() + 1
-    if(ctrv > REVISIT_LIMIT)
-      return false
-    overrunCounter.get.put(posObj, new Integer(ctrv))
-    true
-  }
+//  private def overrunCheck(posObj: Long, overrunCounter: MMap[Long, Integer]): Boolean = {
+//    var ctr = overrunCounter.get(posObj)
+//    if(!ctr.isDefined) {
+//      ctr = Some(new Integer(1))
+//      overrunCounter.put(posObj, ctr.get)
+//      return true
+//    }
+//    val ctrv = ctr.get.intValue() + 1
+//    if(ctrv > REVISIT_LIMIT)
+//      return false
+//    overrunCounter.put(posObj, new Integer(ctrv))
+//    true
+//  }
   
   private def processTryCatchBlock(
       procName: String,
@@ -748,8 +821,8 @@ class PilarStyleCodeGenerator(
       instructionParser: DexInstructionToPilarParser,
       dexMethodHeadParser: DexMethodHeadParser,
       visitStack: Stack[VisitStackEntry],
-      initRegMap: MMap[Integer, JawaType],
-      exceptionHandlerList: Option[MList[ExceptionHandlerMapEntry]]) = {
+      initRegMap: MMap[Int, DedexType],
+      exceptionHandlerList: MList[ExceptionHandlerMapEntry]) = {
     val dtcb = new DexTryCatchBlockParser()
     dtcb.setDexMethodHeadParser(dexMethodHeadParser)
     dtcb.setDexTypeIdsBlock(dexTypeIdsBlock)
@@ -773,9 +846,7 @@ class PilarStyleCodeGenerator(
         val handlerLabel = "L%06x".format(handlerOffset)
         // Put a marker for the first pass that register map needs to be saved for a certain
         // exception handler at the start location
-        if(exceptionHandlerList.isDefined) {
-          saveExceptionHandlerMapMarker(procName, exceptionHandlerList.get, start, end, handlerOffset, excpType, initRegMap)
-        }
+        saveExceptionHandlerMapMarker(procName, exceptionHandlerList, start, end, handlerOffset, excpType, initRegMap)
         writeTryCatchBlock(catchTemplate, startLabel, endLabel, excpType, handlerLabel)
         catchs.add(0, catchTemplate)
       }
@@ -790,7 +861,7 @@ class PilarStyleCodeGenerator(
       end: Long,
       handlerOffset: Long,
       exceptionType: JawaType,
-      regMap: MMap[Integer, JawaType]) = {
+      regMap: MMap[Int, DedexType]) = {
     val entry = ExceptionHandlerMapEntry(start, end, handlerOffset, exceptionType, regMap)
     exceptionHandlerList.add(entry)
     if(DEBUG_EXCP)
@@ -822,94 +893,32 @@ class PilarStyleCodeGenerator(
    * Otherwise there is no change.
    */
   private def mergeExcpRegMaps(
-      exceptionMap: MMap[Integer, JawaType],
-      currentMap: IMap[Integer, JawaType]) = {
+      exceptionMap: MMap[Int, DedexType],
+      currentMap: IMap[Int, DedexType]) = {
     currentMap foreach {
       case (key, currentValue) =>
         val excpValue = exceptionMap.getOrElse(key, null)
         if(excpValue == null) {
           exceptionMap.put(key, currentValue)
         } else if(currentValue != null){
-          if(excpValue.isPrimitive && currentValue.isObject) {
-            exceptionMap.put(key, currentValue)
-          }
+          exceptionMap.put(key, currentValue)
         }
     }
   }
-  
-  /**
-  * Merges the old reg trace map with the new one and check for inconsistencies.
-  * The rules are:
-  * - Two reg trace maps are consistent if all the registers in the old reg trace
-  *   maps are present in the new reg trace map with the same type.
-  * - In addition, if the old reg trace maps contains single-length in a given
-  *   register but the new reg trace map contains an object type (type starting
-  *   with L or [) then the object type overwrites the single-length type. This
-  *   handles the case when an reference variable was initialized with null and is
-  *   assigned to an object reference only in some branches of the program. In this
-  *   case, the two reg trace maps are consistent but the branch needs to be 
-  *   analyzed one more time with the new reg trace map.
-  * - If both the old and the new value are classes, then the youngest common 
-  *   ancestor of the two classes must be found and if that ancestor is not equal
-  *   to the old value, the branch needs to be analysed with that ancestor.
-  * - In any other case, the reg trace maps are inconsistent.
-  *   The method returns true if the branch needs to be revisited with the new
-  *   reg trace map. In any other case, it returns false.
-  *
-  */
+
   private def mergeCheckRegTraceMaps(
-      newRegTraceMap: MMap[Integer, JawaType],
-      oldRegTraceMap: MMap[Integer, JawaType]): Boolean = {
+      pos: Long,
+      newUndeterminedRegTraceMap: IMap[Int, DedexUndeterminedType],
+      savedUndeterminedRegTraceMap: MMap[Int, MSet[DedexUndeterminedType]]): Boolean = {
     var revisit = false
-    breakable{
-      oldRegTraceMap foreach {
-        case (key, oldValue) =>
-          val newValue: JawaType = newRegTraceMap.getOrElse(key, null)
-          if(DEBUG_MERGE)
-            println("Merging: key: " + key + "; oldValue: " + oldValue + "; newValue: "+ newValue)
-          if(newValue == null) {
-            // The old set may be a superset of the new one.
-            if(DEBUG_MERGE)
-              println("Moving old value to new reg trace map")
-            newRegTraceMap.put(key, oldValue)
-          } else if(oldValue != null && !newValue.equals(oldValue)) {
-            if(DexInstructionParser.TYPE_SINGLE_LENGTH.equals(oldValue) && newValue.isObject) {
-              if(DEBUG_MERGE)
-                println("single-length->class: revisit")
-              revisit = true
-            } else if(newValue.isObject && oldValue.isObject) {
-              // newValue and oldValue are both classes, we should find out the youngest common
-              // ancestor of these two classes. This is, however, not possible if the disassembler
-              // is not processing ODEX files because otherwise the disassembler is only aware
-              // of the classes in the DEX file which it currently processes. As this affects
-              // only the registers displayed with the -r switch for non-ODEX files, we sweep
-              // the issue under the carpet and we don't do ancestor searching in this case but
-              // replace the class with java/lang/Object, the common ancestor of every class
-              if(dexOffsetResolver != null) {
-                if(DEBUG_MERGE)
-                  println("finding ancestor for: oldValue: " + oldValue + "; newValue: "+ newValue)
-                var ancestor = dexOffsetResolver.findCommonAncestor(JavaKnowledge.formatTypeToSignature(newValue), JavaKnowledge.formatTypeToSignature(oldValue))
-                ancestor = "L" + ancestor + ";"
-                if(DEBUG_MERGE)
-                  println("ancestor: " + ancestor)
-                if(!newValue.equals(ancestor) && !oldValue.equals(ancestor)) {
-                  if(DEBUG_MERGE)
-                    println("Moving ancestor to new reg trace map (key: " + key + "; value: " + ancestor + ")")
-                  newRegTraceMap.put(key, JavaKnowledge.formatSignatureToType(ancestor))
-                  revisit = true
-                } 
-              } else if(!newValue.equals(oldValue) && !oldValue.equals( "Ljava/lang/Object;")) {
-                if(DEBUG_MERGE)
-                  println("Replacing key " + key + " with java/lang/Object")
-                newRegTraceMap.put(key, JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE)
-                revisit = true
-              }
-            } else if(!newValue.equals(oldValue)) {
-              revisit = false
-              break
-            }
-          }
-      }
+    newUndeterminedRegTraceMap foreach {
+      case (reg, ud) =>
+        ud.mergepos += pos
+        val saved = savedUndeterminedRegTraceMap.getOrElseUpdate(reg, msetEmpty)
+        if(!saved.contains(ud)){
+          saved += ud
+          revisit = true
+        }
     }
     revisit
   }
@@ -938,32 +947,13 @@ class PilarStyleCodeGenerator(
         val excpRegMap = entry.regMap
         // We can't set the original instance to instruction parser - that would
         // corrupt the register map for further executions of the handler.
-        excpRegMap.put(DexInstructionParser.REGMAP_RESULT_KEY, entry.exceptionType)
+        excpRegMap.put(DexInstructionParser.REGMAP_RESULT_KEY, DedexJawaType(entry.exceptionType))
         if(DEBUG_EXCP)
           println("excp,setRegMap: 0x" + java.lang.Long.toHexString( pos ) + 
               "; exception register map set: [" + excpRegMap+ "]")
         instructionParser.setRegisterMap(excpRegMap.toMap)
       }
     }
-  }
-  
-  private def saveRegTraceMap(
-      instructionParser: DexInstructionParser,
-      regTraceMap: MMap[Long, String]) = {
-    val sb = new StringBuilder()
-    val affectedRegisters = instructionParser.getAffectedRegisters()
-    for(i <- 0 to affectedRegisters.length - 1) {
-      if(i > 0) sb.append(" , ")
-      val reg = affectedRegisters(i)
-      sb.append("v" + reg + " : ")
-      val regMap = instructionParser.getRegisterMap()
-      sb.append(regMap.get(new Integer(reg)))
-    }
-    val pos: Long = instructionParser.getFilePosition()
-    val line = sb.toString()
-    regTraceMap.put(pos, line)
-    if(DEBUG_REGTRACE)
-      println("regTrace: 0x" + java.lang.Long.toHexString(pos) + "; saved regtrace: " + line)
   }
   
   def writeByteArray(element: String) = {

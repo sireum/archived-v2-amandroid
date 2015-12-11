@@ -676,17 +676,13 @@ trait DexConstants {
   def ifGe(x: String, y: String, target: Long) = "if %s >= %s then goto L%06x;".format(x, y, target) // 0x35
   def ifGt(x: String, y: String, target: Long) = "if %s > %s then goto L%06x;".format(x, y, target) // 0x36
   def ifLe(x: String, y: String, target: Long) = "if %s <= %s then goto L%06x;".format(x, y, target) // 0x37
-  def ifEqz(x: String, target: Long, typ: JawaType) = {
-    typ match {
-      case ot if ot.isObject => "if %s == null then goto L%06x;".format(x, target)
-      case _ => "if %s == 0 then goto L%06x;".format(x, target)
-    }
+  def ifEqz(x: String, target: Long, isObject: Boolean) = {
+    if(isObject) "if %s == null then goto L%06x;".format(x, target)
+    else "if %s == 0 then goto L%06x;".format(x, target)
   } // 0x38
-  def ifNez(x: String, target: Long, typ: JawaType) = {
-    typ match {
-      case ot if ot.isObject => "if %s != null then goto L%06x;".format(x, target)
-      case _ => "if %s != 0 then goto L%06x;".format(x, target)
-    }
+  def ifNez(x: String, target: Long, isObject: Boolean) = {
+    if(isObject) "if %s != null then goto L%06x;".format(x, target)
+    else "if %s != 0 then goto L%06x;".format(x, target)
   } // 0x39
   def ifLtz(x: String, target: Long) = "if %s < 0 then goto L%06x;".format(x, target) // 0x3a
   def ifGez(x: String, target: Long) = "if %s >= 0 then goto L%06x;".format(x, target) // 0x3b

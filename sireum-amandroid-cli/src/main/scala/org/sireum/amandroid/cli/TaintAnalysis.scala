@@ -148,7 +148,7 @@ object TanitAnalysis{
             case ie: IgnoreException => println("No interesting element found for " + module)
             case e: Throwable =>
               CliLogger.logError(new File(outputPath), "Error: " , e)
-          } finally{
+          } finally {
             System.gc
           }
       }

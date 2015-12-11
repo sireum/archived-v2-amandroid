@@ -14,6 +14,8 @@ import hu.uw.pallergabor.dedexer._
 import java.io.File
 import java.io.IOException
 import org.sireum.jawa.JawaType
+import org.sireum.jawa.JawaPackage
+import org.sireum.jawa.JavaKnowledge
 
 /**
  * @author fgwei
@@ -25,6 +27,44 @@ class PilarDeDex {
   private var dexLogStream: Option[PrintStream] = None
   private val depFiles: MList[DexDependencyFile] = mlistEmpty
   
+  private var pkgNameMapping: IMap[JawaPackage, String] = imapEmpty
+  private var recordNameMapping: IMap[JawaType, String] = imapEmpty
+  private var procedureNameMapping: IMap[String, String] = imapEmpty
+  private var attributeNameMapping: IMap[(String, JawaType), String] = imapEmpty
+  def getPkgNameMapping = pkgNameMapping
+  def getRecordNameMapping = recordNameMapping
+  def getProcedureNameMapping = procedureNameMapping
+  def getAttributeNameMapping = attributeNameMapping
+  def haveRenamedElements: Boolean = !pkgNameMapping.isEmpty || !recordNameMapping.isEmpty || !procedureNameMapping.isEmpty || !attributeNameMapping.isEmpty
+  def mapPackage(pkg: String): String = {
+    val pkglist: MList[String] = mlistEmpty
+    val jawapkg = JavaKnowledge.formatPackageStringToPackage(pkg)
+    jawapkg.getPkgList foreach {
+      pkg =>
+        getPkgNameMapping.get(pkg) match {
+          case Some(name) =>
+            pkglist += name
+          case None =>
+            pkglist += pkg.name
+        }
+    }
+    pkglist.mkString(".")
+  }
+  def mapRecord(className: String): String = {
+    val typ = new JawaType(className)
+    val pkgstr = typ.baseType.pkg match {
+      case Some(pkg) => mapPackage(pkg.toPkgString("."))
+      case None => ""
+    }
+    val classnamestr = getRecordNameMapping.get(typ) match {
+      case Some(name) =>
+        name
+      case None =>
+        typ.baseType.name
+    }
+    pkgstr + "." + classnamestr
+  }
+  
   def decompile(
       sourceFileUri: FileResourceUri,
       targetDirUri: Option[FileResourceUri],
@@ -35,9 +75,9 @@ class PilarDeDex {
     try{
       val raf = new RandomAccessFile(FileUtil.toFilePath(sourceFileUri), "r")
       if(dexlog){ 
-        if(targetDirUri.isDefined)
-          dexLogStream = Some(new PrintStream(FileUtil.toFilePath(targetDirUri.get) + "/dex.log"))
-        else {
+        if(targetDirUri.isDefined) {
+          dexLogStream = Some(new PrintStream(FileUtil.toFilePath(targetDirUri.get) + File.separator + "dex.log"))
+        } else {
           System.err.println("If want dexlog please specify the target dir")
           return
         }
@@ -49,7 +89,7 @@ class PilarDeDex {
       dexSignatureBlock.parse()
   
       var depsParser: DexDependencyParser = null
-      var dexOffsetResolver: DexOffsetResolver = null
+      val dexOffsetResolver: DexOffsetResolver = new DexOffsetResolver()
       if(depsDirUri.isDefined &&
           dexSignatureBlock.getDexOptimizationData() != null &&
           dexSignatureBlock.getDexOptimizationData().isOptimized()) {
@@ -58,7 +98,6 @@ class PilarDeDex {
         depsParser.setRandomAccessFile(raf)
         depsParser.setDumpFile(dexLogStream.getOrElse(null))
         depsParser.parse()
-        dexOffsetResolver = new DexOffsetResolver()
         dexOffsetResolver.setDumpFile(dexLogStream.getOrElse(null))
         if(handleDependencies(depsDirUri.get, depsParser, dexOffsetResolver)) {
           close()
@@ -138,6 +177,10 @@ class PilarDeDex {
           recordFilter)
       pscg.generate
       raf.close()
+      this.pkgNameMapping = pscg.pkgNameMapping.toMap
+      this.recordNameMapping = pscg.recordNameMapping.toMap
+      this.procedureNameMapping = pscg.procedureNameMapping.toMap
+      this.attributeNameMapping = pscg.attributeNameMapping.toMap
     } catch {
       case ex: IOException =>
         System.err.println("I/O error: "+ex.getMessage())

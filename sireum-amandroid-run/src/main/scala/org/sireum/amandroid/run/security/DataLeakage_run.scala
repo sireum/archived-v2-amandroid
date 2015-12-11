@@ -101,7 +101,7 @@ object DataLeakage_run {
     val outputPath = args(1)
     val dpsuri = try{Some(FileUtil.toUri(args(2)))} catch {case e: Exception => None}
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
-    
+      .filter(_.contains("Button1.apk"))
     files.foreach{
       file =>
         val reporter = new PrintReporter(MsgLevel.INFO)
@@ -109,8 +109,6 @@ object DataLeakage_run {
         global.setJavaLib(AndroidGlobalConfig.lib_files)
         val apk = new Apk(file)
         val socket = new AmandroidSocket(global, apk)
-        
-//        if(file.contains("ActivityCommunication6"))
         try {
           reporter.echo(TITLE, DataLeakageTask(global, apk, outputPath, dpsuri, file, socket, Some(1000)).run)   
         } catch {

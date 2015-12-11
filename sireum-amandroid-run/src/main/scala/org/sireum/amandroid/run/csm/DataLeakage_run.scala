@@ -42,7 +42,6 @@ import org.sireum.amandroid.util.ApkFileUtil
  */ 
 object DataLeakage_run {
   private final val TITLE = "DataLeakage_run"
-//  MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
   object DataLeakageCounter {
     var total = 0
     var haveresult = 0
@@ -68,7 +67,7 @@ object DataLeakage_run {
     val outputUri = FileUtil.toUri(outputPath)
     val dpsuri = try{Some(FileUtil.toUri(args(1)))} catch {case e: Exception => None}
     val files = ApkFileUtil.getApks(FileUtil.toUri(sourcePath), true)
-//      .filter(_.contains("FieldAndObjectSensitivity_FieldFlowSensitivity1"))
+//      .filter(_.contains("SharedPreferences1.apk"))
     files.foreach{
       file =>
         DataLeakageCounter.total += 1

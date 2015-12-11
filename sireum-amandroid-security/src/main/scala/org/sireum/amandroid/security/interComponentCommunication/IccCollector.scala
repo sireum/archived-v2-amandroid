@@ -53,7 +53,6 @@ class IccCollector(global: Global, timer: Option[MyTimer]) extends AppInfoCollec
           codeLineCounter = clCounter
         }
     }
-    ra.initWithEnv
     val sensitiveAPISigs = AndroidConstants.getIccMethods
     this.iccContainers = sensitiveAPISigs.map(ra.getSensitiveAPIContainer(_)).reduce(iunion[JawaClass])
     apk.setComponents(components.toSet)

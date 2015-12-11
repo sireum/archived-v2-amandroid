@@ -23,6 +23,7 @@ import java.io.File
 import java.io.InputStream
 import java.io.IOException
 import org.sireum.amandroid.util.TypedValue
+import java.io.FileInputStream
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -197,45 +198,32 @@ class ManifestParser{
         ex.printStackTrace()
     }
   }
-  
-  private def getAttribute(comp: Element, name: String, ret_null: Boolean): String = {
-    var res: String = if(ret_null) null else ""
-    headerNames.foreach {
-      header =>
-        val x = comp.getAttribute(header + name)
-        if(!x.isEmpty()) res = x
-    }
-    res
-  }
 
   private def loadManifestEntry(comp: Element, baseClass: ComponentType.Value, packageName: String) = {
-    val className = getAttribute(comp, "name", false)
-    val classType = new JawaType(className)
+    val className = ManifestParser.getAttribute(comp, "name", false, this.headerNames.toSet)
     if (className.startsWith(".")){
       this.currentComponent = toPilarClass(this.packageName + className)
       this.components += (this.currentComponent -> baseClass)
-    }
-    else if (className.substring(0, 1).equals(className.substring(0, 1).toUpperCase())){
+    } else if (className.substring(0, 1).equals(className.substring(0, 1).toUpperCase())){
       this.currentComponent = toPilarClass(this.packageName + "." + className)
       this.components += (this.currentComponent -> baseClass)
-    }
-    else if (this.packageName != "" && !className.contains(".")){
+    } else if (this.packageName != "" && !className.contains(".")){
       this.currentComponent = toPilarClass(this.packageName + "." + className)
       this.components += (this.currentComponent -> baseClass)
-    }
-    else {
+    } else {
       this.currentComponent = toPilarClass(className)
       this.components += (this.currentComponent -> baseClass)
     }
-    val permission = getAttribute(comp, "permission", false)
+    val classType = this.currentComponent
+    val permission = ManifestParser.getAttribute(comp, "permission", false, this.headerNames.toSet)
     if (!permission.isEmpty()){
       this.componentPermission += (classType -> permission)
     }
-    val exported = getAttribute(comp, "exported", false)
+    val exported = ManifestParser.getAttribute(comp, "exported", false, this.headerNames.toSet)
     if(!exported.isEmpty()){
       this.componentExported += (classType -> exported)
     }
-    val enabled = getAttribute(comp, "enabled", false)
+    val enabled = ManifestParser.getAttribute(comp, "enabled", false, this.headerNames.toSet)
     if(!enabled.isEmpty()){
       this.componentEnabled += (classType -> enabled)
     }
@@ -249,7 +237,7 @@ class ManifestParser{
         for (a <- 0 to actions.getLength() - 1) {
           if (this.currentIntentFilter != null){
             val action = actions.item(a).asInstanceOf[Element]
-            val name = getAttribute(action, "name", false)
+            val name = ManifestParser.getAttribute(action, "name", false, this.headerNames.toSet)
             val intentF = this.currentIntentFilter
             intentF.addAction(name)              
           }
@@ -258,7 +246,7 @@ class ManifestParser{
         for (c <- 0 to categories.getLength() - 1) {
           if (this.currentIntentFilter != null){
             val category = categories.item(c).asInstanceOf[Element]
-            val name = getAttribute(category, "name", false)
+            val name = ManifestParser.getAttribute(category, "name", false, this.headerNames.toSet)
             val intentF = this.currentIntentFilter
             intentF.addCategory(name)              
           }
@@ -267,13 +255,13 @@ class ManifestParser{
         for (d <- 0 to datas.getLength() - 1) {
           if (this.currentIntentFilter != null){
             val data = datas.item(d).asInstanceOf[Element]
-            val scheme = getAttribute(data, "scheme", true)
-            val host = getAttribute(data, "host", true)
-            val port = getAttribute(data, "port", true)
-            val path = getAttribute(data, "path", true)
-            val pathPrefix = getAttribute(data, "pathPrefix", true)
-            val pathPattern = getAttribute(data, "pathPattern", true)
-            val mimeType = getAttribute(data, "mimeType", true)
+            val scheme = ManifestParser.getAttribute(data, "scheme", true, this.headerNames.toSet)
+            val host = ManifestParser.getAttribute(data, "host", true, this.headerNames.toSet)
+            val port = ManifestParser.getAttribute(data, "port", true, this.headerNames.toSet)
+            val path = ManifestParser.getAttribute(data, "path", true, this.headerNames.toSet)
+            val pathPrefix = ManifestParser.getAttribute(data, "pathPrefix", true, this.headerNames.toSet)
+            val pathPattern = ManifestParser.getAttribute(data, "pathPattern", true, this.headerNames.toSet)
+            val mimeType = ManifestParser.getAttribute(data, "mimeType", true, this.headerNames.toSet)
             val intentF = this.currentIntentFilter
             intentF.modData(scheme, host, port, path, pathPrefix, pathPattern, mimeType)
           }
@@ -296,26 +284,71 @@ class ManifestParser{
 }
 
 object ManifestParser {
-  def loadPackageName(apk: File): String = {
-    var pkg: String = ""
-    AndroidXMLParser.handleAndroidXMLFiles(apk, Set("AndroidManifest.xml"), new AndroidXMLHandler() {
-      
-      override def handleXMLFile(fileName: String, fileNameFilter: Set[String], stream: InputStream) = {
-        try {
-          if (fileNameFilter.contains(fileName)){
-            pkg = getPackageNameFromManifest(stream)
-          }
-        }
-        catch {
-          case ex: IOException =>
-            System.err.println("Could not read AndroidManifest file: " + ex.getMessage())
-            ex.printStackTrace()
+  def loadPackageName(manifestUri: FileResourceUri): String = {
+    getPackageNameFromManifest(new FileInputStream(FileUtil.toFile(manifestUri)))
+  }
+  
+  def loadPackageAndComponentNames(manifestUri: FileResourceUri): (String, ISet[(String, String)]) = {
+    val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+    val doc = db.parse(new FileInputStream(FileUtil.toFile(manifestUri)))
+    val rootElement = doc.getDocumentElement()
+    val attributes = rootElement.getAttributes
+    val headerNames: MSet[String] = msetEmpty
+    if(attributes != null) {
+      for(i <- 0 to attributes.getLength - 1){
+        val attribute = attributes.item(i)
+        if(attribute != null && attribute.toString().startsWith("xmlns:") && attribute.toString().contains("=")) {
+          val headername = attribute.toString().substring(attribute.toString().indexOf(":") + 1, attribute.toString().indexOf("="))
+          headerNames += headername + ":"
         }
       }
-      
-    })
-    
-    pkg
+    }
+    if(headerNames.isEmpty) headerNames += ""
+    val pkg = rootElement.getAttribute("package")
+    val recNames: MSet[(String, String)] = msetEmpty
+    val appsElement = rootElement.getElementsByTagName("application")
+    for (appIdx <- 0 to appsElement.getLength() - 1) {
+      val appElement: Element = appsElement.item(appIdx).asInstanceOf[Element]
+      val className = getAttribute(appElement, "name", false, headerNames.toSet)
+      recNames += ((className, getClassName(pkg, className)))
+      val activities = appElement.getElementsByTagName("activity")
+      val receivers = appElement.getElementsByTagName("receiver")
+      val services  = appElement.getElementsByTagName("service")
+      val providers = appElement.getElementsByTagName("provider")
+      for (i <- 0 to activities.getLength() - 1) {
+        val activity = activities.item(i).asInstanceOf[Element]
+        val className = getAttribute(activity, "name", false, headerNames.toSet)
+        recNames += ((className, getClassName(pkg, className)))
+      }
+      for (i <- 0 to receivers.getLength() - 1) {
+        val receiver = receivers.item(i).asInstanceOf[Element]
+        val className = getAttribute(receiver, "name", false, headerNames.toSet)
+        recNames += ((className, getClassName(pkg, className)))
+      }
+      for (i <- 0 to services.getLength() - 1) {
+        val service = services.item(i).asInstanceOf[Element]
+        val className = getAttribute(service, "name", false, headerNames.toSet)
+        recNames += ((className, getClassName(pkg, className)))
+      }
+      for (i <- 0 to providers.getLength() - 1) {
+        val provider = providers.item(i).asInstanceOf[Element]
+        val className = getAttribute(provider, "name", false, headerNames.toSet)
+        recNames += ((className, getClassName(pkg, className)))
+      }
+    }
+    (pkg, recNames.toSet)
+  }
+  
+  private def getClassName(packageName: String, className: String): String = {
+    if (className.startsWith(".")){
+      packageName + className
+    } else if (!className.isEmpty() && className.substring(0, 1).equals(className.substring(0, 1).toUpperCase())){
+      packageName + "." + className
+    } else if (packageName != "" && !className.contains(".")){
+      packageName + "." + className
+    } else {
+      className
+    }
   }
   
   def loadSdkVersionFromManifestFile(apk: File): (Int, Int, Int) = {
@@ -332,8 +365,7 @@ object ManifestParser {
             target = targett
             max = maxt
           }
-        }
-        catch {
+        } catch {
           case ex: IOException =>
             System.err.println("Could not read AndroidManifest file: " + ex.getMessage())
             ex.printStackTrace()
@@ -347,26 +379,14 @@ object ManifestParser {
   protected def getPackageNameFromManifest(manifestIS: InputStream): String = {
     var pkg: String = ""
     try {
-      val parser = new ResAXmlResourceParser()
-      parser.open(manifestIS)
-      var typ = parser.next()
-      while (typ != 0x00000001) { // XmlPullParser.END_DOCUMENT
-        typ match {
-          case 0x00000000 => // XmlPullParser.START_DOCUMENT
-          case 0x00000002 => //XmlPullParser.START_TAG
-            val tagName = parser.getName
-            if(tagName.equals("manifest")){
-              pkg = getAttributeValue(parser, "package")
-              if(pkg == null) pkg = ""
-            }
-          case 0x00000003 => //XmlPullParser.END_TAG
-          case 0x00000004 => //XmlPullParser.TEXT
-        }
-        typ = parser.next()
-      }
+      val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+      val doc = db.parse(manifestIS)
+      var applicationEnabled = true
+      val rootElement = doc.getDocumentElement()
+      pkg = rootElement.getAttribute("package")
     } catch {
       case e: Exception =>
-        e.printStackTrace()
+        println(e)
     }
     pkg
   }
@@ -461,6 +481,16 @@ object ManifestParser {
       return "android:"
     }
     return ""
+  }
+  
+  def getAttribute(comp: Element, name: String, ret_null: Boolean, headerNames: ISet[String]): String = {
+    var res: String = if(ret_null) null else ""
+    headerNames.foreach {
+      header =>
+        val x = comp.getAttribute(header + name)
+        if(!x.isEmpty()) res = x
+    }
+    res
   }
   
   def complexToFloat(complex: Int): Float = {

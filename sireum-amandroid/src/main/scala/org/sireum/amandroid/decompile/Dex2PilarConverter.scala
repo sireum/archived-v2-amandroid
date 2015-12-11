@@ -14,23 +14,26 @@ import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.jawa.util.OsUtils
 import org.sireum.amandroid.dedex.PilarDeDex
 import org.sireum.jawa.JawaType
+import org.sireum.amandroid.util.FixResources
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
 object Dex2PilarConverter {
-  def convert(f: FileResourceUri, out: FileResourceUri, dpsuri: Option[FileResourceUri], recordFilter: (JawaType => Boolean), dexLog: Boolean, debugMode: Boolean, forceDelete: Boolean): FileResourceUri = {
-    if(!forceDelete && FileUtil.toFile(out).exists()) return out
-    ConverterUtil.cleanDir(out)
+  def convert(f: FileResourceUri, targetDirUri: FileResourceUri, out: FileResourceUri, dpsuri: Option[FileResourceUri], recordFilter: (JawaType => Boolean), dexLog: Boolean, debugMode: Boolean, forceDelete: Boolean): FileResourceUri = {
+    if(!forceDelete && FileUtil.toFile(targetDirUri).exists()) return targetDirUri
+    ConverterUtil.cleanDir(targetDirUri)
     try {
       val pdd = new PilarDeDex
-      pdd.decompile(f, Some(out), dpsuri, recordFilter, dexLog, debugMode)
+      pdd.decompile(f, Some(targetDirUri), dpsuri, recordFilter, dexLog, debugMode)
+      FixResources.fix(out, pdd)
     } catch {
       case ex: Exception =>
+        ex.printStackTrace()
         System.err.println("Given file is not a decompilable file: " + f)
     }
-    out
+    targetDirUri
   }
 }
 
