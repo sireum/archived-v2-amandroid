@@ -22,86 +22,37 @@ object DedexTypeResolver {
   
   sealed trait DedexType
   case class DedexJawaType(typ: JawaType) extends DedexType
-//  sealed trait DedexObjectType extends DedexType {
-//    
-//  }
-//  case class DedexSingleObjectType(defsite: Position, defaultType: JawaType) extends DedexObjectType {
-//    /**
-//     * Any use of this DedexSingleObjectType will give a required lowest possible type
-//     */
-//    def possible(typ: JawaType): DedexSingleObjectType = {
-//      typs += DedexJawaType(typ)
-//      this
-//    }
-//    val typs: MSet[DedexJawaType] = msetEmpty
-//    def resolve(dexOffsetResolver: DexOffsetResolver): DedexJawaType = {
-//      if(typs.isEmpty) DedexJawaType(defaultType)
-//      else {
-//        val typlist = typs.toList
-//        var res = typlist.head
-//        typlist.tail foreach {
-//          typ =>
-//            val oldSig = JavaKnowledge.formatTypeToSignature(res.typ)
-//            val newSig = JavaKnowledge.formatTypeToSignature(typ.typ)
-//            if(oldSig != newSig) {
-//              val ancestorSig = "L" + dexOffsetResolver.findCommonAncestor(oldSig, newSig) + ";"
-//              if(newSig != ancestorSig)
-//                res = typ
-//            }
-//        }
-//        res
-//      }
-//    }
-//  }
-//  class DedexMultiObjectType extends DedexObjectType {
-//    def possible(typ: DedexObjectType): DedexMultiObjectType = {
-//      typs += typ
-//      this
-//    }
-//    val typs: MSet[DedexObjectType] = msetEmpty
-//    def resolve(dexOffsetResolver: DexOffsetResolver): DedexJawaType = {
-//      val singleTyps: MSet[DedexSingleObjectType] = msetEmpty
-//      val resolved: MSet[DedexMultiObjectType] = msetEmpty
-//      val worklist: MList[DedexMultiObjectType] = mlistEmpty
-//      typs foreach {
-//        typ =>
-//          typ match {
-//            case dso: DedexSingleObjectType => singleTyps += dso
-//            case dmo: DedexMultiObjectType => worklist += dmo
-//          }
-//      }
-//      while(!worklist.isEmpty) {
-//        val ot = worklist.remove(0)
-//        resolved += ot
-//        ot.typs foreach {
-//          ottyp =>
-//            ottyp match {
-//              case dso: DedexSingleObjectType => singleTyps += dso
-//              case dmo: DedexMultiObjectType => if(!resolved.contains(dmo)) worklist += dmo
-//            }
-//        }
-//      }
-//      val postyps = singleTyps.map(_.resolve(dexOffsetResolver))
-//      val typlist = postyps.toList
-//      var res = typlist.head
-//      typlist.tail foreach {
-//        typ =>
-//          val oldSig = JavaKnowledge.formatTypeToSignature(res.typ)
-//          val newSig = JavaKnowledge.formatTypeToSignature(typ.typ)
-//          if(oldSig != newSig) {
-//            val ancestorSig = "L" + dexOffsetResolver.findCommonAncestor(oldSig, newSig) + ";"
-//            res = DedexJawaType(JavaKnowledge.formatSignatureToType(ancestorSig))
-//          }
-//      }
-//      res
-//    }
-//  }
-  case class DedexUndeterminedType(defsite: Position, defaultType: JawaType) extends DedexType {
-    def possible(position: Position, typ: JawaType, isLeft: Boolean) = {
+
+  case class DedexUndeterminedType(defsite: Position, defaultType: JawaType, objectable: Boolean) extends DedexType {
+    def possible(position: Position, typ: JawaType, isLeft: Boolean): DedexUndeterminedType = {
       typs += ((position, typ, isLeft))
       this
     }
     val typs: MSet[(Position, JawaType, Boolean)] = msetEmpty
+    val typHolders: MSet[Position] = msetEmpty
+//    def exhaustDimention(position: Position): DedexUndeterminedType = {
+//      val newut = DedexUndeterminedType(position, defaultType)
+//      typs.foreach {
+//        case (position, typ, isLeft) =>
+//          if(typ.isArray) {
+//            newut.possible(position, JawaType(typ.baseType, typ.dimensions - 1), isLeft)
+//          }
+//      }
+//      newut.parent = Some(this)
+//      exhaustedDimentions += newut
+//      newut
+//    }
+//    var parent: Option[DedexUndeterminedType] = None
+//    val exhaustedDimentions: MSet[DedexUndeterminedType] = msetEmpty
+//    def dimentionDepth: Int = {
+//      var i = 0
+//      var ut = this
+//      while(ut.parent.isDefined){
+//        i += 1
+//        ut = ut.parent.get
+//      }
+//      i
+//    }
     val mergepos: MSet[Long] = msetEmpty
   }
 }
@@ -140,8 +91,8 @@ trait DedexTypeResolver { self: DexInstructionToPilarParser =>
   def getRegisterMap: IMap[Int, DedexType] = regMap.toMap
   
   implicit class UndeterminedType(typ: JawaType) {
-    def undetermined(pos: Position): DedexUndeterminedType = {
-      undeterminedMap.getOrElseUpdate(pos, DedexUndeterminedType(pos, typ))
+    def undetermined(pos: Position, objectable: Boolean): DedexUndeterminedType = {
+      undeterminedMap.getOrElseUpdate(pos, DedexUndeterminedType(pos, typ, objectable))
     }
   }
   
@@ -165,18 +116,34 @@ trait DedexTypeResolver { self: DexInstructionToPilarParser =>
     
   }
   
-  protected[dedex] def resolveRegType(position: Position, reg: Int, defaultTyp: JawaType, isLeft: Boolean): DedexType = {
+  protected[dedex] def resolveRegType(position: Position, reg: Int, defaultTyp: JawaType, isLeft: Boolean, isHolder: Boolean = false): DedexType = {
     if(secondPass) {
       DedexJawaType(this.positionTypMap.getOrElseUpdate(position, defaultTyp))
     } else {
       val typ = this.regMap.getOrElseUpdate(reg, DedexJawaType(defaultTyp))
       typ match {
         case ut: DedexUndeterminedType =>
-          ut.possible(position, defaultTyp, isLeft)
-          ut
+          if(!ut.objectable && defaultTyp.isObject) {
+            if(isLeft)
+              this.regMap(reg) = DedexJawaType(defaultTyp)
+            this.positionTypMap(position) = defaultTyp
+            DedexJawaType(defaultTyp)
+          } else if (ut.typs.exists(_._2.isPrimitive) && defaultTyp.isObject) {
+            if(isLeft)
+              this.regMap(reg) = DedexJawaType(defaultTyp)
+            this.positionTypMap(position) = defaultTyp
+            DedexJawaType(defaultTyp)
+          } else {
+            if(isHolder) ut.typHolders += position
+            else ut.possible(position, defaultTyp, isLeft)
+            ut
+          }
         case jt: DedexJawaType =>
-          val result = jt.typ
-          this.regMap(reg) = DedexJawaType(result)
+          var result = jt.typ
+          if(isLeft) {
+            result = defaultTyp
+            this.regMap(reg) = DedexJawaType(result)
+          }
           this.positionTypMap(position) = result
           DedexJawaType(result)
       }
@@ -191,16 +158,24 @@ trait DedexTypeResolver { self: DexInstructionToPilarParser =>
       result += ut.defaultType
     } else {
       val primitiveTyps: MSet[(Position, JawaType)] = msetEmpty
+      val arrayTyps: MSet[(Position, JawaType)] = msetEmpty
       val objectTyps: MSet[(Position, JawaType)] = msetEmpty
       ut.typs foreach {
         case (position, typ, _) =>
-          if(typ.isObject) objectTyps += ((position, typ))
+          if(typ.isArray) arrayTyps += ((position, typ))
+          else if(typ.isObject) objectTyps += ((position, typ))
           else primitiveTyps += ((position, typ))
       }
       primitiveTyps foreach {
         case (position, typ) =>
           result += typ
           this.positionTypMap(position) = typ
+      }
+      arrayTyps foreach {
+        case (position, typ) =>
+          result += typ
+          this.positionTypMap(position) = typ
+          ut.typHolders.foreach(this.positionTypMap(_) = typ)
       }
       if(!objectTyps.isEmpty) {
         val otyplist = objectTyps.toList
@@ -226,6 +201,7 @@ trait DedexTypeResolver { self: DexInstructionToPilarParser =>
           case (position, typ) =>
             this.positionTypMap(position) = res
         }
+        ut.typHolders.foreach(this.positionTypMap(_) = res)
         result += res
       }
     }

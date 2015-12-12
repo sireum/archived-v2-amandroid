@@ -164,7 +164,7 @@ class PilarStyleCodeGenerator(
       val recType: JawaType = toPilarRecordName(dexClassDefsBlock.getClassNameOnly(classIdx)).resolveRecord
       val classPath = recType.jawaName.replaceAll("\\.", File.separator)
       if(filter(recType)) {
-//      if(recType.baseTyp == "com.creativemobile.billing.u") {
+//      if(recType.baseTyp == "com.facebook.katana.activity.media.CameraReviewActivity") {
         val outputStream = outputDir match {
           case Some(od) =>
             var targetFile = FileUtil.toFile(od + File.separator + classPath + ".pilar")

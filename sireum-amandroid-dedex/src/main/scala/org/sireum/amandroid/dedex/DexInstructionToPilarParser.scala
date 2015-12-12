@@ -191,7 +191,9 @@ case class DexInstructionToPilarParser(
     forkStatus = initialForkStatus(instrCode)
     forkData.clear
     def handleConst(position: Position, reg: Int, defaultType: JawaType, constant: Either[Int, Long]) = {
-      val undetermined = defaultType.undetermined(position)
+      val undetermined = 
+        if(instrCode == CONST_4 && constant.left.get == 0) defaultType.undetermined(position, true)
+        else defaultType.undetermined(position, false)
       val typs: IList[JawaType] =
         if(secondPass) {
           resolveUndetermined(undetermined)
@@ -778,9 +780,9 @@ case class DexInstructionToPilarParser(
           var arrayType = JavaKnowledge.formatSignatureToType(dexTypeIdsBlock.getType(typeidx))
           arrayType = arrayType.jawaName.resolveRecord
           val baseType = generator.generateType(JawaType.generateType(arrayType.baseTyp, arrayType.dimensions - 1)).render()
+          val sizeregName = genRegName(sizereg, resolveRegType(sizeregpos, sizereg, new JawaType("int"), false))
           val regtyp = resolveRegType(regpos, reg, arrayType, true)
           val targetregName = genRegName(reg, regtyp)
-          val sizeregName = genRegName(sizereg, resolveRegType(sizeregpos, sizereg, new JawaType("int"), false))
           val code = instrCode match {
             case NEW_ARRAY => newArray(targetregName, baseType, sizeregName)
             case _ => "@UNKNOWN_NEWARRAY 0x%x".format(instrCode)
@@ -794,7 +796,7 @@ case class DexInstructionToPilarParser(
           val reg = read8Bit()
           val offset = readSigned32Bit()
           val target: Long = instrBase + (offset * 2L)
-          val regtyp = resolveRegType(regpos, reg, new JawaType("int", 1), true)
+          val regtyp = resolveRegType(regpos, reg, new JawaType("int", 1), false)
           val regName = genRegName(reg, regtyp)
           val fillArrayTask = new FillArrayDataTask(regName, getFilePosition, this, instrBase, target)
           val valid = fillArrayTask.isValid
@@ -1081,17 +1083,17 @@ case class DexInstructionToPilarParser(
             case AGET_SHORT => new JawaType("short", 1)
             case _ => new JawaType("int", 1)
           }
-          val arrayType = resolveRegType(reg2pos, reg2, defaultType, false)
-          val elementType: JawaType = arrayType match {
+          val arrayType = resolveRegType(reg2pos, reg2, defaultType, false, isHolder = true)
+          val reg1typ: DedexType = arrayType match {
             case ut: DedexUndeterminedType =>
-              JawaType.generateType(defaultType.baseTyp, defaultType.dimensions - 1)
+              resolveRegType(reg1pos, reg1, JawaType.addDimensions(defaultType, -1), true)
             // should mostly come here
-            case DedexJawaType(typ) if typ.dimensions > 0 => JawaType.generateType(typ.baseTyp, typ.dimensions - 1)
+            case DedexJawaType(typ) if typ.isArray => 
+              resolveRegType(reg1pos, reg1, JawaType.generateType(typ.baseTyp, typ.dimensions - 1), true)
             // some problem might happened
             case DedexJawaType(typ) =>
-              typ
+              resolveRegType(reg1pos, reg1, typ, true)
           }
-          val reg1typ = resolveRegType(reg1pos, reg1, elementType, true)
           val reg1Name = genRegName(reg1, reg1typ)
           val reg2Name = genRegName(reg2, arrayType)
           val reg3Name = genRegName(reg3, resolveRegType(reg3pos, reg3, new JawaType("int"), false))
@@ -1127,7 +1129,7 @@ case class DexInstructionToPilarParser(
             case APUT_SHORT => new JawaType("short", 1)
             case _ => new JawaType("int", 1)
           }
-          val arrayType = resolveRegType(reg1pos, reg1, defaultType, true)
+          val arrayType = resolveRegType(reg1pos, reg1, defaultType, false)
           val elementType: JawaType = arrayType match {
             case ut: DedexUndeterminedType =>
               JawaType.generateType(defaultType.baseTyp, defaultType.dimensions - 1)
@@ -1137,10 +1139,11 @@ case class DexInstructionToPilarParser(
             case DedexJawaType(typ) =>
               typ
           }
+          val reg3Name = genRegName(reg3, resolveRegType(reg3pos, reg3, elementType, false))
           val reg1Name = genRegName(reg1, arrayType)
           val reg2typ = resolveRegType(reg2pos, reg2, new JawaType("int"), false)
           val reg2Name = genRegName(reg2, reg2typ)
-          val reg3Name = genRegName(reg3, resolveRegType(reg3pos, reg3, elementType, false))
+          
           val code = instrCode match {
             case APUT => aput(reg1Name, reg2Name, reg3Name)
             case APUT_WIDE => aputWide(reg1Name, reg2Name, reg3Name)
@@ -1229,10 +1232,11 @@ case class DexInstructionToPilarParser(
               }
             case MOVE_EXCEPTION =>
               val exctyp = resolveRegType(temppos, REGMAP_RESULT_KEY, ExceptionCenter.THROWABLE, false)
-              val regtyp = resolveRegType(regpos, reg, exctyp.asInstanceOf[DedexJawaType].typ, true)
+              val regtyp = DedexJawaType(exctyp.asInstanceOf[DedexJawaType].typ)
               val regName = genRegName(reg, regtyp)
               val code = moveExc(regName, generator.generateType(regtyp.asInstanceOf[DedexJawaType].typ).render())
               instrText.append(code)
+              positionTypMap(regpos) = exctyp.asInstanceOf[DedexJawaType].typ
               regMap(reg) = regtyp
             case _ =>
               instrText.append("@UNKNOWN_MOVERESULT 0x%x".format(instrCode))
