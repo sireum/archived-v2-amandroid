@@ -80,7 +80,7 @@ object IntentInjection_run {
     }
 
     def entryPointFilter(eps: Set[org.sireum.jawa.JawaMethod]): Set[org.sireum.jawa.JawaMethod] = {
-      val iacs = app_info.getInterestingContainers(ssm.getSinkSigs ++ AndroidConstants.getIccMethods)
+      val iacs = app_info.getInterestingContainers(ssm.getSinkSigs.map(_.signature) ++ AndroidConstants.getIccMethods)
       val res = eps.filter(e=>iacs.contains(e.getDeclaringClass))
       IntentInjectionCounter.totalComponents += res.size
       res

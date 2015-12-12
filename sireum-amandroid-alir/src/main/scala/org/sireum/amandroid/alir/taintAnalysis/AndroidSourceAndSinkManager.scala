@@ -78,11 +78,11 @@ abstract class AndroidSourceAndSinkManager(
   }
   
   private def getSourceTags(calleep: JawaMethod): ISet[String] = {
-    this.sources.filter(_._1 == calleep.getSignature.signature.replaceAll("\\*", "")).map(_._2).fold(isetEmpty)(iunion _)
+    this.sources.filter(src => matchs(calleep.getSignature, src._1)).map(_._2).fold(isetEmpty)(iunion _)
   }
   
   private def getSinkTags(calleep: JawaMethod): ISet[String] = {
-    this.sinks.filter(_._1 == calleep.getSignature.signature.replaceAll("\\*", "")).map(_._2._2).fold(isetEmpty)(iunion _)
+    this.sinks.filter(sink => matchs(calleep.getSignature, sink._1)).map(_._2._2).fold(isetEmpty)(iunion _)
   }
   
   private def handleICFGNode[N <: InterProceduralNode](icfgN: ICFGNode, ptaresult: PTAResult): (ISet[TaintSource[N]], ISet[TaintSink[N]]) = {
@@ -109,7 +109,7 @@ abstract class AndroidSourceAndSinkManager(
               var tags = getSinkTags(calleep)
               if(tags.isEmpty) tags += "ANY"
               global.reporter.echo(TITLE, "found sink: " + calleep + "@" + invNode.getContext + " " + tags)
-              val poss = this.sinks.filter(_._1 == calleesig.signature.replaceAll("\\*", "")).map(_._2._1).fold(isetEmpty)(iunion _)
+              val poss = this.sinks.filter(sink => matchs(calleesig, sink._1)).map(_._2._1).fold(isetEmpty)(iunion _)
               val tn = TaintSink(gNode, TagTaintDescriptor(calleesig.signature, poss, SourceAndSinkCategory.API_SINK, tags))
               sinks += tn
             }
@@ -167,7 +167,7 @@ abstract class AndroidSourceAndSinkManager(
               sources += tn
             }
             if(invNode.isInstanceOf[IDDGCallArgNode] && this.isSink(calleep)){
-              val poss = this.sinks.filter(_._1 == calleep.getSignature.signature.replaceAll("\\*", "")).map(_._2._1).fold(isetEmpty)(iunion _)
+              val poss = this.sinks.filter(sink => matchs(calleep.getSignature, sink._1)).map(_._2._1).fold(isetEmpty)(iunion _)
               if(poss.isEmpty || poss.contains(invNode.asInstanceOf[IDDGCallArgNode].position)) {
                 global.reporter.echo(TITLE, "found sink: " + calleep + "@" + invNode.getContext + " " + invNode.asInstanceOf[IDDGCallArgNode].position)
                 val tn = TaintSink(gNode, TypeTaintDescriptor(calleep.getSignature.signature, Some(invNode.asInstanceOf[IDDGCallArgNode].position), SourceAndSinkCategory.API_SINK))
@@ -209,14 +209,26 @@ abstract class AndroidSourceAndSinkManager(
     (sources.toSet, sinks.toSet)
   }
   
-  private def matchs(method: JawaMethod, methodpool: ISet[String]): Boolean = methodpool.exists{
+  private def matchs(method: JawaMethod, methodpool: ISet[Signature]): Boolean = methodpool.exists{
     sig =>
-      sig == method.getSignature.signature.replaceAll("\\*", "")
+      val typ1 = sig.classTyp
+      val typ2 = method.getDeclaringClass
+      sig.getSubSignature == method.getSubSignature &&
+      (typ2.typ == typ1 || typ2.isChildOf(typ1) || typ2.isImplementerOf(typ1))
+  }
+  
+  private def matchs(sig1: Signature, sig2: Signature): Boolean = {
+    val typ1 = global.getClassOrResolve(sig1.classTyp)
+    val typ2 = sig2.classTyp
+      sig1.getSubSignature == sig2.getSubSignature &&
+      (typ1.typ == typ2 || typ1.isChildOf(typ2) || typ1.isImplementerOf(typ2))
   }
 
   def isSourceMethod(method: JawaMethod) = matchs(method, this.sources.map(s => s._1).toSet)
 
-  def isSink(method: JawaMethod) = matchs(method, this.sinks.map(s => s._1).toSet)
+  def isSink(method: JawaMethod) = {
+    matchs(method, this.sinks.map(s => s._1).toSet)
+  }
 
   def isSource(calleeMethod: JawaMethod, callerMethod: JawaMethod, callerLoc: JumpLocation): Boolean = {
     if(isSourceMethod(calleeMethod)) return true
@@ -233,9 +245,9 @@ abstract class AndroidSourceAndSinkManager(
   def isIccSink(invNode: ICFGInvokeNode, s: PTAResult): Boolean
   def isIccSource(entNode: ICFGNode, iddgEntNode: ICFGNode): Boolean
 
-  def getSourceSigs: ISet[String] = this.sources.map{_._1}.toSet
-  def getSinkSigs: ISet[String] = this.sinks.map{_._1}.toSet
-  def getInterestedSigs: ISet[String] = getSourceSigs ++ getSinkSigs
+  def getSourceSigs: ISet[Signature] = this.sources.map{_._1}.toSet
+  def getSinkSigs: ISet[Signature] = this.sinks.map{_._1}.toSet
+  def getInterestedSigs: ISet[Signature] = getSourceSigs ++ getSinkSigs
 
 }
 

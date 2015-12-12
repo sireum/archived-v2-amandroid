@@ -175,12 +175,7 @@ trait DedexTypeResolver { self: DexInstructionToPilarParser =>
           ut.possible(position, defaultTyp, isLeft)
           ut
         case jt: DedexJawaType =>
-          val result =
-            if(isLeft) {
-              defaultTyp
-            } else {
-              jt.typ
-            }
+          val result = jt.typ
           this.regMap(reg) = DedexJawaType(result)
           this.positionTypMap(position) = result
           DedexJawaType(result)
@@ -215,10 +210,15 @@ trait DedexTypeResolver { self: DexInstructionToPilarParser =>
             val oldSig = JavaKnowledge.formatTypeToSignature(res)
             val newSig = JavaKnowledge.formatTypeToSignature(typ)
             if(oldSig != newSig) {
-              var ancestorSig = dexOffsetResolver.findCommonAncestor(oldSig, newSig)
-              if(ancestorSig != null) {
-                ancestorSig = "L" + ancestorSig + ";"
-                res = JavaKnowledge.formatSignatureToType(ancestorSig)
+              try {
+                var ancestorSig = dexOffsetResolver.findCommonAncestor(oldSig, newSig)
+                if(ancestorSig != null) {
+                  ancestorSig = "L" + ancestorSig + ";"
+                  res = JavaKnowledge.formatSignatureToType(ancestorSig)
+                }
+              } catch {
+                case e: Exception =>
+                  res = JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE
               }
             }
         }

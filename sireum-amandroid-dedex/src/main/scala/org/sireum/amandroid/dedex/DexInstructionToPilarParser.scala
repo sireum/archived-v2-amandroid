@@ -48,7 +48,7 @@ case class DexInstructionToPilarParser(
     dexOffsetResolver: DexOffsetResolver) extends DexParser with DedexTypeResolver with DexConstants {
   
   final val TITLE = "DexInstructionToPilarParser"
-  final val DEBUG = false
+  final val DEBUG = true
   
   import DexInstructionToPilarParser._
   import generator._
@@ -1572,7 +1572,17 @@ case class DexInstructionToPilarParser(
               else new JawaType("long")
           }
           val reg2Name = genRegName(reg2, resolveRegType(reg2pos, reg2, typrhs, false))
-          val reg1Name2 = genRegName(reg1, resolveRegType(reg1pos2, reg1, typrhs, false))
+          val reg1Name2 = instrCode match {
+            case ADD_INT_2ADDR | SUB_INT_2ADDR | MUL_INT_2ADDR |
+            DIV_INT_2ADDR | REM_INT_2ADDR | AND_INT_2ADDR | OR_INT_2ADDR |
+            XOR_INT_2ADDR | SHL_INT_2ADDR | SHR_INT_2ADDR | USHR_INT_2ADDR |
+            ADD_LONG_2ADDR | SUB_LONG_2ADDR | MUL_LONG_2ADDR | DIV_LONG_2ADDR | REM_LONG_2ADDR |
+            AND_LONG_2ADDR | OR_LONG_2ADDR | XOR_LONG_2ADDR | SHL_LONG_2ADDR | SHR_LONG_2ADDR |
+            USHR_LONG_2ADDR | ADD_FLOAT_2ADDR | SUB_FLOAT_2ADDR | MUL_FLOAT_2ADDR | DIV_FLOAT_2ADDR |
+            REM_FLOAT_2ADDR | ADD_DOUBLE_2ADDR | SUB_DOUBLE_2ADDR | MUL_DOUBLE_2ADDR | DIV_DOUBLE_2ADDR |
+            REM_DOUBLE_2ADDR => genRegName(reg1, resolveRegType(reg1pos2, reg1, typrhs, false))
+            case _ => ""
+          }
           val reg1typ = resolveRegType(reg1pos, reg1, typlhs, true)
           val reg1Name = genRegName(reg1, reg1typ)
           val code = instrCode match {

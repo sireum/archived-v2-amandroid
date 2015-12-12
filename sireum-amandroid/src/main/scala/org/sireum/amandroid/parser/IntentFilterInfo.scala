@@ -90,7 +90,7 @@ class IntentFilter(holder: JawaType) {
   // note that in android there is some discrepancy regarding data and mType on the Intent side and the Intent Filter side
     if(this.data.matchWith(uriData, mType))
       dataTest = true
-  //  println("actionTest:" + actionTest + "  categoryTest:" + categoryTest + "  dataTest:" + dataTest)
+//    println("holder:" + holder + "actionTest:" + actionTest + "  categoryTest:" + categoryTest + "  dataTest:" + dataTest)
     actionTest && categoryTest && dataTest
   }
 
