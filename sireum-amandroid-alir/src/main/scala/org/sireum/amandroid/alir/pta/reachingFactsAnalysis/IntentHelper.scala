@@ -16,21 +16,33 @@ import org.sireum.jawa.alir.Instance
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.alir.Slot
+<<<<<<< HEAD
 import org.sireum.jawa.util.StringFormConverter
+=======
+>>>>>>> upstream/master
 import org.sireum.jawa.JawaClass
 import org.sireum.amandroid.parser.UriData
 import java.net.URI
-import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.alir.Context
+<<<<<<< HEAD
 import org.sireum.jawa.Center
 import org.sireum.jawa.MessageCenter._
+=======
+>>>>>>> upstream/master
 import java.net.URLEncoder
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 <<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/IntentHelper.scala
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.FieldSlot
+<<<<<<< HEAD
 =======
 >>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/IntentHelper.scala
+=======
+import org.sireum.jawa.JavaKnowledge
+import org.sireum.amandroid.Apk
+import org.sireum.jawa.Global
+import org.sireum.jawa.JawaType
+>>>>>>> upstream/master
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -41,9 +53,10 @@ object IntentHelper {
   val DEBUG = false
   
   object IntentType extends Enumeration {
-	  val EXPLICIT, IMPLICIT = Value
-	}
+    val EXPLICIT, IMPLICIT = Value
+  }
   
+<<<<<<< HEAD
   final case class IntentContent(componentNames: ISet[String], 
       													 actions: ISet[String], 
       													 categories: ISet[String], 
@@ -56,14 +69,28 @@ object IntentHelper {
 	def getIntentContents(s: PTAResult, intentValues: ISet[Instance], currentContext: Context): ISet[IntentContent] = {
 	  var result = isetEmpty[IntentContent]
 	  intentValues.foreach{
+=======
+  final case class IntentContent(
+      componentNames: ISet[String], 
+      actions: ISet[String], 
+      categories: ISet[String], 
+      datas: ISet[UriData], 
+      types: ISet[String], 
+      preciseExplicit: Boolean,
+      preciseImplicit: Boolean)
+  
+  def getIntentContents(s: PTAResult, intentValues: ISet[Instance], currentContext: Context): ISet[IntentContent] = {
+    var result = isetEmpty[IntentContent]
+    intentValues.foreach {
+>>>>>>> upstream/master
       intentIns =>
         var preciseExplicit = true
         var preciseImplicit = true
         var componentNames = isetEmpty[String]
-        val iFieldSlot = FieldSlot(intentIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_COMPONENT))
+        val iFieldSlot = FieldSlot(intentIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_COMPONENT))
         s.pointsToSet(iFieldSlot, currentContext).foreach{
           compIns =>
-            val cFieldSlot = FieldSlot(compIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS))
+            val cFieldSlot = FieldSlot(compIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS))
             s.pointsToSet(cFieldSlot, currentContext).foreach{
               ins =>
                 if(ins.isInstanceOf[PTAConcreteStringInstance]){
@@ -72,9 +99,8 @@ object IntentHelper {
                 else preciseExplicit = false
             }
         }
-        
         var actions: ISet[String] = isetEmpty[String]
-        val acFieldSlot = FieldSlot(intentIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION))
+        val acFieldSlot = FieldSlot(intentIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION))
         s.pointsToSet(acFieldSlot, currentContext).foreach{
           acIns =>
             if(acIns.isInstanceOf[PTAConcreteStringInstance])
@@ -83,7 +109,7 @@ object IntentHelper {
         }
         
         var categories = isetEmpty[String] // the code to get the valueSet of categories is to be added below
-        val categoryFieldSlot = FieldSlot(intentIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_CATEGORIES))
+        val categoryFieldSlot = FieldSlot(intentIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_CATEGORIES))
         s.pointsToSet(categoryFieldSlot, currentContext).foreach{
           cateIns =>
             val hashSetFieldSlot = FieldSlot(cateIns, "items")
@@ -96,10 +122,10 @@ object IntentHelper {
         }
         
         var datas: ISet[UriData] = isetEmpty
-        val dataFieldSlot = FieldSlot(intentIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_URI_DATA))
+        val dataFieldSlot = FieldSlot(intentIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_URI_DATA))
         s.pointsToSet(dataFieldSlot, currentContext).foreach{
           dataIns =>
-            val uriStringFieldSlot = FieldSlot(dataIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.URI_STRING_URI_URI_STRING))
+            val uriStringFieldSlot = FieldSlot(dataIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.URI_STRING_URI_URI_STRING))
             s.pointsToSet(uriStringFieldSlot, currentContext).foreach{
               usIns =>
                 if(usIns.isInstanceOf[PTAConcreteStringInstance]){
@@ -112,7 +138,7 @@ object IntentHelper {
         }
         
         var types:Set[String] = Set()
-        val mtypFieldSlot = FieldSlot(intentIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_MTYPE))
+        val mtypFieldSlot = FieldSlot(intentIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_MTYPE))
         s.pointsToSet(mtypFieldSlot, currentContext).foreach{
           mtypIns =>
             if(mtypIns.isInstanceOf[PTAConcreteStringInstance])
@@ -120,33 +146,41 @@ object IntentHelper {
             else preciseImplicit = false
         }
         val ic = IntentContent(componentNames, actions, categories, datas, types, 
-            									 preciseExplicit, preciseImplicit, currentContext)
+             preciseExplicit, preciseImplicit)
         result += ic
     }
-	  result
-	}
-	
-	private def populateByUri(data: UriData, uriData: String) = {
+    result
+  }
+
+  def populateByUri(data: UriData, uriData: String) = {
     var scheme:String = null
     var host:String = null
     var port:String = null
     var path:String = null
     if(uriData != null){
+<<<<<<< HEAD
       if(!uriData.startsWith("tel:") && !uriData.startsWith("file:") && uriData.contains("://") && uriData.indexOf("://") < uriData.length()){
+=======
+      if(!uriData.startsWith("tel:") && !uriData.startsWith("file:") && uriData.contains("://") && uriData.indexOf("://") < uriData.length()) {
+>>>>>>> upstream/master
         var legalUriStr: String = uriData
         if(uriData.contains("=")){
           val (head, query) = uriData.splitAt(uriData.indexOf("=") + 1)
           legalUriStr = head + URLEncoder.encode(query, "UTF-8")
         }
         try{
-	        val uri = URI.create(legalUriStr)
-	        scheme = uri.getScheme()
-	        host = uri.getHost()
-	        port = if(uri.getPort() != -1) uri.getPort().toString else null
-	        path = if(uri.getPath() != "") uri.getPath() else null
-	        data.set(scheme, host, port, path, null, null)
+          val uri = URI.create(legalUriStr)
+          scheme = uri.getScheme()
+          host = uri.getHost()
+          port = if(uri.getPort() != -1) uri.getPort().toString else null
+          path = if(uri.getPath() != "") uri.getPath() else null
+          data.set(scheme, host, port, path, null, null)
         } catch {
+<<<<<<< HEAD
           case e: IllegalArgumentException => err_msg_normal(TITLE, "Unexpected uri: " + legalUriStr)
+=======
+          case e: IllegalArgumentException => // err_msg_normal(TITLE, "Unexpected uri: " + legalUriStr)
+>>>>>>> upstream/master
         }
       } else if(uriData.contains(":")){  // because e.g. app code can have intent.setdata("http:") instead of intent.setdata("http://xyz:200/pqr/abc")
         scheme = uriData.split(":")(0)
@@ -155,6 +189,7 @@ object IntentHelper {
       }
     }
   }
+<<<<<<< HEAD
 	
 	def mappingIntents(intentContents: ISet[IntentContent], compType: AndroidConstants.CompType.Value): IMap[IntentContent, ISet[(JawaClass, IntentType.Value)]] = {
 	  intentContents.map{
@@ -170,10 +205,28 @@ object IntentHelper {
               components ++= AppCenter.getReceivers.map((_, IntentType.EXPLICIT))
             case AndroidConstants.CompType.PROVIDER =>
               components ++= AppCenter.getProviders.map((_, IntentType.EXPLICIT))
+=======
+
+  def mappingIntents(global: Global, apk: Apk, intentContents: ISet[IntentContent], compType: AndroidConstants.CompType.Value): IMap[IntentContent, ISet[(JawaClass, IntentType.Value)]] = {
+    intentContents.map{
+      ic =>
+        val components: MSet[(JawaClass, IntentType.Value)] = msetEmpty
+        if(!ic.preciseExplicit){
+          compType match {
+            case AndroidConstants.CompType.ACTIVITY =>
+              components ++= apk.getActivities.map((_, IntentType.EXPLICIT))
+            case AndroidConstants.CompType.SERVICE =>
+              components ++= apk.getServices.map((_, IntentType.EXPLICIT))
+            case AndroidConstants.CompType.RECEIVER =>
+              components ++= apk.getReceivers.map((_, IntentType.EXPLICIT))
+            case AndroidConstants.CompType.PROVIDER =>
+              components ++= apk.getProviders.map((_, IntentType.EXPLICIT))
+>>>>>>> upstream/master
           }
         } else if(!ic.preciseImplicit) {
           compType match {
             case AndroidConstants.CompType.ACTIVITY =>
+<<<<<<< HEAD
               components ++= AppCenter.getActivities.map((_, IntentType.IMPLICIT))
             case AndroidConstants.CompType.SERVICE =>
               components ++= AppCenter.getServices.map((_, IntentType.IMPLICIT))
@@ -196,39 +249,59 @@ object IntentHelper {
 	}
 	
 	private def findComponents(actions: Set[String], categories: Set[String], datas: Set[UriData], mTypes:Set[String]): ISet[JawaClass] = {
+=======
+              components ++= apk.getActivities.filter(ep => !apk.getIntentFilterDB.getIntentFilters(ep).isEmpty).map((_, IntentType.IMPLICIT))
+            case AndroidConstants.CompType.SERVICE =>
+              components ++= apk.getServices.filter(ep => !apk.getIntentFilterDB.getIntentFilters(ep).isEmpty).map((_, IntentType.IMPLICIT))
+            case AndroidConstants.CompType.RECEIVER =>
+              components ++= apk.getReceivers.filter(ep => !apk.getIntentFilterDB.getIntentFilters(ep).isEmpty).map((_, IntentType.IMPLICIT))
+            case AndroidConstants.CompType.PROVIDER =>
+              components ++= apk.getProviders.filter(ep => !apk.getIntentFilterDB.getIntentFilters(ep).isEmpty).map((_, IntentType.IMPLICIT))
+          }
+        }
+        ic.componentNames.foreach{
+          targetRecName =>
+            val targetRec = global.getClassOrResolve(new JawaType(targetRecName))
+            components += ((targetRec, IntentType.EXPLICIT))
+        }
+        components ++= findComponents(apk, ic.actions, ic.categories, ic.datas, ic.types).map((_, IntentType.IMPLICIT))
+        (ic, components.toSet)
+    }.toMap
+  }
+
+  def findComponents(apk: Apk, actions: Set[String], categories: Set[String], datas: Set[UriData], mTypes:Set[String]): ISet[JawaClass] = {
+>>>>>>> upstream/master
     var components: ISet[JawaClass] = isetEmpty
     if(actions.isEmpty){
-	      if(datas.isEmpty){
-	        if(mTypes.isEmpty) components ++= findComps(null, categories, null, null) 
-	        else mTypes.foreach{components ++= findComps(null, categories, null, _)}
-	      }
-	      else{
-	         datas.foreach{
-	           data =>
-	             if(mTypes.isEmpty) components ++= findComps(null, categories, data, null) 
-	             else mTypes.foreach{components ++= findComps(null, categories, data, _)}
-	        }
-	      }
-    }
-    else {  
-	    actions.foreach{
-	      action =>
-	        if(datas.isEmpty){
-             if(mTypes.isEmpty) components ++= findComps(action, categories, null, null) 
-             else mTypes.foreach{components ++= findComps(action, categories, null, _)}
-	        }
-	        else{
-		        datas.foreach{
-		          data =>
-	              if(mTypes.isEmpty) components ++= findComps(action, categories, data, null) 
-	              else mTypes.foreach{components ++= findComps(action, categories, data, _)} 
-		        }
-	        }
-	      }
+      if(datas.isEmpty){
+        if(mTypes.isEmpty) components ++= findComps(apk, null, categories, null, null) 
+        else mTypes.foreach{components ++= findComps(apk, null, categories, null, _)}
+      } else {
+        datas.foreach{
+          data =>
+            if(mTypes.isEmpty) components ++= findComps(apk, null, categories, data, null) 
+            else mTypes.foreach{components ++= findComps(apk, null, categories, data, _)}
+        }
+      }
+    } else {  
+      actions.foreach{
+        action =>
+          if(datas.isEmpty){
+             if(mTypes.isEmpty) components ++= findComps(apk, action, categories, null, null) 
+             else mTypes.foreach{components ++= findComps(apk, action, categories, null, _)}
+          } else {
+            datas.foreach{
+              data =>
+                if(mTypes.isEmpty) components ++= findComps(apk, action, categories, data, null) 
+                else mTypes.foreach{components ++= findComps(apk, action, categories, data, _)} 
+            }
+          }
+      }
     }
     components
   }
   
+<<<<<<< HEAD
   private def findComps(action:String, categories: Set[String], data:UriData, mType:String): ISet[JawaClass] = {
     var components: ISet[JawaClass] = isetEmpty
     AppCenter.getComponents.foreach{
@@ -239,6 +312,18 @@ object IntentHelper {
 	        if(!matchedFilters.isEmpty)
 	          components += ep
 	      }
+=======
+  private def findComps(apk: Apk, action:String, categories: Set[String], data:UriData, mType:String): ISet[JawaClass] = {
+    var components: ISet[JawaClass] = isetEmpty
+    apk.getComponents.foreach {
+      ep =>
+        val iFilters = apk.getIntentFilterDB.getIntentFilters(ep)
+        if(!iFilters.isEmpty){
+          val matchedFilters = iFilters.filter(iFilter => iFilter.isMatchWith(action, categories, data, mType))
+          if(!matchedFilters.isEmpty)
+            components += ep
+        }
+>>>>>>> upstream/master
     }
     components
   }

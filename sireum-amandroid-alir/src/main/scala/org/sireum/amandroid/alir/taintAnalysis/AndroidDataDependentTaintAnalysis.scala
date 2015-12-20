@@ -11,6 +11,7 @@ import org.sireum.jawa.alir.dataDependenceAnalysis._
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.util._
 <<<<<<< HEAD
+<<<<<<< HEAD
 import org.sireum.jawa.JawaMethod
 =======
 import org.sireum.jawa.JawaProcedure
@@ -18,6 +19,9 @@ import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 >>>>>>> CommunicationLeakage
 import org.sireum.jawa.Center
 import org.sireum.jawa.MessageCenter._
+=======
+import org.sireum.jawa.JawaMethod
+>>>>>>> upstream/master
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.pilar.ast._
 <<<<<<< HEAD
@@ -28,6 +32,7 @@ import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependence
 import org.sireum.jawa.alir.taintAnalysis._
 import org.sireum.amandroid.security.AndroidProblemCategories
 import scala.tools.nsc.ConsoleWriter
+<<<<<<< HEAD
 import org.sireum.jawa.util.StringFormConverter
 <<<<<<< HEAD
 import org.sireum.jawa.alir.pta.PTAResult
@@ -36,6 +41,15 @@ import org.sireum.jawa.alir.pta.reachingFactsAnalysis.ReachingFactsAnalysisHelpe
 =======
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
 >>>>>>> CommunicationLeakage
+=======
+import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.jawa.alir.pta.VarSlot
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.ReachingFactsAnalysisHelper
+import org.sireum.jawa.Signature
+import org.sireum.jawa.Global
+import org.sireum.jawa.alir.taintAnalysis.TaintSource
+import org.sireum.jawa.alir.taintAnalysis.TaintSink
+>>>>>>> upstream/master
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -45,121 +59,122 @@ object AndroidDataDependentTaintAnalysis {
   final val TITLE = "AndroidDataDependentTaintAnalysis"
   type Node = InterproceduralDataDependenceAnalysis.Node
   
-  case class Td(name : String, typ : String) extends TaintDescriptor {
-    override def toString : String = "(" + name + "," + typ + ")"
-  }
-    
-  case class Tn(node : InterproceduralDataDependenceAnalysis.Node) extends TaintNode{
-    var descriptors : ISet[TaintDescriptor] = isetEmpty
-    var isSrc : Boolean = false
-    def getNode = node
-    def getDescriptors = this.descriptors
-    def isSource = this.isSrc
-    def isSink = !isSource
-    def isSame(tn : TaintNode) : Boolean = getDescriptors == tn.getDescriptors && getNode.getContext.getCurrentLocUri == tn.getNode.getContext.getCurrentLocUri
-  }
-  
-  case class Tp(path : IList[InterproceduralDataDependenceAnalysis.Edge]) extends TaintPath{
-    var srcN : TaintNode = null
-    var sinN : TaintNode = null
-    var typs : ISet[String] = isetEmpty
+  case class Tp(path: IList[InterproceduralDataDependenceAnalysis.Edge]) extends TaintPath[Node, InterproceduralDataDependenceAnalysis.Edge] {
+    var srcN: TaintSource[Node] = null
+    var sinN: TaintSink[Node] = null
+    val typs: MSet[String] = msetEmpty
     def getSource = srcN
     def getSink = sinN
-    def getTypes : ISet[String] = this.typs
-    def getPath : IList[InterproceduralDataDependenceAnalysis.Edge] = {
+    def getTypes: ISet[String] = this.typs.toSet
+    def getPath: IList[InterproceduralDataDependenceAnalysis.Edge] = {
       path.reverse.map(edge=> new InterproceduralDataDependenceAnalysis.Edge(edge.owner, edge.target, edge.source))
     }
-    def isSame(tp : TaintPath) : Boolean = getSource.isSame(tp.getSource) && getSink.isSame(tp.getSink)
-    override def toString : String = {
+    def isSame(tp: TaintPath[Node, InterproceduralDataDependenceAnalysis.Edge]): Boolean = getSource.isSame(tp.getSource) && getSink.isSame(tp.getSink)
+    override def toString: String = {
       val sb = new StringBuilder
-      sb.append("found path from\n" + srcN.getDescriptors + "\nto\n" + sinN.getDescriptors + "\n")
-      sb.append("path types:" + this.typs + "\n")
-      path.reverse.foreach{
-        edge =>
-          sb.append(edge.target + " -> " + edge.source + "\n")
+      sb.append("Taint path: ")
+      this.typs foreach (typ => sb.append(typ + " "))
+      sb.append("\n")
+      sb.append(srcN.descriptor + "\n\t-> " + sinN.descriptor + "\n")
+      if(path.size > 1) {
+        path.tail.reverse.foreach{
+          edge =>
+            sb.append(edge.target + "\n\t-> ")
+        }
+        sb.append(path.head.source + "\n")
+      } else if(path.size == 1) {
+        sb.append(path.head.target + "\n\t-> ")
+        sb.append(path.head.source + "\n")
       }
       sb.toString().intern
     }
   }
   
-  case class Tar(iddi : InterproceduralDataDependenceInfo) extends TaintAnalysisResult{
-    var sourceNodes : ISet[TaintNode] = isetEmpty
-    var sinkNodes : ISet[TaintNode] = isetEmpty
-    
-    def getSourceNodes : ISet[TaintNode] = this.sourceNodes
-		def getSinkNodes : ISet[TaintNode] = this.sinkNodes
-		def getTaintedPaths : ISet[TaintPath] = {
-      var tps : ISet[TaintPath] = isetEmpty
-      sinkNodes.foreach{
-	      sinN =>
-	        sourceNodes.foreach{
-	          srcN =>
-	            val path = iddi.getDependentPath(sinN.getNode, srcN.getNode)
-	            if(path != null){
-		            val tp = Tp(path)
-		            tp.srcN = srcN
-		            tp.sinN = sinN
-		            val srctyps = srcN.getDescriptors.map(_.typ)
-		            val sintyps = sinN.getDescriptors.map(_.typ)
-		            srctyps.foreach{
-		              srcTyp =>
-		                sintyps.foreach{
-		                  sinTyp =>
-		                    if(srcTyp == SourceAndSinkCategory.API_SOURCE || srcTyp == SourceAndSinkCategory.CALLBACK_SOURCE){
-		                      if(sinTyp == SourceAndSinkCategory.API_SINK) tp.typs += AndroidProblemCategories.MAL_INFOMATION_LEAK
-		                      else if(sinTyp == SourceAndSinkCategory.ICC_SINK) tp.typs += AndroidProblemCategories.VUL_INFOMATION_LEAK
-		                    } else if(srcTyp == SourceAndSinkCategory.ICC_SOURCE) {
-		                      if(sinTyp == SourceAndSinkCategory.API_SINK) tp.typs += AndroidProblemCategories.VUL_CAPABILITY_LEAK
-		                      else if(sinTyp == SourceAndSinkCategory.ICC_SINK) tp.typs += AndroidProblemCategories.VUL_CONFUSED_DEPUTY
-		                    } else if(srcTyp == SourceAndSinkCategory.STMT_SOURCE){
-		                      if(sinTyp == SourceAndSinkCategory.API_SINK) tp.typs += AndroidProblemCategories.VUL_CAPABILITY_LEAK
-		                      else if(sinTyp == SourceAndSinkCategory.ICC_SINK) tp.typs += AndroidProblemCategories.VUL_CONFUSED_DEPUTY
-		                    }
-		                }
-		            }
-		            if(!tp.typs.isEmpty)
-		            	tps += tp
-	            }
-	        }
-	    }
+  class TarApk extends TaintAnalysisResult[Node, InterproceduralDataDependenceAnalysis.Edge] {
+    var tars: MSet[TaintAnalysisResult[Node, InterproceduralDataDependenceAnalysis.Edge]] = msetEmpty
+    def getSourceNodes: ISet[TaintSource[Node]] = tars.map(_.getSourceNodes).fold(isetEmpty)(_ ++ _)
+    def getSinkNodes: ISet[TaintSink[Node]] = tars.map(_.getSinkNodes).fold(isetEmpty)(_ ++ _)
+    def getTaintedPaths: ISet[TaintPath[Node, InterproceduralDataDependenceAnalysis.Edge]] = tars.map(_.getTaintedPaths).fold(isetEmpty)(_ ++ _)
+  }
+  
+  case class Tar(iddi: InterproceduralDataDependenceInfo) extends TaintAnalysisResult[Node, InterproceduralDataDependenceAnalysis.Edge] {
+    var sourceNodes: ISet[TaintSource[Node]] = isetEmpty
+    var sinkNodes: ISet[TaintSink[Node]] = isetEmpty
+    def getSourceNodes: ISet[TaintSource[Node]] = this.sourceNodes.toSet
+    def getSinkNodes: ISet[TaintSink[Node]] = this.sinkNodes.toSet
+    def getTaintedPaths: ISet[TaintPath[Node, InterproceduralDataDependenceAnalysis.Edge]] = {
+      var tps: ISet[TaintPath[Node, InterproceduralDataDependenceAnalysis.Edge]] = isetEmpty
+      sinkNodes.foreach {
+        sinN =>
+          sourceNodes.foreach {
+            srcN =>
+              val path = iddi.getDependentPath(sinN.node, srcN.node)
+              if(!path.isEmpty){
+                val tp = Tp(path)
+                tp.srcN = srcN
+                tp.sinN = sinN
+                val srcTyp = srcN.descriptor.typ
+                val sinTyp = sinN.descriptor.typ
+                if(srcTyp == SourceAndSinkCategory.API_SOURCE || srcTyp == SourceAndSinkCategory.CALLBACK_SOURCE){
+                  if(sinTyp == SourceAndSinkCategory.API_SINK) tp.typs += AndroidProblemCategories.MAL_INFORMATION_LEAK
+                  else if(sinTyp == SourceAndSinkCategory.ICC_SINK) tp.typs += AndroidProblemCategories.VUL_INFORMATION_LEAK
+                } else if(srcTyp == SourceAndSinkCategory.ICC_SOURCE) {
+                  if(sinTyp == SourceAndSinkCategory.API_SINK) tp.typs += AndroidProblemCategories.VUL_CAPABILITY_LEAK
+                  else if(sinTyp == SourceAndSinkCategory.ICC_SINK) tp.typs += AndroidProblemCategories.VUL_CONFUSED_DEPUTY
+                } else if(srcTyp == SourceAndSinkCategory.STMT_SOURCE){
+                  if(sinTyp == SourceAndSinkCategory.API_SINK) tp.typs += AndroidProblemCategories.VUL_CAPABILITY_LEAK
+                  else if(sinTyp == SourceAndSinkCategory.ICC_SINK) tp.typs += AndroidProblemCategories.VUL_CONFUSED_DEPUTY
+                }
+                if(!tp.typs.isEmpty)
+                  tps += tp
+              }
+          }
+      }
       tps
     }
-    override def toString : String = {
+    
+    override def toString: String = {
       val sb = new StringBuilder
       val paths = getTaintedPaths
       if(!paths.isEmpty){
-	      sb.append("path:\n")
-	      getTaintedPaths.foreach(tp => sb.append(tp.toString) + "\n")
+        getTaintedPaths.foreach(tp => sb.append(tp.toString) + "\n")
       }
       sb.toString.intern()
     }
   }
     
-	def apply(iddi : InterproceduralDataDependenceInfo, ptaresult : PTAResult, ssm : AndroidSourceAndSinkManager) : TaintAnalysisResult
-  	= build(iddi, ptaresult, ssm)
-  	
-  def build(iddi : InterproceduralDataDependenceInfo, ptaresult : PTAResult, ssm : AndroidSourceAndSinkManager) : TaintAnalysisResult = {
-    var sourceNodes : ISet[TaintNode] = isetEmpty
-    var sinkNodes : ISet[TaintNode] = isetEmpty
+  def apply(global: Global, iddi: InterproceduralDataDependenceInfo, ptaresult: PTAResult, ssm: AndroidSourceAndSinkManager): TaintAnalysisResult[Node, InterproceduralDataDependenceAnalysis.Edge]
+    = build(global, iddi, ptaresult, ssm)
+  
+  def build(global: Global, iddi: InterproceduralDataDependenceInfo, ptaresult: PTAResult, ssm: AndroidSourceAndSinkManager): TaintAnalysisResult[Node, InterproceduralDataDependenceAnalysis.Edge] = {
+    var sourceNodes: ISet[TaintSource[Node]] = isetEmpty
+    var sinkNodes: ISet[TaintSink[Node]] = isetEmpty
     
     val iddg = iddi.getIddg
     iddg.nodes.foreach{
       node =>
-        val (src, sin) = getSourceAndSinkNode(node, ptaresult, ssm, iddg)
+        val (src, sin) = ssm.getSourceAndSinkNode(node, ptaresult)
         sourceNodes ++= src
         sinkNodes ++= sin
+    }
+    sinkNodes foreach {
+      sinN =>
+        if(sinN.node.isInstanceOf[IDDGCallArgNode])
+          extendIDDGForSinkApis(iddg, sinN.node.asInstanceOf[IDDGCallArgNode], ptaresult)
     }
     val tar = Tar(iddi)
     tar.sourceNodes = sourceNodes
     tar.sinkNodes = sinkNodes
     
-    if(!tar.getTaintedPaths.isEmpty){
-      err_msg_critical(TITLE, "Found " + tar.getTaintedPaths.size + " path.")
-    	err_msg_critical(TITLE, tar.toString)
+    val tps = tar.getTaintedPaths
+    if(!tps.isEmpty){
+      System.err.println(TITLE + " found " + tps.size + s" path${if(tps.size > 1)"s" else ""}.")
+      System.err.println(tar.toString)
     }
     tar
   }
   
+<<<<<<< HEAD
   def getSourceAndSinkNode(node : IDDGNode, ptaresult : PTAResult, ssm : AndroidSourceAndSinkManager, iddg: InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node]) = {
     val sources = msetEmpty[TaintNode]
     val sinks = msetEmpty[TaintNode]
@@ -289,6 +304,13 @@ object AndroidDataDependentTaintAnalysis {
       callee =>
         val argSlot = VarSlot(callArgNode.argName)
 <<<<<<< HEAD
+=======
+  private def extendIDDGForSinkApis(iddg: DataDependenceBaseGraph[InterproceduralDataDependenceAnalysis.Node], callArgNode: IDDGCallArgNode, ptaresult: PTAResult) = {
+    val calleeSet = callArgNode.getCalleeSet
+    calleeSet.foreach{
+      callee =>
+        val argSlot = VarSlot(callArgNode.argName, false, true)
+>>>>>>> upstream/master
         val argValue = ptaresult.pointsToSet(argSlot, callArgNode.getContext)
         val argRelatedValue = ptaresult.getRelatedHeapInstances(argValue, callArgNode.getContext)
         argRelatedValue.foreach{
@@ -296,6 +318,7 @@ object AndroidDataDependentTaintAnalysis {
             if(ins.defSite != callArgNode.getContext){
               val t = iddg.findDefSite(ins.defSite)
               iddg.addEdge(callArgNode.asInstanceOf[Node], t)
+<<<<<<< HEAD
             }
         }
 //        argValue.foreach{
@@ -324,6 +347,8 @@ object AndroidDataDependentTaintAnalysis {
                   val t = iddg.findDefSite(defsite)
                   iddg.addEdge(callArgNode.asInstanceOf[Node], t)
                 }
+=======
+>>>>>>> upstream/master
             }
         }
 >>>>>>> CommunicationLeakage

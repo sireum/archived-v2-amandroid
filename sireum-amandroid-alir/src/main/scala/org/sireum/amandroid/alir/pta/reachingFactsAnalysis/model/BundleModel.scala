@@ -36,7 +36,7 @@ object BundleModel {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true
-	  p.getSignature match{
+	  p.getSignature.signature match{
 	    case "Landroid/os/Bundle;.<clinit>:()V" =>  //static constructor
 		  case "Landroid/os/Bundle;.<init>:()V" =>  //public constructor
 		  case "Landroid/os/Bundle;.<init>:(I)V" =>  //public constructor
@@ -241,14 +241,14 @@ object BundleModel {
 	
 	private def getPointStringToRet(retVar : String, currentContext : Context): RFAFact = {
     val newThisValue = PTAPointStringInstance(currentContext.copy)
-    RFAFact(VarSlot(retVar), newThisValue)	 
+    RFAFact(VarSlot(retVar, false, false), newThisValue)	 
 	}
 	  
 	private def initBundleFromBundle(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
     require(args.size >1)
-    val thisSlot = VarSlot(args(0))
+    val thisSlot = VarSlot(args(0), false, true)
 	  val thisValue = s.pointsToSet(thisSlot, currentContext)
-	  val paramSlot = VarSlot(args(1))
+	  val paramSlot = VarSlot(args(1), false, true)
 	  val paramValue = s.pointsToSet(paramSlot, currentContext)
 	  if(!paramValue.isEmpty && !thisValue.isEmpty){
 	    val pvs = paramValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
@@ -263,17 +263,17 @@ object BundleModel {
 	
 	private def cloneBundle(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
     require(args.size >0)
-    val thisSlot = VarSlot(args(0))
+    val thisSlot = VarSlot(args(0), false, true)
 	  val thisValue = s.pointsToSet(thisSlot, currentContext)
-	  thisValue.map{s => RFAFact(VarSlot(retVar), s.clone(currentContext))}
+	  thisValue.map{s => RFAFact(VarSlot(retVar, false, false), s.clone(currentContext))}
   }
 	
 	private def forPair(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
-    val rf = ReachingFactsAnalysisHelper.getReturnFact(NormalType("android.os.Bundle", 0), retVar, currentContext).get
+    val rf = ReachingFactsAnalysisHelper.getReturnFact(new JawaType("android.os.Bundle"), retVar, currentContext).get
     require(args.size >1)
-    val param1Slot = VarSlot(args(0))
+    val param1Slot = VarSlot(args(0), false, true)
 	  val param1Value = s.pointsToSet(param1Slot, currentContext)
-	  val param2Slot = VarSlot(args(1))
+	  val param2Slot = VarSlot(args(1), false, true)
 	  val param2Value = s.pointsToSet(param2Slot, currentContext)
 	  var entries = isetEmpty[Instance]
 	  param1Value.foreach{
@@ -289,6 +289,7 @@ object BundleModel {
 	private def getBundleKeySetToRet(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
 	  var result = isetEmpty[RFAFact]
     require(args.size >0)
+<<<<<<< HEAD
     val thisSlot = VarSlot(args(0))
 <<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
 	  val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -310,6 +311,19 @@ object BundleModel {
   	      RFAFact(FieldSlot(rf.v, "java.util.HashSet.items"), s.asInstanceOf[PTATupleInstance].left)
 >>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
   	  }
+=======
+    val thisSlot = VarSlot(args(0), false, true)
+	  val thisValue = s.pointsToSet(thisSlot, currentContext)
+    if(!thisValue.isEmpty){
+	    val strValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
+    	  val rf = ReachingFactsAnalysisHelper.getReturnFact(new JawaType("java.util.HashSet", 0), retVar, currentContext).get
+    	  result += rf
+    	  result ++= strValue.map{
+    	    s => 
+    	      require(s.isInstanceOf[PTATupleInstance])
+    	      RFAFact(FieldSlot(rf.v, "items"), s.asInstanceOf[PTATupleInstance].left)
+    	  }
+>>>>>>> upstream/master
     }
 	  result
   }
@@ -317,10 +331,14 @@ object BundleModel {
 	private def getBundleValue(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
 	  var result = isetEmpty[RFAFact]
     require(args.size >1)
-    val thisSlot = VarSlot(args(0))
+    val thisSlot = VarSlot(args(0), false, true)
 	  val thisValue = s.pointsToSet(thisSlot, currentContext)
+<<<<<<< HEAD
 	  val keySlot = VarSlot(args(1))
 <<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
+=======
+	  val keySlot = VarSlot(args(1), false, true)
+>>>>>>> upstream/master
 	  val keyValue = s.pointsToSet(keySlot, currentContext)
     if(!thisValue.isEmpty){
   	  val entValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
@@ -333,19 +351,24 @@ object BundleModel {
   		  entValue.foreach{
   		    v =>
   		      require(v.isInstanceOf[PTATupleInstance])
+<<<<<<< HEAD
 <<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
   		      if(keyValue.exists { kIns => kIns === v.asInstanceOf[PTATupleInstance].left }){
 =======
   		      if(keyValue.contains(v.asInstanceOf[PTATupleInstance].left)){
 >>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
   		        result += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
+=======
+  		      if(keyValue.exists { kIns => kIns === v.asInstanceOf[PTATupleInstance].left }){
+  		        result += (RFAFact(VarSlot(retVar, false, false), v.asInstanceOf[PTATupleInstance].right))
+>>>>>>> upstream/master
   		      }
   		  }
   	  } else {
   	    entValue.foreach{
   		    v =>
   		      require(v.isInstanceOf[PTATupleInstance])
-  		      result += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
+  		      result += (RFAFact(VarSlot(retVar, false, false), v.asInstanceOf[PTATupleInstance].right))
   		  }
   	  }
     }
@@ -355,10 +378,11 @@ object BundleModel {
 	private def getBundleValueWithDefault(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
 	  var result = isetEmpty[RFAFact]
     require(args.size >2)
-    val thisSlot = VarSlot(args(0))
+    val thisSlot = VarSlot(args(0), false, true)
 	  val thisValue = s.pointsToSet(thisSlot, currentContext)
-	  val keySlot = VarSlot(args(1))
+	  val keySlot = VarSlot(args(1), false, true)
 	  val keyValue = s.pointsToSet(keySlot, currentContext)
+<<<<<<< HEAD
 	  val defaultSlot = VarSlot(args(2))
 <<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
 	  val defaultValue = s.pointsToSet(defaultSlot, currentContext)
@@ -379,6 +403,27 @@ object BundleModel {
   		      result += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
   		  }
   	  }
+=======
+	  val defaultSlot = VarSlot(args(2), false, true)
+	  val defaultValue = s.pointsToSet(defaultSlot, currentContext)
+    if(!thisValue.isEmpty){
+    	  val entValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
+    	  if(keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
+    		  entValue.foreach{
+    		    v =>
+    		      require(v.isInstanceOf[PTATupleInstance])
+    		      if(keyValue.exists { kIns => kIns === v.asInstanceOf[PTATupleInstance].left }){
+    		        result += (RFAFact(VarSlot(retVar, false, false), v.asInstanceOf[PTATupleInstance].right))
+    		      }
+    		  }
+    	  } else {
+    	    entValue.foreach{
+    		    v =>
+    		      require(v.isInstanceOf[PTATupleInstance])
+    		      result += (RFAFact(VarSlot(retVar, false, false), v.asInstanceOf[PTATupleInstance].right))
+    		  }
+    	  }
+>>>>>>> upstream/master
     }
 =======
 	  val defaultValue = factMap.getOrElse(defaultSlot, isetEmpty)
@@ -400,7 +445,7 @@ object BundleModel {
 	  }
 >>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
 	  if(result.isEmpty){
-	    result ++= defaultValue.map(RFAFact(VarSlot(retVar), _))
+	    result ++= defaultValue.map(RFAFact(VarSlot(retVar, false, false), _))
 	  }
 	  result
   }
@@ -408,25 +453,31 @@ object BundleModel {
 	private def putBundleValue(s : PTAResult, args : List[String], currentContext : Context) : ISet[RFAFact] ={
 	  var result = isetEmpty[RFAFact]
     require(args.size >2)
-    val thisSlot = VarSlot(args(0))
+    val thisSlot = VarSlot(args(0), false, true)
 	  val thisValue = s.pointsToSet(thisSlot, currentContext)
-	  val keySlot = VarSlot(args(1))
+	  val keySlot = VarSlot(args(1), false, true)
 	  val keyValue = s.pointsToSet(keySlot, currentContext)
-	  val valueSlot = VarSlot(args(2))
+	  val valueSlot = VarSlot(args(2), false, true)
 	  val valueValue = s.pointsToSet(valueSlot, currentContext)
 	  var entries = isetEmpty[Instance]
 	  keyValue.foreach{
 	    kv =>
 	      valueValue.foreach{
 	        vv =>
+<<<<<<< HEAD
 <<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
+=======
+>>>>>>> upstream/master
             thisValue.foreach{
               ins =>
                 entries += PTATupleInstance(kv, vv, ins.defSite)
             }
+<<<<<<< HEAD
 =======
 	          entries += PTATupleInstance(kv, vv, currentContext)
 >>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
+=======
+>>>>>>> upstream/master
 	      }
 	  }
 	  thisValue.foreach{
@@ -441,9 +492,9 @@ object BundleModel {
 	private def putAllBundleValues(s : PTAResult, args : List[String], currentContext : Context) : ISet[RFAFact] ={
 	  var result = isetEmpty[RFAFact]
     require(args.size >1)
-    val thisSlot = VarSlot(args(0))
+    val thisSlot = VarSlot(args(0), false, true)
 	  val thisValue = s.pointsToSet(thisSlot, currentContext)
-	  val slot2 = VarSlot(args(1))
+	  val slot2 = VarSlot(args(1), false, true)
 	  val value2 = s.pointsToSet(slot2, currentContext)
 	  thisValue.foreach{
 	    ins =>

@@ -11,8 +11,11 @@ import org.sireum.amandroid.alir.taintAnalysis.AndroidSourceAndSinkManager
 import org.sireum.amandroid.parser.LayoutControl
 import org.sireum.util._
 import org.sireum.jawa.JawaMethod
+<<<<<<< HEAD
 import org.sireum.jawa.MessageCenter._
 <<<<<<< HEAD
+=======
+>>>>>>> upstream/master
 import org.sireum.jawa.alir.controlFlowGraph.ICFGCallNode
 import org.sireum.jawa.alir.controlFlowGraph.ICFGNode
 =======
@@ -28,21 +31,26 @@ import org.sireum.pilar.ast._
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
 <<<<<<< HEAD
 import org.sireum.jawa.alir.controlFlowGraph.ICFGInvokeNode
-import org.sireum.jawa.Center
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentCommunicationModel
 import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.jawa.alir.pta.PTAResult
+<<<<<<< HEAD
 =======
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
 import org.sireum.jawa.alir.controlFlowGraph.CGInvokeNode
 import org.sireum.jawa.Center
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentCommunicationModel
 >>>>>>> CommunicationLeakage
+=======
+import org.sireum.amandroid.Apk
+import org.sireum.jawa.Global
+>>>>>>> upstream/master
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
+<<<<<<< HEAD
 class OAuthSourceAndSinkManager(appPackageName : String, 
     												layoutControls : Map[Int, LayoutControl], 
     												callbackMethods : ISet[JawaMethod], 
@@ -82,27 +90,79 @@ class OAuthSourceAndSinkManager(appPackageName : String,
 	
 	def isIccSink(invNode : ICFGInvokeNode, ptaresult : PTAResult) : Boolean = {
 	  var sinkflag = false
+=======
+class OAuthSourceAndSinkManager(
+    global: Global,
+    apk: Apk, 
+    layoutControls: Map[Int, LayoutControl], 
+    callbackMethods: ISet[JawaMethod], 
+    sasFilePath: String) extends AndroidSourceAndSinkManager(global, apk, layoutControls, callbackMethods, sasFilePath){
+  
+  private final val TITLE = "OAuthSourceAndSinkManager"
+    
+  override def isSource(calleeMethod: JawaMethod, callerMethod: JawaMethod, callerLoc: JumpLocation) = false
+    
+  override def isCallbackSource(proc: JawaMethod): Boolean = {
+    false
+  }
+  
+  override def isUISource(calleeMethod: JawaMethod, callerMethod: JawaMethod, callerLoc: JumpLocation): Boolean = {
+    false
+  }
+
+  override def isSource(loc: LocationDecl, ptaresult: PTAResult): Boolean = {
+    var flag = false
+    val visitor = Visitor.build({
+      case as: AssignAction =>
+        as.rhs match {
+          case le: LiteralExp =>
+            if(le.typ.name.equals("STRING")){
+              if(le.text.contains("content://call_log/calls"))
+                flag = true
+            }
+            false
+          case _ =>
+            false
+        }
+    })
+  
+    visitor(loc)
+    flag
+  }
+
+  def isIccSink(invNode: ICFGInvokeNode, ptaresult: PTAResult): Boolean = {
+    var sinkflag = false
+>>>>>>> upstream/master
     val calleeSet = invNode.getCalleeSet
     calleeSet.foreach{
       callee =>
         if(InterComponentCommunicationModel.isIccOperation(callee.callee)){
           sinkflag = true
+<<<<<<< HEAD
           val args = Center.getMethodWithoutFailing(invNode.getOwner).getMethodBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
               case te : TupleExp =>
+=======
+          val args = global.getMethod(invNode.getOwner).get.getBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
+              case te: TupleExp =>
+>>>>>>> upstream/master
                 te.exps.map{
-			            exp =>
-			              exp match{
-					            case ne : NameExp => ne.name.name
-					            case _ => exp.toString()
-					          }
-			          }.toList
+                  exp =>
+                    exp match{
+                      case ne: NameExp => ne.name.name
+                      case _ => exp.toString()
+                    }
+                }.toList
               case a => throw new RuntimeException("wrong exp type: " + a)
-            }
-          val intentSlot = VarSlot(args(1))
+          }
+          val intentSlot = VarSlot(args(1), false, true)
           val intentValues = ptaresult.pointsToSet(intentSlot, invNode.getContext)
           val intentContents = IntentHelper.getIntentContents(ptaresult, intentValues, invNode.getContext)
           val compType = AndroidConstants.getIccCallType(callee.callee.getSubSignature)
+<<<<<<< HEAD
           val comMap = IntentHelper.mappingIntents(intentContents, compType)
+=======
+          val comMap = IntentHelper.mappingIntents(global, apk, intentContents, compType)
+>>>>>>> upstream/master
           comMap.foreach{
             case (_, coms) =>
               if(coms.isEmpty) sinkflag = true
@@ -118,9 +178,9 @@ class OAuthSourceAndSinkManager(appPackageName : String,
         }
     }
     sinkflag
-	}
-	
-	def isIccSource(entNode : ICFGNode, iddgEntNode : ICFGNode) : Boolean = {
+  }
+
+	def isIccSource(entNode: ICFGNode, iddgEntNode: ICFGNode): Boolean = {
 	  false
 	}
 	

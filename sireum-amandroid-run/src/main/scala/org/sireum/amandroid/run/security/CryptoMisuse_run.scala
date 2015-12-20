@@ -8,11 +8,9 @@ http://www.eclipse.org/legal/epl-v10.html
 package org.sireum.amandroid.run.security
 
 import org.sireum.amandroid.security._
-import org.sireum.jawa.MessageCenter._
 import org.sireum.util.FileUtil
 import org.sireum.amandroid.security.apiMisuse.InterestingApiCollector
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
-import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.security.apiMisuse.CryptographicMisuse
 <<<<<<< HEAD
 =======
@@ -23,7 +21,10 @@ import org.sireum.jawa.util.IgnoreException
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.util.MyTimer
 import org.sireum.jawa.util.MyTimeoutException
-import org.sireum.jawa.GlobalConfig
+import org.sireum.jawa.DefaultReporter
+import org.sireum.jawa.Global
+import org.sireum.amandroid.Apk
+import org.sireum.amandroid.AndroidGlobalConfig
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -39,7 +40,7 @@ object CryptoMisuse_run {
     override def toString : String = "total: " + total + ", oversize: " + oversize + ", haveResult: " + haveresult
   }
   
-  private class CryptoMisuseListener extends AmandroidSocketListener {
+  private class CryptoMisuseListener(global: Global) extends AmandroidSocketListener {
     def onPreAnalysis: Unit = {
       CryptoMisuseCounter.total += 1
     }
@@ -55,7 +56,7 @@ object CryptoMisuse_run {
     }
 
     def onPostAnalysis: Unit = {
-      msg_critical(TITLE, CryptoMisuseCounter.toString)
+      global.reporter.echo(TITLE, CryptoMisuseCounter.toString)
     }
     
     def onException(e : Exception) : Unit = {
@@ -68,11 +69,12 @@ object CryptoMisuse_run {
   }
   
   def main(args: Array[String]): Unit = {
-    if(args.size != 2){
+    if(args.size < 2){
       System.err.print("Usage: source_path output_path")
       return
     }
     
+<<<<<<< HEAD
     val socket = new AmandroidSocket
     socket.preProcess
     
@@ -81,42 +83,51 @@ object CryptoMisuse_run {
 =======
     GlobalConfig.CG_CONTEXT_K = 1
 >>>>>>> CommunicationLeakage
+=======
+//    GlobalConfig.ICFG_CONTEXT_K = 1
+>>>>>>> upstream/master
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
 //    AndroidReachingFactsAnalysisConfig.timeout = 5
     val sourcePath = args(0)
     val outputPath = args(1)
-    
+    val dpsuri = try{Some(FileUtil.toUri(args(2)))} catch {case e: Exception => None}
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
     
     files.foreach{
       file =>
-        try{
-          msg_critical(TITLE, CryptoMisuseTask(outputPath, file, socket, Some(500)).run)
+        val reporter = new DefaultReporter
+        val global = new Global(file, reporter)
+        global.setJavaLib(AndroidGlobalConfig.lib_files)
+        val apk = new Apk(file)
+        val socket = new AmandroidSocket(global, apk)
+        try {
+          reporter.echo(TITLE, CryptoMisuseTask(global, apk, outputPath, dpsuri, file, socket, Some(500)).run)
         } catch {
-          case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
+          case te : MyTimeoutException => reporter.error(TITLE, te.message)
           case e : Throwable => e.printStackTrace()
         } finally {
-          msg_critical(TITLE, CryptoMisuseCounter.toString)
+          reporter.echo(TITLE, CryptoMisuseCounter.toString)
           socket.cleanEnv
         }
     }
   }
   
-  private case class CryptoMisuseTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]){
+  private case class CryptoMisuseTask(global: Global, apk: Apk, outputPath : String, dpsuri: Option[FileResourceUri], file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]) {
     def run() : String = {
-      msg_critical(TITLE, "####" + file + "#####")
+      global.reporter.echo(TITLE, "####" + file + "#####")
       val timer = timeout match {
         case Some(t) => Some(new MyTimer(t))
         case None => None
       }
       if(timer.isDefined) timer.get.start
-      val outUri = socket.loadApk(file, outputPath, AndroidLibraryAPISummary)
-      val app_info = new InterestingApiCollector(file, outUri, timer)
-      app_info.collectInfo
-      socket.plugListener(new CryptoMisuseListener)
+      val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false)
+      val app_info = new InterestingApiCollector(global, timer)
+      app_info.collectInfo(apk, outUri)
+      socket.plugListener(new CryptoMisuseListener(global))
       socket.runWithoutDDA(false, true, timer)
       
+<<<<<<< HEAD
 <<<<<<< HEAD
       val idfgs = AppCenter.getIDFGs
       idfgs.foreach{
@@ -128,6 +139,12 @@ object CryptoMisuse_run {
         case (rec, InterProceduralDataFlowGraph(icfg, irfaResult)) =>
           CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
 >>>>>>> CommunicationLeakage
+=======
+      val idfgs = apk.getIDFGs
+      idfgs.foreach{
+        case (rec, idfg) =>
+          CryptographicMisuse(global, idfg)
+>>>>>>> upstream/master
       }
       return "Done!"
     }

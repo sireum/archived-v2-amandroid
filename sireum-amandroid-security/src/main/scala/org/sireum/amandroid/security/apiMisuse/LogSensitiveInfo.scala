@@ -7,14 +7,11 @@ http://www.eclipse.org/legal/epl-v10.html
 */
 package org.sireum.amandroid.security.apiMisuse
 
-import org.sireum.jawa.MessageCenter
 import org.sireum.util.FileUtil
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.amandroid.security.AmandroidSocket
-import org.sireum.jawa.Center
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysis
-import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.ClassLoadManager
 import org.sireum.jawa.alir.controlFlowGraph.ICFGNode
 import org.sireum.jawa.alir.controlFlowGraph.ICFGCallNode
@@ -28,15 +25,19 @@ import org.sireum.jawa.JawaMethod
 import org.sireum.pilar.ast.JumpLocation
 import org.sireum.util.MList
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 >>>>>>> CommunicationLeakage
 import org.sireum.jawa.MessageCenter._
+=======
+>>>>>>> upstream/master
 import org.sireum.util._
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.pilar.ast._
+<<<<<<< HEAD
 import org.sireum.jawa.Center
 <<<<<<< HEAD
 =======
@@ -44,6 +45,8 @@ import org.sireum.jawa.alir.interProcedural.InterProceduralMonotoneDataFlowAnaly
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
 import org.sireum.jawa.JawaProcedure
 >>>>>>> CommunicationLeakage
+=======
+>>>>>>> upstream/master
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.security.AmandroidSocketListener
 import org.sireum.jawa.util.IgnoreException
@@ -51,6 +54,7 @@ import org.sireum.jawa.alir.reachability.ReachabilityAnalysis
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.jawa.Global
 /*
  * @author <a href="mailto:i@flanker017.me">Qidan He</a>
  */
@@ -60,23 +64,23 @@ object LogSensitiveInfo {
   private final val API_SIG = "Landroid/util/Log;.i:(Ljava/lang/String;Ljava/lang/String;)I"
   private final val VUL_PARAM = "@@org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER"
   
-  def apply(idfg : InterProceduralDataFlowGraph) : Unit
-    = build(idfg)
+  def apply(global: Global, idfg : InterProceduralDataFlowGraph) : Unit
+    = build(global, idfg)
     
-  def build(idfg : InterProceduralDataFlowGraph) : Unit = {
+  def build(global: Global, idfg : InterProceduralDataFlowGraph) : Unit = {
     val icfg = idfg.icfg
     val ptaresult = idfg.ptaresult
     val nodeMap : MMap[String, MSet[ICFGCallNode]] = mmapEmpty
     val callmap = icfg.getCallGraph.getCallMap
     icfg.nodes.foreach{
       node =>
-        val result = getParticularAPINode(node)
+        val result = getParticularAPINode(global, node)
         result.foreach{
           r =>
             nodeMap.getOrElseUpdate(r._1, msetEmpty) += r._2
         }
     }
-    val rule1Res = VerifierCheck(nodeMap, ptaresult)
+    val rule1Res = VerifierCheck(global, nodeMap, ptaresult)
     rule1Res.foreach{
       case (n, b) =>
         if(!b){
@@ -89,7 +93,7 @@ object LogSensitiveInfo {
    * detect constant propagation on ALLOW_ALLHOSTNAME_VERIFIER
    * which is a common api miuse in many android apps.
    */
-  def VerifierCheck(nodeMap : MMap[String, MSet[ICFGCallNode]], ptaresult : PTAResult): Map[ICFGCallNode, Boolean] = {
+  def VerifierCheck(global: Global, nodeMap : MMap[String, MSet[ICFGCallNode]], ptaresult : PTAResult): Map[ICFGCallNode, Boolean] = {
     var result : Map[ICFGCallNode, Boolean] = Map()
     val nodes : MSet[ICFGCallNode] = msetEmpty
     nodeMap.foreach{
@@ -102,7 +106,11 @@ object LogSensitiveInfo {
         println("ZWZW - verify checker on " + node.toString())
         result += (node -> true)
         
+<<<<<<< HEAD
         val loc = Center.getMethodWithoutFailing(node.getOwner).getMethodBody.location(node.getLocIndex)
+=======
+        val loc = global.getMethod(node.getOwner).get.getBody.location(node.getLocIndex)
+>>>>>>> upstream/master
         val argNames : MList[String] = mlistEmpty
         loc match{
           case jumploc : JumpLocation =>
@@ -125,7 +133,7 @@ object LogSensitiveInfo {
           case _ =>
         }
         require(argNames.isDefinedAt(0))
-        val argSlot = VarSlot(argNames(0))
+        val argSlot = VarSlot(argNames(0), false, true)
         /*val argValue = rfaFacts.filter(p=>argSlot == p.s).map(_.v)
         argValue.foreach{
           ins =>
@@ -145,7 +153,7 @@ object LogSensitiveInfo {
     result
   }
   
-  def getParticularAPINode(node : ICFGNode): Set[(String, ICFGCallNode)] = {
+  def getParticularAPINode(global: Global, node : ICFGNode): Set[(String, ICFGCallNode)] = {
     val result : MSet[(String, ICFGCallNode)] = msetEmpty
     node match{
       case invNode : ICFGCallNode =>
@@ -156,6 +164,7 @@ object LogSensitiveInfo {
           callee =>
             val calleep = callee.callee
 <<<<<<< HEAD
+<<<<<<< HEAD
             val callees : MSet[JawaMethod] = msetEmpty
             val caller = Center.getMethodWithoutFailing(invNode.getOwner)
             val jumpLoc = caller.getMethodBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
@@ -164,6 +173,11 @@ object LogSensitiveInfo {
             val caller = Center.getProcedureWithoutFailing(invNode.getOwner)
             val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
 >>>>>>> CommunicationLeakage
+=======
+            val callees : MSet[JawaMethod] = msetEmpty
+            val caller = global.getMethod(invNode.getOwner).get
+            val jumpLoc = caller.getBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
+>>>>>>> upstream/master
             val cj = jumpLoc.jump.asInstanceOf[CallJump]
             println("ZWZW - callee's signature - " + calleep.getSignature)
 
@@ -189,7 +203,7 @@ object LogSensitiveInfo {
                   println("=======")
                   println("Got an interesting api call - " + API_SIG)
                   println("=======")
-                  result += ((callee.getSignature, invNode))
+                  result += ((callee.getSignature.signature, invNode))
                 }
             }
         }

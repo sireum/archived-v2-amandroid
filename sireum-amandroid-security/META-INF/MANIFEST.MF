@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Sireum Amandroid Security
+Bundle-SymbolicName: sireum-amandroid-security
+Bundle-Version: 2.0.0
+Export-Package: org.sireum.amandroid.security,
+ org.sireum.amandroid.security.apiMisuse,
+ org.sireum.amandroid.security.dataInjection,
+ org.sireum.amandroid.security.interComponentCommunication,
+ org.sireum.amandroid.security.oauth,
+ org.sireum.amandroid.security.password,
+ org.sireum.amandroid.security.report
+Bundle-Vendor: sireum.org
+Require-Bundle: org.sireum;bundle-version="2.0.0",
+ sireum-amandroid;bundle-version="2.0.0",
+ sireum-amandroid-alir;bundle-version="2.0.0",
+ sireum-jawa;bundle-version="2.0.0",
+ sireum-jawa-alir;bundle-version="2.0.0"

@@ -6,7 +6,7 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#include<errno.h>
+#include <errno.h>
 #define DEFAULT_MODE      S_IRWXU | S_IRGRP |  S_IXGRP | S_IROTH | S_IXOTH  // used in mkdirp() which creates directory
 #define PILAR_EXT ".pilar"
 /*
@@ -240,8 +240,6 @@ bool mkdirp(const char* path, mode_t mode = DEFAULT_MODE) {
                 // Write end of string at p
                 *p = '\0';
 
-                printf("directory = %s \n", q);
-
                 // Create directory:"from beginning to current p" (note that '\0' was inserted at p)
                 if(mkdir(q, mode) == -1 && errno != EEXIST) {
                     // enters inside the condition only when some serious error happens
@@ -388,34 +386,34 @@ static char* pilarExtName(const char* str)
 }
 
  #define  outMove(x, y)            fprintf(pFp,"v%d:= v%d;", x, y)
- #define  outMoveWide(x, y)        fprintf(pFp,"v%d:= v%d  @type `wide`;", x, y)
- #define  outMoveObject(x, y)      fprintf(pFp,"v%d:= v%d  @type `object`;", x, y)
+ #define  outMoveWide(x, y)        fprintf(pFp,"v%d:= v%d  @kind long;", x, y)
+ #define  outMoveObject(x, y)      fprintf(pFp,"v%d:= v%d  @kind object;", x, y)
  #define  outMoveResult(x)         fprintf(pFp,"v%d:= temp;", x)
- #define  outMoveResultWide(x)     fprintf(pFp,"v%d:= temp  @type `wide`;", x)
- #define  outMoveResultObject(x)   fprintf(pFp,"v%d:= temp  @type `object`;", x)
- #define  outMoveExc(x)            fprintf(pFp,"v%d:= Exception  @type `object`;", x)
- #define  outReturnVoid()          fprintf(pFp,"return @void ;")
+ #define  outMoveResultWide(x)     fprintf(pFp,"v%d:= temp  @kind long;", x)
+ #define  outMoveResultObject(x)   fprintf(pFp,"v%d:= temp  @kind object;", x)
+ #define  outMoveExc(x)            fprintf(pFp,"v%d:= Exception  @kind object;", x)
+ #define  outReturnVoid()          fprintf(pFp,"return  @kind void;")
  #define  outReturn(x)             fprintf(pFp,"return v%d;", x)
- #define  outReturnWide(x)         fprintf(pFp,"return v%d  @type `wide`;", x)
- #define  outReturnObj(x)          fprintf(pFp,"return v%d  @type `object`;", x);
- #define  outConst4(x, y)          fprintf(pFp,"v%d:= %dI  @length `4`;", x, y)
- #define  outConst16(x, y)         fprintf(pFp,"v%d:= %dI  @length `16`;", x, y)
- #define  outConst32(x, y)         fprintf(pFp,"v%d:= %dI  @length `32`;", x, y)
- #define  outConstHigh16(x, y)     fprintf(pFp,"v%d:= %dI  @length `high16`;", x, y)
- #define  outConstWide16(x, y)     fprintf(pFp,"v%d:= %dL  @length `wide16`;", x, y)
- #define  outConstWide32(x, y)     fprintf(pFp,"v%d:= %fF  @length `wide32`;", x, y)
+ #define  outReturnWide(x)         fprintf(pFp,"return v%d  @kind long;", x)
+ #define  outReturnObj(x)          fprintf(pFp,"return v%d  @kind object;", x);
+ #define  outConst4(x, y)          fprintf(pFp,"v%d:= %dI  @kind int;", x, y)
+ #define  outConst16(x, y)         fprintf(pFp,"v%d:= %dI  @kind int;", x, y)
+ #define  outConst32(x, y)         fprintf(pFp,"v%d:= %dI  @kind int;", x, y)
+ #define  outConstHigh16(x, y)     fprintf(pFp,"v%d:= %dI  @kind int;", x, y)
+ #define  outConstWide16(x, y)     fprintf(pFp,"v%d:= %dI  @kind int;", x, y)
+ #define  outConstWide32(x, y)     fprintf(pFp,"v%d:= %fF  @kind float;", x, y)
 // #define  outConstWide(x, y)       fprintf(pFp,"v%d:= %fL  @length wide;", x, y)
- #define  outConstWideHigh16(x, y) fprintf(pFp,"v%d:= %lldL  @length `wide_high16`;", x, y)
- #define  outConstWide(x, y)       fprintf(pFp,"v%d:= %fF  @length `wide`;", x, y)
+ #define  outConstWideHigh16(x, y) fprintf(pFp,"v%d:= %lldL  @kind long;", x, y)
+ #define  outConstWide(x, y)       fprintf(pFp,"v%d:= %fD  @kind double;", x, y)
 // #define  outConstWideHigh16(x, y) fprintf(pFp,"v%d:= %lld  @length wide_high16;", x, y)
- #define  outConstString(x, y)     fprintf(pFp,"v%d:= \"%s\" @type `object`;", x, y)  // adding annotation in pilar for const string to treat it as object
- #define  outConstClass(x, y)      fprintf(pFp,"v%d:= `@@%s.class` @type `object`;", x, y)
+ #define  outConstString(x, y)     fprintf(pFp,"v%d:= \"%s\" @kind object;", x, y)  // adding annotation in pilar for const string to treat it as object
+ #define  outConstClass(x, y)      fprintf(pFp,"v%d:= constclass @type ^%s @kind object;", x, toPilar(y))
  #define  outMonitorEnter(x)       fprintf(pFp,"@monitorenter v%d", x)
  #define  outMonitorExit(x)        fprintf(pFp,"@monitorexit v%d", x)
- #define  outCheckCast(x, y, z)    fprintf(pFp,"v%d:= (%s)v%d;", x, toPilar(y), z)
- #define  outInstanceOf(x, y, z)   fprintf(pFp,"v%d:= instanceof @varname v%d @type \"%s\";", x, y, toPilarS(z))
+ #define  outCheckCast(x, y, z)    fprintf(pFp,"v%d:= (%s)v%d  @kind object;", x, toPilar(y), z)
+ #define  outInstanceOf(x, y, z)   fprintf(pFp,"v%d:= instanceof @variable v%d @type ^%s @kind boolean;", x, y, toPilar(z))
 // #define  outArrayLen(x, y)        fprintf(pFp,"v%d:= v%d.length;", x, y)
- #define  outArrayLen(x, y)        fprintf(pFp,"v%d:= v%d.`Array[].length`;", x, y)
+ #define  outArrayLen(x, y)        fprintf(pFp,"v%d:= length @variable v%d @kind int;", x, y)
  #define  outNewIns(x, y)          fprintf(pFp,"v%d:= new %s;", x, toPilar(y))
  #define  outNewArray(x, y)        fprintf(pFp,"v%d:= new %s;", x, toPilarS(y))
 
@@ -443,182 +441,155 @@ static char* pilarExtName(const char* str)
                                          fprintf(pFp,"];");\
                                         } 
 
-#define  outFillArrData(x)         fprintf(pFp,"goto L%06x;", x)
+#define  outFillArrData(x)         	fprintf(pFp,"goto L%06x;", x)
 
-#define outThrow(x)                fprintf(pFp,"throw v%d;", x)
+#define outThrow(x)                	fprintf(pFp,"throw v%d;", x)
 
-#define outGoto(x)                 fprintf(pFp,"goto L%06x;", x)
-#define outSwitch(x)               fprintf(pFp,"goto L%06x;", x)
-#define outCmpl(x, y, z)           fprintf(pFp,"v%d:= cmpl(v%d,v%d);", x, y, z)
-#define outCmpg(x, y, z)           fprintf(pFp,"v%d:= cmpg(v%d,v%d);", x, y, z)
-#define outCmp(x, y, z)            fprintf(pFp,"v%d:= cmp(v%d,v%d);", x, y, z)
-#define outIfEq(x, y, z)           fprintf(pFp,"if v%d == v%d then goto L%06x;", x, y, z)
-#define outIfNq(x, y, z)           fprintf(pFp,"if v%d != v%d then goto L%06x;", x, y, z)
-#define outIfLt(x, y, z)           fprintf(pFp,"if v%d < v%d then goto L%06x;", x, y, z)
-#define outIfGe(x, y, z)           fprintf(pFp,"if v%d >= v%d then goto L%06x;", x, y, z)
-#define outIfGt(x, y, z)           fprintf(pFp,"if v%d > v%d then goto L%06x;", x, y, z)
-#define outIfLe(x, y, z)           fprintf(pFp,"if v%d <= v%d then goto L%06x;", x, y, z)
-#define outIfEqz(x, y)             fprintf(pFp,"if v%d == 0 then goto L%06x;", x, y)
-#define outIfNez(x, y)             fprintf(pFp,"if v%d != 0 then goto L%06x;", x, y)
-#define outIfLtz(x, y)             fprintf(pFp,"if v%d < 0 then goto L%06x;", x, y)
-#define outIfGez(x, y)             fprintf(pFp,"if v%d >= 0 then goto L%06x;", x, y)
-#define outIfGtz(x, y)             fprintf(pFp,"if v%d > 0 then goto L%06x;", x, y)
-#define outIfLez(x, y)             fprintf(pFp,"if v%d <= 0 then goto L%06x;", x, y)
+#define outGoto(x)                 	fprintf(pFp,"goto L%06x;", x)
+#define outSwitch(x)               	fprintf(pFp,"goto L%06x;", x)
+#define outFcmpl(x, y, z)           fprintf(pFp,"v%d:= fcmpl(v%d,v%d);", x, y, z)
+#define outDcmpl(x, y, z)           fprintf(pFp,"v%d:= dcmpl(v%d,v%d);", x, y, z)
+#define outFcmpg(x, y, z)           fprintf(pFp,"v%d:= fcmpg(v%d,v%d);", x, y, z)
+#define outDcmpg(x, y, z)           fprintf(pFp,"v%d:= dcmpg(v%d,v%d);", x, y, z)
+#define outLcmp(x, y, z)            fprintf(pFp,"v%d:= lcmp(v%d,v%d);", x, y, z)
+#define outIfEq(x, y, z)           	fprintf(pFp,"if v%d == v%d then goto L%06x;", x, y, z)
+#define outIfNq(x, y, z)           	fprintf(pFp,"if v%d != v%d then goto L%06x;", x, y, z)
+#define outIfLt(x, y, z)           	fprintf(pFp,"if v%d < v%d then goto L%06x;", x, y, z)
+#define outIfGe(x, y, z)           	fprintf(pFp,"if v%d >= v%d then goto L%06x;", x, y, z)
+#define outIfGt(x, y, z)           	fprintf(pFp,"if v%d > v%d then goto L%06x;", x, y, z)
+#define outIfLe(x, y, z)           	fprintf(pFp,"if v%d <= v%d then goto L%06x;", x, y, z)
+#define outIfEqz(x, y)             	fprintf(pFp,"if v%d == 0 then goto L%06x;", x, y)
+#define outIfNez(x, y)             	fprintf(pFp,"if v%d != 0 then goto L%06x;", x, y)
+#define outIfLtz(x, y)             	fprintf(pFp,"if v%d < 0 then goto L%06x;", x, y)
+#define outIfGez(x, y)             	fprintf(pFp,"if v%d >= 0 then goto L%06x;", x, y)
+#define outIfGtz(x, y)             	fprintf(pFp,"if v%d > 0 then goto L%06x;", x, y)
+#define outIfLez(x, y)             	fprintf(pFp,"if v%d <= 0 then goto L%06x;", x, y)
 
-#define  outAget(x, y, z)          fprintf(pFp,"v%d:= v%d[v%d];", x, y, z)
-#define  outAgetWide(x, y, z)      fprintf(pFp,"v%d:= v%d[v%d]  @type `wide`;", x, y, z)
-#define  outAgetObject(x, y, z)    fprintf(pFp,"v%d:= v%d[v%d]  @type `object`;", x, y, z)
-#define  outAgetBool(x, y, z)      fprintf(pFp,"v%d:= v%d[v%d]  @type `boolean`;", x, y, z)
-#define  outAgetByte(x, y, z)      fprintf(pFp,"v%d:= v%d[v%d]  @type `byte`;", x, y, z)
-#define  outAgetChar(x, y, z)      fprintf(pFp,"v%d:= v%d[v%d]  @type `char`;", x, y, z)
-#define  outAgetShort(x, y, z)     fprintf(pFp,"v%d:= v%d[v%d]  @type `short`;", x, y, z)
+#define  outAget(x, y, z)          	fprintf(pFp,"v%d:= v%d[v%d]  @kind int;", x, y, z)
+#define  outAgetWide(x, y, z)      	fprintf(pFp,"v%d:= v%d[v%d]  @kind long;", x, y, z)
+#define  outAgetObject(x, y, z)    	fprintf(pFp,"v%d:= v%d[v%d]  @kind object;", x, y, z)
+#define  outAgetBool(x, y, z)      	fprintf(pFp,"v%d:= v%d[v%d]  @kind boolean;", x, y, z)
+#define  outAgetByte(x, y, z)      	fprintf(pFp,"v%d:= v%d[v%d]  @kind byte;", x, y, z)
+#define  outAgetChar(x, y, z)      	fprintf(pFp,"v%d:= v%d[v%d]  @kind char;", x, y, z)
+#define  outAgetShort(x, y, z)     	fprintf(pFp,"v%d:= v%d[v%d]  @kind short;", x, y, z)
 
 
-#define  outAput(x, y, z)          fprintf(pFp,"v%d[v%d]:= v%d;",pDecInsn->vB,pDecInsn->vC,pDecInsn->vA)
-#define  outAputWide(x, y, z)      fprintf(pFp,"v%d[v%d]:= v%d  @type `wide`;", x, y, z)
-#define  outAputObject(x, y, z)    fprintf(pFp,"v%d[v%d]:= v%d  @type `object`;", x, y, z)
-#define  outAputBool(x, y, z)      fprintf(pFp,"v%d[v%d]:= v%d  @type `boolean`;",x, y, z)
-#define  outAputByte(x, y, z)      fprintf(pFp,"v%d[v%d]:= v%d  @type `byte`;",x, y, z)
-#define  outAputChar(x, y, z)      fprintf(pFp,"v%d[v%d]:= v%d  @type `char`;", x, y, z)
-#define  outAputShort(x, y, z)     fprintf(pFp,"v%d[v%d]:= v%d  @type `short`;", x, y, z)
+#define  outAput(x, y, z)          	fprintf(pFp,"v%d[v%d]:= v%d  @kind int;", x, y, z)
+#define  outAputWide(x, y, z)      	fprintf(pFp,"v%d[v%d]:= v%d  @kind long;", x, y, z)
+#define  outAputObject(x, y, z)    	fprintf(pFp,"v%d[v%d]:= v%d  @kind object;", x, y, z)
+#define  outAputBool(x, y, z)      	fprintf(pFp,"v%d[v%d]:= v%d  @kind boolean;",x, y, z)
+#define  outAputByte(x, y, z)      	fprintf(pFp,"v%d[v%d]:= v%d  @kind byte;",x, y, z)
+#define  outAputChar(x, y, z)      	fprintf(pFp,"v%d[v%d]:= v%d  @kind char;", x, y, z)
+#define  outAputShort(x, y, z)     	fprintf(pFp,"v%d[v%d]:= v%d  @kind short;", x, y, z)
          
 		 
 		 
-#define  outIget(x, y, z)          fprintf(pFp,"v%d:= v%d%s;", x, y, z)
-#define  outIgetWide(x, y, z)      fprintf(pFp,"v%d:= v%d%s  @type `wide`;", x, y, z)
-#define  outIgetObject(x, y, z)    fprintf(pFp,"v%d:= v%d%s  @type `object`;",x, y, z )
-#define  outIgetBool(x, y, z)      fprintf(pFp,"v%d:= v%d%s  @type `boolean`;",x, y, z )
-#define  outIgetByte(x, y, z)      fprintf(pFp,"v%d:= v%d%s  @type `byte`;",x, y, z )
-#define  outIgetChar(x, y, z)      fprintf(pFp,"v%d:= v%d%s  @type `char`;",x, y, z )
-#define  outIgetShort(x, y, z)     fprintf(pFp,"v%d:= v%d%s  @type `short`;", x, y, z)
+#define  outIget(x, y, z, t)          	fprintf(pFp,"v%d:= v%d.%s  @kind int @type ^%s;", x, y, z, toPilar(t))
+#define  outIgetWide(x, y, z, t)      	fprintf(pFp,"v%d:= v%d.%s  @kind long @type ^%s;", x, y, z, toPilar(t))
+#define  outIgetObject(x, y, z, t)    	fprintf(pFp,"v%d:= v%d.%s  @kind object @type ^%s;",x, y, z, toPilar(t))
+#define  outIgetBool(x, y, z, t)      	fprintf(pFp,"v%d:= v%d.%s  @kind boolean @type ^%s;",x, y, z, toPilar(t))
+#define  outIgetByte(x, y, z, t)      	fprintf(pFp,"v%d:= v%d.%s  @kind byte @type ^%s;",x, y, z, toPilar(t))
+#define  outIgetChar(x, y, z, t)      	fprintf(pFp,"v%d:= v%d.%s  @kind char @type ^%s;",x, y, z, toPilar(t))
+#define  outIgetShort(x, y, z, t)     	fprintf(pFp,"v%d:= v%d.%s  @kind short @type ^%s;", x, y, z, toPilar(t))
         
-#define  outIgetQuick(x, y, z)          fprintf(pFp,"v%d:= v%d.%s @type `iget_quick`;", x, y, z)
-#define  outIgetWideQuick(x, y, z)      fprintf(pFp,"v%d:= v%d.%s  @type `iget_wide_quick`;", x, y, z)
-#define  outIgetObjectQuick(x, y, z)    fprintf(pFp,"v%d:= v%d.%s  @type `iget_object_quick`",x, y, z )
+#define  outIgetQuick(x, y, z, t)       fprintf(pFp,"v%d:= v%d.%s  @kind int @type ^%s;", x, y, z, toPilar(t))
+#define  outIgetWideQuick(x, y, z, t)   fprintf(pFp,"v%d:= v%d.%s  @kind long @type ^%s;", x, y, z, toPilar(t))
+#define  outIgetObjectQuick(x, y, z, t) fprintf(pFp,"v%d:= v%d.%s  @kind object @type ^%s;",x, y, z, toPilar(t))
 		
-#define  outIput(x, y, z)          fprintf(pFp,"v%d%s := v%d;", x, y, z)
-#define  outIputWide(x, y, z)      fprintf(pFp,"v%d%s := v%d @type `wide`;", x, y, z)
-#define  outIputObject(x, y, z)    fprintf(pFp,"v%d%s := v%d @type `object`;", x, y, z)
-#define  outIputBool(x, y, z)      fprintf(pFp,"v%d%s := v%d @type `boolean`;", x, y, z)
-#define  outIputByte(x, y, z)      fprintf(pFp,"v%d%s := v%d @type `byte`;", x, y, z)
-#define  outIputChar(x, y, z)      fprintf(pFp,"v%d%s := v%d @type `char`;", x, y, z)
-#define  outIputShort(x, y, z)     fprintf(pFp,"v%d%s := v%d @type `short`;", x, y, z)
+#define  outIput(x, y, z, t)          	fprintf(pFp,"v%d.%s:= v%d  @kind int @type ^%s;", x, y, z, toPilar(t))
+#define  outIputWide(x, y, z, t)      	fprintf(pFp,"v%d.%s:= v%d  @kind long @type ^%s;", x, y, z, toPilar(t))
+#define  outIputObject(x, y, z, t)    	fprintf(pFp,"v%d.%s:= v%d  @kind object @type ^%s;", x, y, z, toPilar(t))
+#define  outIputBool(x, y, z, t)      	fprintf(pFp,"v%d.%s:= v%d  @kind boolean @type ^%s;", x, y, z, toPilar(t))
+#define  outIputByte(x, y, z, t)      	fprintf(pFp,"v%d.%s:= v%d  @kind byte @type ^%s;", x, y, z, toPilar(t))
+#define  outIputChar(x, y, z, t)      	fprintf(pFp,"v%d.%s:= v%d  @kind char @type ^%s;", x, y, z, toPilar(t))
+#define  outIputShort(x, y, z, t)     	fprintf(pFp,"v%d.%s:= v%d  @kind short @type ^%s;", x, y, z, toPilar(t))
  
 
-#define  outIputQuick(x, y, z)          fprintf(pFp,"v%d.%s := v%d @type `iput_quick`;", x, y, z)
-#define  outIputWideQuick(x, y, z)      fprintf(pFp,"v%d.%s := v%d @type `iput_wide_quick`;", x, y, z)
-#define  outIputObjectQuick(x, y, z)    fprintf(pFp,"v%d.%s := v%d @type `iput_object_quick`;", x, y, z)
+#define  outIputQuick(x, y, z, t)       fprintf(pFp,"v%d.%s:= v%d  @kind int @type ^%s;", x, y, z, toPilar(t))
+#define  outIputWideQuick(x, y, z, t)   fprintf(pFp,"v%d.%s:= v%d  @kind long @type ^%s;", x, y, z, toPilar(t))
+#define  outIputObjectQuick(x, y, z, t) fprintf(pFp,"v%d.%s:= v%d  @kind object @type ^%s;", x, y, z, toPilar(t))
 
-#define  outSget(x, y)    fprintf(pFp,"v%d:= %s;", x, y)
-#define  outSgetWide(x, y)  fprintf(pFp,"v%d:= %s  @type `wide`;", x, y)
-#define  outSgetObject(x, y)  fprintf(pFp,"v%d:= %s  @type `object`;", x, y)
-#define  outSgetBool(x, y)  fprintf(pFp,"v%d:= %s  @type `boolean`;", x, y)
-#define  outSgetByte(x, y)  fprintf(pFp,"v%d:= %s  @type `byte`;", x, y)
-#define  outSgetChar(x, y)  fprintf(pFp,"v%d:= %s  @type `char`;", x, y)
-#define  outSgetShort(x, y)  fprintf(pFp,"v%d:= %s  @type `short`;", x, y)
+#define  outSget(x, y, z)    			fprintf(pFp,"v%d:= %s  @kind int @type ^%s;", x, y, toPilar(z))
+#define  outSgetWide(x, y, z)  			fprintf(pFp,"v%d:= %s  @kind long @type ^%s;", x, y, toPilar(z))
+#define  outSgetObject(x, y, z)  		fprintf(pFp,"v%d:= %s  @kind object @type ^%s;", x, y, toPilar(z))
+#define  outSgetBool(x, y, z)  			fprintf(pFp,"v%d:= %s  @kind boolean @type ^%s;", x, y, toPilar(z))
+#define  outSgetByte(x, y, z)  			fprintf(pFp,"v%d:= %s  @kind byte @type ^%s;", x, y, toPilar(z))
+#define  outSgetChar(x, y, z)  			fprintf(pFp,"v%d:= %s  @kind char @type ^%s;", x, y, toPilar(z))
+#define  outSgetShort(x, y, z)  		fprintf(pFp,"v%d:= %s  @kind short @type ^%s;", x, y, toPilar(z))
           
-#define  outSput(x, y)            fprintf(pFp,"%s:= v%d;", x, y)
-#define  outSputWide(x, y)        fprintf(pFp,"%s:= v%d  @type `wide`;", x, y)
-#define  outSputObject(x, y)      fprintf(pFp,"%s:= v%d  @type `object`;", x, y)
-#define  outSputBool(x, y)        fprintf(pFp,"%s:= v%d  @type `boolean`;", x, y)
-#define  outSputByte(x, y)        fprintf(pFp,"%s:= v%d  @type `byte`;", x, y)
-#define  outSputChar(x, y)        fprintf(pFp,"%s:= v%d  @type `char`;", x, y)
-#define  outSputShort(x, y)       fprintf(pFp,"%s:= v%d  @type `short`;", x, y)
+#define  outSput(x, y, z)            	fprintf(pFp,"%s:= v%d  @kind int @type ^%s;", x, y, toPilar(z))
+#define  outSputWide(x, y, z)        	fprintf(pFp,"%s:= v%d  @kind long @type ^%s;", x, y, toPilar(z))
+#define  outSputObject(x, y, z)      	fprintf(pFp,"%s:= v%d  @kind object @type ^%s;", x, y, toPilar(z))
+#define  outSputBool(x, y, z)        	fprintf(pFp,"%s:= v%d  @kind boolean @type ^%s;", x, y, toPilar(z))
+#define  outSputByte(x, y, z)        	fprintf(pFp,"%s:= v%d  @kind byte @type ^%s;", x, y, toPilar(z))
+#define  outSputChar(x, y, z)        	fprintf(pFp,"%s:= v%d  @kind char @type ^%s;", x, y, toPilar(z))
+#define  outSputShort(x, y, z)       	fprintf(pFp,"%s:= v%d  @kind short @type ^%s;", x, y, toPilar(z))
 
 
 /********  Note that there are INCONSISTENCIES between above and following macro sets in the context of "z[i]", "y->vB", "y->arg[i], etc"  *****/
 
 char* cut3Char(char* proc)  // not in use now
 {
-			   /* processing a proc name which looks like "[|<name>|]" ; we want to cut it to "name>|]" */ 
-			assert(sizeof(proc) > 7);
-			   return (&proc[3]);
-			  /* processing ends;  */ 
+  /* processing a proc name which looks like "[|<name>|]" ; we want to cut it to "name>|]" */
+  assert(sizeof(proc) > 7);
+  return (&proc[3]);
+  /* processing ends;  */
 }          
 
 
 char* cut2Char(char* proc) // not in use now
 {
-			   /* processing a proc name which looks like "[|name|]" ; we want to cut it to "name|]" */ 
-			assert(sizeof(proc) > 5);
-			   return (&proc[2]);
-			  /* processing ends;  */ 
+  /* processing a proc name which looks like "[|name|]" ; we want to cut it to "name|]" */
+  assert(sizeof(proc) > 5);
+  return (&proc[2]);
+  /* processing ends;  */
 }          
 
 char* cut1Char(char* proc) // in use now
 {
-			   /* processing a proc name which looks like "`name`" ; we want to cut it to "name`" */
-			assert(sizeof(proc) > 3);
-			   return (&proc[1]);
-			  /* processing ends;  */
+  /* processing a proc name which looks like "`name`" ; we want to cut it to "name`" */
+  assert(sizeof(proc) > 3);
+  return (&proc[1]);
+  /* processing ends;  */
 }
 
 
-#define  outInvokeObjectInitRange(x, y, z) \
-    { \
-           FieldMethodInfo methInfo;\
-           if (getMethodInfo(x, y->vB, &methInfo)) { \
-              fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
-              for (i = 0; i < (int) y->vA; i++) { \
-               if (i == 0) \
-                 fprintf(pFp,"v%d", y->arg[i]);\
-               else \
-                 fprintf(pFp,", v%d", y->arg[i]);\
-                    }\
-               fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type (object, object_init);",methInfo.classDescriptor, methInfo.name,\
-                   methInfo.signature, descriptorToDot(methInfo.classDescriptor));\
-         }\
-     }
+#define  outInvokeObjectInitRange(x, y, z) { \
+  FieldMethodInfo methInfo;\
+  if (getMethodInfo(x, y->vB, &methInfo)) { \
+    fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
+    for (i = 0; i < (int) y->vA; i++) { \
+      if (i == 0) \
+        fprintf(pFp,"v%u", y->arg[i]);\
+      else \
+        fprintf(pFp,", v%u", y->arg[i]);\
+    }\
+    fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor ^`%s` @kind (object, object_init);",methInfo.classDescriptor, methInfo.name,\
+      methInfo.signature, descriptorToDot(methInfo.classDescriptor));\
+  } \
+}
 
 
-#define  outInvokeVirtual(x, y, z) \
-    { \
-           FieldMethodInfo methInfo;\
-           if (getMethodInfo(x, y->vB, &methInfo)) { \
-              fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
-              for (i = 0; i < (int) y->vA; i++) { \
-               if (i == 0) \
-                 fprintf(pFp,"v%d", y->arg[i]);\
-               else \
-                 fprintf(pFp,", v%d", y->arg[i]);\
-                    }\
-               fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type virtual;",methInfo.classDescriptor, methInfo.name,\
-                   methInfo.signature, descriptorToDot(methInfo.classDescriptor));\
-         }\
-     }
+#define  outInvokeVirtual(x, y, z){ \
+  FieldMethodInfo methInfo;\
+  if (getMethodInfo(x, y->vB, &methInfo)) { \
+    fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
+    for (i = 0; i < (int) y->vA; i++) { \
+      if (i == 0) \
+        fprintf(pFp,"v%u", y->arg[i]);\
+      else \
+        fprintf(pFp,", v%u", y->arg[i]);\
+    }\
+    fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor ^`%s` @kind virtual;",methInfo.classDescriptor, methInfo.name,\
+      methInfo.signature, descriptorToDot(methInfo.classDescriptor));\
+  }\
+}
 
 
 
 #define  outInvokeVirtualQuick(x, y, z) \
     { \
-			   \
-			   /* now processing indexBuf z which looks like "[003b] //vtable 003b" ; we want to convert z to "`003b`" after removing comment */ \
-				char* newStr = (char*)malloc(sizeof(z));\
-				int index1 = 0;\
-				int index2 = 0;\
-				assert(sizeof(newStr) > 19);\
-				strcpy(newStr,"`");\
-				index1 = 1;\
-				index2 = 1;\
-				while(z[index2] != ']' && index1 < 15){\
-					newStr[index1] = z[index2];\
-					index1++;\
-					index2++;\
-					}\
-                newStr[index1]='\0';\
-				strcat(newStr, "`");\
-			\
-			  /* z processing ends; note the free(newStr) at the end */ \
-            \
-			  fprintf(pFp,"call temp:=  %s(", newStr);\
-              for (i = 0; i < (int) y->vA; i++) { \
-               if (i == 0) \
-                 fprintf(pFp,"v%d", y->arg[i]);\
-               else \
-                 fprintf(pFp,", v%d", y->arg[i]);\
-                    }\
-               fprintf(pFp,") @signature `` @classDescriptor `` @type virtual_quick;");\
-				   free(newStr);    /**** this is to free the newStr ******/\
+			  fprintf(pFp,"@invoke virtual_quick");\
      }
 
 #define  outInvokeSuper(x, y, z) \
@@ -628,11 +599,11 @@ char* cut1Char(char* proc) // in use now
               fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
               for (i = 0; i < (int) y->vA; i++) { \
                if (i == 0) \
-                 fprintf(pFp,"v%d", y->arg[i]);\
+                 fprintf(pFp,"v%u", y->arg[i]);\
                else \
-                 fprintf(pFp,", v%d", y->arg[i]);\
+                 fprintf(pFp,", v%u", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type super;",methInfo.classDescriptor, methInfo.name,\
+               fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor ^`%s` @kind super;",methInfo.classDescriptor, methInfo.name,\
                    methInfo.signature, descriptorToDot(methInfo.classDescriptor));\
          }\
 	}
@@ -640,33 +611,7 @@ char* cut1Char(char* proc) // in use now
 
 #define  outInvokeSuperQuick(x, y, z) \
     { \
-			   /* now processing indexBuf z which looks like "[003b] //vtable 003b" ; we want to convert z to "`003b`" after removing comment */ \
-				char* newStr = (char*)malloc(sizeof(z));\
-				int index1 = 0;\
-				int index2 = 0;\
-				assert(sizeof(newStr) > 19);\
-				strcpy(newStr,"`");\
-				index1 = 1;\
-				index2 = 1;\
-				while(z[index2] != ']' && index1 < 15){\
-					newStr[index1] = z[index2];\
-					index1++;\
-					index2++;\
-					}\
-                newStr[index1]='\0';\
-				strcat(newStr, "`");\
-			\
-			  /* z processing ends; note the free(newStr) at the end */ \
-            \
-			  fprintf(pFp,"call temp:=  %s(", newStr);\
-              for (i = 0; i < (int) y->vA; i++) { \
-               if (i == 0) \
-                 fprintf(pFp,"v%d", y->arg[i]);\
-               else \
-                 fprintf(pFp,", v%d", y->arg[i]);\
-                    }\
-               fprintf(pFp,") @signature `` @classDescriptor `` @type super_quick;");\
-				   free(newStr); /**** this is to free the newStr ******/\
+		fprintf(pFp,"@invoke super_quick");\
 	}
 
 
@@ -677,11 +622,11 @@ char* cut1Char(char* proc) // in use now
               fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
               for (i = 0; i < (int) y->vA; i++) { \
                if (i == 0) \
-                 fprintf(pFp,"v%d", y->arg[i]);\
+                 fprintf(pFp,"v%u", y->arg[i]);\
                else \
-                 fprintf(pFp,", v%d", y->arg[i]);\
+                 fprintf(pFp,", v%u", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type direct;",methInfo.classDescriptor, methInfo.name,\
+               fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor ^`%s` @kind direct;",methInfo.classDescriptor, methInfo.name,\
                    methInfo.signature, descriptorToDot(methInfo.classDescriptor));\
          }\
 	}
@@ -694,11 +639,11 @@ char* cut1Char(char* proc) // in use now
               fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
               for (i = 0; i < (int) y->vA; i++) { \
                if (i == 0) \
-                 fprintf(pFp,"v%d", y->arg[i]);\
+                 fprintf(pFp,"v%u", y->arg[i]);\
                else \
-                 fprintf(pFp,", v%d", y->arg[i]);\
+                 fprintf(pFp,", v%u", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type static;",methInfo.classDescriptor, methInfo.name,\
+               fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor ^`%s` @kind static;",methInfo.classDescriptor, methInfo.name,\
                    methInfo.signature, descriptorToDot(methInfo.classDescriptor));\
          }\
 	}
@@ -712,11 +657,11 @@ char* cut1Char(char* proc) // in use now
               fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
               for (i = 0; i < (int) y->vA; i++) { \
                if (i == 0) \
-                 fprintf(pFp,"v%d", y->arg[i]);\
+                 fprintf(pFp,"v%u", y->arg[i]);\
                else \
-                 fprintf(pFp,", v%d", y->arg[i]);\
+                 fprintf(pFp,", v%u", y->arg[i]);\
                     }\
-               fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type interface;",methInfo.classDescriptor, methInfo.name,\
+               fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor ^`%s` @kind interface;",methInfo.classDescriptor, methInfo.name,\
                    methInfo.signature, descriptorToDot(methInfo.classDescriptor));\
          }\
 	}
@@ -728,11 +673,11 @@ char* cut1Char(char* proc) // in use now
               fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
           for (i = 0; i < (int) y->vA; i++) { \
             if (i == 0) \
-                fprintf(pFp,"v%d", y->vC + i); \
+                fprintf(pFp,"v%u", y->vC + i); \
             else \
-                fprintf(pFp,", v%d", y->vC + i); \
+                fprintf(pFp,", v%u", y->vC + i); \
           } \
-          fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type virtual;",methInfo.classDescriptor, methInfo.name, \
+          fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor ^`%s` @kind virtual;",methInfo.classDescriptor, methInfo.name, \
                            methInfo.signature, descriptorToDot(methInfo.classDescriptor)); \
           } \
   }
@@ -741,34 +686,7 @@ char* cut1Char(char* proc) // in use now
 
 #define outInvokeVirtualQuickRange(x, y, z) \
   { \
-               \
-			   /* now processing indexBuf z which looks like "[003b] //vtable 003b" ; we want to convert z to "`offset`" after removing comment */ \
-				char* newStr = (char*)malloc(sizeof(z));\
-				int index1 = 0;\
-				int index2 = 0;\
-				assert(sizeof(newStr) > 19);\
-				strcpy(newStr,"`");\
-				index1 = 1;\
-				index2 = 1;\
-				while(z[index2] != ']' && index1 < 15){\
-					newStr[index1] = z[index2];\
-					index1++;\
-					index2++;\
-					}\
-                newStr[index1]='\0';\
-				strcat(newStr, "`");\
-			\
-			  /* z processing ends; note the free(newStr) at the end; */ \
-         \
-           fprintf(pFp,"call temp:=  %s(", newStr); \
-          for (i = 0; i < (int) y->vA; i++) { \
-            if (i == 0) \
-                fprintf(pFp,"v%d", y->vC + i); \
-            else \
-                fprintf(pFp,", v%d", y->vC + i); \
-          } \
-          fprintf(pFp,") @signature `` @classDescriptor `` @type virtual_quick;"); \
-						   free(newStr);\
+	fprintf(pFp,"@invoke virtual_quick_range");\
   }
 
 
@@ -780,11 +698,11 @@ char* cut1Char(char* proc) // in use now
               fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
           for (i = 0; i < (int) y->vA; i++) { \
             if (i == 0) \
-                fprintf(pFp,"v%d", y->vC + i); \
+                fprintf(pFp,"v%u", y->vC + i); \
             else \
-                fprintf(pFp,", v%d", y->vC + i); \
+                fprintf(pFp,", v%u", y->vC + i); \
           } \
-          fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type super;",methInfo.classDescriptor, methInfo.name, \
+          fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor ^`%s` @kind super;",methInfo.classDescriptor, methInfo.name, \
                            methInfo.signature, descriptorToDot(methInfo.classDescriptor)); \
           } \
   }
@@ -793,34 +711,7 @@ char* cut1Char(char* proc) // in use now
 
 #define outInvokeSuperQuickRange(x, y, z) \
   { \
-               \
-			   /* now processing indexBuf z which looks like "[003b] //vtable 003b" ; we want to convert z to "`offset`" after removing comment */ \
-				char* newStr = (char*)malloc(sizeof(z));\
-				int index1 = 0;\
-				int index2 = 0;\
-				assert(sizeof(newStr) > 19);\
-				strcpy(newStr,"`");\
-				index1 = 1;\
-				index2 = 1;\
-				while(z[index2] != ']' && index1 < 15){\
-					newStr[index1] = z[index2];\
-					index1++;\
-					index2++;\
-					}\
-                newStr[index1]='\0';\
-				strcat(newStr, "`");\
-			\
-			  /* z processing ends; note the free(newStr) at the end; */ \
-         \
-           fprintf(pFp,"call temp:=  %s(", newStr); \
-          for (i = 0; i < (int) y->vA; i++) { \
-            if (i == 0) \
-                fprintf(pFp,"v%d", y->vC + i); \
-            else \
-                fprintf(pFp,", v%d", y->vC + i); \
-          } \
-          fprintf(pFp,") @signature `` @classDescriptor `` @type super_quick;"); \
-						   free(newStr);\
+	fprintf(pFp,"@invoke super_quick_range");\
   }
 
 #define outInvokeDirectRange(x, y, z) \
@@ -830,11 +721,11 @@ char* cut1Char(char* proc) // in use now
               fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
           for (i = 0; i < (int) y->vA; i++) { \
             if (i == 0) \
-                fprintf(pFp,"v%d", y->vC + i); \
+                fprintf(pFp,"v%u", y->vC + i); \
             else \
-                fprintf(pFp,", v%d", y->vC + i); \
+                fprintf(pFp,", v%u", y->vC + i); \
           } \
-          fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type direct;",methInfo.classDescriptor, methInfo.name, \
+          fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor ^`%s` @kind direct;",methInfo.classDescriptor, methInfo.name, \
                            methInfo.signature, descriptorToDot(methInfo.classDescriptor)); \
           } \
   }
@@ -847,11 +738,11 @@ char* cut1Char(char* proc) // in use now
               fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
           for (i = 0; i < (int) y->vA; i++) { \
             if (i == 0) \
-                fprintf(pFp,"v%d", y->vC + i); \
+                fprintf(pFp,"v%u", y->vC + i); \
             else \
-                fprintf(pFp,", v%d", y->vC + i); \
+                fprintf(pFp,", v%u", y->vC + i); \
           } \
-          fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type static;",methInfo.classDescriptor, methInfo.name, \
+          fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor ^`%s` @kind static;",methInfo.classDescriptor, methInfo.name, \
                            methInfo.signature, descriptorToDot(methInfo.classDescriptor)); \
           } \
   }
@@ -863,11 +754,11 @@ char* cut1Char(char* proc) // in use now
               fprintf(pFp,"call temp:=  `%s.%s(", descriptorToDot(methInfo.classDescriptor), cut1Char(z));\
           for (i = 0; i < (int) y->vA; i++) { \
             if (i == 0) \
-                fprintf(pFp,"v%d", y->vC + i); \
+                fprintf(pFp,"v%u", y->vC + i); \
             else \
-                fprintf(pFp,", v%d", y->vC + i); \
+                fprintf(pFp,", v%u", y->vC + i); \
           } \
-          fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor `%s` @type interface;",methInfo.classDescriptor, methInfo.name, \
+          fprintf(pFp,") @signature `%s.%s:%s` @classDescriptor ^`%s` @kind interface;",methInfo.classDescriptor, methInfo.name, \
                            methInfo.signature, descriptorToDot(methInfo.classDescriptor)); \
           } \
   }
@@ -876,179 +767,123 @@ char* cut1Char(char* proc) // in use now
 
 #define  outExecuteInline(x, y, z) \
     { \
-			   \
-			   /* now processing indexBuf z which looks like "[003b] //inline 003b" ; we want to convert z to "`003b`" after removing comment */ \
-				char* newStr = (char*)malloc(sizeof(z));\
-				int index1 = 0;\
-				int index2 = 0;\
-				assert(sizeof(newStr) > 19);\
-				strcpy(newStr,"`");\
-				index1 = 1;\
-				index2 = 1;\
-				while(z[index2] != ']' && index1 < 15){\
-					newStr[index1] = z[index2];\
-					index1++;\
-					index2++;\
-					}\
-                newStr[index1]='\0';\
-				strcat(newStr, "`");\
-			\
-			  /* z processing ends; note the free(newStr) at the end */ \
-            \
-			  fprintf(pFp,"call temp:=  %s(", newStr);\
-              for (i = 0; i < (int) y->vA; i++) { \
-               if (i == 0) \
-                 fprintf(pFp,"v%d", y->arg[i]);\
-               else \
-                 fprintf(pFp,", v%d", y->arg[i]);\
-                    }\
-               /* fprintf(pFp,") @signature [|%s.%s:%s|] @classDescriptor [|%s|] @type execute_inline;",methInfo.classDescriptor, methInfo.name,\
-                   methInfo.signature,descriptorToDot(methInfo.classDescriptor)); */\
-               fprintf(pFp,") @signature `` @classDescriptor `` @type `execute_inline`;");\
-				   free(newStr);    /**** this is to free the newStr ******/\
+		fprintf(pFp,"@invoke execute_inline");\
      }
 
 
 #define outExecuteInlineRange(x, y, z) \
   { \
-               \
-			   /* now processing indexBuf z which looks like "[003b] //inline 003b" ; we want to convert z to "`offset`" after removing comment */ \
-				char* newStr = (char*)malloc(sizeof(z));\
-				int index1 = 0;\
-				int index2 = 0;\
-				assert(sizeof(newStr) > 19);\
-				strcpy(newStr,"`");\
-				index1 = 1;\
-				index2 = 1;\
-				while(z[index2] != ']' && index1 < 15){\
-					newStr[index1] = z[index2];\
-					index1++;\
-					index2++;\
-					}\
-                newStr[index1]='\0';\
-				strcat(newStr, "`");\
-			\
-			  /* z processing ends; note the free(newStr) at the end; */ \
-         \
-           fprintf(pFp,"call temp:=  %s(", newStr); \
-          for (i = 0; i < (int) y->vA; i++) { \
-            if (i == 0) \
-                fprintf(pFp,"v%d", y->vC + i); \
-            else \
-                fprintf(pFp,", v%d", y->vC + i); \
-          } \
-          fprintf(pFp,") @signature `` @classDescriptor `` @type `execute_inline`;"); \
-						   free(newStr);\
+	fprintf(pFp,"@invoke execute_inline_range");\
   }
 
 
-#define          outUnopNegInt(x, y)        fprintf(pFp,"v%d:= -v%d  @type `int`;", x, y)
-#define          outUnopNotInt(x, y)        fprintf(pFp,"v%d:= ~v%d  @type `int`;", x, y)
-#define          outUnopNegLong(x, y)       fprintf(pFp,"v%d:= -v%d  @type `long`;", x, y)
-#define          outUnopNotLong(x, y)       fprintf(pFp,"v%d:= ~v%d  @type `long`;", x, y)
-#define          outUnopNegFloat(x, y)      fprintf(pFp,"v%d:= -v%d  @type `float`;", x, y)
-#define          outUnopNegDouble(x, y)    fprintf(pFp,"v%d:= -v%d  @type `double`;", x, y)
-#define          outUnopInt2Long(x, y)     fprintf(pFp,"v%d:= (`long`)v%d  @type `i2l`;", x, y)
-#define          outUnopInt2Float(x, y)    fprintf(pFp,"v%d:= (`float`)v%d  @type `i2f`;", x, y)
-#define          outUnopInt2Double(x, y)   fprintf(pFp,"v%d:= (`double`)v%d  @type `i2d`;", x, y)
-#define          outUnopLong2Int(x, y)     fprintf(pFp,"v%d:= (`int`)v%d  @type `l2i`;", x, y)
-#define          outUnopLong2Float(x, y)   fprintf(pFp,"v%d:= (`float`)v%d  @type `l2f`;", x, y)
-#define          outUnopLong2Double(x, y)  fprintf(pFp,"v%d:= (`double`)v%d  @type `l2d`;", x, y)
-#define          outUnopFloat2Int(x, y)    fprintf(pFp,"v%d:= (`int`)v%d  @type `f2i`;", x, y)
-#define          outUnopFloat2Long(x, y)   fprintf(pFp,"v%d:= (`long`)v%d  @type `f2l`;", x, y)
-#define          outUnopFloat2Double(x, y) fprintf(pFp,"v%d:= (`double`)v%d  @type `f2d`;", x, y)
-#define          outUnopDouble2Int(x, y)   fprintf(pFp,"v%d:= (`int`)v%d  @type `d2i`;", x, y)
-#define          outUnopDouble2Long(x, y)  fprintf(pFp,"v%d:= (`long`)v%d  @type `d2l`;", x, y)
-#define          outUnopDouble2Float(x, y) fprintf(pFp,"v%d:= (`float`)v%d  @type `d2f`;", x, y)
-#define          outUnopInt2Byte(x, y)   fprintf(pFp,"v%d:= (`byte`)v%d  @type `i2b`;", x, y)
-#define          outUnopInt2Char(x, y)   fprintf(pFp,"v%d:= (`char`)v%d  @type `i2c`;", x, y)
-#define          outUnopInt2short(x, y)  fprintf(pFp,"v%d:= (`short`)v%d  @type `i2s`;", x, y)
+#define          outUnopNegInt(x, y)        fprintf(pFp,"v%d:= -v%d  @kind int;", x, y)
+#define          outUnopNotInt(x, y)        fprintf(pFp,"v%d:= ~v%d  @kind int;", x, y)
+#define          outUnopNegLong(x, y)       fprintf(pFp,"v%d:= -v%d  @kind long;", x, y)
+#define          outUnopNotLong(x, y)       fprintf(pFp,"v%d:= ~v%d  @kind long;", x, y)
+#define          outUnopNegFloat(x, y)      fprintf(pFp,"v%d:= -v%d  @kind float;", x, y)
+#define          outUnopNegDouble(x, y)     fprintf(pFp,"v%d:= -v%d  @kind double;", x, y)
+#define          outUnopInt2Long(x, y)      fprintf(pFp,"v%d:= (long)v%d  @kind i2l;", x, y)
+#define          outUnopInt2Float(x, y)     fprintf(pFp,"v%d:= (float)v%d  @kind i2f;", x, y)
+#define          outUnopInt2Double(x, y)    fprintf(pFp,"v%d:= (double)v%d  @kind i2d;", x, y)
+#define          outUnopLong2Int(x, y)      fprintf(pFp,"v%d:= (int)v%d  @kind l2i;", x, y)
+#define          outUnopLong2Float(x, y)    fprintf(pFp,"v%d:= (float)v%d  @kind l2f;", x, y)
+#define          outUnopLong2Double(x, y)   fprintf(pFp,"v%d:= (double)v%d  @kind l2d;", x, y)
+#define          outUnopFloat2Int(x, y)     fprintf(pFp,"v%d:= (int)v%d  @kind f2i;", x, y)
+#define          outUnopFloat2Long(x, y)    fprintf(pFp,"v%d:= (long)v%d  @kind f2l;", x, y)
+#define          outUnopFloat2Double(x, y)  fprintf(pFp,"v%d:= (double)v%d  @kind f2d;", x, y)
+#define          outUnopDouble2Int(x, y)    fprintf(pFp,"v%d:= (int)v%d  @kind d2i;", x, y)
+#define          outUnopDouble2Long(x, y)   fprintf(pFp,"v%d:= (long)v%d  @kind d2l;", x, y)
+#define          outUnopDouble2Float(x, y)  fprintf(pFp,"v%d:= (float)v%d  @kind d2f;", x, y)
+#define          outUnopInt2Byte(x, y)      fprintf(pFp,"v%d:= (byte)v%d  @kind i2b;", x, y)
+#define          outUnopInt2Char(x, y)      fprintf(pFp,"v%d:= (char)v%d  @kind i2c;", x, y)
+#define          outUnopInt2short(x, y)     fprintf(pFp,"v%d:= (short)v%d  @kind i2s;", x, y)
 
 
-#define                   outAddInt(x, y, z) fprintf(pFp,"v%d:= v%d + v%d  @type `int`;", x, y, z)
-#define                   outSubInt(x, y, z) fprintf(pFp,"v%d:= v%d - v%d  @type `int`;", x, y, z)
-#define                   outMulInt(x, y, z) fprintf(pFp,"v%d:= v%d * v%d  @type `int`;", x, y, z)
-#define                   outDivInt(x, y, z) fprintf(pFp,"v%d:= v%d / v%d  @type `int`;", x, y, z)
-#define                   outRemInt(x, y, z) fprintf(pFp,"v%d:= v%d %% v%d  @type `int`;", x, y, z)
-#define                   outAndInt(x, y, z) fprintf(pFp,"v%d:= v%d ^& v%d  @type `int`;", x, y, z)
-#define                   outOrInt(x, y, z) fprintf(pFp,"v%d:= v%d ^| v%d  @type `int`;", x, y, z)
-#define                   outXorInt(x, y, z) fprintf(pFp,"v%d:= v%d ^~ v%d  @type `int`;", x, y, z)
-#define                   outShlInt(x, y, z) fprintf(pFp,"v%d:= v%d ^< v%d  @type `int`;", x, y, z)
-#define                   outShrInt(x, y, z) fprintf(pFp,"v%d:= v%d ^> v%d  @type `int`;", x, y, z)
-#define                   outUshrInt(x, y, z) fprintf(pFp,"v%d:= v%d ^>> v%d  @type `int`;", x, y, z)
-#define                   outAddLong(x, y, z) fprintf(pFp,"v%d:= v%d + v%d  @type `long`;", x, y, z)
-#define                  outSubLong(x, y, z)  fprintf(pFp,"v%d:= v%d - v%d  @type `long`;", x, y, z)
-#define                  outMulLong(x, y, z)  fprintf(pFp,"v%d:= v%d * v%d  @type `long`;", x, y, z)
-#define                  outDivLong(x, y, z)  fprintf(pFp,"v%d:= v%d / v%d  @type `long`;", x, y, z)
-#define                  outRemLong(x, y, z)  fprintf(pFp,"v%d:= v%d %% v%d  @type `long`;", x, y, z)
-#define                  outAndLong(x, y, z)  fprintf(pFp,"v%d:= v%d ^& v%d  @type `long`;", x, y, z)
-#define                  outOrLong(x, y, z)  fprintf(pFp,"v%d:= v%d ^| v%d  @type `long`;", x, y, z)
-#define                  outXorLong(x, y, z)  fprintf(pFp,"v%d:= v%d ^~ v%d  @type `long`;", x, y, z)
-#define                  outShlLong(x, y, z)  fprintf(pFp,"v%d:= v%d ^< v%d  @type `long`;", x, y, z)
-#define                  outShrLong(x, y, z)  fprintf(pFp,"v%d:= v%d ^> v%d  @type `long`;", x, y, z)
-#define                  outUshrLong(x, y, z)  fprintf(pFp,"v%d:= v%d ^>> v%d  @type `long`;", x, y, z)
-#define                  outAddFloat(x, y, z)  fprintf(pFp,"v%d:= v%d + v%d  @type `float`;", x, y, z)
-#define                  outSubFloat(x, y, z)   fprintf(pFp,"v%d:= v%d - v%d  @type `float`;", x, y, z)
-#define                  outMulFloat(x, y, z)   fprintf(pFp,"v%d:= v%d * v%d  @type `float`;", x, y, z)
-#define                  outDivFloat(x, y, z)   fprintf(pFp,"v%d:= v%d / v%d  @type `float`;", x, y, z)
-#define                  outRemFloat(x, y, z)   fprintf(pFp,"v%d:= v%d %% v%d  @type `float`;", x, y, z)
-#define                  outAddDouble(x, y, z) fprintf(pFp,"v%d:= v%d + v%d  @type `double`;", x, y, z)
-#define                  outSubDouble(x, y, z) fprintf(pFp,"v%d:= v%d - v%d  @type `double`;", x, y, z)
-#define                  outMulDouble(x, y, z) fprintf(pFp,"v%d:= v%d * v%d  @type `double`;", x, y, z)
-#define                  outDivDouble(x, y, z) fprintf(pFp,"v%d:= v%d / v%d  @type `double`;", x, y, z)
-#define                  outRemDouble(x, y, z) fprintf(pFp,"v%d:= v%d %% v%d  @type `double`;", x, y, z)
+#define          outAddInt(x, y, z) fprintf(pFp,"v%d:= v%d + v%d  @kind int;", x, y, z)
+#define          outSubInt(x, y, z) fprintf(pFp,"v%d:= v%d - v%d  @kind int;", x, y, z)
+#define          outMulInt(x, y, z) fprintf(pFp,"v%d:= v%d * v%d  @kind int;", x, y, z)
+#define          outDivInt(x, y, z) fprintf(pFp,"v%d:= v%d / v%d  @kind int;", x, y, z)
+#define          outRemInt(x, y, z) fprintf(pFp,"v%d:= v%d %% v%d  @kind int;", x, y, z)
+#define          outAndInt(x, y, z) fprintf(pFp,"v%d:= v%d ^& v%d  @kind int;", x, y, z)
+#define          outOrInt(x, y, z) fprintf(pFp,"v%d:= v%d ^| v%d  @kind int;", x, y, z)
+#define          outXorInt(x, y, z) fprintf(pFp,"v%d:= v%d ^~ v%d  @kind int;", x, y, z)
+#define          outShlInt(x, y, z) fprintf(pFp,"v%d:= v%d ^< v%d  @kind int;", x, y, z)
+#define          outShrInt(x, y, z) fprintf(pFp,"v%d:= v%d ^> v%d  @kind int;", x, y, z)
+#define          outUshrInt(x, y, z) fprintf(pFp,"v%d:= v%d ^>> v%d  @kind int;", x, y, z)
+#define          outAddLong(x, y, z) fprintf(pFp,"v%d:= v%d + v%d  @kind long;", x, y, z)
+#define          outSubLong(x, y, z)  fprintf(pFp,"v%d:= v%d - v%d  @kind long;", x, y, z)
+#define          outMulLong(x, y, z)  fprintf(pFp,"v%d:= v%d * v%d  @kind long;", x, y, z)
+#define          outDivLong(x, y, z)  fprintf(pFp,"v%d:= v%d / v%d  @kind long;", x, y, z)
+#define          outRemLong(x, y, z)  fprintf(pFp,"v%d:= v%d %% v%d  @kind long;", x, y, z)
+#define          outAndLong(x, y, z)  fprintf(pFp,"v%d:= v%d ^& v%d  @kind long;", x, y, z)
+#define          outOrLong(x, y, z)  fprintf(pFp,"v%d:= v%d ^| v%d  @kind long;", x, y, z)
+#define          outXorLong(x, y, z)  fprintf(pFp,"v%d:= v%d ^~ v%d  @kind long;", x, y, z)
+#define          outShlLong(x, y, z)  fprintf(pFp,"v%d:= v%d ^< v%d  @kind long;", x, y, z)
+#define          outShrLong(x, y, z)  fprintf(pFp,"v%d:= v%d ^> v%d  @kind long;", x, y, z)
+#define          outUshrLong(x, y, z)  fprintf(pFp,"v%d:= v%d ^>> v%d  @kind long;", x, y, z)
+#define          outAddFloat(x, y, z)  fprintf(pFp,"v%d:= v%d + v%d  @kind float;", x, y, z)
+#define          outSubFloat(x, y, z)   fprintf(pFp,"v%d:= v%d - v%d  @kind float;", x, y, z)
+#define          outMulFloat(x, y, z)   fprintf(pFp,"v%d:= v%d * v%d  @kind float;", x, y, z)
+#define          outDivFloat(x, y, z)   fprintf(pFp,"v%d:= v%d / v%d  @kind float;", x, y, z)
+#define          outRemFloat(x, y, z)   fprintf(pFp,"v%d:= v%d %% v%d  @kind float;", x, y, z)
+#define          outAddDouble(x, y, z) fprintf(pFp,"v%d:= v%d + v%d  @kind double;", x, y, z)
+#define          outSubDouble(x, y, z) fprintf(pFp,"v%d:= v%d - v%d  @kind double;", x, y, z)
+#define          outMulDouble(x, y, z) fprintf(pFp,"v%d:= v%d * v%d  @kind double;", x, y, z)
+#define          outDivDouble(x, y, z) fprintf(pFp,"v%d:= v%d / v%d  @kind double;", x, y, z)
+#define          outRemDouble(x, y, z) fprintf(pFp,"v%d:= v%d %% v%d  @kind double;", x, y, z)
 
 /*********** Should we pass only two parameters in the following 2 address macros?????? When applicable, should we do casting inside the macro?  *****/
 
-#define                  outAddInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d + v%d  @type `int`;", x, y, z)
-#define                  outSubInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d - v%d  @type `int`;", x, y, z)
-#define                  outMulInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d * v%d  @type `int`;", x, y, z)
-#define                  outDivInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d / v%d  @type `int`;", x, y, z)
-#define                  outRemInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d %% v%d  @type `int`;", x, y, z)
-#define                  outAndInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^& v%d  @type `int`;", x, y, z)
-#define                  outOrInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^| v%d  @type `int`;", x, y, z)
-#define                  outXorInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^~ v%d  @type `int`;", x, y, z)
-#define                  outShlInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^< v%d  @type `int`;", x, y, z)
-#define                  outShrInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^> v%d  @type `int`;", x, y, z)
-#define                  outUshrInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^>> v%d  @type `int`;", x, y, z)
-#define               outAddLong2addr(x, y, z)  fprintf(pFp,"v%d:= v%d + v%d  @type `long`;", x, y, z)
-#define                outSubLong2addr(x, y, z) fprintf(pFp,"v%d:= v%d - v%d  @type `long`;", x, y, z)
-#define               outMulLong2addr(x, y, z)  fprintf(pFp,"v%d:= v%d * v%d  @type `long`;", x, y, z)
-#define               outDivLong2addr(x, y, z)  fprintf(pFp,"v%d:= v%d / v%d  @type `long`;", x, y, z)
-#define               outRemLong2addr(x, y, z)  fprintf(pFp,"v%d:= v%d %% v%d  @type `long`;", x, y, z)
-#define               outAndLong2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^& v%d  @type `long`;", x, y, z)
-#define               outOrLong2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^| v%d  @type `long`;", x, y, z)
-#define               outXorLong2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^~ v%d  @type `long`;", x, y, z)
-#define               outShlLong2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^< v%d  @type `long`;", x, y, z)
-#define               outShrLong2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^> v%d  @type `long`;", x, y, z)
-#define               outUshrLong2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^>> v%d  @type `long`;", x, y, z)
-#define                 outAddFloat2addr(x, y, z)  fprintf(pFp,"v%d:= v%d + v%d  @type `float`;", x, y, z)
-#define                 outSubFloat2addr(x, y, z)  fprintf(pFp,"v%d:= v%d - v%d  @type `float`;", x, y, z)
-#define                 outMulFloat2addr(x, y, z)  fprintf(pFp,"v%d:= v%d * v%d  @type `float`;", x, y, z)
-#define                 outDivFloat2addr(x, y, z)  fprintf(pFp,"v%d:= v%d / v%d  @type `float`;", x, y, z)
-#define                  outRemFloat2addr(x, y, z) fprintf(pFp,"v%d:= v%d %% v%d  @type `float`;", x, y, z)
-#define                   outAddDouble2addr(x, y, z) fprintf(pFp,"v%d:= v%d + v%d  @type `double`;", x, y, z)
-#define                   outSubDouble2addr(x, y, z)  fprintf(pFp,"v%d:= v%d - v%d  @type `double`;", x, y, z)
-#define                   outMulDouble2addr(x, y, z)  fprintf(pFp,"v%d:= v%d * v%d  @type `double`;", x, y, z)
-#define                   outDivDouble2addr(x, y, z)  fprintf(pFp,"v%d:= v%d / v%d  @type `double`;", x, y, z)
-#define                   outRemDouble2addr(x, y, z)  fprintf(pFp,"v%d:= v%d %% v%d  @type `double`;", x, y, z)
+#define          outAddInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d + v%d  @kind int;", x, y, z)
+#define          outSubInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d - v%d  @kind int;", x, y, z)
+#define          outMulInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d * v%d  @kind int;", x, y, z)
+#define          outDivInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d / v%d  @kind int;", x, y, z)
+#define          outRemInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d %% v%d  @kind int;", x, y, z)
+#define          outAndInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^& v%d  @kind int;", x, y, z)
+#define          outOrInt2addr(x, y, z)   fprintf(pFp,"v%d:= v%d ^| v%d  @kind int;", x, y, z)
+#define          outXorInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^~ v%d  @kind int;", x, y, z)
+#define          outShlInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^< v%d  @kind int;", x, y, z)
+#define          outShrInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^> v%d  @kind int;", x, y, z)
+#define          outUshrInt2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^>> v%d  @kind int;", x, y, z)
+#define          outAddLong2addr(x, y, z)  fprintf(pFp,"v%d:= v%d + v%d  @kind long;", x, y, z)
+#define          outSubLong2addr(x, y, z) fprintf(pFp,"v%d:= v%d - v%d  @kind long;", x, y, z)
+#define          outMulLong2addr(x, y, z)  fprintf(pFp,"v%d:= v%d * v%d  @kind long;", x, y, z)
+#define          outDivLong2addr(x, y, z)  fprintf(pFp,"v%d:= v%d / v%d  @kind long;", x, y, z)
+#define          outRemLong2addr(x, y, z)  fprintf(pFp,"v%d:= v%d %% v%d  @kind long;", x, y, z)
+#define          outAndLong2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^& v%d  @kind long;", x, y, z)
+#define          outOrLong2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^| v%d  @kind long;", x, y, z)
+#define          outXorLong2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^~ v%d  @kind long;", x, y, z)
+#define          outShlLong2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^< v%d  @kind long;", x, y, z)
+#define          outShrLong2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^> v%d  @kind long;", x, y, z)
+#define          outUshrLong2addr(x, y, z)  fprintf(pFp,"v%d:= v%d ^>> v%d  @kind long;", x, y, z)
+#define          outAddFloat2addr(x, y, z)  fprintf(pFp,"v%d:= v%d + v%d  @kind float;", x, y, z)
+#define          outSubFloat2addr(x, y, z)  fprintf(pFp,"v%d:= v%d - v%d  @kind float;", x, y, z)
+#define          outMulFloat2addr(x, y, z)  fprintf(pFp,"v%d:= v%d * v%d  @kind float;", x, y, z)
+#define          outDivFloat2addr(x, y, z)  fprintf(pFp,"v%d:= v%d / v%d  @kind float;", x, y, z)
+#define          outRemFloat2addr(x, y, z) fprintf(pFp,"v%d:= v%d %% v%d  @kind float;", x, y, z)
+#define          outAddDouble2addr(x, y, z) fprintf(pFp,"v%d:= v%d + v%d  @kind double;", x, y, z)
+#define          outSubDouble2addr(x, y, z)  fprintf(pFp,"v%d:= v%d - v%d  @kind double;", x, y, z)
+#define          outMulDouble2addr(x, y, z)  fprintf(pFp,"v%d:= v%d * v%d  @kind double;", x, y, z)
+#define          outDivDouble2addr(x, y, z)  fprintf(pFp,"v%d:= v%d / v%d  @kind double;", x, y, z)
+#define          outRemDouble2addr(x, y, z)  fprintf(pFp,"v%d:= v%d %% v%d  @kind double;", x, y, z)
 
-#define                   outAddLit16(x, y, z)    fprintf(pFp,"v%d:= v%d + %d;",x, y, z)
-#define                   outSubLit16(x, y, z)    fprintf(pFp,"v%d:= v%d - %d;",x, y, z)
-#define                   outMulLit16(x, y, z)    fprintf(pFp,"v%d:= v%d * %d;",x, y, z)
-#define                   outDivLit16(x, y, z)    fprintf(pFp,"v%d:= v%d / %d;",x, y, z)
-#define                   outRemLit16(x, y, z)    fprintf(pFp,"v%d:= v%d %% %d;",x, y, z)
-#define                   outAndLit16(x, y, z)    fprintf(pFp,"v%d:= v%d ^& %d;",x, y, z)
-#define                   outOrLit16(x, y, z)     fprintf(pFp,"v%d:= v%d ^| %d;",x, y, z)
-#define                   outXorLit16(x, y, z)    fprintf(pFp,"v%d:= v%d ^~ %d;",x, y, z)
-#define                   outAddLit8(x, y, z)     fprintf(pFp,"v%d:= v%d + %d;",x, y, z)
-#define                   outSubLit8(x, y, z)     fprintf(pFp,"v%d:= v%d - %d;",x, y, z)
-#define                   outMulLit8(x, y, z)     fprintf(pFp,"v%d:= v%d * %d;",x, y, z)
-#define                   outDivLit8(x, y, z)     fprintf(pFp,"v%d:= v%d / %d;",x, y, z)
-#define                   outRemLit8(x, y, z)     fprintf(pFp,"v%d:= v%d %% %d;",x, y, z)
-#define                   outAndLit8(x, y, z)     fprintf(pFp,"v%d:= v%d ^& %d;",x, y, z)
-#define                   outOrLit8(x, y, z)      fprintf(pFp,"v%d:= v%d ^| %d;",x, y, z)
-#define                   outXorLit8(x, y, z)     fprintf(pFp,"v%d:= v%d ^~ %d;",x, y, z)
-#define                   outShlLit8(x, y, z)     fprintf(pFp,"v%d:= v%d ^< %d;",x, y, z)
-#define                   outShrLit8(x, y, z)     fprintf(pFp,"v%d:= v%d ^> %d;",x, y, z)
-#define                   outUshrLit8(x, y, z)    fprintf(pFp,"v%d:= v%d ^>> %d;",x, y, z)
+#define          outAddLit16(x, y, z)    fprintf(pFp,"v%d:= v%d + %d  @kind int;",x, y, z)
+#define          outSubLit16(x, y, z)    fprintf(pFp,"v%d:= v%d - %d  @kind int;",x, y, z)
+#define          outMulLit16(x, y, z)    fprintf(pFp,"v%d:= v%d * %d  @kind int;",x, y, z)
+#define          outDivLit16(x, y, z)    fprintf(pFp,"v%d:= v%d / %d  @kind int;",x, y, z)
+#define          outRemLit16(x, y, z)    fprintf(pFp,"v%d:= v%d %% %d  @kind int;",x, y, z)
+#define          outAndLit16(x, y, z)    fprintf(pFp,"v%d:= v%d ^& %d  @kind int;",x, y, z)
+#define          outOrLit16(x, y, z)     fprintf(pFp,"v%d:= v%d ^| %d  @kind int;",x, y, z)
+#define          outXorLit16(x, y, z)    fprintf(pFp,"v%d:= v%d ^~ %d  @kind int;",x, y, z)
+#define          outAddLit8(x, y, z)     fprintf(pFp,"v%d:= v%d + %d  @kind int;",x, y, z)
+#define          outSubLit8(x, y, z)     fprintf(pFp,"v%d:= v%d - %d  @kind int;",x, y, z)
+#define          outMulLit8(x, y, z)     fprintf(pFp,"v%d:= v%d * %d  @kind int;",x, y, z)
+#define          outDivLit8(x, y, z)     fprintf(pFp,"v%d:= v%d / %d  @kind int;",x, y, z)
+#define          outRemLit8(x, y, z)     fprintf(pFp,"v%d:= v%d %% %d  @kind int;",x, y, z)
+#define          outAndLit8(x, y, z)     fprintf(pFp,"v%d:= v%d ^& %d  @kind int;",x, y, z)
+#define          outOrLit8(x, y, z)      fprintf(pFp,"v%d:= v%d ^| %d  @kind int;",x, y, z)
+#define          outXorLit8(x, y, z)     fprintf(pFp,"v%d:= v%d ^~ %d  @kind int;",x, y, z)
+#define          outShlLit8(x, y, z)     fprintf(pFp,"v%d:= v%d ^< %d  @kind int;",x, y, z)
+#define          outShrLit8(x, y, z)     fprintf(pFp,"v%d:= v%d ^> %d  @kind int;",x, y, z)
+#define          outUshrLit8(x, y, z)    fprintf(pFp,"v%d:= v%d ^>> %d  @kind int;",x, y, z)

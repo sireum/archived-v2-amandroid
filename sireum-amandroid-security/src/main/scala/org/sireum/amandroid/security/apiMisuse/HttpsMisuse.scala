@@ -7,14 +7,11 @@ http://www.eclipse.org/legal/epl-v10.html
 */
 package org.sireum.amandroid.security.apiMisuse
 
-import org.sireum.jawa.MessageCenter
 import org.sireum.util.FileUtil
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.amandroid.security.AmandroidSocket
-import org.sireum.jawa.Center
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysis
-import org.sireum.amandroid.AppCenter
 import org.sireum.jawa.ClassLoadManager
 import org.sireum.jawa.alir.controlFlowGraph.ICFGNode
 import org.sireum.jawa.alir.controlFlowGraph.ICFGCallNode
@@ -28,15 +25,19 @@ import org.sireum.jawa.JawaMethod
 import org.sireum.pilar.ast.JumpLocation
 import org.sireum.util.MList
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
 import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
 >>>>>>> CommunicationLeakage
 import org.sireum.jawa.MessageCenter._
+=======
+>>>>>>> upstream/master
 import org.sireum.util._
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.pilar.ast._
+<<<<<<< HEAD
 import org.sireum.jawa.Center
 <<<<<<< HEAD
 =======
@@ -44,6 +45,8 @@ import org.sireum.jawa.alir.interProcedural.InterProceduralMonotoneDataFlowAnaly
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
 import org.sireum.jawa.JawaProcedure
 >>>>>>> CommunicationLeakage
+=======
+>>>>>>> upstream/master
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.security.AmandroidSocketListener
 import org.sireum.jawa.util.IgnoreException
@@ -51,6 +54,8 @@ import org.sireum.jawa.alir.reachability.ReachabilityAnalysis
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.VarSlot
+import org.sireum.jawa.Global
+
 /*
  * @author <a href="mailto:i@flanker017.me">Qidan He</a>
  */
@@ -58,23 +63,23 @@ object HttpsMisuse {
   private final val API_SIG = "Lorg/apache/http/conn/ssl/SSLSocketFactory;.setHostnameVerifier:(Lorg/apache/http/conn/ssl/X509HostnameVerifier;)V"
   private final val VUL_PARAM = "@@org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER"
   
-  def apply(idfg : InterProceduralDataFlowGraph) : Unit
-    = build(idfg)
+  def apply(global: Global, idfg : InterProceduralDataFlowGraph) : Unit
+    = build(global, idfg)
     
-  def build(idfg : InterProceduralDataFlowGraph) : Unit = {
+  def build(global: Global, idfg : InterProceduralDataFlowGraph) : Unit = {
     val icfg = idfg.icfg
     val ptaresult = idfg.ptaresult
     val nodeMap : MMap[String, MSet[ICFGCallNode]] = mmapEmpty
     val callmap = icfg.getCallGraph.getCallMap
     icfg.nodes.foreach{
       node =>
-        val result = getHTTPSNode(node)
+        val result = getHTTPSNode(global, node)
         result.foreach{
           r =>
             nodeMap.getOrElseUpdate(r._1, msetEmpty) += r._2
         }
     }
-    val rule1Res = VerifierCheck(nodeMap, ptaresult)
+    val rule1Res = VerifierCheck(global, nodeMap, ptaresult)
     rule1Res.foreach{
       case (n, b) =>
         if(!b){
@@ -87,7 +92,7 @@ object HttpsMisuse {
    * detect constant propagation on ALLOW_ALLHOSTNAME_VERIFIER
    * which is a common api miuse in many android apps.
    */
-  def VerifierCheck(nodeMap : MMap[String, MSet[ICFGCallNode]], ptaresult : PTAResult): Map[ICFGCallNode, Boolean] = {
+  def VerifierCheck(global: Global, nodeMap : MMap[String, MSet[ICFGCallNode]], ptaresult : PTAResult): Map[ICFGCallNode, Boolean] = {
     var result : Map[ICFGCallNode, Boolean] = Map()
     val nodes : MSet[ICFGCallNode] = msetEmpty
     nodeMap.foreach{
@@ -99,7 +104,11 @@ object HttpsMisuse {
       node =>
         result += (node -> true)
         
+<<<<<<< HEAD
         val loc = Center.getMethodWithoutFailing(node.getOwner).getMethodBody.location(node.getLocIndex)
+=======
+        val loc = global.getMethod(node.getOwner).get.getBody.location(node.getLocIndex)
+>>>>>>> upstream/master
         val argNames : MList[String] = mlistEmpty
         loc match{
           case jumploc : JumpLocation =>
@@ -122,19 +131,22 @@ object HttpsMisuse {
           case _ =>
         }
         require(argNames.isDefinedAt(0))
-        val argSlot = VarSlot(argNames(1))
+        val argSlot = VarSlot(argNames(1), false, true)
         val argValue = ptaresult.pointsToSet(argSlot, node.context)
         argValue.foreach{
           ins =>
             val defsites = ins.defSite
+<<<<<<< HEAD
             val loc = Center.getMethodWithoutFailing(defsites.getMethodSig).getMethodBody.location(defsites.getCurrentLocUri)
+=======
+            val loc = global.getMethod(defsites.getMethodSig).get.getBody.location(defsites.getCurrentLocUri)
+>>>>>>> upstream/master
             //The found definition loc should be an assignment action
             var bar:ActionLocation = loc.asInstanceOf[ActionLocation]
             var as:AssignAction = bar.action.asInstanceOf[AssignAction]
             //retrive right side value
             var nameExp:NameExp = as.rhs.asInstanceOf[NameExp]
-            if(nameExp.name.name.equals(VUL_PARAM))
-            {
+            if(nameExp.name.name.equals(VUL_PARAM)) {
               result += (node -> false)
             }
         }
@@ -142,7 +154,7 @@ object HttpsMisuse {
     result
   }
   
-  def getHTTPSNode(node : ICFGNode): Set[(String, ICFGCallNode)] = {
+  def getHTTPSNode(global: Global, node : ICFGNode): Set[(String, ICFGCallNode)] = {
     val result : MSet[(String, ICFGCallNode)] = msetEmpty
     node match{
       case invNode : ICFGCallNode =>
@@ -150,6 +162,7 @@ object HttpsMisuse {
         calleeSet.foreach{
           callee =>
             val calleep = callee.callee
+<<<<<<< HEAD
 <<<<<<< HEAD
             val callees : MSet[JawaMethod] = msetEmpty
             val caller = Center.getMethodWithoutFailing(invNode.getOwner)
@@ -159,6 +172,11 @@ object HttpsMisuse {
             val caller = Center.getProcedureWithoutFailing(invNode.getOwner)
             val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
 >>>>>>> CommunicationLeakage
+=======
+            val callees : MSet[JawaMethod] = msetEmpty
+            val caller = global.getMethod(invNode.getOwner).get
+            val jumpLoc = caller.getBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
+>>>>>>> upstream/master
             val cj = jumpLoc.jump.asInstanceOf[CallJump]
 //            if(calleep.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
 //              val calleeSignature = cj.getValueAnnotation("signature") match {
@@ -175,7 +193,7 @@ object HttpsMisuse {
             callees.foreach{
               callee =>
                 if(callee.getSignature.equals(API_SIG)){
-                  result += ((callee.getSignature, invNode))
+                  result += ((callee.getSignature.signature, invNode))
                 }
             }
         }

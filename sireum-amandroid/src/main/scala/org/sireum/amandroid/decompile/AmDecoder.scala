@@ -14,7 +14,6 @@ import java.io.File
 import java.util.logging.Logger
 import java.util.logging.LogManager
 import brut.androlib.err.CantFindFrameworkResException
-import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.util.IgnoreException
 
 object AmDecoder {
@@ -23,24 +22,38 @@ object AmDecoder {
    *  Decode apk file and return outputpath
    *  @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
    */
+<<<<<<< HEAD
   def decode(sourcePathUri : FileResourceUri, outputUri : FileResourceUri, createFolder: Boolean = true) : FileResourceUri = {
+=======
+  def decode(sourcePathUri : FileResourceUri, outputUri : FileResourceUri, createFolder: Boolean = true, forceDelete: Boolean = true) : FileResourceUri = {
+>>>>>>> upstream/master
     // make it as quiet mode
     val logger = Logger.getLogger("")
     logger.getHandlers().foreach {
       h =>
         logger.removeHandler(h)
     }
-    LogManager.getLogManager().reset();
+    LogManager.getLogManager().reset()
 
     val apkFile = FileUtil.toFile(sourcePathUri)
     val outputDir = 
       if(createFolder){
+<<<<<<< HEAD
         val dirName = apkFile.getName().substring(0, apkFile.getName().lastIndexOf("."))
         new File(new URI(outputUri + "/" + dirName))
       } else {
         new File(new URI(outputUri))
       }
     try{
+=======
+        val dirName = try{apkFile.getName().substring(0, apkFile.getName().lastIndexOf("."))} catch {case e: Exception => apkFile.getName()}
+        new File(new URI(outputUri + File.separator + dirName))
+      } else {
+        new File(new URI(outputUri))
+      }
+    if(outputDir.exists() && !forceDelete) return FileUtil.toUri(outputDir)
+    try {
+>>>>>>> upstream/master
       val decoder = new ApkDecoder
       decoder.setDecodeSources(0x0000) // DECODE_SOURCES_NONE = 0x0000
       decoder.setApkFile(apkFile)
@@ -48,9 +61,10 @@ object AmDecoder {
       decoder.setForceDelete(true)
       decoder.decode()
     } catch {
-      case fe : CantFindFrameworkResException =>
-        err_msg_critical(TITLE, "Can't find framework resources for package of id: " + fe.getPkgId + ". You must install proper framework files, see apk-tool website for more info.")
-        throw new IgnoreException
+      case fe: CantFindFrameworkResException =>
+        System.err.println(TITLE + ": Can't find framework resources for package of id: " + fe.getPkgId + ". You must install proper framework files, see apk-tool website for more info.")
+      case e: Exception =>
+        System.err.println(TITLE + ": Outdated framework resources. You must install proper framework files, see apk-tool website for more info.")
     }
     FileUtil.toUri(outputDir)
   }

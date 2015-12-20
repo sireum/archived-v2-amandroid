@@ -12,7 +12,6 @@ import org.sireum.util._
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
-import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.pta.PTAInstance
@@ -20,9 +19,12 @@ import org.sireum.jawa.alir.pta.PTAInstance
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.jawa.alir.pta.FieldSlot
+<<<<<<< HEAD
 import org.sireum.jawa.util.StringFormConverter
 =======
 >>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/UriModel.scala
+=======
+>>>>>>> upstream/master
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -36,7 +38,7 @@ object UriModel {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true
-	  p.getSignature match{
+	  p.getSignature.signature match{
 	    case "Landroid/net/Uri;.<clinit>:()V" =>  //static constructor
 		  case "Landroid/net/Uri;.<init>:()V" =>  //private constructor
 		  case "Landroid/net/Uri;.<init>:(Landroid/net/Uri$1;)V" =>  //synthetic constructor
@@ -97,16 +99,17 @@ object UriModel {
    */
   private def uriParse(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >0)
-	  val strSlot = VarSlot(args(0))
+	  val strSlot = VarSlot(args(0), false, true)
 	  val strValue = s.pointsToSet(strSlot, currentContext)
 	  var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
-    val stringUriIns = PTAInstance(NormalType(AndroidConstants.URI_STRING_URI, 0), currentContext)
-    newfacts += RFAFact(VarSlot(retVar), stringUriIns)
+    val stringUriIns = PTAInstance(new JawaType(AndroidConstants.URI_STRING_URI), currentContext, false)
+    newfacts += RFAFact(VarSlot(retVar, false, false), stringUriIns)
     strValue.map{
       sv =>
         sv match{
           case cstr @ PTAConcreteStringInstance(text, c) =>
+<<<<<<< HEAD
 <<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/UriModel.scala
             newfacts += RFAFact(FieldSlot(stringUriIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.URI_STRING_URI_URI_STRING)), cstr)
 =======
@@ -115,9 +118,13 @@ object UriModel {
           case pstr @ PTAPointStringInstance(c) => 
             err_msg_detail(TITLE, "Init uri string use point string: " + pstr)
             newfacts += RFAFact(FieldSlot(stringUriIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.URI_STRING_URI_URI_STRING)), pstr)
+=======
+            newfacts += RFAFact(FieldSlot(stringUriIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.URI_STRING_URI_URI_STRING)), cstr)
+          case pstr @ PTAPointStringInstance(c) =>
+            newfacts += RFAFact(FieldSlot(stringUriIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.URI_STRING_URI_URI_STRING)), pstr)
+>>>>>>> upstream/master
           case _ => 
-            err_msg_detail(TITLE, "Init uri use unknown instance: " + sv)
-            newfacts += RFAFact(FieldSlot(stringUriIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.URI_STRING_URI_URI_STRING)), sv)
+            newfacts += RFAFact(FieldSlot(stringUriIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.URI_STRING_URI_URI_STRING)), sv)
         }
     }
     (newfacts, delfacts)

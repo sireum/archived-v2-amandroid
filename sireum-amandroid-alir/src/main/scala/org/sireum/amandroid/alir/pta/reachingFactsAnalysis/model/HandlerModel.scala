@@ -27,7 +27,7 @@ object HandlerModel {
 	  var newFacts = isetEmpty[RFAFact]
 	  var delFacts = isetEmpty[RFAFact]
 	  var byPassFlag = true
-	  p.getSignature match{
+	  p.getSignature.signature match{
 	    case "Landroid/os/Handler;.<init>:()V" =>  //public constructor
 		  case "Landroid/os/Handler;.<init>:(Landroid/os/Handler$Callback;)V" =>  //public constructor
 		  case "Landroid/os/Handler;.<init>:(Landroid/os/Handler$Callback;Z)V" =>  //public constructor

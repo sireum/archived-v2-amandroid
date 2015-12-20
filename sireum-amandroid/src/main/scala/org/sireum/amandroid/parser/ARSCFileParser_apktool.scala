@@ -17,7 +17,6 @@ import brut.androlib.res.data.ResPackage
 import java.util.regex.Pattern
 import org.sireum.util._
 import java.util.zip.ZipFile
-import org.sireum.jawa.MessageCenter._
 
 class ARSCFileParser_apktool {
   final private val TITLE = "ARSCFileParser_apktool"
@@ -31,7 +30,7 @@ class ARSCFileParser_apktool {
       if(ze != null){
         val in = zf.getInputStream(ze)
         this.data = ARSCDecoder.decode(in, false, false)
-      } else err_msg_normal(TITLE, "Cannot find resources.arsc file.")
+      } else {}//err_msg_normal(TITLE, "Cannot find resources.arsc file.")
     } finally {
       zf.close()
     }

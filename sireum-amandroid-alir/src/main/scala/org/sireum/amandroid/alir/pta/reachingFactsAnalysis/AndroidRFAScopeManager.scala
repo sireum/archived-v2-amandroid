@@ -9,6 +9,7 @@ package org.sireum.amandroid.alir.pta.reachingFactsAnalysis
 
 import org.sireum.jawa.ScopeManager
 import org.sireum.util._
+<<<<<<< HEAD
 <<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidRFAScopeManager.scala
 import org.sireum.jawa.JawaClass
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
@@ -18,10 +19,13 @@ import org.sireum.jawa.JawaRecord
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.jawa.JawaProcedure
 >>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidRFAScopeManager.scala
+=======
+import org.sireum.jawa.JawaClass
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
+import org.sireum.jawa.JawaMethod
+>>>>>>> upstream/master
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.AndroidConstants
-import org.sireum.jawa.alir.pta.UnknownInstance
-import org.sireum.jawa.Center
 import org.sireum.jawa.alir.pta.PTAResult
 
 /**
@@ -32,10 +36,11 @@ class AndroidRFAScopeManager extends ScopeManager{
   private var packages : ISet[String] = isetEmpty
   private var includeMode = true
   def setMode(includeMode : Boolean) = this.includeMode = includeMode
-	/**
+  /**
    * return true means use in scope mode, any package defined in ScopeManager will be keep
    * during the analysis, and vice versa.
    */
+<<<<<<< HEAD
 	def isIncludeMode : Boolean = this.includeMode
 	
 	def addPackage(packageName : String) = this.packages += packageName
@@ -59,14 +64,35 @@ class AndroidRFAScopeManager extends ScopeManager{
 	def shouldBypass(rec : JawaRecord) : Boolean = {
     (rec.isFrameworkRecord || rec.isThirdPartyLibRecord) &&
 >>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidRFAScopeManager.scala
+=======
+  def isIncludeMode : Boolean = this.includeMode
+
+  def addPackage(packageName : String) = this.packages += packageName
+  def addPackages(packageNames : ISet[String]) = this.packages ++= packageNames
+  def removePackage(packageName : String) = this.packages -= packageName
+  def removePackages(packageNames : ISet[String]) = this.packages --= packageNames
+
+  /**
+   * return true if given package name contained in the scope manager
+   */
+  def contains(packageName : String) : Boolean = this.packages.contains(packageName)
+  def clear = this.packages = isetEmpty
+
+  /**
+   * return true if given record needs to be bypassed
+   */
+  def shouldBypass(rec : JawaClass) : Boolean = {
+    (rec.isSystemLibraryClass || rec.isUserLibraryClass) &&
+>>>>>>> upstream/master
     {
-	    if(isIncludeMode){
-	    	if(rec.getPackageName != null) !contains(rec.getPackageName) else true
-	    } else {
-	      if(rec.getPackageName != null) contains(rec.getPackageName) else false
-	    }
+      if(isIncludeMode){
+        if(rec.getPackage.isDefined) !contains(rec.getPackage.get.toPkgString(".")) else true
+      } else {
+        if(rec.getPackage.isDefined) contains(rec.getPackage.get.toPkgString(".")) else false
+      }
     }
   }
+<<<<<<< HEAD
 }
 //<<<<<<< HEAD
   //*
@@ -77,3 +103,6 @@ class AndroidRFAScopeManager extends ScopeManager{
 //* >>>>>>> 6ef60fb9a86f699ca2273c59d66fbd725218c236
 //* }
 //*/
+=======
+}
+>>>>>>> upstream/master

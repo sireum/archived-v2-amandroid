@@ -9,22 +9,37 @@ package org.sireum.amandroid.alir.pta.reachingFactsAnalysis
 
 import org.sireum.util._
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
+<<<<<<< HEAD
 <<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidRFAConfig.scala
 import org.sireum.jawa.JawaMethod
 =======
 import org.sireum.jawa.JawaProcedure
 >>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidRFAConfig.scala
+=======
+import org.sireum.jawa.JawaMethod
+>>>>>>> upstream/master
 import org.sireum.amandroid.AndroidConstants
-import org.sireum.jawa.NormalType
 import org.sireum.jawa.alir.Context
+<<<<<<< HEAD
 import org.sireum.jawa.GlobalConfig
 import org.sireum.jawa.JawaClass
 import org.sireum.jawa.Center
+=======
+import org.sireum.jawa.JawaClass
+>>>>>>> upstream/master
 import org.sireum.jawa.alir.pta.PTAInstance
 <<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidRFAConfig.scala
 import org.sireum.jawa.alir.pta.VarSlot
+<<<<<<< HEAD
 =======
 >>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidRFAConfig.scala
+=======
+import org.sireum.jawa.alir.pta.FieldSlot
+import org.sireum.jawa.alir.pta.PTATupleInstance
+import org.sireum.jawa.alir.pta.PTAPointStringInstance
+import org.sireum.jawa.JavaKnowledge
+import org.sireum.jawa.JawaType
+>>>>>>> upstream/master
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -35,6 +50,7 @@ object AndroidRFAConfig {
    * generates and returns the initial facts corresponding to the "Intent" parameter of a dummyMain 
    * the generated fact says that the param Intent is generated at the Center.
    */
+<<<<<<< HEAD
 	def getInitialFactsForMainEnvironment(dm : JawaMethod) : ISet[RFAFact] = {
 	  require(dm.getShortName == AndroidConstants.MAINCOMP_ENV || dm.getShortName == AndroidConstants.COMP_ENV)
 	  var result = isetEmpty[RFAFact]
@@ -51,4 +67,37 @@ object AndroidRFAConfig {
 //	  result += RFAFact(mCategoriesSlot, mCategoriesValue)
 	  result
 	}
+=======
+  def getInitialFactsForMainEnvironment(dm : JawaMethod) : ISet[RFAFact] = {
+    require(dm.getName == AndroidConstants.MAINCOMP_ENV || dm.getName == AndroidConstants.COMP_ENV)
+    var result = isetEmpty[RFAFact]
+    val intentSlot = VarSlot(dm.getParamName(0), false, false)
+    val context : Context = new Context
+    context.setContext(dm.getSignature, "L0000")
+    val intentValue = PTAInstance(new JawaType(AndroidConstants.INTENT), context.copy, false)
+    result += RFAFact(intentSlot, intentValue)
+//    val entSlot = FieldSlot(intentValue, "entries")
+//    val entValue = PTATupleInstance(PTAPointStringInstance(context.copy), PTAPointStringInstance(context.copy), context.copy)
+//    result += RFAFact(entSlot, entValue)
+    val mComponentSlot = FieldSlot(intentValue, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_COMPONENT))
+    val mComponentValue = PTAInstance(new JawaType(AndroidConstants.COMPONENTNAME).toUnknown, context.copy, false)
+    result += RFAFact(mComponentSlot, mComponentValue)
+    val mActionSlot = FieldSlot(intentValue, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION))
+    val mActionValue = PTAPointStringInstance(context.copy)
+    result += RFAFact(mActionSlot, mActionValue)
+    val mCategoriesSlot = FieldSlot(intentValue, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_CATEGORIES))
+    val mCategoriesValue = PTAPointStringInstance(context.copy)
+    result += RFAFact(mCategoriesSlot, mCategoriesValue)
+    val mTypeSlot = FieldSlot(intentValue, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_MTYPE))
+    val mTypeValue = PTAPointStringInstance(context.copy)
+    result += RFAFact(mTypeSlot, mTypeValue)
+    val mDataSlot = FieldSlot(intentValue, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_URI_DATA))
+    val mDataValue = PTAPointStringInstance(context.copy)
+    result += RFAFact(mDataSlot, mDataValue)
+    val mExtrasSlot = FieldSlot(intentValue, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_EXTRAS))
+    val mExtrasValue = PTATupleInstance(PTAPointStringInstance(context.copy), PTAInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE.toUnknown, context.copy, false), context.copy)
+    result += RFAFact(mExtrasSlot, mExtrasValue)
+    result
+  }
+>>>>>>> upstream/master
 }

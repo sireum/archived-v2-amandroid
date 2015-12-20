@@ -11,7 +11,10 @@ import java.io.InputStream
 import java.io.IOException
 import org.sireum.util._
 import org.sireum.jawa.util.ResourceRetriever
+<<<<<<< HEAD
 import org.sireum.jawa.MessageCenter._
+=======
+>>>>>>> upstream/master
 import java.io.File
 import java.net.URI
 
@@ -752,7 +755,7 @@ class ARSCFileParser {
 				}
 				catch {
 				  case ex : IOException =>
-						err_msg_critical(TITLE, "Could not read resource file: " + ex.getMessage())
+//						err_msg_critical(TITLE, "Could not read resource file: " + ex.getMessage())
 						ex.printStackTrace()
 				}
 			}
@@ -768,8 +771,8 @@ class ARSCFileParser {
 		val resourceHeader = new ResTable_Header()
 		readChunkHeader(stream, resourceHeader.header)
 		resourceHeader.packageCount = readUInt32(stream)
-		if (DEBUG)
-			msg_normal(TITLE, "Package Groups (" + resourceHeader.packageCount + ")")
+//		if (DEBUG)
+//			msg_normal(TITLE, "Package Groups (" + resourceHeader.packageCount + ")")
 		
 		// Do we have any packages to read?
 		var remainingSize = resourceHeader.header.size - resourceHeader.header.headerSize
@@ -783,7 +786,7 @@ class ARSCFileParser {
 			val block = new Array[Byte](Math.min(BLOCK_SIZE, remainingSize - totalBytesRead))
 			val bytesRead = stream.read(block)
 			if (bytesRead == 0 && bytesRead < block.length) {
-				err_msg_critical(TITLE, "Could not read block from resource file")
+//				err_msg_critical(TITLE, "Could not read block from resource file")
 				return
 			}
 			System.arraycopy(block, 0, remainingData, totalBytesRead, bytesRead)
@@ -818,9 +821,9 @@ class ARSCFileParser {
 				packageTable.header = nextChunkHeader
 				offset = parsePackageTable(packageTable, remainingData, offset)
 				
-				if (DEBUG)
-					msg_normal(TITLE, "\tPackage " + packageCtr + " id=" + packageTable.id
-							+ " name=" + packageTable.name)
+//				if (DEBUG)
+//					msg_normal(TITLE, "\tPackage " + packageCtr + " id=" + packageTable.id
+//							+ " name=" + packageTable.name)
 				
 				// Record the end of the object to know then to stop looking for
 				// internal records
@@ -945,8 +948,8 @@ class ARSCFileParser {
 									entryOffset = readValue(rval, remainingData, entryOffset)
 									res = parseValue(rval)
 									if (res == null) {
-										msg_normal(TITLE, "Could not parse resource " + keyStrings.get(entry.key)
-												+ "of type " + Integer.toHexString(rval.dataType) + ", skipping entry")
+//										msg_normal(TITLE, "Could not parse resource " + keyStrings.get(entry.key)
+//												+ "of type " + Integer.toHexString(rval.dataType) + ", skipping entry")
 										flag = false
 									}
 								}
@@ -975,19 +978,19 @@ class ARSCFileParser {
 				}
 				
 				// Create the data objects for the types in the package
-				for (resType <- resPackage.types) {
-					if (DEBUG) {
-						msg_normal(TITLE, "\t\tType " + resType.typeName + " " + (resType.id - 1) + ", configCount="
-							+ resType.configurations.size + ", entryCount="
-							+ (if(resType.configurations.size > 0) resType.configurations(0).resources.size else 0))
-						for (resConfig <- resType.configurations) {
-							msg_normal(TITLE, "\t\t\tconfig")
-							for (res <- resConfig.resources)
-								msg_normal(TITLE, "\t\t\t\tresource " + Integer.toHexString(res.resourceID)
-										+ " " + res.resourceName)
-						}
-					}
-				}
+//				for (resType <- resPackage.types) {
+//					if (DEBUG) {
+//						msg_normal(TITLE, "\t\tType " + resType.typeName + " " + (resType.id - 1) + ", configCount="
+//							+ resType.configurations.size + ", entryCount="
+//							+ (if(resType.configurations.size > 0) resType.configurations(0).resources.size else 0))
+//						for (resConfig <- resType.configurations) {
+//							msg_normal(TITLE, "\t\t\tconfig")
+//							for (res <- resConfig.resources)
+//								msg_normal(TITLE, "\t\t\t\tresource " + Integer.toHexString(res.resourceID)
+//										+ " " + res.resourceName)
+//						}
+//					}
+//				}
 				packageCtr+=1
 			}
 

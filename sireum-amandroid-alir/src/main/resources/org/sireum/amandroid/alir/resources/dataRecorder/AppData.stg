@@ -2,34 +2,31 @@ group AppData;
 
 delimiters "$", "$"
 
-AppData(name, uses_permissions, components, dynamicRegisteredComponents) ::= <<
+AppData(name, uses_permissions, components, dynamicRegisteredComponents, taintResult) ::= <<
 Application Name: $name$
 Uses Permissions: $uses_permissions ; separator=", "$
 
-Analysis results with components as entry points are listed below:
+$components ; separator="\n\n"$
 
-  $components ; separator="\n\n"$
 $if(dynamicRegisteredComponents)$Dynamic Registered Components:
-  $dynamicRegisteredComponents ; separator="\n\n"$$endif$
+$dynamicRegisteredComponents ; separator="\n\n"$$endif$
+
+
+Taint analysis result:
+  $taintResult$
 >>
 
-ComponentData(compName, typ, exported, protectPermission, intentFilters, iccInfos, taintResult) ::= <<
-############################# Analysis result with one entry point starts #############################
-Entry point name: Component $compName$
+ComponentData(compName, typ, exported, dynamicReg, protectPermission, intentFilters, iccInfos) ::= <<
+Component $compName$
   Component type: $typ$
-  exported: $exported$
-  Required Permission: $protectPermission$
+  Exported: $exported$
+  Dynamic Registered: $dynamicReg$
+  Required Permission: $protectPermission ; separator=", "$
   IntentFilters:
     $intentFilters ; separator="\n"$
-  *************************************************************
+
   Inter-component communication (ICC) Result:
     $iccInfos ; separator="\n"$
-  *************************************************************
-  Taint analysis result:
-    $taintResult$
-  *************************************************************
-############################# Analysis result ends ####################################
-
 >>
 
 DynamicRegisteredComponentData(compName, typ, protectPermission, intentFilters) ::= <<
@@ -87,7 +84,7 @@ Sources found:
 Sinks found:
   $sinks ; separator="\n"$
 Discovered taint paths are listed below:
-  $paths ; separator="\n"$
+  $paths ; separator="\n\n"$
 >>
 
 Target(proc, typ) ::= <<
@@ -103,6 +100,6 @@ TaintPath:
   Source: $source$
   Sink: $sink$
   Types: $typs ; separator=", "$
-  The path consists of the following edges ("->"). The nodes have the context information. The source is at the top :
+  The path consists of the following edges ("->"). The nodes have the context information (p1 to pn means which parameter). The source is at the top :
     $path ; separator="\n"$
 >>

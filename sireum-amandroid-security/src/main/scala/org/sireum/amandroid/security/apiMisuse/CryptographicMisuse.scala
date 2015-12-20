@@ -7,24 +7,30 @@ http://www.eclipse.org/legal/epl-v10.html
 */
 package org.sireum.amandroid.security.apiMisuse
 
-import org.sireum.jawa.MessageCenter._
 import org.sireum.util._
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.pilar.ast._
+<<<<<<< HEAD
 import org.sireum.jawa.Center
 <<<<<<< HEAD
+=======
+>>>>>>> upstream/master
 import org.sireum.jawa.JawaMethod
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.VarSlot
+<<<<<<< HEAD
 =======
 import org.sireum.jawa.alir.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
 import org.sireum.jawa.JawaProcedure
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 >>>>>>> CommunicationLeakage
+=======
+import org.sireum.jawa.Global
+>>>>>>> upstream/master
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -32,22 +38,22 @@ import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
  */ 
 object CryptographicMisuse {
   
-  def apply(idfg : InterProceduralDataFlowGraph) : Unit
-  	= build(idfg)
+  def apply(global: Global, idfg : InterProceduralDataFlowGraph) : Unit
+  	= build(global, idfg)
   	
-  def build(idfg : InterProceduralDataFlowGraph) : Unit = {
+  def build(global: Global, idfg : InterProceduralDataFlowGraph) : Unit = {
     val icfg = idfg.icfg
     val ptaresult = idfg.ptaresult
     val nodeMap : MMap[String, MSet[ICFGCallNode]] = mmapEmpty
     icfg.nodes.foreach{
       node =>
-        val result = getCryptoNode(node)
+        val result = getCryptoNode(global, node)
         result.foreach{
           r =>
             nodeMap.getOrElseUpdate(r._1, msetEmpty) += r._2
         }
     }
-    val rule1Res = ECBCheck(nodeMap, ptaresult)
+    val rule1Res = ECBCheck(global, nodeMap, ptaresult)
     rule1Res.foreach{
       case (n, b) =>
         if(!b){
@@ -60,7 +66,7 @@ object CryptographicMisuse {
    * Rule 1 forbids the use of ECB mode because ECB mode is deterministic and not stateful, 
    * thus cannot be IND-CPA secure.
    */
-  def ECBCheck(nodeMap : MMap[String, MSet[ICFGCallNode]], ptaresult : PTAResult) : Map[ICFGCallNode, Boolean] = {
+  def ECBCheck(global: Global, nodeMap : MMap[String, MSet[ICFGCallNode]], ptaresult : PTAResult) : Map[ICFGCallNode, Boolean] = {
     var result : Map[ICFGCallNode, Boolean] = Map()
     val nodes : MSet[ICFGCallNode] = msetEmpty
     nodeMap.foreach{
@@ -71,7 +77,11 @@ object CryptographicMisuse {
     nodes.foreach{
       node =>
         result += (node -> true)
+<<<<<<< HEAD
         val loc = Center.getMethodWithoutFailing(node.getOwner).getMethodBody.location(node.getLocIndex)
+=======
+        val loc = global.getMethod(node.getOwner).get.getBody.location(node.getLocIndex)
+>>>>>>> upstream/master
         val argNames : MList[String] = mlistEmpty
         loc match{
           case jumploc : JumpLocation =>
@@ -94,7 +104,7 @@ object CryptographicMisuse {
           case _ =>
         }
         require(argNames.isDefinedAt(0))
-        val argSlot = VarSlot(argNames(0))
+        val argSlot = VarSlot(argNames(0), false, true)
         val argValue = ptaresult.pointsToSet(argSlot, node.context)
         argValue.foreach{
           ins =>
@@ -107,7 +117,7 @@ object CryptographicMisuse {
     result
   }
   
-  def getCryptoNode(node : ICFGNode) : Set[(String, ICFGCallNode)] = {
+  def getCryptoNode(global: Global, node : ICFGNode) : Set[(String, ICFGCallNode)] = {
     val result : MSet[(String, ICFGCallNode)] = msetEmpty
     node match{
       case invNode : ICFGCallNode =>
@@ -115,6 +125,7 @@ object CryptographicMisuse {
 		    calleeSet.foreach{
 		      callee =>
 		        val calleep = callee.callee
+<<<<<<< HEAD
 <<<<<<< HEAD
 		        val callees : MSet[JawaMethod] = msetEmpty
 				    val caller = Center.getMethodWithoutFailing(invNode.getOwner)
@@ -124,6 +135,11 @@ object CryptographicMisuse {
 				    val caller = Center.getProcedureWithoutFailing(invNode.getOwner)
 				    val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
 >>>>>>> CommunicationLeakage
+=======
+		        val callees : MSet[JawaMethod] = msetEmpty
+				    val caller = global.getMethod(invNode.getOwner).get
+				    val jumpLoc = caller.getBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
+>>>>>>> upstream/master
 				    val cj = jumpLoc.jump.asInstanceOf[CallJump]
 //				    if(calleep.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
 //				      val calleeSignature = cj.getValueAnnotation("signature") match {
@@ -140,8 +156,8 @@ object CryptographicMisuse {
 //				    }
 		        callees.foreach{
 		          callee =>
-						    if(CryptographicConstants.getCryptoAPIs.contains(callee.getSignature)){
-						      result += ((callee.getSignature, invNode))
+						    if(CryptographicConstants.getCryptoAPIs.contains(callee.getSignature.signature)){
+						      result += ((callee.getSignature.signature, invNode))
 						    }
 		        }
 		    }
