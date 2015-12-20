@@ -20,6 +20,7 @@ import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.pta.PTAInstance
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
 import org.sireum.jawa.alir.pta.PTATupleInstance
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
 import org.sireum.jawa.alir.pta.ClassInstance
 import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.alir.pta.NullInstance
@@ -27,6 +28,8 @@ import org.sireum.jawa.alir.pta.Instance
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.FieldSlot
 import org.sireum.jawa.alir.pta.VarSlot
+=======
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -535,7 +538,11 @@ object IntentModel {
 		      acStr =>
 	          acStr match{
 	            case cstr @ PTAConcreteStringInstance(text, c) =>
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
 	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), cstr)
+=======
+	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
 	            case pstr @ PTAPointStringInstance(c) => 
 	              err_msg_detail(TITLE, "Init action use point string: " + pstr)
 	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), pstr)
@@ -579,7 +586,11 @@ object IntentModel {
 		      acStr =>
 	          acStr match{
 	            case cstr @ PTAConcreteStringInstance(text, c) =>
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
 	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), cstr)
+=======
+	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
 	            case pstr @ PTAPointStringInstance(c) => 
 	              err_msg_detail(TITLE,"Init action use point string: " + pstr)
 	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), pstr)
@@ -642,7 +653,11 @@ object IntentModel {
 		      acStr =>
 	          acStr match{
 	            case cstr @ PTAConcreteStringInstance(text, c) =>
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
 	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), cstr)
+=======
+	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
 	            case pstr @ PTAPointStringInstance(c) => 
 	              err_msg_detail(TITLE, "Init action use point string: " + pstr)
 	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), pstr)
@@ -665,8 +680,13 @@ object IntentModel {
 	          recOpt match{
               case Some(rec) =>
 		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
 		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
+=======
+		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
               case None =>
                 err_msg_normal(TITLE, "Cannot find Given class: " + cstr)
                 val unknownIns = UnknownInstance(new NormalType(recordName), c)
@@ -730,8 +750,13 @@ object IntentModel {
 	          recOpt match{
               case Some(rec) =>
 		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
 		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
+=======
+		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
               case None =>
                 err_msg_normal(TITLE, "Cannot find Given class: " + cstr)
                 val unknownIns = UnknownInstance(new NormalType(recordName), c)
@@ -778,7 +803,11 @@ object IntentModel {
 				      cn =>
 				        cn match{
 				          case cstr @ PTAConcreteStringInstance(text, c) =>
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
 				            newfacts += RFAFact(FieldSlot(hashsetIns, "items"), cstr)
+=======
+				            newfacts += RFAFact(FieldSlot(hashsetIns, "java.util.HashSet.items"), cstr)
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
 				          case pstr @ PTAPointStringInstance(c) => 
 				            err_msg_detail(TITLE, "add category use point string: " + pstr)
 				            newfacts += RFAFact(FieldSlot(hashsetIns, "items"), pstr)
@@ -840,7 +869,11 @@ object IntentModel {
 	            tv =>
 	              str match{
 			            case cstr @ PTAConcreteStringInstance(text, c) =>
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
 			              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), cstr)
+=======
+			              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_ACTION), cstr)
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
 			            case pstr @ PTAPointStringInstance(c) => 
 			              err_msg_detail(TITLE, "Init package use point string: " + pstr)
 			              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_ACTION)), pstr)
@@ -900,8 +933,13 @@ object IntentModel {
 	          recOpt match{
               case Some(rec) =>
 		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
 		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
+=======
+		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
               case None =>
                 err_msg_normal(TITLE, "Cannot find Given class: " + cstr)
                 val unknownIns = UnknownInstance(new NormalType(recordName), c)
@@ -930,7 +968,11 @@ object IntentModel {
     val thisSlot = VarSlot(args(0))
 	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val clazzSlot = VarSlot(args(2))
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
 	  val clazzValue = s.pointsToSet(clazzSlot, currentContext)
+=======
+	  val clazzValue = factMap.getOrElse(clazzSlot, isetEmpty)
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
     val componentNameIns = PTAInstance(NormalType(AndroidConstants.COMPONENTNAME, 0), currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
@@ -957,8 +999,13 @@ object IntentModel {
 	          recOpt match{
               case Some(rec) =>
 		            val pakStr = PTAConcreteStringInstance(rec.getPackageName, c)
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
 		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
 		            newfacts += RFAFact(FieldSlot(componentNameIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
+=======
+		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_PACKAGE), pakStr)
+		            newfacts += RFAFact(FieldSlot(componentNameIns, AndroidConstants.COMPONENTNAME_CLASS), cstr)
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
               case None =>
                 err_msg_normal(TITLE, "Cannot find Given class: " + cstr)
                 val unknownIns = UnknownInstance(new NormalType(recordName), c)
@@ -1148,7 +1195,11 @@ object IntentModel {
 	            tv =>
 	              str match{
 			            case cstr @ PTAConcreteStringInstance(text, c) =>
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
 			              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_PACKAGE)), cstr)
+=======
+			              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENT_PACKAGE), cstr)
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
 			            case pstr @ PTAPointStringInstance(c) => 
 			              err_msg_detail(TITLE, "Init package use point string: " + pstr)
 			              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_PACKAGE)), pstr)
@@ -1208,9 +1259,13 @@ object IntentModel {
 				      str =>
 			          valueValue.foreach{
 			            vv =>
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
                     thisValue foreach{
                       ins => entries += PTATupleInstance(str, vv, ins.defSite)
                     }
+=======
+			              entries += PTATupleInstance(str, vv, currentContext)
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
 			          }
 				    }
 	          newfacts ++= entries.map(e => RFAFact(FieldSlot(mev, "entries"), e))
@@ -1253,6 +1308,7 @@ object IntentModel {
 	  val keyValue = s.pointsToSet(keySlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
     if(!thisValue.isEmpty){
   	  val mExtraValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_EXTRAS)), currentContext)}.reduce(iunion[Instance])
   	  val entValue = 
@@ -1278,6 +1334,22 @@ object IntentModel {
         }
       } else {
         newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(Center.DEFAULT_TOPLEVEL_OBJECT), currentContext)))
+=======
+	  if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
+      val keys = keyValue.map{k => k.asInstanceOf[PTAConcreteStringInstance].string}
+      entValue.foreach{
+        v =>
+          require(v.isInstanceOf[PTATupleInstance])
+          if(keys.contains(v.asInstanceOf[PTATupleInstance].left.asInstanceOf[PTAConcreteStringInstance].string)){
+            newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
+          }
+      }
+    } else if(!entValue.isEmpty) {
+      entValue.foreach{
+        v =>
+          require(v.isInstanceOf[PTATupleInstance])
+          newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
       }
     }
     (newfacts, delfacts)
@@ -1296,6 +1368,7 @@ object IntentModel {
 	  val defaultValue = s.pointsToSet(defaultSlot, currentContext)
     var newfacts = isetEmpty[RFAFact]
     var delfacts = isetEmpty[RFAFact]
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
     if(!thisValue.isEmpty){
   	  val mExtraValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENT_EXTRAS)), currentContext)}.reduce(iunion[Instance])
   	  val entValue = 
@@ -1321,6 +1394,22 @@ object IntentModel {
         }
       } else {
         newfacts += (RFAFact(VarSlot(retVar), UnknownInstance(StringFormConverter.formatClassNameToType(Center.DEFAULT_TOPLEVEL_OBJECT), currentContext)))
+=======
+	  if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
+      val keys = keyValue.map{k => k.asInstanceOf[PTAConcreteStringInstance].string}
+      entValue.foreach{
+        v =>
+          require(v.isInstanceOf[PTATupleInstance])
+          if(keys.contains(v.asInstanceOf[PTATupleInstance].left.asInstanceOf[PTAConcreteStringInstance].string)){
+            newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
+          }
+      }
+    } else if(!entValue.isEmpty) {
+      entValue.foreach{
+        v =>
+          require(v.isInstanceOf[PTATupleInstance])
+          newfacts += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentModel.scala
       }
     }
 	  if(newfacts.isEmpty){

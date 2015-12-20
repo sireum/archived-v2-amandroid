@@ -12,12 +12,18 @@ import org.sireum.util._
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
 import org.sireum.jawa.alir.pta.Instance
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
 import org.sireum.jawa.alir.pta.PTATupleInstance
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.jawa.alir.pta.FieldSlot
+=======
+import org.sireum.jawa.alir.Instance
+import org.sireum.jawa.alir.pta.PTAPointStringInstance
+import org.sireum.jawa.alir.pta.PTATupleInstance
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -284,15 +290,25 @@ object BundleModel {
 	  var result = isetEmpty[RFAFact]
     require(args.size >0)
     val thisSlot = VarSlot(args(0))
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
 	  val thisValue = s.pointsToSet(thisSlot, currentContext)
     if(!thisValue.isEmpty){
 	    val strValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
+=======
+	  val thisValue = factMap.getOrElse(thisSlot, isetEmpty)
+    if(!thisValue.isEmpty){
+	  val strValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, "android.os.Bundle.entries"), isetEmpty)}.reduce(iunion[Instance])
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
   	  val rf = ReachingFactsAnalysisHelper.getReturnFact(NormalType("java.util.HashSet", 0), retVar, currentContext).get
   	  result += rf
   	  result ++= strValue.map{
   	    s => 
   	      require(s.isInstanceOf[PTATupleInstance])
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
   	      RFAFact(FieldSlot(rf.v, "items"), s.asInstanceOf[PTATupleInstance].left)
+=======
+  	      RFAFact(FieldSlot(rf.v, "java.util.HashSet.items"), s.asInstanceOf[PTATupleInstance].left)
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
   	  }
     }
 	  result
@@ -304,14 +320,24 @@ object BundleModel {
     val thisSlot = VarSlot(args(0))
 	  val thisValue = s.pointsToSet(thisSlot, currentContext)
 	  val keySlot = VarSlot(args(1))
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
 	  val keyValue = s.pointsToSet(keySlot, currentContext)
     if(!thisValue.isEmpty){
   	  val entValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
+=======
+	  val keyValue = factMap.getOrElse(keySlot, isetEmpty)
+    if(!thisValue.isEmpty){
+  	  val entValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, "android.os.Bundle.entries"), isetEmpty)}.reduce(iunion[Instance])
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
   	  if(keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
   		  entValue.foreach{
   		    v =>
   		      require(v.isInstanceOf[PTATupleInstance])
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
   		      if(keyValue.exists { kIns => kIns === v.asInstanceOf[PTATupleInstance].left }){
+=======
+  		      if(keyValue.contains(v.asInstanceOf[PTATupleInstance].left)){
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
   		        result += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
   		      }
   		  }
@@ -334,6 +360,7 @@ object BundleModel {
 	  val keySlot = VarSlot(args(1))
 	  val keyValue = s.pointsToSet(keySlot, currentContext)
 	  val defaultSlot = VarSlot(args(2))
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
 	  val defaultValue = s.pointsToSet(defaultSlot, currentContext)
     if(!thisValue.isEmpty){
   	  val entValue = thisValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
@@ -353,6 +380,25 @@ object BundleModel {
   		  }
   	  }
     }
+=======
+	  val defaultValue = factMap.getOrElse(defaultSlot, isetEmpty)
+	  val entValue = thisValue.map{ins => factMap.getOrElse(FieldSlot(ins, "android.os.Bundle.entries"), isetEmpty)}.reduce(iunion[Instance])
+	  if(keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty){
+		  entValue.foreach{
+		    v =>
+		      require(v.isInstanceOf[PTATupleInstance])
+		      if(keyValue.contains(v.asInstanceOf[PTATupleInstance].left)){
+		        result += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
+		      }
+		  }
+	  } else {
+	    entValue.foreach{
+		    v =>
+		      require(v.isInstanceOf[PTATupleInstance])
+		      result += (RFAFact(VarSlot(retVar), v.asInstanceOf[PTATupleInstance].right))
+		  }
+	  }
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
 	  if(result.isEmpty){
 	    result ++= defaultValue.map(RFAFact(VarSlot(retVar), _))
 	  }
@@ -373,10 +419,14 @@ object BundleModel {
 	    kv =>
 	      valueValue.foreach{
 	        vv =>
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
             thisValue.foreach{
               ins =>
                 entries += PTATupleInstance(kv, vv, ins.defSite)
             }
+=======
+	          entries += PTATupleInstance(kv, vv, currentContext)
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/BundleModel.scala
 	      }
 	  }
 	  thisValue.foreach{

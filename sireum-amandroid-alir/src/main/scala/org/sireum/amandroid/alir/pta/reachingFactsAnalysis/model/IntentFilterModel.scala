@@ -13,6 +13,7 @@ import org.sireum.jawa.alir.Context
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.MessageCenter._
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentFilterModel.scala
 import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.alir.pta.NullInstance
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
@@ -21,6 +22,12 @@ import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.FieldSlot
 import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.alir.pta.VarSlot
+=======
+import org.sireum.jawa.alir.UnknownInstance
+import org.sireum.jawa.alir.NullInstance
+import org.sireum.jawa.alir.pta.PTAPointStringInstance
+import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentFilterModel.scala
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -122,7 +129,11 @@ object IntentFilterModel {
 		      acStr =>
 	          acStr match{
 	            case cstr @ PTAConcreteStringInstance(text, c) =>
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentFilterModel.scala
 	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENTFILTER_ACTIONS)), cstr)
+=======
+	              newfacts += RFAFact(FieldSlot(tv, AndroidConstants.INTENTFILTER_ACTIONS), cstr)
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/IntentFilterModel.scala
 	            case pstr @ PTAPointStringInstance(c) => 
 	              err_msg_detail(TITLE, "Init IntentFilter use point string: " + pstr)
 	              newfacts += RFAFact(FieldSlot(tv, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.INTENTFILTER_ACTIONS)), pstr)

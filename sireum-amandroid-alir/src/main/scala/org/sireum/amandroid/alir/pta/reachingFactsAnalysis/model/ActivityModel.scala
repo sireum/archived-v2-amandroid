@@ -12,11 +12,15 @@ import org.sireum.util._
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/ActivityModel.scala
 import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.jawa.alir.pta.FieldSlot
 import org.sireum.jawa.util.StringFormConverter
+=======
+import org.sireum.jawa.alir.UnknownInstance
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/ActivityModel.scala
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

@@ -16,6 +16,7 @@ import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.parser.IntentFilterDataBase
 import org.sireum.amandroid.parser.IntentFilter
 import org.sireum.jawa.MessageCenter._
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/FrameworkMethodsModel.scala
 import org.sireum.jawa.alir.pta.UnknownInstance
 import org.sireum.jawa.alir.pta.NullInstance
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
@@ -24,6 +25,12 @@ import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.jawa.alir.pta.FieldSlot
 import org.sireum.jawa.util.StringFormConverter
+=======
+import org.sireum.jawa.alir.UnknownInstance
+import org.sireum.jawa.alir.NullInstance
+import org.sireum.jawa.alir.pta.PTAPointStringInstance
+import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/FrameworkMethodsModel.scala
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

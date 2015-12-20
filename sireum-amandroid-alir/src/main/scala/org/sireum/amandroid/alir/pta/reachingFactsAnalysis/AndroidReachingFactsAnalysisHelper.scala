@@ -8,11 +8,10 @@ http://www.eclipse.org/legal/epl-v10.html
 package org.sireum.amandroid.alir.pta.reachingFactsAnalysis
 
 import org.sireum.util._
-import org.sireum.jawa.JawaMethod
+import org.sireum.jawa.JawaProcedure
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.AndroidModelCallHandler
-import org.sireum.jawa.alir.pta.PTAResult
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -20,19 +19,19 @@ import org.sireum.jawa.alir.pta.PTAResult
  */ 
 object AndroidReachingFactsAnalysisHelper {
 	
-	def isModelCall(calleeMethod : JawaMethod) : Boolean = {
-    AndroidModelCallHandler.isModelCall(calleeMethod)
+	def isModelCall(calleeProc : JawaProcedure) : Boolean = {
+    AndroidModelCallHandler.isModelCall(calleeProc)
   }
   
-  def doModelCall(s : PTAResult, calleeMethod : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
-    AndroidModelCallHandler.doModelCall(s, calleeMethod, args, retVars, currentContext)
+  def doModelCall(s : ISet[RFAFact], calleeProc : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : ISet[RFAFact] = {
+    AndroidModelCallHandler.doModelCall(s, calleeProc, args, retVars, currentContext)
   }
   
-  def isICCCall(calleeMethod : JawaMethod) : Boolean = {
-    AndroidModelCallHandler.isICCCall(calleeMethod)
+  def isICCCall(calleeProc : JawaProcedure) : Boolean = {
+    AndroidModelCallHandler.isICCCall(calleeProc)
   }
   
-  def doICCCall(s : PTAResult, calleeMethod : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[JawaMethod]) = {
-    AndroidModelCallHandler.doICCCall(s, calleeMethod, args, retVars, currentContext)
+  def doICCCall(s : ISet[RFAFact], calleeProc : JawaProcedure, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[JawaProcedure]) = {
+    AndroidModelCallHandler.doICCCall(s, calleeProc, args, retVars, currentContext)
   }
 }

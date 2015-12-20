@@ -14,16 +14,27 @@ import org.sireum.jawa.alir.taintAnalysis.TaintAnalysisResult
 import org.sireum.jawa.Center
 import org.stringtemplate.v4.STGroupFile
 import java.util.ArrayList
+<<<<<<< HEAD
 import org.sireum.jawa.alir.controlFlowGraph.ICFGCallNode
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.ReachingFactsAnalysisHelper
+=======
+import org.sireum.jawa.alir.controlFlowGraph.CGCallNode
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.ReachingFactsAnalysisHelper
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
+>>>>>>> CommunicationLeakage
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
 import org.sireum.pilar.ast._
 import org.sireum.amandroid.parser.UriData
 import org.sireum.jawa.alir.Context
+<<<<<<< HEAD
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentCommunicationModel
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.amandroid.AndroidConstants
+=======
+import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentCommunicationModel
+>>>>>>> CommunicationLeakage
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -326,8 +337,13 @@ object DataCollector {
 			      val InterProceduralDataFlowGraph(icfg, ptaresult) = AppCenter.getIDFG(compRec)
 			      val iccNodes = icfg.nodes.filter{
 			        	node =>
+<<<<<<< HEAD
 			        	  node.isInstanceOf[ICFGCallNode] && node.asInstanceOf[ICFGCallNode].getCalleeSet.exists(c => InterComponentCommunicationModel.isIccOperation(c.callee))
 			      	}.map(_.asInstanceOf[ICFGCallNode])
+=======
+			        	  node.isInstanceOf[CGCallNode] && node.asInstanceOf[CGCallNode].getCalleeSet.exists(c => InterComponentCommunicationModel.isIccOperation(c.callee))
+			      	}.map(_.asInstanceOf[CGCallNode])
+>>>>>>> CommunicationLeakage
 			      iccInfos =
 				      iccNodes.map{
 				        iccNode =>

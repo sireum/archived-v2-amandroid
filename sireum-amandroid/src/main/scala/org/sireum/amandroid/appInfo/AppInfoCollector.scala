@@ -134,7 +134,11 @@ class AppInfoCollector(apkUri : FileResourceUri, outputUri : FileResourceUri, ti
 		  if(!comRec.declaresMethodByShortName(AndroidConstants.COMP_ENV)){
 			  msg_critical(TITLE, "*************Dynamically Register Component**************")
 			  msg_normal(TITLE, "Component name: " + comRec)
+<<<<<<< HEAD
 			  this.intentFdb.merge(iDB)
+=======
+			  this.intentFdb.updateIntentFmap(iDB)
+>>>>>>> CommunicationLeakage
 			  val analysisHelper = new ReachableInfoCollector(Set(comRec.getName), timer) 
 				analysisHelper.collectCallbackMethods()
 				this.callbackMethods ++= analysisHelper.getCallbackMethods

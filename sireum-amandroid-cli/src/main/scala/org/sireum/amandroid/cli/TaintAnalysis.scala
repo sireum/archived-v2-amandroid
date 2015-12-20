@@ -137,7 +137,11 @@ object TanitAnalysis{
   
   def taintAnalyze(apkFileUris: Set[FileResourceUri], sasFilePath: String, outputPath: String, static: Boolean, parallel: Boolean, icc: Boolean, k_context: Int, timeout: Int) = {
     AndroidGlobalConfig.SourceAndSinkFilePath = sasFilePath
+<<<<<<< HEAD
     GlobalConfig.ICFG_CONTEXT_K = k_context
+=======
+    GlobalConfig.CG_CONTEXT_K = k_context
+>>>>>>> CommunicationLeakage
     AndroidReachingFactsAnalysisConfig.parallel = parallel
     AndroidReachingFactsAnalysisConfig.resolve_icc = icc
     AndroidReachingFactsAnalysisConfig.resolve_static_init = static
@@ -158,8 +162,13 @@ object TanitAnalysis{
             msg_critical(TITLE, "Analyzing #" + i + ":" + file)
             msg_critical(TITLE, TaintTask(outputPath, file, socket, parallel, Some(timeout*60)).run)   
           } catch {
+<<<<<<< HEAD
             case te: MyTimeoutException => err_msg_critical(TITLE, te.message)
             case e: Throwable =>
+=======
+            case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
+            case e : Throwable =>
+>>>>>>> CommunicationLeakage
               CliLogger.logError(new File(outputPath), "Error: " , e)
           } finally{
             socket.cleanEnv
@@ -173,8 +182,13 @@ object TanitAnalysis{
 	  
 	}
   
+<<<<<<< HEAD
   private case class TaintTask(outputPath: String, file: FileResourceUri, socket: AmandroidSocket, parallel: Boolean, timeout: Option[Int]) {
     def run: String = {
+=======
+  private case class TaintTask(outputPath : String, file : FileResourceUri, socket : AmandroidSocket, parallel : Boolean, timeout : Option[Int]) {
+    def run : String = {
+>>>>>>> CommunicationLeakage
       val timer = timeout match {
         case Some(t) => Some(new MyTimer(t))
         case None => None
@@ -190,7 +204,11 @@ object TanitAnalysis{
     }
   }
   
+<<<<<<< HEAD
   private class TaintListener(source_apk: FileResourceUri, output_dir: String, app_info: AppInfoCollector) extends AmandroidSocketListener {
+=======
+  private class TaintListener(source_apk : FileResourceUri, output_dir : String, app_info : AppInfoCollector) extends AmandroidSocketListener {
+>>>>>>> CommunicationLeakage
     def onPreAnalysis: Unit = {
     }
 

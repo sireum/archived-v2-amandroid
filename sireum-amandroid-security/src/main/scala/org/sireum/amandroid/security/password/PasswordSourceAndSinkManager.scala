@@ -19,12 +19,20 @@ import org.sireum.jawa.alir.util.ExplicitValueFinder
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.ReachingFactsAnalysisHelper
 import org.sireum.pilar.ast._
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
+<<<<<<< HEAD
 import org.sireum.jawa.alir.controlFlowGraph.ICFGInvokeNode
 import org.sireum.jawa.Center
 import org.sireum.amandroid.alir.taintAnalysis.AndroidSourceAndSinkManager
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentCommunicationModel
 import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.jawa.alir.pta.PTAResult
+=======
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
+import org.sireum.jawa.alir.controlFlowGraph.CGInvokeNode
+import org.sireum.jawa.Center
+import org.sireum.amandroid.alir.taintAnalysis.AndroidSourceAndSinkManager
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentCommunicationModel
+>>>>>>> CommunicationLeakage
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

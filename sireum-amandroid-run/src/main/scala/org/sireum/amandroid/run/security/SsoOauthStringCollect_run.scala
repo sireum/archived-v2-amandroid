@@ -344,7 +344,11 @@ object SsoOauthStringCollect_run {
         	    
           }
         	
+<<<<<<< HEAD
         	(JawaCodeSource.getThirdPartyLibraryClassCodes).foreach{
+=======
+        	(JawaCodeSource.getThirdPartyLibraryRecordsCodes).foreach{
+>>>>>>> CommunicationLeakage
         	  case (name, code) => 	    
         	    if(!extract(code, regexSso).isEmpty){ 
         	      Counter.ssoLoginUser += file

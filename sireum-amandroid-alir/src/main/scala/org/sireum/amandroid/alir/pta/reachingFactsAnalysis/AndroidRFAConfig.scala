@@ -9,7 +9,11 @@ package org.sireum.amandroid.alir.pta.reachingFactsAnalysis
 
 import org.sireum.util._
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidRFAConfig.scala
 import org.sireum.jawa.JawaMethod
+=======
+import org.sireum.jawa.JawaProcedure
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidRFAConfig.scala
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.NormalType
 import org.sireum.jawa.alir.Context
@@ -17,7 +21,10 @@ import org.sireum.jawa.GlobalConfig
 import org.sireum.jawa.JawaClass
 import org.sireum.jawa.Center
 import org.sireum.jawa.alir.pta.PTAInstance
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidRFAConfig.scala
 import org.sireum.jawa.alir.pta.VarSlot
+=======
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidRFAConfig.scala
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

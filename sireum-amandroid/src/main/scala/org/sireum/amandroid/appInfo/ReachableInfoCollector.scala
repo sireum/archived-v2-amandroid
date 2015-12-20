@@ -55,7 +55,11 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	  var flag = false
 	  compProcMap.foreach{
 	    case(comp, procs) => 
+<<<<<<< HEAD
 	      val tmpReachableMethods = ReachabilityAnalysis.getReachableMethods(procs, timer)
+=======
+	      val tmpReachableMethods = ReachabilityAnalysis.getReachableProcedures(procs, timer)
+>>>>>>> CommunicationLeakage
 	      val oldReachableMethods = reachableMap.getOrElse(comp, Set())
 	      val newReachableMethods = tmpReachableMethods -- oldReachableMethods
 	      if(!newReachableMethods.isEmpty){
@@ -70,8 +74,13 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	  initAndroidCallbacks
 		(if(GlobalConfig.androidInfoCollectParallel) entryPointClasses.par else entryPointClasses).foreach {
 		  compName =>
+<<<<<<< HEAD
 		    val comp = Center.resolveClass(compName, Center.ResolveLevel.BODY)
 		    val reachableMethods = ReachabilityAnalysis.getReachableMethods(comp.getMethods)
+=======
+		    val comp = Center.resolveRecord(compName, Center.ResolveLevel.BODY)
+		    val reachableMethods = ReachabilityAnalysis.getReachableProcedures(comp.getProcedures)
+>>>>>>> CommunicationLeakage
 		    reachableMap += (comp -> reachableMethods)
 		}
 	}
@@ -80,8 +89,13 @@ class ReachableInfoCollector(entryPointClasses:Set[String], timer : Option[MyTim
 	  initAndroidCallbacks
 	  (if(GlobalConfig.androidInfoCollectParallel) entryPointClasses.par else entryPointClasses).foreach {
 		  compName =>
+<<<<<<< HEAD
 		    val comp = Center.resolveClass(compName, Center.ResolveLevel.BODY)
 		    val reachableMethods = ReachabilityAnalysis.getReachableMethods(comp.getMethodsByShortName(AndroidConstants.MAINCOMP_ENV) ++ comp.getMethodsByShortName(AndroidConstants.COMP_ENV))
+=======
+		    val comp = Center.resolveRecord(compName, Center.ResolveLevel.BODY)
+		    val reachableMethods = ReachabilityAnalysis.getReachableProcedures(comp.getProceduresByShortName(AndroidConstants.MAINCOMP_ENV) ++ comp.getProceduresByShortName(AndroidConstants.COMP_ENV))
+>>>>>>> CommunicationLeakage
 		    reachableMap += (comp -> reachableMethods)
 		}
 	}

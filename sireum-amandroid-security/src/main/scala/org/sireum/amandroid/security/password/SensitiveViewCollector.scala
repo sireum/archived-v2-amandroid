@@ -42,7 +42,11 @@ class SensitiveViewCollector(apkUri : FileResourceUri, outputUri : FileResourceU
 		if(!this.layoutControls.exists(p => p._2.isSensitive)) throw new IgnoreException
 		
 		val ra = AppInfoCollector.reachabilityAnalysis(mfp, timer)
+<<<<<<< HEAD
 		this.sensitiveLayoutContainers = ra.getSensitiveLayoutContainer(layoutControls.toMap)
+=======
+		this.sensitiveLayoutContainers = ra.getSensitiveLayoutContainer(layoutControls)
+>>>>>>> CommunicationLeakage
 		val callbacks = AppInfoCollector.analyzeCallback(afp, lfp, ra)
 		this.callbackMethods ++= callbacks
 		var components = isetEmpty[JawaClass]

@@ -278,7 +278,11 @@ object OAuth_run {
         	}
       	
       	
+<<<<<<< HEAD
         	(JawaCodeSource.getThirdPartyLibraryClassCodes).foreach{
+=======
+        	(JawaCodeSource.getThirdPartyLibraryRecordsCodes).foreach{
+>>>>>>> CommunicationLeakage
         	  case (name, code) =>
         	    if(code.contains("m.facebook.com")){
         	      System.err.println("Facebook url in App Using Lib:" + name)

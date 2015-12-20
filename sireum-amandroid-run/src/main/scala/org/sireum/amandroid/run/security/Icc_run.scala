@@ -106,7 +106,11 @@ object Icc_run {
       return
     }
     
+<<<<<<< HEAD
     GlobalConfig.ICFG_CONTEXT_K = 1
+=======
+    GlobalConfig.CG_CONTEXT_K = 1
+>>>>>>> CommunicationLeakage
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
 //    AndroidReachingFactsAnalysisConfig.timeout = 10

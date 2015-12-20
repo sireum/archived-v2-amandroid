@@ -46,7 +46,11 @@ class InterestingApiCollector (apkUri : FileResourceUri, outputUri : FileResourc
 		
 	  val afp = AppInfoCollector.analyzeARSC(apkUri)
 		val lfp = AppInfoCollector.analyzeLayouts(apkUri, mfp)
+<<<<<<< HEAD
 		this.layoutControls ++= lfp.getUserControls
+=======
+		this.layoutControls = lfp.getUserControls
+>>>>>>> CommunicationLeakage
 		this.ra = AppInfoCollector.reachabilityAnalysis(mfp, timer)
 		val callbacks = AppInfoCollector.analyzeCallback(afp, lfp, ra)
 		this.callbackMethods ++= callbacks

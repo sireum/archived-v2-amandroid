@@ -21,8 +21,11 @@ import java.net.URI
 import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.MessageCenter._
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/InterComponentCommunicationModel.scala
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.VarSlot
+=======
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/InterComponentCommunicationModel.scala
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

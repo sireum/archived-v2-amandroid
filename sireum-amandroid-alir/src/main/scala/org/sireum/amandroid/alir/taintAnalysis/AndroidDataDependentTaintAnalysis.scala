@@ -10,19 +10,32 @@ package org.sireum.amandroid.alir.taintAnalysis
 import org.sireum.jawa.alir.dataDependenceAnalysis._
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysis
 import org.sireum.util._
+<<<<<<< HEAD
 import org.sireum.jawa.JawaMethod
+=======
+import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
+>>>>>>> CommunicationLeakage
 import org.sireum.jawa.Center
 import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.pilar.ast._
+<<<<<<< HEAD
+=======
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.ReachingFactsAnalysisHelper
+>>>>>>> CommunicationLeakage
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceInfo
 import org.sireum.jawa.alir.taintAnalysis._
 import org.sireum.amandroid.security.AndroidProblemCategories
 import scala.tools.nsc.ConsoleWriter
 import org.sireum.jawa.util.StringFormConverter
+<<<<<<< HEAD
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.ReachingFactsAnalysisHelper
+=======
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
+>>>>>>> CommunicationLeakage
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -157,6 +170,7 @@ object AndroidDataDependentTaintAnalysis {
 		      callee =>
 		        val calleesig = callee.callee.getSignature
 		        val calleep = callee.callee
+<<<<<<< HEAD
 				    val caller = Center.getMethodWithoutFailing(invNode.getOwner)
 				    val jumpLoc = caller.getMethodBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
 
@@ -174,6 +188,50 @@ object AndroidDataDependentTaintAnalysis {
 				      tn.isSrc = false
 				      tn.descriptors += Td(calleep.getSignature, SourceAndSinkCategory.API_SINK)
 				      sinks += tn
+=======
+		        val callees : MSet[JawaProcedure] = msetEmpty
+				    val caller = Center.getProcedureWithoutFailing(invNode.getOwner)
+				    val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
+				    val cj = jumpLoc.jump.asInstanceOf[CallJump]
+//				    if(calleep.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
+//				      val calleeSignature = cj.getValueAnnotation("signature") match {
+//				        case Some(s) => s match {
+//				          case ne : NameExp => ne.name.name
+//				          case _ => ""
+//				        }
+//				        case None => throw new RuntimeException("cannot found annotation 'signature' from: " + cj)
+//				      }
+//				      // source and sink APIs can only come from given app's parents.
+//				      callees ++= Center.getProcedureDeclarations(calleeSignature)
+//				    } else 
+              callees += calleep
+				    callees.foreach{
+				      callee =>
+						    if(invNode.isInstanceOf[IDDGVirtualBodyNode] && ssm.isSource(callee, caller, jumpLoc)){
+						      msg_normal(TITLE, "found source: " + callee + "@" + invNode.getContext)
+						      val tn = Tn(invNode)
+						      tn.isSrc = true
+						      tn.descriptors += Td(callee.getSignature, SourceAndSinkCategory.API_SOURCE)
+						      sources += tn
+						    }
+//                println(callee)
+						    if(invNode.isInstanceOf[IDDGCallArgNode] && ssm.isSinkProcedure(callee)){
+						      msg_normal(TITLE, "found sink: " + callee + "@" + invNode.getContext)
+						      extendIDDGForSinkApis(iddg, invNode.asInstanceOf[IDDGCallArgNode], rfaFacts)
+						      val tn = Tn(invNode)
+						      tn.isSrc = false
+						      tn.descriptors += Td(callee.getSignature, SourceAndSinkCategory.API_SINK)
+						      sinks += tn
+						    }
+						    if(invNode.isInstanceOf[IDDGCallArgNode] && invNode.asInstanceOf[IDDGCallArgNode].position > 0 && ssm.isIccSink(invNode.getCGNode.asInstanceOf[CGCallNode], rfaFacts)){
+				          msg_normal(TITLE, "found icc sink: " + invNode)
+				          extendIDDGForSinkApis(iddg, invNode.asInstanceOf[IDDGCallArgNode], rfaFacts)
+				          val tn = Tn(invNode)
+				          tn.isSrc = false
+						      tn.descriptors += Td(invNode.getLocUri, SourceAndSinkCategory.ICC_SINK)
+						      sinks += tn
+				        }
+>>>>>>> CommunicationLeakage
 				    }
 				    if(invNode.isInstanceOf[IDDGCallArgNode] && invNode.asInstanceOf[IDDGCallArgNode].position > 0 && ssm.isIccSink(invNode.getICFGNode.asInstanceOf[ICFGCallNode], ptaresult)){
 		          msg_normal(TITLE, "found icc sink: " + invNode)
@@ -221,11 +279,16 @@ object AndroidDataDependentTaintAnalysis {
     (sources.toSet, sinks.toSet)
   }
   
+<<<<<<< HEAD
   def extendIDDGForSinkApis(iddg: InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node], callArgNode : IDDGCallArgNode, ptaresult : PTAResult) = {
+=======
+  def extendIDDGForSinkApis(iddg: InterProceduralDataDependenceGraph[InterproceduralDataDependenceAnalysis.Node], callArgNode : IDDGCallArgNode, rfaFacts : ISet[RFAFact]) = {
+>>>>>>> CommunicationLeakage
     val calleeSet = callArgNode.getCalleeSet
     calleeSet.foreach{
       callee =>
         val argSlot = VarSlot(callArgNode.argName)
+<<<<<<< HEAD
         val argValue = ptaresult.pointsToSet(argSlot, callArgNode.getContext)
         val argRelatedValue = ptaresult.getRelatedHeapInstances(argValue, callArgNode.getContext)
         argRelatedValue.foreach{
@@ -245,6 +308,25 @@ object AndroidDataDependentTaintAnalysis {
 //                }
 //            }
 //        }
+=======
+        val argFacts = rfaFacts.filter(fact=> argSlot == fact.s)
+        val argRelatedFacts = ReachingFactsAnalysisHelper.getRelatedHeapFactsFrom(argFacts, rfaFacts)
+        argRelatedFacts.foreach{
+          case RFAFact(slot, ins) =>
+            val t = iddg.findDefSite(ins.getDefSite)
+            iddg.addEdge(callArgNode.asInstanceOf[Node], t)
+        }
+        argFacts.foreach{
+          case RFAFact(slot, argIns) => 
+            argIns.getFieldsUnknownDefSites.foreach{
+              case (defsite, udfields) =>
+                if(callArgNode.getContext != defsite){
+                  val t = iddg.findDefSite(defsite)
+                  iddg.addEdge(callArgNode.asInstanceOf[Node], t)
+                }
+            }
+        }
+>>>>>>> CommunicationLeakage
     }
   }
   

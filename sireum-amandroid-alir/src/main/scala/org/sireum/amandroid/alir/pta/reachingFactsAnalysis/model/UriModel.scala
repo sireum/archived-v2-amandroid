@@ -16,10 +16,13 @@ import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.alir.pta.PTAPointStringInstance
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.pta.PTAInstance
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/UriModel.scala
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.jawa.alir.pta.FieldSlot
 import org.sireum.jawa.util.StringFormConverter
+=======
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/UriModel.scala
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -104,7 +107,11 @@ object UriModel {
       sv =>
         sv match{
           case cstr @ PTAConcreteStringInstance(text, c) =>
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/UriModel.scala
             newfacts += RFAFact(FieldSlot(stringUriIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.URI_STRING_URI_URI_STRING)), cstr)
+=======
+            newfacts += RFAFact(FieldSlot(stringUriIns, AndroidConstants.URI_STRING_URI_URI_STRING), cstr)
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/UriModel.scala
           case pstr @ PTAPointStringInstance(c) => 
             err_msg_detail(TITLE, "Init uri string use point string: " + pstr)
             newfacts += RFAFact(FieldSlot(stringUriIns, StringFormConverter.getFieldNameFromFieldSignature(AndroidConstants.URI_STRING_URI_URI_STRING)), pstr)

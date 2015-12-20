@@ -12,7 +12,10 @@ import org.sireum.util._
 import org.sireum.jawa.JawaMethod
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/HandlerModel.scala
 import org.sireum.jawa.alir.pta.PTAResult
+=======
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/model/HandlerModel.scala
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

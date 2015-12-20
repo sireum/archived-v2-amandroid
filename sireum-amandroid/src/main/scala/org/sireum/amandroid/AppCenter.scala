@@ -11,6 +11,10 @@ import org.sireum.util._
 import org.sireum.jawa.JawaClass
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.jawa.alir.taintAnalysis.TaintAnalysisResult
+<<<<<<< HEAD
+=======
+import org.sireum.jawa.alir.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
+>>>>>>> CommunicationLeakage
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceInfo
 import org.sireum.amandroid.parser.IntentFilterDataBase

@@ -19,7 +19,14 @@ import org.sireum.amandroid.security.communication.CommunicationSourceAndSinkMan
 import org.sireum.jawa.util.MyTimeoutException
 import org.sireum.jawa.util.MyTimer
 import org.sireum.jawa.GlobalConfig
-
+import java.io.PrintWriter
+import java.util.Calendar
+import java.io
+import java.io.OutputStream
+import java.io.BufferedReader
+import java.io.FileReader
+import java.io.InputStreamReader
+import java.io.FileInputStream
 
 object CommunicationLeakage_run {
   private final val TITLE = "CommunicationLeakage_run"
@@ -51,16 +58,20 @@ object CommunicationLeakage_run {
       }
       CommunicationLeakageCounter.haveresult += 1
       val msgfile = new File(outputPath + "/msg.txt")
-      val msgw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(msgfile, true)))
-      msgw.write("################# " + source_apk + " ################\n")
+      val msgw =new PrintWriter(new OutputStreamWriter(new FileOutputStream(msgfile, true)))
+      val today = Calendar.getInstance().getTime()
+      msgw.print("The following results are done at "+today+"\n")
+      msgw.print("################# " + source_apk + " ################\n")
       val tRes = AppCenter.getTaintAnalysisResults
       tRes.foreach{
         case (rec, res) =>
-          msgw.write(rec.getName + "\n")
-          msgw.write("Found " + res.getTaintedPaths.size + " path.")
-          msgw.write(res.toString)
-          msgw.write("\n\n")
-      }
+          msgw.print(rec.getName + "\n")
+          msgw.print("Found " + res.getTaintedPaths.size + " path.")
+          msgw.print(res.toString)
+          msgw.print("\n\n")
+          msgw.flush()
+          }
+     
     }
 
     def onPostAnalysis: Unit = {
@@ -100,7 +111,6 @@ object CommunicationLeakage_run {
     
     files.foreach{
       file =>
-        //if(file.contains("FieldSensitivity1"))
         try{
           msg_critical(TITLE, CommunicationLeakageTask(outputPath, file, socket, Some(1000)).run)   
         } catch {

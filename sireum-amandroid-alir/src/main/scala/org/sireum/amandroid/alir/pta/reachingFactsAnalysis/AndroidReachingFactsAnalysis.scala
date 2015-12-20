@@ -20,9 +20,15 @@ import java.io.OutputStreamWriter
 import org.sireum.jawa.alir.pta.Instance
 import org.sireum.jawa.util.StringFormConverter
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
 import org.sireum.jawa.JawaClass
 import org.sireum.jawa.alir.pta.NullInstance
 import org.sireum.jawa.alir.pta.UnknownInstance
+=======
+import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.alir.NullInstance
+import org.sireum.jawa.alir.UnknownInstance
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
 import org.sireum.jawa.MessageCenter._
 import org.sireum.jawa.GlobalConfig
 import org.sireum.jawa.alir.controlFlowGraph._
@@ -35,6 +41,7 @@ import java.io.PrintWriter
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.pta.PTAInstance
 import org.sireum.jawa.util.MyTimer
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
 import org.sireum.jawa.alir.pta._
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralMonotoneDataFlowAnalysisFramework
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralMonotonicFunction
@@ -42,6 +49,8 @@ import org.sireum.jawa.alir.dataFlowAnalysis.CallResolver
 import org.sireum.jawa.alir.dataFlowAnalysis.NodeListener
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralMonotoneDataFlowAnalysisResult
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
+=======
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -51,9 +60,13 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
   
   final val TITLE = "AndroidReachingFactsAnalysisBuilder"
   
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
   var icfg : InterproceduralControlFlowGraph[ICFGNode] = null
   val ptaresult = new PTAResult
   val needtoremove : MMap[Context, RFAFact] = mmapEmpty
+=======
+  var icfg : InterproceduralControlFlowGraph[CGNode] = null
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
   
   def build //
   (entryPointProc : JawaMethod,
@@ -66,6 +79,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
     val callr = new Callr
     val nl = new NodeL
     val initial : ISet[RFAFact] = isetEmpty
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
     val icfg = new InterproceduralControlFlowGraph[ICFGNode]
     this.icfg = icfg
     icfg.collectCfgToBaseGraph(entryPointProc, initContext, true)
@@ -73,6 +87,15 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](icfg,
       true, true, false, AndroidReachingFactsAnalysisConfig.parallel, gen, kill, callr, iota, initial, timer, switchAsOrderedMatch, Some(nl))
     InterProceduralDataFlowGraph(icfg, ptaresult)
+=======
+    val cg = new InterproceduralControlFlowGraph[CGNode]
+    this.icfg = cg
+    cg.collectCfgToBaseGraph(entryPointProc, initContext, true)
+    val iota : ISet[RFAFact] = initialFacts + RFAFact(VarSlot("@@RFAiota"), NullInstance(initContext))
+    val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](cg,
+      true, true, false, AndroidReachingFactsAnalysisConfig.parallel, gen, kill, callr, iota, initial, timer, switchAsOrderedMatch, Some(nl))
+    (cg, result)
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
   }
   
   private def checkAndLoadClassFromHierarchy(me : JawaClass, s : ISet[RFAFact], currentNode : ICFGLocNode) : Unit = {
@@ -169,6 +192,39 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
     }
   }
   
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
+=======
+  protected def getFieldsFacts(rhss : List[Exp], s : ISet[RFAFact], currentContext : Context) : ISet[RFAFact] = {
+    var result = isetEmpty[RFAFact]
+    val factMap = ReachingFactsAnalysisHelper.getFactMap(s)
+    rhss.foreach{
+      rhs =>
+        rhs match{
+      	  case ne : NewExp =>
+      	    var recName : ResourceUri = ""
+            var dimensions = 0
+            ne.typeSpec match {
+              case nt : NamedTypeSpec => 
+                dimensions = ne.dims.size + ne.typeFragments.size
+                recName = nt.name.name
+              case _ =>
+            }
+      	    val typ = NormalType(recName, dimensions)
+      	    val rec = Center.resolveRecord(typ.name, Center.ResolveLevel.HIERARCHY)
+      	    val ins = 
+	            if(recName == "java.lang.String" && dimensions == 0){
+	              PTAConcreteStringInstance("", currentContext.copy)
+	            } else {
+	              PTAInstance(typ, currentContext.copy)
+	            }
+//      	    result ++= rec.getNonStaticObjectTypeFields.map(f=>RFAFact(FieldSlot(ins, f.getSignature), NullInstance(currentContext)))
+      	  case _ =>
+        }
+    }
+    result
+  }
+  
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
   def getExceptionFacts(a : Assignment, s : ISet[RFAFact], currentContext : Context) : ISet[RFAFact] = {
     var result = isetEmpty[RFAFact]
     a match{
@@ -298,6 +354,7 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
     /**
      * It returns the facts for each callee entry node and caller return node
      */
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
     def resolveCall(s : ISet[RFAFact], cj : CallJump, callerContext : Context, icfg : InterproceduralControlFlowGraph[ICFGNode]) : (IMap[ICFGNode, ISet[RFAFact]], ISet[RFAFact]) = {
       ReachingFactsAnalysisHelper.updatePTAResultCallJump(cj, callerContext, s, ptaresult)
 //<<<<<<< HEAD
@@ -317,6 +374,15 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
       val icfgReturnnode = icfg.getICFGReturnNode(callerContext)
       icfgReturnnode.asInstanceOf[ICFGReturnNode].setCalleeSet(calleeSet)
       var calleeFactsMap : IMap[ICFGNode, ISet[RFAFact]] = imapEmpty
+=======
+    def resolveCall(s : ISet[RFAFact], cj : CallJump, callerContext : Context, cg : InterproceduralControlFlowGraph[CGNode]) : (IMap[CGNode, ISet[RFAFact]], ISet[RFAFact]) = {
+      val calleeSet = ReachingFactsAnalysisHelper.getCalleeSet(s, cj, callerContext)
+      val cgCallnode = cg.getCGCallNode(callerContext)
+      cgCallnode.asInstanceOf[CGCallNode].setCalleeSet(calleeSet)
+      val cgReturnnode = cg.getCGReturnNode(callerContext)
+      cgReturnnode.asInstanceOf[CGReturnNode].setCalleeSet(calleeSet)
+      var calleeFactsMap : IMap[CGNode, ISet[RFAFact]] = imapEmpty
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
       var returnFacts : ISet[RFAFact] = s
       var tmpReturnFacts : ISet[RFAFact] = isetEmpty
       var pureNormalFlag = true  //no mix of normal and model callee
@@ -356,7 +422,11 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
 	              }
               }
             } else { // for non-ICC model call
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
               val factsForCallee = getFactsForCallee(s, cj, calleep, callerContext)
+=======
+              val factsForCallee = getFactsForCallee(s, cj, calleep)
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
               returnFacts --= factsForCallee
             	val (g, k) = AndroidReachingFactsAnalysisHelper.doModelCall(ptaresult, calleep, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)
               tmpReturnFacts = tmpReturnFacts ++ factsForCallee -- g ++ g -- k
@@ -368,7 +438,11 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
             }
             val factsForCallee = getFactsForCallee(s, cj, calleep, callerContext)
             returnFacts --= factsForCallee
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
             calleeFactsMap += (icfg.entryNode(calleep.getSignature, callerContext) -> mapFactsToCallee(factsForCallee, callerContext, cj, calleep))
+=======
+            calleeFactsMap += (cg.entryNode(calleep.getSignature, callerContext) -> mapFactsToCallee(factsForCallee, callerContext, cj, calleep))
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
           }
       }
       returnFacts ++= tmpReturnFacts
@@ -471,9 +545,15 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
       }
     }
     
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
     def mapFactsToCallee(factsToCallee : ISet[RFAFact], callerContext : Context, cj : CallJump, calleep : JawaMethod) : ISet[RFAFact] = {
       val varFacts = factsToCallee.filter(f=>f.s.isInstanceOf[VarSlot] && !f.s.asInstanceOf[VarSlot].isGlobal).map{f=>RFAFact(f.s.asInstanceOf[VarSlot], f.v)}
       val calleeMethod = calleep.getMethodBody.procedure
+=======
+    def mapFactsToCallee(factsToCallee : ISet[RFAFact], callerContext : Context, cj : CallJump, calleep : JawaProcedure) : ISet[RFAFact] = {
+      val varFacts = factsToCallee.filter(f=>f.s.isInstanceOf[VarSlot] && !f.s.asInstanceOf[VarSlot].isGlobal).map{f=>RFAFact(f.s.asInstanceOf[VarSlot], f.v)}
+      val calleeProcedure = calleep.getProcedureBody.procedure
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
       cj.callExp.arg match{
         case te : TupleExp =>
           val argSlots = te.exps.map{
@@ -679,7 +759,11 @@ class AndroidReachingFactsAnalysisBuilder(clm : ClassLoadManager){
       node.setLoadedClassBitSet(bitset)
     }
     
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
     def onPostVisitNode(node : ICFGNode, succs : CSet[ICFGNode]) : Unit = {
+=======
+    def onPostVisitNode(node : CGNode, succs : CSet[CGNode]) : Unit = {
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
     }
   }
   
@@ -699,7 +783,12 @@ object AndroidReachingFactsAnalysis {
    initialFacts : ISet[RFAFact] = isetEmpty,
    clm : ClassLoadManager,
    timer : Option[MyTimer],
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
    initContext : Context = new Context(GlobalConfig.ICFG_CONTEXT_K),
    switchAsOrderedMatch : Boolean = false) : InterProceduralDataFlowGraph
+=======
+   initContext : Context = new Context(GlobalConfig.CG_CONTEXT_K),
+   switchAsOrderedMatch : Boolean = false) : (InterproceduralControlFlowGraph[Node], Result)
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidReachingFactsAnalysis.scala
 				   = new AndroidReachingFactsAnalysisBuilder(clm).build(entryPointProc, initialFacts, timer, initContext, switchAsOrderedMatch)
 }

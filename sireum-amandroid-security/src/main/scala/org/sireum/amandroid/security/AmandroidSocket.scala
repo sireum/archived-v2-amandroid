@@ -34,8 +34,11 @@ import org.sireum.util.FileResourceUri
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.decompile.AmDecoder
 import org.sireum.jawa.util.MyTimer
+<<<<<<< HEAD
 import org.sireum.jawa.ScopeManager
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAScopeManager
+=======
+>>>>>>> CommunicationLeakage
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -123,6 +126,7 @@ class AmandroidSocket {
     	  ep =>
     	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
     	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
+<<<<<<< HEAD
     	    val idfg = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, timer)
     	    AppCenter.addIDFG(ep.getDeclaringClass, idfg)
 //<<<<<<< HEAD
@@ -134,6 +138,15 @@ class AmandroidSocket {
     	    AppCenter.addIDDG(ep.getDeclaringClass, iddResult)
     	    val tar = AndroidDataDependentTaintAnalysis(iddResult, idfg.ptaresult, ssm)    
     	    AppCenter.addTaintAnalysisResult(ep.getDeclaringClass, tar)
+=======
+    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, timer)
+    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)	    	    
+    	    msg_critical(TITLE, "processed-->" + icfg.getProcessed.size)
+    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
+    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
+    	    val tar = AndroidDataDependentTaintAnalysis(iddResult, irfaResult, ssm)    
+    	    AppCenter.addTaintAnalysisResult(ep.getDeclaringRecord, tar)
+>>>>>>> CommunicationLeakage
       } 
   
     	if(myListener_opt.isDefined) myListener_opt.get.onAnalysisSuccess
@@ -169,11 +182,19 @@ class AmandroidSocket {
     	  ep =>
     	    msg_critical(TITLE, "--------------Component " + ep + "--------------")
     	    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
+<<<<<<< HEAD
     	    val idfg = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, timer)
     	    AppCenter.addIDFG(ep.getDeclaringClass, idfg)
     	    msg_critical(TITLE, "processed-->" + idfg.icfg.getProcessed.size)
     	    val iddResult = InterproceduralDataDependenceAnalysis(idfg)
     	    AppCenter.addIDDG(ep.getDeclaringClass, iddResult)
+=======
+    	    val (icfg, irfaResult) = AndroidReachingFactsAnalysis(ep, initialfacts, new ClassLoadManager, timer)
+    	    AppCenter.addInterproceduralReachingFactsAnalysisResult(ep.getDeclaringRecord, icfg, irfaResult)
+    	    msg_critical(TITLE, "processed-->" + icfg.getProcessed.size)
+    	    val iddResult = InterproceduralDataDependenceAnalysis(icfg, irfaResult)
+    	    AppCenter.addInterproceduralDataDependenceAnalysisResult(ep.getDeclaringRecord, iddResult)
+>>>>>>> CommunicationLeakage
       } 
   
     	if(myListener_opt.isDefined) myListener_opt.get.onAnalysisSuccess

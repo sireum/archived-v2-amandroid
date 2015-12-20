@@ -162,7 +162,11 @@ object HttpLibStatCollect_run {
         	}
       	
       	
+<<<<<<< HEAD
         	(JawaCodeSource.getThirdPartyLibraryClassCodes).foreach{
+=======
+        	(JawaCodeSource.getThirdPartyLibraryRecordsCodes).foreach{
+>>>>>>> CommunicationLeakage
         	  case (name, code) =>
         	    
         	   if(code.contains("java.net.HttpURLConnection")){  // java net http client

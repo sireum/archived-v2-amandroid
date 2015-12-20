@@ -14,13 +14,21 @@ import org.sireum.jawa.MessageCenter._
 import org.sireum.pilar.ast._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.alir.util.ExplicitValueFinder
+<<<<<<< HEAD
 import org.sireum.jawa.alir.controlFlowGraph.ICFGInvokeNode
 import org.sireum.jawa.alir.controlFlowGraph.ICFGNode
+=======
+import org.sireum.jawa.alir.controlFlowGraph.CGInvokeNode
+import org.sireum.jawa.alir.controlFlowGraph.CGNode
+>>>>>>> CommunicationLeakage
 import org.sireum.jawa.Center
 import org.sireum.amandroid.alir.taintAnalysis.AndroidSourceAndSinkManager
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentCommunicationModel
+<<<<<<< HEAD
 import org.sireum.jawa.alir.pta.PTAResult
+=======
+>>>>>>> CommunicationLeakage
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

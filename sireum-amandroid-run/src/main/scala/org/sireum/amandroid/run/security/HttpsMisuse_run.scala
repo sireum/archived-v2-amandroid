@@ -14,6 +14,10 @@ import org.sireum.amandroid.security.apiMisuse.InterestingApiCollector
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.security.apiMisuse.HttpsMisuse
+<<<<<<< HEAD
+=======
+import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
+>>>>>>> CommunicationLeakage
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.util.FileResourceUri
@@ -72,7 +76,11 @@ object HttpsMisuse_run {
     val socket = new AmandroidSocket
     socket.preProcess
     
+<<<<<<< HEAD
     GlobalConfig.ICFG_CONTEXT_K = 1
+=======
+    GlobalConfig.CG_CONTEXT_K = 1
+>>>>>>> CommunicationLeakage
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = true;
     val sourcePath = args(0)
@@ -108,10 +116,17 @@ object HttpsMisuse_run {
       socket.plugListener(new HTTPSMisuseListener)
       socket.runWithoutDDA(false, true, timer)
        
+<<<<<<< HEAD
       val idfgs = AppCenter.getIDFGs
       idfgs.foreach{
         case (rec, idfg) =>
           HttpsMisuse(idfg)
+=======
+      val idfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
+      idfgs.foreach{
+        case (rec, InterProceduralDataFlowGraph(icfg, irfaResult)) =>
+          HttpsMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
+>>>>>>> CommunicationLeakage
       }
       return "Done!"
     }

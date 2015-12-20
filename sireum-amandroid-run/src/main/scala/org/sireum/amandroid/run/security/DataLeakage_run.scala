@@ -89,12 +89,21 @@ object DataLeakage_run {
       return
     }
     
+<<<<<<< HEAD
     GlobalConfig.ICFG_CONTEXT_K = 1
     AndroidReachingFactsAnalysisConfig.resolve_icc = true
     AndroidReachingFactsAnalysisConfig.parallel = true
     AndroidReachingFactsAnalysisConfig.resolve_static_init = true
 
     MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
+=======
+    GlobalConfig.CG_CONTEXT_K = 1
+    AndroidReachingFactsAnalysisConfig.resolve_icc = true
+    AndroidReachingFactsAnalysisConfig.parallel = true
+    AndroidReachingFactsAnalysisConfig.resolve_static_init = false
+
+    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
+>>>>>>> CommunicationLeakage
     val socket = new AmandroidSocket
     socket.preProcess
     
@@ -106,6 +115,7 @@ object DataLeakage_run {
     
     files.foreach{
       file =>
+<<<<<<< HEAD
 //<<<<<<< HEAD
         //if(file.contains("FieldSensitivity1"))
 //=======
@@ -113,13 +123,20 @@ object DataLeakage_run {
 //>>>>>>> 6ef60fb9a86f699ca2273c59d66fbd725218c236
         try{
           msg_critical(TITLE, DataLeakageTask(outputPath, file, socket, Some(1000)).run)   
+=======
+        try{
+          msg_critical(TITLE, DataLeakageTask(outputPath, file, socket, Some(10)).run)   
+>>>>>>> CommunicationLeakage
         } catch {
           case te : MyTimeoutException => err_msg_critical(TITLE, te.message)
           case e : Throwable => e.printStackTrace()
         } finally{
           msg_critical(TITLE, DataLeakageCounter.toString)
           socket.cleanEnv
+<<<<<<< HEAD
           msg_critical(TITLE, "************************************\n")
+=======
+>>>>>>> CommunicationLeakage
         }
     }
   }

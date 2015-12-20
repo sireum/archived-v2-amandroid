@@ -42,9 +42,32 @@ object AndroidLibSideEffectAnalysis {
 	  if(androidLibDir != null){
 	    val startTime = System.currentTimeMillis()
 			JawaCodeSource.preLoad(FileUtil.toUri(androidLibDir), GlobalConfig.PILAR_FILE_EXT)
+<<<<<<< HEAD
 			var intraPSEResults = 
         if(smallmem) smallMem
         else largeMem
+=======
+			var x : Float = 0
+			val recSize = JawaCodeSource.getFrameworkRecordsCodes.size
+			val recs =
+				JawaCodeSource.getFrameworkRecordsCodes.par.map{
+				  case (recName, code) =>
+				    this.synchronized(x += 1)
+				    if(x%100==0)println((x/recSize)*100 + "%")
+				    if(x == recSize) println("Record resolving Done!")
+				    Center.resolveRecord(recName, Center.ResolveLevel.BODY)
+				}
+	    val procedures = recs.par.map(_.getProcedures.filter(_.isConcrete)).reduce(iunion[JawaProcedure])
+	    val procSize = procedures.size
+	    x = 0
+		  var intraPSEResults = procedures.par.map{
+        p => 
+          this.synchronized(x += 1)
+			    if(x%1000==0)println((x/procSize)*100 + "%")
+			    if(x == procSize) println("Intra side effect Done!")
+          (p.getSignature, SideEffectAnalysis.intraProceduralSideEffect(p))
+      }.toMap
+>>>>>>> CommunicationLeakage
       Center.reset
       System.gc()
       System.gc()

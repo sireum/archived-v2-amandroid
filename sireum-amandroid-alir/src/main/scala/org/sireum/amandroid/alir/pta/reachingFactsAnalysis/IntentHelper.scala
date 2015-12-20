@@ -8,7 +8,11 @@ http://www.eclipse.org/legal/epl-v10.html
 package org.sireum.amandroid.alir.pta.reachingFactsAnalysis
 
 import org.sireum.util._
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/IntentHelper.scala
 import org.sireum.jawa.alir.pta.Instance
+=======
+import org.sireum.jawa.alir.Instance
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/IntentHelper.scala
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.alir.Slot
@@ -22,8 +26,11 @@ import org.sireum.jawa.Center
 import org.sireum.jawa.MessageCenter._
 import java.net.URLEncoder
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/IntentHelper.scala
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.FieldSlot
+=======
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/IntentHelper.scala
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>

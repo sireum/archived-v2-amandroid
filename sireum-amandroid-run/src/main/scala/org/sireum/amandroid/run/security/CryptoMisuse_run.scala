@@ -14,6 +14,10 @@ import org.sireum.amandroid.security.apiMisuse.InterestingApiCollector
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.AppCenter
 import org.sireum.amandroid.security.apiMisuse.CryptographicMisuse
+<<<<<<< HEAD
+=======
+import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
+>>>>>>> CommunicationLeakage
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.util.FileResourceUri
@@ -72,7 +76,11 @@ object CryptoMisuse_run {
     val socket = new AmandroidSocket
     socket.preProcess
     
+<<<<<<< HEAD
     GlobalConfig.ICFG_CONTEXT_K = 1
+=======
+    GlobalConfig.CG_CONTEXT_K = 1
+>>>>>>> CommunicationLeakage
     AndroidReachingFactsAnalysisConfig.resolve_icc = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
 //    AndroidReachingFactsAnalysisConfig.timeout = 5
@@ -109,10 +117,17 @@ object CryptoMisuse_run {
       socket.plugListener(new CryptoMisuseListener)
       socket.runWithoutDDA(false, true, timer)
       
+<<<<<<< HEAD
       val idfgs = AppCenter.getIDFGs
       idfgs.foreach{
         case (rec, idfg) =>
           CryptographicMisuse(idfg)
+=======
+      val icfgs = AppCenter.getInterproceduralReachingFactsAnalysisResults
+      icfgs.foreach{
+        case (rec, InterProceduralDataFlowGraph(icfg, irfaResult)) =>
+          CryptographicMisuse(new InterProceduralDataFlowGraph(icfg, irfaResult))
+>>>>>>> CommunicationLeakage
       }
       return "Done!"
     }

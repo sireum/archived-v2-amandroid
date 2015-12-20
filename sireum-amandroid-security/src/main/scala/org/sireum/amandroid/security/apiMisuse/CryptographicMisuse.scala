@@ -13,11 +13,18 @@ import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.pilar.ast._
 import org.sireum.jawa.Center
+<<<<<<< HEAD
 import org.sireum.jawa.JawaMethod
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.VarSlot
+=======
+import org.sireum.jawa.alir.interProcedural.InterProceduralMonotoneDataFlowAnalysisResult
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
+import org.sireum.jawa.JawaProcedure
+import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
+>>>>>>> CommunicationLeakage
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -108,9 +115,15 @@ object CryptographicMisuse {
 		    calleeSet.foreach{
 		      callee =>
 		        val calleep = callee.callee
+<<<<<<< HEAD
 		        val callees : MSet[JawaMethod] = msetEmpty
 				    val caller = Center.getMethodWithoutFailing(invNode.getOwner)
 				    val jumpLoc = caller.getMethodBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
+=======
+		        val callees : MSet[JawaProcedure] = msetEmpty
+				    val caller = Center.getProcedureWithoutFailing(invNode.getOwner)
+				    val jumpLoc = caller.getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
+>>>>>>> CommunicationLeakage
 				    val cj = jumpLoc.jump.asInstanceOf[CallJump]
 //				    if(calleep.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
 //				      val calleeSignature = cj.getValueAnnotation("signature") match {

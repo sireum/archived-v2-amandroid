@@ -32,6 +32,10 @@ import org.sireum.jawa.util.IgnoreException
 import java.io.PrintWriter
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.alir.LibSideEffectProvider
+<<<<<<< HEAD
+=======
+import org.sireum.jawa.alir.interProcedural.InterProceduralDataFlowGraph
+>>>>>>> CommunicationLeakage
 import org.sireum.option.SireumAmandroidStagingMode
 import org.sireum.jawa.GlobalConfig
 import org.sireum.jawa.MessageCenter._
@@ -144,7 +148,11 @@ object Staging {
 	}
   
   def staging(apkFileUris : Set[FileResourceUri], outputPath : String, static : Boolean, parallel : Boolean, icc : Boolean, k_context : Int, timeout : Int) = {
+<<<<<<< HEAD
     GlobalConfig.ICFG_CONTEXT_K = k_context
+=======
+    GlobalConfig.CG_CONTEXT_K = k_context
+>>>>>>> CommunicationLeakage
     AndroidReachingFactsAnalysisConfig.parallel = parallel
     AndroidReachingFactsAnalysisConfig.resolve_icc = icc
     AndroidReachingFactsAnalysisConfig.resolve_static_init = static

@@ -9,9 +9,15 @@ package org.sireum.amandroid.alir.pta.reachingFactsAnalysis
 
 import org.sireum.jawa.ScopeManager
 import org.sireum.util._
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidRFAScopeManager.scala
 import org.sireum.jawa.JawaClass
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
 import org.sireum.jawa.JawaMethod
+=======
+import org.sireum.jawa.JawaRecord
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis._
+import org.sireum.jawa.JawaProcedure
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidRFAScopeManager.scala
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.alir.pta.UnknownInstance
@@ -46,8 +52,13 @@ class AndroidRFAScopeManager extends ScopeManager{
 	/**
 	 * return true if given record needs to be bypassed
 	 */
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidRFAScopeManager.scala
 	def shouldBypass(rec : JawaClass) : Boolean = {
     (rec.isFrameworkClass || rec.isThirdPartyLibClass) &&
+=======
+	def shouldBypass(rec : JawaRecord) : Boolean = {
+    (rec.isFrameworkRecord || rec.isThirdPartyLibRecord) &&
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/pta/reachingFactsAnalysis/AndroidRFAScopeManager.scala
     {
 	    if(isIncludeMode){
 	    	if(rec.getPackageName != null) !contains(rec.getPackageName) else true

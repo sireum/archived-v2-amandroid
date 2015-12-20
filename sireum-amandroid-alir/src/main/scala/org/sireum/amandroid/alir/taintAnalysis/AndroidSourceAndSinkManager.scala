@@ -23,7 +23,14 @@ import org.sireum.jawa.alir.util.ExplicitValueFinder
 import org.sireum.pilar.ast.JumpLocation
 import org.sireum.jawa.MessageCenter._
 import java.io.File
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/taintAnalysis/AndroidSourceAndSinkManager.scala
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
+=======
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.VarSlot
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.ReachingFactsAnalysisHelper
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/taintAnalysis/AndroidSourceAndSinkManager.scala
 import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterProceduralDataDependenceGraph
 import org.sireum.amandroid.AppCenter
@@ -32,9 +39,13 @@ import java.io.InputStreamReader
 import java.io.FileInputStream
 import org.sireum.jawa.alir.interProcedural.Callee
 import org.sireum.jawa.alir.taintAnalysis.SourceAndSinkManager
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/taintAnalysis/AndroidSourceAndSinkManager.scala
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentCommunicationModel
 import org.sireum.jawa.alir.pta.VarSlot
+=======
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentCommunicationModel
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/taintAnalysis/AndroidSourceAndSinkManager.scala
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -56,8 +67,13 @@ object SourceAndSinkCategory {
  */ 
 abstract class AndroidSourceAndSinkManager(appPackageName : String, 
     												layoutControls : Map[Int, LayoutControl], 
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/taintAnalysis/AndroidSourceAndSinkManager.scala
     												callbackMethods : ISet[JawaMethod], 
     												sasFilePath : String) extends SourceAndSinkManager{
+=======
+    												callbackMethods : ISet[JawaProcedure], 
+    												sasFilePath : String) extends SourceAndSinkManager[RFAFact]{
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/taintAnalysis/AndroidSourceAndSinkManager.scala
   
   private final val TITLE = "BasicSourceAndSinkManager"
   
@@ -164,7 +180,12 @@ class DefaultAndroidSourceAndSinkManager(appPackageName : String,
     calleeSet.foreach{
       callee =>
         if(InterComponentCommunicationModel.isIccOperation(callee.callee)){
+<<<<<<< HEAD:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/taintAnalysis/AndroidSourceAndSinkManager.scala
           val args = Center.getMethodWithoutFailing(invNode.getOwner).getMethodBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
+=======
+          val rfafactMap = ReachingFactsAnalysisHelper.getFactMap(rfaFact)
+          val args = Center.getProcedureWithoutFailing(invNode.getOwner).getProcedureBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
+>>>>>>> CommunicationLeakage:sireum-amandroid-alir/src/main/scala/org/sireum/amandroid/alir/taintAnalysis/AndroidSourceAndSinkManager.scala
               case te : TupleExp =>
                 te.exps.map{
 			            exp =>
