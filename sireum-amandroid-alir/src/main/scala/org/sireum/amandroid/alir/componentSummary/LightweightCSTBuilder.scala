@@ -49,11 +49,9 @@ class LightweightCSTBuilder(global: Global, timer: Option[MyTimer]) extends AppI
     val components = msetEmpty[(JawaClass, ComponentType.Value)]
     mfp.getComponentInfos.foreach {
       f =>
-        if(f.enabled){
-          val comp = global.getClassOrResolve(f.compType)
-          if(!comp.isUnknown && comp.isApplicationClass){
-            components += ((comp, f.typ))
-          }
+        val comp = global.getClassOrResolve(f.compType)
+        if(!comp.isUnknown && comp.isApplicationClass){
+          components += ((comp, f.typ))
         }
     }
     components.foreach {
@@ -68,9 +66,12 @@ class LightweightCSTBuilder(global: Global, timer: Option[MyTimer]) extends AppI
   }
   
   private def buildCST(apk: Apk, comps: ISet[(JawaClass, ComponentType.Value)]) = {
+    println("Total components: " + comps.size)
+    var i = 0
     comps foreach {
       case (comp, typ) =>
-        val methods = comp.getDeclaredMethods
+        val methods = comp.getDeclaredMethods.filter(!_.isPrivate)
+        println("methods: " + methods.size)
         val idfg = InterproceduralSuperSpark(global, methods, timer)
         val context = new Context
         val sig = new Signature(JavaKnowledge.formatTypeToSignature(comp.getType) + ".ent:()V")
@@ -81,8 +82,11 @@ class LightweightCSTBuilder(global: Global, timer: Option[MyTimer]) extends AppI
         val exitNode = ICFGExitNode(context)
         exitNode.setOwner(sig)
         idfg.icfg.addExitNode(exitNode)
+        apk.addIDFG(comp, idfg)
         collectIntentContent(comp, idfg)
         buildCSTFromIDFG(apk, comp, idfg)
+        i += 1
+        println("components resolved: " + i)
     }
   }
   

@@ -44,7 +44,9 @@ object IntentHelper {
       datas: ISet[UriData], 
       types: ISet[String], 
       preciseExplicit: Boolean,
-      preciseImplicit: Boolean)
+      preciseImplicit: Boolean) {
+    def isImplicit: Boolean = !actions.isEmpty || !categories.isEmpty || !datas.isEmpty || !types.isEmpty || !preciseImplicit
+  }
   
   def getIntentContents(s: PTAResult, intentValues: ISet[Instance], currentContext: Context): ISet[IntentContent] = {
     var result = isetEmpty[IntentContent]

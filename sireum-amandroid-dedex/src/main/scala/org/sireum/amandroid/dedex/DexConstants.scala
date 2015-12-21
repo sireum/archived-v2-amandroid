@@ -56,6 +56,7 @@ trait DexConstants {
       TWOREGSTYPE,
       REGOFFSET16,
       OFFSET16,
+      OFFSET32,
       TWOREGSOFFSET16,
       MOVE,
       MOVE_OBJECT,
@@ -126,7 +127,7 @@ trait DexConstants {
     InstructionType.ONEREG,                             // 27
     InstructionType.OFFSET8,                            // 28
     InstructionType.OFFSET16,                           // 29
-    InstructionType.UNKNOWN_INSTRUCTION,                // 2a
+    InstructionType.OFFSET32,                           // 2a
     InstructionType.PACKEDSWITCH,                       // 2b
     InstructionType.SPARSESWITCH,                       // 2c
     InstructionType.THREEREGS,                          // 2d

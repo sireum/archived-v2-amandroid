@@ -13,8 +13,8 @@ import java.io.IOException
 /**
  * @author fgwei
  */
-case class SparseSwitchTask(regName: String, defaultTarget: Long, instrParser: DexInstructionToPilarParser, base: Long, offset: Long) extends PilarDedexerTask {
-  
+case class SparseSwitchTask(defaultTarget: Long, instrParser: DexInstructionToPilarParser, base: Long, offset: Long) extends PilarDedexerTask {
+  var regName: String = null
   private var tableLength: Long = 0L
   private val jumpTable: MList[Long] = mlistEmpty
   val defaultLabelName: String = "L%06x".format(defaultTarget)
@@ -62,27 +62,29 @@ case class SparseSwitchTask(regName: String, defaultTarget: Long, instrParser: D
   // Reads the jump table and returns the offsets (compared to the jump instruction base)
   // as array of longs
   def readJumpTable(): IList[Long] = {
-    val origPos = instrParser.getFilePosition()
-    instrParser.setFilePosition(offset)
-    val tableBasePos = instrParser.getFilePosition()
-    val tableType = instrParser.read16Bit()
-    if(tableType != 0x200)    // type flag for sparse switch tables
-      throw new IOException("Invalid sparse-switch table type (0x" +
-          Integer.toHexString(tableType) + ") at offset 0x" + 
-          java.lang.Long.toHexString(instrParser.getFilePosition() - 2))
-    val tableElements = instrParser.read16Bit()
-    val switchKeys: MList[Int] = mlistEmpty
-    for(i <- 0 to tableElements - 1)
-      switchKeys += instrParser.readSigned32Bit()
-    for(i <- 0 to tableElements - 1) {
-      val targetOffset = instrParser.readSigned32Bit()
-      val keyString: String = switchKeys(i).toString
-      val targetString: String = "L%06x".format(base + (targetOffset * 2))
-      labels += ((keyString, targetString))
-      jumpTable += base + (targetOffset * 2)
+    if(jumpTable.isEmpty){
+      val origPos = instrParser.getFilePosition()
+      instrParser.setFilePosition(offset)
+      val tableBasePos = instrParser.getFilePosition()
+      val tableType = instrParser.read16Bit()
+      if(tableType != 0x200)    // type flag for sparse switch tables
+        throw new IOException("Invalid sparse-switch table type (0x" +
+            Integer.toHexString(tableType) + ") at offset 0x" + 
+            java.lang.Long.toHexString(instrParser.getFilePosition() - 2))
+      val tableElements = instrParser.read16Bit()
+      val switchKeys: MList[Int] = mlistEmpty
+      for(i <- 0 to tableElements - 1)
+        switchKeys += instrParser.readSigned32Bit()
+      for(i <- 0 to tableElements - 1) {
+        val targetOffset = instrParser.readSigned32Bit()
+        val keyString: String = switchKeys(i).toString
+        val targetString: String = "L%06x".format(base + (targetOffset * 2))
+        labels += ((keyString, targetString))
+        jumpTable += base + (targetOffset * 2)
+      }
+      tableLength = instrParser.getFilePosition() - tableBasePos
+      instrParser.setFilePosition(origPos)
     }
-    tableLength = instrParser.getFilePosition() - tableBasePos
-    instrParser.setFilePosition(origPos)
     jumpTable.toList
   }
 

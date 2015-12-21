@@ -88,4 +88,12 @@ class ApkYard(global: Global) {
   def hasTaintAnalysisResult: Boolean = taintResult.isDefined
   def getTaintAnalysisResult: Option[TaintAnalysisResult[InterProceduralNode, AlirEdge[InterProceduralNode]]] = this.taintResult
   
+  def reset = {
+    this.apks.clear()
+    this.componentToApkMap.clear()
+    this.idfgResults.clear()
+    this.iddaResults.clear()
+    this.summaryTables.clear()
+    this.taintResult = None
+  }
 }

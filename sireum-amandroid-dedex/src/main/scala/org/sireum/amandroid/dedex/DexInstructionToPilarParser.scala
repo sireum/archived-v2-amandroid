@@ -61,6 +61,11 @@ case class DexInstructionToPilarParser(
   private var forkStatus: ForkStatus.Value = null
   private val forkData: MList[Long] = mlistEmpty
   
+  // For special task param type resolve
+  val fadTasks: MMap[Long, FillArrayDataTask] = mmapEmpty
+  val pstTasks: MMap[Long, PackedSwitchTask] = mmapEmpty
+  val sstTasks: MMap[Long, SparseSwitchTask] = mmapEmpty
+  
   def initializePass(secondPass: Boolean) = {
     this.secondPass = secondPass
     tasks.clear()
@@ -161,6 +166,14 @@ case class DexInstructionToPilarParser(
     var offset = read16Bit()
     if((offset & 0x8000) != 0)
       offset -= 65536
+    val target = instrBase + (offset * 2)
+    target
+  }
+  
+  private def calculateTarget32Bit(instrBase: Long): Long = {
+    var offset = read32Bit()
+    if((offset & 0x80000000) != 0)
+      offset -= 4294967296L
     val target = instrBase + (offset * 2)
     target
   }
@@ -798,7 +811,8 @@ case class DexInstructionToPilarParser(
           val target: Long = instrBase + (offset * 2L)
           val regtyp = resolveRegType(regpos, reg, new JawaType("int", 1), false)
           val regName = genRegName(reg, regtyp)
-          val fillArrayTask = new FillArrayDataTask(regName, getFilePosition, this, instrBase, target)
+          val fillArrayTask = fadTasks.getOrElseUpdate(target, FillArrayDataTask(getFilePosition, this, instrBase, target))
+          fillArrayTask.regName = regName
           val valid = fillArrayTask.isValid
           if(valid) {
             val code = instrCode match {
@@ -1165,7 +1179,8 @@ case class DexInstructionToPilarParser(
           val offset = read32Bit()
           val target = instrBase + (offset * 2L)
           val regName = genRegName(reg, resolveRegType(regpos, reg, new JawaType("int"), false))
-          val packedSwitchTask = new PackedSwitchTask(regName, getFilePosition, this, instrBase, target)
+          val packedSwitchTask = pstTasks.getOrElseUpdate(target, PackedSwitchTask(getFilePosition, this, instrBase, target))
+          packedSwitchTask.regName = regName
           val valid = packedSwitchTask.isValid
           if(valid) {
             val code = instrCode match {
@@ -1190,7 +1205,8 @@ case class DexInstructionToPilarParser(
           val offset = read32Bit()
           val target = instrBase + (offset * 2L)
           val regName = genRegName(reg, resolveRegType(regpos, reg, new JawaType("int"), false))
-          val sparseSwitchTask = new SparseSwitchTask(regName, getFilePosition, this, instrBase, target)
+          val sparseSwitchTask = sstTasks.getOrElseUpdate(target, SparseSwitchTask(getFilePosition, this, instrBase, target))
+          sparseSwitchTask.regName = regName
           val valid = sparseSwitchTask.isValid
           if(valid) {
             val code = instrCode match {
@@ -1389,6 +1405,18 @@ case class DexInstructionToPilarParser(
             forkData += target
             forkStatus = ForkStatus.FORK_UNCONDITIONALLY
           } else instrText.append("@INVALID_OFFSET16")
+        case InstructionType.OFFSET32 =>
+          val padding = read8Bit()
+          val target = calculateTarget32Bit(instrBase)
+          if(inRange(target)){
+            val code = instrCode match {
+              case GOTO_32 => goto(target)
+              case _ => "@UNKNOWN_OFFSET32 0x%x".format(instrCode)
+            }
+            instrText.append(code)
+            forkData += target
+            forkStatus = ForkStatus.FORK_UNCONDITIONALLY
+          } else instrText.append("@INVALID_OFFSET32")
         // The instruction is followed by one byte with two register indexes on the high and low
         // 4 bits and one signed 16 bit offset
         case InstructionType.TWOREGSOFFSET16 =>
@@ -1435,10 +1463,10 @@ case class DexInstructionToPilarParser(
             case MOVE_OBJECT => JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE
             case _ => JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE
           }
-          val reg2typ = resolveRegType(reg2pos, reg2, defaultTyp, false)
+          val reg2typ = resolveRegType(reg2pos, reg2, defaultTyp, false, isHolder = true)
           val reg1typ = reg2typ match {
             case jt: DedexJawaType => resolveRegType(reg1pos, reg1, jt.typ, true)
-            case ut: DedexUndeterminedType => ut.possible(reg1pos, defaultTyp, true)
+            case ut: DedexUndeterminedType => resolveRegType(reg1pos, reg1, defaultTyp, true)
           }
           val reg1Name = genRegName(reg1, reg1typ)
           val reg2Name = genRegName(reg2, reg2typ)
@@ -1783,8 +1811,8 @@ case class DexInstructionToPilarParser(
           val reg1 = read16Bit()
           val reg2pos = Position(instrBase, 1)
           val reg2 = read16Bit()
+          val reg2typ = resolveRegType(reg2pos, reg2, JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, false, isHolder = true)
           val reg1typ = resolveRegType(reg1pos, reg1, JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, true)
-          val reg2typ = resolveRegType(reg2pos, reg2, JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, false)
           val reg1Name = genRegName(reg1, reg1typ)
           val reg2Name = genRegName(reg2, reg2typ)
           val code = instrCode match {
