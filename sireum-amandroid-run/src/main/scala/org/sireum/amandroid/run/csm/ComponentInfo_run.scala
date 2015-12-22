@@ -25,6 +25,8 @@ import org.sireum.amandroid.parser.IntentFilter
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 import org.sireum.jawa.util.JVMUtil
 import java.io._
+import org.sireum.jawa.alir.pta.suspark.InterproceduralSuperSpark
+import org.sireum.jawa.Signature
 
 /**
  * @author fgwei
@@ -274,12 +276,13 @@ object ComponentInfo_run {
     val outputUri = FileUtil.toUri(outputPath)
     val dpsuri = AndroidGlobalConfig.dependence_dir.map(FileUtil.toUri(_))
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), "", true).toSet
-    .filter(_.contains("qqsecuritycenter.apk"))
+//    .filter(_.contains("wechatphonebook.apk"))
     files foreach {
       file =>
         if(Apk.isValidApk(file)) {
           ComponentInfoCounter.total += 1
           println("#####" + file + "#####")
+          JVMUtil.showMemoryUsage
           val staapk = StaApk(file)
           ComponentInfoCounter.apks += staapk
           
@@ -336,7 +339,6 @@ object ComponentInfo_run {
             println(ComponentInfoCounter.toString())
             System.gc()
             System.gc()
-            JVMUtil.showMemoryUsage
           }
         }
     }

@@ -70,7 +70,7 @@ class LightweightCSTBuilder(global: Global, timer: Option[MyTimer]) extends AppI
     var i = 0
     comps foreach {
       case (comp, typ) =>
-        val methods = comp.getDeclaredMethods.filter(!_.isPrivate)
+        val methods = comp.getDeclaredMethods.filter(m => m.isConcrete && !m.isPrivate)
         println("methods: " + methods.size)
         val idfg = InterproceduralSuperSpark(global, methods, timer)
         val context = new Context
