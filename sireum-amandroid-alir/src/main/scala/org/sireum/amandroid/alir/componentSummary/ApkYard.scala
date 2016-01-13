@@ -49,7 +49,7 @@ class ApkYard(global: Global) {
     // convert the dex file to the "pilar" form
     srcs foreach {
       src =>
-        val fileUri = outUri + File.separator + src
+        val fileUri = FileUtil.toUri(FileUtil.toFilePath(outUri) + File.separator + src)
         if(FileUtil.toFile(fileUri).exists()) {
           //store the app's pilar code in AmandroidCodeSource which is organized class by class.
           global.load(fileUri, Constants.PILAR_FILE_EXT, AndroidLibraryAPISummary)

@@ -285,7 +285,12 @@ class ManifestParser{
 
 object ManifestParser {
   def loadPackageName(manifestUri: FileResourceUri): String = {
-    getPackageNameFromManifest(new FileInputStream(FileUtil.toFile(manifestUri)))
+    try {
+      getPackageNameFromManifest(new FileInputStream(FileUtil.toFile(manifestUri)))
+    } catch {
+      case e: Exception =>
+        ""
+    }
   }
   
   def loadPackageAndComponentNames(manifestUri: FileResourceUri): (String, ISet[(String, String)]) = {

@@ -111,7 +111,7 @@ object ComponentInfo_run {
       s.toString()
     }
     def writeFdComp(outputUri: FileResourceUri) = {
-      val outFile = FileUtil.toFile(outputUri + File.separator + "Comp.csv")
+      val outFile = FileUtil.toFile(outputUri + "/" + "Comp.csv")
       val outstream = new PrintWriter(outFile)
       val h = apks.groupBy(_.comps.size).map(_._1).toList.sortBy(x => x)
       outstream.append(generateCsvHead(h) + "\n")
@@ -123,7 +123,7 @@ object ComponentInfo_run {
       outstream.close()
     }
     def writeFdHandleImplicit(outputUri: FileResourceUri) = {
-      val outFile = FileUtil.toFile(outputUri + File.separator + "HandleImplicit.csv")
+      val outFile = FileUtil.toFile(outputUri + "/" + "HandleImplicit.csv")
       val outstream = new PrintWriter(outFile)
       val h = apks.groupBy {
         apk => apk.comps.count { comp => comp.handleImplicit }
@@ -137,7 +137,7 @@ object ComponentInfo_run {
       outstream.close()
     }
     def writeFdHandleExplicitOnly(outputUri: FileResourceUri) = {
-      val outFile = FileUtil.toFile(outputUri + File.separator + "HandleExplicitOnly.csv")
+      val outFile = FileUtil.toFile(outputUri + "/" + "HandleExplicitOnly.csv")
       val outstream = new PrintWriter(outFile)
       val h = apks.groupBy {
         apk => apk.comps.count { comp => !comp.handleImplicit }
@@ -151,7 +151,7 @@ object ComponentInfo_run {
       outstream.close()
     }
     def writeFdNumberOfEdgesForIntraAppGraph(outputUri: FileResourceUri) = {
-      val outFile = FileUtil.toFile(outputUri + File.separator + "NumberOfEdgesForIntraAppGraph.csv")
+      val outFile = FileUtil.toFile(outputUri + "/" + "NumberOfEdgesForIntraAppGraph.csv")
       val outstream = new PrintWriter(outFile)
       val h = apks.groupBy {
         apk => apk.comps.map(comp => comp.edges + comp.outgoingIntent).sum / 100 * 100
@@ -165,7 +165,7 @@ object ComponentInfo_run {
       outstream.close()
     }
     def writeFdImplicitIntentEdges(outputUri: FileResourceUri) = {
-      val outFile = FileUtil.toFile(outputUri + File.separator + "ImplicitIntentEdges.csv")
+      val outFile = FileUtil.toFile(outputUri + "/" + "ImplicitIntentEdges.csv")
       val outstream = new PrintWriter(outFile)
       val h = apks.groupBy(_.comps.map(comp => comp.outgoingImplicit).sum).map(_._1).toList.sortBy(x => x)
       outstream.append(generateCsvHead(h) + "\n")
@@ -177,7 +177,7 @@ object ComponentInfo_run {
       outstream.close()
     }
     def writeFdNumberOfIncomingIntent(outputUri: FileResourceUri) = {
-      val outFile = FileUtil.toFile(outputUri + File.separator + "NumberOfIncomingIntent.csv")
+      val outFile = FileUtil.toFile(outputUri + "/" + "NumberOfIncomingIntent.csv")
       val outstream = new PrintWriter(outFile)
       val h = apks.map(_.comps).reduce(_ ++ _).groupBy(c => c.incomingIntent).map(_._1).toList.sortBy(x => x)
       outstream.append(generateCsvHead(h) + "\n")
@@ -189,7 +189,7 @@ object ComponentInfo_run {
       outstream.close()
     }
     def writeFdNumberOfOutgoingIntent(outputUri: FileResourceUri) = {
-      val outFile = FileUtil.toFile(outputUri + File.separator + "NumberOfOutgoingIntent.csv")
+      val outFile = FileUtil.toFile(outputUri + "/" + "NumberOfOutgoingIntent.csv")
       val outstream = new PrintWriter(outFile)
       val h = apks.map(_.comps).reduce(_ ++ _).groupBy(c => c.outgoingIntent).map(_._1).toList.sortBy(x => x)
       outstream.append(generateCsvHead(h) + "\n")
@@ -201,7 +201,7 @@ object ComponentInfo_run {
       outstream.close()
     }
     def writeFdNumberOfIncomingExplicit(outputUri: FileResourceUri) = {
-      val outFile = FileUtil.toFile(outputUri + File.separator + "NumberOfIncomingExplicit.csv")
+      val outFile = FileUtil.toFile(outputUri + "/" + "NumberOfIncomingExplicit.csv")
       val outstream = new PrintWriter(outFile)
       val h = apks.map(_.comps).reduce(_ ++ _).groupBy(c => c.incomingExplicit).map(_._1).toList.sortBy(x => x)
       outstream.append(generateCsvHead(h) + "\n")
@@ -213,7 +213,7 @@ object ComponentInfo_run {
       outstream.close()
     }
     def writeFdNumberOfOutgoingExplicit(outputUri: FileResourceUri) = {
-      val outFile = FileUtil.toFile(outputUri + File.separator + "NumberOfOutgoingExplicit.csv")
+      val outFile = FileUtil.toFile(outputUri + "/" + "NumberOfOutgoingExplicit.csv")
       val outstream = new PrintWriter(outFile)
       val h = apks.map(_.comps).reduce(_ ++ _).groupBy(c => c.outgoingExplicit).map(_._1).toList.sortBy(x => x)
       outstream.append(generateCsvHead(h) + "\n")
@@ -225,7 +225,7 @@ object ComponentInfo_run {
       outstream.close()
     }
     def writeFdNumberOfIncomingImplicit(outputUri: FileResourceUri) = {
-      val outFile = FileUtil.toFile(outputUri + File.separator + "NumberOfIncomingImplicit.csv")
+      val outFile = FileUtil.toFile(outputUri + "/" + "NumberOfIncomingImplicit.csv")
       val outstream = new PrintWriter(outFile)
       val h = apks.map(_.comps).reduce(_ ++ _).groupBy(c => c.incomingImplicit).map(_._1).toList.sortBy(x => x)
       outstream.append(generateCsvHead(h) + "\n")
@@ -237,7 +237,7 @@ object ComponentInfo_run {
       outstream.close()
     }
     def writeFdNumberOfOutgoingImplicit(outputUri: FileResourceUri) = {
-      val outFile = FileUtil.toFile(outputUri + File.separator + "NumberOfOutgoingImplicit.csv")
+      val outFile = FileUtil.toFile(outputUri + "/" + "NumberOfOutgoingImplicit.csv")
       val outstream = new PrintWriter(outFile)
       val h = apks.map(_.comps).reduce(_ ++ _).groupBy(c => c.outgoingImplicit).map(_._1).toList.sortBy(x => x)
       outstream.append(generateCsvHead(h) + "\n")

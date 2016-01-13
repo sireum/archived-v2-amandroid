@@ -171,7 +171,7 @@ class AppInfoCollector(global: Global, timer: Option[MyTimer]) {
   }
 
   def collectInfo(apk: Apk, outputUri: FileResourceUri): Unit = {
-    val manifestUri = outputUri + File.separator + "AndroidManifest.xml"
+    val manifestUri = outputUri + "/AndroidManifest.xml"
     val mfp = AppInfoCollector.analyzeManifest(global.reporter, manifestUri)
     val afp = AppInfoCollector.analyzeARSC(global.reporter, apk.nameUri)
     val lfp = AppInfoCollector.analyzeLayouts(global, apk.nameUri, mfp)

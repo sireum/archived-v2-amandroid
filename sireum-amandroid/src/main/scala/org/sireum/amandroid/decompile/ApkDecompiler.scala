@@ -44,15 +44,19 @@ object ApkDecompiler {
     }
     val srcFolder: String = "src" + File.separator + {
       if(dexUri.startsWith(outUri)) dexUri.replace(outUri, "").replace(".dex", "").replace(".odex", "")
-      else dexUri.substring(dexUri.lastIndexOf(File.separator) + 1, dexUri.lastIndexOf("."))
-    }.replaceAll(File.separator, "_")
-    val src = Dex2PilarConverter.convert(dexUri, s"$outUri${if(!srcFolder.startsWith(File.separator)) File.separator}$srcFolder", outUri, dpsuri, recordFilter, dexLog, debugMode, forceDelete)
+      else dexUri.substring(dexUri.lastIndexOf("/") + 1, dexUri.lastIndexOf("."))
+    }.replaceAll("/", "_")
+    val pilarOutUri = {
+      val outPath = FileUtil.toFilePath(outUri)
+      FileUtil.toUri(outPath + File.separator + srcFolder)
+    }
+    val src = Dex2PilarConverter.convert(dexUri, pilarOutUri, outUri, dpsuri, recordFilter, dexLog, debugMode, forceDelete)
     (srcFolder, dependencies.toSet)
   }
   
   def decompile(apk: File, outputLocation: File, dpsuri: Option[FileResourceUri], dexLog: Boolean, debugMode: Boolean, removeSupportGen: Boolean, forceDelete: Boolean): (FileResourceUri, ISet[String], ISet[String]) = {
     val outUri = decodeApk(FileUtil.toUri(apk), FileUtil.toUri(outputLocation), forceDelete)
-    val pkg = ManifestParser.loadPackageName(outUri + File.separator + "AndroidManifest.xml")
+    val pkg = ManifestParser.loadPackageName(outUri + "/AndroidManifest.xml")
     val srcFolders: MSet[String] = msetEmpty
     val dependencies: MSet[String] = msetEmpty
     if(FileUtil.toFile(outUri).exists()) {

@@ -162,16 +162,16 @@ class PilarStyleCodeGenerator(
     while(classreader.hasNext()) {
       val classIdx = classreader.next().intValue()
       val recType: JawaType = toPilarRecordName(dexClassDefsBlock.getClassNameOnly(classIdx)).resolveRecord
-      val classPath = recType.jawaName.replaceAll("\\.", File.separator)
+      val classPath = recType.jawaName.replaceAll("\\.", "/")
       if(filter(recType)) {
 //      if(recType.baseTyp == "com.tencent.token.core.push.a") {
         val outputStream = outputDir match {
           case Some(od) =>
-            var targetFile = FileUtil.toFile(od + File.separator + classPath + ".pilar")
+            var targetFile = FileUtil.toFile(od + "/" + classPath + ".pilar")
             var i = 0
             while(targetFile.exists()){
               i += 1
-              targetFile = FileUtil.toFile(od + File.separator + classPath + "." + i + ".pilar")
+              targetFile = FileUtil.toFile(od + "/" + classPath + "." + i + ".pilar")
             }
             val parent = targetFile.getParentFile()
             if(parent != null)

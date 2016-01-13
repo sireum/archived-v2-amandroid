@@ -28,7 +28,7 @@ class IccCollector(global: Global, timer: Option[MyTimer]) extends AppInfoCollec
   def getIccContainers = this.iccContainers
   
   override def collectInfo(apk: Apk, outputUri: FileResourceUri): Unit = {
-    val manifestUri = outputUri + File.separator + "AndroidManifest.xml"
+    val manifestUri = outputUri + "/" + "AndroidManifest.xml"
     val mfp = AppInfoCollector.analyzeManifest(global.reporter, manifestUri)
     this.appPackageName = mfp.getPackageName
     this.componentInfos ++= mfp.getComponentInfos

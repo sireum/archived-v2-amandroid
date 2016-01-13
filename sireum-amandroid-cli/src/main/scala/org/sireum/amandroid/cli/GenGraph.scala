@@ -150,7 +150,7 @@ object GenGraph {
             val (outUri, srcs, _) = ApkDecompiler.decompile(FileUtil.toFile(apkFileUri), FileUtil.toFile(outputUri), dpsuri, false, false, true, true)
             srcs foreach {
               src =>
-                val fileUri = outUri + "/" + src
+                val fileUri = FileUtil.toUri(FileUtil.toFilePath(outUri) + File.separator + src)
                 if(FileUtil.toFile(fileUri).exists()) {
                   //store the app's pilar code in AmandroidCodeSource which is organized class by class.
                   global.load(fileUri, Constants.PILAR_FILE_EXT, AndroidLibraryAPISummary)

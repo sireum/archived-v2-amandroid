@@ -18,7 +18,7 @@ object FixResources {
     val allxmls = FileUtil.listFiles(decFolder, ".xml", true)
     allxmls foreach {
       xml =>
-        if(xml.endsWith("AndroidManifest.xml") && !xml.endsWith("original" + File.separator + "AndroidManifest.xml")) {
+        if(xml.endsWith("AndroidManifest.xml") && !xml.endsWith("original/AndroidManifest.xml")) {
           if(dedex.haveRenamedElements) {
             var filestr = MyFileUtil.readFileContent(xml)
             val pkgMap = dedex.getPkgNameMapping
@@ -37,7 +37,7 @@ object FixResources {
             pw.flush()
             pw.close()
           }
-        } else if(xml.contains(File.separator + "res" + File.separator + "layout" + File.separator)) {
+        } else if(xml.contains("/res/layout/")) {
           
         }
     }
