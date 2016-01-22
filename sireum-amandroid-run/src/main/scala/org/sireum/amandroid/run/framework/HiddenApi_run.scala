@@ -15,6 +15,8 @@ import org.sireum.jawa.JawaType
 import org.sireum.amandroid.util.PScoutTranslator
 import org.sireum.jawa.alir.pta.suspark.InterproceduralSuperSpark
 import org.sireum.jawa.util.PerComponentTimer
+import org.sireum.jawa.util.MyTimeoutException
+import java.io.PrintWriter
 
 /**
  * @author fgwei
@@ -45,20 +47,21 @@ object HiddenApi_run {
       case (typ, file) =>
         i += 1
         if(i % 1000 == 0) println(i)
-        if(typ.name.contains("LocationManagerService")) println("typ:" + typ)
         fullGlobal.getClassOrResolve(typ)
     }
     val hiddenapis = getHiddenApiList(fullGlobal)
-    val nonPublicMethods = fullGlobal.getClasses.map(_.getDeclaredMethods.filter(m => !m.isPublic && !m.isAbstract).map(_.getSignature)).fold(isetEmpty)(_ ++ _)
+    val nonPublicMethods = fullGlobal.getClasses.filter(c => c.getName.startsWith("android.") || c.getName.startsWith("com.android.")).map(_.getDeclaredMethods.filter(m => !m.isPublic && !m.isAbstract && !m.isConstructor).map(_.getSignature)).fold(isetEmpty)(_ ++ _)
+    writeApiToFile(hiddenapis, outUri, "HideApis.txt")
+    writeApiToFile(nonPublicMethods, outUri, "NonPublicMethods.txt")
     println("Total Non-Public Methods: " + nonPublicMethods.size)
     val systemServices = getSystemServiceList(fullGlobal)
-    systemServices.foreach{println(_)}
-//    val systemServiceHiddenApis = getSystemServiceMethods(fullGlobal, systemServices, hiddenapis)
-//    val systemServiceNonPublicMethods = getSystemServiceMethods(fullGlobal, systemServices, nonPublicMethods)
-//    fullGlobal.reset(false)
-//    println("Total system services: " + systemServices.size)
-//    println("System service hidden apis: " + systemServiceHiddenApis.size)
-//    println("System service Non-Public Methods: " + systemServiceNonPublicMethods.size)
+//    systemServices.foreach{println(_)}
+    val systemServiceHiddenApis = getSystemServiceMethods(fullGlobal, systemServices, hiddenapis)
+    val systemServiceNonPublicMethods = getSystemServiceMethods(fullGlobal, systemServices, nonPublicMethods)
+    fullGlobal.reset(false)
+    println("Total system services: " + systemServices.size)
+    println("System service hidden apis: " + systemServiceHiddenApis.size)
+    println("System service Non-Public Methods: " + systemServiceNonPublicMethods.size)
 //    val permissionMapping = PScoutTranslator.translate(pscoutFileUri)
 //    println("Analyze systemServiceHiddenApis:")
 //    methodsAnalysis(fullGlobal, systemServiceHiddenApis)
@@ -66,19 +69,38 @@ object HiddenApi_run {
 //    methodsAnalysis(fullGlobal, systemServiceNonPublicMethods)
   }
   
+  def writeApiToFile(apis: ISet[Signature], outputUri: FileResourceUri, fileName: String) = {
+    val apiFile = FileUtil.toFile(outputUri + "/" + fileName)
+    val out = new PrintWriter(apiFile)
+    apis.toList.sortBy(_.signature).foreach {
+      api =>
+        out.println(api.signature)
+    }
+    out.flush()
+    out.close()
+  }
+  
   def methodsAnalysis(global: Global, sigs: ISet[Signature]) = {
     sigs foreach {
       sig =>
-        val reachableSigs = reachabilityAnalysis(global, Set(sig))
-        val rNative = reachableNative(global, reachableSigs)
-        if(!rNative.isEmpty) {
-          println(sig + " reaches native methods: ")
-          rNative.foreach{println(_)}
-          if(!reachCheckPermission(global, reachableSigs)) {
-            System.err.println("Not protected by permission check!")
+        try{
+          val reachableSigs = reachabilityAnalysis(global, Set(sig))
+          val rNative = reachableNative(global, reachableSigs)
+          if(!rNative.isEmpty) {
+            println(sig + " reaches native methods: ")
+            rNative.foreach{println(_)}
+            if(!reachCheckPermission(global, reachableSigs)) {
+              System.err.println("Not protected by permission check!")
+            }
           }
+        } catch {
+          case te: MyTimeoutException =>
+            System.err.println("timeout")
+          case e: Exception =>
+            System.err.println("Error in " + sig + " " + e.getMessage)
+        } finally {
+          global.reset(false)
         }
-        global.reset(false)
     }
   }
   
@@ -134,16 +156,17 @@ object HiddenApi_run {
     sdkGlobal.setJavaLib(AndroidGlobalConfig.lib_files)
     fullGlobal.getApplicationClassCodes.foreach {
       case (typ, file) =>
-        val fullclazz = fullGlobal.getClassOrResolve(typ)
-        if(typ.name.contains("LocationManagerService")) println("typ.name:" + fullclazz)
-        total ++= fullclazz.getDeclaredMethods.filter(m => m.isPublic && !m.isAbstract).map(_.getSignature)
-        sdkGlobal.getMyClass(typ) match {
-          case Some(mc) =>
-            val sdkmethods = mc.methods.map(_.signature).toSet
-            val fullmethods = fullclazz.getDeclaredMethods.filter(m => m.isPublic && !m.isAbstract).map(_.getSignature)
-            result ++= (fullmethods -- sdkmethods)
-          case None =>
-            result ++= fullclazz.getDeclaredMethods.filter(m => m.isPublic && !m.isAbstract).map(_.getSignature)
+        if(typ.name.startsWith("android.") || typ.name.startsWith("com.android.")) {
+          val fullclazz = fullGlobal.getClassOrResolve(typ)
+          total ++= fullclazz.getDeclaredMethods.filter(m => m.isPublic && !m.isAbstract && !m.isConstructor).map(_.getSignature)
+          sdkGlobal.getMyClass(typ) match {
+            case Some(mc) =>
+              val sdkmethods = mc.methods.map(_.signature).toSet
+              val fullmethods = fullclazz.getDeclaredMethods.filter(m => m.isPublic && !m.isAbstract && !m.isConstructor).map(_.getSignature)
+              result ++= (fullmethods -- sdkmethods)
+            case None =>
+              result ++= fullclazz.getDeclaredMethods.filter(m => m.isPublic && !m.isAbstract && !m.isConstructor).map(_.getSignature)
+          }
         }
     }
     println("Total public methods: " + total.size)

@@ -43,7 +43,6 @@ class ApkYard(global: Global) {
   def loadApk(nameUri: FileResourceUri, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], app_info: AppInfoCollector, dexLog: Boolean, debugMode: Boolean, forceDelete: Boolean = true): Apk = {
     val apk = new Apk(nameUri)
     val apkFile = FileUtil.toFile(nameUri)
-//    val name = try{apkFile.getName.substring(0, apkFile.getName().lastIndexOf(".apk"))} catch {case e: Exception => apkFile.getName}
     val resultDir = FileUtil.toFile(outputUri)
     val (outUri, srcs, _) = ApkDecompiler.decompile(apkFile, resultDir, dpsuri, dexLog, debugMode, true, forceDelete)
     // convert the dex file to the "pilar" form

@@ -209,9 +209,9 @@ trait DexConstants {
     InstructionType.UNKNOWN_INSTRUCTION,                // 79
     InstructionType.UNKNOWN_INSTRUCTION,                // 7a
     InstructionType.TWOREGSPACKED_SINGLE,               // 7b
-    InstructionType.UNKNOWN_INSTRUCTION,                // 7c
+    InstructionType.TWOREGSPACKED_SINGLE,               // 7c
     InstructionType.TWOREGSPACKED_DOUBLE,               // 7d
-    InstructionType.UNKNOWN_INSTRUCTION,                // 7e
+    InstructionType.TWOREGSPACKED_DOUBLE,               // 7e
     InstructionType.TWOREGSPACKED_SINGLE,               // 7f
     InstructionType.TWOREGSPACKED_DOUBLE,               // 80
     InstructionType.TWOREGSPACKED_DOUBLE,               // 81

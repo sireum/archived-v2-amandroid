@@ -48,7 +48,7 @@ case class DexInstructionToPilarParser(
     dexOffsetResolver: DexOffsetResolver) extends DexParser with DedexTypeResolver with DexConstants {
   
   final val TITLE = "DexInstructionToPilarParser"
-  final val DEBUG = true
+  final val DEBUG = false
   
   import DexInstructionToPilarParser._
   import generator._
