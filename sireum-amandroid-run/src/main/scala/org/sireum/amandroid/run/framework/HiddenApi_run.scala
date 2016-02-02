@@ -17,6 +17,7 @@ import org.sireum.jawa.alir.pta.suspark.InterproceduralSuperSpark
 import org.sireum.jawa.util.PerComponentTimer
 import org.sireum.jawa.util.MyTimeoutException
 import java.io.PrintWriter
+import org.sireum.jawa.util.MyFileUtil
 
 /**
  * @author fgwei
@@ -70,7 +71,7 @@ object HiddenApi_run {
   }
   
   def writeApiToFile(apis: ISet[Signature], outputUri: FileResourceUri, fileName: String) = {
-    val apiFile = FileUtil.toFile(outputUri + "/" + fileName)
+    val apiFile = FileUtil.toFile(MyFileUtil.appendFileName(outputUri, fileName))
     val out = new PrintWriter(apiFile)
     apis.toList.sortBy(_.signature).foreach {
       api =>
