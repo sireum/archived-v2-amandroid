@@ -30,29 +30,6 @@ object DedexTypeResolver {
     }
     val typs: MSet[(Position, JawaType, Boolean)] = msetEmpty
     val typHolders: MSet[Position] = msetEmpty
-//    def exhaustDimention(position: Position): DedexUndeterminedType = {
-//      val newut = DedexUndeterminedType(position, defaultType)
-//      typs.foreach {
-//        case (position, typ, isLeft) =>
-//          if(typ.isArray) {
-//            newut.possible(position, JawaType(typ.baseType, typ.dimensions - 1), isLeft)
-//          }
-//      }
-//      newut.parent = Some(this)
-//      exhaustedDimentions += newut
-//      newut
-//    }
-//    var parent: Option[DedexUndeterminedType] = None
-//    val exhaustedDimentions: MSet[DedexUndeterminedType] = msetEmpty
-//    def dimentionDepth: Int = {
-//      var i = 0
-//      var ut = this
-//      while(ut.parent.isDefined){
-//        i += 1
-//        ut = ut.parent.get
-//      }
-//      i
-//    }
     val mergepos: MSet[Long] = msetEmpty
   }
 }
@@ -96,10 +73,6 @@ trait DedexTypeResolver { self: DexInstructionToPilarParser =>
     }
   }
   
-//  protected[dedex] def defsite(position: Position, typ: JawaType): DedexSingleObjectType = {
-//    DedexSingleObjectType(position, typ)
-//  }
-  
   protected[dedex] def genRegName(reg: Int, typ: DedexType): String = {
     genVarName("v" + reg, typ)
   }
@@ -123,7 +96,10 @@ trait DedexTypeResolver { self: DexInstructionToPilarParser =>
       val typ = this.regMap.getOrElseUpdate(reg, DedexJawaType(defaultTyp))
       typ match {
         case ut: DedexUndeterminedType =>
-          if(!ut.objectable && defaultTyp.isObject) {
+          if(isHolder) {
+            ut.typHolders += position
+            ut
+          } else if (!ut.objectable && defaultTyp.isObject) {
             if(isLeft)
               this.regMap(reg) = DedexJawaType(defaultTyp)
             this.positionTypMap(position) = defaultTyp
@@ -134,9 +110,7 @@ trait DedexTypeResolver { self: DexInstructionToPilarParser =>
             this.positionTypMap(position) = defaultTyp
             DedexJawaType(defaultTyp)
           } else {
-            if(isHolder) ut.typHolders += position
-            else ut.possible(position, defaultTyp, isLeft)
-            ut
+            ut.possible(position, defaultTyp, isLeft)
           }
         case jt: DedexJawaType =>
           var result = jt.typ

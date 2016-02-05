@@ -13,7 +13,8 @@ import org.sireum.util._
 /**
  * @author fgwei
  */
-case class FillArrayDataTask(regName: String, target: Long, instrParser: DexInstructionToPilarParser, base: Long, offset: Long) extends PilarDedexerTask {
+case class FillArrayDataTask(target: Long, instrParser: DexInstructionToPilarParser, base: Long, offset: Long) extends PilarDedexerTask {
+  var regName: String = null
   override def equals(o: PilarDedexerTask): Boolean = {
     o match {
       case fadt: FillArrayDataTask => super.equals(fadt)
@@ -22,7 +23,9 @@ case class FillArrayDataTask(regName: String, target: Long, instrParser: DexInst
   }
 
   def doTask(isSecondPass: Boolean): Unit = {
-    instrParser.placeTask(offset, this)
+    if(!isSecondPass) {
+      instrParser.placeTask(offset, this)
+    }
   }
   
   def isValid: Boolean = {
