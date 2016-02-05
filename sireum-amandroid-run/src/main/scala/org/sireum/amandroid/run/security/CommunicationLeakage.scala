@@ -10,15 +10,21 @@ import org.sireum.util.FileResourceUri
 import org.sireum.jawa.util.IgnoreException
 import java.io.File
 import java.io.FileOutputStream
-import java.io.BufferedWriter
+//import java.io.BufferedWriter
+import java.io.PrintWriter
 import java.io.OutputStreamWriter
-import org.sireum.amandroid.alir.taintAnalysis.DataLeakageAndroidSourceAndSinkManager
+//import org.sireum.amandroid.alir.taintAnalysis.DataLeakageAndroidSourceAndSinkManager
+import org.sireum.amandroid.security.communication.CommunicationSourceAndSinkManager
+import java.util.Calendar
 import org.sireum.jawa.util.MyTimeoutException
 import org.sireum.jawa.util.MyTimer
-import org.sireum.jawa.DefaultReporter
+import org.sireum.jawa.PrintReporter
+import org.sireum.jawa.MsgLevel
+//import org.sireum.jawa.DefaultReporter
 import org.sireum.jawa.Global
 import org.sireum.amandroid.Apk
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
+import org.sireum.amandroid.alir.dataRecorder.DataCollector
 
 object CommunicationLeakage_run {
   private final val TITLE = "CommunicationLeakage_run"
@@ -41,7 +47,7 @@ object CommunicationLeakage_run {
       eps//.filter { ep => ep.getSignature.contains("envMain") }
     }
 
-    def onTimeout: Unit = {}
+   // def onTimeout: Unit = {}
 
     def onAnalysisSuccess: Unit = {
       if(apk.getTaintAnalysisResult[InterproceduralDataDependenceAnalysis.Node, InterproceduralDataDependenceAnalysis.Edge].exists(!_.getTaintedPaths.isEmpty)){
@@ -49,25 +55,32 @@ object CommunicationLeakage_run {
         CommunicationLeakageCounter.taintPathFoundList += apk.nameUri
       }
       CommunicationLeakageCounter.haveresult += 1
-      val msgfile = new File(outputPath + "/msg.txt")
-      val msgw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(msgfile, true)))
-      msgw.write("################# " + apk.nameUri + " ################\n")
+      val appData = DataCollector.collect(global, apk)
+      val msgfile = new File(outputPath + "/business.txt")
+      val msgw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(msgfile, true)))
+     // val msgw1 =new PrintWriter(msgfile)
+      val today =Calendar.getInstance().getTime()
+      msgw.print("The following results are done at "+ today +"\n")
+      msgw.print("################# " + apk.nameUri + " ################\n")
       val tRes = apk.getTaintAnalysisResult
       tRes.foreach{
         res =>
-          msgw.write("Found " + res.getTaintedPaths.size + " path.")
-          msgw.write(res.toString)
-          msgw.write("\n\n")
+          msgw.print("Found " + res.getTaintedPaths.size + " path.")
+          msgw.print(res.toString)
+          msgw.print(appData.toString)
+          msgw.print("\n\n")
+          msgw.close()
       }
     }
 
     def onPostAnalysis: Unit = {
-      global.reporter.echo(TITLE, CommunicationLeakageCounter.toString)
+     // global.reporter.echo(TITLE, CommunicationLeakageCounter.toString)
     }
     
     def onException(e: Exception): Unit = {
       e match{
-        case ie: IgnoreException => System.err.println("Ignored!")
+        case ie: IgnoreException => global.reporter.echo(TITLE,"Ignored!")
+        case te: MyTimeoutException => global.reporter.echo(TITLE, te.message)
         case a => 
           e.printStackTrace()
       }
@@ -81,38 +94,39 @@ object CommunicationLeakage_run {
     }
     
 //    GlobalConfig.ICFG_CONTEXT_K = 1
-    AndroidReachingFactsAnalysisConfig.resolve_icc = true
-    AndroidReachingFactsAnalysisConfig.parallel = true
+    AndroidReachingFactsAnalysisConfig.resolve_icc = false
+    AndroidReachingFactsAnalysisConfig.parallel = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-
-//    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
+   // MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
     
     val sourcePath = args(0)
     val outputPath = args(1)
     val dpsuri = try{Some(FileUtil.toUri(args(2)))} catch {case e: Exception => None}
-    
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
     
     files.foreach{
       file =>
-        val reporter = new DefaultReporter
+        val reporter = new PrintReporter(MsgLevel.ERROR)//INFO
         val global = new Global(file, reporter)
         global.setJavaLib(AndroidGlobalConfig.lib_files)
         val apk = new Apk(file)
         val socket = new AmandroidSocket(global, apk)
         try{
-          reporter.echo(TITLE, DataLeakageTask(global, apk, outputPath, dpsuri, file, socket, Some(100)).run)   
+          reporter.echo(TITLE, CommunicationLeakageTask(global, apk, outputPath, dpsuri, file, socket, Some(600)).run)   
         } catch {
           case te: MyTimeoutException => reporter.error(TITLE, te.message)
           case e: Throwable => e.printStackTrace()
         } finally{
-          reporter.echo(TITLE, CommunicationLeakageCounter.toString)
+          //reporter.echo(TITLE, CommunicationLeakageCounter.toString)
+          //socket.cleanEnv
+          println(TITLE + " " + CommunicationLeakageCounter.toString)
           socket.cleanEnv
+          println(TITLE + " ************************************\n")
         }
     }
   }
   
-  private case class DataLeakageTask(global: Global, apk: Apk, outputPath: String, dpsuri: Option[FileResourceUri], file: FileResourceUri, socket: AmandroidSocket, timeout: Option[Int]) {
+  private case class CommunicationLeakageTask(global: Global, apk: Apk, outputPath: String, dpsuri: Option[FileResourceUri], file: FileResourceUri, socket: AmandroidSocket, timeout: Option[Int]) {
     def run: String = {
       global.reporter.echo(TITLE, "####" + file + "#####")
       val timer = timeout match {
@@ -123,7 +137,7 @@ object CommunicationLeakage_run {
       val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false)
       val app_info = new AppInfoCollector(global, timer)
       app_info.collectInfo(apk, outUri)
-      val ssm = new DataLeakageAndroidSourceAndSinkManager(global, apk, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.sas_file)
+      val ssm = new CommunicationSourceAndSinkManager(global, apk, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.csas_file)//sas+file??
       socket.plugListener(new CommunicationLeakageListener(global, apk, outputPath))
       socket.runWithDDA(ssm, false, false, timer)
       return "Done!"

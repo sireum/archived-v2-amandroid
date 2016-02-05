@@ -101,7 +101,7 @@ object DataLeakage_run {
     val outputPath = args(1)
     val dpsuri = try{Some(FileUtil.toUri(args(2)))} catch {case e: Exception => None}
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
-      .filter(_.contains("Button1.apk"))
+     // .filter(_.contains("Button1.apk"))
     files.foreach{
       file =>
         val reporter = new PrintReporter(MsgLevel.INFO)

@@ -55,6 +55,7 @@ import org.sireum.amandroid.security.dataInjection.IntentInjectionSourceAndSinkM
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.NoReporter
+import org.sireum.amandroid.security.communication.CommunicationSourceAndSinkManager
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -71,6 +72,7 @@ object TaintAnalyzeCli {
       case AnalysisModule.DATA_LEAKAGE => "DATA_LEAKAGE"
       case AnalysisModule.INTENT_INJECTION => "INTENT_INJECTION"
       case AnalysisModule.PASSWORD_TRACKING => "PASSWORD_TRACKING"
+      case AnalysisModule.COMMUNICATION_LEAKAGE=> "COMMUNICATION_LEAKAGE"
     }
     forkProcess(module, timeout, sourceDir, outputDir, mem, debug)
   }
@@ -92,7 +94,7 @@ object TanitAnalysis{
   private final val TITLE = "TaintAnalysis"
   def main(args: Array[String]) {
     if(args.size != 5){
-      println("Usage: <module: DATA_LEAKAGE, INTENT_INJECTION, PASSWORD_TRACKING> <timeout minutes> <debug> <source path> <output path>")
+      println("Usage: <module: DATA_LEAKAGE, INTENT_INJECTION, PASSWORD_TRACKING,COMMUNICATION_LEAKAGE> <timeout minutes> <debug> <source path> <output path>")
       return
     }
     
@@ -109,6 +111,7 @@ object TanitAnalysis{
     val k_context = AndroidGlobalConfig.k_context
     val pct = AndroidGlobalConfig.per_component
     val sasFilePath = AndroidGlobalConfig.sas_file
+    val csasFilePath =AndroidGlobalConfig.csas_file//communication
   
     val apkFileUris: MSet[FileResourceUri] = msetEmpty
     val fileOrDir = new File(sourcePath)
@@ -175,12 +178,14 @@ object TanitAnalysis{
         case "DATA_LEAKAGE" => new AppInfoCollector(global, timer)
         case "INTENT_INJECTION" => new IntentInjectionCollector(global, timer)
         case "PASSWORD_TRACKING" => new SensitiveViewCollector(global, timer)
+        case "COMMUNICATION_LEAKAGE"=> new AppInfoCollector(global, timer)
       }
       val apk: Apk = apkYard.loadApk(file, outputUri, dpsuri, app_info, false, false, true)
       val ssm = module match {
-        case "DATA_LEAKAGE" => new DataLeakageAndroidSourceAndSinkManager(global, apk, apk.getAppInfo.getLayoutControls, apk.getAppInfo.getCallbackMethods, sasFilePath)
+        case "DATA_LEAKAGE" => new DataLeakageAndroidSourceAndSinkManager(global, apk, apk.getAppInfo.getLayoutControls, apk.getAppInfo.getCallbackMethods,sasFilePath)
         case "INTENT_INJECTION" => new IntentInjectionSourceAndSinkManager(global, apk, apk.getAppInfo.getLayoutControls, apk.getAppInfo.getCallbackMethods, sasFilePath)
         case "PASSWORD_TRACKING" =>  new PasswordSourceAndSinkManager(global, apk, apk.getAppInfo.getLayoutControls, apk.getAppInfo.getCallbackMethods, sasFilePath)
+        case "COMMUNUICATION_LEAKAGE" => new CommunicationSourceAndSinkManager(global, apk, apk.getAppInfo.getLayoutControls, apk.getAppInfo.getCallbackMethods, sasFilePath)
       }
       val cba = new ComponentBasedAnalysis(global, apkYard)
       cba.phase1(apk, parallel, timer)

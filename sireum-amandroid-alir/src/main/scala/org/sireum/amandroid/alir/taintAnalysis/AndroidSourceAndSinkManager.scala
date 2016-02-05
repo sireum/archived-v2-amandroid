@@ -112,7 +112,7 @@ abstract class AndroidSourceAndSinkManager(
               val poss = this.sinks.filter(sink => matchs(calleesig, sink._1)).map(_._2._1).fold(isetEmpty)(iunion _)
               val tn = TaintSink(gNode, TagTaintDescriptor(calleesig.signature, poss, SourceAndSinkCategory.API_SINK, tags))
               sinks += tn
-            }
+            }//api_sink
             if(invNode.isInstanceOf[ICFGCallNode] && this.isIccSink(invNode.asInstanceOf[ICFGCallNode], ptaresult)) {
               global.reporter.echo(TITLE, "found icc sink: " + invNode)
               val tn = TaintSink(gNode, TagTaintDescriptor(invNode.getLocUri, Set(1), SourceAndSinkCategory.ICC_SINK, Set("ICC")))
@@ -137,7 +137,7 @@ abstract class AndroidSourceAndSinkManager(
           global.reporter.echo(TITLE, "found simple statement source: " + normalNode)
           val tn = TaintSource(gNode, TagTaintDescriptor(normalNode.getOwner.signature, isetEmpty, SourceAndSinkCategory.STMT_SOURCE, isetEmpty + "ANY"))
           sources += tn
-        }
+        }//stmt_source
         if(this.isSink(loc, ptaresult)){
           global.reporter.echo(TITLE, "found simple statement sink: " + normalNode)
           val tn = TaintSink(gNode, TagTaintDescriptor(normalNode.getOwner.signature, isetEmpty, SourceAndSinkCategory.STMT_SINK, isetEmpty + "ANY"))
@@ -198,7 +198,7 @@ abstract class AndroidSourceAndSinkManager(
           global.reporter.echo(TITLE, "found simple statement source: " + normalNode)
           val tn = TaintSource(gNode, TypeTaintDescriptor(normalNode.getOwner.signature, None, SourceAndSinkCategory.STMT_SOURCE))
           sources += tn
-        }
+        }//stmt_source
         if(this.isSink(loc, ptaresult)){
           global.reporter.echo(TITLE, "found simple statement sink: " + normalNode)
           val tn = TaintSink(gNode, TypeTaintDescriptor(normalNode.getOwner.signature, None, SourceAndSinkCategory.STMT_SINK))
