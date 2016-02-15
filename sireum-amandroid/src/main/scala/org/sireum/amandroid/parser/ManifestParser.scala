@@ -437,48 +437,48 @@ object ManifestParser {
     val count = parser.getAttributeCount
     for (i <- 0 to count - 1){ 
       if (parser.getAttributeName(i).equals(attributeName))
-        return getAttributeValue(parser, i)
+        return parser.getAttributeValue(i)
     }
     null
   }
   
-  private def getAttributeValue(parser: AXmlResourceParser,index: Int): String = {
-    val typ: Int = parser.getAttributeValueType(index)
-    val data: Int = parser.getAttributeValueData(index)
-    if (typ == TypedValue.TYPE_STRING) {
-      return parser.getAttributeValue(index);
-    }
-    if (typ==TypedValue.TYPE_ATTRIBUTE) {
-      val pkg = getPackage(data)
-      return f"?$pkg%s$data%08X"
-    }
-    if (typ==TypedValue.TYPE_REFERENCE) {
-      val pkg = getPackage(data)
-      return f"@$pkg%s$data%08X"
-    }
-    if (typ==TypedValue.TYPE_FLOAT) {
-      return String.valueOf(data.toFloat)
-    }
-    if (typ==TypedValue.TYPE_INT_HEX) {
-      return f"0x$data%08X"
-    }
-    if (typ==TypedValue.TYPE_INT_BOOLEAN) {
-      return if(data!=0)"true"else"false"
-    }
-    if (typ==TypedValue.TYPE_DIMENSION) {
-      return complexToFloat(data) + DIMENSION_UNITS(data & TypedValue.COMPLEX_UNIT_MASK)
-    }
-    if (typ == TypedValue.TYPE_FRACTION) {
-      return complexToFloat(data) + FRACTION_UNITS(data & TypedValue.COMPLEX_UNIT_MASK)
-    }
-    if (typ >= TypedValue.TYPE_FIRST_COLOR_INT && typ<=TypedValue.TYPE_LAST_COLOR_INT) {
-      return f"#$data%08X"
-    }
-    if (typ >= TypedValue.TYPE_FIRST_INT && typ<=TypedValue.TYPE_LAST_INT) {
-      return String.valueOf(data)
-    }
-    return f"<0x$data%X, type 0x$typ%02X>"
-  }
+//  private def getAttributeValue(parser: AXmlResourceParser,index: Int): String = {
+//    val typ: Int = parser.getAttributeValueType(index)
+//    val data: Int = parser.getAttributeValueData(index)
+//    if (typ == TypedValue.TYPE_STRING) {
+//      return parser.getAttributeValue(index);
+//    }
+//    if (typ==TypedValue.TYPE_ATTRIBUTE) {
+//      val pkg = getPackage(data)
+//      return f"?$pkg%s$data%08X"
+//    }
+//    if (typ==TypedValue.TYPE_REFERENCE) {
+//      val pkg = getPackage(data)
+//      return f"@$pkg%s$data%08X"
+//    }
+//    if (typ==TypedValue.TYPE_FLOAT) {
+//      return String.valueOf(data.toFloat)
+//    }
+//    if (typ==TypedValue.TYPE_INT_HEX) {
+//      return f"0x$data%08X"
+//    }
+//    if (typ==TypedValue.TYPE_INT_BOOLEAN) {
+//      return if(data!=0)"true"else"false"
+//    }
+//    if (typ==TypedValue.TYPE_DIMENSION) {
+//      return complexToFloat(data) + DIMENSION_UNITS(data & TypedValue.COMPLEX_UNIT_MASK)
+//    }
+//    if (typ == TypedValue.TYPE_FRACTION) {
+//      return complexToFloat(data) + FRACTION_UNITS(data & TypedValue.COMPLEX_UNIT_MASK)
+//    }
+//    if (typ >= TypedValue.TYPE_FIRST_COLOR_INT && typ<=TypedValue.TYPE_LAST_COLOR_INT) {
+//      return f"#$data%08X"
+//    }
+//    if (typ >= TypedValue.TYPE_FIRST_INT && typ<=TypedValue.TYPE_LAST_INT) {
+//      return String.valueOf(data)
+//    }
+//    return f"<0x$data%X, type 0x$typ%02X>"
+//  }
   
   private def getPackage(id: Int): String = {
     if (id>>>24==1) {
