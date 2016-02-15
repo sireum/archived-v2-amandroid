@@ -16,8 +16,7 @@ import org.w3c.dom.Element
 import java.io.IOException
 import javax.xml.parsers.ParserConfigurationException
 import org.xml.sax.SAXException
-import brut.androlib.res.decoder.{AXmlResourceParser => BrutAXmlResourceParser}
-import android.content.res.{AXmlResourceParser => ResAXmlResourceParser}
+import brut.androlib.res.decoder.AXmlResourceParser
 import org.sireum.jawa.JawaType
 import java.io.File
 import java.io.InputStream
@@ -401,7 +400,7 @@ object ManifestParser {
     var target: Int = min
     var max: Int = target
     try {
-      val parser = new ResAXmlResourceParser()
+      val parser = new AXmlResourceParser()
       parser.open(manifestIS)
       var typ = parser.next()
       while (typ != 0x00000001) { // XmlPullParser.END_DOCUMENT
@@ -434,7 +433,7 @@ object ManifestParser {
     (min, target, max)
   }
   
-  private def getAttributeValue(parser: ResAXmlResourceParser, attributeName: String): String = {
+  private def getAttributeValue(parser: AXmlResourceParser, attributeName: String): String = {
     val count = parser.getAttributeCount
     for (i <- 0 to count - 1){ 
       if (parser.getAttributeName(i).equals(attributeName))
@@ -443,7 +442,7 @@ object ManifestParser {
     null
   }
   
-  private def getAttributeValue(parser: ResAXmlResourceParser,index: Int): String = {
+  private def getAttributeValue(parser: AXmlResourceParser,index: Int): String = {
     val typ: Int = parser.getAttributeValueType(index)
     val data: Int = parser.getAttributeValueData(index)
     if (typ == TypedValue.TYPE_STRING) {
