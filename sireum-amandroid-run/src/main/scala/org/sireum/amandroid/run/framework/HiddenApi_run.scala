@@ -26,10 +26,10 @@ object HiddenApi_run {
   def main(args: Array[String]): Unit = {
     val fullPath = args(0)
     val outPath = args(1)
-    val pscoutFilePath = args(2)
+//    val pscoutFilePath = args(2)
     val fullUri = FileUtil.toUri(fullPath)
     val outUri = FileUtil.toUri(outPath)
-    val pscoutFileUri = FileUtil.toUri(pscoutFilePath)
+//    val pscoutFileUri = FileUtil.toUri(pscoutFilePath)
     val reporter = new PrintReporter(MsgLevel.ERROR)
     val fullGlobal = new Global("AndroidFullFramework", reporter)
     val dexUris = FileUtil.listFiles(fullUri, ".dex", true)

@@ -185,11 +185,12 @@ class PilarDeDex {
       case ex: IOException =>
         System.err.println("I/O error: "+ex.getMessage())
         if(debugMode)
-            ex.printStackTrace()
+          ex.printStackTrace()
       case ex: UnknownInstructionException =>
         System.err.println(ex.getMessage())
       case ex: Exception =>
-        ex.printStackTrace()
+        if(debugMode)
+          ex.printStackTrace()
     }
     close()
   }

@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringEscapeUtils
 import org.sireum.jawa.JawaPackage
 import org.sireum.jawa.FieldFQN
 import org.sireum.amandroid.dedex.DedexTypeResolver._
+import org.sireum.jawa.util.MyFileUtil
 
 /**
  * @author fgwei
@@ -167,11 +168,11 @@ class PilarStyleCodeGenerator(
 //      if(recType.baseTyp == "com.tencent.token.core.push.a") {
         val outputStream = outputDir match {
           case Some(od) =>
-            var targetFile = FileUtil.toFile(od + "/" + classPath + ".pilar")
+            var targetFile = FileUtil.toFile(MyFileUtil.appendFileName(od, classPath + ".pilar"))
             var i = 0
             while(targetFile.exists()){
               i += 1
-              targetFile = FileUtil.toFile(od + "/" + classPath + "." + i + ".pilar")
+              targetFile = FileUtil.toFile(MyFileUtil.appendFileName(od, classPath + "." + i + ".pilar"))
             }
             val parent = targetFile.getParentFile()
             if(parent != null)
@@ -319,7 +320,10 @@ class PilarStyleCodeGenerator(
     for(i <- 0 to paramRegs.size() - 1 by + 2) {
       val paramReg = paramRegs.get(i).asInstanceOf[Integer]
       paramRegNumbers += paramReg
-      val paramTyp: JawaType = JavaKnowledge.formatSignatureToType(paramRegs.get(i+1).asInstanceOf[String])
+      val paramTypSig = paramRegs.get(i+1).asInstanceOf[String]
+      val paramTyp: JawaType = 
+        if(paramTypSig.isEmpty()) JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE
+        else JavaKnowledge.formatSignatureToType(paramTypSig)
       paramList += paramTyp
     }
     val sig: Signature = 

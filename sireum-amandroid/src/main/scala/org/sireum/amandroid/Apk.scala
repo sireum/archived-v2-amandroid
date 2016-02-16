@@ -34,6 +34,8 @@ object Apk {
       case dir if dir.isDirectory() => false
       case _ => 
         var valid: Boolean = false
+        var foundManifest: Boolean = false
+        var foundDex: Boolean = false
         var archive : ZipInputStream = null
         try {
           archive = new ZipInputStream(new FileInputStream(file))
@@ -42,8 +44,13 @@ object Apk {
           while (entry != null) {
             val entryName = entry.getName()
             if(entryName == "AndroidManifest.xml"){
+              foundManifest = true
+            } else if(entryName == "classes.dex"){
+              foundDex = true
+            }
+            if(foundManifest && foundDex) {
               valid = true
-              throw new FindManifest 
+              throw new FindManifest
             }
             entry = archive.getNextEntry()
           }

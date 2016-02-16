@@ -15,6 +15,7 @@ import org.sireum.jawa.util.OsUtils
 import org.sireum.amandroid.dedex.PilarDeDex
 import org.sireum.jawa.JawaType
 import org.sireum.amandroid.util.FixResources
+import org.xml.sax.SAXParseException
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -29,6 +30,7 @@ object Dex2PilarConverter {
       pdd.decompile(f, Some(targetDirUri), dpsuri, recordFilter, dexLog, debugMode)
       FixResources.fix(out, pdd)
     } catch {
+      case spe: SAXParseException =>
       case ex: Exception =>
         ex.printStackTrace()
         System.err.println("Given file is not a decompilable file: " + f)
