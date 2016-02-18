@@ -390,7 +390,6 @@ object ManifestParser {
       pkg = rootElement.getAttribute("package")
     } catch {
       case e: Exception =>
-        println(e)
     }
     pkg
   }
