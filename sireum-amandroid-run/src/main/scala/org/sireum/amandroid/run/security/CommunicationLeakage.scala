@@ -10,19 +10,28 @@ import org.sireum.util.FileResourceUri
 import org.sireum.jawa.util.IgnoreException
 import java.io.File
 import java.io.FileOutputStream
-import java.io.BufferedWriter
+import java.io.PrintWriter
 import java.io.OutputStreamWriter
-import org.sireum.amandroid.alir.taintAnalysis.DataLeakageAndroidSourceAndSinkManager
+import org.sireum.amandroid.security.communication.CommunicationSourceAndSinkManager
+import java.util.Calendar
 import org.sireum.jawa.util.MyTimeoutException
 import org.sireum.jawa.util.MyTimer
-import org.sireum.jawa.DefaultReporter
+import org.sireum.jawa.PrintReporter
+import org.sireum.jawa.MsgLevel
 import org.sireum.jawa.Global
 import org.sireum.amandroid.Apk
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
+import org.sireum.amandroid.alir.dataRecorder.DataCollector
+import org.sireum.jawa.ScopeManager
+import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAScopeManager
+import org.sireum.jawa.util.PerComponentTimer
+import org.sireum.amandroid.alir.componentSummary.ApkYard
+import org.sireum.amandroid.alir.componentSummary.ComponentBasedAnalysis
+import org.sireum.amandroid.util.ApkFileUtil
+import org.sireum.jawa.util.MyFileUtil
 
 object CommunicationLeakage_run {
   private final val TITLE = "CommunicationLeakage_run"
-//  MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
   object CommunicationLeakageCounter {
     var total = 0
     var haveresult = 0
@@ -32,100 +41,83 @@ object CommunicationLeakage_run {
     override def toString: String = "total: " + total + ", haveResult: " + haveresult + ", taintPathFound: " + taintPathFound 
   }// contact list, phone record, text message three types of leakage
   
-  private class CommunicationLeakageListener(global: Global, apk: Apk, outputPath: String) extends AmandroidSocketListener {
-    def onPreAnalysis: Unit = {
-      CommunicationLeakageCounter.total += 1
-    }
-
-    def entryPointFilter(eps: Set[org.sireum.jawa.JawaMethod]): Set[org.sireum.jawa.JawaMethod] = {
-      eps//.filter { ep => ep.getSignature.contains("envMain") }
-    }
-
-    def onTimeout: Unit = {}
-
-    def onAnalysisSuccess: Unit = {
-      if(apk.getTaintAnalysisResult[InterproceduralDataDependenceAnalysis.Node, InterproceduralDataDependenceAnalysis.Edge].exists(!_.getTaintedPaths.isEmpty)){
-        CommunicationLeakageCounter.taintPathFound += 1
-        CommunicationLeakageCounter.taintPathFoundList += apk.nameUri
-      }
-      CommunicationLeakageCounter.haveresult += 1
-      val msgfile = new File(outputPath + "/msg.txt")
-      val msgw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(msgfile, true)))
-      msgw.write("################# " + apk.nameUri + " ################\n")
-      val tRes = apk.getTaintAnalysisResult
-      tRes.foreach{
-        res =>
-          msgw.write("Found " + res.getTaintedPaths.size + " path.")
-          msgw.write(res.toString)
-          msgw.write("\n\n")
-      }
-    }
-
-    def onPostAnalysis: Unit = {
-      global.reporter.echo(TITLE, CommunicationLeakageCounter.toString)
-    }
-    
-    def onException(e: Exception): Unit = {
-      e match{
-        case ie: IgnoreException => System.err.println("Ignored!")
-        case a => 
-          e.printStackTrace()
-      }
-    }
-  }
-  
   def main(args: Array[String]): Unit = {
     if(args.size < 2){
       System.err.print("Usage: source_path output_path [dependence_uri]")
       return
     }
     
-//    GlobalConfig.ICFG_CONTEXT_K = 1
-    AndroidReachingFactsAnalysisConfig.resolve_icc = true
-    AndroidReachingFactsAnalysisConfig.parallel = true
+    AndroidReachingFactsAnalysisConfig.resolve_icc = false
+    AndroidReachingFactsAnalysisConfig.parallel = false
     AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-
-//    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.CRITICAL
     
     val sourcePath = args(0)
     val outputPath = args(1)
+    val outputUri = FileUtil.toUri(outputPath)
     val dpsuri = try{Some(FileUtil.toUri(args(2)))} catch {case e: Exception => None}
-    
-    val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), ".apk", true).toSet
+    val files = ApkFileUtil.getApks(FileUtil.toUri(sourcePath), true)
     
     files.foreach{
       file =>
-        val reporter = new DefaultReporter
+        val reporter = new PrintReporter(MsgLevel.ERROR) //INFO
         val global = new Global(file, reporter)
         global.setJavaLib(AndroidGlobalConfig.lib_files)
         val apk = new Apk(file)
         val socket = new AmandroidSocket(global, apk)
         try{
-          reporter.echo(TITLE, DataLeakageTask(global, apk, outputPath, dpsuri, file, socket, Some(100)).run)   
+          reporter.echo(TITLE, CommunicationLeakageTask(global, apk, outputUri, dpsuri, file, socket, Some(600, true)).run)   
+          CommunicationLeakageCounter.haveresult += 1
         } catch {
           case te: MyTimeoutException => reporter.error(TITLE, te.message)
           case e: Throwable => e.printStackTrace()
-        } finally{
-          reporter.echo(TITLE, CommunicationLeakageCounter.toString)
-          socket.cleanEnv
+        } finally {
+          println(TITLE + " " + CommunicationLeakageCounter.toString)
+          System.gc
+          println(TITLE + " ************************************\n")
         }
     }
   }
   
-  private case class DataLeakageTask(global: Global, apk: Apk, outputPath: String, dpsuri: Option[FileResourceUri], file: FileResourceUri, socket: AmandroidSocket, timeout: Option[Int]) {
+  private case class CommunicationLeakageTask(global: Global, apk: Apk, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], file: FileResourceUri, socket: AmandroidSocket, timeout: Option[(Int, Boolean)]) {
     def run: String = {
-      global.reporter.echo(TITLE, "####" + file + "#####")
+      println(TITLE + " #####" + file + "#####")
+      ScopeManager.setScopeManager(new AndroidRFAScopeManager)
       val timer = timeout match {
-        case Some(t) => Some(new MyTimer(t))
+        case Some((t, p)) => Some(if(p) new PerComponentTimer(t) else new MyTimer(t))
         case None => None
       }
       if(timer.isDefined) timer.get.start
-      val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false)
+      val apkYard = new ApkYard(global)
       val app_info = new AppInfoCollector(global, timer)
-      app_info.collectInfo(apk, outUri)
-      val ssm = new DataLeakageAndroidSourceAndSinkManager(global, apk, app_info.getLayoutControls, app_info.getCallbackMethods, AndroidGlobalConfig.sas_file)
-      socket.plugListener(new CommunicationLeakageListener(global, apk, outputPath))
-      socket.runWithDDA(ssm, false, false, timer)
+      val apk: Apk = apkYard.loadApk(file, outputUri, dpsuri, app_info, false, false, true)
+      val ssm = new CommunicationSourceAndSinkManager(global, apk, apk.getAppInfo.getLayoutControls, apk.getAppInfo.getCallbackMethods, AndroidGlobalConfig.sas_file)
+      val cba = new ComponentBasedAnalysis(global, apkYard)
+      cba.phase1(apk, false, timer)
+      val iddResult = cba.phase2(Set(apk), false)
+      val tar = cba.phase3(iddResult, ssm)
+      tar.foreach{
+        t =>
+          val size = t.getTaintedPaths.size
+          if(size > 0){
+            CommunicationLeakageCounter.taintPathFound += 1
+            CommunicationLeakageCounter.taintPathFoundList += apk.nameUri
+          }
+      }
+      val appData = DataCollector.collect(global, apk)
+      val msgfile = FileUtil.toFile(MyFileUtil.appendFileName(outputUri, "business.txt"))
+      val msgw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(msgfile, true)))
+      val today = Calendar.getInstance().getTime()
+      msgw.print("The following results are done at "+ today +"\n")
+      msgw.print("################# " + apk.nameUri + " ################\n")
+      val tRes = apk.getTaintAnalysisResult
+      tRes.foreach{
+        res =>
+          msgw.print("Found " + res.getTaintedPaths.size + " path.")
+          msgw.print(res.toString)
+          msgw.print(appData.toString)
+          msgw.print("\n\n")
+          msgw.close()
+      }
       return "Done!"
     }
   }
