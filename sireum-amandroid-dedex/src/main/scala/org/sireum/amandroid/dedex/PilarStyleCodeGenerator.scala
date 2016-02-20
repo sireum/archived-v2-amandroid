@@ -34,6 +34,43 @@ import org.sireum.amandroid.dedex.DedexTypeResolver._
 import org.sireum.jawa.util.MyFileUtil
 
 /**
+ * Be aware that if you using this listener, the record code will not write to file automatically.
+ * Basically the idea is you should handle that by yourself.
+ * 
+ * @author fgwei
+ */
+trait PilarStyleCodeGeneratorListener {
+  def onRecodeGenerated(recType: JawaType, code: String, outputUri: Option[FileResourceUri])
+  def onGenerateEnd(recordCount: Int)
+}
+
+object PilarStypeCodeGenerator {
+  def outputCode(recType: JawaType, code: String, outputUri: Option[FileResourceUri]) = {
+    val classPath = recType.jawaName.replaceAll("\\.", "/")
+    val outputStream = outputUri match {
+      case Some(od) =>
+        var targetFile = FileUtil.toFile(MyFileUtil.appendFileName(od, classPath + ".pilar"))
+        var i = 0
+        while(targetFile.exists()){
+          i += 1
+          targetFile = FileUtil.toFile(MyFileUtil.appendFileName(od, classPath + "." + i + ".pilar"))
+        }
+        val parent = targetFile.getParentFile()
+        if(parent != null)
+          parent.mkdirs()
+        new PrintStream(targetFile)
+      case None =>
+        new PrintStream(System.out)
+    }
+    outputStream.println(code)
+    outputUri match {
+      case Some(t) => outputStream.close()
+      case _ =>
+    }
+  }
+}
+
+/**
  * @author fgwei
  */
 class PilarStyleCodeGenerator(
@@ -45,9 +82,11 @@ class PilarStyleCodeGenerator(
     dexClassDefsBlock: DexClassDefsBlock,
     dexOffsetResolver: DexOffsetResolver,
     file: RandomAccessFile,
-    outputDir: Option[FileResourceUri],
+    outputUri: Option[FileResourceUri],
     dump: Option[PrintStream],
     filter: (JawaType => Boolean)) {
+  
+  import PilarStypeCodeGenerator._
   
   private final val DEBUG_EXCP = false
   private final val DEBUG_REGMAPS = false
@@ -73,6 +112,7 @@ class PilarStyleCodeGenerator(
       StringEscapeUtils.escapeJava(str) != str ||
       str.split("\\.").exists(_.startsWith("0x"))
     }
+    
     def resolveRecord: JawaType = {
       if(haveStrangeCharacter(s)) {
         val sb: StringBuilder = new StringBuilder
@@ -105,6 +145,7 @@ class PilarStyleCodeGenerator(
         new JawaType(sb.toString(), typ.dimensions)
       } else JavaKnowledge.getTypeFromName(s)
     }
+    
     def resolveProcedure: Signature = {
       if(haveStrangeCharacter(s)) {
         val sig = new Signature(s)
@@ -158,29 +199,13 @@ class PilarStyleCodeGenerator(
     }
   }
   
-  def generate: Unit = {
+  def generate(listener: Option[PilarStyleCodeGeneratorListener] = None): IMap[JawaType, String] = {
+    val result: MMap[JawaType, String] = mmapEmpty
     val classreader = dexClassDefsBlock.getClassIterator
     while(classreader.hasNext()) {
       val classIdx = classreader.next().intValue()
       val recType: JawaType = toPilarRecordName(dexClassDefsBlock.getClassNameOnly(classIdx)).resolveRecord
-      val classPath = recType.jawaName.replaceAll("\\.", "/")
       if(filter(recType)) {
-//      if(recType.baseTyp == "com.tencent.token.core.push.a") {
-        val outputStream = outputDir match {
-          case Some(od) =>
-            var targetFile = FileUtil.toFile(MyFileUtil.appendFileName(od, classPath + ".pilar"))
-            var i = 0
-            while(targetFile.exists()){
-              i += 1
-              targetFile = FileUtil.toFile(MyFileUtil.appendFileName(od, classPath + "." + i + ".pilar"))
-            }
-            val parent = targetFile.getParentFile()
-            if(parent != null)
-              parent.mkdirs()
-            new PrintStream(targetFile)
-          case None =>
-            new PrintStream(System.out)
-        }
         if(DEBUG_FLOW)
           println("Processing " + recType)
         if(dump.isDefined) {
@@ -188,14 +213,13 @@ class PilarStyleCodeGenerator(
           dump.get.println("Class: " + recType)
         }
         val code = generateRecord(classIdx)
-        outputStream.println(code)
-        outputDir match {
-          case Some(t) => outputStream.close()
-          case _ =>
-        }
-        
+        result(recType) = code
+        if(listener.isDefined) listener.get.onRecodeGenerated(recType, code, outputUri)
+        else outputCode(recType, code, outputUri)
       }
     }
+    if(listener.isDefined) listener.get.onGenerateEnd(result.size)
+    result.toMap
   }
   
   private def generateAnnotation(flag: String, value: String): ST = {

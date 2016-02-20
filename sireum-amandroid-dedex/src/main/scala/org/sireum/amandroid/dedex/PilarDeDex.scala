@@ -71,7 +71,8 @@ class PilarDeDex {
       depsDirUri: Option[FileResourceUri],
       recordFilter: (JawaType => Boolean),
       dexlog: Boolean,
-      debugMode: Boolean): Unit = {
+      debugMode: Boolean,
+      listener: Option[PilarStyleCodeGeneratorListener] = None): Unit = {
     try{
       val raf = new RandomAccessFile(FileUtil.toFilePath(sourceFileUri), "r")
       if(dexlog){ 
@@ -175,7 +176,7 @@ class PilarDeDex {
           targetDirUri,
           dexLogStream,
           recordFilter)
-      pscg.generate
+      pscg.generate(listener)
       raf.close()
       this.pkgNameMapping = pscg.pkgNameMapping.toMap
       this.recordNameMapping = pscg.recordNameMapping.toMap

@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Amandroid Concurrent
+Bundle-SymbolicName: sireum-amandroid-concurrent;singleton:=true
+Bundle-Version: 2.0.0
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: argus.org
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.sireum;bundle-version="2.0.0",
+ sireum-amandroid;bundle-version="2.0.0",
+ sireum-amandroid-alir;bundle-version="2.0.0",
+ sireum-amandroid-dedex;bundle-version="2.0.0",
+ sireum-amandroid-security;bundle-version="2.0.0",
+ sireum-jawa;bundle-version="2.0.0",
+ sireum-jawa-alir;bundle-version="2.0.0",
+ sireum-jawa-compiler;bundle-version="2.0.0",
+ sireum-jawa-concurrent;bundle-version="2.0.0"

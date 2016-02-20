@@ -10,6 +10,7 @@ import org.sireum.amandroid.AndroidConstants
 import org.sireum.jawa.io.FgSourceFile
 import org.sireum.jawa.io.PlainFile
 import org.sireum.jawa.JawaType
+import org.sireum.amandroid.dedex.PilarStyleCodeGeneratorListener
 
 object ApkDecompiler {
   final val TITLE = "ApkDecompiler"
@@ -19,7 +20,16 @@ object ApkDecompiler {
     AmDecoder.decode(apkUri, outputUri, true, forceDelete)
   }
   
-  def decompileDex(dexUri: FileResourceUri, outUri: FileResourceUri, dpsuri: Option[FileResourceUri], pkg: String, dexLog: Boolean, debugMode: Boolean, removeSupportGen: Boolean, forceDelete: Boolean): (String, ISet[String]) = {
+  def decompileDex(
+      dexUri: FileResourceUri, 
+      outUri: FileResourceUri, 
+      dpsuri: Option[FileResourceUri], 
+      pkg: String, 
+      dexLog: Boolean, 
+      debugMode: Boolean, 
+      removeSupportGen: Boolean, 
+      forceDelete: Boolean,
+      listener: Option[PilarStyleCodeGeneratorListener] = None): (String, ISet[String]) = {
     val dependencies: MSet[String] = msetEmpty
     val recordFilter: (JawaType => Boolean) = {
       ot =>
@@ -50,11 +60,18 @@ object ApkDecompiler {
       val outPath = FileUtil.toFilePath(outUri)
       FileUtil.toUri(outPath + File.separator + srcFolder)
     }
-    val src = Dex2PilarConverter.convert(dexUri, pilarOutUri, outUri, dpsuri, recordFilter, dexLog, debugMode, forceDelete)
+    val src = Dex2PilarConverter.convert(dexUri, pilarOutUri, outUri, dpsuri, recordFilter, dexLog, debugMode, forceDelete, listener)
     (srcFolder, dependencies.toSet)
   }
   
-  def decompile(apk: File, outputLocation: File, dpsuri: Option[FileResourceUri], dexLog: Boolean, debugMode: Boolean, removeSupportGen: Boolean, forceDelete: Boolean): (FileResourceUri, ISet[String], ISet[String]) = {
+  def decompile(
+      apk: File, 
+      outputLocation: File, 
+      dpsuri: Option[FileResourceUri], 
+      dexLog: Boolean, 
+      debugMode: Boolean, 
+      removeSupportGen: Boolean, 
+      forceDelete: Boolean): (FileResourceUri, ISet[String], ISet[String]) = {
     val outUri = decodeApk(FileUtil.toUri(apk), FileUtil.toUri(outputLocation), forceDelete)
     val pkg = ManifestParser.loadPackageName(outUri + "/AndroidManifest.xml")
     val srcFolders: MSet[String] = msetEmpty
