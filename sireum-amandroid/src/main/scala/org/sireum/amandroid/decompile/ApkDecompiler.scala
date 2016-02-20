@@ -3,7 +3,6 @@ package org.sireum.amandroid.decompile
 import java.io.File
 import org.sireum.util._
 import org.sireum.util.FileResourceUri
-import org.sireum.jawa.sjc.util.MyFileUtil
 import java.io.FileWriter
 import org.sireum.amandroid.parser.ManifestParser
 import org.sireum.amandroid.AndroidConstants
@@ -11,6 +10,7 @@ import org.sireum.jawa.io.FgSourceFile
 import org.sireum.jawa.io.PlainFile
 import org.sireum.jawa.JawaType
 import org.sireum.amandroid.dedex.PilarStyleCodeGeneratorListener
+import org.sireum.jawa.util.MyFileUtil
 
 object ApkDecompiler {
   final val TITLE = "ApkDecompiler"
@@ -73,7 +73,8 @@ object ApkDecompiler {
       removeSupportGen: Boolean, 
       forceDelete: Boolean): (FileResourceUri, ISet[String], ISet[String]) = {
     val outUri = decodeApk(FileUtil.toUri(apk), FileUtil.toUri(outputLocation), forceDelete)
-    val pkg = ManifestParser.loadPackageName(outUri + "/AndroidManifest.xml")
+    val manifestUri = MyFileUtil.appendFileName(outUri, "AndroidManifest.xml")
+    val pkg = ManifestParser.loadPackageName(manifestUri)
     val srcFolders: MSet[String] = msetEmpty
     val dependencies: MSet[String] = msetEmpty
     if(FileUtil.toFile(outUri).exists()) {
