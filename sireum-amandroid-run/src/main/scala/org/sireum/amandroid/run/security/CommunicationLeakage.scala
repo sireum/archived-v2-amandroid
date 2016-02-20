@@ -30,6 +30,9 @@ import org.sireum.amandroid.alir.componentSummary.ComponentBasedAnalysis
 import org.sireum.amandroid.util.ApkFileUtil
 import org.sireum.jawa.util.MyFileUtil
 
+/**
+ * @author Fengchi Lin
+ */
 object CommunicationLeakage_run {
   private final val TITLE = "CommunicationLeakage_run"
   object CommunicationLeakageCounter {
