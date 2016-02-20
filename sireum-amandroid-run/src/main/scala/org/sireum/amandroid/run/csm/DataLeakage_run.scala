@@ -55,17 +55,12 @@ object DataLeakage_run {
     if(args.size < 2) {
       System.err.print("Usage: source_path output_path [dependence_path]")
       return
-    }
-    
-//    GlobalConfig.ICFG_CONTEXT_K = 1
+    }    
     AndroidReachingFactsAnalysisConfig.resolve_static_init = true
-
-//    MessageCenter.msglevel = MessageCenter.MSG_LEVEL.NORMAL
-    
     val sourcePath = args(0)
     val outputPath = args(1)
     val outputUri = FileUtil.toUri(outputPath)
-    val dpsuri = try{Some(FileUtil.toUri(args(1)))} catch {case e: Exception => None}
+    val dpsuri = try{Some(FileUtil.toUri(args(2)))} catch {case e: Exception => None}
     val files = ApkFileUtil.getApks(FileUtil.toUri(sourcePath), true)
 //      .filter(_.contains("InterComponentCommunication_DynRegister2.apk"))
     files.foreach{
