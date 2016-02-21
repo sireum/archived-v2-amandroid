@@ -7,6 +7,5 @@ trait AmandroidData
 
 // DecompileActor's input
 case class DecompileData(fileUri: FileResourceUri, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], removeSupportGen: Boolean, forceDelete: Boolean) extends AmandroidData
-case class DecompileTimeout(fileUri: FileResourceUri, outputUri: FileResourceUri) extends AmandroidData
 // DecompileActor's result
-case class DecompilerResult(fileUri: FileResourceUri, outUri: FileResourceUri, srcFolders: ISet[String], dependencies: ISet[String]) extends AmandroidData
+case class DecompilerResult(valid: Boolean, fileUri: FileResourceUri, outUri: FileResourceUri, srcFolders: ISet[String], dependencies: ISet[String]) extends AmandroidData

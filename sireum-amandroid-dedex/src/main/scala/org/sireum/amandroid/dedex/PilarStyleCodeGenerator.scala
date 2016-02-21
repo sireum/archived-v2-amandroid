@@ -44,7 +44,7 @@ trait PilarStyleCodeGeneratorListener {
   def onGenerateEnd(recordCount: Int)
 }
 
-object PilarStypeCodeGenerator {
+object PilarStyleCodeGenerator {
   def outputCode(recType: JawaType, code: String, outputUri: Option[FileResourceUri]) = {
     val classPath = recType.jawaName.replaceAll("\\.", "/")
     val outputStream = outputUri match {
@@ -86,7 +86,7 @@ class PilarStyleCodeGenerator(
     dump: Option[PrintStream],
     filter: (JawaType => Boolean)) {
   
-  import PilarStypeCodeGenerator._
+  import PilarStyleCodeGenerator._
   
   private final val DEBUG_EXCP = false
   private final val DEBUG_REGMAPS = false

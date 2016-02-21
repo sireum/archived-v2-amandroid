@@ -22,46 +22,58 @@ import com.typesafe.config.ConfigFactory
 import akka.routing.Broadcast
 
 /**
- * This is a supervisor actor for managing the whole decompile process.
- * It has two sub actors: 
- * 	 DexDecodeActor, decode given dex file and send back record type to code mapping data.
- *   DecodeOutputActor, output given code to file, console, etc.
+ * This is an actor for managing the whole decompile process.
  *   
  * @author Fengguo Wei
  */
-class DecompilerActor(nrOfDecodeInstances: Int) extends Actor with ActorLogging {
-  
+class DecompilerActor(timeout: Duration) extends Actor with ActorLogging {
+  private var currentOutDirUri: FileResourceUri = null
   def receive: Receive = {
     case ddata: DecompileData =>
       log.info("Start decompile " + ddata.fileUri)
       if(Apk.isValidApk(ddata.fileUri)) {
+        var opUri: Option[FileResourceUri] = None
+        val codes: MMap[JawaType, String] = mmapEmpty
+        val listener = new PilarStyleCodeGeneratorListener {
+          def onRecodeGenerated(recType: JawaType, code: String, outputUri: Option[FileResourceUri]) = {
+            opUri = outputUri
+            codes(recType) = code
+          }
+          def onGenerateEnd(recordCount: Int) = {}
+        }
         val apkFile = FileUtil.toFile(ddata.fileUri)
         val resultDir = FileUtil.toFile(ddata.outputUri)
+        val dirName = try{apkFile.getName().substring(0, apkFile.getName().lastIndexOf("."))} catch {case e: Exception => apkFile.getName()}
+        currentOutDirUri = MyFileUtil.appendFileName(ddata.outputUri, dirName)
+        context.setReceiveTimeout(timeout)
         val (outUri, srcs, deps) = ApkDecompiler.decompile(apkFile, resultDir, ddata.dpsuri, false, false, ddata.removeSupportGen, ddata.forceDelete)
+        context.setReceiveTimeout(Duration.Undefined)
+        codes.foreach {
+          case (typ, code) =>
+            PilarStyleCodeGenerator.outputCode(typ, code, opUri)
+        }
+        sender ! DecompilerResult(true, ddata.fileUri, outUri, srcs, deps)
+      } else {
+        sender ! DecompilerResult(false, ddata.fileUri, null, null, null)
       }
-    case dt: DecompileTimeout =>
-      
+    case ReceiveTimeout =>
+      context.setReceiveTimeout(Duration.Undefined)
+      if(currentOutDirUri != null)
+        MyFileUtil.deleteDir(FileUtil.toFile(currentOutDirUri))
   }
 }
 
-class DecompilePrioMailbox(settings: ActorSystem.Settings, config: Config) extends UnboundedPriorityMailbox (
-  PriorityGenerator {
-    case DecompileTimeout => 0
-    case _ => 1
-  }
-)
-
 object DecompileTestApplication extends App {
   val _system = ActorSystem("DecompileApp", ConfigFactory.load)
-  val supervisor = _system.actorOf(Props(new DecompilerActor(2)).withDispatcher("akka.decompile-prio-dispatcher"), name = "decompile_supervisor")
+  val supervisor = _system.actorOf(Props(new DecompilerActor(10 seconds)).withDispatcher("akka.decompile-prio-dispatcher"), name = "decompile_supervisor")
 //  implicit val timeout = Timeout(40 seconds)
   val fileUris = FileUtil.listFiles(FileUtil.toUri("/Users/fgwei/Develop/Sireum/apps/amandroid/sources/icc-bench"), ".apk", true)
   val outputUri = FileUtil.toUri("/Users/fgwei/Work/output/icc-bench")
   val futures = fileUris map {
     fileUri =>
-      (supervisor.ask(DecompileData(fileUri, outputUri, None, true, true))(10 seconds)).mapTo[DecompilerResult].recover{
+      (supervisor.ask(DecompileData(fileUri, outputUri, None, true, true))(30 seconds)).mapTo[DecompilerResult].recover{
           case te: AskTimeoutException =>
-            supervisor ! DecompileTimeout(fileUri, outputUri)
+            (fileUri, false)
           case ex: Exception => 
             (fileUri, false)
         }
