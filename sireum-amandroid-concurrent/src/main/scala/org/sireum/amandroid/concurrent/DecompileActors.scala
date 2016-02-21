@@ -17,17 +17,17 @@ import scala.concurrent.Await
 import akka.pattern.AskTimeoutException
 import akka.dispatch.UnboundedPriorityMailbox
 import com.typesafe.config.Config
-import akka.dispatch.PriorityGenerator
 import com.typesafe.config.ConfigFactory
-import akka.routing.Broadcast
+import java.util.concurrent.TimeoutException
+import org.sireum.jawa.util.FutureUtil
 
 /**
  * This is an actor for managing the whole decompile process.
  *   
  * @author Fengguo Wei
  */
-class DecompilerActor(timeout: Duration) extends Actor with ActorLogging {
-  private var currentOutDirUri: FileResourceUri = null
+class DecompilerActor extends Actor with ActorLogging {
+  
   def receive: Receive = {
     case ddata: DecompileData =>
       log.info("Start decompile " + ddata.fileUri)
@@ -43,35 +43,52 @@ class DecompilerActor(timeout: Duration) extends Actor with ActorLogging {
         }
         val apkFile = FileUtil.toFile(ddata.fileUri)
         val resultDir = FileUtil.toFile(ddata.outputUri)
-        val dirName = try{apkFile.getName().substring(0, apkFile.getName().lastIndexOf("."))} catch {case e: Exception => apkFile.getName()}
-        currentOutDirUri = MyFileUtil.appendFileName(ddata.outputUri, dirName)
-        context.setReceiveTimeout(timeout)
-        val (outUri, srcs, deps) = ApkDecompiler.decompile(apkFile, resultDir, ddata.dpsuri, false, false, ddata.removeSupportGen, ddata.forceDelete)
-        context.setReceiveTimeout(Duration.Undefined)
-        codes.foreach {
-          case (typ, code) =>
-            PilarStyleCodeGenerator.outputCode(typ, code, opUri)
+        val (f, cancel) = FutureUtil.interruptableFuture[DecompilerResult] { () =>
+          val res = 
+          try {
+            val (outUri, srcs, deps) = ApkDecompiler.decompile(apkFile, resultDir, ddata.dpsuri, false, false, ddata.removeSupportGen, ddata.forceDelete, Some(listener))
+            DecompileSuccResult(ddata.fileUri, outUri, srcs, deps)
+          } catch {
+            case e: Exception =>
+              DecompileFailResult(ddata.fileUri, Some(e))
+          }
+          res
         }
-        sender ! DecompilerResult(true, ddata.fileUri, outUri, srcs, deps)
+        val res = try {
+          Await.result(f, ddata.timeout)
+        } catch {
+          case te: TimeoutException =>
+            cancel()
+            log.warning("Decompile timeout for " + ddata.fileUri)
+            DecompileFailResult(ddata.fileUri, Some(te))
+        }
+        res match {
+          case dfr: DecompileFailResult =>
+            val dirName = try{apkFile.getName().substring(0, apkFile.getName().lastIndexOf("."))} catch {case e: Exception => apkFile.getName()}
+            val outDir = FileUtil.toFile(MyFileUtil.appendFileName(ddata.outputUri, dirName))
+            MyFileUtil.deleteDir(outDir)
+          case _ =>
+            codes.foreach {
+              case (typ, code) =>
+                PilarStyleCodeGenerator.outputCode(typ, code, opUri)
+            }
+        }
+        sender ! res
       } else {
-        sender ! DecompilerResult(false, ddata.fileUri, null, null, null)
+        sender ! DecompileFailResult(ddata.fileUri, None)
       }
-    case ReceiveTimeout =>
-      context.setReceiveTimeout(Duration.Undefined)
-      if(currentOutDirUri != null)
-        MyFileUtil.deleteDir(FileUtil.toFile(currentOutDirUri))
   }
 }
 
 object DecompileTestApplication extends App {
   val _system = ActorSystem("DecompileApp", ConfigFactory.load)
-  val supervisor = _system.actorOf(Props(new DecompilerActor(10 seconds)).withDispatcher("akka.decompile-prio-dispatcher"), name = "decompile_supervisor")
+  val supervisor = _system.actorOf(Props[DecompilerActor], name = "decompile_supervisor")
 //  implicit val timeout = Timeout(40 seconds)
   val fileUris = FileUtil.listFiles(FileUtil.toUri("/Users/fgwei/Develop/Sireum/apps/amandroid/sources/icc-bench"), ".apk", true)
   val outputUri = FileUtil.toUri("/Users/fgwei/Work/output/icc-bench")
   val futures = fileUris map {
     fileUri =>
-      (supervisor.ask(DecompileData(fileUri, outputUri, None, true, true))(30 seconds)).mapTo[DecompilerResult].recover{
+      (supervisor.ask(DecompileData(fileUri, outputUri, None, true, true, 10 seconds))(30 seconds)).mapTo[DecompilerResult].recover{
           case te: AskTimeoutException =>
             (fileUri, false)
           case ex: Exception => 

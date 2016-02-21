@@ -42,7 +42,6 @@ object Dex2PilarConverter {
     } catch {
       case spe: SAXParseException =>
       case ex: Exception =>
-        ex.printStackTrace()
         System.err.println("Given file is not a decompilable file: " + f)
     }
     targetDirUri

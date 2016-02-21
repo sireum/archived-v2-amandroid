@@ -71,7 +71,8 @@ object ApkDecompiler {
       dexLog: Boolean, 
       debugMode: Boolean, 
       removeSupportGen: Boolean, 
-      forceDelete: Boolean): (FileResourceUri, ISet[String], ISet[String]) = {
+      forceDelete: Boolean,
+      listener: Option[PilarStyleCodeGeneratorListener] = None): (FileResourceUri, ISet[String], ISet[String]) = {
     val outUri = decodeApk(FileUtil.toUri(apk), FileUtil.toUri(outputLocation), forceDelete)
     val manifestUri = MyFileUtil.appendFileName(outUri, "AndroidManifest.xml")
     val pkg = ManifestParser.loadPackageName(manifestUri)
@@ -81,7 +82,7 @@ object ApkDecompiler {
       val dexUris = FileUtil.listFiles(outUri, "dex", true)
       dexUris.foreach {
         dexUri =>
-          val (sf, dependent) = decompileDex(dexUri, outUri, dpsuri, pkg, dexLog, debugMode, removeSupportGen, forceDelete)
+          val (sf, dependent) = decompileDex(dexUri, outUri, dpsuri, pkg, dexLog, debugMode, removeSupportGen, forceDelete, listener)
           srcFolders += sf
           dependencies ++= dependent
       }
