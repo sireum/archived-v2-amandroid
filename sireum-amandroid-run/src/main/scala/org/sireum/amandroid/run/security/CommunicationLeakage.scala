@@ -29,6 +29,7 @@ import org.sireum.amandroid.alir.componentSummary.ApkYard
 import org.sireum.amandroid.alir.componentSummary.ComponentBasedAnalysis
 import org.sireum.amandroid.util.ApkFileUtil
 import org.sireum.jawa.util.MyFileUtil
+import org.sireum.amandroid.security.oauth.CommunicationSourceContainerCollector
 
 /**
  * @author Fengchi Lin
@@ -91,8 +92,8 @@ object CommunicationLeakage_run {
       }
       if(timer.isDefined) timer.get.start
       val apkYard = new ApkYard(global)
-      val app_info = new AppInfoCollector(global, timer)
-      val apk: Apk = apkYard.loadApk(file, outputUri, dpsuri, app_info, false, false, true)
+      val app_info = new CommunicationSourceContainerCollector(global, timer)
+      val apk: Apk = apkYard.loadApk(file, outputUri, dpsuri, app_info, false, false, false)
       val ssm = new CommunicationSourceAndSinkManager(global, apk, apk.getAppInfo.getLayoutControls, apk.getAppInfo.getCallbackMethods, AndroidGlobalConfig.sas_file)
       val cba = new ComponentBasedAnalysis(global, apkYard)
       cba.phase1(apk, false, timer)

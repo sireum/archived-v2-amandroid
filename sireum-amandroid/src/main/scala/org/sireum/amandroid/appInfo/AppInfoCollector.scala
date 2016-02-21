@@ -258,7 +258,7 @@ object AppInfoCollector {
         v.foreach {
           i =>
             val resource = afp.findResource(i)
-            if(resource != null && resource.getType.getName == "layout"){
+            if(resource != null && resource.getType().getName == "layout"){
               val includes = lfp.getIncludes.filter(_._1.contains(resource.getName)).flatten(_._2).toSet
               val resources = includes.map(i => afp.findResource(i)) + resource
               lfp.getCallbackMethods.find{case (file, _) => resources.map(_.getName).exists { x => file.contains(x) }}.foreach{
