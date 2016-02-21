@@ -53,7 +53,7 @@ object AmDecoder {
       case fe: CantFindFrameworkResException =>
         System.err.println(TITLE + ": Can't find framework resources for package of id: " + fe.getPkgId + ". You must install proper framework files, see apk-tool website for more info.")
       case e: Exception =>
-        System.err.println(TITLE + ": Outdated framework resources. You must install proper framework files, see apk-tool website for more info.")
+        System.err.println(TITLE + ": " + e.getMessage + ". See apk-tool website for more info.")
     }
     FileUtil.toUri(outputDir)
   }
