@@ -14,38 +14,35 @@
  *    Wu Zhou - Fireeye
  *    Fengchi Lin - Chinese People's Public Security University
  ******************************************************************************/
-package org.sireum.amandroid.run.security
+package org.sireum.amandroid.run.csm
 
 import org.sireum.amandroid.security._
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.util.FileUtil
-import org.sireum.amandroid.appInfo.AppInfoCollector
-import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.util.FileResourceUri
-import org.sireum.jawa.util.IgnoreException
-import java.io.File
 import java.io.FileOutputStream
 import java.io.PrintWriter
 import java.io.OutputStreamWriter
 import org.sireum.amandroid.security.communication.CommunicationSourceAndSinkManager
 import java.util.Calendar
-import org.sireum.jawa.util.MyTimeoutException
-import org.sireum.jawa.util.MyTimer
 import org.sireum.jawa.PrintReporter
 import org.sireum.jawa.MsgLevel
 import org.sireum.jawa.Global
 import org.sireum.amandroid.Apk
-import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceAnalysis
 import org.sireum.amandroid.alir.dataRecorder.DataCollector
 import org.sireum.jawa.ScopeManager
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAScopeManager
-import org.sireum.jawa.util.PerComponentTimer
 import org.sireum.amandroid.alir.componentSummary.ApkYard
 import org.sireum.amandroid.alir.componentSummary.ComponentBasedAnalysis
 import org.sireum.amandroid.util.ApkFileUtil
 import org.sireum.jawa.util.MyFileUtil
-import org.sireum.amandroid.security.oauth.CommunicationSourceContainerCollector
+import org.sireum.jawa.util.FutureUtil
+import scala.concurrent.ExecutionContext.Implicits.{global => ec}
+import scala.concurrent.Await
+import scala.concurrent.duration._
+import java.util.concurrent.TimeoutException
+import scala.concurrent.ExecutionContext.Implicits.{global => ec}
 
 /**
  * @author Fengchi Lin
@@ -79,16 +76,24 @@ object CommunicationLeakage_run {
     
     files.foreach{
       file =>
-        val reporter = new PrintReporter(MsgLevel.ERROR) //INFO
-        val global = new Global(file, reporter)
-        global.setJavaLib(AndroidGlobalConfig.lib_files)
-        val apk = new Apk(file)
-        val socket = new AmandroidSocket(global, apk)
         try{
-          reporter.echo(TITLE, CommunicationLeakageTask(global, apk, outputUri, dpsuri, file, socket, Some(600, true)).run)   
-          CommunicationLeakageCounter.haveresult += 1
+          val reporter = new PrintReporter(MsgLevel.ERROR) //INFO
+          val global = new Global(file, reporter)
+          global.setJavaLib(AndroidGlobalConfig.lib_files)
+          val (f, cancel) = FutureUtil.interruptableFuture { () => 
+            CommunicationLeakageTask(global, outputUri, dpsuri, file).run
+          }
+          try {
+            Await.result(f, 10 minutes)
+            CommunicationLeakageCounter.haveresult += 1
+          } catch {
+            case te: TimeoutException => 
+              cancel()
+              reporter.error(TITLE, te.getMessage)
+          }
+          
         } catch {
-          case te: MyTimeoutException => reporter.error(TITLE, te.message)
+          
           case e: Throwable => e.printStackTrace()
         } finally {
           println(TITLE + " " + CommunicationLeakageCounter.toString)
@@ -98,21 +103,15 @@ object CommunicationLeakage_run {
     }
   }
   
-  private case class CommunicationLeakageTask(global: Global, apk: Apk, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], file: FileResourceUri, socket: AmandroidSocket, timeout: Option[(Int, Boolean)]) {
+  private case class CommunicationLeakageTask(global: Global, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], file: FileResourceUri) {
     def run: String = {
       println(TITLE + " #####" + file + "#####")
       ScopeManager.setScopeManager(new AndroidRFAScopeManager)
-      val timer = timeout match {
-        case Some((t, p)) => Some(if(p) new PerComponentTimer(t) else new MyTimer(t))
-        case None => None
-      }
-      if(timer.isDefined) timer.get.start
-      val apkYard = new ApkYard(global)
-      val app_info = new CommunicationSourceContainerCollector(global, timer)
-      val apk: Apk = apkYard.loadApk(file, outputUri, dpsuri, app_info, false, false, false)
-      val ssm = new CommunicationSourceAndSinkManager(global, apk, apk.getAppInfo.getLayoutControls, apk.getAppInfo.getCallbackMethods, AndroidGlobalConfig.sas_file)
-      val cba = new ComponentBasedAnalysis(global, apkYard)
-      cba.phase1(apk, false, timer)
+      val yard = new ApkYard(global)
+      val apk: Apk = yard.loadApk(file, outputUri, dpsuri, false, false, false)
+      val ssm = new CommunicationSourceAndSinkManager(global, apk, apk.getLayoutControls, apk.getCallbackMethods, AndroidGlobalConfig.sas_file)
+      val cba = new ComponentBasedAnalysis(global, yard)
+      cba.phase1(apk, false)
       val iddResult = cba.phase2(Set(apk), false)
       val tar = cba.phase3(iddResult, ssm)
       tar.foreach{
@@ -123,13 +122,13 @@ object CommunicationLeakage_run {
             CommunicationLeakageCounter.taintPathFoundList += apk.nameUri
           }
       }
-      val appData = DataCollector.collect(global, apk)
+      val appData = DataCollector.collect(global, yard, apk)
       val msgfile = FileUtil.toFile(MyFileUtil.appendFileName(outputUri, "business.txt"))
       val msgw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(msgfile, true)))
       val today = Calendar.getInstance().getTime()
       msgw.print("The following results are done at "+ today +"\n")
       msgw.print("################# " + apk.nameUri + " ################\n")
-      val tRes = apk.getTaintAnalysisResult
+      val tRes = yard.getTaintAnalysisResult(file)
       tRes.foreach{
         res =>
           msgw.print("Found " + res.getTaintedPaths.size + " path.")

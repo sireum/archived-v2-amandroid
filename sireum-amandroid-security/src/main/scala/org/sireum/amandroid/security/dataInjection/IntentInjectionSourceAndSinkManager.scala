@@ -30,6 +30,7 @@ import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.InterComponentC
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.amandroid.Apk
 import org.sireum.jawa.Global
+import org.sireum.jawa.Signature
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -37,21 +38,21 @@ import org.sireum.jawa.Global
  */ 
 class IntentInjectionSourceAndSinkManager(
     global: Global,
-    apk : Apk, 
-    layoutControls : Map[Int, LayoutControl], 
-    callbackMethods : ISet[JawaMethod], 
-    sasFilePath : String) 
-    extends AndroidSourceAndSinkManager(global, apk, layoutControls, callbackMethods, sasFilePath){
+    apk: Apk, 
+    layoutControls: Map[Int, LayoutControl], 
+    callbackSigs: ISet[Signature], 
+    sasFilePath: String) 
+    extends AndroidSourceAndSinkManager(global, apk, layoutControls, callbackSigs, sasFilePath){
   
-  override def isSource(calleeMethod : JawaMethod, callerMethod : JawaMethod, callerLoc : JumpLocation) : Boolean = {
+  override def isSource(calleeSig: Signature, callerSig: Signature, callerLoc: JumpLocation): Boolean = {
     false
   }
   
-  override def isCallbackSource(proc : JawaMethod) : Boolean = {
+  override def isCallbackSource(sig: Signature): Boolean = {
     false
   }
   
-  override def isUISource(calleeMethod : JawaMethod, callerMethod : JawaMethod, callerLoc : JumpLocation) : Boolean = {
+  override def isUISource(calleeSig: Signature, callerSig: Signature, callerLoc: JumpLocation): Boolean = {
 //  if(calleeMethod.getSignature == AndroidConstants.ACTIVITY_FINDVIEWBYID || calleeMethod.getSignature == AndroidConstants.VIEW_FINDVIEWBYID){
 //    val nums = ExplicitValueFinder.findExplicitIntValueForArgs(callerMethod, callerLoc, 1)
 //    nums.foreach{
@@ -67,7 +68,7 @@ class IntentInjectionSourceAndSinkManager(
     false
   }
 
-  override def isIccSink(invNode : ICFGInvokeNode, ptaresult : PTAResult) : Boolean = {
+  override def isIccSink(invNode: ICFGInvokeNode, ptaresult: PTAResult): Boolean = {
     var sinkflag = false
     val calleeSet = invNode.getCalleeSet
     calleeSet.foreach{
@@ -76,11 +77,11 @@ class IntentInjectionSourceAndSinkManager(
           sinkflag = true
 //          val rfafactMap = ReachingFactsAnalysisHelper.getFactMap(rfaFact)
 //          val args = invNode.getOwner.getMethodBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
-//              case te : TupleExp =>
+//              case te: TupleExp =>
 //                te.exps.map{
 //            exp =>
 //              exp match{
-//            case ne : NameExp => ne.name.name
+//            case ne: NameExp => ne.name.name
 //            case _ => exp.toString()
 //          }
 //          }.toList
@@ -107,7 +108,7 @@ class IntentInjectionSourceAndSinkManager(
     sinkflag
   }
 
-  override def isIccSource(entNode : ICFGNode, iddgEntNode : ICFGNode) : Boolean = {
+  override def isIccSource(entNode: ICFGNode, iddgEntNode: ICFGNode): Boolean = {
     entNode == iddgEntNode
   }
 }

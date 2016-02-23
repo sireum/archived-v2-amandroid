@@ -31,6 +31,7 @@ import org.sireum.jawa.alir.controlFlowGraph._
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 import org.sireum.jawa.alir.pta.Instance
 import org.sireum.jawa.alir.pta.VarSlot
+import org.sireum.jawa.JawaType
 
 trait ComponentSummaryProvider {
   def getIntentCaller(idfg: InterProceduralDataFlowGraph, intentValue: ISet[Instance], context: Context): ISet[IntentContent]
@@ -44,7 +45,7 @@ object ComponentSummaryTable {
     val INTENT_CHANNEL, RPC_CHANNEL, STORAGE_CHANNEL = Value
   }
   
-  def buildComponentSummaryTable(apk: Apk, component: JawaClass, idfg: InterProceduralDataFlowGraph, csp: ComponentSummaryProvider): ComponentSummaryTable = {
+  def buildComponentSummaryTable(apk: Apk, component: JawaType, idfg: InterProceduralDataFlowGraph, csp: ComponentSummaryProvider): ComponentSummaryTable = {
     val summaryTable: ComponentSummaryTable = new ComponentSummaryTable(component)
     // Add component as icc callee
     val filters = apk.getIntentFilterDB.getIntentFilters(component)
@@ -58,7 +59,7 @@ object ComponentSummaryTable {
       node =>
         node match {
           case en: ICFGEntryNode =>
-            rpcs.filter (rpc => rpc.getSignature == en.context.getMethodSig).foreach{
+            rpcs.filter (rpc => rpc == en.context.getMethodSig).foreach{
               rpc =>
                 // Add component as rpc callee
                 rpc_summary.addCallee(en, RPCCallee(rpc))
@@ -67,11 +68,11 @@ object ComponentSummaryTable {
             val callees = cn.getCalleeSet
             callees foreach {
               callee =>
-                val calleep = callee.callee
+                val calleeSig = callee.callee
                 val ptsmap = idfg.ptaresult.getPTSMap(cn.context)
-                if(AndroidConstants.isIccMethod(calleep.getSubSignature)) {
+                if(AndroidConstants.isIccMethod(calleeSig.getSubSignature)) {
                   // add component as icc caller
-                  val callTyp = AndroidConstants.getIccCallType(calleep.getSubSignature)
+                  val callTyp = AndroidConstants.getIccCallType(calleeSig.getSubSignature)
                   val intentSlot = VarSlot(cn.argNames(1), false, true) // FIXME later
                   val intentValue: ISet[Instance] = ptsmap.getOrElse(intentSlot, isetEmpty)
                   val intentcontents = csp.getIntentCaller(idfg, intentValue, cn.context)
@@ -81,10 +82,10 @@ object ComponentSummaryTable {
                   }
                 }
                 
-                if(apk.getRpcMethods.contains(calleep)) {
+                if(apk.getRpcMethods.contains(calleeSig)) {
                   // add component as rpc caller
                   val rpc_summary: RPC_Summary = summaryTable.get(CHANNELS.RPC_CHANNEL)
-                  rpc_summary.addCaller(cn, RPCCaller(calleep, ptsmap))
+                  rpc_summary.addCaller(cn, RPCCaller(calleeSig, ptsmap))
                 }
             }
           case _ =>
@@ -94,7 +95,7 @@ object ComponentSummaryTable {
   }
 }
 
-class ComponentSummaryTable(val component: JawaClass) {
+class ComponentSummaryTable(val component: JawaType) {
   import ComponentSummaryTable._
   
   private val table: IMap[CHANNELS.Value, CSTContent] = Map(
@@ -131,14 +132,14 @@ class Intent_Summary extends CSTContent {
 
 case class IntentCaller(compTyp: AndroidConstants.CompType.Value, intent: IntentContent) extends CSTCaller
 
-case class IntentCallee(apk: Apk, component: JawaClass, compTyp: AndroidConstants.CompType.Value, filter: ISet[IntentFilter]) extends CSTCallee {
+case class IntentCallee(apk: Apk, component: JawaType, compTyp: AndroidConstants.CompType.Value, filter: ISet[IntentFilter]) extends CSTCallee {
   def matchWith(caller: CSTCaller): Boolean = {
     caller match {
       case icc_caller: IntentCaller =>
         if(compTyp == icc_caller.compTyp){
           if (!icc_caller.intent.preciseExplicit) true
           else if (!icc_caller.intent.preciseImplicit && !filter.isEmpty) true
-          else if (icc_caller.intent.componentNames.exists(name => name == component.getName)) true
+          else if (icc_caller.intent.componentNames.exists(name => name == component.name)) true
           else if (IntentHelper.findComponents(
               apk, 
               icc_caller.intent.actions, 
@@ -161,13 +162,13 @@ class RPC_Summary extends CSTContent {
   def asCallee: ISet[(ICFGNode, CSTCallee)] = callees.toSet
 }
 
-case class RPCCaller(method: JawaMethod, pts: PTAResult.PTSMap) extends CSTCaller
+case class RPCCaller(sig: Signature, pts: PTAResult.PTSMap) extends CSTCaller
 
-case class RPCCallee(method: JawaMethod) extends CSTCallee {
+case class RPCCallee(sig: Signature) extends CSTCallee {
   def matchWith(caller: CSTCaller): Boolean = {
     caller match {
       case rpc_caller: RPCCaller =>
-        method.getSignature == rpc_caller.method.getSignature
+        sig == rpc_caller.sig
       case _ => false
     }
   }

@@ -37,6 +37,7 @@ import org.sireum.jawa.Signature
 import org.sireum.jawa.alir.interProcedural.InterProceduralNode
 import org.sireum.alir.AlirEdge
 import org.sireum.amandroid.parser.ComponentType
+import org.sireum.amandroid.alir.componentSummary.ApkYard
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -322,11 +323,10 @@ object DataCollector {
     }
   }
   
-  def collect(global: Global, apk: Apk) = {
-    val appInfo = apk.getAppInfo
+  def collect(global: Global, yard: ApkYard, apk: Apk) = {
     val appName = apk.getAppName
-    val uses_permissions = appInfo.getUsesPermissions
-    val compInfos = appInfo.getComponentInfos
+    val uses_permissions = apk.getUsesPermissions
+    val compInfos = apk.getComponentInfos
     val intentFDB = apk.getIntentFilterDB
     val compDatas = compInfos.map{
       comp =>
@@ -339,8 +339,8 @@ object DataCollector {
         var iccInfos = isetEmpty[IccInfo]
         var taintResult: Option[TaintAnalysisResult[InterProceduralNode, AlirEdge[InterProceduralNode]]] = None
         if(!compRec.isUnknown){
-          if(apk.hasIDFG(compRec)) {
-            val InterProceduralDataFlowGraph(icfg, ptaresult) = apk.getIDFG(compRec).get
+          if(yard.hasIDFG(compTyp)) {
+            val InterProceduralDataFlowGraph(icfg, ptaresult) = yard.getIDFG(compTyp).get
             val iccNodes = icfg.nodes.filter{
               node =>
                 node.isInstanceOf[ICFGCallNode] && node.asInstanceOf[ICFGCallNode].getCalleeSet.exists(c => InterComponentCommunicationModel.isIccOperation(c.callee))
@@ -365,15 +365,15 @@ object DataCollector {
                   val intentcontents = IntentHelper.getIntentContents(ptaresult, intentValues, iccNode.getContext)
                   val compType = AndroidConstants.getIccCallType(iccNode.getCalleeSet.head.callee.getSubSignature)
                   val comMap = IntentHelper.mappingIntents(global, apk, intentcontents, compType)
-                  val intents = intentcontents.map(ic=>Intent(ic.componentNames, ic.actions, ic.categories, ic.datas, ic.types, ic.preciseExplicit, ic.preciseImplicit, comMap(ic).map(c=>(c._1.getName, c._2.toString()))))
-                  IccInfo(iccNode.getCalleeSet.map(_.callee.getSignature), iccNode.getContext, intents)
+                  val intents = intentcontents.map(ic=>Intent(ic.componentNames, ic.actions, ic.categories, ic.datas, ic.types, ic.preciseExplicit, ic.preciseImplicit, comMap(ic).map(c=>(c._1.name, c._2.toString()))))
+                  IccInfo(iccNode.getCalleeSet.map(_.callee), iccNode.getContext, intents)
               }.toSet
           }
       }
-      val dynamicReg = apk.getDynamicRegisteredReceivers.contains(compRec)
+      val dynamicReg = apk.getDynamicRegisteredReceivers.contains(compTyp)
       ComponentData(compTyp.jawaName, typ, exported, dynamicReg, protectPermission, intentFilters, iccInfos)
     }
-    val taintResult = apk.getTaintAnalysisResult[InterProceduralNode, AlirEdge[InterProceduralNode]]
+    val taintResult = yard.getTaintAnalysisResult[InterProceduralNode, AlirEdge[InterProceduralNode]](apk.nameUri)
     AppData(appName, uses_permissions.toSet, compDatas.toSet, taintResult)
   }
 }

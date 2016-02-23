@@ -16,7 +16,7 @@
  ******************************************************************************/
 package org.sireum.amandroid.parser
 
-import org.sireum.jawa.JawaClass
+import org.sireum.jawa.JawaType
 
 /**
  * Data class representing a layout control on the android screen
@@ -26,5 +26,4 @@ import org.sireum.jawa.JawaClass
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
-final case class LayoutControl(id : Int, viewClass : JawaClass, isSensitive : Boolean = false) {
-}
+final case class LayoutControl(id: Int, viewClass: JawaType, isSensitive: Boolean = false)

@@ -24,6 +24,7 @@ import org.sireum.amandroid.Apk
 import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.AndroidGlobalConfig
+import org.sireum.amandroid.alir.componentSummary.ApkYard
 
 /**
  * @author fgwei
@@ -48,6 +49,7 @@ object ProposalNeeds_run {
     }
     val sourcePath = args(0)
     val outputPath = args(1)
+    val outputUri = FileUtil.toUri(outputPath)
     val dpsuri = try{Some(FileUtil.toUri(args(2)))} catch {case e: Exception => None}
     val files = FileUtil.listFiles(FileUtil.toUri(sourcePath), "", true).filter(Apk.isValidApk(_)).toSet
     files.foreach{
@@ -57,10 +59,9 @@ object ProposalNeeds_run {
         val reporter = new PrintReporter(MsgLevel.ERROR)
         val global = new Global(file, reporter)
         global.setJavaLib(AndroidGlobalConfig.lib_files)
-        val apk = new Apk(file)
-        val socket = new AmandroidSocket(global, apk)
+        val yard = new ApkYard(global)
+        val apk = yard.loadApk(file, outputUri, dpsuri, false, false, false)
         try{
-          val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false, true) 
           var dynamicLoading = false
           var reflection = false
           var nativecode = false
@@ -111,7 +112,6 @@ object ProposalNeeds_run {
             if(true) e.printStackTrace()
         } finally {
           println(ProposalNeedsCounter.toString)
-          socket.cleanEnv
         }
     }
   }

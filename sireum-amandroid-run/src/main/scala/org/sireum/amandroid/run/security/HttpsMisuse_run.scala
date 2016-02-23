@@ -18,17 +18,21 @@ package org.sireum.amandroid.run.security
 
 import org.sireum.amandroid.security._
 import org.sireum.util.FileUtil
-import org.sireum.amandroid.security.apiMisuse.InterestingApiCollector
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.security.apiMisuse.HttpsMisuse
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.util.FileResourceUri
-import org.sireum.jawa.util.MyTimer
-import org.sireum.jawa.util.MyTimeoutException
 import org.sireum.jawa.DefaultReporter
 import org.sireum.jawa.Global
 import org.sireum.amandroid.Apk
+import org.sireum.amandroid.alir.componentSummary.ApkYard
+import org.sireum.amandroid.alir.componentSummary.ComponentBasedAnalysis
+import scala.concurrent.ExecutionContext.Implicits.{global => ec}
+import scala.concurrent.Await
+import scala.concurrent.duration._
+import java.util.concurrent.TimeoutException
+import org.sireum.jawa.util.FutureUtil
 
 /**
  * @author <a href="mailto:i@flanker017.me">Qidan He</a>
@@ -90,35 +94,32 @@ object HttpsMisuse_run {
       file =>
         val reporter = new DefaultReporter
         val global = new Global(file, reporter)
-        val apk = new Apk(file)
-        val socket = new AmandroidSocket(global, apk)
         try{
-          reporter.echo(TITLE, HttpsMisuseTask(global, apk, outputPath, dpsuri, file, socket, Some(500)).run)
+          val (f, cancel) = FutureUtil.interruptableFuture { () =>
+            HttpsMisuseTask(global, outputPath, dpsuri, file).run
+          }
+          try {
+            reporter.echo(TITLE, Await.result(f, 10 minutes))
+          } catch {
+            case te: TimeoutException => reporter.error(TITLE, te.getMessage)
+          }
         } catch {
-          case te : MyTimeoutException => reporter.error(TITLE, te.message)
           case e : Throwable => e.printStackTrace()
         } finally {
           reporter.echo(TITLE, HttpsMisuseCounter.toString)
-          socket.cleanEnv
         }
     }
   }
   
-  private case class HttpsMisuseTask(global: Global, apk: Apk, outputPath : String, dpsuri: Option[FileResourceUri], file : FileResourceUri, socket : AmandroidSocket, timeout : Option[Int]) {
+  private case class HttpsMisuseTask(global: Global, outputPath : String, dpsuri: Option[FileResourceUri], file : FileResourceUri) {
     def run : String = {
       global.reporter.echo(TITLE, "####" + file + "#####")
-      val timer = timeout match {
-        case Some(t) => Some(new MyTimer(t))
-        case None => None
-      }
-      if(timer.isDefined) timer.get.start
-      val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false)
-      val app_info = new InterestingApiCollector(global, timer)
-      app_info.collectInfo(apk, outUri)
-      socket.plugListener(new HTTPSMisuseListener(global))
-      socket.runWithoutDDA(false, true, timer)
-       
-      val idfgs = apk.getIDFGs
+      val yard = new ApkYard(global)
+      val outputUri = FileUtil.toUri(outputPath)
+      val apk = yard.loadApk(file, outputUri, dpsuri, false, false, false)
+      val cba = new ComponentBasedAnalysis(global, yard)
+      cba.phase1(apk, false)
+      val idfgs = yard.getIDFGs
       idfgs.foreach{
         case (rec, idfg) =>
           HttpsMisuse(global, idfg)

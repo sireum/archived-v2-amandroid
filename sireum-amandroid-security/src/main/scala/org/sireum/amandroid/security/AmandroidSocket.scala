@@ -36,21 +36,21 @@ import org.sireum.amandroid.alir.taintAnalysis.AndroidSourceAndSinkManager
 import org.sireum.jawa.JawaMethod
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.alir.Context
-import org.sireum.jawa.util.MyTimer
 import org.sireum.jawa.ScopeManager
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAScopeManager
 import org.sireum.jawa.Global
 import org.sireum.jawa.Constants
 import org.sireum.amandroid.Apk
 import org.sireum.amandroid.decompile.ApkDecompiler
-import org.sireum.jawa.util.MyTimeoutException
-import org.sireum.jawa.util.PerComponentTimer
 import org.sireum.amandroid.alir.taintAnalysis.AndroidDataDependentTaintAnalysis.TarApk
+import org.sireum.amandroid.alir.componentSummary.ApkYard
+import java.util.concurrent.TimeoutException
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
+@deprecated
 trait AmandroidSocketListener {
   def onPreAnalysis: Unit
   def entryPointFilter(eps: Set[JawaMethod]): Set[JawaMethod]
@@ -63,7 +63,8 @@ trait AmandroidSocketListener {
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
-class AmandroidSocket(global: Global, apk: Apk) {
+@deprecated
+class AmandroidSocket(global: Global, yard: ApkYard, apk: Apk) {
   private final val TITLE = "AmandroidSocket"
   private var myListener_opt: Option[AmandroidSocketListener] = None
 //  private var dirtyFlag = false
@@ -115,8 +116,7 @@ class AmandroidSocket(global: Global, apk: Apk) {
   def runWithDDA(
       ssm: AndroidSourceAndSinkManager,
       public_only: Boolean,
-      parallel: Boolean,
-      timer: Option[MyTimer]) = {    
+      parallel: Boolean) = {    
     try {
       if(myListener_opt.isDefined) myListener_opt.get.onPreAnalysis
   
@@ -136,15 +136,15 @@ class AmandroidSocket(global: Global, apk: Apk) {
         ep =>
           global.reporter.echo(TITLE, "--------------Component " + ep + "--------------")
           val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-          val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager, timer)
-          apk.addIDFG(ep.getDeclaringClass, idfg)
+          val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager)
+          yard.addIDFG(ep.getDeclaringClass.getType, idfg)
           global.reporter.echo(TITLE, "processed-->" + idfg.icfg.getProcessed.size)
           val iddResult = InterproceduralDataDependenceAnalysis(global, idfg)
-          apk.addIDDG(ep.getDeclaringClass, iddResult)
+          yard.addIDDG(ep.getDeclaringClass.getType, iddResult)
           val tar = AndroidDataDependentTaintAnalysis(global, iddResult, idfg.ptaresult, ssm)
           tarApk.tars += tar
       }
-      apk.addTaintAnalysisResult(tarApk)
+      yard.addTaintAnalysisResult(apk.nameUri, tarApk)
       if(myListener_opt.isDefined) myListener_opt.get.onAnalysisSuccess
     } catch {
       case e: Exception => 
@@ -156,8 +156,7 @@ class AmandroidSocket(global: Global, apk: Apk) {
   
   def runWithoutDDA(
       public_only: Boolean,
-      parallel: Boolean,
-      timer: Option[MyTimer]) = {    
+      parallel: Boolean) = {    
     try{
       if(myListener_opt.isDefined) myListener_opt.get.onPreAnalysis
   
@@ -176,20 +175,15 @@ class AmandroidSocket(global: Global, apk: Apk) {
       {if(parallel) entryPoints.par else entryPoints}.foreach{
         ep =>
           try {
-            val timertouse =
-              if(timer.isDefined && timer.get.isInstanceOf[PerComponentTimer]){
-                timer.get.start
-                timer
-              } else timer
             global.reporter.echo(TITLE, "--------------Component " + ep + "--------------")
             val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-            val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager, timertouse)
-            apk.addIDFG(ep.getDeclaringClass, idfg)
+            val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager)
+            yard.addIDFG(ep.getDeclaringClass.getType, idfg)
             global.reporter.echo(TITLE, "processed-->" + idfg.icfg.getProcessed.size)
             val iddResult = InterproceduralDataDependenceAnalysis(global, idfg)
-            apk.addIDDG(ep.getDeclaringClass, iddResult)
+            yard.addIDDG(ep.getDeclaringClass.getType, iddResult)
           } catch {
-            case te: MyTimeoutException => global.reporter.error(TITLE, ep + ":" + te.message)
+            case te: TimeoutException => global.reporter.error(TITLE, ep + ":" + te.getMessage)
           }
       }
       if(myListener_opt.isDefined) myListener_opt.get.onAnalysisSuccess

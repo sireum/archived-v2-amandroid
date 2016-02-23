@@ -35,7 +35,6 @@ import scala.collection.immutable.BitSet
 import java.io.PrintWriter
 import org.sireum.jawa.alir.pta.PTAConcreteStringInstance
 import org.sireum.jawa.alir.pta.PTAInstance
-import org.sireum.jawa.util.MyTimer
 import org.sireum.jawa.alir.pta._
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralMonotoneDataFlowAnalysisFramework
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralMonotonicFunction
@@ -68,7 +67,6 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
   def build (
       entryPointProc: JawaMethod,
       initialFacts: ISet[RFAFact] = isetEmpty,
-      timer: Option[MyTimer],
       initContext: Context,
       switchAsOrderedMatch: Boolean): InterProceduralDataFlowGraph = {
     val gen = new Gen
@@ -82,7 +80,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
     icfg.collectCfgToBaseGraph(entryPointProc, initContext, true)
     val iota: ISet[RFAFact] = initialFacts + RFAFact(StaticFieldSlot(FieldFQN(new JawaType("Analysis"), "RFAiota", JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE)), PTAInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE.toUnknown, initContext.copy, false))
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](icfg,
-      true, true, false, AndroidReachingFactsAnalysisConfig.parallel, gen, kill, callr, ppr, iota, initial, timer, switchAsOrderedMatch, Some(nl))
+      true, true, false, AndroidReachingFactsAnalysisConfig.parallel, gen, kill, callr, ppr, iota, initial, switchAsOrderedMatch, Some(nl))
 //    icfg.toDot(new PrintWriter(System.out))
     InterProceduralDataFlowGraph(icfg, ptaresult)
   }
@@ -340,14 +338,15 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
       }
       calleeSet.foreach{
         callee =>
-          val calleep = callee.callee
-          if(AndroidReachingFactsAnalysisHelper.isICCCall(calleep) || AndroidReachingFactsAnalysisHelper.isModelCall(calleep)){
+          val calleeSig = callee.callee
+          val calleep = global.getMethod(calleeSig).get
+          if(AndroidReachingFactsAnalysisHelper.isICCCall(calleeSig) || AndroidReachingFactsAnalysisHelper.isModelCall(calleep)){
             pureNormalFlag = false
-            if(AndroidReachingFactsAnalysisHelper.isICCCall(calleep)) {
+            if(AndroidReachingFactsAnalysisHelper.isICCCall(calleeSig)) {
               if(AndroidReachingFactsAnalysisConfig.resolve_icc){
-                val factsForCallee = getFactsForICCTarget(s, cj, calleep, callerContext)
+                val factsForCallee = getFactsForICCTarget(s, cj, callerContext)
                 killSet ++= factsForCallee -- ReachingFactsAnalysisHelper.getGlobalFacts(s) // don't remove global facts for ICC call
-                val (retFacts, targets) = AndroidReachingFactsAnalysisHelper.doICCCall(apk, ptaresult, calleep, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)
+                val (retFacts, targets) = AndroidReachingFactsAnalysisHelper.doICCCall(global, apk, ptaresult, calleeSig, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)
                 genSet ++= retFacts
                 
                 targets.foreach{
@@ -366,13 +365,13 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
               killSet ++= k
             }
           } else { // for normal call
-            if(!icfg.isProcessed(calleep.getSignature, callerContext)){
+            if(!icfg.isProcessed(calleeSig, callerContext)){
               icfg.collectCfgToBaseGraph[String](calleep, callerContext, false)
-              icfg.extendGraph(calleep.getSignature, callerContext)
+              icfg.extendGraph(calleeSig, callerContext)
             }
             val factsForCallee = getFactsForCallee(s, cj, calleep, callerContext)
             killSet ++= factsForCallee
-            calleeFactsMap += (icfg.entryNode(calleep.getSignature, callerContext) -> mapFactsToCallee(factsForCallee, callerContext, cj, calleep))
+            calleeFactsMap += (icfg.entryNode(calleeSig, callerContext) -> mapFactsToCallee(factsForCallee, callerContext, cj, calleep))
           }
       }
       if(pureNormalFlag) {
@@ -422,7 +421,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
       (calleeFactsMap, returnFacts)
     }
     
-    private def getFactsForICCTarget(s: ISet[RFAFact], cj: CallJump, callee: JawaMethod, callerContext: Context): ISet[RFAFact] = {
+    private def getFactsForICCTarget(s: ISet[RFAFact], cj: CallJump, callerContext: Context): ISet[RFAFact] = {
       var calleeFacts = isetEmpty[RFAFact]
       calleeFacts ++= ReachingFactsAnalysisHelper.getGlobalFacts(s)
       cj.callExp.arg match{
@@ -714,8 +713,7 @@ object AndroidReachingFactsAnalysis {
       entryPointProc: JawaMethod,
       initialFacts: ISet[RFAFact] = isetEmpty,
       clm: ClassLoadManager,
-      timer: Option[MyTimer],
       initContext: Context = new Context,
       switchAsOrderedMatch: Boolean = false): InterProceduralDataFlowGraph
-    = new AndroidReachingFactsAnalysisBuilder(global, apk, clm).build(entryPointProc, initialFacts, timer, initContext, switchAsOrderedMatch)
+    = new AndroidReachingFactsAnalysisBuilder(global, apk, clm).build(entryPointProc, initialFacts, initContext, switchAsOrderedMatch)
 }

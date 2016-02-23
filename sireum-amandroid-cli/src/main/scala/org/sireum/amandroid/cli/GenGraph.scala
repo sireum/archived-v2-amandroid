@@ -37,8 +37,6 @@ import org.sireum.jawa.xml.AndroidXStream
 import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.amandroid.decompile.AmDecoder
 import org.sireum.jawa.alir.pta.suspark.InterproceduralSuperSpark
-import org.sireum.jawa.util.MyTimeoutException
-import org.sireum.jawa.util.MyTimer
 import org.sireum.option.GraphFormat
 import org.sireum.option.GraphType
 import java.io.BufferedWriter
@@ -59,7 +57,12 @@ import org.sireum.amandroid.Apk
 import org.sireum.amandroid.util.ApkFileUtil
 import org.sireum.jawa.Constants
 import org.sireum.jawa.NoReporter
-
+import org.sireum.jawa.util.FutureUtil
+import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
+import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.{global => ec}
+import scala.concurrent.Await
+import java.util.concurrent.TimeoutException
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -137,7 +140,19 @@ object GenGraph {
     genGraph(apkFileUris.toSet, outputPath, dpsuri, liblist, static, parallel, k_context, timeout, header, format, graphtyp, debug)
   }
   
-  def genGraph(apkFileUris: Set[FileResourceUri], outputPath: String, dpsuri: Option[FileResourceUri], liblist: String, static: Boolean, parallel: Boolean, k_context: Int, timeout: Int, header: String, format: String, graphtyp: String, debug: Boolean) = {
+  def genGraph(
+      apkFileUris: Set[FileResourceUri], 
+      outputPath: String, 
+      dpsuri: Option[FileResourceUri], 
+      liblist: String, 
+      static: Boolean, 
+      parallel: Boolean, 
+      k_context: Int, 
+      timeout: Int, 
+      header: String, 
+      format: String, 
+      graphtyp: String, 
+      debug: Boolean) = {
     Context.init_context_length(k_context)
     println("Total apks: " + apkFileUris.size)
     try{
@@ -153,92 +168,96 @@ object GenGraph {
               else new NoReporter
             val global = new Global(apkFileUri, reporter)
             global.setJavaLib(liblist)
-            val timer = Some(new MyTimer(timeout*60))
-            if(timer.isDefined) timer.get.start
-            val apkName = apkFileUri.substring(apkFileUri.lastIndexOf("/") + 1, apkFileUri.lastIndexOf("."))
-            val (outUri, srcs, _) = ApkDecompiler.decompile(FileUtil.toFile(apkFileUri), FileUtil.toFile(outputUri), dpsuri, false, false, true, true)
-            srcs foreach {
-              src =>
-                val fileUri = FileUtil.toUri(FileUtil.toFilePath(outUri) + File.separator + src)
-                if(FileUtil.toFile(fileUri).exists()) {
-                  //store the app's pilar code in AmandroidCodeSource which is organized class by class.
-                  global.load(fileUri, Constants.PILAR_FILE_EXT, AndroidLibraryAPISummary)
-                }
-            }
-            // convert the dex file to the "pilar" form
-            val apk = new Apk(apkFileUri)
-            val app_info = new AppInfoCollector(global, timer)
-            app_info.collectInfo(apk, outUri)
             
-            val eps = app_info.getEntryPoints
-            val pros =
-              eps.map{
-                compName =>
-                  val comp = global.resolveToBody(compName)
-                  val procedures = comp.getDeclaredMethodsByName(AndroidConstants.MAINCOMP_ENV) ++ comp.getDeclaredMethodsByName(AndroidConstants.COMP_ENV)
-                  procedures
-              }.reduce(iunion[JawaMethod])
-
-            val icfg = InterproceduralSuperSpark(global, pros, timer).icfg   
-            graphtyp match{
-              case "FULL" => 
-                val graph = icfg
-                val ext = format match {
-                  case "GraphML" => ".graphml"
-                  case "GML" => ".gml"
-                }
-                val file = FileUtil.toFile(outUri + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ext)
-                val w = new FileOutputStream(file)
-                val zips = new BufferedOutputStream(w)
-                val zipw = new BufferedWriter(new OutputStreamWriter(zips, "UTF-8"))
-                try {
-                  format match {
-                    case "GraphML" => graph.toGraphML(zipw)
-                    case "GML" => graph.toGML(zipw)
+            val timer = timeout minutes
+            val (f, cancel) = FutureUtil.interruptableFuture[(InterproceduralControlFlowGraph[ICFGNode], FileResourceUri)] { () =>
+              val (outUri, srcs, _) = ApkDecompiler.decompile(FileUtil.toFile(apkFileUri), FileUtil.toFile(outputUri), dpsuri, false, false, true, true)
+              srcs foreach {
+                src =>
+                  val fileUri = FileUtil.toUri(FileUtil.toFilePath(outUri) + File.separator + src)
+                  if(FileUtil.toFile(fileUri).exists()) {
+                    //store the app's pilar code in AmandroidCodeSource which is organized class by class.
+                    global.load(fileUri, Constants.PILAR_FILE_EXT, AndroidLibraryAPISummary)
                   }
-                } catch {case e: Exception => }
-                finally {
-                  zipw.close()
-                }
-              case "SIMPLE_CALL" => 
-                val path = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + "/simple_cg")
-                val fm = format match {
-                  case "GraphML" => "GraphML"
-                  case "GML" => "GML"
-                }
-                icfg.getCallGraph.toSimpleCallGraph(header, path.getPath, fm)
-              case "DETAILED_CALL" => 
-                val path = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + "/detailed_cg")
-                val fm = format match {
-                  case "GraphML" => "GraphML"
-                  case "GML" => "GML"
-                }
-                icfg.getCallGraph.toDetailedCallGraph(header, icfg, path.getPath, fm)
-              case "API" => 
-                val graph = icfg.toApiGraph
-                val ext = format match {
-                  case "GraphML" => ".graphml"
-                  case "GML" => ".gml"
-                }
-                val file = FileUtil.toFile(outUri + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ext)
-                val w = new FileOutputStream(file)
-                val zips = new BufferedOutputStream(w)
-                val zipw = new BufferedWriter(new OutputStreamWriter(zips, "UTF-8"))
-                try {
-                  format match {
-                    case "GraphML" => graph.toGraphML(zipw)
-                    case "GML" => graph.toGML(zipw)
+              }
+              val apk = new Apk(apkFileUri)
+              AppInfoCollector.collectInfo(apk, global, outUri)
+              val eps = apk.getEntryPoints
+              val pros =
+                eps.map{
+                  compName =>
+                    val comp = global.resolveToBody(compName)
+                    val procedures = comp.getDeclaredMethodsByName(AndroidConstants.MAINCOMP_ENV) ++ comp.getDeclaredMethodsByName(AndroidConstants.COMP_ENV)
+                    procedures
+                }.reduce(iunion[JawaMethod])
+              (InterproceduralSuperSpark(global, pros.map(_.getSignature)).icfg, outUri)
+            }
+            try {
+              val (icfg, outUri) = Await.result(f, timer)
+              val apkName = apkFileUri.substring(apkFileUri.lastIndexOf("/") + 1, apkFileUri.lastIndexOf("."))
+              graphtyp match{
+                case "FULL" => 
+                  val graph = icfg
+                  val ext = format match {
+                    case "GraphML" => ".graphml"
+                    case "GML" => ".gml"
                   }
-                } catch {case e: Exception =>}
-                finally {
-                  zipw.close()
-                }
-           }
-           println(apkName + " result stored!")
-           if(debug) println("Debug info write into " + reporter.asInstanceOf[FileReporter].f)
-           println("Done!")
+                  val file = FileUtil.toFile(outUri + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ext)
+                  val w = new FileOutputStream(file)
+                  val zips = new BufferedOutputStream(w)
+                  val zipw = new BufferedWriter(new OutputStreamWriter(zips, "UTF-8"))
+                  try {
+                    format match {
+                      case "GraphML" => graph.toGraphML(zipw)
+                      case "GML" => graph.toGML(zipw)
+                    }
+                  } catch {case e: Exception => }
+                  finally {
+                    zipw.close()
+                  }
+                case "SIMPLE_CALL" => 
+                  val path = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + "/simple_cg")
+                  val fm = format match {
+                    case "GraphML" => "GraphML"
+                    case "GML" => "GML"
+                  }
+                  icfg.getCallGraph.toSimpleCallGraph(header, path.getPath, fm)
+                case "DETAILED_CALL" => 
+                  val path = new File(outputPath + "/" + apkName.filter(_.isUnicodeIdentifierPart) + "/detailed_cg")
+                  val fm = format match {
+                    case "GraphML" => "GraphML"
+                    case "GML" => "GML"
+                  }
+                  icfg.getCallGraph.toDetailedCallGraph(header, icfg, path.getPath, fm)
+                case "API" => 
+                  val graph = icfg.toApiGraph(global)
+                  val ext = format match {
+                    case "GraphML" => ".graphml"
+                    case "GML" => ".gml"
+                  }
+                  val file = FileUtil.toFile(outUri + "/" + apkName.filter(_.isUnicodeIdentifierPart) + ext)
+                  val w = new FileOutputStream(file)
+                  val zips = new BufferedOutputStream(w)
+                  val zipw = new BufferedWriter(new OutputStreamWriter(zips, "UTF-8"))
+                  try {
+                    format match {
+                      case "GraphML" => graph.toGraphML(zipw)
+                      case "GML" => graph.toGML(zipw)
+                    }
+                  } catch {case e: Exception =>}
+                  finally {
+                    zipw.close()
+                  }
+              }
+              println(apkName + " result stored!")
+              if(debug) println("Debug info write into " + reporter.asInstanceOf[FileReporter].f)
+              println("Done!")
+            } catch {
+              case te: TimeoutException => 
+                cancel()
+                println(te.getMessage)
+            }
          } catch {
-           case te: MyTimeoutException => println(te.message)
            case e: Throwable => 
              CliLogger.logError(new File(outputPath), "Error: " , e)
          } finally {

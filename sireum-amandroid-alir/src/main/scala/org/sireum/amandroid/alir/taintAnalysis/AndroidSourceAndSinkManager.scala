@@ -73,7 +73,7 @@ abstract class AndroidSourceAndSinkManager(
     global: Global,
     apk: Apk,
     layoutControls: Map[Int, LayoutControl], 
-    callbackMethods: ISet[JawaMethod], 
+    callbackSigs: ISet[Signature], 
     val sasFilePath: String) extends SourceAndSinkManager{
   
   private final val TITLE = "BasicSourceAndSinkManager"
@@ -86,12 +86,12 @@ abstract class AndroidSourceAndSinkManager(
     }
   }
   
-  private def getSourceTags(calleep: JawaMethod): ISet[String] = {
-    this.sources.filter(src => matchs(calleep.getSignature, src._1)).map(_._2).fold(isetEmpty)(iunion _)
+  private def getSourceTags(calleeSig: Signature): ISet[String] = {
+    this.sources.filter(src => matchs(calleeSig, src._1)).map(_._2).fold(isetEmpty)(iunion _)
   }
   
-  private def getSinkTags(calleep: JawaMethod): ISet[String] = {
-    this.sinks.filter(sink => matchs(calleep.getSignature, sink._1)).map(_._2._2).fold(isetEmpty)(iunion _)
+  private def getSinkTags(calleeSig: Signature): ISet[String] = {
+    this.sinks.filter(sink => matchs(calleeSig, sink._1)).map(_._2._2).fold(isetEmpty)(iunion _)
   }
   
   private def handleICFGNode[N <: InterProceduralNode](icfgN: ICFGNode, ptaresult: PTAResult): (ISet[TaintSource[N]], ISet[TaintSink[N]]) = {
@@ -103,23 +103,22 @@ abstract class AndroidSourceAndSinkManager(
         val calleeSet = invNode.getCalleeSet
         calleeSet.foreach{
           callee =>
-            val calleep = callee.callee
-            val calleesig = calleep.getSignature
+            val calleeSig = callee.callee
             val caller = global.getMethod(invNode.getOwner).get
             val jumpLoc = caller.getBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
-            if(this.isSource(calleep, caller, jumpLoc)) {
-              var tags = getSourceTags(calleep)
+            if(this.isSource(calleeSig, invNode.getOwner, jumpLoc)) {
+              var tags = getSourceTags(calleeSig)
               if(tags.isEmpty) tags += "ANY"
-              global.reporter.echo(TITLE, "found source: " + calleep + "@" + invNode.getContext + " " + tags)
-              val tn = TaintSource(gNode, TagTaintDescriptor(calleesig.signature, isetEmpty, SourceAndSinkCategory.API_SOURCE, tags))
+              global.reporter.echo(TITLE, "found source: " + calleeSig + "@" + invNode.getContext + " " + tags)
+              val tn = TaintSource(gNode, TagTaintDescriptor(calleeSig.signature, isetEmpty, SourceAndSinkCategory.API_SOURCE, tags))
               sources += tn
             }
-            if(this.isSink(calleep)) {
-              var tags = getSinkTags(calleep)
+            if(this.isSink(calleeSig)) {
+              var tags = getSinkTags(calleeSig)
               if(tags.isEmpty) tags += "ANY"
-              global.reporter.echo(TITLE, "found sink: " + calleep + "@" + invNode.getContext + " " + tags)
-              val poss = this.sinks.filter(sink => matchs(calleesig, sink._1)).map(_._2._1).fold(isetEmpty)(iunion _)
-              val tn = TaintSink(gNode, TagTaintDescriptor(calleesig.signature, poss, SourceAndSinkCategory.API_SINK, tags))
+              global.reporter.echo(TITLE, "found sink: " + calleeSig + "@" + invNode.getContext + " " + tags)
+              val poss = this.sinks.filter(sink => matchs(calleeSig, sink._1)).map(_._2._1).fold(isetEmpty)(iunion _)
+              val tn = TaintSink(gNode, TagTaintDescriptor(calleeSig.signature, poss, SourceAndSinkCategory.API_SINK, tags))
               sinks += tn
             }
             if(invNode.isInstanceOf[ICFGCallNode] && this.isIccSink(invNode.asInstanceOf[ICFGCallNode], ptaresult)) {
@@ -134,7 +133,7 @@ abstract class AndroidSourceAndSinkManager(
           val tn = TaintSource(gNode, TagTaintDescriptor(entNode.getOwner.signature, isetEmpty, SourceAndSinkCategory.ICC_SOURCE, Set("ICC")))
           sources += tn
         }
-        if(this.isCallbackSource(global.getMethod(entNode.getOwner).get)){
+        if(this.isCallbackSource(entNode.getOwner)){
           global.reporter.echo(TITLE, "found callback source: " + entNode)
           val tn = TaintSource(gNode, TagTaintDescriptor(entNode.getOwner.signature, isetEmpty, SourceAndSinkCategory.CALLBACK_SOURCE, Set("CALL_BACK")))
           sources += tn
@@ -166,20 +165,19 @@ abstract class AndroidSourceAndSinkManager(
         val calleeSet = invNode.getCalleeSet
         calleeSet.foreach{
           callee =>
-            val calleesig = callee.callee.getSignature
-            val calleep = callee.callee
+            val calleeSig = callee.callee
             val caller = global.getMethod(invNode.getOwner).get
             val jumpLoc = caller.getBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
-            if(invNode.isInstanceOf[IDDGVirtualBodyNode] && this.isSource(calleep, caller, jumpLoc)){
-              global.reporter.echo(TITLE, "found source: " + calleep + "@" + invNode.getContext)
-              val tn = TaintSource(gNode, TypeTaintDescriptor(calleep.getSignature.signature, None, SourceAndSinkCategory.API_SOURCE))
+            if(invNode.isInstanceOf[IDDGVirtualBodyNode] && this.isSource(calleeSig, invNode.getOwner, jumpLoc)){
+              global.reporter.echo(TITLE, "found source: " + calleeSig + "@" + invNode.getContext)
+              val tn = TaintSource(gNode, TypeTaintDescriptor(calleeSig.signature, None, SourceAndSinkCategory.API_SOURCE))
               sources += tn
             }
-            if(invNode.isInstanceOf[IDDGCallArgNode] && this.isSink(calleep)){
-              val poss = this.sinks.filter(sink => matchs(calleep.getSignature, sink._1)).map(_._2._1).fold(isetEmpty)(iunion _)
+            if(invNode.isInstanceOf[IDDGCallArgNode] && this.isSink(calleeSig)){
+              val poss = this.sinks.filter(sink => matchs(calleeSig, sink._1)).map(_._2._1).fold(isetEmpty)(iunion _)
               if(poss.isEmpty || poss.contains(invNode.asInstanceOf[IDDGCallArgNode].position)) {
-                global.reporter.echo(TITLE, "found sink: " + calleep + "@" + invNode.getContext + " " + invNode.asInstanceOf[IDDGCallArgNode].position)
-                val tn = TaintSink(gNode, TypeTaintDescriptor(calleep.getSignature.signature, Some(invNode.asInstanceOf[IDDGCallArgNode].position), SourceAndSinkCategory.API_SINK))
+                global.reporter.echo(TITLE, "found sink: " + calleeSig + "@" + invNode.getContext + " " + invNode.asInstanceOf[IDDGCallArgNode].position)
+                val tn = TaintSink(gNode, TypeTaintDescriptor(calleeSig.signature, Some(invNode.asInstanceOf[IDDGCallArgNode].position), SourceAndSinkCategory.API_SINK))
                 sinks += tn
               }
             }
@@ -195,7 +193,7 @@ abstract class AndroidSourceAndSinkManager(
           val tn = TaintSource(gNode, TypeTaintDescriptor(entNode.getOwner.signature, None, SourceAndSinkCategory.ICC_SOURCE))
           sources += tn
         }
-        if(entNode.position > 0 && this.isCallbackSource(global.getMethod(entNode.getOwner).get)){
+        if(entNode.position > 0 && this.isCallbackSource(entNode.getOwner)){
           global.reporter.echo(TITLE, "found callback source: " + entNode)
           val tn = TaintSource(gNode, TypeTaintDescriptor(entNode.getOwner.signature, None, SourceAndSinkCategory.CALLBACK_SOURCE))
           sources += tn
@@ -218,30 +216,30 @@ abstract class AndroidSourceAndSinkManager(
     (sources.toSet, sinks.toSet)
   }
   
-  private def matchs(method: JawaMethod, methodpool: ISet[Signature]): Boolean = methodpool.exists{
-    sig =>
-      val typ1 = sig.classTyp
-      val typ2 = method.getDeclaringClass
-      sig.getSubSignature == method.getSubSignature &&
-      (typ2.typ == typ1 || typ2.isChildOf(typ1) || typ2.isImplementerOf(typ1))
+  private def matchs(sig1: Signature, methodpool: ISet[Signature]): Boolean = methodpool.exists{
+    sig2 =>
+      val clazz1 = global.getClassOrResolve(sig1.classTyp)
+      val typ2 = sig2.classTyp
+      sig1.getSubSignature == sig2.getSubSignature &&
+      (clazz1.typ == typ2 || clazz1.isChildOf(typ2) || clazz1.isImplementerOf(typ2))
   }
   
   private def matchs(sig1: Signature, sig2: Signature): Boolean = {
-    val typ1 = global.getClassOrResolve(sig1.classTyp)
+    val clazz1 = global.getClassOrResolve(sig1.classTyp)
     val typ2 = sig2.classTyp
       sig1.getSubSignature == sig2.getSubSignature &&
-      (typ1.typ == typ2 || typ1.isChildOf(typ2) || typ1.isImplementerOf(typ2))
+      (clazz1.typ == typ2 || clazz1.isChildOf(typ2) || clazz1.isImplementerOf(typ2))
   }
 
-  def isSourceMethod(method: JawaMethod) = matchs(method, this.sources.map(s => s._1).toSet)
+  def isSourceMethod(sig: Signature) = matchs(sig, this.sources.map(s => s._1).toSet)
 
-  def isSink(method: JawaMethod) = {
-    matchs(method, this.sinks.map(s => s._1).toSet)
+  def isSink(sig: Signature) = {
+    matchs(sig, this.sinks.map(s => s._1).toSet)
   }
 
-  def isSource(calleeMethod: JawaMethod, callerMethod: JawaMethod, callerLoc: JumpLocation): Boolean = {
-    if(isSourceMethod(calleeMethod)) return true
-    if(isUISource(calleeMethod, callerMethod, callerLoc)) return true
+  def isSource(calleeSig: Signature, callerSig: Signature, callerLoc: JumpLocation): Boolean = {
+    if(isSourceMethod(calleeSig)) return true
+    if(isUISource(calleeSig, callerSig, callerLoc)) return true
     false
   }
 
@@ -249,8 +247,8 @@ abstract class AndroidSourceAndSinkManager(
 
   def isSink(loc: LocationDecl, ptaresult: PTAResult): Boolean = false
 
-  def isCallbackSource(proc: JawaMethod): Boolean
-  def isUISource(calleeMethod: JawaMethod, callerMethod: JawaMethod, callerLoc: JumpLocation): Boolean
+  def isCallbackSource(sig: Signature): Boolean
+  def isUISource(calleeSig: Signature, callerSig: Signature, callerLoc: JumpLocation): Boolean
   def isIccSink(invNode: ICFGInvokeNode, s: PTAResult): Boolean
   def isIccSource(entNode: ICFGNode, iddgEntNode: ICFGNode): Boolean
 
@@ -268,28 +266,27 @@ class DefaultAndroidSourceAndSinkManager(
     global: Global,
     apk: Apk, 
     layoutControls: Map[Int, LayoutControl], 
-    callbackMethods: ISet[JawaMethod], 
-    sasFilePath: String) extends AndroidSourceAndSinkManager(global, apk, layoutControls, callbackMethods, sasFilePath){
+    callbackSigs: ISet[Signature], 
+    sasFilePath: String) extends AndroidSourceAndSinkManager(global, apk, layoutControls, callbackSigs, sasFilePath){
 
   private final val TITLE = "DefaultSourceAndSinkManager"
   
-  
-  
-  def isCallbackSource(proc: JawaMethod): Boolean = {
-    if(this.callbackMethods.contains(proc) && proc.getParamNames.size > 1) true
+  def isCallbackSource(sig: Signature): Boolean = {
+    if(this.callbackSigs.contains(sig) && sig.getParameterNum() > 1) true
     else false
   }
 
-  def isUISource(calleeMethod: JawaMethod, callerMethod: JawaMethod, callerLoc: JumpLocation): Boolean = {
-    if(calleeMethod.getSignature.signature == AndroidConstants.ACTIVITY_FINDVIEWBYID || calleeMethod.getSignature.signature == AndroidConstants.VIEW_FINDVIEWBYID){
-      val nums = ExplicitValueFinder.findExplicitIntValueForArgs(callerMethod, callerLoc, 1)
+  def isUISource(calleeSig: Signature, callerSig: Signature, callerLoc: JumpLocation): Boolean = {
+    if(calleeSig.signature == AndroidConstants.ACTIVITY_FINDVIEWBYID || calleeSig.signature == AndroidConstants.VIEW_FINDVIEWBYID){
+      val callerProc = global.getMethod(callerSig).get
+      val nums = ExplicitValueFinder.findExplicitIntValueForArgs(callerProc, callerLoc, 1)
       nums.foreach{
         num =>
           this.layoutControls.get(num) match{
             case Some(control) =>
               return control.isSensitive
             case None =>
-              calleeMethod.getDeclaringClass.global.reporter.echo(TITLE, "Layout control with ID " + num + " not found.")
+              global.reporter.echo(TITLE, "Layout control with ID " + num + " not found.")
           }
       }
     }
@@ -319,10 +316,11 @@ class DefaultAndroidSourceAndSinkManager(
           val compType = AndroidConstants.getIccCallType(callee.callee.getSubSignature)
           val comMap = IntentHelper.mappingIntents(global, apk, intentContents, compType)
           comMap.foreach{
-            case (_, coms) =>
-              if(coms.isEmpty) sinkflag = true
-              coms.foreach{
-                case (com, typ) =>
+            case (_, comTypes) =>
+              if(comTypes.isEmpty) sinkflag = true
+              comTypes.foreach{
+                case (comType, typ) =>
+                  val com = global.getClassOrResolve(comType)
                   typ match {
                     case IntentHelper.IntentType.EXPLICIT => if(com.isUnknown) sinkflag = true
 //                    case IntentHelper.IntentType.EXPLICIT => sinkflag = true
@@ -366,16 +364,16 @@ class DataLeakageAndroidSourceAndSinkManager(
     global: Global,
     apk: Apk, 
     layoutControls: Map[Int, LayoutControl], 
-    callbackMethods: ISet[JawaMethod], 
-    sasFilePath: String) extends DefaultAndroidSourceAndSinkManager(global, apk, layoutControls, callbackMethods, sasFilePath){
+    callbackSigs: ISet[Signature], 
+    sasFilePath: String) extends DefaultAndroidSourceAndSinkManager(global, apk, layoutControls, callbackSigs, sasFilePath){
   
   private final val TITLE = "DataLeakageAndroidSourceAndSinkManager"
   
   private def sensitiveData: ISet[String] = Set("android.location.Location", "android.content.Intent")
   
-  override def isCallbackSource(proc: JawaMethod): Boolean = {
-    if(this.callbackMethods.contains(proc)){
-      if(proc.getParamTypes.exists { pt => sensitiveData.contains(pt.name) }) true
+  override def isCallbackSource(sig: Signature): Boolean = {
+    if(this.callbackSigs.contains(sig)){
+      if(sig.getParameterTypes().exists { pt => sensitiveData.contains(pt.name) }) true
       else false
     }
     else false

@@ -29,6 +29,7 @@ import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.ScopeManager
 import org.sireum.amandroid.Apk
 import org.sireum.jawa.Global
+import org.sireum.jawa.Signature
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -39,7 +40,7 @@ object AndroidModelCallHandler extends ModelCallHandler{
   /**
    * return true if the given callee procedure needs to be modeled
    */
-  override def isModelCall(calleeMethod : JawaMethod) : Boolean = {
+  override def isModelCall(calleeMethod: JawaMethod): Boolean = {
     val r = calleeMethod.getDeclaringClass
     BundleModel.isBundle(r) ||
     HandlerModel.isHandler(r) ||
@@ -53,14 +54,14 @@ object AndroidModelCallHandler extends ModelCallHandler{
     ScopeManager.getCurrentScopeManager.shouldBypass(r)
   }
   
-  def isICCCall(calleeMethod : JawaMethod) : Boolean = {
-    InterComponentCommunicationModel.isIccOperation(calleeMethod)
+  def isICCCall(calleeSig: Signature): Boolean = {
+    InterComponentCommunicationModel.isIccOperation(calleeSig)
   }
   
   /**
    * instead of doing operation inside callee procedure's real code, we do it manually and return the result. 
    */
-  override def caculateResult[T](s : PTAResult, calleeMethod : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context, addition: Option[T]) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+  override def caculateResult[T](s: PTAResult, calleeMethod: JawaMethod, args: List[String], retVars: Seq[String], currentContext: Context, addition: Option[T]): (ISet[RFAFact], ISet[RFAFact], Boolean) = {
     val r = calleeMethod.getDeclaringClass
     if(BundleModel.isBundle(r)) BundleModel.doBundleCall(s, calleeMethod, args, retVars, currentContext)
     else if(HandlerModel.isHandler(r)) HandlerModel.doHandlerCall(s, calleeMethod, args, retVars, currentContext)
@@ -75,9 +76,9 @@ object AndroidModelCallHandler extends ModelCallHandler{
     else throw new RuntimeException("given callee is not a model call: " + calleeMethod)
   }
 
-  def doICCCall(apk: Apk, s : PTAResult, calleeMethod : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[JawaMethod]) = {
-    if(InterComponentCommunicationModel.isIccOperation(calleeMethod)) InterComponentCommunicationModel.doIccCall(apk, s, calleeMethod, args, retVars, currentContext)
-    else throw new RuntimeException("given callee is not an ICC call: " + calleeMethod)
+  def doICCCall(global: Global, apk: Apk, s: PTAResult, calleeSig: Signature, args: List[String], retVars: Seq[String], currentContext: Context): (ISet[RFAFact], ISet[JawaMethod]) = {
+    if(InterComponentCommunicationModel.isIccOperation(calleeSig)) InterComponentCommunicationModel.doIccCall(global, apk, s, calleeSig, args, retVars, currentContext)
+    else throw new RuntimeException("given callee is not an ICC call: " + calleeSig)
   }
 
 }

@@ -17,10 +17,11 @@
 package org.sireum.amandroid.concurrent
 
 import akka.actor._
+import org.sireum.amandroid.Apk
 
 class ApkInfoCollectActor extends Actor with ActorLogging {
   def receive: Receive = {
     case acd: ApkInfoCollectData =>
-      
+      val apk = new Apk(acd.fileUri)
   }
 }

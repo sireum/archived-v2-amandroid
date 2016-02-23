@@ -23,7 +23,6 @@ import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.jawa.Global
 import org.sireum.amandroid.Apk
 import org.sireum.jawa.JawaClass
-import org.sireum.jawa.util.MyTimer
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 import org.sireum.jawa.alir.controlFlowGraph.ICFGCallNode
@@ -47,10 +46,10 @@ import java.io.PrintWriter
 import org.sireum.jawa.alir.interProcedural.InterProceduralNode
 import org.sireum.alir.AlirEdge
 import org.sireum.amandroid.AndroidGlobalConfig
-import org.sireum.jawa.util.MyTimeoutException
-import org.sireum.jawa.util.PerComponentTimer
 import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper.IntentContent
+import org.sireum.jawa.JawaType
+import java.util.concurrent.TimeoutException
 
 /**
  * @author fgwei
@@ -61,43 +60,37 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
   
   import ComponentSummaryTable._
   
-  val problematicComp: MSet[JawaClass] = msetEmpty
+  val problematicComp: MSet[JawaType] = msetEmpty
   
   /**
    * ComponentBasedAnalysis phase1 is doing intra component analysis for one giving apk.
    */
-  def phase1(apk: Apk, parallel: Boolean, timer: Option[MyTimer]) = {
+  def phase1(apk: Apk, parallel: Boolean) = {
     println(TITLE + ":" + "-------Phase 1-------")
     AndroidReachingFactsAnalysisConfig.resolve_icc = false // We don't want to resolve ICC at this phase
     var components = apk.getComponents
-    val worklist: MList[JawaClass] = mlistEmpty ++ components
+    val worklist: MList[JawaType] = mlistEmpty ++ components
     
     while(!worklist.isEmpty) {
-      val timertouse =
-        if(timer.isDefined && timer.get.isInstanceOf[PerComponentTimer]){
-          timer.get.start
-          timer
-        } else timer
       val component = worklist.remove(0)
       println("-------Analyze component " + component + "--------------")
       try{
         // do pta on this component
-        apk.getAppInfo.getEnvMap.get(component) match {
-          case Some((ep, _)) =>
+        apk.getEnvMap.get(component) match {
+          case Some((esig, _)) =>
+            val ep = global.getMethod(esig).get // need to double check
             val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-            val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager, timertouse)
-            apk.addIDFG(component, idfg)
+            val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager)
             yard.addIDFG(component, idfg)
             // do dda on this component
             val iddResult = InterproceduralDataDependenceAnalysis(global, idfg)
-            apk.addIDDG(component, iddResult)
             yard.addIDDG(component, iddResult)
           case None =>
             problematicComp += component
             global.reporter.error(TITLE, "Component " + component + " did not have environment! Some package or name mismatch maybe in the Manifestfile.")
         }
       } catch {
-        case te: MyTimeoutException =>
+        case te: TimeoutException =>
           problematicComp += component
           global.reporter.error(TITLE, "Timeout for " + component)
         case ex: Exception =>
@@ -131,7 +124,7 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
   }
   
   def phase2(apks: ISet[Apk], parallel: Boolean): (ISet[Apk], InterproceduralDataDependenceInfo) = {
-    val components = apks.map(_.getComponents).fold(Set[JawaClass]())(iunion _) -- problematicComp
+    val components = apks.map(_.getComponents).fold(Set[JawaType]())(iunion _) -- problematicComp
     println(TITLE + ":" + "-------Phase 2-------" + apks.size + s" apk${if(apks.size > 1)"s"else""} " + components.size + s" component${if(components.size > 1)"s"else""}-------")
     val mddg = new MultiDataDependenceGraph[IDDGNode]
     val summaryTables = components.map(yard.getSummaryTable(_)).flatten
@@ -159,6 +152,7 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
           val intent_summary: Intent_Summary = summaryTable.get(CHANNELS.INTENT_CHANNEL)
           intent_summary.asCaller foreach {
             case (callernode, intent_caller) =>
+              println(intent_caller)
               val icc_callees = allIntentCallees.filter(_._2.matchWith(intent_caller))
               icc_callees foreach {
                 case (calleenode, icc_callee) =>
@@ -182,14 +176,14 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
   
   def phase3(iddResult: (ISet[Apk], InterproceduralDataDependenceInfo), ssm: AndroidSourceAndSinkManager): Option[TaintAnalysisResult[AndroidDataDependentTaintAnalysis.Node, InterproceduralDataDependenceAnalysis.Edge]] = {
     val apks = iddResult._1
-    val components = apks.map(_.getComponents).fold(Set[JawaClass]())(iunion _)
+    val components = apks.map(_.getComponents).fold(Set[JawaType]())(iunion _)
     println(TITLE + ":" + "-------Phase 3-------" + apks.size + s" apk${if(apks.size > 1)"s"else""} " + components.size + s" component${if(components.size > 1)"s"else""}-------")
     val idfgs = components.map(yard.getIDFG(_)).flatten
     if(!idfgs.isEmpty) {
       try {
         val ptaresult = idfgs.map(_.ptaresult).reduce(_.merge(_))
         val tar = AndroidDataDependentTaintAnalysis(global, iddResult._2, ptaresult, ssm)
-        apks.foreach(_.addTaintAnalysisResult(tar))
+        yard.setInterAppTaintAnalysisResult(tar)
         Some(tar)
       } catch {
         case ex: Exception =>
@@ -200,7 +194,7 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
     } else None
   }
   
-  private def buildComponentSummaryTable(component: JawaClass): ComponentSummaryTable = {
+  private def buildComponentSummaryTable(component: JawaType): ComponentSummaryTable = {
     val apkOpt: Option[Apk] = yard.getOwnerApk(component)
     if(!apkOpt.isDefined) return new ComponentSummaryTable(component)
     val apk = apkOpt.get

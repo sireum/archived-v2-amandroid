@@ -251,7 +251,7 @@ class Data{
       this.schemes +=scheme
     }
     if(host != null || port != null){
-      this.authorities += Authority(host, port)
+      this.authorities += Authority(host, port.replaceAll("\\\\ ", ""))
     }
     if(path!= null){
       this.paths +=path

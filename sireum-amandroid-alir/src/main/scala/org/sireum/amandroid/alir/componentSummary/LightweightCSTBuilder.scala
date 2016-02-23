@@ -43,71 +43,47 @@ import org.sireum.jawa.JavaKnowledge
 import org.sireum.jawa.Signature
 import org.sireum.jawa.alir.controlFlowGraph.ICFGExitNode
 import org.sireum.amandroid.parser.ComponentType
+import org.sireum.jawa.JawaType
 
 /**
  * Hopefully this will be really light weight to build the component based summary table
  * @author fgwei
  */
-class LightweightCSTBuilder(global: Global, timer: Option[MyTimer]) extends AppInfoCollector(global, timer) {
+class LightweightCSTBuilder(global: Global) {
   
-  private val intentContents: MMap[JawaClass, MMap[Instance, MSet[IntentContent]]] = mmapEmpty
-  private val summaryTables: MMap[JawaClass, ComponentSummaryTable] = mmapEmpty
+  private val intentContents: MMap[JawaType, MMap[Instance, MSet[IntentContent]]] = mmapEmpty
+  private val summaryTables: MMap[JawaType, ComponentSummaryTable] = mmapEmpty
   
-  def getSummaryTables: IMap[JawaClass, ComponentSummaryTable] = summaryTables.toMap
+  def getSummaryTables: IMap[JawaType, ComponentSummaryTable] = summaryTables.toMap
   
-  override def collectInfo(apk: Apk, outputUri: FileResourceUri): Unit = {
-    val manifestUri = outputUri + "/AndroidManifest.xml"
-    val mfp = AppInfoCollector.analyzeManifest(global.reporter, manifestUri)
-    this.appPackageName = mfp.getPackageName
-    this.componentInfos ++= mfp.getComponentInfos
-    this.uses_permissions ++= mfp.getPermissions
-    this.intentFdb.merge(mfp.getIntentDB)
-    val components = msetEmpty[(JawaClass, ComponentType.Value)]
-    mfp.getComponentInfos.foreach {
-      f =>
-        val comp = global.getClassOrResolve(f.compType)
-        if(!comp.isUnknown && comp.isApplicationClass){
-          components += ((comp, f.typ))
-        }
-    }
-    components.foreach {
-      comp =>
-        val rpcs = getRpcMethods(apk, comp._1)
-        apk.addRpcMethods(comp._1, rpcs)
-    }
-    apk.setComponents(components.toSet)
-    apk.updateIntentFilterDB(this.intentFdb)
-    apk.setAppInfo(this)
-    buildCST(apk, components.toSet)
-  }
-  
-  private def buildCST(apk: Apk, comps: ISet[(JawaClass, ComponentType.Value)]) = {
+  def build(yard: ApkYard, apk: Apk, comps: ISet[(JawaType, ComponentType.Value)]) = {
     println("Total components: " + comps.size)
     var i = 0
     comps foreach {
-      case (comp, typ) =>
+      case (compTyp, typ) =>
+        val comp = global.getClassOrResolve(compTyp)
         val methods = comp.getDeclaredMethods.filter(m => m.isConcrete && !m.isPrivate)
         println("methods: " + methods.size)
-        val idfg = InterproceduralSuperSpark(global, methods, timer)
+        val idfg = InterproceduralSuperSpark(global, methods.map(_.getSignature))
         val context = new Context
         val sig = new Signature(JavaKnowledge.formatTypeToSignature(comp.getType) + ".ent:()V")
-        context.setContext(sig, comp.getType.name)
+        context.setContext(sig, compTyp.name)
         val entryNode = ICFGEntryNode(context)
         entryNode.setOwner(sig)
         idfg.icfg.addEntryNode(entryNode)
         val exitNode = ICFGExitNode(context)
         exitNode.setOwner(sig)
         idfg.icfg.addExitNode(exitNode)
-        apk.addIDFG(comp, idfg)
-        collectIntentContent(comp, idfg)
-        buildCSTFromIDFG(apk, comp, idfg)
+        yard.addIDFG(compTyp, idfg)
+        collectIntentContent(compTyp, idfg)
+        buildCSTFromIDFG(apk, compTyp, idfg)
         i += 1
         println("components resolved: " + i)
     }
   }
   
-  private def collectIntentContent(component: JawaClass, idfg: InterProceduralDataFlowGraph) = {
-    val cpIntentmap = intentContents.getOrElseUpdate(component, mmapEmpty)
+  private def collectIntentContent(componentType: JawaType, idfg: InterProceduralDataFlowGraph) = {
+    val cpIntentmap = intentContents.getOrElseUpdate(componentType, mmapEmpty)
     val allIntent = msetEmpty[Instance]
     val impreciseExplicit = msetEmpty[Instance]
     val impreciseImplicit = msetEmpty[Instance]
@@ -130,7 +106,7 @@ class LightweightCSTBuilder(global: Global, timer: Option[MyTimer]) extends AppI
             val currentContext = cn.context
             callees foreach {
               callee =>
-                callee.callee.getSignature.signature match {
+                callee.callee.signature match {
                   case "Landroid/content/Intent;.<init>:(Landroid/content/Context;Ljava/lang/Class;)V" =>  //public constructor
                     val thisSlot = VarSlot(args(0), false, true)
                     val thisValue = ptaresult.pointsToSet(thisSlot, currentContext)
@@ -341,7 +317,7 @@ class LightweightCSTBuilder(global: Global, timer: Option[MyTimer]) extends AppI
             val currentContext = cn.context
             callees foreach {
               callee =>
-                callee.callee.getSignature.signature match {
+                callee.callee.signature match {
                   case "Landroid/net/Uri;.parse:(Ljava/lang/String;)Landroid/net/Uri;" =>  //public static
                     val strSlot = VarSlot(args(0), false, true)
                     val strValue = ptaresult.pointsToSet(strSlot, currentContext)
@@ -423,11 +399,11 @@ class LightweightCSTBuilder(global: Global, timer: Option[MyTimer]) extends AppI
     }
   }
   
-  private def buildCSTFromIDFG(apk: Apk, component: JawaClass, idfg: InterProceduralDataFlowGraph) = {
+  private def buildCSTFromIDFG(apk: Apk, componentType: JawaType, idfg: InterProceduralDataFlowGraph) = {
     val csp = new ComponentSummaryProvider {
       def getIntentCaller(idfg: InterProceduralDataFlowGraph, intentValue: ISet[Instance], context: Context): ISet[IntentContent] = {
         val result = msetEmpty[IntentContent]
-        val cpIntentmap = intentContents.getOrElse(component, mmapEmpty)
+        val cpIntentmap = intentContents.getOrElse(componentType, mmapEmpty)
         intentValue.foreach {
           intent =>
             result ++= cpIntentmap.getOrElse(intent, msetEmpty)
@@ -435,7 +411,7 @@ class LightweightCSTBuilder(global: Global, timer: Option[MyTimer]) extends AppI
         result.toSet
       }
     }
-    val summaryTable = ComponentSummaryTable.buildComponentSummaryTable(apk, component, idfg, csp)
-    summaryTables(component) = summaryTable
+    val summaryTable = ComponentSummaryTable.buildComponentSummaryTable(apk, componentType, idfg, csp)
+    summaryTables(componentType) = summaryTable
   }
 }

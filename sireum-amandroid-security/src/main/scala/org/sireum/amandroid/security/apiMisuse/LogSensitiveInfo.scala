@@ -45,6 +45,7 @@ import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.Global
+import org.sireum.jawa.Signature
 /*
  * @author <a href="mailto:i@flanker017.me">Qidan He</a>
  */
@@ -149,11 +150,11 @@ object LogSensitiveInfo {
         calleeSet.foreach{
           callee =>
             val calleep = callee.callee
-            val callees : MSet[JawaMethod] = msetEmpty
+            val callees : MSet[Signature] = msetEmpty
             val caller = global.getMethod(invNode.getOwner).get
             val jumpLoc = caller.getBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
             val cj = jumpLoc.jump.asInstanceOf[CallJump]
-            println("ZWZW - callee's signature - " + calleep.getSignature)
+            println("ZWZW - callee's signature - " + calleep)
 
 //            if(calleep.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
 //              val calleeSignature = cj.getValueAnnotation("signature") match {
@@ -170,14 +171,14 @@ object LogSensitiveInfo {
             callees.foreach{
               callee =>
                 println("=======")
-                println("Got an callee - " + callee.getSignature)
+                println("Got an callee - " + callee)
                 println("=======")
 
-                if(callee.getSignature.equals(API_SIG)){
+                if(callee.equals(API_SIG)){
                   println("=======")
                   println("Got an interesting api call - " + API_SIG)
                   println("=======")
-                  result += ((callee.getSignature.signature, invNode))
+                  result += ((callee.signature, invNode))
                 }
             }
         }

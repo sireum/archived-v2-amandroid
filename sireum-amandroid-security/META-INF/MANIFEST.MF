@@ -6,7 +6,6 @@ Bundle-Version: 2.0.0
 Export-Package: org.sireum.amandroid.security,
  org.sireum.amandroid.security.apiMisuse,
  org.sireum.amandroid.security.dataInjection,
- org.sireum.amandroid.security.interComponentCommunication,
  org.sireum.amandroid.security.oauth,
  org.sireum.amandroid.security.password,
  org.sireum.amandroid.security.report

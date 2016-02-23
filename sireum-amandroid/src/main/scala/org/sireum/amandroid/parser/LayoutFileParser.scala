@@ -55,7 +55,7 @@ class LayoutFileParser(global: Global) {
     this.packageName = packageName;
   }
 
-  private def getLayoutClass(className: String): JawaClass = {
+  private def getLayoutClass(className: String): Option[JawaClass] = {
     var ar: Option[JawaClass] = global.tryLoadClass(new JawaType(className))
     if(!ar.isDefined || !this.packageName.isEmpty())
       ar = global.tryLoadClass(new JawaType(packageName + "." + className))
@@ -65,16 +65,16 @@ class LayoutFileParser(global: Global) {
       ar = global.tryLoadClass(new JawaType("android.webkit." + className))
     if(!ar.isDefined)
       global.reporter.echo(TITLE, "Could not find layout class " + className)
-    ar.getOrElse(null)
+    ar
   }
 
-  private def isLayoutClass(theClass: JawaClass): Boolean = {
-    if (theClass == null)
+  private def isLayoutClass(theClass: Option[JawaClass]): Boolean = {
+    if (!theClass.isDefined)
       return false
     // To make sure that nothing all wonky is going on here, we
     // check the hierarchy to find the android view class
     var found = false
-    global.getClassHierarchy.getAllSuperClassesOf(theClass).foreach{
+    global.getClassHierarchy.getAllSuperClassesOf(theClass.get).foreach{
       su =>
         if(su.getName == "android.view.ViewGroup")
           found = true
@@ -82,12 +82,12 @@ class LayoutFileParser(global: Global) {
     found
   }
 
-  private def isViewClass(theClass: JawaClass): Boolean = {
-    if (theClass == null)
+  private def isViewClass(theClass: Option[JawaClass]): Boolean = {
+    if (!theClass.isDefined)
       return false
     // To make sure that nothing all wonky is going on here, we
     // check the hierarchy to find the android view class
-    global.getClassHierarchy.getAllSuperClassesOf(theClass).foreach{
+    global.getClassHierarchy.getAllSuperClassesOf(theClass.get).foreach{
       su =>
       if(su.getName == "android.view.View" || su.getName == "android.webkit.WebView")
         return true
@@ -110,9 +110,9 @@ class LayoutFileParser(global: Global) {
       } else {
         val childClass = getLayoutClass(name.trim())
         if (isLayoutClass(childClass) || isViewClass(childClass))
-          new LayoutParser(layoutFile, childClass)
+          new LayoutParser(layoutFile, childClass.get)
         else
-          super.child(ns, name);
+          super.child(ns, name)
       }
     }
         
@@ -158,7 +158,7 @@ class LayoutFileParser(global: Global) {
 
     override def end() = {
       if (id > 0)
-        userControls += (id -> new LayoutControl(id, theClass, isSensitive))
+        userControls += (id -> new LayoutControl(id, theClass.getType, isSensitive))
     }
   }
 
@@ -209,9 +209,9 @@ class LayoutFileParser(global: Global) {
           val rdr = new AxmlReader(data)
           rdr.accept(new AxmlVisitor() {
             override def first(ns: String, name: String): NodeVisitor = {
-              val theClass = if(name == null) null else getLayoutClass(name.trim())
-              if (theClass == null || isLayoutClass(theClass))
-                new LayoutParser(fileName, theClass)
+              val theClass = if(name == null) None else getLayoutClass(name.trim())
+              if (isLayoutClass(theClass))
+                new LayoutParser(fileName, theClass.get)
               else
                 super.first(ns, name)
               }

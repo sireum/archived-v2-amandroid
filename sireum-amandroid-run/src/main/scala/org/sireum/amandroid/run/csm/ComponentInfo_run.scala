@@ -23,8 +23,6 @@ import org.sireum.jawa.PrintReporter
 import org.sireum.jawa.MsgLevel
 import org.sireum.jawa.Global
 import org.sireum.amandroid.alir.componentSummary.ApkYard
-import org.sireum.jawa.util.PerComponentTimer
-import org.sireum.jawa.util.MyTimer
 import org.sireum.amandroid.alir.componentSummary.LightweightCSTBuilder
 import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.amandroid.alir.componentSummary.ComponentSummaryTable.CHANNELS
@@ -306,17 +304,14 @@ object ComponentInfo_run {
             val reporter = new PrintReporter(MsgLevel.ERROR)
             val global = new Global(file, reporter)
             global.setJavaLib(AndroidGlobalConfig.lib_files)
-            val timer = new PerComponentTimer(600)
-            timer.start
-            val app_info = new LightweightCSTBuilder(global, Some(timer))
+            val app_info = new LightweightCSTBuilder(global)
             val yard = new ApkYard(global)
-            val apk = yard.loadApk(file, outputUri, dpsuri, app_info, false, false, true)
-            app_info.getComponentInfos.map{
+            val apk = yard.loadApk(file, outputUri, dpsuri, false, false, true)
+            apk.getComponentInfos.map{
               ci => 
                 val stacomp = StaComponent(file, ci.compType)
-                stacomp.handleImplicit = !app_info.getIntentDB.getIntentFilters(ci.compType).isEmpty
-                val comp = global.getClassOrResolve(ci.compType)
-                stacomp.edges = apk.getIDFG(comp).map(_.icfg.edges.size).getOrElse(0)
+                stacomp.handleImplicit = !apk.getIntentFilterDB.getIntentFilters(ci.compType).isEmpty
+                stacomp.edges = yard.getIDFG(ci.compType).map(_.icfg.edges.size).getOrElse(0)
                 staapk.components(ci.compType) = stacomp
             }
             val st = app_info.getSummaryTables
@@ -326,7 +321,7 @@ object ComponentInfo_run {
             val allRPCCallees = rpcChannels.map(_.asCallee).reduceOption{_ ++ _}.getOrElse(imapEmpty)
             st.foreach {
               case (comp, table) =>
-                val stacomp = staapk.components(comp.getType)
+                val stacomp = staapk.components(comp)
                 yard.addSummaryTable(comp, table)
                 val isummary = table.get[Intent_Summary](CHANNELS.INTENT_CHANNEL)
                 stacomp.outgoingExplicit += isummary.asCaller.filter(!_._2.asInstanceOf[IntentCaller].intent.isImplicit).size
@@ -338,11 +333,11 @@ object ComponentInfo_run {
                     icc_callees foreach {
                       case (calleenode, callee) =>
                         val intent_callee = callee.asInstanceOf[IntentCallee]
-                        val calleeStaComp = staapk.components(intent_callee.component.getType)
+                        val calleeStaComp = staapk.components(intent_callee.component)
                         if(!intent_caller.intent.isImplicit) calleeStaComp.incomingExplicit +=  1
                         else calleeStaComp.incomingImplicit += 1
                         val precise = intent_caller.intent.preciseExplicit && intent_caller.intent.preciseImplicit
-                        println({if(precise) "precise:" else "imprecise:"} + " " + comp + " --icc--> " + intent_callee.component.getName)
+                        println({if(precise) "precise:" else "imprecise:"} + " " + comp + " --icc--> " + intent_callee.component.name)
                     }
                 }
             }

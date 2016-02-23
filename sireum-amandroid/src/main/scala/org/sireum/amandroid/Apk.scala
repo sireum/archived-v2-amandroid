@@ -17,23 +17,17 @@
 package org.sireum.amandroid
 
 import org.sireum.util._
-import org.sireum.jawa.JawaClass
-import org.sireum.jawa.alir.controlFlowGraph._
-import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFact
 import org.sireum.jawa.alir.dataDependenceAnalysis.InterproceduralDataDependenceInfo
 import org.sireum.amandroid.parser.IntentFilterDataBase
-import org.sireum.amandroid.appInfo.AppInfoCollector
 import org.sireum.jawa.alir.pta.PTAResult
-import org.sireum.jawa.io.NoPosition
-import org.sireum.jawa.JawaMethod
-import org.sireum.jawa.alir.taintAnalysis.TaintAnalysisResult
-import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
-import org.sireum.jawa.alir.interProcedural.InterProceduralNode
-import org.sireum.alir.AlirEdge
 import java.util.zip.ZipInputStream
 import java.io.FileInputStream
 import java.util.zip.ZipEntry
 import org.sireum.amandroid.parser.ComponentType
+import org.sireum.jawa.JawaType
+import org.sireum.jawa.Signature
+import org.sireum.amandroid.parser.ComponentInfo
+import org.sireum.amandroid.parser.LayoutControl
 
 object Apk {
   def isValidApk(nameUri: FileResourceUri): Boolean = {
@@ -85,28 +79,26 @@ case class Apk(nameUri: FileResourceUri) {
   import Apk._
   require(isValidApk(nameUri))
   private final val TITLE = "Apk"
-  private val activities: MSet[JawaClass] = msetEmpty
-  private val services: MSet[JawaClass] = msetEmpty
-  private val receivers: MSet[JawaClass] = msetEmpty
-  private val providers: MSet[JawaClass] = msetEmpty
-  	
-	private val dynamicRegisteredReceivers: MSet[JawaClass] = msetEmpty
+  def getAppName: String = FileUtil.toFile(nameUri).getName
+  private val activities: MSet[JawaType] = msetEmpty
+  private val services: MSet[JawaType] = msetEmpty
+  private val receivers: MSet[JawaType] = msetEmpty
+  private val providers: MSet[JawaType] = msetEmpty
+	private val dynamicRegisteredReceivers: MSet[JawaType] = msetEmpty
 	
-	private val intentFdb: IntentFilterDataBase = new IntentFilterDataBase()
-	
-  private val rpcMethods: MMap[JawaClass, MSet[JawaMethod]] = mmapEmpty
+  private val rpcMethods: MMap[JawaType, MSet[Signature]] = mmapEmpty
   
-	def addActivity(activity: JawaClass) = this.synchronized{this.activities += activity}
-  def addService(service: JawaClass) = this.synchronized{this.services += service}
-  def addReceiver(receiver: JawaClass) = this.synchronized{this.receivers += receiver}
-  def addProvider(provider: JawaClass) = this.synchronized{this.providers += provider}
+	def addActivity(activity: JawaType) = this.synchronized{this.activities += activity}
+  def addService(service: JawaType) = this.synchronized{this.services += service}
+  def addReceiver(receiver: JawaType) = this.synchronized{this.receivers += receiver}
+  def addProvider(provider: JawaType) = this.synchronized{this.providers += provider}
   
-  def addRpcMethod(comp: JawaClass, rpc: JawaMethod) = rpcMethods.getOrElseUpdate(comp, msetEmpty) += rpc
-  def addRpcMethods(comp: JawaClass, rpcs: ISet[JawaMethod]) = rpcMethods.getOrElseUpdate(comp, msetEmpty) ++= rpcs
-  def getRpcMethods(comp: JawaClass): ISet[JawaMethod] = rpcMethods.getOrElse(comp, msetEmpty).toSet
-  def getRpcMethods: ISet[JawaMethod] = rpcMethods.flatMap(_._2).toSet
+  def addRpcMethod(comp: JawaType, rpc: Signature) = rpcMethods.getOrElseUpdate(comp, msetEmpty) += rpc
+  def addRpcMethods(comp: JawaType, rpcs: ISet[Signature]) = rpcMethods.getOrElseUpdate(comp, msetEmpty) ++= rpcs
+  def getRpcMethods(comp: JawaType): ISet[Signature] = rpcMethods.getOrElse(comp, msetEmpty).toSet
+  def getRpcMethods: ISet[Signature] = rpcMethods.flatMap(_._2).toSet
 	
-  def getComponentType(comp: JawaClass): Option[AndroidConstants.CompType.Value] = {
+  def getComponentType(comp: JawaType): Option[AndroidConstants.CompType.Value] = {
     if(activities.contains(comp)) Some(AndroidConstants.CompType.ACTIVITY)
     else if(services.contains(comp)) Some(AndroidConstants.CompType.SERVICE)
     else if(receivers.contains(comp)) Some(AndroidConstants.CompType.RECEIVER)
@@ -114,7 +106,7 @@ case class Apk(nameUri: FileResourceUri) {
     else None
   }
   
-	def setComponents(comps: ISet[(JawaClass, ComponentType.Value)]) = this.synchronized{
+	def setComponents(comps: ISet[(JawaType, ComponentType.Value)]) = this.synchronized{
     comps.foreach{
       case (ac, typ) => 
         typ match {
@@ -130,13 +122,13 @@ case class Apk(nameUri: FileResourceUri) {
     }
   }
 	
-	def getComponents: ISet[JawaClass] = (this.activities ++ this.services ++ this.receivers ++ this.providers).toSet
-	def getActivities: ISet[JawaClass] = this.activities.toSet
-  def getServices: ISet[JawaClass] = this.services.toSet
-  def getReceivers: ISet[JawaClass] = this.receivers.toSet
-  def getProviders: ISet[JawaClass] = this.providers.toSet
+	def getComponents: ISet[JawaType] = (this.activities ++ this.services ++ this.receivers ++ this.providers).toSet
+	def getActivities: ISet[JawaType] = this.activities.toSet
+  def getServices: ISet[JawaType] = this.services.toSet
+  def getReceivers: ISet[JawaType] = this.receivers.toSet
+  def getProviders: ISet[JawaType] = this.providers.toSet
   
-	def addDynamicRegisteredReceiver(receiver: JawaClass) = 
+	def addDynamicRegisteredReceiver(receiver: JawaType) = 
     this.synchronized{
       this.dynamicRegisteredReceivers += receiver
       this.receivers += receiver
@@ -144,58 +136,108 @@ case class Apk(nameUri: FileResourceUri) {
 
 	def getDynamicRegisteredReceivers = this.dynamicRegisteredReceivers
 	
+	private val uses_permissions: MSet[String] = msetEmpty
+  private val callbackMethods: MMap[JawaType, MSet[Signature]] = mmapEmpty
+  private val componentInfos: MSet[ComponentInfo] = msetEmpty
+  private val layoutControls: MMap[Int, LayoutControl] = mmapEmpty
+  private var appPackageName: String = null
+  private val intentFdb: IntentFilterDataBase = new IntentFilterDataBase
+  private var codeLineCounter: Int = 0
+	/**
+   * Map from record name to it's env method code.
+   */
+  protected val envProcMap: MMap[JawaType, (Signature, String)] = mmapEmpty
+  
+  def setCodeLineCounter(c: Int) = this.codeLineCounter = c
+  def getCodeLineCounter: Int = this.codeLineCounter
 	def setIntentFilterDB(i: IntentFilterDataBase) = this.synchronized{this.intentFdb.reset.merge(i)}
-	
 	def updateIntentFilterDB(i: IntentFilterDataBase) = this.synchronized{this.intentFdb.merge(i)}
+	def getIntentFilterDB = this.intentFdb
+  def setPackageName(pn: String) = this.appPackageName = pn
+  def getPackageName: String = this.appPackageName
+  def addUsesPermissions(ps: ISet[String]) = this.uses_permissions ++= ps
+  def getUsesPermissions: ISet[String] = this.uses_permissions.toSet
+  def addLayoutControls(i: Int, lc: LayoutControl) = this.layoutControls(i) = lc
+  def addLayoutControls(lcs: IMap[Int, LayoutControl]) = this.layoutControls ++= lcs
+  def getLayoutControls: IMap[Int, LayoutControl] = this.layoutControls.toMap
+  def addCallbackMethods(typ: JawaType, sigs: ISet[Signature]) = this.callbackMethods.getOrElseUpdate(typ, msetEmpty) ++= sigs
+  def getCallbackMethodMapping: IMap[JawaType, ISet[Signature]] = this.callbackMethods.map {
+	  case (k, vs) => k -> vs.toSet
+	}.toMap
+  def getCallbackMethods: ISet[Signature] = if(!this.callbackMethods.isEmpty)this.callbackMethods.map(_._2.toSet).reduce(iunion[Signature]) else isetEmpty
+  def addComponentInfo(ci: ComponentInfo) = this.componentInfos += ci
+  def addComponentInfos(cis: ISet[ComponentInfo]) = this.componentInfos ++= cis
+  def getComponentInfos: ISet[ComponentInfo] = this.componentInfos.toSet
+  def printEnvs() =
+    envProcMap.foreach{case(k, v) => println("Environment for " + k + "\n" + v._2)}
+
+  def printEntrypoints() = {
+    if (this.componentInfos == null)
+      println("Entry points not initialized")
+    else {
+      println("Classes containing entry points:")
+      for (record <- componentInfos)
+        println("\t" + record)
+      println("End of Entrypoints")
+    }
+  }
+
+  def getEntryPoints: ISet[JawaType] = this.componentInfos.filter(_.enabled).map(_.compType).toSet
+  
+  def addEnvMap(typ: JawaType, sig: Signature, code: String) = this.envProcMap(typ) = ((sig, code))
+  def getEnvMap = this.envProcMap.toMap
+  def getEnvString: String = {
+    val sb = new StringBuilder
+    this.envProcMap.foreach{
+      case (k, v) =>
+        sb.append("*********************** Environment for " + k + " ************************\n")
+        sb.append(v._2 + "\n\n")
+    }
+    sb.toString.intern()
+  }
+
+  def hasEnv(typ: JawaType): Boolean = this.envProcMap.contains(typ)
 	
-	def getIntentFilterDB ={
-	  if(this.intentFdb == null) throw new RuntimeException("intent-filter database does not exist.")
-	  this.intentFdb
-	}
-	
-	/**
-	 * hold application information (current only used for android app)
-	 */
-	
-	private var appInfoOpt: Option[AppInfoCollector] = None
-	
-	/**
-	 * set application info
-	 */
-	  
-	def setAppInfo(info: AppInfoCollector) = this.appInfoOpt = Some(info)
-	
-	/**
-	 * get application info
-	 */
-	  
-	def getAppInfo: AppInfoCollector = 
-	  this.appInfoOpt match{
-	    case Some(info) => info
-	    case None => throw new RuntimeException("AppInfo does not exist.")
-  	}
-  
-  def getAppName: String = FileUtil.toFile(nameUri).getName
-  
-  private val idfgResults: MMap[JawaClass, InterProceduralDataFlowGraph] = mmapEmpty
-  
-  def addIDFG(key: JawaClass, idfg: InterProceduralDataFlowGraph) = this.synchronized(this.idfgResults += (key -> idfg))
-  def hasIDFG(key: JawaClass): Boolean = this.synchronized(this.idfgResults.contains(key))
-  def getIDFG(key: JawaClass): Option[InterProceduralDataFlowGraph] = this.synchronized(this.idfgResults.get(key))
-  def getIDFGs = this.idfgResults.toMap
-  
-  private val iddaResults: MMap[JawaClass, InterproceduralDataDependenceInfo] = mmapEmpty
-  
-  def addIDDG(key: JawaClass, iddi: InterproceduralDataDependenceInfo) = this.synchronized(this.iddaResults += (key -> iddi))
-  def hasIDDG(key: JawaClass): Boolean = this.iddaResults.contains(key)
-  def getIDDG(key: JawaClass): Option[InterproceduralDataDependenceInfo] = this.synchronized(this.iddaResults.get(key))
-  def getIDDGs = this.iddaResults.toMap
-  
-  private var taintResult: Option[Any] = None
-  
-  def addTaintAnalysisResult[N <: InterProceduralNode, E <: AlirEdge[N]](tar: TaintAnalysisResult[N, E]) = this.synchronized(this.taintResult = Some(tar))
-  def hasTaintAnalysisResult: Boolean = taintResult.isDefined
-  def getTaintAnalysisResult[N <: InterProceduralNode, E <: AlirEdge[N]] = this.taintResult.map{v => v.asInstanceOf[TaintAnalysisResult[N, E]]}
+//	/**
+//	 * hold application information (current only used for android app)
+//	 */
+//	
+//	private var appInfoOpt: Option[AppInfoCollector] = None
+//	
+//	/**
+//	 * set application info
+//	 */
+//	  
+//	def setAppInfo(info: AppInfoCollector) = this.appInfoOpt = Some(info)
+//	
+//	/**
+//	 * get application info
+//	 */
+//	  
+//	def getAppInfo: AppInfoCollector = 
+//	  this.appInfoOpt match{
+//	    case Some(info) => info
+//	    case None => throw new RuntimeException("AppInfo does not exist.")
+//  	}
+//  private val idfgResults: MMap[JawaClass, InterProceduralDataFlowGraph] = mmapEmpty
+//  
+//  def addIDFG(key: JawaClass, idfg: InterProceduralDataFlowGraph) = this.synchronized(this.idfgResults += (key -> idfg))
+//  def hasIDFG(key: JawaClass): Boolean = this.synchronized(this.idfgResults.contains(key))
+//  def getIDFG(key: JawaClass): Option[InterProceduralDataFlowGraph] = this.synchronized(this.idfgResults.get(key))
+//  def getIDFGs = this.idfgResults.toMap
+//  
+//  private val iddaResults: MMap[JawaClass, InterproceduralDataDependenceInfo] = mmapEmpty
+//  
+//  def addIDDG(key: JawaClass, iddi: InterproceduralDataDependenceInfo) = this.synchronized(this.iddaResults += (key -> iddi))
+//  def hasIDDG(key: JawaClass): Boolean = this.iddaResults.contains(key)
+//  def getIDDG(key: JawaClass): Option[InterproceduralDataDependenceInfo] = this.synchronized(this.iddaResults.get(key))
+//  def getIDDGs = this.iddaResults.toMap
+//  
+//  private var taintResult: Option[Any] = None
+//  
+//  def addTaintAnalysisResult[N <: InterProceduralNode, E <: AlirEdge[N]](tar: TaintAnalysisResult[N, E]) = this.synchronized(this.taintResult = Some(tar))
+//  def hasTaintAnalysisResult: Boolean = taintResult.isDefined
+//  def getTaintAnalysisResult[N <: InterProceduralNode, E <: AlirEdge[N]] = this.taintResult.map{v => v.asInstanceOf[TaintAnalysisResult[N, E]]}
   
   def reset = {
     this.activities.clear()
@@ -204,9 +246,9 @@ case class Apk(nameUri: FileResourceUri) {
     this.providers.clear()
     this.dynamicRegisteredReceivers.clear()
     this.intentFdb.reset
-	  this.appInfoOpt = None
-	  this.idfgResults.clear
-	  this.iddaResults.clear
-	  this.taintResult = None
+//	  this.appInfoOpt = None
+//	  this.idfgResults.clear
+//	  this.iddaResults.clear
+//	  this.taintResult = None
   }
 }

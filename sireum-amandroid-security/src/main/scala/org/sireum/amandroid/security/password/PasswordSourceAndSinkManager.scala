@@ -34,6 +34,7 @@ import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.Global
 import org.sireum.amandroid.Apk
+import org.sireum.jawa.Signature
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -42,17 +43,18 @@ import org.sireum.amandroid.Apk
 class PasswordSourceAndSinkManager(
     global: Global,
     apk: Apk, 
-    layoutControls : Map[Int, LayoutControl], 
-    callbackMethods : ISet[JawaMethod], 
-    sasFilePath : String) extends AndroidSourceAndSinkManager(global, apk, layoutControls, callbackMethods, sasFilePath){
+    layoutControls: Map[Int, LayoutControl], 
+    callbackSigs: ISet[Signature], 
+    sasFilePath: String) extends AndroidSourceAndSinkManager(global, apk, layoutControls, callbackSigs, sasFilePath){
   private final val TITLE = "PasswordSourceAndSinkManager"
     
-  def isCallbackSource(proc : JawaMethod) : Boolean = {
+  def isCallbackSource(sig: Signature): Boolean = {
     false
   }
   
-  def isUISource(calleeMethod : JawaMethod, callerMethod : JawaMethod, callerLoc : JumpLocation) : Boolean = {
-    if(calleeMethod.getSignature == AndroidConstants.ACTIVITY_FINDVIEWBYID || calleeMethod.getSignature == AndroidConstants.VIEW_FINDVIEWBYID){
+  def isUISource(calleeSig: Signature, callerSig: Signature, callerLoc: JumpLocation): Boolean = {
+    if(calleeSig.signature == AndroidConstants.ACTIVITY_FINDVIEWBYID || calleeSig.signature == AndroidConstants.VIEW_FINDVIEWBYID){
+      val callerMethod = global.getMethod(callerSig).get
       val nums = ExplicitValueFinder.findExplicitIntValueForArgs(callerMethod, callerLoc, 1)
       nums.foreach{
         num =>
@@ -67,7 +69,7 @@ class PasswordSourceAndSinkManager(
     false
   }
 
-  def isIccSink(invNode : ICFGInvokeNode, ptaresult : PTAResult) : Boolean = {
+  def isIccSink(invNode: ICFGInvokeNode, ptaresult: PTAResult): Boolean = {
     var sinkflag = false
     val calleeSet = invNode.getCalleeSet
     calleeSet.foreach{
@@ -75,11 +77,11 @@ class PasswordSourceAndSinkManager(
         if(InterComponentCommunicationModel.isIccOperation(callee.callee)){
           sinkflag = true
           val args = global.getMethod(invNode.getOwner).get.getBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation].jump.asInstanceOf[CallJump].callExp.arg match{
-            case te : TupleExp =>
+            case te: TupleExp =>
               te.exps.map{
                 exp =>
                   exp match{
-                    case ne : NameExp => ne.name.name
+                    case ne: NameExp => ne.name.name
                     case _ => exp.toString()
                   }
               }.toList
@@ -96,7 +98,9 @@ class PasswordSourceAndSinkManager(
               coms.foreach{
                 case (com, typ) =>
                   typ match {
-                    case IntentHelper.IntentType.EXPLICIT => if(com.isUnknown) sinkflag = true
+                    case IntentHelper.IntentType.EXPLICIT => 
+                      val clazz = global.getClassOrResolve(com)
+                      if(clazz.isUnknown) sinkflag = true
 //                    case IntentHelper.IntentType.EXPLICIT => sinkflag = true
                     case IntentHelper.IntentType.IMPLICIT => sinkflag = true
                   }
@@ -107,7 +111,7 @@ class PasswordSourceAndSinkManager(
     sinkflag
   }
 
-  def isIccSource(entNode : ICFGNode, iddgEntNode : ICFGNode) : Boolean = {
+  def isIccSource(entNode: ICFGNode, iddgEntNode: ICFGNode): Boolean = {
     false
   }
 

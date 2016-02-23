@@ -30,8 +30,6 @@ import org.sireum.jawa.Reporter
 import org.sireum.jawa.JawaType
 import org.sireum.amandroid.util.PScoutTranslator
 import org.sireum.jawa.alir.pta.suspark.InterproceduralSuperSpark
-import org.sireum.jawa.util.PerComponentTimer
-import org.sireum.jawa.util.MyTimeoutException
 import java.io.PrintWriter
 import org.sireum.jawa.util.MyFileUtil
 
@@ -111,8 +109,6 @@ object HiddenApi_run {
             }
           }
         } catch {
-          case te: MyTimeoutException =>
-            System.err.println("timeout")
           case e: Exception =>
             System.err.println("Error in " + sig + " " + e.getMessage)
         } finally {
@@ -154,15 +150,7 @@ object HiddenApi_run {
   }
   
   def reachabilityAnalysis(global: Global, sigs: ISet[Signature]): ISet[Signature] = {
-    val methods = 
-      sigs.map {
-        sig =>
-          val clazz = global.getClassOrResolve(sig.classTyp)
-          clazz.getMethod(sig.getSubSignature).get
-      }
-    val timer = new PerComponentTimer(600)
-    timer.start
-    val idfg = InterproceduralSuperSpark(global, methods, Some(timer))
+    val idfg = InterproceduralSuperSpark(global, sigs)
     idfg.icfg.getCallGraph.getReachableMethods(sigs)
   }
   

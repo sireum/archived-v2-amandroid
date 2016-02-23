@@ -38,17 +38,12 @@ import org.sireum.amandroid.AndroidConstants
 import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.alir.LibSideEffectProvider
-import org.sireum.amandroid.security.AmandroidSocket
-import org.sireum.amandroid.security.AmandroidSocketListener
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.amandroid.cli.util.CliLogger
-import org.sireum.jawa.util.MyTimer
-import org.sireum.jawa.util.MyTimeoutException
 import org.sireum.amandroid.util.ApkFileUtil
 import org.sireum.amandroid.Apk
 import org.sireum.jawa.ScopeManager
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAScopeManager
-import org.sireum.jawa.util.PerComponentTimer
 import org.sireum.jawa.Global
 import org.sireum.amandroid.alir.componentSummary.ApkYard
 import org.sireum.amandroid.alir.componentSummary.ComponentBasedAnalysis
@@ -56,14 +51,16 @@ import org.sireum.amandroid.alir.taintAnalysis.DataLeakageAndroidSourceAndSinkMa
 import org.sireum.jawa.MsgLevel
 import org.sireum.jawa.FileReporter
 import org.sireum.option.AnalysisModule
-import org.sireum.amandroid.security.dataInjection.IntentInjectionCollector
-import org.sireum.amandroid.security.apiMisuse.InterestingApiCollector
-import org.sireum.amandroid.security.password.SensitiveViewCollector
 import org.sireum.amandroid.security.password.PasswordSourceAndSinkManager
 import org.sireum.amandroid.security.dataInjection.IntentInjectionSourceAndSinkManager
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.NoReporter
+import org.sireum.jawa.util.FutureUtil
+import scala.concurrent.ExecutionContext.Implicits.{global => ec}
+import scala.concurrent.Await
+import scala.concurrent.duration._
+import java.util.concurrent.TimeoutException
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -106,7 +103,7 @@ object TanitAnalysis{
     }
     
     val module = args(0)
-    val timeout = args(1).toInt * 60
+    val timeout = args(1).toInt
     val debug = args(2).toBoolean
     val sourcePath = args(3)
     val outputPath = args(4)
@@ -129,10 +126,10 @@ object TanitAnalysis{
           apkFileUris += FileUtil.toUri(file)
         else println(file + " is not decompilable.")
     }
-    taintAnalyze(module, apkFileUris.toSet, sasFilePath, outputPath, dpsuri, liblist, static, parallel, k_context, (timeout, pct), debug)
+    taintAnalyze(module, apkFileUris.toSet, sasFilePath, outputPath, dpsuri, liblist, static, parallel, k_context, timeout, debug)
   }
   
-  def taintAnalyze(module: String, apkFileUris: Set[FileResourceUri], sasFilePath: String, outputPath: String, dpsuri: Option[FileResourceUri], liblist: String, static: Boolean, parallel: Boolean, k_context: Int, timeout: (Int, Boolean), debug: Boolean) = {
+  def taintAnalyze(module: String, apkFileUris: Set[FileResourceUri], sasFilePath: String, outputPath: String, dpsuri: Option[FileResourceUri], liblist: String, static: Boolean, parallel: Boolean, k_context: Int, timeout: Int, debug: Boolean) = {
     Context.init_context_length(k_context)
     AndroidReachingFactsAnalysisConfig.parallel = parallel
     AndroidReachingFactsAnalysisConfig.resolve_static_init = static
@@ -150,10 +147,19 @@ object TanitAnalysis{
               else new NoReporter
             val global = new Global(file, reporter)
             global.setJavaLib(liblist)
-            println(TaintTask(module, global, sasFilePath, outputUri, dpsuri, file, parallel, Some(timeout)).run)
+            val (f, cancel) = FutureUtil.interruptableFuture { () =>
+              TaintTask(module, global, sasFilePath, outputUri, dpsuri, file, parallel).run
+            }
+            try {
+              Await.result(f, timeout minutes)
+            } catch {
+              case te: TimeoutException => 
+                cancel()
+                println(te.getMessage)
+            }
+            println()
             if(debug) println("Debug info write into " + reporter.asInstanceOf[FileReporter].f)
           } catch {
-            case te: MyTimeoutException => println(te.message)
             case ie: IgnoreException => println("No interesting element found for " + module)
             case e: Throwable =>
               CliLogger.logError(new File(outputPath), "Error: " , e)
@@ -171,44 +177,34 @@ object TanitAnalysis{
   /**
    * Timer is a option of tuple, left is the time second you want to timer, right is whether use this timer for each of the components during analyze.
    */
-  private case class TaintTask(module: String, global: Global, sasFilePath: String, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], file: FileResourceUri, parallel: Boolean, timeout: Option[(Int, Boolean)]) {
+  private case class TaintTask(module: String, global: Global, sasFilePath: String, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], file: FileResourceUri, parallel: Boolean) {
     def run: String = {
       ScopeManager.setScopeManager(new AndroidRFAScopeManager)
-      val timer = timeout match {
-        case Some((t, p)) => Some(if(p) new PerComponentTimer(t) else new MyTimer(t))
-        case None => None
-      }
-      if(timer.isDefined) timer.get.start
-      val apkYard = new ApkYard(global)
-      val app_info = module match {
-        case "DATA_LEAKAGE" => new AppInfoCollector(global, timer)
-        case "INTENT_INJECTION" => new IntentInjectionCollector(global, timer)
-        case "PASSWORD_TRACKING" => new SensitiveViewCollector(global, timer)
-      }
-      val apk: Apk = apkYard.loadApk(file, outputUri, dpsuri, app_info, false, false, true)
+      val yard = new ApkYard(global)
+      val apk: Apk = yard.loadApk(file, outputUri, dpsuri, false, false, true)
       val ssm = module match {
-        case "DATA_LEAKAGE" => new DataLeakageAndroidSourceAndSinkManager(global, apk, apk.getAppInfo.getLayoutControls, apk.getAppInfo.getCallbackMethods, sasFilePath)
-        case "INTENT_INJECTION" => new IntentInjectionSourceAndSinkManager(global, apk, apk.getAppInfo.getLayoutControls, apk.getAppInfo.getCallbackMethods, sasFilePath)
-        case "PASSWORD_TRACKING" =>  new PasswordSourceAndSinkManager(global, apk, apk.getAppInfo.getLayoutControls, apk.getAppInfo.getCallbackMethods, sasFilePath)
+        case "DATA_LEAKAGE" => new DataLeakageAndroidSourceAndSinkManager(global, apk, apk.getLayoutControls, apk.getCallbackMethods, sasFilePath)
+        case "INTENT_INJECTION" => new IntentInjectionSourceAndSinkManager(global, apk, apk.getLayoutControls, apk.getCallbackMethods, sasFilePath)
+        case "PASSWORD_TRACKING" =>  new PasswordSourceAndSinkManager(global, apk, apk.getLayoutControls, apk.getCallbackMethods, sasFilePath)
       }
-      val cba = new ComponentBasedAnalysis(global, apkYard)
-      cba.phase1(apk, parallel, timer)
+      val cba = new ComponentBasedAnalysis(global, yard)
+      cba.phase1(apk, parallel)
       val iddResult = cba.phase2(Set(apk), false)
       val tar = cba.phase3(iddResult, ssm)
-      onAnalysisSuccess(global, apk, outputUri)
+      onAnalysisSuccess(global, yard, apk, outputUri)
       return "Done!"
     }
   }
   
-  def onAnalysisSuccess(global: Global, apk: Apk, outputUri: FileResourceUri): Unit = {
-    val appData = DataCollector.collect(global, apk)
+  def onAnalysisSuccess(global: Global, yard: ApkYard, apk: Apk, outputUri: FileResourceUri): Unit = {
+    val appData = DataCollector.collect(global, yard, apk)
 //    MetricRepo.collect(appData)
     val appDataDirFile = FileUtil.toFile(getOutputDirUri(outputUri, apk.nameUri))
     if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
     
     val envFile = appDataDirFile + "/EnvironmentModel.txt"
     val environmentModel = new PrintWriter(envFile)
-    val envString = apk.getAppInfo.getEnvString
+    val envString = apk.getEnvString
     environmentModel.print(envString)
     environmentModel.close()
     println("Encironment model write into " + envFile)

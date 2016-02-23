@@ -28,12 +28,8 @@ import java.io.FileOutputStream
 import java.io.BufferedWriter
 import java.io.OutputStreamWriter
 import org.sireum.amandroid.alir.taintAnalysis.DataLeakageAndroidSourceAndSinkManager
-import org.sireum.jawa.util.MyTimeoutException
-import org.sireum.jawa.util.MyTimer
 import org.sireum.jawa.Global
 import org.sireum.amandroid.Apk
-import org.sireum.amandroid.security.AmandroidSocketListener
-import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.jawa.PrintReporter
 import org.sireum.jawa.MsgLevel
 import org.sireum.jawa.Constants
@@ -42,8 +38,18 @@ import org.sireum.amandroid.alir.componentSummary.ComponentBasedAnalysis
 import org.sireum.jawa.ScopeManager
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAScopeManager
 import org.sireum.amandroid.alir.componentSummary.ApkYard
-import org.sireum.jawa.util.PerComponentTimer
 import org.sireum.amandroid.util.ApkFileUtil
+import scala.concurrent.ExecutionContext.Implicits.{global => ec}
+import scala.concurrent.Await
+import scala.concurrent.duration._
+import java.util.concurrent.TimeoutException
+import org.sireum.jawa.util.FutureUtil
+import org.sireum.amandroid.security.dataInjection.IntentInjectionSourceAndSinkManager
+import org.sireum.amandroid.alir.dataRecorder.MetricRepo
+import java.io.PrintWriter
+import org.sireum.amandroid.alir.dataRecorder.DataCollector
+import org.sireum.amandroid.security.password.PasswordSourceAndSinkManager
+import org.sireum.amandroid.security.oauth.OAuthSourceAndSinkManager
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -71,18 +77,26 @@ object DataLeakage_run {
     val outputUri = FileUtil.toUri(outputPath)
     val dpsuri = try{Some(FileUtil.toUri(args(2)))} catch {case e: Exception => None}
     val files = ApkFileUtil.getApks(FileUtil.toUri(sourcePath), true)
-//      .filter(_.contains("InterComponentCommunication_DynRegister2.apk"))
+//      .filter(_.contains("InterComponentCommunication_Implicit6.apk"))
     files.foreach{
       file =>
         DataLeakageCounter.total += 1
-        val reporter = new PrintReporter(MsgLevel.ERROR)
+        val reporter = new PrintReporter(MsgLevel.INFO)
         val global = new Global(file, reporter)
         global.setJavaLib(AndroidGlobalConfig.lib_files)
         try {
-          reporter.echo(TITLE, DataLeakageTask(global, outputUri, dpsuri, file, Some(300, true)).run)
-          DataLeakageCounter.haveresult += 1
+          val (f, cancel) = FutureUtil.interruptableFuture[String] { () =>
+            DataLeakageTask(global, "DataLeakage", outputUri, dpsuri, file).run
+          }
+          try {
+            println(Await.result(f, 5 minutes))
+            DataLeakageCounter.haveresult += 1
+          } catch {
+            case te: TimeoutException => 
+              cancel()
+              reporter.error(TITLE, te.getMessage)
+          }
         } catch {
-          case te: MyTimeoutException => reporter.error(TITLE, te.message)
           case e: Throwable => e.printStackTrace()
         } finally {
           println(TITLE + " " + DataLeakageCounter.toString)
@@ -95,21 +109,24 @@ object DataLeakage_run {
   /**
    * Timer is a option of tuple, left is the time second you want to timer, right is whether use this timer for each of the components during analyze.
    */
-  private case class DataLeakageTask(global: Global, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], file: FileResourceUri, timeout: Option[(Int, Boolean)]) {
+  private case class DataLeakageTask(global: Global, module: String, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], file: FileResourceUri) {
     def run: String = {
       println(TITLE + " #####" + file + "#####")
       ScopeManager.setScopeManager(new AndroidRFAScopeManager)
-      val timer = timeout match {
-        case Some((t, p)) => Some(if(p) new PerComponentTimer(t) else new MyTimer(t))
-        case None => None
+      val yard = new ApkYard(global)
+      val apk: Apk = yard.loadApk(file, outputUri, dpsuri, false, false, true)
+      val ssm = module match {
+        case "IntentInjection" =>
+          new IntentInjectionSourceAndSinkManager(global, apk, apk.getLayoutControls, apk.getCallbackMethods, AndroidGlobalConfig.IntentInjectionSinkFilePath)
+        case "PasswordTracking" =>
+          new PasswordSourceAndSinkManager(global, apk, apk.getLayoutControls, apk.getCallbackMethods, AndroidGlobalConfig.PasswordSinkFilePath)
+        case "OAuthTokenTracking" =>
+          new OAuthSourceAndSinkManager(global, apk, apk.getLayoutControls, apk.getCallbackMethods, AndroidGlobalConfig.sas_file)
+        case "DataLeakage" | _ => 
+          new DataLeakageAndroidSourceAndSinkManager(global, apk, apk.getLayoutControls, apk.getCallbackMethods, AndroidGlobalConfig.sas_file)
       }
-      if(timer.isDefined) timer.get.start
-      val apkYard = new ApkYard(global)
-      val app_info = new AppInfoCollector(global, timer)
-      val apk: Apk = apkYard.loadApk(file, outputUri, dpsuri, app_info, false, false, true)
-      val ssm = new DataLeakageAndroidSourceAndSinkManager(global, apk, apk.getAppInfo.getLayoutControls, apk.getAppInfo.getCallbackMethods, AndroidGlobalConfig.sas_file)
-      val cba = new ComponentBasedAnalysis(global, apkYard)
-      cba.phase1(apk, false, timer)
+      val cba = new ComponentBasedAnalysis(global, yard)
+      cba.phase1(apk, false)
       val iddResult = cba.phase2(Set(apk), false)
       val tar = cba.phase3(iddResult, ssm)
       tar.foreach{
@@ -120,6 +137,18 @@ object DataLeakage_run {
             DataLeakageCounter.totalPath += size
           }
       }
+      val appData = DataCollector.collect(global, yard, apk)
+      MetricRepo.collect(appData)
+      val outputDir = AndroidGlobalConfig.amandroid_home + "/output"
+      val apkName = apk.nameUri.substring(apk.nameUri.lastIndexOf("/"), apk.nameUri.lastIndexOf("."))
+      val appDataDirFile = new File(outputDir + "/" + apkName)
+      if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
+      val out = new PrintWriter(appDataDirFile + "/AppData.txt")
+      out.print(appData.toString)
+      out.close()
+      val mr = new PrintWriter(outputDir + "/MetricInfo.txt")
+      mr.print(MetricRepo.toString)
+      mr.close()
       return "Done!"
     }
   }

@@ -25,6 +25,7 @@ import org.sireum.amandroid.parser.IntentFilterDataBase
 import org.sireum.amandroid.parser.IntentFilter
 import org.sireum.jawa.alir.pta._
 import org.sireum.amandroid.Apk
+import org.sireum.amandroid.appInfo.AppInfoCollector
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -156,9 +157,8 @@ object FrameworkMethodsModel {
                 }
             }
             iDB.updateIntentFmap(intentF)
-            val appinfo = apk.getAppInfo
-            if(!appinfo.hasEnv(comRec)){
-              appinfo.dynamicRegisterReceiver(apk, comRec, iDB, permission.toSet)
+            if(!apk.hasEnv(rv.typ)){
+              AppInfoCollector.dynamicRegisterReceiver(apk, comRec, iDB, permission.toSet, global.reporter)
             } else {
               apk.updateIntentFilterDB(iDB)
             }

@@ -24,6 +24,7 @@ import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model.AndroidModelCal
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.amandroid.Apk
 import org.sireum.jawa.Global
+import org.sireum.jawa.Signature
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -39,11 +40,11 @@ object AndroidReachingFactsAnalysisHelper {
     AndroidModelCallHandler.doModelCall(s, calleeMethod, args, retVars, currentContext, Some(apk))
   }
   
-  def isICCCall(calleeMethod: JawaMethod): Boolean = {
-    AndroidModelCallHandler.isICCCall(calleeMethod)
+  def isICCCall(calleeSig: Signature): Boolean = {
+    AndroidModelCallHandler.isICCCall(calleeSig)
   }
   
-  def doICCCall(apk: Apk, s: PTAResult, calleeMethod: JawaMethod, args: List[String], retVars: Seq[String], currentContext: Context): (ISet[RFAFact], ISet[JawaMethod]) = {
-    AndroidModelCallHandler.doICCCall(apk: Apk, s, calleeMethod, args, retVars, currentContext)
+  def doICCCall(global: Global, apk: Apk, s: PTAResult, calleeSig: Signature, args: List[String], retVars: Seq[String], currentContext: Context): (ISet[RFAFact], ISet[JawaMethod]) = {
+    AndroidModelCallHandler.doICCCall(global, apk, s, calleeSig, args, retVars, currentContext)
   }
 }

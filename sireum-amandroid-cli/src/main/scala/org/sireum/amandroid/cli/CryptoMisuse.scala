@@ -20,18 +20,13 @@ import org.sireum.option.SireumAmandroidCryptoMisuseMode
 import java.io.File
 import org.sireum.util._
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
-import org.sireum.amandroid.security.AmandroidSocket
 import org.sireum.amandroid.cli.util.CliLogger
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
-import org.sireum.amandroid.security.apiMisuse.InterestingApiCollector
 import org.sireum.amandroid.security.apiMisuse.CryptographicConstants
 import org.sireum.amandroid.alir.dataRecorder.DataCollector
 import java.io.PrintWriter
 import org.sireum.jawa.util.IgnoreException
-import org.sireum.amandroid.security.AmandroidSocketListener
 import org.sireum.amandroid.security.apiMisuse.CryptographicMisuse
-import org.sireum.jawa.util.MyTimer
-import org.sireum.jawa.util.MyTimeoutException
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 import org.sireum.jawa.alir.Context
 import org.sireum.jawa.Global
@@ -41,7 +36,13 @@ import org.sireum.jawa.FileReporter
 import org.sireum.jawa.MsgLevel
 import org.sireum.jawa.NoReporter
 import org.sireum.amandroid.AndroidGlobalConfig
-
+import java.util.concurrent.TimeoutException
+import org.sireum.amandroid.alir.componentSummary.ApkYard
+import org.sireum.amandroid.alir.componentSummary.ComponentBasedAnalysis
+import org.sireum.jawa.util.FutureUtil
+import scala.concurrent.ExecutionContext.Implicits.{global => ec}
+import scala.concurrent.Await
+import scala.concurrent.duration._
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -109,20 +110,26 @@ object CryptoMisuse {
     try{  
       var i: Int = 0
       apkFileUris.foreach{
-        file =>
+        fileUri =>
           i += 1
           try{
-            println("Analyzing #" + i + ":" + file)
+            println("Analyzing #" + i + ":" + fileUri)
             val reporter = 
-              if(debug) new FileReporter(getOutputDirUri(FileUtil.toUri(outputPath), file), MsgLevel.INFO)
+              if(debug) new FileReporter(getOutputDirUri(FileUtil.toUri(outputPath), fileUri), MsgLevel.INFO)
               else new NoReporter
-            val global = new Global(file, reporter)
-            val apk = new Apk(file)
-            val socket = new AmandroidSocket(global, apk)
-            println(CryptoMisuseTask(global, apk, outputPath, dpsuri, socket, parallel, Some(timeout*60)).run)   
+            val global = new Global(fileUri, reporter)
+            val (f, cancel) = FutureUtil.interruptableFuture[String] { () => 
+              CryptoMisuseTask(global, fileUri, outputPath, dpsuri, parallel).run
+            }
+            try {
+              println(Await.result(f, timeout minutes))
+            } catch {
+              case te: TimeoutException => 
+                cancel()
+                println(te.getMessage)
+            }
             if(debug) println("Debug info write into " + reporter.asInstanceOf[FileReporter].f)
           } catch {
-            case te: MyTimeoutException => println(te.message)
             case ie: IgnoreException => println("No crypto api found.")
             case e: Throwable =>
               CliLogger.logError(new File(outputPath), "Error: " , e)
@@ -133,65 +140,39 @@ object CryptoMisuse {
         CliLogger.logError(new File(outputPath), "Error: " , e)
 
     }
-}
+  }
   
-  private case class CryptoMisuseTask(global: Global, apk: Apk, outputPath: String, dpsuri: Option[FileResourceUri], socket: AmandroidSocket, parallel: Boolean, timeout: Option[Int]) {
-    def run(): String = {
-      global.reporter.echo(TITLE, "####" + apk.nameUri + "#####")
-      val timer = timeout match {
-        case Some(t) => Some(new MyTimer(t))
-        case None => None
-      }
-      if(timer.isDefined) timer.get.start
-      val outUri = socket.loadApk(outputPath, AndroidLibraryAPISummary, dpsuri, false, false)
-      val app_info = new InterestingApiCollector(global, timer)
-      app_info.collectInfo(apk, outUri)
-      socket.plugListener(new CryptoMisuseListener(global, apk, app_info, outUri))
-      socket.runWithoutDDA(false, true, timer)
-      
-      val idfgs = apk.getIDFGs
+  private case class CryptoMisuseTask(global: Global, nameUri: FileResourceUri, outputPath: String, dpsuri: Option[FileResourceUri], parallel: Boolean) {
+    def run: String = {
+      global.reporter.echo(TITLE, "####" + nameUri + "#####")
+      val yard = new ApkYard(global)
+      val outputUri = FileUtil.toUri(outputPath)
+      val apk = yard.loadApk(nameUri, outputUri, dpsuri, false, false, true)
+      val csa = new ComponentBasedAnalysis(global, yard)
+      csa.phase1(apk, parallel)
+      val idfgs = yard.getIDFGs
       idfgs.foreach{
         case (rec, idfg) =>
           CryptographicMisuse(global, idfg)
       }
+      onAnalysisSuccess(global, yard, apk, outputUri)
       return "Done!"
     }
   }
   
-  private class CryptoMisuseListener(global: Global, apk: Apk, app_info: InterestingApiCollector, output_dir: String) extends AmandroidSocketListener {
-    def onPreAnalysis: Unit = {
-    }
+  def onAnalysisSuccess(global: Global, yard: ApkYard, apk: Apk, outputUri: FileResourceUri): Unit = {
+    val appData = DataCollector.collect(global, yard, apk)
 
-    def entryPointFilter(eps: Set[org.sireum.jawa.JawaMethod]): Set[org.sireum.jawa.JawaMethod] = {
-      val iacs = app_info.getInterestingContainers(CryptographicConstants.getCryptoAPIs)
-      eps.filter(e=>iacs.contains(e.getDeclaringClass))
-    }
-
-    def onAnalysisSuccess: Unit = {
-      val appData = DataCollector.collect(global, apk)
-
-      val appDataDirFile = new File(getOutputDirUri(output_dir, apk.nameUri))
-          
-      if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
-      
-      val envFile = appDataDirFile + "/EnvironmentModel.txt"
-      val environmentModel = new PrintWriter(envFile)
-      val envString = app_info.getEnvString
-      environmentModel.print(envString)
-      environmentModel.close()
-      println("Encironment model write into " + envFile)
-    }
-
-    def onPostAnalysis: Unit = {
-    }
+    val appDataDirFile = new File(getOutputDirUri(outputUri, apk.nameUri))
+        
+    if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
     
-    def onException(e: Exception): Unit = {
-      e match{
-        case ie: IgnoreException => System.err.println("Ignored!")
-        case a => 
-          CliLogger.logError(new File(output_dir), "Error: " , e)
-      }
-    }
+    val envFile = appDataDirFile + "/EnvironmentModel.txt"
+    val environmentModel = new PrintWriter(envFile)
+    val envString = apk.getEnvString
+    environmentModel.print(envString)
+    environmentModel.close()
+    println("Encironment model write into " + envFile)
   }
   
   private def getOutputDirUri(outputUri: FileResourceUri, apkUri: FileResourceUri): FileResourceUri = {

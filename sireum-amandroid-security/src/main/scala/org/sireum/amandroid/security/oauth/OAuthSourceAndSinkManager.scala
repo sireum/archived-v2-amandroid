@@ -35,6 +35,7 @@ import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.amandroid.Apk
 import org.sireum.jawa.Global
+import org.sireum.jawa.Signature
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -44,18 +45,18 @@ class OAuthSourceAndSinkManager(
     global: Global,
     apk: Apk, 
     layoutControls: Map[Int, LayoutControl], 
-    callbackMethods: ISet[JawaMethod], 
-    sasFilePath: String) extends AndroidSourceAndSinkManager(global, apk, layoutControls, callbackMethods, sasFilePath){
+    callbackSigs: ISet[Signature], 
+    sasFilePath: String) extends AndroidSourceAndSinkManager(global, apk, layoutControls, callbackSigs, sasFilePath){
   
   private final val TITLE = "OAuthSourceAndSinkManager"
     
-  override def isSource(calleeMethod: JawaMethod, callerMethod: JawaMethod, callerLoc: JumpLocation) = false
+  override def isSource(calleeSig: Signature, callerSig: Signature, callerLoc: JumpLocation) = false
     
-  override def isCallbackSource(proc: JawaMethod): Boolean = {
+  override def isCallbackSource(sig: Signature): Boolean = {
     false
   }
   
-  override def isUISource(calleeMethod: JawaMethod, callerMethod: JawaMethod, callerLoc: JumpLocation): Boolean = {
+  override def isUISource(calleeSig: Signature, callerSig: Signature, callerLoc: JumpLocation): Boolean = {
     false
   }
 
@@ -108,7 +109,9 @@ class OAuthSourceAndSinkManager(
               coms.foreach{
                 case (com, typ) =>
                   typ match {
-                    case IntentHelper.IntentType.EXPLICIT => if(com.isUnknown) sinkflag = true
+                    case IntentHelper.IntentType.EXPLICIT => 
+                      val clazz = global.getClassOrResolve(com)
+                      if(clazz.isUnknown) sinkflag = true
 //                    case IntentHelper.IntentType.EXPLICIT => sinkflag = true
                     case IntentHelper.IntentType.IMPLICIT => sinkflag = true
                   }

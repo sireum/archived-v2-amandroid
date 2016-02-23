@@ -40,46 +40,52 @@ import org.sireum.jawa.util.ASTUtil
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author Sankardas Roy. 
  */
-class ReachableInfoCollector(global: Global, entryPointClasses:Set[JawaType], timer: Option[MyTimer]) {
+class ReachableInfoCollector(val global: Global, entryPointTypes: ISet[JawaType]) {
   final val TITLE = "ReachableInfoCollector"
-  private final val callbackMethods: MMap[JawaClass, Set[JawaMethod]] = mmapEmpty // a map from an app component to associated callbacks
-  private final val layoutClasses: MMap[JawaClass, Set[Int]] = mmapEmpty
+  private final val callbackMethods: MMap[JawaType, MSet[Signature]] = mmapEmpty // a map from an app component to associated callbacks
+  private final val layoutClasses: MMap[JawaType, MSet[Int]] = mmapEmpty
   private final val androidCallbacks: MSet[String] = msetEmpty  // a list of system interfaces which have wellknown callback methods
 
-  def getCallbackMethods(): IMap[JawaClass, Set[JawaMethod]] = this.callbackMethods.toMap
-  def getLayoutClasses(): IMap[JawaClass, Set[Int]] = this.layoutClasses.toMap
+  def getCallbackMethods(): IMap[JawaType, ISet[Signature]] = this.callbackMethods.map {
+    case (k, vs) => k -> vs.toSet
+  }.toMap
+  def getLayoutClasses(): IMap[JawaType, Set[Int]] = this.layoutClasses.map {
+    case (k, vs) => k -> vs.toSet
+  }.toMap
 
-  private val reachableMap: MMap[JawaClass, Set[JawaMethod]] = mmapEmpty // a map from an app component to the rechable methods
+  private val reachableMap: MMap[JawaType, MSet[Signature]] = mmapEmpty // a map from an app component to the rechable methods
 
-  def getReachableMap: IMap[JawaClass, Set[JawaMethod]] = this.reachableMap.toMap
+  def getReachableMap: IMap[JawaType, ISet[Signature]] = this.reachableMap.map {
+    case (k, vs) => k -> vs.toSet
+  }.toMap
 
-  def updateReachableMap(compProcMap: IMap[JawaClass, Set[JawaMethod]]): Boolean = {
+  def updateReachableMap(compProcMap: IMap[JawaType, ISet[Signature]]): Boolean = {
     var flag = false
     compProcMap.foreach{
       case(comp, procs) =>
-        val tmpReachableMethods = ReachabilityAnalysis.getReachableMethods(global, procs, timer)
+        val tmpReachableMethods = ReachabilityAnalysis.getReachableMethods(global, procs)
         val oldReachableMethods = reachableMap.getOrElse(comp, Set())
         val newReachableMethods = tmpReachableMethods -- oldReachableMethods
         if(!newReachableMethods.isEmpty){
           flag = true
-          reachableMap += (comp -> (oldReachableMethods ++ newReachableMethods))
+          reachableMap.getOrElseUpdate(comp, msetEmpty) ++= newReachableMethods
         }
     }
     flag
   }
 
+  initAndroidCallbacks
+  
   def init = {
-    initAndroidCallbacks
-    (if(false) entryPointClasses.par else entryPointClasses).foreach {
+    (if(false) entryPointTypes.par else entryPointTypes).foreach {
       compTyp =>
         val comp = global.getClassOrResolve(compTyp)
-        val reachableMethods = ReachabilityAnalysis.getReachableMethods(global, comp.getDeclaredMethods)
-        reachableMap += (comp -> reachableMethods)
+        val reachableMethods = ReachabilityAnalysis.getReachableMethods(global, comp.getDeclaredMethods.map(_.getSignature))
+        reachableMap.getOrElseUpdate(compTyp, msetEmpty) ++= reachableMethods
     }
   }
 
 //  def initWithEnv = {
-//    initAndroidCallbacks
 //    (if(false) entryPointClasses.par else entryPointClasses).foreach {
 //      compTyp =>
 //        val comp = global.getClassOrResolve(compTyp)
@@ -88,14 +94,14 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[JawaType], ti
 //    }
 //  }
 
-  def getSensitiveLayoutContainer(layoutControls: IMap[Int, LayoutControl]): Set[JawaClass] = {
-    val result: MSet[JawaClass] = msetEmpty
+  def getSensitiveLayoutContainer(layoutControls: IMap[Int, LayoutControl]): Set[JawaType] = {
+    val result: MSet[JawaType] = msetEmpty
     layoutControls.foreach{
       case (i, lc) =>
         if(lc.isSensitive){
           reachableMap.foreach{
             case (r, ps) =>
-              if(ps.exists(p => p.retrieveCode.getOrElse("").contains(i.toString)))
+              if(ps.exists(p => global.getMethodCode(p).getOrElse("").contains(i.toString)))
                 result += r
           }
         }
@@ -103,21 +109,21 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[JawaType], ti
     result.toSet
   }
 
-  def getSensitiveAPIContainer(apiSig: String): ISet[JawaClass] = {
-    val result: MSet[JawaClass] = msetEmpty
+  def getSensitiveAPIContainer(apiSig: String): ISet[JawaType] = {
+    val result: MSet[JawaType] = msetEmpty
       reachableMap.foreach{
         case (r, ps) =>
-          if(ps.exists(p => p.retrieveCode.getOrElse("").contains(apiSig)))
+          if(ps.exists(p => global.getMethodCode(p).getOrElse("").contains(apiSig)))
             result += r
       }
     result.toSet
   }
 
-  def getInterestingStringContainer(str: String): ISet[JawaClass] = {
-    val result: MSet[JawaClass] = msetEmpty
+  def getInterestingStringContainer(str: String): ISet[JawaType] = {
+    val result: MSet[JawaType] = msetEmpty
     reachableMap.foreach{
       case (r, ps) =>
-        if(ps.exists(p => p.retrieveCode.getOrElse("").contains(str)))
+        if(ps.exists(p => global.getMethodCode(p).getOrElse("").contains(str)))
           result += r
     }
     result.toSet
@@ -131,24 +137,26 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[JawaType], ti
   def collectCallbackMethods() = {
     findClassLayoutMappings()
     // worklist is a list of tuples of the format (a reachable proc's declaring class, app-entrypoint-component)
-    val worklist: MList[(JawaClass, JawaClass)] = mlistEmpty
-    val processed: MList[(JawaClass, JawaClass)] = mlistEmpty
+    val worklist: MList[(JawaType, JawaType)] = mlistEmpty
+    val processed: MList[(JawaType, JawaType)] = mlistEmpty
     this.reachableMap.foreach{
       case(comp, procs) => 
-        val containerClasses = procs.map(_.getDeclaringClass)
+        val containerClasses = procs.map(_.getClassType)
         worklist ++= containerClasses.map((_, comp))
     }
     while(!worklist.isEmpty) {
       worklist.foreach {
         case (item, comp) =>
-          collectCallbackMethodsInAppSource(item, comp)
+          val clazz = global.getClassOrResolve(item)
+          val lifecycleElement = global.getClassOrResolve(comp)
+          collectCallbackMethodsInAppSource(clazz, lifecycleElement)
       }
       processed ++= worklist
       worklist.clear
-      if(updateReachableMap(this.callbackMethods.toMap)){
+      if(updateReachableMap(getCallbackMethods())){
         this.reachableMap.foreach{
           case(comp, procs) => 
-            val containerClasses = procs.map(_.getDeclaringClass)
+            val containerClasses = procs.map(_.getClassType)
             worklist ++= (containerClasses.map((_, comp)) -- processed)
         }
       }
@@ -161,7 +169,7 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[JawaType], ti
    */
   def findClassLayoutMappings() {
     val procedures: MSet[JawaMethod] = msetEmpty
-    this.entryPointClasses.foreach{
+    this.entryPointTypes.foreach{
       compTyp =>
         val rec = global.getClassOrResolve(compTyp)
         procedures ++= rec.getDeclaredMethods
@@ -178,8 +186,8 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[JawaType], ti
                       val sig = ASTUtil.getSignature(t).get
                       if(sig.getSubSignature == AndroidConstants.SETCONTENTVIEW){
                         val nums = ExplicitValueFinder.findExplicitIntValueForArgs(procedure, j, 1)
-                        val declClass = procedure.getDeclaringClass
-                        this.layoutClasses += (declClass -> (this.layoutClasses.getOrElse(declClass, isetEmpty) ++ nums))
+                        val declType = sig.getClassType
+                        this.layoutClasses.getOrElseUpdate(declType, msetEmpty) ++= nums
                       }
                     case _ =>
                   }
@@ -198,8 +206,9 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[JawaType], ti
    */
   private def collectCallbackMethodsInAppSource(clazz: JawaClass, lifecycleElement: JawaClass) {
     // Check for callback handlers implemented via interfaces
-    val procs = this.reachableMap(lifecycleElement)
-    analyzeReachableMethods(procs, lifecycleElement)
+    val sigs = this.reachableMap(lifecycleElement.getType).toSet
+    val methods = sigs.map(global.getMethod(_)).flatten.toSet
+    analyzeReachableMethods(methods, lifecycleElement)
     // Check for method overrides
     analyzeMethodOverrideCallbacks(clazz, lifecycleElement)
   }
@@ -281,7 +290,7 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[JawaType], ti
 //  temp
 //}
 
-  private def analyzeReachableMethods(procs: Set[JawaMethod], lifecycleElement: JawaClass): Unit = { 
+  private def analyzeReachableMethods(procs: ISet[JawaMethod], lifecycleElement: JawaClass): Unit = { 
     procs.foreach{
       proc =>
         analyzeMethodForCallbackRegistrations(proc, lifecycleElement)
@@ -391,7 +400,7 @@ class ReachableInfoCollector(global: Global, entryPointClasses:Set[JawaType], ti
    */
   private def checkAndAddMethod(proc: JawaMethod, lifecycleElement: JawaClass) = {
     if(!proc.getFullName.startsWith("android.")){
-      this.callbackMethods += (lifecycleElement -> (this.callbackMethods.getOrElse(lifecycleElement, isetEmpty) + proc))
+      this.callbackMethods.getOrElseUpdate(lifecycleElement.getType, msetEmpty) += proc.getSignature
     }
   }
 

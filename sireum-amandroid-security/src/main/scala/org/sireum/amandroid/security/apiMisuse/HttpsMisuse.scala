@@ -45,6 +45,7 @@ import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.jawa.Global
+import org.sireum.jawa.Signature
 
 /*
  * @author <a href="mailto:i@flanker017.me">Qidan He</a>
@@ -144,7 +145,7 @@ object HttpsMisuse {
         calleeSet.foreach{
           callee =>
             val calleep = callee.callee
-            val callees : MSet[JawaMethod] = msetEmpty
+            val callees : MSet[Signature] = msetEmpty
             val caller = global.getMethod(invNode.getOwner).get
             val jumpLoc = caller.getBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
             val cj = jumpLoc.jump.asInstanceOf[CallJump]
@@ -162,8 +163,8 @@ object HttpsMisuse {
 //            }
             callees.foreach{
               callee =>
-                if(callee.getSignature.equals(API_SIG)){
-                  result += ((callee.getSignature.signature, invNode))
+                if(callee.equals(API_SIG)){
+                  result += ((callee.signature, invNode))
                 }
             }
         }

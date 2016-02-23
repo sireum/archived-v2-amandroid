@@ -26,6 +26,7 @@ import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.jawa.Global
+import org.sireum.jawa.Signature
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -116,7 +117,7 @@ object CryptographicMisuse {
 		    calleeSet.foreach{
 		      callee =>
 		        val calleep = callee.callee
-		        val callees : MSet[JawaMethod] = msetEmpty
+		        val callees : MSet[Signature] = msetEmpty
 				    val caller = global.getMethod(invNode.getOwner).get
 				    val jumpLoc = caller.getBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
 				    val cj = jumpLoc.jump.asInstanceOf[CallJump]
@@ -135,8 +136,8 @@ object CryptographicMisuse {
 //				    }
 		        callees.foreach{
 		          callee =>
-						    if(CryptographicConstants.getCryptoAPIs.contains(callee.getSignature.signature)){
-						      result += ((callee.getSignature.signature, invNode))
+						    if(CryptographicConstants.getCryptoAPIs.contains(callee.signature)){
+						      result += ((callee.signature, invNode))
 						    }
 		        }
 		    }

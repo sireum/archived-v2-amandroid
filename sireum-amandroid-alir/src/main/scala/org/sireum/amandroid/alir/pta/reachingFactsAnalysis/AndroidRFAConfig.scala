@@ -39,7 +39,7 @@ object AndroidRFAConfig {
    * generates and returns the initial facts corresponding to the "Intent" parameter of a dummyMain 
    * the generated fact says that the param Intent is generated at the Center.
    */
-  def getInitialFactsForMainEnvironment(dm : JawaMethod) : ISet[RFAFact] = {
+  def getInitialFactsForMainEnvironment(dm: JawaMethod) : ISet[RFAFact] = {
     require(dm.getName == AndroidConstants.MAINCOMP_ENV || dm.getName == AndroidConstants.COMP_ENV)
     var result = isetEmpty[RFAFact]
     val intentSlot = VarSlot(dm.getParamName(0), false, false)

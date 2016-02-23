@@ -159,10 +159,10 @@ object IntentHelper {
     }
   }
 
-  def mappingIntents(global: Global, apk: Apk, intentContents: ISet[IntentContent], compType: AndroidConstants.CompType.Value): IMap[IntentContent, ISet[(JawaClass, IntentType.Value)]] = {
+  def mappingIntents(global: Global, apk: Apk, intentContents: ISet[IntentContent], compType: AndroidConstants.CompType.Value): IMap[IntentContent, ISet[(JawaType, IntentType.Value)]] = {
     intentContents.map{
       ic =>
-        val components: MSet[(JawaClass, IntentType.Value)] = msetEmpty
+        val components: MSet[(JawaType, IntentType.Value)] = msetEmpty
         if(!ic.preciseExplicit){
           compType match {
             case AndroidConstants.CompType.ACTIVITY =>
@@ -189,15 +189,15 @@ object IntentHelper {
         ic.componentNames.foreach{
           targetRecName =>
             val targetRec = global.getClassOrResolve(new JawaType(targetRecName))
-            components += ((targetRec, IntentType.EXPLICIT))
+            components += ((targetRec.getType, IntentType.EXPLICIT))
         }
         components ++= findComponents(apk, ic.actions, ic.categories, ic.datas, ic.types).map((_, IntentType.IMPLICIT))
         (ic, components.toSet)
     }.toMap
   }
 
-  def findComponents(apk: Apk, actions: Set[String], categories: Set[String], datas: Set[UriData], mTypes:Set[String]): ISet[JawaClass] = {
-    var components: ISet[JawaClass] = isetEmpty
+  def findComponents(apk: Apk, actions: Set[String], categories: Set[String], datas: Set[UriData], mTypes:Set[String]): ISet[JawaType] = {
+    val components: MSet[JawaType] = msetEmpty
     if(actions.isEmpty){
       if(datas.isEmpty){
         if(mTypes.isEmpty) components ++= findComps(apk, null, categories, null, null) 
@@ -224,11 +224,11 @@ object IntentHelper {
           }
       }
     }
-    components
+    components.toSet
   }
   
-  private def findComps(apk: Apk, action:String, categories: Set[String], data:UriData, mType:String): ISet[JawaClass] = {
-    var components: ISet[JawaClass] = isetEmpty
+  private def findComps(apk: Apk, action:String, categories: Set[String], data:UriData, mType:String): ISet[JawaType] = {
+    val components: MSet[JawaType] = msetEmpty
     apk.getComponents.foreach {
       ep =>
         val iFilters = apk.getIntentFilterDB.getIntentFilters(ep)
@@ -238,6 +238,6 @@ object IntentHelper {
             components += ep
         }
     }
-    components
+    components.toSet
   }
 }
