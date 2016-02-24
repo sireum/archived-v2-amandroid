@@ -53,8 +53,8 @@ class ApkYard(global: Global) {
     val apk = new Apk(nameUri)
     val apkFile = FileUtil.toFile(nameUri)
     val resultDir = FileUtil.toFile(outputUri)
-    val (outUri, srcs, _) = ApkDecompiler.decompile(apkFile, resultDir, dpsuri, dexLog, debugMode, true, forceDelete)
     // convert the dex file to the "pilar" form
+    val (outUri, srcs, _) = ApkDecompiler.decompile(apkFile, resultDir, dpsuri, dexLog, debugMode, true, forceDelete)
     srcs foreach {
       src =>
         val fileUri = FileUtil.toUri(FileUtil.toFilePath(outUri) + File.separator + src)

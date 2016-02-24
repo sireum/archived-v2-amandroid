@@ -28,7 +28,6 @@ import org.sireum.jawa.alir.reachability.ReachabilityAnalysis
 import org.sireum.amandroid.parser.LayoutControl
 import org.sireum.jawa.PointsCollector
 import org.sireum.jawa.PointI
-import org.sireum.jawa.util.MyTimer
 import org.sireum.jawa.util.ASTUtil
 
 

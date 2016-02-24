@@ -21,7 +21,6 @@ import org.sireum.jawa.Reporter
 import org.sireum.amandroid.Apk
 import org.sireum.jawa.Global
 import org.sireum.util._
-import org.sireum.jawa.util.MyTimer
 import java.io.File
 import org.sireum.jawa.JawaClass
 import org.sireum.amandroid.appInfo.ReachableInfoCollector

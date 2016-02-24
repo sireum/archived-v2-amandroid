@@ -41,7 +41,6 @@ import org.sireum.jawa.util.IgnoreException
 import org.sireum.amandroid.parser.ARSCFileParser_apktool
 import java.io.FileInputStream
 import java.io.BufferedInputStream
-import org.sireum.jawa.util.MyTimer
 import org.sireum.jawa.Global
 import org.sireum.jawa.Signature
 import org.sireum.amandroid.Apk

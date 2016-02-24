@@ -81,7 +81,7 @@ object DataLeakage_run {
     files.foreach{
       file =>
         DataLeakageCounter.total += 1
-        val reporter = new PrintReporter(MsgLevel.INFO)
+        val reporter = new PrintReporter(MsgLevel.ERROR)
         val global = new Global(file, reporter)
         global.setJavaLib(AndroidGlobalConfig.lib_files)
         try {
