@@ -405,7 +405,7 @@ class ReachableInfoCollector(val global: Global, entryPointTypes: ISet[JawaType]
 
   private def collectAllInterfaces(ar: JawaClass): Set[JawaClass] = {
     if(ar.getInterfaceSize == 0) Set()
-      else ar.getInterfaces ++ ar.getInterfaces.map{collectAllInterfaces(_)}.reduce((s1, s2) => s1 ++ s2)
+    else ar.getInterfaces ++ ar.getInterfaces.map{collectAllInterfaces(_)}.reduce((s1, s2) => s1 ++ s2)
   }
 
   private def getMethodsFromHierarchyByShortName(r :JawaClass, procShortName: String): Set[JawaMethod] = {
