@@ -251,7 +251,10 @@ class Data{
       this.schemes +=scheme
     }
     if(host != null || port != null){
-      this.authorities += Authority(host, port.replaceAll("\\\\ ", ""))
+      val portAfterSanit =
+        if(port != null) port.replaceAll("\\\\ ", "")
+        else port
+      this.authorities += Authority(host, portAfterSanit)
     }
     if(path!= null){
       this.paths +=path

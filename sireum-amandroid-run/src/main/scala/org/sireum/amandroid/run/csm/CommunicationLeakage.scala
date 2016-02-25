@@ -84,7 +84,7 @@ object CommunicationLeakage_run {
             CommunicationLeakageTask(global, outputUri, dpsuri, file).run
           }
           try {
-            Await.result(f, 10 minutes)
+            Await.result(f, 300 minutes)
             CommunicationLeakageCounter.haveresult += 1
           } catch {
             case te: TimeoutException => 
