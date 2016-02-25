@@ -23,16 +23,25 @@ import org.sireum.amandroid.Apk
 
 trait AmandroidData
 
+// AmandroidSupervisorActor's input
+case class AnalysisSpec(fileUri: FileResourceUri, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], removeSupportGen: Boolean, forceDelete: Boolean) extends AmandroidData
+
 // DecompileActor's input
 case class DecompileData(fileUri: FileResourceUri, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], removeSupportGen: Boolean, forceDelete: Boolean, timeout: Duration) extends AmandroidData
 // DecompileActor's result
-trait DecompilerResult extends AmandroidData
+trait DecompilerResult extends AmandroidData {
+  val fileUri: FileResourceUri
+}
 case class DecompileSuccResult(fileUri: FileResourceUri, outApkUri: FileResourceUri, srcFolders: ISet[String], dependencies: ISet[String]) extends DecompilerResult
-case class DecompileFailResult(fileUri: FileResourceUri, e: Option[Exception]) extends DecompilerResult
+case class DecompileFailResult(fileUri: FileResourceUri, e: Exception) extends DecompilerResult
 
 // ApkInfoCollectActor's input
 case class ApkInfoCollectData(fileUri: FileResourceUri, outApkUri: FileResourceUri, srcFolders: ISet[String], timeout: Duration) extends DecompilerResult
 // ApkInfoCollectActor's result
-trait ApkInfoCollectResult extends AmandroidData
-case class ApkInfoCollectSuccResult(apk: Apk, outApkUri: FileResourceUri, srcFolders: ISet[String]) extends ApkInfoCollectResult
-case class ApkInfoCollectFailResult(fileUri: FileResourceUri, e: Option[Exception]) extends ApkInfoCollectResult
+trait ApkInfoCollectResult extends AmandroidData {
+  val fileUri: FileResourceUri
+}
+case class ApkInfoCollectSuccResult(apk: Apk, outApkUri: FileResourceUri, srcFolders: ISet[String]) extends ApkInfoCollectResult {
+  val fileUri: FileResourceUri = apk.nameUri
+}
+case class ApkInfoCollectFailResult(fileUri: FileResourceUri, e: Exception) extends ApkInfoCollectResult

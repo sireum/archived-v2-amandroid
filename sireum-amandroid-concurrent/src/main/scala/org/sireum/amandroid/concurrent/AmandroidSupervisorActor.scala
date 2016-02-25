@@ -16,8 +16,69 @@
  ******************************************************************************/
 package org.sireum.amandroid.concurrent
 
-import akka.actor.Actor
+import org.sireum.util._
+import akka.actor._
+import akka.routing.FromConfig
+import scala.concurrent.duration._
+import com.typesafe.config.Config
+import akka.dispatch.UnboundedPriorityMailbox
+import akka.dispatch.PriorityGenerator
+import com.typesafe.config.ConfigFactory
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Await
+import akka.pattern.ask
 
-trait AmandroidSupervisorActor extends Actor {
-  
+class AmandroidSupervisorActor extends Actor with ActorLogging {
+  private val decActor = context.actorOf(FromConfig.props(Props[DecompilerActor]), "DecompilerActor")
+  private val apkInfoColActor = context.actorOf(FromConfig.props(Props[ApkInfoCollectActor]), "ApkInfoCollectorActor")
+  private val sendership: MMap[FileResourceUri, ActorRef] = mmapEmpty
+  def receive: Receive = {
+    case as: AnalysisSpec =>
+      sendership(as.fileUri) = sender
+      decActor ! DecompileData(as.fileUri, as.outputUri, as.dpsuri, as.removeSupportGen, as.forceDelete, 30 minutes)
+    case dr: DecompilerResult =>
+      dr match {
+        case dsr: DecompileSuccResult =>
+          apkInfoColActor ! ApkInfoCollectData(dsr.fileUri, dsr.outApkUri, dsr.srcFolders, 20 minutes)
+        case dfr: DecompileFailResult =>
+          log.error(dfr.e, "Decompile fail on " + dfr.fileUri)
+      }
+    case aicr: ApkInfoCollectResult =>
+      aicr match {
+        case aicsr: ApkInfoCollectSuccResult =>
+          println("Success " + aicsr)
+        case aicfr: ApkInfoCollectFailResult =>
+          log.error(aicfr.e, "Infomation collect failed on " + aicfr.fileUri)
+      }
+      sendership(aicr.fileUri) ! aicr 
+  }
+}
+
+class AmandroidSupervisorActorPrioMailbox(settings: ActorSystem.Settings, config: Config) extends UnboundedPriorityMailbox(
+    // Create a new PriorityGenerator, lower prio means more important
+    PriorityGenerator {
+      case AnalysisSpec => 3
+      case dr: DecompilerResult => 2
+      case aicr: ApkInfoCollectResult => 1
+      case otherwise => 4
+    })
+
+object AmandroidTestApplication extends App {
+  val _system = ActorSystem("AmandroidTestApplication", ConfigFactory.load)
+  val supervisor = _system.actorOf(Props[AmandroidSupervisorActor], name = "AmandroidSupervisorActor")
+  val fileUris = FileUtil.listFiles(FileUtil.toUri("/Users/fgwei/Develop/Sireum/apps/amandroid/sources/icc-bench"), ".apk", true)
+  val outputUri = FileUtil.toUri("/Users/fgwei/Work/output/icc-bench")
+  val futures = fileUris map {
+    fileUri =>
+      (supervisor.ask(AnalysisSpec(fileUri, outputUri, None, true, true))(30 minutes)).mapTo[ApkInfoCollectResult].recover{
+        case ex: Exception => 
+            (fileUri, false)
+        }
+  }
+  val fseq = Future.sequence(futures)
+  Await.result(fseq, Duration.Inf).foreach {
+    dr => println(dr)
+  }
+  _system.shutdown
 }

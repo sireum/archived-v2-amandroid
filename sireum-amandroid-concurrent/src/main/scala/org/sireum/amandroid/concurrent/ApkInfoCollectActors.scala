@@ -57,7 +57,7 @@ class ApkInfoCollectActor extends Actor with ActorLogging {
         ApkInfoCollectSuccResult(apk, acdata.outApkUri, acdata.srcFolders)
       } catch {
         case e: Exception =>
-          ApkInfoCollectFailResult(acdata.fileUri, Some(e))
+          ApkInfoCollectFailResult(acdata.fileUri, e)
       }
     }
     val res =
@@ -67,7 +67,7 @@ class ApkInfoCollectActor extends Actor with ActorLogging {
         case te: TimeoutException =>
           cancel()
           log.warning("Collect apk info timeout for " + acdata.fileUri)
-          ApkInfoCollectFailResult(acdata.fileUri, Some(te))
+          ApkInfoCollectFailResult(acdata.fileUri, te)
       }
     res
   }

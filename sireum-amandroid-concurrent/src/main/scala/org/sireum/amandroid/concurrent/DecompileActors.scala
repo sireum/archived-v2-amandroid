@@ -35,6 +35,7 @@ import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import java.util.concurrent.TimeoutException
 import org.sireum.jawa.util.FutureUtil
+import org.sireum.amandroid.InvalidApk
 
 /**
  * This is an actor for managing the whole decompile process.
@@ -69,7 +70,7 @@ class DecompilerActor extends Actor with ActorLogging {
               DecompileSuccResult(ddata.fileUri, outApkUri, srcs, deps)
             } catch {
               case e: Exception =>
-                DecompileFailResult(ddata.fileUri, Some(e))
+                DecompileFailResult(ddata.fileUri, e)
             }
           res
         }
@@ -79,7 +80,7 @@ class DecompilerActor extends Actor with ActorLogging {
           case te: TimeoutException =>
             cancel()
             log.warning("Decompile timeout for " + ddata.fileUri)
-            DecompileFailResult(ddata.fileUri, Some(te))
+            DecompileFailResult(ddata.fileUri, te)
         }
         res match {
           case dfr: DecompileFailResult =>
@@ -94,7 +95,7 @@ class DecompilerActor extends Actor with ActorLogging {
         }
         res
       } else {
-        DecompileFailResult(ddata.fileUri, None)
+        DecompileFailResult(ddata.fileUri, InvalidApk(ddata.fileUri))
       }
   }
 }
