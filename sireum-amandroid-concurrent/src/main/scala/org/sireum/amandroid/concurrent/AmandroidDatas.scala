@@ -20,6 +20,7 @@ import org.sireum.util._
 import org.sireum.jawa.JawaType
 import scala.concurrent.duration.Duration
 import org.sireum.amandroid.Apk
+import org.sireum.jawa.Signature
 
 trait AmandroidData
 
@@ -45,3 +46,8 @@ case class ApkInfoCollectSuccResult(apk: Apk, outApkUri: FileResourceUri, srcFol
   val fileUri: FileResourceUri = apk.nameUri
 }
 case class ApkInfoCollectFailResult(fileUri: FileResourceUri, e: Exception) extends ApkInfoCollectResult
+
+// PointsToAnalysisActor's input
+case class PointsToAnalysisData(apk: Apk, outApkUri: FileResourceUri, srcFolders: ISet[String], algos: PTAAlgorithms.Value, stage: Boolean) extends AmandroidData
+// RFAActor's input
+case class RFAData(apk: Apk, outApkUri: FileResourceUri, srcFolders: ISet[String], stage: Boolean, ep: Signature)

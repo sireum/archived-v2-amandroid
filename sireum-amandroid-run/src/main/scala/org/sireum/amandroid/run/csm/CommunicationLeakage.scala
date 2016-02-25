@@ -42,7 +42,6 @@ import scala.concurrent.ExecutionContext.Implicits.{global => ec}
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import java.util.concurrent.TimeoutException
-import scala.concurrent.ExecutionContext.Implicits.{global => ec}
 
 /**
  * @author Fengchi Lin

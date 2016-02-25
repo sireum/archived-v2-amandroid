@@ -28,6 +28,7 @@ import org.sireum.jawa.util.FutureUtil
 import scala.concurrent.ExecutionContext.Implicits.{global => sc}
 import scala.concurrent.Await
 import java.util.concurrent.TimeoutException
+import org.sireum.amandroid.concurrent.util.GlobalUtil
 
 class ApkInfoCollectActor extends Actor with ActorLogging {
   def receive: Receive = {
@@ -40,16 +41,7 @@ class ApkInfoCollectActor extends Actor with ActorLogging {
     val srcs = acdata.srcFolders
     val outApkUri = acdata.outApkUri
     val reporter = new PrintReporter(MsgLevel.ERROR)
-    val global = new Global(acdata.fileUri, reporter)
-    global.setJavaLib(AndroidGlobalConfig.lib_files)
-    srcs foreach {
-      src =>
-        val fileUri = MyFileUtil.appendFileName(outApkUri, src)
-        if(FileUtil.toFile(fileUri).exists()) {
-          //store the app's pilar code in AmandroidCodeSource which is organized class by class.
-          global.load(fileUri, Constants.PILAR_FILE_EXT, AndroidLibraryAPISummary)
-        }
-    }
+    val global = GlobalUtil.buildGlobal(acdata.fileUri, reporter, outApkUri, srcs)
     val apk = new Apk(acdata.fileUri)
     val (f, cancel) = FutureUtil.interruptableFuture[ApkInfoCollectResult] { () =>
       try {
