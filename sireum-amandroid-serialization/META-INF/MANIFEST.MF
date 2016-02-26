@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Amandroid Serialization
+Bundle-SymbolicName: sireum-amandroid-serialization;singleton:=true
+Bundle-Version: 2.0.0
+Bundle-Vendor: argus.org
+Require-Bundle: org.sireum;bundle-version="2.0.0",
+ sireum-amandroid;bundle-version="2.0.0",
+ sireum-amandroid-alir;bundle-version="2.0.0",
+ sireum-jawa;bundle-version="2.0.0",
+ sireum-jawa-alir;bundle-version="2.0.0",
+ sireum-jawa-compiler;bundle-version="2.0.0"
+Bundle-ClassPath: lib/json4s-ast_2.11-3.3.0.jar,
+ lib/json4s-core_2.11-3.3.0.jar,
+ lib/json4s-native_2.11-3.3.0.jar,
+ lib/json4s-scalap_2.11-3.3.0.jar,
+ lib/paranamer-2.8.jar,
+ .

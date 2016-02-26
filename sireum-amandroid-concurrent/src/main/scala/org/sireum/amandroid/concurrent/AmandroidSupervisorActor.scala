@@ -28,6 +28,10 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Await
 import akka.pattern.ask
+import org.json4s._
+import org.json4s.native.Serialization
+import org.json4s.native.Serialization.{read, write}
+import org.sireum.amandroid.Apk
 
 class AmandroidSupervisorActor extends Actor with ActorLogging {
   private val decActor = context.actorOf(FromConfig.props(Props[DecompilerActor]), "DecompilerActor")
@@ -78,7 +82,16 @@ object AmandroidTestApplication extends App {
   }
   val fseq = Future.sequence(futures)
   Await.result(fseq, Duration.Inf).foreach {
-    dr => println(dr)
+    dr =>
+      dr match {
+        case acr: ApkInfoCollectSuccResult =>
+          implicit val formats = DefaultFormats + FieldSerializer[Apk]()
+          val ser = write(acr.apk)
+          println(ser)
+          val apk = read[Apk](ser)
+          println(apk)
+        case _ =>
+      }
   }
   _system.shutdown
 }

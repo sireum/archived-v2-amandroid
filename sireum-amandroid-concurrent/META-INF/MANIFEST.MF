@@ -14,4 +14,5 @@ Require-Bundle: org.sireum;bundle-version="2.0.0",
  sireum-jawa;bundle-version="2.0.0",
  sireum-jawa-alir;bundle-version="2.0.0",
  sireum-jawa-compiler;bundle-version="2.0.0",
- sireum-jawa-concurrent;bundle-version="2.0.0"
+ sireum-jawa-concurrent;bundle-version="2.0.0",
+ sireum-amandroid-serialization;bundle-version="2.0.0"

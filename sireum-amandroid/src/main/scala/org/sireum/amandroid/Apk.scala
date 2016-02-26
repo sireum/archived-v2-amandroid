@@ -78,7 +78,7 @@ case class InvalidApk(fileUri: FileResourceUri) extends Exception
  */
 case class Apk(nameUri: FileResourceUri) {
   import Apk._
-  require(isValidApk(nameUri))
+  require(isValidApk(nameUri), throw InvalidApk(nameUri))
   private final val TITLE = "Apk"
   def getAppName: String = FileUtil.toFile(nameUri).getName
   private val activities: MSet[JawaType] = msetEmpty
@@ -94,10 +94,13 @@ case class Apk(nameUri: FileResourceUri) {
   def addReceiver(receiver: JawaType) = this.synchronized{this.receivers += receiver}
   def addProvider(provider: JawaType) = this.synchronized{this.providers += provider}
   
-  def addRpcMethod(comp: JawaType, rpc: Signature) = rpcMethods.getOrElseUpdate(comp, msetEmpty) += rpc
-  def addRpcMethods(comp: JawaType, rpcs: ISet[Signature]) = rpcMethods.getOrElseUpdate(comp, msetEmpty) ++= rpcs
-  def getRpcMethods(comp: JawaType): ISet[Signature] = rpcMethods.getOrElse(comp, msetEmpty).toSet
-  def getRpcMethods: ISet[Signature] = rpcMethods.flatMap(_._2).toSet
+  def addRpcMethod(comp: JawaType, rpc: Signature) = this.rpcMethods.getOrElseUpdate(comp, msetEmpty) += rpc
+  def addRpcMethods(comp: JawaType, rpcs: ISet[Signature]) = this.rpcMethods.getOrElseUpdate(comp, msetEmpty) ++= rpcs
+  def getRpcMethods(comp: JawaType): ISet[Signature] = this.rpcMethods.getOrElse(comp, msetEmpty).toSet
+  def getRpcMethods: ISet[Signature] = this.rpcMethods.flatMap(_._2).toSet
+  def getRpcMethodMapping: IMap[JawaType, ISet[Signature]] = this.rpcMethods.map {
+    case (k, vs) => k -> vs.toSet
+  }.toMap
 	
   def getComponentType(comp: JawaType): Option[AndroidConstants.CompType.Value] = {
     if(activities.contains(comp)) Some(AndroidConstants.CompType.ACTIVITY)
@@ -135,7 +138,7 @@ case class Apk(nameUri: FileResourceUri) {
       this.receivers += receiver
     }
 
-	def getDynamicRegisteredReceivers = this.dynamicRegisteredReceivers
+	def getDynamicRegisteredReceivers: ISet[JawaType] = this.dynamicRegisteredReceivers.toSet
 	
 	private val uses_permissions: MSet[String] = msetEmpty
   private val callbackMethods: MMap[JawaType, MSet[Signature]] = mmapEmpty
