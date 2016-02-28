@@ -48,6 +48,7 @@ object ComponentType extends Enumeration {
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
 class ManifestParser{
+  final private val DEBUG = false
   private val componentInfos: MSet[ComponentInfo] = msetEmpty
   private val components: MMap[JawaType, ComponentType.Value] = mmapEmpty
   private var packageName = ""
@@ -197,13 +198,16 @@ class ManifestParser{
     } catch {
       case ex: IOException =>
         System.err.println("Could not parse manifest: " + ex.getMessage())
-        ex.printStackTrace()
+        if(DEBUG)
+          ex.printStackTrace()
       case ex: ParserConfigurationException =>
         System.err.println("Could not parse manifest: " + ex.getMessage())
-        ex.printStackTrace()
+        if(DEBUG)
+          ex.printStackTrace()
       case ex: SAXException =>
         System.err.println("Could not parse manifest: " + ex.getMessage())
-        ex.printStackTrace()
+        if(DEBUG)
+          ex.printStackTrace()
     }
   }
 
@@ -487,13 +491,13 @@ object ManifestParser {
 //    }
 //    return f"<0x$data%X, type 0x$typ%02X>"
 //  }
-  
-  private def getPackage(id: Int): String = {
-    if (id>>>24==1) {
-      return "android:"
-    }
-    return ""
-  }
+//  
+//  private def getPackage(id: Int): String = {
+//    if (id>>>24==1) {
+//      return "android:"
+//    }
+//    return ""
+//  }
   
   def getAttribute(comp: Element, name: String, ret_null: Boolean, headerNames: ISet[String]): String = {
     var res: String = if(ret_null) null else ""

@@ -1,1 +1,7 @@
-/bin/
+/bin
+/target
+/.cache*
+/.scala_dependencies
+.DS_Store
+*.apk
+*.pilar

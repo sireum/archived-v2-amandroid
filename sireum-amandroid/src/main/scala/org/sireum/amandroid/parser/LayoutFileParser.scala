@@ -28,6 +28,10 @@ import java.io.File
 import java.net.URI
 import org.sireum.jawa.Global
 import org.sireum.jawa.JawaType
+import java.io.IOException
+import javax.xml.parsers.ParserConfigurationException
+import org.xml.sax.SAXException
+import javax.xml.parsers.DocumentBuilderFactory
 
 /**
  * Parser for analyzing the layout XML files inside an android application
@@ -46,13 +50,13 @@ class LayoutFileParser(global: Global) {
   private final val includes: MMap[String, MSet[Int]] = mmapEmpty
   private final var packageName: String = ""
 
-  private final val TYPE_NUMBER_VARIATION_PASSWORD = 0x00000010;
-  private final val TYPE_TEXT_VARIATION_PASSWORD = 0x00000080;
-  private final val TYPE_TEXT_VARIATION_VISIBLE_PASSWORD = 0x00000090;
-  private final val TYPE_TEXT_VARIATION_WEB_PASSWORD = 0x000000e0;
+  private final val TYPE_NUMBER_VARIATION_PASSWORD = 0x00000010
+  private final val TYPE_TEXT_VARIATION_PASSWORD = 0x00000080
+  private final val TYPE_TEXT_VARIATION_VISIBLE_PASSWORD = 0x00000090
+  private final val TYPE_TEXT_VARIATION_WEB_PASSWORD = 0x000000e0
 
   def setPackageName(packageName: String) {
-    this.packageName = packageName;
+    this.packageName = packageName
   }
 
   private def getLayoutClass(className: String): Option[JawaClass] = {
@@ -159,6 +163,31 @@ class LayoutFileParser(global: Global) {
     override def end() = {
       if (id > 0)
         userControls += (id -> new LayoutControl(id, theClass.getType, isSensitive))
+    }
+  }
+  
+  def loadLayoutFromTextXml(layouts: ISet[InputStream]) = {
+    layouts foreach {
+      layout_in =>
+        try {
+          val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+          val doc = db.parse(layout_in)
+          var applicationEnabled = true
+          val rootElement = doc.getDocumentElement()
+        } catch {
+        case ex: IOException =>
+          System.err.println("Could not parse layout: " + ex.getMessage())
+          if(DEBUG)
+            ex.printStackTrace()
+        case ex: ParserConfigurationException =>
+          System.err.println("Could not parse layout: " + ex.getMessage())
+          if(DEBUG)
+            ex.printStackTrace()
+        case ex: SAXException =>
+          System.err.println("Could not parse layout: " + ex.getMessage())
+          if(DEBUG)
+            ex.printStackTrace()
+      }
     }
   }
 

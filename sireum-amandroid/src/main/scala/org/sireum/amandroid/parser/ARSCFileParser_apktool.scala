@@ -29,9 +29,9 @@ import java.util.zip.ZipFile
 
 class ARSCFileParser_apktool {
   final private val TITLE = "ARSCFileParser_apktool"
-  private var data : ARSCData = null
+  private var data: ARSCData = null
   
-  def parse(apkUri : FileResourceUri) : Unit = {
+  def parse(apkUri: FileResourceUri): Unit = {
     val apkFile = FileUtil.toFilePath(apkUri)
     val zf = new ZipFile(apkFile)
     try{
@@ -45,8 +45,8 @@ class ARSCFileParser_apktool {
     }
   }
   
-  def findResource(resourceId : Int) : ResResSpec = {
-    var result : ResResSpec = null
+  def findResource(resourceId: Int): ResResSpec = {
+    var result: ResResSpec = null
     val id = new ResID(resourceId)
     if(this.data != null){
       this.data.getPackages.foreach{
@@ -59,20 +59,20 @@ class ARSCFileParser_apktool {
     result
   }
   
-  def getPackages : Set[ResPackage] = {
+  def getPackages: Set[ResPackage] = {
     if(this.data != null){
       data.getPackages.toSet
     } else Set()
   }
   
-  def getGlobalStringPool : Map[Int, String] = {
-    val matches : MMap[Int, String] = mmapEmpty
+  def getGlobalStringPool: Map[Int, String] = {
+    val matches: MMap[Int, String] = mmapEmpty
     getPackages.map{
       pkg =>
         val str = pkg.getResTable.toString()
         val strs = str.substring(1, str.length() - 1).split(", ")
         val p = Pattern.compile("(.+)\\sstring\\/(.+)") 
-        var matches : Map[Int, String] = Map()
+        var matches: Map[Int, String] = Map()
         strs foreach{
           str =>
           

@@ -16,5 +16,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-amandroid"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-parser"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sireum-amandroid-dedex"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sireum-amandroid-concurrent"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -10,9 +10,10 @@ Require-Bundle: org.sireum;bundle-version="2.0.0",
  sireum-jawa;bundle-version="2.0.0",
  sireum-jawa-alir;bundle-version="2.0.0",
  sireum-jawa-compiler;bundle-version="2.0.0"
-Bundle-ClassPath: lib/json4s-ast_2.11-3.3.0.jar,
- lib/json4s-core_2.11-3.3.0.jar,
- lib/json4s-native_2.11-3.3.0.jar,
- lib/json4s-scalap_2.11-3.3.0.jar,
- lib/paranamer-2.8.jar,
- .
+Bundle-ClassPath: .,
+ lib/json4s-ast.jar,
+ lib/json4s-core.jar,
+ lib/json4s-native.jar,
+ lib/json4s-scalap.jar,
+ lib/paranamer.jar,
+ lib/json4s-ext.jar

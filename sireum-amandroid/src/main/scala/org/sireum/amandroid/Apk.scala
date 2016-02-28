@@ -93,9 +93,14 @@ case class Apk(nameUri: FileResourceUri) {
   def addService(service: JawaType) = this.synchronized{this.services += service}
   def addReceiver(receiver: JawaType) = this.synchronized{this.receivers += receiver}
   def addProvider(provider: JawaType) = this.synchronized{this.providers += provider}
+  def addActivities(activities: ISet[JawaType]) = this.synchronized{this.activities ++= activities}
+  def addServices(services: ISet[JawaType]) = this.synchronized{this.services ++= services}
+  def addReceivers(receivers: ISet[JawaType]) = this.synchronized{this.receivers ++= receivers}
+  def addProviders(providers: ISet[JawaType]) = this.synchronized{this.providers ++= providers}
   
   def addRpcMethod(comp: JawaType, rpc: Signature) = this.rpcMethods.getOrElseUpdate(comp, msetEmpty) += rpc
   def addRpcMethods(comp: JawaType, rpcs: ISet[Signature]) = this.rpcMethods.getOrElseUpdate(comp, msetEmpty) ++= rpcs
+  def addRpcMethods(map: IMap[JawaType, ISet[Signature]]) = map.foreach{case (k, vs) => this.rpcMethods.getOrElseUpdate(k, msetEmpty) ++= vs}
   def getRpcMethods(comp: JawaType): ISet[Signature] = this.rpcMethods.getOrElse(comp, msetEmpty).toSet
   def getRpcMethods: ISet[Signature] = this.rpcMethods.flatMap(_._2).toSet
   def getRpcMethodMapping: IMap[JawaType, ISet[Signature]] = this.rpcMethods.map {
@@ -137,6 +142,11 @@ case class Apk(nameUri: FileResourceUri) {
       this.dynamicRegisteredReceivers += receiver
       this.receivers += receiver
     }
+	def addDynamicRegisteredReceivers(receivers: ISet[JawaType]) = 
+    this.synchronized{
+      this.dynamicRegisteredReceivers ++= receivers
+      this.receivers ++= receivers
+    }
 
 	def getDynamicRegisteredReceivers: ISet[JawaType] = this.dynamicRegisteredReceivers.toSet
 	
@@ -165,6 +175,7 @@ case class Apk(nameUri: FileResourceUri) {
   def addLayoutControls(lcs: IMap[Int, LayoutControl]) = this.layoutControls ++= lcs
   def getLayoutControls: IMap[Int, LayoutControl] = this.layoutControls.toMap
   def addCallbackMethods(typ: JawaType, sigs: ISet[Signature]) = this.callbackMethods.getOrElseUpdate(typ, msetEmpty) ++= sigs
+  def addCallbackMethods(map: IMap[JawaType, ISet[Signature]]) = map.foreach {case (k, vs) => this.callbackMethods.getOrElseUpdate(k, msetEmpty) ++= vs}
   def getCallbackMethodMapping: IMap[JawaType, ISet[Signature]] = this.callbackMethods.map {
 	  case (k, vs) => k -> vs.toSet
 	}.toMap
