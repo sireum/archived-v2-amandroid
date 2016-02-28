@@ -65,6 +65,8 @@ class ARSCFileParser_apktool {
     } else Set()
   }
   
+  def getData: ARSCData = this.data
+  
   def getGlobalStringPool: Map[Int, String] = {
     val matches: MMap[Int, String] = mmapEmpty
     getPackages.map{
@@ -75,7 +77,6 @@ class ARSCFileParser_apktool {
         var matches: Map[Int, String] = Map()
         strs foreach{
           str =>
-          
             val m = p.matcher(str)
             if(m.find()){
               matches += (Integer.parseInt(m.group(1).substring(2), 16) -> m.group(2))

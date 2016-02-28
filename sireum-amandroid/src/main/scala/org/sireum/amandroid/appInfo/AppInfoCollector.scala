@@ -48,6 +48,7 @@ import org.sireum.jawa.Reporter
 import org.sireum.amandroid.parser.ComponentInfo
 import org.sireum.amandroid.parser.ComponentType
 import org.sireum.jawa.JawaType
+import org.sireum.jawa.util.MyFileUtil
 
 /** 
  * adapted from Steven Arzt of the FlowDroid group
@@ -76,11 +77,16 @@ object AppInfoCollector {
     afp
   }
 
-  def analyzeLayouts(global: Global, apkUri: FileResourceUri, mfp: ManifestParser): LayoutFileParser = {
+  def analyzeLayouts(global: Global, outputUri: FileResourceUri, mfp: ManifestParser, afp: ARSCFileParser_apktool): LayoutFileParser = {
     // Find the user-defined sources in the layout XML files
-    val lfp = new LayoutFileParser(global)
-    lfp.setPackageName(mfp.getPackageName)
-    lfp.parseLayoutFile(apkUri)
+    val lfp = new LayoutFileParser(global, mfp.getPackageName, afp)
+    val resFolderUri = MyFileUtil.appendFileName(MyFileUtil.appendFileName(outputUri, "res"), "layout")
+    FileUtil.listFiles(resFolderUri, ".xml", true).foreach {
+      u => 
+        val file = FileUtil.toFile(u)
+        val layout_in = new FileInputStream(file)
+        lfp.loadLayoutFromTextXml(file.getName, layout_in)
+    }
     global.reporter.echo(TITLE, "layoutcallback--->" + lfp.getCallbackMethods)
     global.reporter.echo(TITLE, "layoutuser--->" + lfp.getUserControls)
     lfp
@@ -200,11 +206,11 @@ object AppInfoCollector {
     } else isetEmpty
   }
 
-  def collectInfo(apk: Apk, global: Global, outputUri: FileResourceUri): Unit = {
-    val manifestUri = outputUri + "/AndroidManifest.xml"
+  def collectInfo(apk: Apk, global: Global, outUri: FileResourceUri): Unit = {
+    val manifestUri = MyFileUtil.appendFileName(outUri, "AndroidManifest.xml")
     val mfp = AppInfoCollector.analyzeManifest(global.reporter, manifestUri)
     val afp = AppInfoCollector.analyzeARSC(global.reporter, apk.nameUri)
-    val lfp = AppInfoCollector.analyzeLayouts(global, apk.nameUri, mfp)
+    val lfp = AppInfoCollector.analyzeLayouts(global, outUri, mfp, afp)
     val ra = AppInfoCollector.reachabilityAnalysis(global, mfp.getComponentInfos.map(_.compType))
     val callbacks = AppInfoCollector.analyzeCallback(global.reporter, afp, lfp, ra)
 

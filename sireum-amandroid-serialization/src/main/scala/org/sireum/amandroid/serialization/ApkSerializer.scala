@@ -93,7 +93,7 @@ object ApkSerializer extends CustomSerializer[Apk](format => (
 
 object ApkSerializerTest extends App {
   implicit val formats = Serialization.formats(NoTypeHints) + ApkSerializer + JawaTypeSerializer + JawaTypeKeySerializer + SignatureSerializer + new org.json4s.ext.EnumNameSerializer(ComponentType)
-  val nameUri = FileUtil.toUri("/Users/fgwei/Develop/Sireum/apps/amandroid/sources/icc-bench/AndroidSpecific/AndroidSpecific_PrivateDataLeak3.apk")
+  val nameUri = FileUtil.toUri("/Users/fgwei/Developer/Sireum/apps/amandroid/sources/icc-bench/AndroidSpecific/AndroidSpecific_PrivateDataLeak3.apk")
   val apk = new Apk(nameUri)
   val apkFile = FileUtil.toFile(nameUri)
   val resultDir = new File("/Users/fgwei/Work/output/icc-bench")

@@ -32,6 +32,19 @@ import java.io.IOException
 import javax.xml.parsers.ParserConfigurationException
 import org.xml.sax.SAXException
 import javax.xml.parsers.DocumentBuilderFactory
+import java.io.FileInputStream
+import org.sireum.amandroid.Apk
+import org.sireum.amandroid.decompile.ApkDecompiler
+import org.sireum.jawa.PrintReporter
+import org.sireum.jawa.MsgLevel
+import org.sireum.amandroid.AndroidGlobalConfig
+import org.sireum.jawa.Constants
+import org.sireum.amandroid.util.AndroidLibraryAPISummary
+import org.sireum.amandroid.appInfo.AppInfoCollector
+import org.w3c.dom.Node
+import brut.androlib.res.decoder.ARSCDecoder.ARSCData
+import brut.androlib.res.data.ResTypeSpec
+import brut.androlib.res.data.ResResSpec
 
 /**
  * Parser for analyzing the layout XML files inside an android application
@@ -41,23 +54,32 @@ import javax.xml.parsers.DocumentBuilderFactory
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */
-class LayoutFileParser(global: Global) {
+class LayoutFileParser(global: Global, packageName: String, arsc: ARSCFileParser_apktool) {
   final val TITLE = "LayoutFileParser"
   private final val DEBUG = false
 
   private final val userControls: MMap[Int, LayoutControl] = mmapEmpty
-  private final val callbackMethods: MMap[String, MSet[String]] = mmapEmpty
-  private final val includes: MMap[String, MSet[Int]] = mmapEmpty
-  private final var packageName: String = ""
-
+  private final val callbackMethods: MMap[FileResourceUri, MSet[String]] = mmapEmpty
+  private final val includes: MMap[FileResourceUri, MSet[Int]] = mmapEmpty
+  
+  val data = arsc.getData
+  val typs: MMap[String, ResTypeSpec] = mmapEmpty
+  import collection.JavaConversions._
+  data.getPackages foreach {
+    pkg =>
+      try {
+        val f = pkg.getClass.getDeclaredField("mTypes")
+        f.setAccessible(true)
+        typs ++= f.get(pkg).asInstanceOf[java.util.LinkedHashMap[String, ResTypeSpec]]
+      } catch {
+        case e: Exception =>
+      }
+  }
+  
   private final val TYPE_NUMBER_VARIATION_PASSWORD = 0x00000010
   private final val TYPE_TEXT_VARIATION_PASSWORD = 0x00000080
   private final val TYPE_TEXT_VARIATION_VISIBLE_PASSWORD = 0x00000090
   private final val TYPE_TEXT_VARIATION_WEB_PASSWORD = 0x000000e0
-
-  def setPackageName(packageName: String) {
-    this.packageName = packageName
-  }
 
   private def getLayoutClass(className: String): Option[JawaClass] = {
     var ar: Option[JawaClass] = global.tryLoadClass(new JawaType(className))
@@ -99,161 +121,114 @@ class LayoutFileParser(global: Global) {
     global.reporter.echo(TITLE, "Layout class " + theClass + " is not derived from " + "android.view.View");
     false
   }
-
-  private class LayoutParser(layoutFile: String, theClass: JawaClass) extends NodeVisitor {
-    private var id = -1
-    private var isSensitive = false
-
-    override def child(ns: String, name: String): NodeVisitor = {
-      if (name == null) {
-        global.reporter.echo(TITLE, "Encountered a null node name " + "in file " + layoutFile + ", skipping node...")
-        return null
-      }
-      if(name.trim().equals("include")){
-        new LayoutParser(layoutFile, null)
-      } else {
-        val childClass = getLayoutClass(name.trim())
-        if (isLayoutClass(childClass) || isViewClass(childClass))
-          new LayoutParser(layoutFile, childClass.get)
-        else
-          super.child(ns, name)
-      }
-    }
-        
-    override def attr(ns: String, name: String, resourceId: Int, typ: Int, obj: Object): Unit = {
-      // Read out the field data
-      var tempName = name
-      tempName = tempName.trim()
-      if (tempName.equals("id") && typ == AxmlVisitor.TYPE_REFERENCE)
-        this.id = obj.asInstanceOf[Int]
-      else if (tempName.equals("password") && typ == AxmlVisitor.TYPE_INT_BOOLEAN)
-        isSensitive = (obj.asInstanceOf[Int]) != 0; // -1 for true, 0 for false
-      else if (!isSensitive && tempName.equals("inputType") && typ == AxmlVisitor.TYPE_INT_HEX) {
-        val tp = obj.asInstanceOf[Int]
-        isSensitive = (((tp & TYPE_NUMBER_VARIATION_PASSWORD) == TYPE_NUMBER_VARIATION_PASSWORD)
-        || ((tp & TYPE_TEXT_VARIATION_PASSWORD) == TYPE_TEXT_VARIATION_PASSWORD)
-        || ((tp & TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) == TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
-        || ((tp & TYPE_TEXT_VARIATION_WEB_PASSWORD) == TYPE_TEXT_VARIATION_WEB_PASSWORD))
-      } else if (isActionListener(tempName) && typ == AxmlVisitor.TYPE_STRING && obj.isInstanceOf[String]) {
-        val strData = obj.asInstanceOf[String].trim();
-        if (callbackMethods.keySet.contains(layoutFile))
-          callbackMethods(layoutFile) += strData
-        else {
-          val callbackSet: MSet[String] = msetEmpty
-          callbackSet += strData
-          callbackMethods += (layoutFile -> callbackSet)
-        }
-      } else if (tempName.equals("layout") && typ == AxmlVisitor.TYPE_REFERENCE) {
-        includes.getOrElseUpdate(layoutFile, msetEmpty) += obj.asInstanceOf[Int]
-      } else {
-//        global.reporter.echo(TITLE, "Found unrecognized XML attribute:  " + tempName)
-      }
-    }
   
-    /**
-     * Checks whether this name is the name of a well-known Android listener
-     * attribute. This is a function to allow for future extension.
-     * @param name The attribute name to check. This name is guaranteed to
-     * be in the android namespace.
-     * @return True if the given attribute name corresponds to a listener,
-     * otherwise false.
-     */
-    private def isActionListener(name: String): Boolean = name.equals("onClick")
-
-    override def end() = {
-      if (id > 0)
-        userControls += (id -> new LayoutControl(id, theClass.getType, isSensitive))
-    }
-  }
-  
-  def loadLayoutFromTextXml(layouts: ISet[InputStream]) = {
-    layouts foreach {
-      layout_in =>
-        try {
-          val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-          val doc = db.parse(layout_in)
-          var applicationEnabled = true
-          val rootElement = doc.getDocumentElement()
-        } catch {
-        case ex: IOException =>
-          System.err.println("Could not parse layout: " + ex.getMessage())
-          if(DEBUG)
-            ex.printStackTrace()
-        case ex: ParserConfigurationException =>
-          System.err.println("Could not parse layout: " + ex.getMessage())
-          if(DEBUG)
-            ex.printStackTrace()
-        case ex: SAXException =>
-          System.err.println("Could not parse layout: " + ex.getMessage())
-          if(DEBUG)
-            ex.printStackTrace()
-      }
-    }
-  }
-
   /**
-   * Parses all layout XML files in the given APK file and loads the IDs of
-   * the user controls in it.
-   * @param fileName The APK file in which to look for user controls
+   * Checks whether this name is the name of a well-known Android listener
+   * attribute. This is a function to allow for future extension.
+   * @param name The attribute name to check. This name is guaranteed to
+   * be in the android namespace.
+   * @return True if the given attribute name corresponds to a listener,
+   * otherwise false.
    */
-  def parseLayoutFile(apkUri: FileResourceUri) {
-    AbstractAndroidXMLParser.handleAndroidXMLFiles(new File(new URI(apkUri)), null, new AndroidXMLHandler() {
-      override def handleXMLFile(fileName: String, fileNameFilter: Set[String], stream: InputStream): Unit = {
-        // We only process valid layout XML files
-        if (!fileName.startsWith("res/layout"))
-          return
-        if (!fileName.endsWith(".xml")) {
-          global.reporter.echo(TITLE, "Skipping file " + fileName + " in layout folder...")
-          return
-        }
-        // Get the fully-qualified class name
-        var entryClass = fileName.substring(0, fileName.lastIndexOf("."))
-        if (!packageName.isEmpty())
-          entryClass = packageName + "." + entryClass
-        // We are dealing with resource files
-        if (!fileName.startsWith("res/layout"))
-          return
-        if (fileNameFilter != null) {
-          var found = false
-          for (s <- fileNameFilter)
-          if (s.equalsIgnoreCase(entryClass)) {
-            found = true
-          }
-          if (!found)
-            return
-        }
+  private def isActionListener(name: String): Boolean = name.equals("onClick")
   
-        try {
-          val bos = new ByteArrayOutputStream()
-          var in: Int = 0
-          in = stream.read()
-          while (in >= 0){
-            bos.write(in)
-            in = stream.read()
-          }
-          bos.flush()
-          val data = bos.toByteArray()
-          if (data == null || data.length == 0)// File empty?
-            return
-          val rdr = new AxmlReader(data)
-          rdr.accept(new AxmlVisitor() {
-            override def first(ns: String, name: String): NodeVisitor = {
-              val theClass = if(name == null) None else getLayoutClass(name.trim())
-              if (isLayoutClass(theClass))
-                new LayoutParser(fileName, theClass.get)
-              else
-                super.first(ns, name)
-              }
-          })
-        
-          global.reporter.echo(TITLE, "Found " + userControls.size + " layout controls in file " + fileName)
-        } catch {
-          case ex: Exception =>
-            global.reporter.echo(TITLE, "Could not read binary XML file: " + ex.getMessage())
+  private def visitLayoutNode(fileUri: FileResourceUri, n: Node): (Int, Boolean) = {
+    var id: Int = -1
+    var isSensitive = false
+    try {
+      val attrs = n.getAttributes
+      for(i <- 0 to attrs.getLength - 1) {
+        val attr = attrs.item(i)
+        val nname = attr.getNodeName
+        val ntyp = attr.getNodeType
+        val nobj = attr.getNodeValue
+        val n = nname.trim
+        if(n.endsWith(":id")) {
+          val index = nobj.asInstanceOf[String]
+          id = getID(index).getOrElse(-1)
+        }
+        else if(n.endsWith(":password"))
+          isSensitive = (nobj.asInstanceOf[Int]) != 0; // -1 for true, 0 for false
+        else if(!isSensitive && n.endsWith(":inputType")) {
+          val tp = nobj.asInstanceOf[String]
+          isSensitive = tp.contains("Password")
+        } else if(isActionListener(n) && ntyp == AxmlVisitor.TYPE_STRING && nobj.isInstanceOf[String]) {
+          callbackMethods.getOrElseUpdate(fileUri, msetEmpty) += nobj.asInstanceOf[String]
+        } else if(n.endsWith(":layout") && ntyp == AxmlVisitor.TYPE_REFERENCE) {
+          this.includes.getOrElseUpdate(fileUri, msetEmpty) += nobj.asInstanceOf[Int]
+        } else {
+  //        global.reporter.echo(TITLE, "Found unrecognized XML attribute:  " + tempName)
         }
       }
-    })
+    } catch {
+      case e: Exception =>
+    }
+    (id, isSensitive)
   }
+  
+  private def isIndex(str: String): Boolean = str.startsWith("@")
+  
+  private def getTypeAndSpec(str: String): (String, String) = {
+    val strs = str.substring(1).split("/")
+    (strs(0), strs(1))
+  }
+  
+  private def getID(index: String): Option[Int] = {
+    if(isIndex(index)) {
+      val (typ, spec) = getTypeAndSpec(index)
+      typs.get(typ) match {
+        case Some(t) =>
+          val f = t.getClass.getDeclaredField("mResSpecs")
+          f.setAccessible(true)
+          val specs = f.get(t).asInstanceOf[java.util.LinkedHashMap[String, ResResSpec]].toMap
+          specs.get(spec) match {
+            case Some(s) =>
+              return Some(s.getId.id)
+            case None =>
+          }
+        case None =>
+      }
+    }
+    None
+  }
+  
+  def loadLayoutFromTextXml(fileUri: FileResourceUri, layout_in: InputStream) = {
+    try {
+      val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+      val doc = db.parse(layout_in)
+      val rootElement = doc.getDocumentElement()
+      val cns = rootElement.getChildNodes
+      for(i <- 0 to cns.getLength - 1) {
+        val cn = cns.item(i)
+        val nname = cn.getNodeName
+        val theClass =
+          if(nname != null && !nname.startsWith("#")) {
+            getLayoutClass(nname.trim())
+          } else None
+        if (isLayoutClass(theClass) || isViewClass(theClass)) {
+          val (id, isSensitive) = visitLayoutNode(fileUri, cn)
+          if (id > 0)
+            userControls += (id -> new LayoutControl(id, theClass.get.getType, isSensitive))
+        }
+      }
+      
+    } catch {
+      case ex: IOException =>
+        System.err.println("Could not parse layout: " + ex.getMessage())
+        if(DEBUG)
+          ex.printStackTrace()
+      case ex: ParserConfigurationException =>
+        System.err.println("Could not parse layout: " + ex.getMessage())
+        if(DEBUG)
+          ex.printStackTrace()
+      case ex: SAXException =>
+        System.err.println("Could not parse layout: " + ex.getMessage())
+        if(DEBUG)
+          ex.printStackTrace()
+    }
+  }
+
+  
 
   /**
    * Gets the user controls found in the layout XML file. The result is a
@@ -267,7 +242,7 @@ class LayoutFileParser(global: Global) {
    * mapping from the file name to the set of found callback methods.
    * @return The callback methods found in the XML file.
    */
-  def getCallbackMethods: IMap[String, ISet[String]] = this.callbackMethods.map{case (k, v) => (k, v.toSet)}.toMap
+  def getCallbackMethods: IMap[FileResourceUri, ISet[String]] = this.callbackMethods.map{case (k, vs) => k -> vs.toSet}.toMap
   
-  def getIncludes: IMap[String, ISet[Int]] = this.includes.map{case (k, v) => (k, v.toSet)}.toMap
+  def getIncludes: IMap[FileResourceUri, ISet[Int]] = this.includes.map{case (k, vs) => k -> vs.toSet}.toMap
 }
