@@ -62,7 +62,7 @@ class ReachableInfoCollector(val global: Global, entryPointTypes: ISet[JawaType]
     var flag = false
     compProcMap.foreach{
       case(comp, procs) =>
-        val tmpReachableMethods = ReachabilityAnalysis.getReachableMethods(global, procs)
+        val tmpReachableMethods = ReachabilityAnalysis.getReachableMethodsBySBCG(global, procs)
         val oldReachableMethods = reachableMap.getOrElse(comp, Set())
         val newReachableMethods = tmpReachableMethods -- oldReachableMethods
         if(!newReachableMethods.isEmpty){
@@ -79,19 +79,10 @@ class ReachableInfoCollector(val global: Global, entryPointTypes: ISet[JawaType]
     (if(false) entryPointTypes.par else entryPointTypes).foreach {
       compTyp =>
         val comp = global.getClassOrResolve(compTyp)
-        val reachableMethods = ReachabilityAnalysis.getReachableMethods(global, comp.getDeclaredMethods.map(_.getSignature))
+        val reachableMethods = ReachabilityAnalysis.getReachableMethodsBySBCG(global, comp.getDeclaredMethods.map(_.getSignature))
         reachableMap.getOrElseUpdate(compTyp, msetEmpty) ++= reachableMethods
     }
   }
-
-//  def initWithEnv = {
-//    (if(false) entryPointClasses.par else entryPointClasses).foreach {
-//      compTyp =>
-//        val comp = global.getClassOrResolve(compTyp)
-//        val reachableMethods = ReachabilityAnalysis.getReachableMethods(global, comp.getDeclaredMethodsByName(AndroidConstants.MAINCOMP_ENV) ++ comp.getDeclaredMethodsByName(AndroidConstants.COMP_ENV))
-//        reachableMap += (comp -> reachableMethods)
-//    }
-//  }
 
   def getSensitiveLayoutContainer(layoutControls: IMap[Int, LayoutControl]): Set[JawaType] = {
     val result: MSet[JawaType] = msetEmpty

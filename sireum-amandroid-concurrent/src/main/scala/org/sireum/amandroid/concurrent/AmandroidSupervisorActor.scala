@@ -95,15 +95,7 @@ object AmandroidTestApplication extends App {
   val fseq = Future.sequence(futures)
   Await.result(fseq, Duration.Inf).foreach {
     dr =>
-      dr match {
-        case acr: ApkInfoCollectSuccResult =>
-          implicit val formats = DefaultFormats + FieldSerializer[Apk]()
-          val ser = write(acr.apk)
-          println(ser)
-          val apk = read[Apk](ser)
-          println(apk)
-        case _ =>
-      }
+      println(dr)
   }
   _system.shutdown
 }
