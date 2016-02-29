@@ -36,6 +36,7 @@ import org.sireum.amandroid.Apk
 class AmandroidSupervisorActor extends Actor with ActorLogging {
   private val decActor = context.actorOf(FromConfig.props(Props[DecompilerActor]), "DecompilerActor")
   private val apkInfoColActor = context.actorOf(FromConfig.props(Props[ApkInfoCollectActor]), "ApkInfoCollectorActor")
+  private val ptaActor = context.actorOf(FromConfig.props(Props[PointsToAnalysisActor]), "PointsToAnalysisActor")
   private val sendership: MMap[FileResourceUri, ActorRef] = mmapEmpty
   def receive: Receive = {
     case as: AnalysisSpec =>
@@ -51,11 +52,21 @@ class AmandroidSupervisorActor extends Actor with ActorLogging {
     case aicr: ApkInfoCollectResult =>
       aicr match {
         case aicsr: ApkInfoCollectSuccResult =>
-          println("Success " + aicsr)
+          ptaActor ! PointsToAnalysisData(aicsr.apk, aicsr.outApkUri, aicsr.srcFolders, PTAAlgorithms.RFA, true)
         case aicfr: ApkInfoCollectFailResult =>
           log.error(aicfr.e, "Infomation collect failed on " + aicfr.fileUri)
+          sendership(aicfr.fileUri) ! aicfr
       }
-      sendership(aicr.fileUri) ! aicr 
+    case ptar: PointsToAnalysisResult =>
+      ptar match {
+        case ptsr: PointsToAnalysisSuccResult =>
+          log.info("Points to analysis success for " + ptsr.fileUri)
+        case ptssr: PointsToAnalysisSuccStageResult =>
+          log.info("Points to analysis success staged for " + ptssr.fileUri)
+        case ptfr: PointsToAnalysisFailResult =>
+          log.error(ptfr.e, "Points to analysis failed on " + ptfr.fileUri)
+      }
+      sendership(ptar.fileUri) ! ptar
   }
 }
 
@@ -65,6 +76,7 @@ class AmandroidSupervisorActorPrioMailbox(settings: ActorSystem.Settings, config
       case AnalysisSpec => 3
       case dr: DecompilerResult => 2
       case aicr: ApkInfoCollectResult => 1
+      case ptar: PointsToAnalysisResult => 0
       case otherwise => 4
     })
 

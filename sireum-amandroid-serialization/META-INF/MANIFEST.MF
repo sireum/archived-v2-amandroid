@@ -17,3 +17,11 @@ Bundle-ClassPath: .,
  lib/json4s-scalap.jar,
  lib/paranamer.jar,
  lib/json4s-ext.jar
+Export-Package: com.thoughtworks.paranamer,
+ org.json4s,
+ org.json4s.ext,
+ org.json4s.prefs,
+ org.json4s.reflect,
+ org.json4s.scalap,
+ org.json4s.scalap.scalasig,
+ org.sireum.amandroid.serialization

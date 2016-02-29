@@ -29,25 +29,24 @@ class IntentFilterDataBase {
   /**
    * Map from record name to it's intent filter information
    */
-  private val intentFmap: MMap[JawaType, Set[IntentFilter]] = mmapEmpty
+  private val intentFmap: MMap[JawaType, MSet[IntentFilter]] = mmapEmpty
   def updateIntentFmap(intentFilter: IntentFilter) = {
-    this.intentFmap += (intentFilter.getHolder -> (this.intentFmap.getOrElse(intentFilter.getHolder, Set()) + intentFilter))
+    this.intentFmap.getOrElseUpdate(intentFilter.getHolder, msetEmpty) += intentFilter
+  }
+  def addIntentFmap(intentFmap: IMap[JawaType, ISet[IntentFilter]]) = {
+    intentFmap.foreach{
+      case (rec, filters) =>
+        this.intentFmap.getOrElseUpdate(rec, msetEmpty) ++= filters
+    }
   }
   def merge(intentFilterDB: IntentFilterDataBase) = {
-    intentFilterDB.getIntentFmap.foreach{
-      case (rec, filters) =>
-        if(this.intentFmap.contains(rec)){
-          this.intentFmap += (rec -> (this.intentFmap(rec) ++ filters))
-        } else {
-          this.intentFmap += (rec -> filters)
-        }
-    }
+    addIntentFmap(intentFilterDB.getIntentFmap)
   }
   def containsClass(r: JawaClass): Boolean = containsClass(r.getType)
   def containsClass(compTyp: JawaType): Boolean = this.intentFmap.contains(compTyp)
-  def getIntentFmap(): IMap[JawaType, Set[IntentFilter]] = intentFmap.toMap
+  def getIntentFmap(): IMap[JawaType, ISet[IntentFilter]] = intentFmap.map{case (k, vs) => k -> vs.toSet}.toMap
   def getIntentFilters(r: JawaClass): ISet[IntentFilter] = getIntentFilters(r.getType)
-  def getIntentFilters(compTyp: JawaType): ISet[IntentFilter] = this.intentFmap.getOrElse(compTyp, Set())
+  def getIntentFilters(compTyp: JawaType): ISet[IntentFilter] = this.intentFmap.getOrElse(compTyp, msetEmpty).toSet
   def getIntentFiltersActions(r: JawaClass): ISet[String] = {
     val intentFilterS: ISet[IntentFilter] = getIntentFilters(r)
     val actions: MSet[String] = msetEmpty
@@ -110,8 +109,10 @@ class IntentFilter(holder: JawaType) {
     categories.subsetOf(this.categories) || this.categories.contains("ANY")
   }
 
-  def addAction(action: String) = actions += action
-  def addCategory(category: String) = categories += category
+  def addAction(action: String) = this.actions += action
+  def addActions(actions: ISet[String]) = this.actions ++= actions
+  def addCategory(category: String) = this.categories += category
+  def addCategories(categories: ISet[String]) = this.categories ++= categories
   def modData(
       scheme: String, 
       host: String, 
@@ -123,16 +124,26 @@ class IntentFilter(holder: JawaType) {
     data.add(scheme, host, port, path, pathPrefix, pathPattern, mimeType)
   }
   
+  def addData(d: Data) = {
+    this.data.addSchemes(d.getSchemes)
+    this.data.addAuthorities(d.getAuthorities)
+    this.data.addPaths(d.getPaths)
+    this.data.addPathPrefixs(d.getPathPrefixs)
+    this.data.addPathPatterns(d.getPathPatterns)
+    this.data.addTypes(d.getMimeTypes)
+  }
+  
   def getActions: ISet[String] = IntentFilter.this.actions.toSet
   def getCategorys: ISet[String] = IntentFilter.this.categories.toSet
   def getData: Data = IntentFilter.this.data
-  def getHolder() = IntentFilter.this.holder
+  def getHolder = IntentFilter.this.holder
   
   override def toString() = "component: " + holder + " (actions: " + actions + " categories: " + categories + " datas: " + data + ")"
 }
 
-// A Data class represents all pieces of info associated with all <data> tags of a particular filter as declared in a manifest file 
+case class Authority(host: String, port: String)
 
+// A Data class represents all pieces of info associated with all <data> tags of a particular filter as declared in a manifest file 
 class Data{
   private val schemes: MSet[String] = msetEmpty
   private val authorities: MSet[Authority] = msetEmpty
@@ -141,14 +152,12 @@ class Data{
   private val pathPatterns: MSet[String] = msetEmpty
   private val mimeTypes: MSet[String] = msetEmpty
   
-  def getSchemes = schemes
-  def getAuthorities = authorities
-  def getPaths = paths
-  def getPathPrefixs = pathPrefixs
-  def getPathPatterns = pathPatterns
-  def getMimeTypes = mimeTypes
-  
-  case class Authority(host: String, port: String)
+  def getSchemes = schemes.toSet
+  def getAuthorities = authorities.toSet
+  def getPaths = paths.toSet
+  def getPathPrefixs = pathPrefixs.toSet
+  def getPathPatterns = pathPatterns.toSet
+  def getMimeTypes = mimeTypes.toSet
   
   def isEmpty: Boolean = schemes.isEmpty && authorities.isEmpty && paths.isEmpty && pathPrefixs.isEmpty && pathPatterns.isEmpty && mimeTypes.isEmpty
   
@@ -275,6 +284,7 @@ class Data{
       this.schemes +=scheme
     }
   }
+  def addSchemes(schemes: ISet[String]) = this.schemes ++= schemes
   
   def addAuthority(host: String, port: String) = {
     this.authorities += Authority(host, port)
@@ -288,16 +298,26 @@ class Data{
     this.authorities += Authority(null, port)
   }
   
+  def addAuthorities(authorities: ISet[Authority]) = this.authorities ++= authorities
+  
   def addPath(path: String) ={
     if(path!= null){
       this.paths +=path
     }
   }
+  def addPaths(paths: ISet[String]) = this.paths ++= paths
+  
+  def addPathPrefixs(pathPrefixs: ISet[String]) = this.pathPrefixs ++= pathPrefixs
+  
+  def addPathPatterns(pathPatterns: ISet[String]) = this.pathPatterns ++= pathPatterns
+  
   def addType(mimeType: String) ={
     if(mimeType!= null){
       this.mimeTypes +=mimeType
     }
   }
+  def addTypes(mimeTypes: ISet[String]) = this.mimeTypes ++= mimeTypes
+  
   override def toString() = {"schemes= " + schemes + " authorities= " + authorities + " path= " + paths + " pathPrefix= " + pathPrefixs + " pathPattern= " + pathPatterns + " mimeType= " + mimeTypes}
 }
 

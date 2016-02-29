@@ -18,33 +18,22 @@ package org.sireum.amandroid.serialization
 
 import org.json4s._
 import org.json4s.JsonDSL._
-import org.json4s.native.Serialization
-import org.json4s.native.Serialization.{read, write}
+import org.sireum.jawa.alir.pta.PTAResult
+import org.sireum.jawa.alir.pta.PTAResult._
 import org.sireum.util._
-import org.sireum.jawa.Signature
+import org.sireum.jawa.alir.Context
 
-object SignatureSerializer extends CustomSerializer[Signature](format => (
+object PTAResultSerializer extends CustomSerializer[PTAResult](format => (
     {
       case jv: JValue =>
-        implicit val formats = DefaultFormats
-//        val pkg = (jv \ "pkg").extract[String]
-//        val name = (jv \ "name").extract[String]
-//        val unknown = (jv \ "unknown").extract[Boolean]
-//        val d = (jv \ "dim").extract[Int]
-//        val j = new JawaType(pkg + "." + name, d)
-//        if(unknown) j.toUnknown
-//        j
-        val str = (jv \ "sig").extract[String]
-        new Signature(str)
-    },
-    {
-      case sig: Signature =>
-//        val bt = typ.baseType
-//        val d = typ.dimensions
-//        ("pkg" -> bt.packageName) ~
-//        ("name" -> bt.name) ~
-//        ("unknown" -> bt.unknown) ~
-//        ("dim" -> d)
-      ("sig" -> sig.signature)
+        implicit val formats = format + PTASlotKeySerializer + InstanceSerializer
+        val pointsToMap = (jv \ "pointsToMap").extract[IMap[String, PTSMap]]
+        val ptaresult = new PTAResult
+        ptaresult.addPointsToMap(pointsToMap)
+        ptaresult
+    }, {
+      case ptaresult: PTAResult =>
+        implicit val formats = format + PTASlotKeySerializer + InstanceSerializer
+        ("pointsToMap" -> Extraction.decompose(ptaresult.pointsToMap))
     }
 ))

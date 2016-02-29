@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright (c) 2013 - 2016 Fengguo Wei and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Main Contributors:
+ *    Fengguo Wei - Argus Lab @ University of South Florida
+ *    Sankardas Roy - Bowling Green State University
+ *    
+ * Contributors:
+ *    Robby - Santos Lab @ Kansas State University
+ *    Wu Zhou - Fireeye
+ *    Fengchi Lin - Chinese People's Public Security University
+ ******************************************************************************/
 package org.sireum.amandroid.serialization
 
 import org.json4s._
@@ -25,7 +41,7 @@ import org.sireum.amandroid.parser.ComponentType
 object ApkSerializer extends CustomSerializer[Apk](format => (
   {
     case jv: JValue =>
-      implicit val formats = format
+      implicit val formats = format + JawaTypeSerializer + JawaTypeKeySerializer + SignatureSerializer + IntentFilterDataBaseSerializer + new org.json4s.ext.EnumNameSerializer(ComponentType)
       val nameUri  = (jv \ "nameUri").extract[FileResourceUri]
       val activities = (jv \ "activities").extract[ISet[JawaType]]
       val services = (jv \ "services").extract[ISet[JawaType]]
@@ -38,7 +54,7 @@ object ApkSerializer extends CustomSerializer[Apk](format => (
       val componentInfos = (jv \ "componentInfos").extract[ISet[ComponentInfo]]
       val layoutControls = (jv \ "layoutControls").extract[IMap[Int, LayoutControl]]
       val appPackageName = (jv \ "appPackageName").extract[Option[String]]
-//      val intentFdb = (jv \ "intentFdb").extract[IntentFilterDataBase]
+      val intentFdb = (jv \ "intentFdb").extract[IntentFilterDataBase]
       val codeLineCounter = (jv \ "codeLineCounter").extract[Int]
       val apk = new Apk(nameUri)
       apk.addActivities(activities)
@@ -52,13 +68,13 @@ object ApkSerializer extends CustomSerializer[Apk](format => (
       apk.addComponentInfos(componentInfos)
       apk.addLayoutControls(layoutControls)
       apk.setPackageName(appPackageName.getOrElse(""))
-//      apk.setIntentFilterDB(intentFdb)
+      apk.setIntentFilterDB(intentFdb)
       apk.setCodeLineCounter(codeLineCounter)
       apk
   },
   {
     case apk: Apk =>
-      implicit val formats = format
+      implicit val formats = format + JawaTypeSerializer + JawaTypeKeySerializer + SignatureSerializer + IntentFilterDataBaseSerializer + new org.json4s.ext.EnumNameSerializer(ComponentType)
       val nameUri: FileResourceUri = apk.nameUri
       val activities: ISet[JawaType] = apk.getActivities
       val services: ISet[JawaType] = apk.getServices
@@ -71,7 +87,7 @@ object ApkSerializer extends CustomSerializer[Apk](format => (
       val componentInfos: ISet[ComponentInfo] = apk.getComponentInfos
       val layoutControls: IMap[Int, LayoutControl] = apk.getLayoutControls
       val appPackageName: String = apk.getPackageName
-//      val intentFdb: IntentFilterDataBase = apk.getIntentFilterDB
+      val intentFdb: IntentFilterDataBase = apk.getIntentFilterDB
       val codeLineCounter: Int = apk.getCodeLineCounter
       ("nameUri" -> nameUri) ~
       ("activities" -> Extraction.decompose(activities)) ~
@@ -85,34 +101,7 @@ object ApkSerializer extends CustomSerializer[Apk](format => (
       ("componentInfos" -> Extraction.decompose(componentInfos)) ~
       ("layoutControls" -> Extraction.decompose(layoutControls)) ~
       ("appPackageName" -> Option(appPackageName)) ~
-//      ("intentFdb" -> Extraction.decompose(intentFdb)) ~
+      ("intentFdb" -> Extraction.decompose(intentFdb)) ~
       ("codeLineCounter" -> codeLineCounter) 
   }
 ))
-
-
-object ApkSerializerTest extends App {
-  implicit val formats = Serialization.formats(NoTypeHints) + ApkSerializer + JawaTypeSerializer + JawaTypeKeySerializer + SignatureSerializer + new org.json4s.ext.EnumNameSerializer(ComponentType)
-  val nameUri = FileUtil.toUri("/Users/fgwei/Developer/Sireum/apps/amandroid/sources/icc-bench/AndroidSpecific/AndroidSpecific_PrivateDataLeak3.apk")
-  val apk = new Apk(nameUri)
-  val apkFile = FileUtil.toFile(nameUri)
-  val resultDir = new File("/Users/fgwei/Work/output/icc-bench")
-  // convert the dex file to the "pilar" form
-  val (outUri, srcs, _) = ApkDecompiler.decompile(apkFile, resultDir, None, false, false, true, false)
-  val reporter = new PrintReporter(MsgLevel.ERROR)
-  val global = new Global(nameUri, reporter)
-  global.setJavaLib(AndroidGlobalConfig.lib_files)
-  srcs foreach {
-    src =>
-      val fileUri = FileUtil.toUri(FileUtil.toFilePath(outUri) + File.separator + src)
-      if(FileUtil.toFile(fileUri).exists()) {
-        //store the app's pilar code in AmandroidCodeSource which is organized class by class.
-        global.load(fileUri, Constants.PILAR_FILE_EXT, AndroidLibraryAPISummary)
-      }
-  }
-  AppInfoCollector.collectInfo(apk, global, outUri)
-  val ser = write(apk)
-  println(ser)
-  val apknew = read[Apk](ser)
-  println(apknew.nameUri)
-}

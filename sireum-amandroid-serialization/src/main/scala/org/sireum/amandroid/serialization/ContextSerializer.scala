@@ -14,15 +14,26 @@
  *    Wu Zhou - Fireeye
  *    Fengchi Lin - Chinese People's Public Security University
  ******************************************************************************/
-package org.sireum.amandroid.alir.pta.reachingFactsAnalysis
+package org.sireum.amandroid.serialization
 
-/**
- * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
- * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
- */ 
-object AndroidReachingFactsAnalysisConfig {
-  final var resolve_icc = false
-  final var resolve_static_init = false
-  final var parallel : Boolean = false
-  final var timeout : Option[Int] = None
-}
+import org.json4s._
+import org.json4s.JsonDSL._
+import org.sireum.jawa.alir.Context
+import org.sireum.util._
+import org.sireum.jawa.Signature
+
+object ContextSerializer extends CustomSerializer[Context](format => (
+    {
+      case jv: JValue =>
+        implicit val formats = format + SignatureSerializer
+        val callStack = (jv \ "callStack").extract[IList[(Signature, String)]]
+        val c = new Context
+        c.setContext(callStack)
+        c
+    },
+    {
+      case c: Context =>
+        implicit val formats = format + SignatureSerializer
+        ("callStack" -> Extraction.decompose(c.getContext))
+    }
+))
