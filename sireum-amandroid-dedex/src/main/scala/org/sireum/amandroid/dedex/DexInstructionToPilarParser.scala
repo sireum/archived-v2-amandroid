@@ -228,8 +228,8 @@ case class DexInstructionToPilarParser(
         typ =>
           val regName = genRegName(reg, DedexJawaType(typ))
           val code = instrCode match {
-            case CONST_4 | CONST_16 => const(regName, constant.left.get, typ)
-            case CONST_HIGH16 => const(regName, (constant.left.get << 16), typ)
+            case CONST_4 | CONST_16 => const(regName, constant.left.get, typ, generator.generateType(typ).render())
+            case CONST_HIGH16 => const(regName, (constant.left.get << 16), typ, generator.generateType(typ).render())
             case CONST_WIDE_16 | CONST | CONST_WIDE_32 | CONST_WIDE => constWide(regName, constant.right.get, typ)
             case CONST_WIDE_HIGH16 => constWide(regName, (constant.right.get << 48), typ)
             case _ => "@UNKNOWN_REGCONST 0x%x".format(instrCode)

@@ -83,7 +83,7 @@ object CommunicationLeakage_run {
             CommunicationLeakageTask(global, outputUri, dpsuri, file).run
           }
           try {
-            Await.result(f, 300 minutes)
+            Await.result(f, 10 minutes)
             CommunicationLeakageCounter.haveresult += 1
           } catch {
             case te: TimeoutException => 
@@ -107,7 +107,7 @@ object CommunicationLeakage_run {
       println(TITLE + " #####" + file + "#####")
       ScopeManager.setScopeManager(new AndroidRFAScopeManager)
       val yard = new ApkYard(global)
-      val apk: Apk = yard.loadApk(file, outputUri, dpsuri, false, false, false)
+      val apk: Apk = yard.loadApk(file, outputUri, dpsuri, false, false, true)
       val ssm = new CommunicationSourceAndSinkManager(global, apk, apk.getLayoutControls, apk.getCallbackMethods, AndroidGlobalConfig.sas_file)
       val cba = new ComponentBasedAnalysis(global, yard)
       cba.phase1(apk, false)

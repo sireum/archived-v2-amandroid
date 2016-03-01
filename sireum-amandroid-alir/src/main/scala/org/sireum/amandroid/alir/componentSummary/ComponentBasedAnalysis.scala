@@ -56,7 +56,7 @@ import java.util.concurrent.TimeoutException
  */
 class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
   private final val TITLE = "ComponentBasedAnalysis"
-  private final val DEBUG = false
+  private final val DEBUG = true
   
   import ComponentSummaryTable._
   

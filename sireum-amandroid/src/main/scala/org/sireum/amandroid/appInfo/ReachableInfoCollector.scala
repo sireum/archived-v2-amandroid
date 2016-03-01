@@ -127,29 +127,14 @@ class ReachableInfoCollector(val global: Global, entryPointTypes: ISet[JawaType]
   def collectCallbackMethods() = {
     findClassLayoutMappings()
     // worklist is a list of tuples of the format (a reachable proc's declaring class, app-entrypoint-component)
-    val worklist: MList[(JawaType, JawaType)] = mlistEmpty
-    val processed: MList[(JawaType, JawaType)] = mlistEmpty
     this.reachableMap.foreach{
       case(comp, procs) => 
-        val containerClasses = procs.map(_.getClassType)
-        worklist ++= containerClasses.map((_, comp))
-    }
-    while(!worklist.isEmpty) {
-      worklist.foreach {
-        case (item, comp) =>
-          val clazz = global.getClassOrResolve(item)
-          val lifecycleElement = global.getClassOrResolve(comp)
-          collectCallbackMethodsInAppSource(clazz, lifecycleElement)
-      }
-      processed ++= worklist
-      worklist.clear
-      if(updateReachableMap(getCallbackMethods())){
-        this.reachableMap.foreach{
-          case(comp, procs) => 
-            val containerClasses = procs.map(_.getClassType)
-            worklist ++= (containerClasses.map((_, comp)) -- processed)
+        procs.map{
+          proc =>
+            val clazz = global.getClassOrResolve(proc.classTyp)
+            val lifecycleElement = global.getClassOrResolve(comp)
+            collectCallbackMethodsInAppSource(clazz, lifecycleElement)
         }
-      }
     }
     global.reporter.echo(TITLE, "current all callbacks = " + this.callbackMethods)
   }

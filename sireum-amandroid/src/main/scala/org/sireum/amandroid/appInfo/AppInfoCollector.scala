@@ -80,12 +80,13 @@ object AppInfoCollector {
   def analyzeLayouts(global: Global, outputUri: FileResourceUri, mfp: ManifestParser, afp: ARSCFileParser_apktool): LayoutFileParser = {
     // Find the user-defined sources in the layout XML files
     val lfp = new LayoutFileParser(global, mfp.getPackageName, afp)
-    val resFolderUri = MyFileUtil.appendFileName(MyFileUtil.appendFileName(outputUri, "res"), "layout")
-    FileUtil.listFiles(resFolderUri, ".xml", true).foreach {
-      u => 
-        val file = FileUtil.toFile(u)
-        val layout_in = new FileInputStream(file)
-        lfp.loadLayoutFromTextXml(file.getName, layout_in)
+    FileUtil.listFiles(outputUri, ".xml", true).foreach {
+      u =>
+        if(u.contains("/res/layout")) {
+          val file = FileUtil.toFile(u)
+          val layout_in = new FileInputStream(file)
+          lfp.loadLayoutFromTextXml(file.getName, layout_in)
+        }
     }
     global.reporter.echo(TITLE, "layoutcallback--->" + lfp.getCallbackMethods)
     global.reporter.echo(TITLE, "layoutuser--->" + lfp.getUserControls)
@@ -213,7 +214,6 @@ object AppInfoCollector {
     val lfp = AppInfoCollector.analyzeLayouts(global, outUri, mfp, afp)
     val ra = AppInfoCollector.reachabilityAnalysis(global, mfp.getComponentInfos.map(_.compType))
     val callbacks = AppInfoCollector.analyzeCallback(global.reporter, afp, lfp, ra)
-
     apk.setPackageName(mfp.getPackageName)
     apk.addComponentInfos(mfp.getComponentInfos)
     apk.addUsesPermissions(mfp.getPermissions)

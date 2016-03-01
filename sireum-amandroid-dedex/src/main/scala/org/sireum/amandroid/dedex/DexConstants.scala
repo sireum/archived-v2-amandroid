@@ -621,7 +621,7 @@ trait DexConstants {
   def `return`(x: String) = "return %s;".format(x)  // 0xf
   def returnWide(x: String) = "return %s  @kind wide;".format(x) // 0x10
   def returnObj(x: String) = "return %s  @kind object;".format(x) // 0x11
-  def const(x: String, y: Int, typ: JawaType) = {
+  def const(x: String, y: Int, typ: JawaType, typstr: String) = {
     typ match {
       case pt if pt.isPrimitive =>
         pt.jawaName match {
@@ -632,7 +632,7 @@ trait DexConstants {
           case _ => "%s:= %dI;".format(x, y)
         }
       case ot if ot.isObject =>
-        "%s:= null  @kind object;".format(x)
+        "%s:= null  @type ^%s @kind object;".format(x, typstr)
       case _ => "%s:= %dI;".format(x, y)
     }
     
