@@ -25,6 +25,7 @@ import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.amandroid.Apk
 import org.sireum.jawa.Global
 import org.sireum.jawa.Signature
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFactFactory
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -36,7 +37,7 @@ object AndroidReachingFactsAnalysisHelper {
     AndroidModelCallHandler.isModelCall(calleeMethod)
   }
   
-  def doModelCall(s: PTAResult, calleeMethod: JawaMethod, args: List[String], retVars: Seq[String], currentContext: Context, apk: Apk): (ISet[RFAFact], ISet[RFAFact]) = {
+  def doModelCall(s: PTAResult, calleeMethod: JawaMethod, args: List[String], retVars: Seq[String], currentContext: Context, apk: Apk)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     AndroidModelCallHandler.doModelCall(s, calleeMethod, args, retVars, currentContext, Some(apk))
   }
   

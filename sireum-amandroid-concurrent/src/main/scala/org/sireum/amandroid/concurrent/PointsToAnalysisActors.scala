@@ -49,6 +49,7 @@ import org.sireum.jawa.Signature
 import org.sireum.amandroid.Apk
 import org.sireum.jawa.ScopeManager
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAScopeManager
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFactFactory
 
 object PTAAlgorithms extends Enumeration {
   val SUPER_SPARK, RFA = Value
@@ -141,6 +142,7 @@ class RFAActor extends Actor with ActorLogging {
     val reporter = new PrintReporter(MsgLevel.ERROR)
     val global = GlobalUtil.buildGlobal(apk.nameUri, reporter, outApkUri, srcs)
     val m = global.resolveMethodCode(rfadata.ep, apk.getEnvMap(rfadata.ep.classTyp)._2)
+    implicit val factory = new RFAFactFactory
     val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(m)
     val (f, cancel) = FutureUtil.interruptableFuture[RFAResult] { () => 
       try {

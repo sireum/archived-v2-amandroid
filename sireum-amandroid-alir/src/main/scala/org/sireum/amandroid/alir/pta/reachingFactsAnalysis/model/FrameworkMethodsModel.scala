@@ -35,7 +35,7 @@ object FrameworkMethodsModel {
   
   final val TITLE = "FrameworkMethodsModel"
   
-	def isFrameworkMethods(p : JawaMethod) : Boolean = {
+  def isFrameworkMethods(p: JawaMethod): Boolean = {
     val contextRec = p.getDeclaringClass.global.getClassOrResolve(new JawaType("android.content.Context"))
     if(!p.getDeclaringClass.isInterface && p.getDeclaringClass.global.getClassHierarchy.isClassRecursivelySubClassOfIncluding(p.getDeclaringClass, contextRec)){
       p.getSubSignature match{
@@ -52,7 +52,7 @@ object FrameworkMethodsModel {
     else false
   }
 
-  def doFrameworkMethodsModelCall(global: Global, apk: Apk, s : PTAResult, p : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+  def doFrameworkMethodsModelCall(global: Global, apk: Apk, s: PTAResult, p: JawaMethod, args: List[String], retVars: Seq[String], currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact], Boolean) = {
     var newFacts = isetEmpty[RFAFact]
     var delFacts = isetEmpty[RFAFact]
     var byPassFlag = true
@@ -96,7 +96,7 @@ object FrameworkMethodsModel {
     (newFacts, delFacts, byPassFlag)
   }
 
-  private def registerReceiver(global: Global, apk: Apk, s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
+  private def registerReceiver(global: Global, apk: Apk, s: PTAResult, args: List[String], retVar: String, currentContext: Context): ISet[RFAFact] ={
     val result = msetEmpty[RFAFact]
     require(args.size > 2)
     val thisSlot = VarSlot(args(0), false, true)
@@ -168,24 +168,24 @@ object FrameworkMethodsModel {
     isetEmpty
   }
 
-	private def getSystemService(global: Global, s : PTAResult, args : List[String], retVar : String, currentContext : Context) : ISet[RFAFact] ={
-	  var result = isetEmpty[RFAFact]
+  private def getSystemService(global: Global, s: PTAResult, args: List[String], retVar: String, currentContext: Context): ISet[RFAFact] ={
+    var result = isetEmpty[RFAFact]
     require(args.size >1)
     val paramSlot = VarSlot(args(1), false, true)
-	  val paramValue = s.pointsToSet(paramSlot, currentContext)
-	  paramValue.foreach{
-	    str =>
-	      str match{
-			    case cstr @ PTAConcreteStringInstance(text, c) =>
-			      if(AndroidConstants.getSystemServiceStrings.contains(text)){
-			        global.reporter.echo(TITLE, "Get " + text + " service in " + currentContext)
-			      } else {
-			        global.reporter.echo(TITLE, "Given service does not exist: " + cstr)
-			      }
-			    case pstr @ PTAPointStringInstance(c) => global.reporter.echo(TITLE, "Get system service use point string: " + pstr)
-			    case _ => global.reporter.echo(TITLE, "Get system service use unexpected instance type: " + str)
-	      }
-	  }
-	  result
-	}
+    val paramValue = s.pointsToSet(paramSlot, currentContext)
+    paramValue.foreach{
+      str =>
+        str match{
+          case cstr @ PTAConcreteStringInstance(text, c) =>
+            if(AndroidConstants.getSystemServiceStrings.contains(text)){
+              global.reporter.echo(TITLE, "Get " + text + " service in " + currentContext)
+            } else {
+              global.reporter.echo(TITLE, "Given service does not exist: " + cstr)
+            }
+          case pstr @ PTAPointStringInstance(c) => global.reporter.echo(TITLE, "Get system service use point string: " + pstr)
+          case _ => global.reporter.echo(TITLE, "Get system service use unexpected instance type: " + str)
+        }
+    }
+    result
+  }
 }

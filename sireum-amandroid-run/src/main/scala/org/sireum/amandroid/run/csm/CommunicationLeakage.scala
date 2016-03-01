@@ -76,6 +76,7 @@ object CommunicationLeakage_run {
     files.foreach{
       file =>
         try{
+          CommunicationLeakageCounter.total += 1
           val reporter = new PrintReporter(MsgLevel.ERROR) //INFO
           val global = new Global(file, reporter)
           global.setJavaLib(AndroidGlobalConfig.lib_files)

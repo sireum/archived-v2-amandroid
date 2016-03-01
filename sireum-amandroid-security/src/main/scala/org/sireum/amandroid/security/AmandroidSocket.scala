@@ -45,6 +45,7 @@ import org.sireum.amandroid.decompile.ApkDecompiler
 import org.sireum.amandroid.alir.taintAnalysis.AndroidDataDependentTaintAnalysis.TarApk
 import org.sireum.amandroid.alir.componentSummary.ApkYard
 import java.util.concurrent.TimeoutException
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFactFactory
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -135,6 +136,7 @@ class AmandroidSocket(global: Global, yard: ApkYard, apk: Apk) {
       {if(parallel) entryPoints.par else entryPoints}.foreach {
         ep =>
           global.reporter.echo(TITLE, "--------------Component " + ep + "--------------")
+          implicit val factory = new RFAFactFactory
           val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
           val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager)
           yard.addIDFG(ep.getDeclaringClass.getType, idfg)
@@ -176,6 +178,7 @@ class AmandroidSocket(global: Global, yard: ApkYard, apk: Apk) {
         ep =>
           try {
             global.reporter.echo(TITLE, "--------------Component " + ep + "--------------")
+            implicit val factory = new RFAFactFactory
             val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
             val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager)
             yard.addIDFG(ep.getDeclaringClass.getType, idfg)

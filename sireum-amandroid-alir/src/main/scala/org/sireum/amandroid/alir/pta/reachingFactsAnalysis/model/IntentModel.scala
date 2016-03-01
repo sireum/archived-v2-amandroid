@@ -40,9 +40,9 @@ import org.sireum.jawa.alir.pta.VarSlot
 object IntentModel {
   final val TITLE = "IntentModel"
   
-  def isIntent(r : JawaClass) : Boolean = r.getName == AndroidConstants.INTENT
+  def isIntent(r: JawaClass): Boolean = r.getName == AndroidConstants.INTENT
   
-  def doIntentCall(s : PTAResult, p : JawaMethod, args : List[String], retVars : Seq[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact], Boolean) = {
+  def doIntentCall(s: PTAResult, p: JawaMethod, args: List[String], retVars: Seq[String], currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact], Boolean) = {
     var newFacts = isetEmpty[RFAFact]
     var delFacts = isetEmpty[RFAFact]
     var byPassFlag = true
@@ -446,7 +446,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.<init>:(Ljava/lang/String;)V
    */
-  private def intentInitWithIntent(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentInitWithIntent(s: PTAResult, args: List[String], currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -456,7 +456,7 @@ object IntentModel {
     var delfacts = isetEmpty[RFAFact]
     thisValue.foreach{
       tv =>
-        val interestSlots : ISet[Slot] = 
+        val interestSlots: ISet[Slot] = 
           Set(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)),
               FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_CATEGORIES)),
               FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_COMPONENT)),
@@ -470,37 +470,37 @@ object IntentModel {
             val mActionValue = s.pointsToSet(mActionSlot, currentContext)
             mActionValue.foreach{
               mav =>
-                newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), mav)
+                newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), mav)
             }
             val mCategoriesSlot = FieldSlot(pv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_CATEGORIES))
             val mCategoriesValue = s.pointsToSet(mCategoriesSlot, currentContext)
             mCategoriesValue.foreach{
               mcv =>
-                newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_CATEGORIES)), mcv)
+                newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_CATEGORIES)), mcv)
             }
             val mComponentSlot = FieldSlot(pv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_COMPONENT))
             val mComponentValue = s.pointsToSet(mComponentSlot, currentContext)
             mComponentValue.foreach{
               mcv =>
-                newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_COMPONENT)), mcv)
+                newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_COMPONENT)), mcv)
             }
             val mDataSlot = FieldSlot(pv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_URI_DATA))
             val mDataValue = s.pointsToSet(mDataSlot, currentContext)
             mDataValue.foreach{
               mdv =>
-                newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_URI_DATA)), mdv)
+                newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_URI_DATA)), mdv)
             }
             val mTypeSlot = FieldSlot(pv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_MTYPE))
             val mTypeValue = s.pointsToSet(mTypeSlot, currentContext)
             mTypeValue.foreach{
               mtv =>
-                newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_MTYPE)), mtv)
+                newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_MTYPE)), mtv)
             }
             val mExtrasSlot = FieldSlot(pv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_EXTRAS))
             val mExtrasValue = s.pointsToSet(mExtrasSlot, currentContext)
             mExtrasValue.foreach{
               mev =>
-                newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_EXTRAS)), mev)
+                newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_EXTRAS)), mev)
             }
         }
     }
@@ -510,7 +510,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.<init>:(Landroid/content/Intent;)V
    */
-  private def intentInitWithAction(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentInitWithAction(s: PTAResult, args: List[String], currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -524,11 +524,11 @@ object IntentModel {
           acStr =>
             acStr match{
               case cstr @ PTAConcreteStringInstance(text, c) =>
-                newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), cstr)
+                newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), cstr)
               case pstr @ PTAPointStringInstance(c) => 
-                newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), pstr)
+                newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), pstr)
               case _ =>
-                newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), acStr)
+                newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), acStr)
             }
         }
     }
@@ -538,7 +538,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.<init>:(Ljava/lang/String;Landroid/net/Uri;)V
    */
-  private def intentInitWithActionAndData(s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentInitWithActionAndData(s: PTAResult, args: List[String], currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -550,7 +550,7 @@ object IntentModel {
     var delfacts = isetEmpty[RFAFact]
     thisValue.foreach {
       tv =>
-        val interestSlots : ISet[Slot] = 
+        val interestSlots: ISet[Slot] = 
           Set(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)),
             FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_URI_DATA))
           )
@@ -558,16 +558,16 @@ object IntentModel {
           acStr =>
             acStr match{
               case cstr @ PTAConcreteStringInstance(text, c) =>
-                newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), cstr)
+                newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), cstr)
               case pstr @ PTAPointStringInstance(c) => 
-                newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), pstr)
+                newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), pstr)
               case _ =>
-                newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), acStr)
+                newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), acStr)
             }
         }
         dataValue.foreach{
           data =>
-            newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_URI_DATA)), data)
+            newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_URI_DATA)), data)
         }
     }
     (newfacts, delfacts)
@@ -576,7 +576,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.<init>:(Ljava/lang/String;Landroid/net/Uri;Landroid/content/Context;Ljava/lang/Class;)V
    */
-  private def intentInitWithActionDataAndComponent(global: Global, s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentInitWithActionDataAndComponent(global: Global, s: PTAResult, args: List[String], currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >4)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -602,7 +602,7 @@ object IntentModel {
     var delfacts = isetEmpty[RFAFact]
     thisValue.foreach{
       tv =>
-        val interestSlots : ISet[Slot] = 
+        val interestSlots: ISet[Slot] = 
           Set(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)),
             FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_URI_DATA)),
             FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_COMPONENT))
@@ -611,18 +611,18 @@ object IntentModel {
           acStr =>
               acStr match{
                 case cstr @ PTAConcreteStringInstance(text, c) =>
-                  newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), cstr)
+                  newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), cstr)
                 case pstr @ PTAPointStringInstance(c) => 
-                  newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), pstr)
+                  newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), pstr)
                 case _ =>
-                  newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), acStr)
+                  newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), acStr)
               }
         }
         dataValue.foreach{
           data =>
-            newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_URI_DATA)), data)
+            newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_URI_DATA)), data)
         }
-        newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_COMPONENT)), componentNameIns)
+        newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_COMPONENT)), componentNameIns)
         clazzNames.foreach{
           sIns =>
             sIns match {
@@ -636,19 +636,19 @@ object IntentModel {
                       case None => ""
                     }
                     val pakStr = PTAConcreteStringInstance(packageName, c)
-                    newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
-                    newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
+                    newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
+                    newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
                   case None =>
                     val unknownIns = PTAInstance(recordTyp.toUnknown, c, false)
-                    newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
-                    newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
+                    newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
+                    newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
                 }
               case pstr @ PTAPointStringInstance(c) => 
-                newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr)
-                newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), pstr)
+                newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr)
+                newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), pstr)
               case a =>
-                newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), a)
-                newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), a)
+                newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), a)
+                newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), a)
             }
         }
     }
@@ -658,7 +658,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.<init>:(Landroid/content/Context;Ljava/lang/Class;)V
    */
-  private def intentInitWithCC(global: Global, s : PTAResult, args : List[String], currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentInitWithCC(global: Global, s: PTAResult, args: List[String], currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -679,7 +679,7 @@ object IntentModel {
     thisValue.map{
       tv =>
         val mComponentSlot = FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_COMPONENT))
-        newfacts += RFAFact(mComponentSlot, componentNameIns)
+        newfacts += new RFAFact(mComponentSlot, componentNameIns)
     }
     clazzNames.foreach{
       sIns =>
@@ -694,19 +694,19 @@ object IntentModel {
                   case None => ""
                 }
                 val pakStr = PTAConcreteStringInstance(packageName, c)
-                newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
-                newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
+                newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
+                newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
               case None =>
                 val unknownIns = PTAInstance(recordTyp.toUnknown, c, false)
-                newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
-                newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
+                newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
+                newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
             }
           case pstr @ PTAPointStringInstance(c) => 
-            newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr)
-            newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), pstr)
+            newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr)
+            newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), pstr)
           case a =>
-            newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), a)
-            newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), a)
+            newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), a)
+            newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), a)
         }
     }
     (newfacts, delfacts)
@@ -715,7 +715,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.addCategory:(Ljava/lang/String;)Landroid/content/Intent;
    */
-  private def intentAddCategory(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentAddCategory(s: PTAResult, args: List[String], retVar: String, currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -730,29 +730,29 @@ object IntentModel {
         if(mCategoryValue.isEmpty) {
           val hashsetIns = PTAInstance(new JawaType("java.util.HashSet"), currentContext, false)
           mCategoryValue += hashsetIns
-          newfacts += RFAFact(mCategorySlot, hashsetIns)
+          newfacts += new RFAFact(mCategorySlot, hashsetIns)
         }
         mCategoryValue.foreach{
           cv => 
             var hashsetIns = cv
             if(cv.isNull){
               hashsetIns = PTAInstance(new JawaType("java.util.HashSet"), currentContext, false)
-              newfacts += RFAFact(mCategorySlot, hashsetIns)
-              delfacts += RFAFact(mCategorySlot, cv)
+              newfacts += new RFAFact(mCategorySlot, hashsetIns)
+              delfacts += new RFAFact(mCategorySlot, cv)
             }
             categoryValue.map{
               cn =>
                 cn match{
                   case cstr @ PTAConcreteStringInstance(text, c) =>
-                    newfacts += RFAFact(FieldSlot(hashsetIns, "items"), cstr)
+                    newfacts += new RFAFact(FieldSlot(hashsetIns, "items"), cstr)
                   case pstr @ PTAPointStringInstance(c) => 
-                    newfacts += RFAFact(FieldSlot(hashsetIns, "items"), pstr)
+                    newfacts += new RFAFact(FieldSlot(hashsetIns, "items"), pstr)
                   case _ =>
-                    newfacts += RFAFact(FieldSlot(hashsetIns, "items"), cn)
+                    newfacts += new RFAFact(FieldSlot(hashsetIns, "items"), cn)
                 }
             }
         }
-        newfacts += RFAFact(VarSlot(retVar, false, false), tv)
+        newfacts += new RFAFact(VarSlot(retVar, false, false), tv)
     }
     (newfacts, delfacts)
   }
@@ -760,7 +760,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.clone:()Ljava/lang/Object;
    */
-  private def intentClone(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentClone(s: PTAResult, args: List[String], retVar: String, currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >0)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -768,7 +768,7 @@ object IntentModel {
     var delfacts = isetEmpty[RFAFact]
     thisValue.foreach{
       tv =>
-        newfacts += RFAFact(VarSlot(retVar, false, false), tv.clone(currentContext))
+        newfacts += new RFAFact(VarSlot(retVar, false, false), tv.clone(currentContext))
     }
     (newfacts, delfacts)
   }
@@ -777,7 +777,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setAction:(Ljava/lang/String;)Landroid/content/Intent;
    */
-  private def intentSetAction(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentSetAction(s: PTAResult, args: List[String], retVar: String, currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -793,15 +793,15 @@ object IntentModel {
               tv =>
                 str match{
                   case cstr @ PTAConcreteStringInstance(text, c) =>
-                    newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), cstr)
+                    newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), cstr)
                   case pstr @ PTAPointStringInstance(c) => 
-                    newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), pstr)
+                    newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), pstr)
                   case _ =>
-                    newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), str)
+                    newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_ACTION)), str)
                 }
             }
         }
-        newfacts += RFAFact(VarSlot(retVar, false, false), tv)
+        newfacts += new RFAFact(VarSlot(retVar, false, false), tv)
     }
     (newfacts, delfacts)
   }
@@ -810,7 +810,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setClass:(Landroid/content/Context;Ljava/lang/Class;)Landroid/content/Intent;
    */
-  private def intentSetClass(global: Global, s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentSetClass(global: Global, s: PTAResult, args: List[String], retVar: String, currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue =s.pointsToSet(thisSlot, currentContext)
@@ -831,8 +831,8 @@ object IntentModel {
     thisValue.map{
       tv =>
         val mComponentSlot = FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_COMPONENT))
-        newfacts += RFAFact(mComponentSlot, componentNameIns)
-        newfacts += RFAFact(VarSlot(retVar, false, false), tv)
+        newfacts += new RFAFact(mComponentSlot, componentNameIns)
+        newfacts += new RFAFact(VarSlot(retVar, false, false), tv)
     }
     clazzNames.foreach{
       sIns =>
@@ -847,19 +847,19 @@ object IntentModel {
                   case None => ""
                 }
                 val pakStr = PTAConcreteStringInstance(packageName, c)
-                newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
-                newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
+                newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
+                newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
               case None =>
                 val unknownIns = PTAInstance(recordTyp.toUnknown, c, false)
-                newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
-                newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
+                newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
+                newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
             }
           case pstr @ PTAPointStringInstance(c) => 
-            newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr)
-            newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), pstr)
+            newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr)
+            newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), pstr)
           case a =>
-            newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), a)
-            newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), a)
+            newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), a)
+            newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), a)
         }
     }
     (newfacts, delfacts)
@@ -869,7 +869,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setClassName:(Landroid/content/Context;Ljava/lang/String;)Landroid/content/Intent;
    */
-  private def intentSetClassName(global: Global, s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentSetClassName(global: Global, s: PTAResult, args: List[String], retVar: String, currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -881,8 +881,8 @@ object IntentModel {
     thisValue.map{
       tv =>
         val mComponentSlot = FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_COMPONENT))
-        newfacts += RFAFact(mComponentSlot, componentNameIns)
-        newfacts += RFAFact(VarSlot(retVar, false, false), tv)
+        newfacts += new RFAFact(mComponentSlot, componentNameIns)
+        newfacts += new RFAFact(VarSlot(retVar, false, false), tv)
     }
     clazzValue.map{
       name =>
@@ -897,19 +897,19 @@ object IntentModel {
                   case None => ""
                 }
                 val pakStr = PTAConcreteStringInstance(packageName, c)
-                newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
-                newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
+                newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pakStr)
+                newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), cstr)
               case None =>
                 val unknownIns = PTAInstance(recordTyp.toUnknown, c, false)
-                newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
-                newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
+                newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), unknownIns)
+                newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), unknownIns)
             }
           case pstr @ PTAPointStringInstance(c) => 
-            newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr)
-            newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), pstr)
+            newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), pstr)
+            newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), pstr)
           case a =>
-            newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), a)
-            newfacts += RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), a)
+            newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_PACKAGE)), a)
+            newfacts += new RFAFact(FieldSlot(componentNameIns, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.COMPONENTNAME_CLASS)), a)
         }
     }
     (newfacts, delfacts)
@@ -919,7 +919,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setComponent:(Landroid/content/ComponentName;)Landroid/content/Intent;
    */
-  private def intentSetComponent(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentSetComponent(s: PTAResult, args: List[String], retVar: String, currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -933,10 +933,10 @@ object IntentModel {
           component =>
             thisValue.foreach{
               tv =>
-                newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_COMPONENT)), component)
+                newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_COMPONENT)), component)
             }
         }
-        newfacts += RFAFact(VarSlot(retVar, false, false), tv)
+        newfacts += new RFAFact(VarSlot(retVar, false, false), tv)
     }
     (newfacts, delfacts)
   }
@@ -944,7 +944,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setData:(Landroid/net/Uri;)Landroid/content/Intent;
    */
-  private def intentSetData(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentSetData(s: PTAResult, args: List[String], retVar: String, currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -958,10 +958,10 @@ object IntentModel {
           data =>
             thisValue.foreach{
               tv =>
-                newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_URI_DATA)), data)
+                newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_URI_DATA)), data)
             }
         }
-        newfacts += RFAFact(VarSlot(retVar, false, false), tv)
+        newfacts += new RFAFact(VarSlot(retVar, false, false), tv)
     }
     (newfacts, delfacts)
   }
@@ -969,7 +969,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setDataAndType:(Landroid/net/Uri;Ljava/lang/String;)Landroid/content/Intent;
    */
-  private def intentSetDataAndType(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentSetDataAndType(s: PTAResult, args: List[String], retVar: String, currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -985,17 +985,17 @@ object IntentModel {
           data =>
             thisValue.foreach{
               tv =>
-                newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_URI_DATA)), data)
+                newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_URI_DATA)), data)
             }
         }
         typeValue.foreach{
           typ =>
             thisValue.foreach{
               tv =>
-                newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_MTYPE)), typ)
+                newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_MTYPE)), typ)
             }
         }
-        newfacts += RFAFact(VarSlot(retVar, false, false), tv)
+        newfacts += new RFAFact(VarSlot(retVar, false, false), tv)
     }
     (newfacts, delfacts)
   }
@@ -1003,7 +1003,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setType:(Ljava/lang/String;)Landroid/content/Intent;
    */
-  private def intentSetType(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentSetType(s: PTAResult, args: List[String], retVar: String, currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -1017,10 +1017,10 @@ object IntentModel {
           typ =>
             thisValue.foreach{
               tv =>
-                newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_MTYPE)), typ)
+                newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_MTYPE)), typ)
             }
         }
-        newfacts += RFAFact(VarSlot(retVar, false, false), tv)
+        newfacts += new RFAFact(VarSlot(retVar, false, false), tv)
     }
     (newfacts, delfacts)
   }
@@ -1028,7 +1028,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setPackage:(Ljava/lang/String;)Landroid/content/Intent;
    */
-  private def intentSetPackage(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentSetPackage(s: PTAResult, args: List[String], retVar: String, currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -1044,15 +1044,15 @@ object IntentModel {
             tv =>
               str match{
                 case cstr @ PTAConcreteStringInstance(text, c) =>
-                  newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_PACKAGE)), cstr)
+                  newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_PACKAGE)), cstr)
                 case pstr @ PTAPointStringInstance(c) =>
-                  newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_PACKAGE)), pstr)
+                  newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_PACKAGE)), pstr)
                 case _ =>
-                  newfacts += RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_PACKAGE)), str)
+                  newfacts += new RFAFact(FieldSlot(tv, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_PACKAGE)), str)
               }
           }
       }
-      newfacts += RFAFact(VarSlot(retVar, false, false), tv)
+      newfacts += new RFAFact(VarSlot(retVar, false, false), tv)
     }
     (newfacts, delfacts)
   }
@@ -1060,7 +1060,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.setFlags:(I)Landroid/content/Intent;
    */
-  private def intentSetFlags(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentSetFlags(s: PTAResult, args: List[String], retVar: String, currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -1068,7 +1068,7 @@ object IntentModel {
     var delfacts = isetEmpty[RFAFact]
     thisValue.foreach{
       tv =>
-        newfacts += RFAFact(VarSlot(retVar, false, false), tv)
+        newfacts += new RFAFact(VarSlot(retVar, false, false), tv)
     }
     (newfacts, delfacts)
   }
@@ -1076,7 +1076,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.putExtra:(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;
    */
-  private def intentPutExtra(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentPutExtra(s: PTAResult, args: List[String], retVar: String, currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -1093,7 +1093,7 @@ object IntentModel {
         var mExtraValue = s.pointsToSet(mExtraSlot, currentContext)
         if(mExtraValue.isEmpty){
           mExtraValue += bundleIns
-          newfacts += RFAFact(mExtraSlot, bundleIns)
+          newfacts += new RFAFact(mExtraSlot, bundleIns)
         }
         mExtraValue.foreach{
           mev =>
@@ -1107,9 +1107,9 @@ object IntentModel {
                     }
                 }
             }
-            newfacts ++= entries.map(e => RFAFact(FieldSlot(mev, "entries"), e))
+            newfacts ++= entries.map(e => new RFAFact(FieldSlot(mev, "entries"), e))
         }
-        newfacts += RFAFact(VarSlot(retVar, false, false), tv)
+        newfacts += new RFAFact(VarSlot(retVar, false, false), tv)
     }
     (newfacts, delfacts)
   }
@@ -1117,7 +1117,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.getExtras:()Landroid/os/Bundle;
    */
-  private def intentGetExtras(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentGetExtras(s: PTAResult, args: List[String], retVar: String, currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >0)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -1128,9 +1128,9 @@ object IntentModel {
         val mExtraSlot = FieldSlot(ins, JavaKnowledge.getFieldNameFromFieldFQN(AndroidConstants.INTENT_EXTRAS))
         val mExtraValue = s.pointsToSet(mExtraSlot, currentContext)
         if(!mExtraValue.isEmpty){
-          newfacts ++= mExtraValue.map{mev => RFAFact(VarSlot(retVar, false, false), mev)}
+          newfacts ++= mExtraValue.map{mev => new RFAFact(VarSlot(retVar, false, false), mev)}
         } else {
-          newfacts += (RFAFact(VarSlot(retVar, false, false), PTAInstance(JavaKnowledge.getTypeFromName(AndroidConstants.BUNDLE).toUnknown, currentContext.copy, false)))
+          newfacts += (new RFAFact(VarSlot(retVar, false, false), PTAInstance(JavaKnowledge.getTypeFromName(AndroidConstants.BUNDLE).toUnknown, currentContext.copy, false)))
         }
     }
     (newfacts, delfacts)
@@ -1139,7 +1139,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.getExtra:(Ljava/lang/String;)Ljava/lang/Object;
    */
-  private def intentGetExtra(s : PTAResult, args : List[String], retVar : String, currentContext : Context, desiredReturnTyp: JawaType) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentGetExtra(s: PTAResult, args: List[String], retVar: String, currentContext: Context, desiredReturnTyp: JawaType)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >1)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -1155,24 +1155,24 @@ object IntentModel {
         else
           mExtraValue.map{ins => s.pointsToSet(FieldSlot(ins, "entries"), currentContext)}.reduce(iunion[Instance])
       if(entValue.isEmpty && desiredReturnTyp.isObject) {
-        newfacts += (RFAFact(VarSlot(retVar, false, false), PTAInstance(desiredReturnTyp.toUnknown, currentContext.copy, false)))
+        newfacts += (new RFAFact(VarSlot(retVar, false, false), PTAInstance(desiredReturnTyp.toUnknown, currentContext.copy, false)))
       } else if(!keyValue.isEmpty && keyValue.filter(_.isInstanceOf[PTAPointStringInstance]).isEmpty) {
         val keys = keyValue.map{k => k.asInstanceOf[PTAConcreteStringInstance].string}
         entValue.foreach{
           v =>
             require(v.isInstanceOf[PTATupleInstance])
             if(keys.contains(v.asInstanceOf[PTATupleInstance].left.asInstanceOf[PTAConcreteStringInstance].string)){
-              newfacts += (RFAFact(VarSlot(retVar, false, false), v.asInstanceOf[PTATupleInstance].right))
+              newfacts += (new RFAFact(VarSlot(retVar, false, false), v.asInstanceOf[PTATupleInstance].right))
             }
         }
       } else if(!entValue.isEmpty) {
         entValue.foreach {
           v =>
             require(v.isInstanceOf[PTATupleInstance])
-            newfacts += (RFAFact(VarSlot(retVar, false, false), v.asInstanceOf[PTATupleInstance].right))
+            newfacts += (new RFAFact(VarSlot(retVar, false, false), v.asInstanceOf[PTATupleInstance].right))
         }
       } else {
-        newfacts += (RFAFact(VarSlot(retVar, false, false), PTAInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE.toUnknown, currentContext.copy, false)))
+        newfacts += (new RFAFact(VarSlot(retVar, false, false), PTAInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE.toUnknown, currentContext.copy, false)))
       }
     }
     (newfacts, delfacts)
@@ -1181,7 +1181,7 @@ object IntentModel {
   /**
    * Landroid/content/Intent;.getExtra:(Ljava/lang/String;)Ljava/lang/Object;
    */
-  private def intentGetExtraWithDefault(s : PTAResult, args : List[String], retVar : String, currentContext : Context) : (ISet[RFAFact], ISet[RFAFact]) = {
+  private def intentGetExtraWithDefault(s: PTAResult, args: List[String], retVar: String, currentContext: Context)(implicit factory: RFAFactFactory): (ISet[RFAFact], ISet[RFAFact]) = {
     require(args.size >2)
     val thisSlot = VarSlot(args(0), false, true)
     val thisValue = s.pointsToSet(thisSlot, currentContext)
@@ -1204,21 +1204,21 @@ object IntentModel {
           v =>
             require(v.isInstanceOf[PTATupleInstance])
             if(keys.contains(v.asInstanceOf[PTATupleInstance].left.asInstanceOf[PTAConcreteStringInstance].string)){
-              newfacts += (RFAFact(VarSlot(retVar, false, false), v.asInstanceOf[PTATupleInstance].right))
+              newfacts += (new RFAFact(VarSlot(retVar, false, false), v.asInstanceOf[PTATupleInstance].right))
             }
         }
       } else if(!entValue.isEmpty) {
         entValue.foreach{
           v =>
             require(v.isInstanceOf[PTATupleInstance])
-            newfacts += (RFAFact(VarSlot(retVar, false, false), v.asInstanceOf[PTATupleInstance].right))
+            newfacts += (new RFAFact(VarSlot(retVar, false, false), v.asInstanceOf[PTATupleInstance].right))
         }
       } else {
-        newfacts += (RFAFact(VarSlot(retVar, false, false), PTAInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE.toUnknown, currentContext.copy, false)))
+        newfacts += (new RFAFact(VarSlot(retVar, false, false), PTAInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE.toUnknown, currentContext.copy, false)))
       }
     }
     if(newfacts.isEmpty){
-      newfacts ++= defaultValue.map(RFAFact(VarSlot(retVar, false, false), _))
+      newfacts ++= defaultValue.map(new RFAFact(VarSlot(retVar, false, false), _))
     }
     (newfacts, delfacts)
   }

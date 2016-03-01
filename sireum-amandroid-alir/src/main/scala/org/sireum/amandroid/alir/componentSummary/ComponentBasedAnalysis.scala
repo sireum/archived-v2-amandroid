@@ -50,6 +50,7 @@ import org.sireum.jawa.alir.Context
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper.IntentContent
 import org.sireum.jawa.JawaType
 import java.util.concurrent.TimeoutException
+import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFactFactory
 
 /**
  * @author fgwei
@@ -79,6 +80,7 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
         apk.getEnvMap.get(component) match {
           case Some((esig, _)) =>
             val ep = global.getMethod(esig).get // need to double check
+            implicit val factory = new RFAFactFactory
             val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
             val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager)
             yard.addIDFG(component, idfg)
@@ -152,7 +154,6 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
           val intent_summary: Intent_Summary = summaryTable.get(CHANNELS.INTENT_CHANNEL)
           intent_summary.asCaller foreach {
             case (callernode, intent_caller) =>
-              println(intent_caller)
               val icc_callees = allIntentCallees.filter(_._2.matchWith(intent_caller))
               icc_callees foreach {
                 case (calleenode, icc_callee) =>
