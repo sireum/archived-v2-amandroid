@@ -218,7 +218,7 @@ case class DexInstructionToPilarParser(
         else defaultType.undetermined(position, false)
       val typs: IList[JawaType] =
         if(secondPass) {
-          resolveUndetermined(undetermined)
+          resolveUndeterminedForConst(undetermined)
         } else {
           regMap(reg) = undetermined
           ilistEmpty :+ defaultType
@@ -1473,9 +1473,16 @@ case class DexInstructionToPilarParser(
             case _ => JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE
           }
           val reg2typ = resolveRegType(reg2pos, reg2, defaultTyp, false, isHolder = true)
-          val reg1typ = reg2typ match {
-            case jt: DedexJawaType => resolveRegType(reg1pos, reg1, jt.typ, true)
-            case ut: DedexUndeterminedType => resolveRegType(reg1pos, reg1, defaultTyp, true)
+          val reg1typ = if(secondPass) {
+            undeterminedMap.get(reg1pos) match {
+              case Some(ut) => DedexJawaType(resolveUndeterminedForMove(ut))
+              case None => resolveRegType(reg1pos, reg1, reg2typ.asInstanceOf[DedexJawaType].typ, true)
+            }
+          } else {
+            reg2typ match {
+              case jt: DedexJawaType => resolveRegType(reg1pos, reg1, jt.typ, true)
+              case ut: DedexUndeterminedType => defaultTyp.undetermined(reg1pos, true)
+            }
           }
           val reg1Name = genRegName(reg1, reg1typ)
           val reg2Name = genRegName(reg2, reg2typ)
@@ -1782,8 +1789,19 @@ case class DexInstructionToPilarParser(
           val reg1 = read8Bit()
           val reg2pos = Position(instrBase, 1)
           val reg2 = read16Bit()
-          val reg1typ = resolveRegType(reg1pos, reg1, JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, true)
-          val reg2typ = resolveRegType(reg2pos, reg2, JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, false)
+//          val reg1typ = resolveRegType(reg1pos, reg1, JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, true)
+          val reg2typ = resolveRegType(reg2pos, reg2, JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, false, isHolder = true)
+          val reg1typ = if(secondPass) {
+            undeterminedMap.get(reg1pos) match {
+              case Some(ut) => DedexJawaType(resolveUndeterminedForMove(ut))
+              case None => resolveRegType(reg1pos, reg1, reg2typ.asInstanceOf[DedexJawaType].typ, true)
+            }
+          } else {
+            reg2typ match {
+              case jt: DedexJawaType => resolveRegType(reg1pos, reg1, jt.typ, true)
+              case ut: DedexUndeterminedType => JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE.undetermined(reg1pos, true)
+            }
+          }
           val reg1Name = genRegName(reg1, reg1typ)
           val reg2Name = genRegName(reg2, reg2typ)
           val code = instrCode match {
@@ -1821,7 +1839,17 @@ case class DexInstructionToPilarParser(
           val reg2pos = Position(instrBase, 1)
           val reg2 = read16Bit()
           val reg2typ = resolveRegType(reg2pos, reg2, JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, false, isHolder = true)
-          val reg1typ = resolveRegType(reg1pos, reg1, JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE, true)
+          val reg1typ = if(secondPass) {
+            undeterminedMap.get(reg1pos) match {
+              case Some(ut) => DedexJawaType(resolveUndeterminedForMove(ut))
+              case None => resolveRegType(reg1pos, reg1, reg2typ.asInstanceOf[DedexJawaType].typ, true)
+            }
+          } else {
+            reg2typ match {
+              case jt: DedexJawaType => resolveRegType(reg1pos, reg1, jt.typ, true)
+              case ut: DedexUndeterminedType => JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE.undetermined(reg1pos, true)
+            }
+          }
           val reg1Name = genRegName(reg1, reg1typ)
           val reg2Name = genRegName(reg2, reg2typ)
           val code = instrCode match {

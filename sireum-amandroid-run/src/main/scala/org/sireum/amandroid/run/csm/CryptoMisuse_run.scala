@@ -95,7 +95,7 @@ object CryptoMisuse_run {
       val outputUri = FileUtil.toUri(outputPath)
       val apk = yard.loadApk(file, outputUri, dpsuri, false, false, false)
       val csa = new ComponentBasedAnalysis(global, yard)
-      csa.phase1(apk, false)
+      csa.phase1(apk, false)(10 minutes)
       val idfgs = yard.getIDFGs
       idfgs.foreach{
         case (rec, idfg) =>

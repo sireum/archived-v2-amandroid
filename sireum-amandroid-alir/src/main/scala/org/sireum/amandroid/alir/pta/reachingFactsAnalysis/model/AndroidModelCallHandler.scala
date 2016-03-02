@@ -30,6 +30,7 @@ import org.sireum.jawa.ScopeManager
 import org.sireum.amandroid.Apk
 import org.sireum.jawa.Global
 import org.sireum.jawa.Signature
+import org.sireum.jawa.alir.pta.PTAScopeManager
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -51,7 +52,7 @@ object AndroidModelCallHandler extends ModelCallHandler{
     FrameworkMethodsModel.isFrameworkMethods(calleeMethod) ||
     ActivityModel.isActivity(r) ||
     super.isModelCall(calleeMethod) ||
-    ScopeManager.getCurrentScopeManager.shouldBypass(r)
+    PTAScopeManager.shouldBypass(r)
   }
   
   def isICCCall(calleeSig: Signature): Boolean = {

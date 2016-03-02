@@ -51,6 +51,10 @@ import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.IntentHelper.IntentCo
 import org.sireum.jawa.JawaType
 import java.util.concurrent.TimeoutException
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFactFactory
+import org.sireum.jawa.util.FutureUtil
+import scala.concurrent.ExecutionContext.Implicits.{global => ec}
+import scala.concurrent.Await
+import scala.concurrent.duration._
 
 /**
  * @author fgwei
@@ -66,7 +70,7 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
   /**
    * ComponentBasedAnalysis phase1 is doing intra component analysis for one giving apk.
    */
-  def phase1(apk: Apk, parallel: Boolean) = {
+  def phase1(apk: Apk, parallel: Boolean)(implicit timeout: FiniteDuration) = {
     println(TITLE + ":" + "-------Phase 1-------")
     AndroidReachingFactsAnalysisConfig.resolve_icc = false // We don't want to resolve ICC at this phase
     var components = apk.getComponents
@@ -75,8 +79,7 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
     while(!worklist.isEmpty) {
       val component = worklist.remove(0)
       println("-------Analyze component " + component + "--------------")
-      try{
-        // do pta on this component
+      val (f, cancel) = FutureUtil.interruptableFuture[Unit] { () =>
         apk.getEnvMap.get(component) match {
           case Some((esig, _)) =>
             val ep = global.getMethod(esig).get // need to double check
@@ -91,8 +94,13 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
             problematicComp += component
             global.reporter.error(TITLE, "Component " + component + " did not have environment! Some package or name mismatch maybe in the Manifestfile.")
         }
+      }
+      try{
+        // do pta on this component
+        Await.result(f, timeout)
       } catch {
         case te: TimeoutException =>
+          cancel()
           problematicComp += component
           global.reporter.error(TITLE, "Timeout for " + component)
         case ex: Exception =>

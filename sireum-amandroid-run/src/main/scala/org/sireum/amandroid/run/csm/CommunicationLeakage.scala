@@ -80,20 +80,9 @@ object CommunicationLeakage_run {
           val reporter = new PrintReporter(MsgLevel.ERROR) //INFO
           val global = new Global(file, reporter)
           global.setJavaLib(AndroidGlobalConfig.lib_files)
-          val (f, cancel) = FutureUtil.interruptableFuture { () => 
-            CommunicationLeakageTask(global, outputUri, dpsuri, file).run
-          }
-          try {
-            Await.result(f, 10 minutes)
-            CommunicationLeakageCounter.haveresult += 1
-          } catch {
-            case te: TimeoutException => 
-              cancel()
-              reporter.error(TITLE, te.getMessage)
-          }
-          
+          CommunicationLeakageTask(global, outputUri, dpsuri, file).run
+          CommunicationLeakageCounter.haveresult += 1
         } catch {
-          
           case e: Throwable => e.printStackTrace()
         } finally {
           println(TITLE + " " + CommunicationLeakageCounter.toString)
@@ -111,7 +100,7 @@ object CommunicationLeakage_run {
       val apk: Apk = yard.loadApk(file, outputUri, dpsuri, false, false, true)
       val ssm = new CommunicationSourceAndSinkManager(global, apk, apk.getLayoutControls, apk.getCallbackMethods, AndroidGlobalConfig.sas_file)
       val cba = new ComponentBasedAnalysis(global, yard)
-      cba.phase1(apk, false)
+      cba.phase1(apk, false)(10 minutes)
       val iddResult = cba.phase2(Set(apk), false)
       val tar = cba.phase3(iddResult, ssm)
       tar.foreach{

@@ -118,16 +118,8 @@ object CryptoMisuse {
               if(debug) new FileReporter(getOutputDirUri(FileUtil.toUri(outputPath), fileUri), MsgLevel.INFO)
               else new NoReporter
             val global = new Global(fileUri, reporter)
-            val (f, cancel) = FutureUtil.interruptableFuture[String] { () => 
-              CryptoMisuseTask(global, fileUri, outputPath, dpsuri, parallel).run
-            }
-            try {
-              println(Await.result(f, timeout minutes))
-            } catch {
-              case te: TimeoutException => 
-                cancel()
-                println(te.getMessage)
-            }
+            global.setJavaLib(liblist)
+            println(CryptoMisuseTask(global, fileUri, outputPath, dpsuri, parallel, timeout).run)
             if(debug) println("Debug info write into " + reporter.asInstanceOf[FileReporter].f)
           } catch {
             case ie: IgnoreException => println("No crypto api found.")
@@ -142,14 +134,14 @@ object CryptoMisuse {
     }
   }
   
-  private case class CryptoMisuseTask(global: Global, nameUri: FileResourceUri, outputPath: String, dpsuri: Option[FileResourceUri], parallel: Boolean) {
+  private case class CryptoMisuseTask(global: Global, nameUri: FileResourceUri, outputPath: String, dpsuri: Option[FileResourceUri], parallel: Boolean, timeout: Int) {
     def run: String = {
       global.reporter.echo(TITLE, "####" + nameUri + "#####")
       val yard = new ApkYard(global)
       val outputUri = FileUtil.toUri(outputPath)
       val apk = yard.loadApk(nameUri, outputUri, dpsuri, false, false, true)
       val csa = new ComponentBasedAnalysis(global, yard)
-      csa.phase1(apk, parallel)
+      csa.phase1(apk, parallel)(timeout minutes)
       val idfgs = yard.getIDFGs
       idfgs.foreach{
         case (rec, idfg) =>

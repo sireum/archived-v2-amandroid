@@ -306,6 +306,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
   }
   
   class Callr extends CallResolver[RFAFact] {
+    val pureNormalFlagMap: MMap[ICFGNode, Boolean] = mmapEmpty
     /**
      * It returns the facts for each callee entry node and caller return node
      */
@@ -322,7 +323,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
       var returnFacts: ISet[RFAFact] = s
       val genSet: MSet[RFAFact] = msetEmpty
       val killSet: MSet[RFAFact] = msetEmpty
-      var pureNormalFlag = true  //no mix of normal and model callee
+      var pureNormalFlag = pureNormalFlagMap.getOrElseUpdate(callerNode, true)
       
       val args = cj.callExp.arg match{
         case te: TupleExp =>
@@ -347,7 +348,6 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
                 killSet ++= factsForCallee -- ReachingFactsAnalysisHelper.getGlobalFacts(s) // don't remove global facts for ICC call
                 val (retFacts, targets) = AndroidReachingFactsAnalysisHelper.doICCCall(global, apk, ptaresult, calleeSig, args, cj.lhss.map(lhs=>lhs.name.name), callerContext)
                 genSet ++= retFacts
-                
                 targets.foreach{
                   target =>
                     if(!icfg.isProcessed(target.getSignature, callerContext)){
@@ -377,7 +377,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
         if(icfg.hasEdge(icfgCallnode, icfgReturnnode)) {
           icfg.deleteEdge(icfgCallnode, icfgReturnnode)
         }
-      }
+      } else pureNormalFlagMap(callerNode) = pureNormalFlag
       
       /**
        * update ptaresult with each callee params and return var's points-to info

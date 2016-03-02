@@ -147,16 +147,7 @@ object TanitAnalysis{
               else new NoReporter
             val global = new Global(file, reporter)
             global.setJavaLib(liblist)
-            val (f, cancel) = FutureUtil.interruptableFuture { () =>
-              TaintTask(module, global, sasFilePath, outputUri, dpsuri, file, parallel).run
-            }
-            try {
-              Await.result(f, timeout minutes)
-            } catch {
-              case te: TimeoutException => 
-                cancel()
-                println(te.getMessage)
-            }
+            println(TaintTask(module, global, sasFilePath, outputUri, dpsuri, file, parallel, timeout).run)
             println()
             if(debug) println("Debug info write into " + reporter.asInstanceOf[FileReporter].f)
           } catch {
@@ -177,7 +168,7 @@ object TanitAnalysis{
   /**
    * Timer is a option of tuple, left is the time second you want to timer, right is whether use this timer for each of the components during analyze.
    */
-  private case class TaintTask(module: String, global: Global, sasFilePath: String, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], file: FileResourceUri, parallel: Boolean) {
+  private case class TaintTask(module: String, global: Global, sasFilePath: String, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], file: FileResourceUri, parallel: Boolean, timeout: Int) {
     def run: String = {
       ScopeManager.setScopeManager(new AndroidRFAScopeManager)
       val yard = new ApkYard(global)
@@ -188,7 +179,7 @@ object TanitAnalysis{
         case "PASSWORD_TRACKING" =>  new PasswordSourceAndSinkManager(global, apk, apk.getLayoutControls, apk.getCallbackMethods, sasFilePath)
       }
       val cba = new ComponentBasedAnalysis(global, yard)
-      cba.phase1(apk, parallel)
+      cba.phase1(apk, parallel)(timeout minutes)
       val iddResult = cba.phase2(Set(apk), false)
       val tar = cba.phase3(iddResult, ssm)
       onAnalysisSuccess(global, yard, apk, outputUri)

@@ -85,17 +85,8 @@ object DataLeakage_run {
         val global = new Global(file, reporter)
         global.setJavaLib(AndroidGlobalConfig.lib_files)
         try {
-          val (f, cancel) = FutureUtil.interruptableFuture[String] { () =>
-            DataLeakageTask(global, "DataLeakage", outputUri, dpsuri, file).run
-          }
-          try {
-            println(Await.result(f, 5 minutes))
-            DataLeakageCounter.haveresult += 1
-          } catch {
-            case te: TimeoutException => 
-              cancel()
-              reporter.error(TITLE, te.getMessage)
-          }
+          DataLeakageTask(global, "DataLeakage", outputUri, dpsuri, file).run
+          DataLeakageCounter.haveresult += 1
         } catch {
           case e: Throwable => e.printStackTrace()
         } finally {
@@ -126,7 +117,7 @@ object DataLeakage_run {
           new DataLeakageAndroidSourceAndSinkManager(global, apk, apk.getLayoutControls, apk.getCallbackMethods, AndroidGlobalConfig.sas_file)
       }
       val cba = new ComponentBasedAnalysis(global, yard)
-      cba.phase1(apk, false)
+      cba.phase1(apk, false)(10 minutes)
       val iddResult = cba.phase2(Set(apk), false)
       val tar = cba.phase3(iddResult, ssm)
       tar.foreach{

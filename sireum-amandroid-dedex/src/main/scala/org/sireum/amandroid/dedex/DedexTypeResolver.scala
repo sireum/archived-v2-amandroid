@@ -103,28 +103,29 @@ trait DedexTypeResolver { self: DexInstructionToPilarParser =>
       DedexJawaType(this.positionTypMap.getOrElseUpdate(position, defaultTyp))
     } else {
       val typ = this.regMap.getOrElseUpdate(reg, DedexJawaType(defaultTyp))
+      val theDefaultTyp = this.positionTypMap.getOrElseUpdate(position, defaultTyp)
       typ match {
         case ut: DedexUndeterminedType =>
           if(isHolder) {
             ut.typHolders += position
             ut
-          } else if (!ut.objectable && defaultTyp.isObject) {
+          } else if (!ut.objectable && theDefaultTyp.isObject) {
             if(isLeft)
-              this.regMap(reg) = DedexJawaType(defaultTyp)
-            this.positionTypMap(position) = defaultTyp
-            DedexJawaType(defaultTyp)
-          } else if (ut.typs.exists(_._2.isPrimitive) && defaultTyp.isObject) {
+              this.regMap(reg) = DedexJawaType(theDefaultTyp)
+            this.positionTypMap(position) = theDefaultTyp
+            DedexJawaType(theDefaultTyp)
+          } else if (ut.typs.exists(_._2.isPrimitive) && theDefaultTyp.isObject) {
             if(isLeft)
-              this.regMap(reg) = DedexJawaType(defaultTyp)
-            this.positionTypMap(position) = defaultTyp
-            DedexJawaType(defaultTyp)
+              this.regMap(reg) = DedexJawaType(theDefaultTyp)
+            this.positionTypMap(position) = theDefaultTyp
+            DedexJawaType(theDefaultTyp)
           } else {
-            ut.possible(position, defaultTyp, isLeft)
+            ut.possible(position, theDefaultTyp, isLeft)
           }
         case jt: DedexJawaType =>
           var result = jt.typ
           if(isLeft) {
-            result = defaultTyp
+            result = theDefaultTyp
             this.regMap(reg) = DedexJawaType(result)
           }
           this.positionTypMap(position) = result
@@ -133,34 +134,19 @@ trait DedexTypeResolver { self: DexInstructionToPilarParser =>
     }
   }
   
-  protected[dedex] def resolveUndetermined(ut: DedexUndeterminedType): IList[JawaType] = {
-    val result: MSet[JawaType] = msetEmpty
-    val rightTyps: MList[(Position, JawaType)] = mlistEmpty
-    val leftTyps: MList[(Position, JawaType)] = mlistEmpty
-    if(ut.typs.isEmpty) {
-      result += ut.defaultType
-    } else {
-      val primitiveTyps: MSet[(Position, JawaType)] = msetEmpty
-      val arrayTyps: MSet[(Position, JawaType)] = msetEmpty
-      val objectTyps: MSet[(Position, JawaType)] = msetEmpty
-      ut.typs foreach {
-        case (position, typ, _) =>
-          if(typ.isArray) arrayTyps += ((position, typ))
-          else if(typ.isObject) objectTyps += ((position, typ))
-          else primitiveTyps += ((position, typ))
-      }
-      primitiveTyps foreach {
-        case (position, typ) =>
-          result += typ
-          this.positionTypMap(position) = typ
-      }
-      arrayTyps foreach {
-        case (position, typ) =>
-          result += typ
-          this.positionTypMap(position) = typ
-          ut.typHolders.foreach(this.positionTypMap(_) = typ)
-      }
-      if(!objectTyps.isEmpty) {
+  protected[dedex] def resolveUndeterminedForMove(ut: DedexUndeterminedType): JawaType = {
+    var result: JawaType = ut.defaultType
+    val primitiveTyps: MSet[(Position, JawaType)] = msetEmpty
+    val arrayTyps: MSet[(Position, JawaType)] = msetEmpty
+    val objectTyps: MSet[(Position, JawaType)] = msetEmpty
+    ut.typs foreach {
+      case (position, typ, _) =>
+        if(typ.isArray) arrayTyps += ((position, typ))
+        else if(typ.isObject) objectTyps += ((position, typ))
+        else primitiveTyps += ((position, typ))
+    }
+    if(ut.objectable) {
+      if(arrayTyps.isEmpty) {
         val otyplist = objectTyps.toList
         var res = otyplist.head._2
         otyplist.tail foreach {
@@ -184,9 +170,80 @@ trait DedexTypeResolver { self: DexInstructionToPilarParser =>
           case (position, typ) =>
             this.positionTypMap(position) = res
         }
-        ut.typHolders.foreach(this.positionTypMap(_) = res)
-        result += res
+        result = res
+      } else {
+        if(arrayTyps.size == 1) result = arrayTyps.head._2
+        arrayTyps foreach{case (position, _ ) => this.positionTypMap(position) = result}
       }
+      ut.typHolders.foreach(this.positionTypMap(_) = result)
+    } else {
+      if(primitiveTyps.size == 1) result = primitiveTyps.head._2
+      primitiveTyps foreach{case (position, _ ) => this.positionTypMap(position) = result}
+    }
+    result
+  }
+  
+  protected[dedex] def resolveUndeterminedForConst(ut: DedexUndeterminedType): IList[JawaType] = {
+    val result: MSet[JawaType] = msetEmpty
+    val rightTyps: MList[(Position, JawaType)] = mlistEmpty
+    val leftTyps: MList[(Position, JawaType)] = mlistEmpty
+    if(ut.typs.isEmpty) {
+      result += ut.defaultType
+    } else {
+      val primitiveTyps: MSet[(Position, JawaType)] = msetEmpty
+      val objectable: MSet[Position] = msetEmpty
+      ut.typs foreach {
+        case (position, typ, _) =>
+          if(typ.isArray || typ.isObject) objectable += position
+          else primitiveTyps += ((position, typ))
+      }
+      primitiveTyps foreach {
+        case (position, typ) =>
+          result += typ
+          this.positionTypMap(position) = typ
+      }
+      if(!objectable.isEmpty) {
+        val typ = JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE
+        result += typ
+        objectable.foreach {
+          position =>
+            this.positionTypMap(position) = typ
+        }
+        ut.typHolders.foreach(this.positionTypMap(_) = typ)
+      }
+//      arrayTyps foreach {
+//        case (position, typ) =>
+//          result += typ
+//          this.positionTypMap(position) = typ
+//          ut.typHolders.foreach(this.positionTypMap(_) = typ)
+//      }
+//      if(!objectTyps.isEmpty) {
+//        val otyplist = objectTyps.toList
+//        var res = otyplist.head._2
+//        otyplist.tail foreach {
+//          case (position, typ) =>
+//            val oldSig = JavaKnowledge.formatTypeToSignature(res)
+//            val newSig = JavaKnowledge.formatTypeToSignature(typ)
+//            if(oldSig != newSig) {
+//              try {
+//                var ancestorSig = dexOffsetResolver.findCommonAncestor(oldSig, newSig)
+//                if(ancestorSig != null) {
+//                  ancestorSig = "L" + ancestorSig + ";"
+//                  res = JavaKnowledge.formatSignatureToType(ancestorSig)
+//                }
+//              } catch {
+//                case e: Exception =>
+//                  res = JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE
+//              }
+//            }
+//        }
+//        otyplist foreach {
+//          case (position, typ) =>
+//            this.positionTypMap(position) = res
+//        }
+//        ut.typHolders.foreach(this.positionTypMap(_) = res)
+//        result += res
+//      }
     }
     result.toList
   }

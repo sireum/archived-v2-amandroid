@@ -415,6 +415,7 @@ class PilarStyleCodeGenerator(
     }
     
     val procTemplate = template.getInstanceOf("ProcedureDecl")
+//    if(sig.signature == "Lavm;.a:([B)[B") {
     procTemplate.add("retTyp", generateType(retTyp))
     procTemplate.add("procedureName", procName)
     val params: ArrayList[ST] = new ArrayList[ST]
@@ -457,6 +458,7 @@ class PilarStyleCodeGenerator(
     } else {
       procTemplate.add("body", "# return;")
     }
+//    }
     procTemplate
   }
   

@@ -14,18 +14,16 @@
  *    Wu Zhou - Fireeye
  *    Fengchi Lin - Chinese People's Public Security University
  ******************************************************************************/
-package org.sireum.amandroid.run.security
+package org.sireum.amandroid.run.csm
 
 import org.sireum.amandroid.security._
 import org.sireum.util.FileUtil
-import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.security.apiMisuse.HttpsMisuse
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.util.FileResourceUri
 import org.sireum.jawa.DefaultReporter
 import org.sireum.jawa.Global
-import org.sireum.amandroid.Apk
 import org.sireum.amandroid.alir.componentSummary.ApkYard
 import org.sireum.amandroid.alir.componentSummary.ComponentBasedAnalysis
 import scala.concurrent.ExecutionContext.Implicits.{global => ec}
@@ -33,6 +31,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import java.util.concurrent.TimeoutException
 import org.sireum.jawa.util.FutureUtil
+import scala.concurrent.ExecutionContext.Implicits.{global => ec}
 
 /**
  * @author <a href="mailto:i@flanker017.me">Qidan He</a>
@@ -118,7 +117,7 @@ object HttpsMisuse_run {
       val outputUri = FileUtil.toUri(outputPath)
       val apk = yard.loadApk(file, outputUri, dpsuri, false, false, false)
       val cba = new ComponentBasedAnalysis(global, yard)
-      cba.phase1(apk, false)
+      cba.phase1(apk, false)(10 minutes)
       val idfgs = yard.getIDFGs
       idfgs.foreach{
         case (rec, idfg) =>
