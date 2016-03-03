@@ -1,4 +1,4 @@
-# Welcome! Thank you for contributing to Scala!
+# Welcome! Thank you for contributing to Amandroid!
 We follow the standard GitHub [fork & pull](https://help.github.com/articles/using-pull-requests/#fork--pull) 
 approach to pull requests. Just fork the official repo, develop in a branch, and submit a PR!
 
@@ -58,7 +58,7 @@ Some characteristics of good tests:
 
 * includes comments: what is being tested and why?
 * be minimal, deterministic, stable (unaffected by irrelevant changes), easy to understand and review
-* have minimal dependencies: a compiler bug test should not depend on, e.g., the Scala library
+* have minimal dependencies
 
 ### Documentation
 
@@ -108,4 +108,4 @@ A reviewer gives the green light by commenting "LGTM" (looks good to me).
 
 A review feedback may be addressed by pushing new commits to the request, if these commits stand on their own.
 
-Once all these conditions are met, and we agree with the change (we are available on scala-internals to discuss this beforehand, before you put in the coding work!), we will merge your changes.
+Once all these conditions are met, and we agree with the change, we will merge your changes.
