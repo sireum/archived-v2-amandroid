@@ -98,7 +98,7 @@ http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
 
 ### Pass code review
 
-Your PR will need to be assigned to a reviewer. (Now just assign to @fgwei.)
+Your PR will need to be assigned to a reviewer. (Now just assign to [`@fgwei`](https://github.com/fgwei).)
 
 To assign a reviewer, add a "review by @reviewer" to your PR description.
 
