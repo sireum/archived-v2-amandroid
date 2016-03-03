@@ -24,6 +24,6 @@ To contribute to the Amandroid Core, Amandroid Alir, Amandroid Dedex, Amandroid 
 
 For more information on building and developing Amandroid, please also check out our [guidelines for contributing](CONTRIBUTING.md).
  
+# What to contribute
 
-
-
+If you don't know what to contribute, please check out our [Challenges need to resolve](CHALLENGE.md).
