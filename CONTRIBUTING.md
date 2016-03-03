@@ -95,3 +95,17 @@ say so.
 
 Here is standard advice on good commit messages:
 http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
+
+### Pass code review
+
+Your PR will need to be assigned to a reviewer. (Now just assign to @fgwei.)
+
+To assign a reviewer, add a "review by @reviewer" to your PR description.
+
+NOTE: it's best not to @mention in commit messages, as github pings you every time a commit with your @name on it shuffles through the system (even in other repos, on merges,...).
+
+A reviewer gives the green light by commenting "LGTM" (looks good to me).
+
+A review feedback may be addressed by pushing new commits to the request, if these commits stand on their own.
+
+Once all these conditions are met, and we agree with the change (we are available on scala-internals to discuss this beforehand, before you put in the coding work!), we will merge your changes.
