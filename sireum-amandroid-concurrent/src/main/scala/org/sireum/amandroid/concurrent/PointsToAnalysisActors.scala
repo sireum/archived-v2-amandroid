@@ -68,7 +68,6 @@ class PointsToAnalysisActor extends Actor with ActorLogging {
     val apk = ptadata.apk
     val components = apk.getComponents
     val futures: MSet[Future[RFAResult]] = msetEmpty
-    implicit val timeout = 
     
     components foreach {
       compTyp =>
@@ -76,7 +75,7 @@ class PointsToAnalysisActor extends Actor with ActorLogging {
           case Some((esig, _)) =>
             ptadata.algos match {
               case PTAAlgorithms.RFA =>
-                futures += rfaActor.ask(RFAData(apk, ptadata.outApkUri, ptadata.srcFolders, esig, 10 minutes))(15 minutes).mapTo[RFAResult]
+                futures += rfaActor.ask(RFAData(apk, ptadata.outApkUri, ptadata.srcFolders, esig, 10 minutes))(40 minutes).mapTo[RFAResult]
             }
           case None =>
             log.error("Component " + compTyp.name + " did not have environment! Some package or name mismatch maybe in the Manifestfile.")

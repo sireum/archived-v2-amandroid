@@ -35,8 +35,8 @@ import org.sireum.jawa.Signature
 object CryptographicMisuse {
   
   def apply(global: Global, idfg : InterProceduralDataFlowGraph) : Unit
-  	= build(global, idfg)
-  	
+    = build(global, idfg)
+    
   def build(global: Global, idfg : InterProceduralDataFlowGraph) : Unit = {
     val icfg = idfg.icfg
     val ptaresult = idfg.ptaresult
@@ -67,8 +67,8 @@ object CryptographicMisuse {
     val nodes : MSet[ICFGCallNode] = msetEmpty
     nodeMap.foreach{
       case (sig, ns) =>
-      	if(CryptographicConstants.getCipherGetinstanceAPIs.contains(sig))
-      	  nodes ++= ns
+        if(CryptographicConstants.getCipherGetinstanceAPIs.contains(sig))
+          nodes ++= ns
     }
     nodes.foreach{
       node =>
@@ -80,17 +80,17 @@ object CryptographicMisuse {
             jumploc.jump match {
               case t : CallJump if t.jump.isEmpty =>
                 t.callExp.arg match {
-				          case te : TupleExp =>
-				            val exps = te.exps
-				            for(i <- 0 to (exps.size-1)) {
-				              val varName = exps(i) match{
-				                case ne : NameExp => ne.name.name
-				                case a => a.toString()
-				              }
-				              argNames += varName
-		                }
-				          case _ =>
-				        }
+                  case te : TupleExp =>
+                    val exps = te.exps
+                    for(i <- 0 to (exps.size-1)) {
+                      val varName = exps(i) match{
+                        case ne : NameExp => ne.name.name
+                        case a => a.toString()
+                      }
+                      argNames += varName
+                    }
+                  case _ =>
+                }
               case _ =>
             }
           case _ =>
@@ -114,33 +114,33 @@ object CryptographicMisuse {
     node match{
       case invNode : ICFGCallNode =>
         val calleeSet = invNode.getCalleeSet
-		    calleeSet.foreach{
-		      callee =>
-		        val calleep = callee.callee
-		        val callees : MSet[Signature] = msetEmpty
-				    val caller = global.getMethod(invNode.getOwner).get
-				    val jumpLoc = caller.getBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
-				    val cj = jumpLoc.jump.asInstanceOf[CallJump]
-//				    if(calleep.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
-//				      val calleeSignature = cj.getValueAnnotation("signature") match {
-//				        case Some(s) => s match {
-//				          case ne : NameExp => ne.name.name
-//				          case _ => ""
-//				        }
-//				        case None => throw new RuntimeException("cannot found annotation 'signature' from: " + cj)
-//				      }
-//				      // source and sink APIs can only come from given app's parents.
-//				      callees ++= Center.getMethodDeclarations(calleeSignature)
-//				    } else {
-				      callees += calleep
-//				    }
-		        callees.foreach{
-		          callee =>
-						    if(CryptographicConstants.getCryptoAPIs.contains(callee.signature)){
-						      result += ((callee.signature, invNode))
-						    }
-		        }
-		    }
+        calleeSet.foreach{
+          callee =>
+            val calleep = callee.callee
+            val callees : MSet[Signature] = msetEmpty
+            val caller = global.getMethod(invNode.getOwner).get
+            val jumpLoc = caller.getBody.location(invNode.getLocIndex).asInstanceOf[JumpLocation]
+            val cj = jumpLoc.jump.asInstanceOf[CallJump]
+//            if(calleep.getSignature == Center.UNKNOWN_PROCEDURE_SIG){
+//              val calleeSignature = cj.getValueAnnotation("signature") match {
+//                case Some(s) => s match {
+//                  case ne : NameExp => ne.name.name
+//                  case _ => ""
+//                }
+//                case None => throw new RuntimeException("cannot found annotation 'signature' from: " + cj)
+//              }
+//              // source and sink APIs can only come from given app's parents.
+//              callees ++= Center.getMethodDeclarations(calleeSignature)
+//            } else {
+              callees += calleep
+//            }
+            callees.foreach{
+              callee =>
+                if(CryptographicConstants.getCryptoAPIs.contains(callee.signature)){
+                  result += ((callee.signature, invNode))
+                }
+            }
+        }
       case _ =>
     }
     result.toSet

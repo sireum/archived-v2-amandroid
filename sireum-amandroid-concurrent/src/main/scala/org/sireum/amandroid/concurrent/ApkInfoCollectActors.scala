@@ -29,6 +29,11 @@ import scala.concurrent.ExecutionContext.Implicits.{global => sc}
 import scala.concurrent.Await
 import java.util.concurrent.TimeoutException
 import org.sireum.amandroid.concurrent.util.GlobalUtil
+import java.io.PrintWriter
+import org.json4s._
+import org.json4s.native.Serialization
+import org.json4s.native.Serialization.{read, write}
+import org.sireum.amandroid.serialization.ApkSerializer
 
 class ApkInfoCollectActor extends Actor with ActorLogging {
   def receive: Receive = {
@@ -54,7 +59,21 @@ class ApkInfoCollectActor extends Actor with ActorLogging {
     }
     val res =
       try {
-        Await.result(f, acdata.timeout)
+        val res = Await.result(f, acdata.timeout)
+        val apkRes = FileUtil.toFile(MyFileUtil.appendFileName(outApkUri, "apk.json"))
+        val oapk = new PrintWriter(apkRes)
+        implicit val formats = Serialization.formats(NoTypeHints) + ApkSerializer
+        try {
+          write(apk, oapk)
+        } catch {
+          case e: Exception =>
+            apkRes.delete()
+            PointsToAnalysisFailResult(apk.nameUri, e)
+        } finally {
+          oapk.flush()
+          oapk.close()
+        }
+        res
       } catch {
         case te: TimeoutException =>
           cancel()

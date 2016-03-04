@@ -45,7 +45,7 @@ class AmandroidSupervisorActor extends Actor with ActorLogging {
     case dr: DecompilerResult =>
       dr match {
         case dsr: DecompileSuccResult =>
-          apkInfoColActor ! ApkInfoCollectData(dsr.fileUri, dsr.outApkUri, dsr.srcFolders, 20 minutes)
+          apkInfoColActor ! ApkInfoCollectData(dsr.fileUri, dsr.outApkUri, dsr.srcFolders, 30 minutes)
         case dfr: DecompileFailResult =>
           log.error(dfr.e, "Decompile fail on " + dfr.fileUri)
       }
@@ -83,11 +83,11 @@ class AmandroidSupervisorActorPrioMailbox(settings: ActorSystem.Settings, config
 object AmandroidTestApplication extends App {
   val _system = ActorSystem("AmandroidTestApplication", ConfigFactory.load)
   val supervisor = _system.actorOf(Props[AmandroidSupervisorActor], name = "AmandroidSupervisorActor")
-  val fileUris = FileUtil.listFiles(FileUtil.toUri("/Users/fgwei/Develop/Sireum/apps/amandroid/sources/icc-bench"), ".apk", true)
-  val outputUri = FileUtil.toUri("/Users/fgwei/Work/output/icc-bench")
+  val fileUris = FileUtil.listFiles(FileUtil.toUri("/Users/fgwei/Work/Source/fcapps"), ".apk", true)
+  val outputUri = FileUtil.toUri("/Users/fgwei/Work/output/fcapps")
   val futures = fileUris map {
     fileUri =>
-      (supervisor.ask(AnalysisSpec(fileUri, outputUri, None, true, true))(30 minutes)).mapTo[ApkInfoCollectResult].recover{
+      (supervisor.ask(AnalysisSpec(fileUri, outputUri, None, true, true))(600 minutes)).mapTo[ApkInfoCollectResult].recover{
         case ex: Exception => 
             (fileUri, false)
         }
