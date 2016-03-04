@@ -3,7 +3,7 @@ amandroid [![Gitter](https://badges.gitter.im/sireum/amandroid.svg)](https://git
 
 This is official reporitory for the [Amandroid](http://amandroid.sireum.org/).
 
-# Repository structure
+## Repository structure
 
 ```
 amandroid/
@@ -18,12 +18,12 @@ amandroid/
 +--sireum-amandroid-test          Test suite.
 ```
 
-# How to contribute
+## How to contribute
 
 To contribute to the Amandroid Core, Amandroid Alir, Amandroid Dedex, Amandroid Serialization, Amandroid Concurrent, please send us a [pull request](https://help.github.com/articles/using-pull-requests/#fork--pull) from your fork of this repository!
 
 For more information on building and developing Amandroid, please also check out our [guidelines for contributing](CONTRIBUTING.md).
  
-# What to contribute
+## What to contribute
 
 If you don't know what to contribute, please check out our [Challenges need to resolve](CHALLENGE.md).
