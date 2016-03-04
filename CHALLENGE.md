@@ -28,7 +28,7 @@ In package `org.sireum.amandroid.alir.pta.reachingFactsAnalysis.model`:
 ##sireum-amandroid-dedex
 In package `org.sireum.amandroid.dedex`,
 
-- `#c10`. Register type resolving in DedexTypeResolver.scala and DexInstructionToPilarParser need to be tested and cleaned (or even redesigned). The main beast is the const4 resoling, as it can be `int`/`short`/`boolean` 0 or `object` null. (Important!) (Post by [`@fgwei`](https://github.com/fgwei))
+- `#c10`. Register type resolving in DedexTypeResolver.scala and DexInstructionToPilarParser.scala need to be tested and cleaned (or even redesigned). The main beast is the const4 resoling, as it can be `int`/`short`/`boolean` 0 or `object` null. (Important!) (Post by [`@fgwei`](https://github.com/fgwei))
 - `#c11`. Make the decompiling process faster. (Post by [`@fgwei`](https://github.com/fgwei))
 
 `#c12`. Package `org.sireum.amandroid.java` need to be added, and developing pilar to java translator. (Major task.) (Post by [`@fgwei`](https://github.com/fgwei))
