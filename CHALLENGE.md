@@ -2,7 +2,7 @@
 
 Before you take one of the challenges, please contact [`@fgwei`](https://github.com/fgwei) to let him aware. And put a mark (e.g., Resolving by [`@fgwei`](https://github.com/fgwei)) in the end of the challenge to avoid any situation of conflict. You can create a PR following guidance in [CONTRIBUTING.md](CONTRIBUTING.md) after you resolved it. 
 
-##Continous tasks
+##Continuous tasks
 
 All the APIs should be documented. (Post by [`@fgwei`](https://github.com/fgwei))
 
