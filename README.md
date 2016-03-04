@@ -3,7 +3,7 @@ amandroid [![Gitter](https://badges.gitter.im/sireum/amandroid.svg)](https://git
 
 This is official reporitory for the [Amandroid](http://amandroid.sireum.org/).
 
-This reporitory only contains android related data structures and resolvers. For the core data structure and static analysis algorithms, you can check out our [JAWA](https://github.com/sireum/jawa) reporitory.
+This reporitory only contains android related data structures and resolvers. For the core data structures and static analysis algorithms, you can check out our [Jawa](https://github.com/sireum/jawa) reporitory.
 
 ## Repository structure
 
