@@ -26,4 +26,4 @@ For more information on building and developing Amandroid, please also check out
  
 ## What to contribute
 
-If you don't know what to contribute, please check out our [Challenges need to resolve](CHALLENGE.md).
+If you don't know what to contribute, please check out our [challenges need to resolve](CHALLENGE.md).
