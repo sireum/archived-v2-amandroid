@@ -49,7 +49,7 @@ case class ApkInfoCollectSuccResult(apk: Apk, outApkUri: FileResourceUri, srcFol
 case class ApkInfoCollectFailResult(fileUri: FileResourceUri, e: Exception) extends ApkInfoCollectResult
 
 // PointsToAnalysisActor's input
-case class PointsToAnalysisData(apk: Apk, outApkUri: FileResourceUri, srcFolders: ISet[String], algos: PTAAlgorithms.Value, stage: Boolean) extends AmandroidData
+case class PointsToAnalysisData(apk: Apk, outApkUri: FileResourceUri, srcFolders: ISet[String], algos: PTAAlgorithms.Value, stage: Boolean, timeoutForeachComponent: Duration) extends AmandroidData
 // PointsToAnalysisActor's result
 trait PointsToAnalysisResult {
   def fileUri: FileResourceUri
@@ -59,10 +59,3 @@ case class PointsToAnalysisSuccResult(apk: Apk, ptaresult: PTAResult, succEps: I
 }
 case class PointsToAnalysisSuccStageResult(fileUri: FileResourceUri, outApkUri: FileResourceUri, succEps: ISet[Signature]) extends PointsToAnalysisResult
 case class PointsToAnalysisFailResult(fileUri: FileResourceUri, e: Exception) extends PointsToAnalysisResult
-
-// RFAActor's input
-case class RFAData(apk: Apk, outApkUri: FileResourceUri, srcFolders: ISet[String], ep: Signature, timeout: Duration)
-// RFAActor's result
-trait RFAResult extends AmandroidData
-case class RFASuccResult(apk: Apk, ptaresult: PTAResult, ep: Signature) extends RFAResult
-case class RFAFailResult(ep: Signature, e: Exception) extends RFAResult

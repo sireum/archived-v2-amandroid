@@ -50,14 +50,13 @@ import org.sireum.amandroid.Apk
 import org.sireum.jawa.ScopeManager
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAScopeManager
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFactFactory
+import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 
 object PTAAlgorithms extends Enumeration {
   val SUPER_SPARK, RFA = Value
 }
 
 class PointsToAnalysisActor extends Actor with ActorLogging {
-  
-  private val rfaActor = context.actorOf(FromConfig.props(Props[RFAActor]), "RFAActor")
   
   def receive: Receive = {
     case ptadata: PointsToAnalysisData =>
@@ -67,32 +66,34 @@ class PointsToAnalysisActor extends Actor with ActorLogging {
     log.info("Start points to analysis for " + ptadata.apk.nameUri)
     val apk = ptadata.apk
     val components = apk.getComponents
-    val futures: MSet[Future[RFAResult]] = msetEmpty
-    
+    val worklist: MList[Signature] = mlistEmpty
     components foreach {
       compTyp =>
         apk.getEnvMap.get(compTyp) match {
           case Some((esig, _)) =>
-            ptadata.algos match {
-              case PTAAlgorithms.RFA =>
-                futures += rfaActor.ask(RFAData(apk, ptadata.outApkUri, ptadata.srcFolders, esig, 10 minutes))(40 minutes).mapTo[RFAResult]
-            }
+            worklist += esig
           case None =>
             log.error("Component " + compTyp.name + " did not have environment! Some package or name mismatch maybe in the Manifestfile.")
         }
     }
-    val fseq = Future.sequence(futures)
     val ptaresult = new PTAResult
     val succEps: MSet[Signature] = msetEmpty
-    Await.result(fseq, Duration.Inf).foreach {
-      ptar =>
-        ptar match {
-          case rsr: RFASuccResult =>
-            succEps += rsr.ep
-            ptaresult.merge(rsr.ptaresult)
-          case rfr: RFAFailResult =>
-            log.error(rfr.e, "RFA failed for " + rfr.ep)
-        }
+    while(!worklist.isEmpty) {
+      val esig = worklist.remove(0)
+      val (f, cancel) = FutureUtil.interruptableFuture { () =>
+        rfa(esig, apk, ptadata.outApkUri, ptadata.srcFolders)
+      }
+      try {
+        val res = Await.result(f, ptadata.timeoutForeachComponent)
+        ptaresult.merge(res.ptaresult)
+      } catch {
+        case te: TimeoutException =>
+          log.warning("PTA timeout for " + esig)
+        case e: Exception =>
+          log.error(e, "PTA failed for " + esig)
+      } finally {
+        cancel()
+      }
     }
     if(ptadata.stage) {
       stage(apk, ptaresult, ptadata.outApkUri, succEps.toSet)
@@ -100,6 +101,17 @@ class PointsToAnalysisActor extends Actor with ActorLogging {
       PointsToAnalysisSuccResult(apk, ptaresult, succEps.toSet)
     }
     
+  }
+  
+  private def rfa(ep: Signature, apk: Apk, outApkUri: FileResourceUri, srcs: ISet[String]): InterProceduralDataFlowGraph = {
+    log.info("Start rfa for " + ep)
+    val reporter = new PrintReporter(MsgLevel.ERROR)
+    val global = GlobalUtil.buildGlobal(apk.nameUri, reporter, outApkUri, srcs)
+    val m = global.resolveMethodCode(ep, apk.getEnvMap(ep.classTyp)._2)
+    implicit val factory = new RFAFactFactory
+    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(m)
+    val idfg = AndroidReachingFactsAnalysis(global, apk, m, initialfacts, new ClassLoadManager)
+    idfg
   }
   
   private def stage(apk: Apk, ptaresult: PTAResult, outApkUri: FileResourceUri, succEps: ISet[Signature]): PointsToAnalysisResult = {
@@ -123,44 +135,5 @@ class PointsToAnalysisActor extends Actor with ActorLogging {
       opts.flush()
       opts.close()
     }
-  }
-}
-
-class RFAActor extends Actor with ActorLogging {
-  def receive: Receive = {
-    case rfadata: RFAData =>
-      sender ! rfa(rfadata)
-  }
-  
-  private def rfa(rfadata: RFAData): RFAResult = {
-    log.info("Start rfa for " + rfadata.ep)
-    ScopeManager.setScopeManager(new AndroidRFAScopeManager)
-    val apk = rfadata.apk
-    val srcs = rfadata.srcFolders
-    val outApkUri = rfadata.outApkUri
-    val reporter = new PrintReporter(MsgLevel.ERROR)
-    val global = GlobalUtil.buildGlobal(apk.nameUri, reporter, outApkUri, srcs)
-    val m = global.resolveMethodCode(rfadata.ep, apk.getEnvMap(rfadata.ep.classTyp)._2)
-    implicit val factory = new RFAFactFactory
-    val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(m)
-    val (f, cancel) = FutureUtil.interruptableFuture[RFAResult] { () => 
-      try {
-        val idfg = AndroidReachingFactsAnalysis(global, apk, m, initialfacts, new ClassLoadManager)
-        RFASuccResult(apk, idfg.ptaresult, rfadata.ep)
-      } catch {
-        case e: Exception =>
-          RFAFailResult(rfadata.ep, e)
-      }
-    }
-    val res =
-      try {
-        Await.result(f, rfadata.timeout)
-      } catch {
-        case te: TimeoutException =>
-          cancel()
-          log.warning("Doing RFA timeout for " + rfadata.ep)
-          RFAFailResult(rfadata.ep, te)
-      }
-    res
   }
 }

@@ -73,7 +73,7 @@ object AndroidModelCallHandler extends ModelCallHandler{
     else if(FrameworkMethodsModel.isFrameworkMethods(calleeMethod)) FrameworkMethodsModel.doFrameworkMethodsModelCall(calleeMethod.getDeclaringClass.global, addition.get.asInstanceOf[Apk], s, calleeMethod, args, retVars, currentContext)
     else if(ActivityModel.isActivity(r)) ActivityModel.doActivityCall(s, calleeMethod, args, retVars, currentContext)
     else if(super.isModelCall(calleeMethod)) super.caculateResult(s, calleeMethod, args, retVars, currentContext, addition)
-    else if(ScopeManager.getCurrentScopeManager.shouldBypass(r)) BypassedModel.handleBypass(s, calleeMethod, args, retVars, currentContext)
+    else if(PTAScopeManager.shouldBypass(r)) BypassedModel.handleBypass(s, calleeMethod, args, retVars, currentContext)
     else throw new RuntimeException("given callee is not a model call: " + calleeMethod)
   }
 
