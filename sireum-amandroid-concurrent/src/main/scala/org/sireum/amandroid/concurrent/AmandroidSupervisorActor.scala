@@ -83,11 +83,11 @@ class AmandroidSupervisorActorPrioMailbox(settings: ActorSystem.Settings, config
 object AmandroidTestApplication extends App {
   val _system = ActorSystem("AmandroidTestApplication", ConfigFactory.load)
   val supervisor = _system.actorOf(Props[AmandroidSupervisorActor], name = "AmandroidSupervisorActor")
-  val fileUris = FileUtil.listFiles(FileUtil.toUri("/Users/fgwei/Work/Source/fcapps"), ".apk", true)
-  val outputUri = FileUtil.toUri("/Users/fgwei/Work/output/fcapps")
+  val fileUris = FileUtil.listFiles(FileUtil.toUri("/Users/fgwei/Develop/Sireum/apps/amandroid/sources/icc-bench"), ".apk", true)
+  val outputUri = FileUtil.toUri("/Users/fgwei/Work/output/icc-bench")
   val futures = fileUris map {
     fileUri =>
-      (supervisor.ask(AnalysisSpec(fileUri, outputUri, None, true, true))(600 minutes)).mapTo[ApkInfoCollectResult].recover{
+      (supervisor.ask(AnalysisSpec(fileUri, outputUri, None, true, true))(600 minutes)).mapTo[PointsToAnalysisResult].recover{
         case ex: Exception => 
             (fileUri, false)
         }

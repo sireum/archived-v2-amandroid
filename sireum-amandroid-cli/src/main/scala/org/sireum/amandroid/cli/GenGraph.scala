@@ -97,7 +97,7 @@ def forkProcess(timeout: Int, sourceDir: String, outputDir: String, mem: Int, fo
     args += debug.toString()
     args += header
     args ++= List(sourceDir, outputDir)
-    org.sireum.jawa.util.JVMUtil.startSecondJVM(GenGraph.getClass(), "-Xmx" + mem + "G", args.toList, true)
+    org.sireum.jawa.util.JVMUtil.startSecondJVM(GenGraph.getClass(), List("-Xmx" + mem + "G"), args.toList, true)
   }
 }
 

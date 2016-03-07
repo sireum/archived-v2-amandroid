@@ -8,8 +8,7 @@ Require-Bundle: org.sireum;bundle-version="2.0.0",
  sireum-amandroid;bundle-version="2.0.0",
  sireum-amandroid-alir;bundle-version="2.0.0",
  sireum-jawa;bundle-version="2.0.0",
- sireum-jawa-alir;bundle-version="2.0.0",
- sireum-jawa-compiler;bundle-version="2.0.0"
+ sireum-jawa-alir;bundle-version="2.0.0"
 Bundle-ClassPath: .,
  lib/json4s-ast.jar,
  lib/json4s-core.jar,

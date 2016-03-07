@@ -63,7 +63,7 @@ object CryptoMisuseCli {
     args += debug.toString
     args += sourceDir
     args += outputDir
-    org.sireum.jawa.util.JVMUtil.startSecondJVM(CryptoMisuse.getClass(), "-Xmx" + mem + "G", args.toList, true)
+    org.sireum.jawa.util.JVMUtil.startSecondJVM(CryptoMisuse.getClass(), List("-Xmx" + mem + "G"), args.toList, true)
   }
 }
 

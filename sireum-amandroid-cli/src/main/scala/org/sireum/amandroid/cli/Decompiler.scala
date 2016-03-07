@@ -49,7 +49,7 @@ object DecompilerCli {
 	
 	def forkProcess(mem: Int, debug: Boolean, sourceDir: String, outputDir: String) = {
 	  val args = List(debug.toString, sourceDir, outputDir)
-    org.sireum.jawa.util.JVMUtil.startSecondJVM(Decompiler.getClass(), "-Xmx" + mem + "G", args, true)
+    org.sireum.jawa.util.JVMUtil.startSecondJVM(Decompiler.getClass(), List("-Xmx" + mem + "G"), args, true)
   }
   
 //  def main(args: Array[String]): Unit = {

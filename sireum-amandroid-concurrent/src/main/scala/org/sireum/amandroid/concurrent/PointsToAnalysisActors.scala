@@ -86,6 +86,7 @@ class PointsToAnalysisActor extends Actor with ActorLogging {
       try {
         val res = Await.result(f, ptadata.timeoutForeachComponent)
         ptaresult.merge(res.ptaresult)
+        succEps += esig
       } catch {
         case te: TimeoutException =>
           log.warning("PTA timeout for " + esig)

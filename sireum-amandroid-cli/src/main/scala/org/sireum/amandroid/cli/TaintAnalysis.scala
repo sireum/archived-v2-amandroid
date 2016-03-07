@@ -87,7 +87,7 @@ object TaintAnalyzeCli {
     args += timeout.toString
     args += debug.toString
     args ++= List(sourceDir, outputDir)
-    org.sireum.jawa.util.JVMUtil.startSecondJVM(TanitAnalysis.getClass(), "-Xmx" + mem + "G", args.toList, true)
+    org.sireum.jawa.util.JVMUtil.startSecondJVM(TanitAnalysis.getClass(), List("-Xmx" + mem + "G"), args.toList, true)
   }
 }
 
