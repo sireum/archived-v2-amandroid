@@ -1,4 +1,4 @@
-amandroid [![Gitter](https://badges.gitter.im/sireum/amandroid.svg)](https://gitter.im/sireum/amandroid?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+amandroid [![Gitter](https://badges.gitter.im/sireum/amandroid.svg)](https://gitter.im/sireum/amandroid?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) 
 ========================
 
 This is official reporitory for the [Amandroid](http://amandroid.sireum.org/).
