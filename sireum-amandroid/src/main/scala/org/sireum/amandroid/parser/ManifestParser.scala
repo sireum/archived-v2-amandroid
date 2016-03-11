@@ -300,6 +300,7 @@ object ManifestParser {
     try {
       getPackageNameFromManifest(new FileInputStream(FileUtil.toFile(manifestUri)))
     } catch {
+      case ie: InterruptedException => throw ie
       case e: Exception =>
         ""
     }
@@ -402,6 +403,7 @@ object ManifestParser {
       val rootElement = doc.getDocumentElement()
       pkg = rootElement.getAttribute("package")
     } catch {
+      case ie: InterruptedException => throw ie
       case e: Exception =>
     }
     pkg
@@ -435,6 +437,7 @@ object ManifestParser {
         typ = parser.next()
       }
     } catch {
+      case ie: InterruptedException => throw ie
       case e: Exception =>
         e.printStackTrace()
     } finally {

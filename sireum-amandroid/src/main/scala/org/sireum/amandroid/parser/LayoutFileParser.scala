@@ -72,6 +72,7 @@ class LayoutFileParser(global: Global, packageName: String, arsc: ARSCFileParser
         f.setAccessible(true)
         typs ++= f.get(pkg).asInstanceOf[java.util.LinkedHashMap[String, ResTypeSpec]]
       } catch {
+        case ie: InterruptedException => throw ie
         case e: Exception =>
       }
   }
@@ -161,6 +162,7 @@ class LayoutFileParser(global: Global, packageName: String, arsc: ARSCFileParser
         }
       }
     } catch {
+      case ie: InterruptedException => throw ie
       case e: Exception =>
     }
     (id, isSensitive)

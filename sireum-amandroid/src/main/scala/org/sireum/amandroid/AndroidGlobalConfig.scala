@@ -66,7 +66,7 @@ object AndroidGlobalConfig {
   val k_context: Int = ini.get("analysis", "k_context", classOf[Int])
   val sas_file: String = Option(ini.get("analysis", "sas_file", classOf[String])).getOrElse(SourceAndSinkFilePath)
   val csas_file: String = Option(ini.get("analysis","csas_file", classOf[String])).getOrElse(CommunicationSinkFilePath)
-  val per_component: Boolean = ini.get("timer", "per_component", classOf[Boolean])
+  val timeout: Int = Option(ini.get("analysis", "timeout", classOf[Int])).getOrElse(10)
   private def initIni = {
     val w = new FileWriter(iniFile)
     val inicontent =
@@ -89,15 +89,12 @@ object AndroidGlobalConfig {
  k_context = 1
  ; Source and sink list file
 ;sas_file = /path/sas.txt 
+ ; timeout setting for analyzing one component (minutes)
+ timeout = 10
 
 ; Concurrent settings for Amandroid actors
 [concurrent]
 ;actor_conf_file = /path/application.conf
-
-; Timer setting
-[timer]
- ; Apply timer for analyze each component.
- per_component = true
 """
     w.write(inicontent)
     w.flush()

@@ -51,6 +51,7 @@ import org.sireum.jawa.ScopeManager
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAScopeManager
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFactFactory
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
+import org.sireum.jawa.util.MyTimeout
 
 object PTAAlgorithms extends Enumeration {
   val SUPER_SPARK, RFA = Value
@@ -80,11 +81,8 @@ class PointsToAnalysisActor extends Actor with ActorLogging {
     val succEps: MSet[Signature] = msetEmpty
     while(!worklist.isEmpty) {
       val esig = worklist.remove(0)
-      val (f, cancel) = FutureUtil.interruptableFuture { () =>
-        rfa(esig, apk, ptadata.outApkUri, ptadata.srcFolders)
-      }
       try {
-        val res = Await.result(f, ptadata.timeoutForeachComponent)
+        val res = rfa(esig, apk, ptadata.outApkUri, ptadata.srcFolders, ptadata.timeoutForeachComponent)
         ptaresult.merge(res.ptaresult)
         succEps += esig
       } catch {
@@ -92,8 +90,6 @@ class PointsToAnalysisActor extends Actor with ActorLogging {
           log.warning("PTA timeout for " + esig)
         case e: Exception =>
           log.error(e, "PTA failed for " + esig)
-      } finally {
-        cancel()
       }
     }
     if(ptadata.stage) {
@@ -104,14 +100,14 @@ class PointsToAnalysisActor extends Actor with ActorLogging {
     
   }
   
-  private def rfa(ep: Signature, apk: Apk, outApkUri: FileResourceUri, srcs: ISet[String]): InterProceduralDataFlowGraph = {
+  private def rfa(ep: Signature, apk: Apk, outApkUri: FileResourceUri, srcs: ISet[String], timeout: Duration): InterProceduralDataFlowGraph = {
     log.info("Start rfa for " + ep)
     val reporter = new PrintReporter(MsgLevel.ERROR)
     val global = GlobalUtil.buildGlobal(apk.nameUri, reporter, outApkUri, srcs)
     val m = global.resolveMethodCode(ep, apk.getEnvMap(ep.classTyp)._2)
     implicit val factory = new RFAFactFactory
     val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(m)
-    val idfg = AndroidReachingFactsAnalysis(global, apk, m, initialfacts, new ClassLoadManager)
+    val idfg = AndroidReachingFactsAnalysis(global, apk, m, initialfacts, new ClassLoadManager, timeout = timeout match{case fd: FiniteDuration => Some(MyTimeout(fd)) case _ => None })
     idfg
   }
   

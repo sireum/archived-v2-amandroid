@@ -75,6 +75,7 @@ object CommunicationLeakage_run {
     
     files.foreach{
       file =>
+        if(!file.contains("com_qihoo360_mobilesafe_235.apk"))
         try{
           CommunicationLeakageCounter.total += 1
           val reporter = new PrintReporter(MsgLevel.ERROR) //INFO
@@ -95,12 +96,11 @@ object CommunicationLeakage_run {
   private case class CommunicationLeakageTask(global: Global, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], file: FileResourceUri) {
     def run: String = {
       println(TITLE + " #####" + file + "#####")
-      ScopeManager.setScopeManager(new AndroidRFAScopeManager)
       val yard = new ApkYard(global)
       val apk: Apk = yard.loadApk(file, outputUri, dpsuri, false, false, true)
       val ssm = new CommunicationSourceAndSinkManager(global, apk, apk.getLayoutControls, apk.getCallbackMethods, AndroidGlobalConfig.sas_file)
       val cba = new ComponentBasedAnalysis(global, yard)
-      cba.phase1(apk, false)(10 minutes)
+      cba.phase1(apk, false)(5 minutes)
       val iddResult = cba.phase2(Set(apk), false)
       val tar = cba.phase3(iddResult, ssm)
       tar.foreach{

@@ -50,6 +50,7 @@ object Dex2PilarConverter {
       FixResources.fix(out, pdd)
     } catch {
       case spe: SAXParseException =>
+      case ie: InterruptedException => throw ie
       case ex: Exception =>
         System.err.println("Given file is not a decompilable file: " + f)
     }

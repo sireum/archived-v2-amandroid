@@ -51,12 +51,13 @@ import org.sireum.jawa.Signature
 import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.jawa.FieldFQN
 import org.sireum.jawa.JawaType
+import org.sireum.jawa.util.MyTimeout
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLoadManager)(implicit factory: RFAFactFactory) {
+class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLoadManager, timeout: Option[MyTimeout])(implicit factory: RFAFactFactory) {
   
   final val TITLE = "AndroidReachingFactsAnalysisBuilder"
   
@@ -696,6 +697,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
     }
     
     def onPostVisitNode(node: ICFGNode, succs: CSet[ICFGNode]): Unit = {
+      timeout foreach (_.isTimeoutThrow)
     }
   }
   
@@ -718,6 +720,7 @@ object AndroidReachingFactsAnalysis {
       initialFacts: ISet[RFAFact] = isetEmpty,
       clm: ClassLoadManager,
       initContext: Context = new Context,
-      switchAsOrderedMatch: Boolean = false)(implicit factory: RFAFactFactory): InterProceduralDataFlowGraph
-    = new AndroidReachingFactsAnalysisBuilder(global, apk, clm).build(entryPointProc, initialFacts, initContext, switchAsOrderedMatch)
+      switchAsOrderedMatch: Boolean = false,
+      timeout: Option[MyTimeout])(implicit factory: RFAFactFactory): InterProceduralDataFlowGraph
+    = new AndroidReachingFactsAnalysisBuilder(global, apk, clm, timeout).build(entryPointProc, initialFacts, initContext, switchAsOrderedMatch)
 }

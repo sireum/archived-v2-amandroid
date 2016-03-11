@@ -167,8 +167,11 @@ object AndroidDataDependentTaintAnalysis {
         argRelatedValue.foreach{
           case ins =>
             if(ins.defSite != callArgNode.getContext){
-              val t = iddg.findDefSite(ins.defSite)
-              iddg.addEdge(callArgNode.asInstanceOf[Node], t)
+              iddg.findDefSite(ins.defSite) match {
+                case Some(t) => iddg.addEdge(callArgNode.asInstanceOf[Node], t)
+                case None =>
+              }
+              
             }
         }
     }

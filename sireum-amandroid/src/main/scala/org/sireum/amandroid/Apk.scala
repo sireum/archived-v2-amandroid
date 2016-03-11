@@ -58,6 +58,7 @@ object Apk {
             entry = archive.getNextEntry()
           }
         } catch {
+          case ie: InterruptedException => throw ie
           case e: Exception =>
         } finally {
           if (archive != null)

@@ -70,7 +70,6 @@ object TaintAnalyzeCli {
   def run(saamode: SireumAmandroidTaintAnalysisMode) {
     val sourceDir = saamode.srcFile
     val outputDir = saamode.analysis.outdir
-    val timeout = saamode.analysis.timeout
     val mem = saamode.general.mem
     val debug = saamode.general.debug
     val module = saamode.module match {
@@ -78,13 +77,12 @@ object TaintAnalyzeCli {
       case AnalysisModule.INTENT_INJECTION => "INTENT_INJECTION"
       case AnalysisModule.PASSWORD_TRACKING => "PASSWORD_TRACKING"
     }
-    forkProcess(module, timeout, sourceDir, outputDir, mem, debug)
+    forkProcess(module, sourceDir, outputDir, mem, debug)
   }
 
-  def forkProcess(module: String, timeout: Int, sourceDir: String, outputDir: String, mem: Int, debug: Boolean) = {
+  def forkProcess(module: String, sourceDir: String, outputDir: String, mem: Int, debug: Boolean) = {
     val args: MList[String] = mlistEmpty
     args += module
-    args += timeout.toString
     args += debug.toString
     args ++= List(sourceDir, outputDir)
     org.sireum.jawa.util.JVMUtil.startSecondJVM(TanitAnalysis.getClass(), List("-Xmx" + mem + "G"), args.toList, true)
@@ -97,23 +95,21 @@ object TaintAnalyzeCli {
 object TanitAnalysis{
   private final val TITLE = "TaintAnalysis"
   def main(args: Array[String]) {
-    if(args.size != 5){
-      println("Usage: <module: DATA_LEAKAGE, INTENT_INJECTION, PASSWORD_TRACKING> <timeout minutes> <debug> <source path> <output path>")
+    if(args.size != 4){
+      println("Usage: <module: DATA_LEAKAGE, INTENT_INJECTION, PASSWORD_TRACKING> <debug> <source path> <output path>")
       return
     }
     
     val module = args(0)
-    val timeout = args(1).toInt
-    val debug = args(2).toBoolean
-    val sourcePath = args(3)
-    val outputPath = args(4)
+    val debug = args(1).toBoolean
+    val sourcePath = args(2)
+    val outputPath = args(3)
     
     val dpsuri = AndroidGlobalConfig.dependence_dir.map(FileUtil.toUri(_))
     val liblist = AndroidGlobalConfig.lib_files
     val static = AndroidGlobalConfig.static_init
     val parallel = AndroidGlobalConfig.parallel
     val k_context = AndroidGlobalConfig.k_context
-    val pct = AndroidGlobalConfig.per_component
     val sasFilePath = AndroidGlobalConfig.sas_file
   
     val apkFileUris: MSet[FileResourceUri] = msetEmpty
@@ -126,10 +122,10 @@ object TanitAnalysis{
           apkFileUris += FileUtil.toUri(file)
         else println(file + " is not decompilable.")
     }
-    taintAnalyze(module, apkFileUris.toSet, sasFilePath, outputPath, dpsuri, liblist, static, parallel, k_context, timeout, debug)
+    taintAnalyze(module, apkFileUris.toSet, sasFilePath, outputPath, dpsuri, liblist, static, parallel, k_context, debug)
   }
   
-  def taintAnalyze(module: String, apkFileUris: Set[FileResourceUri], sasFilePath: String, outputPath: String, dpsuri: Option[FileResourceUri], liblist: String, static: Boolean, parallel: Boolean, k_context: Int, timeout: Int, debug: Boolean) = {
+  def taintAnalyze(module: String, apkFileUris: Set[FileResourceUri], sasFilePath: String, outputPath: String, dpsuri: Option[FileResourceUri], liblist: String, static: Boolean, parallel: Boolean, k_context: Int, debug: Boolean) = {
     Context.init_context_length(k_context)
     AndroidReachingFactsAnalysisConfig.parallel = parallel
     AndroidReachingFactsAnalysisConfig.resolve_static_init = static
@@ -147,7 +143,7 @@ object TanitAnalysis{
               else new NoReporter
             val global = new Global(file, reporter)
             global.setJavaLib(liblist)
-            println(TaintTask(module, global, sasFilePath, outputUri, dpsuri, file, parallel, timeout).run)
+            println(TaintTask(module, global, sasFilePath, outputUri, dpsuri, file, parallel).run)
             println()
             if(debug) println("Debug info write into " + reporter.asInstanceOf[FileReporter].f)
           } catch {
@@ -168,7 +164,7 @@ object TanitAnalysis{
   /**
    * Timer is a option of tuple, left is the time second you want to timer, right is whether use this timer for each of the components during analyze.
    */
-  private case class TaintTask(module: String, global: Global, sasFilePath: String, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], file: FileResourceUri, parallel: Boolean, timeout: Int) {
+  private case class TaintTask(module: String, global: Global, sasFilePath: String, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], file: FileResourceUri, parallel: Boolean) {
     def run: String = {
       ScopeManager.setScopeManager(new AndroidRFAScopeManager)
       val yard = new ApkYard(global)
@@ -179,7 +175,7 @@ object TanitAnalysis{
         case "PASSWORD_TRACKING" =>  new PasswordSourceAndSinkManager(global, apk, apk.getLayoutControls, apk.getCallbackMethods, sasFilePath)
       }
       val cba = new ComponentBasedAnalysis(global, yard)
-      cba.phase1(apk, parallel)(timeout minutes)
+      cba.phase1(apk, parallel)(AndroidGlobalConfig.timeout minutes)
       val iddResult = cba.phase2(Set(apk), false)
       val tar = cba.phase3(iddResult, ssm)
       onAnalysisSuccess(global, yard, apk, outputUri)

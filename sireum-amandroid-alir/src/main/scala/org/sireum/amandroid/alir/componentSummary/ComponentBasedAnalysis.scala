@@ -55,6 +55,7 @@ import org.sireum.jawa.util.FutureUtil
 import scala.concurrent.ExecutionContext.Implicits.{global => ec}
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import org.sireum.jawa.util.MyTimeout
 
 /**
  * @author fgwei
@@ -79,34 +80,30 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
     while(!worklist.isEmpty) {
       val component = worklist.remove(0)
       println("-------Analyze component " + component + "--------------")
-      val (f, cancel) = FutureUtil.interruptableFuture[Unit] { () =>
+      try {
         apk.getEnvMap.get(component) match {
           case Some((esig, _)) =>
             val ep = global.getMethod(esig).get // need to double check
             implicit val factory = new RFAFactFactory
             val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-            val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager)
+            val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager, timeout = Some(MyTimeout(timeout)))
             yard.addIDFG(component, idfg)
             // do dda on this component
             val iddResult = InterproceduralDataDependenceAnalysis(global, idfg)
             yard.addIDDG(component, iddResult)
           case None =>
-            problematicComp += component
             global.reporter.error(TITLE, "Component " + component + " did not have environment! Some package or name mismatch maybe in the Manifestfile.")
         }
-      }
-      try{
-        // do pta on this component
-        Await.result(f, timeout)
       } catch {
-        case te: TimeoutException =>
-          cancel()
+        case te: TimeoutException => // Timeout happened
           problematicComp += component
-          global.reporter.error(TITLE, "Timeout for " + component)
+          global.reporter.error(TITLE, component + " " + te.getMessage)
         case ex: Exception =>
           problematicComp += component
           if(DEBUG) ex.printStackTrace()
           global.reporter.error(TITLE, "Analyzing component " + component + " has error: " + ex.getMessage)
+      } finally {
+        System.gc()
       }
       worklist ++= (apk.getComponents -- components)
       components = apk.getComponents

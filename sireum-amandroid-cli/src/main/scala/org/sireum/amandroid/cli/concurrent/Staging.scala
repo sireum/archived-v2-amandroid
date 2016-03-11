@@ -43,18 +43,16 @@ object StagingCli {
   def run(saamode: SireumAmandroidStagingMode) {
     val sourceDir = saamode.srcFile
     val outputDir = saamode.analysis.outdir
-    val timeout = saamode.analysis.timeout
     val mem = saamode.general.mem
     val debug = saamode.general.debug
-    forkProcess(timeout, sourceDir, outputDir, mem, debug)
+    forkProcess(sourceDir, outputDir, mem, debug)
   }
   
   def forkProcess(
-      timeout: Int, 
       sourceDir: String, outputDir: String, 
       mem: Int, debug: Boolean) = {
     val args: MList[String] = mlistEmpty
-    args ++= List(timeout.toString, debug.toString(), sourceDir, outputDir)
+    args ++= List(debug.toString(), sourceDir, outputDir)
     org.sireum.jawa.util.JVMUtil.startSecondJVM(Staging.getClass(), List("-Xmx" + mem + "G", "-Dconfig.file=" + AndroidGlobalConfig.actor_conf_file), args.toList, true)
   }
 }
@@ -68,14 +66,13 @@ object Staging {
   private final val TITLE = "Staging"
   
   def main(args: Array[String]) {
-    if(args.size != 4){
-      println("Usage: <timeout minutes> <debug> <source path> <output path>")
+    if(args.size != 3){
+      println("Usage: <debug> <source path> <output path>")
       return
     }
-    val timeout = args(0).toInt
-    val debug = args(1).toBoolean
-    val sourcePath = args(2)
-    val outputPath = args(3)
+    val debug = args(0).toBoolean
+    val sourcePath = args(1)
+    val outputPath = args(2)
     
     val apkFileUris: MSet[FileResourceUri] = msetEmpty
     val fileOrDir = new File(sourcePath)
@@ -87,14 +84,14 @@ object Staging {
           apkFileUris += FileUtil.toUri(file)
         else println(file + " is not decompilable.")
     }
-    staging(apkFileUris.toSet, outputPath, timeout)
+    staging(apkFileUris.toSet, outputPath)
   }
   
-  def staging(apkFileUris: ISet[FileResourceUri], outputPath: String, timeout: Int) = {
+  def staging(apkFileUris: ISet[FileResourceUri], outputPath: String) = {
     println("Total apks: " + apkFileUris.size)
     val outputUri = FileUtil.toUri(outputPath)
     val _system = ActorSystem("AmandroidTestApplication", ConfigFactory.load)
-    implicit val to = Timeout(timeout * apkFileUris.size minutes)
+    implicit val to = Timeout(AndroidGlobalConfig.timeout * apkFileUris.size minutes)
     
     try {
       val supervisor = _system.actorOf(Props[AmandroidSupervisorActor], name = "AmandroidSupervisorActor")

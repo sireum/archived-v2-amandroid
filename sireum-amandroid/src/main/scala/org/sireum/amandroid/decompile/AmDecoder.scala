@@ -44,7 +44,7 @@ object AmDecoder {
     val apkFile = FileUtil.toFile(sourcePathUri)
     val outputDir = 
       if(createFolder){
-        val dirName = try{apkFile.getName().substring(0, apkFile.getName().lastIndexOf("."))} catch {case e: Exception => apkFile.getName()}
+        val dirName = try{apkFile.getName().substring(0, apkFile.getName().lastIndexOf("."))} catch {case e: IndexOutOfBoundsException => apkFile.getName()}
         val newUri = MyFileUtil.appendFileName(outputUri, dirName)
         FileUtil.toFile(newUri)
       } else {
@@ -59,6 +59,7 @@ object AmDecoder {
       decoder.setForceDelete(true)
       decoder.decode()
     } catch {
+      case ie: InterruptedException => throw ie
       case fe: CantFindFrameworkResException =>
         System.err.println(TITLE + ": Can't find framework resources for package of id: " + fe.getPkgId + ". You must install proper framework files, see apk-tool website for more info.")
       case e: Exception =>

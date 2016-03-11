@@ -46,10 +46,12 @@ import org.sireum.amandroid.alir.taintAnalysis.AndroidDataDependentTaintAnalysis
 import org.sireum.amandroid.alir.componentSummary.ApkYard
 import java.util.concurrent.TimeoutException
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFactFactory
+import org.sireum.jawa.util.MyTimeout
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
+ * @deprecated Use org.sireum.amandroid.alir.componentSummary.ComponentBasedAnalysis instead.
  */ 
 @deprecated
 trait AmandroidSocketListener {
@@ -138,7 +140,7 @@ class AmandroidSocket(global: Global, yard: ApkYard, apk: Apk) {
           global.reporter.echo(TITLE, "--------------Component " + ep + "--------------")
           implicit val factory = new RFAFactFactory
           val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-          val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager)
+          val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager, timeout = None)
           yard.addIDFG(ep.getDeclaringClass.getType, idfg)
           global.reporter.echo(TITLE, "processed-->" + idfg.icfg.getProcessed.size)
           val iddResult = InterproceduralDataDependenceAnalysis(global, idfg)
@@ -180,7 +182,7 @@ class AmandroidSocket(global: Global, yard: ApkYard, apk: Apk) {
             global.reporter.echo(TITLE, "--------------Component " + ep + "--------------")
             implicit val factory = new RFAFactFactory
             val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-            val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager)
+            val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager, timeout = None)
             yard.addIDFG(ep.getDeclaringClass.getType, idfg)
             global.reporter.echo(TITLE, "processed-->" + idfg.icfg.getProcessed.size)
             val iddResult = InterproceduralDataDependenceAnalysis(global, idfg)

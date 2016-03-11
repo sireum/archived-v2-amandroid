@@ -72,7 +72,6 @@ object GenGraphCli {
     val sourceDir = saamode.srcFile
     val sourceFile = new File(sourceDir)
     val outputDir = saamode.analysis.outdir
-    val timeout = saamode.analysis.timeout
     val mem = saamode.general.mem
     val debug = saamode.general.debug
     val format = saamode.format match {
@@ -86,12 +85,11 @@ object GenGraphCli {
       case GraphType.SIMPLE_CALL => "SIMPLE_CALL"
     }
     val header = saamode.header
-    forkProcess(timeout, sourceDir, outputDir, mem, format, graphtyp, debug, header)
+    forkProcess(sourceDir, outputDir, mem, format, graphtyp, debug, header)
   }
 
-def forkProcess(timeout: Int, sourceDir: String, outputDir: String, mem: Int, format: String, graphtyp: String, debug: Boolean, header: String) = {
+def forkProcess(sourceDir: String, outputDir: String, mem: Int, format: String, graphtyp: String, debug: Boolean, header: String) = {
     val args: MList[String] = mlistEmpty
-    args += timeout.toString
     args += format
     args += graphtyp
     args += debug.toString()
@@ -110,17 +108,16 @@ object GenGraph {
   private final val TITLE = "GenCallGraph"
   
   def main(args: Array[String]) {
-    if(args.size != 7){
-      println("Usage: <timeout minutes> <[Graph Format: DOT, GraphML, GML> <[Graph Type: FULL, SIMPLE_CALL, DETAILED_CALL, API> <debug> <header> <source path> <output path>")
+    if(args.size != 6){
+      println("Usage: <[Graph Format: DOT, GraphML, GML> <[Graph Type: FULL, SIMPLE_CALL, DETAILED_CALL, API> <debug> <header> <source path> <output path>")
       return
     }
-    val timeout = args(0).toInt
-    val format = args(1)
-    val graphtyp = args(2)
-    val debug = args(3).toBoolean
-    val header = args(4)
-    val sourcePath = args(5)
-    val outputPath = args(6)
+    val format = args(0)
+    val graphtyp = args(1)
+    val debug = args(2).toBoolean
+    val header = args(3)
+    val sourcePath = args(4)
+    val outputPath = args(5)
     val dpsuri = AndroidGlobalConfig.dependence_dir.map(FileUtil.toUri(_))
     val liblist = AndroidGlobalConfig.lib_files
     val static = AndroidGlobalConfig.static_init
@@ -137,7 +134,7 @@ object GenGraph {
           apkFileUris += FileUtil.toUri(file)
         else println(file + " is not decompilable.")
     }
-    genGraph(apkFileUris.toSet, outputPath, dpsuri, liblist, static, parallel, k_context, timeout, header, format, graphtyp, debug)
+    genGraph(apkFileUris.toSet, outputPath, dpsuri, liblist, static, parallel, k_context, header, format, graphtyp, debug)
   }
   
   def genGraph(
@@ -147,8 +144,7 @@ object GenGraph {
       liblist: String, 
       static: Boolean, 
       parallel: Boolean, 
-      k_context: Int, 
-      timeout: Int, 
+      k_context: Int,
       header: String, 
       format: String, 
       graphtyp: String, 
@@ -169,7 +165,7 @@ object GenGraph {
             val global = new Global(apkFileUri, reporter)
             global.setJavaLib(liblist)
             
-            val timer = timeout minutes
+            val timer = AndroidGlobalConfig.timeout minutes
             val (f, cancel) = FutureUtil.interruptableFuture[(InterproceduralControlFlowGraph[ICFGNode], FileResourceUri)] { () =>
               val (outUri, srcs, _) = ApkDecompiler.decompile(FileUtil.toFile(apkFileUri), FileUtil.toFile(outputUri), dpsuri, false, false, true, true)
               srcs foreach {
