@@ -7,19 +7,11 @@
  * 
  * Detailed contributors are listed in the CONTRIBUTOR.md
  ******************************************************************************/
-/*
-Copyright (c) 2013-2014 Fengguo Wei & Sankardas Roy, Kansas State University.        
-All rights reserved. This program and the accompanying materials      
-are made available under the terms of the Eclipse Public License v1.0 
-which accompanies this distribution, and is available at              
-http://www.eclipse.org/legal/epl-v10.html                             
-*/
 package org.sireum.amandroid.run.csm
 
 import org.sireum.amandroid.security._
 import org.sireum.util.FileUtil
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
-import org.sireum.amandroid.security.apiMisuse.HideAPIMisuse
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidReachingFactsAnalysisConfig
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.util.FileResourceUri
@@ -33,49 +25,19 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import java.util.concurrent.TimeoutException
 import org.sireum.amandroid.alir.componentSummary.ComponentBasedAnalysis
-import scala.concurrent.ExecutionContext.Implicits.{global => ec}
 import org.sireum.amandroid.alir.componentSummary.ApkYard
-import org.sireum.amandroid.security.apiMisuse.HideAPIMisuse
+import org.sireum.amandroid.security.apiMisuse.HideIconAPIMisuse
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
-object HideAPI_run {
+object HideIconAPI_run {
   private final val TITLE = "HideAPI_run"
 
   object HideAPIMisuseCounter {
     var total = 0
-    var oversize = 0
-    var haveresult = 0
+    var haveHideIconApi = 0
 
-    override def toString: String = "total: " + total + ", oversize: " + oversize + ", haveResult: " + haveresult
-  }
-
-  private class HideAPIMisuseListener(global: Global) extends AmandroidSocketListener {
-    def onPreAnalysis: Unit = {
-      HideAPIMisuseCounter.total += 1
-    }
-
-    def entryPointFilter(eps: Set[org.sireum.jawa.JawaMethod]): Set[org.sireum.jawa.JawaMethod] = {
-      eps
-    }
-
-    def onTimeout: Unit = {}
-
-    def onAnalysisSuccess: Unit = {
-      HideAPIMisuseCounter.haveresult += 1
-    }
-
-    def onPostAnalysis: Unit = {
-      global.reporter.echo(TITLE, HideAPIMisuseCounter.toString)
-    }
-
-    def onException(e: Exception): Unit = {
-      e match {
-        case ie: IgnoreException => System.err.println("Ignored!")
-        case a =>
-          e.printStackTrace()
-      }
-    }
+    override def toString: String = "total: " + total + ", haveHideIconApi: " + haveHideIconApi
   }
 
   def main(args: Array[String]): Unit = {
@@ -83,11 +45,6 @@ object HideAPI_run {
       System.err.print("Usage: source_path output_path")
       return
     }
-
-    //    GlobalConfig.ICFG_CONTEXT_K = 1
-    AndroidReachingFactsAnalysisConfig.resolve_icc = false
-    AndroidReachingFactsAnalysisConfig.resolve_static_init = false
-    //    AndroidReachingFactsAnalysisConfig.timeout = 5
     val sourcePath = args(0)
     val outputPath = args(1)
     val dpsuri = try { Some(FileUtil.toUri(args(2))) } catch { case e: Exception => None }
@@ -100,23 +57,11 @@ object HideAPI_run {
         val global = new Global(file, reporter)
         global.setJavaLib(AndroidGlobalConfig.lib_files)
         try {
-          val (f, cancel) = FutureUtil.interruptableFuture[String] { () =>
-            HideAPIMisuseTask(global, outputPath, dpsuri, file).run
-          }
-          try {
-            reporter.echo(TITLE, Await.result(f, 5 minutes))
-            HideAPIMisuseCounter.haveresult += 1
-          } catch {
-            case te : TimeoutException => 
-              cancel()
-              reporter.error(TITLE, te.getMessage)
-          }
+          reporter.echo(TITLE,HideAPIMisuseTask(global, outputPath, dpsuri, file).run)
         } catch {
           case e : Throwable => e.printStackTrace()
         } finally {
           reporter.echo(TITLE, HideAPIMisuseCounter.toString)
-          val fileName = file.toString().split("/")
-          scala.tools.nsc.io.File("C:/Users/Netorare/Desktop/GAWork/Amandroid/HideAPI/APPSDone.txt").appendAll(fileName(fileName.length-1))
         }
     }
   }
@@ -126,13 +71,11 @@ private case class HideAPIMisuseTask(global: Global, outputPath : String, dpsuri
       global.reporter.echo(TITLE, "####" + file + "#####")
       val yard = new ApkYard(global)
       val outputUri = FileUtil.toUri(outputPath)
-      val apk = yard.loadApk(file, outputUri, dpsuri, false, false, false)
-      val csa = new ComponentBasedAnalysis(global, yard)
-      csa.phase1(apk, false)(10 minutes)
-      val idfgs = yard.getIDFGs
-      idfgs.foreach{
-        case (rec, idfg) =>
-          HideAPIMisuse(global, idfg)
+      val outUri = yard.loadCode(file, outputUri, dpsuri, false, false, false)
+      val hideIconInvokeContainers = HideIconAPIMisuse(global)
+      if(!hideIconInvokeContainers.isEmpty) {
+        global.reporter.error(TITLE, (hideIconInvokeContainers + " invoked hide icon api."))
+        HideAPIMisuseCounter.haveHideIconApi += 1
       }
       return "Done!"
     }

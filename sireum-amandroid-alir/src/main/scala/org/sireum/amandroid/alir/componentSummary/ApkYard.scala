@@ -44,9 +44,16 @@ class ApkYard(global: Global) {
   
   def loadApk(nameUri: FileResourceUri, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], dexLog: Boolean, debugMode: Boolean, forceDelete: Boolean = true): Apk = {
     val apk = new Apk(nameUri)
+    val outUri = loadCode(nameUri, outputUri, dpsuri, dexLog, debugMode, forceDelete)
+    AppInfoCollector.collectInfo(apk, global, outUri)
+    addApk(apk)
+    apk.getComponents.foreach(addComponent(_, apk))
+    apk
+  }
+  
+  def loadCode(nameUri: FileResourceUri, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], dexLog: Boolean, debugMode: Boolean, forceDelete: Boolean = true): FileResourceUri = {
     val apkFile = FileUtil.toFile(nameUri)
     val resultDir = FileUtil.toFile(outputUri)
-    // convert the dex file to the "pilar" form
     val (outUri, srcs, _) = ApkDecompiler.decompile(apkFile, resultDir, dpsuri, dexLog, debugMode, true, forceDelete)
     srcs foreach {
       src =>
@@ -56,10 +63,7 @@ class ApkYard(global: Global) {
           global.load(fileUri, Constants.PILAR_FILE_EXT, AndroidLibraryAPISummary)
         }
     }
-    AppInfoCollector.collectInfo(apk, global, outUri)
-    addApk(apk)
-    apk.getComponents.foreach(addComponent(_, apk))
-    apk
+    outUri
   }
   
   private val idfgResults: MMap[JawaType, InterProceduralDataFlowGraph] = mmapEmpty
