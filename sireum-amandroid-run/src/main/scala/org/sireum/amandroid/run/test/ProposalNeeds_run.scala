@@ -5,14 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  * 
- * Main Contributors:
- *    Fengguo Wei - Argus Lab @ University of South Florida
- *    Sankardas Roy - Bowling Green State University
- *    
- * Contributors:
- *    Robby - Santos Lab @ Kansas State University
- *    Wu Zhou - Fireeye
- *    Fengchi Lin - Chinese People's Public Security University
+ * Detailed contributors are listed in the CONTRIBUTOR.md
  ******************************************************************************/
 package org.sireum.amandroid.run.test
 
