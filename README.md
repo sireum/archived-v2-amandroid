@@ -24,7 +24,7 @@ amandroid/
 
 To contribute to the Amandroid Core, Amandroid Alir, Amandroid Dedex, Amandroid Serialization, Amandroid Concurrent, please send us a [pull request](https://help.github.com/articles/using-pull-requests/#fork--pull) from your fork of this repository!
 
-For more information on building and developing Amandroid, please also check out our [guidelines for contributing](CONTRIBUTING.md).
+For more information on building and developing Amandroid, please also check out our [guidelines for contributing](CONTRIBUTING.md). People who provided excellent ideas or more than 200 LOC of codes are listed in [contributor](CONTRIBUTOR.md).
  
 ## What to contribute
 
