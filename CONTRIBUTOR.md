@@ -8,4 +8,5 @@
  Xinming (Simon) Ou  | [`@xinmingou`](https://github.com/Ichoran)   | University of South Florida           | Amandroid initiator, idea & solution provider  |
  Wu Zhou             | [`@woodzltc`](https://github.com/woodzltc)   | FireEye                               | Plugin contributor              |
  Fengchi Lin         | [`@linfc`](https://github.com/linfc)         | CPPSU                                 | Plugin Contributor |
- Kaushik Nmmala      | [`@kaushin`](https://github.com/kaushin)     | Bowling Green State University       | Plugin contributor, online service contributor |
+ Kaushik Nmmala      | [`@kaushin`](https://github.com/kaushin)     | Bowling Green State University        | Plugin contributor |
+ Rohit Sharma        |                                              | Bowling Green State University        | Online service contributor|
