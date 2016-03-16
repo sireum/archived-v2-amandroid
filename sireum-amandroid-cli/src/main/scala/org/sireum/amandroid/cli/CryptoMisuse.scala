@@ -137,24 +137,8 @@ object CryptoMisuse {
         case (rec, idfg) =>
           CryptographicMisuse(global, idfg)
       }
-      onAnalysisSuccess(global, yard, apk, outputUri)
       return "Done!"
     }
-  }
-  
-  def onAnalysisSuccess(global: Global, yard: ApkYard, apk: Apk, outputUri: FileResourceUri): Unit = {
-    val appData = DataCollector.collect(global, yard, apk)
-
-    val appDataDirFile = new File(getOutputDirUri(outputUri, apk.nameUri))
-        
-    if(!appDataDirFile.exists()) appDataDirFile.mkdirs()
-    
-    val envFile = appDataDirFile + "/EnvironmentModel.txt"
-    val environmentModel = new PrintWriter(envFile)
-    val envString = apk.getEnvString
-    environmentModel.print(envString)
-    environmentModel.close()
-    println("Encironment model write into " + envFile)
   }
   
   private def getOutputDirUri(outputUri: FileResourceUri, apkUri: FileResourceUri): FileResourceUri = {

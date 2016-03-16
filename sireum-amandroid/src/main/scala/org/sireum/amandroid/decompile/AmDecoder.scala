@@ -18,6 +18,7 @@ import java.util.logging.LogManager
 import brut.androlib.err.CantFindFrameworkResException
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.util.MyFileUtil
+import org.sireum.amandroid.util.ApkFileUtil
 
 object AmDecoder {
   final private val TITLE = "AmDecoder"
@@ -25,7 +26,7 @@ object AmDecoder {
    *  Decode apk file and return outputpath
    *  @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
    */
-  def decode(sourcePathUri: FileResourceUri, outputUri: FileResourceUri, createFolder: Boolean = true, forceDelete: Boolean = true): FileResourceUri = {
+  def decode(sourcePathUri: FileResourceUri, outputUri: FileResourceUri, forceDelete: Boolean = true): FileResourceUri = {
     // make it as quiet mode
     val logger = Logger.getLogger("")
     logger.getHandlers().foreach {
@@ -35,14 +36,7 @@ object AmDecoder {
     LogManager.getLogManager().reset()
 
     val apkFile = FileUtil.toFile(sourcePathUri)
-    val outputDir = 
-      if(createFolder){
-        val dirName = try{apkFile.getName().substring(0, apkFile.getName().lastIndexOf("."))} catch {case e: IndexOutOfBoundsException => apkFile.getName()}
-        val newUri = MyFileUtil.appendFileName(outputUri, dirName)
-        FileUtil.toFile(newUri)
-      } else {
-        FileUtil.toFile(outputUri)
-      }
+    val outputDir = FileUtil.toFile(ApkFileUtil.getOutputUri(sourcePathUri, outputUri))
     if(outputDir.exists() && !forceDelete) return FileUtil.toUri(outputDir)
     try {
       val decoder = new ApkDecoder

@@ -76,6 +76,7 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
     val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](icfg,
       true, true, false, AndroidReachingFactsAnalysisConfig.parallel, gen, kill, callr, ppr, iota, initial, switchAsOrderedMatch, Some(nl))
 //    icfg.toDot(new PrintWriter(System.out))
+    ptaresult.addEntryPoint(entryPointProc.getSignature)
     InterProceduralDataFlowGraph(icfg, ptaresult)
   }
   

@@ -15,18 +15,22 @@ import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.PTAResult._
 import org.sireum.util._
 import org.sireum.jawa.alir.Context
+import org.sireum.jawa.Signature
 
 object PTAResultSerializer extends CustomSerializer[PTAResult](format => (
     {
       case jv: JValue =>
         implicit val formats = format + PTASlotKeySerializer + InstanceSerializer
+        val entryPoints = (jv \ "entryPoints").extract[ISet[Signature]]
         val pointsToMap = (jv \ "pointsToMap").extract[IMap[String, PTSMap]]
         val ptaresult = new PTAResult
+        ptaresult.addEntryPoints(entryPoints)
         ptaresult.addPointsToMap(pointsToMap)
         ptaresult
     }, {
       case ptaresult: PTAResult =>
         implicit val formats = format + PTASlotKeySerializer + InstanceSerializer
+        ("entryPoints" -> Extraction.decompose(ptaresult.getEntryPoints)) ~
         ("pointsToMap" -> Extraction.decompose(ptaresult.pointsToMap))
     }
 ))

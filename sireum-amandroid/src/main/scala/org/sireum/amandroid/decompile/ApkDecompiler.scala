@@ -26,7 +26,7 @@ object ApkDecompiler {
   final val DEBUG = false
   
   def decodeApk(apkUri: FileResourceUri, outputUri: FileResourceUri, forceDelete: Boolean): FileResourceUri = {
-    AmDecoder.decode(apkUri, outputUri, true, forceDelete)
+    AmDecoder.decode(apkUri, outputUri, forceDelete)
   }
   
   def decompileDex(
