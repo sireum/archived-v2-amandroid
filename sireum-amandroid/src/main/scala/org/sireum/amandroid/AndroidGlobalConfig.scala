@@ -28,10 +28,6 @@ object AndroidGlobalConfig {
     else throw new RuntimeException("Please set env variable SIREUM_HOME!")
   
   private val SourceAndSinkFilePath = amandroid_home + "/taintAnalysis/sourceAndSinks/TaintSourcesAndSinks.txt"
-  final val PasswordSinkFilePath = amandroid_home +  "/taintAnalysis/sourceAndSinks/PasswordSourcesAndSinks.txt"
-  final val IntentInjectionSinkFilePath = amandroid_home + "/taintAnalysis/sourceAndSinks/IntentInjectionSourcesAndSinks.txt"
-  final val CommunicationSinkFilePath = amandroid_home + "/taintAnalysis/sourceAndSinks/CommunicationSourceAndSinks.txt"
-  
 
   private val defaultLibFiles = 
     amandroid_home + "/androidSdk/android-21/android.jar" + java.io.File.pathSeparator +
@@ -58,7 +54,6 @@ object AndroidGlobalConfig {
   val parallel: Boolean = ini.get("analysis", "parallel", classOf[Boolean])
   val k_context: Int = ini.get("analysis", "k_context", classOf[Int])
   val sas_file: String = Option(ini.get("analysis", "sas_file", classOf[String])).getOrElse(SourceAndSinkFilePath)
-  val csas_file: String = Option(ini.get("analysis","csas_file", classOf[String])).getOrElse(CommunicationSinkFilePath)
   val timeout: Int = Option(ini.get("analysis", "timeout", classOf[Int])).getOrElse(10)
   private def initIni = {
     val w = new FileWriter(iniFile)

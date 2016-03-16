@@ -44,11 +44,11 @@ case class ApkInfoCollectFailResult(fileUri: FileResourceUri, e: Exception) exte
 // PointsToAnalysisActor's input
 case class PointsToAnalysisData(apk: Apk, outApkUri: FileResourceUri, srcFolders: ISet[String], algos: PTAAlgorithms.Value, stage: Boolean, timeoutForeachComponent: Duration) extends AmandroidData
 // PointsToAnalysisActor's result
-trait PointsToAnalysisResult {
+trait PointsToAnalysisResult extends AmandroidData {
   def fileUri: FileResourceUri
 }
-case class PointsToAnalysisSuccResult(apk: Apk, ptaresult: PTAResult, succEps: ISet[Signature]) extends PointsToAnalysisResult {
+case class PointsToAnalysisSuccResult(apk: Apk, ptaresult: PTAResult) extends PointsToAnalysisResult {
   def fileUri: FileResourceUri = apk.nameUri
 }
-case class PointsToAnalysisSuccStageResult(fileUri: FileResourceUri, outApkUri: FileResourceUri, succEps: ISet[Signature]) extends PointsToAnalysisResult
+case class PointsToAnalysisSuccStageResult(fileUri: FileResourceUri, outApkUri: FileResourceUri) extends PointsToAnalysisResult
 case class PointsToAnalysisFailResult(fileUri: FileResourceUri, e: Exception) extends PointsToAnalysisResult

@@ -45,6 +45,7 @@ import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAScopeManage
 import org.sireum.jawa.alir.pta.reachingFactsAnalysis.RFAFactFactory
 import org.sireum.jawa.alir.dataFlowAnalysis.InterProceduralDataFlowGraph
 import org.sireum.jawa.util.MyTimeout
+import org.sireum.amandroid.serialization.stage.Staging
 
 object PTAAlgorithms extends Enumeration {
   val SUPER_SPARK, RFA = Value
@@ -56,6 +57,7 @@ class PointsToAnalysisActor extends Actor with ActorLogging {
     case ptadata: PointsToAnalysisData =>
       sender ! pta(ptadata)
   }
+  
   private def pta(ptadata: PointsToAnalysisData): PointsToAnalysisResult = {
     log.info("Start points to analysis for " + ptadata.apk.nameUri)
     val apk = ptadata.apk
@@ -86,9 +88,16 @@ class PointsToAnalysisActor extends Actor with ActorLogging {
       }
     }
     if(ptadata.stage) {
-      stage(apk, ptaresult, ptadata.outApkUri, succEps.toSet)
+      try {
+        Staging.stage(apk, ptaresult, ptadata.outApkUri)
+        PointsToAnalysisSuccStageResult(apk.nameUri, ptadata.outApkUri)
+      } catch {
+        case e: Exception =>
+          PointsToAnalysisFailResult(apk.nameUri, e)
+        
+      }
     } else {
-      PointsToAnalysisSuccResult(apk, ptaresult, succEps.toSet)
+      PointsToAnalysisSuccResult(apk, ptaresult)
     }
     
   }
@@ -104,26 +113,4 @@ class PointsToAnalysisActor extends Actor with ActorLogging {
     idfg
   }
   
-  private def stage(apk: Apk, ptaresult: PTAResult, outApkUri: FileResourceUri, succEps: ISet[Signature]): PointsToAnalysisResult = {
-    val apkRes = FileUtil.toFile(MyFileUtil.appendFileName(outApkUri, "apk.json"))
-    val oapk = new PrintWriter(apkRes)
-    val ptsRes = FileUtil.toFile(MyFileUtil.appendFileName(outApkUri, "ptaresult.json"))
-    val opts = new PrintWriter(ptsRes)
-    implicit val formats = Serialization.formats(NoTypeHints) + ApkSerializer + PTAResultSerializer
-    try {
-      write(apk, oapk)
-      write(ptaresult, opts)
-      PointsToAnalysisSuccStageResult(apk.nameUri, outApkUri, succEps)
-    } catch {
-      case e: Exception =>
-        apkRes.delete()
-        ptsRes.delete()
-        PointsToAnalysisFailResult(apk.nameUri, e)
-    } finally {
-      oapk.flush()
-      oapk.close()
-      opts.flush()
-      opts.close()
-    }
-  }
 }

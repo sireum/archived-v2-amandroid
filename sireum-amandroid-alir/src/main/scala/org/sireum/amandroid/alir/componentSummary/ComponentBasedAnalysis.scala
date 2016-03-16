@@ -55,7 +55,7 @@ import org.sireum.jawa.util.MyTimeout
  */
 class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
   private final val TITLE = "ComponentBasedAnalysis"
-  private final val DEBUG = true
+  private final val DEBUG = false
   
   import ComponentSummaryTable._
   
@@ -90,7 +90,7 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
       } catch {
         case te: TimeoutException => // Timeout happened
           problematicComp += component
-          global.reporter.error(TITLE, component + " " + te.getMessage)
+          global.reporter.error(TITLE, component + " " + te)
         case ex: Exception =>
           problematicComp += component
           if(DEBUG) ex.printStackTrace()
@@ -175,7 +175,7 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
   
   def phase3(iddResult: (ISet[Apk], InterproceduralDataDependenceInfo), ssm: AndroidSourceAndSinkManager): Option[TaintAnalysisResult[AndroidDataDependentTaintAnalysis.Node, InterproceduralDataDependenceAnalysis.Edge]] = {
     val apks = iddResult._1
-    val components = apks.map(_.getComponents).fold(Set[JawaType]())(iunion _)
+    val components = apks.map(_.getComponents).fold(Set[JawaType]())(iunion _) -- problematicComp
     println(TITLE + ":" + "-------Phase 3-------" + apks.size + s" apk${if(apks.size > 1)"s"else""} " + components.size + s" component${if(components.size > 1)"s"else""}-------")
     val idfgs = components.map(yard.getIDFG(_)).flatten
     if(!idfgs.isEmpty) {

@@ -27,21 +27,21 @@ import org.sireum.amandroid.AndroidGlobalConfig
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
 object DecompilerCli {
-	def run(sadmode: SireumAmandroidDecompileMode) {
+  def run(sadmode: SireumAmandroidDecompileMode) {
     val mem = sadmode.general.mem
     val debug = sadmode.general.debug
     val sourceDir = sadmode.srcFile
     val sourceFile = new File(sourceDir)
     val outputDirOpt = if(sadmode.outFile == "") None else Some(sadmode.outFile)
     val outputDir = outputDirOpt match{
-	    case Some(path) => path
-	    case None => sourceFile.getParent()
-	  }
+      case Some(path) => path
+      case None => sourceFile.getParent()
+    }
     forkProcess(mem, debug, sourceDir, outputDir)
   }
-	
-	def forkProcess(mem: Int, debug: Boolean, sourceDir: String, outputDir: String) = {
-	  val args = List(debug.toString, sourceDir, outputDir)
+  
+  def forkProcess(mem: Int, debug: Boolean, sourceDir: String, outputDir: String) = {
+    val args = List(debug.toString, sourceDir, outputDir)
     org.sireum.jawa.util.JVMUtil.startSecondJVM(Decompiler.getClass(), List("-Xmx" + mem + "G"), args, true)
   }
   
@@ -54,18 +54,18 @@ object DecompilerCli {
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */ 
 object Decompiler {
-	def main(args: Array[String]) {
-	  if(args.size != 3){
-	    println("Usage: <debug> <source path> <output path>")
-	    return
-	  }
-	  val debug = args(0).toBoolean
-	  val sourcePath = args(1)
-	  val outputPath = args(2)
+  def main(args: Array[String]) {
+    if(args.size != 3){
+      println("Usage: <debug> <source path> <output path>")
+      return
+    }
+    val debug = args(0).toBoolean
+    val sourcePath = args(1)
+    val outputPath = args(2)
     val dpsuri = AndroidGlobalConfig.dependence_dir.map(FileUtil.toUri(_))
-	  val outputUri = FileUtil.toUri(outputPath)
+    val outputUri = FileUtil.toUri(outputPath)
 
-	  val fileUris: MSet[(FileResourceUri, FileResourceUri)] = msetEmpty
+    val fileUris: MSet[(FileResourceUri, FileResourceUri)] = msetEmpty
     try {
       val fileOrDir = new File(sourcePath)
       fileOrDir match {
