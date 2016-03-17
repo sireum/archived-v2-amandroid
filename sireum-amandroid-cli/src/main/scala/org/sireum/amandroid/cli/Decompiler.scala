@@ -10,7 +10,6 @@
 package org.sireum.amandroid.cli
 
 import org.sireum.option.SireumAmandroidDecompileMode
-import org.sireum.jawa.util.APKFileResolver
 import org.sireum.util._
 import java.io.File
 import java.net.URI
@@ -70,10 +69,10 @@ object Decompiler {
       val fileOrDir = new File(sourcePath)
       fileOrDir match {
         case dir if dir.isDirectory() =>
-          val apks = ApkFileUtil.getApks(FileUtil.toUri(dir), true)
-          val dexs = FileUtil.listFiles(FileUtil.toUri(dir), "dex", true)
-          println(s"Processing directory which contains ${if(apks.size > 0) s"${apks.size} apk${if(apks.size > 1) "s" else ""}" else ""} ${if(dexs.size > 0) s"${dexs.size} dex${if(dexs.size > 1) "s" else ""}" else ""}")
-          apks.foreach {
+          val decs = ApkFileUtil.getDecompileableFiles(FileUtil.toUri(dir), true)
+          val dexs = FileUtil.listFiles(FileUtil.toUri(dir), ".dex", true)
+          println(s"Processing directory which contains ${if(decs.size > 0) s"${decs.size} apk/jar${if(decs.size > 1) "s" else ""}" else ""} ${if(dexs.size > 0) s"${dexs.size} dex${if(dexs.size > 1) "s" else ""}" else ""}")
+          decs.foreach {
             apkUri =>
               println("####" + apkUri + "####")
               ApkDecompiler.decompile(FileUtil.toFile(apkUri), FileUtil.toFile(outputUri), dpsuri, false, false, true, true)

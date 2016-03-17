@@ -24,7 +24,7 @@ import org.sireum.amandroid.parser.LayoutControl
 
 object Apk {
   def isValidApk(nameUri: FileResourceUri): Boolean = {
-    class FindManifest extends Exception
+    class ValidApk extends Exception
     val file = FileUtil.toFile(nameUri)
     file match {
       case dir if dir.isDirectory() => false
@@ -46,7 +46,37 @@ object Apk {
             }
             if(foundManifest && foundDex) {
               valid = true
-              throw new FindManifest
+              throw new ValidApk
+            }
+            entry = archive.getNextEntry()
+          }
+        } catch {
+          case ie: InterruptedException => throw ie
+          case e: Exception =>
+        } finally {
+          if (archive != null)
+            archive.close()
+        }
+        valid
+    }
+  }
+  def isDecompilable(nameUri: FileResourceUri): Boolean = {
+    class ValidJar extends Exception
+    val file = FileUtil.toFile(nameUri)
+    file match {
+      case dir if dir.isDirectory() => false
+      case _ => 
+        var valid: Boolean = false
+        var archive : ZipInputStream = null
+        try {
+          archive = new ZipInputStream(new FileInputStream(file))
+          var entry: ZipEntry = null
+          entry = archive.getNextEntry()
+          while (entry != null) {
+            val entryName = entry.getName()
+            if(entryName == "classes.dex"){
+              valid = true
+              throw new ValidJar
             }
             entry = archive.getNextEntry()
           }

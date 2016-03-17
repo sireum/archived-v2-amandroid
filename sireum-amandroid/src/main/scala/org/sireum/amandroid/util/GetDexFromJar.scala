@@ -10,7 +10,6 @@
 package org.sireum.amandroid.util
 
 import org.sireum.util.FileUtil
-import org.sireum.jawa.util.APKFileResolver
 
 /**
  * @author fgwei
@@ -21,7 +20,7 @@ object GetDexFromJar {
     val dirUri = FileUtil.toUri(dir)
     FileUtil.listFiles(dirUri, ".jar", true) foreach {
       jarUri =>
-        APKFileResolver.getDexFile(jarUri, dirUri, false)
+        ApkFileUtil.getDexFile(jarUri, dirUri, false)
     }
   }
 }

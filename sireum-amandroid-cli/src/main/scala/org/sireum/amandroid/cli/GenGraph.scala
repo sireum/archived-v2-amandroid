@@ -14,8 +14,6 @@ import java.io.File
 import org.sireum.util._
 import org.sireum.amandroid.cli.util.CliLogger
 import org.sireum.jawa.util.IgnoreException
-import java.net.URI
-import org.sireum.jawa.util.APKFileResolver
 import org.sireum.amandroid.decompile.Dex2PilarConverter
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.appInfo.AppInfoCollector

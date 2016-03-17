@@ -13,8 +13,6 @@ import org.sireum.util.FileUtil
 import org.sireum.amandroid.AndroidGlobalConfig
 import org.sireum.jawa.alir.LibSideEffectProvider
 import java.io.File
-import java.net.URI
-import org.sireum.jawa.util.APKFileResolver
 import org.sireum.amandroid.decompile.Dex2PilarConverter
 import org.sireum.amandroid.alir.pta.reachingFactsAnalysis.AndroidRFAConfig
 import org.sireum.jawa.LibraryAPISummary
