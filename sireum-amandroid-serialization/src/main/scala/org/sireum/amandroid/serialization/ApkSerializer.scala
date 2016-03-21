@@ -120,6 +120,7 @@ object ApkSerTest {
     global.setJavaLib(AndroidGlobalConfig.lib_files)
     val yard = new ApkYard(global)
     val apk = yard.loadApk(apkUri, outputUri, None, false, false, true)
+    println(apk.getCertificates)
     implicit val formats = Serialization.formats(NoTypeHints) + ApkSerializer
     val apkRes = FileUtil.toFile(MyFileUtil.appendFileName(outputUri, "apk.json"))
     val oapk = new FileWriter(apkRes)

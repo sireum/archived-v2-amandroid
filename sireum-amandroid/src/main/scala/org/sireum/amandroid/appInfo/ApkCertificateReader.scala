@@ -22,31 +22,75 @@ import java.math.BigInteger
 import java.util.Date
 import java.security.cert.Certificate
 import java.security.MessageDigest
+import java.security.PublicKey
+import java.security.interfaces.RSAPublicKey
 
 case class ApkCertificate(
-    owner: String, 
-    issuer: String, 
-    serialNumber: Int, 
-    notBefore: Date,
-    notAfter: Date,
-    md5fp: String,
-    sha1fp: String,
-    sha256fp: String,
-    algName: String,
-    version: Int) {
+    typ: String,
+    version: Int,
+    serialNumber: BigInt,
+    owner: String,
+    issuer: String,
+    validity: ApkCertificateValidity,
+    pubkey: ApkPublicKey,
+    certSig: ApkCertificateSignature,
+    fps: ApkCertificateFingerprints
+    ) {
   override def toString: String = {
     val sb: StringBuilder = new StringBuilder
-    sb.append("Owner: " + owner + "\n")
-    sb.append("Issuer:" + issuer + "\n")
-    sb.append("Serial number: " + serialNumber.toHexString + "\n")
-    sb.append("Valid from: " + notBefore + " until: " + notAfter + "\n")
+    sb.append("Type: " + typ + "\n")
+    sb.append("Version: " + version + "\n")
+    sb.append("Serial number: " + serialNumber.longValue().toHexString + "\n")
+    sb.append("Owner:  " + owner + "\n")
+    sb.append("Issuer: " + issuer + "\n")
+    sb.append(validity.toString)
+    sb.append(pubkey.toString)
+    sb.append(certSig.toString)
+    sb.append(fps.toString)
+    sb.toString()
+  }
+}
+
+case class ApkCertificateValidity(notBefore: Date, notAfter: Date) {
+  override def toString: String = {
+    val sb: StringBuilder = new StringBuilder
+    sb.append("Validity:\n")
+    sb.append("\tfrom: " + notBefore + "\n")
+    sb.append("\t  to: " + notAfter + "\n")
+    sb.toString
+  }
+}
+
+case class ApkCertificateFingerprints(md5fp: String, sha1fp: String, sha256fp: String) {
+  override def toString: String = {
+    val sb: StringBuilder = new StringBuilder
     sb.append("Certificate fingerprints:\n")
     sb.append("\tMD5: " + md5fp + "\n")
     sb.append("\tSHA1: " + sha1fp + "\n")
     sb.append("\tSHA256: " + sha256fp + "\n")
-    sb.append("Signature algorithm name: " + algName + "\n")
-    sb.append("Version: " + version + "\n")
     sb.toString()
+  }
+}
+
+case class ApkCertificateSignature(algName: String, oid: String, hexdata: String) {
+  override def toString: String = {
+    val sb: StringBuilder = new StringBuilder
+    sb.append("Signature:\n")
+    sb.append("\ttype: " + algName + "\n")
+    sb.append("\tOID: " + oid + "\n")
+    sb.append("\thexdata: " + hexdata + "\n")
+    sb.toString
+  }
+}
+
+case class ApkPublicKey(algName: String, exponent: BigInt, modulus: BigInt) {
+  override def toString: String = {
+    val sb: StringBuilder = new StringBuilder
+    sb.append("Public Key:\n")
+    sb.append("\ttype: " + algName + " " + modulus.bitLength + " bits" + "\n")
+    sb.append("\texponent: " + exponent + "\n")
+    sb.append("\thexdata: " + modulus + "\n")
+    sb.toString
   }
 }
 
@@ -82,17 +126,21 @@ object ApkCertificateReader {
         val md5fp = getCertFingerPrint("MD5", cert)
         val sha1fp = getCertFingerPrint("SHA1", cert)
         val sha256fp = getCertFingerPrint("SHA-256", cert)
+        val rsaPubKey = x509cert.getPublicKey.asInstanceOf[RSAPublicKey]
+        val validity = ApkCertificateValidity(x509cert.getNotBefore, x509cert.getNotAfter)
+        val pubKey = ApkPublicKey(rsaPubKey.getAlgorithm, rsaPubKey.getPublicExponent, rsaPubKey.getModulus)
+        val certSig = ApkCertificateSignature(x509cert.getSigAlgName, x509cert.getSigAlgOID, toHexString(x509cert.getSignature))
+        val fps = ApkCertificateFingerprints(md5fp, sha1fp, sha256fp)
         apkcerts += ApkCertificate(
+            x509cert.getType,
+            x509cert.getVersion,
+            x509cert.getSerialNumber,
             x509cert.getSubjectDN.getName,
             x509cert.getIssuerDN.getName,
-            x509cert.getSerialNumber.intValue(),
-            x509cert.getNotBefore,
-            x509cert.getNotAfter,
-            md5fp,
-            sha1fp,
-            sha256fp,
-            x509cert.getSigAlgName,
-            x509cert.getVersion)
+            validity,
+            pubKey,
+            certSig,
+            fps)
       }
     } catch {
       case e: Exception =>
