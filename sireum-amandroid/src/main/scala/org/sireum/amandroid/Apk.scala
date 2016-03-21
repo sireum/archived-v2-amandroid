@@ -21,6 +21,7 @@ import org.sireum.jawa.JawaType
 import org.sireum.jawa.Signature
 import org.sireum.amandroid.parser.ComponentInfo
 import org.sireum.amandroid.parser.LayoutControl
+import org.sireum.amandroid.appInfo.ApkCertificate
 
 object Apk {
   def isValidApk(nameUri: FileResourceUri): Boolean = {
@@ -105,6 +106,12 @@ case class Apk(nameUri: FileResourceUri) {
   require(isValidApk(nameUri), throw InvalidApk(nameUri))
   private final val TITLE = "Apk"
   def getAppName: String = FileUtil.toFile(nameUri).getName
+  
+  private val certificates: MSet[ApkCertificate] = msetEmpty
+  
+  def addCertificates(certs: ISet[ApkCertificate]) = this.certificates ++= certs
+  def getCertificates: ISet[ApkCertificate] = this.certificates.toSet
+  
   private val activities: MSet[JawaType] = msetEmpty
   private val services: MSet[JawaType] = msetEmpty
   private val receivers: MSet[JawaType] = msetEmpty

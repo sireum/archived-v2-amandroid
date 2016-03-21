@@ -49,8 +49,8 @@ object Staging {
     val rpts = new FileReader(ptsRes)
     implicit val formats = Serialization.formats(NoTypeHints) + ApkSerializer + PTAResultSerializer
     try {
-      val apk = read(rapk).asInstanceOf[Apk]
-      val ptaresult = read(rpts).asInstanceOf[PTAResult]
+      val apk = read[Apk](rapk)
+      val ptaresult = read[PTAResult](rpts)
       (apk, ptaresult)
     } catch {
       case e: Exception =>

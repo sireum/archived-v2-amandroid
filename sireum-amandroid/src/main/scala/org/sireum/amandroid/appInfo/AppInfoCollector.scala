@@ -49,6 +49,11 @@ import org.sireum.jawa.util.MyFileUtil
  */
 object AppInfoCollector {
   final val TITLE = "AppInfoCollector"
+  
+  def readCertificates(apkUri: FileResourceUri): ISet[ApkCertificate] = {
+    ApkCertificateReader(apkUri)
+  }
+  
   def analyzeManifest(reporter: Reporter, manifestUri: FileResourceUri): ManifestParser = {
     val manifestIS = new FileInputStream(FileUtil.toFile(manifestUri))
     val mfp = new ManifestParser
@@ -201,12 +206,14 @@ object AppInfoCollector {
   }
 
   def collectInfo(apk: Apk, global: Global, outUri: FileResourceUri): Unit = {
+    val certs = AppInfoCollector.readCertificates(apk.nameUri)
     val manifestUri = MyFileUtil.appendFileName(outUri, "AndroidManifest.xml")
     val mfp = AppInfoCollector.analyzeManifest(global.reporter, manifestUri)
     val afp = AppInfoCollector.analyzeARSC(global.reporter, apk.nameUri)
     val lfp = AppInfoCollector.analyzeLayouts(global, outUri, mfp, afp)
     val ra = AppInfoCollector.reachabilityAnalysis(global, mfp.getComponentInfos.map(_.compType))
     val callbacks = AppInfoCollector.analyzeCallback(global.reporter, afp, lfp, ra)
+    apk.addCertificates(certs)
     apk.setPackageName(mfp.getPackageName)
     apk.addComponentInfos(mfp.getComponentInfos)
     apk.addUsesPermissions(mfp.getPermissions)

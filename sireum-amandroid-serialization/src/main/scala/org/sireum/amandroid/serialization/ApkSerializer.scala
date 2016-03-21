@@ -30,12 +30,19 @@ import java.io.File
 import org.sireum.jawa.Constants
 import org.sireum.amandroid.util.AndroidLibraryAPISummary
 import org.sireum.amandroid.parser.ComponentType
+import org.sireum.amandroid.alir.componentSummary.ApkYard
+import java.io.PrintWriter
+import org.sireum.amandroid.appInfo.ApkCertificate
+import org.sireum.jawa.util.MyFileUtil
+import java.io.FileReader
+import java.io.FileWriter
 
 object ApkSerializer extends CustomSerializer[Apk](format => (
   {
     case jv: JValue =>
       implicit val formats = format + JawaTypeSerializer + JawaTypeKeySerializer + SignatureSerializer + IntentFilterDataBaseSerializer + new org.json4s.ext.EnumNameSerializer(ComponentType)
       val nameUri  = (jv \ "nameUri").extract[FileResourceUri]
+      val certificates = (jv \ "certificates").extract[ISet[ApkCertificate]]
       val activities = (jv \ "activities").extract[ISet[JawaType]]
       val services = (jv \ "services").extract[ISet[JawaType]]
       val receivers = (jv \ "receivers").extract[ISet[JawaType]]
@@ -50,6 +57,7 @@ object ApkSerializer extends CustomSerializer[Apk](format => (
       val intentFdb = (jv \ "intentFdb").extract[IntentFilterDataBase]
       val codeLineCounter = (jv \ "codeLineCounter").extract[Int]
       val apk = new Apk(nameUri)
+      apk.addCertificates(certificates)
       apk.addActivities(activities)
       apk.addServices(services)
       apk.addReceivers(receivers)
@@ -69,6 +77,7 @@ object ApkSerializer extends CustomSerializer[Apk](format => (
     case apk: Apk =>
       implicit val formats = format + JawaTypeSerializer + JawaTypeKeySerializer + SignatureSerializer + IntentFilterDataBaseSerializer + new org.json4s.ext.EnumNameSerializer(ComponentType)
       val nameUri: FileResourceUri = apk.nameUri
+      val certificates: ISet[ApkCertificate] = apk.getCertificates
       val activities: ISet[JawaType] = apk.getActivities
       val services: ISet[JawaType] = apk.getServices
       val receivers: ISet[JawaType] = apk.getReceivers
@@ -83,6 +92,7 @@ object ApkSerializer extends CustomSerializer[Apk](format => (
       val intentFdb: IntentFilterDataBase = apk.getIntentFilterDB
       val codeLineCounter: Int = apk.getCodeLineCounter
       ("nameUri" -> nameUri) ~
+      ("certificates" -> Extraction.decompose(certificates)) ~
       ("activities" -> Extraction.decompose(activities)) ~
       ("services" -> Extraction.decompose(services)) ~
       ("receivers" -> Extraction.decompose(receivers)) ~
@@ -98,3 +108,39 @@ object ApkSerializer extends CustomSerializer[Apk](format => (
       ("codeLineCounter" -> codeLineCounter) 
   }
 ))
+
+object ApkSerTest {
+  def main(args: Array[String]): Unit = {
+    val apkPath = args(0)
+    val outputPath = args(1)
+    val apkUri = FileUtil.toUri(apkPath)
+    val outputUri = FileUtil.toUri(outputPath)
+    val reporter = new PrintReporter(MsgLevel.ERROR)
+    val global = new Global(apkUri, reporter)
+    global.setJavaLib(AndroidGlobalConfig.lib_files)
+    val yard = new ApkYard(global)
+    val apk = yard.loadApk(apkUri, outputUri, None, false, false, true)
+    implicit val formats = Serialization.formats(NoTypeHints) + ApkSerializer
+    val apkRes = FileUtil.toFile(MyFileUtil.appendFileName(outputUri, "apk.json"))
+    val oapk = new FileWriter(apkRes)
+    try {
+      write(apk, oapk)
+    } catch {
+      case e: Exception =>
+        e.printStackTrace()
+    } finally {
+      oapk.flush()
+      oapk.close()
+    }
+    val iapk = new FileReader(apkRes)
+    try {
+      val apk = read[Apk](iapk)
+      println(apk.getCertificates)
+    } catch {
+      case e: Exception =>
+        e.printStackTrace()
+    } finally {
+      iapk.close()
+    }
+  }
+}
