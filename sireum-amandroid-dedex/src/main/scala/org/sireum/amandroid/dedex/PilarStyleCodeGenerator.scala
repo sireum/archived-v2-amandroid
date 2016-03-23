@@ -22,7 +22,7 @@ import java.util.Stack
 import java.util.{HashMap => JHashMap}
 import java.io.IOException
 import scala.util.control.Breaks._
-import org.stringtemplate.v4.STGroupFile
+import org.stringtemplate.v4.STGroupString
 import org.stringtemplate.v4.ST
 import org.sireum.jawa.JawaType
 import org.sireum.jawa.JavaKnowledge
@@ -42,7 +42,7 @@ import org.sireum.jawa.util.MyFileUtil
  * @author fgwei
  */
 trait PilarStyleCodeGeneratorListener {
-  def onRecodeGenerated(recType: JawaType, code: String, outputUri: Option[FileResourceUri])
+  def onRecordGenerated(recType: JawaType, code: String, outputUri: Option[FileResourceUri])
   def onGenerateEnd(recordCount: Int)
 }
 
@@ -97,7 +97,7 @@ class PilarStyleCodeGenerator(
   private final val DEBUG_FLOW = false
   private final val REVISIT_LIMIT = 20
   
-  protected val template = new STGroupFile("org/sireum/amandroid/dedex/PilarModel.stg")
+  protected val template = new STGroupString(PilarModelProvider.pilarModel)
   private var procDeclTemplate = template.getInstanceOf("ProcedureDecl")
   private var localVarsTemplate = template.getInstanceOf("LocalVars")
   
@@ -216,7 +216,7 @@ class PilarStyleCodeGenerator(
         }
         val code = generateRecord(classIdx)
         result(recType) = code
-        if(listener.isDefined) listener.get.onRecodeGenerated(recType, code, outputUri)
+        if(listener.isDefined) listener.get.onRecordGenerated(recType, code, outputUri)
         else outputCode(recType, code, outputUri)
       }
     }

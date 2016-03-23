@@ -48,7 +48,7 @@ class DecompilerActor extends Actor with ActorLogging {
         var opUri: Option[FileResourceUri] = None
         val codes: MMap[JawaType, String] = mmapEmpty
         val listener = new PilarStyleCodeGeneratorListener {
-          def onRecodeGenerated(recType: JawaType, code: String, outputUri: Option[FileResourceUri]) = {
+          def onRecordGenerated(recType: JawaType, code: String, outputUri: Option[FileResourceUri]) = {
             opUri = outputUri
             codes(recType) = code
           }

@@ -109,7 +109,7 @@ class PointsToAnalysisActor extends Actor with ActorLogging {
     val m = global.resolveMethodCode(ep, apk.getEnvMap(ep.classTyp)._2)
     implicit val factory = new RFAFactFactory
     val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(m)
-    val idfg = AndroidReachingFactsAnalysis(global, apk, m, initialfacts, new ClassLoadManager, timeout = timeout match{case fd: FiniteDuration => Some(MyTimeout(fd)) case _ => None })
+    val idfg = AndroidReachingFactsAnalysis(global, apk, m, initialfacts, new ClassLoadManager, timeout = timeout match{case fd: FiniteDuration => Some(new MyTimeout(fd)) case _ => None })
     idfg
   }
   

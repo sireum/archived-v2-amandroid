@@ -26,7 +26,7 @@ object AmDecoder {
    *  Decode apk file and return outputpath
    *  @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
    */
-  def decode(sourcePathUri: FileResourceUri, outputUri: FileResourceUri, forceDelete: Boolean = true): FileResourceUri = {
+  def decode(sourcePathUri: FileResourceUri, outputUri: FileResourceUri, forceDelete: Boolean = true, createFolder: Boolean = true): FileResourceUri = {
     // make it as quiet mode
     val logger = Logger.getLogger("")
     logger.getHandlers().foreach {
@@ -36,7 +36,9 @@ object AmDecoder {
     LogManager.getLogManager().reset()
 
     val apkFile = FileUtil.toFile(sourcePathUri)
-    val outputDir = FileUtil.toFile(ApkFileUtil.getOutputUri(sourcePathUri, outputUri))
+    val outputDir = 
+      if(createFolder) FileUtil.toFile(ApkFileUtil.getOutputUri(sourcePathUri, outputUri))
+      else FileUtil.toFile(outputUri)
     if(outputDir.exists() && !forceDelete) return FileUtil.toUri(outputDir)
     try {
       val decoder = new ApkDecoder

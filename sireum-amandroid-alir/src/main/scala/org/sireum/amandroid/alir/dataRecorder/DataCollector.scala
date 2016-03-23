@@ -366,7 +366,10 @@ object DataCollector {
       val dynamicReg = apk.getDynamicRegisteredReceivers.contains(compTyp)
       ComponentData(compTyp.jawaName, typ, exported, dynamicReg, protectPermission, intentFilters, iccInfos)
     }
-    val taintResult = yard.getTaintAnalysisResult[InterProceduralNode, AlirEdge[InterProceduralNode]](apk.nameUri)
+    val taintResult = yard.getTaintAnalysisResult[InterProceduralNode, AlirEdge[InterProceduralNode]](apk.nameUri) match {
+      case a @ Some(_) => a
+      case None => yard.getInterAppTaintAnalysisResult[InterProceduralNode, AlirEdge[InterProceduralNode]]
+    }
     AppData(appName, uses_permissions.toSet, compDatas.toSet, taintResult)
   }
 }

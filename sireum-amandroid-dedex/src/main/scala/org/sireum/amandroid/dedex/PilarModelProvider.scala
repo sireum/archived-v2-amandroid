@@ -1,3 +1,8 @@
+package org.sireum.amandroid.dedex
+
+object PilarModelProvider {
+  val pilarModel =
+"""
 group PilarModelGenerator;
 
 delimiters "$", "$"
@@ -119,3 +124,5 @@ $catchs ; separator="\n"$
 Catch(catchTyp, fromLoc, toLoc, targetLoc) ::= <<
 catch $catchTyp$ @[$fromLoc$..$toLoc$] goto $targetLoc$;
 >>
+"""
+}

@@ -79,7 +79,7 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
             val ep = global.getMethod(esig).get // need to double check
             implicit val factory = new RFAFactFactory
             val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
-            val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager, timeout = Some(MyTimeout(timeout)))
+            val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager, timeout = Some(new MyTimeout(timeout)))
             yard.addIDFG(component, idfg)
             // do dda on this component
             val iddResult = InterproceduralDataDependenceAnalysis(global, idfg)
