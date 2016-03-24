@@ -4,7 +4,7 @@ Bundle-Name: Amandroid Concurrent
 Bundle-SymbolicName: sireum-amandroid-concurrent;singleton:=true
 Bundle-Version: 2.0.0
 Bundle-ActivationPolicy: lazy
-Bundle-Vendor: argus.org
+Bundle-Vendor: arguslab.org
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.sireum;bundle-version="2.0.0",
  sireum-amandroid;bundle-version="2.0.0",

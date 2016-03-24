@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Amandroid Serialization
 Bundle-SymbolicName: sireum-amandroid-serialization;singleton:=true
 Bundle-Version: 2.0.0
-Bundle-Vendor: argus.org
+Bundle-Vendor: arguslab.org
 Require-Bundle: org.sireum;bundle-version="2.0.0",
  sireum-amandroid;bundle-version="2.0.0",
  sireum-amandroid-alir;bundle-version="2.0.0",
