@@ -27,6 +27,8 @@ import java.util.concurrent.TimeoutException
 import org.sireum.amandroid.alir.componentSummary.ComponentBasedAnalysis
 import org.sireum.amandroid.alir.componentSummary.ApkYard
 import org.sireum.amandroid.security.apiMisuse.HideIconAPIMisuse
+import org.sireum.jawa.PrintReporter
+import org.sireum.jawa.MsgLevel
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  */
@@ -52,12 +54,12 @@ object HideIconAPI_run {
 
     files.foreach {
       file =>
-       HideAPIMisuseCounter.total += 1
-        val reporter = new DefaultReporter
+        HideAPIMisuseCounter.total += 1
+        val reporter = new PrintReporter(MsgLevel.INFO)
         val global = new Global(file, reporter)
         global.setJavaLib(AndroidGlobalConfig.lib_files)
         try {
-          reporter.echo(TITLE,HideAPIMisuseTask(global, outputPath, dpsuri, file).run)
+          reporter.echo(TITLE, HideAPIMisuseTask(global, outputPath, dpsuri, file).run)
         } catch {
           case e : Throwable => e.printStackTrace()
         } finally {
@@ -71,7 +73,7 @@ private case class HideAPIMisuseTask(global: Global, outputPath : String, dpsuri
       global.reporter.echo(TITLE, "####" + file + "#####")
       val yard = new ApkYard(global)
       val outputUri = FileUtil.toUri(outputPath)
-      val outUri = yard.loadCode(file, outputUri, dpsuri, false, false, false)
+      val outUri = yard.loadCode(file, outputUri, dpsuri, false, false, true)
       val hideIconInvokeContainers = HideIconAPIMisuse(global)
       if(!hideIconInvokeContainers.isEmpty) {
         global.reporter.error(TITLE, (hideIconInvokeContainers + " invoked hide icon api."))
