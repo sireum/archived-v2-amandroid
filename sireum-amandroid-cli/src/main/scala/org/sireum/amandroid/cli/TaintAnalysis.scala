@@ -116,8 +116,8 @@ object TaintAnalysis{
               else new NoReporter
             val global = new Global(file, reporter)
             global.setJavaLib(liblist)
-            println(TaintAnalysisTask(global, tmodule, outputUri, dpsuri, file).run)
-            println()
+            TaintAnalysisTask(global, tmodule, outputUri, dpsuri, file).run
+            println("Done!")
             if(debug) println("Debug info write into " + reporter.asInstanceOf[FileReporter].f)
           } catch {
             case ie: IgnoreException => println("No interesting element found for " + module)
