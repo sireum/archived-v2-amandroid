@@ -18,7 +18,6 @@ object InstanceSerializer extends CustomSerializer[Instance](format => (
     {
       case jv: JValue =>
         implicit val formats = format + ContextSerializer + JawaTypeSerializer
-        println(jv)
         jv match {
           case JObject(List(JField("ClassInstance", v))) => Extraction.extract[ClassInstance](v)
           case JObject(List(JField("PTAInstance", v))) => Extraction.extract[PTAInstance](v)

@@ -58,6 +58,8 @@ case class PointsToAnalysisFailResult(fileUri: FileResourceUri, e: Exception) ex
 // SecurityEngineActor's input
 case class SecurityEngineData(ptar: PointsToAnalysisResult with Success, spec: SecSpec)
 // SecurityEngineActor's result
-trait SecurityEngineResult extends AmandroidData
-case class SecurityEngineSuccResult() extends SecurityEngineResult with Success
-case class SecurityEngineFailResult() extends SecurityEngineResult with Failure
+trait SecurityEngineResult extends AmandroidData {
+  def fileUri: FileResourceUri
+}
+case class SecurityEngineSuccResult(fileUri: FileResourceUri, sr: Option[SecResult]) extends SecurityEngineResult with Success
+case class SecurityEngineFailResult(fileUri: FileResourceUri, e: Exception) extends SecurityEngineResult with Failure

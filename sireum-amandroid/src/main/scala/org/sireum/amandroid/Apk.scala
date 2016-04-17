@@ -22,6 +22,7 @@ import org.sireum.jawa.Signature
 import org.sireum.amandroid.parser.ComponentInfo
 import org.sireum.amandroid.parser.LayoutControl
 import org.sireum.amandroid.appInfo.ApkCertificate
+import org.sireum.jawa.Global
 
 object Apk {
   def isValidApk(nameUri: FileResourceUri): Boolean = {
@@ -232,6 +233,7 @@ case class Apk(nameUri: FileResourceUri, outApkUri: FileResourceUri, srcs: ISet[
   def getEntryPoints: ISet[JawaType] = this.componentInfos.filter(_.enabled).map(_.compType).toSet
   
   def addEnvMap(typ: JawaType, sig: Signature, code: String) = this.envProcMap(typ) = ((sig, code))
+  def addEnvMap(envMap: IMap[JawaType, (Signature, String)]) = this.envProcMap ++= envMap
   def getEnvMap = this.envProcMap.toMap
   def getEnvString: String = {
     val sb = new StringBuilder
@@ -241,6 +243,12 @@ case class Apk(nameUri: FileResourceUri, outApkUri: FileResourceUri, srcs: ISet[
         sb.append(v._2 + "\n\n")
     }
     sb.toString.intern()
+  }
+  def resolveEnvInGlobal(global: Global) = {
+    getEnvMap.foreach {
+      case (typ, (sig, code)) =>
+        global.resolveMethodCode(sig, code)
+    }
   }
 
   def hasEnv(typ: JawaType): Boolean = this.envProcMap.contains(typ)

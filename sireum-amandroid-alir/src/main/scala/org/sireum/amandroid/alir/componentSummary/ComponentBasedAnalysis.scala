@@ -203,9 +203,9 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
         Some(tar)
       } catch {
         case ex: Exception =>
-            if(DEBUG) ex.printStackTrace()
-            global.reporter.error(TITLE, ex.getMessage)
-            None
+          if(DEBUG) ex.printStackTrace()
+          global.reporter.error(TITLE, ex.getMessage)
+          None
       }
     } else None
   }

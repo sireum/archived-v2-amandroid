@@ -90,7 +90,8 @@ object CryptoMisuse_run {
       val idfgs = ComponentBasedAnalysis.prepare(global, apk, false)(10 minutes)
       idfgs.foreach{
         case (rec, idfg) =>
-          CryptographicMisuse(global, idfg)
+          val res = CryptographicMisuse(global, idfg)
+          res.print
       }
       return "Done!"
     }

@@ -20,6 +20,9 @@ import org.sireum.jawa.alir.pta.PTAResult
 import org.sireum.jawa.alir.pta.VarSlot
 import org.sireum.jawa.Global
 import org.sireum.jawa.Signature
+import org.sireum.jawa.alir.Context
+import org.sireum.jawa.alir.apicheck.ApiMisuseResult
+import org.sireum.jawa.alir.apicheck.ApiMisuseChecker
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -27,10 +30,10 @@ import org.sireum.jawa.Signature
  */ 
 object CryptographicMisuse extends ApiMisuseChecker {
   
-  def apply(global: Global, idfg: InterProceduralDataFlowGraph): IMap[ICFGCallNode, Boolean]
+  def apply(global: Global, idfg: InterProceduralDataFlowGraph): ApiMisuseResult
     = check(global, idfg)
     
-  def check(global: Global, idfg: InterProceduralDataFlowGraph): IMap[ICFGCallNode, Boolean] = {
+  def check(global: Global, idfg: InterProceduralDataFlowGraph): ApiMisuseResult = {
     val icfg = idfg.icfg
     val ptaresult = idfg.ptaresult
     val nodeMap : MMap[String, MSet[ICFGCallNode]] = mmapEmpty
@@ -43,13 +46,14 @@ object CryptographicMisuse extends ApiMisuseChecker {
         }
     }
     val rule1Res = ECBCheck(global, nodeMap, ptaresult)
+    val misusedApis: MMap[Context, String] = mmapEmpty
     rule1Res.foreach{
       case (n, b) =>
         if(!b){
-          println(n.context + " using ECB mode!")
+          misusedApis(n.getContext) = "Using ECB mode!"
         }
     }
-    rule1Res
+    ApiMisuseResult(misusedApis.toMap)
   }
   
   /**

@@ -133,7 +133,8 @@ object CryptoMisuse {
       val idfgs = ComponentBasedAnalysis.prepare(global, apk, false)(AndroidGlobalConfig.timeout minutes)
       idfgs.foreach{
         case (rec, idfg) =>
-          CryptographicMisuse(global, idfg)
+          val res = CryptographicMisuse(global, idfg)
+          res.print
       }
       return "Done!"
     }

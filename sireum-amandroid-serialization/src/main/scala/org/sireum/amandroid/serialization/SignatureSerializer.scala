@@ -41,3 +41,14 @@ object SignatureSerializer extends CustomSerializer[Signature](format => (
       ("sig" -> sig.signature)
     }
 ))
+
+object SignatureKeySerializer extends CustomKeySerializer[Signature](format => (
+    {
+      case str: String =>
+        new Signature(str)
+    },
+    {
+      case sig: Signature =>
+        sig.signature
+    }
+))

@@ -58,6 +58,7 @@ object ApkSerializer extends CustomSerializer[Apk](format => (
       val appPackageName = (jv \ "appPackageName").extract[Option[String]]
       val intentFdb = (jv \ "intentFdb").extract[IntentFilterDataBase]
       val codeLineCounter = (jv \ "codeLineCounter").extract[Int]
+      val envMap = (jv \ "envMap").extract[IMap[JawaType, (Signature, String)]]
       val apk = new Apk(nameUri, outApkUri, srcs)
       apk.addCertificates(certificates)
       apk.addActivities(activities)
@@ -73,6 +74,7 @@ object ApkSerializer extends CustomSerializer[Apk](format => (
       apk.setPackageName(appPackageName.getOrElse(""))
       apk.setIntentFilterDB(intentFdb)
       apk.setCodeLineCounter(codeLineCounter)
+      apk.addEnvMap(envMap)
       apk
   },
   {
@@ -95,6 +97,7 @@ object ApkSerializer extends CustomSerializer[Apk](format => (
       val appPackageName: String = apk.getPackageName
       val intentFdb: IntentFilterDataBase = apk.getIntentFilterDB
       val codeLineCounter: Int = apk.getCodeLineCounter
+      val envMap: IMap[JawaType, (Signature, String)] = apk.getEnvMap
       ("nameUri" -> nameUri) ~
       ("outApkUri" -> outApkUri) ~
       ("srcs" -> srcs) ~
@@ -111,7 +114,8 @@ object ApkSerializer extends CustomSerializer[Apk](format => (
       ("layoutControls" -> Extraction.decompose(layoutControls)) ~
       ("appPackageName" -> Option(appPackageName)) ~
       ("intentFdb" -> Extraction.decompose(intentFdb)) ~
-      ("codeLineCounter" -> codeLineCounter) 
+      ("codeLineCounter" -> codeLineCounter) ~
+      ("envMap" -> Extraction.decompose(envMap))
   }
 ))
 
