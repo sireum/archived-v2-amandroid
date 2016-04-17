@@ -35,7 +35,7 @@ object Staging {
     }
   }
   
-  def stagePTAResult(ptaresult: PTAResult, outApkUri: FileResourceUri): Unit = {
+  def stagePTAResult(ptaresults: IMap[Signature, PTAResult], outApkUri: FileResourceUri): Unit = {
     val outStageUri = MyFileUtil.appendFileName(outApkUri, "stage")
     val outStageDir = FileUtil.toFile(outStageUri)
     if(!outStageDir.exists()) outStageDir.mkdirs()
@@ -43,7 +43,7 @@ object Staging {
     val opts = new PrintWriter(ptsRes)
     implicit val formats = Serialization.formats(NoTypeHints) + ApkSerializer + PTAResultSerializer
     try {
-      write(ptaresult, opts)
+      write(ptaresults, opts)
     } catch {
       case e: Exception =>
         ptsRes.delete()
@@ -54,9 +54,9 @@ object Staging {
     }
   }
   
-  def stage(apk: Apk, ptaresult: PTAResult, outApkUri: FileResourceUri): Unit = {
+  def stage(apk: Apk, ptaresults: IMap[Signature, PTAResult], outApkUri: FileResourceUri): Unit = {
     stageApk(apk, outApkUri)
-    stagePTAResult(ptaresult, outApkUri)
+    stagePTAResult(ptaresults, outApkUri)
   }
   
   def recoverApk(outApkUri: FileResourceUri): Apk = {
@@ -77,7 +77,7 @@ object Staging {
     }
   }
   
-  def recoverPTAResult(outApkUri: FileResourceUri): PTAResult = {
+  def recoverPTAResult(outApkUri: FileResourceUri): IMap[Signature, PTAResult] = {
     val outStageUri = MyFileUtil.appendFileName(outApkUri, "stage")
     val outStageDir = FileUtil.toFile(outStageUri)
     if(!outStageDir.exists()) outStageDir.mkdirs()
@@ -85,8 +85,8 @@ object Staging {
     val rpts = new FileReader(ptsRes)
     implicit val formats = Serialization.formats(NoTypeHints) + PTAResultSerializer
     try {
-      val ptaresult = read[PTAResult](rpts)
-      ptaresult
+      val ptaresults = read[IMap[Signature, PTAResult]](rpts)
+      ptaresults
     } catch {
       case e: Exception =>
         throw e
@@ -95,7 +95,7 @@ object Staging {
     }
   }
   
-  def recoverStage(outApkUri: FileResourceUri): (Apk, PTAResult) = {
+  def recoverStage(outApkUri: FileResourceUri): (Apk, IMap[Signature, PTAResult]) = {
     (recoverApk(outApkUri), recoverPTAResult(outApkUri))
   }
   

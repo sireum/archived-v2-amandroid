@@ -25,12 +25,12 @@ import org.sireum.jawa.Signature
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a>
  */ 
-object CryptographicMisuse {
+object CryptographicMisuse extends ApiMisuseChecker {
   
-  def apply(global: Global, idfg : InterProceduralDataFlowGraph) : Unit
-    = build(global, idfg)
+  def apply(global: Global, idfg: InterProceduralDataFlowGraph): IMap[ICFGCallNode, Boolean]
+    = check(global, idfg)
     
-  def build(global: Global, idfg : InterProceduralDataFlowGraph) : Unit = {
+  def check(global: Global, idfg: InterProceduralDataFlowGraph): IMap[ICFGCallNode, Boolean] = {
     val icfg = idfg.icfg
     val ptaresult = idfg.ptaresult
     val nodeMap : MMap[String, MSet[ICFGCallNode]] = mmapEmpty
@@ -49,13 +49,14 @@ object CryptographicMisuse {
           println(n.context + " using ECB mode!")
         }
     }
+    rule1Res
   }
   
   /**
    * Rule 1 forbids the use of ECB mode because ECB mode is deterministic and not stateful, 
    * thus cannot be IND-CPA secure.
    */
-  def ECBCheck(global: Global, nodeMap : MMap[String, MSet[ICFGCallNode]], ptaresult : PTAResult) : Map[ICFGCallNode, Boolean] = {
+  def ECBCheck(global: Global, nodeMap : MMap[String, MSet[ICFGCallNode]], ptaresult : PTAResult): IMap[ICFGCallNode, Boolean] = {
     var result : Map[ICFGCallNode, Boolean] = Map()
     val nodes : MSet[ICFGCallNode] = msetEmpty
     nodeMap.foreach{

@@ -49,27 +49,20 @@ import scala.concurrent.ExecutionContext.Implicits.{global => ec}
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import org.sireum.jawa.util.MyTimeout
+import org.sireum.jawa.Signature
 
 /**
  * @author fgwei
  */
-class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
+object ComponentBasedAnalysis {
   private final val TITLE = "ComponentBasedAnalysis"
   private final val DEBUG = false
-  
-  import ComponentSummaryTable._
-  
-  val problematicComp: MSet[JawaType] = msetEmpty
-  
-  /**
-   * ComponentBasedAnalysis phase1 is doing intra component analysis for one giving apk.
-   */
-  def phase1(apk: Apk, parallel: Boolean)(implicit timeout: FiniteDuration) = {
-    println(TITLE + ":" + "-------Phase 1-------")
+  def prepare(global: Global, apk: Apk, parallel: Boolean)(implicit timeout: FiniteDuration): IMap[JawaType, InterProceduralDataFlowGraph] = {
+    println(TITLE + ":" + "-------Prepare IDFGs-------")
     AndroidReachingFactsAnalysisConfig.resolve_icc = false // We don't want to resolve ICC at this phase
     var components = apk.getComponents
     val worklist: MList[JawaType] = mlistEmpty ++ components
-    
+    val idfgs: MMap[JawaType, InterProceduralDataFlowGraph] = mmapEmpty
     while(!worklist.isEmpty) {
       val component = worklist.remove(0)
       println("-------Analyze component " + component + "--------------")
@@ -80,19 +73,14 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
             implicit val factory = new RFAFactFactory
             val initialfacts = AndroidRFAConfig.getInitialFactsForMainEnvironment(ep)
             val idfg = AndroidReachingFactsAnalysis(global, apk, ep, initialfacts, new ClassLoadManager, timeout = Some(new MyTimeout(timeout)))
-            yard.addIDFG(component, idfg)
-            // do dda on this component
-            val iddResult = InterproceduralDataDependenceAnalysis(global, idfg)
-            yard.addIDDG(component, iddResult)
+            idfgs(esig.getClassType) = idfg
           case None =>
             global.reporter.error(TITLE, "Component " + component + " did not have environment! Some package or name mismatch maybe in the Manifestfile.")
         }
       } catch {
         case te: TimeoutException => // Timeout happened
-          problematicComp += component
-          global.reporter.error(TITLE, component + " " + te)
+          global.reporter.error(TITLE, component + " " + te.getMessage)
         case ex: Exception =>
-          problematicComp += component
           if(DEBUG) ex.printStackTrace()
           global.reporter.error(TITLE, "Analyzing component " + component + " has error: " + ex.getMessage)
       } finally {
@@ -101,6 +89,35 @@ class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
       worklist ++= (apk.getComponents -- components)
       components = apk.getComponents
     }
+    idfgs.toMap
+  }
+}
+
+/**
+ * @author fgwei
+ */
+class ComponentBasedAnalysis(global: Global, yard: ApkYard) {
+  import ComponentBasedAnalysis._
+  import ComponentSummaryTable._
+  
+  val problematicComp: MSet[JawaType] = msetEmpty
+  
+  /**
+   * ComponentBasedAnalysis phase1 is doing intra component analysis for one giving apk.
+   */
+  def phase1(apk: Apk, parallel: Boolean, idfgs: IMap[JawaType, InterProceduralDataFlowGraph]) = {
+    println(TITLE + ":" + "-------Phase 1-------")
+    
+    var components = apk.getComponents
+    idfgs foreach {
+      case (comp, idfg) =>
+        yard.addIDFG(comp, idfg)
+        // do dda on this component
+        val iddResult = InterproceduralDataDependenceAnalysis(global, idfg)
+        yard.addIDDG(comp, iddResult)
+    }
+    problematicComp ++= (components -- idfgs.keySet)
+    components = apk.getComponents
     apk.getComponents.foreach{
       comp => yard.addComponent(comp, apk)
     }

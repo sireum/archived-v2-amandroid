@@ -42,6 +42,8 @@ object ApkSerializer extends CustomSerializer[Apk](format => (
     case jv: JValue =>
       implicit val formats = format + JawaTypeSerializer + JawaTypeKeySerializer + SignatureSerializer + IntentFilterDataBaseSerializer + new org.json4s.ext.EnumNameSerializer(ComponentType)
       val nameUri  = (jv \ "nameUri").extract[FileResourceUri]
+      val outApkUri = (jv \ "outApkUri").extract[FileResourceUri]
+      val srcs = (jv \ "srcs").extract[ISet[String]]
       val certificates = (jv \ "certificates").extract[ISet[ApkCertificate]]
       val activities = (jv \ "activities").extract[ISet[JawaType]]
       val services = (jv \ "services").extract[ISet[JawaType]]
@@ -56,7 +58,7 @@ object ApkSerializer extends CustomSerializer[Apk](format => (
       val appPackageName = (jv \ "appPackageName").extract[Option[String]]
       val intentFdb = (jv \ "intentFdb").extract[IntentFilterDataBase]
       val codeLineCounter = (jv \ "codeLineCounter").extract[Int]
-      val apk = new Apk(nameUri)
+      val apk = new Apk(nameUri, outApkUri, srcs)
       apk.addCertificates(certificates)
       apk.addActivities(activities)
       apk.addServices(services)
@@ -77,6 +79,8 @@ object ApkSerializer extends CustomSerializer[Apk](format => (
     case apk: Apk =>
       implicit val formats = format + JawaTypeSerializer + JawaTypeKeySerializer + SignatureSerializer + IntentFilterDataBaseSerializer + new org.json4s.ext.EnumNameSerializer(ComponentType)
       val nameUri: FileResourceUri = apk.nameUri
+      val outApkUri: FileResourceUri = apk.outApkUri
+      val srcs: ISet[String] = apk.srcs
       val certificates: ISet[ApkCertificate] = apk.getCertificates
       val activities: ISet[JawaType] = apk.getActivities
       val services: ISet[JawaType] = apk.getServices
@@ -92,6 +96,8 @@ object ApkSerializer extends CustomSerializer[Apk](format => (
       val intentFdb: IntentFilterDataBase = apk.getIntentFilterDB
       val codeLineCounter: Int = apk.getCodeLineCounter
       ("nameUri" -> nameUri) ~
+      ("outApkUri" -> outApkUri) ~
+      ("srcs" -> srcs) ~
       ("certificates" -> Extraction.decompose(certificates)) ~
       ("activities" -> Extraction.decompose(activities)) ~
       ("services" -> Extraction.decompose(services)) ~

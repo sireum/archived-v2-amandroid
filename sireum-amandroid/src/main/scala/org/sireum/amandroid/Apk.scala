@@ -101,9 +101,10 @@ case class InvalidApk(fileUri: FileResourceUri) extends Exception
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
  * @author <a href="mailto:sroy@k-state.edu">Sankardas Roy</a> 
  */
-case class Apk(nameUri: FileResourceUri) {
+case class Apk(nameUri: FileResourceUri, outApkUri: FileResourceUri, srcs: ISet[String]) {
   import Apk._
   require(isValidApk(nameUri), throw InvalidApk(nameUri))
+  
   private final val TITLE = "Apk"
   def getAppName: String = FileUtil.toFile(nameUri).getName
   
