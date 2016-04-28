@@ -45,6 +45,7 @@ import org.sireum.pilar.symbol.ProcedureSymbolTable
 import org.sireum.jawa.FieldFQN
 import org.sireum.jawa.JawaType
 import org.sireum.jawa.util.MyTimeout
+import java.util.concurrent.TimeoutException
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -73,8 +74,13 @@ class AndroidReachingFactsAnalysisBuilder(global: Global, apk: Apk, clm: ClassLo
     this.icfg = icfg
     icfg.collectCfgToBaseGraph(entryPointProc, initContext, true)
     val iota: ISet[RFAFact] = initialFacts + new RFAFact(StaticFieldSlot(FieldFQN(new JawaType("Analysis"), "RFAiota", JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE)), PTAInstance(JavaKnowledge.JAVA_TOPLEVEL_OBJECT_TYPE.toUnknown, initContext.copy, false))
-    val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](icfg,
-      true, true, false, AndroidReachingFactsAnalysisConfig.parallel, gen, kill, callr, ppr, iota, initial, switchAsOrderedMatch, Some(nl))
+    try {
+      val result = InterProceduralMonotoneDataFlowAnalysisFramework[RFAFact](icfg,
+        true, true, false, AndroidReachingFactsAnalysisConfig.parallel, gen, kill, callr, ppr, iota, initial, switchAsOrderedMatch, Some(nl))
+    } catch {
+      case te: TimeoutException =>
+        global.reporter.warning(TITLE, entryPointProc.getSignature + " " + te.getMessage)
+    }
 //    icfg.toDot(new PrintWriter(System.out))
     ptaresult.addEntryPoint(entryPointProc.getSignature)
     InterProceduralDataFlowGraph(icfg, ptaresult)

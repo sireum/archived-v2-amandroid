@@ -54,7 +54,7 @@ object HideIconAPIMisuse {
           case jumpLoc: JumpLocation =>
             jumpLoc.jump match {
               case t: CallJump if t.jump.isEmpty =>
-                ASTUtil.getSignature(jumpLoc) match {
+                ASTUtil.getSignature(t) match {
                   case Some(signature) =>
                     if(signature.getSubSignature == "setComponentEnabledSetting:(Landroid/content/ComponentName;II)V") {
                       val valuesForParam2 = ExplicitValueFinder.findExplicitIntValueForArgs(method, jumpLoc, 2)

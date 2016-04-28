@@ -130,12 +130,11 @@ object CryptoMisuse {
       val yard = new ApkYard(global)
       val outputUri = FileUtil.toUri(outputPath)
       val apk = yard.loadApk(nameUri, outputUri, dpsuri, false, false, true)
-      val csa = new ComponentBasedAnalysis(global, yard)
-      csa.phase1(apk, parallel)(AndroidGlobalConfig.timeout minutes)
-      val idfgs = yard.getIDFGs
+      val idfgs = ComponentBasedAnalysis.prepare(global, apk, false)(AndroidGlobalConfig.timeout minutes)
       idfgs.foreach{
         case (rec, idfg) =>
-          CryptographicMisuse(global, idfg)
+          val res = CryptographicMisuse(global, idfg)
+          res.print
       }
       return "Done!"
     }

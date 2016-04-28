@@ -167,6 +167,10 @@ akka {
       router = round-robin-pool
       nr-of-instances = 3
     }
+    /AmandroidSupervisorActor/SecurityEngineActor {
+      router = round-robin-pool
+      nr-of-instances = 3
+    }
   }
 }
 

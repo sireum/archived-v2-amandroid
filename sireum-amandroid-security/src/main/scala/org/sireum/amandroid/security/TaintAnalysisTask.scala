@@ -44,8 +44,9 @@ case class TaintAnalysisTask(global: Global, module: TaintAnalysisModules.Value,
       case COMMUNICATION_LEAKAGE =>
         new CommunicationSourceAndSinkManager(global, apk, apk.getLayoutControls, apk.getCallbackMethods, AndroidGlobalConfig.sas_file)
     }
+    val idfgs = ComponentBasedAnalysis.prepare(global, apk, false)(AndroidGlobalConfig.timeout minutes)
     val cba = new ComponentBasedAnalysis(global, yard)
-    cba.phase1(apk, false)(AndroidGlobalConfig.timeout minutes)
+    cba.phase1(apk, false, idfgs)
     val iddResult = cba.phase2(Set(apk), false)
     val tar = cba.phase3(iddResult, ssm)
     val appData = DataCollector.collect(global, yard, apk)

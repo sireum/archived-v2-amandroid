@@ -109,9 +109,7 @@ object HttpsMisuse_run {
       val yard = new ApkYard(global)
       val outputUri = FileUtil.toUri(outputPath)
       val apk = yard.loadApk(file, outputUri, dpsuri, false, false, false)
-      val cba = new ComponentBasedAnalysis(global, yard)
-      cba.phase1(apk, false)(10 minutes)
-      val idfgs = yard.getIDFGs
+      val idfgs = ComponentBasedAnalysis.prepare(global, apk, false)(10 minutes)
       idfgs.foreach{
         case (rec, idfg) =>
           HttpsMisuse(global, idfg)

@@ -167,7 +167,7 @@ object GenGraph {
                     global.load(fileUri, Constants.PILAR_FILE_EXT, AndroidLibraryAPISummary)
                   }
               }
-              val apk = new Apk(apkFileUri)
+              val apk = new Apk(apkFileUri, outUri, srcs)
               AppInfoCollector.collectInfo(apk, global, outUri)
               val eps = apk.getEntryPoints
               val pros =
