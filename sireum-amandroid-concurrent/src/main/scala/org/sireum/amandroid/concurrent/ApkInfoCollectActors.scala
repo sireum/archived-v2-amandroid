@@ -41,7 +41,7 @@ class ApkInfoCollectActor extends Actor with ActorLogging {
     val outApkUri = acdata.outApkUri
     val reporter = new PrintReporter(MsgLevel.ERROR)
     val global = GlobalUtil.buildGlobal(acdata.fileUri, reporter, outApkUri, srcs)
-    val apk = new Apk(acdata.fileUri)
+    val apk = new Apk(acdata.fileUri, outApkUri, srcs)
     val (f, cancel) = FutureUtil.interruptableFuture[ApkInfoCollectResult] { () =>
       try {
         AppInfoCollector.collectInfo(apk, global, outApkUri)

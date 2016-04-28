@@ -43,15 +43,15 @@ class ApkYard(global: Global) {
   def getComponentToApkMap = this.componentToApkMap.toMap
   
   def loadApk(nameUri: FileResourceUri, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], dexLog: Boolean, debugMode: Boolean, forceDelete: Boolean = true): Apk = {
-    val apk = new Apk(nameUri)
-    val outUri = loadCode(nameUri, outputUri, dpsuri, dexLog, debugMode, forceDelete)
+    val (outUri, srcs) = loadCode(nameUri, outputUri, dpsuri, dexLog, debugMode, forceDelete)
+    val apk = new Apk(nameUri, outUri, srcs)
     AppInfoCollector.collectInfo(apk, global, outUri)
     addApk(apk)
     apk.getComponents.foreach(addComponent(_, apk))
     apk
   }
   
-  def loadCode(nameUri: FileResourceUri, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], dexLog: Boolean, debugMode: Boolean, forceDelete: Boolean = true): FileResourceUri = {
+  def loadCode(nameUri: FileResourceUri, outputUri: FileResourceUri, dpsuri: Option[FileResourceUri], dexLog: Boolean, debugMode: Boolean, forceDelete: Boolean = true): (FileResourceUri, ISet[String]) = {
     val apkFile = FileUtil.toFile(nameUri)
     val resultDir = FileUtil.toFile(outputUri)
     val (outUri, srcs, _) = ApkDecompiler.decompile(apkFile, resultDir, dpsuri, dexLog, debugMode, true, forceDelete)
@@ -63,7 +63,7 @@ class ApkYard(global: Global) {
           global.load(fileUri, Constants.PILAR_FILE_EXT, AndroidLibraryAPISummary)
         }
     }
-    outUri
+    (outUri, srcs)
   }
   
   private val idfgResults: MMap[JawaType, InterProceduralDataFlowGraph] = mmapEmpty

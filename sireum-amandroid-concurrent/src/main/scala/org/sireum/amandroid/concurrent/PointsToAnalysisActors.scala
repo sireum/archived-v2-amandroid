@@ -72,13 +72,13 @@ class PointsToAnalysisActor extends Actor with ActorLogging {
             log.error("Component " + compTyp.name + " did not have environment! Some package or name mismatch maybe in the Manifestfile.")
         }
     }
-    val ptaresult = new PTAResult
+    val ptaresults: MMap[Signature, PTAResult] = mmapEmpty
     val succEps: MSet[Signature] = msetEmpty
     while(!worklist.isEmpty) {
       val esig = worklist.remove(0)
       try {
         val res = rfa(esig, apk, ptadata.outApkUri, ptadata.srcFolders, ptadata.timeoutForeachComponent)
-        ptaresult.merge(res.ptaresult)
+        ptaresults(esig) = res.ptaresult
         succEps += esig
       } catch {
         case te: TimeoutException =>
@@ -89,7 +89,7 @@ class PointsToAnalysisActor extends Actor with ActorLogging {
     }
     if(ptadata.stage) {
       try {
-        Staging.stage(apk, ptaresult, ptadata.outApkUri)
+        Staging.stage(apk, ptaresults.toMap, ptadata.outApkUri)
         PointsToAnalysisSuccStageResult(apk.nameUri, ptadata.outApkUri)
       } catch {
         case e: Exception =>
@@ -97,7 +97,7 @@ class PointsToAnalysisActor extends Actor with ActorLogging {
         
       }
     } else {
-      PointsToAnalysisSuccResult(apk, ptaresult)
+      PointsToAnalysisSuccResult(apk, ptaresults.toMap)
     }
     
   }

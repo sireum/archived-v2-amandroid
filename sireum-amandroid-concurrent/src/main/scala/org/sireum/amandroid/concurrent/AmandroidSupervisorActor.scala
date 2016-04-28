@@ -25,11 +25,13 @@ import org.json4s._
 import org.json4s.native.Serialization
 import org.json4s.native.Serialization.{read, write}
 import org.sireum.amandroid.Apk
+import org.sireum.amandroid.security.TaintAnalysisModules
 
 class AmandroidSupervisorActor extends Actor with ActorLogging {
   private val decActor = context.actorOf(FromConfig.props(Props[DecompilerActor]), "DecompilerActor")
   private val apkInfoColActor = context.actorOf(FromConfig.props(Props[ApkInfoCollectActor]), "ApkInfoCollectorActor")
   private val ptaActor = context.actorOf(FromConfig.props(Props[PointsToAnalysisActor]), "PointsToAnalysisActor")
+  private val seActor = context.actorOf(FromConfig.props(Props[SecurityEngineActor]), "SecurityEngineActor")
   private val sendership: MMap[FileResourceUri, ActorRef] = mmapEmpty
   def receive: Receive = {
     case as: AnalysisSpec =>
@@ -49,6 +51,7 @@ class AmandroidSupervisorActor extends Actor with ActorLogging {
         case aicfr: ApkInfoCollectFailResult =>
           log.error(aicfr.e, "Infomation collect failed on " + aicfr.fileUri)
           sendership(aicfr.fileUri) ! aicfr
+          sendership -= aicfr.fileUri
       }
     case ptar: PointsToAnalysisResult =>
       ptar match {
@@ -60,6 +63,19 @@ class AmandroidSupervisorActor extends Actor with ActorLogging {
           log.error(ptfr.e, "Points to analysis failed on " + ptfr.fileUri)
       }
       sendership(ptar.fileUri) ! ptar
+      sendership -= ptar.fileUri
+    case sed: SecurityEngineData =>
+      sendership(sed.ptar.fileUri) = sender
+      seActor ! sed
+    case ser: SecurityEngineResult =>
+      ser match {
+        case sesr: SecurityEngineSuccResult =>
+          log.info("Security analysis success for " + sesr.fileUri)
+        case sefr: SecurityEngineFailResult =>
+          log.error(sefr.e, "Security analysis failed on " + sefr.fileUri)
+      }
+      sendership(ser.fileUri) ! ser
+      sendership -= ser.fileUri
   }
 }
 
@@ -70,25 +86,39 @@ class AmandroidSupervisorActorPrioMailbox(settings: ActorSystem.Settings, config
       case dr: DecompilerResult => 2
       case aicr: ApkInfoCollectResult => 1
       case ptar: PointsToAnalysisResult => 0
+      case sed: SecurityEngineData => 3
+      case ser: SecurityEngineResult => 0
       case otherwise => 4
     })
 
 object AmandroidTestApplication extends App {
   val _system = ActorSystem("AmandroidTestApplication", ConfigFactory.load)
   val supervisor = _system.actorOf(Props[AmandroidSupervisorActor], name = "AmandroidSupervisorActor")
-  val fileUris = FileUtil.listFiles(FileUtil.toUri("/Users/fgwei/Work/Source/fcapps"), ".apk", true)
-  val outputUri = FileUtil.toUri("/Users/fgwei/Work/output/fcapps")
+  val fileUris = FileUtil.listFiles(FileUtil.toUri(args(0)), ".apk", true)
+  val outputUri = FileUtil.toUri(args(1))
   val futures = fileUris map {
     fileUri =>
-      (supervisor.ask(AnalysisSpec(fileUri, outputUri, None, true, true))(6000 minutes)).mapTo[PointsToAnalysisResult].recover{
+      (supervisor.ask(AnalysisSpec(fileUri, outputUri, None, true, true))(600 minutes)).mapTo[PointsToAnalysisResult].recover{
         case ex: Exception => 
-            (fileUri, false)
+            PointsToAnalysisFailResult(fileUri, ex)
         }
   }
   val fseq = Future.sequence(futures)
+  val seFutures: MSet[Future[SecurityEngineResult]] = msetEmpty
   Await.result(fseq, Duration.Inf).foreach {
     dr =>
-      println(dr)
+      dr match {
+        case ptar: PointsToAnalysisResult with Success =>
+          seFutures += (supervisor.ask(SecurityEngineData(ptar, TaintAnalysisSpec(TaintAnalysisModules.DATA_LEAKAGE)))(10 minutes)).mapTo[SecurityEngineResult].recover{
+            case ex: Exception => 
+                SecurityEngineFailResult(ptar.fileUri, ex)
+            }
+        case _ =>
+      }
+  }
+  val sefseq = Future.sequence(seFutures)
+  Await.result(sefseq, Duration.Inf).foreach {
+    sr => println(sr)
   }
   _system.shutdown
 }

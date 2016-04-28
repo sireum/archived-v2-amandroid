@@ -46,6 +46,17 @@ object AndroidDataDependentTaintAnalysis {
       path.reverse.map(edge=> new InterproceduralDataDependenceAnalysis.Edge(edge.owner, edge.target, edge.source))
     }
     def isSame(tp: TaintPath[Node, InterproceduralDataDependenceAnalysis.Edge]): Boolean = getSource.isSame(tp.getSource) && getSink.isSame(tp.getSink)
+    def toTaintSimplePath: TaintSimplePath = {
+      val source: TaintDescriptor = getSource.descriptor
+      val sink: TaintDescriptor = getSink.descriptor
+      val path: IList[(TaintSimpleNode, TaintSimpleNode)] = getPath.map {
+        edge =>
+          val src = edge.source
+          val tar = edge.target
+          (TaintSimpleNode(src.getContext, src.getPosition), TaintSimpleNode(tar.getContext, tar.getPosition))
+      }
+      TaintSimplePath(source, sink, path)
+    }
     override def toString: String = {
       val sb = new StringBuilder
       sb.append("Taint path: ")
@@ -71,6 +82,7 @@ object AndroidDataDependentTaintAnalysis {
     def getSourceNodes: ISet[TaintSource[Node]] = tars.map(_.getSourceNodes).fold(isetEmpty)(_ ++ _)
     def getSinkNodes: ISet[TaintSink[Node]] = tars.map(_.getSinkNodes).fold(isetEmpty)(_ ++ _)
     def getTaintedPaths: ISet[TaintPath[Node, InterproceduralDataDependenceAnalysis.Edge]] = tars.map(_.getTaintedPaths).fold(isetEmpty)(_ ++ _)
+    
   }
   
   case class Tar(iddi: InterproceduralDataDependenceInfo) extends TaintAnalysisResult[Node, InterproceduralDataDependenceAnalysis.Edge] {
@@ -164,7 +176,6 @@ object AndroidDataDependentTaintAnalysis {
                 case Some(t) => iddg.addEdge(callArgNode.asInstanceOf[Node], t)
                 case None =>
               }
-              
             }
         }
     }
