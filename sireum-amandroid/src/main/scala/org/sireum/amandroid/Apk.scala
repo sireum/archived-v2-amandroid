@@ -23,6 +23,7 @@ import org.sireum.amandroid.parser.ComponentInfo
 import org.sireum.amandroid.parser.LayoutControl
 import org.sireum.amandroid.appInfo.ApkCertificate
 import org.sireum.jawa.Global
+import java.util.zip.ZipFile
 
 object Apk {
   def isValidApk(nameUri: FileResourceUri): Boolean = {
@@ -34,12 +35,11 @@ object Apk {
         var valid: Boolean = false
         var foundManifest: Boolean = false
         var foundDex: Boolean = false
-        var archive : ZipInputStream = null
+        val zipFile: ZipFile = new ZipFile(file)
         try {
-          archive = new ZipInputStream(new FileInputStream(file))
-          var entry: ZipEntry = null
-          entry = archive.getNextEntry()
-          while (entry != null) {
+          val entries = zipFile.entries()
+          while(entries.hasMoreElements()){
+            val entry = entries.nextElement()
             val entryName = entry.getName()
             if(entryName == "AndroidManifest.xml"){
               foundManifest = true
@@ -50,14 +50,12 @@ object Apk {
               valid = true
               throw new ValidApk
             }
-            entry = archive.getNextEntry()
           }
         } catch {
           case ie: InterruptedException => throw ie
           case e: Exception =>
         } finally {
-          if (archive != null)
-            archive.close()
+          zipFile.close()
         }
         valid
     }
@@ -118,11 +116,11 @@ case class Apk(nameUri: FileResourceUri, outApkUri: FileResourceUri, srcs: ISet[
   private val services: MSet[JawaType] = msetEmpty
   private val receivers: MSet[JawaType] = msetEmpty
   private val providers: MSet[JawaType] = msetEmpty
-	private val dynamicRegisteredReceivers: MSet[JawaType] = msetEmpty
-	
+  private val dynamicRegisteredReceivers: MSet[JawaType] = msetEmpty
+  
   private val rpcMethods: MMap[JawaType, MSet[Signature]] = mmapEmpty
   
-	def addActivity(activity: JawaType) = this.synchronized{this.activities += activity}
+  def addActivity(activity: JawaType) = this.synchronized{this.activities += activity}
   def addService(service: JawaType) = this.synchronized{this.services += service}
   def addReceiver(receiver: JawaType) = this.synchronized{this.receivers += receiver}
   def addProvider(provider: JawaType) = this.synchronized{this.providers += provider}
@@ -139,7 +137,7 @@ case class Apk(nameUri: FileResourceUri, outApkUri: FileResourceUri, srcs: ISet[
   def getRpcMethodMapping: IMap[JawaType, ISet[Signature]] = this.rpcMethods.map {
     case (k, vs) => k -> vs.toSet
   }.toMap
-	
+  
   def getComponentType(comp: JawaType): Option[AndroidConstants.CompType.Value] = {
     if(activities.contains(comp)) Some(AndroidConstants.CompType.ACTIVITY)
     else if(services.contains(comp)) Some(AndroidConstants.CompType.SERVICE)
@@ -148,7 +146,7 @@ case class Apk(nameUri: FileResourceUri, outApkUri: FileResourceUri, srcs: ISet[
     else None
   }
   
-	def setComponents(comps: ISet[(JawaType, ComponentType.Value)]) = this.synchronized{
+  def setComponents(comps: ISet[(JawaType, ComponentType.Value)]) = this.synchronized{
     comps.foreach{
       case (ac, typ) => 
         typ match {
@@ -163,43 +161,43 @@ case class Apk(nameUri: FileResourceUri, outApkUri: FileResourceUri, srcs: ISet[
         }
     }
   }
-	
-	def getComponents: ISet[JawaType] = (this.activities ++ this.services ++ this.receivers ++ this.providers).toSet
-	def getActivities: ISet[JawaType] = this.activities.toSet
+  
+  def getComponents: ISet[JawaType] = (this.activities ++ this.services ++ this.receivers ++ this.providers).toSet
+  def getActivities: ISet[JawaType] = this.activities.toSet
   def getServices: ISet[JawaType] = this.services.toSet
   def getReceivers: ISet[JawaType] = this.receivers.toSet
   def getProviders: ISet[JawaType] = this.providers.toSet
   
-	def addDynamicRegisteredReceiver(receiver: JawaType) = 
+  def addDynamicRegisteredReceiver(receiver: JawaType) = 
     this.synchronized{
       this.dynamicRegisteredReceivers += receiver
       this.receivers += receiver
     }
-	def addDynamicRegisteredReceivers(receivers: ISet[JawaType]) = 
+  def addDynamicRegisteredReceivers(receivers: ISet[JawaType]) = 
     this.synchronized{
       this.dynamicRegisteredReceivers ++= receivers
       this.receivers ++= receivers
     }
 
-	def getDynamicRegisteredReceivers: ISet[JawaType] = this.dynamicRegisteredReceivers.toSet
-	
-	private val uses_permissions: MSet[String] = msetEmpty
+  def getDynamicRegisteredReceivers: ISet[JawaType] = this.dynamicRegisteredReceivers.toSet
+  
+  private val uses_permissions: MSet[String] = msetEmpty
   private val callbackMethods: MMap[JawaType, MSet[Signature]] = mmapEmpty
   private val componentInfos: MSet[ComponentInfo] = msetEmpty
   private val layoutControls: MMap[Int, LayoutControl] = mmapEmpty
   private var appPackageName: String = null
   private val intentFdb: IntentFilterDataBase = new IntentFilterDataBase
   private var codeLineCounter: Int = 0
-	/**
+  /**
    * Map from record name to it's env method code.
    */
   protected val envProcMap: MMap[JawaType, (Signature, String)] = mmapEmpty
   
   def setCodeLineCounter(c: Int) = this.codeLineCounter = c
   def getCodeLineCounter: Int = this.codeLineCounter
-	def setIntentFilterDB(i: IntentFilterDataBase) = this.synchronized{this.intentFdb.reset.merge(i)}
-	def updateIntentFilterDB(i: IntentFilterDataBase) = this.synchronized{this.intentFdb.merge(i)}
-	def getIntentFilterDB = this.intentFdb
+  def setIntentFilterDB(i: IntentFilterDataBase) = this.synchronized{this.intentFdb.reset.merge(i)}
+  def updateIntentFilterDB(i: IntentFilterDataBase) = this.synchronized{this.intentFdb.merge(i)}
+  def getIntentFilterDB = this.intentFdb
   def setPackageName(pn: String) = this.appPackageName = pn
   def getPackageName: String = this.appPackageName
   def addUsesPermissions(ps: ISet[String]) = this.uses_permissions ++= ps
@@ -210,8 +208,8 @@ case class Apk(nameUri: FileResourceUri, outApkUri: FileResourceUri, srcs: ISet[
   def addCallbackMethods(typ: JawaType, sigs: ISet[Signature]) = this.callbackMethods.getOrElseUpdate(typ, msetEmpty) ++= sigs
   def addCallbackMethods(map: IMap[JawaType, ISet[Signature]]) = map.foreach {case (k, vs) => this.callbackMethods.getOrElseUpdate(k, msetEmpty) ++= vs}
   def getCallbackMethodMapping: IMap[JawaType, ISet[Signature]] = this.callbackMethods.map {
-	  case (k, vs) => k -> vs.toSet
-	}.toMap
+    case (k, vs) => k -> vs.toSet
+  }.toMap
   def getCallbackMethods: ISet[Signature] = if(!this.callbackMethods.isEmpty)this.callbackMethods.map(_._2.toSet).reduce(iunion[Signature]) else isetEmpty
   def addComponentInfo(ci: ComponentInfo) = this.componentInfos += ci
   def addComponentInfos(cis: ISet[ComponentInfo]) = this.componentInfos ++= cis
@@ -252,7 +250,7 @@ case class Apk(nameUri: FileResourceUri, outApkUri: FileResourceUri, srcs: ISet[
   }
 
   def hasEnv(typ: JawaType): Boolean = this.envProcMap.contains(typ)
-	
+  
   def reset = {
     this.activities.clear()
     this.services.clear()

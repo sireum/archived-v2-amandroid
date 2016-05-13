@@ -19,6 +19,8 @@ import brut.androlib.err.CantFindFrameworkResException
 import org.sireum.jawa.util.IgnoreException
 import org.sireum.jawa.util.MyFileUtil
 import org.sireum.amandroid.util.ApkFileUtil
+import brut.androlib.Androlib
+import brut.androlib.res.util.ExtFile
 
 object AmDecoder {
   final private val TITLE = "AmDecoder"
@@ -55,5 +57,17 @@ object AmDecoder {
         System.err.println(TITLE + ": " + e.getMessage + ". See apk-tool website for more info.")
     }
     FileUtil.toUri(outputDir)
+  }
+  
+  def decodeManifest(sourcePathUri: FileResourceUri, outputUri: FileResourceUri) = {
+    val apkFile = FileUtil.toFile(sourcePathUri)
+    val outputDir = FileUtil.toFile(outputUri)
+    val alib = new Androlib()
+    val decoder = new ApkDecoder(alib)
+    decoder.setDecodeSources(0x0000) // DECODE_SOURCES_NONE = 0x0000
+    decoder.setApkFile(apkFile)
+    decoder.setOutDir(outputDir)
+    decoder.setForceDelete(true)
+    alib.decodeManifestFull(new ExtFile(apkFile), outputDir, decoder.getResTable)
   }
 }

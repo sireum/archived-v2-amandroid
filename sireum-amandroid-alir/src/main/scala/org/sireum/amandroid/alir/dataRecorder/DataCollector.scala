@@ -31,6 +31,7 @@ import org.sireum.jawa.alir.interProcedural.InterProceduralNode
 import org.sireum.alir.AlirEdge
 import org.sireum.amandroid.parser.ComponentType
 import org.sireum.amandroid.alir.componentSummary.ApkYard
+import org.stringtemplate.v4.STGroupString
 
 /**
  * @author <a href="mailto:fgwei@k-state.edu">Fengguo Wei</a>
@@ -38,7 +39,7 @@ import org.sireum.amandroid.alir.componentSummary.ApkYard
  */ 
 object DataCollector {
   
-  private val template = new STGroupFile("org/sireum/amandroid/alir/resources/dataRecorder/AppData.stg")
+  private val template = new STGroupString(AppDataStg.stg)
   
   private def getIntentFilterStrings(intentFilters: ISet[IntentFilter]): ArrayList[String] = {
     val intFs: ArrayList[String] = new ArrayList[String]
