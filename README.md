@@ -1,7 +1,7 @@
 amandroid [![Gitter](https://badges.gitter.im/sireum/amandroid.svg)](https://gitter.im/sireum/amandroid?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) 
 ========================
 
-# This repo no longer maintained, please checkout out our new repo: https://github.com/arguslab/Argus-SAF
+# This repo no longer maintained, please checkout our new repo: https://github.com/arguslab/Argus-SAF
 
 This is official reporitory for the [Amandroid](http://amandroid.sireum.org/).
 
